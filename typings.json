@@ -1,0 +1,10 @@
+{
+  "globalDependencies": {
+    "github-electron": "registry:dt/github-electron#1.4.2+20161012142539",
+    "material-ui": "registry:dt/material-ui#0.16.0+20161019120356",
+    "node": "registry:dt/node#6.0.0+20161019125345",
+    "react": "registry:dt/react#0.14.0+20161008064207",
+    "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
+    "react-tap-event-plugin": "registry:dt/react-tap-event-plugin#0.0.0+20160602142434"
+  }
+}

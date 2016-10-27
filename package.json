@@ -1,0 +1,23 @@
+{
+  "name": "material-ui-cs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "pj",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^1.4.4",
+    "source-map-loader": "^0.1.5",
+    "ts-loader": "^0.9.5"
+  },
+  "dependencies": {
+    "material-ui": "^0.16.1",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "react-tap-event-plugin": "^1.0.0"
+  }
+}
