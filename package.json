@@ -9,7 +9,9 @@
   },
   "author": "pj",
   "license": "ISC",
-  "devDependencies": {},
+  "devDependencies": {
+    "electron": "^1.4.4"
+  },
   "dependencies": {
     "feng3d": "^1.0.7"
   }
