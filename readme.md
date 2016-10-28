@@ -1,7 +1,6 @@
 # feng3d-editor
 feng3d引擎编辑器
 编辑器UI基于[laybox](http://www.layabox.com/)开发。
-使用webpack打包
 
 ## 运行项目
 1. 安装npm依赖
