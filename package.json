@@ -1,5 +1,5 @@
 {
-  "name": "material-ui-cs",
+  "name": "feng3d-editor",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -9,16 +9,8 @@
   },
   "author": "pj",
   "license": "ISC",
-  "devDependencies": {
-    "electron": "^1.4.4",
-    "source-map-loader": "^0.1.5",
-    "ts-loader": "^0.9.5"
-  },
+  "devDependencies": {},
   "dependencies": {
-    "feng3d": "^1.0.7",
-    "material-ui": "^0.16.1",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2",
-    "react-tap-event-plugin": "^1.0.0"
+    "feng3d": "^1.0.7"
   }
 }

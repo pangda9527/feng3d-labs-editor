@@ -1,20 +1,12 @@
 # feng3d-editor
 feng3d引擎编辑器
-编辑器基于[react](https://github.com/facebook/react)、[material-ui](https://github.com/callemall/material-ui)开发。
+编辑器UI基于[laybox](http://www.layabox.com/)开发。
 使用webpack打包
 
 ## 运行项目
-1. 安装webpack
-
-    `cnpm install -g webpack`
-
 1. 安装npm依赖
 
     `cnpm install`
-    
-1. 链接TypeScript，允许ts-loader使用全局安装的TypeScript，而不需要单独的本地拷贝。
-
-    `npm link typescript`
 
 1. 打包编译项目
 
@@ -32,6 +24,3 @@ feng3d引擎编辑器
     * 本地应用方式
 
         `npm start`
-
-## 参考
-[React & Webpack](http://www.tslang.cn/docs/handbook/react-&-webpack.html)

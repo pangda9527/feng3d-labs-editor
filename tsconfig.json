@@ -1,10 +1,18 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
         "target": "es5",
-        "outDir": "build",
-        "jsx": "react",
         "noImplicitAny": false,
-        "sourceMap": true
-    }
+        "sourceMap": true,
+        "outFile": "bin/editor.js"
+    },
+    "files": [
+        "typings/index.d.ts",
+        "src/ui/layaUI.max.all.ts",
+        "src/ui/LayaUISample.ts",
+        "src/feng3d/ColorMaterialTest.ts",
+        "src/Editor.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }
