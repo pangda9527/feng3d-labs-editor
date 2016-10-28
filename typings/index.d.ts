@@ -4,3 +4,5 @@
 /// <reference path="globals/react-dom/index.d.ts" />
 /// <reference path="globals/react-tap-event-plugin/index.d.ts" />
 /// <reference path="globals/react/index.d.ts" />
+
+/// <reference path="../node_modules/feng3d/index.d.ts" />

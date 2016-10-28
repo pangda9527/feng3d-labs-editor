@@ -73,6 +73,9 @@ export default class Main extends React.Component<any, any> {
                         secondary={true}
                         onTouchTap={this.handleTouchTap}
                         />
+                    <canvas id="glcanvas" width="640" height="480">
+                        Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
+                    </canvas>
                 </div>
             </MuiThemeProvider>
         );

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { render } from 'react-dom';
+import ColorMaterialTest from './feng3d/ColorMaterialTest';
 
 import injectTapEventPlugin = require('react-tap-event-plugin');
 injectTapEventPlugin();
@@ -14,3 +15,4 @@ import Main from './Main'; // Our custom react component
 
 render(<Main />, document.getElementById('app'));
 
+new ColorMaterialTest();
