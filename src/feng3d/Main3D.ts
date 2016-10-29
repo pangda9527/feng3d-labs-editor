@@ -1,5 +1,5 @@
 module feng3d.editor {
-    export class ColorMaterialTest {
+    export class Main3D {
         view3D: feng3d.View3D;
         constructor() {
 
@@ -26,6 +26,8 @@ module feng3d.editor {
             setInterval(function () {
                 colorMaterial.color.color = Math.random() * (1 << 32 - 1);
             }, 1000);
+
+            this.view3D.scene.addChild(new GroundGrid().groundGridObject3D);
         }
     }
 }

@@ -1,6 +1,6 @@
 module feng3d.editor {
 
-    export class TestUI extends TestPageUI {
+    export class MainUI extends TestPageUI {
 
         constructor() {
             super();
