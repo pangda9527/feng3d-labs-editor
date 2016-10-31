@@ -1,5 +1,9 @@
 module feng3d.editor {
 
+    /**
+     * 编辑器UI入口
+     * @author feng 2016-10-29
+     */
     export class MainUI extends TestPageUI {
 
         constructor() {
@@ -35,7 +39,7 @@ module feng3d.editor {
             this.list.array = arr;
 
             //还可以自定义list渲染方式，可以打开下面注释看一下效果
-            //list.renderHandler = new Handler(this, onListRender);
+            this.list.renderHandler = new laya.utils.Handler(this, this.onListRender);
         }
 
         private onListRender(item: laya.ui.Box, index: number): void {
