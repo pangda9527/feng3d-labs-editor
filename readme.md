@@ -3,6 +3,10 @@ feng3d引擎编辑器
 编辑器UI基于[laybox](http://www.layabox.com/)开发。
 
 ## 运行项目
+1. 更新（下载）Submodule Update 
+
+    `git submodule update --init --recursive`
+
 1. 安装npm依赖
 
     `cnpm install`
