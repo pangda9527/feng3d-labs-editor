@@ -19,19 +19,16 @@ module feng3d.editor {
 
             //初始化颜色材质
             var colorMaterial = new feng3d.ColorMaterial();
-            var cube = new feng3d.Object3D("cube", [
-                feng3d.primitives.createCube(),
-                new feng3d.Space3D(0, 0, 300),
-                colorMaterial,
-            ]);
+            var cube = feng3d.$object3DFactory.createCube();
+            cube.transform.z = 300;
             this.view3D.scene.addChild(cube);
 
             //变化旋转与颜色
             setInterval(function () {
-                cube.space3D.ry += 1;
+                cube.transform.ry += 1;
             }, 15);
             setInterval(function () {
-                colorMaterial.color.color = Math.random() * (1 << 32 - 1);
+                colorMaterial.color.fromUnit(Math.random() * (1 << 32 - 1));
             }, 1000);
 
             this.view3D.scene.addChild(new GroundGrid().groundGridObject3D);
