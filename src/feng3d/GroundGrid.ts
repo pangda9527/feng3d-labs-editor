@@ -32,8 +32,10 @@ module feng3d.editor {
 
             segmentGeometry.removeAllSegments();
             for (var i = -halfNum; i <= halfNum; i++) {
-                segmentGeometry.addSegment(new Segment(new Vector3D(-halfNum * step, 0, i * step), new Vector3D(halfNum * step, 0, i * step)));
-                segmentGeometry.addSegment(new Segment(new Vector3D(i * step, 0, -halfNum * step), new Vector3D(i * step, 0, halfNum * step)));
+
+                var color = (i % 10) != 0 ? 0xFF757575 : 0x88757575;
+                segmentGeometry.addSegment(new Segment(new Vector3D(-halfNum * step, 0, i * step), new Vector3D(halfNum * step, 0, i * step), color, color));
+                segmentGeometry.addSegment(new Segment(new Vector3D(i * step, 0, -halfNum * step), new Vector3D(i * step, 0, halfNum * step), color, color));
             }
 
             return groundGridObject3D;
