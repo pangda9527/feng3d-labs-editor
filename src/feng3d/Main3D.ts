@@ -6,11 +6,40 @@ module feng3d.editor {
     */
     export class Main3D {
 
-        view3D: feng3d.View3D;
+        view3D: View3D;
+        controller: FPSController;
+        cameraObj: Object3D;
 
         constructor() {
 
             this.init();
+
+            this.cameraObj = new Object3D("camera");
+            this.cameraObj.transform.z = -500;
+            this.cameraObj.transform.lookAt(new Vector3D());
+            this.cameraObj.addComponent(this.view3D.camera);
+            //
+            this.controller = new FPSController();
+            //
+            $ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
+
+            $mouseKeyInput.addEventListener("mousedown", this.onMousedown, this);
+            $mouseKeyInput.addEventListener("mouseup", this.onMouseup, this);
+        }
+
+        private onMousedown() {
+
+            this.controller.target = this.cameraObj.transform;
+        }
+
+        private onMouseup() {
+
+            this.controller.target = null;
+        }
+
+        process(event: Event) {
+
+            this.controller.update();
         }
 
         init() {
@@ -32,6 +61,8 @@ module feng3d.editor {
             }, 1000);
 
             this.view3D.scene.addChild(new GroundGrid().groundGridObject3D);
+            this.view3D.scene.addChild(new Trident());
+
         }
     }
 }
