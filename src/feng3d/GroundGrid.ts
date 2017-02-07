@@ -20,7 +20,6 @@ module feng3d.editor {
 
             var groundGridObject3D = new Object3D("GroundGrid");
             groundGridObject3D.getOrCreateComponentByClass(MeshRenderer).material = new SegmentMaterial();
-            groundGridObject3D.transform.y = -50;
             var segmentGeometry = new SegmentGeometry();
             var geometry = groundGridObject3D.getOrCreateComponentByClass(Geometry);
             geometry.addComponent(segmentGeometry);

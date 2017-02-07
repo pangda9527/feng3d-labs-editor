@@ -48,7 +48,7 @@ module feng3d.editor {
 
             //初始化颜色材质
             var colorMaterial = new feng3d.ColorMaterial();
-            var cube = feng3d.$object3DFactory.createCube();
+            var cube = new CubeObject3D();
             cube.transform.z = 300;
             this.view3D.scene.addChild(cube);
 
