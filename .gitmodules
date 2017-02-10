@@ -2,3 +2,6 @@
 	path = feng3d
 	url = https://github.com/feng3dTS/feng3d-ts.git
 	branch = master
+[submodule "objectView"]
+	path = objectView
+	url = https://git.oschina.net/feng3d/ObjectView-ts.git

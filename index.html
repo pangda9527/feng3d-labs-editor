@@ -4,14 +4,15 @@
 <head>
 	<meta charset="UTF-8">
 	<title>feng3d-editor</title>
-	<!-- libraries -->
-	<script src="feng3d/out/feng3d.js"></script>
 
 	<!--核心包，封装了显示对象渲染，事件，时间管理，时间轴动画，缓动，消息交互,socket，本地存储，鼠标触摸，声音，加载，颜色滤镜，位图字体等-->
 	<script type="text/javascript" src="libs/laya.core.js"></script>
 	<!--提供了制作UI的各种组件实现-->
 	<script type="text/javascript" src="libs/laya.ui.js"></script>
 
+	<!-- libraries -->
+	<script src="feng3d/out/feng3d.js"></script>
+	<script src="objectview/out/objectview.js"></script>
 </head>
 
 <body>
@@ -22,8 +23,8 @@
     height:100%;
 ">
 		Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
-	</canvas>
-	<script src="bin/editor.js"></script>
+		</canvas>
+		<script src="bin/editor.js"></script>
 </body>
 
 </html>
