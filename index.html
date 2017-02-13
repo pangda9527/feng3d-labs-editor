@@ -13,7 +13,6 @@
 
     <style>
         html, body {
-            -ms-touch-action: none;
             background: #888888;
             padding: 0;
             border: 0;
@@ -24,17 +23,12 @@
 
 	<!--这个标签为通过egret提供的第三方库的方式生成的 javascript 文件。删除 modules_files 标签后，库文件加载列表将不会变化，请谨慎操作！-->
 	<!--modules_files_start-->
-	<script src="libs/modules/egret/egret.js" src-release="libs/modules/egret/egret.min.js"></script>
+	<script src="libs/modules/egret/egret.js" src-release="libs/modules/egret/egret.js"></script>
 	<script src="libs/modules/egret/egret.web.js" src-release="libs/modules/egret/egret.web.min.js"></script>
 	<script src="libs/modules/res/res.js" src-release="libs/modules/res/res.min.js"></script>
 	<script src="libs/modules/eui/eui.js" src-release="libs/modules/eui/eui.min.js"></script>
 	<script src="libs/modules/tween/tween.js" src-release="libs/modules/tween/tween.min.js"></script>
 	<!--modules_files_end-->
-
-	<!--核心包，封装了显示对象渲染，事件，时间管理，时间轴动画，缓动，消息交互,socket，本地存储，鼠标触摸，声音，加载，颜色滤镜，位图字体等-->
-	<script type="text/javascript" src="libs/laya.core.js"></script>
-	<!--提供了制作UI的各种组件实现-->
-	<script type="text/javascript" src="libs/laya.ui.js"></script>
 
 	<!-- libraries -->
 	<script src="feng3d/out/feng3d.js"></script>
@@ -60,8 +54,8 @@
 			data-orientation="auto"
 			data-scale-mode="showAll"
 			data-frame-rate="30"
-			data-content-width="640"
-			data-content-height="1136"
+			data-content-width="100%"
+			data-content-height="100%"
 			data-show-paint-rect="false"
 			data-multi-fingered="2"
 			data-show-fps="false" data-show-log="false"

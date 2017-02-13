@@ -8,21 +8,15 @@
     "files": [
         "typings/index.d.ts",
         //
-        "src/ui/TestPageUI.ts",
+        "src/ui/AssetAdapter.ts",
+        "src/ui/LoadingUI.ts",
         "src/ui/MainUI.ts",
+        "src/ui/ThemeAdapter.ts",
         //
         "src/feng3d/Main3D.ts",
         "src/feng3d/GroundGrid.ts",
         //
-        "src/AssetAdapter.ts",
-        "src/LoadingUI.ts",
-        "src/EMainUI.ts",
-        "src/ThemeAdapter.ts",
-        //
         "src/Editor.ts"
-
-
-        
     ],
     "exclude": [
         "node_modules"

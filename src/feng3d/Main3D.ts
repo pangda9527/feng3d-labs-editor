@@ -16,6 +16,7 @@ module feng3d.editor {
 
             this.cameraObj = new Object3D("camera");
             this.cameraObj.transform.z = -500;
+            this.cameraObj.transform.y = 300;
             this.cameraObj.transform.lookAt(new Vector3D());
             this.cameraObj.addComponent(this.view3D.camera);
             //
