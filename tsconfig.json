@@ -8,6 +8,13 @@
     "files": [
         "typings/index.d.ts",
         //
+        "src/ui/objectview/data/ObjectA.ts",
+        "src/ui/objectview/view/BooleanAttrView.ts",
+        "src/ui/objectview/view/CustomAttrView.ts",
+        "src/ui/objectview/view/CustomBlockView.ts",
+        "src/ui/objectview/view/CustomObjectView.ts",
+        "src/ui/objectview/ObjectViewTest.ts",
+        //
         "src/ui/AssetAdapter.ts",
         "src/ui/LoadingUI.ts",
         "src/ui/MainUI.ts",

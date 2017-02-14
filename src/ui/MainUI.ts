@@ -97,8 +97,10 @@ module feng3d.editor {
             if (this.isThemeLoadEnd && this.isResourceLoadEnd) {
                 this.startCreateScene();
 
-                var view = ObjectView.getObjectView({ a: 1, b: 2, c: 3, d: "abc" });
-                this.stage.addChild(view);
+                // var view = ObjectView.getObjectView({ a: 1, b: false, c: "abc" });
+                // this.stage.addChild(view);
+
+                this.stage.addChild(new ObjectViewTest());
             }
         }
         /**
