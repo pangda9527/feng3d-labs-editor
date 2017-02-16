@@ -4,19 +4,44 @@ module feng3d.editor {
 
 		public constructor() {
 			super();
+
+			ClassUtils.addClassNameSpace("feng3d.editor");
+			ClassUtils.addClassNameSpace("egret");
 			this.init();
 		}
 
 		public init() {
-			var box: egret.DisplayObjectContainer = new eui.Panel();
+
+			var box = new eui.Group();
+			var hLayout: eui.HorizontalLayout = new eui.HorizontalLayout();
+			hLayout.gap = 10;
+			hLayout.paddingTop = 30;
+			hLayout.horizontalAlign = egret.HorizontalAlign.CENTER;
+			box.layout = hLayout;
 			this.addChild(box);
-			var spriteConfig: ClassDefinition = ObjectViewConfig.instance.getClassConfig(egret.Sprite);
-			spriteConfig.getAttributeDefinition("accessibilityImplementation").block = "坐标";
-			spriteConfig.getAttributeDefinition("x").block = "坐标";
-			spriteConfig.getAttributeDefinition("y").block = "坐标";
-			spriteConfig.getAttributeDefinition("z").block = "坐标";
+
+			var attributeTypeDefinition: AttributeTypeDefinition = { type: ClassUtils.getQualifiedClassName(Boolean), component: ClassUtils.getQualifiedClassName(BooleanAttrView) };
+			$objectViewConfig.attributeDefaultViewClassByTypeVec[attributeTypeDefinition.type] = attributeTypeDefinition;
+
+			var view = ObjectView.getObjectView({ a: 1, b: false, c: "abc" });
+			box.addChild(view);
+
+			var spriteConfig: ClassDefinition = {
+				name: ClassUtils.getQualifiedClassName(egret.Sprite),
+				component: "",
+				componentParam: null,
+				attributeDefinitionVec: [
+					{ name: "accessibilityImplementation", block: "坐标" },
+					{ name: "x", block: "坐标" },
+					{ name: "y", block: "坐标" },
+					{ name: "z", block: "坐标" },
+				],
+				blockDefinitionVec: []
+			};
+			$objectViewConfig.classConfigVec[spriteConfig.name] = spriteConfig;
 			box.addChild(ObjectView.getObjectView(new egret.Sprite()));
-			spriteConfig.setCustomObjectViewClass(CustomObjectView);
+
+			spriteConfig.component = ClassUtils.getQualifiedClassName(CustomObjectView);
 			box.addChild(ObjectView.getObjectView(new egret.Sprite()));
 			var a: ObjectA = new ObjectA();
 			a["boo"] = true;
@@ -31,15 +56,16 @@ module feng3d.editor {
 			(<egret.DisplayObject><any>aView.getAttributeView("ry")).alpha = 0.2;
 			console.log(egret.getTimer() - t);
 			t = egret.getTimer();
-			var fullConfig: any = <any>ObjectViewConfig.instance;
+			var fullConfig: any = <any>$objectViewConfig;
 			var fullConfigStr: string = <any>JSON.stringify(fullConfig);
 			console.log(fullConfigStr);
 			var fullConfig1: any = <any>JSON.parse(fullConfigStr);
-			ObjectViewConfig.instance.clearConfig();
+			$objectViewConfig.attributeDefaultViewClassByTypeVec = {};
+			$objectViewConfig.classConfigVec = {};
 			box.addChild(ObjectView.getObjectView(a));
 			console.log(egret.getTimer() - t);
 			t = egret.getTimer();
-			ObjectViewConfig.instance.setConfig(fullConfig1);
+			$objectViewConfig = fullConfig1;
 			box.addChild(ObjectView.getObjectView(a));
 			console.log(egret.getTimer() - t);
 			t = egret.getTimer();
@@ -50,24 +76,35 @@ module feng3d.editor {
 		}
 
 		private initBlockConfig() {
-			var objectAConfig: ClassDefinition = ObjectViewConfig.instance.getClassConfig(ObjectA);
-			objectAConfig.getAttributeDefinition("x").block = "坐标";
-			objectAConfig.getAttributeDefinition("x").block = "坐标";
-			objectAConfig.getAttributeDefinition("y").block = "坐标";
-			objectAConfig.getAttributeDefinition("z").block = "坐标";
-			objectAConfig.getAttributeDefinition("rx").block = "旋转";
-			objectAConfig.getAttributeDefinition("ry").block = "旋转";
-			objectAConfig.getAttributeDefinition("rz").block = "旋转";
-			objectAConfig.getAttributeDefinition("sx").block = "缩放";
-			objectAConfig.getAttributeDefinition("sy").block = "缩放";
-			objectAConfig.getAttributeDefinition("sz").block = "缩放";
-			objectAConfig.getAttributeDefinition("custom").block = "缩放";
-			objectAConfig.getAttributeDefinition("a").block = "自定义块";
-			objectAConfig.getAttributeDefinition("b").block = "自定义块";
-			objectAConfig.getAttributeDefinition("custom").setComponent(CustomAttrView);
-			objectAConfig.getBlockDefinition("自定义块").setComponent(CustomBlockView);
-			ObjectViewConfig.instance.getAttributeDefaultViewClass(Boolean).setComponent(BooleanAttrView);
-		}
 
+			var classDefinition: ClassDefinition = {
+				name: ClassUtils.getQualifiedClassName(ObjectA),
+				component: "",
+				componentParam: null,
+				attributeDefinitionVec: [
+					{ name: "x", block: "坐标" },
+					{ name: "x", block: "坐标" },
+					{ name: "y", block: "坐标" },
+					{ name: "z", block: "坐标" },
+					{ name: "rx", block: "旋转" },
+					{ name: "ry", block: "旋转" },
+					{ name: "rz", block: "旋转" },
+					{ name: "sx", block: "缩放" },
+					{ name: "sy", block: "缩放" },
+					{ name: "sz", block: "缩放" },
+					{ name: "custom", block: "缩放", component: ClassUtils.getQualifiedClassName(CustomAttrView) },
+					{ name: "a", block: "自定义块" },
+					{ name: "b", block: "自定义块" },
+				],
+				blockDefinitionVec: [
+					{ name: "自定义块", component: ClassUtils.getQualifiedClassName(CustomBlockView) }
+				]
+			};
+
+			$objectViewConfig.classConfigVec[classDefinition.name] = classDefinition;
+
+			var attributeTypeDefinition = { type: ClassUtils.getQualifiedClassName(Boolean), component: ClassUtils.getQualifiedClassName(BooleanAttrView) };
+			$objectViewConfig.attributeDefaultViewClassByTypeVec[attributeTypeDefinition.type] = attributeTypeDefinition;
+		}
 	}
 }
