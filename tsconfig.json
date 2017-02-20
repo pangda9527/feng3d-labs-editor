@@ -22,6 +22,7 @@
         //
         "src/feng3d/Main3D.ts",
         "src/feng3d/GroundGrid.ts",
+        "src/feng3d/MousePickTest.ts",
         //
         "src/Editor.ts"
     ],

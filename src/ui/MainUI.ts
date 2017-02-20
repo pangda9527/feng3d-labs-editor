@@ -98,9 +98,16 @@ module feng3d.editor {
 
                 this.stage.setContentSize(window.innerWidth, window.innerHeight);
 
+                window.onresize = this.onresize.bind(this);
+
                 this.stage.addChild(new ObjectViewTest());
             }
         }
+
+        private onresize() {
+            this.stage.setContentSize(window.innerWidth, window.innerHeight);
+        }
+
         /**
          * 资源组加载出错
          *  The resource group loading failed

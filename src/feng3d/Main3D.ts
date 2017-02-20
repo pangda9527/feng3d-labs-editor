@@ -48,7 +48,6 @@ module feng3d.editor {
             this.view3D = new feng3d.View3D(canvas);
 
             //初始化颜色材质
-            var colorMaterial = new feng3d.ColorMaterial();
             var cube = new CubeObject3D();
             cube.transform.z = 300;
             this.view3D.scene.addChild(cube);
@@ -57,13 +56,11 @@ module feng3d.editor {
             setInterval(function () {
                 cube.transform.ry += 1;
             }, 15);
-            setInterval(function () {
-                colorMaterial.color.fromUnit(Math.random() * (1 << 32 - 1));
-            }, 1000);
 
             this.view3D.scene.addChild(new GroundGrid().groundGridObject3D);
             this.view3D.scene.addChild(new Trident());
 
+            new MousePickTest(this.view3D.scene);
         }
     }
 }
