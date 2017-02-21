@@ -3,11 +3,7 @@
     <e:Image source="on_png"
              source.up="off_png"
              source.down="off_png"
-             source.disabled="off_png"/>
+             source.disabled="off_png" height="20" width="45"/>
     <e:Image source="handle_png"
-             horizontalCenter="-18"
-             horizontalCenter.upAndSelected="18"
-             horizontalCenter.downAndSelected="18"
-             horizontalCenter.disabledAndSelected="18"
-             verticalCenter="0"/>
+             verticalCenter="0" width="18" height="18" right.disabledAndSelected="0" right.downAndSelected="0" right.upAndSelected="0" left.disabled="0" left.down="0" left.up="0"/>
 </e:Skin>

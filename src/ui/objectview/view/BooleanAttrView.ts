@@ -1,9 +1,9 @@
 module feng3d.editor {
-	export class BooleanAttrView extends egret.Sprite implements feng3d.IObjectAttributeView {
+	export class BooleanAttrView extends eui.Group implements feng3d.IObjectAttributeView {
 		private _space: any;
 		private _attributeName: string;
 		private _attributeType: string;
-		private label: egret.TextField;
+		private label: eui.Label;
 		private checkBox: eui.CheckBox;
 
 		public constructor(attributeViewInfo: feng3d.AttributeViewInfo) {
@@ -11,7 +11,7 @@ module feng3d.editor {
 			this._space = attributeViewInfo["owner"];
 			this._attributeName = attributeViewInfo["name"];
 			this._attributeType = attributeViewInfo["type"];
-			this.label = new egret.TextField();
+			this.label = new eui.Label();
 			this.label.width = 100;
 			this.label.height = 20;
 			this.addChild(this.label);
@@ -20,8 +20,6 @@ module feng3d.editor {
 			this.checkBox.y = 5;
 			this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
 			this.addChild(this.checkBox);
-			this.graphics.beginFill(0x999999);
-			this.graphics.drawRect(0, 0, 200, 24);
 			this.label.text = this._attributeName;
 			this.updateView();
 		}

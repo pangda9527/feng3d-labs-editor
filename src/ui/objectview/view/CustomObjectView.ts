@@ -1,13 +1,12 @@
 module feng3d {
 
-	export class CustomObjectView extends egret.Sprite implements IObjectView {
+	export class CustomObjectView extends eui.Group implements IObjectView {
 		private _space: any;
 
 		public constructor(objectViewInfo: ObjectViewInfo) {
 			super();
 			this._space = objectViewInfo.owner;
-			var label: egret.TextField;
-			label = new egret.TextField();
+			var label = new eui.Label();
 			label.text = "自定义对象界面_" + egret.getQualifiedClassName(this._space);
 			label.textColor = 0xff00ff;
 			label.width = 100;

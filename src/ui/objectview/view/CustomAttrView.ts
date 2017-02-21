@@ -1,18 +1,17 @@
 module feng3d.editor {
 
-	export class CustomAttrView extends egret.Sprite implements IObjectAttributeView {
+	export class CustomAttrView extends eui.Group implements IObjectAttributeView {
 		private _space: any;
 		private _attributeName: string;
 		private _attributeType: string;
-		private label: egret.TextField;
+		private label: eui.Group;
 
 		public constructor(attributeViewInfo: AttributeViewInfo) {
 			super();
 			this._space = attributeViewInfo["owner"];
 			this._attributeName = attributeViewInfo["name"];
 			this._attributeType = attributeViewInfo["type"];
-			var label: egret.TextField;
-			label = new egret.TextField();
+			var label = new eui.Label();
 			label.text = "自定义属性界面_" + this._attributeName;
 			label.textColor = 0xffff00;
 			label.width = 100;

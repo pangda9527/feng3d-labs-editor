@@ -8,9 +8,9 @@
                  source="radiobutton_unselect_png"
                  source.upAndSelected="radiobutton_select_up_png"
                  source.downAndSelected="radiobutton_select_down_png"
-                 source.disabledAndSelected="radiobutton_select_disabled_png"/>
-        <e:Label id="labelDisplay" size="20" textColor="0x707070"
+                 source.disabledAndSelected="radiobutton_select_disabled_png" width="20" height="20"/>
+        <e:Label id="labelDisplay" size="12" textColor="0x707070"
                  textAlign="center" verticalAlign="middle"
-                 fontFamily="Tahoma"/>
+                 fontFamily="Tahoma" text=""/>
     </e:Group>
 </e:Skin>

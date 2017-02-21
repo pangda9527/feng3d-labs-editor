@@ -100,6 +100,8 @@ module feng3d.editor {
 
                 window.onresize = this.onresize.bind(this);
 
+                egret.TextField.default_size = 12;
+
                 this.stage.addChild(new ObjectViewTest());
             }
         }
