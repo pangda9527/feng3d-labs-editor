@@ -1,11 +1,14 @@
-module feng3d.editor {
+module feng3d.editor
+{
 
     /**
      * 操作方式:鼠标按下后可以使用移动鼠标改变旋转，wasdqe平移
      */
-    export class MousePickTest {
+    export class MousePickTest
+    {
 
-        constructor(scene3D: Scene3D) {
+        constructor(scene3D: Scene3D)
+        {
 
             var cube = new CubeObject3D();
             cube.transform.position = new Vector3D(0, 0, 0);
@@ -31,11 +34,14 @@ module feng3d.editor {
             scene3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
         }
 
-        onMouseClick(event: Event) {
-
+        onMouseClick(event: Event)
+        {
             var object3D: Object3D = <Object3D>event.target;
-            var material = object3D.getComponentByClass(MeshRenderer).material = new ColorMaterial();
-            material.color.fromUnit(Math.random() * (1 << 24));
+            var material = ClassUtils.as(object3D.getComponentByClass(MeshRenderer).material, ColorMaterial);
+            if (material)
+            {
+                material.color.fromUnit(Math.random() * (1 << 24));
+            }
         }
     }
 }

@@ -102,7 +102,9 @@ module feng3d.editor {
 
                 egret.TextField.default_size = 12;
 
-                this.stage.addChild(new ObjectViewTest());
+                this.stage.addChild(new CustomView());
+
+                // this.stage.addChild(new ObjectViewTest());
             }
         }
 

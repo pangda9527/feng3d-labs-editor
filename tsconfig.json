@@ -20,6 +20,8 @@
         "src/ui/MainUI.ts",
         "src/ui/ThemeAdapter.ts",
         //
+        "src/ui/view/CustomView.ts",
+        //
         "src/feng3d/Main3D.ts",
         "src/feng3d/GroundGrid.ts",
         "src/feng3d/MousePickTest.ts",

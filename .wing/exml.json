@@ -1,0 +1,12 @@
+{
+    "15a5ffac1ae": {
+        "path": "..\\resource\\view\\TTT.ts",
+        "class": "TTT",
+        "parentPath": ""
+    },
+    "15a5ffee890": {
+        "path": "ui\\view\\CustomView.ts",
+        "class": "CustomView",
+        "parentPath": ""
+    }
+}

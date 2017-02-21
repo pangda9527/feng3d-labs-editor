@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="CustomViewSkin" width="400" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:feng3d="feng3d.*" xmlns:editor="feng3d.editor.*" >
+	<w:Config id="15a5ffee890" ></w:Config>
+	<e:CheckBox id="xx" label="CheckBox" x="41" y="24"/>
+	<e:Button id="aa" label="Button" x="170" y="23"/>
+	<e:EditableText id="jj" width="100" height="100" text="Label" x="64" y="77"/>
+	<e:TextInput id="ss" width="20" height="20" x="235" y="61"/>
+	<e:ToggleSwitch id="dd" label="ToggleButton" x="203" y="131"/>
+	<e:ToggleButton id="zz" label="ToggleButton" x="56" y="173"/>
+</e:Skin>
