@@ -1,8 +1,11 @@
-module feng3d.editor {
+module feng3d.editor
+{
 
-	export class ObjectViewTest extends egret.Sprite {
+	export class ObjectViewTest extends egret.Sprite
+	{
 
-		public constructor() {
+		public constructor()
+		{
 			super();
 
 			ClassUtils.addClassNameSpace("feng3d.editor");
@@ -10,7 +13,17 @@ module feng3d.editor {
 			this.init();
 		}
 
-		public init() {
+		public init()
+		{
+			$objectViewConfig = {
+
+				defaultBaseObjectViewClass: ClassUtils.getQualifiedClassName(DefaultBaseObjectView),
+				defaultObjectViewClass: ClassUtils.getQualifiedClassName(DefaultObjectView),
+				defaultObjectAttributeViewClass: ClassUtils.getQualifiedClassName(DefaultObjectAttributeView),
+				defaultObjectAttributeBlockView: ClassUtils.getQualifiedClassName(DefaultObjectBlockView),
+				attributeDefaultViewClassByTypeVec: {},
+				classConfigVec: {}
+			};
 
 			var box = new eui.Group();
 			var hLayout: eui.HorizontalLayout = new eui.HorizontalLayout();
@@ -69,11 +82,14 @@ module feng3d.editor {
 			t = egret.getTimer();
 		}
 
-		protected onValueChange(event: ObjectViewEvent) {
+		protected onValueChange(event: ObjectViewEvent)
+		{
 			console.log(event["toString"]());
 		}
 
-		private initBlockConfig() {
+		private initBlockConfig()
+		{
+
 
 			var classDefinition: ClassDefinition = {
 				name: ClassUtils.getQualifiedClassName(ObjectA),

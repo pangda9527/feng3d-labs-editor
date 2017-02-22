@@ -8,12 +8,19 @@
     "files": [
         "typings/index.d.ts",
         //
-        "src/ui/objectview/data/ObjectA.ts",
-        "src/ui/objectview/view/BooleanAttrView.ts",
-        "src/ui/objectview/view/CustomAttrView.ts",
-        "src/ui/objectview/view/CustomBlockView.ts",
-        "src/ui/objectview/view/CustomObjectView.ts",
-        "src/ui/objectview/ObjectViewTest.ts",
+        "src/objectview/data/ObjectA.ts",
+        //
+        "src/objectview/view/DefaultBaseObjectView.ts",
+        "src/objectview/view/DefaultObjectAttributeView.ts",
+        "src/objectview/view/DefaultObjectBlockView.ts",
+        "src/objectview/view/DefaultObjectView.ts",
+        "src/objectview/view/BooleanAttrView.ts",
+        "src/objectview/view/CustomAttrView.ts",
+        "src/objectview/view/CustomBlockView.ts",
+        "src/objectview/view/CustomObjectView.ts",
+        "src/objectview/ObjectViewTest.ts",
+        //
+        "src/objectview/events/ObjectViewEvent.ts",
         //
         "src/ui/AssetAdapter.ts",
         "src/ui/LoadingUI.ts",
