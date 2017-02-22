@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="DefaultObjectAttributeView" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+	<e:Label id="label" text="" size="12" width="100" height="20" y="0"/>
+	<e:TextInput id="text" width="100" height="20" x="100" y="0"/>
+</e:Skin>

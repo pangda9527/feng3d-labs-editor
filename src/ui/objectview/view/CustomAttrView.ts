@@ -1,44 +1,56 @@
-module feng3d.editor {
+module feng3d.editor
+{
 
-	export class CustomAttrView extends eui.Group implements IObjectAttributeView {
+	export class CustomAttrView extends eui.Component implements IObjectAttributeView
+	{
 		private _space: any;
 		private _attributeName: string;
 		private _attributeType: string;
-		private label: eui.Group;
+		public label: eui.Label;
 
-		public constructor(attributeViewInfo: AttributeViewInfo) {
+		public constructor(attributeViewInfo: AttributeViewInfo)
+		{
 			super();
-			this._space = attributeViewInfo["owner"];
-			this._attributeName = attributeViewInfo["name"];
-			this._attributeType = attributeViewInfo["type"];
-			var label = new eui.Label();
-			label.text = "自定义属性界面_" + this._attributeName;
-			label.textColor = 0xffff00;
-			label.width = 100;
-			label.wordWrap = true;
-			this.addChild(label);
+
+			this._space = attributeViewInfo.owner;
+			this._attributeName = attributeViewInfo.name;
+			this._attributeType = attributeViewInfo.type;
+			
+			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.skinName = "resource/custom_skins/CustomAttrView.exml";
+		}
+
+		private onComplete()
+		{
+			this.label.text = "自定义属性界面_" + this._attributeName;
 			this.updateView();
 		}
 
-		public get space(): any {
+		public get space(): any
+		{
 			return this._space;
 		}
 
-		public set space(value: any) {
+		public set space(value: any)
+		{
 			this._space = value;
 			this.updateView();
 		}
 
-		public get attributeName(): string {
+		public get attributeName(): string
+		{
 			return this._attributeName;
 		}
 
-		public get attributeValue(): any {
+		public get attributeValue(): any
+		{
 			return this._space[this._attributeName];
 		}
 
-		public set attributeValue(value: any) {
-			if (this._space[this._attributeName] != value) {
+		public set attributeValue(value: any)
+		{
+			if (this._space[this._attributeName] != value)
+			{
 				this._space[this._attributeName] = value;
 				var objectViewEvent: ObjectViewEvent = <any>new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
 				objectViewEvent.space = this._space;
@@ -48,7 +60,8 @@ module feng3d.editor {
 			}
 		}
 
-		public updateView() {
+		public updateView()
+		{
 		}
 
 	}

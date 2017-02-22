@@ -1,12 +1,20 @@
 {
-    "15a5ffac1ae": {
-        "path": "..\\resource\\view\\TTT.ts",
-        "class": "TTT",
-        "parentPath": ""
-    },
-    "15a5ffee890": {
-        "path": "ui\\view\\CustomView.ts",
-        "class": "CustomView",
-        "parentPath": ""
-    }
+  "15a5ffac1ae": {
+    "path": "..\\resource\\view\\TTT.ts",
+    "class": "TTT",
+    "parentPath": ""
+  },
+  "15a5ffee890": {
+    "path": "ui\\view\\CustomView.ts",
+    "class": "CustomView",
+    "parentPath": "",
+    "bindingDataTestObj": []
+  },
+  "global": {
+    "globalBindingDataTestObj": [],
+    "globalAutoLayerMarkEnable": true
+  },
+  "15a64cb93c1": {
+    "bindingDataTestObj": []
+  }
 }

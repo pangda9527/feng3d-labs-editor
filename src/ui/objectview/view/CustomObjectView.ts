@@ -1,37 +1,48 @@
-module feng3d {
+module feng3d
+{
 
-	export class CustomObjectView extends eui.Group implements IObjectView {
+	export class CustomObjectView extends eui.Component implements IObjectView
+	{
 		private _space: any;
+		public label: eui.Label;
 
-		public constructor(objectViewInfo: ObjectViewInfo) {
+		public constructor(objectViewInfo: ObjectViewInfo)
+		{
 			super();
 			this._space = objectViewInfo.owner;
-			var label = new eui.Label();
-			label.text = "自定义对象界面_" + egret.getQualifiedClassName(this._space);
-			label.textColor = 0xff00ff;
-			label.width = 100;
-			label.wordWrap = true;
-			this.addChild(label);
+
+			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.skinName = "resource/custom_skins/CustomObjectView.exml";
+		}
+
+		private onComplete()
+		{
+			this.label.text = "自定义对象界面_" + egret.getQualifiedClassName(this._space);
 			this.updateView();
 		}
 
-		public get space(): any {
+		public get space(): any
+		{
 			return this._space;
 		}
 
-		public set space(value: any) {
+		public set space(value: any)
+		{
 			this._space = value;
 			this.updateView();
 		}
 
-		public updateView() {
+		public updateView()
+		{
 		}
 
-		public getAttributeView(attributeName: string): IObjectAttributeView {
+		public getAttributeView(attributeName: string): IObjectAttributeView
+		{
 			return null;
 		}
 
-		public getblockView(blockName: string): IObjectBlockView {
+		public getblockView(blockName: string): IObjectBlockView
+		{
 			return null;
 		}
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="DefaultObjectBlockView" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+	<w:Config id="15a64cb93c1"/>
+	<e:Group id="group" width="200" scaleX="1" scaleY="1">
+		<e:layout>
+		<e:VerticalLayout horizontalAlign="left" gap="10"/>
+		</e:layout>
+		<e:Label id="blockTitle" text="" x="0" y="-30" size="14" textColor="0xff0000" height="20" width="200" scaleX="1" scaleY="1"/>
+	</e:Group>
+</e:Skin>

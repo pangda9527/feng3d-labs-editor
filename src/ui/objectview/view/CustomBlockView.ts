@@ -1,39 +1,49 @@
-module feng3d.editor {
-	export class CustomBlockView extends eui.Group implements IObjectBlockView {
+module feng3d.editor
+{
+	export class CustomBlockView extends eui.Component implements IObjectBlockView
+	{
 		private _space: any;
 		private _blockName: string;
+		public label: eui.Label;
 
-		public constructor(blockViewInfo: BlockViewInfo) {
+		public constructor(blockViewInfo: BlockViewInfo)
+		{
 			super();
-			var _self__: any = this;
-			this._blockName = blockViewInfo["name"];
-			this._space = blockViewInfo["owner"];
-			var label = new eui.Label();
-			label.text = "自定义块界面_(blockName:" + this._blockName + ")";
-			label.textColor = 0xff00ff;
-			label.width = 100;
-			label.wordWrap = true;
-			_self__.addChild(label);
+			this._blockName = blockViewInfo.name;
+			this._space = blockViewInfo.owner;
+
+			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.skinName = "resource/custom_skins/CustomBlockView.exml";
+		}
+
+		private onComplete()
+		{
+			this.label.text = "自定义块界面_(blockName:" + this._blockName + ")";
 			this.updateView();
 		}
 
-		public get space(): any {
+		public get space(): any
+		{
 			return this._space;
 		}
 
-		public set space(value: any) {
+		public set space(value: any)
+		{
 			this._space = value;
 			this.updateView();
 		}
 
-		public get blockName(): string {
+		public get blockName(): string
+		{
 			return this._blockName;
 		}
 
-		public updateView() {
+		public updateView()
+		{
 		}
 
-		public getAttributeView(attributeName: string): IObjectAttributeView {
+		public getAttributeView(attributeName: string): IObjectAttributeView
+		{
 			return null;
 		}
 

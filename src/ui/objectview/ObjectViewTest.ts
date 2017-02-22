@@ -52,8 +52,6 @@ module feng3d.editor {
 			var aView: DefaultObjectView = <any>ObjectView.getObjectView(a);
 			aView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.onValueChange, this);
 			box.addChild(aView);
-			(<egret.DisplayObject><any>aView.getblockView("坐标")).alpha = 0.5;
-			(<egret.DisplayObject><any>aView.getAttributeView("ry")).alpha = 0.2;
 			console.log(egret.getTimer() - t);
 			t = egret.getTimer();
 			var fullConfig: any = <any>$objectViewConfig;
