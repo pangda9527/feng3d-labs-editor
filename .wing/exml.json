@@ -1,20 +1,42 @@
 {
-  "15a5ffac1ae": {
-    "path": "..\\resource\\view\\TTT.ts",
-    "class": "TTT",
-    "parentPath": ""
-  },
-  "15a5ffee890": {
-    "path": "ui\\view\\CustomView.ts",
-    "class": "CustomView",
-    "parentPath": "",
-    "bindingDataTestObj": []
-  },
-  "global": {
-    "globalBindingDataTestObj": [],
-    "globalAutoLayerMarkEnable": true
-  },
-  "15a64cb93c1": {
-    "bindingDataTestObj": []
-  }
+    "15a5ffac1ae": {
+        "path": "..\\resource\\view\\TTT.ts",
+        "class": "TTT",
+        "parentPath": ""
+    },
+    "15a5ffee890": {
+        "path": "ui\\view\\CustomView.ts",
+        "class": "CustomView",
+        "parentPath": "",
+        "bindingDataTestObj": []
+    },
+    "global": {
+        "globalBindingDataTestObj": [],
+        "globalAutoLayerMarkEnable": true,
+        "gridColor": 15011856,
+        "gridEnabled": false,
+        "gridSize": 20,
+        "globalRulerEnable": true,
+        "globalAdsorbEnable": true
+    },
+    "15a64cb93c1": {
+        "bindingDataTestObj": []
+    },
+    "15a6521014b": {
+        "path": "ui\\customcomponents\\Transform.ts",
+        "class": "Transform",
+        "parentPath": "",
+        "bindingDataTestObj": [],
+        "guideLinesEnabled": false
+    },
+    "15a6adcd3c5": {
+        "path": "ui\\components\\Vector3DView.ts",
+        "class": "Vector3DView",
+        "parentPath": ""
+    },
+    "15a6ae1c5b4": {
+        "path": "objectview\\oav\\OAVVector3D.ts",
+        "class": "OAVVector3D",
+        "parentPath": ""
+    }
 }

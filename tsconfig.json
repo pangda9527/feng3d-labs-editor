@@ -22,6 +22,11 @@
         //
         "src/objectview/events/ObjectViewEvent.ts",
         //
+        "src/objectview/oav/OAVVector3D.ts",
+        "src/objectview/oav/OAVTransform.ts",
+        //
+        "src/ui/components/Vector3DView.ts",
+        //
         "src/ui/AssetAdapter.ts",
         "src/ui/LoadingUI.ts",
         "src/ui/MainUI.ts",
