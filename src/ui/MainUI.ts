@@ -104,7 +104,14 @@ module feng3d.editor {
 
                 // this.stage.addChild(new CustomView());
 
-                this.stage.addChild(new ObjectViewTest());
+                // this.stage.addChild(new ObjectViewTest());
+
+                // this.stage.addChild(new OAVTransform());
+
+                // v = new Vector3DView();
+                v = new OAVTransform();
+
+                this.stage.addChild(v);
             }
         }
 
@@ -141,3 +148,5 @@ module feng3d.editor {
         }
     }
 }
+
+var v;

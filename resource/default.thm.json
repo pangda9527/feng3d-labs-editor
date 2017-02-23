@@ -12,7 +12,10 @@
         "eui.ToggleSwitch": "resource/eui_skins/ToggleSwitchSkin.exml",
         "eui.VScrollBar": "resource/eui_skins/VScrollBarSkin.exml",
         "eui.VSlider": "resource/eui_skins/VSliderSkin.exml",
-        "eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml"
+        "eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml",
+        "feng3d.editor.OAVTransform": "resource/custom_skins/OAVTransformSKin.exml",
+        "feng3d.editor.Vector3DView": "resource/custom_skins/Vector3DViewSkin.exml",
+        "feng3d.editor.OAVVector3D": "resource/custom_skins/OAVVector3DSkin.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [
@@ -28,6 +31,10 @@
         "resource/eui_skins/TextInputSkin.exml",
         "resource/eui_skins/ToggleSwitchSkin.exml",
         "resource/eui_skins/VScrollBarSkin.exml",
-        "resource/eui_skins/VSliderSkin.exml"
+        "resource/eui_skins/VSliderSkin.exml",
+        
+        "resource/custom_skins/Vector3DViewSkin.exml",
+        "resource/custom_skins/OAVVector3DSkin.exml",
+        "resource/custom_skins/OAVTransformSKin.exml"
     ]
 }
