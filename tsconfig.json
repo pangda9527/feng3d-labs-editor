@@ -19,6 +19,7 @@
         "src/objectview/view/CustomBlockView.ts",
         "src/objectview/view/CustomObjectView.ts",
         "src/objectview/ObjectViewTest.ts",
+        "src/objectview/EditorObjectView.ts",
         //
         "src/objectview/events/ObjectViewEvent.ts",
         //

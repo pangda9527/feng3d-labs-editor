@@ -27,15 +27,18 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-module feng3d.editor {
+module feng3d.editor
+{
 
-    export class MainUI extends eui.UILayer {
+    export class MainUI extends eui.UILayer
+    {
         /**
          * 加载进度界面
          * loading process interface
          */
         private loadingView: LoadingUI;
-        protected createChildren(): void {
+        protected createChildren(): void
+        {
             super.createChildren();
             //inject the custom material parser
             //注入自定义的素材解析器
@@ -55,7 +58,8 @@ module feng3d.editor {
          * 配置文件加载完成,开始预加载皮肤主题资源和preload资源组。
          * Loading of configuration file is complete, start to pre-load the theme configuration file and the preload resource group
          */
-        private onConfigComplete(event: RES.ResourceEvent): void {
+        private onConfigComplete(event: RES.ResourceEvent): void
+        {
             RES.removeEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
             // load skin theme configuration file, you can manually modify the file. And replace the default skin.
             //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
@@ -73,7 +77,8 @@ module feng3d.editor {
          * 主题文件加载完成,开始预加载
          * Loading of theme configuration file is complete, start to pre-load the 
          */
-        private onThemeLoadComplete(): void {
+        private onThemeLoadComplete(): void
+        {
             this.isThemeLoadEnd = true;
             this.createScene();
         }
@@ -82,8 +87,10 @@ module feng3d.editor {
          * preload资源组加载完成
          * preload resource group is loaded
          */
-        private onResourceLoadComplete(event: RES.ResourceEvent): void {
-            if (event.groupName == "preload") {
+        private onResourceLoadComplete(event: RES.ResourceEvent): void
+        {
+            if (event.groupName == "preload")
+            {
                 this.stage.removeChild(this.loadingView);
                 RES.removeEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
                 RES.removeEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
@@ -93,14 +100,14 @@ module feng3d.editor {
                 this.createScene();
             }
         }
-        private createScene() {
-            if (this.isThemeLoadEnd && this.isResourceLoadEnd) {
+        private createScene()
+        {
+            if (this.isThemeLoadEnd && this.isResourceLoadEnd)
+            {
 
                 this.stage.setContentSize(window.innerWidth, window.innerHeight);
 
                 window.onresize = this.onresize.bind(this);
-
-                egret.TextField.default_size = 12;
 
                 // this.stage.addChild(new CustomView());
 
@@ -109,13 +116,26 @@ module feng3d.editor {
                 // this.stage.addChild(new OAVTransform());
 
                 // v = new Vector3DView();
-                v = new OAVTransform();
+                // v = new OAVTransform();
 
-                this.stage.addChild(v);
+                // this.stage.addChild(v);
+
+                var box = new eui.Group();
+                var hLayout: eui.HorizontalLayout = new eui.HorizontalLayout();
+                hLayout.gap = 10;
+                hLayout.paddingTop = 30;
+                hLayout.horizontalAlign = egret.HorizontalAlign.CENTER;
+                box.layout = hLayout;
+                this.addChild(box);
+
+                box.addChild(ObjectView.getObjectView(new ObjectA()));
+                box.addChild(ObjectView.getObjectView(new egret.Sprite()));
+
             }
         }
 
-        private onresize() {
+        private onresize()
+        {
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
         }
 
@@ -123,14 +143,16 @@ module feng3d.editor {
          * 资源组加载出错
          *  The resource group loading failed
          */
-        private onItemLoadError(event: RES.ResourceEvent): void {
+        private onItemLoadError(event: RES.ResourceEvent): void
+        {
             console.warn("Url:" + event.resItem.url + " has failed to load");
         }
         /**
          * 资源组加载出错
          * Resource group loading failed
          */
-        private onResourceLoadError(event: RES.ResourceEvent): void {
+        private onResourceLoadError(event: RES.ResourceEvent): void
+        {
             //TODO
             console.warn("Group:" + event.groupName + " has failed to load");
             //忽略加载失败的项目
@@ -141,8 +163,10 @@ module feng3d.editor {
          * preload资源组加载进度
          * loading process of preload resource
          */
-        private onResourceProgress(event: RES.ResourceEvent): void {
-            if (event.groupName == "preload") {
+        private onResourceProgress(event: RES.ResourceEvent): void
+        {
+            if (event.groupName == "preload")
+            {
                 this.loadingView.setProgress(event.itemsLoaded, event.itemsTotal);
             }
         }

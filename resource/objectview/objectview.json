@@ -1,0 +1,109 @@
+{
+    "defaultBaseObjectViewClass": "feng3d.DefaultBaseObjectView",
+    "defaultObjectViewClass": "feng3d.DefaultObjectView",
+    "defaultObjectAttributeViewClass": "feng3d.DefaultObjectAttributeView",
+    "defaultObjectAttributeBlockView": "feng3d.DefaultObjectBlockView",
+    "attributeDefaultViewClassByTypeVec": {
+        "Boolean": {
+            "type": "Boolean",
+            "component": "feng3d.editor.BooleanAttrView"
+        }
+    },
+    "classConfigVec": {
+        "egret.Sprite": {
+            "name": "egret.Sprite",
+            "component": "",
+            "componentParam": null,
+            "attributeDefinitionVec": [
+                {
+                    "name": "accessibilityImplementation",
+                    "block": "坐标"
+                },
+                {
+                    "name": "x",
+                    "block": "坐标"
+                },
+                {
+                    "name": "y",
+                    "block": "坐标"
+                },
+                {
+                    "name": "z",
+                    "block": "坐标"
+                },
+                {
+                    "name": "visible",
+                    "block": ""
+                }
+            ],
+            "blockDefinitionVec": []
+        },
+        "feng3d.editor.ObjectA": {
+            "name": "feng3d.editor.ObjectA",
+            "component": "",
+            "componentParam": null,
+            "attributeDefinitionVec": [
+                {
+                    "name": "x",
+                    "block": "坐标"
+                },
+                {
+                    "name": "x",
+                    "block": "坐标"
+                },
+                {
+                    "name": "y",
+                    "block": "坐标"
+                },
+                {
+                    "name": "z",
+                    "block": "坐标"
+                },
+                {
+                    "name": "rx",
+                    "block": "旋转"
+                },
+                {
+                    "name": "ry",
+                    "block": "旋转"
+                },
+                {
+                    "name": "rz",
+                    "block": "旋转"
+                },
+                {
+                    "name": "sx",
+                    "block": "缩放"
+                },
+                {
+                    "name": "sy",
+                    "block": "缩放"
+                },
+                {
+                    "name": "sz",
+                    "block": "缩放"
+                },
+                {
+                    "name": "custom",
+                    "block": "缩放",
+                    "component": "feng3d.editor.CustomAttrView"
+                },
+                {
+                    "name": "a",
+                    "block": "自定义块"
+                },
+                {
+                    "name": "b",
+                    "block": "自定义块"
+                }
+            ],
+            "blockDefinitionVec": [
+                {
+                    "name": "自定义块",
+                    "component": "feng3d.editor.CustomBlockView"
+                }
+            ]
+        }
+    },
+    "classConfigs": []
+}
