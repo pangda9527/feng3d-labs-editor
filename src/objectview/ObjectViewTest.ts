@@ -21,8 +21,8 @@ module feng3d.editor
 				defaultObjectViewClass: ClassUtils.getQualifiedClassName(DefaultObjectView),
 				defaultObjectAttributeViewClass: ClassUtils.getQualifiedClassName(DefaultObjectAttributeView),
 				defaultObjectAttributeBlockView: ClassUtils.getQualifiedClassName(DefaultObjectBlockView),
-				attributeDefaultViewClassByTypeVec: {},
-				classConfigVec: {}
+				attributeDefaultViewClassByTypeVec: [],
+				classConfigVec: []
 			};
 
 			var box = new eui.Group();
@@ -34,7 +34,7 @@ module feng3d.editor
 			this.addChild(box);
 
 			var attributeTypeDefinition: AttributeTypeDefinition = { type: ClassUtils.getQualifiedClassName(Boolean), component: ClassUtils.getQualifiedClassName(BooleanAttrView) };
-			$objectViewConfig.attributeDefaultViewClassByTypeVec[attributeTypeDefinition.type] = attributeTypeDefinition;
+			$objectViewConfig.attributeDefaultViewClassByTypeVec.push( attributeTypeDefinition);
 
 			var view = ObjectView.getObjectView({ a: 1, b: false, c: "abc" });
 			box.addChild(view);
@@ -51,7 +51,7 @@ module feng3d.editor
 				],
 				blockDefinitionVec: []
 			};
-			$objectViewConfig.classConfigVec[spriteConfig.name] = spriteConfig;
+			$objectViewConfig.classConfigVec.push(spriteConfig);
 			box.addChild(ObjectView.getObjectView(new egret.Sprite()));
 
 			spriteConfig.component = ClassUtils.getQualifiedClassName(CustomObjectView);
@@ -71,8 +71,8 @@ module feng3d.editor
 			var fullConfigStr: string = <any>JSON.stringify(fullConfig);
 			console.log(fullConfigStr);
 			var fullConfig1: any = <any>JSON.parse(fullConfigStr);
-			$objectViewConfig.attributeDefaultViewClassByTypeVec = {};
-			$objectViewConfig.classConfigVec = {};
+			$objectViewConfig.attributeDefaultViewClassByTypeVec = [];
+			$objectViewConfig.classConfigVec = [];
 			box.addChild(ObjectView.getObjectView(a));
 			console.log(egret.getTimer() - t);
 			t = egret.getTimer();
@@ -115,10 +115,10 @@ module feng3d.editor
 				]
 			};
 
-			$objectViewConfig.classConfigVec[classDefinition.name] = classDefinition;
+			$objectViewConfig.classConfigVec.push( classDefinition);
 
 			var attributeTypeDefinition = { type: ClassUtils.getQualifiedClassName(Boolean), component: ClassUtils.getQualifiedClassName(BooleanAttrView) };
-			$objectViewConfig.attributeDefaultViewClassByTypeVec[attributeTypeDefinition.type] = attributeTypeDefinition;
+			$objectViewConfig.attributeDefaultViewClassByTypeVec.push(attributeTypeDefinition);
 		}
 	}
 }

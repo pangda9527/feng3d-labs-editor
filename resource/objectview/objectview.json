@@ -3,22 +3,22 @@
     "defaultObjectViewClass": "feng3d.DefaultObjectView",
     "defaultObjectAttributeViewClass": "feng3d.DefaultObjectAttributeView",
     "defaultObjectAttributeBlockView": "feng3d.DefaultObjectBlockView",
-    "attributeDefaultViewClassByTypeVec": {
-        "Boolean": {
+    "attributeDefaultViewClassByTypeVec": [
+        {
             "type": "Boolean",
             "component": "feng3d.editor.BooleanAttrView"
         },
-        "feng3d.Vector3D": {
+        {
             "type": "feng3d.Vector3D",
             "component": "feng3d.editor.OAVVector3D"
         },
-        "feng3d.Transform": {
+        {
             "type": "feng3d.Transform",
             "component": "feng3d.editor.OAVTransform"
         }
-    },
-    "classConfigVec": {
-        "egret.Sprite": {
+    ],
+    "classConfigVec": [
+        {
             "name": "egret.Sprite",
             "component": "",
             "componentParam": null,
@@ -46,7 +46,7 @@
             ],
             "blockDefinitionVec": []
         },
-        "feng3d.editor.ObjectA": {
+        {
             "name": "feng3d.editor.ObjectA",
             "component": "",
             "componentParam": null,
@@ -112,6 +112,6 @@
                 }
             ]
         }
-    },
+    ],
     "classConfigs": []
 }
