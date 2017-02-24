@@ -17,6 +17,8 @@ module feng3d.editor
             ClassUtils.addClassNameSpace("feng3d.editor");
             ClassUtils.addClassNameSpace("egret");
 
+            egret.TextField.default_size = 12;
+
             //初始化feng3d
             new Main3D();
         }
@@ -24,9 +26,6 @@ module feng3d.editor
         protected createChildren(): void
         {
             super.createChildren();
-
-
-            egret.TextField.default_size = 12;
 
             var editorObjectView = new EditorObjectView();
             editorObjectView.addEventListener(EditorObjectView.COMPLETED, this.onEditorObjectViewCompleted, this)

@@ -131,6 +131,10 @@ module feng3d.editor
                 box.addChild(ObjectView.getObjectView(new ObjectA()));
                 box.addChild(ObjectView.getObjectView(new egret.Sprite()));
 
+                box.addChild(ObjectView.getObjectView({
+                    vector3D: new Vector3D(1, 2, 3),
+                    transform: new Transform(1, 2, 3, 4, 5, 6)
+                }));
             }
         }
 

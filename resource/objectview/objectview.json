@@ -7,6 +7,14 @@
         "Boolean": {
             "type": "Boolean",
             "component": "feng3d.editor.BooleanAttrView"
+        },
+        "feng3d.Vector3D": {
+            "type": "feng3d.Vector3D",
+            "component": "feng3d.editor.OAVVector3D"
+        },
+        "feng3d.Transform": {
+            "type": "feng3d.Transform",
+            "component": "feng3d.editor.OAVTransform"
         }
     },
     "classConfigVec": {
