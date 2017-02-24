@@ -8,6 +8,9 @@
     "files": [
         "typings/index.d.ts",
         //
+        "src/ui/components/Vector3DView.ts",
+        "src/ui/components/TransformView.ts",
+        //
         "src/objectview/data/ObjectA.ts",
         //
         "src/objectview/view/DefaultBaseObjectView.ts",
@@ -25,8 +28,6 @@
         //
         "src/objectview/oav/OAVVector3D.ts",
         "src/objectview/oav/OAVTransform.ts",
-        //
-        "src/ui/components/Vector3DView.ts",
         //
         "src/ui/AssetAdapter.ts",
         "src/ui/LoadingUI.ts",

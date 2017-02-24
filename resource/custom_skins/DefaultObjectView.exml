@@ -2,7 +2,7 @@
 <e:Skin class="DefaultObjectView" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:editor="feng3d.editor.*">
 	<e:Group id="group" width="200" scaleX="1" scaleY="1">
 		<e:layout>
-		<e:VerticalLayout horizontalAlign="left" gap="10"/>
+		<e:VerticalLayout horizontalAlign="left" gap="10" paddingLeft="0" paddingRight="0"/>
 		</e:layout>
 	</e:Group>
 </e:Skin>

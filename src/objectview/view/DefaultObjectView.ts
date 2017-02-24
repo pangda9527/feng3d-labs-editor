@@ -24,7 +24,6 @@ module feng3d
 
 			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "resource/custom_skins/DefaultObjectView.exml";
-
 		}
 
 		private onComplete()
@@ -33,7 +32,8 @@ module feng3d
 			var objectBlockInfos: BlockViewInfo[] = this._objectViewInfo.objectBlockInfos;
 			for (var i = 0; i < objectBlockInfos.length; i++)
 			{
-				var displayObject = ObjectView.getBlockView(objectBlockInfos[i]);
+				var displayObject: eui.Component = ObjectView.getBlockView(objectBlockInfos[i]);
+				displayObject.left = displayObject.right = 0;
 				this.group.addChild(displayObject);
 				this.blockViews.push(<any>displayObject);
 			}

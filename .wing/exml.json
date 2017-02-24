@@ -38,5 +38,15 @@
         "path": "objectview\\oav\\OAVVector3D.ts",
         "class": "OAVVector3D",
         "parentPath": ""
+    },
+    "15a6f3c4abf": {
+        "path": "ui\\components\\Accordion.ts",
+        "class": "Accordion",
+        "parentPath": ""
+    },
+    "15a6f64675f": {
+        "path": "ui\\components\\TransformView.ts",
+        "class": "TransformView",
+        "parentPath": ""
     }
 }

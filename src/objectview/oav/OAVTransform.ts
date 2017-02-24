@@ -2,15 +2,14 @@ module feng3d.editor
 {
 	export class OAVTransform extends eui.Component implements eui.UIComponent
 	{
+		public titleButton: eui.Button;
+		public titleLabel: eui.Label;
+		public transformView: feng3d.editor.TransformView;
 
 		private _space: Object;
 		private _attributeName: string;
 		private _attributeType: string;
 		private attributeViewInfo: AttributeViewInfo;
-
-		public pVector3DView: feng3d.editor.Vector3DView;
-		public rVector3DView: feng3d.editor.Vector3DView;
-		public sVector3DView: feng3d.editor.Vector3DView;
 
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
@@ -26,6 +25,7 @@ module feng3d.editor
 
 		private onComplete(): void
 		{
+			this.titleButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTitleButtonClick, this);
 			this.updateView();
 		}
 
@@ -64,12 +64,13 @@ module feng3d.editor
 		 */
 		public updateView(): void
 		{
-
 			var transform: Transform = <any>this.attributeValue;
+			this.transformView.vm = transform;
+		}
 
-			this.pVector3DView.vm = transform.position;
-			this.rVector3DView.vm = transform.rotation;
-			this.sVector3DView.vm = transform.scale;
+		private onTitleButtonClick()
+		{
+			this.currentState = this.currentState == "hide" ? "show" : "hide";
 		}
 	}
 }
