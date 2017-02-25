@@ -2,7 +2,7 @@
 <e:Skin class="AccordionSkin" states="show,hide" xmlns:e="http://ns.egret.com/eui"
         xmlns:w="http://ns.egret.com/wing">
 	<w:Config id="15a7457514f"></w:Config>
-	<e:Group id="group" width="200" scaleX="1" scaleY="1">
+	<e:Group id="group" scaleX="1" scaleY="1" left="0" top="0" bottom="0" right="0">
 		<e:layout>
 			<e:VerticalLayout horizontalAlign="left" gap="10" paddingLeft="0" paddingRight="0" />
 		</e:layout>

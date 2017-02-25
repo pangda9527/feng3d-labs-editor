@@ -70,8 +70,15 @@ module feng3d
 		 */
 		public updateView(): void
 		{
-			this.label.text = this._attributeName + ":";
-			this.text.text = String(this.attributeValue);
+			this.label.text = this._attributeName;
+			if (ClassUtils.isBaseType(this.attributeValue))
+			{
+				this.text.text = String(this.attributeValue);
+			} else
+			{
+				this.text.enabled = false;
+				this.text.text = "[" + ClassUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + "]";
+			}
 		}
 	}
 }

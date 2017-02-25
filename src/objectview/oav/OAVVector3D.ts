@@ -62,7 +62,7 @@ module feng3d.editor
 		 */
 		public updateView(): void
 		{
-			this.label.text = this._attributeName + ":";
+			this.label.text = this._attributeName;
 			this.vector3DView.vm = <any>this.attributeValue;
 		}
 	}

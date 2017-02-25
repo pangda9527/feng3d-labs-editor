@@ -39,7 +39,10 @@ module feng3d.editor
 				var component = components[i];
 				var accordion = new Accordion();
 				accordion.titleName = component.name;
-				accordion.addContent(ObjectView.getObjectView(component.data));
+				var displayObject = ObjectView.getObjectView(component.data);
+				displayObject.left = displayObject.right = 0;
+				accordion.addContent(displayObject);
+				accordion.left = accordion.right = 0;
 				this.group.addChild(accordion);
 			}
 		}
