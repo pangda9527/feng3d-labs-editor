@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="AccordionSkin" states="show,hide" xmlns:e="http://ns.egret.com/eui"
-        xmlns:w="http://ns.egret.com/wing">
+<e:Skin class="AccordionSkin" states="show,hide" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
 	<w:Config id="15a7457514f"></w:Config>
 	<e:Group id="group" scaleX="1" scaleY="1" left="0" top="0" bottom="0" right="0">
 		<e:layout>
@@ -9,7 +8,7 @@
 		<e:Group id="titleGroup" y="0" left="0" width="100%">
 			<e:Button id="titleButton" label="" y="0" left="0" right="0" />
 			<e:Label text="-" text.show="-" text.hide="+" size="12" verticalCenter="0" left="5" touchEnabled="false" />
-			<e:Label size="14" bold="true" verticalCenter="0" left="20" touchEnabled="false"  text="{titleName}"/>
+			<e:Label size="14" bold="true" verticalCenter="0" left="20" touchEnabled="false" text="{titleName}" />
 		</e:Group>
 		<e:Group id="contentGroup" includeIn="show" y="10" left="0" width="100%" x="10">
 			<e:layout>
