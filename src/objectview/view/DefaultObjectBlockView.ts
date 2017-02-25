@@ -56,7 +56,7 @@ module feng3d
 			for (var i = 0; i < objectAttributeInfos.length; i++)
 			{
 				var displayObject: eui.Component = ObjectView.getAttributeView(objectAttributeInfos[i]);
-				displayObject.left = displayObject.right = 0;
+				displayObject.percentWidth = 100;
 				this.contentGroup.addChild(displayObject);
 				this.attributeViews.push(<any>displayObject);
 			}

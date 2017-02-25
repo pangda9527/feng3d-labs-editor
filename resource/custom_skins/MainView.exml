@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <e:Skin class="MainViewSkin" width="400" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:editor="feng3d.editor.*" >
 	<w:Config id="15a73de4177" ></w:Config>
-	<editor:InspectorView right="0" bottom="0" top="0"/>
+	<editor:InspectorView right="0" bottom="0" top="0" width="300"/>
 </e:Skin>

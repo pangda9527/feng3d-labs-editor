@@ -16,6 +16,7 @@ module feng3d.editor
 
 		private onComplete(): void
 		{
+			this.group.percentWidth = 100;
 			// this.group.addChild(ObjectView.getObjectView(new ObjectA()));
 			// this.group.addChild(ObjectView.getObjectView(new egret.Sprite()));
 			// this.group.addChild(ObjectView.getObjectView(new Transform(1, 2, 3, 4, 5, 6)));

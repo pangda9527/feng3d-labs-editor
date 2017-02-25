@@ -30,6 +30,7 @@ module feng3d
 
 		private onComplete()
 		{
+			this.text.percentWidth = 100;
 			this.text.enabled = this.attributeViewInfo.writable;
 			this.updateView();
 		}
