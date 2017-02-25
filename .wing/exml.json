@@ -48,5 +48,15 @@
         "path": "ui\\components\\TransformView.ts",
         "class": "TransformView",
         "parentPath": ""
+    },
+    "15a73de4177": {
+        "path": "ui\\MainView.ts",
+        "class": "MainView",
+        "parentPath": ""
+    },
+    "15a73e1089e": {
+        "path": "ui\\inspector\\InspectorView.ts",
+        "class": "InspectorView",
+        "parentPath": ""
     }
 }

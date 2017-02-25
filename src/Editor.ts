@@ -37,4 +37,5 @@ module feng3d.editor
             this.addChild(new MainUI());
         }
     }
+    export var $editorEventDispatcher: EventDispatcher = new EventDispatcher();
 }

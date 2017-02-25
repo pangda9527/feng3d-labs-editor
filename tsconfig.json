@@ -29,6 +29,11 @@
         "src/objectview/oav/OAVVector3D.ts",
         "src/objectview/oav/OAVTransform.ts",
         //
+        "src/ui/inspector/data/InspectorObject3D.ts",
+        //
+        "src/ui/inspector/InspectorView.ts",
+        "src/ui/MainView.ts",
+        //
         "src/ui/AssetAdapter.ts",
         "src/ui/LoadingUI.ts",
         "src/ui/MainUI.ts",

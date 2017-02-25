@@ -42,6 +42,8 @@ module feng3d.editor
             {
                 material.color.fromUnit(Math.random() * (1 << 24));
             }
+
+            $editorEventDispatcher.dispatchEvent(new Event(InspectorView.Inspector_Object, object3D));
         }
     }
 }

@@ -100,47 +100,25 @@ module feng3d.editor
                 this.createScene();
             }
         }
+
+        private mainView: eui.Component;
+
         private createScene()
         {
             if (this.isThemeLoadEnd && this.isResourceLoadEnd)
             {
-
-                this.stage.setContentSize(window.innerWidth, window.innerHeight);
-
+                this.mainView = new MainView();
+                this.stage.addChild(this.mainView);
+                this.onresize();
                 window.onresize = this.onresize.bind(this);
-
-                // this.stage.addChild(new CustomView());
-
-                // this.stage.addChild(new ObjectViewTest());
-
-                // this.stage.addChild(new OAVTransform());
-
-                // v = new Vector3DView();
-                // v = new OAVTransform();
-
-                // this.stage.addChild(v);
-
-                var box = new eui.Group();
-                var hLayout: eui.HorizontalLayout = new eui.HorizontalLayout();
-                hLayout.gap = 10;
-                hLayout.paddingTop = 30;
-                hLayout.horizontalAlign = egret.HorizontalAlign.CENTER;
-                box.layout = hLayout;
-                this.addChild(box);
-
-                box.addChild(ObjectView.getObjectView(new ObjectA()));
-                box.addChild(ObjectView.getObjectView(new egret.Sprite()));
-
-                box.addChild(ObjectView.getObjectView({
-                    vector3D: new Vector3D(1, 2, 3),
-                    transform: new Transform(1, 2, 3, 4, 5, 6)
-                }));
             }
         }
 
         private onresize()
         {
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
+            this.mainView.width = this.stage.stageWidth;
+            this.mainView.height = this.stage.stageHeight;
         }
 
         /**
