@@ -58,5 +58,10 @@
         "path": "ui\\inspector\\InspectorView.ts",
         "class": "InspectorView",
         "parentPath": ""
+    },
+    "15a740761e9": {
+        "path": "objectview\\ov\\OVObject3D.ts",
+        "class": "OVObject3D",
+        "parentPath": ""
     }
 }

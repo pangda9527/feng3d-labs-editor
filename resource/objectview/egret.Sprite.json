@@ -1,0 +1,28 @@
+{
+    "name": "egret.Sprite",
+    "component": "",
+    "componentParam": null,
+    "attributeDefinitionVec": [
+        {
+            "name": "accessibilityImplementation",
+            "block": "坐标"
+        },
+        {
+            "name": "x",
+            "block": "坐标"
+        },
+        {
+            "name": "y",
+            "block": "坐标"
+        },
+        {
+            "name": "z",
+            "block": "坐标"
+        },
+        {
+            "name": "visible",
+            "block": ""
+        }
+    ],
+    "blockDefinitionVec": []
+}

@@ -51,7 +51,7 @@ module feng3d
             loader.removeEventListener(LoaderEvent.COMPLETE, this.onMainCompleted, this);
             var str: string = loader.content;
             var classDefinition: ClassDefinition = JSON.parse(str);
-            $objectViewConfig.classConfigVec[classDefinition.name] = classDefinition;
+            $objectViewConfig.classConfigVec.push(classDefinition);
 
             this.loadClassConfigs();
         }
