@@ -2,11 +2,13 @@ module feng3d.editor
 {
 	export class OVObject3D extends eui.Component implements IObjectView
 	{
-		private _space: any;
+		public group: eui.Group;
+
+		private _space: Object3D;
 		public constructor(objectViewInfo: ObjectViewInfo)
 		{
 			super();
-			this._space = objectViewInfo.owner;
+			this._space = <any>objectViewInfo.owner;
 
 			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "OVObject3DSkin";
@@ -30,6 +32,7 @@ module feng3d.editor
 
 		public updateView()
 		{
+
 		}
 
 		public getAttributeView(attributeName: string): IObjectAttributeView

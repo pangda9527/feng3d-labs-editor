@@ -34,6 +34,8 @@ module feng3d.editor
             scene3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
         }
 
+        private inspectorObject3D = new InspectorObject3D();
+
         onMouseClick(event: Event)
         {
             var object3D: Object3D = <Object3D>event.target;
@@ -43,7 +45,8 @@ module feng3d.editor
                 material.color.fromUnit(Math.random() * (1 << 24));
             }
 
-            $editorEventDispatcher.dispatchEvent(new Event(InspectorView.Inspector_Object, object3D));
+            this.inspectorObject3D.setObject3D(object3D);
+            $editorEventDispatcher.dispatchEvent(new Event(InspectorView.Inspector_Object, this.inspectorObject3D));
         }
     }
 }

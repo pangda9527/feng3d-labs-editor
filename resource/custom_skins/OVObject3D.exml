@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="OVObject3DSkin" width="400" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
+<e:Skin class="OVObject3DSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
 	<w:Config id="15a740761e9" ></w:Config>
+	<e:Group id="group">
+		<e:layout>
+			<e:VerticalLayout/>
+		</e:layout>
+	</e:Group>
 </e:Skin>

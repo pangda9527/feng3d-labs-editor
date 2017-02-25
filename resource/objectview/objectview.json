@@ -20,6 +20,7 @@
     "classConfigVec": [],
     "classConfigs": [
         "egret.Sprite.json",
-        "feng3d.editor.ObjectA.json"
+        "feng3d.editor.ObjectA.json",
+        "feng3d.Transform.json"
     ]
 }
