@@ -8,9 +8,15 @@
 			<e:Label text="-" text.show="-" text.hide="+" size="12" verticalCenter="0" left="5"  touchEnabled="false"/>
 			<e:Label id="titleLabel" text="{attributeName}" size="14" bold="true" verticalCenter="0" left="20"  touchEnabled="false"/>
 		</e:Group>
-		<editor:TransformView id="transformView" includeIn="show" x="0" y="0" />
+		<e:Group x="124" y="161" width="100%">
+			<editor:TransformView id="transformView" includeIn="show" scaleX="1" scaleY="1"/>
+			<e:layout>
+				<e:VerticalLayout horizontalAlign="center" verticalAlign="middle"/>
+			</e:layout>
+		</e:Group>
+
 		<e:layout>
-			<e:VerticalLayout/>
+			<e:VerticalLayout horizontalAlign="left"/>
 		</e:layout>
 	</e:Group>
 </e:Skin>

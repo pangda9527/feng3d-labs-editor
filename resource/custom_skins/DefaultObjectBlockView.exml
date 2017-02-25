@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="DefaultObjectBlockView" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
-	<w:Config id="15a64cb93c1"/>
+<e:Skin class="DefaultObjectBlockView" xmlns:e="http://ns.egret.com/eui" states="show,hide"
+        xmlns:w="http://ns.egret.com/wing">
+	<w:Config id="15a64cb93c1" />
 	<e:Group id="group" width="200" scaleX="1" scaleY="1">
 		<e:layout>
-		<e:VerticalLayout horizontalAlign="left" gap="10" paddingLeft="0" paddingRight="0"/>
+			<e:VerticalLayout horizontalAlign="left" gap="10" paddingLeft="0" paddingRight="0" />
 		</e:layout>
-		<e:Label id="blockTitle" text="" x="0" y="-30" size="14" textColor="0xff0000" height="20" width="200" scaleX="1" scaleY="1"/>
+		<e:Group id="titleGroup" y="0" left="0" width="100%">
+			<e:Button id="titleButton" label="" y="0" left="0" right="0" />
+			<e:Label text="-" text.show="-" text.hide="+" size="12" verticalCenter="0" left="5" touchEnabled="false" />
+			<e:Label size="14" bold="true" verticalCenter="0" left="20" touchEnabled="false" text="{blockName}" />
+		</e:Group>
+		<e:Group id="contentGroup" includeIn="show" y="10" left="0" width="100%" x="10">
+			<e:layout>
+				<e:VerticalLayout horizontalAlign="left" verticalAlign="middle" />
+			</e:layout>
+		</e:Group>
 	</e:Group>
 </e:Skin>

@@ -13,8 +13,10 @@ module feng3d
 		private itemList: AttributeViewInfo[];
 		private isInitView: boolean;
 
-		public blockTitle: eui.Label;
 		public group: eui.Group;
+		public titleGroup: eui.Group;
+		public titleButton: eui.Button;
+		public contentGroup: eui.Group;
 
 		/**
 		 * @inheritDoc
@@ -34,6 +36,7 @@ module feng3d
 
 		private onComplete()
 		{
+			this.titleButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTitleButtonClick, this);
 			this.$updateView();
 		}
 
@@ -42,11 +45,10 @@ module feng3d
 			var h = 0;
 			if (this._blockName != null && this._blockName.length > 0)
 			{
-				this.blockTitle.text = this._blockName;
-				this.group.addChildAt(this.blockTitle, 0);
+				this.group.addChildAt(this.titleGroup, 0);
 			} else
 			{
-				this.group.removeChild(this.blockTitle);
+				this.group.removeChild(this.titleGroup);
 			}
 
 			this.attributeViews = [];
@@ -55,7 +57,7 @@ module feng3d
 			{
 				var displayObject: eui.Component = ObjectView.getAttributeView(objectAttributeInfos[i]);
 				displayObject.left = displayObject.right = 0;
-				this.group.addChild(displayObject);
+				this.contentGroup.addChild(displayObject);
 				this.attributeViews.push(<any>displayObject);
 			}
 
@@ -113,6 +115,11 @@ module feng3d
 				}
 			}
 			return null;
+		}
+
+		private onTitleButtonClick()
+		{
+			this.currentState = this.currentState == "hide" ? "show" : "hide";
 		}
 	}
 }
