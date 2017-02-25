@@ -37,7 +37,10 @@ module feng3d.editor
 			for (var i = 0; i < components.length; i++)
 			{
 				var component = components[i];
-				this.group.addChild(ObjectView.getObjectView(component));
+				var accordion = new Accordion();
+				accordion.titleName = component.name;
+				accordion.addContent(ObjectView.getObjectView(component.data));
+				this.group.addChild(accordion);
 			}
 		}
 

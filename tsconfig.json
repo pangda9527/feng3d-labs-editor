@@ -8,6 +8,7 @@
     "files": [
         "typings/index.d.ts",
         //
+        "src/ui/components/Accordion.ts",
         "src/ui/components/Vector3DView.ts",
         "src/ui/components/TransformView.ts",
         //

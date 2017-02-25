@@ -63,5 +63,10 @@
         "path": "objectview\\ov\\OVInspectorObject3D.ts",
         "class": "OVInspectorObject3D",
         "parentPath": ""
+    },
+    "15a7457514f": {
+        "path": "ui\\components\\Accordion.ts",
+        "class": "Accordion",
+        "parentPath": ""
     }
 }
