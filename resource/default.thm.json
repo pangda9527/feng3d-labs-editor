@@ -19,7 +19,7 @@
         "feng3d.editor.TransformView": "resource/custom_skins/TransformView.exml",
         "feng3d.editor.MainView": "resource/custom_skins/MainView.exml",
         "feng3d.editor.InspectorView": "resource/custom_skins/InspectorView.exml",
-        "feng3d.editor.OVObject3D": "resource/custom_skins/OVObject3D.exml"
+        "feng3d.editor.OVObject3D": "resource/custom_skins/OVInspectorObject3D.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [
@@ -40,7 +40,7 @@
         "resource/custom_skins/TransformView.exml",
         "resource/custom_skins/OAVVector3DSkin.exml",
         "resource/custom_skins/OAVTransformSKin.exml",
-        "resource/custom_skins/OVObject3D.exml",
+        "resource/custom_skins/OVInspectorObject3D.exml",
         "resource/custom_skins/InspectorView.exml",
         "resource/custom_skins/MainView.exml"
     ]

@@ -29,7 +29,7 @@
         "src/objectview/oav/OAVVector3D.ts",
         "src/objectview/oav/OAVTransform.ts",
         //
-        "src/objectview/ov/OVObject3D.ts",
+        "src/objectview/ov/OVInspectorObject3D.ts",
         //
         "src/ui/inspector/data/InspectorObject3D.ts",
         //

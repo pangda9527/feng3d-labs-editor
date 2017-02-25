@@ -1,17 +1,17 @@
 module feng3d.editor
 {
-	export class OVObject3D extends eui.Component implements IObjectView
+	export class OVInspectorObject3D extends eui.Component implements IObjectView
 	{
 		public group: eui.Group;
 
-		private _space: Object3D;
+		private _space: InspectorObject3D;
 		public constructor(objectViewInfo: ObjectViewInfo)
 		{
 			super();
 			this._space = <any>objectViewInfo.owner;
 
 			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.skinName = "OVObject3DSkin";
+			this.skinName = "OVInspectorObject3DSkin";
 		}
 
 		private onComplete(): void
@@ -32,7 +32,13 @@ module feng3d.editor
 
 		public updateView()
 		{
-
+			this.group.removeChildren();
+			var components = this._space.components;
+			for (var i = 0; i < components.length; i++)
+			{
+				var component = components[i];
+				this.group.addChild(ObjectView.getObjectView(component));
+			}
 		}
 
 		public getAttributeView(attributeName: string): IObjectAttributeView
