@@ -40,7 +40,7 @@ module feng3d.editor
 			var style = this.canvas.style;
 			style.position = "absolute";
 			style.left = bound.x + "px";
-			style.right = bound.y + "px";
+			style.top = bound.y + "px";
 			style.width = bound.width + "px";
 			style.height = bound.height + "px";
 		}
