@@ -1,17 +1,18 @@
-module feng3d.editor {
+module feng3d.editor
+{
 
     /**
     * 编辑器3D入口
     * @author feng 2016-10-29
     */
-    export class Main3D {
-
+    export class Main3D
+    {
         view3D: View3D;
         controller: FPSController;
         cameraObj: Object3D;
 
-        constructor() {
-
+        constructor()
+        {
             this.init();
 
             this.cameraObj = new Object3D("camera");
@@ -24,26 +25,29 @@ module feng3d.editor {
             //
             $ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
 
-            $mouseKeyInput.addEventListener("mousedown", this.onMousedown, this);
-            $mouseKeyInput.addEventListener("mouseup", this.onMouseup, this);
+            var canvas = document.getElementById("glcanvas");
+            canvas.addEventListener("mousedown", this.onMousedown.bind(this));
+            canvas.addEventListener("mouseup", this.onMouseup.bind(this));
+            canvas.addEventListener("mouseout",this.onMouseup.bind(this))
         }
 
-        private onMousedown() {
-
+        private onMousedown()
+        {
             this.controller.target = this.cameraObj.transform;
         }
 
-        private onMouseup() {
-
+        private onMouseup()
+        {
             this.controller.target = null;
         }
 
-        process(event: Event) {
-
+        process(event: Event)
+        {
             this.controller.update();
         }
 
-        init() {
+        init()
+        {
             var canvas = document.getElementById("glcanvas");
             this.view3D = new feng3d.View3D(canvas);
 
@@ -53,7 +57,8 @@ module feng3d.editor {
             this.view3D.scene.addChild(cube);
 
             //变化旋转与颜色
-            setInterval(function () {
+            setInterval(function ()
+            {
                 cube.transform.ry += 1;
             }, 15);
 
