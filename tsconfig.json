@@ -47,8 +47,9 @@
         "src/ui/MainUI.ts",
         "src/ui/ThemeAdapter.ts",
         //
-        "src/feng3d/Main3D.ts",
+        "src/feng3d/Object3DMoveModel.ts",
         "src/feng3d/GroundGrid.ts",
+        "src/feng3d/Main3D.ts",
         //
         "src/Editor.ts"
     ],
