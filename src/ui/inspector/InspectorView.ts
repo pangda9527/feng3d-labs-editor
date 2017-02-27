@@ -35,6 +35,7 @@ module feng3d.editor
 			if (event.data)
 			{
 				this.objectView = ObjectView.getObjectView(event.data);
+				this.objectView.percentWidth = 100;
 				this.group.addChild(this.objectView);
 			}
 		}

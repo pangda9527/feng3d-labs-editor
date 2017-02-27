@@ -2,7 +2,7 @@
 <e:Skin class="InspectorViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
 	<w:Config id="15a73e1089e" ></w:Config>
 	<e:Group width="100%" height="100%">
-		<e:Rect minHeight="50" minWidth="50" fillColor="0x383838" left="0" top="0" bottom="0" right="0"/>
+		<e:Rect minHeight="50" minWidth="50" fillColor="0x383838" width="100%" x="0" height="100%" y="0"/>
 		<e:Group id="group" width="100%" height="100%">
 			<e:layout>
 			<e:VerticalLayout horizontalAlign="left"/>

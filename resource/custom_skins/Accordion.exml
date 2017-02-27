@@ -6,7 +6,7 @@
 			<e:VerticalLayout horizontalAlign="left" gap="10" paddingLeft="0" paddingRight="0" />
 		</e:layout>
 		<e:Group id="titleGroup" y="0" left="0" width="100%">
-			<e:Button id="titleButton" label="" y="0" left="0" right="0" />
+			<e:Button id="titleButton" label="" y="0"  width="100%" x="0"/>
 			<e:Label text="-" text.show="-" text.hide="+" size="12" verticalCenter="0" left="5" touchEnabled="false" />
 			<e:Label size="14" bold="true" verticalCenter="0" left="20" touchEnabled="false" text="{titleName}" />
 		</e:Group>

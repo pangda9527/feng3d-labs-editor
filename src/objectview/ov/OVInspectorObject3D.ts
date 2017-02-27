@@ -11,6 +11,7 @@ module feng3d.editor
 			this._space = <any>objectViewInfo.owner;
 
 			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.addEventListener(eui.UIEvent.RESIZE, this.onResize, this);
 			this.skinName = "OVInspectorObject3DSkin";
 		}
 
@@ -30,8 +31,11 @@ module feng3d.editor
 			this.updateView();
 		}
 
+		private accordions: Accordion[] = [];
+
 		public updateView()
 		{
+			this.accordions.length = 0;
 			this.group.removeChildren();
 			var components = this._space.components;
 			for (var i = 0; i < components.length; i++)
@@ -44,6 +48,7 @@ module feng3d.editor
 				accordion.addContent(displayObject);
 				accordion.percentWidth = 100;
 				this.group.addChild(accordion);
+				this.accordions.push(accordion);
 			}
 		}
 
@@ -55,6 +60,14 @@ module feng3d.editor
 		public getblockView(blockName: string): IObjectBlockView
 		{
 			return null;
+		}
+
+		private onResize()
+		{
+			for (var i = 0; i < this.accordions.length; i++)
+			{
+				this.accordions[i].width = this.width;
+			}
 		}
 	}
 }

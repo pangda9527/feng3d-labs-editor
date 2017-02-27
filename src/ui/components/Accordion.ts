@@ -27,7 +27,6 @@ module feng3d.editor
 
 		private onComplete()
 		{
-			this.group.percentWidth = 100;
 			this.titleButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTitleButtonClick, this);
 			if (this.components)
 			{

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <e:Skin class="Vector3DViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
 	<w:Config id="15a6adcd3c5" ></w:Config>
-	<e:Group left="0" top="0" bottom="0" right="0">
+	<e:Group width="100%" height="20">
 		<e:Group x="0" y="0" width="33%">
 		<e:Label text="x" size="12" textAlign="right" x="0" y="0"/>
 			<e:TextInput width="100%" height="20" x="113" y="117" text="{vm.x}"/>

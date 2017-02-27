@@ -68,5 +68,10 @@
         "path": "ui\\components\\Accordion.ts",
         "class": "Accordion",
         "parentPath": ""
+    },
+    "15a7d5dea78": {
+        "path": "ui\\Feng3dView.ts",
+        "class": "Feng3dView",
+        "parentPath": ""
     }
 }
