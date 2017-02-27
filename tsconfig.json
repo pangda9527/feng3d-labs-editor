@@ -30,6 +30,7 @@
         //
         "src/objectview/oav/OAVVector3D.ts",
         "src/objectview/oav/OAVTransform.ts",
+        "src/objectview/oav/OAVObject3DComponent.ts",
         //
         "src/objectview/ov/OVInspectorObject3D.ts",
         //

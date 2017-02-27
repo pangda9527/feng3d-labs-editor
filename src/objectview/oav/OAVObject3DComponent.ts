@@ -1,15 +1,14 @@
 module feng3d.editor
 {
-	export class OAVTransform extends eui.Component implements IObjectAttributeView
+	export class OAVObject3DComponent extends eui.Component implements eui.UIComponent
 	{
-		public titleButton: eui.Button;
-		public titleLabel: eui.Label;
-		public transformView: feng3d.editor.TransformView;
-
 		private _space: Object;
 		private _attributeName: string;
 		private _attributeType: string;
 		private attributeViewInfo: AttributeViewInfo;
+
+		public group: eui.Group;
+		private accordions: Accordion[] = [];
 
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
@@ -20,12 +19,10 @@ module feng3d.editor
 			this.attributeViewInfo = attributeViewInfo;
 
 			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.skinName = "OAVTransformSKin";
+			this.skinName = "OAVObject3DComponentSkin";
 		}
-
-		private onComplete(): void
+		private onComplete()
 		{
-			this.titleButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTitleButtonClick, this);
 			this.updateView();
 		}
 
@@ -64,13 +61,30 @@ module feng3d.editor
 		 */
 		public updateView(): void
 		{
-			var transform: Transform = <any>this.attributeValue;
-			this.transformView.vm = transform;
+			this.accordions.length = 0;
+			this.group.removeChildren();
+			var inspectorObject3DComponent: InspectorObject3DComponent = <any>this.attributeValue;
+			var components = inspectorObject3DComponent.components;
+			for (var i = 0; i < components.length; i++)
+			{
+				var component = components[i];
+				var accordion = new Accordion();
+				accordion.titleName = component.name;
+				var displayObject: eui.Component = ObjectView.getObjectView(component.data);
+				displayObject.percentWidth = 100;
+				accordion.addContent(displayObject);
+				accordion.percentWidth = 100;
+				this.group.addChild(accordion);
+				this.accordions.push(accordion);
+			}
 		}
 
-		private onTitleButtonClick()
+		private onResize()
 		{
-			this.currentState = this.currentState == "hide" ? "show" : "hide";
+			for (var i = 0; i < this.accordions.length; i++)
+			{
+				this.accordions[i].width = this.width;
+			}
 		}
 	}
 }

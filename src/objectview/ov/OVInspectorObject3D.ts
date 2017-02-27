@@ -35,21 +35,21 @@ module feng3d.editor
 
 		public updateView()
 		{
-			this.accordions.length = 0;
-			this.group.removeChildren();
-			var components = this._space.components;
-			for (var i = 0; i < components.length; i++)
-			{
-				var component = components[i];
-				var accordion = new Accordion();
-				accordion.titleName = component.name;
-				var displayObject: eui.Component = ObjectView.getObjectView(component.data);
-				displayObject.percentWidth = 100;
-				accordion.addContent(displayObject);
-				accordion.percentWidth = 100;
-				this.group.addChild(accordion);
-				this.accordions.push(accordion);
-			}
+			// this.accordions.length = 0;
+			// this.group.removeChildren();
+			// var components = this._space.inspectorObject3DComponent;
+			// for (var i = 0; i < components.length; i++)
+			// {
+			// 	var component = components[i];
+			// 	var accordion = new Accordion();
+			// 	accordion.titleName = component.name;
+			// 	var displayObject: eui.Component = ObjectView.getObjectView(component.data);
+			// 	displayObject.percentWidth = 100;
+			// 	accordion.addContent(displayObject);
+			// 	accordion.percentWidth = 100;
+			// 	this.group.addChild(accordion);
+			// 	this.accordions.push(accordion);
+			// }
 		}
 
 		public getAttributeView(attributeName: string): IObjectAttributeView

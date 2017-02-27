@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="OAVObject3DComponentSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
+	<w:Config id="15a7f6a9cde" ></w:Config>
+	<e:Group id="group" width="100%">
+		<e:layout>
+		<e:VerticalLayout/>
+		</e:layout>
+	</e:Group>
+</e:Skin>

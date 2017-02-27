@@ -15,6 +15,10 @@
         {
             "type": "feng3d.Transform",
             "component": "feng3d.editor.OAVTransform"
+        },
+        {
+            "type": "feng3d.editor.InspectorObject3DComponent",
+            "component": "feng3d.editor.OAVObject3DComponent"
         }
     ],
     "classConfigVec": [],

@@ -4,21 +4,21 @@
 	<e:Group width="100%" height="20">
 		<e:Group x="0" y="0" width="33%">
 		<e:Label text="x" size="12" textAlign="right" x="0" y="0"/>
-			<e:TextInput width="100%" height="20" x="113" y="117" text="{vm.x}"/>
+			<e:TextInput id="xTextInput" width="100%" height="20" x="113" y="117" text="{vm.x}"/>
 		<e:layout>
 			<e:HorizontalLayout/>
 		</e:layout>
 		</e:Group>
 		<e:Group x="112" y="0" width="33%">
 		<e:Label text="y" size="12" textAlign="right" x="0" y="0"/>
-			<e:TextInput width="100%" height="20" x="123" y="127" text="{vm.y}"/>
+			<e:TextInput id="yTextInput" width="100%" height="20" x="123" y="127" text="{vm.y}"/>
 		<e:layout>
 			<e:HorizontalLayout/>
 		</e:layout>
 		</e:Group>
 		<e:Group x="122" y="10" width="33%">
 		<e:Label text="z" size="12" textAlign="right" x="0" y="0"/>
-			<e:TextInput width="100%" height="20" x="133" y="137" text="{vm.z}"/>
+			<e:TextInput id="zTextInput" width="100%" height="20" x="133" y="137" text="{vm.z}"/>
 		<e:layout>
 			<e:HorizontalLayout/>
 		</e:layout>
