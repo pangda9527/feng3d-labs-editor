@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="HierarchyViewSkin" width="400" height="300" xmlns:e="http://ns.egret.com/eui"
+        xmlns:w="http://ns.egret.com/wing">
+	<w:Config id="15a7ed011a7"></w:Config>
+	<e:Group x="0" y="0" width="100%">
+		<e:Label text="Hierarchy" y="3" size="14" bold="true" x="5" />
+		<e:Button id="addButton" label="+" y="0" right="20" width="20" />
+		<e:layout>
+			<e:BasicLayout/>
+		</e:layout>
+	</e:Group>
+	<e:List id="object3dList" width="100" y="32" right="20">
+		<e:ArrayCollection>
+			<e:Array>
+				<e:Object label="Plane" />
+				<e:Object label="Cube" />
+				<e:Object label="Sphere" />
+				<e:Object label="Capsule" />
+				<e:Object label="Cylinder" />
+			</e:Array>
+		</e:ArrayCollection>
+	</e:List>
+</e:Skin>

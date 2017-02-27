@@ -21,7 +21,8 @@
         "feng3d.editor.InspectorView": "resource/custom_skins/InspectorView.exml",
         "feng3d.editor.OVObject3D": "resource/custom_skins/OVInspectorObject3D.exml",
         "feng3d.editor.Accordion": "resource/custom_skins/Accordion.exml",
-        "feng3d.editor.Feng3dView": "resource/custom_skins/Feng3dView.exml"
+        "feng3d.editor.Feng3dView": "resource/custom_skins/Feng3dView.exml",
+        "feng3d.editor.HierarchyView": "resource/custom_skins/HierarchyView.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [
@@ -46,6 +47,7 @@
         "resource/custom_skins/OVInspectorObject3D.exml",
         "resource/custom_skins/InspectorView.exml",
         "resource/custom_skins/Feng3dView.exml",
+        "resource/custom_skins/HierarchyView.exml",
         "resource/custom_skins/MainView.exml"
     ]
 }

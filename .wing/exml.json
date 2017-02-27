@@ -73,5 +73,10 @@
         "path": "ui\\Feng3dView.ts",
         "class": "Feng3dView",
         "parentPath": ""
+    },
+    "15a7ed011a7": {
+        "path": "ui\\hierarchy\\HierarchyView.ts",
+        "class": "HierarchyView",
+        "parentPath": ""
     }
 }

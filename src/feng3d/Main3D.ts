@@ -8,6 +8,8 @@ module feng3d.editor
     export class Main3D
     {
         view3D: View3D;
+        scene: Scene3D;
+
         controller: FPSController;
         cameraObj: Object3D;
 
@@ -28,7 +30,7 @@ module feng3d.editor
             var canvas = document.getElementById("glcanvas");
             canvas.addEventListener("mousedown", this.onMousedown.bind(this));
             canvas.addEventListener("mouseup", this.onMouseup.bind(this));
-            canvas.addEventListener("mouseout",this.onMouseup.bind(this))
+            canvas.addEventListener("mouseout", this.onMouseup.bind(this))
         }
 
         private onMousedown()
@@ -50,22 +52,45 @@ module feng3d.editor
         {
             var canvas = document.getElementById("glcanvas");
             this.view3D = new feng3d.View3D(canvas);
-
-            //初始化颜色材质
-            var cube = new CubeObject3D();
-            cube.transform.z = 300;
-            this.view3D.scene.addChild(cube);
-
-            //变化旋转与颜色
-            setInterval(function ()
-            {
-                cube.transform.ry += 1;
-            }, 15);
+            this.scene = this.view3D.scene;
 
             this.view3D.scene.addChild(new GroundGrid().groundGridObject3D);
             this.view3D.scene.addChild(new Trident());
 
-            new MousePickTest(this.view3D.scene);
+            this.scene.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
+            $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
+        }
+
+        private inspectorObject3D = new InspectorObject3D();
+
+        onMouseClick(event: Event)
+        {
+            var object3D: Object3D = <Object3D>event.target;
+
+            this.inspectorObject3D.setObject3D(object3D);
+            $editorEventDispatcher.dispatchEvent(new Event(InspectorView.Inspector_Object, this.inspectorObject3D));
+        }
+
+        private onCreateObject3D(event: Event)
+        {
+            switch (event.data)
+            {
+                case "Plane":
+                    this.scene.addChild(new PlaneObject3D());
+                    break;
+                case "Cube":
+                    this.scene.addChild(new CubeObject3D());
+                    break;
+                case "Sphere":
+                    this.scene.addChild(new SphereObject3D());
+                    break;
+                case "Capsule":
+                    this.scene.addChild(new CapsuleObject3D());
+                    break;
+                case "Cylinder":
+                    this.scene.addChild(new CylinderObject3D());
+                    break;
+            }
         }
     }
 }
