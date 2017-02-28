@@ -1,6 +1,6 @@
 # feng3d-editor
 feng3d引擎编辑器
-编辑器UI基于[laybox](http://www.layabox.com/)开发。
+编辑器UI基于[egret](https://www.egret.com/)开发。
 
 ## 运行项目
 1. 更新（下载）Submodule Update 

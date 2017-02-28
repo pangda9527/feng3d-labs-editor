@@ -5,6 +5,3 @@
 [submodule "objectView"]
 	path = objectView
 	url = https://git.oschina.net/feng3d/ObjectView-ts.git
-[submodule "feng3d-common"]
-	path = feng3d-common
-	url = https://git.oschina.net/feng3d/feng3d-common.git
