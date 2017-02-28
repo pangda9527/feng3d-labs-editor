@@ -4,4 +4,4 @@
 	branch = master
 [submodule "objectView"]
 	path = objectView
-	url = https://git.oschina.net/feng3d/ObjectView-ts.git
+	url = https://github.com/wardenfeng/ObjectView-ts.git
