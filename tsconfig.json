@@ -57,6 +57,7 @@
         "src/feng3d/GroundGrid.ts",
         "src/feng3d/Main3D.ts",
         //
+        "src/EditorEnvironment.ts",
         "src/Editor.ts"
     ],
     "exclude": [

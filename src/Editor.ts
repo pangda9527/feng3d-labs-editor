@@ -7,17 +7,13 @@ module feng3d.editor
      */
     export class Editor extends eui.UILayer
     {
-        // export class Editor {
 
         constructor()
         {
 
             super();
 
-            ClassUtils.addClassNameSpace("feng3d.editor");
-            ClassUtils.addClassNameSpace("egret");
-
-            egret.TextField.default_size = 12;
+            new EditorEnvironment();
 
             //初始化feng3d
             new Main3D();
