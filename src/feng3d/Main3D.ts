@@ -57,9 +57,7 @@ module feng3d.editor
             this.view3D.scene.addChild(new GroundGrid().groundGridObject3D);
             this.view3D.scene.addChild(new Trident());
 
-            var o = new Object3DMoveModel();
-            o.transform.position.setTo(0, 200, 0);
-            this.scene.addChild(o);
+            this.view3D.scene.addChild(new Object3DControllerTool());
 
             this.scene.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);

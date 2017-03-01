@@ -51,6 +51,8 @@
         //
         "src/feng3d/events/Editor3DEvent.ts",
         //
+        "src/feng3d/object3DControllerTool/Object3DControllerToolBase.ts",
+        "src/feng3d/object3DControllerTool/Object3DMoveTool.ts",
         "src/feng3d/object3DControllerTool/Object3DControllerTool.ts",
         "src/feng3d/object3DControllerTool/models/Object3DMoveModel.ts",
         //
