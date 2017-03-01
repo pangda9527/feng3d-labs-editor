@@ -65,14 +65,11 @@ module feng3d.editor
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
         }
 
-        private inspectorObject3D = new InspectorObject3D();
-
         onMouseClick(event: Event)
         {
             var object3D: Object3D = <Object3D>event.target;
 
-            this.inspectorObject3D.setObject3D(object3D);
-            $editorEventDispatcher.dispatchEvent(new Event(InspectorView.Inspector_Object, this.inspectorObject3D));
+            Editor3DData.instance.selectedObject3D = object3D;
         }
 
         private onCreateObject3D(event: Event)

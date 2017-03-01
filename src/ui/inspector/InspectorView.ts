@@ -2,15 +2,19 @@ module feng3d.editor
 {
 	export class InspectorView extends eui.Component implements eui.UIComponent
 	{
-		public static Inspector_Object = "inspectorObject";
 		public group: eui.Group;
 		private objectView: eui.Component;
+		private selectedObject3D: Object3D;
+		private inspectorObject3D = new InspectorObject3D();
 
 		public constructor()
 		{
 			super();
-			$editorEventDispatcher.addEventListener(InspectorView.Inspector_Object, this.onInspectorObject, this);
 			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+
+			Binding.bindProperty(Editor3DData.instance, ["selectedObject3D"], this, "selectedObject3D");
+			Binding.bindHandler(this, ["selectedObject3D"], this.updateView, this);
+
 			this.skinName = "InspectorViewSkin";
 		}
 
@@ -26,15 +30,16 @@ module feng3d.editor
 			// }));
 		}
 
-		private onInspectorObject(event: Event)
+		private updateView()
 		{
 			if (this.objectView && this.objectView.parent)
 			{
 				this.objectView.parent.removeChild(this.objectView);
 			}
-			if (event.data)
+			if (this.selectedObject3D)
 			{
-				this.objectView = ObjectView.getObjectView(event.data);
+				this.inspectorObject3D.setObject3D(this.selectedObject3D);
+				this.objectView = ObjectView.getObjectView(this.inspectorObject3D);
 				this.objectView.percentWidth = 100;
 				this.group.addChild(this.objectView);
 			}

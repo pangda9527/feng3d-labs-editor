@@ -1,4 +1,4 @@
-module feng3d
+module feng3d.editor
 {
     export class Object3DMoveModel extends Object3D
     {
