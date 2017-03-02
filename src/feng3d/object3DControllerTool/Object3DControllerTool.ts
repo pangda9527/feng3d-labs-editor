@@ -7,7 +7,8 @@ module feng3d.editor
             super();
 
             // this.addChild(new Object3DMoveTool());
-            this.addChild(new Object3DScaleTool());
+            // this.addChild(new Object3DScaleTool());
+            this.addChild(new Object3DRotationTool());
         }
     }
 }

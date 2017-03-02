@@ -171,6 +171,8 @@ module feng3d.editor
             this.colorMaterial.color = this.selected ? this.selectedColor : this.color;
 
             var border = this.border;
+            border.segmentGeometry.removeAllSegments();
+            
             var segment = new Segment(new Vector3D(0, 0, 0), new Vector3D(this.width, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
             border.segmentGeometry.addSegment(segment);

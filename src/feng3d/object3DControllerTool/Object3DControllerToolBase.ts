@@ -2,7 +2,7 @@ module feng3d.editor
 {
     export class Object3DControllerToolBase extends Object3D
     {
-        private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube;
+        private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis;
         //
         protected _selectedObject3D: Object3D;
         protected toolModel: Object3D;
