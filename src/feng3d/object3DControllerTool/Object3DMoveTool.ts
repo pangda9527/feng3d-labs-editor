@@ -31,7 +31,6 @@ module feng3d.editor
             super.onItemMouseDown(event);
             //全局矩阵
             var globalMatrix3D = this.toolModel.transform.globalMatrix3D;
-            this.startSceneTransform = globalMatrix3D.clone();
             //中心与X,Y,Z轴上点坐标
             var po = globalMatrix3D.transformVector(new Vector3D(0, 0, 0));
             var px = globalMatrix3D.transformVector(new Vector3D(1, 0, 0));
@@ -78,6 +77,7 @@ module feng3d.editor
                     break;
             }
             //
+            this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
             this.startPos = this.toolModel.transform.position.clone();
 
@@ -103,6 +103,7 @@ module feng3d.editor
             $mouseKeyInput.removeEventListener($mouseKeyType.mousemove, this.onMouseMove, this);
 
             this.startPos = null;
+            this.startPlanePos = null;
             this.startSceneTransform = null;
             this.updateToolModel();
         }

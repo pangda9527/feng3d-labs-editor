@@ -55,6 +55,9 @@ module feng3d.editor
         process(event: Event)
         {
             this.controller.update();
+
+            Editor3DData.instance.mouseInView3D.copyFrom(this.view3D.mousePos);
+            Editor3DData.instance.view3DRect.copyFrom(this.view3D.viewRect);
         }
 
         init()

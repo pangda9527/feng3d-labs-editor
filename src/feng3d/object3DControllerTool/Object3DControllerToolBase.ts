@@ -2,7 +2,7 @@ module feng3d.editor
 {
     export class Object3DControllerToolBase extends Object3D
     {
-        private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube;
+        private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube;
         //
         protected _selectedObject3D: Object3D;
         protected toolModel: Object3D;
@@ -57,7 +57,7 @@ module feng3d.editor
             if (this._selectedObject3D)
             {
                 this.addChild(this.toolModel);
-                this.toolModel.transform.globalMatrix3D = this._selectedObject3D.transform.globalMatrix3D;
+                this.updatePositionRotation();
                 this._selectedObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
                 Editor3DData.instance.camera3D.object3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             }
@@ -79,12 +79,20 @@ module feng3d.editor
         protected onItemMouseDown(event: Event)
         {
             this.selectedItem = <any>event.currentTarget;
+        }
 
+        protected updatePositionRotation()
+        {
+            var vec = this._selectedObject3D.transform.globalMatrix3D.decompose();
+            vec[2].setTo(1, 1, 1);
+            var mat = new Matrix3D();
+            mat.recompose(vec);
+            this.toolModel.transform.globalMatrix3D = mat;
         }
 
         protected onScenetransformChanged()
         {
-            this.toolModel.transform.globalMatrix3D = this._selectedObject3D.transform.globalMatrix3D;
+            this.updatePositionRotation();
         }
 
         protected onCameraScenetransformChanged()

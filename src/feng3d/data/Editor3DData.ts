@@ -6,6 +6,11 @@ module feng3d.editor
         public camera3D: Camera3D;
         public view3D: View3D;
         public hierarchy: Hierarchy;
+        /**
+         * 鼠标在view3D中的坐标
+         */
+        public mouseInView3D: Point = new Point();
+        public view3DRect: Rectangle = new Rectangle(0, 0, 100, 100);
 
         private static _instance: Editor3DData;
         public static get instance()
