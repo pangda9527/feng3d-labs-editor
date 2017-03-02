@@ -5,6 +5,10 @@ module feng3d.editor
         protected _selectedObject3D: Object3D;
         protected toolModel: Object3D;
 
+        //平移平面，该平面处于场景空间，用于计算位移量
+        protected movePlane3D: Plane3D;
+        protected startSceneTransform: Matrix3D;
+
         constructor()
         {
             super();
@@ -43,6 +47,28 @@ module feng3d.editor
 
         protected onCameraScenetransformChanged()
         {
+        }
+
+        /**
+         * 获取鼠标射线与移动平面的交点（模型空间）
+         */
+        protected getLocalMousePlaneCross()
+        {
+            //射线与平面交点
+            var crossPos = this.getMousePlaneCross();
+            //把交点从世界转换为模型空间
+            var inverseGlobalMatrix3D = this.startSceneTransform.clone();
+            inverseGlobalMatrix3D.invert();
+            crossPos = inverseGlobalMatrix3D.transformVector(crossPos);
+            return crossPos;
+        }
+
+        protected getMousePlaneCross()
+        {
+            var line3D = Editor3DData.instance.view3D.getMouseRay3D();
+            //射线与平面交点
+            var crossPos = this.movePlane3D.lineCross(line3D);
+            return crossPos;
         }
     }
 }

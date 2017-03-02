@@ -6,6 +6,12 @@ module feng3d.editor
         protected toolModel: Object3DMoveModel;
 
         private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube;
+        /**
+         * 用于判断是否改变了XYZ
+         */
+        private changeXYZ: Vector3D = new Vector3D();
+        private startPlanePos: Vector3D;
+        private startPos: Vector3D;
 
         constructor()
         {
@@ -30,32 +36,88 @@ module feng3d.editor
 
         private onItemMouseDown(event: Event)
         {
-            var selected: CoordinateAxis | CoordinatePlane | CoordinateCube = null;
-            switch (event.currentTarget)
+            this.selectedItem = <any>event.currentTarget;
+            //全局矩阵
+            var globalMatrix3D = this.toolModel.transform.globalMatrix3D;
+            this.startSceneTransform = globalMatrix3D.clone();
+            //中心与X,Y,Z轴上点坐标
+            var po = globalMatrix3D.transformVector(new Vector3D(0, 0, 0));
+            var px = globalMatrix3D.transformVector(new Vector3D(1, 0, 0));
+            var py = globalMatrix3D.transformVector(new Vector3D(0, 1, 0));
+            var pz = globalMatrix3D.transformVector(new Vector3D(0, 0, 1));
+            //
+            var ox = px.subtract(po);
+            var oy = py.subtract(po);
+            var oz = pz.subtract(po);
+            //摄像机前方方向
+            var cameraSceneTransform = Editor3DData.instance.camera3D.object3D.transform.globalMatrix3D;
+            var cameraDir = cameraSceneTransform.forward;
+            this.movePlane3D = new Plane3D();
+            //
+            switch (this.selectedItem)
             {
                 case this.toolModel.xAxis:
-                    selected = this.toolModel.xAxis;
+                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
+                    this.changeXYZ.setTo(1, 0, 0);
                     break;
                 case this.toolModel.yAxis:
-                    selected = this.toolModel.yAxis;
+                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
+                    this.changeXYZ.setTo(0, 1, 0);
                     break;
                 case this.toolModel.zAxis:
-                    selected = this.toolModel.zAxis;
+                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
+                    this.changeXYZ.setTo(0, 0, 1);
                     break;
                 case this.toolModel.yzPlane:
-                    selected = this.toolModel.yzPlane;
+                    this.movePlane3D.fromPoints(po, py, pz);
+                    this.changeXYZ.setTo(0, 1, 1);
                     break;
                 case this.toolModel.xzPlane:
-                    selected = this.toolModel.xzPlane;
+                    this.movePlane3D.fromPoints(po, px, pz);
+                    this.changeXYZ.setTo(1, 0, 1);
                     break;
                 case this.toolModel.xyPlane:
-                    selected = this.toolModel.xyPlane;
+                    this.movePlane3D.fromPoints(po, px, py);
+                    this.changeXYZ.setTo(1, 1, 0);
                     break;
                 case this.toolModel.oCube:
-                    selected = this.toolModel.oCube;
+                    this.movePlane3D.fromNormalAndPoint(cameraDir, po);
+                    this.changeXYZ.setTo(1, 1, 1);
                     break;
             }
-            this.selectedItem = selected;
+            //
+            this.startPlanePos = this.getLocalMousePlaneCross();
+            this.startPos = this.toolModel.transform.position.clone();
+
+            //
+            $mouseKeyInput.addEventListener($mouseKeyType.mousemove, this.onMouseMove, this);
+            $mouseKeyInput.addEventListener($mouseKeyType.mouseup, this.onMouseUp, this);
+        }
+
+        private onMouseMove()
+        {
+            var crossPos = this.getLocalMousePlaneCross();
+            var addPos = crossPos.subtract(this.startPlanePos);
+            addPos.x *= this.changeXYZ.x;
+            addPos.y *= this.changeXYZ.y;
+            addPos.z *= this.changeXYZ.z;
+            var sceneTransform = this.startSceneTransform.clone();
+            sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
+            var sceneAddPos = sceneTransform.position.subtract(this.startSceneTransform.position);
+            //
+            sceneTransform = this.startSceneTransform.clone();
+            sceneTransform.appendTranslation(sceneAddPos.x, sceneAddPos.y, sceneAddPos.z);
+            this._selectedObject3D.transform.globalMatrix3D = sceneTransform;
+        }
+
+        private onMouseUp()
+        {
+            $mouseKeyInput.removeEventListener($mouseKeyType.mousemove, this.onMouseMove, this);
+            $mouseKeyInput.removeEventListener($mouseKeyType.mouseup, this.onMouseUp, this);
+            
+            this.movePlane3D = null;
+            this.startPos = null;
+            this.startSceneTransform = null;
         }
 
         public get selectedItem()
