@@ -10,7 +10,7 @@ module feng3d.editor
         public xzPlane: CoordinatePlane;
         public xyPlane: CoordinatePlane;
 
-        public oCube: CubeObject3D;
+        public oCube: CoordinateCube;
 
         constructor()
         {
@@ -55,7 +55,7 @@ module feng3d.editor
             this.xyPlane.transform.rx = -90;
             this.addChild(this.xyPlane);
 
-            this.oCube = new CubeObject3D(8);
+            this.oCube = new CoordinateCube();
             this.addChild(this.oCube);
         }
     }
@@ -97,6 +97,37 @@ module feng3d.editor
             //
             this.xArrow.transform.y = this.length;
             this.xArrow.colorMaterial.color = this.selected ? this.selectedColor : this.color;
+        }
+    }
+
+    export class CoordinateCube extends Object3D
+    {
+        public colorMaterial: ColorMaterial;
+        public oCube: CubeObject3D;
+
+        public color = new Color(1, 1, 1);
+        public selectedColor = new Color(1, 1, 0);
+        public selected = false;
+
+        constructor()
+        {
+            super();
+            this.oCube = new CubeObject3D(8);
+            this.colorMaterial = new ColorMaterial();
+            this.oCube.getOrCreateComponentByClass(MeshRenderer).material = this.colorMaterial;
+            this.addChild(this.oCube);
+
+            this.update();
+
+            //
+            Binding.bindHandler(this, ["color"], this.update, this);
+            Binding.bindHandler(this, ["selectedColor"], this.update, this);
+            Binding.bindHandler(this, ["selected"], this.update, this);
+        }
+
+        private update()
+        {
+            this.colorMaterial.color = this.selected ? this.selectedColor : this.color;
         }
     }
 

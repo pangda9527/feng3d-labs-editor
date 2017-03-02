@@ -5,7 +5,7 @@ module feng3d.editor
     {
         protected toolModel: Object3DMoveModel;
 
-        private _selectedItem: CoordinateAxis | CoordinatePlane;
+        private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube;
 
         constructor()
         {
@@ -18,6 +18,7 @@ module feng3d.editor
             this.toolModel.yzPlane.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.xzPlane.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.xyPlane.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.oCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
 
             $mouseKeyInput.addEventListener($mouseKeyType.mousedown, this.onMouseDown, this);
         }
@@ -29,7 +30,7 @@ module feng3d.editor
 
         private onItemMouseDown(event: Event)
         {
-            var selected = null;
+            var selected: CoordinateAxis | CoordinatePlane | CoordinateCube = null;
             switch (event.currentTarget)
             {
                 case this.toolModel.xAxis:
@@ -49,6 +50,9 @@ module feng3d.editor
                     break;
                 case this.toolModel.xyPlane:
                     selected = this.toolModel.xyPlane;
+                    break;
+                case this.toolModel.oCube:
+                    selected = this.toolModel.oCube;
                     break;
             }
             this.selectedItem = selected;
