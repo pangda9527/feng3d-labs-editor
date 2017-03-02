@@ -19,6 +19,7 @@
 				</e:Group>
 				<e:Group id="assetsGroup" width="100%" height="200" x="400" y="0">
 					<e:Rect width="100%" height="100%" scaleX="1" scaleY="1" fillColor="0x383838"/>
+					<e:Label text="Assets" y="3" size="14" bold="true" x="5"/>
 				</e:Group>
 				<e:layout>
 					<e:VerticalLayout gap="4"/>

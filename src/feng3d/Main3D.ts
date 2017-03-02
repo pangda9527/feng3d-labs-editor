@@ -19,6 +19,9 @@ module feng3d.editor
 
             Editor3DData.instance.view3D = this.view3D;
             Editor3DData.instance.camera3D = this.view3D.camera;
+            Editor3DData.instance.hierarchy = new Hierarchy();
+            Editor3DData.instance.hierarchy.scene = this.view3D.scene;
+
 
             this.cameraObj = new Object3D("camera");
             this.cameraObj.transform.z = -500;
@@ -64,38 +67,6 @@ module feng3d.editor
             this.view3D.scene.addChild(new Trident());
 
             this.view3D.scene.addChild(new Object3DControllerTool());
-
-            this.scene.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
-            $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
-        }
-
-        onMouseClick(event: Event)
-        {
-            var object3D: Object3D = <Object3D>event.target;
-
-            Editor3DData.instance.selectedObject3D = object3D;
-        }
-
-        private onCreateObject3D(event: Event)
-        {
-            switch (event.data)
-            {
-                case "Plane":
-                    this.scene.addChild(new PlaneObject3D());
-                    break;
-                case "Cube":
-                    this.scene.addChild(new CubeObject3D());
-                    break;
-                case "Sphere":
-                    this.scene.addChild(new SphereObject3D());
-                    break;
-                case "Capsule":
-                    this.scene.addChild(new CapsuleObject3D());
-                    break;
-                case "Cylinder":
-                    this.scene.addChild(new CylinderObject3D());
-                    break;
-            }
         }
     }
 }

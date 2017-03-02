@@ -5,6 +5,7 @@ module feng3d.editor
         public selectedObject3D: Object3D;
         public camera3D: Camera3D;
         public view3D: View3D;
+        public hierarchy: Hierarchy;
 
         private static _instance: Editor3DData;
         public static get instance()
