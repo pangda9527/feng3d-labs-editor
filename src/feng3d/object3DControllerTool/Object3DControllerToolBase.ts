@@ -2,8 +2,12 @@ module feng3d.editor
 {
     export class Object3DControllerToolBase extends Object3D
     {
+        private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube;
+        //
         protected _selectedObject3D: Object3D;
         protected toolModel: Object3D;
+
+        protected ismouseDown = false;
 
         //平移平面，该平面处于场景空间，用于计算位移量
         protected movePlane3D: Plane3D;
@@ -14,6 +18,25 @@ module feng3d.editor
             super();
 
             Binding.bindProperty(Editor3DData.instance, ["selectedObject3D"], this, "selectedObject3D");
+
+            $mouseKeyInput.addEventListener($mouseKeyType.mousedown, this.onMouseDown, this);
+            $mouseKeyInput.addEventListener($mouseKeyType.mouseup, this.onMouseUp, this);
+        }
+
+        public get selectedItem()
+        {
+            return this._selectedItem;
+        }
+
+        public set selectedItem(value)
+        {
+            if (this._selectedItem == value)
+                return;
+            if (this._selectedItem)
+                this._selectedItem.selected = false;
+            this._selectedItem = value;
+            if (this._selectedItem)
+                this._selectedItem.selected = true;
         }
 
         protected get selectedObject3D()
@@ -38,6 +61,25 @@ module feng3d.editor
                 this._selectedObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
                 Editor3DData.instance.camera3D.object3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             }
+        }
+
+        protected onMouseDown()
+        {
+            this.selectedItem = null;
+            this.ismouseDown = true;
+        }
+
+        protected onMouseUp()
+        {
+            this.ismouseDown = false;
+            this.movePlane3D = null;
+            this.startSceneTransform = null;
+        }
+
+        protected onItemMouseDown(event: Event)
+        {
+            this.selectedItem = <any>event.currentTarget;
+
         }
 
         protected onScenetransformChanged()

@@ -5,15 +5,12 @@ module feng3d.editor
     {
         protected toolModel: Object3DMoveModel;
 
-        private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube;
         /**
          * 用于判断是否改变了XYZ
          */
         private changeXYZ: Vector3D = new Vector3D();
         private startPlanePos: Vector3D;
         private startPos: Vector3D;
-
-        private ismouseDown = false;
 
         constructor()
         {
@@ -27,20 +24,11 @@ module feng3d.editor
             this.toolModel.xzPlane.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.xyPlane.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.oCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-
-            $mouseKeyInput.addEventListener($mouseKeyType.mousedown, this.onMouseDown, this);
-            $mouseKeyInput.addEventListener($mouseKeyType.mouseup, this.onMouseUp, this);
         }
 
-        private onMouseDown()
+        protected onItemMouseDown(event: Event)
         {
-            this.selectedItem = null;
-            this.ismouseDown = true;
-        }
-
-        private onItemMouseDown(event: Event)
-        {
-            this.selectedItem = <any>event.currentTarget;
+            super.onItemMouseDown(event);
             //全局矩阵
             var globalMatrix3D = this.toolModel.transform.globalMatrix3D;
             this.startSceneTransform = globalMatrix3D.clone();
@@ -109,31 +97,14 @@ module feng3d.editor
             this._selectedObject3D.transform.globalMatrix3D = sceneTransform;
         }
 
-        private onMouseUp()
+        protected onMouseUp()
         {
+            super.onMouseUp()
             $mouseKeyInput.removeEventListener($mouseKeyType.mousemove, this.onMouseMove, this);
 
-            this.ismouseDown = false;
-            this.movePlane3D = null;
             this.startPos = null;
             this.startSceneTransform = null;
             this.updateToolModel();
-        }
-
-        public get selectedItem()
-        {
-            return this._selectedItem;
-        }
-
-        public set selectedItem(value)
-        {
-            if (this._selectedItem == value)
-                return;
-            if (this._selectedItem)
-                this._selectedItem.selected = false;
-            this._selectedItem = value;
-            if (this._selectedItem)
-                this._selectedItem.selected = true;
         }
 
         protected set selectedObject3D(value)

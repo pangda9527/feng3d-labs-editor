@@ -51,10 +51,13 @@
         //
         "src/feng3d/events/Editor3DEvent.ts",
         //
+        "src/feng3d/object3DControllerTool/models/Object3DMoveModel.ts",
+        "src/feng3d/object3DControllerTool/models/Object3DScaleModel.ts",
         "src/feng3d/object3DControllerTool/Object3DControllerToolBase.ts",
         "src/feng3d/object3DControllerTool/Object3DMoveTool.ts",
+        "src/feng3d/object3DControllerTool/Object3DRotationTool.ts",
+        "src/feng3d/object3DControllerTool/Object3DScaleTool.ts",
         "src/feng3d/object3DControllerTool/Object3DControllerTool.ts",
-        "src/feng3d/object3DControllerTool/models/Object3DMoveModel.ts",
         //
         "src/feng3d/hierarchy/Hierarchy.ts",
         "src/feng3d/GroundGrid.ts",
