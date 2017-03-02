@@ -104,15 +104,16 @@ module feng3d.editor
                     {
                         var segment = new Segment(points[i - 1], points[i]);
                         segment.startColor = segment.endColor = color;
-                        this.border.segmentGeometry.addSegment(segment);
+                        this.border.segmentGeometry.addSegment(segment, false);
                     } else if (this.selected)
                     {
                         var segment = new Segment(points[i - 1], points[i]);
                         segment.startColor = segment.endColor = this.backColor;
-                        this.border.segmentGeometry.addSegment(segment);
+                        this.border.segmentGeometry.addSegment(segment, false);
                     }
                 }
             }
+            this.border.segmentGeometry.updateGeometry();
         }
     }
 }
