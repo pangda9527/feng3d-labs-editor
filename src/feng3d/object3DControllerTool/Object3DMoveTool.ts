@@ -13,6 +13,8 @@ module feng3d.editor
         private startPlanePos: Vector3D;
         private startPos: Vector3D;
 
+        private ismouseDown = false;
+
         constructor()
         {
             super();
@@ -27,11 +29,13 @@ module feng3d.editor
             this.toolModel.oCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
 
             $mouseKeyInput.addEventListener($mouseKeyType.mousedown, this.onMouseDown, this);
+            $mouseKeyInput.addEventListener($mouseKeyType.mouseup, this.onMouseUp, this);
         }
 
         private onMouseDown()
         {
             this.selectedItem = null;
+            this.ismouseDown = true;
         }
 
         private onItemMouseDown(event: Event)
@@ -91,7 +95,6 @@ module feng3d.editor
 
             //
             $mouseKeyInput.addEventListener($mouseKeyType.mousemove, this.onMouseMove, this);
-            $mouseKeyInput.addEventListener($mouseKeyType.mouseup, this.onMouseUp, this);
         }
 
         private onMouseMove()
@@ -113,11 +116,12 @@ module feng3d.editor
         private onMouseUp()
         {
             $mouseKeyInput.removeEventListener($mouseKeyType.mousemove, this.onMouseMove, this);
-            $mouseKeyInput.removeEventListener($mouseKeyType.mouseup, this.onMouseUp, this);
-            
+
+            this.ismouseDown = false;
             this.movePlane3D = null;
             this.startPos = null;
             this.startSceneTransform = null;
+            this.updateToolModel();
         }
 
         public get selectedItem()
@@ -161,6 +165,9 @@ module feng3d.editor
 
         private updateToolModel()
         {
+            //鼠标按下时不更新
+            if (this.ismouseDown)
+                return;
             var cameraPos = Editor3DData.instance.camera3D.object3D.transform.globalPosition;
             var localCameraPos = this.toolModel.transform.inverseGlobalMatrix3D.transformVector(cameraPos);
 
