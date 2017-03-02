@@ -106,10 +106,6 @@ module feng3d.editor
             addPos.z *= this.changeXYZ.z;
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
-            var sceneAddPos = sceneTransform.position.subtract(this.startSceneTransform.position);
-            //
-            sceneTransform = this.startSceneTransform.clone();
-            sceneTransform.appendTranslation(sceneAddPos.x, sceneAddPos.y, sceneAddPos.z);
             this._selectedObject3D.transform.globalMatrix3D = sceneTransform;
         }
 
