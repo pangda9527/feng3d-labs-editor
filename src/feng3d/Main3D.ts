@@ -36,9 +36,12 @@ module feng3d.editor
             canvas.addEventListener("mouseout", this.onMouseup.bind(this))
         }
 
-        private onMousedown()
+        private onMousedown(e)
         {
-            this.controller.target = this.cameraObj.transform;
+            if (e.button == 2)
+            {
+                this.controller.target = this.cameraObj.transform;
+            }
         }
 
         private onMouseup()
