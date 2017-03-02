@@ -17,6 +17,8 @@ module feng3d.editor
         {
             this.init();
 
+            Editor3DData.instance.camera3D = this.view3D.camera;
+
             this.cameraObj = new Object3D("camera");
             this.cameraObj.transform.z = -500;
             this.cameraObj.transform.y = 300;

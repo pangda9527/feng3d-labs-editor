@@ -69,5 +69,43 @@ module feng3d.editor
             if (this._selectedItem)
                 this._selectedItem.selected = true;
         }
+
+        protected set selectedObject3D(value)
+        {
+            if (this._selectedObject3D == value)
+                return;
+            super.selectedObject3D = value;
+            if (this._selectedObject3D)
+            {
+                this.updateToolModel();
+            }
+        }
+
+        protected onScenetransformChanged()
+        {
+            super.onScenetransformChanged();
+            this.updateToolModel();
+        }
+
+        protected onCameraScenetransformChanged()
+        {
+            super.onCameraScenetransformChanged();
+            this.updateToolModel();
+        }
+
+        private updateToolModel()
+        {
+            var cameraPos = Editor3DData.instance.camera3D.object3D.transform.globalPosition;
+            var localCameraPos = this.toolModel.transform.inverseGlobalMatrix3D.transformVector(cameraPos);
+
+            this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
+            this.toolModel.xyPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;
+
+            this.toolModel.xzPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xzPlane.width;
+            this.toolModel.xzPlane.transform.z = localCameraPos.z > 0 ? 0 : -this.toolModel.xzPlane.width;
+
+            this.toolModel.yzPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.yzPlane.width;
+            this.toolModel.yzPlane.transform.z = localCameraPos.z > 0 ? 0 : -this.toolModel.yzPlane.width;
+        }
     }
 }

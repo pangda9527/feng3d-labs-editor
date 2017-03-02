@@ -24,6 +24,7 @@ module feng3d.editor
             {
                 this.removeChild(this.toolModel);
                 this._selectedObject3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+                Editor3DData.instance.camera3D.object3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             }
             this._selectedObject3D = value;
             if (this._selectedObject3D)
@@ -31,12 +32,17 @@ module feng3d.editor
                 this.addChild(this.toolModel);
                 this.toolModel.transform.globalMatrix3D = this._selectedObject3D.transform.globalMatrix3D;
                 this._selectedObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+                Editor3DData.instance.camera3D.object3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             }
         }
 
         protected onScenetransformChanged()
         {
             this.toolModel.transform.globalMatrix3D = this._selectedObject3D.transform.globalMatrix3D;
+        }
+
+        protected onCameraScenetransformChanged()
+        {
         }
     }
 }
