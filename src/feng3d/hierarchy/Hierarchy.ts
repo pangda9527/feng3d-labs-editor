@@ -8,6 +8,9 @@ module feng3d.editor
         {
 
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
+
+            //监听命令
+            shortcut.ShortCut.commandDispatcher.addEventListener("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
         }
 
         public addObject3D(object3D: Object3D)
@@ -42,6 +45,18 @@ module feng3d.editor
                 case "Cylinder":
                     this.addObject3D(new CylinderObject3D());
                     break;
+            }
+        }
+
+        private onLookToSelectedObject3D()
+        {
+            var selectedObject3D = Editor3DData.instance.selectedObject3D;
+            if (selectedObject3D)
+            {
+                var lookPos = Editor3DData.instance.camera3D.globalMatrix3D.forward;
+                lookPos.scaleBy(-300);
+                lookPos.incrementBy(selectedObject3D.transform.globalPosition);
+                egret.Tween.get(Editor3DData.instance.camera3D.object3D.transform).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
             }
         }
     }

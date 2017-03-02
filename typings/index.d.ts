@@ -11,3 +11,5 @@
 /// <reference path="globals/github-electron/index.d.ts" />
 /// <reference path="globals/node/index.d.ts" />
 
+/** 快捷方式配置，该配置在resource目录下，通过index.html加载 */
+declare var shortcutConfig: ({ key: string; command: string; when: string; } | { key: string; command: string; })[];
