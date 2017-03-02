@@ -19,8 +19,8 @@ module feng3d.editor
 
             Binding.bindProperty(Editor3DData.instance, ["selectedObject3D"], this, "selectedObject3D");
 
-            $mouseKeyInput.addEventListener($mouseKeyType.mousedown, this.onMouseDown, this);
-            $mouseKeyInput.addEventListener($mouseKeyType.mouseup, this.onMouseUp, this);
+            Input.instance.addEventListener(InputEvent.types.MOUSE_DOWN, this.onMouseDown, this);
+            Input.instance.addEventListener(InputEvent.types.MOUSE_UP, this.onMouseUp, this);
         }
 
         public get selectedItem()

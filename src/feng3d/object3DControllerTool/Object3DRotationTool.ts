@@ -57,7 +57,7 @@ module feng3d.editor
             this.startMousePos = Editor3DData.instance.mouseInView3D.clone();
             this.startSceneTransform = globalMatrix3D.clone();
             //
-            $mouseKeyInput.addEventListener($mouseKeyType.mousemove, this.onMouseMove, this);
+            Input.instance.addEventListener(InputEvent.types.MOUSE_MOVE, this.onMouseMove, this);
         }
 
         private onMouseMove()
@@ -102,7 +102,7 @@ module feng3d.editor
         protected onMouseUp()
         {
             super.onMouseUp()
-            $mouseKeyInput.removeEventListener($mouseKeyType.mousemove, this.onMouseMove, this);
+            Input.instance.removeEventListener(InputEvent.types.MOUSE_MOVE, this.onMouseMove, this);
 
             this.startMousePos = null;
             this.startPlanePos = null;
