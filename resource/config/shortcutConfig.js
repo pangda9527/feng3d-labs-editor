@@ -5,9 +5,9 @@ var shortcutConfig = [ //
 	{ "key": "w", "command": "object3DMoveTool", "when": "!fpsViewing" },
 	{ "key": "e", "command": "object3DRotationTool", "when": "!fpsViewing" },
 	{ "key": "r", "command": "object3DScaleTool", "when": "!fpsViewing" },
-	{ "key": "alt+mousedown", "command": "mouseRotateSceneStart", "stateCommand": "mouseRotateSceneing", "when": "" }, //启动3D对象缩放工具
-	{ "key": "mousemove", "command": "mouseRotateScene", "when": "mouseRotateSceneing" }, //启动3D对象缩放工具
-	{ "key": "mouseup", "stateCommand": "!mouseRotateSceneing", "when": "mouseRotateSceneing" }, //启动3D对象缩放工具
+	{ "key": "alt+mousedown", "command": "mouseRotateSceneStart", "stateCommand": "mouseRotateSceneing", "when": "" },
+	{ "key": "mousemove", "command": "mouseRotateScene", "when": "mouseRotateSceneing" },
+	{ "key": "mouseup", "stateCommand": "!mouseRotateSceneing", "when": "mouseRotateSceneing" },
 
 
 ]
@@ -19,10 +19,13 @@ var shortcutConfig = [ //
 // - object3DMoveTool					启动3D对象移动工具
 // - object3DRotationTool				启动3D对象旋转工具
 // - object3DScaleTool					启动3D对象缩放工具
+// - mouseRotateSceneStart				启动场景旋转
+// - mouseRotateScene					旋转场景
 
 // 可用状态
-// - mouseInView3D		鼠标在3D视图中
-// - fpsViewing			fps浏览场景
+// - mouseInView3D						鼠标在3D视图中
+// - fpsViewing							fps浏览场景中
+// - mouseRotateSceneing				旋转场景中
 
 // 可用按键（按键均为小写）
 // - a-z

@@ -35,6 +35,8 @@ module feng3d.editor
 
             shortcut.ShortCut.commandDispatcher.addEventListener("fpsViewStart", this.onFpsViewStart, this);
             shortcut.ShortCut.commandDispatcher.addEventListener("fpsViewStop", this.onFpsViewStop, this);
+            shortcut.ShortCut.commandDispatcher.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+            shortcut.ShortCut.commandDispatcher.addEventListener("mouseRotateScene", this.onMouseRotateScene, this);
         }
 
         private onFpsViewStart()
@@ -45,6 +47,39 @@ module feng3d.editor
         private onFpsViewStop()
         {
             this.controller.target = null;
+        }
+
+        private rotateSceneCenter: Vector3D;
+        private rotateSceneCameraGlobalMatrix3D: Matrix3D;
+        private rotateSceneMousePoint: Point;
+        private onMouseRotateSceneStart()
+        {
+            this.rotateSceneMousePoint = new Point(Input.instance.clientX, Input.instance.clientY);
+            this.rotateSceneCameraGlobalMatrix3D = Editor3DData.instance.camera3D.globalMatrix3D.clone();
+            this.rotateSceneCenter = null;
+            if (Editor3DData.instance.selectedObject3D)
+            {
+                this.rotateSceneCenter = Editor3DData.instance.selectedObject3D.transform.globalPosition;
+            } else
+            {
+                this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
+                this.rotateSceneCenter.scaleBy(300);
+                this.rotateSceneCenter = this.rotateSceneCenter.add(this.rotateSceneCameraGlobalMatrix3D.position);
+            }
+        }
+
+        private onMouseRotateScene()
+        {
+            var camera3D = Editor3DData.instance.camera3D;
+            var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
+            var mousePoint = new Point(Input.instance.clientX, Input.instance.clientY);
+            var view3DRect = Editor3DData.instance.view3DRect;
+            var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
+            var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
+            globalMatrix3D.appendRotation(rotateY, Vector3D.Y_AXIS, this.rotateSceneCenter);
+            var rotateAxisX = globalMatrix3D.right;
+            globalMatrix3D.appendRotation(rotateX, rotateAxisX, this.rotateSceneCenter);
+            camera3D.object3D.transform.globalMatrix3D = globalMatrix3D;
         }
 
         process(event: Event)
