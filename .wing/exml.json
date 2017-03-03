@@ -83,5 +83,10 @@
         "path": "objectview\\oav\\OAVObject3DComponent.ts",
         "class": "OAVObject3DComponent",
         "parentPath": ""
+    },
+    "15a9380c143": {
+        "path": "ui\\hierarchy\\CreateObject3DView.ts",
+        "class": "CreateObject3DView",
+        "parentPath": ""
     }
 }

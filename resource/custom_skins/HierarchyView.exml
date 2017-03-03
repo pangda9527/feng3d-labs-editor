@@ -9,15 +9,5 @@
 			<e:BasicLayout/>
 		</e:layout>
 	</e:Group>
-	<e:List id="object3dList" width="100" y="32" right="20">
-		<e:ArrayCollection>
-			<e:Array>
-				<e:Object label="Plane" />
-				<e:Object label="Cube" />
-				<e:Object label="Sphere" />
-				<e:Object label="Capsule" />
-				<e:Object label="Cylinder" />
-			</e:Array>
-		</e:ArrayCollection>
-	</e:List>
+
 </e:Skin>

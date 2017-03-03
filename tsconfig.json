@@ -38,6 +38,7 @@
         //
         "src/ui/inspector/InspectorView.ts",
         //
+        "src/ui/hierarchy/CreateObject3DView.ts",
         "src/ui/hierarchy/HierarchyView.ts",
         //
         "src/ui/MainView.ts",
