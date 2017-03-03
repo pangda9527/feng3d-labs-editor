@@ -83,7 +83,7 @@ module feng3d.editor
                     sign = sign > 0 ? 1 : -1;
                     angle = angle * sign;
                     //
-                    tempSceneTransform.appendRotation(angle, this.movePlane3D.normal);
+                    tempSceneTransform.appendRotation(angle, this.movePlane3D.normal, tempSceneTransform.position);
                     this._selectedObject3D.transform.globalMatrix3D = tempSceneTransform;
                     break;
                 case this.toolModel.freeAxis:
@@ -92,8 +92,8 @@ module feng3d.editor
                     var cameraSceneTransform = Editor3DData.instance.camera3D.globalMatrix3D;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
-                    tempSceneTransform.appendRotation(-offset.y, right);
-                    tempSceneTransform.appendRotation(-offset.x, up);
+                    tempSceneTransform.appendRotation(-offset.y, right, tempSceneTransform.position);
+                    tempSceneTransform.appendRotation(-offset.x, up, tempSceneTransform.position);
                     this._selectedObject3D.transform.globalMatrix3D = tempSceneTransform;
                     break;
             }
