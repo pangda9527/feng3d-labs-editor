@@ -4,7 +4,7 @@ module feng3d.editor
 	{
 
 		public object3dList: eui.List;
-		private maskSprite: egret.Sprite;
+		private maskSprite: eui.Rect;
 
 		public constructor()
 		{
@@ -29,12 +29,10 @@ module feng3d.editor
 		{
 			if (!this.maskSprite)
 			{
-				this.maskSprite = new egret.Sprite();
-				this.maskSprite.graphics.beginFill(0, 0);
-				this.maskSprite.graphics.drawRect(0, 0, 100, 100);
-				this.maskSprite.graphics.endFill();
+				this.maskSprite = new eui.Rect(100, 100, 0);
+				this.maskSprite.alpha = 0;
 				this.addChildAt(this.maskSprite, 0);
-				this.maskSprite.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.maskMouseDown, this);
+				this.maskSprite.addEventListener(egret.TouchEvent.TOUCH_TAP, this.maskMouseDown, this);
 			}
 			var gP = this.localToGlobal(0, 0);
 			this.maskSprite.x = -gP.x;
