@@ -85,6 +85,13 @@ module feng3d.editor
                     //
                     tempSceneTransform.appendRotation(angle, this.movePlane3D.normal, tempSceneTransform.position);
                     this._selectedObject3D.transform.globalMatrix3D = tempSceneTransform;
+                    //绘制扇形区域
+                    if (this.selectedItem instanceof CoordinateRotationAxis)
+                    {
+                        this.selectedItem.startPos = this.startPlanePos;
+                        this.selectedItem.endPos = planeCross;
+                        this.selectedItem.showSector = true;
+                    }
                     break;
                 case this.toolModel.freeAxis:
                     var endPoint = Editor3DData.instance.mouseInView3D.clone();
@@ -103,6 +110,11 @@ module feng3d.editor
         {
             super.onMouseUp()
             Input.instance.removeEventListener(InputEvent.types.MOUSE_MOVE, this.onMouseMove, this);
+
+            if (this.selectedItem instanceof CoordinateRotationAxis)
+            {
+                this.selectedItem.showSector = false;
+            }
 
             this.startMousePos = null;
             this.startPlanePos = null;

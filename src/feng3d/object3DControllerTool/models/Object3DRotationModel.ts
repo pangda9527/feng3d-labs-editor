@@ -45,6 +45,11 @@ module feng3d.editor
     export class CoordinateRotationAxis extends Object3D
     {
         public border: SegmentObject3D;
+        public sector: SectorObject3D;
+
+        public showSector = false;
+        public startPos: Vector3D;
+        public endPos: Vector3D;
 
         public radius = 80;
         public color: Color = new Color(1, 0, 0);
@@ -68,6 +73,8 @@ module feng3d.editor
             this.border = new SegmentObject3D();
             this.addChild(this.border);
 
+            this.sector = new SectorObject3D();
+
             this.update();
 
             //
@@ -76,15 +83,20 @@ module feng3d.editor
             Binding.bindHandler(this, ["selectedColor"], this.update, this);
             Binding.bindHandler(this, ["selected"], this.update, this);
             Binding.bindHandler(this, ["filterNormal"], this.update, this);
+            //
+            Binding.bindHandler(this, ["showSector"], this.updateSector, this);
+            Binding.bindHandler(this, ["startPos"], this.updateSector, this);
+            Binding.bindHandler(this, ["endPos"], this.updateSector, this);
         }
 
         private update()
         {
             var color = this.selected ? this.selectedColor : this.color;
 
+            var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
             if (this.filterNormal)
             {
-                var localNormal = this.transform.inverseGlobalMatrix3D.deltaTransformVector(this.filterNormal);
+                var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this.filterNormal);
             }
 
             this.border.segmentGeometry.removeAllSegments();
@@ -114,6 +126,111 @@ module feng3d.editor
                 }
             }
             this.border.segmentGeometry.updateGeometry();
+        }
+
+        private updateSector()
+        {
+            //
+            if (this.showSector && this.startPos && this.endPos)
+            {
+                var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
+                var localStartPos = inverseGlobalMatrix3D.transformVector(this.startPos);
+                var localEndPos = inverseGlobalMatrix3D.transformVector(this.endPos);
+                var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * MathConsts.RADIANS_TO_DEGREES;
+                var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * MathConsts.RADIANS_TO_DEGREES;
+                this.sector.update(startAngle, endAngle);
+                this.addChild(this.sector);
+            } else
+            {
+                this.removeChild(this.sector);
+            }
+        }
+    }
+
+    /**
+     * 扇形对象
+     */
+    export class SectorObject3D extends Object3D
+    {
+        public geometry: Geometry;
+        public border: SegmentObject3D;
+        public borderColor = new Color(0, 1, 1, 0.6);
+
+        public radius = 80
+
+        public _start = 0;
+        public _end = 0;
+
+        /**
+         * 构建3D对象
+         */
+        constructor(name = "sector")
+        {
+            super(name);
+            var mesh = this.getOrCreateComponentByClass(MeshFilter);
+            this.geometry = mesh.geometry = new Geometry();
+            this.getOrCreateComponentByClass(MeshRenderer).material = new ColorMaterial(new Color(0.5, 0.5, 0.5, 0.2));
+
+            this.border = new SegmentObject3D();
+            this.addChild(this.border);
+
+            this.update();
+        }
+
+        public update(start = 0, end = 0)
+        {
+            this._start = start;
+            this._end = end;
+            this.adjustAngle();
+            var length = Math.floor(this._end - this._start);
+            if (length == 0)
+                length = 1;
+            var vertexPositionData = new Float32Array((length + 2) * 3);
+            var indices = new Uint16Array(length * 3);
+            vertexPositionData[0] = 0;
+            vertexPositionData[1] = 0;
+            vertexPositionData[2] = 0;
+            for (var i = 0; i < length; i++)
+            {
+                vertexPositionData[i * 3 + 3] = this.radius * Math.cos((i + this._start) * MathConsts.DEGREES_TO_RADIANS);
+                vertexPositionData[i * 3 + 4] = this.radius * Math.sin((i + this._start) * MathConsts.DEGREES_TO_RADIANS);
+                vertexPositionData[i * 3 + 5] = 0;
+                if (i > 0)
+                {
+                    indices[(i - 1) * 3] = 0;
+                    indices[(i - 1) * 3 + 1] = i;
+                    indices[(i - 1) * 3 + 2] = i + 1;
+                }
+            }
+            this.geometry.setVAData(GLAttribute.a_position, vertexPositionData, 3);
+            this.geometry.setIndices(indices);
+            //绘制边界
+            var startPoint = new Vector3D(this.radius * Math.cos((this._start - 0.5) * MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._start - 0.5) * MathConsts.DEGREES_TO_RADIANS), 0);
+            var endPoint = new Vector3D(this.radius * Math.cos((this._end + 0.5) * MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._end + 0.5) * MathConsts.DEGREES_TO_RADIANS), 0);
+            //
+            this.border.segmentGeometry.removeAllSegments();
+            var segment = new Segment(new Vector3D(), startPoint);
+            segment.startColor = segment.endColor = this.borderColor;
+            this.border.segmentGeometry.addSegment(segment);
+            var segment = new Segment(new Vector3D(), endPoint);
+            segment.startColor = segment.endColor = this.borderColor;
+            this.border.segmentGeometry.addSegment(segment);
+        }
+
+        private adjustAngle()
+        {
+            var min = Math.min(this._start, this._end);
+            var max = Math.max(this._start, this._end);
+            if (max - min > 180)
+            {
+                min += 360;
+                this._start = max;
+                this._end = min;
+            } else
+            {
+                this._start = min;
+                this._end = max;
+            }
         }
     }
 }
