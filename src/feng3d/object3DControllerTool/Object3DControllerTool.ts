@@ -21,6 +21,8 @@ module feng3d.editor
             shortcut.ShortCut.commandDispatcher.addEventListener("object3DMoveTool", this.onObject3DMoveTool, this);
             shortcut.ShortCut.commandDispatcher.addEventListener("object3DRotationTool", this.onObject3DRotationTool, this);
             shortcut.ShortCut.commandDispatcher.addEventListener("object3DScaleTool", this.onObject3DScaleTool, this);
+            //
+            shortcut.ShortCut.commandDispatcher.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
         }
 
         private onObject3DMoveTool()
@@ -47,7 +49,13 @@ module feng3d.editor
             this._currentTool = value;
             if (this._currentTool)
                 this.addChild(this._currentTool)
+        }
 
+        private onMouseRotateSceneStart()
+        {
+            var camera3D = Editor3DData.instance.camera3D;
+            var position = camera3D.globalMatrix3D.forward;
+            
         }
     }
 }

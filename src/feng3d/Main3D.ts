@@ -33,21 +33,16 @@ module feng3d.editor
             //
             $ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
 
-            var canvas = document.getElementById("glcanvas");
-            canvas.addEventListener("mousedown", this.onMousedown.bind(this));
-            canvas.addEventListener("mouseup", this.onMouseup.bind(this));
-            canvas.addEventListener("mouseout", this.onMouseup.bind(this))
+            shortcut.ShortCut.commandDispatcher.addEventListener("fpsViewStart", this.onFpsViewStart, this);
+            shortcut.ShortCut.commandDispatcher.addEventListener("fpsViewStop", this.onFpsViewStop, this);
         }
 
-        private onMousedown(e)
+        private onFpsViewStart()
         {
-            if (e.button == 2)
-            {
-                this.controller.target = this.cameraObj.transform;
-            }
+            this.controller.target = this.cameraObj.transform;
         }
 
-        private onMouseup()
+        private onFpsViewStop()
         {
             this.controller.target = null;
         }
