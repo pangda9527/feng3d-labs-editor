@@ -46,10 +46,10 @@ module feng3d.editor
 
 			if (bound.contains(Input.instance.clientX, Input.instance.clientY))
 			{
-				shortcut.ShortCut.activityState("mouseInView3D");
+				shortcut.activityState("mouseInView3D");
 			} else
 			{
-				shortcut.ShortCut.deactivityState("mouseInView3D");
+				shortcut.deactivityState("mouseInView3D");
 			}
 		}
 	}

@@ -10,6 +10,9 @@ module feng3d.editor
 
         private init()
         {
+            document.body.oncontextmenu = function () { return false; }
+
+
             //给反射添加查找的空间
             ClassUtils.addClassNameSpace("feng3d.editor");
             ClassUtils.addClassNameSpace("egret");

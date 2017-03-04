@@ -10,7 +10,7 @@ module feng3d.editor
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
 
             //监听命令
-            shortcut.ShortCut.commandDispatcher.addEventListener("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
+            shortcut.addEventListener("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
         }
 
         public addObject3D(object3D: Object3D)

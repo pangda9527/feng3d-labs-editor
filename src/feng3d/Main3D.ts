@@ -33,10 +33,10 @@ module feng3d.editor
             //
             $ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
 
-            shortcut.ShortCut.commandDispatcher.addEventListener("fpsViewStart", this.onFpsViewStart, this);
-            shortcut.ShortCut.commandDispatcher.addEventListener("fpsViewStop", this.onFpsViewStop, this);
-            shortcut.ShortCut.commandDispatcher.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
-            shortcut.ShortCut.commandDispatcher.addEventListener("mouseRotateScene", this.onMouseRotateScene, this);
+            shortcut.addEventListener("fpsViewStart", this.onFpsViewStart, this);
+            shortcut.addEventListener("fpsViewStop", this.onFpsViewStop, this);
+            shortcut.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+            shortcut.addEventListener("mouseRotateScene", this.onMouseRotateScene, this);
         }
 
         private onFpsViewStart()

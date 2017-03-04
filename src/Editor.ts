@@ -15,8 +15,7 @@ module feng3d.editor
 
             new EditorEnvironment();
 
-            shortcut.ShortCut.init();
-            shortcut.ShortCut.addShortCuts(shortcutConfig);
+            shortcut.addShortCuts(shortcutConfig);
 
             //初始化feng3d
             new Main3D();

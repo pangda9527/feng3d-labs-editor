@@ -18,11 +18,11 @@ module feng3d.editor
 
             this.currentTool = this.object3DMoveTool;
 
-            shortcut.ShortCut.commandDispatcher.addEventListener("object3DMoveTool", this.onObject3DMoveTool, this);
-            shortcut.ShortCut.commandDispatcher.addEventListener("object3DRotationTool", this.onObject3DRotationTool, this);
-            shortcut.ShortCut.commandDispatcher.addEventListener("object3DScaleTool", this.onObject3DScaleTool, this);
+            shortcut.addEventListener("object3DMoveTool", this.onObject3DMoveTool, this);
+            shortcut.addEventListener("object3DRotationTool", this.onObject3DRotationTool, this);
+            shortcut.addEventListener("object3DScaleTool", this.onObject3DScaleTool, this);
             //
-            shortcut.ShortCut.commandDispatcher.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+            shortcut.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
         }
 
         private onObject3DMoveTool()
