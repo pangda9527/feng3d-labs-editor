@@ -62,6 +62,7 @@
         "src/feng3d/object3DControllerTool/Object3DControllerTool.ts",
         //
         "src/feng3d/hierarchy/Hierarchy.ts",
+        "src/feng3d/scene/SceneControl.ts",
         "src/feng3d/GroundGrid.ts",
         "src/feng3d/Main3D.ts",
         //

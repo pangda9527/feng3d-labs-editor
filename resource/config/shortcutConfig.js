@@ -13,6 +13,9 @@ var shortcutConfig = [ //
 	{ key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "" },
 	{ key: "mousemove", command: "mouseRotateScene", when: "mouseRotateSceneing" },
 	{ key: "mouseup", stateCommand: "!mouseRotateSceneing", when: "mouseRotateSceneing" },
+	{ key: "middlemousedown", command: "dragSceneStart", stateCommand: "dragSceneing", when: "mouseInView3D" },
+	{ key: "mousemove", command: "dragScene", when: "dragSceneing" },
+	{ key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
 
 
 ]
@@ -26,11 +29,14 @@ var shortcutConfig = [ //
 // - object3DScaleTool					启动3D对象缩放工具
 // - mouseRotateSceneStart				启动场景旋转
 // - mouseRotateScene					旋转场景
+// - dragSceneStart						启动拖拽场景
+// - dragScene							拖拽场景
 
 // 可用状态
 // - mouseInView3D						鼠标在3D视图中
 // - fpsViewing							fps浏览场景中
 // - mouseRotateSceneing				旋转场景中
+// - dragSceneing						拖拽场景中
 
 // 可用按键（按键均为小写）
 // - a-z
