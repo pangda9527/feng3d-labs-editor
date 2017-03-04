@@ -36,7 +36,7 @@ module feng3d.editor
 			var attributeTypeDefinition: AttributeTypeDefinition = { type: ClassUtils.getQualifiedClassName(Boolean), component: ClassUtils.getQualifiedClassName(BooleanAttrView) };
 			$objectViewConfig.attributeDefaultViewClassByTypeVec.push( attributeTypeDefinition);
 
-			var view = ObjectView.getObjectView({ a: 1, b: false, c: "abc" });
+			var view = objectview.getObjectView({ a: 1, b: false, c: "abc" });
 			box.addChild(view);
 
 			var spriteConfig: ClassDefinition = {
@@ -52,17 +52,17 @@ module feng3d.editor
 				blockDefinitionVec: []
 			};
 			$objectViewConfig.classConfigVec.push(spriteConfig);
-			box.addChild(ObjectView.getObjectView(new egret.Sprite()));
+			box.addChild(objectview.getObjectView(new egret.Sprite()));
 
 			spriteConfig.component = ClassUtils.getQualifiedClassName(CustomObjectView);
-			box.addChild(ObjectView.getObjectView(new egret.Sprite()));
+			box.addChild(objectview.getObjectView(new egret.Sprite()));
 			var a: ObjectA = new ObjectA();
 			a["boo"] = true;
 			a["da"] = 2;
 			a["db"] = "```";
 			var t: number = egret.getTimer();
 			this.initBlockConfig();
-			var aView: DefaultObjectView = <any>ObjectView.getObjectView(a);
+			var aView: DefaultObjectView = <any>objectview.getObjectView(a);
 			aView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.onValueChange, this);
 			box.addChild(aView);
 			console.log(egret.getTimer() - t);
@@ -73,11 +73,11 @@ module feng3d.editor
 			var fullConfig1: any = <any>JSON.parse(fullConfigStr);
 			$objectViewConfig.attributeDefaultViewClassByTypeVec = [];
 			$objectViewConfig.classConfigVec = [];
-			box.addChild(ObjectView.getObjectView(a));
+			box.addChild(objectview.getObjectView(a));
 			console.log(egret.getTimer() - t);
 			t = egret.getTimer();
 			$objectViewConfig = fullConfig1;
-			box.addChild(ObjectView.getObjectView(a));
+			box.addChild(objectview.getObjectView(a));
 			console.log(egret.getTimer() - t);
 			t = egret.getTimer();
 		}

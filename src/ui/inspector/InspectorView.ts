@@ -3,7 +3,7 @@ module feng3d.editor
 	export class InspectorView extends eui.Component implements eui.UIComponent
 	{
 		public group: eui.Group;
-		private objectView: eui.Component;
+		private view: eui.Component;
 		private selectedObject3D: Object3D;
 		private inspectorObject3D = new InspectorObject3D();
 
@@ -21,10 +21,10 @@ module feng3d.editor
 		private onComplete(): void
 		{
 			this.group.percentWidth = 100;
-			// this.group.addChild(ObjectView.getObjectView(new ObjectA()));
-			// this.group.addChild(ObjectView.getObjectView(new egret.Sprite()));
-			// this.group.addChild(ObjectView.getObjectView(new Transform(1, 2, 3, 4, 5, 6)));
-			// this.group.addChild(ObjectView.getObjectView({
+			// this.group.addChild(objectview.getObjectView(new ObjectA()));
+			// this.group.addChild(objectview.getObjectView(new egret.Sprite()));
+			// this.group.addChild(objectview.getObjectView(new Transform(1, 2, 3, 4, 5, 6)));
+			// this.group.addChild(objectview.getObjectView({
 			// 	vector3D: new Vector3D(1, 2, 3),
 			// 	transform: new Transform(1, 2, 3, 4, 5, 6)
 			// }));
@@ -32,16 +32,16 @@ module feng3d.editor
 
 		private updateView()
 		{
-			if (this.objectView && this.objectView.parent)
+			if (this.view && this.view.parent)
 			{
-				this.objectView.parent.removeChild(this.objectView);
+				this.view.parent.removeChild(this.view);
 			}
 			if (this.selectedObject3D)
 			{
 				this.inspectorObject3D.setObject3D(this.selectedObject3D);
-				this.objectView = ObjectView.getObjectView(this.inspectorObject3D);
-				this.objectView.percentWidth = 100;
-				this.group.addChild(this.objectView);
+				this.view = objectview.getObjectView(this.inspectorObject3D);
+				this.view.percentWidth = 100;
+				this.group.addChild(this.view);
 			}
 		}
 	}

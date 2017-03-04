@@ -32,7 +32,7 @@ module feng3d
 			var objectBlockInfos: BlockViewInfo[] = this._objectViewInfo.objectBlockInfos;
 			for (var i = 0; i < objectBlockInfos.length; i++)
 			{
-				var displayObject: eui.Component = ObjectView.getBlockView(objectBlockInfos[i]);
+				var displayObject: eui.Component = objectview.getBlockView(objectBlockInfos[i]);
 				displayObject.percentWidth = 100;
 				this.group.addChild(displayObject);
 				this.blockViews.push(<any>displayObject);

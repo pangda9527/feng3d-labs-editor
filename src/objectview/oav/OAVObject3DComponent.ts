@@ -70,7 +70,7 @@ module feng3d.editor
 				var component = components[i];
 				var accordion = new Accordion();
 				accordion.titleName = component.name;
-				var displayObject: eui.Component = ObjectView.getObjectView(component.data);
+				var displayObject: eui.Component = objectview.getObjectView(component.data);
 				displayObject.percentWidth = 100;
 				accordion.addContent(displayObject);
 				accordion.percentWidth = 100;
