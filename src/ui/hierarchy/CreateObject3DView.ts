@@ -21,6 +21,7 @@ module feng3d.editor
 		private onObject3dListChange()
 		{
 			var name = this.object3dList.selectedItem.label;
+			this.object3dList.selectedIndex = -1;
 			$editorEventDispatcher.dispatchEvent(new Event("Create_Object3D", name));
 			this.parent && this.parent.removeChild(this);
 		}

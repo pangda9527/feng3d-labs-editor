@@ -16,6 +16,7 @@ var shortcutConfig = [ //
 	{ key: "middlemousedown", command: "dragSceneStart", stateCommand: "dragSceneing", when: "mouseInView3D" },
 	{ key: "mousemove", command: "dragScene", when: "dragSceneing" },
 	{ key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
+	{ key: "del", command: "deleteSeletedObject3D", when: "" },
 
 
 ]
@@ -40,10 +41,13 @@ var shortcutConfig = [ //
 
 // 可用按键（按键均为小写）
 // - a-z
+
 // - ctrl
 // - shift
 // - escape
 // - alt
+// - del
+
 // - doubleclick
 // - click
 // - mousedown

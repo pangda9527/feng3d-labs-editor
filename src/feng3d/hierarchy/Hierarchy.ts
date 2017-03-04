@@ -14,6 +14,7 @@ module feng3d.editor
 
             //监听命令
             shortcut.addEventListener("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
+            shortcut.addEventListener("deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
         }
 
         /**
@@ -21,6 +22,8 @@ module feng3d.editor
          */
         public getNode(object3D: Object3D)
         {
+            if (object3D == null)
+                return null;
             var node = this.nodeMap.get(object3D);
             if (!node)
             {
@@ -72,6 +75,18 @@ module feng3d.editor
             }
         }
 
+        private onDeleteSeletedObject3D()
+        {
+            var selectedObject3D = editor3DData.selectedObject3D;
+            if (selectedObject3D)
+            {
+                var node = this.nodeMap.get(selectedObject3D);
+                node.delete();
+                selectedObject3D.parent.removeChild(selectedObject3D);
+                editor3DData.selectedObject3D = null;
+            }
+        }
+
         private onLookToSelectedObject3D()
         {
             var selectedObject3D = editor3DData.selectedObject3D;
@@ -88,6 +103,7 @@ module feng3d.editor
     export class HierarchyNode extends EventDispatcher
     {
         public static readonly ADDED = "added";
+        public static readonly REMOVED = "removed";
 
         public object3D: Object3D;
 
@@ -111,9 +127,21 @@ module feng3d.editor
 
         public addNode(node: HierarchyNode)
         {
+            node.parent = this;
             this.object3D.addChild(node.object3D);
             this.children.push(node);
-            this.dispatchEvent(new Event(HierarchyNode.ADDED, node));
+            node.dispatchEvent(new Event(HierarchyNode.ADDED, node, true));
+        }
+
+        public delete()
+        {
+            for (var i = 0; i < this.children.length; i++)
+            {
+                this.children[i].delete();
+            }
+            var index = this.parent.children.indexOf(this);
+            this.parent.children.splice(index, 1);
+            this.dispatchEvent(new Event(HierarchyNode.REMOVED, this, true));
         }
     }
 }

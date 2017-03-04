@@ -10,7 +10,7 @@
 			<e:BasicLayout/>
 			</e:layout>
 		</e:Group>
-		<e:List id="list" width="100%" x="133" y="153"/>
+		<e:List id="list" width="100%" x="133" y="153" height="100%"/>
 		<e:layout>
 			<e:VerticalLayout/>
 		</e:layout>

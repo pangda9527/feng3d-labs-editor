@@ -22,20 +22,32 @@ module feng3d.editor
 			this.listData = this.list.dataProvider = new eui.ArrayCollection();
 
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
+			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
 
-			// Binding.bindHandler(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this)
-			// this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
+			Binding.bindHandler(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this);
+			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
 		}
 
 		private onListChange()
 		{
-			this.list.selectedItem
+			var node: HierarchyNode = this.list.selectedItem;
+			editor3DData.selectedObject3D = node.object3D;
 		}
 
 		private onHierarchyNodeAdded(event: Event)
 		{
 			var hierarchyNode: HierarchyNode = event.data;
 			this.listData.addItem(hierarchyNode);
+		}
+
+		private onHierarchyNodeRemoved(event: Event)
+		{
+			var hierarchyNode: HierarchyNode = event.data;
+			var index = this.listData.getItemIndex(hierarchyNode);
+			if (index != -1)
+			{
+				this.listData.removeItemAt(index);
+			}
 		}
 
 		private selectedObject3DChanged()
