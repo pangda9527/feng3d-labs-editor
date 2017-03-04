@@ -45,7 +45,7 @@ module feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = Editor3DData.instance.camera3D.object3D.transform.globalMatrix3D;
+            var cameraSceneTransform = editor3DData.camera3D.object3D.transform.globalMatrix3D;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             switch (this.selectedItem)
@@ -63,7 +63,7 @@ module feng3d.editor
                     this.changeXYZ.setTo(0, 0, 1);
                     break;
                 case this.toolModel.oCube:
-                    this.startMousePos = Editor3DData.instance.mouseInView3D.clone();
+                    this.startMousePos = editor3DData.mouseInView3D.clone();
                     this.changeXYZ.setTo(1, 1, 1);
                     break;
             }
@@ -80,10 +80,10 @@ module feng3d.editor
             var addPos = new Vector3D();
             if (this.selectedItem == this.toolModel.oCube)
             {
-                var currentMouse = Editor3DData.instance.mouseInView3D;
+                var currentMouse = editor3DData.mouseInView3D;
                 var distance = currentMouse.x - currentMouse.y - this.startMousePos.x + this.startMousePos.y;
                 addPos.setTo(distance, distance, distance);
-                var scale = 1 + (addPos.x + addPos.y) / (Editor3DData.instance.view3DRect.height);
+                var scale = 1 + (addPos.x + addPos.y) / (editor3DData.view3DRect.height);
                 this.addScale.setTo(scale, scale, scale);
             } else
             {

@@ -23,7 +23,7 @@ module feng3d.editor
         private onMouseClick(event: Mouse3DEvent)
         {
             var object3D: Object3D = <Object3D>event.currentTarget;
-            Editor3DData.instance.selectedObject3D = object3D;
+            editor3DData.selectedObject3D = object3D;
         }
 
         private onCreateObject3D(event: Event)
@@ -50,13 +50,13 @@ module feng3d.editor
 
         private onLookToSelectedObject3D()
         {
-            var selectedObject3D = Editor3DData.instance.selectedObject3D;
+            var selectedObject3D = editor3DData.selectedObject3D;
             if (selectedObject3D)
             {
-                var lookPos = Editor3DData.instance.camera3D.globalMatrix3D.forward;
+                var lookPos = editor3DData.camera3D.globalMatrix3D.forward;
                 lookPos.scaleBy(-300);
                 lookPos.incrementBy(selectedObject3D.transform.globalPosition);
-                egret.Tween.get(Editor3DData.instance.camera3D.object3D.transform).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
+                egret.Tween.get(editor3DData.camera3D.object3D.transform).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
             }
         }
     }

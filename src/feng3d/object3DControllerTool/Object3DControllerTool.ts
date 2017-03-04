@@ -53,7 +53,7 @@ module feng3d.editor
 
         private onMouseRotateSceneStart()
         {
-            var camera3D = Editor3DData.instance.camera3D;
+            var camera3D = editor3DData.camera3D;
             var position = camera3D.globalMatrix3D.forward;
             
         }

@@ -11,12 +11,5 @@ module feng3d.editor
          */
         public mouseInView3D: Point = new Point();
         public view3DRect: Rectangle = new Rectangle(0, 0, 100, 100);
-
-        private static _instance: Editor3DData;
-        public static get instance()
-        {
-            this._instance = this._instance || new Editor3DData();
-            return this._instance;
-        }
     }
 }

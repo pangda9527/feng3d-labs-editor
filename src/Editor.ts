@@ -32,5 +32,10 @@ module feng3d.editor
             this.addChild(new MainUI());
         }
     }
+
+    /*************************** 初始化模块 ***************************/
     export var $editorEventDispatcher: EventDispatcher = new EventDispatcher();
+
+    //
+    export var editor3DData = new Editor3DData();
 }

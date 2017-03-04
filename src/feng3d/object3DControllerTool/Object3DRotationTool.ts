@@ -31,7 +31,7 @@ module feng3d.editor
             var yDir = globalMatrix3D.up;
             var zDir = globalMatrix3D.forward;
             //摄像机前方方向
-            var cameraSceneTransform = Editor3DData.instance.camera3D.object3D.transform.globalMatrix3D;
+            var cameraSceneTransform = editor3DData.camera3D.object3D.transform.globalMatrix3D;
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.position;
             this.movePlane3D = new Plane3D();
@@ -54,7 +54,7 @@ module feng3d.editor
                     break;
             }
             this.startPlanePos = this.getMousePlaneCross();
-            this.startMousePos = Editor3DData.instance.mouseInView3D.clone();
+            this.startMousePos = editor3DData.mouseInView3D.clone();
             this.startSceneTransform = globalMatrix3D.clone();
             //
             input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
@@ -94,9 +94,9 @@ module feng3d.editor
                     }
                     break;
                 case this.toolModel.freeAxis:
-                    var endPoint = Editor3DData.instance.mouseInView3D.clone();
+                    var endPoint = editor3DData.mouseInView3D.clone();
                     var offset = endPoint.subtract(this.startMousePos);
-                    var cameraSceneTransform = Editor3DData.instance.camera3D.globalMatrix3D;
+                    var cameraSceneTransform = editor3DData.camera3D.globalMatrix3D;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
                     tempSceneTransform.appendRotation(-offset.y, right, tempSceneTransform.position);
@@ -146,7 +146,7 @@ module feng3d.editor
 
         private updateToolModel()
         {
-            var cameraSceneTransform = Editor3DData.instance.camera3D.globalMatrix3D.clone();
+            var cameraSceneTransform = editor3DData.camera3D.globalMatrix3D.clone();
             var cameraDir = cameraSceneTransform.forward;
             cameraDir.negate();
             //

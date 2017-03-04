@@ -17,7 +17,7 @@ module feng3d.editor
         {
             super();
 
-            Binding.bindProperty(Editor3DData.instance, ["selectedObject3D"], this, "selectedObject3D");
+            Binding.bindProperty(editor3DData, ["selectedObject3D"], this, "selectedObject3D");
 
             input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
             input.addEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
@@ -51,7 +51,7 @@ module feng3d.editor
             {
                 this.removeChild(this.toolModel);
                 this._selectedObject3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-                Editor3DData.instance.camera3D.object3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+                editor3DData.camera3D.object3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             }
             this._selectedObject3D = value;
             if (this._selectedObject3D)
@@ -59,7 +59,7 @@ module feng3d.editor
                 this.addChild(this.toolModel);
                 this.updatePositionRotation();
                 this._selectedObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-                Editor3DData.instance.camera3D.object3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+                editor3DData.camera3D.object3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             }
         }
 
@@ -115,7 +115,7 @@ module feng3d.editor
 
         protected getMousePlaneCross()
         {
-            var line3D = Editor3DData.instance.view3D.getMouseRay3D();
+            var line3D = editor3DData.view3D.getMouseRay3D();
             //射线与平面交点
             var crossPos = this.movePlane3D.lineCross(line3D);
             return crossPos;
