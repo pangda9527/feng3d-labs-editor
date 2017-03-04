@@ -72,7 +72,7 @@ module feng3d.editor
             this.startScale = this.selectedObject3D.transform.scale.clone();
 
             //
-            Input.instance.addEventListener(InputEvent.types.MOUSE_MOVE, this.onMouseMove, this);
+            input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
         }
 
         private onMouseMove()
@@ -104,7 +104,7 @@ module feng3d.editor
         protected onMouseUp()
         {
             super.onMouseUp()
-            Input.instance.removeEventListener(InputEvent.types.MOUSE_MOVE, this.onMouseMove, this);
+            input.removeEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
 
             this.startPlanePos = null;
             this.startSceneTransform = null;

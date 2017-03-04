@@ -13,13 +13,13 @@ module feng3d.editor
 
         private onDragSceneStart()
         {
-            this.dragSceneMousePoint = new Point(Input.instance.clientX, Input.instance.clientY);
+            this.dragSceneMousePoint = new Point(input.clientX, input.clientY);
             this.dragSceneCameraGlobalMatrix3D = Editor3DData.instance.camera3D.globalMatrix3D.clone();
         }
 
         private onDragScene()
         {
-            var mousePoint = new Point(Input.instance.clientX, Input.instance.clientY);
+            var mousePoint = new Point(input.clientX, input.clientY);
             var addPoint = mousePoint.subtract(this.dragSceneMousePoint);
             var scale = Editor3DData.instance.view3D.getScaleByDepth(300);
             var up = this.dragSceneCameraGlobalMatrix3D.up;

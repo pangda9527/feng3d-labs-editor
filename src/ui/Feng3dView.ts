@@ -44,7 +44,7 @@ module feng3d.editor
 			style.width = bound.width + "px";
 			style.height = bound.height + "px";
 
-			if (bound.contains(Input.instance.clientX, Input.instance.clientY))
+			if (bound.contains(input.clientX, input.clientY))
 			{
 				shortcut.activityState("mouseInView3D");
 			} else

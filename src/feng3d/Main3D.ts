@@ -54,7 +54,7 @@ module feng3d.editor
         private rotateSceneMousePoint: Point;
         private onMouseRotateSceneStart()
         {
-            this.rotateSceneMousePoint = new Point(Input.instance.clientX, Input.instance.clientY);
+            this.rotateSceneMousePoint = new Point(input.clientX, input.clientY);
             this.rotateSceneCameraGlobalMatrix3D = Editor3DData.instance.camera3D.globalMatrix3D.clone();
             this.rotateSceneCenter = null;
             if (Editor3DData.instance.selectedObject3D)
@@ -72,7 +72,7 @@ module feng3d.editor
         {
             var camera3D = Editor3DData.instance.camera3D;
             var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
-            var mousePoint = new Point(Input.instance.clientX, Input.instance.clientY);
+            var mousePoint = new Point(input.clientX, input.clientY);
             var view3DRect = Editor3DData.instance.view3DRect;
             var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
             var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
