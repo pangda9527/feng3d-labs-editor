@@ -1,5 +1,5 @@
 cd feng3d
-call tsc
+call compile.cmd
 cd ..
 cd objectView
 call tsc
