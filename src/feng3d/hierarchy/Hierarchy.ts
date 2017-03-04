@@ -2,10 +2,13 @@ module feng3d.editor
 {
     export class Hierarchy
     {
-        public scene: Scene3D;
+        public rootNode: HierarchyNode;
 
-        constructor()
+        private nodeMap = new Map<Object3D, HierarchyNode>();
+
+        constructor(rootObject3D: Object3D)
         {
+            this.rootNode = this.getNode(rootObject3D);
 
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
 
@@ -13,9 +16,24 @@ module feng3d.editor
             shortcut.addEventListener("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
         }
 
+        /**
+         * 获取节点
+         */
+        public getNode(object3D: Object3D)
+        {
+            var node = this.nodeMap.get(object3D);
+            if (!node)
+            {
+                node = new HierarchyNode(object3D);
+                this.nodeMap.push(object3D, node);
+            }
+            return node;
+        }
+
         public addObject3D(object3D: Object3D)
         {
-            this.scene.addChild(object3D);
+            var node = this.getNode(object3D);
+            this.rootNode.addNode(node);
 
             object3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
         }
@@ -28,23 +46,29 @@ module feng3d.editor
 
         private onCreateObject3D(event: Event)
         {
+            var createdObject: Object3D;
             switch (event.data)
             {
                 case "Plane":
-                    this.addObject3D(new PlaneObject3D());
+                    createdObject = new PlaneObject3D();
                     break;
                 case "Cube":
-                    this.addObject3D(new CubeObject3D());
+                    createdObject = new CubeObject3D();
                     break;
                 case "Sphere":
-                    this.addObject3D(new SphereObject3D());
+                    createdObject = new SphereObject3D();
                     break;
                 case "Capsule":
-                    this.addObject3D(new CapsuleObject3D());
+                    createdObject = new CapsuleObject3D();
                     break;
                 case "Cylinder":
-                    this.addObject3D(new CylinderObject3D());
+                    createdObject = new CylinderObject3D();
                     break;
+            }
+            if (createdObject)
+            {
+                this.addObject3D(createdObject);
+                editor3DData.selectedObject3D = createdObject;
             }
         }
 
@@ -58,6 +82,38 @@ module feng3d.editor
                 lookPos.incrementBy(selectedObject3D.transform.globalPosition);
                 egret.Tween.get(editor3DData.camera3D.object3D.transform).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
             }
+        }
+    }
+
+    export class HierarchyNode extends EventDispatcher
+    {
+        public static readonly ADDED = "added";
+
+        public object3D: Object3D;
+
+        public label: string;
+
+        /** 
+         * 父节点
+         */
+        public parent: HierarchyNode;
+        /**
+         * 子节点列表
+         */
+        public children: HierarchyNode[] = [];
+
+        constructor(object3D: Object3D)
+        {
+            super();
+            this.object3D = object3D;
+            this.label = object3D.name;
+        }
+
+        public addNode(node: HierarchyNode)
+        {
+            this.object3D.addChild(node.object3D);
+            this.children.push(node);
+            this.dispatchEvent(new Event(HierarchyNode.ADDED, node));
         }
     }
 }

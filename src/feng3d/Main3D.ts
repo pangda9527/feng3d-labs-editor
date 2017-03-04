@@ -19,8 +19,7 @@ module feng3d.editor
 
             editor3DData.view3D = this.view3D;
             editor3DData.camera3D = this.view3D.camera;
-            editor3DData.hierarchy = new Hierarchy();
-            editor3DData.hierarchy.scene = this.view3D.scene;
+            editor3DData.hierarchy = new Hierarchy(this.view3D.scene);
 
 
             this.cameraObj = new Object3D("camera");
