@@ -5,7 +5,7 @@ module feng3d.editor
         private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis;
         //
         protected _selectedObject3D: Object3D;
-        protected toolModel: Object3D;
+        private _toolModel: Object3D;
 
         protected ismouseDown = false;
 
@@ -13,14 +13,28 @@ module feng3d.editor
         protected movePlane3D: Plane3D;
         protected startSceneTransform: Matrix3D;
 
+        private selectedObject3DWatcher: Watcher;
+
         constructor()
         {
             super();
 
-            Binding.bindProperty(editor3DData, ["selectedObject3D"], this, "selectedObject3D");
-
             input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
             input.addEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
+        }
+
+        protected get toolModel()
+        {
+            return this._toolModel;
+        }
+
+        protected set toolModel(value)
+        {
+            if (this._toolModel)
+                this.removeChild(this._toolModel);
+            this._toolModel = value;;
+            if (this._toolModel)
+                this.addChild(this._toolModel);
         }
 
         public get selectedItem()
@@ -39,24 +53,22 @@ module feng3d.editor
                 this._selectedItem.selected = true;
         }
 
-        protected get selectedObject3D()
+        public get selectedObject3D()
         {
             return this._selectedObject3D;
         }
-        protected set selectedObject3D(value)
+        public set selectedObject3D(value)
         {
             if (this._selectedObject3D == value)
                 return;
             if (this._selectedObject3D)
             {
-                this.removeChild(this.toolModel);
                 this._selectedObject3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
                 editor3DData.camera3D.object3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             }
             this._selectedObject3D = value;
             if (this._selectedObject3D)
             {
-                this.addChild(this.toolModel);
                 this.updatePositionRotation();
                 this._selectedObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
                 editor3DData.camera3D.object3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);

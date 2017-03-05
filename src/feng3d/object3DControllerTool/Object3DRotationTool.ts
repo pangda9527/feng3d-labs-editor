@@ -24,7 +24,7 @@ module feng3d.editor
             super.onItemMouseDown(event);
 
             //全局矩阵
-            var globalMatrix3D = this.toolModel.transform.globalMatrix3D;
+            var globalMatrix3D = this._selectedObject3D.transform.globalMatrix3D;
             //中心与X,Y,Z轴上点坐标
             var pos = globalMatrix3D.position;
             var xDir = globalMatrix3D.right;
@@ -121,7 +121,7 @@ module feng3d.editor
             this.startSceneTransform = null;
         }
 
-        protected set selectedObject3D(value)
+        public set selectedObject3D(value)
         {
             if (this._selectedObject3D == value)
                 return;

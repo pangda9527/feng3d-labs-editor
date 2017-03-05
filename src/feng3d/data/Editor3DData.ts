@@ -4,6 +4,8 @@ module feng3d.editor
     {
         public selectedObject3D: Object3D;
         public camera3D: Camera3D;
+        /** 3d场景 */
+        public scene3D: Scene3D;
         public view3D: View3D;
         public hierarchy: Hierarchy;
 

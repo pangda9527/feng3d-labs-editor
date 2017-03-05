@@ -17,11 +17,6 @@ module feng3d.editor
         {
             this.init();
 
-            editor3DData.view3D = this.view3D;
-            editor3DData.camera3D = this.view3D.camera;
-            editor3DData.hierarchy = new Hierarchy(this.view3D.scene);
-
-
             this.cameraObj = new Object3D("camera");
             this.cameraObj.transform.z = -500;
             this.cameraObj.transform.y = 300;
@@ -95,10 +90,15 @@ module feng3d.editor
             this.view3D = new feng3d.View3D(canvas);
             this.scene = this.view3D.scene;
 
+            editor3DData.view3D = this.view3D;
+            editor3DData.scene3D = this.view3D.scene;
+            editor3DData.camera3D = this.view3D.camera;
+            editor3DData.hierarchy = new Hierarchy(this.view3D.scene);
+
             this.view3D.scene.addChild(new GroundGrid().groundGridObject3D);
             this.view3D.scene.addChild(new Trident());
 
-            this.view3D.scene.addChild(new Object3DControllerTool());
+            new Object3DControllerTool();
         }
     }
 }

@@ -16,7 +16,7 @@ var shortcutConfig = [ //
 	{ key: "middlemousedown", command: "dragSceneStart", stateCommand: "dragSceneing", when: "mouseInView3D" },
 	{ key: "mousemove", command: "dragScene", when: "dragSceneing" },
 	{ key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
-	{ key: "del", command: "deleteSeletedObject3D", when: "" },
+	{ key: "del+!ctrl", command: "deleteSeletedObject3D", when: "" },
 
 
 ]

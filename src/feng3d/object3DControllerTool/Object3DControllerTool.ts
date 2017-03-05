@@ -6,7 +6,7 @@ module feng3d.editor
         private object3DRotationTool: Object3DRotationTool;
         private object3DScaleTool: Object3DScaleTool;
 
-        private _currentTool: Object3D;
+        private _currentTool: Object3DControllerToolBase;
 
         constructor()
         {
@@ -24,6 +24,20 @@ module feng3d.editor
             shortcut.addEventListener("object3DRotationTool", this.onObject3DRotationTool, this);
             shortcut.addEventListener("object3DScaleTool", this.onObject3DScaleTool, this);
 
+            Binding.bindHandler(editor3DData, ["selectedObject3D"], this.onSelectedObject3DChange, this)
+        }
+
+        private onSelectedObject3DChange()
+        {
+            if (editor3DData.selectedObject3D)
+            {
+                editor3DData.scene3D.addChild(this);
+            }
+            else
+            {
+                editor3DData.scene3D.removeChild(this);
+            }
+            this._currentTool.selectedObject3D = editor3DData.selectedObject3D;
         }
 
         private onObject3DOperationIDChange()
@@ -64,10 +78,16 @@ module feng3d.editor
             if (this._currentTool == value)
                 return;
             if (this._currentTool)
+            {
+                this._currentTool.selectedObject3D = null;
                 this.removeChild(this._currentTool)
+            }
             this._currentTool = value;
             if (this._currentTool)
+            {
                 this.addChild(this._currentTool)
+                this._currentTool.selectedObject3D = editor3DData.selectedObject3D;
+            }
         }
     }
 }
