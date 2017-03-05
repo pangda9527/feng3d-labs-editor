@@ -7,6 +7,8 @@ module feng3d.editor
         public view3D: View3D;
         public hierarchy: Hierarchy;
 
+        public object3DOperationID = 0;
+
         /**
          * 鼠标在view3D中的坐标
          */

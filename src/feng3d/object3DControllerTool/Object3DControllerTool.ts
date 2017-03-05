@@ -18,26 +18,45 @@ module feng3d.editor
 
             this.currentTool = this.object3DMoveTool;
 
+            Binding.bindHandler(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this)
+
             shortcut.addEventListener("object3DMoveTool", this.onObject3DMoveTool, this);
             shortcut.addEventListener("object3DRotationTool", this.onObject3DRotationTool, this);
             shortcut.addEventListener("object3DScaleTool", this.onObject3DScaleTool, this);
-            //
-            shortcut.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+
+        }
+
+        private onObject3DOperationIDChange()
+        {
+            switch (editor3DData.object3DOperationID)
+            {
+                case 0:
+                    this.currentTool = this.object3DMoveTool;
+                    break;
+                case 1:
+                    this.currentTool = this.object3DRotationTool;
+                    break;
+                case 2:
+                    this.currentTool = this.object3DScaleTool;
+                    break;
+            }
+
         }
 
         private onObject3DMoveTool()
         {
-            this.currentTool = this.object3DMoveTool;
+            editor3DData.object3DOperationID = 0;
+
         }
 
         private onObject3DRotationTool()
         {
-            this.currentTool = this.object3DRotationTool;
+            editor3DData.object3DOperationID = 1;
         }
 
         private onObject3DScaleTool()
         {
-            this.currentTool = this.object3DScaleTool;
+            editor3DData.object3DOperationID = 2;
         }
 
         private set currentTool(value)
@@ -49,13 +68,6 @@ module feng3d.editor
             this._currentTool = value;
             if (this._currentTool)
                 this.addChild(this._currentTool)
-        }
-
-        private onMouseRotateSceneStart()
-        {
-            var camera3D = editor3DData.camera3D;
-            var position = camera3D.globalMatrix3D.forward;
-            
         }
     }
 }

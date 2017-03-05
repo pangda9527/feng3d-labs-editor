@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,selected_png,border_png,header_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,button_down_png,button_up_png,thumb_pb_png,track_pb_png,track_sb_png,bg_jpg,egret_icon_png,description_json,objectview_json,egret.Sprite_json,feng3d.editor.ObjectA_json,feng3d.Transform_json,feng3d.editor.InspectorObject3D_json,egret.Sprite2_json,feng3d.editor.InspectorObject3D2_json,feng3d.editor.ObjectA2_json,feng3d.Transform2_json,objectview2_json",
+			"keys": "checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,selected_png,border_png,header_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,button_down_png,button_up_png,thumb_pb_png,track_pb_png,track_sb_png,bg_jpg,egret_icon_png,description_json,objectview_json,egret.Sprite_json,feng3d.editor.ObjectA_json,feng3d.Transform_json,feng3d.editor.InspectorObject3D_json,egret.Sprite2_json,feng3d.editor.InspectorObject3D2_json,feng3d.editor.ObjectA2_json,feng3d.Transform2_json,objectview2_json,move_png,rotate_png,scale_png",
 			"name": "preload"
 		}
 	],
@@ -185,6 +185,21 @@
 			"name": "objectview2_json",
 			"type": "json",
 			"url": "objectview/objectview.json"
+		},
+		{
+			"name": "move_png",
+			"type": "image",
+			"url": "assets/Button/move.png"
+		},
+		{
+			"name": "rotate_png",
+			"type": "image",
+			"url": "assets/Button/rotate.png"
+		},
+		{
+			"name": "scale_png",
+			"type": "image",
+			"url": "assets/Button/scale.png"
 		}
 	]
 }
