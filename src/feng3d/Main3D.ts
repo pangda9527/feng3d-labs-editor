@@ -46,7 +46,9 @@ module feng3d.editor
             this.view3D.scene.addChild(new GroundGrid().groundGridObject3D);
             this.view3D.scene.addChild(new Trident());
 
-            new Object3DControllerTool();
+            //初始化模块
+            var object3DControllerTool = new Object3DControllerTool();
+            var sceneControl = new SceneControl();
         }
     }
 }

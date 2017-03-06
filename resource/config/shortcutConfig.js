@@ -17,6 +17,7 @@ var shortcutConfig = [ //
 	{ key: "mousemove", command: "dragScene", when: "dragSceneing" },
 	{ key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
 	{ key: "del+!ctrl", command: "deleteSeletedObject3D", when: "" },
+	{ key: "mousewheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
 
 
 ]
@@ -32,6 +33,7 @@ var shortcutConfig = [ //
 // - mouseRotateScene					旋转场景
 // - dragSceneStart						启动拖拽场景
 // - dragScene							拖拽场景
+// - mouseWheelMoveSceneCamera			鼠标滚轮前后移动摄像机
 
 // 可用状态
 // - mouseInView3D						鼠标在3D视图中

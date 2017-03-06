@@ -18,6 +18,7 @@ module feng3d.editor
             shortcut.addEventListener("fpsViewStop", this.onFpsViewStop, this);
             shortcut.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
             shortcut.addEventListener("mouseRotateScene", this.onMouseRotateScene, this);
+            shortcut.addEventListener("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
             $ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
             //
@@ -71,7 +72,7 @@ module feng3d.editor
             } else
             {
                 this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
-                this.rotateSceneCenter.scaleBy(300);
+                this.rotateSceneCenter.scaleBy(config.lookDistance);
                 this.rotateSceneCenter = this.rotateSceneCenter.add(this.rotateSceneCameraGlobalMatrix3D.position);
             }
         }
@@ -95,12 +96,35 @@ module feng3d.editor
             var selectedObject3D = editor3DData.selectedObject3D;
             if (selectedObject3D)
             {
+                config.lookDistance = config.defaultLookDistance;
                 var lookPos = editor3DData.camera3D.globalMatrix3D.forward;
-                lookPos.scaleBy(-300);
+                lookPos.scaleBy(-config.lookDistance);
                 lookPos.incrementBy(selectedObject3D.transform.globalPosition);
                 egret.Tween.get(editor3DData.camera3D.object3D.transform).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
             }
         }
+
+        private onMouseWheelMoveSceneCamera(event: ShortCutEvent)
+        {
+            var distance = event.data.wheelDelta * config.mouseWheelMoveStep;
+            editor3DData.camera3D.object3D.transform.zGlobalMove(distance);
+            config.lookDistance -= distance;
+            // var cameraTransform = editor3DData.camera3D.object3D.transform;
+            // var position = cameraTransform.position;
+            // var forward = cameraTransform.matrix3d.forward;
+            // forward.scaleBy(distance);
+            // position = position.add(forward);
+            // cameraTransform.position = position;
+        }
     }
-    export var sceneControl = new SceneControl();
+
+    export class SceneControlConfig
+    {
+        public mouseWheelMoveStep = 0.4;
+        public defaultLookDistance = 300;
+
+        //dynamic
+        public lookDistance = 300;
+    }
+    var config = new SceneControlConfig();
 }
