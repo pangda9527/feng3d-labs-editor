@@ -18,7 +18,6 @@ module feng3d.editor
         constructor()
         {
             super();
-
             input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
             input.addEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
         }
@@ -34,7 +33,10 @@ module feng3d.editor
                 this.removeChild(this._toolModel);
             this._toolModel = value;;
             if (this._toolModel)
+            {
+                this._toolModel.transform = new HoldSizeTransform();
                 this.addChild(this._toolModel);
+            }
         }
 
         public get selectedItem()

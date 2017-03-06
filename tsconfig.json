@@ -52,6 +52,7 @@
         //
         "src/feng3d/events/Editor3DEvent.ts",
         //
+        "src/feng3d/object3DControllerTool/HoldSizeTransform.ts",
         "src/feng3d/object3DControllerTool/models/Object3DMoveModel.ts",
         "src/feng3d/object3DControllerTool/models/Object3DRotationModel.ts",
         "src/feng3d/object3DControllerTool/models/Object3DScaleModel.ts",
