@@ -5,27 +5,23 @@ module feng3d.editor
      * 地面网格
      * @author feng 2016-10-29
      */
-    export class GroundGrid
+    export class GroundGrid extends Object3D
     {
-
-        private _groundGridObject3D: Object3D;
-
-        public get groundGridObject3D(): Object3D
+        constructor()
         {
-
-            return this._groundGridObject3D || (this._groundGridObject3D = this.createGroundGridObject3d());
+            super("GroundGrid");
+            this.init();
+            editor3DData.scene3D.addChild(this);
         }
 
         /**
          * 创建地面网格对象
          */
-        private createGroundGridObject3d(): Object3D
+        private init()
         {
-
-            var groundGridObject3D = new Object3D("GroundGrid");
-            groundGridObject3D.getOrCreateComponentByClass(MeshRenderer).material = new SegmentMaterial();
+            this.getOrCreateComponentByClass(MeshRenderer).material = new SegmentMaterial();
             var segmentGeometry = new SegmentGeometry();
-            var geometry = groundGridObject3D.getOrCreateComponentByClass(Geometry);
+            var geometry = this.getOrCreateComponentByClass(Geometry);
             geometry.addComponent(segmentGeometry);
 
             var step = 10;
@@ -41,7 +37,6 @@ module feng3d.editor
                 segmentGeometry.addSegment(new Segment(new Vector3D(i * step, 0, -halfNum * step), new Vector3D(i * step, 0, halfNum * step), color, color), false);
             }
             segmentGeometry.updateGeometry();
-            return groundGridObject3D;
         }
     }
 }

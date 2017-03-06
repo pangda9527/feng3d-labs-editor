@@ -3,8 +3,7 @@ module feng3d.editor
     export class Editor3DData
     {
         public selectedObject3D: Object3D;
-        public camera3D: Camera3D;
-        public cameraObject3D: Object3D;
+        public cameraObject3D: CameraObject3D;
         /** 3d场景 */
         public scene3D: Scene3D;
         public view3D: View3D;

@@ -41,7 +41,7 @@ module feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.camera3D.object3D.transform.globalMatrix3D;
+            var cameraSceneTransform = editor3DData.cameraObject3D.transform.globalMatrix3D;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             //
@@ -136,7 +136,7 @@ module feng3d.editor
             //鼠标按下时不更新
             if (this.ismouseDown)
                 return;
-            var cameraPos = editor3DData.camera3D.object3D.transform.globalPosition;
+            var cameraPos = editor3DData.cameraObject3D.transform.globalPosition;
             var localCameraPos = this.toolModel.transform.inverseGlobalMatrix3D.transformVector(cameraPos);
 
             this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;

@@ -45,7 +45,7 @@ module feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.camera3D.object3D.transform.globalMatrix3D;
+            var cameraSceneTransform = editor3DData.cameraObject3D.transform.globalMatrix3D;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             switch (this.selectedItem)
