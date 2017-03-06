@@ -65,6 +65,11 @@ module feng3d.editor
             this.coordinateCube = new CoordinateCube();
             this.addChild(this.coordinateCube);
 
+            var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 4);
+            mouseHit.transform.y = 4 + (this.length - 4) / 2;
+            mouseHit.visible = false;
+            this.addChild(mouseHit);
+
             this.update();
 
             //

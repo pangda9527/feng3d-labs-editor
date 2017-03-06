@@ -81,6 +81,11 @@ module feng3d.editor
             this.addChild(this.xArrow);
             this.update();
 
+            var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 20);
+            mouseHit.transform.y = 20 + (this.length - 20) / 2;
+            mouseHit.visible = false;
+            this.addChild(mouseHit);
+
             //
             Binding.bindHandler(this, ["color"], this.update, this);
             Binding.bindHandler(this, ["selectedColor"], this.update, this);
@@ -172,7 +177,7 @@ module feng3d.editor
 
             var border = this.border;
             border.segmentGeometry.removeAllSegments();
-            
+
             var segment = new Segment(new Vector3D(0, 0, 0), new Vector3D(this.width, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
             border.segmentGeometry.addSegment(segment);

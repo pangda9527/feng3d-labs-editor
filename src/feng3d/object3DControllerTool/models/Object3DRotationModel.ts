@@ -77,6 +77,13 @@ module feng3d.editor
 
             this.update();
 
+            var mouseHit = new TorusObect3D("hit");
+            mouseHit.torusGeometry.radius = 80;
+            mouseHit.torusGeometry.tubeRadius = 2;
+            mouseHit.transform.rx = 90;
+            mouseHit.visible = false;
+            this.addChild(mouseHit);
+
             //
             Binding.bindHandler(this, ["radius"], this.update, this);
             Binding.bindHandler(this, ["color"], this.update, this);
@@ -205,8 +212,8 @@ module feng3d.editor
             this.geometry.setVAData(GLAttribute.a_position, vertexPositionData, 3);
             this.geometry.setIndices(indices);
             //绘制边界
-            var startPoint = new Vector3D(this.radius * Math.cos((this._start - 0.5) * MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._start - 0.5) * MathConsts.DEGREES_TO_RADIANS), 0);
-            var endPoint = new Vector3D(this.radius * Math.cos((this._end + 0.5) * MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._end + 0.5) * MathConsts.DEGREES_TO_RADIANS), 0);
+            var startPoint = new Vector3D(this.radius * Math.cos((this._start - 0.1) * MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._start - 0.1) * MathConsts.DEGREES_TO_RADIANS), 0);
+            var endPoint = new Vector3D(this.radius * Math.cos((this._end + 0.1) * MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._end + 0.1) * MathConsts.DEGREES_TO_RADIANS), 0);
             //
             this.border.segmentGeometry.removeAllSegments();
             var segment = new Segment(new Vector3D(), startPoint);
