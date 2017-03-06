@@ -7,11 +7,19 @@ module feng3d.editor
      */
     export class GroundGrid extends Object3D
     {
+        private num = 100;
+        private segmentGeometry: SegmentGeometry;
+
+        private level: number;
+        private step: number;
+
         constructor()
         {
             super("GroundGrid");
             this.init();
             editor3DData.scene3D.addChild(this);
+
+            editor3DData.cameraObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         /**
@@ -20,23 +28,37 @@ module feng3d.editor
         private init()
         {
             this.getOrCreateComponentByClass(MeshRenderer).material = new SegmentMaterial();
-            var segmentGeometry = new SegmentGeometry();
+            this.segmentGeometry = new SegmentGeometry();
             var geometry = this.getOrCreateComponentByClass(Geometry);
-            geometry.addComponent(segmentGeometry);
+            geometry.addComponent(this.segmentGeometry);
+            this.update();
+        }
 
-            var step = 10;
-            var num = 100;
-            var halfNum = num / 2;
-            var thickness = 1;
+        private update()
+        {
+            var cameraGlobalPosition = editor3DData.cameraObject3D.transform.globalPosition;
+            this.level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
+            this.step = Math.pow(10, this.level - 1);
 
-            segmentGeometry.removeAllSegments();
+            var startX: number = Math.round(cameraGlobalPosition.x / (10 * this.step)) * 10 * this.step;
+            var startZ: number = Math.round(cameraGlobalPosition.z / (10 * this.step)) * 10 * this.step;
+
+            var halfNum = this.num / 2;
+
+            this.segmentGeometry.removeAllSegments();
             for (var i = -halfNum; i <= halfNum; i++)
             {
-                var color = (i % 10) != 0 ? 0xFF757575 : 0x88757575;
-                segmentGeometry.addSegment(new Segment(new Vector3D(-halfNum * step, 0, i * step), new Vector3D(halfNum * step, 0, i * step), color, color), false);
-                segmentGeometry.addSegment(new Segment(new Vector3D(i * step, 0, -halfNum * step), new Vector3D(i * step, 0, halfNum * step), color, color), false);
+                var color = (i % 10) == 0 ? 0x222222 : 0x111111;
+                var thickness = (i % 10) == 0 ? 2 : 1;
+                this.segmentGeometry.addSegment(new Segment(new Vector3D(-halfNum * this.step + startX, 0, i * this.step + startZ), new Vector3D(halfNum * this.step + startX, 0, i * this.step + startZ), color, color, thickness), false);
+                this.segmentGeometry.addSegment(new Segment(new Vector3D(i * this.step + startX, 0, -halfNum * this.step + startZ), new Vector3D(i * this.step + startX, 0, halfNum * this.step + startZ), color, color, thickness), false);
             }
-            segmentGeometry.updateGeometry();
+            this.segmentGeometry.updateGeometry();
+        }
+
+        private onCameraScenetransformChanged()
+        {
+            this.update();
         }
     }
 }
