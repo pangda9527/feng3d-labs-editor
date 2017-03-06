@@ -13,7 +13,6 @@ module feng3d.editor
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
 
             //监听命令
-            shortcut.addEventListener("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
             shortcut.addEventListener("deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
         }
 
@@ -84,18 +83,6 @@ module feng3d.editor
                 node.delete();
                 selectedObject3D.parent.removeChild(selectedObject3D);
                 editor3DData.selectedObject3D = null;
-            }
-        }
-
-        private onLookToSelectedObject3D()
-        {
-            var selectedObject3D = editor3DData.selectedObject3D;
-            if (selectedObject3D)
-            {
-                var lookPos = editor3DData.camera3D.globalMatrix3D.forward;
-                lookPos.scaleBy(-300);
-                lookPos.incrementBy(selectedObject3D.transform.globalPosition);
-                egret.Tween.get(editor3DData.camera3D.object3D.transform).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
             }
         }
     }
