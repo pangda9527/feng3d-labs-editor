@@ -9,6 +9,9 @@ module feng3d.editor
         constructor()
         {
             super();
+
+            this.object3DControllerToolBingding = new Object3DRotationBinding(this);
+
             this.toolModel = new Object3DRotationModel();
 
             this.toolModel.xAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);

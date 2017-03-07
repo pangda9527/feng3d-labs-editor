@@ -7,7 +7,7 @@ module feng3d.editor
         private startGlobalMatrixVec: Matrix3D[] = [];
         private startScaleVec: Vector3D[] = [];
 
-        private controllerImage: Object3D;
+        private controllerImage: Object3D = new Object3D();
         private startControllerImageGlobalMatrix3D: Matrix3D;
 
         private isWoldCoordinate = false;
@@ -39,7 +39,7 @@ module feng3d.editor
                 this.controllerImage.transform.globalMatrix3D = new Matrix3D();
             }
             this._controllerTargets = value;
-            if (this.controllerTargets && this._controllerTargets.length > 0)
+            if (this._controllerTargets && this._controllerTargets.length > 0)
             {
                 this.controllerBindingShowTarget.target = this._controllerTargets[0];
                 this._controllerTargets[0].addChild(this.controllerImage);
@@ -86,7 +86,7 @@ module feng3d.editor
         {
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                tempGlobalMatrix.copyFrom(this.startTranslation[i]);
+                tempGlobalMatrix.copyFrom(this.startGlobalMatrixVec[i]);
                 tempGlobalMatrix.appendTranslation(addPos.x, addPos.y, addPos.z);
                 this._controllerTargets[i].transform.globalMatrix3D = tempGlobalMatrix;
             }

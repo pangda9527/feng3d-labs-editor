@@ -17,6 +17,8 @@ module feng3d.editor
         constructor()
         {
             super();
+            this.object3DControllerToolBingding = new Object3DScaleBinding(this);
+
             this.toolModel = new Object3DScaleModel();
             this.toolModel.addScale = this.addScale;
 
