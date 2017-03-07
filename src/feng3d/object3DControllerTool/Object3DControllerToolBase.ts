@@ -4,7 +4,6 @@ module feng3d.editor
     {
         private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis;
         //
-        protected _selectedObject3D: Object3D;
         private _toolModel: Object3D;
 
         protected ismouseDown = false;
@@ -13,7 +12,7 @@ module feng3d.editor
         protected movePlane3D: Plane3D;
         protected startSceneTransform: Matrix3D;
 
-        private selectedObject3DWatcher: Watcher;
+        protected object3DControllerToolBingding: Object3DControllerToolBinding;
 
         constructor()
         {
@@ -55,26 +54,29 @@ module feng3d.editor
                 this._selectedItem.selected = true;
         }
 
-        public get selectedObject3D()
+        public get bindingObject3D(): Object3DControllerTarget
         {
-            return this._selectedObject3D;
+            return <any>this.object3DControllerToolBingding.target;
         }
-        public set selectedObject3D(value)
+
+        public set bindingObject3D(value)
         {
-            if (this._selectedObject3D == value)
-                return;
-            if (this._selectedObject3D)
+            this.object3DControllerToolBingding.target = value;
+            if (value)
             {
-                this._selectedObject3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+                this.updateToolModel();
+                this.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+                editor3DData.cameraObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            } else
+            {
+                this.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
                 editor3DData.cameraObject3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             }
-            this._selectedObject3D = value;
-            if (this._selectedObject3D)
-            {
-                this.updatePositionRotation();
-                this._selectedObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-                editor3DData.cameraObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
-            }
+        }
+
+        protected updateToolModel()
+        {
+
         }
 
         protected onMouseDown()
@@ -95,22 +97,14 @@ module feng3d.editor
             this.selectedItem = <any>event.currentTarget;
         }
 
-        protected updatePositionRotation()
-        {
-            var vec = this._selectedObject3D.transform.globalMatrix3D.decompose();
-            vec[2].setTo(1, 1, 1);
-            var mat = new Matrix3D();
-            mat.recompose(vec);
-            this.toolModel.transform.globalMatrix3D = mat;
-        }
-
         protected onScenetransformChanged()
         {
-            this.updatePositionRotation();
+            this.updateToolModel();
         }
 
         protected onCameraScenetransformChanged()
         {
+            this.updateToolModel();
         }
 
         /**

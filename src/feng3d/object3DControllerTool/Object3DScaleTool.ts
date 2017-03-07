@@ -10,10 +10,6 @@ module feng3d.editor
         private changeXYZ: Vector3D = new Vector3D();
         private startPlanePos: Vector3D;
         /**
-         * 初始缩放
-         */
-        private startScale: Vector3D;
-        /**
          * 增加的缩放值
          */
         private addScale: Vector3D = new Vector3D();
@@ -69,8 +65,7 @@ module feng3d.editor
             }
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
-            this.startScale = this.selectedObject3D.transform.scale.clone();
-
+            this.bindingObject3D.startScale();
             //
             input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
         }
@@ -93,12 +88,7 @@ module feng3d.editor
                 addPos.z = (crossPos.z - this.startPlanePos.z) * this.changeXYZ.z;
                 this.addScale.setTo(1 + addPos.x / this.startPlanePos.x, 1 + addPos.y / this.startPlanePos.y, 1 + addPos.z / this.startPlanePos.z);
             }
-            if (this.changeXYZ.x)
-                this._selectedObject3D.transform.sx = this.startScale.x * this.addScale.x;
-            if (this.changeXYZ.y)
-                this._selectedObject3D.transform.sy = this.startScale.y * this.addScale.y;
-            if (this.changeXYZ.z)
-                this._selectedObject3D.transform.sz = this.startScale.z * this.addScale.z;
+            this.bindingObject3D.doScale(this.addScale);
         }
 
         protected onMouseUp()
@@ -108,7 +98,6 @@ module feng3d.editor
 
             this.startPlanePos = null;
             this.startSceneTransform = null;
-            this.startScale = null;
             this.addScale.setTo(1, 1, 1);
         }
     }

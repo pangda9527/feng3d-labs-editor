@@ -56,13 +56,13 @@ module feng3d.editor
             this.startPlanePos = this.getMousePlaneCross();
             this.startMousePos = editor3DData.mouseInView3D.clone();
             this.startSceneTransform = globalMatrix3D.clone();
+            this.bindingObject3D.startRotate();
             //
             input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
         }
 
         private onMouseMove()
         {
-            var tempSceneTransform = this.startSceneTransform.clone();
             switch (this.selectedItem)
             {
                 case this.toolModel.xAxis:
@@ -83,8 +83,7 @@ module feng3d.editor
                     sign = sign > 0 ? 1 : -1;
                     angle = angle * sign;
                     //
-                    tempSceneTransform.appendRotation(angle, this.movePlane3D.normal, tempSceneTransform.position);
-                    this._selectedObject3D.transform.globalMatrix3D = tempSceneTransform;
+                    this.bindingObject3D.rotate(angle, this.movePlane3D.normal);
                     //绘制扇形区域
                     if (this.selectedItem instanceof CoordinateRotationAxis)
                     {
@@ -99,9 +98,7 @@ module feng3d.editor
                     var cameraSceneTransform = editor3DData.cameraObject3D.transform.globalMatrix3D;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
-                    tempSceneTransform.appendRotation(-offset.y, right, tempSceneTransform.position);
-                    tempSceneTransform.appendRotation(-offset.x, up, tempSceneTransform.position);
-                    this._selectedObject3D.transform.globalMatrix3D = tempSceneTransform;
+                    this.bindingObject3D.rotate2(-offset.y, right, -offset.x, up);
                     break;
             }
         }
@@ -116,35 +113,13 @@ module feng3d.editor
                 this.selectedItem.showSector = false;
             }
 
+            this.bindingObject3D.stopRote();
             this.startMousePos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
         }
 
-        public set selectedObject3D(value)
-        {
-            if (this._selectedObject3D == value)
-                return;
-            super.selectedObject3D = value;
-            if (this._selectedObject3D)
-            {
-                this.updateToolModel();
-            }
-        }
-
-        protected onScenetransformChanged()
-        {
-            super.onScenetransformChanged();
-            this.updateToolModel();
-        }
-
-        protected onCameraScenetransformChanged()
-        {
-            super.onCameraScenetransformChanged();
-            this.updateToolModel();
-        }
-
-        private updateToolModel()
+        protected updateToolModel()
         {
             var cameraSceneTransform = editor3DData.cameraObject3D.transform.globalMatrix3D.clone();
             var cameraDir = cameraSceneTransform.forward;

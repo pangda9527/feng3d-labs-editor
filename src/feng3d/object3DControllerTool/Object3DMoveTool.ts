@@ -16,6 +16,8 @@ module feng3d.editor
         {
             super();
 
+            this.object3DControllerToolBingding = new Object3DMoveBinding(this);
+
             this.toolModel = new Object3DMoveModel();
             this.toolModel.xAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.yAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
@@ -80,7 +82,7 @@ module feng3d.editor
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
             this.startPos = this.toolModel.transform.position.clone();
-
+            this.bindingObject3D.startTranslation();
             //
             input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
         }
@@ -94,7 +96,8 @@ module feng3d.editor
             addPos.z *= this.changeXYZ.z;
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
-            this._selectedObject3D.transform.globalMatrix3D = sceneTransform;
+            var sceneAddpos = sceneTransform.position.subtract(this.startSceneTransform.position);
+            this.bindingObject3D.translation(sceneAddpos);
         }
 
         protected onMouseUp()
@@ -102,36 +105,14 @@ module feng3d.editor
             super.onMouseUp()
             input.removeEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
 
+            this.bindingObject3D.stopTranslation();
             this.startPos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
             this.updateToolModel();
         }
 
-        public set selectedObject3D(value)
-        {
-            if (this._selectedObject3D == value)
-                return;
-            super.selectedObject3D = value;
-            if (this._selectedObject3D)
-            {
-                this.updateToolModel();
-            }
-        }
-
-        protected onScenetransformChanged()
-        {
-            super.onScenetransformChanged();
-            this.updateToolModel();
-        }
-
-        protected onCameraScenetransformChanged()
-        {
-            super.onCameraScenetransformChanged();
-            this.updateToolModel();
-        }
-
-        private updateToolModel()
+        protected updateToolModel()
         {
             //鼠标按下时不更新
             if (this.ismouseDown)
