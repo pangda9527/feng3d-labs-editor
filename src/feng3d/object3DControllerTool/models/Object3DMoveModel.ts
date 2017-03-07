@@ -57,7 +57,10 @@ module feng3d.editor
         private selectedColor: Color = new Color(1, 1, 0);
         private length: number = 100;
 
-        public selected = false;
+        //
+        public get selected() { return this._selected; }
+        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        private _selected = false;
 
         constructor(color = new Color(1, 0, 0))
         {
@@ -75,9 +78,6 @@ module feng3d.editor
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
             this.addChild(mouseHit);
-
-            //
-            Binding.bindHandler(this, ["selected"], this.update, this);
         }
 
         private update()
@@ -97,12 +97,12 @@ module feng3d.editor
         private colorMaterial: ColorMaterial;
         private oCube: CubeObject3D;
 
-        public color: Color;
-        public selectedColor: Color;
+        private color: Color;
+        private selectedColor: Color;
         //
-        private _selected = false;
-        public set selected(value) { this._selected = value; this.update(); }
         public get selected() { return this._selected; }
+        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        private _selected = false;
 
         constructor(color = new Color(1, 1, 1), selectedColor = new Color(1, 1, 0))
         {
@@ -116,10 +116,6 @@ module feng3d.editor
             this.addChild(this.oCube);
 
             this.update();
-
-            //
-            Binding.bindHandler(this, ["color"], this.update, this);
-            Binding.bindHandler(this, ["selectedColor"], this.update, this);
         }
 
         private update()
@@ -140,12 +136,12 @@ module feng3d.editor
         private selectedborderColor = new Color(1, 1, 0);
 
         //
-        private _width = 20
         public get width() { return this._width; }
+        private _width = 20
         //
-        private _selected = false;
-        public set selected(value) { this._selected = value; this.update(); }
         public get selected() { return this._selected; }
+        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        private _selected = false;
 
         constructor(color = new Color(1, 0, 0, 0.2), selectedColor = new Color(1, 0, 0, 0.5), borderColor = new Color(1, 0, 0))
         {

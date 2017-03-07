@@ -50,9 +50,14 @@ module feng3d.editor
         private color: Color;
         private selectedColor = new Color(1, 1, 0);
         private length = 100;
-        public selected = false;
         //
-        public scale = 1;
+        public get selected() { return this._selected; }
+        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        private _selected = false;
+        //
+        public get scale() { return this._scale; }
+        public set scale(value) { if (this._scale == value) return; this._scale = value; this.update(); }
+        private _scale = 1;
 
         constructor(color = new Color(1, 0, 0))
         {
@@ -61,7 +66,7 @@ module feng3d.editor
 
             this.xLine = new SegmentObject3D();
             this.addChild(this.xLine);
-            this.coordinateCube = new CoordinateCube();
+            this.coordinateCube = new CoordinateCube(this.color, this.selectedColor);
             this.addChild(this.coordinateCube);
 
             var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 4);
@@ -70,22 +75,17 @@ module feng3d.editor
             this.addChild(mouseHit);
 
             this.update();
-
-            Binding.bindHandler(this, ["selected"], this.update, this);
-            Binding.bindHandler(this, ["scale"], this.update, this);
         }
 
         private update()
         {
             this.xLine.segmentGeometry.removeAllSegments();
-            var segment = new Segment(new Vector3D(), new Vector3D(0, this.scale * this.length, 0));
+            var segment = new Segment(new Vector3D(), new Vector3D(0, this._scale * this.length, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedColor : this.color;
             this.xLine.segmentGeometry.addSegment(segment);
 
             //
-            this.coordinateCube.transform.y = this.length * this.scale;
-            this.coordinateCube.color = this.color;
-            this.coordinateCube.selectedColor = this.selectedColor;
+            this.coordinateCube.transform.y = this.length * this._scale;
             this.coordinateCube.selected = this.selected;
         }
     }

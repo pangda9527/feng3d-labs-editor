@@ -47,14 +47,16 @@ module feng3d.editor
         private selectedColor: Color = new Color(1, 1, 0);
 
         //
-        private _selected = false;
-        public set selected(value) { this._selected = value; this.update(); }
         public get selected() { return this._selected; }
+        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        private _selected = false;
 
         /**
          * 过滤法线显示某一面线条
          */
-        private filterNormal: Vector3D;
+        public get filterNormal() { return this._filterNormal; }
+        public set filterNormal(value) { this._filterNormal = value; this.update(); }
+        private _filterNormal: Vector3D;
 
         constructor(color = new Color(1, 0, 0), radius = 80)
         {
@@ -86,9 +88,9 @@ module feng3d.editor
             var color = this._selected ? this.selectedColor : this.color;
 
             var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
-            if (this.filterNormal)
+            if (this._filterNormal)
             {
-                var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this.filterNormal);
+                var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this._filterNormal);
             }
 
             this.border.segmentGeometry.removeAllSegments();
@@ -142,14 +144,14 @@ module feng3d.editor
      */
     export class SectorObject3D extends Object3D
     {
-        public geometry: Geometry;
-        public border: SegmentObject3D;
-        public borderColor = new Color(0, 1, 1, 0.6);
+        private geometry: Geometry;
+        private border: SegmentObject3D;
+        private borderColor = new Color(0, 1, 1, 0.6);
 
-        public radius = 80
+        private radius = 80
 
-        public _start = 0;
-        public _end = 0;
+        private _start = 0;
+        private _end = 0;
 
         /**
          * 构建3D对象
