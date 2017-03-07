@@ -20,7 +20,7 @@ module feng3d.editor
             shortcut.addEventListener("mouseRotateScene", this.onMouseRotateScene, this);
             shortcut.addEventListener("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
-            $ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
+            ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
             //
         }
         process(event: Event)

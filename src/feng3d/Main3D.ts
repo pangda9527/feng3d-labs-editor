@@ -12,7 +12,7 @@ module feng3d.editor
         {
             this.init();
             //
-            $ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
+            ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
         }
 
         private process(event: Event)
