@@ -5,7 +5,7 @@ module feng3d.editor
         public xAxis: CoordinateRotationAxis;
         public yAxis: CoordinateRotationAxis;
         public zAxis: CoordinateRotationAxis;
-        public freeAxis: CoordinateRotationAxis;
+        public freeAxis: CoordinateRotationFreeAxis;
         public cameraAxis: CoordinateRotationAxis;
 
         constructor()
@@ -31,7 +31,7 @@ module feng3d.editor
             this.cameraAxis = new CoordinateRotationAxis(new Color(1, 1, 1), 88);
             this.addChild(this.cameraAxis);
 
-            this.freeAxis = new CoordinateRotationAxis(new Color(1, 1, 1));
+            this.freeAxis = new CoordinateRotationFreeAxis(new Color(1, 1, 1));
             this.addChild(this.freeAxis);
         }
     }
@@ -71,7 +71,7 @@ module feng3d.editor
             this.border = new SegmentObject3D();
             this.addChild(this.border);
 
-            this.sector = new SectorObject3D();
+            this.sector = new SectorObject3D(this.radius);
 
             this.update();
 
@@ -129,7 +129,15 @@ module feng3d.editor
             var localEndPos = inverseGlobalMatrix3D.transformVector(endPos);
             var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * MathConsts.RADIANS_TO_DEGREES;
             var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * MathConsts.RADIANS_TO_DEGREES;
-            this.sector.update(startAngle, endAngle);
+
+            //
+            var min = Math.min(startAngle, endAngle);
+            var max = Math.max(startAngle, endAngle);
+            if (max - min > 180)
+            {
+                min += 360;
+            }
+            this.sector.update(min, max);
             this.addChild(this.sector);
         }
 
@@ -148,7 +156,7 @@ module feng3d.editor
         private border: SegmentObject3D;
         private borderColor = new Color(0, 1, 1, 0.6);
 
-        private radius = 80
+        private radius: number;
 
         private _start = 0;
         private _end = 0;
@@ -156,9 +164,10 @@ module feng3d.editor
         /**
          * 构建3D对象
          */
-        constructor(name = "sector")
+        constructor(radius = 80)
         {
-            super(name);
+            super("sector");
+            this.radius = radius;
             var mesh = this.getOrCreateComponentByClass(MeshFilter);
             this.geometry = mesh.geometry = new Geometry();
             this.getOrCreateComponentByClass(MeshRenderer).material = new ColorMaterial(new Color(0.5, 0.5, 0.5, 0.2));
@@ -169,9 +178,8 @@ module feng3d.editor
 
         public update(start = 0, end = 0)
         {
-            this._start = start;
-            this._end = end;
-            this.adjustAngle();
+            this._start = Math.min(start, end);
+            this._end = Math.max(start, end);
             var length = Math.floor(this._end - this._start);
             if (length == 0)
                 length = 1;
@@ -206,21 +214,64 @@ module feng3d.editor
             segment.startColor = segment.endColor = this.borderColor;
             this.border.segmentGeometry.addSegment(segment);
         }
+    }
 
-        private adjustAngle()
+    export class CoordinateRotationFreeAxis extends Object3D
+    {
+        private border: SegmentObject3D;
+        private sector: SectorObject3D;
+
+        private radius;
+        private color: Color;
+        private backColor: Color = new Color(0.6, 0.6, 0.6);
+        private selectedColor: Color = new Color(1, 1, 0);
+
+        //
+        public get selected() { return this._selected; }
+        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        private _selected = false;
+
+        constructor(color = new Color(1, 0, 0), radius = 80)
         {
-            var min = Math.min(this._start, this._end);
-            var max = Math.max(this._start, this._end);
-            if (max - min > 180)
+            super();
+            this.color = color;
+            this.radius = radius;
+            this.initModels();
+        }
+
+        private initModels()
+        {
+            this.border = new SegmentObject3D();
+            this.addChild(this.border);
+
+            this.sector = new SectorObject3D(this.radius);
+            this.sector.update(0, 360);
+            this.sector.visible = false;
+            this.addChild(this.sector);
+
+            this.update();
+        }
+
+        private update()
+        {
+            var color = this._selected ? this.selectedColor : this.color;
+
+            var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
+
+            this.border.segmentGeometry.removeAllSegments();
+            var points: Vector3D[] = [];
+            for (var i = 0; i <= 360; i++)
             {
-                min += 360;
-                this._start = max;
-                this._end = min;
-            } else
-            {
-                this._start = min;
-                this._end = max;
+                points[i] = new Vector3D(Math.sin(i * MathConsts.DEGREES_TO_RADIANS), Math.cos(i * MathConsts.DEGREES_TO_RADIANS), 0);
+                points[i].scaleBy(this.radius);
+                if (i > 0)
+                {
+                    var segment = new Segment(points[i - 1], points[i]);
+                    segment.startColor = segment.endColor = color;
+                    this.border.segmentGeometry.addSegment(segment, false);
+                }
             }
+            this.border.segmentGeometry.updateGeometry();
         }
     }
 }
