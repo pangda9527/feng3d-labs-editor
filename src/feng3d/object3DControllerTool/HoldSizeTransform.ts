@@ -26,14 +26,23 @@ module feng3d.editor
 
         public set matrix3d(value: Matrix3D)
         {
-            var vecs = value.decompose();
-            vecs[1].scaleBy(MathConsts.RADIANS_TO_DEGREES);
+            this._matrix3DDirty = false;
+            //
             var depthScale = this.getDepthScale();
-            vecs[1].scaleBy(1 / depthScale);
+            this._matrix3D.rawData.set(value.rawData);
+            var vecs = this._matrix3D.decompose();
+            this._x = vecs[0].x;
+            this._y = vecs[0].y;
+            this._z = vecs[0].z;
+            this._rx = vecs[1].x * MathConsts.RADIANS_TO_DEGREES;
+            this._ry = vecs[1].y * MathConsts.RADIANS_TO_DEGREES;
+            this._rz = vecs[1].z * MathConsts.RADIANS_TO_DEGREES;
+            this._sx = vecs[2].x / depthScale;
+            this._sy = vecs[2].y / depthScale;
+            this._sz = vecs[2].z / depthScale;
 
-            this._position.copyFrom(vecs[0]);
-            this._rotation.copyFrom(vecs[1]);
-            this._scale.copyFrom(vecs[2]);
+            this.notifyMatrix3DChanged();
+            this.invalidateGlobalMatrix3D();
         }
 
         /**
@@ -41,15 +50,12 @@ module feng3d.editor
          */
         protected updateMatrix3D()
         {
-            var rotation = this._rotation.clone();
-            rotation.scaleBy(MathConsts.DEGREES_TO_RADIANS);
-            var scale = this._scale.clone();
             var depthScale = this.getDepthScale();
-            scale.scaleBy(depthScale);
+            //
             this._matrix3D.recompose([//
-                this._position,//
-                rotation,//
-                scale,//
+                new Vector3D(this.x, this.y, this.z),//
+                new Vector3D(this.rx * MathConsts.DEGREES_TO_RADIANS, this.ry * MathConsts.DEGREES_TO_RADIANS, this.rz * MathConsts.DEGREES_TO_RADIANS),//
+                new Vector3D(this.sx * depthScale, this.sy * depthScale, this.sz * depthScale),//
             ]);
             this._matrix3DDirty = false;
         }
