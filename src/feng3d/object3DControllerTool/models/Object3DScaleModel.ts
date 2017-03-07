@@ -22,17 +22,14 @@ module feng3d.editor
 
         private initModels()
         {
-            this.xCube = new CoordinateScaleCube();
-            this.xCube.color = new Color(1, 0, 0);
+            this.xCube = new CoordinateScaleCube(new Color(1, 0, 0));
             this.xCube.transform.rz = -90;
             this.addChild(this.xCube);
 
-            this.yCube = new CoordinateScaleCube();
-            this.yCube.color = new Color(0, 1, 0);
+            this.yCube = new CoordinateScaleCube(new Color(0, 1, 0));
             this.addChild(this.yCube);
 
-            this.zCube = new CoordinateScaleCube();
-            this.zCube.color = new Color(0, 0, 1);
+            this.zCube = new CoordinateScaleCube(new Color(0, 0, 1));
             this.zCube.transform.rx = 90;
             this.addChild(this.zCube);
 
@@ -47,18 +44,20 @@ module feng3d.editor
 
     export class CoordinateScaleCube extends Object3D
     {
-        public coordinateCube: CoordinateCube
-        public xLine: SegmentObject3D;
+        private coordinateCube: CoordinateCube
+        private xLine: SegmentObject3D;
 
-        public color = new Color(1, 0, 0);
-        public selectedColor = new Color(1, 1, 0);
-        public length = 100;
-        public scale = 1;
+        private color: Color;
+        private selectedColor = new Color(1, 1, 0);
+        private length = 100;
         public selected = false;
+        //
+        public scale = 1;
 
-        constructor()
+        constructor(color = new Color(1, 0, 0))
         {
             super();
+            this.color = color;
 
             this.xLine = new SegmentObject3D();
             this.addChild(this.xLine);
@@ -72,10 +71,6 @@ module feng3d.editor
 
             this.update();
 
-            //
-            Binding.bindHandler(this, ["color"], this.update, this);
-            Binding.bindHandler(this, ["selectedColor"], this.update, this);
-            Binding.bindHandler(this, ["length"], this.update, this);
             Binding.bindHandler(this, ["selected"], this.update, this);
             Binding.bindHandler(this, ["scale"], this.update, this);
         }

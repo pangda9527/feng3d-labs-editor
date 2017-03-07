@@ -17,54 +17,50 @@ module feng3d.editor
 
         private initModels()
         {
-            this.xAxis = new CoordinateRotationAxis();
-            this.xAxis.color = new Color(1, 0, 0);
+            this.xAxis = new CoordinateRotationAxis(new Color(1, 0, 0));
             this.xAxis.transform.ry = 90;
             this.addChild(this.xAxis);
 
-            this.yAxis = new CoordinateRotationAxis();
-            this.yAxis.color = new Color(0, 1, 0);
+            this.yAxis = new CoordinateRotationAxis(new Color(0, 1, 0));
             this.yAxis.transform.rx = 90;
             this.addChild(this.yAxis);
 
-            this.zAxis = new CoordinateRotationAxis();
-            this.zAxis.color = new Color(0, 0, 1);
+            this.zAxis = new CoordinateRotationAxis(new Color(0, 0, 1));
             this.addChild(this.zAxis);
 
-            this.cameraAxis = new CoordinateRotationAxis();
-            this.cameraAxis.radius = 88;
-            this.cameraAxis.color = new Color(1, 1, 1);
+            this.cameraAxis = new CoordinateRotationAxis(new Color(1, 1, 1), 88);
             this.addChild(this.cameraAxis);
 
-            this.freeAxis = new CoordinateRotationAxis();
-            this.freeAxis.color = new Color(1, 1, 1);
+            this.freeAxis = new CoordinateRotationAxis(new Color(1, 1, 1));
             this.addChild(this.freeAxis);
         }
     }
 
     export class CoordinateRotationAxis extends Object3D
     {
-        public border: SegmentObject3D;
-        public sector: SectorObject3D;
+        private border: SegmentObject3D;
+        private sector: SectorObject3D;
 
-        public showSector = false;
-        public startPos: Vector3D;
-        public endPos: Vector3D;
+        private radius;
+        private color: Color;
+        private backColor: Color = new Color(0.6, 0.6, 0.6);
+        private selectedColor: Color = new Color(1, 1, 0);
 
-        public radius = 80;
-        public color: Color = new Color(1, 0, 0);
-        public backColor: Color = new Color(0.6, 0.6, 0.6);
-        public selectedColor: Color = new Color(1, 1, 0);
-        public selected = false;
+        //
+        private _selected = false;
+        public set selected(value) { this._selected = value; this.update(); }
+        public get selected() { return this._selected; }
 
         /**
          * 过滤法线显示某一面线条
          */
-        public filterNormal: Vector3D;
+        private filterNormal: Vector3D;
 
-        constructor()
+        constructor(color = new Color(1, 0, 0), radius = 80)
         {
             super();
+            this.color = color;
+            this.radius = radius;
             this.initModels();
         }
 
@@ -78,27 +74,16 @@ module feng3d.editor
             this.update();
 
             var mouseHit = new TorusObect3D("hit");
-            mouseHit.torusGeometry.radius = 80;
+            mouseHit.torusGeometry.radius = this.radius;
             mouseHit.torusGeometry.tubeRadius = 2;
             mouseHit.transform.rx = 90;
             mouseHit.visible = false;
             this.addChild(mouseHit);
-
-            //
-            Binding.bindHandler(this, ["radius"], this.update, this);
-            Binding.bindHandler(this, ["color"], this.update, this);
-            Binding.bindHandler(this, ["selectedColor"], this.update, this);
-            Binding.bindHandler(this, ["selected"], this.update, this);
-            Binding.bindHandler(this, ["filterNormal"], this.update, this);
-            //
-            Binding.bindHandler(this, ["showSector"], this.updateSector, this);
-            Binding.bindHandler(this, ["startPos"], this.updateSector, this);
-            Binding.bindHandler(this, ["endPos"], this.updateSector, this);
         }
 
         private update()
         {
-            var color = this.selected ? this.selectedColor : this.color;
+            var color = this._selected ? this.selectedColor : this.color;
 
             var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
             if (this.filterNormal)
@@ -135,22 +120,20 @@ module feng3d.editor
             this.border.segmentGeometry.updateGeometry();
         }
 
-        private updateSector()
+        public showSector(startPos: Vector3D, endPos: Vector3D)
         {
-            //
-            if (this.showSector && this.startPos && this.endPos)
-            {
-                var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
-                var localStartPos = inverseGlobalMatrix3D.transformVector(this.startPos);
-                var localEndPos = inverseGlobalMatrix3D.transformVector(this.endPos);
-                var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * MathConsts.RADIANS_TO_DEGREES;
-                var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * MathConsts.RADIANS_TO_DEGREES;
-                this.sector.update(startAngle, endAngle);
-                this.addChild(this.sector);
-            } else
-            {
-                this.removeChild(this.sector);
-            }
+            var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
+            var localStartPos = inverseGlobalMatrix3D.transformVector(startPos);
+            var localEndPos = inverseGlobalMatrix3D.transformVector(endPos);
+            var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * MathConsts.RADIANS_TO_DEGREES;
+            var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * MathConsts.RADIANS_TO_DEGREES;
+            this.sector.update(startAngle, endAngle);
+            this.addChild(this.sector);
+        }
+
+        public hideSector()
+        {
+            this.removeChild(this.sector);
         }
     }
 
@@ -180,8 +163,6 @@ module feng3d.editor
 
             this.border = new SegmentObject3D();
             this.addChild(this.border);
-
-            this.update();
         }
 
         public update(start = 0, end = 0)

@@ -90,9 +90,7 @@ module feng3d.editor
                     //绘制扇形区域
                     if (this.selectedItem instanceof CoordinateRotationAxis)
                     {
-                        this.selectedItem.startPos = this.startPlanePos;
-                        this.selectedItem.endPos = planeCross;
-                        this.selectedItem.showSector = true;
+                         this.selectedItem.showSector(this.startPlanePos, planeCross);
                     }
                     break;
                 case this.toolModel.freeAxis:
@@ -113,7 +111,7 @@ module feng3d.editor
 
             if (this.selectedItem instanceof CoordinateRotationAxis)
             {
-                this.selectedItem.showSector = false;
+                this.selectedItem.hideSector();
             }
 
             this.bindingObject3D.stopRote();

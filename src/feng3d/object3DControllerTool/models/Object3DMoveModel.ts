@@ -21,37 +21,25 @@ module feng3d.editor
 
         private initModels()
         {
-            this.xAxis = new CoordinateAxis();
-            this.xAxis.color = new Color(1, 0, 0);
+            this.xAxis = new CoordinateAxis(new Color(1, 0, 0));
             this.xAxis.transform.rz = -90;
             this.addChild(this.xAxis);
 
-            this.yAxis = new CoordinateAxis();
-            this.yAxis.color = new Color(0, 1, 0);
+            this.yAxis = new CoordinateAxis(new Color(0, 1, 0));
             this.addChild(this.yAxis);
 
-            this.zAxis = new CoordinateAxis();
-            this.zAxis.color = new Color(0, 0, 1);
+            this.zAxis = new CoordinateAxis(new Color(0, 0, 1));
             this.zAxis.transform.rx = 90;
             this.addChild(this.zAxis);
 
-            this.yzPlane = new CoordinatePlane();
-            this.yzPlane.color = new Color(1, 0, 0, 0.2);
-            this.yzPlane.selectedColor = new Color(1, 0, 0, 0.5);
-            this.yzPlane.borderColor = new Color(1, 0, 0);
+            this.yzPlane = new CoordinatePlane(new Color(1, 0, 0, 0.2), new Color(1, 0, 0, 0.5), new Color(1, 0, 0));
             this.yzPlane.transform.rz = 90;
             this.addChild(this.yzPlane);
 
-            this.xzPlane = new CoordinatePlane();
-            this.xzPlane.color = new Color(0, 1, 0, 0.2);
-            this.xzPlane.selectedColor = new Color(0, 1, 0, 0.5);
-            this.xzPlane.borderColor = new Color(0, 1, 0);
+            this.xzPlane = new CoordinatePlane(new Color(0, 1, 0, 0.2), new Color(0, 1, 0, 0.5), new Color(0, 1, 0));
             this.addChild(this.xzPlane);
 
-            this.xyPlane = new CoordinatePlane();
-            this.xyPlane.color = new Color(0, 0, 1, 0.2);
-            this.xyPlane.selectedColor = new Color(0, 0, 1, 0.5);
-            this.xyPlane.borderColor = new Color(0, 0, 1);
+            this.xyPlane = new CoordinatePlane(new Color(0, 0, 1, 0.2), new Color(0, 0, 1, 0.5), new Color(0, 0, 1));
             this.xyPlane.transform.rx = -90;
             this.addChild(this.xyPlane);
 
@@ -62,18 +50,20 @@ module feng3d.editor
 
     export class CoordinateAxis extends Object3D
     {
-        public xLine: SegmentObject3D;
-        public xArrow: ConeObject3D;
+        private xLine: SegmentObject3D;
+        private xArrow: ConeObject3D;
 
-        public color: Color = new Color(1, 0, 0);
-        public selectedColor: Color = new Color(1, 1, 0);
-        public length: number = 100;
+        private color: Color;
+        private selectedColor: Color = new Color(1, 1, 0);
+        private length: number = 100;
 
         public selected = false;
 
-        constructor()
+        constructor(color = new Color(1, 0, 0))
         {
             super();
+            this.color = color;
+
             this.xLine = new SegmentObject3D();
             this.addChild(this.xLine);
             //
@@ -87,9 +77,6 @@ module feng3d.editor
             this.addChild(mouseHit);
 
             //
-            Binding.bindHandler(this, ["color"], this.update, this);
-            Binding.bindHandler(this, ["selectedColor"], this.update, this);
-            Binding.bindHandler(this, ["length"], this.update, this);
             Binding.bindHandler(this, ["selected"], this.update, this);
         }
 
@@ -107,16 +94,22 @@ module feng3d.editor
 
     export class CoordinateCube extends Object3D
     {
-        public colorMaterial: ColorMaterial;
-        public oCube: CubeObject3D;
+        private colorMaterial: ColorMaterial;
+        private oCube: CubeObject3D;
 
-        public color = new Color(1, 1, 1);
-        public selectedColor = new Color(1, 1, 0);
-        public selected = false;
+        public color: Color;
+        public selectedColor: Color;
+        //
+        private _selected = false;
+        public set selected(value) { this._selected = value; this.update(); }
+        public get selected() { return this._selected; }
 
-        constructor()
+        constructor(color = new Color(1, 1, 1), selectedColor = new Color(1, 1, 0))
         {
             super();
+            this.color = color;
+            this.selectedColor = selectedColor;
+            //
             this.oCube = new CubeObject3D(8);
             this.colorMaterial = new ColorMaterial();
             this.oCube.getOrCreateComponentByClass(MeshRenderer).material = this.colorMaterial;
@@ -127,7 +120,6 @@ module feng3d.editor
             //
             Binding.bindHandler(this, ["color"], this.update, this);
             Binding.bindHandler(this, ["selectedColor"], this.update, this);
-            Binding.bindHandler(this, ["selected"], this.update, this);
         }
 
         private update()
@@ -138,22 +130,32 @@ module feng3d.editor
 
     export class CoordinatePlane extends Object3D
     {
-        public colorMaterial: ColorMaterial;
-        public border: SegmentObject3D;
+        private colorMaterial: ColorMaterial;
+        private border: SegmentObject3D;
 
-        public color = new Color(1, 0, 0, 0.2);
-        public borderColor = new Color(1, 0, 0);
-        public width = 20
+        private color: Color;
+        private borderColor: Color;
 
-        public selectedColor = new Color(1, 0, 0, 0.5);
-        public selectedborderColor = new Color(1, 1, 0);
-        public selected = false;
+        private selectedColor: Color;
+        private selectedborderColor = new Color(1, 1, 0);
 
-        constructor()
+        //
+        private _width = 20
+        public get width() { return this._width; }
+        //
+        private _selected = false;
+        public set selected(value) { this._selected = value; this.update(); }
+        public get selected() { return this._selected; }
+
+        constructor(color = new Color(1, 0, 0, 0.2), selectedColor = new Color(1, 0, 0, 0.5), borderColor = new Color(1, 0, 0))
         {
             super();
-            var plane = new PlaneObject3D(this.width);
-            plane.transform.x = plane.transform.z = this.width / 2;
+            this.color = color;
+            this.selectedColor = selectedColor;
+            this.borderColor = borderColor;
+
+            var plane = new PlaneObject3D(this._width);
+            plane.transform.x = plane.transform.z = this._width / 2;
             this.colorMaterial = new ColorMaterial();
             plane.getOrCreateComponentByClass(MeshRenderer).material = this.colorMaterial;
             this.addChild(plane);
@@ -162,13 +164,6 @@ module feng3d.editor
             this.addChild(this.border);
 
             this.update();
-
-            //
-            Binding.bindHandler(this, ["color"], this.update, this);
-            Binding.bindHandler(this, ["selectedColor"], this.update, this);
-            Binding.bindHandler(this, ["borderColor"], this.update, this);
-            Binding.bindHandler(this, ["selectedborderColor"], this.update, this);
-            Binding.bindHandler(this, ["selected"], this.update, this);
         }
 
         private update()
@@ -178,21 +173,23 @@ module feng3d.editor
             var border = this.border;
             border.segmentGeometry.removeAllSegments();
 
-            var segment = new Segment(new Vector3D(0, 0, 0), new Vector3D(this.width, 0, 0));
+            var segment = new Segment(new Vector3D(0, 0, 0), new Vector3D(this._width, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment);
+            border.segmentGeometry.addSegment(segment, false);
 
-            var segment = new Segment(new Vector3D(this.width, 0, 0), new Vector3D(this.width, 0, this.width));
+            var segment = new Segment(new Vector3D(this._width, 0, 0), new Vector3D(this._width, 0, this._width));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment);
+            border.segmentGeometry.addSegment(segment, false);
 
-            var segment = new Segment(new Vector3D(this.width, 0, this.width), new Vector3D(0, 0, this.width));
+            var segment = new Segment(new Vector3D(this._width, 0, this._width), new Vector3D(0, 0, this._width));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment);
+            border.segmentGeometry.addSegment(segment, false);
 
-            var segment = new Segment(new Vector3D(0, 0, this.width), new Vector3D(0, 0, 0));
+            var segment = new Segment(new Vector3D(0, 0, this._width), new Vector3D(0, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment);
+            border.segmentGeometry.addSegment(segment, false);
+
+            border.segmentGeometry.updateGeometry();
         }
     }
 }
