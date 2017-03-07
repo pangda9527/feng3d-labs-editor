@@ -8,56 +8,26 @@ module feng3d.editor
         {
             super();
             editor3DData.cameraObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
-            Binding.bindHandler(this, ["holdSize"], this.invalidateMatrix3D, this);
         }
 
         private onCameraScenetransformChanged()
         {
-            this.invalidateMatrix3D();
-        }
-
-        /**
-         * 变换矩阵
-         */
-        public get matrix3d(): Matrix3D
-        {
-            return super.matrix3d;
-        }
-
-        public set matrix3d(value: Matrix3D)
-        {
-            this._matrix3DDirty = false;
-            //
-            var depthScale = this.getDepthScale();
-            this._matrix3D.rawData.set(value.rawData);
-            var vecs = this._matrix3D.decompose();
-            this._x = vecs[0].x;
-            this._y = vecs[0].y;
-            this._z = vecs[0].z;
-            this._rx = vecs[1].x * MathConsts.RADIANS_TO_DEGREES;
-            this._ry = vecs[1].y * MathConsts.RADIANS_TO_DEGREES;
-            this._rz = vecs[1].z * MathConsts.RADIANS_TO_DEGREES;
-            this._sx = vecs[2].x / depthScale;
-            this._sy = vecs[2].y / depthScale;
-            this._sz = vecs[2].z / depthScale;
-
-            this.notifyMatrix3DChanged();
             this.invalidateGlobalMatrix3D();
         }
 
         /**
-         * 变换矩阵
+         * 更新全局矩阵
          */
-        protected updateMatrix3D()
+        protected updateGlobalMatrix3D()
         {
-            var depthScale = this.getDepthScale();
-            //
-            this._matrix3D.recompose([//
-                new Vector3D(this.x, this.y, this.z),//
-                new Vector3D(this.rx * MathConsts.DEGREES_TO_RADIANS, this.ry * MathConsts.DEGREES_TO_RADIANS, this.rz * MathConsts.DEGREES_TO_RADIANS),//
-                new Vector3D(this.sx * depthScale, this.sy * depthScale, this.sz * depthScale),//
-            ]);
-            this._matrix3DDirty = false;
+            super.updateGlobalMatrix3D();
+            if (this.holdSize)
+            {
+                var depthScale = this.getDepthScale();
+                var vec = this._globalMatrix3D.decompose();
+                vec[2].setTo(depthScale, depthScale, depthScale);
+                this._globalMatrix3D.recompose(vec);
+            }
         }
 
         private getDepthScale()
