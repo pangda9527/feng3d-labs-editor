@@ -100,6 +100,9 @@ module feng3d.editor
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
                     this.bindingObject3D.rotate2(-offset.y, right, -offset.x, up);
+                    //
+                    this.startMousePos = endPoint;
+                    this.bindingObject3D.startRotate();
                     break;
             }
         }

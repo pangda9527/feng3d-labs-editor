@@ -106,14 +106,8 @@ module feng3d.editor
         private onMouseWheelMoveSceneCamera(event: ShortCutEvent)
         {
             var distance = event.data.wheelDelta * config.mouseWheelMoveStep;
-            editor3DData.cameraObject3D.transform.zGlobalMove(distance);
+            editor3DData.cameraObject3D.transform.globalMatrix3D = editor3DData.cameraObject3D.transform.globalMatrix3D.moveForward(distance);
             config.lookDistance -= distance;
-            // var cameraTransform = editor3DData.cameraObject3D.transform;
-            // var position = cameraTransform.position;
-            // var forward = cameraTransform.matrix3d.forward;
-            // forward.scaleBy(distance);
-            // position = position.add(forward);
-            // cameraTransform.position = position;
         }
     }
 
