@@ -9,10 +9,6 @@ module feng3d.editor
          */
         private changeXYZ: Vector3D = new Vector3D();
         private startPlanePos: Vector3D;
-        /**
-         * 增加的缩放值
-         */
-        private addScale: Vector3D = new Vector3D();
 
         constructor()
         {
@@ -20,7 +16,6 @@ module feng3d.editor
             this.object3DControllerToolBingding = new Object3DScaleBinding(this);
 
             this.toolModel = new Object3DScaleModel();
-            this.toolModel.addScale = this.addScale;
 
             this.toolModel.xCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.yCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
@@ -75,22 +70,27 @@ module feng3d.editor
         private onMouseMove()
         {
             var addPos = new Vector3D();
+            var addScale = new Vector3D();
             if (this.selectedItem == this.toolModel.oCube)
             {
                 var currentMouse = editor3DData.mouseInView3D;
                 var distance = currentMouse.x - currentMouse.y - this.startMousePos.x + this.startMousePos.y;
                 addPos.setTo(distance, distance, distance);
                 var scale = 1 + (addPos.x + addPos.y) / (editor3DData.view3DRect.height);
-                this.addScale.setTo(scale, scale, scale);
+                addScale.setTo(scale, scale, scale);
             } else
             {
                 var crossPos = this.getLocalMousePlaneCross();
                 addPos.x = (crossPos.x - this.startPlanePos.x) * this.changeXYZ.x;
                 addPos.y = (crossPos.y - this.startPlanePos.y) * this.changeXYZ.y;
                 addPos.z = (crossPos.z - this.startPlanePos.z) * this.changeXYZ.z;
-                this.addScale.setTo(1 + addPos.x / this.startPlanePos.x, 1 + addPos.y / this.startPlanePos.y, 1 + addPos.z / this.startPlanePos.z);
+                addScale.setTo(1 + addPos.x / this.startPlanePos.x, 1 + addPos.y / this.startPlanePos.y, 1 + addPos.z / this.startPlanePos.z);
             }
-            this.bindingObject3D.doScale(this.addScale);
+            this.bindingObject3D.doScale(addScale);
+            //
+            this.toolModel.xCube.scale = addScale.x;
+            this.toolModel.yCube.scale = addScale.y;
+            this.toolModel.zCube.scale = addScale.z;
         }
 
         protected onMouseUp()
@@ -100,7 +100,10 @@ module feng3d.editor
 
             this.startPlanePos = null;
             this.startSceneTransform = null;
-            this.addScale.setTo(1, 1, 1);
+            //
+            this.toolModel.xCube.scale = 1;
+            this.toolModel.yCube.scale = 1;
+            this.toolModel.zCube.scale = 1;
         }
     }
 }

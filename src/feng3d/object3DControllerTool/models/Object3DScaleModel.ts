@@ -8,11 +8,6 @@ module feng3d.editor
         public zCube: CoordinateScaleCube;
         public oCube: CoordinateCube;
 
-        /**
-         * 增加的缩放值
-         */
-        public addScale: Vector3D;
-
         constructor()
         {
             super();
@@ -35,10 +30,6 @@ module feng3d.editor
 
             this.oCube = new CoordinateCube();
             this.addChild(this.oCube);
-
-            Binding.bindProperty(this, ["addScale", "x"], this.xCube, "scale");
-            Binding.bindProperty(this, ["addScale", "y"], this.yCube, "scale");
-            Binding.bindProperty(this, ["addScale", "z"], this.zCube, "scale");
         }
     }
 
