@@ -171,21 +171,19 @@ module feng3d.editor
 
             var segment = new Segment(new Vector3D(0, 0, 0), new Vector3D(this._width, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment, false);
+            border.segmentGeometry.addSegment(segment);
 
             var segment = new Segment(new Vector3D(this._width, 0, 0), new Vector3D(this._width, 0, this._width));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment, false);
+            border.segmentGeometry.addSegment(segment);
 
             var segment = new Segment(new Vector3D(this._width, 0, this._width), new Vector3D(0, 0, this._width));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment, false);
+            border.segmentGeometry.addSegment(segment);
 
             var segment = new Segment(new Vector3D(0, 0, this._width), new Vector3D(0, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment, false);
-
-            border.segmentGeometry.updateGeometry();
+            border.segmentGeometry.addSegment(segment);
         }
     }
 }

@@ -110,16 +110,15 @@ module feng3d.editor
                     {
                         var segment = new Segment(points[i - 1], points[i]);
                         segment.startColor = segment.endColor = color;
-                        this.border.segmentGeometry.addSegment(segment, false);
+                        this.border.segmentGeometry.addSegment(segment);
                     } else if (this.selected)
                     {
                         var segment = new Segment(points[i - 1], points[i]);
                         segment.startColor = segment.endColor = this.backColor;
-                        this.border.segmentGeometry.addSegment(segment, false);
+                        this.border.segmentGeometry.addSegment(segment);
                     }
                 }
             }
-            this.border.segmentGeometry.updateGeometry();
         }
 
         public showSector(startPos: Vector3D, endPos: Vector3D)
@@ -268,10 +267,9 @@ module feng3d.editor
                 {
                     var segment = new Segment(points[i - 1], points[i]);
                     segment.startColor = segment.endColor = color;
-                    this.border.segmentGeometry.addSegment(segment, false);
+                    this.border.segmentGeometry.addSegment(segment);
                 }
             }
-            this.border.segmentGeometry.updateGeometry();
         }
     }
 }
