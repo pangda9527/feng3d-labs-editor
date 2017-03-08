@@ -38,7 +38,7 @@ module feng3d.editor
 			}
 			if (this.selectedObject3D)
 			{
-				this.inspectorObject3D.setObject3D(this.selectedObject3D);
+				this.inspectorObject3D.object3D = this.selectedObject3D;
 				this.view = objectview.getObjectView(this.inspectorObject3D);
 				this.view.percentWidth = 100;
 				this.group.addChild(this.view);

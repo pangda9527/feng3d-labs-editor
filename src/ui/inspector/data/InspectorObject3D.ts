@@ -7,16 +7,23 @@ module feng3d.editor
         public name: string;
         public visible: boolean;
         public mouseEnabled: boolean;
+        public object3D: Object3D;
         public inspectorObject3DComponent: InspectorObject3DComponent = new InspectorObject3DComponent();
 
-        public setObject3D(object3D: Object3D)
+        constructor()
         {
-            this.name = object3D.name;
-            this.visible = object3D.visible;
-            this.mouseEnabled = object3D.mouseEnabled;
+            Binding.bothBindProperty(this, ["name"], this, ["object3D", "name"]);
+            Binding.bothBindProperty(this, ["visible"], this, ["object3D", "visible"]);
+            Binding.bothBindProperty(this, ["mouseEnabled"], this, ["object3D", "mouseEnabled"]);
+
+            Watcher.watch(this, ["object3D"], this.onObject3dChange, this)
+        }
+
+        private onObject3dChange()
+        {
             //
             this.inspectorObject3DComponent.components.length = 0;
-            var components = object3D.getComponents();
+            var components = this.object3D.getComponents();
             for (var i = 0; i < components.length; i++)
             {
                 var component = components[i];

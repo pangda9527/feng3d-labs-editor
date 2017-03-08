@@ -8,6 +8,14 @@
             "block": ""
         },
         {
+            "name": "visible",
+            "block": ""
+        },
+        {
+            "name": "mouseEnabled",
+            "block": ""
+        },
+        {
             "name": "inspectorObject3DComponent",
             "block": ""
         }
