@@ -32,9 +32,10 @@ module feng3d.editor
             editor3DData.hierarchy = new Hierarchy(view3D.scene);
 
             //
-            editor3DData.cameraObject3D.transform.z = -500;
-            editor3DData.cameraObject3D.transform.y = 300;
-            editor3DData.cameraObject3D.transform.lookAt(new Vector3D());
+            var camera = view3D.camera;
+            camera.transform.position.z = -500;
+            camera.transform.position.y = 300;
+            camera.transform.lookAt(new Vector3D());
 
             view3D.scene.addChild(new Trident());
 

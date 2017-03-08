@@ -13,7 +13,7 @@ module feng3d.editor
 			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
 
 			Binding.bindProperty(editor3DData, ["selectedObject3D"], this, "selectedObject3D");
-			Binding.bindHandler(this, ["selectedObject3D"], this.updateView, this);
+			Watcher.watch(this, ["selectedObject3D"], this.updateView, this);
 
 			this.skinName = "InspectorViewSkin";
 		}

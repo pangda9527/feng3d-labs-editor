@@ -18,11 +18,11 @@ module feng3d.editor
         private initModels()
         {
             this.xAxis = new CoordinateRotationAxis(new Color(1, 0, 0));
-            this.xAxis.transform.ry = 90;
+            this.xAxis.transform.rotation.y = 90;
             this.addChild(this.xAxis);
 
             this.yAxis = new CoordinateRotationAxis(new Color(0, 1, 0));
-            this.yAxis.transform.rx = 90;
+            this.yAxis.transform.rotation.x = 90;
             this.addChild(this.yAxis);
 
             this.zAxis = new CoordinateRotationAxis(new Color(0, 0, 1));
@@ -78,7 +78,7 @@ module feng3d.editor
             var mouseHit = new TorusObect3D("hit");
             mouseHit.torusGeometry.radius = this.radius;
             mouseHit.torusGeometry.tubeRadius = 2;
-            mouseHit.transform.rx = 90;
+            mouseHit.transform.rotation.x = 90;
             mouseHit.visible = false;
             this.addChild(mouseHit);
         }

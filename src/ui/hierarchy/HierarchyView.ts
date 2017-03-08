@@ -24,7 +24,7 @@ module feng3d.editor
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
 
-			Binding.bindHandler(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this);
+			Watcher.watch(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this);
 			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
 		}
 
