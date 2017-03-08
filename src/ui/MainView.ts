@@ -26,7 +26,7 @@ module feng3d.editor
 			this.rotateButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onButtonClick, this);
 			this.scaleButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onButtonClick, this);
 
-			Binding.bindHandler(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this);
+			Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this);
 		}
 
 		private onHelpButtonClick()

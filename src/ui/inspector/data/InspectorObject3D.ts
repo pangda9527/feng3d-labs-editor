@@ -2,12 +2,18 @@ module feng3d.editor
 {
     export class InspectorObject3D
     {
+        // public readonly viewdata = new Object3DViewData();
+
         public name: string;
+        public visible: boolean;
+        public mouseEnabled: boolean;
         public inspectorObject3DComponent: InspectorObject3DComponent = new InspectorObject3DComponent();
 
         public setObject3D(object3D: Object3D)
         {
             this.name = object3D.name;
+            this.visible = object3D.visible;
+            this.mouseEnabled = object3D.mouseEnabled;
             //
             this.inspectorObject3DComponent.components.length = 0;
             var components = object3D.getComponents();
@@ -45,15 +51,15 @@ module feng3d.editor
         constructor()
         {
             var viewdata = this.viewdata;
-            Binding.bindHandler(viewdata.position, ["x"], this.fromviewdata, this);
-            Binding.bindHandler(viewdata.position, ["y"], this.fromviewdata, this);
-            Binding.bindHandler(viewdata.position, ["z"], this.fromviewdata, this);
-            Binding.bindHandler(viewdata.rotation, ["x"], this.fromviewdata, this);
-            Binding.bindHandler(viewdata.rotation, ["y"], this.fromviewdata, this);
-            Binding.bindHandler(viewdata.rotation, ["z"], this.fromviewdata, this);
-            Binding.bindHandler(viewdata.scale, ["x"], this.fromviewdata, this);
-            Binding.bindHandler(viewdata.scale, ["y"], this.fromviewdata, this);
-            Binding.bindHandler(viewdata.scale, ["z"], this.fromviewdata, this);
+            Watcher.watch(viewdata.position, ["x"], this.fromviewdata, this);
+            Watcher.watch(viewdata.position, ["y"], this.fromviewdata, this);
+            Watcher.watch(viewdata.position, ["z"], this.fromviewdata, this);
+            Watcher.watch(viewdata.rotation, ["x"], this.fromviewdata, this);
+            Watcher.watch(viewdata.rotation, ["y"], this.fromviewdata, this);
+            Watcher.watch(viewdata.rotation, ["z"], this.fromviewdata, this);
+            Watcher.watch(viewdata.scale, ["x"], this.fromviewdata, this);
+            Watcher.watch(viewdata.scale, ["y"], this.fromviewdata, this);
+            Watcher.watch(viewdata.scale, ["z"], this.fromviewdata, this);
         }
 
         public get transform()
@@ -113,6 +119,12 @@ module feng3d.editor
 
             this._mark = false;
         }
+    }
+
+    export class Object3DViewData
+    {
+        public name: string;
+        public visible: boolean;
     }
 
     export class TransformViewData
