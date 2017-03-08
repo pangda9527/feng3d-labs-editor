@@ -7,7 +7,7 @@ module feng3d.editor
         constructor()
         {
             super();
-            editor3DData.cameraObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            editor3DData.cameraObject3D.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         private onCameraScenetransformChanged()

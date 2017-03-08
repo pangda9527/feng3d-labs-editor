@@ -19,39 +19,100 @@ module feng3d.editor
             }
         }
 
-        private getComponentViewData(component: IComponent)
+        private getComponentViewData(component: Object)
         {
             if (component instanceof Transform)
             {
-                this.bindTransform(component);
+                var transformViewBind = new TransformViewBind();
+                transformViewBind.transform = component;
+                component = transformViewBind.viewdata;
             }
             return component;
-        }
-
-        private bindTransform(transform: Transform)
-        {
-            var viewData = new TransformViewData();
-            viewData.position.copyFrom(transform.position);
-            viewData.rotation.copyFrom(transform.rotation);
-            viewData.scale.copyFrom(transform.scale);
-
-            Binding.bindProperty(transform, ["x"], viewData.position, "x");
-            Binding.bindProperty(transform, ["y"], viewData.position, "y");
-            Binding.bindProperty(transform, ["z"], viewData.position, "z");
-            Binding.bindProperty(transform, ["rx"], viewData.rotation, "x");
-            Binding.bindProperty(transform, ["ry"], viewData.rotation, "y");
-            Binding.bindProperty(transform, ["rz"], viewData.rotation, "z");
-            Binding.bindProperty(transform, ["sx"], viewData.scale, "x");
-            Binding.bindProperty(transform, ["sy"], viewData.scale, "y");
-            Binding.bindProperty(transform, ["sz"], viewData.scale, "z");
-
-            return viewData;
         }
     }
 
     export class InspectorObject3DComponent
     {
         public components: { name: string, data: Object }[] = [];
+    }
+
+    export class TransformViewBind
+    {
+        public readonly viewdata = new TransformViewData();
+        private _transform: Transform;
+        private _mark = false;
+
+        constructor()
+        {
+            var viewdata = this.viewdata;
+            Binding.bindHandler(viewdata.position, ["x"], this.fromviewdata, this);
+            Binding.bindHandler(viewdata.position, ["y"], this.fromviewdata, this);
+            Binding.bindHandler(viewdata.position, ["z"], this.fromviewdata, this);
+            Binding.bindHandler(viewdata.rotation, ["x"], this.fromviewdata, this);
+            Binding.bindHandler(viewdata.rotation, ["y"], this.fromviewdata, this);
+            Binding.bindHandler(viewdata.rotation, ["z"], this.fromviewdata, this);
+            Binding.bindHandler(viewdata.scale, ["x"], this.fromviewdata, this);
+            Binding.bindHandler(viewdata.scale, ["y"], this.fromviewdata, this);
+            Binding.bindHandler(viewdata.scale, ["z"], this.fromviewdata, this);
+        }
+
+        public get transform()
+        {
+            return this._transform;
+        }
+
+        public set transform(value)
+        {
+            if (this._transform != null)
+            {
+                this._transform.removeEventListener(TransformEvent.TRANSFORM_CHANGED, this.toviewdata, this);
+            }
+            this._transform = value;
+            if (this._transform != null)
+            {
+                this.toviewdata();
+                this._transform.addEventListener(TransformEvent.TRANSFORM_CHANGED, this.toviewdata, this);
+            }
+        }
+
+        private toviewdata()
+        {
+            if (this._mark)
+                return;
+            this._mark = true;
+            var viewdata = this.viewdata;
+            var transform = this._transform;
+            //
+            viewdata.position.setTo(transform.x, transform.y, transform.z);
+            viewdata.rotation.setTo(transform.rx, transform.ry, transform.rz);
+            viewdata.scale.setTo(transform.sx, transform.sy, transform.sz);
+
+            this._mark = false;
+        }
+
+        private fromviewdata()
+        {
+            if (this._mark)
+                return;
+            this._mark = true;
+            var viewdata = this.viewdata;
+            var transform = this._transform;
+            //
+            if (transform)
+            {
+                transform.x = viewdata.position.x;
+                transform.y = viewdata.position.y;
+                transform.z = viewdata.position.z;
+                transform.rx = viewdata.rotation.x;
+                transform.ry = viewdata.rotation.y;
+                transform.rz = viewdata.rotation.z;
+                transform.sx = viewdata.scale.x;
+                transform.sy = viewdata.scale.y;
+                transform.sz = viewdata.scale.z;
+            }
+
+            this._mark = false;
+        }
     }
 
     export class TransformViewData

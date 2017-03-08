@@ -65,14 +65,14 @@ module feng3d.editor
                 this.updateToolModel();
                 input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
                 input.addEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
-                this.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-                editor3DData.cameraObject3D.addEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+                this.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+                editor3DData.cameraObject3D.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             } else
             {
                 input.removeEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
                 input.removeEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
-                this.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-                editor3DData.cameraObject3D.removeEventListener(TransfromEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+                this.removeEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+                editor3DData.cameraObject3D.removeEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             }
         }
 
