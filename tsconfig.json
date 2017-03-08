@@ -13,8 +13,6 @@
         "src/ui/components/Vector3DView.ts",
         "src/ui/components/TransformView.ts",
         //
-        "src/objectview/data/ObjectA.ts",
-        //
         "src/objectview/view/DefaultBaseObjectView.ts",
         "src/objectview/view/DefaultObjectAttributeView.ts",
         "src/objectview/view/DefaultObjectBlockView.ts",
@@ -23,7 +21,6 @@
         "src/objectview/view/CustomAttrView.ts",
         "src/objectview/view/CustomBlockView.ts",
         "src/objectview/view/CustomObjectView.ts",
-        "src/objectview/ObjectViewTest.ts",
         "src/objectview/EditorObjectView.ts",
         //
         "src/objectview/events/ObjectViewEvent.ts",

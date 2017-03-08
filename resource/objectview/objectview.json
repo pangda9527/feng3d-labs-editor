@@ -13,19 +13,12 @@
             "component": "feng3d.editor.OAVVector3D"
         },
         {
-            "type": "feng3d.Transform",
-            "component": "feng3d.editor.OAVTransform"
-        },
-        {
             "type": "feng3d.editor.InspectorObject3DComponent",
             "component": "feng3d.editor.OAVObject3DComponent"
         }
     ],
     "classConfigVec": [],
     "classConfigs": [
-        "egret.Sprite.json",
-        "feng3d.editor.ObjectA.json",
-        "feng3d.Transform.json",
         "feng3d.editor.InspectorObject3D.json"
     ]
 }
