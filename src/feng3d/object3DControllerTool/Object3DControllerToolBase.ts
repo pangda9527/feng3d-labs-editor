@@ -17,6 +17,7 @@ module feng3d.editor
         constructor()
         {
             super();
+            this.transform = new HoldSizeTransform();
         }
 
         protected get toolModel()
@@ -31,7 +32,6 @@ module feng3d.editor
             this._toolModel = value;;
             if (this._toolModel)
             {
-                this._toolModel.transform = new HoldSizeTransform();
                 this.addChild(this._toolModel);
             }
         }
