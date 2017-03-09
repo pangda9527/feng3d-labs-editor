@@ -19,6 +19,7 @@
     ],
     "classConfigVec": [],
     "classConfigs": [
+        "feng3d.Transform.json",
         "feng3d.editor.InspectorObject3D.json"
     ]
 }

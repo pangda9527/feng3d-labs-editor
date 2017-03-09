@@ -1,0 +1,20 @@
+{
+    "name": "feng3d.Transform",
+    "component": "",
+    "componentParam": null,
+    "attributeDefinitionVec": [
+        {
+            "name": "position",
+            "block": ""
+        },
+        {
+            "name": "rotation",
+            "block": ""
+        },
+        {
+            "name": "scale",
+            "block": ""
+        }
+    ],
+    "blockDefinitionVec": []
+}
