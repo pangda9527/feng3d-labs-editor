@@ -12,7 +12,6 @@ module feng3d.editor
 
         public hasChildren = false;
 
-
         private updateView()
         {
             this.disclosureButton.visible = this.hasChildren;

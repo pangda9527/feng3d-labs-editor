@@ -48,7 +48,7 @@ module feng3d.editor
             this.segmentGeometry.removeAllSegments();
             for (var i = -halfNum; i <= halfNum; i++)
             {
-                var color = (i % 10) == 0 ? 0x222222 : 0x111111;
+                var color = (i % 10) == 0 ? 0x888888 : 0x777777;
                 var thickness = (i % 10) == 0 ? 2 : 1;
                 this.segmentGeometry.addSegment(new Segment(new Vector3D(-halfNum * this.step + startX, 0, i * this.step + startZ), new Vector3D(halfNum * this.step + startX, 0, i * this.step + startZ), color, color, thickness));
                 this.segmentGeometry.addSegment(new Segment(new Vector3D(i * this.step + startX, 0, -halfNum * this.step + startZ), new Vector3D(i * this.step + startX, 0, halfNum * this.step + startZ), color, color, thickness));

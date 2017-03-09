@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,selected_png,border_png,header_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,button_down_png,button_up_png,thumb_pb_png,track_pb_png,track_sb_png,description_json,objectview_json,objectview2_json,move_png,rotate_png,scale_png,move2_png,rotate2_png,scale2_png,Object3D_json,Transform_json,tree_btnDown_png,tree_btnDownSelect_png,tree_btnUp_png,tree_btnUpSelect_png,add_png,QQ截图20170309202712_png,未标题-1_png,1_png,2_png,camera_png",
+			"keys": "checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,selected_png,border_png,header_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,thumb_pb_png,track_pb_png,track_sb_png,description_json,objectview_json,objectview2_json,move_png,rotate_png,scale_png,move2_png,rotate2_png,scale2_png,Object3D_json,Transform_json,tree_btnDown_png,tree_btnDownSelect_png,tree_btnUp_png,tree_btnUpSelect_png,unity_png",
 			"name": "preload"
 		}
 	],
@@ -97,16 +97,6 @@
 			"name": "on_png"
 		},
 		{
-			"url": "assets/Button/button_down.png",
-			"type": "image",
-			"name": "button_down_png"
-		},
-		{
-			"url": "assets/Button/button_up.png",
-			"type": "image",
-			"name": "button_up_png"
-		},
-		{
 			"url": "assets/ProgressBar/thumb_pb.png",
 			"type": "image",
 			"name": "thumb_pb_png"
@@ -197,34 +187,9 @@
 			"url": "assets/Tree/tree_btnUpSelect.png"
 		},
 		{
-			"name": "add_png",
+			"name": "unity_png",
 			"type": "image",
-			"url": "assets/common/add.png"
-		},
-		{
-			"name": "QQ截图20170309202712_png",
-			"type": "image",
-			"url": "assets/common/QQ截图20170309202712.png"
-		},
-		{
-			"name": "未标题-1_png",
-			"type": "image",
-			"url": "assets/common/未标题-1.png"
-		},
-		{
-			"name": "1_png",
-			"type": "image",
-			"url": "assets/common/1.png"
-		},
-		{
-			"name": "2_png",
-			"type": "image",
-			"url": "assets/common/2.png"
-		},
-		{
-			"name": "camera_png",
-			"type": "image",
-			"url": "assets/common/camera.png"
+			"url": "assets/common/unity.png"
 		}
 	]
 }
