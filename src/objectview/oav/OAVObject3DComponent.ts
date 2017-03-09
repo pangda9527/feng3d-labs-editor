@@ -63,14 +63,15 @@ module feng3d.editor
 		{
 			this.accordions.length = 0;
 			this.group.removeChildren();
-			var inspectorObject3DComponent: InspectorObject3DComponent = <any>this.attributeValue;
-			var components = inspectorObject3DComponent.components;
+
+			var components = <any>this.attributeValue;
 			for (var i = 0; i < components.length; i++)
 			{
 				var component = components[i];
+				var componentName = ClassUtils.getQualifiedClassName(component).split(".").pop();
 				var accordion = new Accordion();
-				accordion.titleName = component.name;
-				var displayObject: eui.Component = objectview.getObjectView(component.data);
+				accordion.titleName = componentName;
+				var displayObject: eui.Component = objectview.getObjectView(component);
 				displayObject.percentWidth = 100;
 				accordion.addContent(displayObject);
 				accordion.percentWidth = 100;

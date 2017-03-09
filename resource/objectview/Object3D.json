@@ -1,5 +1,5 @@
 {
-    "name": "feng3d.editor.InspectorObject3D",
+    "name": "feng3d.Object3D",
     "component": "",
     "componentParam": null,
     "attributeDefinitionVec": [
@@ -16,7 +16,8 @@
             "block": ""
         },
         {
-            "name": "inspectorObject3DComponent",
+            "name": "components",
+            "component": "feng3d.editor.OAVObject3DComponent",
             "block": ""
         }
     ],

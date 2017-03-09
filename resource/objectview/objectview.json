@@ -11,15 +11,11 @@
         {
             "type": "feng3d.Vector3D",
             "component": "feng3d.editor.OAVVector3D"
-        },
-        {
-            "type": "feng3d.editor.InspectorObject3DComponent",
-            "component": "feng3d.editor.OAVObject3DComponent"
         }
     ],
     "classConfigVec": [],
     "classConfigs": [
-        "feng3d.Transform.json",
-        "feng3d.editor.InspectorObject3D.json"
+        "Transform.json",
+        "Object3D.json"
     ]
 }

@@ -11,7 +11,6 @@
         "src/ui/Feng3dView.ts",
         "src/ui/components/Accordion.ts",
         "src/ui/components/Vector3DView.ts",
-        "src/ui/components/TransformView.ts",
         //
         "src/objectview/view/DefaultBaseObjectView.ts",
         "src/objectview/view/DefaultObjectAttributeView.ts",
@@ -26,12 +25,7 @@
         "src/objectview/events/ObjectViewEvent.ts",
         //
         "src/objectview/oav/OAVVector3D.ts",
-        "src/objectview/oav/OAVTransform.ts",
         "src/objectview/oav/OAVObject3DComponent.ts",
-        //
-        "src/objectview/ov/OVInspectorObject3D.ts",
-        //
-        "src/ui/inspector/data/InspectorObject3D.ts",
         //
         "src/ui/inspector/InspectorView.ts",
         //
