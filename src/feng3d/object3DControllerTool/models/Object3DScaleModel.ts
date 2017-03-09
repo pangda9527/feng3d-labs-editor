@@ -18,14 +18,14 @@ module feng3d.editor
         private initModels()
         {
             this.xCube = new CoordinateScaleCube(new Color(1, 0, 0));
-            this.xCube.transform.rz = -90;
+            this.xCube.transform.rotation.z = -90;
             this.addChild(this.xCube);
 
             this.yCube = new CoordinateScaleCube(new Color(0, 1, 0));
             this.addChild(this.yCube);
 
             this.zCube = new CoordinateScaleCube(new Color(0, 0, 1));
-            this.zCube.transform.rx = 90;
+            this.zCube.transform.rotation.x = 90;
             this.addChild(this.zCube);
 
             this.oCube = new CoordinateCube();
@@ -61,7 +61,7 @@ module feng3d.editor
             this.addChild(this.coordinateCube);
 
             var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 4);
-            mouseHit.transform.y = 4 + (this.length - 4) / 2;
+            mouseHit.transform.position.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             this.addChild(mouseHit);
 
@@ -76,7 +76,7 @@ module feng3d.editor
             this.xLine.segmentGeometry.addSegment(segment);
 
             //
-            this.coordinateCube.transform.y = this.length * this._scale;
+            this.coordinateCube.transform.position.y = this.length * this._scale;
             this.coordinateCube.selected = this.selected;
         }
     }

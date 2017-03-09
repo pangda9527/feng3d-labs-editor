@@ -184,9 +184,7 @@ module feng3d.editor
         {
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                this._controllerTargets[i].transform.sx = this.startScaleVec[i].x * scale.x;
-                this._controllerTargets[i].transform.sy = this.startScaleVec[i].y * scale.y;
-                this._controllerTargets[i].transform.sz = this.startScaleVec[i].z * scale.z;
+                this._controllerTargets[i].transform.scale = this.startScaleVec[i].multiply(scale);
             }
         }
 
