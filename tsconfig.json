@@ -7,6 +7,9 @@
     },
     "files": [
         "typings/index.d.ts",
+        "src/ui/drag/DragSource.ts",
+        "src/ui/drag/DragEvent.ts",
+        "src/ui/drag/DragManager.ts",
         //
         "src/ui/Feng3dView.ts",
         "src/ui/components/Accordion.ts",
