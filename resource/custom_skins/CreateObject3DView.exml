@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="CreateObject3DViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
-	<w:Config id="15a9380c143" ></w:Config>
+<e:Skin class="CreateObject3DViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+	<w:Config id="15a9380c143"></w:Config>
 	<e:List id="object3dList" width="100" y="0" x="0">
 		<e:ArrayCollection>
-		<e:Array>
-			<e:Object label="Plane"/>
-			<e:Object label="Cube"/>
-			<e:Object label="Sphere"/>
-			<e:Object label="Capsule"/>
-			<e:Object label="Cylinder"/>
-		</e:Array>
+			<e:Array>
+				<e:Object label="Object" />
+				<e:Object label="Cube" />
+				<e:Object label="Sphere" />
+				<e:Object label="Capsule" />
+				<e:Object label="Cylinder" />
+				<e:Object label="Particle" />
+				<e:Object label="Camera" />
+				<e:Object label="Cone" />
+			</e:Array>
 		</e:ArrayCollection>
 	</e:List>
 </e:Skin>

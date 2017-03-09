@@ -51,6 +51,9 @@ module feng3d.editor
             var createdObject: Object3D;
             switch (event.data)
             {
+                case "Object":
+                    createdObject = new Object3D();
+                    break;
                 case "Plane":
                     createdObject = new PlaneObject3D();
                     break;
@@ -65,6 +68,15 @@ module feng3d.editor
                     break;
                 case "Cylinder":
                     createdObject = new CylinderObject3D();
+                    break;
+                case "Cone":
+                    createdObject = new ConeObject3D();
+                    break;
+                case "Particle":
+                    createdObject = new ParticleObject3D();
+                    break;
+                case "Camera":
+                    createdObject = new CameraObject3D();
                     break;
             }
             if (createdObject)
