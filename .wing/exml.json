@@ -1,92 +1,102 @@
 {
-    "15a5ffac1ae": {
-        "path": "..\\resource\\view\\TTT.ts",
-        "class": "TTT",
-        "parentPath": ""
-    },
-    "15a5ffee890": {
-        "path": "ui\\view\\CustomView.ts",
-        "class": "CustomView",
-        "parentPath": "",
-        "bindingDataTestObj": []
-    },
-    "global": {
-        "globalBindingDataTestObj": [],
-        "globalAutoLayerMarkEnable": true,
-        "gridColor": 15011856,
-        "gridEnabled": false,
-        "gridSize": 20,
-        "globalRulerEnable": true,
-        "globalAdsorbEnable": true
-    },
-    "15a64cb93c1": {
-        "bindingDataTestObj": []
-    },
-    "15a6521014b": {
-        "path": "ui\\customcomponents\\Transform.ts",
-        "class": "Transform",
-        "parentPath": "",
-        "bindingDataTestObj": [],
-        "guideLinesEnabled": false
-    },
-    "15a6adcd3c5": {
-        "path": "ui\\components\\Vector3DView.ts",
-        "class": "Vector3DView",
-        "parentPath": ""
-    },
-    "15a6ae1c5b4": {
-        "path": "objectview\\oav\\OAVVector3D.ts",
-        "class": "OAVVector3D",
-        "parentPath": ""
-    },
-    "15a6f3c4abf": {
-        "path": "ui\\components\\Accordion.ts",
-        "class": "Accordion",
-        "parentPath": ""
-    },
-    "15a6f64675f": {
-        "path": "ui\\components\\TransformView.ts",
-        "class": "TransformView",
-        "parentPath": ""
-    },
-    "15a73de4177": {
-        "path": "ui\\MainView.ts",
-        "class": "MainView",
-        "parentPath": ""
-    },
-    "15a73e1089e": {
-        "path": "ui\\inspector\\InspectorView.ts",
-        "class": "InspectorView",
-        "parentPath": ""
-    },
-    "15a740761e9": {
-        "path": "objectview\\ov\\OVInspectorObject3D.ts",
-        "class": "OVInspectorObject3D",
-        "parentPath": ""
-    },
-    "15a7457514f": {
-        "path": "ui\\components\\Accordion.ts",
-        "class": "Accordion",
-        "parentPath": ""
-    },
-    "15a7d5dea78": {
-        "path": "ui\\Feng3dView.ts",
-        "class": "Feng3dView",
-        "parentPath": ""
-    },
-    "15a7ed011a7": {
-        "path": "ui\\hierarchy\\HierarchyView.ts",
-        "class": "HierarchyView",
-        "parentPath": ""
-    },
-    "15a7f6a9cde": {
-        "path": "objectview\\oav\\OAVObject3DComponent.ts",
-        "class": "OAVObject3DComponent",
-        "parentPath": ""
-    },
-    "15a9380c143": {
-        "path": "ui\\hierarchy\\CreateObject3DView.ts",
-        "class": "CreateObject3DView",
-        "parentPath": ""
-    }
+  "15a5ffac1ae": {
+    "path": "..\\resource\\view\\TTT.ts",
+    "class": "TTT",
+    "parentPath": ""
+  },
+  "15a5ffee890": {
+    "path": "ui\\view\\CustomView.ts",
+    "class": "CustomView",
+    "parentPath": "",
+    "bindingDataTestObj": []
+  },
+  "global": {
+    "globalBindingDataTestObj": [],
+    "globalAutoLayerMarkEnable": false,
+    "gridColor": 15011856,
+    "gridEnabled": false,
+    "gridSize": 20,
+    "globalRulerEnable": true,
+    "globalAdsorbEnable": true
+  },
+  "15a64cb93c1": {
+    "bindingDataTestObj": []
+  },
+  "15a6521014b": {
+    "path": "ui\\customcomponents\\Transform.ts",
+    "class": "Transform",
+    "parentPath": "",
+    "bindingDataTestObj": [],
+    "guideLinesEnabled": false
+  },
+  "15a6adcd3c5": {
+    "path": "ui\\components\\Vector3DView.ts",
+    "class": "Vector3DView",
+    "parentPath": ""
+  },
+  "15a6ae1c5b4": {
+    "path": "objectview\\oav\\OAVVector3D.ts",
+    "class": "OAVVector3D",
+    "parentPath": ""
+  },
+  "15a6f3c4abf": {
+    "path": "ui\\components\\Accordion.ts",
+    "class": "Accordion",
+    "parentPath": ""
+  },
+  "15a6f64675f": {
+    "path": "ui\\components\\TransformView.ts",
+    "class": "TransformView",
+    "parentPath": ""
+  },
+  "15a73de4177": {
+    "path": "ui\\MainView.ts",
+    "class": "MainView",
+    "parentPath": ""
+  },
+  "15a73e1089e": {
+    "path": "ui\\inspector\\InspectorView.ts",
+    "class": "InspectorView",
+    "parentPath": ""
+  },
+  "15a740761e9": {
+    "path": "objectview\\ov\\OVInspectorObject3D.ts",
+    "class": "OVInspectorObject3D",
+    "parentPath": ""
+  },
+  "15a7457514f": {
+    "path": "ui\\components\\Accordion.ts",
+    "class": "Accordion",
+    "parentPath": ""
+  },
+  "15a7d5dea78": {
+    "path": "ui\\Feng3dView.ts",
+    "class": "Feng3dView",
+    "parentPath": ""
+  },
+  "15a7ed011a7": {
+    "path": "ui\\hierarchy\\HierarchyView.ts",
+    "class": "HierarchyView",
+    "parentPath": ""
+  },
+  "15a7f6a9cde": {
+    "path": "objectview\\oav\\OAVObject3DComponent.ts",
+    "class": "OAVObject3DComponent",
+    "parentPath": ""
+  },
+  "15a9380c143": {
+    "path": "ui\\hierarchy\\CreateObject3DView.ts",
+    "class": "CreateObject3DView",
+    "parentPath": ""
+  },
+  "15ab2b32b3f": {
+    "path": "ui\\components\\Tree.ts",
+    "class": "Tree",
+    "parentPath": ""
+  },
+  "15ab2b4214e": {
+    "path": "ui\\components\\Tree.ts",
+    "class": "Tree",
+    "parentPath": ""
+  }
 }

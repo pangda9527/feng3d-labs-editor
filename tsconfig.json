@@ -10,6 +10,8 @@
         //
         "src/ui/Feng3dView.ts",
         "src/ui/components/Accordion.ts",
+        "src/ui/components/TreeItemRenderer.ts",
+        "src/ui/components/Tree.ts",
         "src/ui/components/Vector3DView.ts",
         //
         "src/objectview/view/DefaultBaseObjectView.ts",
