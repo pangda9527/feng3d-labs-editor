@@ -11,7 +11,7 @@ module feng3d.editor
 		public constructor()
 		{
 			super();
-			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "HierarchyViewSkin";
 		}
 
@@ -23,6 +23,7 @@ module feng3d.editor
 
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
+
 
 			Watcher.watch(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this);
 			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
@@ -36,18 +37,14 @@ module feng3d.editor
 
 		private onHierarchyNodeAdded(event: Event)
 		{
-			var hierarchyNode: HierarchyNode = event.data;
-			this.listData.addItem(hierarchyNode);
+			var nodes = editor3DData.hierarchy.rootNode.getShowNodes();
+			this.listData.replaceAll(nodes);
 		}
 
 		private onHierarchyNodeRemoved(event: Event)
 		{
-			var hierarchyNode: HierarchyNode = event.data;
-			var index = this.listData.getItemIndex(hierarchyNode);
-			if (index != -1)
-			{
-				this.listData.removeItemAt(index);
-			}
+			var nodes = editor3DData.hierarchy.rootNode.getShowNodes();
+			this.listData.replaceAll(nodes);
 		}
 
 		private selectedObject3DChanged()

@@ -9,6 +9,7 @@ module feng3d.editor
         constructor(rootObject3D: Object3D)
         {
             this.rootNode = this.getNode(rootObject3D);
+            this.rootNode.depth = -1;
 
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
 
@@ -93,7 +94,6 @@ module feng3d.editor
             {
                 var node = this.nodeMap.get(selectedObject3D);
                 node.delete();
-                selectedObject3D.parent.removeChild(selectedObject3D);
                 editor3DData.selectedObject3D = null;
             }
         }
@@ -105,8 +105,10 @@ module feng3d.editor
         public static readonly REMOVED = "removed";
 
         public object3D: Object3D;
-
         public label: string;
+        public depth: number = 0;
+        public isOpen: boolean = true;
+        public hasChildren: boolean;
 
         /** 
          * 父节点
@@ -129,18 +131,55 @@ module feng3d.editor
             node.parent = this;
             this.object3D.addChild(node.object3D);
             this.children.push(node);
-            node.dispatchEvent(new Event(HierarchyNode.ADDED, node, true));
+            node.depth = this.depth + 1;
+            node.updateChildrenDepth();
+            this.hasChildren = true;
+            this.dispatchEvent(new Event(HierarchyNode.ADDED, node, true));
+        }
+
+        public removeNode(node: HierarchyNode)
+        {
+            node.parent = null;
+            this.object3D.removeChild(node.object3D);
+            var index = this.children.indexOf(node);
+            if (index != -1)
+            {
+                this.children.splice(index, 1);
+            }
+            this.hasChildren = this.children.length > 0;
+            this.dispatchEvent(new Event(HierarchyNode.REMOVED, node, true));
         }
 
         public delete()
         {
+            this.parent.removeNode(this);
             for (var i = 0; i < this.children.length; i++)
             {
                 this.children[i].delete();
             }
-            var index = this.parent.children.indexOf(this);
-            this.parent.children.splice(index, 1);
-            this.dispatchEvent(new Event(HierarchyNode.REMOVED, this, true));
+            this.children.length = 0;
+        }
+
+        public updateChildrenDepth()
+        {
+            this.children.forEach(element =>
+            {
+                element.depth = this.depth + 1;
+            });
+        }
+
+        public getShowNodes()
+        {
+            var nodes: HierarchyNode[] = [];
+            if (this.isOpen)
+            {
+                this.children.forEach(element =>
+                {
+                    nodes.push(element);
+                    nodes = nodes.concat(element.getShowNodes());
+                });
+            }
+            return nodes;
         }
     }
 }
