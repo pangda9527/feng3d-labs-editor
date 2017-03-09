@@ -129,7 +129,7 @@ module feng3d.editor
             var cameraDir = cameraSceneTransform.forward;
             cameraDir.negate();
             //
-            var xyzAxis = [this.toolModel.xAxis, this.toolModel.zAxis, this.toolModel.zAxis];
+            var xyzAxis = [this.toolModel.xAxis, this.toolModel.yAxis, this.toolModel.zAxis];
             for (var i = 0; i < xyzAxis.length; i++)
             {
                 var axis = xyzAxis[i];
