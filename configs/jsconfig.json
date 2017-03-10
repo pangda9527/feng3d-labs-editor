@@ -4,6 +4,6 @@
         "outFile": "../bin/config.js"
     },
     "include": [
-        "**/*"
+        "**/*.js"
     ]
 }

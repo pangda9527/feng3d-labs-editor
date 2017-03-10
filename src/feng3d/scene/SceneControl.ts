@@ -99,7 +99,7 @@ module feng3d.editor
                 var lookPos = editor3DData.cameraObject3D.transform.globalMatrix3D.forward;
                 lookPos.scaleBy(-config.lookDistance);
                 lookPos.incrementBy(selectedObject3D.transform.globalPosition);
-                egret.Tween.get(editor3DData.cameraObject3D.transform).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
+                egret.Tween.get(editor3DData.cameraObject3D.transform.position).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
             }
         }
 

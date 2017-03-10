@@ -88,7 +88,7 @@ module feng3d.editor
             this.xLine.segmentGeometry.addSegment(segment);
             //
             this.xArrow.transform.position.y = this.length;
-            this.xArrow.colorMaterial.color = this.selected ? this.selectedColor : this.color;
+            this.xArrow.material.baseColor = this.selected ? this.selectedColor : this.color;
         }
     }
 

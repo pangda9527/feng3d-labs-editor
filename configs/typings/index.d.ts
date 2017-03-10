@@ -5,9 +5,9 @@
  */
 declare var shortcutConfig: {
     key: string;
-    command: string;
-    stateCommand: string;
-    when: string;
+    command?: string;
+    stateCommand?: string;
+    when?: string;
 }[];
 
 /**

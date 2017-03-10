@@ -12,4 +12,5 @@ var createObjectConfig = [
     { label: "Cone", className: "feng3d.ConeObject3D" },
     { label: "Particle", className: "feng3d.ParticleObject3D" },
     { label: "Camera", className: "feng3d.CameraObject3D" },
+    { label: "PointLight", className: "feng3d.PointLightObject3D" },
 ];
