@@ -2,7 +2,7 @@ module feng3d
 {
     export class EditorObjectView extends EventDispatcher
     {
-        public static configPath = "resource/objectview/objectview.json";
+        public static configPath = "configs/objectview/objectview.json";
         public static COMPLETED = "completed";
 
         private classConfigs: string[];

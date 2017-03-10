@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,selected_png,border_png,header_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,thumb_pb_png,track_pb_png,track_sb_png,description_json,objectview_json,objectview2_json,move_png,rotate_png,scale_png,move2_png,rotate2_png,scale2_png,Object3D_json,Transform_json,tree_btnDown_png,tree_btnDownSelect_png,tree_btnUp_png,tree_btnUpSelect_png,unity_png,unity2_png",
+			"keys": "checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,selected_png,border_png,header_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,thumb_pb_png,track_pb_png,track_sb_png,description_json,move_png,rotate_png,scale_png,move2_png,rotate2_png,scale2_png,tree_btnDown_png,tree_btnDownSelect_png,tree_btnUp_png,tree_btnUpSelect_png,unity_png,unity2_png",
 			"name": "preload"
 		}
 	],
@@ -117,16 +117,6 @@
 			"url": "config/description.json"
 		},
 		{
-			"name": "objectview_json",
-			"type": "json",
-			"url": "objectview/objectview.json"
-		},
-		{
-			"name": "objectview2_json",
-			"type": "json",
-			"url": "objectview/objectview.json"
-		},
-		{
 			"name": "move_png",
 			"type": "image",
 			"url": "assets/Button/move.png"
@@ -155,16 +145,6 @@
 			"name": "scale2_png",
 			"type": "image",
 			"url": "assets/Button/scale.png"
-		},
-		{
-			"name": "Object3D_json",
-			"type": "json",
-			"url": "objectview/Object3D.json"
-		},
-		{
-			"name": "Transform_json",
-			"type": "json",
-			"url": "objectview/Transform.json"
 		},
 		{
 			"name": "tree_btnDown_png",

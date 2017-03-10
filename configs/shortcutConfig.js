@@ -18,8 +18,6 @@ var shortcutConfig = [ //
 	{ key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
 	{ key: "del+!ctrl", command: "deleteSeletedObject3D", when: "" },
 	{ key: "mousewheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
-
-
 ]
 
 // 可用命令

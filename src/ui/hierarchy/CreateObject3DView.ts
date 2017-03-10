@@ -16,13 +16,14 @@ module feng3d.editor
 		{
 			this.object3dList.addEventListener(egret.Event.CHANGE, this.onObject3dListChange, this);
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+
+			this.object3dList.dataProvider = new eui.ArrayCollection(createObjectConfig);
 		}
 
 		private onObject3dListChange()
 		{
-			var name = this.object3dList.selectedItem.label;
+			$editorEventDispatcher.dispatchEvent(new Event("Create_Object3D", this.object3dList.selectedItem));
 			this.object3dList.selectedIndex = -1;
-			$editorEventDispatcher.dispatchEvent(new Event("Create_Object3D", name));
 			this.parent && this.parent.removeChild(this);
 		}
 

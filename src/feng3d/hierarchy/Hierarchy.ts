@@ -55,41 +55,19 @@ module feng3d.editor
 
         private onCreateObject3D(event: Event)
         {
-            var createdObject: Object3D;
-            switch (event.data)
+            try
             {
-                case "Object":
-                    createdObject = new Object3D();
-                    break;
-                case "Plane":
-                    createdObject = new PlaneObject3D();
-                    break;
-                case "Cube":
-                    createdObject = new CubeObject3D();
-                    break;
-                case "Sphere":
-                    createdObject = new SphereObject3D();
-                    break;
-                case "Capsule":
-                    createdObject = new CapsuleObject3D();
-                    break;
-                case "Cylinder":
-                    createdObject = new CylinderObject3D();
-                    break;
-                case "Cone":
-                    createdObject = new ConeObject3D();
-                    break;
-                case "Particle":
-                    createdObject = new ParticleObject3D();
-                    break;
-                case "Camera":
-                    createdObject = new CameraObject3D();
-                    break;
-            }
-            if (createdObject)
+                var className = event.data.className;
+                var cls = ClassUtils.getDefinitionByName(className);
+                var createdObject = new cls();
+                if (createdObject)
+                {
+                    this.addObject3D(createdObject);
+                    editor3DData.selectedObject3D = createdObject;
+                }
+            } catch (error)
             {
-                this.addObject3D(createdObject);
-                editor3DData.selectedObject3D = createdObject;
+                console.error(`无法实例化${className},请检查配置 config.js->createObjectConfig`)
             }
         }
 

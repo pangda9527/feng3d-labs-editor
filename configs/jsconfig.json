@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "outFile": "../bin/config.js"
+    },
+    "include": [
+        "**/*.js"
+    ]
+}
