@@ -10,12 +10,19 @@ module feng3d.editor
         {
             super();
 
+            //
             new EditorEnvironment();
 
             shortcut.addShortCuts(shortcutConfig);
 
             //初始化feng3d
             new Main3D();
+
+            this.once(egret.Event.ENTER_FRAME, function ()
+            {
+                //
+                mouseEventEnvironment = new MouseEventEnvironment();
+            }, this);
         }
 
         protected createChildren(): void
