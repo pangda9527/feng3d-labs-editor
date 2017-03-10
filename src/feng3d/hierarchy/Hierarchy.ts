@@ -67,7 +67,7 @@ module feng3d.editor
                 }
             } catch (error)
             {
-                console.error(`无法实例化${className},请检查配置 config.js->createObjectConfig`)
+                console.error(`无法实例化${className},请检查配置 createObjectConfig`)
             }
         }
 

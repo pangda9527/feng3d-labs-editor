@@ -1,11 +1,21 @@
-/** 快捷方式配置，该配置在resource目录下，通过index.html加载 */
+/// <reference path="../../objectview/out/objectview.d.ts" />
+
+/**
+ * 快捷键配置
+ */
 declare var shortcutConfig: {
-    /** keys */
     key: string;
     command: string;
-    stateCommand?: string,
-    when?: string;
+    stateCommand: string;
+    when: string;
 }[];
 
-/** 创建3D对象配置 */
+/**
+ * 层级界面创建3D对象列表数据
+ */
 declare var createObjectConfig: { label: string; className: string; }[];
+
+/**
+ * ObjectView总配置数据
+ */
+declare var objectViewConfig: feng3d.ObjectViewConfig;

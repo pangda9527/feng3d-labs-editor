@@ -18,29 +18,20 @@ module feng3d.editor
             //初始化feng3d
             new Main3D();
 
+            this.addChild(new MainUI());
+
             this.once(egret.Event.ENTER_FRAME, function ()
             {
                 //
                 mouseEventEnvironment = new MouseEventEnvironment();
             }, this);
         }
-
-        protected createChildren(): void
-        {
-            super.createChildren();
-
-            var editorObjectView = new EditorObjectView();
-            editorObjectView.addEventListener(EditorObjectView.COMPLETED, this.onEditorObjectViewCompleted, this)
-            editorObjectView.init();
-        }
-
-        private onEditorObjectViewCompleted()
-        {
-            this.addChild(new MainUI());
-        }
     }
 
     /*************************** 初始化模块 ***************************/
+    //初始化配置
+    $objectViewConfig = objectViewConfig;
+
     export var $editorEventDispatcher: EventDispatcher = new EventDispatcher();
 
     //
