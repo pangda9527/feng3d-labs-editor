@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <e:Skin class="AccordionSkin" states="show,hide" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
 	<w:Config id="15a7457514f"></w:Config>
-	<e:Group id="group" scaleX="1" scaleY="1" left="0" top="0" bottom="0" right="0">
+	<e:Rect width="100%" height="100%" fillColor="0x747474" fillAlpha="0" strokeAlpha="1" strokeWeight="1" strokeColor="0x747474"/>
+	<e:Group id="group" scaleX="1" scaleY="1" width="100%" height="100%">
 		<e:layout>
-			<e:VerticalLayout horizontalAlign="left" gap="10" paddingLeft="0" paddingRight="0" />
+			<e:VerticalLayout horizontalAlign="left" gap="0" paddingLeft="2" paddingRight="2"  paddingBottom="2" paddingTop="2"/>
 		</e:layout>
 		<e:Group id="titleGroup" y="0" left="0" width="100%">
-			<e:Button id="titleButton" label="" y="0"  width="100%" x="0"/>
-			<e:Label text="-" text.show="-" text.hide="+" size="16" verticalCenter="0" left="5" touchEnabled="false"  textColor="0x000000" bold="true"/>
-			<e:Label size="14" bold="true" verticalCenter="0" left="20" touchEnabled="false" text="{titleName}"  textColor="0x000000"/>
+			<e:Rect id="titleButton" width="100%" height="100%" fillAlpha="0"/>
+			<e:Group x="5" y="2" touchEnabled="false" touchThrough="false">
+				<e:Label text="-" text.show="-" text.hide="+" size="16" textColor="0x000000" bold="true" x="0" y="0" touchEnabled="false"/>
+				<e:Label size="12" bold="true" text="{titleName}" textColor="0x000000" x="15" y="1" width="100%" touchEnabled="false"/>
+				<e:layout>
+					<e:HorizontalLayout verticalAlign="middle"/>
+				</e:layout>
+			</e:Group>
 		</e:Group>
 		<e:Group id="contentGroup" includeIn="show" y="10" left="0" width="100%" x="10">
 			<e:layout>
-				<e:VerticalLayout horizontalAlign="left" verticalAlign="middle" />
+				<e:VerticalLayout horizontalAlign="left" verticalAlign="middle"  paddingLeft="18" gap="0"/>
 			</e:layout>
 		</e:Group>
 	</e:Group>

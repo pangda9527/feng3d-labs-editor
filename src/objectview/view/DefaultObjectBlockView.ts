@@ -18,6 +18,8 @@ module feng3d
 		public titleButton: eui.Button;
 		public contentGroup: eui.Group;
 
+		public border: eui.Rect;
+
 		/**
 		 * @inheritDoc
 		 */
@@ -45,9 +47,11 @@ module feng3d
 			var h = 0;
 			if (this._blockName != null && this._blockName.length > 0)
 			{
+				this.addChildAt(this.border, 0);
 				this.group.addChildAt(this.titleGroup, 0);
 			} else
 			{
+				this.removeChild(this.border);
 				this.group.removeChild(this.titleGroup);
 			}
 

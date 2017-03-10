@@ -22,7 +22,7 @@ module feng3d.editor
 		private onComplete(): void
 		{
 			this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
-			this.label.text = this._attributeName + ":";
+			this.label.text = this._attributeName;
 			this.updateView();
 		}
 

@@ -1,6 +1,6 @@
 module feng3d.editor
 {
-	export class OAVObject3DComponent extends eui.Component implements eui.UIComponent
+	export class OAVObject3DComponent extends eui.Component implements IObjectAttributeView
 	{
 		private _space: Object;
 		private _attributeName: string;
@@ -62,6 +62,7 @@ module feng3d.editor
 		public updateView(): void
 		{
 			this.accordions.length = 0;
+			(<eui.VerticalLayout>this.group.layout).gap = -1;
 			this.group.removeChildren();
 
 			var components = <any>this.attributeValue;
