@@ -9,7 +9,7 @@ module feng3d.editor
 		 * 子节点相对父节点的缩进值，以像素为单位。默认17。
 		 */
         public indentation = 17
-        public data: { depth: number, isOpen: boolean, hasChildren: boolean };
+        public data: HierarchyNode;
 
         constructor()
         {
@@ -17,6 +17,9 @@ module feng3d.editor
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "TreeItemRendererSkin";
             this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onItemMouseDown, this, false, 1000);
+            this.addEventListener(DragEvent.DRAG_ENTER, this.onDragEnter, this);
+            this.addEventListener(DragEvent.DRAG_EXIT, this.onDragExit, this);
+            this.addEventListener(DragEvent.DRAG_DROP, this.onDragDrop, this);
         }
 
         private onComplete(): void
@@ -48,7 +51,45 @@ module feng3d.editor
             if (event.target == this.disclosureButton)
             {
                 event.stopImmediatePropagation();
+                return;
             }
+            this.stage.once(MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            this.stage.once(MouseEvent.MOUSE_UP, this.onMouseUp, this);
+        }
+
+        private onMouseUp(event: MouseEvent)
+        {
+            this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+        }
+        private onMouseMove(event: MouseEvent)
+        {
+            var dragSource = new DragSource();
+            dragSource.addData(this.data, DragType.HierarchyNode);
+            DragManager.doDrag(this, dragSource);
+        }
+
+        private onDragEnter(event: DragEvent)
+        {
+            var node = event.dragSource.dataForFormat(DragType.HierarchyNode);
+            if (node && this.data != node)
+            {
+                DragManager.acceptDragDrop(this);
+            }
+        }
+
+        private onDragExit(event: DragEvent)
+        {
+
+        }
+
+        private onDragDrop(event: DragEvent)
+        {
+            var node: HierarchyNode = event.dragSource.dataForFormat(DragType.HierarchyNode);
+            if (node.parent)
+            {
+                node.parent.removeNode(node);
+            }
+            this.data.addNode(node);
         }
     }
 }

@@ -28,11 +28,11 @@ module feng3d.editor
 			Watcher.watch(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this);
 			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
 
-			this.addEventListener(MouseEventE.MOUSE_OVER, function (event: MouseEventE)
+			this.addEventListener(MouseEvent.MOUSE_OVER, function (event: MouseEvent)
 			{
 				console.log(event.type);
 			}, this)
-			this.addEventListener(MouseEventE.MOUSE_OUT, function (event: MouseEventE)
+			this.addEventListener(MouseEvent.MOUSE_OUT, function (event: MouseEvent)
 			{
 				console.log(event.type);
 			}, this)

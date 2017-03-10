@@ -41,7 +41,7 @@ module feng3d.editor
 		 */
 		constructor(type: string, dragInitiator: egret.DisplayObject = null, dragSource: DragSource = null, bubbles = false, cancelable = false)
 		{
-			super(type, null, bubbles);
+			super(type, bubbles);
 			this.dragInitiator = dragInitiator;
 			this.dragSource = dragSource;
 		}

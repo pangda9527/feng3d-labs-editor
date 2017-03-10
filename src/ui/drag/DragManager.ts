@@ -49,9 +49,9 @@ module feng3d.editor
 		 * @param imageAlpha		图片透明度
 		 * @param allowMove			是否允许移动
 		 */
-		public static doDrag(dragInitiator: egret.DisplayObject, dragSource: DragSource, mouseEvent: MouseEvent, dragImagge: egret.DisplayObject = null, xOffset: number = 0, yOffset: number = 0, imageAlpha: number = 0.5, allowMove: boolean = true): void
+		public static doDrag(dragInitiator: egret.DisplayObject, dragSource: DragSource, dragImagge: egret.DisplayObject = null, xOffset: number = 0, yOffset: number = 0, imageAlpha: number = 0.5, allowMove: boolean = true): void
 		{
-			this.instance.doDrag(dragInitiator, dragSource, mouseEvent, dragImagge, xOffset, yOffset, imageAlpha, allowMove);
+			this.instance.doDrag(dragInitiator, dragSource, dragImagge, xOffset, yOffset, imageAlpha, allowMove);
 		}
 
 		/**
@@ -85,10 +85,6 @@ module feng3d.editor
 		 */
 		private dragSource: DragSource;
 		/**
-		 * 鼠标事件
-		 */
-		private mouseEvent: MouseEvent;
-		/**
 		 * 拖拽图片
 		 */
 		private dragImage: egret.DisplayObject;
@@ -121,19 +117,17 @@ module feng3d.editor
 		 * 执行拖拽
 		 * @param dragInitiator		拖拽发起对象
 		 * @param dragSource		拖拽源
-		 * @param mouseEvent		鼠标事件
 		 * @param dragImagge		拖拽图片
 		 * @param xOffset			X偏移
 		 * @param yOffset			Y偏移
 		 * @param imageAlpha		图片透明度
 		 * @param allowMove			是否允许移动
 		 */
-		public doDrag(dragInitiator: egret.DisplayObject, dragSource: DragSource, mouseEvent: MouseEvent, dragImage: egret.DisplayObject = null, xOffset: number = 0, yOffset: number = 0, imageAlpha: number = 0.5, allowMove: boolean = true): void
+		public doDrag(dragInitiator: egret.DisplayObject, dragSource: DragSource, dragImage: egret.DisplayObject = null, xOffset: number = 0, yOffset: number = 0, imageAlpha: number = 0.5, allowMove: boolean = true): void
 		{
 			this.isSuccess = false;
 			this.dragInitiator = dragInitiator;
 			this.dragSource = dragSource;
-			this.mouseEvent = mouseEvent;
 			this.dragImage = dragImage;
 			this.xOffset = xOffset;
 			this.yOffset = yOffset;
@@ -209,7 +203,7 @@ module feng3d.editor
 			this.isDragging = false;
 			this.removeListeners();
 			this.accepter = null;
-			this.stage.removeChild(this.dragImage);
+			this.dragImage && this.stage.removeChild(this.dragImage);
 			this.dragImage = null;
 		}
 
@@ -249,15 +243,15 @@ module feng3d.editor
 		private addListeners(): void
 		{
 			this.stage.addEventListener(MouseEvent.MOUSE_OVER, this.onStageMouseOver, this);
-			this.stage.addEventListener(egret.TouchEvent.TOUCH_END, this.onStageMouseUp, this);
-			this.stage.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onStageMouseMove, this);
+			this.stage.addEventListener(MouseEvent.MOUSE_UP, this.onStageMouseUp, this);
+			this.stage.addEventListener(MouseEvent.MOUSE_MOVE, this.onStageMouseMove, this);
 		}
 
 		private removeListeners(): void
 		{
 			this.stage.removeEventListener(MouseEvent.MOUSE_OVER, this.onStageMouseOver, this);
-			this.stage.removeEventListener(egret.TouchEvent.TOUCH_END, this.onStageMouseUp, this);
-			this.stage.removeEventListener(egret.TouchEvent.TOUCH_MOVE, this.onStageMouseMove, this);
+			this.stage.removeEventListener(MouseEvent.MOUSE_UP, this.onStageMouseUp, this);
+			this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, this.onStageMouseMove, this);
 		}
 	}
 }

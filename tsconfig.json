@@ -7,6 +7,7 @@
     },
     "files": [
         "typings/index.d.ts",
+        "src/ui/drag/DragType.ts",
         "src/ui/drag/DragSource.ts",
         "src/ui/drag/DragEvent.ts",
         "src/ui/drag/DragManager.ts",

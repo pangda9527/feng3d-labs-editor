@@ -41,13 +41,7 @@ module feng3d.editor
         public addObject3D(object3D: Object3D)
         {
             var node = this.getNode(object3D);
-            if (this.selectedNode)
-            {
-                this.selectedNode.addNode(node);
-            } else
-            {
-                this.rootNode.addNode(node);
-            }
+            this.rootNode.addNode(node);
 
             object3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
         }
