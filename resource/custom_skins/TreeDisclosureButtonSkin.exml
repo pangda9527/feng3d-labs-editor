@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="TreeDisclosureButtonSkin" xmlns:e="http://ns.egret.com/eui" states="up,down,disabled,upAndSelected,downAndSelected,disabledAndSelected" >
-	<e:Image width="100%" height="100%" source.up="tree_btnUp_png" source.down="tree_btnDown_png" source.upAndSelected="tree_btnUpSelect_png" source.downAndSelected="tree_btnDownSelect_png" source="tree_btnUp_png" source.disabled="tree_btnUp_png" source.disabledAndSelected="tree_btnUpSelect_png"/>
+<e:Skin class="TreeDisclosureButtonSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" states="up,down,disabled,upAndSelected,downAndSelected,disabledAndSelected" >
+	<e:Image id="image" width="100%" height="100%" source.up="tree_btnUp_png" source.down="tree_btnDown_png" source.upAndSelected="tree_btnUpSelect_png" source.downAndSelected="tree_btnDownSelect_png" source.disabled="tree_btnUp_png" source.disabledAndSelected="tree_btnUpSelect_png" source="tree_btnUp_png"/>
 </e:Skin>

@@ -25,6 +25,15 @@ module feng3d.editor
             eui.Watcher.watch(this, ["data", "isOpen"], this.updateView, this);
             eui.Watcher.watch(this, ["data", "hasChildren"], this.updateView, this);
             eui.Watcher.watch(this, ["indentation"], this.updateView, this);
+            //
+            this.updateView();
+            this.disclosureButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onDisclosureButtonClick, this);
+        }
+
+        private onDisclosureButtonClick()
+        {
+            if (this.data)
+                this.data.isOpen = !this.data.isOpen;
         }
 
         private updateView()

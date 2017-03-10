@@ -6,6 +6,11 @@ module feng3d.editor
 
         private nodeMap = new Map<Object3D, HierarchyNode>();
 
+        public get selectedNode()
+        {
+            return this.nodeMap.get(editor3DData.selectedObject3D);
+        }
+
         constructor(rootObject3D: Object3D)
         {
             this.rootNode = this.getNode(rootObject3D);
@@ -36,7 +41,13 @@ module feng3d.editor
         public addObject3D(object3D: Object3D)
         {
             var node = this.getNode(object3D);
-            this.rootNode.addNode(node);
+            if (this.selectedNode)
+            {
+                this.selectedNode.addNode(node);
+            } else
+            {
+                this.rootNode.addNode(node);
+            }
 
             object3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
         }
@@ -45,6 +56,7 @@ module feng3d.editor
         {
             var object3D: Object3D = <Object3D>event.currentTarget;
             editor3DData.selectedObject3D = object3D;
+            event.isStopBubbles = true;
         }
 
         private onCreateObject3D(event: Event)
@@ -94,7 +106,6 @@ module feng3d.editor
             {
                 var node = this.nodeMap.get(selectedObject3D);
                 node.delete();
-                editor3DData.selectedObject3D = null;
             }
         }
     }
@@ -103,12 +114,14 @@ module feng3d.editor
     {
         public static readonly ADDED = "added";
         public static readonly REMOVED = "removed";
+        public static readonly OPEN_CHANGED = "openChanged";
 
         public object3D: Object3D;
         public label: string;
         public depth: number = 0;
         public isOpen: boolean = true;
         public hasChildren: boolean;
+
 
         /** 
          * 父节点
@@ -124,6 +137,8 @@ module feng3d.editor
             super();
             this.object3D = object3D;
             this.label = object3D.name;
+
+            Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
         }
 
         public addNode(node: HierarchyNode)
@@ -148,6 +163,11 @@ module feng3d.editor
             }
             this.hasChildren = this.children.length > 0;
             this.dispatchEvent(new Event(HierarchyNode.REMOVED, node, true));
+
+            if (editor3DData.selectedObject3D == node.object3D)
+            {
+                editor3DData.selectedObject3D = null;
+            }
         }
 
         public delete()
@@ -180,6 +200,11 @@ module feng3d.editor
                 });
             }
             return nodes;
+        }
+
+        public onIsOpenChange()
+        {
+            this.dispatchEvent(new Event(HierarchyNode.OPEN_CHANGED, this, true));
         }
     }
 }

@@ -39,6 +39,7 @@
         "resource/eui_skins/ToggleSwitchSkin.exml",
         "resource/eui_skins/VScrollBarSkin.exml",
         "resource/eui_skins/VSliderSkin.exml",
+        "resource/custom_skins/TreeDisclosureButtonSkin.exml",
         "resource/custom_skins/TreeItemRendererSkin.exml",
         "resource/custom_skins/Accordion.exml",
         "resource/custom_skins/Vector3DViewSkin.exml",

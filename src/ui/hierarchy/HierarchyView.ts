@@ -23,7 +23,7 @@ module feng3d.editor
 
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
-
+			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
 
 			Watcher.watch(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this);
 			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
@@ -45,6 +45,7 @@ module feng3d.editor
 		{
 			var nodes = editor3DData.hierarchy.rootNode.getShowNodes();
 			this.listData.replaceAll(nodes);
+			this.list.selectedItem = editor3DData.hierarchy.selectedNode;
 		}
 
 		private selectedObject3DChanged()
