@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="CustomBlockView" xmlns:e="http://ns.egret.com/eui">
-	<e:Label id="label" text="" size="12" width="200" height="20" wordWrap="true" textColor="0xff00ff"/>
-</e:Skin>

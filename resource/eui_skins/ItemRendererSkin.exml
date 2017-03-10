@@ -4,5 +4,5 @@
 
     <e:Label id="labelDisplay" top.disabled="2" top.up="2" bottom.disabled="2" bottom.up="2" left.disabled="2" left.up="2" right.disabled="2" right.up="2"
              size="12" fontFamily="Tahoma"
-             textColor="0xFFFFFF" verticalAlign="middle" textAlign="center" text="{data.label}" textColor.up="0x000000" width.down="100%" height.down="100%" multiline.down="false"/>
+             verticalAlign="middle" textAlign="center" text="{data.label}" textColor.up="0x000000" width.down="100%" height.down="100%" multiline.down="false" verticalCenter="0" left="0" right="0" textColor="0x000000"/>
 </e:Skin>

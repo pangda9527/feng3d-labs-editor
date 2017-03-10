@@ -101,6 +101,7 @@ module feng3d.editor
                 var node = this.nodeMap.get(selectedObject3D);
                 node.delete();
             }
+            editor3DData.selectedObject3D = null;
         }
     }
 
@@ -157,11 +158,6 @@ module feng3d.editor
             }
             this.hasChildren = this.children.length > 0;
             this.dispatchEvent(new Event(HierarchyNode.REMOVED, node, true));
-
-            if (editor3DData.selectedObject3D == node.object3D)
-            {
-                editor3DData.selectedObject3D = null;
-            }
         }
 
         public delete()

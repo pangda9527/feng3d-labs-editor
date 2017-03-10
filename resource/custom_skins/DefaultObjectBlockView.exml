@@ -8,8 +8,8 @@
 		</e:layout>
 		<e:Group id="titleGroup" y="0" left="0" width="100%">
 			<e:Button id="titleButton" label=""  width="100%"/>
-			<e:Label text="-" text.show="-" text.hide="+" size="12" verticalCenter="0" left="5" touchEnabled="false" />
-			<e:Label size="14" bold="true" verticalCenter="0" left="20" touchEnabled="false" text="{blockName}" />
+			<e:Label text="-" text.show="-" text.hide="+" size="16" verticalCenter="0" left="5" touchEnabled="false"  textColor="0x000000" bold="true"/>
+			<e:Label size="14" bold="true" verticalCenter="0" left="20" touchEnabled="false" text="{blockName}"  textColor="0x000000"/>
 		</e:Group>
 		<e:Group id="contentGroup" includeIn="show" y="10" left="0" width="100%" x="10">
 			<e:layout>

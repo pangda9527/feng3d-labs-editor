@@ -23,9 +23,6 @@
         "src/objectview/view/DefaultObjectBlockView.ts",
         "src/objectview/view/DefaultObjectView.ts",
         "src/objectview/view/BooleanAttrView.ts",
-        "src/objectview/view/CustomAttrView.ts",
-        "src/objectview/view/CustomBlockView.ts",
-        "src/objectview/view/CustomObjectView.ts",
         "src/objectview/EditorObjectView.ts",
         //
         "src/objectview/events/ObjectViewEvent.ts",
