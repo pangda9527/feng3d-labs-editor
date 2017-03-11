@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es5",
         "noImplicitAny": false,
         "sourceMap": true,
         "outFile": "bin/editor.js"
@@ -17,6 +17,7 @@
         "src/ui/components/TreeItemRenderer.ts",
         "src/ui/components/Tree.ts",
         "src/ui/components/Vector3DView.ts",
+        "src/ui/components/Object3DComponentView.ts",
         //
         "src/objectview/view/DefaultBaseObjectView.ts",
         "src/objectview/view/DefaultObjectAttributeView.ts",
@@ -26,8 +27,9 @@
         //
         "src/objectview/events/ObjectViewEvent.ts",
         //
+        //
         "src/objectview/oav/OAVVector3D.ts",
-        "src/objectview/oav/OAVObject3DComponent.ts",
+        "src/objectview/oav/OAVObject3DComponentList.ts",
         //
         "src/ui/inspector/InspectorView.ts",
         //

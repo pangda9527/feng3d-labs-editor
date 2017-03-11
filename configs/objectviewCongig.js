@@ -19,6 +19,26 @@ var objectViewConfig = {
     ],
     classConfigVec: [
         {
+            name: "feng3d.Transform",
+            component: "",
+            componentParam: null,
+            attributeDefinitionVec: [
+                {
+                    name: "position",
+                    block: ""
+                },
+                {
+                    name: "rotation",
+                    block: ""
+                },
+                {
+                    name: "scale",
+                    block: ""
+                }
+            ],
+            blockDefinitionVec: []
+        },
+        {
             name: "feng3d.Object3D",
             component: "",
             componentParam: null,
@@ -37,27 +57,7 @@ var objectViewConfig = {
                 },
                 {
                     name: "components",
-                    component: "feng3d.editor.OAVObject3DComponent",
-                    block: ""
-                }
-            ],
-            blockDefinitionVec: []
-        },
-        {
-            name: "feng3d.Transform",
-            component: "",
-            componentParam: null,
-            attributeDefinitionVec: [
-                {
-                    name: "position",
-                    block: ""
-                },
-                {
-                    name: "rotation",
-                    block: ""
-                },
-                {
-                    name: "scale",
+                    component: "feng3d.editor.OAVObject3DComponentList",
                     block: ""
                 }
             ],

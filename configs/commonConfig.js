@@ -23,5 +23,6 @@ var createObject3DComponentConfig = [
     { label: "Camera3D", className: "feng3d.Camera3D" },
     { label: "MeshFilter", className: "feng3d.MeshFilter" },
     { label: "MeshRenderer", className: "feng3d.MeshRenderer" },
-    { label: "Light", className: "feng3d.Light" },
+    { label: "PointLight", className: "feng3d.PointLight" },
+    { label: "Script", className: "feng3d.Object3dScript" },
 ];

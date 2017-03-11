@@ -21,10 +21,7 @@ module feng3d.editor
 
 		public showView(data: { label: string; }[], selectedCallBack: (item: { label: string; }) => void, globalPoint: Point = null)
 		{
-			if (this._dataProvider.source != data)
-			{
-				this._dataProvider.replaceAll(data);
-			}
+			this._dataProvider.replaceAll(data.concat());
 			this._selectedCallBack = selectedCallBack;
 			globalPoint = globalPoint || new Point(input.clientX, input.clientY);
 			this.x = globalPoint.x;

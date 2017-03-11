@@ -1,6 +1,6 @@
 module feng3d.editor
 {
-	export class OAVObject3DComponent extends eui.Component implements IObjectAttributeView
+	export class OAVObject3DComponentList extends eui.Component implements IObjectAttributeView
 	{
 		private _space: Object;
 		private _attributeName: string;
@@ -21,7 +21,7 @@ module feng3d.editor
 			this.attributeViewInfo = attributeViewInfo;
 
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.skinName = "OAVObject3DComponentSkin";
+			this.skinName = "OAVObject3DComponentListSkin";
 		}
 
 		private onComplete()
@@ -88,15 +88,9 @@ module feng3d.editor
 			for (var i = 0; i < components.length; i++)
 			{
 				var component = components[i];
-				var componentName = ClassUtils.getQualifiedClassName(component).split(".").pop();
-				var accordion = new Accordion();
-				accordion.titleName = componentName;
-				var displayObject: eui.Component = objectview.getObjectView(component);
-				displayObject.percentWidth = 100;
-				accordion.addContent(displayObject);
-				accordion.percentWidth = 100;
-				this.group.addChild(accordion);
-				this.accordions.push(accordion);
+				
+				var displayObject: Object3DComponentView = new Object3DComponentView(component);
+				this.group.addChild(displayObject);
 			}
 		}
 
@@ -104,7 +98,7 @@ module feng3d.editor
 		{
 			for (var i = 0; i < this.accordions.length; i++)
 			{
-				this.accordions[i].width = this.width;
+				// this.accordions[i].width = this.width;
 			}
 		}
 	}
