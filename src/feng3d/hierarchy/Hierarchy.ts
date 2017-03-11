@@ -17,6 +17,7 @@ module feng3d.editor
             this.rootNode.depth = -1;
 
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
+            $editorEventDispatcher.addEventListener("saveScene", this.onSaveScene, this);
 
             //监听命令
             shortcut.addEventListener("deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
@@ -80,6 +81,12 @@ module feng3d.editor
                 node.delete();
             }
             editor3DData.selectedObject3D = null;
+        }
+
+        private onSaveScene()
+        {
+            var obj = serialization.writeObject(this.rootNode.object3D);
+            
         }
     }
 

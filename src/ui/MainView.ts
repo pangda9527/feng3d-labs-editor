@@ -33,8 +33,20 @@ module feng3d.editor
 			this.scaleButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
 			this.helpButton.addEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.settingButton.addEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.mainButton.addEventListener(MouseEvent.CLICK, this.onMainButtonClick, this);
 
 			Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this);
+		}
+
+		private onMainButtonClick()
+		{
+			var globalPoint = this.mainButton.localToGlobal(0, 0);
+			createObject3DView.showView(mainMenuConfig, this.onMainMenu.bind(this), globalPoint);
+		}
+
+		private onMainMenu(item: { label: string; command: string; })
+		{
+			$editorEventDispatcher.dispatchEvent(new Event(item.command));
 		}
 
 		private onHelpButtonClick()

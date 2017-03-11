@@ -26,3 +26,11 @@ var createObject3DComponentConfig = [
     { label: "PointLight", className: "feng3d.PointLight" },
     { label: "Script", className: "feng3d.Object3dScript" },
 ];
+
+/**
+ * 主菜单
+ */
+var mainMenuConfig = [
+    { label: "save scene", command: "saveScene" },
+
+];

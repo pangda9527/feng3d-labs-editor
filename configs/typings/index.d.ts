@@ -17,6 +17,8 @@ declare var createObjectConfig: { label: string; className: string; }[];
 
 declare var createObject3DComponentConfig: { label: string; className: string; }[];
 
+declare var mainMenuConfig: { label: string; command: string; }[];
+
 /**
  * ObjectView总配置数据
  */
