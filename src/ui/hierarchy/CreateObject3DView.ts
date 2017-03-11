@@ -9,9 +9,10 @@ module feng3d.editor
 		public constructor()
 		{
 			super();
-			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "CreateObject3DViewSkin";
 		}
+
 		private onComplete(): void
 		{
 			this.object3dList.addEventListener(egret.Event.CHANGE, this.onObject3dListChange, this);

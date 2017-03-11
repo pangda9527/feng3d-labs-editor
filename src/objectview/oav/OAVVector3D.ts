@@ -18,7 +18,7 @@ module feng3d.editor
 			this._attributeType = attributeViewInfo.type;
 			this.attributeViewInfo = attributeViewInfo;
 
-			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "resource/custom_skins/OAVVector3DSkin.exml";
 		}
 

@@ -15,7 +15,7 @@ module feng3d.editor
 			super();
 			this._space = objectViewInfo.owner;
 
-			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "resource/custom_skins/DefaultBaseObjectView.exml";
 		}
 

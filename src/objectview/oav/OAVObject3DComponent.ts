@@ -6,9 +6,11 @@ module feng3d.editor
 		private _attributeName: string;
 		private _attributeType: string;
 		private attributeViewInfo: AttributeViewInfo;
-
-		public group: eui.Group;
 		private accordions: Accordion[] = [];
+
+		//
+		public group: eui.Group;
+		public addComponentButton: eui.Button;
 
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
@@ -18,11 +20,13 @@ module feng3d.editor
 			this._attributeType = attributeViewInfo.type;
 			this.attributeViewInfo = attributeViewInfo;
 
-			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "OAVObject3DComponentSkin";
 		}
+
 		private onComplete()
 		{
+			// this.addComponentButton.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.updateView();
 		}
 

@@ -17,7 +17,7 @@ module feng3d.editor
 		{
 			super();
 
-			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "MainViewSkin";
 		}
 

@@ -64,7 +64,7 @@ module feng3d.editor
             // load skin theme configuration file, you can manually modify the file. And replace the default skin.
             //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
             let theme = new eui.Theme("resource/default.thm.json", this.stage);
-            theme.addEventListener(eui.UIEvent.COMPLETE, this.onThemeLoadComplete, this);
+            theme.once(eui.UIEvent.COMPLETE, this.onThemeLoadComplete, this);
 
             RES.addEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
             RES.addEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);

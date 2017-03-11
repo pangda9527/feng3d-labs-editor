@@ -15,7 +15,7 @@ module feng3d.editor
 			this._attributeName = attributeViewInfo.name;
 			this._attributeType = attributeViewInfo.type;
 
-			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "resource/custom_skins/BooleanAttrView.exml";
 		}
 

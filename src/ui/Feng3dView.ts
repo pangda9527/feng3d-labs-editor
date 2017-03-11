@@ -8,7 +8,7 @@ module feng3d.editor
 		{
 			super();
 			this.canvas = document.getElementById("glcanvas");
-			this.addEventListener(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
 
 			this.skinName = "Feng3dViewSkin";
