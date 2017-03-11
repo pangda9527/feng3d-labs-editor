@@ -26,16 +26,31 @@ module feng3d.editor
 
 		private onComplete()
 		{
-			// this.addComponentButton.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.addComponentButton.addEventListener(MouseEvent.CLICK, this.onAddComponentButtonClick, this);
 			this.updateView();
 		}
 
-		public get space(): Object
+		private onAddComponentButtonClick()
 		{
-			return this._space;
+			var globalPoint = this.addComponentButton.localToGlobal(0, 0);
+			createObject3DView.showView(createObject3DComponentConfig, this.onCreateComponent.bind(this), globalPoint);
 		}
 
-		public set space(value: Object)
+		private onCreateComponent(item)
+		{
+			var cls = ClassUtils.getDefinitionByName(item.className);
+			var component = new cls();
+			this.space.addComponent(component);
+
+			this.updateView();
+		}
+
+		public get space(): Object3D
+		{
+			return <Object3D>this._space;
+		}
+
+		public set space(value: Object3D)
 		{
 			this._space = value;
 			this.updateView();

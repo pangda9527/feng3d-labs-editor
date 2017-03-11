@@ -14,3 +14,14 @@ var createObjectConfig = [
     { label: "Camera", className: "feng3d.CameraObject3D" },
     { label: "PointLight", className: "feng3d.PointLightObject3D" },
 ];
+/**
+ * 层级界面创建3D对象列表数据
+ */
+var createObject3DComponentConfig = [
+    //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
+    { label: "ParticleAnimator", className: "feng3d.ParticleAnimator" },
+    { label: "Camera3D", className: "feng3d.Camera3D" },
+    { label: "MeshFilter", className: "feng3d.MeshFilter" },
+    { label: "MeshRenderer", className: "feng3d.MeshRenderer" },
+    { label: "Light", className: "feng3d.Light" },
+];

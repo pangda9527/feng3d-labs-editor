@@ -154,5 +154,3 @@ module feng3d.editor
         }
     }
 }
-
-var v;

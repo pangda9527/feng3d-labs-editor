@@ -5,7 +5,6 @@ module feng3d.editor
 		public addButton: eui.Button;
 		public list: eui.List;
 
-		private createObject3DView: CreateObject3DView;
 		private listData: eui.ArrayCollection;
 
 		public constructor()
@@ -56,12 +55,8 @@ module feng3d.editor
 
 		private onAddButtonClick()
 		{
-			if (!this.createObject3DView)
-			{
-				this.createObject3DView = new CreateObject3DView();
-			}
 			var globalPoint = this.addButton.localToGlobal(0, 0);
-			this.createObject3DView.showView(createObjectConfig, this.onCreateObject3d, globalPoint);
+			createObject3DView.showView(createObjectConfig, this.onCreateObject3d, globalPoint);
 		}
 
 		private onCreateObject3d(selectedItem)

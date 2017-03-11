@@ -19,6 +19,11 @@ module feng3d.editor
 
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "MainViewSkin";
+
+			//
+
+			//
+			createObject3DView = new CreateObject3DView();
 		}
 
 		private onComplete(): void
@@ -60,4 +65,6 @@ module feng3d.editor
 			this.scaleButton.selected = editor3DData.object3DOperationID == 2;
 		}
 	}
+
+	export var createObject3DView: CreateObject3DView;
 }

@@ -15,6 +15,8 @@ declare var shortcutConfig: {
  */
 declare var createObjectConfig: { label: string; className: string; }[];
 
+declare var createObject3DComponentConfig: { label: string; className: string; }[];
+
 /**
  * ObjectView总配置数据
  */
