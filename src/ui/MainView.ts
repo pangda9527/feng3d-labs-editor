@@ -4,10 +4,12 @@ module feng3d.editor
 	{
 		public mainGroup: eui.Group;
 		public topGroup: eui.Group;
+		public mainButton: eui.Button;
 		public moveButton: eui.ToggleButton;
 		public rotateButton: eui.ToggleButton;
 		public scaleButton: eui.ToggleButton;
 		public helpButton: eui.Button;
+		public settingButton: eui.Button;
 		public hierachyGroup: eui.Group;
 		public assetsGroup: eui.Group;
 
@@ -21,10 +23,11 @@ module feng3d.editor
 
 		private onComplete(): void
 		{
-			this.helpButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onHelpButtonClick, this);
-			this.moveButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onButtonClick, this);
-			this.rotateButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onButtonClick, this);
-			this.scaleButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onButtonClick, this);
+			this.moveButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
+			this.rotateButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
+			this.scaleButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
+			this.helpButton.addEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.settingButton.addEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
 
 			Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this);
 		}

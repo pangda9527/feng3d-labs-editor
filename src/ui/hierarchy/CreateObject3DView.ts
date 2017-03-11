@@ -34,7 +34,7 @@ module feng3d.editor
 				this.maskSprite = new eui.Rect(100, 100, 0);
 				this.maskSprite.alpha = 0;
 				this.addChildAt(this.maskSprite, 0);
-				this.maskSprite.addEventListener(egret.TouchEvent.TOUCH_TAP, this.maskMouseDown, this);
+				this.maskSprite.addEventListener(MouseEvent.CLICK, this.maskMouseDown, this);
 			}
 			var gP = this.localToGlobal(0, 0);
 			this.maskSprite.x = -gP.x;

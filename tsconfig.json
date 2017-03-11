@@ -63,6 +63,7 @@
         "src/feng3d/Main3D.ts",
         //
         "src/EditorEnvironment.ts",
+        "src/MouseEvent.ts",
         "src/MouseEventEnvironment.ts",
         "src/Editor.ts"
     ],

@@ -17,7 +17,7 @@ module feng3d.editor
 
 		private onComplete(): void
 		{
-			this.addButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onAddButtonClick, this);
+			this.addButton.addEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
 
 			this.listData = this.list.dataProvider = new eui.ArrayCollection();
 

@@ -16,7 +16,7 @@ module feng3d.editor
             super();
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "TreeItemRendererSkin";
-            this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onItemMouseDown, this, false, 1000);
+            this.addEventListener(MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false, 1000);
             this.addEventListener(DragEvent.DRAG_ENTER, this.onDragEnter, this);
             this.addEventListener(DragEvent.DRAG_EXIT, this.onDragExit, this);
             this.addEventListener(DragEvent.DRAG_DROP, this.onDragDrop, this);
@@ -30,7 +30,7 @@ module feng3d.editor
             eui.Watcher.watch(this, ["indentation"], this.updateView, this);
             //
             this.updateView();
-            this.disclosureButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onDisclosureButtonClick, this);
+            this.disclosureButton.addEventListener(MouseEvent.CLICK, this.onDisclosureButtonClick, this);
         }
 
         private onDisclosureButtonClick()

@@ -1,4 +1,4 @@
-module feng3d
+module feng3d.editor
 {
 	/**
 	 * 默认基础对象界面

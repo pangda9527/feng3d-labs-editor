@@ -3,10 +3,10 @@
  */
 var objectViewConfig = {
 
-    defaultBaseObjectViewClass: "feng3d.DefaultBaseObjectView",
-    defaultObjectViewClass: "feng3d.DefaultObjectView",
-    defaultObjectAttributeViewClass: "feng3d.DefaultObjectAttributeView",
-    defaultObjectAttributeBlockView: "feng3d.DefaultObjectBlockView",
+    defaultBaseObjectViewClass: "feng3d.editor.DefaultBaseObjectView",
+    defaultObjectViewClass: "feng3d.editor.DefaultObjectView",
+    defaultObjectAttributeViewClass: "feng3d.editor.DefaultObjectAttributeView",
+    defaultObjectAttributeBlockView: "feng3d.editor.DefaultObjectBlockView",
     attributeDefaultViewClassByTypeVec: [
         {
             type: "Boolean",

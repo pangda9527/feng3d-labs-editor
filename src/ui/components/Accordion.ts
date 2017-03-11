@@ -27,7 +27,7 @@ module feng3d.editor
 
 		private onComplete()
 		{
-			this.titleButton.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTitleButtonClick, this);
+			this.titleButton.addEventListener(MouseEvent.CLICK, this.onTitleButtonClick, this);
 			if (this.components)
 			{
 				for (var i = 0; i < this.components.length; i++)
