@@ -2,7 +2,7 @@ module feng3d.editor
 {
 	export class Object3DComponentView extends eui.Component
 	{
-		private component: Object;
+		public component: Object3DComponent;
 
 		//
 		public accordion: feng3d.editor.Accordion;

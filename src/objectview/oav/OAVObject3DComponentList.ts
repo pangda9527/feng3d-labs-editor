@@ -88,18 +88,21 @@ module feng3d.editor
 			for (var i = 0; i < components.length; i++)
 			{
 				var component = components[i];
-				
+
 				var displayObject: Object3DComponentView = new Object3DComponentView(component);
+				displayObject.percentWidth = 100;
 				this.group.addChild(displayObject);
+
+				//
+				displayObject.deleteButton.addEventListener(MouseEvent.CLICK, this.onDeleteButton, this);
 			}
 		}
 
-		private onResize()
+		private onDeleteButton(event: MouseEvent)
 		{
-			for (var i = 0; i < this.accordions.length; i++)
-			{
-				// this.accordions[i].width = this.width;
-			}
+			var displayObject: Object3DComponentView = event.currentTarget.parent;
+			this.group.removeChild(displayObject);
+			this.space.removeComponent(displayObject.component);
 		}
 	}
 }

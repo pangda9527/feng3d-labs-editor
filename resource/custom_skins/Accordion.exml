@@ -18,7 +18,7 @@
 		</e:Group>
 		<e:Group id="contentGroup" includeIn="show" y="10" left="0" width="100%" x="10">
 			<e:layout>
-				<e:VerticalLayout horizontalAlign="left" verticalAlign="middle"  paddingLeft="18" gap="0"/>
+				<e:VerticalLayout  paddingLeft="18" gap="-1" horizontalAlign="justify"/>
 			</e:layout>
 		</e:Group>
 	</e:Group>
