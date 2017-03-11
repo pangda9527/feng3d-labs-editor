@@ -25,6 +25,13 @@ module feng3d.editor
                 //
                 mouseEventEnvironment = new MouseEventEnvironment();
             }, this);
+
+            this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
+        }
+
+        private _onAddToStage()
+        {
+            editor3DData.stage = this.stage;
         }
     }
 

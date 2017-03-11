@@ -61,9 +61,12 @@ module feng3d.editor
 				this.createObject3DView = new CreateObject3DView();
 			}
 			var globalPoint = this.addButton.localToGlobal(0, 0);
-			this.createObject3DView.x = globalPoint.x;
-			this.createObject3DView.y = globalPoint.y;
-			this.stage.addChild(this.createObject3DView);
+			this.createObject3DView.showView(createObjectConfig, this.onCreateObject3d, globalPoint);
+		}
+
+		private onCreateObject3d(selectedItem)
+		{
+			$editorEventDispatcher.dispatchEvent(new Event("Create_Object3D", selectedItem));
 		}
 	}
 }

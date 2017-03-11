@@ -6,6 +6,9 @@ module feng3d.editor
 		public object3dList: eui.List;
 		private maskSprite: eui.Rect;
 
+		private dataProvider: eui.ArrayCollection;
+		private selectedCallBack: (item: { label: string; }) => void;
+
 		public constructor()
 		{
 			super();
@@ -13,17 +16,30 @@ module feng3d.editor
 			this.skinName = "CreateObject3DViewSkin";
 		}
 
+		public showView(data: { label: string; }[], selectedCallBack: (item: { label: string; }) => void, globalPoint: Point = null)
+		{
+			if (this.dataProvider.source != data)
+			{
+				this.dataProvider.replaceAll(data);
+			}
+			this.selectedCallBack = selectedCallBack;
+			globalPoint = globalPoint || new Point(input.clientX, input.clientY);
+			this.x = globalPoint.x;
+			this.y = globalPoint.y;
+			editor3DData.stage.addChild(this);
+		}
+
 		private onComplete(): void
 		{
 			this.object3dList.addEventListener(egret.Event.CHANGE, this.onObject3dListChange, this);
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
 
-			this.object3dList.dataProvider = new eui.ArrayCollection(createObjectConfig);
+			this.dataProvider = this.object3dList.dataProvider = new eui.ArrayCollection();
 		}
 
 		private onObject3dListChange()
 		{
-			$editorEventDispatcher.dispatchEvent(new Event("Create_Object3D", this.object3dList.selectedItem));
+			this.selectedCallBack(this.object3dList.selectedItem);
 			this.object3dList.selectedIndex = -1;
 			this.parent && this.parent.removeChild(this);
 		}

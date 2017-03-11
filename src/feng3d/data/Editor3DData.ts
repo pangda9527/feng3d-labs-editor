@@ -2,6 +2,8 @@ module feng3d.editor
 {
     export class Editor3DData
     {
+        public stage: egret.Stage;
+
         public selectedObject3D: Object3D;
         public cameraObject3D: CameraObject3D;
         /** 3d场景 */
