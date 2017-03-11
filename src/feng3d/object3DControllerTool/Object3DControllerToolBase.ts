@@ -18,6 +18,26 @@ module feng3d.editor
         {
             super();
             this.transform = new HoldSizeTransform();
+
+            this.addEventListener(Scene3DEvent.ADDED_TO_SCENE, this.onAddedToScene, this);
+            this.addEventListener(Scene3DEvent.REMOVED_FROM_SCENE, this.onRemovedFromScene, this);
+        }
+
+        private onAddedToScene()
+        {
+            this.updateToolModel();
+            input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
+            input.addEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
+            this.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+            editor3DData.cameraObject3D.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+        }
+
+        private onRemovedFromScene()
+        {
+            input.removeEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
+            input.removeEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
+            this.removeEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+            editor3DData.cameraObject3D.removeEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         protected get toolModel()
@@ -60,20 +80,6 @@ module feng3d.editor
         public set bindingObject3D(value)
         {
             this.object3DControllerToolBingding.target = value;
-            if (value)
-            {
-                this.updateToolModel();
-                input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
-                input.addEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
-                this.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-                editor3DData.cameraObject3D.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
-            } else
-            {
-                input.removeEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
-                input.removeEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
-                this.removeEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-                editor3DData.cameraObject3D.removeEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
-            }
         }
 
         protected updateToolModel()

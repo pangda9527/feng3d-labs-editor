@@ -20,6 +20,11 @@ module feng3d.editor
             this.object3DRotationTool = new Object3DRotationTool();
             this.object3DScaleTool = new Object3DScaleTool();
 
+            this.object3DMoveTool.bindingObject3D = this.object3DControllerTarget;
+            this.object3DRotationTool.bindingObject3D = this.object3DControllerTarget;
+            this.object3DScaleTool.bindingObject3D = this.object3DControllerTarget;
+            //
+
             this.currentTool = this.object3DMoveTool;
 
             Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this)
@@ -35,15 +40,13 @@ module feng3d.editor
         {
             if (editor3DData.selectedObject3D)
             {
-                editor3DData.scene3D.addChild(this);
                 this.object3DControllerTarget.controllerTargets = [editor3DData.selectedObject3D];
-                this._currentTool.bindingObject3D = this.object3DControllerTarget;
+                editor3DData.scene3D.addChild(this);
             }
             else
             {
                 this.object3DControllerTarget.controllerTargets = null;
                 editor3DData.scene3D.removeChild(this);
-                this._currentTool.bindingObject3D = null;
             }
         }
 
@@ -86,14 +89,12 @@ module feng3d.editor
                 return;
             if (this._currentTool)
             {
-                this._currentTool.bindingObject3D = null;
                 this.removeChild(this._currentTool)
             }
             this._currentTool = value;
             if (this._currentTool)
             {
                 this.addChild(this._currentTool);
-                this._currentTool.bindingObject3D = this.object3DControllerTarget;
             }
         }
     }

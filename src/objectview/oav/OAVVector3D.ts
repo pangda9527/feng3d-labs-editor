@@ -19,11 +19,14 @@ module feng3d.editor
 			this.attributeViewInfo = attributeViewInfo;
 
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.skinName = "resource/custom_skins/OAVVector3DSkin.exml";
+			this.skinName = "OAVVector3DSkin";
 		}
 
 		private onComplete()
 		{
+			this.vector3DView.vm = <any>this.attributeValue;
+			Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
+
 			this.updateView();
 		}
 
@@ -62,8 +65,6 @@ module feng3d.editor
 		 */
 		public updateView(): void
 		{
-			this.label.text = this._attributeName;
-			this.vector3DView.vm = <any>this.attributeValue;
 		}
 	}
 }
