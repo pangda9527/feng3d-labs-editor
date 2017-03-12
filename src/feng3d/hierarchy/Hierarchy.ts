@@ -86,7 +86,39 @@ module feng3d.editor
         private onSaveScene()
         {
             var obj = serialization.writeObject(this.rootNode.object3D);
-            
+            obj;
+
+            var output = "";
+
+            try
+            {
+                output = JSON.stringify(obj, null, '\t');
+                output = output.replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+
+            } catch (e)
+            {
+                output = JSON.stringify(output);
+            }
+
+            var link = document.createElement('a');
+            link.style.display = 'none';
+            document.body.appendChild(link); // Firefox workaround, see #6594
+
+            saveString(output, 'scene.json');
+
+            function saveString(text, filename)
+            {
+                save(new Blob([text], { type: 'text/plain' }), filename);
+            }
+
+            function save(blob, filename)
+            {
+                link.href = URL.createObjectURL(blob);
+                link.download = filename || 'data.json';
+                link.click();
+            }
+
+
         }
     }
 
