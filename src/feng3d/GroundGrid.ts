@@ -17,7 +17,6 @@ module feng3d.editor
         {
             super("GroundGrid");
             this.init();
-            editor3DData.scene3D.addChild(this);
 
             editor3DData.cameraObject3D.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }

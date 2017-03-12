@@ -42,6 +42,7 @@ module feng3d.editor
 
             //初始化模块
             var groundGrid = new GroundGrid();
+            view3D.scene.addChild(groundGrid);
 
             var object3DControllerTool = new Object3DControllerTool();
             var sceneControl = new SceneControl();
