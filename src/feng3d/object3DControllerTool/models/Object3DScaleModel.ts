@@ -36,7 +36,7 @@ module feng3d.editor
     export class CoordinateScaleCube extends Object3D
     {
         private coordinateCube: CoordinateCube
-        private xLine: SegmentObject3D;
+        private segmentGeometry: SegmentGeometry;
 
         private color: Color;
         private selectedColor = new Color(1, 1, 0);
@@ -55,8 +55,9 @@ module feng3d.editor
             super();
             this.color = color;
 
-            this.xLine = new SegmentObject3D();
-            this.addChild(this.xLine);
+            var xLine = new SegmentObject3D();
+            this.segmentGeometry = xLine.getOrCreateComponentByClass(SegmentGeometry);
+            this.addChild(xLine);
             this.coordinateCube = new CoordinateCube(this.color, this.selectedColor);
             this.addChild(this.coordinateCube);
 
@@ -70,10 +71,10 @@ module feng3d.editor
 
         private update()
         {
-            this.xLine.segmentGeometry.removeAllSegments();
+            this.segmentGeometry.removeAllSegments();
             var segment = new Segment(new Vector3D(), new Vector3D(0, this._scale * this.length, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedColor : this.color;
-            this.xLine.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.addSegment(segment);
 
             //
             this.coordinateCube.transform.position.y = this.length * this._scale;

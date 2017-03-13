@@ -38,7 +38,7 @@ module feng3d.editor
 
     export class CoordinateRotationAxis extends Object3D
     {
-        private border: SegmentObject3D;
+        private segmentGeometry: SegmentGeometry;
         private sector: SectorObject3D;
 
         private radius;
@@ -68,8 +68,9 @@ module feng3d.editor
 
         private initModels()
         {
-            this.border = new SegmentObject3D();
-            this.addChild(this.border);
+            var border = new SegmentObject3D();
+            this.segmentGeometry = border.getOrCreateComponentByClass(SegmentGeometry);
+            this.addChild(border);
 
             this.sector = new SectorObject3D(this.radius);
 
@@ -93,7 +94,7 @@ module feng3d.editor
                 var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this._filterNormal);
             }
 
-            this.border.segmentGeometry.removeAllSegments();
+            this.segmentGeometry.removeAllSegments();
             var points: Vector3D[] = [];
             for (var i = 0; i <= 360; i++)
             {
@@ -110,12 +111,12 @@ module feng3d.editor
                     {
                         var segment = new Segment(points[i - 1], points[i]);
                         segment.startColor = segment.endColor = color;
-                        this.border.segmentGeometry.addSegment(segment);
+                        this.segmentGeometry.addSegment(segment);
                     } else if (this.selected)
                     {
                         var segment = new Segment(points[i - 1], points[i]);
                         segment.startColor = segment.endColor = this.backColor;
-                        this.border.segmentGeometry.addSegment(segment);
+                        this.segmentGeometry.addSegment(segment);
                     }
                 }
             }
@@ -151,8 +152,8 @@ module feng3d.editor
      */
     export class SectorObject3D extends Object3D
     {
+        private segmentGeometry: SegmentGeometry;
         private geometry: Geometry;
-        private border: SegmentObject3D;
         private borderColor = new Color(0, 1, 1, 0.6);
 
         private radius: number;
@@ -171,8 +172,9 @@ module feng3d.editor
             this.geometry = mesh.geometry = new Geometry();
             this.getOrCreateComponentByClass(MeshRenderer).material = new ColorMaterial(new Color(0.5, 0.5, 0.5, 0.2));
 
-            this.border = new SegmentObject3D();
-            this.addChild(this.border);
+            var border = new SegmentObject3D();
+            this.segmentGeometry = border.getOrCreateComponentByClass(SegmentGeometry);
+            this.addChild(border);
         }
 
         public update(start = 0, end = 0)
@@ -205,19 +207,19 @@ module feng3d.editor
             var startPoint = new Vector3D(this.radius * Math.cos((this._start - 0.1) * MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._start - 0.1) * MathConsts.DEGREES_TO_RADIANS), 0);
             var endPoint = new Vector3D(this.radius * Math.cos((this._end + 0.1) * MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._end + 0.1) * MathConsts.DEGREES_TO_RADIANS), 0);
             //
-            this.border.segmentGeometry.removeAllSegments();
+            this.segmentGeometry.removeAllSegments();
             var segment = new Segment(new Vector3D(), startPoint);
             segment.startColor = segment.endColor = this.borderColor;
-            this.border.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.addSegment(segment);
             var segment = new Segment(new Vector3D(), endPoint);
             segment.startColor = segment.endColor = this.borderColor;
-            this.border.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.addSegment(segment);
         }
     }
 
     export class CoordinateRotationFreeAxis extends Object3D
     {
-        private border: SegmentObject3D;
+        private segmentGeometry: SegmentGeometry;
         private sector: SectorObject3D;
 
         private radius;
@@ -240,8 +242,9 @@ module feng3d.editor
 
         private initModels()
         {
-            this.border = new SegmentObject3D();
-            this.addChild(this.border);
+            var border = new SegmentObject3D();
+            this.segmentGeometry = border.getOrCreateComponentByClass(SegmentGeometry);
+            this.addChild(border);
 
             this.sector = new SectorObject3D(this.radius);
             this.sector.update(0, 360);
@@ -257,7 +260,7 @@ module feng3d.editor
 
             var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
 
-            this.border.segmentGeometry.removeAllSegments();
+            this.segmentGeometry.removeAllSegments();
             var points: Vector3D[] = [];
             for (var i = 0; i <= 360; i++)
             {
@@ -267,7 +270,7 @@ module feng3d.editor
                 {
                     var segment = new Segment(points[i - 1], points[i]);
                     segment.startColor = segment.endColor = color;
-                    this.border.segmentGeometry.addSegment(segment);
+                    this.segmentGeometry.addSegment(segment);
                 }
             }
         }

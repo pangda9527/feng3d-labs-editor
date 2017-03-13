@@ -50,7 +50,9 @@ module feng3d.editor
 
     export class CoordinateAxis extends Object3D
     {
-        private xLine: SegmentObject3D;
+        private segmentGeometry: SegmentGeometry;
+        private material: StandardMaterial;
+
         private xArrow: ConeObject3D;
 
         private color: Color;
@@ -67,11 +69,13 @@ module feng3d.editor
             super();
             this.color = color;
 
-            this.xLine = new SegmentObject3D();
-            this.addChild(this.xLine);
+            var xLine = new SegmentObject3D();
+            this.segmentGeometry = xLine.getOrCreateComponentByClass(SegmentGeometry);
+            this.addChild(xLine);
             //
             this.xArrow = new ConeObject3D(5, 18);
             this.addChild(this.xArrow);
+            this.material = this.xArrow.getOrCreateComponentByClass(MeshRenderer).material = new StandardMaterial();
             this.update();
 
             var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 20);
@@ -82,13 +86,13 @@ module feng3d.editor
 
         private update()
         {
-            this.xLine.segmentGeometry.removeAllSegments();
+            this.segmentGeometry.removeAllSegments();
             var segment = new Segment(new Vector3D(), new Vector3D(0, this.length, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedColor : this.color;
-            this.xLine.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.addSegment(segment);
             //
             this.xArrow.transform.position.y = this.length;
-            this.xArrow.material.baseColor = this.selected ? this.selectedColor : this.color;
+            this.material.baseColor = this.selected ? this.selectedColor : this.color;
         }
     }
 
@@ -127,7 +131,7 @@ module feng3d.editor
     export class CoordinatePlane extends Object3D
     {
         private colorMaterial: ColorMaterial;
-        private border: SegmentObject3D;
+        private segmentGeometry: SegmentGeometry;
 
         private color: Color;
         private borderColor: Color;
@@ -156,8 +160,9 @@ module feng3d.editor
             plane.getOrCreateComponentByClass(MeshRenderer).material = this.colorMaterial;
             this.addChild(plane);
 
-            this.border = new SegmentObject3D();
-            this.addChild(this.border);
+            var border = new SegmentObject3D();
+            this.segmentGeometry = border.getOrCreateComponentByClass(SegmentGeometry);
+            this.addChild(border);
 
             this.update();
         }
@@ -166,24 +171,23 @@ module feng3d.editor
         {
             this.colorMaterial.color = this.selected ? this.selectedColor : this.color;
 
-            var border = this.border;
-            border.segmentGeometry.removeAllSegments();
+            this.segmentGeometry.removeAllSegments();
 
             var segment = new Segment(new Vector3D(0, 0, 0), new Vector3D(this._width, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.addSegment(segment);
 
             var segment = new Segment(new Vector3D(this._width, 0, 0), new Vector3D(this._width, 0, this._width));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.addSegment(segment);
 
             var segment = new Segment(new Vector3D(this._width, 0, this._width), new Vector3D(0, 0, this._width));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.addSegment(segment);
 
             var segment = new Segment(new Vector3D(0, 0, this._width), new Vector3D(0, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            border.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.addSegment(segment);
         }
     }
 }
