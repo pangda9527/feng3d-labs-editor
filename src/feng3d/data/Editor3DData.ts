@@ -2,6 +2,7 @@ module feng3d.editor
 {
     export class Editor3DData
     {
+        public sceneData = new SceneData();
         public stage: egret.Stage;
 
         public selectedObject3D: Object3D;

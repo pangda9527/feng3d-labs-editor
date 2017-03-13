@@ -43,6 +43,7 @@
         "src/ui/MainUI.ts",
         "src/ui/ThemeAdapter.ts",
         //
+        "src/feng3d/data/SceneData.ts",
         "src/feng3d/data/Editor3DData.ts",
         //
         "src/feng3d/events/Editor3DEvent.ts",
