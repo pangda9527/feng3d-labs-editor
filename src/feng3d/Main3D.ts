@@ -38,13 +38,19 @@ module feng3d.editor
             camera.transform.position.y = 300;
             camera.transform.lookAt(new Vector3D());
 
-            view3D.scene.addChild(new Trident());
+            var trident = new Trident();
+            view3D.scene.addChild(trident);
+            serializationConfig.excludeObject.push(trident);
 
             //初始化模块
             var groundGrid = new GroundGrid();
             view3D.scene.addChild(groundGrid);
+            serializationConfig.excludeObject.push(groundGrid);
 
             var object3DControllerTool = new Object3DControllerTool();
+            serializationConfig.excludeObject.push(object3DControllerTool);
+
+            //
             var sceneControl = new SceneControl();
         }
     }

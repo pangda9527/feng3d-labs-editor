@@ -24,6 +24,7 @@ module feng3d.editor
             super();
             this.controllerBindingShowTarget = new Object3DTransformBinding(this._showObject3D);
             this.controllerBinding = new Object3DSceneTransformBinding(this);
+            serializationConfig.excludeObject.push(this.controllerImage);
         }
 
         public set controllerTargets(value: Object3D[])
