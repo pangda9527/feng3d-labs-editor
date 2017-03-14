@@ -85,6 +85,13 @@ module feng3d.editor
         private onDragDrop(event: DragEvent)
         {
             var node: HierarchyNode = event.dragSource.dataForFormat(DragType.HierarchyNode);
+
+            var iscontain = node.contain(this.data)
+            if (iscontain)
+            {
+                alert("无法添加到自身节点中!");
+                return;
+            }
             if (node.parent)
             {
                 node.parent.removeNode(node);

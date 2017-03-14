@@ -18,6 +18,7 @@ module feng3d.editor
 
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
             $editorEventDispatcher.addEventListener("saveScene", this.onSaveScene, this);
+            $editorEventDispatcher.addEventListener("import", this.onImport, this);
 
             //监听命令
             shortcut.addEventListener("deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
@@ -39,12 +40,24 @@ module feng3d.editor
             return node;
         }
 
-        public addObject3D(object3D: Object3D)
+        public addObject3D(object3D: Object3D, parentNode: HierarchyNode = null, allChildren = false)
         {
             var node = this.getNode(object3D);
-            this.rootNode.addNode(node);
-
+            if (parentNode)
+            {
+                parentNode.addNode(node);
+            } else
+            {
+                this.rootNode.addNode(node);
+            }
             object3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
+            if (allChildren)
+            {
+                for (var i = 0; i < object3D.numChildren; i++)
+                {
+                    this.addObject3D(object3D.getChildAt(i), node, true);
+                }
+            }
         }
 
         private onMouseClick(event: Mouse3DEvent)
@@ -83,6 +96,76 @@ module feng3d.editor
             editor3DData.selectedObject3D = null;
         }
 
+        public resetScene(scene: Scene3D)
+        {
+            for (var i = 0; i < scene.numChildren; i++)
+            {
+                this.addObject3D(scene.getChildAt(i), null, true);
+            }
+        }
+
+        private onImport()
+        {
+
+            var fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+
+            fileInput.addEventListener('change', function (event)
+            {
+                if (fileInput.files.length == 0)
+                    return;
+                var file = fileInput.files[0];
+
+                // try sending
+                var reader = new FileReader();
+
+                reader.onloadstart = function ()
+                {
+                    console.log("onloadstart");
+                }
+
+                reader.onprogress = function (p)
+                {
+                    console.log("onprogress");
+                }
+
+                reader.onload = function ()
+                {
+                    console.log("load complete");
+                }
+
+                reader.onloadend = function ()
+                {
+                    if (reader.error)
+                    {
+                        console.log(reader.error);
+                    } else
+                    {
+                        var json = JSON.parse(reader.result);
+                        var scene: Scene3D = serialization.readObject(json);
+
+                        editor3DData.hierarchy.resetScene(scene);
+                    }
+
+                }
+
+
+                reader.readAsBinaryString(file);
+            });
+
+            document.addEventListener("mouseup", onmouseup, true);
+
+            function onmouseup(e)
+            {
+                fileInput.click();
+                e.preventDefault();
+                document.removeEventListener("mouseup", onmouseup, true)
+            }
+
+        }
+
         private onSaveScene()
         {
             var obj = serialization.writeObject(this.rootNode.object3D);
@@ -104,21 +187,10 @@ module feng3d.editor
             link.style.display = 'none';
             document.body.appendChild(link); // Firefox workaround, see #6594
 
-            saveString(output, 'scene.json');
-
-            function saveString(text, filename)
-            {
-                save(new Blob([text], { type: 'text/plain' }), filename);
-            }
-
-            function save(blob, filename)
-            {
-                link.href = URL.createObjectURL(blob);
-                link.download = filename || 'data.json';
-                link.click();
-            }
-
-
+            link.href = URL.createObjectURL(new Blob([output], { type: 'text/plain' }));
+            link.download = 'scene.json';
+            link.click();
+            //to do 删除 link
         }
     }
 
@@ -153,8 +225,25 @@ module feng3d.editor
             Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
         }
 
+        /**
+         * 判断是否包含节点
+         */
+        public contain(node: HierarchyNode)
+        {
+            if (this == node)
+                return true;
+            for (var i = 0; i < this.children.length; i++)
+            {
+                if (this.children[i].contain(node))
+                    return true;
+            }
+            return false;
+        }
+
         public addNode(node: HierarchyNode)
         {
+            debuger && console.assert(!node.contain(this), "无法添加到自身节点中!");
+
             node.parent = this;
             this.object3D.addChild(node.object3D);
             this.children.push(node);
@@ -169,10 +258,8 @@ module feng3d.editor
             node.parent = null;
             this.object3D.removeChild(node.object3D);
             var index = this.children.indexOf(node);
-            if (index != -1)
-            {
-                this.children.splice(index, 1);
-            }
+            console.assert(index != -1);
+            this.children.splice(index, 1);
             this.hasChildren = this.children.length > 0;
             this.dispatchEvent(new Event(HierarchyNode.REMOVED, node, true));
         }
@@ -192,6 +279,7 @@ module feng3d.editor
             this.children.forEach(element =>
             {
                 element.depth = this.depth + 1;
+                element.updateChildrenDepth();
             });
         }
 
