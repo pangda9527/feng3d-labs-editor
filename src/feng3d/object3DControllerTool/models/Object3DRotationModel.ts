@@ -168,9 +168,9 @@ module feng3d.editor
         {
             super("sector");
             this.radius = radius;
-            var mesh = this.getOrCreateComponentByClass(MeshFilter);
+            var mesh = this.getOrCreateComponentByClass(Model);
             this.geometry = mesh.geometry = new Geometry();
-            this.getOrCreateComponentByClass(MeshRenderer).material = new ColorMaterial(new Color(0.5, 0.5, 0.5, 0.2));
+            this.getOrCreateComponentByClass(Model).material = new ColorMaterial(new Color(0.5, 0.5, 0.5, 0.2));
 
             var border = new SegmentObject3D();
             this.segmentGeometry = border.getOrCreateComponentByClass(SegmentGeometry);

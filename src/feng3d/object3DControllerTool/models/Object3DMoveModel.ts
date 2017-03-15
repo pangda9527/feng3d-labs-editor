@@ -69,13 +69,20 @@ module feng3d.editor
             super();
             this.color = color;
 
-            var xLine = new SegmentObject3D();
-            this.segmentGeometry = xLine.getOrCreateComponentByClass(SegmentGeometry);
+            var xLine = new Object3D();
+            var model = new Model();
+            model.material = new SegmentMaterial();
+            this.segmentGeometry = model.geometry = new SegmentGeometry();
+            xLine.addComponent(model);
             this.addChild(xLine);
             //
-            this.xArrow = new ConeObject3D(5, 18);
+            this.xArrow = new Object3D();
+            var model = new Model();
+            this.material = model.material = new StandardMaterial();
+            model.geometry = new ConeGeometry(5, 18);
+            this.xArrow.addComponent(model);
             this.addChild(this.xArrow);
-            this.material = this.xArrow.getOrCreateComponentByClass(MeshRenderer).material = new StandardMaterial();
+
             this.update();
 
             var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 20);
@@ -114,9 +121,12 @@ module feng3d.editor
             this.color = color;
             this.selectedColor = selectedColor;
             //
-            this.oCube = new CubeObject3D(8);
-            this.colorMaterial = new ColorMaterial();
-            this.oCube.getOrCreateComponentByClass(MeshRenderer).material = this.colorMaterial;
+            this.oCube = new Object3D();
+            var model = new Model();
+            model.geometry = new CubeGeometry(8, 8, 8);
+            this.colorMaterial = model.material = new ColorMaterial();
+            this.oCube.addComponent(model);
+
             this.addChild(this.oCube);
 
             this.update();
@@ -154,10 +164,12 @@ module feng3d.editor
             this.selectedColor = selectedColor;
             this.borderColor = borderColor;
 
-            var plane = new PlaneObject3D(this._width);
+            var plane = new Object3D();
             plane.transform.position.x = plane.transform.position.z = this._width / 2;
-            this.colorMaterial = new ColorMaterial();
-            plane.getOrCreateComponentByClass(MeshRenderer).material = this.colorMaterial;
+            var model = new Model();
+            model.geometry = new PlaneGeometry(this._width, this._width);
+            this.colorMaterial = model.material = new ColorMaterial();
+            plane.addComponent(model);
             this.addChild(plane);
 
             var border = new SegmentObject3D();

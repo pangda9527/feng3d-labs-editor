@@ -26,10 +26,10 @@ module feng3d.editor
          */
         private init()
         {
-            this.getOrCreateComponentByClass(MeshRenderer).material = new SegmentMaterial();
-            this.segmentGeometry = new SegmentGeometry();
-            var geometry = this.getOrCreateComponentByClass(Geometry);
-            geometry.addComponent(this.segmentGeometry);
+            var model = new Model();
+            model.material = new SegmentMaterial();
+            this.segmentGeometry = model.geometry = new SegmentGeometry();
+            this.addComponent(model);
             this.update();
         }
 
