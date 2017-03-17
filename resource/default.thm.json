@@ -12,18 +12,7 @@
         "eui.ToggleSwitch": "resource/eui_skins/ToggleSwitchSkin.exml",
         "eui.VScrollBar": "resource/eui_skins/VScrollBarSkin.exml",
         "eui.VSlider": "resource/eui_skins/VSliderSkin.exml",
-        "eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml",
-        "feng3d.editor.TreeItemRenderer": "resource/custom_skins/TreeItemRendererSkin.exml",
-        "feng3d.editor.Vector3DView": "resource/custom_skins/Vector3DViewSkin.exml",
-        "feng3d.editor.OAVVector3D": "resource/custom_skins/OAVVector3DSkin.exml",
-        "feng3d.editor.MainView": "resource/custom_skins/MainView.exml",
-        "feng3d.editor.InspectorView": "resource/custom_skins/InspectorView.exml",
-        "feng3d.editor.Accordion": "resource/custom_skins/Accordion.exml",
-        "feng3d.editor.Feng3dView": "resource/custom_skins/Feng3dView.exml",
-        "feng3d.editor.HierarchyView": "resource/custom_skins/HierarchyView.exml",
-        "feng3d.editor.Object3DComponent": "resource/custom_skins/Object3DComponent.exml",
-        "feng3d.editor.OAVObject3DComponentList": "resource/custom_skins/OAVObject3DComponentListSkin.exml",
-        "feng3d.editor.CreateObject3DView": "resource/custom_skins/CreateObject3DView.exml"
+        "eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [

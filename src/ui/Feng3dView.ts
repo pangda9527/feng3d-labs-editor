@@ -7,23 +7,34 @@ module feng3d.editor
 		public constructor()
 		{
 			super();
-			this.canvas = document.getElementById("glcanvas");
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-
 			this.skinName = "Feng3dViewSkin";
 		}
 
 		private onComplete(): void
 		{
-			this.onResize();
-			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-			this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+			if (this.stage)
+			{
+				this.onAddedToStage();
+			}
 		}
 
 		private onAddedToStage()
 		{
+			this.canvas = document.getElementById("glcanvas");
+			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+			this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
 			this.onResize();
+		}
+
+		private onRemovedFromStage()
+		{
+			this.canvas = null;
+			this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
+			this.removeEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
 		}
 
 		private onResize()

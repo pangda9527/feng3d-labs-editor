@@ -13,20 +13,28 @@ module feng3d.editor
 		public hierachyGroup: eui.Group;
 		public assetsGroup: eui.Group;
 
+		private watchers: Watcher[] = [];
+
 		public constructor()
 		{
 			super();
 
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "MainViewSkin";
-
-			//
-
-			//
-			createObject3DView = new CreateObject3DView();
 		}
 
 		private onComplete(): void
+		{
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+			if (this.stage)
+			{
+				this.onAddedToStage();
+			}
+		}
+
+		private onAddedToStage()
 		{
 			this.moveButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
 			this.rotateButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
@@ -35,7 +43,27 @@ module feng3d.editor
 			this.settingButton.addEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.mainButton.addEventListener(MouseEvent.CLICK, this.onMainButtonClick, this);
 
-			Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this);
+			//
+			createObject3DView = createObject3DView || new CreateObject3DView();
+
+			this.watchers.push(
+				Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this)
+			);
+		}
+
+		private onRemovedFromStage()
+		{
+			this.moveButton.removeEventListener(MouseEvent.CLICK, this.onButtonClick, this);
+			this.rotateButton.removeEventListener(MouseEvent.CLICK, this.onButtonClick, this);
+			this.scaleButton.removeEventListener(MouseEvent.CLICK, this.onButtonClick, this);
+			this.helpButton.removeEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.settingButton.removeEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.mainButton.removeEventListener(MouseEvent.CLICK, this.onMainButtonClick, this);
+
+			while (this.watchers.length > 0)
+			{
+				this.watchers.pop().unwatch();
+			}
 		}
 
 		private onMainButtonClick()

@@ -7,15 +7,11 @@ module feng3d.editor
 
 		private _dataProvider: eui.ArrayCollection;
 		private _selectedCallBack: (item: { label: string; }) => void;
-		private _isinit = false;
 
 		public constructor()
 		{
 			super();
-			this._dataProvider = new eui.ArrayCollection();
-
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onComplete, this);
 			this.skinName = "CreateObject3DViewSkin";
 		}
 
@@ -29,27 +25,35 @@ module feng3d.editor
 			editor3DData.stage.addChild(this);
 		}
 
-		private init()
-		{
-			this.object3dList.dataProvider = this._dataProvider;
-			this.object3dList.addEventListener(egret.Event.CHANGE, this.onObject3dListChange, this);
-			this.maskSprite.addEventListener(MouseEvent.CLICK, this.maskMouseDown, this);
-			//
-			this._isinit = true;
-		}
-
 		private onComplete(): void
 		{
-			this._isinit || this.init();
+			this._dataProvider = new eui.ArrayCollection();
+			this.object3dList.dataProvider = this._dataProvider;
+
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
 			if (this.stage)
 			{
-				var gP = this.localToGlobal(0, 0);
-				this.maskSprite.x = -gP.x;
-				this.maskSprite.y = -gP.y;
-				this.maskSprite.width = this.stage.stageWidth;
-				this.maskSprite.height = this.stage.stageHeight;
+				this.onAddedToStage();
 			}
+		}
+
+		private onAddedToStage()
+		{
+			var gP = this.localToGlobal(0, 0);
+			this.maskSprite.x = -gP.x;
+			this.maskSprite.y = -gP.y;
+			this.maskSprite.width = this.stage.stageWidth;
+			this.maskSprite.height = this.stage.stageHeight;
+			this.object3dList.addEventListener(egret.Event.CHANGE, this.onObject3dListChange, this);
+			this.maskSprite.addEventListener(MouseEvent.CLICK, this.maskMouseDown, this);
+		}
+
+		private onRemovedFromStage()
+		{
+			this.object3dList.removeEventListener(egret.Event.CHANGE, this.onObject3dListChange, this);
+			this.maskSprite.removeEventListener(MouseEvent.CLICK, this.maskMouseDown, this);
 		}
 
 		private onObject3dListChange()
