@@ -40,6 +40,13 @@
         "resource/eui_skins/ToggleSwitchSkin.exml",
         "resource/eui_skins/VScrollBarSkin.exml",
         "resource/eui_skins/VSliderSkin.exml",
+
+        "resource/custom_skins/BooleanAttrView.exml",
+        "resource/custom_skins/DefaultBaseObjectView.exml",
+        "resource/custom_skins/DefaultObjectAttributeView.exml",
+        "resource/custom_skins/DefaultObjectBlockView.exml",
+        "resource/custom_skins/DefaultObjectView.exml",
+
         "resource/custom_skins/TreeDisclosureButtonSkin.exml",
         "resource/custom_skins/TreeItemRendererSkin.exml",
         "resource/custom_skins/Accordion.exml",

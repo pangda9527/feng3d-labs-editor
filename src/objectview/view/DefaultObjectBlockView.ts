@@ -32,7 +32,7 @@ module feng3d.editor
 			this.itemList = blockViewInfo.itemList;
 
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.skinName = "resource/custom_skins/DefaultObjectBlockView.exml";
+			this.skinName = "DefaultObjectBlockView";
 
 		}
 

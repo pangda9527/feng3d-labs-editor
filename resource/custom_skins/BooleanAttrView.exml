@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="ov.BooleanAttrViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+<e:Skin class="BooleanAttrViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
 
 	<e:Group x="0" y="0">
 		<e:Label id="label" text="" size="12" width="80" y="0" textColor="0x000000" verticalAlign="middle" x="0" multiline="false"/>

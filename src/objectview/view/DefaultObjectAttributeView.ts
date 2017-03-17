@@ -25,7 +25,7 @@ module feng3d.editor
 			this.attributeViewInfo = attributeViewInfo;
 
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.skinName = "resource/custom_skins/DefaultObjectAttributeView.exml";
+			this.skinName = "DefaultObjectAttributeView";
 		}
 
 		private onComplete()
