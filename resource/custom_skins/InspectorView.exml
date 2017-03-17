@@ -15,5 +15,8 @@
 			<e:VerticalLayout horizontalAlign="left"/>
 			</e:layout>
 		</e:Group>
+		<e:layout>
+			<e:VerticalLayout/>
+		</e:layout>
 	</e:Group>
 </e:Skin>

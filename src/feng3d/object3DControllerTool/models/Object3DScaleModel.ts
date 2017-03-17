@@ -55,8 +55,11 @@ module feng3d.editor
             super();
             this.color = color;
 
-            var xLine = new SegmentObject3D();
-            this.segmentGeometry = xLine.getOrCreateComponentByClass(SegmentGeometry);
+            var xLine = new Object3D();
+            var model = new Model();
+            model.material = new SegmentMaterial();
+            this.segmentGeometry = model.geometry = new SegmentGeometry();
+            xLine.addComponent(model);
             this.addChild(xLine);
             this.coordinateCube = new CoordinateCube(this.color, this.selectedColor);
             this.addChild(this.coordinateCube);

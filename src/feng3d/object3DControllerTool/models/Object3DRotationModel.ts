@@ -68,8 +68,11 @@ module feng3d.editor
 
         private initModels()
         {
-            var border = new SegmentObject3D();
-            this.segmentGeometry = border.getOrCreateComponentByClass(SegmentGeometry);
+            var border = new Object3D();
+            var model = new Model();
+            model.material = new SegmentMaterial();
+            this.segmentGeometry = model.geometry = new SegmentGeometry();
+            border.addComponent(model);
             this.addChild(border);
 
             this.sector = new SectorObject3D(this.radius);
@@ -77,8 +80,10 @@ module feng3d.editor
             this.update();
 
             var mouseHit = new TorusObect3D("hit");
-            mouseHit.torusGeometry.radius = this.radius;
-            mouseHit.torusGeometry.tubeRadius = 2;
+            var model = new Model();
+            model.geometry = new TorusGeometry(this.radius, 2);
+            model.material = new StandardMaterial();
+            mouseHit.addComponent(model);
             mouseHit.transform.rotation.x = 90;
             mouseHit.visible = false;
             this.addChild(mouseHit);
@@ -172,8 +177,11 @@ module feng3d.editor
             this.geometry = mesh.geometry = new Geometry();
             this.getOrCreateComponentByClass(Model).material = new ColorMaterial(new Color(0.5, 0.5, 0.5, 0.2));
 
-            var border = new SegmentObject3D();
-            this.segmentGeometry = border.getOrCreateComponentByClass(SegmentGeometry);
+            var border = new Object3D();
+            var model = new Model();
+            model.material = new SegmentMaterial();
+            this.segmentGeometry = model.geometry = new SegmentGeometry();
+            border.addComponent(model);
             this.addChild(border);
         }
 
@@ -242,8 +250,11 @@ module feng3d.editor
 
         private initModels()
         {
-            var border = new SegmentObject3D();
-            this.segmentGeometry = border.getOrCreateComponentByClass(SegmentGeometry);
+            var border = new Object3D();
+            var model = new Model();
+            model.material = new SegmentMaterial();
+            this.segmentGeometry = model.geometry = new SegmentGeometry();
+            border.addComponent(model);
             this.addChild(border);
 
             this.sector = new SectorObject3D(this.radius);

@@ -21,8 +21,7 @@ var createObject3DComponentConfig = [
     //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
     { label: "ParticleAnimator", className: "feng3d.ParticleAnimator" },
     { label: "Camera3D", className: "feng3d.Camera3D" },
-    { label: "MeshFilter", className: "feng3d.MeshFilter" },
-    { label: "MeshRenderer", className: "feng3d.MeshRenderer" },
+    { label: "Model", className: "feng3d.Model" },
     { label: "PointLight", className: "feng3d.PointLight" },
     { label: "Script", className: "feng3d.Object3dScript" },
 ];
