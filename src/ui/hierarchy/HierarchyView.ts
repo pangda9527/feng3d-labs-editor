@@ -7,6 +7,8 @@ module feng3d.editor
 
 		private listData: eui.ArrayCollection;
 
+		private watchers: Watcher[] = [];
+
 		public constructor()
 		{
 			super();
@@ -16,16 +18,44 @@ module feng3d.editor
 
 		private onComplete(): void
 		{
-			this.addButton.addEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
-
 			this.listData = this.list.dataProvider = new eui.ArrayCollection();
+
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+			if (this.stage)
+			{
+				this.onAddedToStage();
+			}
+		}
+
+		private onAddedToStage()
+		{
+			this.addButton.addEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
 
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
 			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
-
-			Watcher.watch(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this);
 			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
+
+			this.watchers.push(
+				Watcher.watch(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this)
+			);
+		}
+
+		private onRemovedFromStage()
+		{
+			this.addButton.removeEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
+
+			editor3DData.hierarchy.rootNode.removeEventListener(HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
+			editor3DData.hierarchy.rootNode.removeEventListener(HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
+			editor3DData.hierarchy.rootNode.removeEventListener(HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
+			this.list.removeEventListener(egret.Event.CHANGE, this.onListChange, this);
+
+			while (this.watchers.length > 0)
+			{
+				this.watchers.pop().unwatch();
+			}
 		}
 
 		private onListChange()

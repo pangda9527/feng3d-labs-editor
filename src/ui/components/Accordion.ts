@@ -27,6 +27,17 @@ module feng3d.editor
 
 		private onComplete()
 		{
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+			if (this.stage)
+			{
+				this.onAddedToStage();
+			}
+		}
+
+		private onAddedToStage()
+		{
 			this.titleButton.addEventListener(MouseEvent.CLICK, this.onTitleButtonClick, this);
 			if (this.components)
 			{
@@ -37,6 +48,11 @@ module feng3d.editor
 				this.components = null;
 				delete this.components;
 			}
+		}
+
+		private onRemovedFromStage()
+		{
+			this.titleButton.removeEventListener(MouseEvent.CLICK, this.onTitleButtonClick, this);
 		}
 
 		private onTitleButtonClick()

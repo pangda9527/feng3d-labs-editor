@@ -5,14 +5,12 @@ module feng3d.editor
 		public group: eui.Group;
 		private view: eui.Component;
 		private selectedObject3D: Object3D;
+		private watchers: Watcher[] = [];
 
 		public constructor()
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-
-			Binding.bindProperty(editor3DData, ["selectedObject3D"], this, "selectedObject3D");
-			Watcher.watch(this, ["selectedObject3D"], this.updateView, this);
 
 			this.skinName = "InspectorViewSkin";
 		}
@@ -20,13 +18,30 @@ module feng3d.editor
 		private onComplete(): void
 		{
 			this.group.percentWidth = 100;
-			// this.group.addChild(objectview.getObjectView(new ObjectA()));
-			// this.group.addChild(objectview.getObjectView(new egret.Sprite()));
-			// this.group.addChild(objectview.getObjectView(new Transform(1, 2, 3, 4, 5, 6)));
-			// this.group.addChild(objectview.getObjectView({
-			// 	vector3D: new Vector3D(1, 2, 3),
-			// 	transform: new Transform(1, 2, 3, 4, 5, 6)
-			// }));
+
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+			if (this.stage)
+			{
+				this.onAddedToStage();
+			}
+		}
+
+		private onAddedToStage()
+		{
+			this.watchers.push(
+				Binding.bindProperty(editor3DData, ["selectedObject3D"], this, "selectedObject3D"),
+				Watcher.watch(this, ["selectedObject3D"], this.updateView, this)
+			);
+		}
+
+		private onRemovedFromStage()
+		{
+			while (this.watchers.length > 0)
+			{
+				this.watchers.pop().unwatch();
+			}
 		}
 
 		private updateView()

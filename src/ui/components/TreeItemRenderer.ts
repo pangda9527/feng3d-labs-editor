@@ -11,26 +11,64 @@ module feng3d.editor
         public indentation = 17
         public data: HierarchyNode;
 
+        private watchers: eui.Watcher[] = [];
+
         constructor()
         {
             super();
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "TreeItemRendererSkin";
-            this.addEventListener(MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false, 1000);
-            this.addEventListener(DragEvent.DRAG_ENTER, this.onDragEnter, this);
-            this.addEventListener(DragEvent.DRAG_EXIT, this.onDragExit, this);
-            this.addEventListener(DragEvent.DRAG_DROP, this.onDragDrop, this);
         }
 
         private onComplete(): void
         {
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+            if (this.stage)
+            {
+                this.onAddedToStage();
+            }
+        }
+
+        private onAddedToStage()
+        {
+            this.addEventListener(MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false, 1000);
+            this.addEventListener(DragEvent.DRAG_ENTER, this.onDragEnter, this);
+            this.addEventListener(DragEvent.DRAG_EXIT, this.onDragExit, this);
+            this.addEventListener(DragEvent.DRAG_DROP, this.onDragDrop, this);
+
+            //
+            this.disclosureButton.addEventListener(MouseEvent.CLICK, this.onDisclosureButtonClick, this);
+
+            this.watchers.push(
+                eui.Watcher.watch(this, ["data", "depth"], this.updateView, this),
+                eui.Watcher.watch(this, ["data", "isOpen"], this.updateView, this),
+                eui.Watcher.watch(this, ["data", "hasChildren"], this.updateView, this),
+                eui.Watcher.watch(this, ["indentation"], this.updateView, this)
+            );
+            this.updateView();
+        }
+
+        private onRemovedFromStage()
+        {
+            this.removeEventListener(MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false);
+            this.removeEventListener(DragEvent.DRAG_ENTER, this.onDragEnter, this);
+            this.removeEventListener(DragEvent.DRAG_EXIT, this.onDragExit, this);
+            this.removeEventListener(DragEvent.DRAG_DROP, this.onDragDrop, this);
+
             eui.Watcher.watch(this, ["data", "depth"], this.updateView, this);
             eui.Watcher.watch(this, ["data", "isOpen"], this.updateView, this);
             eui.Watcher.watch(this, ["data", "hasChildren"], this.updateView, this);
             eui.Watcher.watch(this, ["indentation"], this.updateView, this);
+
+            while (this.watchers.length > 0)
+            {
+                this.watchers.pop().unwatch();
+            }
+
             //
-            this.updateView();
-            this.disclosureButton.addEventListener(MouseEvent.CLICK, this.onDisclosureButtonClick, this);
+            this.disclosureButton.removeEventListener(MouseEvent.CLICK, this.onDisclosureButtonClick, this);
         }
 
         private onDisclosureButtonClick()
