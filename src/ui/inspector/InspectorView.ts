@@ -6,9 +6,11 @@ module feng3d.editor
      */
 	export class InspectorView extends eui.Component implements eui.UIComponent
 	{
+		public backButton: eui.Button;
 		public group: eui.Group;
+
+		//
 		private view: eui.Component;
-		private watchers: Watcher[] = [];
 
 		private inspectorViewData: InspectorViewData
 
@@ -35,21 +37,25 @@ module feng3d.editor
 		private onAddedToStage()
 		{
 			this.inspectorViewData = editor3DData.inspectorViewData;
-			this.watchers.push(
-				Watcher.watch(this.inspectorViewData, ["viewData"], this.updateView, this)
-			);
+			this.inspectorViewData.addEventListener(Event.CHANGE, this.onDataChange, this);
+			this.backButton.addEventListener(MouseEvent.CLICK, this.onBackClick, this);
 		}
 
 		private onRemovedFromStage()
 		{
-			while (this.watchers.length > 0)
-			{
-				this.watchers.pop().unwatch();
-			}
+			this.inspectorViewData.removeEventListener(Event.CHANGE, this.onDataChange, this);
+			this.backButton.removeEventListener(MouseEvent.CLICK, this.onBackClick, this);
+			this.inspectorViewData = null;
+		}
+
+		private onDataChange()
+		{
+			this.updateView();
 		}
 
 		private updateView()
 		{
+			this.backButton.visible = this.inspectorViewData.hasBackData;
 			if (this.view && this.view.parent)
 			{
 				this.view.parent.removeChild(this.view);
@@ -60,6 +66,11 @@ module feng3d.editor
 				this.view.percentWidth = 100;
 				this.group.addChild(this.view);
 			}
+		}
+
+		private onBackClick()
+		{
+			this.inspectorViewData.back();
 		}
 	}
 }

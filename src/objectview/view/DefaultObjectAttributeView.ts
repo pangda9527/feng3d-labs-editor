@@ -32,6 +32,7 @@ module feng3d.editor
 		{
 			this.text.percentWidth = 100;
 			this.text.enabled = this.attributeViewInfo.writable;
+			this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
 			this.updateView();
 		}
 
@@ -72,14 +73,43 @@ module feng3d.editor
 		public updateView(): void
 		{
 			this.label.text = this._attributeName;
-			if (ClassUtils.isBaseType(this.attributeValue))
+			if (this.attributeName == undefined)
+			{
+				this.text.text = String(this.attributeValue);
+				this.text.enabled = false;
+			} else if (ClassUtils.isBaseType(this.attributeValue))
 			{
 				this.text.text = String(this.attributeValue);
 			} else
 			{
 				this.text.enabled = false;
 				this.text.text = "[" + ClassUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + "]";
+				this.once(MouseEvent.CLICK, this.onClick, this);
 			}
+		}
+
+		private onClick()
+		{
+			editor3DData.inspectorViewData.showData(this.attributeValue);
+		}
+
+		private onTextChange()
+		{
+			switch (this._attributeType)
+			{
+				case "String":
+					this.attributeValue = this.text.text;
+					break;
+				case "Number":
+					this.attributeValue = Number(this.text.text);
+					break;
+				case "Boolean":
+					this.attributeValue = Boolean(this.text.text);
+					break;
+				default:
+					throw `无法处理类型${this._attributeType}!`;
+			}
+
 		}
 	}
 }
