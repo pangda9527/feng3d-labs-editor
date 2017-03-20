@@ -172,8 +172,11 @@ module feng3d.editor
             plane.addComponent(model);
             this.addChild(plane);
 
-            var border = new SegmentObject3D();
-            this.segmentGeometry = border.getOrCreateComponentByClass(SegmentGeometry);
+            var border = new Object3D();
+            var model = new Model();
+            model.material = new SegmentMaterial();
+            this.segmentGeometry = model.geometry = new SegmentGeometry();
+            border.addComponent(model);
             this.addChild(border);
 
             this.update();
