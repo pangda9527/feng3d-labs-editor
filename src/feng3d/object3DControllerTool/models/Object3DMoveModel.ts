@@ -51,7 +51,7 @@ module feng3d.editor
     export class CoordinateAxis extends Object3D
     {
         private segmentGeometry: SegmentGeometry;
-        private material: StandardMaterial;
+        private material: ColorMaterial;
 
         private xArrow: ConeObject3D;
 
@@ -78,7 +78,7 @@ module feng3d.editor
             //
             this.xArrow = new Object3D();
             var model = new Model();
-            this.material = model.material = new StandardMaterial();
+            this.material = model.material = new ColorMaterial();
             model.geometry = new ConeGeometry(5, 18);
             this.xArrow.addComponent(model);
             this.addChild(this.xArrow);
@@ -99,7 +99,7 @@ module feng3d.editor
             this.segmentGeometry.addSegment(segment);
             //
             this.xArrow.transform.position.y = this.length;
-            this.material.baseColor = this.selected ? this.selectedColor : this.color;
+            this.material.color = this.selected ? this.selectedColor : this.color;
         }
     }
 

@@ -73,7 +73,7 @@ module feng3d.editor
 		public updateView(): void
 		{
 			this.label.text = this._attributeName;
-			if (this.attributeName == undefined)
+			if (this.attributeValue === undefined)
 			{
 				this.text.text = String(this.attributeValue);
 				this.text.enabled = false;
