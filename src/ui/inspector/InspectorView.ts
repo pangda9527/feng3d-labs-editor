@@ -1,17 +1,21 @@
 module feng3d.editor
 {
+	/**
+     * 巡视界面
+     * @author feng     2017-03-20
+     */
 	export class InspectorView extends eui.Component implements eui.UIComponent
 	{
 		public group: eui.Group;
 		private view: eui.Component;
-		private selectedObject3D: Object3D;
 		private watchers: Watcher[] = [];
 
-		public constructor()
+		private inspectorViewData: InspectorViewData
+
+		constructor()
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-
 			this.skinName = "InspectorViewSkin";
 		}
 
@@ -30,9 +34,9 @@ module feng3d.editor
 
 		private onAddedToStage()
 		{
+			this.inspectorViewData = editor3DData.inspectorViewData;
 			this.watchers.push(
-				Binding.bindProperty(editor3DData, ["selectedObject3D"], this, "selectedObject3D"),
-				Watcher.watch(this, ["selectedObject3D"], this.updateView, this)
+				Watcher.watch(this.inspectorViewData, ["viewData"], this.updateView, this)
 			);
 		}
 
@@ -50,9 +54,9 @@ module feng3d.editor
 			{
 				this.view.parent.removeChild(this.view);
 			}
-			if (this.selectedObject3D)
+			if (this.inspectorViewData.viewData)
 			{
-				this.view = objectview.getObjectView(this.selectedObject3D);
+				this.view = objectview.getObjectView(this.inspectorViewData.viewData);
 				this.view.percentWidth = 100;
 				this.group.addChild(this.view);
 			}

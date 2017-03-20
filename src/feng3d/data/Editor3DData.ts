@@ -19,5 +19,15 @@ module feng3d.editor
          */
         public mouseInView3D: Point = new Point();
         public view3DRect: Rectangle = new Rectangle(0, 0, 100, 100);
+
+        /**
+         * 巡视界面数据
+         */
+        public inspectorViewData: InspectorViewData;
+
+        constructor()
+        {
+            this.inspectorViewData = new InspectorViewData(this);
+        }
     }
 }
