@@ -1,6 +1,6 @@
 module feng3d.editor
 {
-    export class Object3DMoveModel extends Object3D
+    export class Object3DMoveModel extends GameObject
     {
         public xAxis: CoordinateAxis;
         public yAxis: CoordinateAxis;
@@ -22,25 +22,25 @@ module feng3d.editor
         private initModels()
         {
             this.xAxis = new CoordinateAxis(new Color(1, 0, 0));
-            this.xAxis.transform.rotation.z = -90;
+            this.xAxis.rotationZ = -90;
             this.addChild(this.xAxis);
 
             this.yAxis = new CoordinateAxis(new Color(0, 1, 0));
             this.addChild(this.yAxis);
 
             this.zAxis = new CoordinateAxis(new Color(0, 0, 1));
-            this.zAxis.transform.rotation.x = 90;
+            this.zAxis.rotationX = 90;
             this.addChild(this.zAxis);
 
             this.yzPlane = new CoordinatePlane(new Color(1, 0, 0, 0.2), new Color(1, 0, 0, 0.5), new Color(1, 0, 0));
-            this.yzPlane.transform.rotation.z = 90;
+            this.yzPlane.rotationZ = 90;
             this.addChild(this.yzPlane);
 
             this.xzPlane = new CoordinatePlane(new Color(0, 1, 0, 0.2), new Color(0, 1, 0, 0.5), new Color(0, 1, 0));
             this.addChild(this.xzPlane);
 
             this.xyPlane = new CoordinatePlane(new Color(0, 0, 1, 0.2), new Color(0, 0, 1, 0.5), new Color(0, 0, 1));
-            this.xyPlane.transform.rotation.x = -90;
+            this.xyPlane.rotationX = -90;
             this.addChild(this.xyPlane);
 
             this.oCube = new CoordinateCube();
@@ -48,12 +48,12 @@ module feng3d.editor
         }
     }
 
-    export class CoordinateAxis extends Object3D
+    export class CoordinateAxis extends GameObject
     {
         private segmentGeometry: SegmentGeometry;
         private material: ColorMaterial;
 
-        private xArrow: ConeObject3D;
+        private xArrow: GameObject;
 
         private color: Color;
         private selectedColor: Color = new Color(1, 1, 0);
@@ -69,14 +69,14 @@ module feng3d.editor
             super();
             this.color = color;
 
-            var xLine = new Object3D();
+            var xLine = new GameObject();
             var model = new Model();
             model.material = new SegmentMaterial();
             this.segmentGeometry = model.geometry = new SegmentGeometry();
             xLine.addComponent(model);
             this.addChild(xLine);
             //
-            this.xArrow = new Object3D();
+            this.xArrow = new GameObject();
             var model = new Model();
             this.material = model.material = new ColorMaterial();
             model.geometry = new ConeGeometry(5, 18);
@@ -103,10 +103,10 @@ module feng3d.editor
         }
     }
 
-    export class CoordinateCube extends Object3D
+    export class CoordinateCube extends GameObject
     {
         private colorMaterial: ColorMaterial;
-        private oCube: CubeObject3D;
+        private oCube: GameObject;
 
         private color: Color;
         private selectedColor: Color;
@@ -121,7 +121,7 @@ module feng3d.editor
             this.color = color;
             this.selectedColor = selectedColor;
             //
-            this.oCube = new Object3D();
+            this.oCube = new GameObject();
             var model = new Model();
             model.geometry = new CubeGeometry(8, 8, 8);
             this.colorMaterial = model.material = new ColorMaterial();
@@ -138,7 +138,7 @@ module feng3d.editor
         }
     }
 
-    export class CoordinatePlane extends Object3D
+    export class CoordinatePlane extends GameObject
     {
         private colorMaterial: ColorMaterial;
         private segmentGeometry: SegmentGeometry;
@@ -164,7 +164,7 @@ module feng3d.editor
             this.selectedColor = selectedColor;
             this.borderColor = borderColor;
 
-            var plane = new Object3D();
+            var plane = new GameObject();
             plane.transform.position.x = plane.transform.position.z = this._width / 2;
             var model = new Model();
             model.geometry = new PlaneGeometry(this._width, this._width);
@@ -172,7 +172,7 @@ module feng3d.editor
             plane.addComponent(model);
             this.addChild(plane);
 
-            var border = new Object3D();
+            var border = new GameObject();
             var model = new Model();
             model.material = new SegmentMaterial();
             this.segmentGeometry = model.geometry = new SegmentGeometry();

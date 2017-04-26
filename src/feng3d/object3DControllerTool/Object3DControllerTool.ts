@@ -1,6 +1,6 @@
 module feng3d.editor
 {
-    export class Object3DControllerTool extends Object3D
+    export class Object3DControllerTool extends GameObject
     {
         private object3DMoveTool: Object3DMoveTool;
         private object3DRotationTool: Object3DRotationTool;

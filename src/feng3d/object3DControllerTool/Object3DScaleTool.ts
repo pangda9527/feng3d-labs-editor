@@ -27,7 +27,7 @@ module feng3d.editor
         {
             super.onItemMouseDown(event);
             //全局矩阵
-            var globalMatrix3D = this.transform.globalMatrix3D;
+            var globalMatrix3D = this.sceneTransform;
             //中心与X,Y,Z轴上点坐标
             var po = globalMatrix3D.transformVector(new Vector3D(0, 0, 0));
             var px = globalMatrix3D.transformVector(new Vector3D(1, 0, 0));
@@ -38,7 +38,7 @@ module feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.cameraObject3D.transform.globalMatrix3D;
+            var cameraSceneTransform = editor3DData.cameraObject3D.sceneTransform;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             switch (this.selectedItem)
@@ -88,9 +88,9 @@ module feng3d.editor
             }
             this.bindingObject3D.doScale(addScale);
             //
-            this.toolModel.xCube.scale = addScale.x;
-            this.toolModel.yCube.scale = addScale.y;
-            this.toolModel.zCube.scale = addScale.z;
+            this.toolModel.xCube.scaleValue = addScale.x;
+            this.toolModel.yCube.scaleValue = addScale.y;
+            this.toolModel.zCube.scaleValue = addScale.z;
         }
 
         protected onMouseUp()
@@ -101,9 +101,9 @@ module feng3d.editor
             this.startPlanePos = null;
             this.startSceneTransform = null;
             //
-            this.toolModel.xCube.scale = 1;
-            this.toolModel.yCube.scale = 1;
-            this.toolModel.zCube.scale = 1;
+            this.toolModel.xCube.scaleValue = 1;
+            this.toolModel.yCube.scaleValue = 1;
+            this.toolModel.zCube.scaleValue = 1;
         }
     }
 }

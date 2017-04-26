@@ -4,14 +4,14 @@ module feng3d.editor
     {
         public rootNode: HierarchyNode;
 
-        private nodeMap = new Map<Object3D, HierarchyNode>();
+        private nodeMap = new Map<GameObject, HierarchyNode>();
 
         public get selectedNode()
         {
             return this.nodeMap.get(editor3DData.selectedObject3D);
         }
 
-        constructor(rootObject3D: Object3D)
+        constructor(rootObject3D: GameObject)
         {
             this.rootNode = this.getNode(rootObject3D);
             this.rootNode.depth = -1;
@@ -27,7 +27,7 @@ module feng3d.editor
         /**
          * 获取节点
          */
-        public getNode(object3D: Object3D)
+        public getNode(object3D: GameObject)
         {
             if (object3D == null)
                 return null;
@@ -40,7 +40,7 @@ module feng3d.editor
             return node;
         }
 
-        public addObject3D(object3D: Object3D, parentNode: HierarchyNode = null, allChildren = false)
+        public addObject3D(object3D: GameObject, parentNode: HierarchyNode = null, allChildren = false)
         {
             var node = this.getNode(object3D);
             if (parentNode)
@@ -55,14 +55,14 @@ module feng3d.editor
             {
                 for (var i = 0; i < object3D.numChildren; i++)
                 {
-                    this.addObject3D(object3D.getChildAt(i), node, true);
+                    this.addObject3D(object3D.getChildAt(i) as GameObject, node, true);
                 }
             }
         }
 
         private onMouseClick(event: Mouse3DEvent)
         {
-            var object3D: Object3D = <Object3D>event.currentTarget;
+            var object3D: GameObject = <GameObject>event.currentTarget;
             editor3DData.selectedObject3D = object3D;
             event.isStopBubbles = true;
         }
@@ -100,7 +100,7 @@ module feng3d.editor
         {
             for (var i = 0; i < scene.numChildren; i++)
             {
-                this.addObject3D(scene.getChildAt(i), null, true);
+                this.addObject3D(scene.getChildAt(i) as GameObject, null, true);
             }
         }
 
@@ -200,7 +200,7 @@ module feng3d.editor
         public static readonly REMOVED = "removed";
         public static readonly OPEN_CHANGED = "openChanged";
 
-        public object3D: Object3D;
+        public object3D: GameObject;
         public label: string;
         public depth: number = 0;
         public isOpen: boolean = true;
@@ -216,7 +216,7 @@ module feng3d.editor
          */
         public children: HierarchyNode[] = [];
 
-        constructor(object3D: Object3D)
+        constructor(object3D: GameObject)
         {
             super();
             this.object3D = object3D;

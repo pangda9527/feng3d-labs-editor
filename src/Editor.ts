@@ -13,10 +13,11 @@ module feng3d.editor
             //
             new EditorEnvironment();
 
-            shortcut.addShortCuts(shortcutConfig);
 
             //初始化feng3d
             new Main3D();
+
+            shortcut.addShortCuts(shortcutConfig);
 
             this.addChild(new MainUI());
 

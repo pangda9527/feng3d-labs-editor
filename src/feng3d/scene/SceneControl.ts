@@ -31,7 +31,7 @@ module feng3d.editor
         private onDragSceneStart()
         {
             this.dragSceneMousePoint = new Point(input.clientX, input.clientY);
-            this.dragSceneCameraGlobalMatrix3D = editor3DData.cameraObject3D.transform.globalMatrix3D.clone();
+            this.dragSceneCameraGlobalMatrix3D = editor3DData.cameraObject3D.sceneTransform.clone();
         }
 
         private onDragScene()
@@ -45,12 +45,12 @@ module feng3d.editor
             right.scaleBy(-addPoint.x * scale);
             var globalMatrix3D = this.dragSceneCameraGlobalMatrix3D.clone();
             globalMatrix3D.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
-            editor3DData.cameraObject3D.transform.globalMatrix3D = globalMatrix3D;
+            editor3DData.cameraObject3D.sceneTransform = globalMatrix3D;
         }
 
         private onFpsViewStart()
         {
-            this.controller.target = editor3DData.cameraObject3D.transform;
+            this.controller.target = editor3DData.cameraObject3D;
         }
 
         private onFpsViewStop()
@@ -64,11 +64,11 @@ module feng3d.editor
         private onMouseRotateSceneStart()
         {
             this.rotateSceneMousePoint = new Point(input.clientX, input.clientY);
-            this.rotateSceneCameraGlobalMatrix3D = editor3DData.cameraObject3D.transform.globalMatrix3D.clone();
+            this.rotateSceneCameraGlobalMatrix3D = editor3DData.cameraObject3D.sceneTransform.clone();
             this.rotateSceneCenter = null;
             if (editor3DData.selectedObject3D)
             {
-                this.rotateSceneCenter = editor3DData.selectedObject3D.transform.globalPosition;
+                this.rotateSceneCenter = editor3DData.selectedObject3D.scenePosition;
             } else
             {
                 this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
@@ -87,7 +87,7 @@ module feng3d.editor
             globalMatrix3D.appendRotation(rotateY, Vector3D.Y_AXIS, this.rotateSceneCenter);
             var rotateAxisX = globalMatrix3D.right;
             globalMatrix3D.appendRotation(rotateX, rotateAxisX, this.rotateSceneCenter);
-            editor3DData.cameraObject3D.transform.globalMatrix3D = globalMatrix3D;
+            editor3DData.cameraObject3D.sceneTransform = globalMatrix3D;
         }
 
         private onLookToSelectedObject3D()
@@ -96,9 +96,9 @@ module feng3d.editor
             if (selectedObject3D)
             {
                 config.lookDistance = config.defaultLookDistance;
-                var lookPos = editor3DData.cameraObject3D.transform.globalMatrix3D.forward;
+                var lookPos = editor3DData.cameraObject3D.sceneTransform.forward;
                 lookPos.scaleBy(-config.lookDistance);
-                lookPos.incrementBy(selectedObject3D.transform.globalPosition);
+                lookPos.incrementBy(selectedObject3D.scenePosition);
                 egret.Tween.get(editor3DData.cameraObject3D.transform.position).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
             }
         }
@@ -106,7 +106,7 @@ module feng3d.editor
         private onMouseWheelMoveSceneCamera(event: ShortCutEvent)
         {
             var distance = event.data.wheelDelta * config.mouseWheelMoveStep;
-            editor3DData.cameraObject3D.transform.globalMatrix3D = editor3DData.cameraObject3D.transform.globalMatrix3D.moveForward(distance);
+            editor3DData.cameraObject3D.sceneTransform = editor3DData.cameraObject3D.sceneTransform.moveForward(distance);
             config.lookDistance -= distance;
         }
     }

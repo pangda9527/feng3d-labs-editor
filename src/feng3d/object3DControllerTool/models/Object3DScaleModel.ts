@@ -1,7 +1,7 @@
 module feng3d.editor
 {
 
-    export class Object3DScaleModel extends Object3D
+    export class Object3DScaleModel extends GameObject
     {
         public xCube: CoordinateScaleCube;
         public yCube: CoordinateScaleCube;
@@ -18,14 +18,14 @@ module feng3d.editor
         private initModels()
         {
             this.xCube = new CoordinateScaleCube(new Color(1, 0, 0));
-            this.xCube.transform.rotation.z = -90;
+            this.xCube.rotationZ = -90;
             this.addChild(this.xCube);
 
             this.yCube = new CoordinateScaleCube(new Color(0, 1, 0));
             this.addChild(this.yCube);
 
             this.zCube = new CoordinateScaleCube(new Color(0, 0, 1));
-            this.zCube.transform.rotation.x = 90;
+            this.zCube.rotationX = 90;
             this.addChild(this.zCube);
 
             this.oCube = new CoordinateCube();
@@ -33,7 +33,7 @@ module feng3d.editor
         }
     }
 
-    export class CoordinateScaleCube extends Object3D
+    export class CoordinateScaleCube extends GameObject
     {
         private coordinateCube: CoordinateCube
         private segmentGeometry: SegmentGeometry;
@@ -46,8 +46,8 @@ module feng3d.editor
         public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
         //
-        public get scale() { return this._scale; }
-        public set scale(value) { if (this._scale == value) return; this._scale = value; this.update(); }
+        public get scaleValue() { return this._scale; }
+        public set scaleValue(value) { if (this._scale == value) return; this._scale = value; this.update(); }
         private _scale = 1;
 
         constructor(color = new Color(1, 0, 0))
@@ -55,7 +55,7 @@ module feng3d.editor
             super();
             this.color = color;
 
-            var xLine = new Object3D();
+            var xLine = new GameObject();
             var model = new Model();
             model.material = new SegmentMaterial();
             this.segmentGeometry = model.geometry = new SegmentGeometry();

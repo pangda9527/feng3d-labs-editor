@@ -32,7 +32,7 @@ module feng3d.editor
         {
             super.onItemMouseDown(event);
             //全局矩阵
-            var globalMatrix3D = this.transform.globalMatrix3D;
+            var globalMatrix3D = this.sceneTransform;
             //中心与X,Y,Z轴上点坐标
             var po = globalMatrix3D.transformVector(new Vector3D(0, 0, 0));
             var px = globalMatrix3D.transformVector(new Vector3D(1, 0, 0));
@@ -43,7 +43,7 @@ module feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.cameraObject3D.transform.globalMatrix3D;
+            var cameraSceneTransform = editor3DData.cameraObject3D.sceneTransform;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             //
@@ -117,8 +117,8 @@ module feng3d.editor
             //鼠标按下时不更新
             if (this.ismouseDown)
                 return;
-            var cameraPos = editor3DData.cameraObject3D.transform.globalPosition;
-            var localCameraPos = this.toolModel.transform.inverseGlobalMatrix3D.transformVector(cameraPos);
+            var cameraPos = editor3DData.cameraObject3D.scenePosition;
+            var localCameraPos = this.toolModel.inverseSceneTransform.transformVector(cameraPos);
 
             this.toolModel.xyPlane.transform.position.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
             this.toolModel.xyPlane.transform.position.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;

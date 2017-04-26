@@ -1,20 +1,20 @@
 module feng3d.editor
 {
 
-    export class Object3DControllerTarget extends Object3D
+    export class Object3DControllerTarget extends GameObject
     {
-        private _controllerTargets: Object3D[];
+        private _controllerTargets: GameObject[];
         private startGlobalMatrixVec: Matrix3D[] = [];
         private startScaleVec: Vector3D[] = [];
 
-        private controllerImage: Object3D = new Object3D();
+        private controllerImage: GameObject = new GameObject();
         private startControllerImageGlobalMatrix3D: Matrix3D;
 
         private isWoldCoordinate = false;
         private isBaryCenter = false;
 
         //
-        private _showObject3D = new Object3D();
+        private _showObject3D = new GameObject();
         private controllerBindingShowTarget: Object3DTransformBinding;
         private controllerBinding: Object3DSceneTransformBinding;
         private targetBindings: Object3DTransformBinding[] = [];
@@ -27,7 +27,7 @@ module feng3d.editor
             serializationConfig.excludeObject.push(this.controllerImage);
         }
 
-        public set controllerTargets(value: Object3D[])
+        public set controllerTargets(value: GameObject[])
         {
             if (this._controllerTargets && this._controllerTargets.length > 0)
             {
@@ -37,7 +37,7 @@ module feng3d.editor
                 {
                     this.controllerImage.parent.removeChild(this.controllerImage);
                 }
-                this.controllerImage.transform.globalMatrix3D = new Matrix3D();
+                this.controllerImage.sceneTransform = new Matrix3D();
             }
             this._controllerTargets = value;
             if (this._controllerTargets && this._controllerTargets.length > 0)
@@ -55,16 +55,16 @@ module feng3d.editor
             var position = new Vector3D();
             if (this.isBaryCenter)
             {
-                position.copyFrom(object3D.transform.globalPosition);
+                position.copyFrom(object3D.scenePosition);
             } else
             {
                 for (var i = 0; i < this._controllerTargets.length; i++)
                 {
-                    position.incrementBy(this._controllerTargets[i].transform.globalPosition);
+                    position.incrementBy(this._controllerTargets[i].scenePosition);
                 }
                 position.scaleBy(1 / this._controllerTargets.length);
             }
-            var vec = object3D.transform.globalMatrix3D.decompose();
+            var vec = object3D.sceneTransform.decompose();
             vec[0] = position;
             vec[2].setTo(1, 1, 1);
             if (this.isWoldCoordinate)
@@ -72,14 +72,14 @@ module feng3d.editor
                 vec[1].setTo(0, 0, 0);
             }
             tempGlobalMatrix.recompose(vec);
-            this.controllerImage.transform.globalMatrix3D = tempGlobalMatrix;
+            this.controllerImage.sceneTransform = tempGlobalMatrix;
         }
 
         public startTranslation()
         {
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                this.startGlobalMatrixVec[i] = this._controllerTargets[i].transform.globalMatrix3D.clone();
+                this.startGlobalMatrixVec[i] = this._controllerTargets[i].sceneTransform.clone();
             }
         }
 
@@ -89,7 +89,7 @@ module feng3d.editor
             {
                 tempGlobalMatrix.copyFrom(this.startGlobalMatrixVec[i]);
                 tempGlobalMatrix.appendTranslation(addPos.x, addPos.y, addPos.z);
-                this._controllerTargets[i].transform.globalMatrix3D = tempGlobalMatrix;
+                this._controllerTargets[i].sceneTransform = tempGlobalMatrix;
             }
         }
 
@@ -100,14 +100,14 @@ module feng3d.editor
 
         public startRotate()
         {
-            this.startControllerImageGlobalMatrix3D = this.controllerImage.transform.globalMatrix3D.clone();
+            this.startControllerImageGlobalMatrix3D = this.controllerImage.sceneTransform.clone();
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                this.startGlobalMatrixVec[i] = this._controllerTargets[i].transform.globalMatrix3D.clone();
+                this.startGlobalMatrixVec[i] = this._controllerTargets[i].sceneTransform.clone();
             }
         }
 
-        public rotate(angle: number, normal: Vector3D)
+        public rotate1(angle: number, normal: Vector3D)
         {
             if (!this.isWoldCoordinate && this.isBaryCenter)
             {
@@ -131,7 +131,7 @@ module feng3d.editor
                         tempGlobalMatrix.appendRotation(angle, normal, this.startControllerImageGlobalMatrix3D.position);
                     }
                 }
-                this._controllerTargets[i].transform.globalMatrix3D = tempGlobalMatrix;
+                this._controllerTargets[i].sceneTransform = tempGlobalMatrix;
             }
         }
 
@@ -163,7 +163,7 @@ module feng3d.editor
                         tempGlobalMatrix.appendRotation(angle2, normal2, this.startControllerImageGlobalMatrix3D.position);
                     }
                 }
-                this._controllerTargets[i].transform.globalMatrix3D = tempGlobalMatrix;
+                this._controllerTargets[i].sceneTransform = tempGlobalMatrix;
             }
         }
 
@@ -177,7 +177,7 @@ module feng3d.editor
         {
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                this.startScaleVec[i] = this._controllerTargets[i].transform.scale.clone();
+                this.startScaleVec[i] = this._controllerTargets[i].getScale();
             }
         }
 
@@ -186,7 +186,10 @@ module feng3d.editor
             debuger && assert(!!scale.length);
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                this._controllerTargets[i].transform.scale = this.startScaleVec[i].multiply(scale);
+                var result = this.startScaleVec[i].multiply(scale);
+                this._controllerTargets[i].scaleX = result.x;
+                this._controllerTargets[i].scaleY = result.y;
+                this._controllerTargets[i].scaleZ = result.z;
             }
         }
 

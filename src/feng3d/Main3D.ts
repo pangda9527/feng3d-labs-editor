@@ -25,7 +25,7 @@ module feng3d.editor
         {
             var canvas = document.getElementById("glcanvas");
             var view3D = new feng3d.View3D(canvas);
-            view3D.background.fromUnit(0x666666);
+            view3D.scene.background.fromUnit(0x666666);
 
             editor3DData.view3D = view3D;
             editor3DData.scene3D = view3D.scene;

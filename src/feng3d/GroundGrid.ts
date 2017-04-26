@@ -5,7 +5,7 @@ module feng3d.editor
      * 地面网格
      * @author feng 2016-10-29
      */
-    export class GroundGrid extends Object3D
+    export class GroundGrid extends GameObject
     {
         private num = 100;
         private segmentGeometry: SegmentGeometry;
@@ -18,7 +18,7 @@ module feng3d.editor
             super("GroundGrid");
             this.init();
 
-            editor3DData.cameraObject3D.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         /**
@@ -35,7 +35,7 @@ module feng3d.editor
 
         private update()
         {
-            var cameraGlobalPosition = editor3DData.cameraObject3D.transform.globalPosition;
+            var cameraGlobalPosition = editor3DData.cameraObject3D.scenePosition;
             this.level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
             this.step = Math.pow(10, this.level - 1);
 

@@ -1,10 +1,10 @@
 module feng3d.editor
 {
-    export class Object3DControllerToolBase extends Object3D
+    export class Object3DControllerToolBase extends GameObject
     {
         private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis | CoordinateRotationFreeAxis;
         //
-        private _toolModel: Object3D;
+        private _toolModel: GameObject;
 
         protected ismouseDown = false;
 
@@ -17,7 +17,7 @@ module feng3d.editor
         constructor()
         {
             super();
-            this.transform = new HoldSizeTransform();
+            this.holdSize = 1;
 
             this.addEventListener(Scene3DEvent.ADDED_TO_SCENE, this.onAddedToScene, this);
             this.addEventListener(Scene3DEvent.REMOVED_FROM_SCENE, this.onRemovedFromScene, this);
@@ -28,16 +28,16 @@ module feng3d.editor
             this.updateToolModel();
             input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
             input.addEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
-            this.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            editor3DData.cameraObject3D.addEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            this.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+            editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         private onRemovedFromScene()
         {
             input.removeEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
             input.removeEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
-            this.removeEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            editor3DData.cameraObject3D.removeEventListener(TransformEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            this.removeEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+            editor3DData.cameraObject3D.removeEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         protected get toolModel()

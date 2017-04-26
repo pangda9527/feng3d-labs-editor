@@ -1,6 +1,6 @@
 module feng3d.editor
 {
-    export class Object3DRotationModel extends Object3D
+    export class Object3DRotationModel extends GameObject
     {
         public xAxis: CoordinateRotationAxis;
         public yAxis: CoordinateRotationAxis;
@@ -18,11 +18,11 @@ module feng3d.editor
         private initModels()
         {
             this.xAxis = new CoordinateRotationAxis(new Color(1, 0, 0));
-            this.xAxis.transform.rotation.y = 90;
+            this.xAxis.rotationY = 90;
             this.addChild(this.xAxis);
 
             this.yAxis = new CoordinateRotationAxis(new Color(0, 1, 0));
-            this.yAxis.transform.rotation.x = 90;
+            this.yAxis.rotationX = 90;
             this.addChild(this.yAxis);
 
             this.zAxis = new CoordinateRotationAxis(new Color(0, 0, 1));
@@ -36,7 +36,7 @@ module feng3d.editor
         }
     }
 
-    export class CoordinateRotationAxis extends Object3D
+    export class CoordinateRotationAxis extends GameObject
     {
         private segmentGeometry: SegmentGeometry;
         private sector: SectorObject3D;
@@ -68,7 +68,7 @@ module feng3d.editor
 
         private initModels()
         {
-            var border = new Object3D();
+            var border = new GameObject();
             var model = new Model();
             model.material = new SegmentMaterial();
             this.segmentGeometry = model.geometry = new SegmentGeometry();
@@ -84,7 +84,7 @@ module feng3d.editor
             model.geometry = new TorusGeometry(this.radius, 2);
             model.material = new StandardMaterial();
             mouseHit.addComponent(model);
-            mouseHit.transform.rotation.x = 90;
+            mouseHit.rotationX = 90;
             mouseHit.visible = false;
             this.addChild(mouseHit);
         }
@@ -93,7 +93,7 @@ module feng3d.editor
         {
             var color = this._selected ? this.selectedColor : this.color;
 
-            var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
+            var inverseGlobalMatrix3D = this.inverseSceneTransform;
             if (this._filterNormal)
             {
                 var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this._filterNormal);
@@ -129,7 +129,7 @@ module feng3d.editor
 
         public showSector(startPos: Vector3D, endPos: Vector3D)
         {
-            var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
+            var inverseGlobalMatrix3D = this.inverseSceneTransform;
             var localStartPos = inverseGlobalMatrix3D.transformVector(startPos);
             var localEndPos = inverseGlobalMatrix3D.transformVector(endPos);
             var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * MathConsts.RADIANS_TO_DEGREES;
@@ -155,7 +155,7 @@ module feng3d.editor
     /**
      * 扇形对象
      */
-    export class SectorObject3D extends Object3D
+    export class SectorObject3D extends GameObject
     {
         private segmentGeometry: SegmentGeometry;
         private geometry: Geometry;
@@ -177,7 +177,7 @@ module feng3d.editor
             this.geometry = mesh.geometry = new Geometry();
             this.getOrCreateComponentByClass(Model).material = new ColorMaterial(new Color(0.5, 0.5, 0.5, 0.2));
 
-            var border = new Object3D();
+            var border = new GameObject();
             var model = new Model();
             model.material = new SegmentMaterial();
             this.segmentGeometry = model.geometry = new SegmentGeometry();
@@ -225,7 +225,7 @@ module feng3d.editor
         }
     }
 
-    export class CoordinateRotationFreeAxis extends Object3D
+    export class CoordinateRotationFreeAxis extends GameObject
     {
         private segmentGeometry: SegmentGeometry;
         private sector: SectorObject3D;
@@ -250,7 +250,7 @@ module feng3d.editor
 
         private initModels()
         {
-            var border = new Object3D();
+            var border = new GameObject();
             var model = new Model();
             model.material = new SegmentMaterial();
             this.segmentGeometry = model.geometry = new SegmentGeometry();
@@ -269,7 +269,7 @@ module feng3d.editor
         {
             var color = this._selected ? this.selectedColor : this.color;
 
-            var inverseGlobalMatrix3D = this.transform.inverseGlobalMatrix3D;
+            var inverseGlobalMatrix3D = this.inverseSceneTransform;
 
             this.segmentGeometry.removeAllSegments();
             var points: Vector3D[] = [];
