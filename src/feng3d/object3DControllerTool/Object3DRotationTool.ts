@@ -140,8 +140,8 @@ module feng3d.editor
             temp.append(this.toolModel.inverseSceneTransform);
             var rotation = temp.decompose()[1];
             rotation.scaleBy(MathConsts.RADIANS_TO_DEGREES);
-            this.toolModel.freeAxis.setRotation(rotation);
-            this.toolModel.cameraAxis.setRotation(rotation);
+            this.toolModel.freeAxis.setRotation(rotation.x, rotation.y, rotation.z);
+            this.toolModel.cameraAxis.setRotation(rotation.x, rotation.y, rotation.z);
         }
     }
 }

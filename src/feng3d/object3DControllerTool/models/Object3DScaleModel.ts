@@ -65,7 +65,7 @@ module feng3d.editor
             this.addChild(this.coordinateCube);
 
             var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 4);
-            mouseHit.transform.position.y = 4 + (this.length - 4) / 2;
+            mouseHit.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             this.addChild(mouseHit);
 
@@ -80,7 +80,7 @@ module feng3d.editor
             this.segmentGeometry.addSegment(segment);
 
             //
-            this.coordinateCube.transform.position.y = this.length * this._scale;
+            this.coordinateCube.y = this.length * this._scale;
             this.coordinateCube.selected = this.selected;
         }
     }

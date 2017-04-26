@@ -81,7 +81,7 @@ module feng3d.editor
             //
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
-            this.startPos = this.toolModel.transform.position.clone();
+            this.startPos = this.toolModel.getPosition();
             this.bindingObject3D.startTranslation();
             //
             input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
@@ -120,14 +120,14 @@ module feng3d.editor
             var cameraPos = editor3DData.cameraObject3D.scenePosition;
             var localCameraPos = this.toolModel.inverseSceneTransform.transformVector(cameraPos);
 
-            this.toolModel.xyPlane.transform.position.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
-            this.toolModel.xyPlane.transform.position.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;
+            this.toolModel.xyPlane.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
+            this.toolModel.xyPlane.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;
 
-            this.toolModel.xzPlane.transform.position.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xzPlane.width;
-            this.toolModel.xzPlane.transform.position.z = localCameraPos.z > 0 ? 0 : -this.toolModel.xzPlane.width;
+            this.toolModel.xzPlane.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xzPlane.width;
+            this.toolModel.xzPlane.z = localCameraPos.z > 0 ? 0 : -this.toolModel.xzPlane.width;
 
-            this.toolModel.yzPlane.transform.position.y = localCameraPos.y > 0 ? 0 : -this.toolModel.yzPlane.width;
-            this.toolModel.yzPlane.transform.position.z = localCameraPos.z > 0 ? 0 : -this.toolModel.yzPlane.width;
+            this.toolModel.yzPlane.y = localCameraPos.y > 0 ? 0 : -this.toolModel.yzPlane.width;
+            this.toolModel.yzPlane.z = localCameraPos.z > 0 ? 0 : -this.toolModel.yzPlane.width;
         }
     }
 }

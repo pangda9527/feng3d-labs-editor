@@ -86,8 +86,9 @@ module feng3d.editor
             this.update();
 
             var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 20);
-            mouseHit.transform.position.y = 20 + (this.length - 20) / 2;
+            mouseHit.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
+            mouseHit.mouseEnabled = true;
             this.addChild(mouseHit);
         }
 
@@ -98,7 +99,7 @@ module feng3d.editor
             segment.startColor = segment.endColor = this.selected ? this.selectedColor : this.color;
             this.segmentGeometry.addSegment(segment);
             //
-            this.xArrow.transform.position.y = this.length;
+            this.xArrow.y = this.length;
             this.material.color = this.selected ? this.selectedColor : this.color;
         }
     }
@@ -165,7 +166,7 @@ module feng3d.editor
             this.borderColor = borderColor;
 
             var plane = new GameObject();
-            plane.transform.position.x = plane.transform.position.z = this._width / 2;
+            plane.x = plane.z = this._width / 2;
             var model = new Model();
             model.geometry = new PlaneGeometry(this._width, this._width);
             this.colorMaterial = model.material = new ColorMaterial();

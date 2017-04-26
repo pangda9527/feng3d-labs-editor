@@ -34,8 +34,8 @@ module feng3d.editor
 
             //
             var camera = view3D.camera;
-            camera.transform.position.z = -500;
-            camera.transform.position.y = 300;
+            camera.z = -500;
+            camera.y = 300;
             camera.transform.lookAt(new Vector3D());
 
             var trident = new Trident();
