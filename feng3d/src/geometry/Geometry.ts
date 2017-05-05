@@ -22,6 +22,28 @@ module feng3d
         private _scaleV: number = 1;
 
         /**
+         * 坐标数据
+         */
+        public get positions()
+        {
+            this.updateGrometry();
+            var positionData = this._attributes[GLAttribute.a_position];
+            return positionData && positionData.data;
+        }
+
+        public set positions(value)
+        {
+            if (value)
+            {
+                var positionData = this._attributes[GLAttribute.a_position] = this._attributes[GLAttribute.a_position] || new AttributeRenderData(value, 3);;
+                positionData.data = value;
+            } else
+            {
+                delete this._attributes[GLAttribute.a_position];
+            }
+        }
+
+        /**
 		 * 创建一个几何体
 		 */
         constructor()
@@ -62,6 +84,7 @@ module feng3d
             {
                 this.buildGeometry();
                 this._geometryInvalid = false;
+                this.invalidateBounds();
             }
         }
 
@@ -316,6 +339,14 @@ module feng3d
             this._scaleV = scaleV;
 
             uvVaData.invalidate();
+        }
+
+        /**
+         * 包围盒失效
+         */
+        public invalidateBounds()
+        {
+            this.dispatchEvent(new GeometryEvent(GeometryEvent.BOUNDS_INVALID))
         }
 
         /**

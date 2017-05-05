@@ -33,7 +33,20 @@ module feng3d
         protected drawRenderables(renderContext: RenderContext, meshRenderer: Model)
         {
             if (meshRenderer.parentComponent.isVisible)
-                super.drawRenderables(renderContext, meshRenderer);
+            {
+                var frustumPlanes = renderContext.camera.frustumPlanes;
+                var gameObject = meshRenderer.parentComponent;
+                var isIn = gameObject.worldBounds.isInFrustum(frustumPlanes, 6);
+                var model = gameObject.getComponentByType(Model);
+                if (model && model.geometry instanceof SkyBoxGeometry)
+                {
+                    isIn = true;
+                }
+                if (isIn)
+                {
+                    super.drawRenderables(renderContext, meshRenderer);
+                }
+            }
         }
     }
 }

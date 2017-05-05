@@ -21,6 +21,7 @@ module feng3d
         private _camera: CameraObject3D;
         private _scene: Scene3D;
         private _canvas: HTMLCanvasElement;
+        public viewRect: Rectangle;
 
         /**
          * 默认渲染器
@@ -100,14 +101,18 @@ module feng3d
          */
         private drawScene(event: Event)
         {
+            this._canvas.width = this._canvas.clientWidth;
+            this._canvas.height = this._canvas.clientHeight;
+
             this._renderContext.camera = this._camera.camera;
             this._renderContext.scene3d = this._scene;
             this._renderContext.view3D = this;
             this._renderContext.gl = this._gl;
 
-            var viewRect: Rectangle = this.viewRect;
-
-            this.camera.camera.aspectRatio = viewRect.width / viewRect.height;
+            var viewClientRect: ClientRect = this._canvas.getBoundingClientRect();
+            var viewRect = this.viewRect = this.viewRect || new Rectangle();
+            viewRect.setTo(viewClientRect.left, viewClientRect.top, viewClientRect.width, viewClientRect.height);
+            this.camera.camera.lens.aspectRatio = viewRect.width / viewRect.height;
 
             //鼠标拾取渲染
             this.mouse3DManager.viewRect.copyFrom(viewRect);
@@ -119,32 +124,6 @@ module feng3d
             // 默认渲染
             this.defaultRenderer.viewRect.copyFrom(viewRect);
             this.defaultRenderer.draw(this._renderContext);
-        }
-
-        /**
-         * 更新视窗区域
-         */
-        public get viewRect()
-        {
-            var viewRect: Rectangle = new Rectangle();
-
-            this._canvas.width = this._canvas.clientWidth;
-            this._canvas.height = this._canvas.clientHeight;
-            var viewWidth = this._canvas.width;
-            var viewHeight = this._canvas.height;
-            var x = 0;
-            var y = 0;
-            var obj: HTMLElement = this._canvas;
-            do
-            {
-                x += obj.offsetLeft;
-                y += obj.offsetTop;
-                obj = obj.parentElement;
-            }
-            while (obj);
-            viewRect.setTo(x, y, viewWidth, viewHeight);
-
-            return viewRect;
         }
 
         /**
@@ -199,6 +178,21 @@ module feng3d
             //定义射线
             var ray3D: Ray3D = new Ray3D(rayPosition, rayDirection);
             return ray3D;
+        }
+
+		/**
+		 * 投影坐标（世界坐标转换为3D视图坐标）
+		 * @param point3d 世界坐标
+		 * @return 屏幕的绝对坐标
+		 */
+        public project(point3d: Vector3D): Vector3D
+        {
+            var v: Vector3D = this._camera.camera.project(point3d);
+
+            v.x = (v.x + 1.0) * this._canvas.width / 2.0;
+            v.y = (v.y + 1.0) * this._canvas.height / 2.0;
+
+            return v;
         }
 
         /**

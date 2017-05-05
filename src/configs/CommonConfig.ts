@@ -33,5 +33,4 @@ var createObject3DComponentConfig = [
 var mainMenuConfig = [
     { label: "save scene", command: "saveScene" },
     { label: "import", command: "import" },
-
 ];

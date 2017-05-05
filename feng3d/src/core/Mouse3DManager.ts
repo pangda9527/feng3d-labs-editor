@@ -27,24 +27,46 @@ module feng3d
          */
         private Object3DClickNum: number;
 
+        /** 射线采集器(采集射线穿过场景中物体的列表) */
+        private _mousePicker: RaycastPicker = new RaycastPicker(false);
+
+        private _catchMouseMove = false;
+        /**
+         * 是否捕捉鼠标移动，默认false。
+         */
+        public get catchMouseMove()
+        {
+            return this._catchMouseMove;
+        }
+        public set catchMouseMove(value)
+        {
+            if (this._catchMouseMove == value)
+                return;
+            if (this._catchMouseMove)
+            {
+                input.removeEventListener(inputType.MOUSE_MOVE, this.onMouseEvent, this);
+            }
+            this._catchMouseMove = value;
+            if (this._catchMouseMove)
+            {
+                input.addEventListener(inputType.MOUSE_MOVE, this.onMouseEvent, this);
+            }
+        }
+
         constructor()
         {
             this.mouseRenderer = new MouseRenderer();
             //
-
-
             mouse3DEventMap[inputType.CLICK] = Mouse3DEvent.CLICK;
             mouse3DEventMap[inputType.DOUBLE_CLICK] = Mouse3DEvent.DOUBLE_CLICK;
             mouse3DEventMap[inputType.MOUSE_DOWN] = Mouse3DEvent.MOUSE_DOWN;
             mouse3DEventMap[inputType.MOUSE_MOVE] = Mouse3DEvent.MOUSE_MOVE;
             mouse3DEventMap[inputType.MOUSE_UP] = Mouse3DEvent.MOUSE_UP;
 
-            input.addEventListener(inputType.MOUSE_MOVE, this.onMousemove, this);
             //
             input.addEventListener(inputType.CLICK, this.onMouseEvent, this);
             input.addEventListener(inputType.DOUBLE_CLICK, this.onMouseEvent, this);
             input.addEventListener(inputType.MOUSE_DOWN, this.onMouseEvent, this);
-            input.addEventListener(inputType.MOUSE_MOVE, this.onMouseEvent, this);
             input.addEventListener(inputType.MOUSE_UP, this.onMouseEvent, this);
         }
 
@@ -55,13 +77,6 @@ module feng3d
         {
             if (this.mouseEventTypes.indexOf(event.type) == -1)
                 this.mouseEventTypes.push(event.type);
-        }
-
-        /**
-         * 监听鼠标移动事件获取鼠标位置
-         */
-        private onMousemove(event: InputEvent)
-        {
             this.mouseX = event.clientX;
             this.mouseY = event.clientY;
         }
@@ -73,7 +88,31 @@ module feng3d
         {
             if (!this.viewRect.contains(this.mouseX, this.mouseY))
                 return;
+            if (this.mouseEventTypes.length == 0)
+                return;
+            var mouseCollisionEntitys = this.getMouseCheckObjects(renderContext);
+            if (mouseCollisionEntitys.length == 0)
+                return;
 
+            this.pick(renderContext);
+
+            // this.glPick(renderContext);
+        }
+
+        private pick(renderContext: RenderContext)
+        {
+            var mouseCollisionEntitys = this.getMouseCheckObjects(renderContext);
+            var mouseRay3D = renderContext.view3D.getMouseRay3D();
+            //计算得到鼠标射线相交的物体
+            var _collidingObject = this._mousePicker.getViewCollision(mouseRay3D, mouseCollisionEntitys);
+
+            var object3D = _collidingObject && _collidingObject.firstEntity;
+
+            this.setSelectedObject3D(object3D as GameObject);
+        }
+
+        private glPick(renderContext: RenderContext)
+        {
             var gl = renderContext.gl;
 
             var offsetX = -(this.mouseX - this.viewRect.x);
@@ -87,6 +126,27 @@ module feng3d
 
             var object3D = this.mouseRenderer.selectedObject3D;
             this.setSelectedObject3D(object3D);
+        }
+
+        private getMouseCheckObjects(renderContext: RenderContext)
+        {
+            var scene3d = renderContext.scene3d;
+            var checkList = scene3d.getChildren();
+            var results: GameObject[] = [];
+            var i = 0;
+            while (i < checkList.length)
+            {
+                var checkObject = checkList[i++];
+                if (checkObject.mouseEnabled && checkObject.getComponentsByType(Geometry))
+                {
+                    results.push(checkObject as GameObject);
+                }
+                if (checkObject.mouseChildren)
+                {
+                    checkList = checkList.concat(checkObject.getChildren());
+                }
+            }
+            return results;
         }
 
         /**

@@ -4,6 +4,7 @@
         "noImplicitAny": false,
         "sourceMap": true,
         "declaration": true,
+        // "outDir": "out"
         "outFile": "out/feng3d.js"
     },
     "files": [ //注：如果有继承关系的，父类必须排在子类前面
@@ -60,6 +61,10 @@
         "src/render/webgl/webgl.ts",
         //渲染
         "src/render/consts/RenderMode.ts",
+        "src/render/consts/BlendFactor.ts",
+        "src/render/consts/BlendEquation.ts",
+        "src/render/consts/TextureType.ts",
+        //
         "src/render/data/ShaderParams.ts",
         "src/render/data/RenderDataHolder.ts",
         "src/render/data/RenderAtomic.ts",
@@ -86,6 +91,7 @@
         //
         "src/core/Object3D.ts",
         "src/core/ObjectContainer3D.ts",
+        "src/core/Entity.ts",
         "src/core/GameObject.ts",
         "src/core/View3D.ts",
         //3D对象组件
@@ -105,9 +111,16 @@
         "src/geometry/SegmentGeometry.ts",
         "src/geometry/components/GeometryComponent.ts",
         //摄像机
-        "src/cameras/CoordinateSystem.ts",
+        "src/cameras/lenses/CoordinateSystem.ts",
+        "src/cameras/lenses/LensBase.ts",
+        "src/cameras/lenses/FreeMatrixLens.ts",
+        "src/cameras/lenses/PerspectiveLens.ts",
+        "src/cameras/lenses/LensEvent.ts",
         "src/cameras/Camera.ts",
-        "src/cameras/PerspectiveCamera.ts",
+        "src/cameras/CameraEvent.ts",
+        //
+        "src/bounds/BoundingVolumeBase.ts",
+        "src/bounds/AxisAlignedBoundingBox.ts",
         //几何体
         "src/primitives/PlaneGeometry.ts",
         "src/primitives/CubeGeometry.ts",
@@ -146,6 +159,10 @@
         "src/controllers/ControllerBase.ts",
         "src/controllers/LookAtController.ts",
         "src/controllers/FPSController.ts",
+        //拾取
+        "src/pick/PickingCollisionVO.ts",
+        "src/pick/PickingCollider.ts",
+        "src/pick/RaycastPicker.ts",
         //地形
         "src/terrain/TerrainGeometry.ts",
         "src/terrain/TerrainMaterial.ts",

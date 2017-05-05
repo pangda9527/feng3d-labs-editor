@@ -1987,7 +1987,7 @@ declare module feng3d {
          * @param   v   一个容纳要转换的坐标的 Vector3D 对象。
          * @return  一个包含转换后的坐标的 Vector3D 对象。
          */
-        deltaTransformVector(v: Vector3D): Vector3D;
+        deltaTransformVector(v: Vector3D, vout?: Vector3D): Vector3D;
         /**
          * 将当前矩阵转换为恒等或单位矩阵。
          */
@@ -2503,23 +2503,94 @@ declare module feng3d {
      * 渲染模式
      * @author feng 2016-09-28
      */
-    enum RenderMode {
+    class RenderMode {
         /**
          * 点渲染
          */
-        POINTS = 0,
-        LINE_LOOP = 1,
-        LINE_STRIP = 2,
-        LINES = 3,
-        TRIANGLES = 4,
-        TRIANGLE_STRIP = 5,
-        TRIANGLE_FAN = 6,
+        static POINTS: number;
+        static LINE_LOOP: number;
+        static LINE_STRIP: number;
+        static LINES: number;
+        static TRIANGLES: number;
+        static TRIANGLE_STRIP: number;
+        static TRIANGLE_FAN: number;
     }
+}
+declare module feng3d {
     /**
-     * 根据枚举渲染模式获取真实值
-     * @param renderMode 渲染模式
+     * 混合因子（R分量系数，G分量系数，B分量系数）
      */
-    function getRenderModeValue(renderMode: RenderMode): number;
+    class BlendFactor {
+        /**
+         * 0.0  0.0 0.0
+         */
+        static ZERO: number;
+        /**
+         * 1.0  1.0 1.0
+         */
+        static ONE: number;
+        /**
+         * Rs   Gs  Bs
+         */
+        static SRC_COLOR: number;
+        /**
+         * 1-Rs   1-Gs  1-Bs
+         */
+        static ONE_MINUS_SRC_COLOR: number;
+        /**
+         * Rd   Gd  Bd
+         */
+        static DST_COLOR: number;
+        /**
+         * 1-Rd   1-Gd  1-Bd
+         */
+        static ONE_MINUS_DST_COLOR: number;
+        /**
+         * As   As  As
+         */
+        static SRC_ALPHA: number;
+        /**
+         * 1-As   1-As  1-As
+         */
+        static ONE_MINUS_SRC_ALPHA: number;
+        /**
+         * Ad   Ad  Ad
+         */
+        static DST_ALPHA: number;
+        /**
+         * 1-Ad   1-Ad  1-Ad
+         */
+        static ONE_MINUS_DST_ALPHA: number;
+        /**
+         * min(As-Ad)   min(As-Ad)  min(As-Ad)
+         */
+        static SRC_ALPHA_SATURATE: number;
+    }
+}
+declare module feng3d {
+    /**
+     * 混合方法
+     */
+    class BlendEquation {
+        /**
+         *  source + destination
+         */
+        static FUNC_ADD: number;
+        /**
+         * source - destination
+         */
+        static FUNC_SUBTRACT: number;
+        /**
+         * destination - source
+         */
+        static FUNC_REVERSE_SUBTRACT: number;
+    }
+}
+declare module feng3d {
+    class TextureType {
+        static TEXTURE_2D: number;
+        static TEXTURE_CUBE_MAP: number;
+    }
 }
 declare module feng3d {
     /**
@@ -2530,7 +2601,7 @@ declare module feng3d {
         /**
          * 渲染模式
          */
-        renderMode: RenderMode;
+        renderMode: number;
     }
 }
 declare module feng3d {
@@ -2710,14 +2781,17 @@ declare module feng3d {
          * 属性数据
          */
         data: Float32Array;
+        private _data;
         /**
          * 数据步长
          */
         stride: number;
+        private _stride;
         /**
          * drawElementsInstanced时将会用到的因子，表示divisor个geometry共用一个数据
          */
         divisor: number;
+        _divisor: number;
         /**
          * 顶点数据缓冲
          */
@@ -3344,9 +3418,6 @@ declare module feng3d {
         clone(): Object3D;
         rotateTo(ax: number, ay: number, az: number): void;
         rotate(axis: Vector3D, angle: number): void;
-        static tempAxeX: Vector3D;
-        static tempAxeY: Vector3D;
-        static tempAxeZ: Vector3D;
         lookAt(target: Vector3D, upAxis?: Vector3D): void;
         dispose(): void;
         disposeAsset(): void;
@@ -3420,6 +3491,101 @@ declare module feng3d {
         updateImplicitVisibility(): void;
         addEventListener(type: string, listener: (event: Event) => void, thisObject: any, priority?: number): void;
         removeEventListener(type: string, listener: (event: Event) => void, thisObject: any): void;
+        /**
+         * 获取子对象列表（备份）
+         */
+        getChildren(): ObjectContainer3D[];
+    }
+}
+declare module feng3d {
+    /**
+     * Entity为所有场景绘制对象提供一个基类，表示存在场景中。可以被entityCollector收集。
+     * @author feng 2014-3-24
+     */
+    abstract class Entity extends ObjectContainer3D {
+        protected _bounds: BoundingVolumeBase;
+        protected _boundsInvalid: boolean;
+        _pickingCollisionVO: PickingCollisionVO;
+        private _worldBounds;
+        private _worldBoundsInvalid;
+        /**
+         * 创建一个实体，该类为虚类
+         */
+        constructor();
+        /**
+         * @inheritDoc
+         */
+        readonly minX: number;
+        /**
+         * @inheritDoc
+         */
+        readonly minY: number;
+        /**
+         * @inheritDoc
+         */
+        readonly minZ: number;
+        /**
+         * @inheritDoc
+         */
+        readonly maxX: number;
+        /**
+         * @inheritDoc
+         */
+        readonly maxY: number;
+        /**
+         * @inheritDoc
+         */
+        readonly maxZ: number;
+        /**
+         * 边界
+         */
+        readonly bounds: BoundingVolumeBase;
+        /**
+         * @inheritDoc
+         */
+        protected invalidateSceneTransform(): void;
+        /**
+         * 边界失效
+         */
+        protected invalidateBounds(): void;
+        /**
+         * 获取默认边界（默认盒子边界）
+         * @return
+         */
+        protected getDefaultBoundingVolume(): BoundingVolumeBase;
+        /**
+         * 更新边界
+         */
+        protected abstract updateBounds(): any;
+        /**
+         * 获取碰撞数据
+         */
+        readonly pickingCollisionVO: PickingCollisionVO;
+        /**
+          * 判断射线是否穿过对象
+          * @param ray3D
+          * @return
+          */
+        isIntersectingRay(ray3D: Ray3D): boolean;
+        /**
+         * 碰撞前设置碰撞状态
+         * @param shortestCollisionDistance 最短碰撞距离
+         * @param findClosest 是否寻找最优碰撞
+         * @return
+         */
+        collidesBefore(pickingCollider: AS3PickingCollider, shortestCollisionDistance: number, findClosest: boolean): boolean;
+        /**
+         * 世界边界
+         */
+        readonly worldBounds: BoundingVolumeBase;
+        /**
+         * 更新世界边界
+         */
+        private updateWorldBounds();
+        /**
+         * 处理包围盒变换事件
+         */
+        protected onBoundsChange(): void;
     }
 }
 declare module feng3d {
@@ -3427,7 +3593,7 @@ declare module feng3d {
      * 3D对象
      * @author feng 2016-04-26
      */
-    class GameObject extends ObjectContainer3D {
+    class GameObject extends Entity {
         readonly renderData: Object3DRenderAtomic;
         private _renderData;
         /**
@@ -3438,6 +3604,9 @@ declare module feng3d {
          * 是否为公告牌（默认永远朝向摄像机），默认false。
          */
         isBillboard: boolean;
+        /**
+         * 保持缩放尺寸
+         */
         holdSize: number;
         updateRender(renderContext: RenderContext): void;
         private getDepthScale(renderContext);
@@ -3454,6 +3623,14 @@ declare module feng3d {
          * 更新渲染数据
          */
         updateRenderData(renderContext: RenderContext, renderData: RenderAtomic): void;
+        /**
+         * @inheritDoc
+         */
+        protected updateBounds(): void;
+        /**
+         * @inheritDoc
+         */
+        collidesBefore(pickingCollider: AS3PickingCollider, shortestCollisionDistance: number, findClosest: boolean): boolean;
     }
 }
 declare module feng3d {
@@ -3474,6 +3651,7 @@ declare module feng3d {
         private _camera;
         private _scene;
         private _canvas;
+        private _viewRect;
         /**
          * 默认渲染器
          */
@@ -3508,10 +3686,6 @@ declare module feng3d {
          */
         private drawScene(event);
         /**
-         * 更新视窗区域
-         */
-        readonly viewRect: Rectangle;
-        /**
          * 摄像机
          */
         camera: CameraObject3D;
@@ -3530,6 +3704,12 @@ declare module feng3d {
          * @return
          */
         getRay3D(x: number, y: number): Ray3D;
+        /**
+         * 投影坐标（世界坐标转换为3D视图坐标）
+         * @param point3d 世界坐标
+         * @return 屏幕的绝对坐标
+         */
+        project(point3d: Vector3D): Vector3D;
         /**
          * 屏幕坐标投影到场景坐标
          * @param nX 屏幕坐标X ([0-width])
@@ -3629,10 +3809,12 @@ declare module feng3d {
          * 几何体
          */
         geometry: Geometry;
+        private _geometry;
         /**
          * 材质
          */
         material: Material;
+        private _material;
         /**
          * 构建
          */
@@ -3748,6 +3930,10 @@ declare module feng3d {
         private _scaleU;
         private _scaleV;
         /**
+         * 坐标数据
+         */
+        positions: Float32Array;
+        /**
          * 创建一个几何体
          */
         constructor();
@@ -3818,6 +4004,10 @@ declare module feng3d {
          */
         scaleUV(scaleU?: number, scaleV?: number): void;
         /**
+         * 包围盒失效
+         */
+        invalidateBounds(): void;
+        /**
          * 克隆一个几何体
          */
         clone(): Geometry;
@@ -3845,6 +4035,10 @@ declare module feng3d {
          * 改变顶点索引数据事件
          */
         static CHANGED_INDEX_DATA: string;
+        /**
+         * 包围盒失效
+         */
+        static BOUNDS_INVALID: string;
         /**
          * 事件目标
          */
@@ -4027,13 +4221,32 @@ declare module feng3d {
 }
 declare module feng3d {
     /**
-     * 摄像机
-     * @author feng 2016-08-16
+     * 摄像机镜头
+     * @author feng 2014-10-14
      */
-    abstract class Camera extends Object3DComponent {
-        protected _projection: Matrix3D;
-        scissorRect: Rectangle;
-        viewPort: Rectangle;
+    abstract class LensBase extends EventDispatcher {
+        protected _matrix: Matrix3D;
+        protected _scissorRect: Rectangle;
+        protected _viewPort: Rectangle;
+        protected _near: number;
+        protected _far: number;
+        protected _aspectRatio: number;
+        protected _matrixInvalid: boolean;
+        protected _frustumCorners: number[];
+        private _unprojection;
+        private _unprojectionInvalid;
+        /**
+         * 创建一个摄像机镜头
+         */
+        constructor();
+        /**
+         * Retrieves the corner points of the lens frustum.
+         */
+        frustumCorners: number[];
+        /**
+         * 投影矩阵
+         */
+        matrix: Matrix3D;
         /**
          * 最近距离
          */
@@ -4046,40 +4259,19 @@ declare module feng3d {
          * 视窗缩放比例(width/height)，在渲染器中设置
          */
         aspectRatio: number;
-        protected _projectionInvalid: boolean;
-        private _unprojection;
-        private _unprojectionInvalid;
-        private _viewProjection;
-        private _viewProjectionInvalid;
         /**
-         * 创建一个摄像机
-         * @param lens 摄像机镜头
+         * 场景坐标投影到屏幕坐标
+         * @param point3d 场景坐标
+         * @param v 屏幕坐标（输出）
+         * @return 屏幕坐标
          */
-        constructor();
-        /**
-         * 投影矩阵
-         */
-        projection: Matrix3D;
+        project(point3d: Vector3D, v?: Vector3D): Vector3D;
         /**
          * 投影逆矩阵
          */
         readonly unprojectionMatrix: Matrix3D;
         /**
-         * 投影矩阵失效
-         */
-        protected invalidateMatrix(): void;
-        /**
-         * 场景投影矩阵，世界空间转投影空间
-         */
-        readonly viewProjection: Matrix3D;
-        readonly inverseGlobalMatrix3D: Matrix3D;
-        readonly globalMatrix3D: Matrix3D;
-        /**
-         * 更新投影矩阵
-         */
-        protected abstract updateMatrix(): any;
-        /**
-         * 屏幕坐标投影到场景坐标
+         * 屏幕坐标投影到摄像机空间坐标
          * @param nX 屏幕坐标X -1（左） -> 1（右）
          * @param nY 屏幕坐标Y -1（上） -> 1（下）
          * @param sZ 到屏幕的距离
@@ -4088,40 +4280,109 @@ declare module feng3d {
          */
         abstract unproject(nX: number, nY: number, sZ: number, v: Vector3D): Vector3D;
         /**
-         * 处理被添加组件事件
+         * 投影矩阵失效
          */
-        protected onBeAddedComponent(event: ComponentEvent): void;
+        protected invalidateMatrix(): void;
         /**
-         * 处理被移除组件事件
+         * 更新投影矩阵
          */
-        protected onBeRemovedComponent(event: ComponentEvent): void;
-        private onSpaceTransformChanged(event);
-        /**
-         * 更新渲染数据
-         */
-        updateRenderData(renderContext: RenderContext, renderData: RenderAtomic): void;
+        protected abstract updateMatrix(): any;
     }
 }
 declare module feng3d {
     /**
-     * 透视摄像机
+     *
+     * @author feng 2015-5-28
+     */
+    class FreeMatrixLens extends LensBase {
+        constructor();
+        protected updateMatrix(): void;
+        /**
+         * 屏幕坐标投影到摄像机空间坐标
+         * @param nX 屏幕坐标X -1（左） -> 1（右）
+         * @param nY 屏幕坐标Y -1（上） -> 1（下）
+         * @param sZ 到屏幕的距离
+         * @param v 场景坐标（输出）
+         * @return 场景坐标
+         */
+        unproject(nX: number, nY: number, sZ: number, v: Vector3D): Vector3D;
+    }
+}
+declare module feng3d {
+    /**
+     * 透视摄像机镜头
      * @author feng 2014-10-14
      */
-    class PerspectiveCamera extends Camera {
+    class PerspectiveLens extends LensBase {
+        private _fieldOfView;
+        private _focalLength;
+        private _focalLengthInv;
+        private _yMax;
+        private _xMax;
+        private _coordinateSystem;
         /**
-         * 视角
+         * 创建一个透视摄像机镜头
+         * @param fieldOfView 视野
+         * @param coordinateSystem 坐标系统类型
+         */
+        constructor(fieldOfView?: number, coordinateSystem?: number);
+        /**
+         * 视野
          */
         fieldOfView: number;
+        /**
+         * 焦距
+         */
+        focalLength: number;
+        unproject(nX: number, nY: number, sZ: number, v?: Vector3D): Vector3D;
         /**
          * 坐标系类型
          */
         coordinateSystem: number;
+        protected updateMatrix(): void;
+    }
+}
+declare module feng3d {
+    /**
+     * 镜头事件
+     * @author feng 2014-10-14
+     */
+    class LensEvent extends Event {
+        static MATRIX_CHANGED: string;
+        constructor(type: string, lens?: LensBase, bubbles?: boolean);
+        readonly lens: LensBase;
+    }
+}
+declare module feng3d {
+    /**
+     * 摄像机
+     * @author feng 2016-08-16
+     */
+    class Camera extends Object3DComponent {
+        private _viewProjection;
+        private _viewProjectionDirty;
+        private _lens;
+        private _frustumPlanes;
+        private _frustumPlanesDirty;
         /**
-         * 创建一个透视摄像机
-         * @param fieldOfView 视角
-         * @param coordinateSystem 坐标系统类型
+         * 创建一个摄像机
+         * @param lens 摄像机镜头
          */
-        constructor();
+        constructor(lens?: LensBase);
+        /**
+         * 处理镜头变化事件
+         */
+        private onLensMatrixChanged(event);
+        /**
+         * 镜头
+         */
+        lens: LensBase;
+        /**
+         * 场景投影矩阵，世界空间转投影空间
+         */
+        readonly viewProjection: Matrix3D;
+        readonly inverseSceneTransform: Matrix3D;
+        readonly sceneTransform: Matrix3D;
         /**
          * 屏幕坐标投影到场景坐标
          * @param nX 屏幕坐标X -1（左） -> 1（右）
@@ -4132,9 +4393,172 @@ declare module feng3d {
          */
         unproject(nX: number, nY: number, sZ: number, v?: Vector3D): Vector3D;
         /**
-         * 更新投影矩阵
+         * 场景坐标投影到屏幕坐标
+         * @param point3d 场景坐标
+         * @param v 屏幕坐标（输出）
+         * @return 屏幕坐标
          */
-        protected updateMatrix(): void;
+        project(point3d: Vector3D, v?: Vector3D): Vector3D;
+        /**
+         * 处理被添加组件事件
+         */
+        protected onBeAddedComponent(event: ComponentEvent): void;
+        /**
+         * 处理被移除组件事件
+         */
+        protected onBeRemovedComponent(event: ComponentEvent): void;
+        /**
+         * 处理场景变换改变事件
+         */
+        protected onScenetransformChanged(): void;
+        /**
+         * 更新渲染数据
+         */
+        updateRenderData(renderContext: RenderContext, renderData: RenderAtomic): void;
+        /**
+         * 视锥体面
+         */
+        readonly frustumPlanes: Plane3D[];
+        /**
+         * 更新视锥体6个面，平面均朝向视锥体内部
+         * @see http://www.linuxgraphics.cn/graphics/opengl_view_frustum_culling.html
+         */
+        private updateFrustum();
+    }
+}
+declare module feng3d {
+    /**
+     * 摄像机事件
+     * @author feng 2014-10-14
+     */
+    class CameraEvent extends Event {
+        static LENS_CHANGED: string;
+        constructor(type: string, camera?: Camera, bubbles?: boolean);
+        readonly camera: Camera;
+    }
+}
+declare module feng3d {
+    /**
+     * 包围盒基类
+     * @author feng 2014-4-27
+     */
+    abstract class BoundingVolumeBase extends EventDispatcher {
+        /** 最小坐标 */
+        protected _min: Vector3D;
+        /** 最大坐标 */
+        protected _max: Vector3D;
+        protected _aabbPointsDirty: boolean;
+        private _geometry;
+        /**
+         * 用于生产包围盒的几何体
+         */
+        geometry: Geometry;
+        /**
+         * The maximum extreme of the bounds
+         */
+        readonly max: Vector3D;
+        /**
+         * The minimum extreme of the bounds
+         */
+        readonly min: Vector3D;
+        /**
+         * 创建包围盒
+         */
+        constructor();
+        /**
+         * 处理几何体包围盒失效
+         */
+        protected onGeometryBoundsInvalid(): void;
+        /**
+         * 根据几何结构更新边界
+         */
+        fromGeometry(geometry: Geometry): void;
+        /**
+         * 根据所给极值设置边界
+         * @param minX 边界最小X坐标
+         * @param minY 边界最小Y坐标
+         * @param minZ 边界最小Z坐标
+         * @param maxX 边界最大X坐标
+         * @param maxY 边界最大Y坐标
+         * @param maxZ 边界最大Z坐标
+         */
+        fromExtremes(minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number): void;
+        /**
+         * 检测射线是否与边界交叉
+         * @param ray3D						射线
+         * @param targetNormal				交叉点法线值
+         * @return							射线起点到交点距离
+         */
+        rayIntersection(ray3D: Ray3D, targetNormal: Vector3D): number;
+        /**
+         * 检测是否包含指定点
+         * @param position 		被检测点
+         * @return				true：包含指定点
+         */
+        containsPoint(position: Vector3D): boolean;
+        /**
+         * 测试是否出现在摄像机视锥体内
+         * @param planes 		视锥体面向量
+         * @param numPlanes		面数
+         * @return 				true：出现在视锥体内
+         */
+        abstract isInFrustum(planes: Plane3D[], numPlanes: number): boolean;
+        /**
+         * 对包围盒进行变换
+         * @param bounds		包围盒
+         * @param matrix		变换矩阵
+         */
+        abstract transformFrom(bounds: BoundingVolumeBase, matrix: Matrix3D): any;
+        /**
+         * 从给出的球体设置边界
+         * @param center 		球心坐标
+         * @param radius 		球体半径
+         */
+        fromSphere(center: Vector3D, radius: number): void;
+    }
+}
+declare module feng3d {
+    /**
+     * 轴对其包围盒
+     * @author feng 2014-4-27
+     */
+    class AxisAlignedBoundingBox extends BoundingVolumeBase {
+        private _centerX;
+        private _centerY;
+        private _centerZ;
+        private _halfExtentsX;
+        private _halfExtentsY;
+        private _halfExtentsZ;
+        /**
+         * 创建轴对其包围盒
+         */
+        constructor();
+        /**
+         * 测试轴对其包围盒是否出现在摄像机视锥体内
+         * @param planes 		视锥体面向量
+         * @return 				true：出现在视锥体内
+         * @see me.feng3d.cameras.Camera3D.updateFrustum()
+         */
+        isInFrustum(planes: Plane3D[], numPlanes: number): boolean;
+        /**
+         * @inheritDoc
+         */
+        fromExtremes(minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number): void;
+        /**
+         * @inheritDoc
+         */
+        rayIntersection(ray3D: Ray3D, targetNormal: Vector3D): number;
+        /**
+         * @inheritDoc
+         */
+        containsPoint(position: Vector3D): boolean;
+        /**
+         * 对包围盒进行变换
+         * @param bounds		包围盒
+         * @param matrix		变换矩阵
+         * @see http://www.cppblog.com/lovedday/archive/2008/02/23/43122.html
+         */
+        transformFrom(bounds: BoundingVolumeBase, matrix: Matrix3D): void;
     }
 }
 declare module feng3d {
@@ -4486,26 +4910,37 @@ declare module feng3d {
          * 纹理类型
          */
         textureType: number;
+        protected _textureType: number;
+        /**
+         * 图片数据
+         */
+        pixels: HTMLCanvasElement | ImageData | HTMLImageElement | HTMLVideoElement | ImageData[] | HTMLVideoElement[] | HTMLImageElement[] | HTMLCanvasElement[];
+        protected _pixels: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | ImageData[] | HTMLVideoElement[] | HTMLImageElement[] | HTMLCanvasElement[];
         /**
          * 格式
          */
         format: number;
+        protected _format: number;
         /**
          * 数据类型
          */
         type: number;
+        _type: number;
         /**
          * 是否生成mipmap
          */
         generateMipmap: boolean;
+        private _generateMipmap;
         /**
          * 对图像进行Y轴反转。默认值为false
          */
         flipY: boolean;
+        private _flipY;
         /**
          * 将图像RGB颜色值得每一个分量乘以A。默认为false
          */
         premulAlpha: boolean;
+        private _premulAlpha;
         minFilter: number;
         magFilter: number;
         /**
@@ -4517,13 +4952,9 @@ declare module feng3d {
          */
         wrapT: number;
         /**
-         * 各向异性过滤。使用各向异性过滤能够使纹理的效果更好，但是会消耗更多的内存、CPU、GPU时间。默认为1。
+         * 各向异性过滤。使用各向异性过滤能够使纹理的效果更好，但是会消耗更多的内存、CPU、GPU时间。默认为0。
          */
         anisotropy: number;
-        /**
-         * 图片数据
-         */
-        protected _pixels: HTMLImageElement | HTMLImageElement[];
         /**
          * 纹理缓冲
          */
@@ -4614,28 +5045,34 @@ declare module feng3d {
      * @author feng 2016-05-02
      */
     class Material extends RenderDataHolder {
+        protected _enableBlend: boolean;
         /**
-        * 渲染模式
+        * 渲染模式，默认RenderMode.TRIANGLES
         */
-        renderMode: RenderMode;
+        renderMode: number;
         /**
          * 着色器名称
          */
         protected shaderName: string;
         /**
+         * 是否渲染双面
+         */
+        bothSides: boolean;
+        /**
          * 是否开启混合
+         * <混合后的颜色> = <源颜色>*sfactor + <目标颜色>*dfactor
          */
         enableBlend: boolean;
         /**
-         * 混合方程
+         * 混合方程，默认BlendEquation.FUNC_ADD
          */
         blendEquation: number;
         /**
-         * 源混合因子
+         * 源混合因子，默认BlendFactor.SRC_ALPHA
          */
         sfactor: number;
         /**
-         * 目标混合因子
+         * 目标混合因子，默认BlendFactor.ONE_MINUS_SRC_ALPHA
          */
         dfactor: number;
         /**
@@ -4773,6 +5210,10 @@ declare module feng3d {
          * 环境反射函数
          */
         ambientMethod: AmbientMethod;
+        /**
+         * 是否开启混合
+         */
+        enableBlend: boolean;
         /**
          * 构建
          */
@@ -4976,16 +5417,16 @@ declare module feng3d {
         /**
          * 控制对象
          */
-        protected _target: Object3D;
+        protected _target: GameObject;
         /**
          * 控制器基类，用于动态调整3D对象的属性
          */
-        constructor(target: Object3D);
+        constructor(target: GameObject);
         /**
          * 手动应用更新到目标3D对象
          */
         update(interpolate?: boolean): void;
-        target: Object3D;
+        target: GameObject;
     }
 }
 declare module feng3d {
@@ -4995,7 +5436,7 @@ declare module feng3d {
         protected _origin: Vector3D;
         protected _upAxis: Vector3D;
         private _pos;
-        constructor(target?: Object3D, lookAtObject?: Object3D);
+        constructor(target?: GameObject, lookAtObject?: Object3D);
         upAxis: Vector3D;
         lookAtPosition: Vector3D;
         lookAtObject: Object3D;
@@ -5028,8 +5469,11 @@ declare module feng3d {
          * 上次鼠标位置
          */
         private preMousePoint;
-        constructor(transform?: Object3D);
-        target: Object3D;
+        constructor(transform?: GameObject);
+        target: GameObject;
+        private onMousedown();
+        private onMouseup();
+        private onEnterFrame();
         /**
          * 初始化
          */
@@ -5055,6 +5499,143 @@ declare module feng3d {
          * @param direction     停止运动的方向
          */
         private stopDirectionVelocity(direction);
+    }
+}
+declare module feng3d {
+    /**
+     * 拾取的碰撞数据
+     */
+    class PickingCollisionVO {
+        /**
+         * 第一个穿过的物体
+         */
+        firstEntity: Entity;
+        /**
+         * 碰撞的uv坐标
+         */
+        uv: Point;
+        /**
+         * 实体上碰撞本地坐标
+         */
+        localPosition: Vector3D;
+        /**
+         * 射线顶点到实体的距离
+         */
+        rayEntryDistance: number;
+        /**
+         * 本地坐标系射线
+         */
+        localRay: Ray3D;
+        /**
+         * 本地坐标碰撞法线
+         */
+        localNormal: Vector3D;
+        /**
+         * 场景中碰撞射线
+         */
+        ray3D: Ray3D;
+        /**
+         * 射线坐标是否在边界内
+         */
+        rayOriginIsInsideBounds: boolean;
+        /**
+         * 碰撞三角形索引
+         */
+        index: number;
+        /**
+         * 碰撞关联的渲染对象
+         */
+        renderable: Model;
+        /**
+         * 创建射线拾取碰撞数据
+         * @param entity
+         */
+        constructor(entity: Entity);
+        /**
+         * 实体上碰撞世界坐标
+         */
+        readonly scenePosition: Vector3D;
+    }
+}
+declare module feng3d {
+    /**
+     * 使用纯计算与实体相交
+     */
+    class AS3PickingCollider {
+        protected ray3D: Ray3D;
+        /** 是否查找最短距离碰撞 */
+        private _findClosestCollision;
+        /**
+         * 创建一个AS碰撞检测器
+         * @param findClosestCollision 是否查找最短距离碰撞
+         */
+        constructor(findClosestCollision?: boolean);
+        testSubMeshCollision(subMesh: Model, pickingCollisionVO: PickingCollisionVO, shortestCollisionDistance?: number, bothSides?: boolean): boolean;
+        /**
+         * 获取碰撞法线
+         * @param indexData 顶点索引数据
+         * @param vertexData 顶点数据
+         * @param triangleIndex 三角形索引
+         * @param normal 碰撞法线
+         * @return 碰撞法线
+         *
+         */
+        protected getCollisionNormal(indexData: number[], vertexData: number[], triangleIndex?: number, normal?: Vector3D): Vector3D;
+        /**
+         * 获取碰撞uv
+         * @param indexData 顶点数据
+         * @param uvData uv数据
+         * @param triangleIndex 三角形所有
+         * @param v
+         * @param w
+         * @param u
+         * @param uvOffset
+         * @param uvStride
+         * @param uv uv坐标
+         * @return 碰撞uv
+         */
+        protected getCollisionUV(indexData: Uint16Array, uvData: Float32Array, triangleIndex: number, v: number, w: number, u: number, uvOffset: number, uvStride: number, uv?: Point): Point;
+        /**
+         * 设置碰撞射线
+         */
+        setLocalRay(ray3D: Ray3D): void;
+    }
+}
+declare module feng3d {
+    /**
+     * 射线投射拾取器
+     * @author feng 2014-4-29
+     */
+    class RaycastPicker {
+        /** 是否需要寻找最接近的 */
+        private _findClosestCollision;
+        protected _entities: GameObject[];
+        private static pickingCollider;
+        /**
+         *
+         * @param findClosestCollision 是否需要寻找最接近的
+         */
+        constructor(findClosestCollision: boolean);
+        /**
+         * 获取射线穿过的实体
+         * @param ray3D 射线
+         * @param entitys 实体列表
+         * @return
+         */
+        getViewCollision(ray3D: Ray3D, entitys: GameObject[]): PickingCollisionVO;
+        /**
+         *获取射线穿过的实体
+         */
+        private getPickingCollisionVO();
+        /**
+         * 按与射线原点距离排序
+         */
+        private sortOnNearT(entity1, entity2);
+        /**
+         * 更新碰撞本地坐标
+         * @param pickingCollisionVO
+         */
+        private updateLocalPosition(pickingCollisionVO);
     }
 }
 declare module feng3d {
@@ -6393,19 +6974,25 @@ declare module feng3d {
          * 统计处理click次数，判断是否达到dblclick
          */
         private Object3DClickNum;
+        /** 射线采集器(采集射线穿过场景中物体的列表) */
+        private _mousePicker;
+        private _catchMouseMove;
+        /**
+         * 是否捕捉鼠标移动，默认false。
+         */
+        catchMouseMove: boolean;
         constructor();
         /**
          * 监听鼠标事件收集事件类型
          */
         private onMouseEvent(event);
         /**
-         * 监听鼠标移动事件获取鼠标位置
-         */
-        private onMousemove(event);
-        /**
          * 渲染
          */
         draw(renderContext: RenderContext): void;
+        private pick(renderContext);
+        private glPick(renderContext);
+        private getMouseCheckObjects(renderContext);
         /**
          * 设置选中对象
          */
@@ -6784,4 +7371,8 @@ declare module feng3d {
      * 初始化引擎
      */
     function initEngine(): void;
+    /**
+     * 初始化函数列表
+     */
+    var initFunctions: Function[];
 }

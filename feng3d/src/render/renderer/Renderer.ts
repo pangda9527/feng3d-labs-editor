@@ -7,7 +7,6 @@ module feng3d
      */
     export class Renderer
     {
-
         /**
 		 * 渲染
 		 */
@@ -34,6 +33,7 @@ module feng3d
                 var material = meshRenderer.material;
                 if (material.enableBlend)
                 {
+                    //
                     gl.enable(GL.BLEND);
                     gl.blendEquation(material.blendEquation);
                     gl.depthMask(false);
@@ -106,7 +106,7 @@ module feng3d
         for (var o = 0; o < uniformInfos.length; o++)
         {
             var activeInfo = uniformInfos[o];
-            if (activeInfo.name.indexOf("[") != -1)
+            if (activeInfo.uniformBaseName)
             {
                 //处理数组
                 var baseName = activeInfo.uniformBaseName;
@@ -129,7 +129,8 @@ module feng3d
 
         indexBuffer.active(gl);
 
-        var renderMode = getRenderModeValue(shaderParams.renderMode);
+        // var renderMode = RenderMode.getRenderModeValue(shaderParams.renderMode);
+        var renderMode = shaderParams.renderMode;
         if (instanceCount > 1)
         {
             var _ext = gl.getExtension('ANGLE_instanced_arrays');

@@ -1,13 +1,11 @@
 module feng3d
 {
-
     /**
      * FPS模式控制器
      * @author feng 2016-12-19
      */
     export class FPSController extends ControllerBase
     {
-
         /**
          * 按键记录
          */
@@ -33,37 +31,55 @@ module feng3d
          */
         private preMousePoint: Point;
 
-        constructor(transform: Object3D = null)
+        constructor(transform: GameObject = null)
         {
             super(transform);
             this.init();
         }
 
-        public get target(): Object3D
+        public get target(): GameObject
         {
             return this._target;
         }
 
-        public set target(value: Object3D)
+        public set target(value: GameObject)
         {
-            
-            
             if (this._target != null)
             {
-                input.removeEventListener(inputType.KEY_DOWN, this.onKeydown, this);
-                input.removeEventListener(inputType.KEY_UP, this.onKeyup, this);
-                input.removeEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
+                input.removeEventListener(inputType.MOUSE_DOWN, this.onMousedown, this);
+                input.removeEventListener(inputType.MOUSE_UP, this.onMouseup, this);
             }
             this._target = value;
             if (this._target != null)
             {
-                input.addEventListener(inputType.KEY_DOWN, this.onKeydown, this);
-                input.addEventListener(inputType.KEY_UP, this.onKeyup, this);
-                input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
-                this.preMousePoint = null;
-                this.velocity = new Vector3D();
-                this.keyDownDic = {};
+                input.addEventListener(inputType.MOUSE_DOWN, this.onMousedown, this);
+                input.addEventListener(inputType.MOUSE_UP, this.onMouseup, this);
             }
+        }
+
+        private onMousedown()
+        {
+            this.preMousePoint = null;
+            this.velocity = new Vector3D();
+            this.keyDownDic = {};
+
+            input.addEventListener(inputType.KEY_DOWN, this.onKeydown, this);
+            input.addEventListener(inputType.KEY_UP, this.onKeyup, this);
+            input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
+            ticker.addEventListener(Event.ENTER_FRAME, this.onEnterFrame, this);
+        }
+
+        private onMouseup()
+        {
+            input.removeEventListener(inputType.KEY_DOWN, this.onKeydown, this);
+            input.removeEventListener(inputType.KEY_UP, this.onKeyup, this);
+            input.removeEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
+            ticker.removeEventListener(Event.ENTER_FRAME, this.onEnterFrame, this);
+        }
+
+        private onEnterFrame()
+        {
+            this.update();
         }
 
         /**
@@ -71,7 +87,6 @@ module feng3d
          */
         private init()
         {
-
             this.keyDirectionDic["a"] = new Vector3D(-1, 0, 0);//左
             this.keyDirectionDic["d"] = new Vector3D(1, 0, 0);//右
             this.keyDirectionDic["w"] = new Vector3D(0, 0, 1);//前
@@ -85,7 +100,6 @@ module feng3d
          */
         public update(interpolate: boolean = true): void
         {
-
             if (this.target == null)
                 return;
 
@@ -125,7 +139,6 @@ module feng3d
             if (this.target == null)
                 return;
 
-            
             var mousePoint = new Point(input.clientX, input.clientY);
 
             if (this.preMousePoint == null)
@@ -137,12 +150,16 @@ module feng3d
             var offsetPoint = mousePoint.subtract(this.preMousePoint)
             offsetPoint.x *= 0.15;
             offsetPoint.y *= 0.15;
-            var matrix3d = this.target.transform;
-            var right = matrix3d.right;
-            var position = matrix3d.position;
-            matrix3d.appendRotation(offsetPoint.y, right, position);
-            matrix3d.appendRotation(offsetPoint.x, Vector3D.Y_AXIS, position);
-            this.target.transform = matrix3d;
+            var matrix3d = this.target.sceneTransform;
+            matrix3d.appendRotation(offsetPoint.y, matrix3d.right, matrix3d.position);
+            var up = Vector3D.Y_AXIS;
+            if (matrix3d.up.dotProduct(up) < 0)
+            {
+                up = up.clone();
+                up.scaleBy(-1);
+            }
+            matrix3d.appendRotation(offsetPoint.x, up, matrix3d.position);
+            this.target.sceneTransform = matrix3d;
             //
             this.preMousePoint = mousePoint;
         }
@@ -152,7 +169,6 @@ module feng3d
 		 */
         private onKeydown(event: InputEvent): void
         {
-
             var boardKey = String.fromCharCode(event.keyCode).toLocaleLowerCase();
             if (this.keyDirectionDic[boardKey] == null)
                 return;
@@ -181,7 +197,6 @@ module feng3d
          */
         private stopDirectionVelocity(direction: Vector3D)
         {
-
             if (direction == null)
                 return;
             if (direction.x != 0)

@@ -2,12 +2,24 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Chrome against localhost, with sourcemaps",
+            "name": "启动chrome调试",
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:8080",
             "sourceMaps": true,
             "webRoot": "${workspaceRoot}"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "合并examples_tsconfig.json与feng3d/tsconfig.json为tsconfig.json",
+            "program": "${workspaceRoot}/mergeTSConfig.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "打包shader",
+            "program": "${workspaceRoot}/ShaderPack.js"
         }
     ]
 }

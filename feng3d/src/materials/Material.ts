@@ -7,8 +7,10 @@ module feng3d
      */
     export class Material extends RenderDataHolder
     {
+        protected _enableBlend = false;
+
         /**
-        * 渲染模式
+        * 渲染模式，默认RenderMode.TRIANGLES
         */
         public renderMode = RenderMode.TRIANGLES;
 
@@ -18,24 +20,38 @@ module feng3d
         protected shaderName: string;
 
         /**
+         * 是否渲染双面
+         */
+        public bothSides = true;
+
+        /**
          * 是否开启混合
+         * <混合后的颜色> = <源颜色>*sfactor + <目标颜色>*dfactor
          */
-        public enableBlend = false;
+        public get enableBlend()
+        {
+            return this._enableBlend;
+        }
+
+        public set enableBlend(value: boolean)
+        {
+            this._enableBlend = value;
+        }
 
         /**
-         * 混合方程
+         * 混合方程，默认BlendEquation.FUNC_ADD
          */
-        public blendEquation = GL.FUNC_ADD;
+        public blendEquation = BlendEquation.FUNC_ADD;
 
         /**
-         * 源混合因子
+         * 源混合因子，默认BlendFactor.SRC_ALPHA
          */
-        public sfactor = GL.ONE;
+        public sfactor = BlendFactor.SRC_ALPHA;
 
         /**
-         * 目标混合因子
+         * 目标混合因子，默认BlendFactor.ONE_MINUS_SRC_ALPHA
          */
-        public dfactor = GL.ZERO;
+        public dfactor = BlendFactor.ONE_MINUS_SRC_ALPHA;
 
         /**
          * 构建材质
