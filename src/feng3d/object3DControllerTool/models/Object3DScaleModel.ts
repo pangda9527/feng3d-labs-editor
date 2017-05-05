@@ -67,6 +67,7 @@ module feng3d.editor
             var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 4);
             mouseHit.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
+            mouseHit.mouseEnabled = true;
             this.addChild(mouseHit);
 
             this.update();

@@ -16,11 +16,26 @@ module feng3d.editor
             this.object3DControllerToolBingding = new Object3DScaleBinding(this);
 
             this.toolModel = new Object3DScaleModel();
+        }
+
+        protected onAddedToScene()
+        {
+            super.onAddedToScene();
 
             this.toolModel.xCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.yCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.zCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.oCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+        }
+
+        protected onRemovedFromScene()
+        {
+            super.onRemovedFromScene();
+
+            this.toolModel.xCube.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.yCube.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.zCube.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.oCube.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
         protected onItemMouseDown(event: Event)
@@ -62,6 +77,7 @@ module feng3d.editor
             }
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
+
             this.bindingObject3D.startScale();
             //
             input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
@@ -81,10 +97,22 @@ module feng3d.editor
             } else
             {
                 var crossPos = this.getLocalMousePlaneCross();
-                addPos.x = (crossPos.x - this.startPlanePos.x) * this.changeXYZ.x;
-                addPos.y = (crossPos.y - this.startPlanePos.y) * this.changeXYZ.y;
-                addPos.z = (crossPos.z - this.startPlanePos.z) * this.changeXYZ.z;
-                addScale.setTo(1 + addPos.x / this.startPlanePos.x, 1 + addPos.y / this.startPlanePos.y, 1 + addPos.z / this.startPlanePos.z);
+                var offset = crossPos.subtract(this.startPlanePos);
+                if (this.changeXYZ.x && this.startPlanePos.x && offset.x != 0)
+                {
+                    addScale.x = offset.x / this.startPlanePos.x;
+                }
+                if (this.changeXYZ.y && this.startPlanePos.y && offset.y != 0)
+                {
+                    addScale.y = offset.y / this.startPlanePos.y;
+                }
+                if (this.changeXYZ.z && this.startPlanePos.z && offset.z != 0)
+                {
+                    addScale.z = offset.z / this.startPlanePos.z;
+                }
+                addScale.x += 1;
+                addScale.y += 1;
+                addScale.z += 1;
             }
             this.bindingObject3D.doScale(addScale);
             //

@@ -13,14 +13,29 @@ module feng3d.editor
             this.object3DControllerToolBingding = new Object3DRotationBinding(this);
 
             this.toolModel = new Object3DRotationModel();
+        }
+        protected onAddedToScene()
+        {
+            super.onAddedToScene();
 
             this.toolModel.xAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.yAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.zAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.freeAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             this.toolModel.cameraAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-
         }
+
+        protected onRemovedFromScene()
+        {
+            super.onRemovedFromScene();
+
+            this.toolModel.xAxis.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.yAxis.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.zAxis.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.freeAxis.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.cameraAxis.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+        }
+
 
         protected onItemMouseDown(event: Event)
         {

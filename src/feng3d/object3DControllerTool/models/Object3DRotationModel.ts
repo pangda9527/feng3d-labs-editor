@@ -86,6 +86,7 @@ module feng3d.editor
             mouseHit.addComponent(model);
             mouseHit.rotationX = 90;
             mouseHit.visible = false;
+            mouseHit.mouseEnabled = true;
             this.addChild(mouseHit);
         }
 
@@ -260,6 +261,7 @@ module feng3d.editor
             this.sector = new SectorObject3D(this.radius);
             this.sector.update(0, 360);
             this.sector.visible = false;
+            this.sector.mouseEnabled = true;
             this.addChild(this.sector);
 
             this.update();

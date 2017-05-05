@@ -24,7 +24,8 @@ module feng3d
             var geometry = subMesh.geometry;
             var indexData = geometry.getIndexData().indices;
             var vertexData = geometry.getVAData(GLAttribute.a_position).data;
-            var uvData = geometry.getVAData(GLAttribute.a_uv).data;
+            var uvVAData = geometry.getVAData(GLAttribute.a_uv);
+            var uvData = uvVAData && uvVAData.data;
 
             var t = 0;
             var i0 = 0, i1 = 0, i2 = 0;
@@ -124,7 +125,8 @@ module feng3d
                         pickingCollisionVO.rayEntryDistance = t;
                         pickingCollisionVO.localPosition = new Vector3D(cx, cy, cz);
                         pickingCollisionVO.localNormal = new Vector3D(nx, ny, nz);
-                        pickingCollisionVO.uv = this.getCollisionUV(indexData, uvData, index, v, w, u, 0, uvStride);
+                        if (uvData)
+                            pickingCollisionVO.uv = this.getCollisionUV(indexData, uvData, index, v, w, u, 0, uvStride);
                         pickingCollisionVO.index = index;
 
                         //是否继续寻找最优解
