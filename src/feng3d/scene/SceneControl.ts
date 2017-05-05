@@ -95,11 +95,13 @@ module feng3d.editor
             var selectedObject3D = editor3DData.selectedObject3D;
             if (selectedObject3D)
             {
+                var cameraObject3D = editor3DData.cameraObject3D;
                 config.lookDistance = config.defaultLookDistance;
-                var lookPos = editor3DData.cameraObject3D.sceneTransform.forward;
+                var lookPos = cameraObject3D.sceneTransform.forward;
                 lookPos.scaleBy(-config.lookDistance);
                 lookPos.incrementBy(selectedObject3D.scenePosition);
-                egret.Tween.get(editor3DData.cameraObject3D.transform.position).to({ x: lookPos.x, y: lookPos.y, z: lookPos.z }, 300, egret.Ease.sineIn);
+                var localLookPos = cameraObject3D.transformSameSpace(lookPos);
+                egret.Tween.get(editor3DData.cameraObject3D).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
             }
         }
 

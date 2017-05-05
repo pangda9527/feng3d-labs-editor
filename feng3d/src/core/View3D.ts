@@ -145,7 +145,7 @@ module feng3d
         public get mousePos()
         {
             var viewRect: Rectangle = this.viewRect;
-            var pos = new Point(this.mouse3DManager.mouseX - viewRect.x, this.mouse3DManager.mouseY - viewRect.y);
+            var pos = new Point(input.clientX - viewRect.x, input.clientY - viewRect.y);
             return pos;
         }
 

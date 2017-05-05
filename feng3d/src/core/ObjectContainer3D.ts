@@ -13,7 +13,6 @@ module feng3d
         private _scenechanged: Object3DEvent;
         private _children: ObjectContainer3D[] = [];
         private _mouseChildren: boolean = true;
-        private _oldScene: Scene3D;
         private _inverseSceneTransform: Matrix3D = new Matrix3D();
         private _inverseSceneTransformDirty: boolean = true;
         private _scenePosition: Vector3D = new Vector3D();
@@ -297,15 +296,17 @@ module feng3d
                 this._children[i++].scene = value;
             if (this._scene == value)
                 return;
-            if (value == null)
-                this._oldScene = this._scene;
-            if (value)
-                this._oldScene = null;
+            if (this._scene)
+            {
+                this.scene.dispatchEvent(new Scene3DEvent(Scene3DEvent.REMOVED_FROM_SCENE, this));
+                this.dispatchEvent(new Scene3DEvent(Scene3DEvent.REMOVED_FROM_SCENE, this));
+            }
             this._scene = value;
             if (this._scene)
+            {
                 this._scene.dispatchEvent(new Scene3DEvent(Scene3DEvent.ADDED_TO_SCENE, this));
-            else if (this._oldScene)
-                this._oldScene.dispatchEvent(new Scene3DEvent(Scene3DEvent.REMOVED_FROM_SCENE, this));
+                this.dispatchEvent(new Scene3DEvent(Scene3DEvent.ADDED_TO_SCENE, this));
+            }
         }
 
         public get inverseSceneTransform(): Matrix3D
@@ -327,6 +328,22 @@ module feng3d
         public constructor()
         {
             super();
+        }
+
+        /**
+         * 全局坐标转换到与该对象相同的空间
+         */
+        public transformSameSpace(scenePosition: Vector3D, sameSpacePosition: Vector3D = null)
+        {
+            sameSpacePosition = sameSpacePosition || new Vector3D();
+            if (this.parent)
+            {
+                sameSpacePosition = this.parent.inverseSceneTransform.transformVector(scenePosition, sameSpacePosition);
+            } else
+            {
+                sameSpacePosition.copyFrom(scenePosition);
+            }
+            return sameSpacePosition;
         }
 
         public contains(child: ObjectContainer3D): boolean

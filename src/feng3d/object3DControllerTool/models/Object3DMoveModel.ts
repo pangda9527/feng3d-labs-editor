@@ -127,7 +127,7 @@ module feng3d.editor
             model.geometry = new CubeGeometry(8, 8, 8);
             this.colorMaterial = model.material = new ColorMaterial();
             this.oCube.addComponent(model);
-
+            this.oCube.mouseEnabled = true;
             this.addChild(this.oCube);
 
             this.update();
@@ -171,6 +171,7 @@ module feng3d.editor
             model.geometry = new PlaneGeometry(this._width, this._width);
             this.colorMaterial = model.material = new ColorMaterial();
             plane.addComponent(model);
+            plane.mouseEnabled = true;
             this.addChild(plane);
 
             var border = new GameObject();

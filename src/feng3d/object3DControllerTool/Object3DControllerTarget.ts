@@ -85,6 +85,8 @@ module feng3d.editor
 
         public translation(addPos: Vector3D)
         {
+            if (addPos.length == 0)
+                return;
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
                 tempGlobalMatrix.copyFrom(this.startGlobalMatrixVec[i]);

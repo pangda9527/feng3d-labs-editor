@@ -23,7 +23,7 @@ module feng3d.editor
             this.addEventListener(Scene3DEvent.REMOVED_FROM_SCENE, this.onRemovedFromScene, this);
         }
 
-        private onAddedToScene()
+        protected onAddedToScene()
         {
             this.updateToolModel();
             input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
@@ -32,7 +32,7 @@ module feng3d.editor
             editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
-        private onRemovedFromScene()
+        protected onRemovedFromScene()
         {
             input.removeEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
             input.removeEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
