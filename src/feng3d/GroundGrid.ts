@@ -18,7 +18,7 @@ module feng3d.editor
             super("GroundGrid");
             this.init();
 
-            editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            // editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         /**
@@ -41,6 +41,10 @@ module feng3d.editor
 
             var startX: number = Math.round(cameraGlobalPosition.x / (10 * this.step)) * 10 * this.step;
             var startZ: number = Math.round(cameraGlobalPosition.z / (10 * this.step)) * 10 * this.step;
+            
+            //设置在原点
+            startX = startZ = 0;
+            this.step = 100;
 
             var halfNum = this.num / 2;
 
@@ -54,9 +58,9 @@ module feng3d.editor
             }
         }
 
-        private onCameraScenetransformChanged()
-        {
-            this.update();
-        }
+        // private onCameraScenetransformChanged()
+        // {
+        //     this.update();
+        // }
     }
 }

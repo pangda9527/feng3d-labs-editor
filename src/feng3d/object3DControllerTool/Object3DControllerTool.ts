@@ -27,13 +27,13 @@ module feng3d.editor
 
             this.currentTool = this.object3DMoveTool;
 
-            Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this)
+            Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this);
 
             shortcut.addEventListener("object3DMoveTool", this.onObject3DMoveTool, this);
             shortcut.addEventListener("object3DRotationTool", this.onObject3DRotationTool, this);
             shortcut.addEventListener("object3DScaleTool", this.onObject3DScaleTool, this);
 
-            Watcher.watch(editor3DData, ["selectedObject3D"], this.onSelectedObject3DChange, this)
+            Watcher.watch(editor3DData, ["selectedObject3D"], this.onSelectedObject3DChange, this);
         }
 
         private onSelectedObject3DChange()

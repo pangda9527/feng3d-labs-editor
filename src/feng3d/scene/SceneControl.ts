@@ -20,12 +20,6 @@ module feng3d.editor
             shortcut.addEventListener("mouseRotateScene", this.onMouseRotateScene, this);
             shortcut.addEventListener("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
-            ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
-            //
-        }
-        process(event: Event)
-        {
-            this.controller.update();
         }
 
         private onDragSceneStart()
@@ -51,11 +45,13 @@ module feng3d.editor
         private onFpsViewStart()
         {
             this.controller.target = editor3DData.cameraObject3D;
+            this.controller.onMousedown();
         }
 
         private onFpsViewStop()
         {
             this.controller.target = null;
+            this.controller.onMouseup();
         }
 
         private rotateSceneCenter: Vector3D;

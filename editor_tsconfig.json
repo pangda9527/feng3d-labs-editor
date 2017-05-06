@@ -14,7 +14,6 @@
         "libs/modules/res/res.d.ts",
         "libs/modules/tween/tween.d.ts",
         "libs/exml.e.d.ts",
-        "configs/typings/index.d.ts",
         "src/ui/drag/DragType.ts",
         "src/ui/drag/DragSource.ts",
         "src/ui/drag/DragEvent.ts",

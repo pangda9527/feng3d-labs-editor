@@ -24,12 +24,12 @@ module feng3d
         /**
          * 速度
          */
-        private velocity: Vector3D;
+        private velocity: Vector3D = new Vector3D();
 
         /**
          * 上次鼠标位置
          */
-        private preMousePoint: Point;
+        private preMousePoint: Point = new Point();
 
         constructor(transform: GameObject = null)
         {
@@ -57,10 +57,10 @@ module feng3d
             }
         }
 
-        private onMousedown()
+        public onMousedown()
         {
-            this.preMousePoint = null;
-            this.velocity = new Vector3D();
+            this.preMousePoint.setTo(input.clientX, input.clientY);
+            this.velocity.setTo(0, 0, 0);
             this.keyDownDic = {};
 
             input.addEventListener(inputType.KEY_DOWN, this.onKeydown, this);
@@ -69,7 +69,7 @@ module feng3d
             ticker.addEventListener(Event.ENTER_FRAME, this.onEnterFrame, this);
         }
 
-        private onMouseup()
+        public onMouseup()
         {
             input.removeEventListener(inputType.KEY_DOWN, this.onKeydown, this);
             input.removeEventListener(inputType.KEY_UP, this.onKeyup, this);
@@ -141,11 +141,6 @@ module feng3d
 
             var mousePoint = new Point(input.clientX, input.clientY);
 
-            if (this.preMousePoint == null)
-            {
-                this.preMousePoint = mousePoint;
-                return;
-            }
             //计算旋转
             var offsetPoint = mousePoint.subtract(this.preMousePoint)
             offsetPoint.x *= 0.15;
@@ -161,7 +156,7 @@ module feng3d
             matrix3d.appendRotation(offsetPoint.x, up, matrix3d.position);
             this.target.sceneTransform = matrix3d;
             //
-            this.preMousePoint = mousePoint;
+            this.preMousePoint.copyFrom(mousePoint);
         }
 
         /**
