@@ -3,12 +3,14 @@
         "target": "es5",
         "noImplicitAny": false,
         "sourceMap": true,
-        "outFile": "bin/editor.js"
+        "outFile": "out/editor.js"
     },
     "files": [
-        "feng3d/out/feng3d.d.ts",
-        "feng3d/typings/index.d.ts",
-        "objectview/out/objectview.d.ts",
+        "libs/event.d.ts",
+        "libs/common.d.ts",
+        "libs/render.d.ts",
+        "libs/feng3d.d.ts",
+        "libs/objectview.d.ts",
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
         "libs/modules/res/res.d.ts",

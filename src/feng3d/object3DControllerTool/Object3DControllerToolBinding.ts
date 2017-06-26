@@ -3,12 +3,12 @@ module feng3d.editor
     export class Object3DTransformBinding
     {
 
-        protected _source: GameObject;
-        protected _target: GameObject;
+        protected _source: Transform;
+        protected _target: Transform;
         protected _sourceChanging = false;
         protected _targetChanging = false;
 
-        constructor(source: GameObject)
+        constructor(source: Transform)
         {
             this._source = source;
         }
@@ -58,12 +58,12 @@ module feng3d.editor
 
         protected doSourceTransformChanged()
         {
-            this._target.transform = this._source.transform;
+            this._target.matrix3d = this._source.matrix3d;
         }
 
         protected doTargetTransformChanged()
         {
-            this._source.transform = this._target.transform;
+            this._source.matrix3d = this._target.matrix3d;
         }
     }
 
@@ -71,12 +71,12 @@ module feng3d.editor
     {
         protected doSourceTransformChanged()
         {
-            this._target.sceneTransform = this._source.sceneTransform;
+            this._target.localToWorldMatrix = this._source.localToWorldMatrix;
         }
 
         protected doTargetTransformChanged()
         {
-            this._source.sceneTransform = this._target.sceneTransform;
+            this._source.localToWorldMatrix = this._target.localToWorldMatrix;
         }
     }
 
@@ -84,26 +84,26 @@ module feng3d.editor
     {
         protected doSourceTransformChanged()
         {
-            var targetVec = this._target.sceneTransform.decompose();
-            var sourceVec = this._source.sceneTransform.decompose();
+            var targetVec = this._target.localToWorldMatrix.decompose();
+            var sourceVec = this._source.localToWorldMatrix.decompose();
             //
             targetVec[0] = sourceVec[0];
             targetVec[1] = sourceVec[1];
             //
             tempMatrix3D.recompose(targetVec);
-            this._target.sceneTransform = tempMatrix3D;
+            this._target.localToWorldMatrix = tempMatrix3D;
         }
 
         protected doTargetTransformChanged()
         {
-            var targetVec = this._target.sceneTransform.decompose();
-            var sourceVec = this._source.sceneTransform.decompose();
+            var targetVec = this._target.localToWorldMatrix.decompose();
+            var sourceVec = this._source.localToWorldMatrix.decompose();
             //
             sourceVec[0] = targetVec[0];
             sourceVec[1] = targetVec[1];
             //
             tempMatrix3D.recompose(sourceVec);
-            this._source.sceneTransform = tempMatrix3D;
+            this._source.localToWorldMatrix = tempMatrix3D;
         }
     }
 
@@ -111,13 +111,13 @@ module feng3d.editor
     {
         protected doSourceTransformChanged()
         {
-            var targetVec = this._target.sceneTransform.decompose();
-            var sourceVec = this._source.sceneTransform.decompose();
+            var targetVec = this._target.localToWorldMatrix.decompose();
+            var sourceVec = this._source.localToWorldMatrix.decompose();
             //
             targetVec[0] = sourceVec[0];
             //
             tempMatrix3D.recompose(targetVec);
-            this._target.sceneTransform = tempMatrix3D;
+            this._target.localToWorldMatrix = tempMatrix3D;
         }
     }
 
@@ -125,13 +125,13 @@ module feng3d.editor
     {
         protected doSourceTransformChanged()
         {
-            var targetVec = this._target.sceneTransform.decompose();
-            var sourceVec = this._source.sceneTransform.decompose();
+            var targetVec = this._target.localToWorldMatrix.decompose();
+            var sourceVec = this._source.localToWorldMatrix.decompose();
             //
             targetVec[1] = sourceVec[1];
             //
             tempMatrix3D.recompose(targetVec);
-            this._target.sceneTransform = tempMatrix3D;
+            this._target.localToWorldMatrix = tempMatrix3D;
         }
     }
 

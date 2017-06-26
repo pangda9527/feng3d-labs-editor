@@ -18,18 +18,18 @@ module feng3d.editor
         private initModels()
         {
             this.xCube = new CoordinateScaleCube(new Color(1, 0, 0));
-            this.xCube.rotationZ = -90;
-            this.addChild(this.xCube);
+            this.xCube.transform.rotationZ = -90;
+            this.transform.addChild(this.xCube.transform);
 
             this.yCube = new CoordinateScaleCube(new Color(0, 1, 0));
-            this.addChild(this.yCube);
+            this.transform.addChild(this.yCube.transform);
 
             this.zCube = new CoordinateScaleCube(new Color(0, 0, 1));
-            this.zCube.rotationX = 90;
-            this.addChild(this.zCube);
+            this.zCube.transform.rotationX = 90;
+            this.transform.addChild(this.zCube.transform);
 
             this.oCube = new CoordinateCube();
-            this.addChild(this.oCube);
+            this.transform.addChild(this.oCube.transform);
         }
     }
 
@@ -56,19 +56,19 @@ module feng3d.editor
             this.color = color;
 
             var xLine = new GameObject();
-            var model = new Model();
-            model.material = new SegmentMaterial();
-            this.segmentGeometry = model.geometry = new SegmentGeometry();
-            xLine.addComponent(model);
-            this.addChild(xLine);
+            xLine.addComponent(MeshRenderer).material = new SegmentMaterial();
+            this.segmentGeometry = xLine.addComponent(MeshFilter).mesh = new SegmentGeometry();
+            this.transform.addChild(xLine.transform);
             this.coordinateCube = new CoordinateCube(this.color, this.selectedColor);
-            this.addChild(this.coordinateCube);
+            this.transform.addChild(this.coordinateCube.transform);
 
-            var mouseHit = new CylinderObject3D("hit", 5, 5, this.length - 4);
-            mouseHit.y = 4 + (this.length - 4) / 2;
-            mouseHit.visible = false;
-            mouseHit.mouseEnabled = true;
-            this.addChild(mouseHit);
+            var mouseHit = new GameObject("hit");
+            mouseHit.addComponent(MeshFilter).mesh = new CylinderGeometry(5, 5, this.length - 4);
+            mouseHit.addComponent(MeshRenderer);
+            mouseHit.transform.y = 4 + (this.length - 4) / 2;
+            mouseHit.transform.visible = false;
+            mouseHit.transform.mouseEnabled = true;
+            this.transform.addChild(mouseHit.transform);
 
             this.update();
         }
@@ -81,7 +81,7 @@ module feng3d.editor
             this.segmentGeometry.addSegment(segment);
 
             //
-            this.coordinateCube.y = this.length * this._scale;
+            this.coordinateCube.transform.y = this.length * this._scale;
             this.coordinateCube.selected = this.selected;
         }
     }

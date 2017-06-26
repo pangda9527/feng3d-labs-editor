@@ -4,14 +4,14 @@ module feng3d.editor
     {
         public rootNode: HierarchyNode;
 
-        private nodeMap = new Map<GameObject, HierarchyNode>();
+        private nodeMap = new Map<Transform, HierarchyNode>();
 
         public get selectedNode()
         {
             return this.nodeMap.get(editor3DData.selectedObject3D);
         }
 
-        constructor(rootObject3D: GameObject)
+        constructor(rootObject3D: Transform)
         {
             this.rootNode = this.getNode(rootObject3D);
             this.rootNode.depth = -1;
@@ -27,7 +27,7 @@ module feng3d.editor
         /**
          * 获取节点
          */
-        public getNode(object3D: GameObject)
+        public getNode(object3D: Transform)
         {
             if (object3D == null)
                 return null;
@@ -40,7 +40,7 @@ module feng3d.editor
             return node;
         }
 
-        public addObject3D(object3D: GameObject, parentNode: HierarchyNode = null, allChildren = false)
+        public addObject3D(object3D: Transform, parentNode: HierarchyNode = null, allChildren = false)
         {
             var node = this.getNode(object3D);
             if (parentNode)
@@ -53,16 +53,16 @@ module feng3d.editor
             object3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
             if (allChildren)
             {
-                for (var i = 0; i < object3D.numChildren; i++)
+                for (var i = 0; i < object3D.childCount; i++)
                 {
-                    this.addObject3D(object3D.getChildAt(i) as GameObject, node, true);
+                    this.addObject3D(object3D.getChildAt(i) as Transform, node, true);
                 }
             }
         }
 
         private onMouseClick(event: Mouse3DEvent)
         {
-            var object3D: GameObject = <GameObject>event.currentTarget;
+            var object3D = <Transform>event.currentTarget;
             editor3DData.selectedObject3D = object3D;
             event.isStopBubbles = true;
         }
@@ -72,6 +72,8 @@ module feng3d.editor
             try
             {
                 var className = event.data.className;
+                GameObjectFactory.create(event.data.label);
+
                 var cls = ClassUtils.getDefinitionByName(className);
                 var createdObject = new cls();
                 if (createdObject)
@@ -98,15 +100,14 @@ module feng3d.editor
 
         public resetScene(scene: Scene3D)
         {
-            for (var i = 0; i < scene.numChildren; i++)
+            for (var i = 0; i < scene.childCount; i++)
             {
-                this.addObject3D(scene.getChildAt(i) as GameObject, null, true);
+                this.addObject3D(scene.getChildAt(i) as Transform, null, true);
             }
         }
 
         private onImport()
         {
-
             var fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.style.display = 'none';
@@ -148,9 +149,7 @@ module feng3d.editor
 
                         editor3DData.hierarchy.resetScene(scene);
                     }
-
                 }
-
 
                 reader.readAsBinaryString(file);
             });
@@ -200,12 +199,16 @@ module feng3d.editor
         public static readonly REMOVED = "removed";
         public static readonly OPEN_CHANGED = "openChanged";
 
-        public object3D: GameObject;
+        public object3D: Transform;
         public label: string;
         public depth: number = 0;
         public isOpen: boolean = true;
         public hasChildren: boolean;
 
+        public get uuid()
+        {
+            return this._uuid;
+        }
 
         /** 
          * 父节点
@@ -216,11 +219,12 @@ module feng3d.editor
          */
         public children: HierarchyNode[] = [];
 
-        constructor(object3D: GameObject)
+        constructor(object3D: Transform)
         {
             super();
             this.object3D = object3D;
             this.label = object3D.name;
+            this._uuid = Math.generateUUID();
 
             Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
         }
@@ -301,5 +305,10 @@ module feng3d.editor
         {
             this.dispatchEvent(new Event(HierarchyNode.OPEN_CHANGED, this, true));
         }
+
+        //------------------------------------------
+        // Private Properties
+        //------------------------------------------
+        private _uuid: string;
     }
 }

@@ -16,7 +16,7 @@ module feng3d.editor
         {
             super();
 
-            this.object3DControllerToolBingding = new Object3DMoveBinding(this);
+            this.object3DControllerToolBingding = new Object3DMoveBinding(this.transform);
 
             this.toolModel = new Object3DMoveModel();
         }
@@ -49,7 +49,7 @@ module feng3d.editor
         {
             super.onItemMouseDown(event);
             //全局矩阵
-            var globalMatrix3D = this.sceneTransform;
+            var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
             var po = globalMatrix3D.transformVector(new Vector3D(0, 0, 0));
             var px = globalMatrix3D.transformVector(new Vector3D(1, 0, 0));
@@ -60,7 +60,7 @@ module feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.cameraObject3D.sceneTransform;
+            var cameraSceneTransform = editor3DData.cameraObject3D.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             //
@@ -98,7 +98,7 @@ module feng3d.editor
             //
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
-            this.startPos = this.toolModel.getPosition();
+            this.startPos = this.toolModel.transform.getPosition();
             this.bindingObject3D.startTranslation();
             //
             input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
@@ -134,17 +134,17 @@ module feng3d.editor
             //鼠标按下时不更新
             if (this.ismouseDown)
                 return;
-            var cameraPos = editor3DData.cameraObject3D.scenePosition;
-            var localCameraPos = this.toolModel.inverseSceneTransform.transformVector(cameraPos);
+            var cameraPos = editor3DData.cameraObject3D.transform.scenePosition;
+            var localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformVector(cameraPos);
 
-            this.toolModel.xyPlane.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
-            this.toolModel.xyPlane.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;
+            this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
+            this.toolModel.xyPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;
 
-            this.toolModel.xzPlane.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xzPlane.width;
-            this.toolModel.xzPlane.z = localCameraPos.z > 0 ? 0 : -this.toolModel.xzPlane.width;
+            this.toolModel.xzPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xzPlane.width;
+            this.toolModel.xzPlane.transform.z = localCameraPos.z > 0 ? 0 : -this.toolModel.xzPlane.width;
 
-            this.toolModel.yzPlane.y = localCameraPos.y > 0 ? 0 : -this.toolModel.yzPlane.width;
-            this.toolModel.yzPlane.z = localCameraPos.z > 0 ? 0 : -this.toolModel.yzPlane.width;
+            this.toolModel.yzPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.yzPlane.width;
+            this.toolModel.yzPlane.transform.z = localCameraPos.z > 0 ? 0 : -this.toolModel.yzPlane.width;
         }
     }
 }

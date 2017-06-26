@@ -17,7 +17,7 @@ module feng3d.editor
         constructor()
         {
             super();
-            this.holdSize = 1;
+            this.transform.holdSize = 1;
 
             this.addEventListener(Scene3DEvent.ADDED_TO_SCENE, this.onAddedToScene, this);
             this.addEventListener(Scene3DEvent.REMOVED_FROM_SCENE, this.onRemovedFromScene, this);
@@ -48,11 +48,11 @@ module feng3d.editor
         protected set toolModel(value)
         {
             if (this._toolModel)
-                this.removeChild(this._toolModel);
+                this.transform.removeChild(this._toolModel.transform);
             this._toolModel = value;;
             if (this._toolModel)
             {
-                this.addChild(this._toolModel);
+                this.transform.addChild(this._toolModel.transform);
             }
         }
 
@@ -79,7 +79,7 @@ module feng3d.editor
 
         public set bindingObject3D(value)
         {
-            this.object3DControllerToolBingding.target = value;
+            this.object3DControllerToolBingding.target = value.transform;
         }
 
         protected updateToolModel()

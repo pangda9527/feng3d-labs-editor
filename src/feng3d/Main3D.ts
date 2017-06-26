@@ -1,29 +1,24 @@
-module feng3d.editor
-{
+module feng3d.editor {
 
     /**
     * 编辑器3D入口
     * @author feng 2016-10-29
     */
-    export class Main3D
-    {
+    export class Main3D {
 
-        constructor()
-        {
+        constructor() {
             this.init();
             //
             ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
         }
 
-        private process(event: Event)
-        {
+        private process(event: Event) {
             editor3DData.mouseInView3D.copyFrom(editor3DData.view3D.mousePos);
             editor3DData.view3DRect.copyFrom(editor3DData.view3D.viewRect);
         }
 
-        private init()
-        {
-            var canvas = document.getElementById("glcanvas");
+        private init() {
+            var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
             var view3D = new feng3d.View3D(canvas);
             view3D.scene.background.fromUnit(0x666666);
 
@@ -34,17 +29,17 @@ module feng3d.editor
 
             //
             var camera = view3D.camera;
-            camera.z = -500;
-            camera.y = 300;
+            camera.transform.z = -500;
+            camera.transform.y = 300;
             camera.transform.lookAt(new Vector3D());
 
             var trident = new Trident();
-            view3D.scene.addChild(trident);
+            view3D.scene.addChild(trident.transform);
             serializationConfig.excludeObject.push(trident);
 
             //初始化模块
             var groundGrid = new GroundGrid();
-            view3D.scene.addChild(groundGrid);
+            view3D.scene.addChild(groundGrid.transform);
             serializationConfig.excludeObject.push(groundGrid);
 
             var object3DControllerTool = new Object3DControllerTool();

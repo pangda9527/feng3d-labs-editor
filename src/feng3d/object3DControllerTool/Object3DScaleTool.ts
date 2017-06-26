@@ -13,7 +13,7 @@ module feng3d.editor
         constructor()
         {
             super();
-            this.object3DControllerToolBingding = new Object3DScaleBinding(this);
+            this.object3DControllerToolBingding = new Object3DScaleBinding(this.transform);
 
             this.toolModel = new Object3DScaleModel();
         }
@@ -42,7 +42,7 @@ module feng3d.editor
         {
             super.onItemMouseDown(event);
             //全局矩阵
-            var globalMatrix3D = this.sceneTransform;
+            var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
             var po = globalMatrix3D.transformVector(new Vector3D(0, 0, 0));
             var px = globalMatrix3D.transformVector(new Vector3D(1, 0, 0));
@@ -53,7 +53,7 @@ module feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.cameraObject3D.sceneTransform;
+            var cameraSceneTransform = editor3DData.cameraObject3D.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             switch (this.selectedItem)

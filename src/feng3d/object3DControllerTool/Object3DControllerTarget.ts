@@ -3,18 +3,18 @@ module feng3d.editor
 
     export class Object3DControllerTarget extends GameObject
     {
-        private _controllerTargets: GameObject[];
+        private _controllerTargets: Transform[];
         private startGlobalMatrixVec: Matrix3D[] = [];
         private startScaleVec: Vector3D[] = [];
 
-        private controllerImage: GameObject = new GameObject();
+        private controllerImage: Transform = new Transform();
         private startControllerImageGlobalMatrix3D: Matrix3D;
 
         private isWoldCoordinate = false;
         private isBaryCenter = false;
 
         //
-        private _showObject3D = new GameObject();
+        private _showObject3D = new Transform();
         private controllerBindingShowTarget: Object3DTransformBinding;
         private controllerBinding: Object3DSceneTransformBinding;
         private targetBindings: Object3DTransformBinding[] = [];
@@ -23,11 +23,11 @@ module feng3d.editor
         {
             super();
             this.controllerBindingShowTarget = new Object3DTransformBinding(this._showObject3D);
-            this.controllerBinding = new Object3DSceneTransformBinding(this);
+            this.controllerBinding = new Object3DSceneTransformBinding(this.transform);
             serializationConfig.excludeObject.push(this.controllerImage);
         }
 
-        public set controllerTargets(value: GameObject[])
+        public set controllerTargets(value: Transform[])
         {
             if (this._controllerTargets && this._controllerTargets.length > 0)
             {
@@ -37,7 +37,7 @@ module feng3d.editor
                 {
                     this.controllerImage.parent.removeChild(this.controllerImage);
                 }
-                this.controllerImage.sceneTransform = new Matrix3D();
+                this.controllerImage.localToWorldMatrix = new Matrix3D();
             }
             this._controllerTargets = value;
             if (this._controllerTargets && this._controllerTargets.length > 0)
@@ -64,7 +64,7 @@ module feng3d.editor
                 }
                 position.scaleBy(1 / this._controllerTargets.length);
             }
-            var vec = object3D.sceneTransform.decompose();
+            var vec = object3D.localToWorldMatrix.decompose();
             vec[0] = position;
             vec[2].setTo(1, 1, 1);
             if (this.isWoldCoordinate)
@@ -72,14 +72,14 @@ module feng3d.editor
                 vec[1].setTo(0, 0, 0);
             }
             tempGlobalMatrix.recompose(vec);
-            this.controllerImage.sceneTransform = tempGlobalMatrix;
+            this.controllerImage.localToWorldMatrix = tempGlobalMatrix;
         }
 
         public startTranslation()
         {
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                this.startGlobalMatrixVec[i] = this._controllerTargets[i].sceneTransform.clone();
+                this.startGlobalMatrixVec[i] = this._controllerTargets[i].localToWorldMatrix.clone();
             }
         }
 
@@ -91,7 +91,7 @@ module feng3d.editor
             {
                 tempGlobalMatrix.copyFrom(this.startGlobalMatrixVec[i]);
                 tempGlobalMatrix.appendTranslation(addPos.x, addPos.y, addPos.z);
-                this._controllerTargets[i].sceneTransform = tempGlobalMatrix;
+                this._controllerTargets[i].localToWorldMatrix = tempGlobalMatrix;
             }
         }
 
@@ -102,10 +102,10 @@ module feng3d.editor
 
         public startRotate()
         {
-            this.startControllerImageGlobalMatrix3D = this.controllerImage.sceneTransform.clone();
+            this.startControllerImageGlobalMatrix3D = this.controllerImage.localToWorldMatrix.clone();
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                this.startGlobalMatrixVec[i] = this._controllerTargets[i].sceneTransform.clone();
+                this.startGlobalMatrixVec[i] = this._controllerTargets[i].localToWorldMatrix.clone();
             }
         }
 
@@ -133,7 +133,7 @@ module feng3d.editor
                         tempGlobalMatrix.appendRotation(angle, normal, this.startControllerImageGlobalMatrix3D.position);
                     }
                 }
-                this._controllerTargets[i].sceneTransform = tempGlobalMatrix;
+                this._controllerTargets[i].localToWorldMatrix = tempGlobalMatrix;
             }
         }
 
@@ -165,7 +165,7 @@ module feng3d.editor
                         tempGlobalMatrix.appendRotation(angle2, normal2, this.startControllerImageGlobalMatrix3D.position);
                     }
                 }
-                this._controllerTargets[i].sceneTransform = tempGlobalMatrix;
+                this._controllerTargets[i].localToWorldMatrix = tempGlobalMatrix;
             }
         }
 

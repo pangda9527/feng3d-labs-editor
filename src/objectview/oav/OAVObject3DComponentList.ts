@@ -2,7 +2,7 @@ module feng3d.editor
 {
 	export class OAVObject3DComponentList extends eui.Component implements IObjectAttributeView
 	{
-		private _space: Object;
+		private _space: GameObject;
 		private _attributeName: string;
 		private _attributeType: string;
 		private attributeViewInfo: AttributeViewInfo;
@@ -15,7 +15,7 @@ module feng3d.editor
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
 			super();
-			this._space = attributeViewInfo.owner;
+			this._space = <GameObject>attributeViewInfo.owner;
 			this._attributeName = attributeViewInfo.name;
 			this._attributeType = attributeViewInfo.type;
 			this.attributeViewInfo = attributeViewInfo;
@@ -39,18 +39,17 @@ module feng3d.editor
 		private onCreateComponent(item)
 		{
 			var cls = ClassUtils.getDefinitionByName(item.className);
-			var component = new cls();
-			this.space.addComponent(component);
+			this.space.addComponent(cls);
 
 			this.updateView();
 		}
 
-		public get space(): Object3D
+		public get space()
 		{
-			return <Object3D>this._space;
+			return this._space;
 		}
 
-		public set space(value: Object3D)
+		public set space(value)
 		{
 			this._space = value;
 			this.updateView();

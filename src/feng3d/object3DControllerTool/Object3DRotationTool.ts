@@ -10,7 +10,7 @@ module feng3d.editor
         {
             super();
 
-            this.object3DControllerToolBingding = new Object3DRotationBinding(this);
+            this.object3DControllerToolBingding = new Object3DRotationBinding(this.transform);
 
             this.toolModel = new Object3DRotationModel();
         }
@@ -42,14 +42,14 @@ module feng3d.editor
             super.onItemMouseDown(event);
 
             //全局矩阵
-            var globalMatrix3D = this.sceneTransform;
+            var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
             var pos = globalMatrix3D.position;
             var xDir = globalMatrix3D.right;
             var yDir = globalMatrix3D.up;
             var zDir = globalMatrix3D.forward;
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.cameraObject3D.sceneTransform;
+            var cameraSceneTransform = editor3DData.cameraObject3D.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.position;
             this.movePlane3D = new Plane3D();
@@ -111,7 +111,7 @@ module feng3d.editor
                 case this.toolModel.freeAxis:
                     var endPoint = editor3DData.mouseInView3D.clone();
                     var offset = endPoint.subtract(this.startMousePos);
-                    var cameraSceneTransform = editor3DData.cameraObject3D.sceneTransform;
+                    var cameraSceneTransform = editor3DData.cameraObject3D.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
                     this.bindingObject3D.rotate2(-offset.y, right, -offset.x, up);
@@ -140,7 +140,7 @@ module feng3d.editor
 
         protected updateToolModel()
         {
-            var cameraSceneTransform = editor3DData.cameraObject3D.sceneTransform.clone();
+            var cameraSceneTransform = editor3DData.cameraObject3D.transform.localToWorldMatrix.clone();
             var cameraDir = cameraSceneTransform.forward;
             cameraDir.negate();
             //
@@ -152,11 +152,11 @@ module feng3d.editor
             }
             //朝向摄像机
             var temp = cameraSceneTransform.clone();
-            temp.append(this.toolModel.inverseSceneTransform);
+            temp.append(this.toolModel.transform.worldToLocalMatrix);
             var rotation = temp.decompose()[1];
             rotation.scaleBy(MathConsts.RADIANS_TO_DEGREES);
-            this.toolModel.freeAxis.setRotation(rotation.x, rotation.y, rotation.z);
-            this.toolModel.cameraAxis.setRotation(rotation.x, rotation.y, rotation.z);
+            this.toolModel.freeAxis.transform.setRotation(rotation.x, rotation.y, rotation.z);
+            this.toolModel.cameraAxis.transform.setRotation(rotation.x, rotation.y, rotation.z);
         }
     }
 }

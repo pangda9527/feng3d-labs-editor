@@ -15,7 +15,7 @@ module feng3d.editor
 			this.skinName = "CreateObject3DViewSkin";
 		}
 
-		public showView(data: { label: string; }[], selectedCallBack: (item: { label: string; }) => void, globalPoint: Point = null)
+		public showView(data: { label: string; }[], selectedCallBack: (item: { label: string; }) => void, globalPoint: { x: number, y: number } = null)
 		{
 			this._dataProvider.replaceAll(data.concat());
 			this._selectedCallBack = selectedCallBack;

@@ -41,12 +41,12 @@ module feng3d.editor
             if (editor3DData.selectedObject3D)
             {
                 this.object3DControllerTarget.controllerTargets = [editor3DData.selectedObject3D];
-                editor3DData.scene3D.addChild(this);
+                editor3DData.scene3D.addChild(this.transform);
             }
             else
             {
                 this.object3DControllerTarget.controllerTargets = null;
-                editor3DData.scene3D.removeChild(this);
+                editor3DData.scene3D.removeChild(this.transform);
             }
         }
 
@@ -89,12 +89,12 @@ module feng3d.editor
                 return;
             if (this._currentTool)
             {
-                this.removeChild(this._currentTool)
+                this.transform.removeChild(this._currentTool.transform)
             }
             this._currentTool = value;
             if (this._currentTool)
             {
-                this.addChild(this._currentTool);
+                this.transform.addChild(this._currentTool.transform);
             }
         }
     }

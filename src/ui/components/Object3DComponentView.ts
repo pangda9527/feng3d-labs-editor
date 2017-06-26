@@ -2,7 +2,7 @@ module feng3d.editor
 {
 	export class Object3DComponentView extends eui.Component
 	{
-		public component: Object3DComponent;
+		public component: Component;
 
 		//
 		public accordion: feng3d.editor.Accordion;
@@ -11,7 +11,7 @@ module feng3d.editor
 		/**
 		 * 对象界面数据
 		 */
-		constructor(component: Object3DComponent)
+		constructor(component: Component)
 		{
 			super();
 			this.component = component;

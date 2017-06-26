@@ -1,4 +1,4 @@
-# feng3d-editor
+# editor
 
 ## 实现功能
 
@@ -6,4 +6,4 @@
 
 编辑器链接：http://www.feng3d.com/editor/index.html
 
-源码链接：https://github.com/feng3d-labs/feng3d-editor
+源码链接：https://github.com/feng3d-labs/editor
