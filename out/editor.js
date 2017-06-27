@@ -1391,7 +1391,7 @@ var feng3d;
             };
             HierarchyView.prototype.onListChange = function () {
                 var node = this.list.selectedItem;
-                editor.editor3DData.selectedObject3D = node.object3D;
+                editor.editor3DData.selectedObject3D = node.object3D.gameObject;
             };
             HierarchyView.prototype.onHierarchyNodeAdded = function (event) {
                 var nodes = editor.editor3DData.hierarchy.rootNode.getShowNodes();
@@ -1403,7 +1403,7 @@ var feng3d;
                 this.list.selectedItem = editor.editor3DData.hierarchy.selectedNode;
             };
             HierarchyView.prototype.selectedObject3DChanged = function () {
-                var node = editor.editor3DData.hierarchy.getNode(editor.editor3DData.selectedObject3D);
+                var node = editor.editor3DData.hierarchy.getNode(editor.editor3DData.selectedObject3D ? editor.editor3DData.selectedObject3D.transform : null);
                 this.list.selectedIndex = this.listData.getItemIndex(node);
             };
             HierarchyView.prototype.onAddButtonClick = function () {
@@ -1871,13 +1871,13 @@ var feng3d;
                 var _this = _super.call(this) || this;
                 _this.startGlobalMatrixVec = [];
                 _this.startScaleVec = [];
-                _this.controllerImage = new feng3d.Transform();
+                _this.controllerImage = new feng3d.GameObject();
                 _this.isWoldCoordinate = false;
                 _this.isBaryCenter = false;
                 //
-                _this._showObject3D = new feng3d.Transform();
+                _this._showObject3D = new feng3d.GameObject();
                 _this.targetBindings = [];
-                _this.controllerBindingShowTarget = new editor.Object3DTransformBinding(_this._showObject3D);
+                _this.controllerBindingShowTarget = new editor.Object3DTransformBinding(_this._showObject3D.transform);
                 _this.controllerBinding = new editor.Object3DSceneTransformBinding(_this.transform);
                 feng3d.serializationConfig.excludeObject.push(_this.controllerImage);
                 return _this;
@@ -1887,17 +1887,17 @@ var feng3d;
                     if (this._controllerTargets && this._controllerTargets.length > 0) {
                         this.controllerBindingShowTarget.target = null;
                         this.targetBindings.length = 0;
-                        if (this.controllerImage.parent) {
-                            this.controllerImage.parent.removeChild(this.controllerImage);
+                        if (this.controllerImage.transform.parent) {
+                            this.controllerImage.transform.parent.removeChild(this.controllerImage.transform);
                         }
-                        this.controllerImage.localToWorldMatrix = new feng3d.Matrix3D();
+                        this.controllerImage.transform.localToWorldMatrix = new feng3d.Matrix3D();
                     }
                     this._controllerTargets = value;
                     if (this._controllerTargets && this._controllerTargets.length > 0) {
                         this.controllerBindingShowTarget.target = this._controllerTargets[0];
-                        this._controllerTargets[0].addChild(this.controllerImage);
+                        this._controllerTargets[0].addChild(this.controllerImage.transform);
                         this.updateControllerImage();
-                        this.controllerBinding.target = this.controllerImage;
+                        this.controllerBinding.target = this.controllerImage.transform;
                     }
                 },
                 enumerable: true,
@@ -1922,7 +1922,7 @@ var feng3d;
                     vec[1].setTo(0, 0, 0);
                 }
                 tempGlobalMatrix.recompose(vec);
-                this.controllerImage.localToWorldMatrix = tempGlobalMatrix;
+                this.controllerImage.transform.localToWorldMatrix = tempGlobalMatrix;
             };
             Object3DControllerTarget.prototype.startTranslation = function () {
                 for (var i = 0; i < this._controllerTargets.length; i++) {
@@ -1942,7 +1942,7 @@ var feng3d;
                 this.startGlobalMatrixVec.length = 0;
             };
             Object3DControllerTarget.prototype.startRotate = function () {
-                this.startControllerImageGlobalMatrix3D = this.controllerImage.localToWorldMatrix.clone();
+                this.startControllerImageGlobalMatrix3D = this.controllerImage.transform.localToWorldMatrix.clone();
                 for (var i = 0; i < this._controllerTargets.length; i++) {
                     this.startGlobalMatrixVec[i] = this._controllerTargets[i].localToWorldMatrix.clone();
                 }
@@ -2180,14 +2180,17 @@ var feng3d;
                 return _this;
             }
             Object3DMoveModel.prototype.initModels = function () {
-                this.xAxis = new CoordinateAxis(new feng3d.Color(1, 0, 0));
-                this.xAxis.transform.rotationZ = -90;
-                this.transform.addChild(this.xAxis.transform);
-                this.yAxis = new CoordinateAxis(new feng3d.Color(0, 1, 0));
-                this.transform.addChild(this.yAxis.transform);
-                this.zAxis = new CoordinateAxis(new feng3d.Color(0, 0, 1));
-                this.zAxis.transform.rotationX = 90;
-                this.transform.addChild(this.zAxis.transform);
+                var xAxis = new feng3d.GameObject("xAxis");
+                xAxis.addComponent(CoordinateAxis).color.setTo(1, 0, 0);
+                xAxis.transform.rotationZ = -90;
+                this.transform.addChild(xAxis.transform);
+                var yAxis = new feng3d.GameObject("yAxis");
+                yAxis.addComponent(CoordinateAxis).color.setTo(0, 1, 0);
+                this.transform.addChild(yAxis.transform);
+                var zAxis = new feng3d.GameObject("zAxis");
+                zAxis.addComponent(CoordinateAxis).color.setTo(0, 0, 1);
+                zAxis.transform.rotationX = 90;
+                this.transform.addChild(zAxis.transform);
                 this.yzPlane = new CoordinatePlane(new feng3d.Color(1, 0, 0, 0.2), new feng3d.Color(1, 0, 0, 0.5), new feng3d.Color(1, 0, 0));
                 this.yzPlane.transform.rotationZ = 90;
                 this.transform.addChild(this.yzPlane.transform);
@@ -2204,13 +2207,12 @@ var feng3d;
         editor.Object3DMoveModel = Object3DMoveModel;
         var CoordinateAxis = (function (_super) {
             __extends(CoordinateAxis, _super);
-            function CoordinateAxis(color) {
-                if (color === void 0) { color = new feng3d.Color(1, 0, 0); }
-                var _this = _super.call(this) || this;
+            function CoordinateAxis(gameObject) {
+                var _this = _super.call(this, gameObject) || this;
+                _this.color = new feng3d.Color(1, 0, 0);
                 _this.selectedColor = new feng3d.Color(1, 1, 0);
                 _this.length = 100;
                 _this._selected = false;
-                _this.color = color;
                 var xLine = new feng3d.GameObject();
                 _this.segmentGeometry = xLine.addComponent(feng3d.MeshFilter).mesh = new feng3d.SegmentGeometry();
                 xLine.addComponent(feng3d.MeshRenderer).material = new feng3d.SegmentMaterial();
@@ -2247,7 +2249,7 @@ var feng3d;
                 this.material.color = this.selected ? this.selectedColor : this.color;
             };
             return CoordinateAxis;
-        }(feng3d.GameObject));
+        }(feng3d.Component));
         editor.CoordinateAxis = CoordinateAxis;
         var CoordinateCube = (function (_super) {
             __extends(CoordinateCube, _super);
@@ -2749,7 +2751,7 @@ var feng3d;
                 this.startSceneTransform = null;
             };
             Object3DControllerToolBase.prototype.onItemMouseDown = function (event) {
-                this.selectedItem = event.currentTarget;
+                this.selectedItem = event.target;
             };
             Object3DControllerToolBase.prototype.onScenetransformChanged = function () {
                 this.updateToolModel();
@@ -2798,23 +2800,11 @@ var feng3d;
             }
             Object3DMoveTool.prototype.onAddedToScene = function () {
                 _super.prototype.onAddedToScene.call(this);
-                this.toolModel.xAxis.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yAxis.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.zAxis.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yzPlane.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.xzPlane.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.xyPlane.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.oCube.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                this.toolModel.transform.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             };
             Object3DMoveTool.prototype.onRemovedFromScene = function () {
                 _super.prototype.onRemovedFromScene.call(this);
-                this.toolModel.xAxis.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yAxis.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.zAxis.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yzPlane.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.xzPlane.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.xyPlane.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.oCube.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                this.toolModel.transform.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             };
             Object3DMoveTool.prototype.onItemMouseDown = function (event) {
                 _super.prototype.onItemMouseDown.call(this, event);
@@ -2833,33 +2823,35 @@ var feng3d;
                 var cameraSceneTransform = editor.editor3DData.cameraObject3D.transform.localToWorldMatrix;
                 var cameraDir = cameraSceneTransform.forward;
                 this.movePlane3D = new feng3d.Plane3D();
+                var selectedTransform = event.target;
                 //
-                switch (this.selectedItem) {
-                    case this.toolModel.xAxis:
+                // switch (this.selectedItem)
+                switch (selectedTransform.gameObject.name) {
+                    case "xAxis":
                         this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
                         this.changeXYZ.setTo(1, 0, 0);
                         break;
-                    case this.toolModel.yAxis:
+                    case "yAxis":
                         this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
                         this.changeXYZ.setTo(0, 1, 0);
                         break;
-                    case this.toolModel.zAxis:
+                    case "zAxis":
                         this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
                         this.changeXYZ.setTo(0, 0, 1);
                         break;
-                    case this.toolModel.yzPlane:
+                    case "yzPlane":
                         this.movePlane3D.fromPoints(po, py, pz);
                         this.changeXYZ.setTo(0, 1, 1);
                         break;
-                    case this.toolModel.xzPlane:
+                    case "xzPlane":
                         this.movePlane3D.fromPoints(po, px, pz);
                         this.changeXYZ.setTo(1, 0, 1);
                         break;
-                    case this.toolModel.xyPlane:
+                    case "xyPlane":
                         this.movePlane3D.fromPoints(po, px, py);
                         this.changeXYZ.setTo(1, 1, 0);
                         break;
-                    case this.toolModel.oCube:
+                    case "oCube":
                         this.movePlane3D.fromNormalAndPoint(cameraDir, po);
                         this.changeXYZ.setTo(1, 1, 1);
                         break;
@@ -3193,12 +3185,12 @@ var feng3d;
             }
             Object3DControllerTool.prototype.onSelectedObject3DChange = function () {
                 if (editor.editor3DData.selectedObject3D) {
-                    this.object3DControllerTarget.controllerTargets = [editor.editor3DData.selectedObject3D];
-                    editor.editor3DData.scene3D.addChild(this.transform);
+                    this.object3DControllerTarget.controllerTargets = [editor.editor3DData.selectedObject3D.transform];
+                    editor.editor3DData.scene3D.transform.addChild(this.transform);
                 }
                 else {
                     this.object3DControllerTarget.controllerTargets = null;
-                    editor.editor3DData.scene3D.removeChild(this.transform);
+                    editor.editor3DData.scene3D.transform.removeChild(this.transform);
                 }
             };
             Object3DControllerTool.prototype.onObject3DOperationIDChange = function () {
@@ -3250,8 +3242,11 @@ var feng3d;
         var Hierarchy = (function () {
             function Hierarchy(rootObject3D) {
                 this.nodeMap = new feng3d.Map();
-                this.rootNode = this.getNode(rootObject3D);
+                this.rootNode = new HierarchyNode(rootObject3D);
                 this.rootNode.depth = -1;
+                this.nodeMap.push(rootObject3D, this.rootNode);
+                //
+                rootObject3D.addEventListener(feng3d.Mouse3DEvent.CLICK, this.onMouseClick, this);
                 editor.$editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
                 editor.$editorEventDispatcher.addEventListener("saveScene", this.onSaveScene, this);
                 editor.$editorEventDispatcher.addEventListener("import", this.onImport, this);
@@ -3260,7 +3255,7 @@ var feng3d;
             }
             Object.defineProperty(Hierarchy.prototype, "selectedNode", {
                 get: function () {
-                    return this.nodeMap.get(editor.editor3DData.selectedObject3D);
+                    return this.nodeMap.get(editor.editor3DData.selectedObject3D.transform);
                 },
                 enumerable: true,
                 configurable: true
@@ -3269,63 +3264,60 @@ var feng3d;
              * 获取节点
              */
             Hierarchy.prototype.getNode = function (object3D) {
-                if (object3D == null)
-                    return null;
                 var node = this.nodeMap.get(object3D);
-                if (!node) {
-                    node = new HierarchyNode(object3D);
-                    this.nodeMap.push(object3D, node);
-                }
                 return node;
             };
             Hierarchy.prototype.addObject3D = function (object3D, parentNode, allChildren) {
                 if (parentNode === void 0) { parentNode = null; }
                 if (allChildren === void 0) { allChildren = false; }
-                var node = this.getNode(object3D);
+                var node = new HierarchyNode(object3D);
+                this.nodeMap.push(object3D, node);
                 if (parentNode) {
                     parentNode.addNode(node);
                 }
                 else {
                     this.rootNode.addNode(node);
                 }
-                object3D.addEventListener(feng3d.Mouse3DEvent.CLICK, this.onMouseClick, this);
                 if (allChildren) {
                     for (var i = 0; i < object3D.childCount; i++) {
                         this.addObject3D(object3D.getChildAt(i), node, true);
                     }
                 }
+                return node;
             };
             Hierarchy.prototype.onMouseClick = function (event) {
-                var object3D = event.currentTarget;
-                editor.editor3DData.selectedObject3D = object3D;
-                event.isStopBubbles = true;
+                var object3D = event.target;
+                var node = this.nodeMap.get(object3D);
+                while (!node && (object3D = object3D.parent))
+                    ;
+                {
+                    node = this.nodeMap.get(object3D);
+                }
+                if (node && object3D)
+                    editor.editor3DData.selectedObject3D = object3D.gameObject;
             };
             Hierarchy.prototype.onCreateObject3D = function (event) {
-                try {
-                    var className = event.data.className;
-                    feng3d.GameObjectFactory.create(event.data.label);
-                    var cls = feng3d.ClassUtils.getDefinitionByName(className);
-                    var createdObject = new cls();
-                    if (createdObject) {
-                        this.addObject3D(createdObject);
-                        editor.editor3DData.selectedObject3D = createdObject;
-                    }
+                var className = event.data.className;
+                var gameobject = feng3d.GameObjectFactory.create(event.data.label);
+                if (gameobject) {
+                    this.addObject3D(gameobject.transform);
+                    editor.editor3DData.selectedObject3D = gameobject;
                 }
-                catch (error) {
+                else {
                     console.error("\u65E0\u6CD5\u5B9E\u4F8B\u5316" + className + ",\u8BF7\u68C0\u67E5\u914D\u7F6E createObjectConfig");
                 }
             };
             Hierarchy.prototype.onDeleteSeletedObject3D = function () {
                 var selectedObject3D = editor.editor3DData.selectedObject3D;
                 if (selectedObject3D) {
-                    var node = this.nodeMap.get(selectedObject3D);
+                    var node = this.nodeMap.get(selectedObject3D.transform);
                     node.delete();
                 }
                 editor.editor3DData.selectedObject3D = null;
             };
             Hierarchy.prototype.resetScene = function (scene) {
-                for (var i = 0; i < scene.childCount; i++) {
-                    this.addObject3D(scene.getChildAt(i), null, true);
+                for (var i = 0; i < scene.transform.childCount; i++) {
+                    this.addObject3D(scene.transform.getChildAt(i), null, true);
                 }
             };
             Hierarchy.prototype.onImport = function () {
@@ -3524,7 +3516,7 @@ var feng3d;
                 this.rotateSceneCameraGlobalMatrix3D = editor.editor3DData.cameraObject3D.transform.localToWorldMatrix.clone();
                 this.rotateSceneCenter = null;
                 if (editor.editor3DData.selectedObject3D) {
-                    this.rotateSceneCenter = editor.editor3DData.selectedObject3D.scenePosition;
+                    this.rotateSceneCenter = editor.editor3DData.selectedObject3D.transform.scenePosition;
                 }
                 else {
                     this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
@@ -3550,7 +3542,7 @@ var feng3d;
                     config.lookDistance = config.defaultLookDistance;
                     var lookPos = cameraObject3D.transform.localToWorldMatrix.forward;
                     lookPos.scaleBy(-config.lookDistance);
-                    lookPos.incrementBy(selectedObject3D.scenePosition);
+                    lookPos.incrementBy(selectedObject3D.transform.scenePosition);
                     var localLookPos = cameraObject3D.transform.worldToLocalMatrix.transformVector(lookPos);
                     egret.Tween.get(editor.editor3DData.cameraObject3D).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
                 }
@@ -3589,6 +3581,7 @@ var feng3d;
             function GroundGrid() {
                 var _this = _super.call(this, "GroundGrid") || this;
                 _this.num = 100;
+                _this.transform.mouseEnabled = false;
                 _this.init();
                 return _this;
                 // editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
@@ -3651,23 +3644,60 @@ var feng3d;
                 editor.editor3DData.view3D = view3D;
                 editor.editor3DData.scene3D = view3D.scene;
                 editor.editor3DData.cameraObject3D = view3D.camera;
-                editor.editor3DData.hierarchy = new editor.Hierarchy(view3D.scene);
+                editor.editor3DData.hierarchy = new editor.Hierarchy(view3D.scene.transform);
                 //
                 var camera = view3D.camera;
                 camera.transform.z = -500;
                 camera.transform.y = 300;
                 camera.transform.lookAt(new feng3d.Vector3D());
-                var trident = new feng3d.Trident();
-                view3D.scene.addChild(trident.transform);
+                var trident = new feng3d.GameObject("Trident");
+                trident.addComponent(feng3d.Trident);
+                view3D.scene.transform.addChild(trident.transform);
                 feng3d.serializationConfig.excludeObject.push(trident);
                 //初始化模块
                 var groundGrid = new editor.GroundGrid();
-                view3D.scene.addChild(groundGrid.transform);
+                view3D.scene.transform.addChild(groundGrid.transform);
                 feng3d.serializationConfig.excludeObject.push(groundGrid);
                 var object3DControllerTool = new editor.Object3DControllerTool();
                 feng3d.serializationConfig.excludeObject.push(object3DControllerTool);
                 //
                 var sceneControl = new editor.SceneControl();
+                this.test();
+            };
+            Main3D.prototype.test = function () {
+                editor.editor3DData.scene3D.transform.addEventListener(feng3d.Mouse3DEvent.CLICK, function (event) {
+                    var transform = event.target;
+                    var names = [transform.gameObject.name];
+                    while (transform.parent) {
+                        transform = transform.parent;
+                        names.push(transform.gameObject.name);
+                    }
+                    console.log(event.type, names.reverse().join("->"));
+                }, this);
+                feng3d.input.addEventListener(feng3d.inputType.CLICK, function () {
+                    var gameobject = new feng3d.GameObject("test");
+                    gameobject.addComponent(feng3d.MeshRenderer).material = new feng3d.StandardMaterial();
+                    gameobject.addComponent(feng3d.MeshFilter).mesh = new feng3d.SphereGeometry(10);
+                    gameobject.transform.mouseEnabled = false;
+                    editor.editor3DData.scene3D.transform.addChild(gameobject.transform);
+                    var mouseRay3D = editor.editor3DData.view3D.getMouseRay3D();
+                    gameobject.transform.position = mouseRay3D.position;
+                    var direction = mouseRay3D.direction.clone();
+                    var num = 1000;
+                    var translate = function () {
+                        gameobject.transform.translate(direction, 15);
+                        if (num > 0) {
+                            setTimeout(function () {
+                                translate();
+                            }, 1000 / 60);
+                        }
+                        else {
+                            editor.editor3DData.scene3D.transform.removeChild(gameobject.transform);
+                        }
+                        num--;
+                    };
+                    translate();
+                }, this);
             };
             return Main3D;
         }());
@@ -3843,7 +3873,7 @@ var objectViewConfig = {
     ],
     classConfigVec: [
         {
-            name: "feng3d.Transform",
+            name: "feng3d.Transform1",
             component: "",
             componentParam: null,
             attributeDefinitionVec: [
@@ -3863,7 +3893,7 @@ var objectViewConfig = {
             blockDefinitionVec: []
         },
         {
-            name: "feng3d.Object3D",
+            name: "feng3d.Object3D1",
             component: "",
             componentParam: null,
             attributeDefinitionVec: [

@@ -102,7 +102,7 @@ module feng3d.editor
 
         protected onItemMouseDown(event: Event)
         {
-            this.selectedItem = <any>event.currentTarget;
+            this.selectedItem = <any>event.target;
         }
 
         protected onScenetransformChanged()

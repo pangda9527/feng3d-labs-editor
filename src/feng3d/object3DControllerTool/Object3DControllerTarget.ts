@@ -7,14 +7,14 @@ module feng3d.editor
         private startGlobalMatrixVec: Matrix3D[] = [];
         private startScaleVec: Vector3D[] = [];
 
-        private controllerImage: Transform = new Transform();
+        private controllerImage = new GameObject();
         private startControllerImageGlobalMatrix3D: Matrix3D;
 
         private isWoldCoordinate = false;
         private isBaryCenter = false;
 
         //
-        private _showObject3D = new Transform();
+        private _showObject3D = new GameObject();
         private controllerBindingShowTarget: Object3DTransformBinding;
         private controllerBinding: Object3DSceneTransformBinding;
         private targetBindings: Object3DTransformBinding[] = [];
@@ -22,7 +22,7 @@ module feng3d.editor
         constructor()
         {
             super();
-            this.controllerBindingShowTarget = new Object3DTransformBinding(this._showObject3D);
+            this.controllerBindingShowTarget = new Object3DTransformBinding(this._showObject3D.transform);
             this.controllerBinding = new Object3DSceneTransformBinding(this.transform);
             serializationConfig.excludeObject.push(this.controllerImage);
         }
@@ -33,19 +33,19 @@ module feng3d.editor
             {
                 this.controllerBindingShowTarget.target = null;
                 this.targetBindings.length = 0;
-                if (this.controllerImage.parent)
+                if (this.controllerImage.transform.parent)
                 {
-                    this.controllerImage.parent.removeChild(this.controllerImage);
+                    this.controllerImage.transform.parent.removeChild(this.controllerImage.transform);
                 }
-                this.controllerImage.localToWorldMatrix = new Matrix3D();
+                this.controllerImage.transform.localToWorldMatrix = new Matrix3D();
             }
             this._controllerTargets = value;
             if (this._controllerTargets && this._controllerTargets.length > 0)
             {
                 this.controllerBindingShowTarget.target = this._controllerTargets[0];
-                this._controllerTargets[0].addChild(this.controllerImage);
+                this._controllerTargets[0].addChild(this.controllerImage.transform);
                 this.updateControllerImage();
-                this.controllerBinding.target = this.controllerImage;
+                this.controllerBinding.target = this.controllerImage.transform;
             }
         }
 
@@ -72,7 +72,7 @@ module feng3d.editor
                 vec[1].setTo(0, 0, 0);
             }
             tempGlobalMatrix.recompose(vec);
-            this.controllerImage.localToWorldMatrix = tempGlobalMatrix;
+            this.controllerImage.transform.localToWorldMatrix = tempGlobalMatrix;
         }
 
         public startTranslation()
@@ -102,7 +102,7 @@ module feng3d.editor
 
         public startRotate()
         {
-            this.startControllerImageGlobalMatrix3D = this.controllerImage.localToWorldMatrix.clone();
+            this.startControllerImageGlobalMatrix3D = this.controllerImage.transform.localToWorldMatrix.clone();
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
                 this.startGlobalMatrixVec[i] = this._controllerTargets[i].localToWorldMatrix.clone();

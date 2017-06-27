@@ -61,7 +61,7 @@ module feng3d.editor
 		private onListChange()
 		{
 			var node: HierarchyNode = this.list.selectedItem;
-			editor3DData.selectedObject3D = node.object3D;
+			editor3DData.selectedObject3D = node.object3D.gameObject;
 		}
 
 		private onHierarchyNodeAdded(event: Event)
@@ -79,7 +79,7 @@ module feng3d.editor
 
 		private selectedObject3DChanged()
 		{
-			var node = editor3DData.hierarchy.getNode(editor3DData.selectedObject3D);
+			var node = editor3DData.hierarchy.getNode(editor3DData.selectedObject3D ? editor3DData.selectedObject3D.transform : null);
 			this.list.selectedIndex = this.listData.getItemIndex(node);
 		}
 

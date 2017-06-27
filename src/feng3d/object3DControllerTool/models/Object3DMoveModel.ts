@@ -2,10 +2,6 @@ module feng3d.editor
 {
     export class Object3DMoveModel extends GameObject
     {
-        public xAxis: CoordinateAxis;
-        public yAxis: CoordinateAxis;
-        public zAxis: CoordinateAxis;
-
         public yzPlane: CoordinatePlane;
         public xzPlane: CoordinatePlane;
         public xyPlane: CoordinatePlane;
@@ -21,16 +17,19 @@ module feng3d.editor
 
         private initModels()
         {
-            this.xAxis = new CoordinateAxis(new Color(1, 0, 0));
-            this.xAxis.transform.rotationZ = -90;
-            this.transform.addChild(this.xAxis.transform);
+            var xAxis = new GameObject("xAxis");
+            xAxis.addComponent(CoordinateAxis).color.setTo(1, 0, 0);
+            xAxis.transform.rotationZ = -90;
+            this.transform.addChild(xAxis.transform);
 
-            this.yAxis = new CoordinateAxis(new Color(0, 1, 0));
-            this.transform.addChild(this.yAxis.transform);
+            var yAxis = new GameObject("yAxis");
+            yAxis.addComponent(CoordinateAxis).color.setTo(0, 1, 0);
+            this.transform.addChild(yAxis.transform);
 
-            this.zAxis = new CoordinateAxis(new Color(0, 0, 1));
-            this.zAxis.transform.rotationX = 90;
-            this.transform.addChild(this.zAxis.transform);
+            var zAxis = new GameObject("zAxis");
+            zAxis.addComponent(CoordinateAxis).color.setTo(0, 0, 1);
+            zAxis.transform.rotationX = 90;
+            this.transform.addChild(zAxis.transform);
 
             this.yzPlane = new CoordinatePlane(new Color(1, 0, 0, 0.2), new Color(1, 0, 0, 0.5), new Color(1, 0, 0));
             this.yzPlane.transform.rotationZ = 90;
@@ -48,14 +47,14 @@ module feng3d.editor
         }
     }
 
-    export class CoordinateAxis extends GameObject
+    export class CoordinateAxis extends Component
     {
         private segmentGeometry: SegmentGeometry;
         private material: ColorMaterial;
 
         private xArrow: GameObject;
 
-        private color: Color;
+        public readonly color = new Color(1, 0, 0)
         private selectedColor: Color = new Color(1, 1, 0);
         private length: number = 100;
 
@@ -64,10 +63,9 @@ module feng3d.editor
         public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
 
-        constructor(color = new Color(1, 0, 0))
+        constructor(gameObject: GameObject)
         {
-            super();
-            this.color = color;
+            super(gameObject);
 
             var xLine = new GameObject();
             this.segmentGeometry = xLine.addComponent(MeshFilter).mesh = new SegmentGeometry();

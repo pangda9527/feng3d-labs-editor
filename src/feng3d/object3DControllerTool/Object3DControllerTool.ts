@@ -40,13 +40,13 @@ module feng3d.editor
         {
             if (editor3DData.selectedObject3D)
             {
-                this.object3DControllerTarget.controllerTargets = [editor3DData.selectedObject3D];
-                editor3DData.scene3D.addChild(this.transform);
+                this.object3DControllerTarget.controllerTargets = [editor3DData.selectedObject3D.transform];
+                editor3DData.scene3D.transform.addChild(this.transform);
             }
             else
             {
                 this.object3DControllerTarget.controllerTargets = null;
-                editor3DData.scene3D.removeChild(this.transform);
+                editor3DData.scene3D.transform.removeChild(this.transform);
             }
         }
 

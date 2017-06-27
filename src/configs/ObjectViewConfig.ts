@@ -19,7 +19,7 @@ var objectViewConfig = {
     ],
     classConfigVec: [
         {
-            name: "feng3d.Transform",
+            name: "feng3d.Transform1",
             component: "",
             componentParam: null,
             attributeDefinitionVec: [
@@ -39,7 +39,7 @@ var objectViewConfig = {
             blockDefinitionVec: []
         },
         {
-            name: "feng3d.Object3D",
+            name: "feng3d.Object3D1",
             component: "",
             componentParam: null,
             attributeDefinitionVec: [

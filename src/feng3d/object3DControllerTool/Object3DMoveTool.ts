@@ -24,25 +24,13 @@ module feng3d.editor
         protected onAddedToScene()
         {
             super.onAddedToScene();
-            this.toolModel.xAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.yAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.zAxis.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.yzPlane.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.xzPlane.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.xyPlane.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.oCube.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
         protected onRemovedFromScene()
         {
             super.onRemovedFromScene();
-            this.toolModel.xAxis.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.yAxis.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.zAxis.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.yzPlane.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.xzPlane.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.xyPlane.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.oCube.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
         protected onItemMouseDown(event: Event)
@@ -63,34 +51,36 @@ module feng3d.editor
             var cameraSceneTransform = editor3DData.cameraObject3D.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
+            var selectedTransform: Transform = <any>event.target;
             //
-            switch (this.selectedItem)
+            // switch (this.selectedItem)
+            switch (selectedTransform.gameObject.name)
             {
-                case this.toolModel.xAxis:
+                case "xAxis":
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
                     this.changeXYZ.setTo(1, 0, 0);
                     break;
-                case this.toolModel.yAxis:
+                case "yAxis":
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
                     this.changeXYZ.setTo(0, 1, 0);
                     break;
-                case this.toolModel.zAxis:
+                case "zAxis":
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
                     this.changeXYZ.setTo(0, 0, 1);
                     break;
-                case this.toolModel.yzPlane:
+                case "yzPlane":
                     this.movePlane3D.fromPoints(po, py, pz);
                     this.changeXYZ.setTo(0, 1, 1);
                     break;
-                case this.toolModel.xzPlane:
+                case "xzPlane":
                     this.movePlane3D.fromPoints(po, px, pz);
                     this.changeXYZ.setTo(1, 0, 1);
                     break;
-                case this.toolModel.xyPlane:
+                case "xyPlane":
                     this.movePlane3D.fromPoints(po, px, py);
                     this.changeXYZ.setTo(1, 1, 0);
                     break;
-                case this.toolModel.oCube:
+                case "oCube":
                     this.movePlane3D.fromNormalAndPoint(cameraDir, po);
                     this.changeXYZ.setTo(1, 1, 1);
                     break;

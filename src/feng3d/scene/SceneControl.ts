@@ -64,7 +64,7 @@ module feng3d.editor
             this.rotateSceneCenter = null;
             if (editor3DData.selectedObject3D)
             {
-                this.rotateSceneCenter = editor3DData.selectedObject3D.scenePosition;
+                this.rotateSceneCenter = editor3DData.selectedObject3D.transform.scenePosition;
             } else
             {
                 this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
@@ -95,7 +95,7 @@ module feng3d.editor
                 config.lookDistance = config.defaultLookDistance;
                 var lookPos = cameraObject3D.transform.localToWorldMatrix.forward;
                 lookPos.scaleBy(-config.lookDistance);
-                lookPos.incrementBy(selectedObject3D.scenePosition);
+                lookPos.incrementBy(selectedObject3D.transform.scenePosition);
                 var localLookPos = cameraObject3D.transform.worldToLocalMatrix.transformVector(lookPos);
                 egret.Tween.get(editor3DData.cameraObject3D).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
             }

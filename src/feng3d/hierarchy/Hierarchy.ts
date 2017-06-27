@@ -2,20 +2,21 @@ module feng3d.editor
 {
     export class Hierarchy
     {
-        public rootNode: HierarchyNode;
-
-        private nodeMap = new Map<Transform, HierarchyNode>();
+        public readonly rootNode: HierarchyNode;
+        private readonly nodeMap = new Map<Transform, HierarchyNode>();
 
         public get selectedNode()
         {
-            return this.nodeMap.get(editor3DData.selectedObject3D);
+            return this.nodeMap.get(editor3DData.selectedObject3D.transform);
         }
 
         constructor(rootObject3D: Transform)
         {
-            this.rootNode = this.getNode(rootObject3D);
+            this.rootNode = new HierarchyNode(rootObject3D);
             this.rootNode.depth = -1;
-
+            this.nodeMap.push(rootObject3D, this.rootNode);
+            //
+            rootObject3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
             $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
             $editorEventDispatcher.addEventListener("saveScene", this.onSaveScene, this);
             $editorEventDispatcher.addEventListener("import", this.onImport, this);
@@ -29,20 +30,14 @@ module feng3d.editor
          */
         public getNode(object3D: Transform)
         {
-            if (object3D == null)
-                return null;
             var node = this.nodeMap.get(object3D);
-            if (!node)
-            {
-                node = new HierarchyNode(object3D);
-                this.nodeMap.push(object3D, node);
-            }
             return node;
         }
 
         public addObject3D(object3D: Transform, parentNode: HierarchyNode = null, allChildren = false)
         {
-            var node = this.getNode(object3D);
+            var node = new HierarchyNode(object3D);
+            this.nodeMap.push(object3D, node);
             if (parentNode)
             {
                 parentNode.addNode(node);
@@ -50,7 +45,6 @@ module feng3d.editor
             {
                 this.rootNode.addNode(node);
             }
-            object3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
             if (allChildren)
             {
                 for (var i = 0; i < object3D.childCount; i++)
@@ -58,30 +52,30 @@ module feng3d.editor
                     this.addObject3D(object3D.getChildAt(i) as Transform, node, true);
                 }
             }
+            return node;
         }
 
         private onMouseClick(event: Mouse3DEvent)
         {
-            var object3D = <Transform>event.currentTarget;
-            editor3DData.selectedObject3D = object3D;
-            event.isStopBubbles = true;
+            var object3D = <Transform>event.target;
+            var node = this.nodeMap.get(object3D);
+            while (!node && (object3D = <Transform>object3D.parent));
+            {
+                node = this.nodeMap.get(object3D);
+            }
+            if (node && object3D)
+                editor3DData.selectedObject3D = object3D.gameObject;
         }
 
         private onCreateObject3D(event: Event)
         {
-            try
+            var className = event.data.className;
+            var gameobject = GameObjectFactory.create(event.data.label);
+            if (gameobject)
             {
-                var className = event.data.className;
-                GameObjectFactory.create(event.data.label);
-
-                var cls = ClassUtils.getDefinitionByName(className);
-                var createdObject = new cls();
-                if (createdObject)
-                {
-                    this.addObject3D(createdObject);
-                    editor3DData.selectedObject3D = createdObject;
-                }
-            } catch (error)
+                this.addObject3D(gameobject.transform);
+                editor3DData.selectedObject3D = gameobject;
+            } else
             {
                 console.error(`无法实例化${className},请检查配置 createObjectConfig`)
             }
@@ -92,7 +86,7 @@ module feng3d.editor
             var selectedObject3D = editor3DData.selectedObject3D;
             if (selectedObject3D)
             {
-                var node = this.nodeMap.get(selectedObject3D);
+                var node = this.nodeMap.get(selectedObject3D.transform);
                 node.delete();
             }
             editor3DData.selectedObject3D = null;
@@ -100,9 +94,9 @@ module feng3d.editor
 
         public resetScene(scene: Scene3D)
         {
-            for (var i = 0; i < scene.childCount; i++)
+            for (var i = 0; i < scene.transform.childCount; i++)
             {
-                this.addObject3D(scene.getChildAt(i) as Transform, null, true);
+                this.addObject3D(scene.transform.getChildAt(i) as Transform, null, true);
             }
         }
 
