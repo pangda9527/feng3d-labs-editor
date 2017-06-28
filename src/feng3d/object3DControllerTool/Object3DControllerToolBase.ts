@@ -1,10 +1,10 @@
 module feng3d.editor
 {
-    export class Object3DControllerToolBase extends GameObject
+    export class Object3DControllerToolBase extends Component
     {
         private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis | CoordinateRotationFreeAxis;
         //
-        private _toolModel: GameObject;
+        private _toolModel: Component | GameObject;
 
         protected ismouseDown = false;
 
@@ -14,13 +14,13 @@ module feng3d.editor
 
         protected object3DControllerToolBingding: Object3DControllerToolBinding;
 
-        constructor()
+        constructor(gameObject: GameObject)
         {
-            super();
+            super(gameObject);
             this.transform.holdSize = 1;
 
-            this.addEventListener(Scene3DEvent.ADDED_TO_SCENE, this.onAddedToScene, this);
-            this.addEventListener(Scene3DEvent.REMOVED_FROM_SCENE, this.onRemovedFromScene, this);
+            this.transform.addEventListener(Scene3DEvent.ADDED_TO_SCENE, this.onAddedToScene, this);
+            this.transform.addEventListener(Scene3DEvent.REMOVED_FROM_SCENE, this.onRemovedFromScene, this);
         }
 
         protected onAddedToScene()
@@ -29,7 +29,7 @@ module feng3d.editor
             input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
             input.addEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
             this.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            editor3DData.cameraObject3D.transform.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         protected onRemovedFromScene()
@@ -37,7 +37,7 @@ module feng3d.editor
             input.removeEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
             input.removeEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
             this.removeEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            editor3DData.cameraObject3D.removeEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            editor3DData.cameraObject3D.transform.removeEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         protected get toolModel()
@@ -74,7 +74,7 @@ module feng3d.editor
 
         public get bindingObject3D(): Object3DControllerTarget
         {
-            return <any>this.object3DControllerToolBingding.target;
+            return this.object3DControllerToolBingding.target.getComponent(Object3DControllerTarget);
         }
 
         public set bindingObject3D(value)
@@ -102,7 +102,7 @@ module feng3d.editor
 
         protected onItemMouseDown(event: Event)
         {
-            this.selectedItem = <any>event.target;
+            this.selectedItem = <any>event.currentTarget;
         }
 
         protected onScenetransformChanged()

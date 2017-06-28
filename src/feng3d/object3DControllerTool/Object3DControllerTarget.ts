@@ -1,27 +1,27 @@
 module feng3d.editor
 {
 
-    export class Object3DControllerTarget extends GameObject
+    export class Object3DControllerTarget extends Component
     {
         private _controllerTargets: Transform[];
         private startGlobalMatrixVec: Matrix3D[] = [];
         private startScaleVec: Vector3D[] = [];
 
-        private controllerImage = new GameObject();
+        private controllerImage = GameObject.create();
         private startControllerImageGlobalMatrix3D: Matrix3D;
 
         private isWoldCoordinate = false;
         private isBaryCenter = false;
 
         //
-        private _showObject3D = new GameObject();
+        private _showObject3D = GameObject.create();
         private controllerBindingShowTarget: Object3DTransformBinding;
         private controllerBinding: Object3DSceneTransformBinding;
         private targetBindings: Object3DTransformBinding[] = [];
 
-        constructor()
+        constructor(gameObject:GameObject)
         {
-            super();
+            super(gameObject);
             this.controllerBindingShowTarget = new Object3DTransformBinding(this._showObject3D.transform);
             this.controllerBinding = new Object3DSceneTransformBinding(this.transform);
             serializationConfig.excludeObject.push(this.controllerImage);

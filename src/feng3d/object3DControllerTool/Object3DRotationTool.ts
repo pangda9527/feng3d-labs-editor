@@ -6,13 +6,13 @@ module feng3d.editor
         private startPlanePos: Vector3D;
         private startMousePos: Point;
 
-        constructor()
+        constructor(gameObject: GameObject)
         {
-            super();
+            super(gameObject);
 
             this.object3DControllerToolBingding = new Object3DRotationBinding(this.transform);
 
-            this.toolModel = new Object3DRotationModel();
+            this.toolModel = GameObject.create().addComponent(Object3DRotationModel);
         }
         protected onAddedToScene()
         {

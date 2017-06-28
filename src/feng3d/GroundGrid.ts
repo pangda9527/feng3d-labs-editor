@@ -4,7 +4,7 @@ module feng3d.editor
      * 地面网格
      * @author feng 2016-10-29
      */
-    export class GroundGrid extends GameObject
+    export class GroundGrid extends Component
     {
         private num = 100;
         private segmentGeometry: SegmentGeometry;
@@ -12,9 +12,9 @@ module feng3d.editor
         private level: number;
         private step: number;
 
-        constructor()
+        constructor(gameObject:GameObject)
         {
-            super("GroundGrid");
+            super(gameObject);
             this.transform.mouseEnabled = false;
             this.init();
 
@@ -26,9 +26,9 @@ module feng3d.editor
          */
         private init()
         {
-            var meshFilter = this.addComponent(MeshFilter);
+            var meshFilter = this.gameObject.addComponent(MeshFilter);
             this.segmentGeometry = meshFilter.mesh = new SegmentGeometry();
-            var meshRenderer = this.addComponent(MeshRenderer);
+            var meshRenderer = this.gameObject.addComponent(MeshRenderer);
             meshRenderer.material = new SegmentMaterial();
             this.update();
         }

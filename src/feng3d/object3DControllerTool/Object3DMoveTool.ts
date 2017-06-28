@@ -12,30 +12,41 @@ module feng3d.editor
         private startPlanePos: Vector3D;
         private startPos: Vector3D;
 
-        constructor()
+        constructor(gameObject:GameObject)
         {
-            super();
+            super(gameObject);
 
             this.object3DControllerToolBingding = new Object3DMoveBinding(this.transform);
 
-            this.toolModel = new Object3DMoveModel();
+            this.toolModel = GameObject.create().addComponent(Object3DMoveModel);
         }
 
         protected onAddedToScene()
         {
             super.onAddedToScene();
-            this.toolModel.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.xAxis.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.yAxis.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.zAxis.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.yzPlane.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.xzPlane.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.xyPlane.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.oCube.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
         protected onRemovedFromScene()
         {
             super.onRemovedFromScene();
-            this.toolModel.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.xAxis.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.yAxis.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.zAxis.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.yzPlane.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.xzPlane.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.xyPlane.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.oCube.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
         protected onItemMouseDown(event: Event)
         {
-            super.onItemMouseDown(event);
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -51,36 +62,42 @@ module feng3d.editor
             var cameraSceneTransform = editor3DData.cameraObject3D.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
-            var selectedTransform: Transform = <any>event.target;
+            var selectedTransform: Transform = <any>event.currentTarget;
             //
-            // switch (this.selectedItem)
-            switch (selectedTransform.gameObject.name)
+            switch (selectedTransform)
             {
-                case "xAxis":
+                case this.toolModel.xAxis.transform:
+                    this.selectedItem = this.toolModel.xAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
                     this.changeXYZ.setTo(1, 0, 0);
                     break;
-                case "yAxis":
+                case this.toolModel.yAxis.transform:
+                    this.selectedItem = this.toolModel.yAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
                     this.changeXYZ.setTo(0, 1, 0);
                     break;
-                case "zAxis":
+                case this.toolModel.zAxis.transform:
+                    this.selectedItem = this.toolModel.zAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
                     this.changeXYZ.setTo(0, 0, 1);
                     break;
-                case "yzPlane":
+                case this.toolModel.yzPlane.transform:
+                    this.selectedItem = this.toolModel.yzPlane;
                     this.movePlane3D.fromPoints(po, py, pz);
                     this.changeXYZ.setTo(0, 1, 1);
                     break;
-                case "xzPlane":
+                case this.toolModel.xzPlane.transform:
+                    this.selectedItem = this.toolModel.xzPlane;
                     this.movePlane3D.fromPoints(po, px, pz);
                     this.changeXYZ.setTo(1, 0, 1);
                     break;
-                case "xyPlane":
+                case this.toolModel.xyPlane.transform:
+                    this.selectedItem = this.toolModel.xyPlane;
                     this.movePlane3D.fromPoints(po, px, py);
                     this.changeXYZ.setTo(1, 1, 0);
                     break;
-                case "oCube":
+                case this.toolModel.oCube.transform:
+                    this.selectedItem = this.toolModel.oCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir, po);
                     this.changeXYZ.setTo(1, 1, 1);
                     break;

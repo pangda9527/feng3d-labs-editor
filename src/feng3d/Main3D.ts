@@ -38,17 +38,17 @@ module feng3d.editor
             camera.transform.y = 300;
             camera.transform.lookAt(new Vector3D());
 
-            var trident = new GameObject("Trident");
+            var trident = GameObject.create("Trident");
             trident.addComponent(Trident);
             view3D.scene.transform.addChild(trident.transform);
             serializationConfig.excludeObject.push(trident);
 
             //初始化模块
-            var groundGrid = new GroundGrid();
+            var groundGrid = GameObject.create("GroundGrid").addComponent(GroundGrid);
             view3D.scene.transform.addChild(groundGrid.transform);
             serializationConfig.excludeObject.push(groundGrid);
 
-            var object3DControllerTool = new Object3DControllerTool();
+            var object3DControllerTool = GameObject.create("object3DControllerTool").addComponent(Object3DControllerTool);
             serializationConfig.excludeObject.push(object3DControllerTool);
 
             //
@@ -71,9 +71,14 @@ module feng3d.editor
                 console.log(event.type, names.reverse().join("->"));
             }, this);
 
+            // this.testMouseRay();
+        }
+
+        private testMouseRay()
+        {
             input.addEventListener(inputType.CLICK, () =>
             {
-                var gameobject = new GameObject("test");
+                var gameobject = GameObject.create("test");
                 gameobject.addComponent(MeshRenderer).material = new StandardMaterial();
                 gameobject.addComponent(MeshFilter).mesh = new SphereGeometry(10);
                 gameobject.transform.mouseEnabled = false;

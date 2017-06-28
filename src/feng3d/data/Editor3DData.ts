@@ -6,7 +6,7 @@ module feng3d.editor
         public stage: egret.Stage;
 
         public selectedObject3D: GameObject;
-        public cameraObject3D: CameraObject3D;
+        public cameraObject3D: Camera;
         /** 3d场景 */
         public scene3D: Scene3D;
         public view3D: View3D;

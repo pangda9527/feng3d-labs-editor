@@ -44,7 +44,7 @@ module feng3d.editor
 
         private onFpsViewStart()
         {
-            this.controller.targetObject = editor3DData.cameraObject3D;
+            this.controller.targetObject = editor3DData.cameraObject3D.gameObject;
             this.controller["onMousedown"]();
         }
 

@@ -10,12 +10,12 @@ module feng3d.editor
         private changeXYZ: Vector3D = new Vector3D();
         private startPlanePos: Vector3D;
 
-        constructor()
+        constructor(gameObject: GameObject)
         {
-            super();
+            super(gameObject);
             this.object3DControllerToolBingding = new Object3DScaleBinding(this.transform);
 
-            this.toolModel = new Object3DScaleModel();
+            this.toolModel = GameObject.create().addComponent(Object3DScaleModel);
         }
 
         protected onAddedToScene()

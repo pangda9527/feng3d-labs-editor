@@ -1,6 +1,6 @@
 module feng3d.editor
 {
-    export class Object3DControllerTool extends GameObject
+    export class Object3DControllerTool extends Component
     {
         private object3DMoveTool: Object3DMoveTool;
         private object3DRotationTool: Object3DRotationTool;
@@ -10,15 +10,15 @@ module feng3d.editor
 
         private object3DControllerTarget: Object3DControllerTarget;
 
-        constructor()
+        constructor(gameObject: GameObject)
         {
-            super();
+            super(gameObject);
 
-            this.object3DControllerTarget = new Object3DControllerTarget();
+            this.object3DControllerTarget = GameObject.create("object3DControllerTarget").addComponent(Object3DControllerTarget);
 
-            this.object3DMoveTool = new Object3DMoveTool();
-            this.object3DRotationTool = new Object3DRotationTool();
-            this.object3DScaleTool = new Object3DScaleTool();
+            this.object3DMoveTool = GameObject.create("object3DMoveTool").addComponent(Object3DMoveTool);
+            this.object3DRotationTool = GameObject.create("object3DRotationTool").addComponent(Object3DRotationTool);
+            this.object3DScaleTool = GameObject.create("object3DScaleTool").addComponent(Object3DScaleTool);
 
             this.object3DMoveTool.bindingObject3D = this.object3DControllerTarget;
             this.object3DRotationTool.bindingObject3D = this.object3DControllerTarget;

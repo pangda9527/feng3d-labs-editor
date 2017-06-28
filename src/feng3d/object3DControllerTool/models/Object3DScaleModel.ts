@@ -1,44 +1,50 @@
 module feng3d.editor
 {
 
-    export class Object3DScaleModel extends GameObject
+    export class Object3DScaleModel extends Component
     {
         public xCube: CoordinateScaleCube;
         public yCube: CoordinateScaleCube;
         public zCube: CoordinateScaleCube;
         public oCube: CoordinateCube;
 
-        constructor()
+        constructor(gameObject: GameObject)
         {
-            super();
-            this.name = "Object3DScaleModel";
+            super(gameObject);
+            this.gameObject.name = "Object3DScaleModel";
             this.initModels();
         }
 
         private initModels()
         {
-            this.xCube = new CoordinateScaleCube(new Color(1, 0, 0));
+            this.xCube = GameObject.create("xCube").addComponent(CoordinateScaleCube);
+            this.xCube.color.setTo(1, 0, 0);
+            this.xCube.update();
             this.xCube.transform.rotationZ = -90;
             this.transform.addChild(this.xCube.transform);
 
-            this.yCube = new CoordinateScaleCube(new Color(0, 1, 0));
+            this.yCube = GameObject.create("yCube").addComponent(CoordinateScaleCube);
+            this.yCube.color.setTo(0, 1, 0);
+            this.yCube.update();
             this.transform.addChild(this.yCube.transform);
 
-            this.zCube = new CoordinateScaleCube(new Color(0, 0, 1));
+            this.zCube = GameObject.create("zCube").addComponent(CoordinateScaleCube);
+            this.zCube.color.setTo(0, 0, 1);
+            this.zCube.update();
             this.zCube.transform.rotationX = 90;
             this.transform.addChild(this.zCube.transform);
 
-            this.oCube = new CoordinateCube();
+            this.oCube = GameObject.create("oCube").addComponent(CoordinateCube);
             this.transform.addChild(this.oCube.transform);
         }
     }
 
-    export class CoordinateScaleCube extends GameObject
+    export class CoordinateScaleCube extends Component
     {
         private coordinateCube: CoordinateCube
         private segmentGeometry: SegmentGeometry;
 
-        private color: Color;
+        public readonly color = new Color(1, 0, 0)
         private selectedColor = new Color(1, 1, 0);
         private length = 100;
         //
@@ -50,19 +56,17 @@ module feng3d.editor
         public set scaleValue(value) { if (this._scale == value) return; this._scale = value; this.update(); }
         private _scale = 1;
 
-        constructor(color = new Color(1, 0, 0))
+        constructor(gameObject: GameObject)
         {
-            super();
-            this.color = color;
-
-            var xLine = new GameObject();
+            super(gameObject);
+            var xLine = GameObject.create();
             xLine.addComponent(MeshRenderer).material = new SegmentMaterial();
             this.segmentGeometry = xLine.addComponent(MeshFilter).mesh = new SegmentGeometry();
             this.transform.addChild(xLine.transform);
-            this.coordinateCube = new CoordinateCube(this.color, this.selectedColor);
+            this.coordinateCube = GameObject.create("coordinateCube").addComponent(CoordinateCube);
             this.transform.addChild(this.coordinateCube.transform);
 
-            var mouseHit = new GameObject("hit");
+            var mouseHit = GameObject.create("hit");
             mouseHit.addComponent(MeshFilter).mesh = new CylinderGeometry(5, 5, this.length - 4);
             mouseHit.addComponent(MeshRenderer);
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
@@ -73,8 +77,12 @@ module feng3d.editor
             this.update();
         }
 
-        private update()
+        public update()
         {
+            this.coordinateCube.color = this.color;
+            this.coordinateCube.selectedColor = this.selectedColor;
+            this.coordinateCube.update();
+
             this.segmentGeometry.removeAllSegments();
             var segment = new Segment(new Vector3D(), new Vector3D(0, this._scale * this.length, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedColor : this.color;
