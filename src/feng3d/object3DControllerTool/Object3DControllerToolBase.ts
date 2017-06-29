@@ -19,25 +19,25 @@ module feng3d.editor
             super(gameObject);
             this.transform.holdSize = 1;
 
-            this.transform.addEventListener(Scene3DEvent.ADDED_TO_SCENE, this.onAddedToScene, this);
-            this.transform.addEventListener(Scene3DEvent.REMOVED_FROM_SCENE, this.onRemovedFromScene, this);
+            Event.on(this.transform, <any>Scene3DEvent.ADDED_TO_SCENE, this.onAddedToScene, this);
+            Event.on(this.transform, <any>Scene3DEvent.REMOVED_FROM_SCENE, this.onRemovedFromScene, this);
         }
 
         protected onAddedToScene()
         {
             this.updateToolModel();
-            input.addEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
-            input.addEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
-            this.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            editor3DData.cameraObject3D.transform.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            Event.on(input, <any>inputType.MOUSE_DOWN, this.onMouseDown, this);
+            Event.on(input, <any>inputType.MOUSE_UP, this.onMouseUp, this);
+            Event.on(this, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+            Event.on(editor3DData.cameraObject3D.transform, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         protected onRemovedFromScene()
         {
-            input.removeEventListener(inputType.MOUSE_DOWN, this.onMouseDown, this);
-            input.removeEventListener(inputType.MOUSE_UP, this.onMouseUp, this);
-            this.removeEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            editor3DData.cameraObject3D.transform.removeEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            Event.off(input, <any>inputType.MOUSE_DOWN, this.onMouseDown, this);
+            Event.off(input, <any>inputType.MOUSE_UP, this.onMouseUp, this);
+            Event.off(this, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+            Event.off(editor3DData.cameraObject3D.transform, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         protected get toolModel()
@@ -100,7 +100,7 @@ module feng3d.editor
             this.startSceneTransform = null;
         }
 
-        protected onItemMouseDown(event: Event)
+        protected onItemMouseDown(event: EventVO<any>)
         {
             this.selectedItem = <any>event.currentTarget;
         }

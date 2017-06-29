@@ -74,7 +74,7 @@ module feng3d.editor
 
 		private onMainMenu(item: { label: string; command: string; })
 		{
-			$editorEventDispatcher.dispatchEvent(new Event(item.command));
+			Event.dispatch($editorEventDispatcher, <any>item.command);
 		}
 
 		private onHelpButtonClick()

@@ -33,9 +33,9 @@ module feng3d.editor
 		{
 			this.addButton.addEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
 
-			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
-			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
-			editor3DData.hierarchy.rootNode.addEventListener(HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
+			Event.on(editor3DData.hierarchy.rootNode, <any>HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
+			Event.on(editor3DData.hierarchy.rootNode, <any>HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
+			Event.on(editor3DData.hierarchy.rootNode, <any>HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
 			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
 
 			this.watchers.push(
@@ -47,9 +47,9 @@ module feng3d.editor
 		{
 			this.addButton.removeEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
 
-			editor3DData.hierarchy.rootNode.removeEventListener(HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
-			editor3DData.hierarchy.rootNode.removeEventListener(HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
-			editor3DData.hierarchy.rootNode.removeEventListener(HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
+			Event.off(editor3DData.hierarchy.rootNode, <any>HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
+			Event.off(editor3DData.hierarchy.rootNode, <any>HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
+			Event.off(editor3DData.hierarchy.rootNode, <any>HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
 			this.list.removeEventListener(egret.Event.CHANGE, this.onListChange, this);
 
 			while (this.watchers.length > 0)
@@ -91,7 +91,7 @@ module feng3d.editor
 
 		private onCreateObject3d(selectedItem)
 		{
-			$editorEventDispatcher.dispatchEvent(new Event("Create_Object3D", selectedItem));
+			Event.dispatch($editorEventDispatcher, <any>"Create_Object3D", selectedItem);
 		}
 	}
 }

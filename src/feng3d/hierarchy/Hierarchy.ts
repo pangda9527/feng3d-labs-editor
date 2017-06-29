@@ -16,13 +16,13 @@ module feng3d.editor
             this.rootNode.depth = -1;
             this.nodeMap.push(rootObject3D, this.rootNode);
             //
-            rootObject3D.addEventListener(Mouse3DEvent.CLICK, this.onMouseClick, this);
-            $editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
-            $editorEventDispatcher.addEventListener("saveScene", this.onSaveScene, this);
-            $editorEventDispatcher.addEventListener("import", this.onImport, this);
+            Event.on(rootObject3D, "click", this.onMouseClick, this);
+            Event.on($editorEventDispatcher, <any>"Create_Object3D", this.onCreateObject3D, this);
+            Event.on($editorEventDispatcher, <any>"saveScene", this.onSaveScene, this);
+            Event.on($editorEventDispatcher, <any>"import", this.onImport, this);
 
             //监听命令
-            shortcut.addEventListener("deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
+            Event.on(shortcut, <any>"deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
         }
 
         /**
@@ -55,7 +55,7 @@ module feng3d.editor
             return node;
         }
 
-        private onMouseClick(event: Mouse3DEvent)
+        private onMouseClick(event:EventVO<"click">)
         {
             var object3D = <Transform>event.target;
             var node = this.nodeMap.get(object3D);
@@ -67,7 +67,7 @@ module feng3d.editor
                 editor3DData.selectedObject3D = object3D.gameObject;
         }
 
-        private onCreateObject3D(event: Event)
+        private onCreateObject3D(event: EventVO<any>)
         {
             var className = event.data.className;
             var gameobject = GameObjectFactory.create(event.data.label);
@@ -187,7 +187,7 @@ module feng3d.editor
         }
     }
 
-    export class HierarchyNode extends EventDispatcher
+    export class HierarchyNode
     {
         public static readonly ADDED = "added";
         public static readonly REMOVED = "removed";
@@ -215,9 +215,8 @@ module feng3d.editor
 
         constructor(object3D: Transform)
         {
-            super();
             this.object3D = object3D;
-            this.label = object3D.name;
+            this.label = object3D.gameObject.name;
             this._uuid = Math.generateUUID();
 
             Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
@@ -248,7 +247,7 @@ module feng3d.editor
             node.depth = this.depth + 1;
             node.updateChildrenDepth();
             this.hasChildren = true;
-            this.dispatchEvent(new Event(HierarchyNode.ADDED, node, true));
+            Event.dispatch(this, <any>HierarchyNode.ADDED, node, true);
         }
 
         public removeNode(node: HierarchyNode)
@@ -259,7 +258,7 @@ module feng3d.editor
             console.assert(index != -1);
             this.children.splice(index, 1);
             this.hasChildren = this.children.length > 0;
-            this.dispatchEvent(new Event(HierarchyNode.REMOVED, node, true));
+            Event.dispatch(this, <any>HierarchyNode.REMOVED, node, true);
         }
 
         public delete()
@@ -297,7 +296,7 @@ module feng3d.editor
 
         public onIsOpenChange()
         {
-            this.dispatchEvent(new Event(HierarchyNode.OPEN_CHANGED, this, true));
+            Event.dispatch(this, <any>HierarchyNode.OPEN_CHANGED, this, true);
         }
 
         //------------------------------------------

@@ -12,7 +12,7 @@ module feng3d.editor
         private startPlanePos: Vector3D;
         private startPos: Vector3D;
 
-        constructor(gameObject:GameObject)
+        constructor(gameObject: GameObject)
         {
             super(gameObject);
 
@@ -24,28 +24,28 @@ module feng3d.editor
         protected onAddedToScene()
         {
             super.onAddedToScene();
-            this.toolModel.xAxis.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.yAxis.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.zAxis.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.yzPlane.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.xzPlane.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.xyPlane.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.oCube.transform.addEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.xAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.yAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.zAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.yzPlane.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.xzPlane.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.xyPlane.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.oCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
         protected onRemovedFromScene()
         {
             super.onRemovedFromScene();
-            this.toolModel.xAxis.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.yAxis.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.zAxis.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.yzPlane.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.xzPlane.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.xyPlane.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            this.toolModel.oCube.transform.removeEventListener(Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.xAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.yAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.zAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.yzPlane.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.xzPlane.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.xyPlane.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.oCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
-        protected onItemMouseDown(event: Event)
+        protected onItemMouseDown(event: EventVO<any>)
         {
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
@@ -108,7 +108,7 @@ module feng3d.editor
             this.startPos = this.toolModel.transform.getPosition();
             this.bindingObject3D.startTranslation();
             //
-            input.addEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
+            Event.on(input, <any>inputType.MOUSE_MOVE, this.onMouseMove, this);
         }
 
         private onMouseMove()
@@ -127,7 +127,7 @@ module feng3d.editor
         protected onMouseUp()
         {
             super.onMouseUp()
-            input.removeEventListener(inputType.MOUSE_MOVE, this.onMouseMove, this);
+            Event.off(input, <any>inputType.MOUSE_MOVE, this.onMouseMove, this);
 
             this.bindingObject3D.stopTranslation();
             this.startPos = null;

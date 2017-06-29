@@ -1203,14 +1203,11 @@ var feng3d;
          * 巡视界面数据
          * @author feng     2017-03-20
          */
-        var InspectorViewData = (function (_super) {
-            __extends(InspectorViewData, _super);
+        var InspectorViewData = (function () {
             function InspectorViewData(editor3DData) {
-                var _this = _super.call(this) || this;
-                _this.hasBackData = false;
-                _this.viewDataList = [];
-                feng3d.Watcher.watch(editor3DData, ["selectedObject3D"], _this.updateView, _this);
-                return _this;
+                this.hasBackData = false;
+                this.viewDataList = [];
+                feng3d.Watcher.watch(editor3DData, ["selectedObject3D"], this.updateView, this);
             }
             InspectorViewData.prototype.showData = function (data, removeBack) {
                 if (removeBack === void 0) { removeBack = false; }
@@ -1223,18 +1220,18 @@ var feng3d;
                 this.hasBackData = this.viewDataList.length > 0;
                 //
                 this.viewData = data;
-                this.dispatchEvent(new feng3d.Event(feng3d.Event.CHANGE));
+                feng3d.Event.dispatch(this, "change");
             };
             InspectorViewData.prototype.back = function () {
                 this.viewData = this.viewDataList.pop();
                 this.hasBackData = this.viewDataList.length > 0;
-                this.dispatchEvent(new feng3d.Event(feng3d.Event.CHANGE));
+                feng3d.Event.dispatch(this, "change");
             };
             InspectorViewData.prototype.updateView = function () {
                 this.showData(editor.editor3DData.selectedObject3D, true);
             };
             return InspectorViewData;
-        }(feng3d.EventDispatcher));
+        }());
         editor.InspectorViewData = InspectorViewData;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -1264,11 +1261,11 @@ var feng3d;
             };
             InspectorView.prototype.onAddedToStage = function () {
                 this.inspectorViewData = editor.editor3DData.inspectorViewData;
-                this.inspectorViewData.addEventListener(feng3d.Event.CHANGE, this.onDataChange, this);
+                feng3d.Event.on(this.inspectorViewData, "change", this.onDataChange, this);
                 this.backButton.addEventListener(editor.MouseEvent.CLICK, this.onBackClick, this);
             };
             InspectorView.prototype.onRemovedFromStage = function () {
-                this.inspectorViewData.removeEventListener(feng3d.Event.CHANGE, this.onDataChange, this);
+                feng3d.Event.off(this.inspectorViewData, "change", this.onDataChange, this);
                 this.backButton.removeEventListener(editor.MouseEvent.CLICK, this.onBackClick, this);
                 this.inspectorViewData = null;
             };
@@ -1373,17 +1370,17 @@ var feng3d;
             };
             HierarchyView.prototype.onAddedToStage = function () {
                 this.addButton.addEventListener(editor.MouseEvent.CLICK, this.onAddButtonClick, this);
-                editor.editor3DData.hierarchy.rootNode.addEventListener(editor.HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
-                editor.editor3DData.hierarchy.rootNode.addEventListener(editor.HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
-                editor.editor3DData.hierarchy.rootNode.addEventListener(editor.HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
+                feng3d.Event.on(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
+                feng3d.Event.on(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
+                feng3d.Event.on(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
                 this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
                 this.watchers.push(feng3d.Watcher.watch(editor.editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this));
             };
             HierarchyView.prototype.onRemovedFromStage = function () {
                 this.addButton.removeEventListener(editor.MouseEvent.CLICK, this.onAddButtonClick, this);
-                editor.editor3DData.hierarchy.rootNode.removeEventListener(editor.HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
-                editor.editor3DData.hierarchy.rootNode.removeEventListener(editor.HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
-                editor.editor3DData.hierarchy.rootNode.removeEventListener(editor.HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
+                feng3d.Event.off(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
+                feng3d.Event.off(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
+                feng3d.Event.off(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
                 this.list.removeEventListener(egret.Event.CHANGE, this.onListChange, this);
                 while (this.watchers.length > 0) {
                     this.watchers.pop().unwatch();
@@ -1411,7 +1408,7 @@ var feng3d;
                 editor.createObject3DView.showView(createObjectConfig, this.onCreateObject3d, globalPoint);
             };
             HierarchyView.prototype.onCreateObject3d = function (selectedItem) {
-                editor.$editorEventDispatcher.dispatchEvent(new feng3d.Event("Create_Object3D", selectedItem));
+                feng3d.Event.dispatch(editor.$editorEventDispatcher, "Create_Object3D", selectedItem);
             };
             return HierarchyView;
         }(eui.Component));
@@ -1465,7 +1462,7 @@ var feng3d;
                 editor.createObject3DView.showView(mainMenuConfig, this.onMainMenu.bind(this), globalPoint);
             };
             MainView.prototype.onMainMenu = function (item) {
-                editor.$editorEventDispatcher.dispatchEvent(new feng3d.Event(item.command));
+                feng3d.Event.dispatch(editor.$editorEventDispatcher, item.command);
             };
             MainView.prototype.onHelpButtonClick = function () {
                 window.open("index.md");
@@ -2041,13 +2038,13 @@ var feng3d;
                         return;
                     }
                     if (this._target) {
-                        this._source.removeEventListener(feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onSourceTransformChanged, this);
-                        this._target.removeEventListener(feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onTargetTransformChanged, this);
+                        feng3d.Event.off(this._source, feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onSourceTransformChanged, this);
+                        feng3d.Event.off(this._target, feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onTargetTransformChanged, this);
                     }
                     this._target = value;
                     if (this._target) {
-                        this._source.addEventListener(feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onSourceTransformChanged, this);
-                        this._target.addEventListener(feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onTargetTransformChanged, this);
+                        feng3d.Event.on(this._source, feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onSourceTransformChanged, this);
+                        feng3d.Event.on(this._target, feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onTargetTransformChanged, this);
                         this.doTargetTransformChanged();
                     }
                 },
@@ -2704,22 +2701,22 @@ var feng3d;
                 var _this = _super.call(this, gameObject) || this;
                 _this.ismouseDown = false;
                 _this.transform.holdSize = 1;
-                _this.transform.addEventListener(feng3d.Scene3DEvent.ADDED_TO_SCENE, _this.onAddedToScene, _this);
-                _this.transform.addEventListener(feng3d.Scene3DEvent.REMOVED_FROM_SCENE, _this.onRemovedFromScene, _this);
+                feng3d.Event.on(_this.transform, feng3d.Scene3DEvent.ADDED_TO_SCENE, _this.onAddedToScene, _this);
+                feng3d.Event.on(_this.transform, feng3d.Scene3DEvent.REMOVED_FROM_SCENE, _this.onRemovedFromScene, _this);
                 return _this;
             }
             Object3DControllerToolBase.prototype.onAddedToScene = function () {
                 this.updateToolModel();
-                feng3d.input.addEventListener(feng3d.inputType.MOUSE_DOWN, this.onMouseDown, this);
-                feng3d.input.addEventListener(feng3d.inputType.MOUSE_UP, this.onMouseUp, this);
-                this.addEventListener(feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-                editor.editor3DData.cameraObject3D.transform.addEventListener(feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+                feng3d.Event.on(feng3d.input, feng3d.inputType.MOUSE_DOWN, this.onMouseDown, this);
+                feng3d.Event.on(feng3d.input, feng3d.inputType.MOUSE_UP, this.onMouseUp, this);
+                feng3d.Event.on(this, feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+                feng3d.Event.on(editor.editor3DData.cameraObject3D.transform, feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             };
             Object3DControllerToolBase.prototype.onRemovedFromScene = function () {
-                feng3d.input.removeEventListener(feng3d.inputType.MOUSE_DOWN, this.onMouseDown, this);
-                feng3d.input.removeEventListener(feng3d.inputType.MOUSE_UP, this.onMouseUp, this);
-                this.removeEventListener(feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-                editor.editor3DData.cameraObject3D.transform.removeEventListener(feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+                feng3d.Event.off(feng3d.input, feng3d.inputType.MOUSE_DOWN, this.onMouseDown, this);
+                feng3d.Event.off(feng3d.input, feng3d.inputType.MOUSE_UP, this.onMouseUp, this);
+                feng3d.Event.off(this, feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
+                feng3d.Event.off(editor.editor3DData.cameraObject3D.transform, feng3d.Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
             };
             Object.defineProperty(Object3DControllerToolBase.prototype, "toolModel", {
                 get: function () {
@@ -2824,23 +2821,23 @@ var feng3d;
             }
             Object3DMoveTool.prototype.onAddedToScene = function () {
                 _super.prototype.onAddedToScene.call(this);
-                this.toolModel.xAxis.transform.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yAxis.transform.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.zAxis.transform.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yzPlane.transform.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.xzPlane.transform.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.xyPlane.transform.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.oCube.transform.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.xAxis.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.yAxis.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.zAxis.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.yzPlane.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.xzPlane.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.xyPlane.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.oCube.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             };
             Object3DMoveTool.prototype.onRemovedFromScene = function () {
                 _super.prototype.onRemovedFromScene.call(this);
-                this.toolModel.xAxis.transform.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yAxis.transform.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.zAxis.transform.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yzPlane.transform.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.xzPlane.transform.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.xyPlane.transform.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.oCube.transform.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.xAxis.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.yAxis.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.zAxis.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.yzPlane.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.xzPlane.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.xyPlane.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.oCube.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             };
             Object3DMoveTool.prototype.onItemMouseDown = function (event) {
                 //全局矩阵
@@ -2903,7 +2900,7 @@ var feng3d;
                 this.startPos = this.toolModel.transform.getPosition();
                 this.bindingObject3D.startTranslation();
                 //
-                feng3d.input.addEventListener(feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
+                feng3d.Event.on(feng3d.input, feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
             };
             Object3DMoveTool.prototype.onMouseMove = function () {
                 var crossPos = this.getLocalMousePlaneCross();
@@ -2918,7 +2915,7 @@ var feng3d;
             };
             Object3DMoveTool.prototype.onMouseUp = function () {
                 _super.prototype.onMouseUp.call(this);
-                feng3d.input.removeEventListener(feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
+                feng3d.Event.off(feng3d.input, feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
                 this.bindingObject3D.stopTranslation();
                 this.startPos = null;
                 this.startPlanePos = null;
@@ -2957,19 +2954,19 @@ var feng3d;
             }
             Object3DRotationTool.prototype.onAddedToScene = function () {
                 _super.prototype.onAddedToScene.call(this);
-                this.toolModel.xAxis.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yAxis.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.zAxis.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.freeAxis.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.cameraAxis.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.xAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.yAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.zAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.freeAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.cameraAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             };
             Object3DRotationTool.prototype.onRemovedFromScene = function () {
                 _super.prototype.onRemovedFromScene.call(this);
-                this.toolModel.xAxis.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yAxis.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.zAxis.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.freeAxis.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.cameraAxis.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.xAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.yAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.zAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.freeAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.cameraAxis, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             };
             Object3DRotationTool.prototype.onItemMouseDown = function (event) {
                 _super.prototype.onItemMouseDown.call(this, event);
@@ -3007,7 +3004,7 @@ var feng3d;
                 this.startSceneTransform = globalMatrix3D.clone();
                 this.bindingObject3D.startRotate();
                 //
-                feng3d.input.addEventListener(feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
+                feng3d.Event.on(feng3d.input, feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
             };
             Object3DRotationTool.prototype.onMouseMove = function () {
                 switch (this.selectedItem) {
@@ -3050,7 +3047,7 @@ var feng3d;
             };
             Object3DRotationTool.prototype.onMouseUp = function () {
                 _super.prototype.onMouseUp.call(this);
-                feng3d.input.removeEventListener(feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
+                feng3d.Event.off(feng3d.input, feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
                 if (this.selectedItem instanceof editor.CoordinateRotationAxis) {
                     this.selectedItem.hideSector();
                 }
@@ -3100,17 +3097,17 @@ var feng3d;
             }
             Object3DScaleTool.prototype.onAddedToScene = function () {
                 _super.prototype.onAddedToScene.call(this);
-                this.toolModel.xCube.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yCube.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.zCube.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.oCube.addEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.xCube, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.yCube, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.zCube, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.on(this.toolModel.oCube, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             };
             Object3DScaleTool.prototype.onRemovedFromScene = function () {
                 _super.prototype.onRemovedFromScene.call(this);
-                this.toolModel.xCube.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.yCube.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.zCube.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-                this.toolModel.oCube.removeEventListener(feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.xCube, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.yCube, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.zCube, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+                feng3d.Event.off(this.toolModel.oCube, feng3d.Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
             };
             Object3DScaleTool.prototype.onItemMouseDown = function (event) {
                 _super.prototype.onItemMouseDown.call(this, event);
@@ -3151,7 +3148,7 @@ var feng3d;
                 this.startPlanePos = this.getLocalMousePlaneCross();
                 this.bindingObject3D.startScale();
                 //
-                feng3d.input.addEventListener(feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
+                feng3d.Event.on(feng3d.input, feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
             };
             Object3DScaleTool.prototype.onMouseMove = function () {
                 var addPos = new feng3d.Vector3D();
@@ -3187,7 +3184,7 @@ var feng3d;
             };
             Object3DScaleTool.prototype.onMouseUp = function () {
                 _super.prototype.onMouseUp.call(this);
-                feng3d.input.removeEventListener(feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
+                feng3d.Event.off(feng3d.input, feng3d.inputType.MOUSE_MOVE, this.onMouseMove, this);
                 this.startPlanePos = null;
                 this.startSceneTransform = null;
                 //
@@ -3218,9 +3215,9 @@ var feng3d;
                 //
                 _this.currentTool = _this.object3DMoveTool;
                 feng3d.Watcher.watch(editor.editor3DData, ["object3DOperationID"], _this.onObject3DOperationIDChange, _this);
-                feng3d.shortcut.addEventListener("object3DMoveTool", _this.onObject3DMoveTool, _this);
-                feng3d.shortcut.addEventListener("object3DRotationTool", _this.onObject3DRotationTool, _this);
-                feng3d.shortcut.addEventListener("object3DScaleTool", _this.onObject3DScaleTool, _this);
+                feng3d.Event.on(feng3d.shortcut, "object3DMoveTool", _this.onObject3DMoveTool, _this);
+                feng3d.Event.on(feng3d.shortcut, "object3DRotationTool", _this.onObject3DRotationTool, _this);
+                feng3d.Event.on(feng3d.shortcut, "object3DScaleTool", _this.onObject3DScaleTool, _this);
                 feng3d.Watcher.watch(editor.editor3DData, ["selectedObject3D"], _this.onSelectedObject3DChange, _this);
                 return _this;
             }
@@ -3287,12 +3284,12 @@ var feng3d;
                 this.rootNode.depth = -1;
                 this.nodeMap.push(rootObject3D, this.rootNode);
                 //
-                rootObject3D.addEventListener(feng3d.Mouse3DEvent.CLICK, this.onMouseClick, this);
-                editor.$editorEventDispatcher.addEventListener("Create_Object3D", this.onCreateObject3D, this);
-                editor.$editorEventDispatcher.addEventListener("saveScene", this.onSaveScene, this);
-                editor.$editorEventDispatcher.addEventListener("import", this.onImport, this);
+                feng3d.Event.on(rootObject3D, "click", this.onMouseClick, this);
+                feng3d.Event.on(editor.$editorEventDispatcher, "Create_Object3D", this.onCreateObject3D, this);
+                feng3d.Event.on(editor.$editorEventDispatcher, "saveScene", this.onSaveScene, this);
+                feng3d.Event.on(editor.$editorEventDispatcher, "import", this.onImport, this);
                 //监听命令
-                feng3d.shortcut.addEventListener("deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
+                feng3d.Event.on(feng3d.shortcut, "deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
             }
             Object.defineProperty(Hierarchy.prototype, "selectedNode", {
                 get: function () {
@@ -3422,21 +3419,18 @@ var feng3d;
             return Hierarchy;
         }());
         editor.Hierarchy = Hierarchy;
-        var HierarchyNode = (function (_super) {
-            __extends(HierarchyNode, _super);
+        var HierarchyNode = (function () {
             function HierarchyNode(object3D) {
-                var _this = _super.call(this) || this;
-                _this.depth = 0;
-                _this.isOpen = true;
+                this.depth = 0;
+                this.isOpen = true;
                 /**
                  * 子节点列表
                  */
-                _this.children = [];
-                _this.object3D = object3D;
-                _this.label = object3D.name;
-                _this._uuid = Math.generateUUID();
-                feng3d.Watcher.watch(_this, ["isOpen"], _this.onIsOpenChange, _this);
-                return _this;
+                this.children = [];
+                this.object3D = object3D;
+                this.label = object3D.gameObject.name;
+                this._uuid = Math.generateUUID();
+                feng3d.Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
             }
             Object.defineProperty(HierarchyNode.prototype, "uuid", {
                 get: function () {
@@ -3465,7 +3459,7 @@ var feng3d;
                 node.depth = this.depth + 1;
                 node.updateChildrenDepth();
                 this.hasChildren = true;
-                this.dispatchEvent(new feng3d.Event(HierarchyNode.ADDED, node, true));
+                feng3d.Event.dispatch(this, HierarchyNode.ADDED, node, true);
             };
             HierarchyNode.prototype.removeNode = function (node) {
                 node.parent = null;
@@ -3474,7 +3468,7 @@ var feng3d;
                 console.assert(index != -1);
                 this.children.splice(index, 1);
                 this.hasChildren = this.children.length > 0;
-                this.dispatchEvent(new feng3d.Event(HierarchyNode.REMOVED, node, true));
+                feng3d.Event.dispatch(this, HierarchyNode.REMOVED, node, true);
             };
             HierarchyNode.prototype.delete = function () {
                 this.parent.removeNode(this);
@@ -3501,10 +3495,10 @@ var feng3d;
                 return nodes;
             };
             HierarchyNode.prototype.onIsOpenChange = function () {
-                this.dispatchEvent(new feng3d.Event(HierarchyNode.OPEN_CHANGED, this, true));
+                feng3d.Event.dispatch(this, HierarchyNode.OPEN_CHANGED, this, true);
             };
             return HierarchyNode;
-        }(feng3d.EventDispatcher));
+        }());
         HierarchyNode.ADDED = "added";
         HierarchyNode.REMOVED = "removed";
         HierarchyNode.OPEN_CHANGED = "openChanged";
@@ -3518,14 +3512,14 @@ var feng3d;
         var SceneControl = (function () {
             function SceneControl() {
                 this.controller = new feng3d.FPSController();
-                feng3d.shortcut.addEventListener("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
-                feng3d.shortcut.addEventListener("dragSceneStart", this.onDragSceneStart, this);
-                feng3d.shortcut.addEventListener("dragScene", this.onDragScene, this);
-                feng3d.shortcut.addEventListener("fpsViewStart", this.onFpsViewStart, this);
-                feng3d.shortcut.addEventListener("fpsViewStop", this.onFpsViewStop, this);
-                feng3d.shortcut.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
-                feng3d.shortcut.addEventListener("mouseRotateScene", this.onMouseRotateScene, this);
-                feng3d.shortcut.addEventListener("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
+                feng3d.Event.on(feng3d.shortcut, "lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
+                feng3d.Event.on(feng3d.shortcut, "dragSceneStart", this.onDragSceneStart, this);
+                feng3d.Event.on(feng3d.shortcut, "dragScene", this.onDragScene, this);
+                feng3d.Event.on(feng3d.shortcut, "fpsViewStart", this.onFpsViewStart, this);
+                feng3d.Event.on(feng3d.shortcut, "fpsViewStop", this.onFpsViewStop, this);
+                feng3d.Event.on(feng3d.shortcut, "mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+                feng3d.Event.on(feng3d.shortcut, "mouseRotateScene", this.onMouseRotateScene, this);
+                feng3d.Event.on(feng3d.shortcut, "mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
                 //
             }
             SceneControl.prototype.onDragSceneStart = function () {
@@ -3584,12 +3578,16 @@ var feng3d;
                     var lookPos = cameraObject3D.transform.localToWorldMatrix.forward;
                     lookPos.scaleBy(-config.lookDistance);
                     lookPos.incrementBy(selectedObject3D.transform.scenePosition);
-                    var localLookPos = cameraObject3D.transform.worldToLocalMatrix.transformVector(lookPos);
-                    egret.Tween.get(editor.editor3DData.cameraObject3D).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
+                    var localLookPos = lookPos.clone();
+                    if (cameraObject3D.transform.parent) {
+                        cameraObject3D.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
+                    }
+                    egret.Tween.get(editor.editor3DData.cameraObject3D.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
                 }
             };
             SceneControl.prototype.onMouseWheelMoveSceneCamera = function (event) {
-                var distance = event.data.wheelDelta * config.mouseWheelMoveStep;
+                var inputEvent = event.data;
+                var distance = inputEvent.wheelDelta * config.mouseWheelMoveStep;
                 editor.editor3DData.cameraObject3D.transform.localToWorldMatrix = editor.editor3DData.cameraObject3D.transform.localToWorldMatrix.moveForward(distance);
                 config.lookDistance -= distance;
             };
@@ -3672,7 +3670,7 @@ var feng3d;
             function Main3D() {
                 this.init();
                 //
-                feng3d.ticker.addEventListener(feng3d.Event.ENTER_FRAME, this.process, this);
+                feng3d.Event.on(feng3d.ticker, "enterFrame", this.process, this);
             }
             Main3D.prototype.process = function (event) {
                 editor.editor3DData.mouseInView3D.copyFrom(editor.editor3DData.view3D.mousePos);
@@ -3706,7 +3704,7 @@ var feng3d;
                 this.test();
             };
             Main3D.prototype.test = function () {
-                editor.editor3DData.scene3D.transform.addEventListener(feng3d.Mouse3DEvent.CLICK, function (event) {
+                feng3d.Event.on(editor.editor3DData.scene3D.transform, feng3d.Mouse3DEvent.CLICK, function (event) {
                     var transform = event.target;
                     var names = [transform.gameObject.name];
                     while (transform.parent) {
@@ -3718,7 +3716,7 @@ var feng3d;
                 // this.testMouseRay();
             };
             Main3D.prototype.testMouseRay = function () {
-                feng3d.input.addEventListener(feng3d.inputType.CLICK, function () {
+                feng3d.Event.on(feng3d.input, feng3d.inputType.CLICK, function () {
                     var gameobject = feng3d.GameObject.create("test");
                     gameobject.addComponent(feng3d.MeshRenderer).material = new feng3d.StandardMaterial();
                     gameobject.addComponent(feng3d.MeshFilter).mesh = new feng3d.SphereGeometry(10);
@@ -4020,7 +4018,7 @@ var feng3d;
         /*************************** 初始化模块 ***************************/
         //初始化配置
         feng3d.$objectViewConfig = objectViewConfig;
-        editor.$editorEventDispatcher = new feng3d.EventDispatcher();
+        editor.$editorEventDispatcher = {};
         //
         editor.editor3DData = new editor.Editor3DData();
     })(editor = feng3d.editor || (feng3d.editor = {}));

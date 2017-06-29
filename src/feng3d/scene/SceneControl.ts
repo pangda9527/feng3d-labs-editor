@@ -11,14 +11,14 @@ module feng3d.editor
         {
             this.controller = new FPSController();
 
-            shortcut.addEventListener("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
-            shortcut.addEventListener("dragSceneStart", this.onDragSceneStart, this);
-            shortcut.addEventListener("dragScene", this.onDragScene, this);
-            shortcut.addEventListener("fpsViewStart", this.onFpsViewStart, this);
-            shortcut.addEventListener("fpsViewStop", this.onFpsViewStop, this);
-            shortcut.addEventListener("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
-            shortcut.addEventListener("mouseRotateScene", this.onMouseRotateScene, this);
-            shortcut.addEventListener("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
+            Event.on(shortcut, <any>"lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
+            Event.on(shortcut, <any>"dragSceneStart", this.onDragSceneStart, this);
+            Event.on(shortcut, <any>"dragScene", this.onDragScene, this);
+            Event.on(shortcut, <any>"fpsViewStart", this.onFpsViewStart, this);
+            Event.on(shortcut, <any>"fpsViewStop", this.onFpsViewStop, this);
+            Event.on(shortcut, <any>"mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+            Event.on(shortcut, <any>"mouseRotateScene", this.onMouseRotateScene, this);
+            Event.on(shortcut, <any>"mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
         }
 
@@ -96,14 +96,19 @@ module feng3d.editor
                 var lookPos = cameraObject3D.transform.localToWorldMatrix.forward;
                 lookPos.scaleBy(-config.lookDistance);
                 lookPos.incrementBy(selectedObject3D.transform.scenePosition);
-                var localLookPos = cameraObject3D.transform.worldToLocalMatrix.transformVector(lookPos);
-                egret.Tween.get(editor3DData.cameraObject3D).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
+                var localLookPos = lookPos.clone();
+                if (cameraObject3D.transform.parent)
+                {
+                    cameraObject3D.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
+                }
+                egret.Tween.get(editor3DData.cameraObject3D.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
             }
         }
 
-        private onMouseWheelMoveSceneCamera(event: ShortCutEvent)
+        private onMouseWheelMoveSceneCamera(event: EventVO<any>)
         {
-            var distance = event.data.wheelDelta * config.mouseWheelMoveStep;
+            var inputEvent: InputEvent = event.data;
+            var distance = inputEvent.wheelDelta * config.mouseWheelMoveStep;
             editor3DData.cameraObject3D.transform.localToWorldMatrix = editor3DData.cameraObject3D.transform.localToWorldMatrix.moveForward(distance);
             config.lookDistance -= distance;
         }

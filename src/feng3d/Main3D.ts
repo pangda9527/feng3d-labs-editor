@@ -12,7 +12,7 @@ module feng3d.editor
         {
             this.init();
             //
-            ticker.addEventListener(Event.ENTER_FRAME, this.process, this);
+            Event.on(ticker, "enterFrame", this.process, this);
         }
 
         private process(event: Event)
@@ -59,7 +59,7 @@ module feng3d.editor
 
         private test()
         {
-            editor3DData.scene3D.transform.addEventListener(Mouse3DEvent.CLICK, (event) =>
+            Event.on(editor3DData.scene3D.transform, <any>Mouse3DEvent.CLICK, (event) =>
             {
                 var transform = <Transform><any>event.target;
                 var names = [transform.gameObject.name];
@@ -76,7 +76,7 @@ module feng3d.editor
 
         private testMouseRay()
         {
-            input.addEventListener(inputType.CLICK, () =>
+            Event.on(input, <any>inputType.CLICK, () =>
             {
                 var gameobject = GameObject.create("test");
                 gameobject.addComponent(MeshRenderer).material = new StandardMaterial();

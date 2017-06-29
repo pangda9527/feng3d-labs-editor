@@ -26,14 +26,14 @@ module feng3d.editor
             }
             if (this._target)
             {
-                this._source.removeEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onSourceTransformChanged, this);
-                this._target.removeEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onTargetTransformChanged, this);
+                Event.off(this._source, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onSourceTransformChanged, this);
+                Event.off(this._target, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onTargetTransformChanged, this);
             }
             this._target = value;
             if (this._target)
             {
-                this._source.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onSourceTransformChanged, this);
-                this._target.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onTargetTransformChanged, this);
+                Event.on(this._source, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onSourceTransformChanged, this);
+                Event.on(this._target, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onTargetTransformChanged, this);
                 this.doTargetTransformChanged();
             }
         }

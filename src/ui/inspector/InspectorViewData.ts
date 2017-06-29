@@ -5,7 +5,7 @@ module feng3d.editor
      * 巡视界面数据
      * @author feng     2017-03-20
      */
-    export class InspectorViewData extends EventDispatcher
+    export class InspectorViewData
     {
         public hasBackData = false;
 
@@ -14,7 +14,6 @@ module feng3d.editor
 
         constructor(editor3DData: Editor3DData)
         {
-            super();
             Watcher.watch(editor3DData, ["selectedObject3D"], this.updateView, this)
         }
 
@@ -32,14 +31,14 @@ module feng3d.editor
             //
             this.viewData = data;
 
-            this.dispatchEvent(new Event(Event.CHANGE));
+            Event.dispatch(this, "change");
         }
 
         public back()
         {
             this.viewData = this.viewDataList.pop();
             this.hasBackData = this.viewDataList.length > 0;
-            this.dispatchEvent(new Event(Event.CHANGE));
+            Event.dispatch(this, "change");
         }
 
         private updateView()

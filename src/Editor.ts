@@ -40,8 +40,7 @@ module feng3d.editor
     //初始化配置
     $objectViewConfig = objectViewConfig;
 
-
-    export var $editorEventDispatcher: EventDispatcher = new EventDispatcher();
+    export var $editorEventDispatcher = {};
 
     //
     export var editor3DData = new Editor3DData();
