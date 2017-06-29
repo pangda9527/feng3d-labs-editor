@@ -97,7 +97,7 @@ var feng3d;
          *
          * @static
          * @param {Object} object				用于生成界面的对象
-         * @returns {egret.DisplayObject}		对象界面
+         * @returns 							对象界面
          *
          * @memberOf ObjectView
          */
@@ -105,7 +105,7 @@ var feng3d;
             var classConfig = this.getObjectInfo(object);
             if (classConfig.component == null || classConfig.component == "") {
                 //返回基础类型界面类定义
-                if (feng3d.ClassUtils.isBaseType(classConfig.owner)) {
+                if (!(classConfig.owner instanceof Object)) {
                     classConfig.component = feng3d.$objectViewConfig.defaultBaseObjectViewClass;
                 }
             }

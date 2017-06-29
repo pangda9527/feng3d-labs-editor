@@ -13,7 +13,7 @@ module feng3d.editor
 		public hierachyGroup: eui.Group;
 		public assetsGroup: eui.Group;
 
-		private watchers: Watcher[] = [];
+		private watchers: eui.Watcher[] = [];
 
 		public constructor()
 		{
@@ -47,7 +47,7 @@ module feng3d.editor
 			createObject3DView = createObject3DView || new CreateObject3DView();
 
 			this.watchers.push(
-				Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this)
+				eui.Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this)
 			);
 		}
 

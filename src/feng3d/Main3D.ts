@@ -59,7 +59,7 @@ module feng3d.editor
 
         private test()
         {
-            Event.on(editor3DData.scene3D.transform, <any>Mouse3DEvent.CLICK, (event) =>
+            Event.on(editor3DData.scene3D.transform, <any>Mouse3DEvent.MOUSE_DOWN, (event) =>
             {
                 var transform = <Transform><any>event.target;
                 var names = [transform.gameObject.name];

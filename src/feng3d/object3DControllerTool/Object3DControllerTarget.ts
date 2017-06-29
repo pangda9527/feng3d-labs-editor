@@ -185,7 +185,7 @@ module feng3d.editor
 
         public doScale(scale: Vector3D)
         {
-            debuger && assert(!!scale.length);
+            debuger && console.assert(!!scale.length);
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
                 var result = this.startScaleVec[i].multiply(scale);

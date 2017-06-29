@@ -752,7 +752,7 @@ var feng3d;
                     this.text.text = String(this.attributeValue);
                     this.text.enabled = false;
                 }
-                else if (feng3d.ClassUtils.isBaseType(this.attributeValue)) {
+                else if (!(this.attributeValue instanceof Object)) {
                     this.text.text = String(this.attributeValue);
                 }
                 else {
@@ -1063,7 +1063,7 @@ var feng3d;
             }
             OAVVector3D.prototype.onComplete = function () {
                 this.vector3DView.vm = this.attributeValue;
-                feng3d.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
+                eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
                 this.updateView();
             };
             Object.defineProperty(OAVVector3D.prototype, "space", {
@@ -1207,7 +1207,7 @@ var feng3d;
             function InspectorViewData(editor3DData) {
                 this.hasBackData = false;
                 this.viewDataList = [];
-                feng3d.Watcher.watch(editor3DData, ["selectedObject3D"], this.updateView, this);
+                eui.Watcher.watch(editor3DData, ["selectedObject3D"], this.updateView, this);
             }
             InspectorViewData.prototype.showData = function (data, removeBack) {
                 if (removeBack === void 0) { removeBack = false; }
@@ -1374,7 +1374,7 @@ var feng3d;
                 feng3d.Event.on(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
                 feng3d.Event.on(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
                 this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
-                this.watchers.push(feng3d.Watcher.watch(editor.editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this));
+                this.watchers.push(eui.Watcher.watch(editor.editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this));
             };
             HierarchyView.prototype.onRemovedFromStage = function () {
                 this.addButton.removeEventListener(editor.MouseEvent.CLICK, this.onAddButtonClick, this);
@@ -1444,7 +1444,7 @@ var feng3d;
                 this.mainButton.addEventListener(editor.MouseEvent.CLICK, this.onMainButtonClick, this);
                 //
                 editor.createObject3DView = editor.createObject3DView || new editor.CreateObject3DView();
-                this.watchers.push(feng3d.Watcher.watch(editor.editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this));
+                this.watchers.push(eui.Watcher.watch(editor.editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this));
             };
             MainView.prototype.onRemovedFromStage = function () {
                 this.moveButton.removeEventListener(editor.MouseEvent.CLICK, this.onButtonClick, this);
@@ -2002,7 +2002,7 @@ var feng3d;
                 }
             };
             Object3DControllerTarget.prototype.doScale = function (scale) {
-                feng3d.debuger && feng3d.assert(!!scale.length);
+                feng3d.debuger && console.assert(!!scale.length);
                 for (var i = 0; i < this._controllerTargets.length; i++) {
                     var result = this.startScaleVec[i].multiply(scale);
                     this._controllerTargets[i].scaleX = result.x;
@@ -3214,11 +3214,11 @@ var feng3d;
                 _this.object3DScaleTool.bindingObject3D = _this.object3DControllerTarget;
                 //
                 _this.currentTool = _this.object3DMoveTool;
-                feng3d.Watcher.watch(editor.editor3DData, ["object3DOperationID"], _this.onObject3DOperationIDChange, _this);
+                eui.Watcher.watch(editor.editor3DData, ["object3DOperationID"], _this.onObject3DOperationIDChange, _this);
                 feng3d.Event.on(feng3d.shortcut, "object3DMoveTool", _this.onObject3DMoveTool, _this);
                 feng3d.Event.on(feng3d.shortcut, "object3DRotationTool", _this.onObject3DRotationTool, _this);
                 feng3d.Event.on(feng3d.shortcut, "object3DScaleTool", _this.onObject3DScaleTool, _this);
-                feng3d.Watcher.watch(editor.editor3DData, ["selectedObject3D"], _this.onSelectedObject3DChange, _this);
+                eui.Watcher.watch(editor.editor3DData, ["selectedObject3D"], _this.onSelectedObject3DChange, _this);
                 return _this;
             }
             Object3DControllerTool.prototype.onSelectedObject3DChange = function () {
@@ -3430,7 +3430,7 @@ var feng3d;
                 this.object3D = object3D;
                 this.label = object3D.gameObject.name;
                 this._uuid = Math.generateUUID();
-                feng3d.Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
+                eui.Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
             }
             Object.defineProperty(HierarchyNode.prototype, "uuid", {
                 get: function () {
@@ -3704,7 +3704,7 @@ var feng3d;
                 this.test();
             };
             Main3D.prototype.test = function () {
-                feng3d.Event.on(editor.editor3DData.scene3D.transform, feng3d.Mouse3DEvent.CLICK, function (event) {
+                feng3d.Event.on(editor.editor3DData.scene3D.transform, feng3d.Mouse3DEvent.MOUSE_DOWN, function (event) {
                     var transform = event.target;
                     var names = [transform.gameObject.name];
                     while (transform.parent) {

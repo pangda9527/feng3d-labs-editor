@@ -77,7 +77,7 @@ module feng3d.editor
 			{
 				this.text.text = String(this.attributeValue);
 				this.text.enabled = false;
-			} else if (ClassUtils.isBaseType(this.attributeValue))
+			} else if (!(this.attributeValue instanceof Object))
 			{
 				this.text.text = String(this.attributeValue);
 			} else

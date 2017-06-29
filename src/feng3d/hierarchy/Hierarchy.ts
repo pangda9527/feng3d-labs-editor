@@ -219,7 +219,7 @@ module feng3d.editor
             this.label = object3D.gameObject.name;
             this._uuid = Math.generateUUID();
 
-            Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
+            eui.Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
         }
 
         /**

@@ -25,7 +25,7 @@ module feng3d.editor
 		private onComplete()
 		{
 			this.vector3DView.vm = <any>this.attributeValue;
-			Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
+			eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
 
 			this.updateView();
 		}

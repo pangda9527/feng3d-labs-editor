@@ -351,7 +351,7 @@ declare module feng3d {
          *
          * @static
          * @param {Object} object				用于生成界面的对象
-         * @returns {egret.DisplayObject}		对象界面
+         * @returns 							对象界面
          *
          * @memberOf ObjectView
          */

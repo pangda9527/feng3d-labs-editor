@@ -7,7 +7,7 @@ module feng3d.editor
 
 		private listData: eui.ArrayCollection;
 
-		private watchers: Watcher[] = [];
+		private watchers: eui.Watcher[] = [];
 
 		public constructor()
 		{
@@ -39,7 +39,7 @@ module feng3d.editor
 			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
 
 			this.watchers.push(
-				Watcher.watch(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this)
+				eui.Watcher.watch(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this)
 			);
 		}
 

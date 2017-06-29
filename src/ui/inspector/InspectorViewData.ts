@@ -14,7 +14,7 @@ module feng3d.editor
 
         constructor(editor3DData: Editor3DData)
         {
-            Watcher.watch(editor3DData, ["selectedObject3D"], this.updateView, this)
+            eui.Watcher.watch(editor3DData, ["selectedObject3D"], this.updateView, this)
         }
 
         public showData(data: any, removeBack = false)
