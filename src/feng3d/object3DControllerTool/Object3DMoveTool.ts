@@ -16,8 +16,6 @@ module feng3d.editor
         {
             super(gameObject);
 
-            this.object3DControllerToolBingding = new Object3DMoveBinding(this.transform);
-
             this.toolModel = GameObject.create().addComponent(Object3DMoveModel);
         }
 
@@ -105,8 +103,8 @@ module feng3d.editor
             //
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
-            this.startPos = this.toolModel.transform.getPosition();
-            this.bindingObject3D.startTranslation();
+            this.startPos = this.toolModel.transform.position;
+            this.object3DControllerTarget.startTranslation();
             //
             Event.on(input, <any>inputType.MOUSE_MOVE, this.onMouseMove, this);
         }
@@ -121,7 +119,7 @@ module feng3d.editor
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
             var sceneAddpos = sceneTransform.position.subtract(this.startSceneTransform.position);
-            this.bindingObject3D.translation(sceneAddpos);
+            this.object3DControllerTarget.translation(sceneAddpos);
         }
 
         protected onMouseUp()
@@ -129,7 +127,7 @@ module feng3d.editor
             super.onMouseUp()
             Event.off(input, <any>inputType.MOUSE_MOVE, this.onMouseMove, this);
 
-            this.bindingObject3D.stopTranslation();
+            this.object3DControllerTarget.stopTranslation();
             this.startPos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;

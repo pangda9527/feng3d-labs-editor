@@ -139,7 +139,7 @@ module feng3d.editor
                     } else
                     {
                         var json = JSON.parse(reader.result);
-                        var scene: Scene3D = serialization.readObject(json);
+                        var scene: Scene3D = Serialization.deserialize(json);
 
                         editor3DData.hierarchy.resetScene(scene);
                     }
@@ -161,7 +161,7 @@ module feng3d.editor
 
         private onSaveScene()
         {
-            var obj = serialization.writeObject(this.rootNode.object3D);
+            var obj = Serialization.serialize(this.rootNode.object3D);
             obj;
 
             var output = "";

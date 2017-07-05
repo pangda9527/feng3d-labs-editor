@@ -13,8 +13,6 @@ module feng3d.editor
         constructor(gameObject: GameObject)
         {
             super(gameObject);
-            this.object3DControllerToolBingding = new Object3DScaleBinding(this.transform);
-
             this.toolModel = GameObject.create().addComponent(Object3DScaleModel);
         }
 
@@ -22,25 +20,24 @@ module feng3d.editor
         {
             super.onAddedToScene();
 
-            Event.on(this.toolModel.xCube, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.yCube, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.zCube, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.oCube, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.xCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.yCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.zCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.oCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
         protected onRemovedFromScene()
         {
             super.onRemovedFromScene();
 
-            Event.off(this.toolModel.xCube, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.yCube, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.zCube, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.oCube, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.xCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.yCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.zCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.oCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
         protected onItemMouseDown(event: EventVO<any>)
         {
-            super.onItemMouseDown(event);
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -56,21 +53,26 @@ module feng3d.editor
             var cameraSceneTransform = editor3DData.cameraObject3D.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
-            switch (this.selectedItem)
+            var selectedTransform: Transform = <any>event.currentTarget;
+            switch (selectedTransform)
             {
-                case this.toolModel.xCube:
+                case this.toolModel.xCube.transform:
+                    this.selectedItem = this.toolModel.xCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
                     this.changeXYZ.setTo(1, 0, 0);
                     break;
-                case this.toolModel.yCube:
+                case this.toolModel.yCube.transform:
+                    this.selectedItem = this.toolModel.yCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
                     this.changeXYZ.setTo(0, 1, 0);
                     break;
-                case this.toolModel.zCube:
+                case this.toolModel.zCube.transform:
+                    this.selectedItem = this.toolModel.zCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
                     this.changeXYZ.setTo(0, 0, 1);
                     break;
-                case this.toolModel.oCube:
+                case this.toolModel.oCube.transform:
+                    this.selectedItem = this.toolModel.oCube;
                     this.startMousePos = editor3DData.mouseInView3D.clone();
                     this.changeXYZ.setTo(1, 1, 1);
                     break;
@@ -78,7 +80,7 @@ module feng3d.editor
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
 
-            this.bindingObject3D.startScale();
+            this.object3DControllerTarget.startScale();
             //
             Event.on(input, <any>inputType.MOUSE_MOVE, this.onMouseMove, this);
         }
@@ -114,7 +116,7 @@ module feng3d.editor
                 addScale.y += 1;
                 addScale.z += 1;
             }
-            this.bindingObject3D.doScale(addScale);
+            this.object3DControllerTarget.doScale(addScale);
             //
             this.toolModel.xCube.scaleValue = addScale.x;
             this.toolModel.yCube.scaleValue = addScale.y;

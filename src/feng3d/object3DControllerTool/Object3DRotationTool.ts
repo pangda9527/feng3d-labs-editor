@@ -9,38 +9,33 @@ module feng3d.editor
         constructor(gameObject: GameObject)
         {
             super(gameObject);
-
-            this.object3DControllerToolBingding = new Object3DRotationBinding(this.transform);
-
             this.toolModel = GameObject.create().addComponent(Object3DRotationModel);
         }
         protected onAddedToScene()
         {
             super.onAddedToScene();
 
-            Event.on(this.toolModel.xAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.yAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.zAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.freeAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.cameraAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.xAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.yAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.zAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.freeAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.on(this.toolModel.cameraAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
         protected onRemovedFromScene()
         {
             super.onRemovedFromScene();
 
-            Event.off(this.toolModel.xAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.yAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.zAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.freeAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.cameraAxis, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.xAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.yAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.zAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.freeAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            Event.off(this.toolModel.cameraAxis.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
         }
 
 
         protected onItemMouseDown(event: EventVO<any>)
         {
-            super.onItemMouseDown(event);
-
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -53,28 +48,35 @@ module feng3d.editor
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.position;
             this.movePlane3D = new Plane3D();
-            switch (this.selectedItem)
+            var selectedTransform: Transform = <any>event.currentTarget;
+            switch (selectedTransform)
             {
-                case this.toolModel.xAxis:
+                case this.toolModel.xAxis.transform:
+                    this.selectedItem = this.toolModel.xAxis;
                     this.movePlane3D.fromNormalAndPoint(xDir, pos);
                     break;
-                case this.toolModel.yAxis:
+                case this.toolModel.yAxis.transform:
+                    this.selectedItem = this.toolModel.yAxis;
                     this.movePlane3D.fromNormalAndPoint(yDir, pos);
                     break;
-                case this.toolModel.zAxis:
+                case this.toolModel.zAxis.transform:
+                    this.selectedItem = this.toolModel.zAxis;
+                    this.selectedItem = this.toolModel.zAxis;
                     this.movePlane3D.fromNormalAndPoint(zDir, pos);
                     break;
-                case this.toolModel.freeAxis:
+                case this.toolModel.freeAxis.transform:
+                    this.selectedItem = this.toolModel.freeAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir, pos);
                     break;
-                case this.toolModel.cameraAxis:
+                case this.toolModel.cameraAxis.transform:
+                    this.selectedItem = this.toolModel.cameraAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir, pos);
                     break;
             }
             this.startPlanePos = this.getMousePlaneCross();
             this.startMousePos = editor3DData.mouseInView3D.clone();
             this.startSceneTransform = globalMatrix3D.clone();
-            this.bindingObject3D.startRotate();
+            this.object3DControllerTarget.startRotate();
             //
             Event.on(input, <any>inputType.MOUSE_MOVE, this.onMouseMove, this);
         }
@@ -101,7 +103,7 @@ module feng3d.editor
                     sign = sign > 0 ? 1 : -1;
                     angle = angle * sign;
                     //
-                    this.bindingObject3D.rotate1(angle, this.movePlane3D.normal);
+                    this.object3DControllerTarget.rotate1(angle, this.movePlane3D.normal);
                     //绘制扇形区域
                     if (this.selectedItem instanceof CoordinateRotationAxis)
                     {
@@ -114,10 +116,10 @@ module feng3d.editor
                     var cameraSceneTransform = editor3DData.cameraObject3D.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
-                    this.bindingObject3D.rotate2(-offset.y, right, -offset.x, up);
+                    this.object3DControllerTarget.rotate2(-offset.y, right, -offset.x, up);
                     //
                     this.startMousePos = endPoint;
-                    this.bindingObject3D.startRotate();
+                    this.object3DControllerTarget.startRotate();
                     break;
             }
         }
@@ -132,7 +134,7 @@ module feng3d.editor
                 this.selectedItem.hideSector();
             }
 
-            this.bindingObject3D.stopRote();
+            this.object3DControllerTarget.stopRote();
             this.startMousePos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
@@ -155,8 +157,8 @@ module feng3d.editor
             temp.append(this.toolModel.transform.worldToLocalMatrix);
             var rotation = temp.decompose()[1];
             rotation.scaleBy(MathConsts.RADIANS_TO_DEGREES);
-            this.toolModel.freeAxis.transform.setRotation(rotation.x, rotation.y, rotation.z);
-            this.toolModel.cameraAxis.transform.setRotation(rotation.x, rotation.y, rotation.z);
+            this.toolModel.freeAxis.transform.rotation = rotation;
+            this.toolModel.cameraAxis.transform.rotation = rotation;
         }
     }
 }

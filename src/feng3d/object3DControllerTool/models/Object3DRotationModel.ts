@@ -20,13 +20,13 @@ module feng3d.editor
             this.xAxis = GameObject.create("xAxis").addComponent(CoordinateRotationAxis);
             this.xAxis.color.setTo(1, 0, 0);
             this.xAxis.update();
-            this.xAxis.transform.rotationY = 90;
+            this.xAxis.transform.ry = 90;
             this.transform.addChild(this.xAxis.transform);
 
             this.yAxis = GameObject.create("yAxis").addComponent(CoordinateRotationAxis);
             this.yAxis.color.setTo(0, 1, 0);
             this.yAxis.update();
-            this.yAxis.transform.rotationX = 90;
+            this.yAxis.transform.rx = 90;
             this.transform.addChild(this.yAxis.transform);
 
             this.zAxis = GameObject.create("zAxis").addComponent(CoordinateRotationAxis);
@@ -87,7 +87,7 @@ module feng3d.editor
             var mouseHit = GameObject.create("hit");
             this.torusGeometry = mouseHit.addComponent(MeshFilter).mesh = new TorusGeometry(this.radius, 2);
             mouseHit.addComponent(MeshRenderer).material = new StandardMaterial();
-            mouseHit.transform.rotationX = 90;
+            mouseHit.transform.rx = 90;
             mouseHit.transform.visible = false;
             mouseHit.transform.mouseEnabled = true;
             this.transform.addChild(mouseHit.transform);

@@ -24,7 +24,7 @@ module feng3d.editor
             var xAxis = GameObject.create("xAxis");
             this.xAxis = xAxis.addComponent(CoordinateAxis);
             this.xAxis.color.setTo(1, 0, 0);
-            xAxis.transform.rotationZ = -90;
+            xAxis.transform.rz = -90;
             this.transform.addChild(xAxis.transform);
 
             var yAxis = GameObject.create("yAxis");
@@ -35,7 +35,7 @@ module feng3d.editor
             var zAxis = GameObject.create("zAxis");
             this.zAxis = zAxis.addComponent(CoordinateAxis);
             this.zAxis.color.setTo(0, 0, 1);
-            zAxis.transform.rotationX = 90;
+            zAxis.transform.rx = 90;
             this.transform.addChild(zAxis.transform);
 
             var yzPlane = GameObject.create("yzPlane");
@@ -43,7 +43,7 @@ module feng3d.editor
             this.yzPlane.color.setTo(1, 0, 0, 0.2);
             this.yzPlane.selectedColor.setTo(1, 0, 0, 0.5);
             this.yzPlane.borderColor.setTo(1, 0, 0);
-            yzPlane.transform.rotationZ = 90;
+            yzPlane.transform.rz = 90;
             this.transform.addChild(this.yzPlane.transform);
 
             this.xzPlane = GameObject.create("xzPlane").addComponent(CoordinatePlane);
@@ -56,7 +56,7 @@ module feng3d.editor
             this.xyPlane.color.setTo(0, 0, 1, 0.2);
             this.xyPlane.selectedColor.setTo(0, 0, 1, 0.5);
             this.xyPlane.borderColor.setTo(0, 0, 1);
-            this.xyPlane.transform.rotationX = -90;
+            this.xyPlane.transform.rx = -90;
             this.transform.addChild(this.xyPlane.transform);
 
             this.oCube = GameObject.create("oCube").addComponent(CoordinateCube);

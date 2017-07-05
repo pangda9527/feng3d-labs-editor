@@ -41,15 +41,12 @@ module feng3d.editor
             var trident = GameObject.create("Trident");
             trident.addComponent(Trident);
             view3D.scene.transform.addChild(trident.transform);
-            serializationConfig.excludeObject.push(trident);
 
             //初始化模块
             var groundGrid = GameObject.create("GroundGrid").addComponent(GroundGrid);
             view3D.scene.transform.addChild(groundGrid.transform);
-            serializationConfig.excludeObject.push(groundGrid);
 
             var object3DControllerTool = GameObject.create("object3DControllerTool").addComponent(Object3DControllerTool);
-            serializationConfig.excludeObject.push(object3DControllerTool);
 
             //
             var sceneControl = new SceneControl();

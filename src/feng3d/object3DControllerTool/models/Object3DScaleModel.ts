@@ -20,7 +20,7 @@ module feng3d.editor
             this.xCube = GameObject.create("xCube").addComponent(CoordinateScaleCube);
             this.xCube.color.setTo(1, 0, 0);
             this.xCube.update();
-            this.xCube.transform.rotationZ = -90;
+            this.xCube.transform.rz = -90;
             this.transform.addChild(this.xCube.transform);
 
             this.yCube = GameObject.create("yCube").addComponent(CoordinateScaleCube);
@@ -31,7 +31,7 @@ module feng3d.editor
             this.zCube = GameObject.create("zCube").addComponent(CoordinateScaleCube);
             this.zCube.color.setTo(0, 0, 1);
             this.zCube.update();
-            this.zCube.transform.rotationX = 90;
+            this.zCube.transform.rx = 90;
             this.transform.addChild(this.zCube.transform);
 
             this.oCube = GameObject.create("oCube").addComponent(CoordinateCube);

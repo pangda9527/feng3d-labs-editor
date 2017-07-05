@@ -12,7 +12,7 @@ module feng3d.editor
         protected movePlane3D: Plane3D;
         protected startSceneTransform: Matrix3D;
 
-        protected object3DControllerToolBingding: Object3DControllerToolBinding;
+        protected _object3DControllerTarget: Object3DControllerTarget;
 
         constructor(gameObject: GameObject)
         {
@@ -26,6 +26,8 @@ module feng3d.editor
         protected onAddedToScene()
         {
             this.updateToolModel();
+            this._object3DControllerTarget.controllerTool = this.transform;
+            //
             Event.on(input, <any>inputType.MOUSE_DOWN, this.onMouseDown, this);
             Event.on(input, <any>inputType.MOUSE_UP, this.onMouseUp, this);
             Event.on(this, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
@@ -34,6 +36,8 @@ module feng3d.editor
 
         protected onRemovedFromScene()
         {
+            this._object3DControllerTarget.controllerTool = null;
+            //
             Event.off(input, <any>inputType.MOUSE_DOWN, this.onMouseDown, this);
             Event.off(input, <any>inputType.MOUSE_UP, this.onMouseUp, this);
             Event.off(this, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
@@ -72,14 +76,14 @@ module feng3d.editor
                 this._selectedItem.selected = true;
         }
 
-        public get bindingObject3D(): Object3DControllerTarget
+        public get object3DControllerTarget(): Object3DControllerTarget
         {
-            return this.object3DControllerToolBingding.target.getComponent(Object3DControllerTarget);
+            return this._object3DControllerTarget;
         }
 
-        public set bindingObject3D(value)
+        public set object3DControllerTarget(value)
         {
-            this.object3DControllerToolBingding.target = value.transform;
+            this._object3DControllerTarget = value;
         }
 
         protected updateToolModel()
@@ -98,11 +102,6 @@ module feng3d.editor
             this.ismouseDown = false;
             this.movePlane3D = null;
             this.startSceneTransform = null;
-        }
-
-        protected onItemMouseDown(event: EventVO<any>)
-        {
-            this.selectedItem = <any>event.currentTarget;
         }
 
         protected onScenetransformChanged()

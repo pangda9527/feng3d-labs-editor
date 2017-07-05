@@ -1,59 +1,87 @@
 module feng3d.editor
 {
-
-    export class Object3DControllerTarget extends Component
+    export class Object3DControllerTarget
     {
-        private _controllerTargets: Transform[];
-        private startGlobalMatrixVec: Matrix3D[] = [];
-        private startScaleVec: Vector3D[] = [];
-
-        private controllerImage = GameObject.create();
-        private startControllerImageGlobalMatrix3D: Matrix3D;
-
-        private isWoldCoordinate = false;
-        private isBaryCenter = false;
-
-        //
-        private _showObject3D = GameObject.create();
-        private controllerBindingShowTarget: Object3DTransformBinding;
-        private controllerBinding: Object3DSceneTransformBinding;
-        private targetBindings: Object3DTransformBinding[] = [];
-
-        constructor(gameObject:GameObject)
+        private static _instance: Object3DControllerTarget;
+        static get instance()
         {
-            super(gameObject);
-            this.controllerBindingShowTarget = new Object3DTransformBinding(this._showObject3D.transform);
-            this.controllerBinding = new Object3DSceneTransformBinding(this.transform);
-            serializationConfig.excludeObject.push(this.controllerImage);
+            return this._instance || (this._instance = new Object3DControllerTarget());
         }
 
-        public set controllerTargets(value: Transform[])
+        //
+        private _controllerTargets: Transform[];
+        private _startScaleVec: Vector3D[] = [];
+        private _isWoldCoordinate = false;
+        private _isBaryCenter = false;
+        private _showObject3D: Transform;
+        private _controllerToolTransfrom: Transform = GameObject.create("controllerToolTransfrom").transform;
+        private _controllerTool: Transform;
+        private _startTransformDic: { [uuid: string]: { position: Vector3D, rotation: Vector3D, scale: Vector3D } };
+
+        //
+        get showObject3D()
+        {
+            return this._showObject3D;
+        }
+        set showObject3D(value)
+        {
+            if (this._showObject3D)
+                Event.off(this._showObject3D, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onShowObjectTransformChanged, this);
+            this._showObject3D = value;
+            if (this._showObject3D)
+                Event.on(this._showObject3D, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onShowObjectTransformChanged, this);
+        }
+
+        get controllerTool()
+        {
+            return this._controllerTool;
+        }
+
+        set controllerTool(value)
+        {
+            this._controllerTool = value;
+            if (this._controllerTool)
+            {
+                this._controllerTool.position = this._controllerToolTransfrom.position;
+                this._controllerTool.rotation = this._controllerToolTransfrom.rotation;
+            }
+        }
+
+        set controllerTargets(value: Transform[])
         {
             if (this._controllerTargets && this._controllerTargets.length > 0)
             {
-                this.controllerBindingShowTarget.target = null;
-                this.targetBindings.length = 0;
-                if (this.controllerImage.transform.parent)
-                {
-                    this.controllerImage.transform.parent.removeChild(this.controllerImage.transform);
-                }
-                this.controllerImage.transform.localToWorldMatrix = new Matrix3D();
+                this.showObject3D = null;
             }
             this._controllerTargets = value;
             if (this._controllerTargets && this._controllerTargets.length > 0)
             {
-                this.controllerBindingShowTarget.target = this._controllerTargets[0];
-                this._controllerTargets[0].addChild(this.controllerImage.transform);
+                this.showObject3D = this._controllerTargets[0];
                 this.updateControllerImage();
-                this.controllerBinding.target = this.controllerImage.transform;
             }
+        }
+
+        private constructor() { }
+
+        private onShowObjectTransformChanged(event: EventVO<any>)
+        {
+            for (var i = 0; i < this._controllerTargets.length; i++)
+            {
+                if (this._controllerTargets[i] != this._showObject3D)
+                {
+                    this._controllerTargets[i].position = this._showObject3D.position;
+                    this._controllerTargets[i].rotation = this._showObject3D.rotation;
+                    this._controllerTargets[i].scale = this._showObject3D.scale;
+                }
+            }
+            this.updateControllerImage();
         }
 
         private updateControllerImage()
         {
             var object3D = this._controllerTargets[0];
             var position = new Vector3D();
-            if (this.isBaryCenter)
+            if (this._isBaryCenter)
             {
                 position.copyFrom(object3D.scenePosition);
             } else
@@ -64,141 +92,197 @@ module feng3d.editor
                 }
                 position.scaleBy(1 / this._controllerTargets.length);
             }
-            var vec = object3D.localToWorldMatrix.decompose();
-            vec[0] = position;
-            vec[2].setTo(1, 1, 1);
-            if (this.isWoldCoordinate)
+            var rotation = new Vector3D();
+            if (this._isWoldCoordinate)
             {
-                vec[1].setTo(0, 0, 0);
+                rotation = this._showObject3D.rotation;
             }
-            tempGlobalMatrix.recompose(vec);
-            this.controllerImage.transform.localToWorldMatrix = tempGlobalMatrix;
-        }
-
-        public startTranslation()
-        {
-            for (var i = 0; i < this._controllerTargets.length; i++)
+            this._controllerToolTransfrom.position = position;
+            this._controllerToolTransfrom.rotation = rotation;
+            if (this._controllerTool)
             {
-                this.startGlobalMatrixVec[i] = this._controllerTargets[i].localToWorldMatrix.clone();
+                this._controllerTool.position = position;
+                this._controllerTool.rotation = rotation;
             }
         }
 
-        public translation(addPos: Vector3D)
+        /**
+         * 开始移动
+         */
+        startTranslation()
         {
-            if (addPos.length == 0)
-                return;
-            for (var i = 0; i < this._controllerTargets.length; i++)
+            this._startTransformDic = {};
+            var objects = this._controllerTargets.concat();
+            objects.push(this._controllerTool);
+            for (var i = 0; i < objects.length; i++)
             {
-                tempGlobalMatrix.copyFrom(this.startGlobalMatrixVec[i]);
-                tempGlobalMatrix.appendTranslation(addPos.x, addPos.y, addPos.z);
-                this._controllerTargets[i].localToWorldMatrix = tempGlobalMatrix;
+                var object3d = objects[i];
+                this._startTransformDic[object3d.uuid] = { position: object3d.position, rotation: object3d.rotation, scale: object3d.scale };
             }
         }
 
-        public stopTranslation()
+        translation(addPos: Vector3D)
         {
-            this.startGlobalMatrixVec.length = 0;
-        }
-
-        public startRotate()
-        {
-            this.startControllerImageGlobalMatrix3D = this.controllerImage.transform.localToWorldMatrix.clone();
-            for (var i = 0; i < this._controllerTargets.length; i++)
+            var objects = this._controllerTargets.concat();
+            objects.push(this._controllerTool);
+            for (var i = 0; i < objects.length; i++)
             {
-                this.startGlobalMatrixVec[i] = this._controllerTargets[i].localToWorldMatrix.clone();
+                var object3d = objects[i];
+                var transform = this._startTransformDic[object3d.uuid];
+                var localMove = addPos.clone();
+                if (object3d.parent)
+                    localMove = object3d.parent.worldToLocalMatrix.deltaTransformVector(localMove);
+                object3d.position = transform.position.add(localMove);
             }
         }
 
-        public rotate1(angle: number, normal: Vector3D)
+        stopTranslation()
         {
-            if (!this.isWoldCoordinate && this.isBaryCenter)
+            this._startTransformDic = null;
+        }
+
+        startRotate()
+        {
+            this._startTransformDic = {};
+            var objects = this._controllerTargets.concat();
+            objects.push(this._controllerTool);
+            for (var i = 0; i < objects.length; i++)
             {
-                tempGlobalMatrix.copyFrom(this.startGlobalMatrixVec[0]);
-                tempGlobalMatrix.invert();
-                normal = tempGlobalMatrix.deltaTransformVector(normal);
+                var object3d = objects[i];
+                this._startTransformDic[object3d.uuid] = { position: object3d.position, rotation: object3d.rotation, scale: object3d.scale };
             }
-            for (var i = 0; i < this._controllerTargets.length; i++)
+        }
+
+        /**
+         * 绕指定轴旋转
+         * @param angle 旋转角度
+         * @param normal 旋转轴
+         */
+        rotate1(angle: number, normal: Vector3D)
+        {
+            var objects = this._controllerTargets.concat();
+            objects.push(this._controllerTool);
+            var localnormal: Vector3D;
+            var object3d = objects[0];
+            if (!this._isWoldCoordinate && this._isBaryCenter)
             {
-                tempGlobalMatrix.copyFrom(this.startGlobalMatrixVec[i]);
-                if (!this.isWoldCoordinate && this.isBaryCenter)
+                if (object3d.parent)
+                    localnormal = object3d.parent.worldToLocalMatrix.deltaTransformVector(normal);
+            }
+            for (var i = 0; i < objects.length; i++)
+            {
+                object3d = objects[i];
+                var tempTransform = this._startTransformDic[object3d.uuid];
+                if (!this._isWoldCoordinate && this._isBaryCenter)
                 {
-                    tempGlobalMatrix.prependRotation(angle, normal);
+                    object3d.rotation = Matrix3D.fromAxisRotate(angle, localnormal).transformRotation(tempTransform.rotation);
                 } else
                 {
-                    if (this.isBaryCenter)
+                    localnormal = normal.clone();
+                    if (object3d.parent)
+                        localnormal = object3d.parent.worldToLocalMatrix.deltaTransformVector(localnormal);
+                    if (this._isBaryCenter)
                     {
-                        tempGlobalMatrix.appendRotation(angle, normal, tempGlobalMatrix.position);
+                        object3d.rotation = Matrix3D.fromAxisRotate(angle, localnormal).transformRotation(tempTransform.rotation);
                     } else
                     {
-                        tempGlobalMatrix.appendRotation(angle, normal, this.startControllerImageGlobalMatrix3D.position);
+                        var localPivotPoint = this._controllerToolTransfrom.position;
+                        if (object3d.parent)
+                            localPivotPoint = object3d.parent.worldToLocalMatrix.transformVector(localPivotPoint);
+                        object3d.position = Matrix3D.fromPosition(tempTransform.position).appendRotation(angle, localnormal, localPivotPoint).position;
+                        object3d.rotation = Matrix3D.fromAxisRotate(angle, localnormal).transformRotation(tempTransform.rotation);
                     }
                 }
-                this._controllerTargets[i].localToWorldMatrix = tempGlobalMatrix;
             }
         }
 
-        public rotate2(angle: number, normal: Vector3D, angle2: number, normal2: Vector3D)
+        /**
+         * 按指定角旋转
+         * @param angle1 第一方向旋转角度
+         * @param normal1 第一方向旋转轴
+         * @param angle2 第二方向旋转角度
+         * @param normal2 第二方向旋转轴
+         */
+        rotate2(angle1: number, normal1: Vector3D, angle2: number, normal2: Vector3D)
         {
-            if (!this.isWoldCoordinate && this.isBaryCenter)
+            var objects = this._controllerTargets.concat();
+            objects.push(this._controllerTool);
+            var object3d = objects[0];
+            if (!this._isWoldCoordinate && this._isBaryCenter)
             {
-                tempGlobalMatrix.copyFrom(this.startGlobalMatrixVec[0]);
-                tempGlobalMatrix.invert();
-                normal = tempGlobalMatrix.deltaTransformVector(normal);
-                normal2 = tempGlobalMatrix.deltaTransformVector(normal2);
-            }
-            for (var i = 0; i < this._controllerTargets.length; i++)
-            {
-                tempGlobalMatrix.copyFrom(this.startGlobalMatrixVec[i]);
-                if (!this.isWoldCoordinate && this.isBaryCenter)
+                if (object3d.parent)
                 {
-                    tempGlobalMatrix.prependRotation(angle2, normal2);
-                    tempGlobalMatrix.prependRotation(angle, normal);
+                    normal1 = object3d.parent.worldToLocalMatrix.deltaTransformVector(normal1);
+                    normal2 = object3d.parent.worldToLocalMatrix.deltaTransformVector(normal2);
+                }
+            }
+            for (var i = 0; i < objects.length; i++)
+            {
+                object3d = objects[i];
+                var tempsceneTransform = this._startTransformDic[object3d.uuid];
+                var tempPosition = tempsceneTransform.position.clone();
+                var tempRotation = tempsceneTransform.rotation.clone();
+                if (!this._isWoldCoordinate && this._isBaryCenter)
+                {
+                    tempRotation = Matrix3D.fromAxisRotate(angle2, normal2).transformRotation(tempRotation);
+                    object3d.rotation = Matrix3D.fromAxisRotate(angle1, normal1).transformRotation(tempRotation);
                 } else
                 {
-                    if (this.isBaryCenter)
+                    var localnormal1 = normal1.clone();
+                    var localnormal2 = normal2.clone();
+                    if (object3d.parent)
                     {
-                        tempGlobalMatrix.appendRotation(angle, normal, tempGlobalMatrix.position);
-                        tempGlobalMatrix.appendRotation(angle2, normal2, tempGlobalMatrix.position);
+                        localnormal1 = object3d.parent.worldToLocalMatrix.deltaTransformVector(localnormal1);
+                        localnormal2 = object3d.parent.worldToLocalMatrix.deltaTransformVector(localnormal2);
+                    }
+                    if (this._isBaryCenter)
+                    {
+                        tempRotation = Matrix3D.fromAxisRotate(angle1, localnormal1).transformRotation(tempRotation);
+                        object3d.rotation = Matrix3D.fromAxisRotate(angle2, localnormal2).transformRotation(tempRotation);
                     } else
                     {
-                        tempGlobalMatrix.appendRotation(angle, normal, this.startControllerImageGlobalMatrix3D.position);
-                        tempGlobalMatrix.appendRotation(angle2, normal2, this.startControllerImageGlobalMatrix3D.position);
+                        var localPivotPoint = this._controllerToolTransfrom.position;
+                        if (object3d.parent)
+                            localPivotPoint = object3d.parent.worldToLocalMatrix.transformVector(localPivotPoint);
+                        //
+                        tempPosition = Matrix3D.fromPosition(tempPosition).appendRotation(angle1, localnormal1, localPivotPoint).position;
+                        object3d.position = Matrix3D.fromPosition(tempPosition).appendRotation(angle1, localnormal1, localPivotPoint).position;
+
+                        tempRotation = Matrix3D.fromAxisRotate(angle1, localnormal1).transformRotation(tempRotation);
+                        object3d.rotation = Matrix3D.fromAxisRotate(angle2, localnormal2).transformRotation(tempRotation);
                     }
                 }
-                this._controllerTargets[i].localToWorldMatrix = tempGlobalMatrix;
             }
         }
 
-        public stopRote()
+        stopRote()
         {
-            this.startGlobalMatrixVec.length = 0;
-            this.startControllerImageGlobalMatrix3D = null;
+            this._startTransformDic = null;
         }
 
-        public startScale()
+        startScale()
         {
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                this.startScaleVec[i] = this._controllerTargets[i].getScale();
+                this._startScaleVec[i] = this._controllerTargets[i].scale;
             }
         }
 
-        public doScale(scale: Vector3D)
+        doScale(scale: Vector3D)
         {
             debuger && console.assert(!!scale.length);
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                var result = this.startScaleVec[i].multiply(scale);
-                this._controllerTargets[i].scaleX = result.x;
-                this._controllerTargets[i].scaleY = result.y;
-                this._controllerTargets[i].scaleZ = result.z;
+                var result = this._startScaleVec[i].multiply(scale);
+                this._controllerTargets[i].sx = result.x;
+                this._controllerTargets[i].sy = result.y;
+                this._controllerTargets[i].sz = result.z;
             }
         }
 
-        public stopScale()
+        stopScale()
         {
-            this.startScaleVec.length = 0;
+            this._startScaleVec.length = 0;
         }
     }
-    var tempGlobalMatrix = new Matrix3D();
 }

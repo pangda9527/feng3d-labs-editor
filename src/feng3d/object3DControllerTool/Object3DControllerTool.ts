@@ -14,15 +14,15 @@ module feng3d.editor
         {
             super(gameObject);
 
-            this.object3DControllerTarget = GameObject.create("object3DControllerTarget").addComponent(Object3DControllerTarget);
+            this.object3DControllerTarget = Object3DControllerTarget.instance;
 
             this.object3DMoveTool = GameObject.create("object3DMoveTool").addComponent(Object3DMoveTool);
             this.object3DRotationTool = GameObject.create("object3DRotationTool").addComponent(Object3DRotationTool);
             this.object3DScaleTool = GameObject.create("object3DScaleTool").addComponent(Object3DScaleTool);
 
-            this.object3DMoveTool.bindingObject3D = this.object3DControllerTarget;
-            this.object3DRotationTool.bindingObject3D = this.object3DControllerTarget;
-            this.object3DScaleTool.bindingObject3D = this.object3DControllerTarget;
+            this.object3DMoveTool.object3DControllerTarget = this.object3DControllerTarget;
+            this.object3DRotationTool.object3DControllerTarget = this.object3DControllerTarget;
+            this.object3DScaleTool.object3DControllerTarget = this.object3DControllerTarget;
             //
 
             this.currentTool = this.object3DMoveTool;
