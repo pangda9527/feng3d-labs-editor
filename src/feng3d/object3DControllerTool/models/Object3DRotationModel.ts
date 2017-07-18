@@ -156,7 +156,8 @@ module feng3d.editor
 
         public hideSector()
         {
-            this.transform.removeChild(this.sector.transform);
+            if (this.sector.transform.parent)
+                this.sector.transform.parent.removeChild(this.sector.transform);
         }
     }
 

@@ -31,7 +31,7 @@ module feng3d.editor
             Event.on(input, <any>inputType.MOUSE_DOWN, this.onMouseDown, this);
             Event.on(input, <any>inputType.MOUSE_UP, this.onMouseUp, this);
             Event.on(this, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            Event.on(editor3DData.cameraObject3D.transform, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            Event.on(editor3DData.camera.transform, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         protected onRemovedFromScene()
@@ -41,7 +41,7 @@ module feng3d.editor
             Event.off(input, <any>inputType.MOUSE_DOWN, this.onMouseDown, this);
             Event.off(input, <any>inputType.MOUSE_UP, this.onMouseUp, this);
             Event.off(this, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            Event.off(editor3DData.cameraObject3D.transform, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            Event.off(editor3DData.camera.transform, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
         }
 
         protected get toolModel()
@@ -130,7 +130,7 @@ module feng3d.editor
 
         protected getMousePlaneCross()
         {
-            var line3D = editor3DData.view3D.getMouseRay3D();
+            var line3D = editor3DData.camera.getMouseRay3D();
             //射线与平面交点
             var crossPos = this.movePlane3D.lineCross(line3D);
             return crossPos;

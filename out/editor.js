@@ -1207,7 +1207,7 @@ var feng3d;
             function InspectorViewData(editor3DData) {
                 this.hasBackData = false;
                 this.viewDataList = [];
-                eui.Watcher.watch(editor3DData, ["selectedObject3D"], this.updateView, this);
+                eui.Watcher.watch(editor3DData, ["selectedObject"], this.updateView, this);
             }
             InspectorViewData.prototype.showData = function (data, removeBack) {
                 if (removeBack === void 0) { removeBack = false; }
@@ -1374,7 +1374,7 @@ var feng3d;
                 feng3d.Event.on(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
                 feng3d.Event.on(editor.editor3DData.hierarchy.rootNode, editor.HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
                 this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
-                this.watchers.push(eui.Watcher.watch(editor.editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this));
+                this.watchers.push(eui.Watcher.watch(editor.editor3DData, ["selectedObject"], this.selectedObject3DChanged, this));
             };
             HierarchyView.prototype.onRemovedFromStage = function () {
                 this.addButton.removeEventListener(editor.MouseEvent.CLICK, this.onAddButtonClick, this);
@@ -3218,7 +3218,7 @@ var feng3d;
                 feng3d.Event.on(feng3d.shortcut, "object3DMoveTool", _this.onObject3DMoveTool, _this);
                 feng3d.Event.on(feng3d.shortcut, "object3DRotationTool", _this.onObject3DRotationTool, _this);
                 feng3d.Event.on(feng3d.shortcut, "object3DScaleTool", _this.onObject3DScaleTool, _this);
-                eui.Watcher.watch(editor.editor3DData, ["selectedObject3D"], _this.onSelectedObject3DChange, _this);
+                eui.Watcher.watch(editor.editor3DData, ["selectedObject"], _this.onSelectedObject3DChange, _this);
                 return _this;
             }
             Object3DControllerTool.prototype.onSelectedObject3DChange = function () {

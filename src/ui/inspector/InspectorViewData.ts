@@ -14,7 +14,7 @@ module feng3d.editor
 
         constructor(editor3DData: Editor3DData)
         {
-            eui.Watcher.watch(editor3DData, ["selectedObject3D"], this.updateView, this)
+            eui.Watcher.watch(editor3DData, ["selectedObject"], this.updateView, this)
         }
 
         public showData(data: any, removeBack = false)
@@ -43,7 +43,7 @@ module feng3d.editor
 
         private updateView()
         {
-            this.showData(editor3DData.selectedObject3D, true)
+            this.showData(editor3DData.selectedObject, true)
         }
     }
 }

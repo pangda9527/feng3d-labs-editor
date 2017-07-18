@@ -7,7 +7,7 @@ module feng3d.editor
 
         public get selectedNode()
         {
-            return this.nodeMap.get(editor3DData.selectedObject3D.transform);
+            return this.nodeMap.get(editor3DData.selectedObject.transform);
         }
 
         constructor(rootObject3D: Transform)
@@ -64,7 +64,7 @@ module feng3d.editor
                 node = this.nodeMap.get(object3D);
             }
             if (node && object3D)
-                editor3DData.selectedObject3D = object3D.gameObject;
+                editor3DData.selectedObject = object3D.gameObject;
         }
 
         private onCreateObject3D(event: EventVO<any>)
@@ -74,7 +74,7 @@ module feng3d.editor
             if (gameobject)
             {
                 this.addObject3D(gameobject.transform);
-                editor3DData.selectedObject3D = gameobject;
+                editor3DData.selectedObject = gameobject;
             } else
             {
                 console.error(`无法实例化${className},请检查配置 createObjectConfig`)
@@ -83,13 +83,13 @@ module feng3d.editor
 
         private onDeleteSeletedObject3D()
         {
-            var selectedObject3D = editor3DData.selectedObject3D;
+            var selectedObject3D = editor3DData.selectedObject;
             if (selectedObject3D)
             {
                 var node = this.nodeMap.get(selectedObject3D.transform);
                 node.delete();
             }
-            editor3DData.selectedObject3D = null;
+            editor3DData.selectedObject = null;
         }
 
         public resetScene(scene: Scene3D)

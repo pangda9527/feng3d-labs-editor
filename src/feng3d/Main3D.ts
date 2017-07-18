@@ -29,7 +29,7 @@ module feng3d.editor
 
             editor3DData.view3D = view3D;
             editor3DData.scene3D = view3D.scene;
-            editor3DData.cameraObject3D = view3D.camera;
+            editor3DData.camera = view3D.camera;
             editor3DData.hierarchy = new Hierarchy(view3D.scene.transform);
 
             //
@@ -80,7 +80,7 @@ module feng3d.editor
                 gameobject.addComponent(MeshFilter).mesh = new SphereGeometry(10);
                 gameobject.transform.mouseEnabled = false;
                 editor3DData.scene3D.transform.addChild(gameobject.transform);
-                var mouseRay3D = editor3DData.view3D.getMouseRay3D();
+                var mouseRay3D = editor3DData.camera.getMouseRay3D()
                 gameobject.transform.position = mouseRay3D.position;
                 var direction = mouseRay3D.direction.clone();
 

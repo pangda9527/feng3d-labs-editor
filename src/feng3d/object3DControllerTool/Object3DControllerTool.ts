@@ -33,14 +33,14 @@ module feng3d.editor
             Event.on(shortcut, <any>"object3DRotationTool", this.onObject3DRotationTool, this);
             Event.on(shortcut, <any>"object3DScaleTool", this.onObject3DScaleTool, this);
 
-            eui.Watcher.watch(editor3DData, ["selectedObject3D"], this.onSelectedObject3DChange, this);
+            eui.Watcher.watch(editor3DData, ["selectedObject"], this.onSelectedObject3DChange, this);
         }
 
         private onSelectedObject3DChange()
         {
-            if (editor3DData.selectedObject3D)
+            if (editor3DData.selectedObject)
             {
-                this.object3DControllerTarget.controllerTargets = [editor3DData.selectedObject3D.transform];
+                this.object3DControllerTarget.controllerTargets = [editor3DData.selectedObject.transform];
                 editor3DData.scene3D.transform.addChild(this.transform);
             }
             else

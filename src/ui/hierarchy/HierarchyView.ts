@@ -39,7 +39,7 @@ module feng3d.editor
 			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
 
 			this.watchers.push(
-				eui.Watcher.watch(editor3DData, ["selectedObject3D"], this.selectedObject3DChanged, this)
+				eui.Watcher.watch(editor3DData, ["selectedObject"], this.selectedObject3DChanged, this)
 			);
 		}
 
@@ -61,7 +61,7 @@ module feng3d.editor
 		private onListChange()
 		{
 			var node: HierarchyNode = this.list.selectedItem;
-			editor3DData.selectedObject3D = node.object3D.gameObject;
+			editor3DData.selectedObject = node.object3D.gameObject;
 		}
 
 		private onHierarchyNodeAdded(event: Event)
@@ -79,7 +79,7 @@ module feng3d.editor
 
 		private selectedObject3DChanged()
 		{
-			var node = editor3DData.hierarchy.getNode(editor3DData.selectedObject3D ? editor3DData.selectedObject3D.transform : null);
+			var node = editor3DData.hierarchy.getNode(editor3DData.selectedObject ? editor3DData.selectedObject.transform : null);
 			this.list.selectedIndex = this.listData.getItemIndex(node);
 		}
 

@@ -35,7 +35,7 @@ module feng3d.editor
 
         private update()
         {
-            var cameraGlobalPosition = editor3DData.cameraObject3D.transform.scenePosition;
+            var cameraGlobalPosition = editor3DData.camera.transform.scenePosition;
             this.level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
             this.step = Math.pow(10, this.level - 1);
 
