@@ -80,9 +80,9 @@ module feng3d.editor
             var view3DRect = editor3DData.view3DRect;
             var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
             var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
-            globalMatrix3D.appendRotation(rotateY, Vector3D.Y_AXIS, this.rotateSceneCenter);
+            globalMatrix3D.appendRotation(Vector3D.Y_AXIS, rotateY, this.rotateSceneCenter);
             var rotateAxisX = globalMatrix3D.right;
-            globalMatrix3D.appendRotation(rotateX, rotateAxisX, this.rotateSceneCenter);
+            globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
             editor3DData.camera.transform.localToWorldMatrix = globalMatrix3D;
         }
 

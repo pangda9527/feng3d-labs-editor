@@ -32,15 +32,14 @@
 	<!--modules_files_end-->
 
 	<!-- libs -->
-	<!--<script src="libs/event.js"></script>
+	<!-- <script src="libs/event.js"></script>
 	<script src="libs/common.js"></script>
 	<script src="libs/render.js"></script>
 	<script src="libs/feng3d.js"></script>
-	<script src="libs/objectview.js"></script>
+	<script src="libs/objectview.js"></script> -->
 
-	<script src="out/editor.js"></script>-->
-
-	<script src="../out/editor.js"></script>
+	<!-- 合并js -->
+	<script src="loadjs.js"></script>
 </head>
 
 
@@ -62,14 +61,45 @@
 	</div>
 
 	<script>
-		/**
-		 * {
-		 * "renderMode":, //引擎渲染模式，"canvas" 或者 "webgl"
-		 * "audioType": "" //使用的音频类型，0:默认，1:qq audio，2:web audio，3:audio
-		 * "antialias": //WebGL模式下是否开启抗锯齿，true:开启，false:关闭，默认为false
-		 * }
-		 **/
-		egret.runEgret({ renderMode: "webgl", audioType: 0 });
+		var loadpaths = [//
+			"../event/out/event.js",
+			"../common/out/common.js",
+			"../render/out/render.js",
+			"../feng3d/out/feng3d.js",
+			"../objectview/out/objectview.js",
+			"../editor/out/editor.js",
+		];
+
+		for (var i = 0; i < loadpaths.length; i++) {
+			loadpaths[i] = loadpaths[i] + "?version=" + Math.random();
+		}
+
+		function loadjsSync(loadpaths) {
+			console.log(loadpaths);
+			if (loadpaths.length == 0) {
+				loadComplete();
+				return;
+			}
+			loadjs(loadpaths.splice(0, 1), {
+				success: function () {
+					loadjsSync(loadpaths);
+				}
+			});
+		}
+
+		function loadComplete() {
+			console.log("loadComplete!");
+			/**
+			 * {
+			 * "renderMode":, //引擎渲染模式，"canvas" 或者 "webgl"
+			 * "audioType": "" //使用的音频类型，0:默认，1:qq audio，2:web audio，3:audio
+			 * "antialias": //WebGL模式下是否开启抗锯齿，true:开启，false:关闭，默认为false
+			 * }
+			 **/
+			egret.runEgret({ renderMode: "webgl", audioType: 0 });
+		}
+
+		loadjsSync(loadpaths);
 	</script>
 </body>
 

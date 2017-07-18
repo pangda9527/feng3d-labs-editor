@@ -3,15 +3,11 @@
         "target": "es5",
         "noImplicitAny": false,
         "sourceMap": true,
-        "experimentalDecorators":true,
+        "declaration": true,
+        "experimentalDecorators": true,
         "outFile": "out/editor.js"
     },
     "files": [
-        "libs/event.d.ts",
-        "libs/common.d.ts",
-        "libs/render.d.ts",
-        "libs/feng3d.d.ts",
-        "libs/objectview.d.ts",
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
         "libs/modules/res/res.d.ts",
@@ -83,7 +79,12 @@
         "src/configs/ShortcutConfig.ts",
         "src/Editor.ts"
     ],
+    "include": [
+        "../**/*.ts",
+        "../**/out/*.d.ts"
+    ],
     "exclude": [
+        "../**/*.d.ts",
         "node_modules"
     ]
 }

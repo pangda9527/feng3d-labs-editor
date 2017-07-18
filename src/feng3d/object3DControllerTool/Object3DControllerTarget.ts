@@ -175,7 +175,7 @@ module feng3d.editor
                 var tempTransform = this._startTransformDic[object3d.uuid];
                 if (!this._isWoldCoordinate && this._isBaryCenter)
                 {
-                    object3d.rotation = Matrix3D.fromAxisRotate(angle, localnormal).transformRotation(tempTransform.rotation);
+                    object3d.rotation = Matrix3D.fromAxisRotate(localnormal, angle).transformRotation(tempTransform.rotation);
                 } else
                 {
                     localnormal = normal.clone();
@@ -183,14 +183,14 @@ module feng3d.editor
                         localnormal = object3d.parent.worldToLocalMatrix.deltaTransformVector(localnormal);
                     if (this._isBaryCenter)
                     {
-                        object3d.rotation = Matrix3D.fromAxisRotate(angle, localnormal).transformRotation(tempTransform.rotation);
+                        object3d.rotation = Matrix3D.fromAxisRotate(localnormal, angle).transformRotation(tempTransform.rotation);
                     } else
                     {
                         var localPivotPoint = this._controllerToolTransfrom.position;
                         if (object3d.parent)
                             localPivotPoint = object3d.parent.worldToLocalMatrix.transformVector(localPivotPoint);
-                        object3d.position = Matrix3D.fromPosition(tempTransform.position).appendRotation(angle, localnormal, localPivotPoint).position;
-                        object3d.rotation = Matrix3D.fromAxisRotate(angle, localnormal).transformRotation(tempTransform.rotation);
+                        object3d.position = Matrix3D.fromPosition(tempTransform.position).appendRotation(localnormal, angle, localPivotPoint).position;
+                        object3d.rotation = Matrix3D.fromAxisRotate(localnormal, angle).transformRotation(tempTransform.rotation);
                     }
                 }
             }
@@ -224,8 +224,8 @@ module feng3d.editor
                 var tempRotation = tempsceneTransform.rotation.clone();
                 if (!this._isWoldCoordinate && this._isBaryCenter)
                 {
-                    tempRotation = Matrix3D.fromAxisRotate(angle2, normal2).transformRotation(tempRotation);
-                    object3d.rotation = Matrix3D.fromAxisRotate(angle1, normal1).transformRotation(tempRotation);
+                    tempRotation = Matrix3D.fromAxisRotate(normal2, angle2).transformRotation(tempRotation);
+                    object3d.rotation = Matrix3D.fromAxisRotate(normal1, angle1).transformRotation(tempRotation);
                 } else
                 {
                     var localnormal1 = normal1.clone();
@@ -237,19 +237,19 @@ module feng3d.editor
                     }
                     if (this._isBaryCenter)
                     {
-                        tempRotation = Matrix3D.fromAxisRotate(angle1, localnormal1).transformRotation(tempRotation);
-                        object3d.rotation = Matrix3D.fromAxisRotate(angle2, localnormal2).transformRotation(tempRotation);
+                        tempRotation = Matrix3D.fromAxisRotate(localnormal1, angle1).transformRotation(tempRotation);
+                        object3d.rotation = Matrix3D.fromAxisRotate(localnormal2, angle2).transformRotation(tempRotation);
                     } else
                     {
                         var localPivotPoint = this._controllerToolTransfrom.position;
                         if (object3d.parent)
                             localPivotPoint = object3d.parent.worldToLocalMatrix.transformVector(localPivotPoint);
                         //
-                        tempPosition = Matrix3D.fromPosition(tempPosition).appendRotation(angle1, localnormal1, localPivotPoint).position;
-                        object3d.position = Matrix3D.fromPosition(tempPosition).appendRotation(angle1, localnormal1, localPivotPoint).position;
+                        tempPosition = Matrix3D.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
+                        object3d.position = Matrix3D.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
 
-                        tempRotation = Matrix3D.fromAxisRotate(angle1, localnormal1).transformRotation(tempRotation);
-                        object3d.rotation = Matrix3D.fromAxisRotate(angle2, localnormal2).transformRotation(tempRotation);
+                        tempRotation = Matrix3D.fromAxisRotate(localnormal1, angle1).transformRotation(tempRotation);
+                        object3d.rotation = Matrix3D.fromAxisRotate(localnormal2, angle2).transformRotation(tempRotation);
                     }
                 }
             }

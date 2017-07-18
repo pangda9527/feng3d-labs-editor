@@ -47,7 +47,7 @@ module feng3d.editor
             }
             if (allChildren)
             {
-                for (var i = 0; i < object3D.childCount; i++)
+                for (var i = 0; i < object3D.numChildren; i++)
                 {
                     this.addObject3D(object3D.getChildAt(i) as Transform, node, true);
                 }
@@ -94,7 +94,7 @@ module feng3d.editor
 
         public resetScene(scene: Scene3D)
         {
-            for (var i = 0; i < scene.transform.childCount; i++)
+            for (var i = 0; i < scene.transform.numChildren; i++)
             {
                 this.addObject3D(scene.transform.getChildAt(i) as Transform, null, true);
             }
