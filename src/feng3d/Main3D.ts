@@ -12,10 +12,10 @@ module feng3d.editor
         {
             this.init();
             //
-            Event.on(ticker, "enterFrame", this.process, this);
+            ticker.on("enterFrame", this.process, this);
         }
 
-        private process(event: Event)
+        private process(event: EventVO<any>)
         {
             editor3DData.mouseInView3D.copyFrom(editor3DData.view3D.mousePos);
             editor3DData.view3DRect.copyFrom(editor3DData.view3D.viewRect);
@@ -24,13 +24,13 @@ module feng3d.editor
         private init()
         {
             var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
-            var view3D = new feng3d.View3D(canvas);
+            var view3D = new Engine(canvas);
             view3D.scene.background.fromUnit(0x666666);
 
             editor3DData.view3D = view3D;
             editor3DData.scene3D = view3D.scene;
             editor3DData.camera = view3D.camera;
-            editor3DData.hierarchy = new Hierarchy(view3D.scene.transform);
+            editor3DData.hierarchy = new Hierarchy(view3D.scene.gameObject);
 
             //
             var camera = view3D.camera;
@@ -40,11 +40,11 @@ module feng3d.editor
 
             var trident = GameObject.create("Trident");
             trident.addComponent(Trident);
-            view3D.scene.transform.addChild(trident.transform);
+            view3D.scene.gameObject.addChild(trident);
 
             //初始化模块
             var groundGrid = GameObject.create("GroundGrid").addComponent(GroundGrid);
-            view3D.scene.transform.addChild(groundGrid.transform);
+            view3D.scene.gameObject.addChild(groundGrid.gameObject);
 
             var object3DControllerTool = GameObject.create("object3DControllerTool").addComponent(Object3DControllerTool);
 
@@ -56,14 +56,14 @@ module feng3d.editor
 
         private test()
         {
-            Event.on(editor3DData.scene3D.transform, <any>Mouse3DEvent.MOUSE_DOWN, (event) =>
+            editor3DData.scene3D.gameObject.on("mousedown", (event) =>
             {
-                var transform = <Transform><any>event.target;
-                var names = [transform.gameObject.name];
-                while (transform.parent)
+                var gameobject = <GameObject>event.target;
+                var names = [gameobject.name];
+                while (gameobject.parent)
                 {
-                    transform = transform.parent;
-                    names.push(transform.gameObject.name);
+                    gameobject = gameobject.parent;
+                    names.push(gameobject.name);
                 }
                 console.log(event.type, names.reverse().join("->"));
             }, this);
@@ -73,13 +73,13 @@ module feng3d.editor
 
         private testMouseRay()
         {
-            Event.on(input, <any>inputType.CLICK, () =>
+            input.on("click", () =>
             {
                 var gameobject = GameObject.create("test");
                 gameobject.addComponent(MeshRenderer).material = new StandardMaterial();
                 gameobject.addComponent(MeshFilter).mesh = new SphereGeometry(10);
                 gameobject.transform.mouseEnabled = false;
-                editor3DData.scene3D.transform.addChild(gameobject.transform);
+                editor3DData.scene3D.gameObject.addChild(gameobject);
                 var mouseRay3D = editor3DData.camera.getMouseRay3D()
                 gameobject.transform.position = mouseRay3D.position;
                 var direction = mouseRay3D.direction.clone();
@@ -96,7 +96,7 @@ module feng3d.editor
                         }, 1000 / 60);
                     } else
                     {
-                        editor3DData.scene3D.transform.removeChild(gameobject.transform);
+                        editor3DData.scene3D.gameObject.removeChild(gameobject);
                     }
                     num--;
                 }

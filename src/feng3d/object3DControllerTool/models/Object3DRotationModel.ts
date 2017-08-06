@@ -21,28 +21,28 @@ module feng3d.editor
             this.xAxis.color.setTo(1, 0, 0);
             this.xAxis.update();
             this.xAxis.transform.ry = 90;
-            this.transform.addChild(this.xAxis.transform);
+            this.gameObject.addChild(this.xAxis.gameObject);
 
             this.yAxis = GameObject.create("yAxis").addComponent(CoordinateRotationAxis);
             this.yAxis.color.setTo(0, 1, 0);
             this.yAxis.update();
             this.yAxis.transform.rx = 90;
-            this.transform.addChild(this.yAxis.transform);
+            this.gameObject.addChild(this.yAxis.gameObject);
 
             this.zAxis = GameObject.create("zAxis").addComponent(CoordinateRotationAxis);
             this.zAxis.color.setTo(0, 0, 1);
             this.zAxis.update();
-            this.transform.addChild(this.zAxis.transform);
+            this.gameObject.addChild(this.zAxis.gameObject);
 
             this.cameraAxis = GameObject.create("cameraAxis").addComponent(CoordinateRotationAxis);
             this.cameraAxis.color.setTo(1, 1, 1);
             this.zAxis.update();
-            this.transform.addChild(this.cameraAxis.transform);
+            this.gameObject.addChild(this.cameraAxis.gameObject);
 
             this.freeAxis = GameObject.create("freeAxis").addComponent(CoordinateRotationFreeAxis);
             this.freeAxis.color.setTo(1, 1, 1);
             this.freeAxis.update();
-            this.transform.addChild(this.freeAxis.transform);
+            this.gameObject.addChild(this.freeAxis.gameObject);
         }
     }
 
@@ -80,7 +80,7 @@ module feng3d.editor
             var border = GameObject.create();
             border.addComponent(MeshRenderer).material = new SegmentMaterial();
             this.segmentGeometry = border.addComponent(MeshFilter).mesh = new SegmentGeometry();
-            this.transform.addChild(border.transform);
+            this.gameObject.addChild(border);
             this.sector = GameObject.create("sector").addComponent(SectorObject3D);
 
 
@@ -90,7 +90,7 @@ module feng3d.editor
             mouseHit.transform.rx = 90;
             mouseHit.transform.visible = false;
             mouseHit.transform.mouseEnabled = true;
-            this.transform.addChild(mouseHit.transform);
+            this.gameObject.addChild(mouseHit);
 
             this.update();
         }
@@ -151,13 +151,13 @@ module feng3d.editor
                 min += 360;
             }
             this.sector.update(min, max);
-            this.transform.addChild(this.sector.transform);
+            this.gameObject.addChild(this.sector.gameObject);
         }
 
         public hideSector()
         {
-            if (this.sector.transform.parent)
-                this.sector.transform.parent.removeChild(this.sector.transform);
+            if (this.sector.gameObject.parent)
+                this.sector.gameObject.parent.removeChild(this.sector.gameObject);
         }
     }
 
@@ -189,7 +189,7 @@ module feng3d.editor
             var border = GameObject.create("border");
             border.addComponent(MeshRenderer).material = new SegmentMaterial();
             this.segmentGeometry = border.addComponent(MeshFilter).mesh = new SegmentGeometry();
-            this.transform.addChild(border.transform);
+            this.gameObject.addChild(border);
 
             this.update(0, 0);
         }
@@ -260,13 +260,13 @@ module feng3d.editor
             var border = GameObject.create("border");
             border.addComponent(MeshRenderer).material = new SegmentMaterial();
             this.segmentGeometry = border.addComponent(MeshFilter).mesh = new SegmentGeometry();
-            this.transform.addChild(border.transform);
+            this.gameObject.addChild(border);
 
             this.sector = GameObject.create("sector").addComponent(SectorObject3D);
             this.sector.update(0, 360);
             this.sector.transform.visible = false;
             this.sector.transform.mouseEnabled = true;
-            this.transform.addChild(this.sector.transform);
+            this.gameObject.addChild(this.sector.gameObject);
 
             this.update();
         }

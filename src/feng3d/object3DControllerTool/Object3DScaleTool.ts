@@ -20,20 +20,20 @@ module feng3d.editor
         {
             super.onAddedToScene();
 
-            Event.on(this.toolModel.xCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.yCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.zCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.on(this.toolModel.oCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.xCube.gameObject.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yCube.gameObject.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zCube.gameObject.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.gameObject.on("mousedown", this.onItemMouseDown, this);
         }
 
         protected onRemovedFromScene()
         {
             super.onRemovedFromScene();
 
-            Event.off(this.toolModel.xCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.yCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.zCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
-            Event.off(this.toolModel.oCube.transform, <any>Mouse3DEvent.MOUSE_DOWN, this.onItemMouseDown, this);
+            this.toolModel.xCube.gameObject.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yCube.gameObject.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zCube.gameObject.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.gameObject.off("mousedown", this.onItemMouseDown, this);
         }
 
         protected onItemMouseDown(event: EventVO<any>)
@@ -53,25 +53,25 @@ module feng3d.editor
             var cameraSceneTransform = editor3DData.camera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
-            var selectedTransform: Transform = <any>event.currentTarget;
-            switch (selectedTransform)
+            var selectedGameObject: GameObject = <any>event.currentTarget;
+            switch (selectedGameObject)
             {
-                case this.toolModel.xCube.transform:
+                case this.toolModel.xCube.gameObject:
                     this.selectedItem = this.toolModel.xCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
                     this.changeXYZ.setTo(1, 0, 0);
                     break;
-                case this.toolModel.yCube.transform:
+                case this.toolModel.yCube.gameObject:
                     this.selectedItem = this.toolModel.yCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
                     this.changeXYZ.setTo(0, 1, 0);
                     break;
-                case this.toolModel.zCube.transform:
+                case this.toolModel.zCube.gameObject:
                     this.selectedItem = this.toolModel.zCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
                     this.changeXYZ.setTo(0, 0, 1);
                     break;
-                case this.toolModel.oCube.transform:
+                case this.toolModel.oCube.gameObject:
                     this.selectedItem = this.toolModel.oCube;
                     this.startMousePos = editor3DData.mouseInView3D.clone();
                     this.changeXYZ.setTo(1, 1, 1);
@@ -82,7 +82,7 @@ module feng3d.editor
 
             this.object3DControllerTarget.startScale();
             //
-            Event.on(input, <any>inputType.MOUSE_MOVE, this.onMouseMove, this);
+            input.on("mousemove", this.onMouseMove, this);
         }
 
         private onMouseMove()
@@ -126,7 +126,7 @@ module feng3d.editor
         protected onMouseUp()
         {
             super.onMouseUp()
-            Event.off(input, <any>inputType.MOUSE_MOVE, this.onMouseMove, this);
+            input.off("mousemove", this.onMouseMove, this);
 
             this.startPlanePos = null;
             this.startSceneTransform = null;

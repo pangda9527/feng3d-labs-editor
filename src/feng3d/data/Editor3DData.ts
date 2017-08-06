@@ -9,7 +9,7 @@ module feng3d.editor
         public camera: Camera;
         /** 3d场景 */
         public scene3D: Scene3D;
-        public view3D: View3D;
+        public view3D: Engine;
         public hierarchy: Hierarchy;
 
         public object3DOperationID = 0;

@@ -33,9 +33,9 @@ module feng3d.editor
 		{
 			this.addButton.addEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
 
-			Event.on(editor3DData.hierarchy.rootNode, <any>HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
-			Event.on(editor3DData.hierarchy.rootNode, <any>HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
-			Event.on(editor3DData.hierarchy.rootNode, <any>HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
+			editor3DData.hierarchy.rootNode.on("added", this.onHierarchyNodeAdded, this);
+			editor3DData.hierarchy.rootNode.on("removed", this.onHierarchyNodeRemoved, this);
+			editor3DData.hierarchy.rootNode.on("openChanged", this.onHierarchyNodeRemoved, this);
 			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
 
 			this.watchers.push(
@@ -47,9 +47,9 @@ module feng3d.editor
 		{
 			this.addButton.removeEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
 
-			Event.off(editor3DData.hierarchy.rootNode, <any>HierarchyNode.ADDED, this.onHierarchyNodeAdded, this);
-			Event.off(editor3DData.hierarchy.rootNode, <any>HierarchyNode.REMOVED, this.onHierarchyNodeRemoved, this);
-			Event.off(editor3DData.hierarchy.rootNode, <any>HierarchyNode.OPEN_CHANGED, this.onHierarchyNodeRemoved, this);
+			editor3DData.hierarchy.rootNode.off("added", this.onHierarchyNodeAdded, this);
+			editor3DData.hierarchy.rootNode.off("removed", this.onHierarchyNodeRemoved, this);
+			editor3DData.hierarchy.rootNode.off("openChanged", this.onHierarchyNodeRemoved, this);
 			this.list.removeEventListener(egret.Event.CHANGE, this.onListChange, this);
 
 			while (this.watchers.length > 0)
@@ -61,16 +61,16 @@ module feng3d.editor
 		private onListChange()
 		{
 			var node: HierarchyNode = this.list.selectedItem;
-			editor3DData.selectedObject = node.object3D.gameObject;
+			editor3DData.selectedObject = node.object3D;
 		}
 
-		private onHierarchyNodeAdded(event: Event)
+		private onHierarchyNodeAdded()
 		{
 			var nodes = editor3DData.hierarchy.rootNode.getShowNodes();
 			this.listData.replaceAll(nodes);
 		}
 
-		private onHierarchyNodeRemoved(event: Event)
+		private onHierarchyNodeRemoved()
 		{
 			var nodes = editor3DData.hierarchy.rootNode.getShowNodes();
 			this.listData.replaceAll(nodes);
@@ -79,7 +79,7 @@ module feng3d.editor
 
 		private selectedObject3DChanged()
 		{
-			var node = editor3DData.hierarchy.getNode(editor3DData.selectedObject ? editor3DData.selectedObject.transform : null);
+			var node = editor3DData.hierarchy.getNode(editor3DData.selectedObject ? editor3DData.selectedObject : null);
 			this.list.selectedIndex = this.listData.getItemIndex(node);
 		}
 
@@ -91,7 +91,7 @@ module feng3d.editor
 
 		private onCreateObject3d(selectedItem)
 		{
-			Event.dispatch($editorEventDispatcher, <any>"Create_Object3D", selectedItem);
+			$editorEventDispatcher.dispatch("Create_Object3D", selectedItem);
 		}
 	}
 }

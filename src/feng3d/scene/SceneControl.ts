@@ -4,21 +4,21 @@ module feng3d.editor
     {
         private dragSceneMousePoint: Point;
         private dragSceneCameraGlobalMatrix3D: Matrix3D;
-
-        private controller: FPSController;
+        private fpsController: FPSController;
 
         constructor()
         {
-            this.controller = new FPSController();
-
-            Event.on(shortcut, <any>"lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
-            Event.on(shortcut, <any>"dragSceneStart", this.onDragSceneStart, this);
-            Event.on(shortcut, <any>"dragScene", this.onDragScene, this);
-            Event.on(shortcut, <any>"fpsViewStart", this.onFpsViewStart, this);
-            Event.on(shortcut, <any>"fpsViewStop", this.onFpsViewStop, this);
-            Event.on(shortcut, <any>"mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
-            Event.on(shortcut, <any>"mouseRotateScene", this.onMouseRotateScene, this);
-            Event.on(shortcut, <any>"mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
+            this.fpsController = editor3DData.camera.gameObject.addComponent(FPSController);
+            this.fpsController.auto = false;
+            //
+            shortcut.on("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
+            shortcut.on("dragSceneStart", this.onDragSceneStart, this);
+            shortcut.on("dragScene", this.onDragScene, this);
+            shortcut.on("fpsViewStart", this.onFpsViewStart, this);
+            shortcut.on("fpsViewStop", this.onFpsViewStop, this);
+            shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+            shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
+            shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
         }
 
@@ -44,14 +44,12 @@ module feng3d.editor
 
         private onFpsViewStart()
         {
-            this.controller.targetObject = editor3DData.camera.gameObject;
-            this.controller["onMousedown"]();
+            this.fpsController.onMousedown();
         }
 
         private onFpsViewStop()
         {
-            this.controller.targetObject = null;
-            this.controller["onMouseup"]();
+            this.fpsController.onMouseup();
         }
 
         private rotateSceneCenter: Vector3D;

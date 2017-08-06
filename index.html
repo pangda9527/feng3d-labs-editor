@@ -62,29 +62,12 @@
 
 	<script>
 		var loadpaths = [//
-			"../event/out/event.js",
-			"../common/out/common.js",
-			"../render/out/render.js",
 			"../feng3d/out/feng3d.js",
-			"../objectview/out/objectview.js",
 			"../editor/out/editor.js",
 		];
 
 		for (var i = 0; i < loadpaths.length; i++) {
 			loadpaths[i] = loadpaths[i] + "?version=" + Math.random();
-		}
-
-		function loadjsSync(loadpaths) {
-			console.log(loadpaths);
-			if (loadpaths.length == 0) {
-				loadComplete();
-				return;
-			}
-			loadjs(loadpaths.splice(0, 1), {
-				success: function () {
-					loadjsSync(loadpaths);
-				}
-			});
 		}
 
 		function loadComplete() {
@@ -99,7 +82,15 @@
 			egret.runEgret({ renderMode: "webgl", audioType: 0 });
 		}
 
-		loadjsSync(loadpaths);
+		setTimeout(function () {
+			feng3d.loadjs.loadjs({
+				paths: loadpaths,
+				success: loadComplete,
+				error: (pathsNotFound) => {
+					console.log(`无法加载 ${JSON.stringify(pathsNotFound)}`);
+				}, numRetries: 5
+			});
+		}, 5000);
 	</script>
 </body>
 

@@ -29,9 +29,9 @@ module feng3d.editor
 
             eui.Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this);
 
-            Event.on(shortcut, <any>"object3DMoveTool", this.onObject3DMoveTool, this);
-            Event.on(shortcut, <any>"object3DRotationTool", this.onObject3DRotationTool, this);
-            Event.on(shortcut, <any>"object3DScaleTool", this.onObject3DScaleTool, this);
+            shortcut.on("object3DMoveTool", this.onObject3DMoveTool, this);
+            shortcut.on("object3DRotationTool", this.onObject3DRotationTool, this);
+            shortcut.on("object3DScaleTool", this.onObject3DScaleTool, this);
 
             eui.Watcher.watch(editor3DData, ["selectedObject"], this.onSelectedObject3DChange, this);
         }
@@ -41,12 +41,12 @@ module feng3d.editor
             if (editor3DData.selectedObject)
             {
                 this.object3DControllerTarget.controllerTargets = [editor3DData.selectedObject.transform];
-                editor3DData.scene3D.transform.addChild(this.transform);
+                editor3DData.scene3D.gameObject.addChild(this.gameObject);
             }
             else
             {
                 this.object3DControllerTarget.controllerTargets = null;
-                editor3DData.scene3D.transform.removeChild(this.transform);
+                editor3DData.scene3D.gameObject.removeChild(this.gameObject);
             }
         }
 
@@ -89,12 +89,12 @@ module feng3d.editor
                 return;
             if (this._currentTool)
             {
-                this.transform.removeChild(this._currentTool.transform)
+                this.gameObject.removeChild(this._currentTool.gameObject)
             }
             this._currentTool = value;
             if (this._currentTool)
             {
-                this.transform.addChild(this._currentTool.transform);
+                this.gameObject.addChild(this._currentTool.gameObject);
             }
         }
     }

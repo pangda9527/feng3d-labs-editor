@@ -4,7 +4,7 @@ module feng3d.editor
     {
         private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis | CoordinateRotationFreeAxis;
         //
-        private _toolModel: Component | GameObject;
+        private _toolModel: Component;
 
         protected ismouseDown = false;
 
@@ -17,10 +17,12 @@ module feng3d.editor
         constructor(gameObject: GameObject)
         {
             super(gameObject);
-            this.transform.holdSize = 1;
-
-            Event.on(this.transform, <any>Scene3DEvent.ADDED_TO_SCENE, this.onAddedToScene, this);
-            Event.on(this.transform, <any>Scene3DEvent.REMOVED_FROM_SCENE, this.onRemovedFromScene, this);
+            var holdSizeComponent = this.gameObject.addComponent(HoldSizeComponent);
+            holdSizeComponent.holdSize = 1;
+            holdSizeComponent.camera = editor3DData.camera;
+            //
+            this.gameObject.on("addedToScene", this.onAddedToScene, this);
+            this.gameObject.on("removedFromScene", this.onRemovedFromScene, this);
         }
 
         protected onAddedToScene()
@@ -28,20 +30,20 @@ module feng3d.editor
             this.updateToolModel();
             this._object3DControllerTarget.controllerTool = this.transform;
             //
-            Event.on(input, <any>inputType.MOUSE_DOWN, this.onMouseDown, this);
-            Event.on(input, <any>inputType.MOUSE_UP, this.onMouseUp, this);
-            Event.on(this, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            Event.on(editor3DData.camera.transform, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            input.on("mousedown", this.onMouseDown, this);
+            input.on("mouseup", this.onMouseUp, this);
+            this.transform.on("scenetransformChanged", this.onScenetransformChanged, this);
+            editor3DData.camera.transform.on("scenetransformChanged", this.onCameraScenetransformChanged, this);
         }
 
         protected onRemovedFromScene()
         {
             this._object3DControllerTarget.controllerTool = null;
             //
-            Event.off(input, <any>inputType.MOUSE_DOWN, this.onMouseDown, this);
-            Event.off(input, <any>inputType.MOUSE_UP, this.onMouseUp, this);
-            Event.off(this, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onScenetransformChanged, this);
-            Event.off(editor3DData.camera.transform, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            input.off("mousedown", this.onMouseDown, this);
+            input.off("mouseup", this.onMouseUp, this);
+            this.transform.off("scenetransformChanged", this.onScenetransformChanged, this);
+            editor3DData.camera.transform.off("scenetransformChanged", this.onCameraScenetransformChanged, this);
         }
 
         protected get toolModel()
@@ -52,11 +54,11 @@ module feng3d.editor
         protected set toolModel(value)
         {
             if (this._toolModel)
-                this.transform.removeChild(this._toolModel.transform);
+                this.gameObject.removeChild(this._toolModel.gameObject);
             this._toolModel = value;;
             if (this._toolModel)
             {
-                this.transform.addChild(this._toolModel.transform);
+                this.gameObject.addChild(this._toolModel.gameObject);
             }
         }
 

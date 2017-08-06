@@ -3,38 +3,38 @@ module feng3d.editor
     export class Hierarchy
     {
         public readonly rootNode: HierarchyNode;
-        private readonly nodeMap = new Map<Transform, HierarchyNode>();
+        private readonly nodeMap = new Map<GameObject, HierarchyNode>();
 
         public get selectedNode()
         {
-            return this.nodeMap.get(editor3DData.selectedObject.transform);
+            return this.nodeMap.get(editor3DData.selectedObject);
         }
 
-        constructor(rootObject3D: Transform)
+        constructor(rootObject3D: GameObject)
         {
             this.rootNode = new HierarchyNode(rootObject3D);
             this.rootNode.depth = -1;
             this.nodeMap.push(rootObject3D, this.rootNode);
             //
-            Event.on(rootObject3D, "click", this.onMouseClick, this);
-            Event.on($editorEventDispatcher, <any>"Create_Object3D", this.onCreateObject3D, this);
-            Event.on($editorEventDispatcher, <any>"saveScene", this.onSaveScene, this);
-            Event.on($editorEventDispatcher, <any>"import", this.onImport, this);
+            rootObject3D.on("click", this.onMouseClick, this);
+            $editorEventDispatcher.on("Create_Object3D", this.onCreateObject3D, this);
+            $editorEventDispatcher.on("saveScene", this.onSaveScene, this);
+            $editorEventDispatcher.on("import", this.onImport, this);
 
             //监听命令
-            Event.on(shortcut, <any>"deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
+            shortcut.on("deleteSeletedObject3D", this.onDeleteSeletedObject3D, this);
         }
 
         /**
          * 获取节点
          */
-        public getNode(object3D: Transform)
+        public getNode(object3D: GameObject)
         {
             var node = this.nodeMap.get(object3D);
             return node;
         }
 
-        public addObject3D(object3D: Transform, parentNode: HierarchyNode = null, allChildren = false)
+        public addObject3D(object3D: GameObject, parentNode: HierarchyNode = null, allChildren = false)
         {
             var node = new HierarchyNode(object3D);
             this.nodeMap.push(object3D, node);
@@ -49,19 +49,19 @@ module feng3d.editor
             {
                 for (var i = 0; i < object3D.numChildren; i++)
                 {
-                    this.addObject3D(object3D.getChildAt(i) as Transform, node, true);
+                    this.addObject3D(object3D.getChildAt(i), node, true);
                 }
             }
             return node;
         }
 
-        private onMouseClick(event:EventVO<"click">)
+        private onMouseClick(event: EventVO<any>)
         {
             var object3D = <Transform>event.target;
-            var node = this.nodeMap.get(object3D);
-            while (!node && (object3D = <Transform>object3D.parent));
+            var node = this.nodeMap.get(object3D.gameObject);
+            while (!node && (object3D == object3D.parent));
             {
-                node = this.nodeMap.get(object3D);
+                node = this.nodeMap.get(object3D.gameObject);
             }
             if (node && object3D)
                 editor3DData.selectedObject = object3D.gameObject;
@@ -73,7 +73,7 @@ module feng3d.editor
             var gameobject = GameObjectFactory.create(event.data.label);
             if (gameobject)
             {
-                this.addObject3D(gameobject.transform);
+                this.addObject3D(gameobject);
                 editor3DData.selectedObject = gameobject;
             } else
             {
@@ -86,7 +86,7 @@ module feng3d.editor
             var selectedObject3D = editor3DData.selectedObject;
             if (selectedObject3D)
             {
-                var node = this.nodeMap.get(selectedObject3D.transform);
+                var node = this.nodeMap.get(selectedObject3D);
                 node.delete();
             }
             editor3DData.selectedObject = null;
@@ -94,9 +94,9 @@ module feng3d.editor
 
         public resetScene(scene: Scene3D)
         {
-            for (var i = 0; i < scene.transform.numChildren; i++)
+            for (var i = 0; i < scene.gameObject.numChildren; i++)
             {
-                this.addObject3D(scene.transform.getChildAt(i) as Transform, null, true);
+                this.addObject3D(scene.gameObject.getChildAt(i), null, true);
             }
         }
 
@@ -138,10 +138,10 @@ module feng3d.editor
                         console.log(reader.error);
                     } else
                     {
-                        var json = JSON.parse(reader.result);
-                        var scene: Scene3D = Serialization.deserialize(json);
+                        // var json = JSON.parse(reader.result);
+                        // var scene: Scene3D = GameObject.des Serialization.deserialize(json);
 
-                        editor3DData.hierarchy.resetScene(scene);
+                        // editor3DData.hierarchy.resetScene(scene);
                     }
                 }
 
@@ -161,7 +161,7 @@ module feng3d.editor
 
         private onSaveScene()
         {
-            var obj = Serialization.serialize(this.rootNode.object3D);
+            var obj = this.rootNode.object3D.serialize();
             obj;
 
             var output = "";
@@ -187,13 +187,25 @@ module feng3d.editor
         }
     }
 
-    export class HierarchyNode
+    export interface HierarchyNodeEventMap
     {
-        public static readonly ADDED = "added";
-        public static readonly REMOVED = "removed";
-        public static readonly OPEN_CHANGED = "openChanged";
+        added: HierarchyNode;
+        removed: HierarchyNode;
+        openChanged: HierarchyNode;
+    }
 
-        public object3D: Transform;
+    export interface HierarchyNode
+    {
+        once<K extends keyof HierarchyNodeEventMap>(type: K, listener: (event: HierarchyNodeEventMap[K]) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof HierarchyNodeEventMap>(type: K, data?: HierarchyNodeEventMap[K], bubbles?: boolean);
+        has<K extends keyof HierarchyNodeEventMap>(type: K): boolean;
+        on<K extends keyof HierarchyNodeEventMap>(type: K, listener: (event: HierarchyNodeEventMap[K]) => any, thisObject?: any, priority?: number, once?: boolean);
+        off<K extends keyof HierarchyNodeEventMap>(type?: K, listener?: (event: HierarchyNodeEventMap[K]) => any, thisObject?: any);
+    }
+
+    export class HierarchyNode extends Event
+    {
+        public object3D: GameObject;
         public label: string;
         public depth: number = 0;
         public isOpen: boolean = true;
@@ -213,10 +225,11 @@ module feng3d.editor
          */
         public children: HierarchyNode[] = [];
 
-        constructor(object3D: Transform)
+        constructor(object3D: GameObject)
         {
+            super();
             this.object3D = object3D;
-            this.label = object3D.gameObject.name;
+            this.label = object3D.name;
             this._uuid = Math.generateUUID();
 
             eui.Watcher.watch(this, ["isOpen"], this.onIsOpenChange, this);
@@ -247,7 +260,7 @@ module feng3d.editor
             node.depth = this.depth + 1;
             node.updateChildrenDepth();
             this.hasChildren = true;
-            Event.dispatch(this, <any>HierarchyNode.ADDED, node, true);
+            this.dispatch("added", node, true);
         }
 
         public removeNode(node: HierarchyNode)
@@ -258,7 +271,7 @@ module feng3d.editor
             console.assert(index != -1);
             this.children.splice(index, 1);
             this.hasChildren = this.children.length > 0;
-            Event.dispatch(this, <any>HierarchyNode.REMOVED, node, true);
+            this.dispatch("removed", node, true);
         }
 
         public delete()
@@ -296,7 +309,7 @@ module feng3d.editor
 
         public onIsOpenChange()
         {
-            Event.dispatch(this, <any>HierarchyNode.OPEN_CHANGED, this, true);
+            this.dispatch("openChanged", this, true);
         }
 
         //------------------------------------------

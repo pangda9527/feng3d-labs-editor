@@ -26,10 +26,10 @@ module feng3d.editor
         set showObject3D(value)
         {
             if (this._showObject3D)
-                Event.off(this._showObject3D, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onShowObjectTransformChanged, this);
+                this._showObject3D.off("scenetransformChanged", this.onShowObjectTransformChanged, this);
             this._showObject3D = value;
             if (this._showObject3D)
-                Event.on(this._showObject3D, <any>Object3DEvent.SCENETRANSFORM_CHANGED, this.onShowObjectTransformChanged, this);
+                this._showObject3D.on("scenetransformChanged", this.onShowObjectTransformChanged, this);
         }
 
         get controllerTool()

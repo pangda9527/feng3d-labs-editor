@@ -37,13 +37,13 @@ module feng3d.editor
 		private onAddedToStage()
 		{
 			this.inspectorViewData = editor3DData.inspectorViewData;
-			Event.on(this.inspectorViewData, "change", this.onDataChange, this);
+			this.inspectorViewData.on("change", this.onDataChange, this);
 			this.backButton.addEventListener(MouseEvent.CLICK, this.onBackClick, this);
 		}
 
 		private onRemovedFromStage()
 		{
-			Event.off(this.inspectorViewData, "change", this.onDataChange, this);
+			this.inspectorViewData.off("change", this.onDataChange, this);
 			this.backButton.removeEventListener(MouseEvent.CLICK, this.onBackClick, this);
 			this.inspectorViewData = null;
 		}

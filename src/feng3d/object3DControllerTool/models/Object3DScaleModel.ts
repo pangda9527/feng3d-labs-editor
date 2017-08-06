@@ -21,21 +21,21 @@ module feng3d.editor
             this.xCube.color.setTo(1, 0, 0);
             this.xCube.update();
             this.xCube.transform.rz = -90;
-            this.transform.addChild(this.xCube.transform);
+            this.gameObject.addChild(this.xCube.gameObject);
 
             this.yCube = GameObject.create("yCube").addComponent(CoordinateScaleCube);
             this.yCube.color.setTo(0, 1, 0);
             this.yCube.update();
-            this.transform.addChild(this.yCube.transform);
+            this.gameObject.addChild(this.yCube.gameObject);
 
             this.zCube = GameObject.create("zCube").addComponent(CoordinateScaleCube);
             this.zCube.color.setTo(0, 0, 1);
             this.zCube.update();
             this.zCube.transform.rx = 90;
-            this.transform.addChild(this.zCube.transform);
+            this.gameObject.addChild(this.zCube.gameObject);
 
             this.oCube = GameObject.create("oCube").addComponent(CoordinateCube);
-            this.transform.addChild(this.oCube.transform);
+            this.gameObject.addChild(this.oCube.gameObject);
         }
     }
 
@@ -62,9 +62,9 @@ module feng3d.editor
             var xLine = GameObject.create();
             xLine.addComponent(MeshRenderer).material = new SegmentMaterial();
             this.segmentGeometry = xLine.addComponent(MeshFilter).mesh = new SegmentGeometry();
-            this.transform.addChild(xLine.transform);
+            this.gameObject.addChild(xLine);
             this.coordinateCube = GameObject.create("coordinateCube").addComponent(CoordinateCube);
-            this.transform.addChild(this.coordinateCube.transform);
+            this.gameObject.addChild(this.coordinateCube.gameObject);
 
             var mouseHit = GameObject.create("hit");
             mouseHit.addComponent(MeshFilter).mesh = new CylinderGeometry(5, 5, this.length - 4);
@@ -72,7 +72,7 @@ module feng3d.editor
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.transform.visible = false;
             mouseHit.transform.mouseEnabled = true;
-            this.transform.addChild(mouseHit.transform);
+            this.gameObject.addChild(mouseHit);
 
             this.update();
         }
