@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class Object3DControllerToolBase extends Component
     {
@@ -62,12 +62,12 @@ module feng3d.editor
             }
         }
 
-        public get selectedItem()
+        get selectedItem()
         {
             return this._selectedItem;
         }
 
-        public set selectedItem(value)
+        set selectedItem(value)
         {
             if (this._selectedItem == value)
                 return;
@@ -78,12 +78,12 @@ module feng3d.editor
                 this._selectedItem.selected = true;
         }
 
-        public get object3DControllerTarget(): Object3DControllerTarget
+        get object3DControllerTarget(): Object3DControllerTarget
         {
             return this._object3DControllerTarget;
         }
 
-        public set object3DControllerTarget(value)
+        set object3DControllerTarget(value)
         {
             this._object3DControllerTarget = value;
         }

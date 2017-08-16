@@ -1,29 +1,30 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class Editor3DData
     {
-        public sceneData = new SceneData();
-        public stage: egret.Stage;
+        sceneData = new SceneData();
+        stage: egret.Stage;
 
-        public selectedObject: GameObject;
-        public camera: Camera;
+        selectedObject: GameObject;
+
+        camera: Camera;
         /** 3d场景 */
-        public scene3D: Scene3D;
-        public view3D: Engine;
-        public hierarchy: Hierarchy;
+        scene3D: Scene3D;
+        view3D: Engine;
+        hierarchy: Hierarchy;
 
-        public object3DOperationID = 0;
+        object3DOperationID = 0;
 
         /**
          * 鼠标在view3D中的坐标
          */
-        public mouseInView3D: Point = new Point();
-        public view3DRect: Rectangle = new Rectangle(0, 0, 100, 100);
+        mouseInView3D: Point = new Point();
+        view3DRect: Rectangle = new Rectangle(0, 0, 100, 100);
 
         /**
          * 巡视界面数据
          */
-        public inspectorViewData: InspectorViewData;
+        inspectorViewData: InspectorViewData;
 
         constructor()
         {

@@ -1,6 +1,5 @@
-module feng3d.editor
+namespace feng3d.editor
 {
-
     export var mouseEventEnvironment: MouseEventEnvironment;
 
     export class MouseEventEnvironment
@@ -9,11 +8,10 @@ module feng3d.editor
         private canvas: HTMLCanvasElement;
         private touch: egret.sys.TouchHandler;
 
-        public overDisplayObject: egret.DisplayObject;
+        overDisplayObject: egret.DisplayObject;
 
         constructor()
         {
-
             this.webTouchHandler = this.getWebTouchHandler();
             this.canvas = this.webTouchHandler.canvas;
             this.touch = this.webTouchHandler.touch;

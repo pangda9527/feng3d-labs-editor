@@ -27,11 +27,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-module feng3d.editor {
+namespace feng3d.editor {
 
     export class LoadingUI extends egret.Sprite {
 
-        public constructor() {
+        constructor() {
             super();
             this.createView();
         }
@@ -47,7 +47,7 @@ module feng3d.editor {
             this.textField.textAlign = "center";
         }
 
-        public setProgress(current: number, total: number): void {
+        setProgress(current: number, total: number): void {
             this.textField.text = `Loading...${current}/${total}`;
         }
     }

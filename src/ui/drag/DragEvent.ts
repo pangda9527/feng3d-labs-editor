@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	/**
 	 * 拖拽事件
@@ -9,27 +9,27 @@ module feng3d.editor
 		/**
 		 * 拖拽放下事件
 		 */
-		public static DRAG_DROP = "dragDrop";
+		static DRAG_DROP = "dragDrop";
 
 		/**
 		 * 拖入事件
 		 */
-		public static DRAG_ENTER = "dragEnter";
+		static DRAG_ENTER = "dragEnter";
 
 		/**
 		 * 拖出事件
 		 */
-		public static DRAG_EXIT = "dragExit";
+		static DRAG_EXIT = "dragExit";
 
 		/**
 		 * 拖拽发起对象
 		 */
-		public dragInitiator: egret.DisplayObject;
+		dragInitiator: egret.DisplayObject;
 
 		/**
 		 * 拖拽源
 		 */
-		public dragSource: DragSource;
+		dragSource: DragSource;
 
 		/**
 		 * 构建拖拽事件

@@ -1,12 +1,12 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class Object3DRotationModel extends Component
     {
-        public xAxis: CoordinateRotationAxis;
-        public yAxis: CoordinateRotationAxis;
-        public zAxis: CoordinateRotationAxis;
-        public freeAxis: CoordinateRotationFreeAxis;
-        public cameraAxis: CoordinateRotationAxis;
+        xAxis: CoordinateRotationAxis;
+        yAxis: CoordinateRotationAxis;
+        zAxis: CoordinateRotationAxis;
+        freeAxis: CoordinateRotationFreeAxis;
+        cameraAxis: CoordinateRotationAxis;
 
         constructor(gameObject: GameObject)
         {
@@ -52,21 +52,21 @@ module feng3d.editor
         private torusGeometry: TorusGeometry;
         private sector: SectorObject3D;
 
-        public radius = 80;
-        public readonly color = new Color(1, 0, 0)
+        radius = 80;
+        readonly color = new Color(1, 0, 0)
         private backColor: Color = new Color(0.6, 0.6, 0.6);
         private selectedColor: Color = new Color(1, 1, 0);
 
         //
-        public get selected() { return this._selected; }
-        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        get selected() { return this._selected; }
+        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
 
         /**
          * 过滤法线显示某一面线条
          */
-        public get filterNormal() { return this._filterNormal; }
-        public set filterNormal(value) { this._filterNormal = value; this.update(); }
+        get filterNormal() { return this._filterNormal; }
+        set filterNormal(value) { this._filterNormal = value; this.update(); }
         private _filterNormal: Vector3D;
 
         constructor(gameObject: GameObject)
@@ -88,14 +88,14 @@ module feng3d.editor
             this.torusGeometry = mouseHit.addComponent(MeshFilter).mesh = new TorusGeometry(this.radius, 2);
             mouseHit.addComponent(MeshRenderer).material = new StandardMaterial();
             mouseHit.transform.rx = 90;
-            mouseHit.transform.visible = false;
-            mouseHit.transform.mouseEnabled = true;
+            mouseHit.visible = false;
+            mouseHit.mouseEnabled = true;
             this.gameObject.addChild(mouseHit);
 
             this.update();
         }
 
-        public update()
+        update()
         {
             this.sector.radius = this.radius;
             this.torusGeometry.radius = this.radius;
@@ -135,7 +135,7 @@ module feng3d.editor
             }
         }
 
-        public showSector(startPos: Vector3D, endPos: Vector3D)
+        showSector(startPos: Vector3D, endPos: Vector3D)
         {
             var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
             var localStartPos = inverseGlobalMatrix3D.transformVector(startPos);
@@ -154,7 +154,7 @@ module feng3d.editor
             this.gameObject.addChild(this.sector.gameObject);
         }
 
-        public hideSector()
+        hideSector()
         {
             if (this.sector.gameObject.parent)
                 this.sector.gameObject.parent.removeChild(this.sector.gameObject);
@@ -170,7 +170,7 @@ module feng3d.editor
         private geometry: Geometry;
         private borderColor = new Color(0, 1, 1, 0.6);
 
-        public radius = 80;
+        radius = 80;
 
         private _start = 0;
         private _end = 0;
@@ -194,7 +194,7 @@ module feng3d.editor
             this.update(0, 0);
         }
 
-        public update(start = 0, end = 0)
+        update(start = 0, end = 0)
         {
             this._start = Math.min(start, end);
             this._end = Math.max(start, end);
@@ -240,13 +240,13 @@ module feng3d.editor
         private sector: SectorObject3D;
 
         private radius = 80;
-        public color = new Color(1, 0, 0)
+        color = new Color(1, 0, 0)
         private backColor: Color = new Color(0.6, 0.6, 0.6);
         private selectedColor: Color = new Color(1, 1, 0);
 
         //
-        public get selected() { return this._selected; }
-        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        get selected() { return this._selected; }
+        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
 
         constructor(gameObject: GameObject)
@@ -264,14 +264,14 @@ module feng3d.editor
 
             this.sector = GameObject.create("sector").addComponent(SectorObject3D);
             this.sector.update(0, 360);
-            this.sector.transform.visible = false;
-            this.sector.transform.mouseEnabled = true;
+            this.sector.gameObject.visible = false;
+            this.sector.gameObject.mouseEnabled = true;
             this.gameObject.addChild(this.sector.gameObject);
 
             this.update();
         }
 
-        public update()
+        update()
         {
             this.sector.radius = this.radius;
             var color = this._selected ? this.selectedColor : this.color;

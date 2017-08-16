@@ -1,15 +1,15 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class HierarchyView extends eui.Component implements eui.UIComponent
 	{
-		public addButton: eui.Button;
-		public list: eui.List;
+		addButton: eui.Button;
+		list: eui.List;
 
 		private listData: eui.ArrayCollection;
 
 		private watchers: eui.Watcher[] = [];
 
-		public constructor()
+		constructor()
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);

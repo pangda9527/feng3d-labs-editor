@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 
     export class Object3DMoveTool extends Object3DControllerToolBase

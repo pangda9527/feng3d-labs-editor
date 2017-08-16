@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     /**
      * 地面网格
@@ -11,11 +11,13 @@ module feng3d.editor
 
         private level: number;
         private step: number;
+        private groundGridObject: GameObject;
 
-        constructor(gameObject:GameObject)
+        constructor(gameObject: GameObject)
         {
             super(gameObject);
-            this.transform.mouseEnabled = false;
+            gameObject.serializable = false;
+            this.gameObject.mouseEnabled = false;
             this.init();
 
             // editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);

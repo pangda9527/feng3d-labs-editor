@@ -1,12 +1,12 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 
     export class Object3DScaleModel extends Component
     {
-        public xCube: CoordinateScaleCube;
-        public yCube: CoordinateScaleCube;
-        public zCube: CoordinateScaleCube;
-        public oCube: CoordinateCube;
+        xCube: CoordinateScaleCube;
+        yCube: CoordinateScaleCube;
+        zCube: CoordinateScaleCube;
+        oCube: CoordinateCube;
 
         constructor(gameObject: GameObject)
         {
@@ -44,16 +44,16 @@ module feng3d.editor
         private coordinateCube: CoordinateCube
         private segmentGeometry: SegmentGeometry;
 
-        public readonly color = new Color(1, 0, 0)
+        readonly color = new Color(1, 0, 0)
         private selectedColor = new Color(1, 1, 0);
         private length = 100;
         //
-        public get selected() { return this._selected; }
-        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        get selected() { return this._selected; }
+        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
         //
-        public get scaleValue() { return this._scale; }
-        public set scaleValue(value) { if (this._scale == value) return; this._scale = value; this.update(); }
+        get scaleValue() { return this._scale; }
+        set scaleValue(value) { if (this._scale == value) return; this._scale = value; this.update(); }
         private _scale = 1;
 
         constructor(gameObject: GameObject)
@@ -70,14 +70,14 @@ module feng3d.editor
             mouseHit.addComponent(MeshFilter).mesh = new CylinderGeometry(5, 5, this.length - 4);
             mouseHit.addComponent(MeshRenderer);
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
-            mouseHit.transform.visible = false;
-            mouseHit.transform.mouseEnabled = true;
+            mouseHit.visible = false;
+            mouseHit.mouseEnabled = true;
             this.gameObject.addChild(mouseHit);
 
             this.update();
         }
 
-        public update()
+        update()
         {
             this.coordinateCube.color = this.color;
             this.coordinateCube.selectedColor = this.selectedColor;

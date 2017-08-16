@@ -1,14 +1,14 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class BooleanAttrView extends eui.Component implements feng3d.IObjectAttributeView
 	{
 		private _space: any;
 		private _attributeName: string;
 		private _attributeType: string;
-		public label: eui.Label;
-		public checkBox: eui.CheckBox;
+		label: eui.Label;
+		checkBox: eui.CheckBox;
 
-		public constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 		{
 			super();
 			this._space = attributeViewInfo.owner;
@@ -26,18 +26,18 @@ module feng3d.editor
 			this.updateView();
 		}
 
-		public get space(): any
+		get space(): any
 		{
 			return this._space;
 		}
 
-		public set space(value: any)
+		set space(value: any)
 		{
 			this._space = value;
 			this.updateView();
 		}
 
-		public updateView()
+		updateView()
 		{
 			this.checkBox["selected"] = this.attributeValue;
 		}
@@ -47,17 +47,17 @@ module feng3d.editor
 			this.attributeValue = this.checkBox["selected"];
 		}
 
-		public get attributeName(): string
+		get attributeName(): string
 		{
 			return this._attributeName;
 		}
 
-		public get attributeValue(): any
+		get attributeValue(): any
 		{
 			return this._space[this._attributeName];
 		}
 
-		public set attributeValue(value: any)
+		set attributeValue(value: any)
 		{
 			if (this._space[this._attributeName] != value)
 			{

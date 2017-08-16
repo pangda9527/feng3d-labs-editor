@@ -1,21 +1,21 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class CreateObject3DView extends eui.Component implements eui.UIComponent
 	{
-		public object3dList: eui.List;
-		public maskSprite: eui.Rect;
+		object3dList: eui.List;
+		maskSprite: eui.Rect;
 
 		private _dataProvider: eui.ArrayCollection;
 		private _selectedCallBack: (item: { label: string; }) => void;
 
-		public constructor()
+		constructor()
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "CreateObject3DViewSkin";
 		}
 
-		public showView(data: { label: string; }[], selectedCallBack: (item: { label: string; }) => void, globalPoint: { x: number, y: number } = null)
+		showView(data: { label: string; }[], selectedCallBack: (item: { label: string; }) => void, globalPoint: { x: number, y: number } = null)
 		{
 			this._dataProvider.replaceAll(data.concat());
 			this._selectedCallBack = selectedCallBack;

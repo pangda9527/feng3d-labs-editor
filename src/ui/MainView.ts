@@ -1,21 +1,21 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class MainView extends eui.Component implements eui.UIComponent
 	{
-		public mainGroup: eui.Group;
-		public topGroup: eui.Group;
-		public mainButton: eui.Button;
-		public moveButton: eui.ToggleButton;
-		public rotateButton: eui.ToggleButton;
-		public scaleButton: eui.ToggleButton;
-		public helpButton: eui.Button;
-		public settingButton: eui.Button;
-		public hierachyGroup: eui.Group;
-		public assetsGroup: eui.Group;
+		mainGroup: eui.Group;
+		topGroup: eui.Group;
+		mainButton: eui.Button;
+		moveButton: eui.ToggleButton;
+		rotateButton: eui.ToggleButton;
+		scaleButton: eui.ToggleButton;
+		helpButton: eui.Button;
+		settingButton: eui.Button;
+		hierachyGroup: eui.Group;
+		assetsGroup: eui.Group;
 
 		private watchers: eui.Watcher[] = [];
 
-		public constructor()
+		constructor()
 		{
 			super();
 

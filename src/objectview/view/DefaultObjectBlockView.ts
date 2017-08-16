@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	/**
 	 * 默认对象属性块界面
@@ -13,12 +13,12 @@ module feng3d.editor
 		private itemList: AttributeViewInfo[];
 		private isInitView: boolean;
 
-		public group: eui.Group;
-		public titleGroup: eui.Group;
-		public titleButton: eui.Button;
-		public contentGroup: eui.Group;
+		group: eui.Group;
+		titleGroup: eui.Group;
+		titleButton: eui.Button;
+		contentGroup: eui.Group;
 
-		public border: eui.Rect;
+		border: eui.Rect;
 
 		/**
 		 * @inheritDoc
@@ -33,7 +33,6 @@ module feng3d.editor
 
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "DefaultObjectBlockView";
-
 		}
 
 		private onComplete()
@@ -68,12 +67,12 @@ module feng3d.editor
 			this.isInitView = true;
 		}
 
-		public get space(): Object
+		get space(): Object
 		{
 			return this._space;
 		}
 
-		public set space(value: Object)
+		set space(value: Object)
 		{
 			this._space = value;
 			for (var i = 0; i < this.attributeViews.length; i++)
@@ -84,7 +83,7 @@ module feng3d.editor
 			this.$updateView();
 		}
 
-		public get blockName(): string
+		get blockName(): string
 		{
 			return this._blockName;
 		}
@@ -100,7 +99,7 @@ module feng3d.editor
 			}
 		}
 
-		public updateView(): void
+		updateView(): void
 		{
 			this.$updateView();
 			for (var i = 0; i < this.attributeViews.length; i++)
@@ -109,7 +108,7 @@ module feng3d.editor
 			}
 		}
 
-		public getAttributeView(attributeName: String): IObjectAttributeView
+		getAttributeView(attributeName: String): IObjectAttributeView
 		{
 			for (var i = 0; i < this.attributeViews.length; i++)
 			{

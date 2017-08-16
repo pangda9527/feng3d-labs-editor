@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class OAVObject3DComponentList extends eui.Component implements IObjectAttributeView
 	{
@@ -9,8 +9,8 @@ module feng3d.editor
 		private accordions: Accordion[] = [];
 
 		//
-		public group: eui.Group;
-		public addComponentButton: eui.Button;
+		group: eui.Group;
+		addComponentButton: eui.Button;
 
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
@@ -27,7 +27,7 @@ module feng3d.editor
 		private onComplete()
 		{
 			this.addComponentButton.addEventListener(MouseEvent.CLICK, this.onAddComponentButtonClick, this);
-			this.updateView();
+			this.initView();
 		}
 
 		private onAddComponentButtonClick()
@@ -39,33 +39,32 @@ module feng3d.editor
 		private onCreateComponent(item)
 		{
 			var cls = ClassUtils.getDefinitionByName(item.className);
-			this.space.addComponent(cls);
-
-			this.updateView();
+			var component = this.space.addComponent(cls);
+			this.addComponentView(component);
 		}
 
-		public get space()
+		get space()
 		{
 			return this._space;
 		}
 
-		public set space(value)
+		set space(value)
 		{
 			this._space = value;
 			this.updateView();
 		}
 
-		public get attributeName(): string
+		get attributeName(): string
 		{
 			return this._attributeName;
 		}
 
-		public get attributeValue(): Object
+		get attributeValue(): Object
 		{
 			return this._space[this._attributeName];
 		}
 
-		public set attributeValue(value: Object)
+		set attributeValue(value: Object)
 		{
 			if (this._space[this._attributeName] != value)
 			{
@@ -74,26 +73,37 @@ module feng3d.editor
 			this.updateView();
 		}
 
-		/**
-		 * 更新界面
-		 */
-		public updateView(): void
+		private initView(): void
 		{
 			this.accordions.length = 0;
 			(<eui.VerticalLayout>this.group.layout).gap = -1;
-			this.group.removeChildren();
-
 			var components = <any>this.attributeValue;
 			for (var i = 0; i < components.length; i++)
 			{
-				var component = components[i];
+				this.addComponentView(components[i]);
+			}
+		}
 
-				var displayObject: Object3DComponentView = new Object3DComponentView(component);
-				displayObject.percentWidth = 100;
-				this.group.addChild(displayObject);
+		private addComponentView(component: Component)
+		{
+			var displayObject: Object3DComponentView = new Object3DComponentView(component);
+			displayObject.percentWidth = 100;
+			this.group.addChild(displayObject);
 
-				//
-				displayObject.deleteButton.addEventListener(MouseEvent.CLICK, this.onDeleteButton, this);
+			//
+			displayObject.deleteButton.addEventListener(MouseEvent.CLICK, this.onDeleteButton, this);
+		}
+
+		/**
+		 * 更新界面
+		 */
+		updateView(): void
+		{
+			for (var i = 0, n = this.group.numChildren; i < n; i++)
+			{
+				var child = this.group.getChildAt(i)
+				if (child instanceof Object3DComponentView)
+					child.updateView();
 			}
 		}
 

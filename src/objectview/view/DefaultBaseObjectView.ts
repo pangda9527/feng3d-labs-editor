@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	/**
 	 * 默认基础对象界面
@@ -8,7 +8,7 @@ module feng3d.editor
 	{
 		private _space: Object;
 
-		public label: eui.Label;
+		label: eui.Label;
 
 		constructor(objectViewInfo: ObjectViewInfo)
 		{
@@ -24,23 +24,23 @@ module feng3d.editor
 			this.updateView();
 		}
 
-		public get space(): Object
+		get space(): Object
 		{
 			return this._space;
 		}
 
-		public set space(value: Object)
+		set space(value: Object)
 		{
 			this._space = value;
 			this.updateView();
 		}
 
-		public getAttributeView(attributeName: String): IObjectAttributeView
+		getAttributeView(attributeName: String): IObjectAttributeView
 		{
 			return null;
 		}
 
-		public getblockView(blockName: String): IObjectBlockView
+		getblockView(blockName: String): IObjectBlockView
 		{
 			return null;
 		}
@@ -48,7 +48,7 @@ module feng3d.editor
 		/**
 		 * 更新界面
 		 */
-		public updateView(): void
+		updateView(): void
 		{
 			this.label.text = String(this._space);
 		}

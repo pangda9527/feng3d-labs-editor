@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class SceneControl
     {
@@ -114,11 +114,11 @@ module feng3d.editor
 
     export class SceneControlConfig
     {
-        public mouseWheelMoveStep = 0.4;
-        public defaultLookDistance = 300;
+        mouseWheelMoveStep = 0.4;
+        defaultLookDistance = 300;
 
         //dynamic
-        public lookDistance = 300;
+        lookDistance = 300;
     }
     var config = new SceneControlConfig();
 }

@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 
 	/**
@@ -25,7 +25,7 @@ module feng3d.editor
 		/**
 		 * 是否正在拖拽
 		 */
-		public static get isDragging(): boolean
+		static get isDragging(): boolean
 		{
 			return this.instance.isDragging;
 		}
@@ -33,7 +33,7 @@ module feng3d.editor
 		/**
 		 * 是否被接受
 		 */
-		public static get isSuccess(): boolean
+		static get isSuccess(): boolean
 		{
 			return this.instance.isSuccess;
 		}
@@ -49,7 +49,7 @@ module feng3d.editor
 		 * @param imageAlpha		图片透明度
 		 * @param allowMove			是否允许移动
 		 */
-		public static doDrag(dragInitiator: egret.DisplayObject, dragSource: DragSource, dragImagge: egret.DisplayObject = null, xOffset: number = 0, yOffset: number = 0, imageAlpha: number = 0.5, allowMove: boolean = true): void
+		static doDrag(dragInitiator: egret.DisplayObject, dragSource: DragSource, dragImagge: egret.DisplayObject = null, xOffset: number = 0, yOffset: number = 0, imageAlpha: number = 0.5, allowMove: boolean = true): void
 		{
 			this.instance.doDrag(dragInitiator, dragSource, dragImagge, xOffset, yOffset, imageAlpha, allowMove);
 		}
@@ -58,7 +58,7 @@ module feng3d.editor
 		 * 接受拖入
 		 * @param target		接受拖入的对象
 		 */
-		public static acceptDragDrop(target: egret.DisplayObject): void
+		static acceptDragDrop(target: egret.DisplayObject): void
 		{
 			this.instance.acceptDragDrop(target);
 		}
@@ -66,7 +66,7 @@ module feng3d.editor
 		/**
 		 * 是否接受拖入
 		 */
-		public static isAcceptDragDrop(target: egret.DisplayObject): boolean
+		static isAcceptDragDrop(target: egret.DisplayObject): boolean
 		{
 			return this.instance.accepter == target;
 		}
@@ -123,7 +123,7 @@ module feng3d.editor
 		 * @param imageAlpha		图片透明度
 		 * @param allowMove			是否允许移动
 		 */
-		public doDrag(dragInitiator: egret.DisplayObject, dragSource: DragSource, dragImage: egret.DisplayObject = null, xOffset: number = 0, yOffset: number = 0, imageAlpha: number = 0.5, allowMove: boolean = true): void
+		doDrag(dragInitiator: egret.DisplayObject, dragSource: DragSource, dragImage: egret.DisplayObject = null, xOffset: number = 0, yOffset: number = 0, imageAlpha: number = 0.5, allowMove: boolean = true): void
 		{
 			this.isSuccess = false;
 			this.dragInitiator = dragInitiator;
@@ -141,7 +141,7 @@ module feng3d.editor
 		 * 接受拖入
 		 * @param target		接受拖入的对象
 		 */
-		public acceptDragDrop(target: egret.DisplayObject)
+		acceptDragDrop(target: egret.DisplayObject)
 		{
 			this.accepter = target;
 		}

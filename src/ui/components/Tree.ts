@@ -1,8 +1,8 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class Tree extends eui.List
 	{
-		public constructor()
+		constructor()
 		{
 			super();
 			this.itemRenderer = TreeItemRenderer;

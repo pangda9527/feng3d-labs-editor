@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 
 	/**
@@ -25,7 +25,7 @@ module feng3d.editor
 		/**
 		 * 格式列表
 		 */
-		public get formats()
+		get formats()
 		{
 			return this._formats;
 		}
@@ -35,7 +35,7 @@ module feng3d.editor
 		 * @param data			数据
 		 * @param format		数据格式
 		 */
-		public addData(data: Object, format: string | number): void
+		addData(data: Object, format: string | number): void
 		{
 			this._formats.push(data);
 			this.dataHolder[format] = data;
@@ -46,7 +46,7 @@ module feng3d.editor
 		 * @param handler
 		 * @param format
 		 */
-		public addHandler(handler: Function, format: string | number): void
+		addHandler(handler: Function, format: string | number): void
 		{
 			this._formats.push(format);
 			this.formatHandlers[format] = handler;
@@ -57,7 +57,7 @@ module feng3d.editor
 		 * @param format		格式
 		 * @return 				拥有的数据或者处理回调函数
 		 */
-		public dataForFormat(format: string | number): any
+		dataForFormat(format: string | number): any
 		{
 			var data = this.dataHolder[format];
 			if (data)
@@ -72,7 +72,7 @@ module feng3d.editor
 		 * @param format			格式
 		 * @return
 		 */
-		public hasFormat(format: string | number): boolean
+		hasFormat(format: string | number): boolean
 		{
 			var n = this._formats.length;
 			for (var i = 0; i < n; i++)

@@ -1,13 +1,13 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class Vector3DView extends eui.Component implements eui.UIComponent
 	{
-		public vm = new Vector3D(1, 2, 3);
-		public xTextInput: eui.TextInput;
-		public yTextInput: eui.TextInput;
-		public zTextInput: eui.TextInput;
+		vm = new Vector3D(1, 2, 3);
+		xTextInput: eui.TextInput;
+		yTextInput: eui.TextInput;
+		zTextInput: eui.TextInput;
 
-		public constructor()
+		constructor()
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);

@@ -1,9 +1,9 @@
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     enum DragType {
         HierarchyNode = 0,
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
      * 拖拽源
      * @author feng		2017-01-22
@@ -51,7 +51,7 @@ declare module feng3d.editor {
         hasFormat(format: string | number): boolean;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
      * 拖拽事件
      * @author feng		2017-01-22
@@ -88,7 +88,7 @@ declare module feng3d.editor {
         constructor(type: string, dragInitiator?: egret.DisplayObject, dragSource?: DragSource, bubbles?: boolean, cancelable?: boolean);
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
      * 拖拽管理者
      * @author feng 2017-01-22
@@ -213,7 +213,7 @@ declare module feng3d.editor {
         private removeListeners();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Feng3dView extends eui.Component implements eui.UIComponent {
         private canvas;
         constructor();
@@ -223,7 +223,7 @@ declare module feng3d.editor {
         private onResize();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Accordion extends eui.Component implements eui.UIComponent {
         group: eui.Group;
         titleGroup: eui.Group;
@@ -239,7 +239,7 @@ declare module feng3d.editor {
         private onTitleButtonClick();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class TreeItemRenderer extends eui.ItemRenderer {
         contentGroup: eui.Group;
         disclosureButton: eui.ToggleButton;
@@ -263,12 +263,51 @@ declare module feng3d.editor {
         private onDragDrop(event);
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
+    interface TreeNodeEventMap {
+        added: TreeNode;
+        removed: TreeNode;
+        openChanged: TreeNode;
+    }
+    interface TreeNode {
+        once<K extends keyof TreeNodeEventMap>(type: K, listener: (event: TreeNodeEventMap[K]) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof TreeNodeEventMap>(type: K, data?: TreeNodeEventMap[K], bubbles?: boolean): any;
+        has<K extends keyof TreeNodeEventMap>(type: K): boolean;
+        on<K extends keyof TreeNodeEventMap>(type: K, listener: (event: TreeNodeEventMap[K]) => any, thisObject?: any, priority?: number, once?: boolean): any;
+        off<K extends keyof TreeNodeEventMap>(type?: K, listener?: (event: TreeNodeEventMap[K]) => any, thisObject?: any): any;
+    }
+    class TreeNode extends Event {
+        label: string;
+        depth: number;
+        isOpen: boolean;
+        hasChildren: boolean;
+        /**
+         * 父节点
+         */
+        parent: TreeNode;
+        /**
+         * 子节点列表
+         */
+        children: TreeNode[];
+        constructor();
+        /**
+         * 判断是否包含节点
+         */
+        contain(node: TreeNode): boolean;
+        addNode(node: TreeNode): void;
+        removeNode(node: TreeNode): void;
+        destroy(): void;
+        updateChildrenDepth(): void;
+        getShowNodes(): TreeNode[];
+        onIsOpenChange(): void;
+    }
+}
+declare namespace feng3d.editor {
     class Tree extends eui.List {
         constructor();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Vector3DView extends eui.Component implements eui.UIComponent {
         vm: Vector3D;
         xTextInput: eui.TextInput;
@@ -281,447 +320,24 @@ declare module feng3d.editor {
         private onTextChange(event);
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DComponentView extends eui.Component {
         component: Component;
+        componentView: IObjectView;
         accordion: feng3d.editor.Accordion;
         deleteButton: eui.Button;
         /**
          * 对象界面数据
          */
         constructor(component: Component);
+        /**
+         * 更新界面
+         */
+        updateView(): void;
         private onComplete();
     }
 }
-declare module feng3d {
-    /**
-     * 排序比较函数
-     * @author feng 2016-3-29
-     */
-    class SortCompare {
-        /**
-         * 比较字符串
-         * @param a
-         * @param b
-         * @return
-         */
-        static stringCompare(a: string, b: string): number;
-    }
-}
-declare module feng3d {
-    /**
-     * 属性信息
-     * @author feng 2016-3-28
-     */
-    class AttributeInfo {
-        /**
-         * 属性名称
-         */
-        name: string;
-        /**
-         * 属性类型
-         */
-        type: string;
-        /**
-         * 是否可写
-         */
-        writable: boolean;
-        /**
-         * 构建
-         */
-        constructor(name?: string, type?: string, writable?: boolean);
-        /**
-         * 比较字符串
-         * @param a
-         * @param b
-         * @return
-         */
-        static compare(a: AttributeInfo, b: AttributeInfo): number;
-    }
-}
-declare module feng3d {
-    /**
-     * 定义属性
-     * @author feng 2016-3-23
-     */
-    interface AttributeDefinition {
-        /**
-         * 属性名称
-         */
-        name: string;
-        /**
-         * 所属块名称
-         */
-        block?: string;
-        /**
-         * 组件
-         */
-        component?: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-    }
-}
-declare module feng3d {
-    /**
-     * 定义特定属性类型默认界面
-     * @author feng 2016-3-25
-     */
-    interface AttributeTypeDefinition {
-        /**
-         * 属性类型
-         */
-        type: string;
-        /**
-         * 界面类
-         */
-        component: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-    }
-}
-declare module feng3d {
-    /**
-     * 块定义
-     * @author feng 2016-3-23
-     */
-    interface BlockDefinition {
-        /**
-         * 块名称
-         */
-        name: string;
-        /**
-         * 组件
-         */
-        component?: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-    }
-}
-declare module feng3d {
-    /**
-     * ObjectView类配置
-     * @author feng 2016-3-23
-     */
-    interface ClassDefinition {
-        /**
-         * 类名
-         */
-        name: string;
-        /**
-         * 组件
-         */
-        component: string;
-        /**
-         * 组件参数
-         */
-        componentParam: Object;
-        /**
-         * 自定义对象属性定义字典（key:属性名,value:属性定义）
-         */
-        attributeDefinitionVec: AttributeDefinition[];
-        /**
-         * 自定义对象属性块界面类定义字典（key:属性块名称,value:自定义对象属性块界面类定义）
-         */
-        blockDefinitionVec: BlockDefinition[];
-    }
-}
-declare module feng3d {
-    /**
-     * 对象属性界面接口
-     * @author feng 2016-3-10
-     */
-    interface IObjectAttributeView {
-        /**
-         * 界面所属对象（空间）
-         */
-        space: Object;
-        /**
-         * 更新界面
-         */
-        updateView(): void;
-        /**
-         * 属性名称
-         */
-        attributeName: string;
-        /**
-         * 属性值
-         */
-        attributeValue: Object;
-    }
-}
-declare module feng3d {
-    /**
-     * 对象属性块界面接口
-     * @author feng 2016-3-22
-     */
-    interface IObjectBlockView {
-        /**
-         * 界面所属对象（空间）
-         */
-        space: Object;
-        /**
-         * 更新界面
-         */
-        updateView(): void;
-        /**
-         * 块名称
-         */
-        blockName: string;
-        /**
-         * 获取属性界面
-         * @param attributeName		属性名称
-         */
-        getAttributeView(attributeName: string): IObjectAttributeView;
-    }
-}
-declare module feng3d {
-    /**
-     * 对象界面接口
-     * @author feng 2016-3-11
-     */
-    interface IObjectView {
-        /**
-         * 界面所属对象（空间）
-         */
-        space: Object;
-        /**
-         * 更新界面
-         */
-        updateView(): void;
-        /**
-         * 获取块界面
-         * @param blockName		块名称
-         */
-        getblockView(blockName: string): IObjectBlockView;
-        /**
-         * 获取属性界面
-         * @param attributeName		属性名称
-         */
-        getAttributeView(attributeName: string): IObjectAttributeView;
-    }
-}
-declare module feng3d {
-    /**
-     * 对象属性信息
-     * @author feng 2016-3-10
-     */
-    class AttributeViewInfo {
-        /**
-         * 属性名称
-         */
-        name: string;
-        /**
-         * 属性类型
-         */
-        type: string;
-        /**
-         * 是否可写
-         */
-        writable: boolean;
-        /**
-         * 所属块名称
-         */
-        block: string;
-        /**
-         * 组件
-         */
-        component: string;
-        /**
-         * 组件参数
-         */
-        componentParam: Object;
-        /**
-         * 属性所属对象
-         */
-        owner: Object;
-    }
-}
-declare module feng3d {
-    /**
-     * 对象属性块
-     * @author feng 2016-3-22
-     */
-    interface BlockViewInfo {
-        /**
-         * 块名称
-         */
-        name: string;
-        /**
-         * 组件
-         */
-        component?: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-        /**
-         * 属性信息列表
-         */
-        itemList: AttributeViewInfo[];
-        /**
-         * 属性拥有者
-         */
-        owner: Object;
-    }
-}
-declare module feng3d {
-    /**
-     * 对象信息
-     * @author feng 2016-3-29
-     */
-    interface ObjectViewInfo {
-        /**
-         * 类名
-         */
-        name: string;
-        /**
-         * 组件
-         */
-        component: string;
-        /**
-         * 组件参数
-         */
-        componentParam: Object;
-        /**
-         * 对象属性列表
-         */
-        objectAttributeInfos: AttributeViewInfo[];
-        /**
-         * 对象块信息列表
-         */
-        objectBlockInfos: BlockViewInfo[];
-        /**
-         * 保存类的一个实例，为了能够获取动态属性信息
-         */
-        owner: Object;
-    }
-}
-declare module feng3d {
-    /**
-     * ObjectView总配置数据
-     * @author feng 2016-3-23
-     */
-    interface ObjectViewConfig {
-        /**
-         * 默认基础类型对象界面类定义
-         */
-        defaultBaseObjectViewClass: string;
-        /**
-         * 默认对象界面类定义
-         */
-        defaultObjectViewClass: string;
-        /**
-         * 默认对象属性界面类定义
-         */
-        defaultObjectAttributeViewClass: string;
-        /**
-         * 属性块默认界面
-         */
-        defaultObjectAttributeBlockView: string;
-        /**
-         * 指定属性类型界面类定义字典（key:属性类名称,value:属性界面类定义）
-         */
-        attributeDefaultViewClassByTypeVec: AttributeTypeDefinition[];
-        /**
-         * ObjectView类配置字典 （key：类名称，value：ObjectView类配置）
-         */
-        classConfigVec: ClassDefinition[];
-    }
-    var $objectViewConfig: ObjectViewConfig;
-}
-declare module feng3d {
-    /**
-     * 对象界面
-     * @author feng 2016-3-10
-     */
-    class ObjectView {
-        /**
-         * 获取对象界面
-         *
-         * @static
-         * @param {Object} object				用于生成界面的对象
-         * @returns 							对象界面
-         *
-         * @memberOf ObjectView
-         */
-        getObjectView(object: Object): any;
-        /**
-         * 获取属性界面
-         *
-         * @static
-         * @param {AttributeViewInfo} attributeViewInfo			属性界面信息
-         * @returns {egret.DisplayObject}						属性界面
-         *
-         * @memberOf ObjectView
-         */
-        getAttributeView(attributeViewInfo: AttributeViewInfo): any;
-        private getAttributeDefaultViewClassByType(type);
-        /**
-         * 获取块界面
-         *
-         * @static
-         * @param {BlockViewInfo} blockViewInfo			块界面信息
-         * @returns {egret.DisplayObject}				块界面
-         *
-         * @memberOf ObjectView
-         */
-        getBlockView(blockViewInfo: BlockViewInfo): any;
-        /**
-         * 获取对象信息
-         * @param object
-         * @return
-         */
-        private getObjectInfo(object);
-        private getClassConfig(object);
-        /**
-         * 获取对象属性列表
-         */
-        private getObjectAttributeInfos(object, filterReg?);
-        /**
-         * 获取对象块信息列表
-         *
-         * @private
-         * @static
-         * @param {Object} object			对象
-         * @returns {BlockViewInfo[]}		对象块信息列表
-         *
-         * @memberOf ObjectView
-         */
-        private getObjectBlockInfos(object);
-        /**
-         * 获取属性界面信息
-         *
-         * @private
-         * @static
-         * @param {Object} object				属性所属对象
-         * @param {string} attributeName		属性名称
-         * @returns {AttributeViewInfo}			属性界面信息
-         *
-         * @memberOf ObjectView
-         */
-        private getAttributeViewInfo(object, attributeName);
-        /**
-         * 获取属性定义
-         *
-         * @private
-         * @static
-         * @param {Object} object					属性所属对象
-         * @param {string} attributeName			属性名称
-         * @returns {AttributeDefinition}			属性定义信息
-         *
-         * @memberOf ObjectView
-         */
-        private getAttributeDefinition(object, attributeName);
-    }
-    var objectview: ObjectView;
-}
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
      * 默认基础对象界面
      * @author feng 2016-3-11
@@ -740,7 +356,7 @@ declare module feng3d.editor {
         updateView(): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
      * 默认对象属性界面
      * @author feng 2016-3-10
@@ -766,7 +382,7 @@ declare module feng3d.editor {
         private onTextChange();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
      * 默认对象属性块界面
      * @author feng 2016-3-22
@@ -799,7 +415,11 @@ declare module feng3d.editor {
         private onTitleButtonClick();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d {
+    interface IObjectView extends eui.Component {
+    }
+}
+declare namespace feng3d.editor {
     /**
      * 默认使用块的对象界面
      * @author feng 2016-3-22
@@ -825,9 +445,11 @@ declare module feng3d.editor {
         private $updateView();
         getblockView(blockName: string): IObjectBlockView;
         getAttributeView(attributeName: string): IObjectAttributeView;
+        private onAddedToStage();
+        private onRemovedFromStage();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class BooleanAttrView extends eui.Component implements feng3d.IObjectAttributeView {
         private _space;
         private _attributeName;
@@ -853,7 +475,7 @@ declare module feng3d {
         toString(): string;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class OAVVector3D extends eui.Component implements IObjectAttributeView {
         private _space;
         private _attributeName;
@@ -872,7 +494,7 @@ declare module feng3d.editor {
         updateView(): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class OAVObject3DComponentList extends eui.Component implements IObjectAttributeView {
         private _space;
         private _attributeName;
@@ -888,6 +510,8 @@ declare module feng3d.editor {
         space: GameObject;
         readonly attributeName: string;
         attributeValue: Object;
+        private initView();
+        private addComponentView(component);
         /**
          * 更新界面
          */
@@ -895,7 +519,7 @@ declare module feng3d.editor {
         private onDeleteButton(event);
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     interface InspectorViewDataEventMap {
         change: any;
     }
@@ -920,7 +544,7 @@ declare module feng3d.editor {
         private updateView();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
      * 巡视界面
      * @author feng     2017-03-20
@@ -939,7 +563,7 @@ declare module feng3d.editor {
         private onBackClick();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class CreateObject3DView extends eui.Component implements eui.UIComponent {
         object3dList: eui.List;
         maskSprite: eui.Rect;
@@ -961,7 +585,18 @@ declare module feng3d.editor {
         private maskMouseDown();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
+    class HierarchyTreeItemRenderer extends TreeItemRenderer {
+        data: HierarchyNode;
+        constructor();
+    }
+}
+declare namespace feng3d.editor {
+    class HierarchyTree extends Tree {
+        constructor();
+    }
+}
+declare namespace feng3d.editor {
     class HierarchyView extends eui.Component implements eui.UIComponent {
         addButton: eui.Button;
         list: eui.List;
@@ -979,7 +614,17 @@ declare module feng3d.editor {
         private onCreateObject3d(selectedItem);
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
+    class AssetsView extends eui.Component implements eui.UIComponent {
+        assetsTree: feng3d.editor.Tree;
+        private listData;
+        constructor();
+        private onComplete();
+        private onAddedToStage();
+        private onRemovedFromStage();
+    }
+}
+declare namespace feng3d.editor {
     class MainView extends eui.Component implements eui.UIComponent {
         mainGroup: eui.Group;
         topGroup: eui.Group;
@@ -1004,7 +649,7 @@ declare module feng3d.editor {
     }
     var createObject3DView: CreateObject3DView;
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class AssetAdapter implements eui.IAssetAdapter {
         /**
          * @language zh_CN
@@ -1016,7 +661,7 @@ declare module feng3d.editor {
         getAsset(source: string, compFunc: Function, thisObject: any): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class LoadingUI extends egret.Sprite {
         constructor();
         private textField;
@@ -1024,7 +669,7 @@ declare module feng3d.editor {
         setProgress(current: number, total: number): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class MainUI extends eui.UILayer {
         /**
          * 加载进度界面
@@ -1069,7 +714,7 @@ declare module feng3d.editor {
         private onResourceProgress(event);
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class ThemeAdapter implements eui.IThemeAdapter {
         /**
          * 解析主题
@@ -1081,14 +726,14 @@ declare module feng3d.editor {
         getTheme(url: string, compFunc: Function, errorFunc: Function, thisObject: any): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
      * 场景数据
      */
     class SceneData {
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Editor3DData {
         sceneData: SceneData;
         stage: egret.Stage;
@@ -1111,11 +756,11 @@ declare module feng3d.editor {
         constructor();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Editor3DEvent extends Event {
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DControllerTarget {
         private static _instance;
         static readonly instance: Object3DControllerTarget;
@@ -1160,7 +805,7 @@ declare module feng3d.editor {
         stopScale(): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DMoveModel extends Component {
         xAxis: CoordinateAxis;
         yAxis: CoordinateAxis;
@@ -1209,7 +854,7 @@ declare module feng3d.editor {
         update(): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DRotationModel extends Component {
         xAxis: CoordinateRotationAxis;
         yAxis: CoordinateRotationAxis;
@@ -1270,7 +915,7 @@ declare module feng3d.editor {
         update(): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DScaleModel extends Component {
         xCube: CoordinateScaleCube;
         yCube: CoordinateScaleCube;
@@ -1293,7 +938,7 @@ declare module feng3d.editor {
         update(): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DControllerToolBase extends Component {
         private _selectedItem;
         private _toolModel;
@@ -1319,7 +964,7 @@ declare module feng3d.editor {
         protected getMousePlaneCross(): Vector3D;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DMoveTool extends Object3DControllerToolBase {
         protected toolModel: Object3DMoveModel;
         /**
@@ -1337,7 +982,7 @@ declare module feng3d.editor {
         protected updateToolModel(): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DRotationTool extends Object3DControllerToolBase {
         protected toolModel: Object3DRotationModel;
         private startPlanePos;
@@ -1351,7 +996,7 @@ declare module feng3d.editor {
         protected updateToolModel(): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DScaleTool extends Object3DControllerToolBase {
         protected toolModel: Object3DScaleModel;
         private startMousePos;
@@ -1368,7 +1013,7 @@ declare module feng3d.editor {
         protected onMouseUp(): void;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class Object3DControllerTool extends Component {
         private object3DMoveTool;
         private object3DRotationTool;
@@ -1384,10 +1029,25 @@ declare module feng3d.editor {
         private currentTool;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
+    class HierarchyNode extends TreeNode {
+        object3D: GameObject;
+        /**
+         * 父节点
+         */
+        parent: HierarchyNode;
+        /**
+         * 子节点列表
+         */
+        children: HierarchyNode[];
+        constructor(object3D: GameObject);
+        addNode(node: HierarchyNode): void;
+        removeNode(node: HierarchyNode): void;
+    }
+}
+declare namespace feng3d.editor {
     class Hierarchy {
         readonly rootNode: HierarchyNode;
-        private readonly nodeMap;
         readonly selectedNode: HierarchyNode;
         constructor(rootObject3D: GameObject);
         /**
@@ -1398,52 +1058,12 @@ declare module feng3d.editor {
         private onMouseClick(event);
         private onCreateObject3D(event);
         private onDeleteSeletedObject3D();
-        resetScene(scene: Scene3D): void;
+        resetScene(scene: GameObject): void;
         private onImport();
         private onSaveScene();
     }
-    interface HierarchyNodeEventMap {
-        added: HierarchyNode;
-        removed: HierarchyNode;
-        openChanged: HierarchyNode;
-    }
-    interface HierarchyNode {
-        once<K extends keyof HierarchyNodeEventMap>(type: K, listener: (event: HierarchyNodeEventMap[K]) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof HierarchyNodeEventMap>(type: K, data?: HierarchyNodeEventMap[K], bubbles?: boolean): any;
-        has<K extends keyof HierarchyNodeEventMap>(type: K): boolean;
-        on<K extends keyof HierarchyNodeEventMap>(type: K, listener: (event: HierarchyNodeEventMap[K]) => any, thisObject?: any, priority?: number, once?: boolean): any;
-        off<K extends keyof HierarchyNodeEventMap>(type?: K, listener?: (event: HierarchyNodeEventMap[K]) => any, thisObject?: any): any;
-    }
-    class HierarchyNode extends Event {
-        object3D: GameObject;
-        label: string;
-        depth: number;
-        isOpen: boolean;
-        hasChildren: boolean;
-        readonly uuid: string;
-        /**
-         * 父节点
-         */
-        parent: HierarchyNode;
-        /**
-         * 子节点列表
-         */
-        children: HierarchyNode[];
-        constructor(object3D: GameObject);
-        /**
-         * 判断是否包含节点
-         */
-        contain(node: HierarchyNode): boolean;
-        addNode(node: HierarchyNode): void;
-        removeNode(node: HierarchyNode): void;
-        delete(): void;
-        updateChildrenDepth(): void;
-        getShowNodes(): HierarchyNode[];
-        onIsOpenChange(): void;
-        private _uuid;
-    }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class SceneControl {
         private dragSceneMousePoint;
         private dragSceneCameraGlobalMatrix3D;
@@ -1467,7 +1087,7 @@ declare module feng3d.editor {
         lookDistance: number;
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
      * 地面网格
      * @author feng 2016-10-29
@@ -1477,6 +1097,7 @@ declare module feng3d.editor {
         private segmentGeometry;
         private level;
         private step;
+        private groundGridObject;
         constructor(gameObject: GameObject);
         /**
          * 创建地面网格对象
@@ -1485,7 +1106,7 @@ declare module feng3d.editor {
         private update();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     /**
     * 编辑器3D入口
     * @author feng 2016-10-29
@@ -1498,13 +1119,13 @@ declare module feng3d.editor {
         private testMouseRay();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     class EditorEnvironment {
         constructor();
         private init();
     }
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     type MouseEvent = egret.TouchEvent;
     var MouseEvent: {
         prototype: TouchEvent;
@@ -1523,7 +1144,7 @@ declare module feng3d.editor {
         MOUSE_OVER: "mouseover";
     };
 }
-declare module feng3d.editor {
+declare namespace feng3d.editor {
     var mouseEventEnvironment: MouseEventEnvironment;
     class MouseEventEnvironment {
         private webTouchHandler;
@@ -1600,15 +1221,7 @@ declare var shortcutConfig: ({
     stateCommand: string;
     when: string;
 })[];
-declare module feng3d.editor {
-    /**
-     * 编辑器
-     * @author feng 2016-10-29
-     */
-    class Editor extends eui.UILayer {
-        constructor();
-        private _onAddToStage();
-    }
+declare namespace feng3d.editor {
     interface EditorEventMap {
         Create_Object3D: any;
         saveScene: any;
@@ -1622,5 +1235,15 @@ declare module feng3d.editor {
         off<K extends keyof EditorEventMap>(type?: K, listener?: (event: EditorEventMap[K]) => any, thisObject?: any): any;
     }
     var $editorEventDispatcher: EditorEvent;
+}
+declare namespace feng3d.editor {
     var editor3DData: Editor3DData;
+    /**
+     * 编辑器
+     * @author feng 2016-10-29
+     */
+    class Editor extends eui.UILayer {
+        constructor();
+        private _onAddToStage();
+    }
 }

@@ -27,7 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-module feng3d.editor {
+namespace feng3d.editor {
     export class ThemeAdapter implements eui.IThemeAdapter {
 
         /**
@@ -37,7 +37,7 @@ module feng3d.editor {
          * @param errorFunc 解析失败回调函数，示例：errorFunc():void;
          * @param thisObject 回调的this引用
          */
-        public getTheme(url: string, compFunc: Function, errorFunc: Function, thisObject: any): void {
+        getTheme(url: string, compFunc: Function, errorFunc: Function, thisObject: any): void {
             function onGetRes(e: string): void {
                 compFunc.call(thisObject, e);
             }

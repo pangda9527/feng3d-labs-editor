@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 
     /**
@@ -78,7 +78,7 @@ module feng3d.editor
                 var gameobject = GameObject.create("test");
                 gameobject.addComponent(MeshRenderer).material = new StandardMaterial();
                 gameobject.addComponent(MeshFilter).mesh = new SphereGeometry(10);
-                gameobject.transform.mouseEnabled = false;
+                gameobject.mouseEnabled = false;
                 editor3DData.scene3D.gameObject.addChild(gameobject);
                 var mouseRay3D = editor3DData.camera.getMouseRay3D()
                 gameobject.transform.position = mouseRay3D.position;

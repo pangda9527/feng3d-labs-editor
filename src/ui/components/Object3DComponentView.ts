@@ -1,12 +1,13 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class Object3DComponentView extends eui.Component
 	{
-		public component: Component;
+		component: Component;
+		componentView: IObjectView;
 
 		//
-		public accordion: feng3d.editor.Accordion;
-		public deleteButton: eui.Button;
+		accordion: feng3d.editor.Accordion;
+		deleteButton: eui.Button;
 
 		/**
 		 * 对象界面数据
@@ -20,12 +21,21 @@ module feng3d.editor
 			this.skinName = "Object3DComponentSkin";
 		}
 
+		/**
+		 * 更新界面
+		 */
+		updateView(): void
+		{
+			if (this.componentView)
+				this.componentView.updateView();
+		}
+
 		private onComplete()
 		{
 			var componentName = ClassUtils.getQualifiedClassName(this.component).split(".").pop();
 			this.accordion.titleName = componentName;
-			var displayObject: eui.Component = objectview.getObjectView(this.component);
-			this.accordion.addContent(displayObject);
+			this.componentView = objectview.getObjectView(this.component);
+			this.accordion.addContent(this.componentView);
 		}
 	}
 }

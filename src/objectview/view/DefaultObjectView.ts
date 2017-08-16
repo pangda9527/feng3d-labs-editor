@@ -1,5 +1,11 @@
-module feng3d.editor
+namespace feng3d
 {
+	export interface IObjectView extends eui.Component { }
+}
+
+namespace feng3d.editor
+{
+
 	/**
 	 * 默认使用块的对象界面
 	 * @author feng 2016-3-22
@@ -10,7 +16,7 @@ module feng3d.editor
 		private _objectViewInfo: ObjectViewInfo;
 		private blockViews: IObjectBlockView[];
 
-		public group: eui.Group;
+		group: eui.Group;
 
 		/**
 		 * 对象界面数据
@@ -28,6 +34,9 @@ module feng3d.editor
 
 		private onComplete()
 		{
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+			//
 			this.blockViews = [];
 			var objectBlockInfos: BlockViewInfo[] = this._objectViewInfo.objectBlockInfos;
 			for (var i = 0; i < objectBlockInfos.length; i++)
@@ -41,12 +50,12 @@ module feng3d.editor
 			this.$updateView();
 		}
 
-		public get space(): Object
+		get space(): Object
 		{
 			return this._space;
 		}
 
-		public set space(value: Object)
+		set space(value: Object)
 		{
 			this._space = value;
 			for (var i = 0; i < this.blockViews.length; i++)
@@ -60,7 +69,7 @@ module feng3d.editor
 		/**
 		 * 更新界面
 		 */
-		public updateView(): void
+		updateView(): void
 		{
 			this.$updateView();
 
@@ -78,7 +87,7 @@ module feng3d.editor
 
 		}
 
-		public getblockView(blockName: string): IObjectBlockView
+		getblockView(blockName: string): IObjectBlockView
 		{
 			for (var i = 0; i < this.blockViews.length; i++)
 			{
@@ -90,7 +99,7 @@ module feng3d.editor
 			return null;
 		}
 
-		public getAttributeView(attributeName: string): IObjectAttributeView
+		getAttributeView(attributeName: string): IObjectAttributeView
 		{
 			for (var i = 0; i < this.blockViews.length; i++)
 			{
@@ -101,6 +110,16 @@ module feng3d.editor
 				}
 			}
 			return null;
+		}
+
+		private onAddedToStage()
+		{
+			this.addEventListener(egret.Event.ENTER_FRAME, this.updateView, this);
+		}
+
+		private onRemovedFromStage()
+		{
+			this.removeEventListener(egret.Event.ENTER_FRAME, this.updateView, this);
 		}
 	}
 }

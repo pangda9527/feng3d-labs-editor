@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	/**
      * 巡视界面
@@ -6,8 +6,8 @@ module feng3d.editor
      */
 	export class InspectorView extends eui.Component implements eui.UIComponent
 	{
-		public backButton: eui.Button;
-		public group: eui.Group;
+		backButton: eui.Button;
+		group: eui.Group;
 
 		//
 		private view: eui.Component;

@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class Object3DControllerTool extends Component
     {
@@ -13,6 +13,8 @@ module feng3d.editor
         constructor(gameObject: GameObject)
         {
             super(gameObject);
+
+            gameObject.serializable = false;
 
             this.object3DControllerTarget = Object3DControllerTarget.instance;
 

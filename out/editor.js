@@ -551,6 +551,85 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        var TreeNode = (function (_super) {
+            __extends(TreeNode, _super);
+            function TreeNode() {
+                var _this = _super.call(this) || this;
+                _this.depth = 0;
+                _this.isOpen = true;
+                /**
+                 * 子节点列表
+                 */
+                _this.children = [];
+                eui.Watcher.watch(_this, ["isOpen"], _this.onIsOpenChange, _this);
+                return _this;
+            }
+            /**
+             * 判断是否包含节点
+             */
+            TreeNode.prototype.contain = function (node) {
+                if (this == node)
+                    return true;
+                for (var i = 0; i < this.children.length; i++) {
+                    if (this.children[i].contain(node))
+                        return true;
+                }
+                return false;
+            };
+            TreeNode.prototype.addNode = function (node) {
+                feng3d.debuger && console.assert(!node.contain(this), "无法添加到自身节点中!");
+                node.parent = this;
+                this.children.push(node);
+                node.depth = this.depth + 1;
+                node.updateChildrenDepth();
+                this.hasChildren = true;
+                this.dispatch("added", node, true);
+            };
+            TreeNode.prototype.removeNode = function (node) {
+                node.parent = null;
+                var index = this.children.indexOf(node);
+                feng3d.debuger && console.assert(index != -1);
+                this.children.splice(index, 1);
+                this.hasChildren = this.children.length > 0;
+                this.dispatch("removed", node, true);
+            };
+            TreeNode.prototype.destroy = function () {
+                if (this.parent)
+                    this.parent.removeNode(this);
+                for (var i = 0; i < this.children.length; i++) {
+                    this.children[i].destroy();
+                }
+                this.children.length = 0;
+            };
+            TreeNode.prototype.updateChildrenDepth = function () {
+                var _this = this;
+                this.children.forEach(function (element) {
+                    element.depth = _this.depth + 1;
+                    element.updateChildrenDepth();
+                });
+            };
+            TreeNode.prototype.getShowNodes = function () {
+                var nodes = [];
+                if (this.isOpen) {
+                    this.children.forEach(function (element) {
+                        nodes.push(element);
+                        nodes = nodes.concat(element.getShowNodes());
+                    });
+                }
+                return nodes;
+            };
+            TreeNode.prototype.onIsOpenChange = function () {
+                this.dispatch("openChanged", this, true);
+            };
+            return TreeNode;
+        }(feng3d.Event));
+        editor.TreeNode = TreeNode;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
         var Tree = (function (_super) {
             __extends(Tree, _super);
             function Tree() {
@@ -627,359 +706,23 @@ var feng3d;
                 _this.skinName = "Object3DComponentSkin";
                 return _this;
             }
+            /**
+             * 更新界面
+             */
+            Object3DComponentView.prototype.updateView = function () {
+                if (this.componentView)
+                    this.componentView.updateView();
+            };
             Object3DComponentView.prototype.onComplete = function () {
                 var componentName = feng3d.ClassUtils.getQualifiedClassName(this.component).split(".").pop();
                 this.accordion.titleName = componentName;
-                var displayObject = feng3d.objectview.getObjectView(this.component);
-                this.accordion.addContent(displayObject);
+                this.componentView = feng3d.objectview.getObjectView(this.component);
+                this.accordion.addContent(this.componentView);
             };
             return Object3DComponentView;
         }(eui.Component));
         editor.Object3DComponentView = Object3DComponentView;
     })(editor = feng3d.editor || (feng3d.editor = {}));
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * 排序比较函数
-     * @author feng 2016-3-29
-     */
-    var SortCompare = (function () {
-        function SortCompare() {
-        }
-        /**
-         * 比较字符串
-         * @param a
-         * @param b
-         * @return
-         */
-        SortCompare.stringCompare = function (a, b) {
-            var index = 0;
-            var len = Math.min(a.length, b.length);
-            for (var i = 0; i < len; i++) {
-                if (a.charCodeAt(i) != b.charCodeAt(i))
-                    return a.charCodeAt(i) - b.charCodeAt(i);
-            }
-            if (a.length != b.length)
-                return a.length - b.length;
-            return 0;
-        };
-        return SortCompare;
-    }());
-    feng3d.SortCompare = SortCompare;
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * 属性信息
-     * @author feng 2016-3-28
-     */
-    var AttributeInfo = (function () {
-        /**
-         * 构建
-         */
-        function AttributeInfo(name, type, writable) {
-            if (name === void 0) { name = ""; }
-            if (type === void 0) { type = ""; }
-            if (writable === void 0) { writable = true; }
-            this.name = name;
-            this.type = type;
-            this.writable = writable;
-        }
-        /**
-         * 比较字符串
-         * @param a
-         * @param b
-         * @return
-         */
-        AttributeInfo.compare = function (a, b) {
-            return feng3d.SortCompare.stringCompare(a.name, b.name);
-        };
-        return AttributeInfo;
-    }());
-    feng3d.AttributeInfo = AttributeInfo;
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * 对象属性信息
-     * @author feng 2016-3-10
-     */
-    var AttributeViewInfo = (function () {
-        function AttributeViewInfo() {
-        }
-        return AttributeViewInfo;
-    }());
-    feng3d.AttributeViewInfo = AttributeViewInfo;
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    feng3d.$objectViewConfig = {
-        defaultBaseObjectViewClass: "",
-        defaultObjectViewClass: "",
-        defaultObjectAttributeViewClass: "",
-        defaultObjectAttributeBlockView: "",
-        attributeDefaultViewClassByTypeVec: [],
-        classConfigVec: []
-    };
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * 对象界面
-     * @author feng 2016-3-10
-     */
-    var ObjectView = (function () {
-        function ObjectView() {
-        }
-        /**
-         * 获取对象界面
-         *
-         * @static
-         * @param {Object} object				用于生成界面的对象
-         * @returns 							对象界面
-         *
-         * @memberOf ObjectView
-         */
-        ObjectView.prototype.getObjectView = function (object) {
-            var classConfig = this.getObjectInfo(object);
-            if (classConfig.component == null || classConfig.component == "") {
-                //返回基础类型界面类定义
-                if (!(classConfig.owner instanceof Object)) {
-                    classConfig.component = feng3d.$objectViewConfig.defaultBaseObjectViewClass;
-                }
-            }
-            if (classConfig.component == null || classConfig.component == "") {
-                //使用默认类型界面类定义
-                classConfig.component = feng3d.$objectViewConfig.defaultObjectViewClass;
-            }
-            var cls = feng3d.ClassUtils.getDefinitionByName(classConfig.component);
-            var view = new cls(classConfig);
-            return view;
-        };
-        /**
-         * 获取属性界面
-         *
-         * @static
-         * @param {AttributeViewInfo} attributeViewInfo			属性界面信息
-         * @returns {egret.DisplayObject}						属性界面
-         *
-         * @memberOf ObjectView
-         */
-        ObjectView.prototype.getAttributeView = function (attributeViewInfo) {
-            if (attributeViewInfo.component == null || attributeViewInfo.component == "") {
-                var defaultViewClass = this.getAttributeDefaultViewClassByType(attributeViewInfo.type);
-                var tempComponent = defaultViewClass ? defaultViewClass.component : "";
-                if (tempComponent != null && tempComponent != "") {
-                    attributeViewInfo.component = defaultViewClass.component;
-                    attributeViewInfo.componentParam = defaultViewClass.componentParam;
-                }
-            }
-            if (attributeViewInfo.component == null || attributeViewInfo.component == "") {
-                //使用默认对象属性界面类定义
-                attributeViewInfo.component = feng3d.$objectViewConfig.defaultObjectAttributeViewClass;
-                attributeViewInfo.componentParam = null;
-            }
-            var cls = feng3d.ClassUtils.getDefinitionByName(attributeViewInfo.component);
-            var view = new cls(attributeViewInfo);
-            return view;
-        };
-        ObjectView.prototype.getAttributeDefaultViewClassByType = function (type) {
-            var defaultViewClass = null;
-            var attributeDefaultViewClassByTypeVec = feng3d.$objectViewConfig.attributeDefaultViewClassByTypeVec;
-            for (var i = 0; i < attributeDefaultViewClassByTypeVec.length; i++) {
-                if (attributeDefaultViewClassByTypeVec[i].type == type) {
-                    defaultViewClass = attributeDefaultViewClassByTypeVec[i];
-                    break;
-                }
-            }
-            return defaultViewClass;
-        };
-        /**
-         * 获取块界面
-         *
-         * @static
-         * @param {BlockViewInfo} blockViewInfo			块界面信息
-         * @returns {egret.DisplayObject}				块界面
-         *
-         * @memberOf ObjectView
-         */
-        ObjectView.prototype.getBlockView = function (blockViewInfo) {
-            if (blockViewInfo.component == null || blockViewInfo.component == "") {
-                //返回默认对象属性界面类定义
-                blockViewInfo.component = feng3d.$objectViewConfig.defaultObjectAttributeBlockView;
-                blockViewInfo.componentParam = null;
-            }
-            var cls = feng3d.ClassUtils.getDefinitionByName(blockViewInfo.component);
-            var view = new cls(blockViewInfo);
-            return view;
-        };
-        /**
-         * 获取对象信息
-         * @param object
-         * @return
-         */
-        ObjectView.prototype.getObjectInfo = function (object) {
-            var classConfig = this.getClassConfig(object);
-            var objectInfo = {
-                objectAttributeInfos: this.getObjectAttributeInfos(object),
-                objectBlockInfos: this.getObjectBlockInfos(object),
-                name: feng3d.ClassUtils.getQualifiedClassName(object),
-                owner: object,
-                component: classConfig ? classConfig.component : "",
-                componentParam: classConfig ? classConfig.componentParam : null
-            };
-            return objectInfo;
-        };
-        ObjectView.prototype.getClassConfig = function (object) {
-            if (object == null || object == Object.prototype)
-                return null;
-            var className = feng3d.ClassUtils.getQualifiedClassName(object);
-            var classConfigVec = feng3d.$objectViewConfig.classConfigVec;
-            for (var i = 0; i < classConfigVec.length; i++) {
-                if (classConfigVec[i].name == className) {
-                    return classConfigVec[i];
-                }
-            }
-            var superCls = feng3d.ClassUtils.getSuperClass(object);
-            return this.getClassConfig(superCls);
-        };
-        /**
-         * 获取对象属性列表
-         */
-        ObjectView.prototype.getObjectAttributeInfos = function (object, filterReg) {
-            if (filterReg === void 0) { filterReg = /(([a-zA-Z0-9])+|(\d+))/; }
-            var attributeNames = [];
-            var classConfig = this.getClassConfig(object);
-            if (classConfig && classConfig.attributeDefinitionVec) {
-                //根据配置中默认顺序生产对象属性信息列表
-                var attributeDefinitions = classConfig.attributeDefinitionVec;
-                for (var i = 0; i < attributeDefinitions.length; i++) {
-                    if (attributeNames.indexOf(attributeDefinitions[i].name) == -1)
-                        attributeNames.push(attributeDefinitions[i].name);
-                }
-            }
-            else {
-                var attributeNames = Object.keys(object);
-                attributeNames = attributeNames.filter(function (value, index, array) {
-                    var result = filterReg.exec(value);
-                    return result[0] == value;
-                });
-                attributeNames = attributeNames.sort();
-            }
-            var objectAttributeInfos = [];
-            for (var i = 0; i < attributeNames.length; i++) {
-                var objectAttributeInfo = this.getAttributeViewInfo(object, attributeNames[i]);
-                objectAttributeInfos.push(objectAttributeInfo);
-            }
-            return objectAttributeInfos;
-        };
-        /**
-         * 获取对象块信息列表
-         *
-         * @private
-         * @static
-         * @param {Object} object			对象
-         * @returns {BlockViewInfo[]}		对象块信息列表
-         *
-         * @memberOf ObjectView
-         */
-        ObjectView.prototype.getObjectBlockInfos = function (object) {
-            var objectBlockInfos = [];
-            var dic = {};
-            var objectBlockInfo;
-            var objectAttributeInfos = this.getObjectAttributeInfos(object);
-            //收集块信息
-            var i = 0;
-            var tempVec = [];
-            for (i = 0; i < objectAttributeInfos.length; i++) {
-                var blockName = objectAttributeInfos[i].block;
-                objectBlockInfo = dic[blockName];
-                if (objectBlockInfo == null) {
-                    objectBlockInfo = dic[blockName] = { name: blockName, owner: object, itemList: [] };
-                    tempVec.push(objectBlockInfo);
-                }
-                objectBlockInfo.itemList.push(objectAttributeInfos[i]);
-            }
-            //按快的默认顺序生成 块信息列表
-            var blockDefinition;
-            var pushDic = {};
-            var classConfig = this.getClassConfig(object);
-            if (classConfig && classConfig.blockDefinitionVec) {
-                for (i = 0; i < classConfig.blockDefinitionVec.length; i++) {
-                    blockDefinition = classConfig.blockDefinitionVec[i];
-                    objectBlockInfo = dic[blockDefinition.name];
-                    if (objectBlockInfo == null) {
-                        objectBlockInfo = {
-                            name: blockDefinition.name,
-                            owner: object,
-                            itemList: []
-                        };
-                    }
-                    objectBlockInfo.component = blockDefinition.component;
-                    objectBlockInfo.componentParam = blockDefinition.componentParam;
-                    objectBlockInfos.push(objectBlockInfo);
-                    pushDic[objectBlockInfo.name] = true;
-                }
-            }
-            //添加剩余的块信息
-            for (i = 0; i < tempVec.length; i++) {
-                if (Boolean(pushDic[tempVec[i].name]) == false) {
-                    objectBlockInfos.push(tempVec[i]);
-                }
-            }
-            return objectBlockInfos;
-        };
-        /**
-         * 获取属性界面信息
-         *
-         * @private
-         * @static
-         * @param {Object} object				属性所属对象
-         * @param {string} attributeName		属性名称
-         * @returns {AttributeViewInfo}			属性界面信息
-         *
-         * @memberOf ObjectView
-         */
-        ObjectView.prototype.getAttributeViewInfo = function (object, attributeName) {
-            var attributeDefinition = this.getAttributeDefinition(object, attributeName);
-            var objectAttributeInfo = {
-                name: attributeName,
-                block: attributeDefinition ? attributeDefinition.block : "",
-                component: attributeDefinition ? attributeDefinition.component : "",
-                componentParam: attributeDefinition ? attributeDefinition.componentParam : null,
-                owner: object,
-                writable: true,
-                type: feng3d.ClassUtils.getQualifiedClassName(object[attributeName])
-            };
-            return objectAttributeInfo;
-        };
-        /**
-         * 获取属性定义
-         *
-         * @private
-         * @static
-         * @param {Object} object					属性所属对象
-         * @param {string} attributeName			属性名称
-         * @returns {AttributeDefinition}			属性定义信息
-         *
-         * @memberOf ObjectView
-         */
-        ObjectView.prototype.getAttributeDefinition = function (object, attributeName) {
-            var classConfig = this.getClassConfig(object);
-            if (!classConfig || !classConfig.attributeDefinitionVec)
-                return null;
-            for (var i = 0; i < classConfig.attributeDefinitionVec.length; i++) {
-                var attributeDefinition = classConfig.attributeDefinitionVec[i];
-                if (attributeDefinition.name == attributeName)
-                    return attributeDefinition;
-            }
-            return null;
-        };
-        return ObjectView;
-    }());
-    feng3d.ObjectView = ObjectView;
-    feng3d.objectview = new ObjectView();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -1246,6 +989,9 @@ var feng3d;
                 return _this;
             }
             DefaultObjectView.prototype.onComplete = function () {
+                this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+                this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+                //
                 this.blockViews = [];
                 var objectBlockInfos = this._objectViewInfo.objectBlockInfos;
                 for (var i = 0; i < objectBlockInfos.length; i++) {
@@ -1300,6 +1046,12 @@ var feng3d;
                     }
                 }
                 return null;
+            };
+            DefaultObjectView.prototype.onAddedToStage = function () {
+                this.addEventListener(egret.Event.ENTER_FRAME, this.updateView, this);
+            };
+            DefaultObjectView.prototype.onRemovedFromStage = function () {
+                this.removeEventListener(egret.Event.ENTER_FRAME, this.updateView, this);
             };
             return DefaultObjectView;
         }(eui.Component));
@@ -1469,7 +1221,7 @@ var feng3d;
             }
             OAVObject3DComponentList.prototype.onComplete = function () {
                 this.addComponentButton.addEventListener(editor.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
-                this.updateView();
+                this.initView();
             };
             OAVObject3DComponentList.prototype.onAddComponentButtonClick = function () {
                 var globalPoint = this.addComponentButton.localToGlobal(0, 0);
@@ -1477,8 +1229,8 @@ var feng3d;
             };
             OAVObject3DComponentList.prototype.onCreateComponent = function (item) {
                 var cls = feng3d.ClassUtils.getDefinitionByName(item.className);
-                this.space.addComponent(cls);
-                this.updateView();
+                var component = this.space.addComponent(cls);
+                this.addComponentView(component);
             };
             Object.defineProperty(OAVObject3DComponentList.prototype, "space", {
                 get: function () {
@@ -1511,21 +1263,29 @@ var feng3d;
                 enumerable: true,
                 configurable: true
             });
+            OAVObject3DComponentList.prototype.initView = function () {
+                this.accordions.length = 0;
+                this.group.layout.gap = -1;
+                var components = this.attributeValue;
+                for (var i = 0; i < components.length; i++) {
+                    this.addComponentView(components[i]);
+                }
+            };
+            OAVObject3DComponentList.prototype.addComponentView = function (component) {
+                var displayObject = new editor.Object3DComponentView(component);
+                displayObject.percentWidth = 100;
+                this.group.addChild(displayObject);
+                //
+                displayObject.deleteButton.addEventListener(editor.MouseEvent.CLICK, this.onDeleteButton, this);
+            };
             /**
              * 更新界面
              */
             OAVObject3DComponentList.prototype.updateView = function () {
-                this.accordions.length = 0;
-                this.group.layout.gap = -1;
-                this.group.removeChildren();
-                var components = this.attributeValue;
-                for (var i = 0; i < components.length; i++) {
-                    var component = components[i];
-                    var displayObject = new editor.Object3DComponentView(component);
-                    displayObject.percentWidth = 100;
-                    this.group.addChild(displayObject);
-                    //
-                    displayObject.deleteButton.addEventListener(editor.MouseEvent.CLICK, this.onDeleteButton, this);
+                for (var i = 0, n = this.group.numChildren; i < n; i++) {
+                    var child = this.group.getChildAt(i);
+                    if (child instanceof editor.Object3DComponentView)
+                        child.updateView();
                 }
             };
             OAVObject3DComponentList.prototype.onDeleteButton = function (event) {
@@ -1697,6 +1457,36 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        var HierarchyTreeItemRenderer = (function (_super) {
+            __extends(HierarchyTreeItemRenderer, _super);
+            function HierarchyTreeItemRenderer() {
+                return _super.call(this) || this;
+            }
+            return HierarchyTreeItemRenderer;
+        }(editor.TreeItemRenderer));
+        editor.HierarchyTreeItemRenderer = HierarchyTreeItemRenderer;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        var HierarchyTree = (function (_super) {
+            __extends(HierarchyTree, _super);
+            function HierarchyTree() {
+                var _this = _super.call(this) || this;
+                _this.itemRenderer = editor.HierarchyTreeItemRenderer;
+                return _this;
+            }
+            return HierarchyTree;
+        }(editor.Tree));
+        editor.HierarchyTree = HierarchyTree;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
         var HierarchyView = (function (_super) {
             __extends(HierarchyView, _super);
             function HierarchyView() {
@@ -1759,6 +1549,38 @@ var feng3d;
             return HierarchyView;
         }(eui.Component));
         editor.HierarchyView = HierarchyView;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        var AssetsView = (function (_super) {
+            __extends(AssetsView, _super);
+            function AssetsView() {
+                var _this = _super.call(this) || this;
+                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                _this.skinName = "AssetsView";
+                return _this;
+            }
+            AssetsView.prototype.onComplete = function () {
+                this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+                this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+                console.log("AssetsView.onComplete");
+                if (this.stage) {
+                    this.onAddedToStage();
+                }
+            };
+            AssetsView.prototype.onAddedToStage = function () {
+                this.listData = this.assetsTree.dataProvider = new eui.ArrayCollection();
+                // this.listData.replaceAll(nodes);
+                console.log("AssetsView.onAddedToStage");
+            };
+            AssetsView.prototype.onRemovedFromStage = function () {
+            };
+            return AssetsView;
+        }(eui.Component));
+        editor.AssetsView = AssetsView;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -2517,8 +2339,8 @@ var feng3d;
                 var mouseHit = feng3d.GameObject.create("hit");
                 mouseHit.addComponent(feng3d.MeshFilter).mesh = new feng3d.CylinderGeometry(5, 5, _this.length - 20);
                 mouseHit.transform.y = 20 + (_this.length - 20) / 2;
-                mouseHit.transform.visible = false;
-                mouseHit.transform.mouseEnabled = true;
+                mouseHit.visible = false;
+                mouseHit.mouseEnabled = true;
                 _this.gameObject.addChild(mouseHit);
                 return _this;
             }
@@ -2549,7 +2371,7 @@ var feng3d;
                 _this.oCube = feng3d.GameObject.create();
                 _this.oCube.addComponent(feng3d.MeshFilter).mesh = new feng3d.CubeGeometry(8, 8, 8);
                 _this.colorMaterial = _this.oCube.addComponent(feng3d.MeshRenderer).material = new feng3d.ColorMaterial();
-                _this.oCube.transform.mouseEnabled = true;
+                _this.oCube.mouseEnabled = true;
                 _this.gameObject.addChild(_this.oCube);
                 _this.update();
                 return _this;
@@ -2582,7 +2404,7 @@ var feng3d;
                 plane.transform.x = plane.transform.z = _this._width / 2;
                 plane.addComponent(feng3d.MeshFilter).mesh = new feng3d.PlaneGeometry(_this._width, _this._width);
                 _this.colorMaterial = plane.addComponent(feng3d.MeshRenderer).material = new feng3d.ColorMaterial();
-                plane.transform.mouseEnabled = true;
+                plane.mouseEnabled = true;
                 _this.gameObject.addChild(plane);
                 var border = feng3d.GameObject.create("border");
                 _this.segmentGeometry = border.addComponent(feng3d.MeshFilter).mesh = new feng3d.SegmentGeometry();
@@ -2704,8 +2526,8 @@ var feng3d;
                 this.torusGeometry = mouseHit.addComponent(feng3d.MeshFilter).mesh = new feng3d.TorusGeometry(this.radius, 2);
                 mouseHit.addComponent(feng3d.MeshRenderer).material = new feng3d.StandardMaterial();
                 mouseHit.transform.rx = 90;
-                mouseHit.transform.visible = false;
-                mouseHit.transform.mouseEnabled = true;
+                mouseHit.visible = false;
+                mouseHit.mouseEnabled = true;
                 this.gameObject.addChild(mouseHit);
                 this.update();
             };
@@ -2853,8 +2675,8 @@ var feng3d;
                 this.gameObject.addChild(border);
                 this.sector = feng3d.GameObject.create("sector").addComponent(SectorObject3D);
                 this.sector.update(0, 360);
-                this.sector.transform.visible = false;
-                this.sector.transform.mouseEnabled = true;
+                this.sector.gameObject.visible = false;
+                this.sector.gameObject.mouseEnabled = true;
                 this.gameObject.addChild(this.sector.gameObject);
                 this.update();
             };
@@ -2931,8 +2753,8 @@ var feng3d;
                 mouseHit.addComponent(feng3d.MeshFilter).mesh = new feng3d.CylinderGeometry(5, 5, _this.length - 4);
                 mouseHit.addComponent(feng3d.MeshRenderer);
                 mouseHit.transform.y = 4 + (_this.length - 4) / 2;
-                mouseHit.transform.visible = false;
-                mouseHit.transform.mouseEnabled = true;
+                mouseHit.visible = false;
+                mouseHit.mouseEnabled = true;
                 _this.gameObject.addChild(mouseHit);
                 _this.update();
                 return _this;
@@ -3495,6 +3317,7 @@ var feng3d;
             __extends(Object3DControllerTool, _super);
             function Object3DControllerTool(gameObject) {
                 var _this = _super.call(this, gameObject) || this;
+                gameObject.serializable = false;
                 _this.object3DControllerTarget = editor.Object3DControllerTarget.instance;
                 _this.object3DMoveTool = feng3d.GameObject.create("object3DMoveTool").addComponent(editor.Object3DMoveTool);
                 _this.object3DRotationTool = feng3d.GameObject.create("object3DRotationTool").addComponent(editor.Object3DRotationTool);
@@ -3567,12 +3390,41 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        var HierarchyNode = (function (_super) {
+            __extends(HierarchyNode, _super);
+            function HierarchyNode(object3D) {
+                var _this = _super.call(this) || this;
+                /**
+                 * 子节点列表
+                 */
+                _this.children = [];
+                _this.object3D = object3D;
+                _this.label = object3D.name;
+                return _this;
+            }
+            HierarchyNode.prototype.addNode = function (node) {
+                _super.prototype.addNode.call(this, node);
+                this.object3D.addChild(node.object3D);
+            };
+            HierarchyNode.prototype.removeNode = function (node) {
+                _super.prototype.removeNode.call(this, node);
+                this.object3D.removeChild(node.object3D);
+            };
+            return HierarchyNode;
+        }(editor.TreeNode));
+        editor.HierarchyNode = HierarchyNode;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        var nodeMap = new feng3d.Map();
         var Hierarchy = (function () {
             function Hierarchy(rootObject3D) {
-                this.nodeMap = new feng3d.Map();
-                this.rootNode = new HierarchyNode(rootObject3D);
+                this.rootNode = new editor.HierarchyNode(rootObject3D);
+                nodeMap.push(rootObject3D, this.rootNode);
                 this.rootNode.depth = -1;
-                this.nodeMap.push(rootObject3D, this.rootNode);
                 //
                 rootObject3D.on("click", this.onMouseClick, this);
                 editor.$editorEventDispatcher.on("Create_Object3D", this.onCreateObject3D, this);
@@ -3583,7 +3435,7 @@ var feng3d;
             }
             Object.defineProperty(Hierarchy.prototype, "selectedNode", {
                 get: function () {
-                    return this.nodeMap.get(editor.editor3DData.selectedObject);
+                    return nodeMap.get(editor.editor3DData.selectedObject);
                 },
                 enumerable: true,
                 configurable: true
@@ -3592,14 +3444,20 @@ var feng3d;
              * 获取节点
              */
             Hierarchy.prototype.getNode = function (object3D) {
-                var node = this.nodeMap.get(object3D);
+                var node = nodeMap.get(object3D);
                 return node;
             };
             Hierarchy.prototype.addObject3D = function (object3D, parentNode, allChildren) {
+                var _this = this;
                 if (parentNode === void 0) { parentNode = null; }
                 if (allChildren === void 0) { allChildren = false; }
-                var node = new HierarchyNode(object3D);
-                this.nodeMap.push(object3D, node);
+                if (!object3D.serializable)
+                    return;
+                if (nodeMap.get(object3D))
+                    return;
+                var node = new editor.HierarchyNode(object3D);
+                feng3d.debuger && console.assert(!nodeMap.get(object3D));
+                nodeMap.push(object3D, node);
                 if (parentNode) {
                     parentNode.addNode(node);
                 }
@@ -3607,22 +3465,28 @@ var feng3d;
                     this.rootNode.addNode(node);
                 }
                 if (allChildren) {
-                    for (var i = 0; i < object3D.numChildren; i++) {
-                        this.addObject3D(object3D.getChildAt(i), node, true);
-                    }
+                    object3D.children.forEach(function (element) {
+                        _this.addObject3D(element, node, true);
+                    });
                 }
                 return node;
             };
             Hierarchy.prototype.onMouseClick = function (event) {
                 var object3D = event.target;
-                var node = this.nodeMap.get(object3D.gameObject);
+                var node = nodeMap.get(object3D);
                 while (!node && (object3D == object3D.parent))
                     ;
                 {
-                    node = this.nodeMap.get(object3D.gameObject);
+                    node = nodeMap.get(object3D);
                 }
-                if (node && object3D)
-                    editor.editor3DData.selectedObject = object3D.gameObject;
+                if (node && object3D) {
+                    if (object3D.scene.gameObject == object3D) {
+                        editor.editor3DData.selectedObject = null;
+                    }
+                    else {
+                        editor.editor3DData.selectedObject = object3D;
+                    }
+                }
             };
             Hierarchy.prototype.onCreateObject3D = function (event) {
                 var className = event.data.className;
@@ -3638,15 +3502,18 @@ var feng3d;
             Hierarchy.prototype.onDeleteSeletedObject3D = function () {
                 var selectedObject3D = editor.editor3DData.selectedObject;
                 if (selectedObject3D) {
-                    var node = this.nodeMap.get(selectedObject3D);
-                    node.delete();
+                    feng3d.debuger && console.assert(!!nodeMap.get(selectedObject3D));
+                    var node = nodeMap.get(selectedObject3D);
+                    node.destroy();
+                    nodeMap.delete(selectedObject3D);
                 }
                 editor.editor3DData.selectedObject = null;
             };
             Hierarchy.prototype.resetScene = function (scene) {
-                for (var i = 0; i < scene.gameObject.numChildren; i++) {
-                    this.addObject3D(scene.gameObject.getChildAt(i), null, true);
-                }
+                var _this = this;
+                scene.children.forEach(function (element) {
+                    _this.addObject3D(element, null, true);
+                });
             };
             Hierarchy.prototype.onImport = function () {
                 var fileInput = document.createElement('input');
@@ -3673,9 +3540,9 @@ var feng3d;
                             console.log(reader.error);
                         }
                         else {
-                            // var json = JSON.parse(reader.result);
-                            // var scene: Scene3D = GameObject.des Serialization.deserialize(json);
-                            // editor3DData.hierarchy.resetScene(scene);
+                            var json = JSON.parse(reader.result);
+                            var scene = feng3d.serialization.deserialize(json);
+                            editor.editor3DData.hierarchy.resetScene(scene);
                         }
                     };
                     reader.readAsBinaryString(file);
@@ -3688,7 +3555,7 @@ var feng3d;
                 }
             };
             Hierarchy.prototype.onSaveScene = function () {
-                var obj = this.rootNode.object3D.serialize();
+                var obj = feng3d.serialization.serialize(this.rootNode.object3D);
                 obj;
                 var output = "";
                 try {
@@ -3709,90 +3576,6 @@ var feng3d;
             return Hierarchy;
         }());
         editor.Hierarchy = Hierarchy;
-        var HierarchyNode = (function (_super) {
-            __extends(HierarchyNode, _super);
-            function HierarchyNode(object3D) {
-                var _this = _super.call(this) || this;
-                _this.depth = 0;
-                _this.isOpen = true;
-                /**
-                 * 子节点列表
-                 */
-                _this.children = [];
-                _this.object3D = object3D;
-                _this.label = object3D.name;
-                _this._uuid = Math.generateUUID();
-                eui.Watcher.watch(_this, ["isOpen"], _this.onIsOpenChange, _this);
-                return _this;
-            }
-            Object.defineProperty(HierarchyNode.prototype, "uuid", {
-                get: function () {
-                    return this._uuid;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            /**
-             * 判断是否包含节点
-             */
-            HierarchyNode.prototype.contain = function (node) {
-                if (this == node)
-                    return true;
-                for (var i = 0; i < this.children.length; i++) {
-                    if (this.children[i].contain(node))
-                        return true;
-                }
-                return false;
-            };
-            HierarchyNode.prototype.addNode = function (node) {
-                feng3d.debuger && console.assert(!node.contain(this), "无法添加到自身节点中!");
-                node.parent = this;
-                this.object3D.addChild(node.object3D);
-                this.children.push(node);
-                node.depth = this.depth + 1;
-                node.updateChildrenDepth();
-                this.hasChildren = true;
-                this.dispatch("added", node, true);
-            };
-            HierarchyNode.prototype.removeNode = function (node) {
-                node.parent = null;
-                this.object3D.removeChild(node.object3D);
-                var index = this.children.indexOf(node);
-                console.assert(index != -1);
-                this.children.splice(index, 1);
-                this.hasChildren = this.children.length > 0;
-                this.dispatch("removed", node, true);
-            };
-            HierarchyNode.prototype.delete = function () {
-                this.parent.removeNode(this);
-                for (var i = 0; i < this.children.length; i++) {
-                    this.children[i].delete();
-                }
-                this.children.length = 0;
-            };
-            HierarchyNode.prototype.updateChildrenDepth = function () {
-                var _this = this;
-                this.children.forEach(function (element) {
-                    element.depth = _this.depth + 1;
-                    element.updateChildrenDepth();
-                });
-            };
-            HierarchyNode.prototype.getShowNodes = function () {
-                var nodes = [];
-                if (this.isOpen) {
-                    this.children.forEach(function (element) {
-                        nodes.push(element);
-                        nodes = nodes.concat(element.getShowNodes());
-                    });
-                }
-                return nodes;
-            };
-            HierarchyNode.prototype.onIsOpenChange = function () {
-                this.dispatch("openChanged", this, true);
-            };
-            return HierarchyNode;
-        }(feng3d.Event));
-        editor.HierarchyNode = HierarchyNode;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -3910,7 +3693,8 @@ var feng3d;
             function GroundGrid(gameObject) {
                 var _this = _super.call(this, gameObject) || this;
                 _this.num = 100;
-                _this.transform.mouseEnabled = false;
+                gameObject.serializable = false;
+                _this.gameObject.mouseEnabled = false;
                 _this.init();
                 return _this;
                 // editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
@@ -4007,7 +3791,7 @@ var feng3d;
                     var gameobject = feng3d.GameObject.create("test");
                     gameobject.addComponent(feng3d.MeshRenderer).material = new feng3d.StandardMaterial();
                     gameobject.addComponent(feng3d.MeshFilter).mesh = new feng3d.SphereGeometry(10);
-                    gameobject.transform.mouseEnabled = false;
+                    gameobject.mouseEnabled = false;
                     editor.editor3DData.scene3D.gameObject.addChild(gameobject);
                     var mouseRay3D = editor.editor3DData.camera.getMouseRay3D();
                     gameobject.transform.position = mouseRay3D.position;
@@ -4202,27 +3986,24 @@ var objectViewConfig = {
     ],
     classConfigVec: [
         {
-            name: "feng3d.Transform1",
+            name: "feng3d.Transform",
             component: "",
             componentParam: null,
             attributeDefinitionVec: [
-                {
-                    name: "position",
-                    block: ""
-                },
-                {
-                    name: "rotation",
-                    block: ""
-                },
-                {
-                    name: "scale",
-                    block: ""
-                }
+                { name: "x", block: "" },
+                { name: "y", block: "" },
+                { name: "z", block: "" },
+                { name: "rx", block: "" },
+                { name: "ry", block: "" },
+                { name: "rz", block: "" },
+                { name: "sx", block: "" },
+                { name: "sy", block: "" },
+                { name: "sz", block: "" },
             ],
             blockDefinitionVec: []
         },
         {
-            name: "feng3d.Object3D1",
+            name: "feng3d.GameObject",
             component: "",
             componentParam: null,
             attributeDefinitionVec: [
@@ -4245,7 +4026,23 @@ var objectViewConfig = {
                 }
             ],
             blockDefinitionVec: []
-        }
+        },
+        {
+            name: "feng3d.Renderer",
+            component: "",
+            componentParam: null,
+            attributeDefinitionVec: [
+                {
+                    name: "enabled",
+                    block: ""
+                },
+                {
+                    name: "material",
+                    block: ""
+                },
+            ],
+            blockDefinitionVec: []
+        },
     ]
 };
 /**
@@ -4275,6 +4072,13 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        editor.$editorEventDispatcher = new feng3d.Event();
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
         /**
          * 编辑器
          * @author feng 2016-10-29
@@ -4283,6 +4087,10 @@ var feng3d;
             __extends(Editor, _super);
             function Editor() {
                 var _this = _super.call(this) || this;
+                //
+                editor.editor3DData = new editor.Editor3DData();
+                //初始化配置
+                feng3d.objectview.mergeConfig(objectViewConfig);
                 //
                 new editor.EditorEnvironment();
                 //初始化feng3d
@@ -4302,12 +4110,6 @@ var feng3d;
             return Editor;
         }(eui.UILayer));
         editor.Editor = Editor;
-        /*************************** 初始化模块 ***************************/
-        //初始化配置
-        feng3d.$objectViewConfig = objectViewConfig;
-        editor.$editorEventDispatcher = new feng3d.Event();
-        //
-        editor.editor3DData = new editor.Editor3DData();
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 //# sourceMappingURL=editor.js.map

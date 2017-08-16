@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 
 	/**
@@ -12,8 +12,8 @@ module feng3d.editor
 		private _attributeName: string;
 		private _attributeType: string;
 		private attributeViewInfo: AttributeViewInfo;
-		public label: eui.Label;
-		public text: eui.TextInput;
+		label: eui.Label;
+		text: eui.TextInput;
 
 
 		constructor(attributeViewInfo: AttributeViewInfo)
@@ -37,28 +37,28 @@ module feng3d.editor
 		}
 
 
-		public get space(): Object
+		get space(): Object
 		{
 			return this._space;
 		}
 
-		public set space(value: Object)
+		set space(value: Object)
 		{
 			this._space = value;
 			this.updateView();
 		}
 
-		public get attributeName(): string
+		get attributeName(): string
 		{
 			return this._attributeName;
 		}
 
-		public get attributeValue(): Object
+		get attributeValue(): Object
 		{
 			return this._space[this._attributeName];
 		}
 
-		public set attributeValue(value: Object)
+		set attributeValue(value: Object)
 		{
 			if (this._space[this._attributeName] != value)
 			{
@@ -70,7 +70,7 @@ module feng3d.editor
 		/**
 		 * 更新界面
 		 */
-		public updateView(): void
+		updateView(): void
 		{
 			this.label.text = this._attributeName;
 			if (this.attributeValue === undefined)

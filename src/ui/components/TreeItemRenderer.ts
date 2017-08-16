@@ -1,15 +1,15 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class TreeItemRenderer extends eui.ItemRenderer
     {
-        public contentGroup: eui.Group;
-        public disclosureButton: eui.ToggleButton;
+        contentGroup: eui.Group;
+        disclosureButton: eui.ToggleButton;
 
         /**
 		 * 子节点相对父节点的缩进值，以像素为单位。默认17。
 		 */
-        public indentation = 17
-        public data: HierarchyNode;
+        indentation = 17
+        data: HierarchyNode;
 
         private watchers: eui.Watcher[] = [];
 

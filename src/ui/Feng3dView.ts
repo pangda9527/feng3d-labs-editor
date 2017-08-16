@@ -1,10 +1,10 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class Feng3dView extends eui.Component implements eui.UIComponent
 	{
 		private canvas: HTMLElement;
 
-		public constructor()
+		constructor()
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);

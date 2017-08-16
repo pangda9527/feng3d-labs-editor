@@ -1,16 +1,16 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class Object3DMoveModel extends Component
     {
-        public xAxis: CoordinateAxis;
-        public yAxis: CoordinateAxis;
-        public zAxis: CoordinateAxis;
+        xAxis: CoordinateAxis;
+        yAxis: CoordinateAxis;
+        zAxis: CoordinateAxis;
 
-        public yzPlane: CoordinatePlane;
-        public xzPlane: CoordinatePlane;
-        public xyPlane: CoordinatePlane;
+        yzPlane: CoordinatePlane;
+        xzPlane: CoordinatePlane;
+        xyPlane: CoordinatePlane;
 
-        public oCube: CoordinateCube;
+        oCube: CoordinateCube;
 
         constructor(gameObject: GameObject)
         {
@@ -67,13 +67,13 @@ module feng3d.editor
 
         private xArrow: GameObject;
 
-        public readonly color = new Color(1, 0, 0)
+        readonly color = new Color(1, 0, 0)
         private selectedColor: Color = new Color(1, 1, 0);
         private length: number = 100;
 
         //
-        public get selected() { return this._selected; }
-        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        get selected() { return this._selected; }
+        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
 
         constructor(gameObject: GameObject)
@@ -98,8 +98,8 @@ module feng3d.editor
             var mouseHit = GameObject.create("hit");
             mouseHit.addComponent(MeshFilter).mesh = new CylinderGeometry(5, 5, this.length - 20);
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
-            mouseHit.transform.visible = false;
-            mouseHit.transform.mouseEnabled = true;
+            mouseHit.visible = false;
+            mouseHit.mouseEnabled = true;
             this.gameObject.addChild(mouseHit);
         }
 
@@ -116,11 +116,11 @@ module feng3d.editor
         private colorMaterial: ColorMaterial;
         private oCube: GameObject;
 
-        public color = new Color(1, 1, 1);
-        public selectedColor = new Color(1, 1, 0);
+        color = new Color(1, 1, 1);
+        selectedColor = new Color(1, 1, 0);
         //
-        public get selected() { return this._selected; }
-        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        get selected() { return this._selected; }
+        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
 
         constructor(gameObject: GameObject)
@@ -130,13 +130,13 @@ module feng3d.editor
             this.oCube = GameObject.create();
             this.oCube.addComponent(MeshFilter).mesh = new CubeGeometry(8, 8, 8);
             this.colorMaterial = this.oCube.addComponent(MeshRenderer).material = new ColorMaterial();
-            this.oCube.transform.mouseEnabled = true;
+            this.oCube.mouseEnabled = true;
             this.gameObject.addChild(this.oCube);
 
             this.update();
         }
 
-        public update()
+        update()
         {
             this.colorMaterial.color = this.selected ? this.selectedColor : this.color;
         }
@@ -147,18 +147,18 @@ module feng3d.editor
         private colorMaterial: ColorMaterial;
         private segmentGeometry: SegmentGeometry;
 
-        public color = new Color(1, 0, 0, 0.2);
-        public borderColor = new Color(1, 0, 0);
+        color = new Color(1, 0, 0, 0.2);
+        borderColor = new Color(1, 0, 0);
 
-        public selectedColor = new Color(1, 0, 0, 0.5);
+        selectedColor = new Color(1, 0, 0, 0.5);
         private selectedborderColor = new Color(1, 1, 0);
 
         //
-        public get width() { return this._width; }
+        get width() { return this._width; }
         private _width = 20
         //
-        public get selected() { return this._selected; }
-        public set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
+        get selected() { return this._selected; }
+        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
 
         constructor(gameObject: GameObject)
@@ -170,7 +170,7 @@ module feng3d.editor
             plane.addComponent(MeshFilter).mesh = new PlaneGeometry(this._width, this._width);
             this.colorMaterial = plane.addComponent(MeshRenderer).material = new ColorMaterial();
 
-            plane.transform.mouseEnabled = true;
+            plane.mouseEnabled = true;
             this.gameObject.addChild(plane);
 
             var border = GameObject.create("border");
@@ -181,7 +181,7 @@ module feng3d.editor
             this.update();
         }
 
-        public update()
+        update()
         {
             this.colorMaterial.color = this.selected ? this.selectedColor : this.color;
 

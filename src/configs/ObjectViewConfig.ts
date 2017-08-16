@@ -19,27 +19,24 @@ var objectViewConfig = {
     ],
     classConfigVec: [
         {
-            name: "feng3d.Transform1",
+            name: "feng3d.Transform",
             component: "",
             componentParam: null,
             attributeDefinitionVec: [
-                {
-                    name: "position",
-                    block: ""
-                },
-                {
-                    name: "rotation",
-                    block: ""
-                },
-                {
-                    name: "scale",
-                    block: ""
-                }
+                { name: "x", block: "" },
+                { name: "y", block: "" },
+                { name: "z", block: "" },
+                { name: "rx", block: "" },
+                { name: "ry", block: "" },
+                { name: "rz", block: "" },
+                { name: "sx", block: "" },
+                { name: "sy", block: "" },
+                { name: "sz", block: "" },
             ],
             blockDefinitionVec: []
         },
         {
-            name: "feng3d.Object3D1",
+            name: "feng3d.GameObject",
             component: "",
             componentParam: null,
             attributeDefinitionVec: [
@@ -62,6 +59,22 @@ var objectViewConfig = {
                 }
             ],
             blockDefinitionVec: []
-        }
+        },
+        {
+            name: "feng3d.Renderer",
+            component: "",
+            componentParam: null,
+            attributeDefinitionVec: [
+                {
+                    name: "enabled",
+                    block: ""
+                },
+                {
+                    name: "material",
+                    block: ""
+                },
+            ],
+            blockDefinitionVec: []
+        },
     ]
 }

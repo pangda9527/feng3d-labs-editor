@@ -1,23 +1,23 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class Accordion extends eui.Component implements eui.UIComponent
 	{
-		public group: eui.Group;
-		public titleGroup: eui.Group;
-		public titleButton: eui.Button;
-		public contentGroup: eui.Group;
+		group: eui.Group;
+		titleGroup: eui.Group;
+		titleButton: eui.Button;
+		contentGroup: eui.Group;
 
 		private components: eui.Component[] = [];
-		public titleName = "";
+		titleName = "";
 
-		public constructor()
+		constructor()
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "AccordionSkin";
 		}
 
-		public addContent(component: eui.Component)
+		addContent(component: eui.Component)
 		{
 			if (!this.contentGroup)
 				this.components.push(component);
