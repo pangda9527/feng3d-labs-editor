@@ -2,6 +2,11 @@ namespace feng3d.editor
 {
     export class Editor3DData
     {
+        /**
+         * 项目根路径
+         */
+        projectRoot: string = "editorproject";
+
         sceneData = new SceneData();
         stage: egret.Stage;
 

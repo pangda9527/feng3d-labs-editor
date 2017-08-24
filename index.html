@@ -39,9 +39,9 @@
 	<script src="libs/objectview.js"></script> -->
 
 	<!-- 合并js -->
-	<script src="loadjs.js"></script>
+	<script src="../feng3d-loadModule/loadModule.js"></script>
+	<script src="index.js"></script>
 </head>
-
 
 <body>
 
@@ -59,39 +59,6 @@
 	 data-scale-mode="showAll" data-frame-rate="30" data-content-width="100%" data-content-height="100%" data-show-paint-rect="false"
 	 data-multi-fingered="2" data-show-fps="false" data-show-log="false" data-show-fps-style="x:0,y:0,size:12,textColor:0xffffff,bgAlpha:0.9">
 	</div>
-
-	<script>
-		var loadpaths = [//
-			"../feng3d/out/feng3d.js",
-			"../editor/out/editor.js",
-		];
-
-		for (var i = 0; i < loadpaths.length; i++) {
-			loadpaths[i] = loadpaths[i] + "?version=" + Math.random();
-		}
-
-		function loadComplete() {
-			// console.log("loadComplete!");
-			/**
-			 * {
-			 * "renderMode":, //引擎渲染模式，"canvas" 或者 "webgl"
-			 * "audioType": "" //使用的音频类型，0:默认，1:qq audio，2:web audio，3:audio
-			 * "antialias": //WebGL模式下是否开启抗锯齿，true:开启，false:关闭，默认为false
-			 * }
-			 **/
-			egret.runEgret({ renderMode: "webgl", audioType: 0 });
-		}
-
-		setTimeout(function () {
-			feng3d.loadjs.loadjs({
-				paths: loadpaths,
-				success: loadComplete,
-				error: (pathsNotFound) => {
-					console.log(`无法加载 ${JSON.stringify(pathsNotFound)}`);
-				}, numRetries: 5
-			});
-		}, 5000);
-	</script>
 </body>
 
 </html>

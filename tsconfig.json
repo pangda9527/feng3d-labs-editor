@@ -5,7 +5,8 @@
         "sourceMap": true,
         "declaration": true,
         "experimentalDecorators": true,
-        "outFile": "out/editor.js"
+        "outDir": "out"
+        // "outFile": "out/editor.js"
     },
     "files": [
         "libs/modules/egret/egret.d.ts",
@@ -13,7 +14,6 @@
         "libs/modules/res/res.d.ts",
         "libs/modules/tween/tween.d.ts",
         "libs/exml.e.d.ts",
-        "../feng3d/out/feng3d.d.ts",
         "src/ui/drag/DragType.ts",
         "src/ui/drag/DragSource.ts",
         "src/ui/drag/DragEvent.ts",
@@ -43,9 +43,10 @@
         //
         "src/ui/hierarchy/CreateObject3DView.ts",
         "src/ui/hierarchy/HierarchyTreeItemRenderer.ts",
-        "src/ui/hierarchy/HierarchyTree.ts",
         "src/ui/hierarchy/HierarchyView.ts",
         //
+        "src/ui/assets/project.ts",
+        "src/ui/assets/AssetsNode.ts",
         "src/ui/assets/AssetsView.ts",
         //
         "src/ui/MainView.ts",
@@ -79,11 +80,19 @@
         "src/EditorEnvironment.ts",
         "src/MouseEvent.ts",
         "src/MouseEventEnvironment.ts",
+        //
+        "src/client/Client.ts",
+        "src/client/file.ts",
+        "src/client/FileObject.ts",
         //configs
         "src/configs/CommonConfig.ts",
         "src/configs/ObjectViewConfig.ts",
         "src/configs/ShortcutConfig.ts",
         "src/EditorEvent.ts",
         "src/Editor.ts"
+    ],
+    "include": [
+        "../objectview/out/**/*.d.ts",
+        "../feng3d/out/**/*.d.ts"
     ]
 }

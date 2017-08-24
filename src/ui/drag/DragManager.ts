@@ -159,10 +159,12 @@ namespace feng3d.editor
 			if (this._accepter)
 			{
 				this._accepter.removeEventListener(MouseEvent.MOUSE_OUT, this.onAccepterMouseOut, this);
+				this._accepter.alpha = 1;
 			}
 			this._accepter = value;
 			if (this._accepter)
 			{
+				this._accepter.alpha = 0.5;
 				this._accepter.addEventListener(MouseEvent.MOUSE_OUT, this.onAccepterMouseOut, this);
 			}
 		}

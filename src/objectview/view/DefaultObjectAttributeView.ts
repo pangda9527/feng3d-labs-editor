@@ -1,10 +1,10 @@
 namespace feng3d.editor
 {
-
 	/**
 	 * 默认对象属性界面
 	 * @author feng 2016-3-10
 	 */
+	@OVAComponent()
 	export class DefaultObjectAttributeView extends eui.Component implements IObjectAttributeView
 	{
 		private textTemp: string;

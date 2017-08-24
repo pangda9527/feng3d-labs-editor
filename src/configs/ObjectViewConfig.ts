@@ -1,25 +1,17 @@
-/**
- * ObjectView总配置数据
- */
-var objectViewConfig = {
+namespace feng3d.editor
+{
+    export function objectViewConfig()
+    {
+        //
+        objectview.defaultBaseObjectViewClass = "DefaultBaseObjectView";
+        objectview.defaultObjectViewClass = "DefaultObjectView";
+        objectview.defaultObjectAttributeViewClass = "DefaultObjectAttributeView";
+        objectview.defaultObjectAttributeBlockView = "DefaultObjectBlockView";
+        //
+        objectview.defaultTypeAttributeView["Boolean"] = { component: "BooleanAttrView" };
+        objectview.defaultTypeAttributeView["Vector3D"] = { component: "OAVVector3D" };
 
-    defaultBaseObjectViewClass: "feng3d.editor.DefaultBaseObjectView",
-    defaultObjectViewClass: "feng3d.editor.DefaultObjectView",
-    defaultObjectAttributeViewClass: "feng3d.editor.DefaultObjectAttributeView",
-    defaultObjectAttributeBlockView: "feng3d.editor.DefaultObjectBlockView",
-    attributeDefaultViewClassByTypeVec: [
-        {
-            type: "Boolean",
-            component: "feng3d.editor.BooleanAttrView"
-        },
-        {
-            type: "feng3d.Vector3D",
-            component: "feng3d.editor.OAVVector3D"
-        }
-    ],
-    classConfigVec: [
-        {
-            name: "feng3d.Transform",
+        setObjectview(Transform, {
             component: "",
             componentParam: null,
             attributeDefinitionVec: [
@@ -34,9 +26,9 @@ var objectViewConfig = {
                 { name: "sz", block: "" },
             ],
             blockDefinitionVec: []
-        },
-        {
-            name: "feng3d.GameObject",
+        });
+
+        setObjectview(GameObject, {
             component: "",
             componentParam: null,
             attributeDefinitionVec: [
@@ -54,14 +46,14 @@ var objectViewConfig = {
                 },
                 {
                     name: "components",
-                    component: "feng3d.editor.OAVObject3DComponentList",
+                    component: "OAVObject3DComponentList",
                     block: ""
                 }
             ],
             blockDefinitionVec: []
-        },
-        {
-            name: "feng3d.Renderer",
+        });
+
+        setObjectview(Renderer, {
             component: "",
             componentParam: null,
             attributeDefinitionVec: [
@@ -75,6 +67,11 @@ var objectViewConfig = {
                 },
             ],
             blockDefinitionVec: []
-        },
-    ]
+        });
+
+        function setObjectview(cls: any, classDefinition: ClassDefinition)
+        {
+            cls["objectview"] = classDefinition;
+        }
+    }
 }

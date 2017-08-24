@@ -2,8 +2,8 @@ namespace feng3d.editor
 {
 	export class HierarchyView extends eui.Component implements eui.UIComponent
 	{
-		addButton: eui.Button;
-		list: eui.List;
+		public addButton: eui.Button;
+		public list: eui.List;
 
 		private listData: eui.ArrayCollection;
 
@@ -18,6 +18,8 @@ namespace feng3d.editor
 
 		private onComplete(): void
 		{
+			this.list.itemRenderer = HierarchyTreeItemRenderer;
+
 			this.listData = this.list.dataProvider = new eui.ArrayCollection();
 
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);

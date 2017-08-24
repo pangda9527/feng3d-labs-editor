@@ -16,7 +16,6 @@ namespace feng3d.editor
             this.rootNode = new HierarchyNode(rootObject3D);
             nodeMap.push(rootObject3D, this.rootNode);
 
-            this.rootNode.depth = -1;
             //
             rootObject3D.on("click", this.onMouseClick, this);
             $editorEventDispatcher.on("Create_Object3D", this.onCreateObject3D, this);

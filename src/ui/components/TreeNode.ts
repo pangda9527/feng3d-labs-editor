@@ -16,12 +16,23 @@ namespace feng3d.editor
         off<K extends keyof TreeNodeEventMap>(type?: K, listener?: (event: TreeNodeEventMap[K]) => any, thisObject?: any);
     }
 
-    export class TreeNode extends Event
+    function treeMap<T extends ITreeNode>(treeNode: T, callback: (node: T, parent: T) => void)
+    {
+        if (treeNode.children)
+        {
+            treeNode.children.forEach(element =>
+            {
+                callback(<T>element, treeNode);
+                treeMap(element, callback);
+            });
+        }
+    }
+
+    export class TreeNode extends Event implements ITreeNode
     {
         label: string;
         depth: number = 0;
         isOpen: boolean = true;
-        hasChildren: boolean;
 
         /** 
          * 父节点
@@ -44,14 +55,13 @@ namespace feng3d.editor
          */
         contain(node: TreeNode)
         {
-            if (this == node)
-                return true;
-            for (var i = 0; i < this.children.length; i++)
+            var result = false;
+            treeMap(this, (item) =>
             {
-                if (this.children[i].contain(node))
-                    return true;
-            }
-            return false;
+                if (item == node)
+                    result = true;
+            });
+            return result;
         }
 
         addNode(node: TreeNode)
@@ -62,7 +72,6 @@ namespace feng3d.editor
             this.children.push(node);
             node.depth = this.depth + 1;
             node.updateChildrenDepth();
-            this.hasChildren = true;
             this.dispatch("added", node, true);
         }
 
@@ -72,7 +81,6 @@ namespace feng3d.editor
             var index = this.children.indexOf(node);
             debuger && console.assert(index != -1);
             this.children.splice(index, 1);
-            this.hasChildren = this.children.length > 0;
             this.dispatch("removed", node, true);
         }
 
@@ -89,21 +97,19 @@ namespace feng3d.editor
 
         updateChildrenDepth()
         {
-            this.children.forEach(element =>
+            treeMap(this, (node, parent) =>
             {
-                element.depth = this.depth + 1;
-                element.updateChildrenDepth();
+                node.depth = parent.depth + 1;
             });
         }
 
         getShowNodes()
         {
-            var nodes: TreeNode[] = [];
+            var nodes: TreeNode[] = [this];
             if (this.isOpen)
             {
                 this.children.forEach(element =>
                 {
-                    nodes.push(element);
                     nodes = nodes.concat(element.getShowNodes());
                 });
             }

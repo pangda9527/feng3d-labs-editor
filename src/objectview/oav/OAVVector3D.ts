@@ -1,5 +1,6 @@
 namespace feng3d.editor
 {
+	@OVAComponent()
 	export class OAVVector3D extends eui.Component implements IObjectAttributeView
 	{
 		private _space: Object;

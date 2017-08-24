@@ -15,8 +15,9 @@ namespace feng3d.editor
 
             //
             editor3DData = new Editor3DData();
+            editor3DData.projectRoot = "editorproject";
             //初始化配置
-            objectview.mergeConfig(objectViewConfig);
+            objectViewConfig();
 
             //
             new EditorEnvironment();
@@ -35,6 +36,8 @@ namespace feng3d.editor
             }, this);
 
             this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
+
+//             new FileObject("editor");
         }
 
         private _onAddToStage()

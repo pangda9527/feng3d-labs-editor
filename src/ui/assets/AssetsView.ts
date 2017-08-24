@@ -2,8 +2,7 @@ namespace feng3d.editor
 {
     export class AssetsView extends eui.Component implements eui.UIComponent
     {
-        assetsTree: feng3d.editor.Tree;
-
+        public list: eui.List;
         private listData: eui.ArrayCollection;
 
         constructor()
@@ -15,10 +14,10 @@ namespace feng3d.editor
 
         private onComplete(): void
         {
+            this.list.itemRenderer = TreeItemRenderer;
+
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-
-            console.log("AssetsView.onComplete");
 
             if (this.stage)
             {
@@ -28,15 +27,38 @@ namespace feng3d.editor
 
         private onAddedToStage()
         {
-            this.listData = this.assetsTree.dataProvider = new eui.ArrayCollection();
-
-            // this.listData.replaceAll(nodes);
-
-            console.log("AssetsView.onAddedToStage");
+            this.listData = this.list.dataProvider = new eui.ArrayCollection();
+            this.initlist();
         }
 
         private onRemovedFromStage()
         {
+
+        }
+
+        private initlist()
+        {
+            project.init(editor3DData.projectRoot, (err, fileInfo) =>
+            {
+                var rootNode = new AssetsNode(fileInfo);
+
+                // var rootNode = new TreeNode();
+                // rootNode.label = "root";
+                // rootNode.depth = -1;
+
+                // var AssetsNode = new TreeNode();
+                // AssetsNode.label = "Assets";
+                // rootNode.addNode(AssetsNode);
+
+                var nodes = rootNode.getShowNodes();
+                this.listData.replaceAll(nodes);
+
+                rootNode.on("openChanged", () =>
+                {
+                    var nodes = rootNode.getShowNodes();
+                    this.listData.replaceAll(nodes);
+                }, this);
+            });
         }
     }
 }

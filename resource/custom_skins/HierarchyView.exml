@@ -11,7 +11,7 @@
 				<e:BasicLayout/>
 			</e:layout>
 		</e:Group>
-		<editor:HierarchyTree id="list" width="100%" height="100%" x="511" y="197" />
+		<e:List id="list" width="100%" height="100%" x="511" y="197" />
 		<e:layout>
 			<e:VerticalLayout/>
 		</e:layout>

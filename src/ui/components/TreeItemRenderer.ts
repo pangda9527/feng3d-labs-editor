@@ -9,9 +9,19 @@ namespace feng3d.editor
 		 * 子节点相对父节点的缩进值，以像素为单位。默认17。
 		 */
         indentation = 17
-        data: HierarchyNode;
+        data: TreeNode;
 
         private watchers: eui.Watcher[] = [];
+
+        private _dragOver = false;
+        protected set dragOver(value)
+        {
+
+        }
+        protected get dragOver()
+        {
+            return this._dragOver;
+        }
 
         constructor()
         {
@@ -79,7 +89,7 @@ namespace feng3d.editor
 
         private updateView()
         {
-            this.disclosureButton.visible = this.data ? this.data.hasChildren : false;
+            this.disclosureButton.visible = this.data ? this.data.children.length > 0 : false;
             this.contentGroup.x = (this.data ? this.data.depth : 0) * this.indentation;
             this.disclosureButton.selected = this.data ? this.data.isOpen : false;
         }
@@ -99,6 +109,7 @@ namespace feng3d.editor
         {
             this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
         }
+
         private onMouseMove(event: MouseEvent)
         {
             var dragSource = new DragSource();
@@ -117,12 +128,11 @@ namespace feng3d.editor
 
         private onDragExit(event: DragEvent)
         {
-
         }
 
         private onDragDrop(event: DragEvent)
         {
-            var node: HierarchyNode = event.dragSource.dataForFormat(DragType.HierarchyNode);
+            var node: TreeNode = event.dragSource.dataForFormat(DragType.HierarchyNode);
 
             var iscontain = node.contain(this.data)
             if (iscontain)

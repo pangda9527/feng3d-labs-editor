@@ -4,6 +4,7 @@ namespace feng3d.editor
 	 * 默认对象属性块界面
 	 * @author feng 2016-3-22
 	 */
+	@OVBComponent()
 	export class DefaultObjectBlockView extends eui.Component implements IObjectBlockView
 	{
 		private _space: Object;

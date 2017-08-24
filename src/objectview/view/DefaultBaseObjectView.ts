@@ -4,6 +4,7 @@ namespace feng3d.editor
 	 * 默认基础对象界面
 	 * @author feng 2016-3-11
 	 */
+	@OVComponent()
 	export class DefaultBaseObjectView extends eui.Component implements IObjectView
 	{
 		private _space: Object;
