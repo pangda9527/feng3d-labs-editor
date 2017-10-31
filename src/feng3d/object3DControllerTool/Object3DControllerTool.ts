@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export class Object3DControllerTool extends Component
     {
@@ -10,11 +10,12 @@ namespace feng3d.editor
 
         private object3DControllerTarget: Object3DControllerTarget;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
 
             gameObject.serializable = false;
+            gameObject.showinHierarchy = false;
 
             this.object3DControllerTarget = Object3DControllerTarget.instance;
 
@@ -40,15 +41,23 @@ namespace feng3d.editor
 
         private onSelectedObject3DChange()
         {
-            if (editor3DData.selectedObject)
+            if (editor3DData.selectedObject
+                //选中的是GameObject
+                && editor3DData.selectedObject instanceof GameObject
+                //选中的不是场景
+                && !editor3DData.selectedObject.getComponent(Scene3D)
+                && !editor3DData.selectedObject.getComponent(Trident)
+                && !editor3DData.selectedObject.getComponent(GroundGrid)
+                && !editor3DData.selectedObject.getComponent(SkinnedMeshRenderer)
+            )
             {
                 this.object3DControllerTarget.controllerTargets = [editor3DData.selectedObject.transform];
-                editor3DData.scene3D.gameObject.addChild(this.gameObject);
+                engine.root.addChild(this.gameObject);
             }
             else
             {
                 this.object3DControllerTarget.controllerTargets = null;
-                editor3DData.scene3D.gameObject.removeChild(this.gameObject);
+                this.gameObject.remove();
             }
         }
 

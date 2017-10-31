@@ -31,13 +31,14 @@
         "resource/eui_skins/VSliderSkin.exml",
 
         "resource/custom_skins/BooleanAttrView.exml",
-        "resource/custom_skins/DefaultBaseObjectView.exml",
-        "resource/custom_skins/DefaultObjectAttributeView.exml",
-        "resource/custom_skins/DefaultObjectBlockView.exml",
-        "resource/custom_skins/DefaultObjectView.exml",
-
+        "resource/custom_skins/OAVArray.exml",
+        "resource/custom_skins/OVBaseDefault.exml",
+        "resource/custom_skins/OAVDefault.exml",
+        "resource/custom_skins/OBVDefault.exml",
+        "resource/custom_skins/OVDefault.exml",
         "resource/custom_skins/TreeDisclosureButtonSkin.exml",
         "resource/custom_skins/TreeItemRendererSkin.exml",
+        "resource/custom_skins/MenuItemRender.exml",
         "resource/custom_skins/Accordion.exml",
         "resource/custom_skins/Vector3DViewSkin.exml",
         "resource/custom_skins/OAVVector3DSkin.exml",
@@ -45,8 +46,9 @@
         "resource/custom_skins/OAVObject3DComponentListSkin.exml",
         "resource/custom_skins/InspectorView.exml",
         "resource/custom_skins/Feng3dView.exml",
-        "resource/custom_skins/CreateObject3DView.exml",
         "resource/custom_skins/HierarchyView.exml",
+        "resource/custom_skins/AssetsTreeItemRenderer.exml",
+        "resource/custom_skins/AssetsFileItemRenderer.exml",
         "resource/custom_skins/AssetsView.exml",
         "resource/custom_skins/MainView.exml"
     ]

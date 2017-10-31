@@ -1,5 +1,6 @@
-namespace feng3d.editor
+module feng3d.editor
 {
+    export var engine: Engine;
 
     /**
     * 编辑器3D入口
@@ -7,44 +8,55 @@ namespace feng3d.editor
     */
     export class Main3D
     {
-
         constructor()
         {
             this.init();
-            //
-            ticker.on("enterFrame", this.process, this);
-        }
-
-        private process(event: EventVO<any>)
-        {
-            editor3DData.mouseInView3D.copyFrom(editor3DData.view3D.mousePos);
-            editor3DData.view3DRect.copyFrom(editor3DData.view3D.viewRect);
         }
 
         private init()
         {
             var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
-            var view3D = new Engine(canvas);
-            view3D.scene.background.fromUnit(0x666666);
+            engine = new Engine(canvas);
+            engine.scene.background = new Color(0.4, 0.4, 0.4, 1.0);
 
-            editor3DData.view3D = view3D;
-            editor3DData.scene3D = view3D.scene;
-            editor3DData.camera = view3D.camera;
-            editor3DData.hierarchy = new Hierarchy(view3D.scene.gameObject);
+            engine.root.addComponent(EditorComponent);
+
+            hierarchy = new Hierarchy(engine.root);
 
             //
-            var camera = view3D.camera;
-            camera.transform.z = -500;
+            var camera = engine.camera;
+            camera.transform.z = 500;
             camera.transform.y = 300;
             camera.transform.lookAt(new Vector3D());
 
             var trident = GameObject.create("Trident");
             trident.addComponent(Trident);
-            view3D.scene.gameObject.addChild(trident);
+            trident.mouseEnabled = false;
+            engine.root.addChild(trident);
 
             //初始化模块
             var groundGrid = GameObject.create("GroundGrid").addComponent(GroundGrid);
-            view3D.scene.gameObject.addChild(groundGrid.gameObject);
+            engine.root.addChild(groundGrid.gameObject);
+
+            var cubeTexture = new TextureCube([
+                'resource/3d/skybox/px.jpg',
+                'resource/3d/skybox/py.jpg',
+                'resource/3d/skybox/pz.jpg',
+                'resource/3d/skybox/nx.jpg',
+                'resource/3d/skybox/ny.jpg',
+                'resource/3d/skybox/nz.jpg',
+            ]);
+
+            var skybox = GameObject.create("skybox");
+            skybox.mouseEnabled = false;
+            var skyBoxComponent = skybox.addComponent(SkyBox);
+            skyBoxComponent.texture = cubeTexture;
+            engine.root.addChild(skybox);
+
+            var directionalLight = GameObject.create("DirectionalLight");
+            directionalLight.addComponent(DirectionalLight);
+            directionalLight.transform.rx = 120;
+            engine.root.addChild(directionalLight)
 
             var object3DControllerTool = GameObject.create("object3DControllerTool").addComponent(Object3DControllerTool);
 
@@ -56,7 +68,7 @@ namespace feng3d.editor
 
         private test()
         {
-            editor3DData.scene3D.gameObject.on("mousedown", (event) =>
+            engine.root.on("mousedown", (event) =>
             {
                 var gameobject = <GameObject>event.target;
                 var names = [gameobject.name];
@@ -65,43 +77,7 @@ namespace feng3d.editor
                     gameobject = gameobject.parent;
                     names.push(gameobject.name);
                 }
-                console.log(event.type, names.reverse().join("->"));
-            }, this);
-
-            // this.testMouseRay();
-        }
-
-        private testMouseRay()
-        {
-            input.on("click", () =>
-            {
-                var gameobject = GameObject.create("test");
-                gameobject.addComponent(MeshRenderer).material = new StandardMaterial();
-                gameobject.addComponent(MeshFilter).mesh = new SphereGeometry(10);
-                gameobject.mouseEnabled = false;
-                editor3DData.scene3D.gameObject.addChild(gameobject);
-                var mouseRay3D = editor3DData.camera.getMouseRay3D()
-                gameobject.transform.position = mouseRay3D.position;
-                var direction = mouseRay3D.direction.clone();
-
-                var num = 1000;
-                var translate = () =>
-                {
-                    gameobject.transform.translate(direction, 15);
-                    if (num > 0)
-                    {
-                        setTimeout(function ()
-                        {
-                            translate();
-                        }, 1000 / 60);
-                    } else
-                    {
-                        editor3DData.scene3D.gameObject.removeChild(gameobject);
-                    }
-                    num--;
-                }
-                translate();
-
+                // console.log(event.type, names.reverse().join("->"));
             }, this);
         }
     }

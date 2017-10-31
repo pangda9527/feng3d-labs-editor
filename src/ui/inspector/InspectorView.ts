@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
 	/**
      * 巡视界面
@@ -39,6 +39,8 @@ namespace feng3d.editor
 			this.inspectorViewData = editor3DData.inspectorViewData;
 			this.inspectorViewData.on("change", this.onDataChange, this);
 			this.backButton.addEventListener(MouseEvent.CLICK, this.onBackClick, this);
+
+			this.backButton.visible = this.inspectorViewData.viewDataList.length > 0;
 		}
 
 		private onRemovedFromStage()
@@ -55,7 +57,7 @@ namespace feng3d.editor
 
 		private updateView()
 		{
-			this.backButton.visible = this.inspectorViewData.hasBackData;
+			this.backButton.visible = this.inspectorViewData.viewDataList.length > 0;
 			if (this.view && this.view.parent)
 			{
 				this.view.parent.removeChild(this.view);

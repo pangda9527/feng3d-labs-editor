@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export class Object3DControllerToolBase extends Component
     {
@@ -14,12 +14,12 @@ namespace feng3d.editor
 
         protected _object3DControllerTarget: Object3DControllerTarget;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
             var holdSizeComponent = this.gameObject.addComponent(HoldSizeComponent);
             holdSizeComponent.holdSize = 1;
-            holdSizeComponent.camera = editor3DData.camera;
+            holdSizeComponent.camera = engine.camera;
             //
             this.gameObject.on("addedToScene", this.onAddedToScene, this);
             this.gameObject.on("removedFromScene", this.onRemovedFromScene, this);
@@ -32,8 +32,8 @@ namespace feng3d.editor
             //
             input.on("mousedown", this.onMouseDown, this);
             input.on("mouseup", this.onMouseUp, this);
-            this.transform.on("scenetransformChanged", this.onScenetransformChanged, this);
-            editor3DData.camera.transform.on("scenetransformChanged", this.onCameraScenetransformChanged, this);
+            this.gameObject.on("scenetransformChanged", this.onScenetransformChanged, this);
+            engine.camera.gameObject.on("scenetransformChanged", this.onCameraScenetransformChanged, this);
         }
 
         protected onRemovedFromScene()
@@ -42,8 +42,8 @@ namespace feng3d.editor
             //
             input.off("mousedown", this.onMouseDown, this);
             input.off("mouseup", this.onMouseUp, this);
-            this.transform.off("scenetransformChanged", this.onScenetransformChanged, this);
-            editor3DData.camera.transform.off("scenetransformChanged", this.onCameraScenetransformChanged, this);
+            this.gameObject.off("scenetransformChanged", this.onScenetransformChanged, this);
+            engine.camera.gameObject.off("scenetransformChanged", this.onCameraScenetransformChanged, this);
         }
 
         protected get toolModel()
@@ -132,7 +132,7 @@ namespace feng3d.editor
 
         protected getMousePlaneCross()
         {
-            var line3D = editor3DData.camera.getMouseRay3D();
+            var line3D = engine.camera.getMouseRay3D();
             //射线与平面交点
             var crossPos = this.movePlane3D.lineCross(line3D);
             return crossPos;

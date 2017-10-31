@@ -1,12 +1,85 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export class HierarchyTreeItemRenderer extends TreeItemRenderer
     {
         data: HierarchyNode;
-        
+
         constructor()
         {
             super();
+        }
+
+        $onAddToStage(stage: egret.Stage, nestLevel: number)
+        {
+            super.$onAddToStage(stage, nestLevel);
+            this.addEventListener(MouseEvent.CLICK, this.onclick, this);
+            this.addEventListener(MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+
+            drag.register(this, this.setdargSource.bind(this), ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
+            {
+                if (dragdata.gameobject)
+                {
+                    if (!dragdata.gameobject.contains(this.data.gameobject))
+                    {
+                        var localToWorldMatrix = dragdata.gameobject.transform.localToWorldMatrix
+                        this.data.gameobject.addChild(dragdata.gameobject);
+                        dragdata.gameobject.transform.localToWorldMatrix = localToWorldMatrix;
+                    }
+                }
+                if (dragdata.file_gameobject)
+                {
+                    hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, this.data.gameobject);
+                }
+                if (dragdata.file_script)
+                {
+                    GameObjectUtil.addScript(this.data.gameobject, dragdata.file_script.replace(/\.ts\b/, ".js"));
+                }
+            });
+        }
+
+        $onRemoveFromStage()
+        {
+            super.$onRemoveFromStage();
+            this.removeEventListener(MouseEvent.CLICK, this.onclick, this);
+            this.removeEventListener(MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+
+            drag.unregister(this);
+        }
+
+        private setdargSource(dragSource: DragData)
+        {
+            dragSource.gameobject = this.data.gameobject;
+        }
+
+        private onclick()
+        {
+            editor3DData.selectedObject = this.data.gameobject;
+        }
+
+        private onrightclick(e)
+        {
+            var menuconfig: MenuItem[] = [];
+            //scene3d无法删除
+            if (this.data.gameobject.scene.gameObject != this.data.gameobject)
+            {
+                menuconfig.push({
+                    label: "delete", click: () =>
+                    {
+                        this.data.gameobject.parent.removeChild(this.data.gameobject);
+                    }
+                });
+            }
+            menuconfig.push(
+                {
+                    label: "save", click: () =>
+                    {
+                        assets.saveGameObject(this.data.gameobject);
+                    }
+                }
+            );
+
+            if (menuconfig.length > 0)
+                menu.popup(menuconfig);
         }
     }
 }

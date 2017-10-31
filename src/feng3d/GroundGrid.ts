@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     /**
      * 地面网格
@@ -13,31 +13,23 @@ namespace feng3d.editor
         private step: number;
         private groundGridObject: GameObject;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
-            gameObject.serializable = false;
+            super.init(gameObject);
             this.gameObject.mouseEnabled = false;
-            this.init();
 
-            // editor3DData.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
-        }
+            // engine.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
 
-        /**
-         * 创建地面网格对象
-         */
-        private init()
-        {
-            var meshFilter = this.gameObject.addComponent(MeshFilter);
-            this.segmentGeometry = meshFilter.mesh = new SegmentGeometry();
             var meshRenderer = this.gameObject.addComponent(MeshRenderer);
-            meshRenderer.material = new SegmentMaterial();
+            this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
+            var material = meshRenderer.material = new SegmentMaterial();
+            material.enableBlend = true;
             this.update();
         }
 
         private update()
         {
-            var cameraGlobalPosition = editor3DData.camera.transform.scenePosition;
+            var cameraGlobalPosition = engine.camera.transform.scenePosition;
             this.level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
             this.step = Math.pow(10, this.level - 1);
 
@@ -53,8 +45,8 @@ namespace feng3d.editor
             this.segmentGeometry.removeAllSegments();
             for (var i = -halfNum; i <= halfNum; i++)
             {
-                var color = (i % 10) == 0 ? 0x888888 : 0x777777;
-                var thickness = (i % 10) == 0 ? 2 : 1;
+                var color = new Color().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
+                color.a = ((i % 10) == 0) ? 0.5 : 0.1;
                 this.segmentGeometry.addSegment(new Segment(new Vector3D(-halfNum * this.step + startX, 0, i * this.step + startZ), new Vector3D(halfNum * this.step + startX, 0, i * this.step + startZ), color, color));
                 this.segmentGeometry.addSegment(new Segment(new Vector3D(i * this.step + startX, 0, -halfNum * this.step + startZ), new Vector3D(i * this.step + startX, 0, halfNum * this.step + startZ), color, color));
             }

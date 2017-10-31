@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export class Object3DScaleTool extends Object3DControllerToolBase
     {
@@ -10,9 +10,9 @@ namespace feng3d.editor
         private changeXYZ: Vector3D = new Vector3D();
         private startPlanePos: Vector3D;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
             this.toolModel = GameObject.create().addComponent(Object3DScaleModel);
         }
 
@@ -38,6 +38,8 @@ namespace feng3d.editor
 
         protected onItemMouseDown(event: EventVO<any>)
         {
+            if (!engine.mouseinview)
+                return;
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -50,7 +52,7 @@ namespace feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.camera.transform.localToWorldMatrix;
+            var cameraSceneTransform = engine.camera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             var selectedGameObject: GameObject = <any>event.currentTarget;
@@ -73,7 +75,7 @@ namespace feng3d.editor
                     break;
                 case this.toolModel.oCube.gameObject:
                     this.selectedItem = this.toolModel.oCube;
-                    this.startMousePos = editor3DData.mouseInView3D.clone();
+                    this.startMousePos = engine.mousePos.clone();
                     this.changeXYZ.setTo(1, 1, 1);
                     break;
             }
@@ -91,10 +93,10 @@ namespace feng3d.editor
             var addScale = new Vector3D();
             if (this.selectedItem == this.toolModel.oCube)
             {
-                var currentMouse = editor3DData.mouseInView3D;
+                var currentMouse = engine.mousePos;
                 var distance = currentMouse.x - currentMouse.y - this.startMousePos.x + this.startMousePos.y;
                 addPos.setTo(distance, distance, distance);
-                var scale = 1 + (addPos.x + addPos.y) / (editor3DData.view3DRect.height);
+                var scale = 1 + (addPos.x + addPos.y) / (engine.viewRect.height);
                 addScale.setTo(scale, scale, scale);
             } else
             {

@@ -1,14 +1,15 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export class Object3DRotationTool extends Object3DControllerToolBase
     {
         protected toolModel: Object3DRotationModel;
         private startPlanePos: Vector3D;
+        private stepPlaneCross: Vector3D;
         private startMousePos: Point;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
             this.toolModel = GameObject.create().addComponent(Object3DRotationModel);
         }
         protected onAddedToScene()
@@ -36,6 +37,9 @@ namespace feng3d.editor
 
         protected onItemMouseDown(event: EventVO<any>)
         {
+            if (!engine.mouseinview)
+                return;
+
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -44,7 +48,7 @@ namespace feng3d.editor
             var yDir = globalMatrix3D.up;
             var zDir = globalMatrix3D.forward;
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.camera.transform.localToWorldMatrix;
+            var cameraSceneTransform = engine.camera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.position;
             this.movePlane3D = new Plane3D();
@@ -74,7 +78,9 @@ namespace feng3d.editor
                     break;
             }
             this.startPlanePos = this.getMousePlaneCross();
-            this.startMousePos = editor3DData.mouseInView3D.clone();
+            this.stepPlaneCross = this.startPlanePos.clone();
+            //
+            this.startMousePos = engine.mousePos.clone();
             this.startSceneTransform = globalMatrix3D.clone();
             this.object3DControllerTarget.startRotate();
             //
@@ -91,7 +97,7 @@ namespace feng3d.editor
                 case this.toolModel.cameraAxis:
                     var origin = this.startSceneTransform.position;
                     var planeCross = this.getMousePlaneCross();
-                    var startDir = this.startPlanePos.subtract(origin);
+                    var startDir = this.stepPlaneCross.subtract(origin);
                     startDir.normalize();
                     var endDir = planeCross.subtract(origin);
                     endDir.normalize();
@@ -104,6 +110,8 @@ namespace feng3d.editor
                     angle = angle * sign;
                     //
                     this.object3DControllerTarget.rotate1(angle, this.movePlane3D.normal);
+                    this.stepPlaneCross.copyFrom(planeCross);
+                    this.object3DControllerTarget.startRotate();
                     //绘制扇形区域
                     if (this.selectedItem instanceof CoordinateRotationAxis)
                     {
@@ -111,9 +119,9 @@ namespace feng3d.editor
                     }
                     break;
                 case this.toolModel.freeAxis:
-                    var endPoint = editor3DData.mouseInView3D.clone();
+                    var endPoint = engine.mousePos.clone();
                     var offset = endPoint.subtract(this.startMousePos);
-                    var cameraSceneTransform = editor3DData.camera.transform.localToWorldMatrix;
+                    var cameraSceneTransform = engine.camera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
                     this.object3DControllerTarget.rotate2(-offset.y, right, -offset.x, up);
@@ -142,7 +150,7 @@ namespace feng3d.editor
 
         protected updateToolModel()
         {
-            var cameraSceneTransform = editor3DData.camera.transform.localToWorldMatrix.clone();
+            var cameraSceneTransform = engine.camera.transform.localToWorldMatrix.clone();
             var cameraDir = cameraSceneTransform.forward;
             cameraDir.negate();
             //

@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export class Object3DControllerTarget
     {
@@ -16,7 +16,7 @@ namespace feng3d.editor
         private _showObject3D: Transform;
         private _controllerToolTransfrom: Transform = GameObject.create("controllerToolTransfrom").transform;
         private _controllerTool: Transform;
-        private _startTransformDic: { [uuid: string]: { position: Vector3D, rotation: Vector3D, scale: Vector3D } };
+        private _startTransformDic: Map<Transform, { position: Vector3D, rotation: Vector3D, scale: Vector3D }>;
 
         //
         get showObject3D()
@@ -26,10 +26,10 @@ namespace feng3d.editor
         set showObject3D(value)
         {
             if (this._showObject3D)
-                this._showObject3D.off("scenetransformChanged", this.onShowObjectTransformChanged, this);
+                this._showObject3D.gameObject.off("scenetransformChanged", this.onShowObjectTransformChanged, this);
             this._showObject3D = value;
             if (this._showObject3D)
-                this._showObject3D.on("scenetransformChanged", this.onShowObjectTransformChanged, this);
+                this._showObject3D.gameObject.on("scenetransformChanged", this.onShowObjectTransformChanged, this);
         }
 
         get controllerTool()
@@ -111,24 +111,26 @@ namespace feng3d.editor
          */
         startTranslation()
         {
-            this._startTransformDic = {};
+            this._startTransformDic = new Map<Transform, { position: Vector3D, rotation: Vector3D, scale: Vector3D }>();
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
             for (var i = 0; i < objects.length; i++)
             {
                 var object3d = objects[i];
-                this._startTransformDic[object3d.uuid] = { position: object3d.position, rotation: object3d.rotation, scale: object3d.scale };
+                this._startTransformDic.push(object3d, { position: object3d.position, rotation: object3d.rotation, scale: object3d.scale });
             }
         }
 
         translation(addPos: Vector3D)
         {
+            if (!this._controllerTargets)
+                return;
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
             for (var i = 0; i < objects.length; i++)
             {
                 var object3d = objects[i];
-                var transform = this._startTransformDic[object3d.uuid];
+                var transform = this._startTransformDic.get(object3d);
                 var localMove = addPos.clone();
                 if (object3d.parent)
                     localMove = object3d.parent.worldToLocalMatrix.deltaTransformVector(localMove);
@@ -143,13 +145,13 @@ namespace feng3d.editor
 
         startRotate()
         {
-            this._startTransformDic = {};
+            this._startTransformDic = new Map<Transform, { position: Vector3D, rotation: Vector3D, scale: Vector3D }>();
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
             for (var i = 0; i < objects.length; i++)
             {
                 var object3d = objects[i];
-                this._startTransformDic[object3d.uuid] = { position: object3d.position, rotation: object3d.rotation, scale: object3d.scale };
+                this._startTransformDic.push(object3d, { position: object3d.position, rotation: object3d.rotation, scale: object3d.scale });
             }
         }
 
@@ -172,10 +174,10 @@ namespace feng3d.editor
             for (var i = 0; i < objects.length; i++)
             {
                 object3d = objects[i];
-                var tempTransform = this._startTransformDic[object3d.uuid];
+                var tempTransform = this._startTransformDic.get(object3d);
                 if (!this._isWoldCoordinate && this._isBaryCenter)
                 {
-                    object3d.rotation = Matrix3D.fromAxisRotate(localnormal, angle).transformRotation(tempTransform.rotation);
+                    object3d.rotation = rotateRotation(tempTransform.rotation, localnormal, angle);
                 } else
                 {
                     localnormal = normal.clone();
@@ -183,14 +185,14 @@ namespace feng3d.editor
                         localnormal = object3d.parent.worldToLocalMatrix.deltaTransformVector(localnormal);
                     if (this._isBaryCenter)
                     {
-                        object3d.rotation = Matrix3D.fromAxisRotate(localnormal, angle).transformRotation(tempTransform.rotation);
+                        object3d.rotation = rotateRotation(tempTransform.rotation, localnormal, angle);
                     } else
                     {
                         var localPivotPoint = this._controllerToolTransfrom.position;
                         if (object3d.parent)
                             localPivotPoint = object3d.parent.worldToLocalMatrix.transformVector(localPivotPoint);
                         object3d.position = Matrix3D.fromPosition(tempTransform.position).appendRotation(localnormal, angle, localPivotPoint).position;
-                        object3d.rotation = Matrix3D.fromAxisRotate(localnormal, angle).transformRotation(tempTransform.rotation);
+                        object3d.rotation = rotateRotation(tempTransform.rotation, localnormal, angle);
                     }
                 }
             }
@@ -219,13 +221,13 @@ namespace feng3d.editor
             for (var i = 0; i < objects.length; i++)
             {
                 object3d = objects[i];
-                var tempsceneTransform = this._startTransformDic[object3d.uuid];
+                var tempsceneTransform = this._startTransformDic.get(object3d);
                 var tempPosition = tempsceneTransform.position.clone();
                 var tempRotation = tempsceneTransform.rotation.clone();
                 if (!this._isWoldCoordinate && this._isBaryCenter)
                 {
-                    tempRotation = Matrix3D.fromAxisRotate(normal2, angle2).transformRotation(tempRotation);
-                    object3d.rotation = Matrix3D.fromAxisRotate(normal1, angle1).transformRotation(tempRotation);
+                    tempRotation = rotateRotation(tempRotation, normal2, angle2);
+                    object3d.rotation = rotateRotation(tempRotation, normal1, angle1);
                 } else
                 {
                     var localnormal1 = normal1.clone();
@@ -237,8 +239,8 @@ namespace feng3d.editor
                     }
                     if (this._isBaryCenter)
                     {
-                        tempRotation = Matrix3D.fromAxisRotate(localnormal1, angle1).transformRotation(tempRotation);
-                        object3d.rotation = Matrix3D.fromAxisRotate(localnormal2, angle2).transformRotation(tempRotation);
+                        tempRotation = rotateRotation(tempRotation, localnormal1, angle1);
+                        object3d.rotation = rotateRotation(tempRotation, localnormal2, angle2);
                     } else
                     {
                         var localPivotPoint = this._controllerToolTransfrom.position;
@@ -248,8 +250,8 @@ namespace feng3d.editor
                         tempPosition = Matrix3D.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
                         object3d.position = Matrix3D.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
 
-                        tempRotation = Matrix3D.fromAxisRotate(localnormal1, angle1).transformRotation(tempRotation);
-                        object3d.rotation = Matrix3D.fromAxisRotate(localnormal2, angle2).transformRotation(tempRotation);
+                        tempRotation = rotateRotation(tempRotation, localnormal1, angle1);
+                        object3d.rotation = rotateRotation(tempRotation, localnormal2, angle2);
                     }
                 }
             }
@@ -284,5 +286,33 @@ namespace feng3d.editor
         {
             this._startScaleVec.length = 0;
         }
+    }
+
+    function rotateRotation(rotation: Vector3D, axis: Vector3D, angle)
+    {
+        var rotationmatrix3d = new Matrix3D();
+        rotationmatrix3d.appendRotation(Vector3D.X_AXIS, rotation.x);
+        rotationmatrix3d.appendRotation(Vector3D.Y_AXIS, rotation.y);
+        rotationmatrix3d.appendRotation(Vector3D.Z_AXIS, rotation.z);
+        rotationmatrix3d.appendRotation(axis, angle);
+        var newrotation = rotationmatrix3d.decompose()[1];
+        newrotation.scaleBy(180 / Math.PI);
+        var v = Math.round((newrotation.x - rotation.x) / 180);
+        if (v % 2 != 0)
+        {
+            newrotation.x += 180;
+            newrotation.y = 180 - newrotation.y;
+            newrotation.z += 180;
+        }
+
+        function toround(a: number, b: number, c: number = 360)
+        {
+            return Math.round((b - a) / c) * c + a;
+        }
+
+        newrotation.x = toround(newrotation.x, rotation.x);
+        newrotation.y = toround(newrotation.y, rotation.y);
+        newrotation.z = toround(newrotation.z, rotation.z);
+        return newrotation;
     }
 }

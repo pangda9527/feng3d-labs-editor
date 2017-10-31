@@ -1,52 +1,74 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es6",
         "noImplicitAny": false,
         "sourceMap": true,
         "declaration": true,
         "experimentalDecorators": true,
-        "outDir": "out"
-        // "outFile": "out/editor.js"
+        "types": [
+            "feng3d",
+            "node"
+        ],
+        // "outDir": "debug"
+        "outFile": "out/editor.js"
     },
     "files": [
+        //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
         "libs/modules/res/res.d.ts",
         "libs/modules/tween/tween.d.ts",
         "libs/exml.e.d.ts",
-        "src/ui/drag/DragType.ts",
-        "src/ui/drag/DragSource.ts",
-        "src/ui/drag/DragEvent.ts",
-        "src/ui/drag/DragManager.ts",
+        //
+        "src/io/native/file.ts",
+        "src/io/web/Client.ts",
+        "src/io/web/file.ts",
+        //
+        "src/io/io.ts",
+        //
+        "src/electron/rendererprocess.ts",
+        //
+        "src/caches/editorcache.ts",
+        //
+        "src/ui/drag/drag.ts",
+        //
+        "src/shortcut/editorshortcut.ts",
         //
         "src/ui/Feng3dView.ts",
+        "src/ui/components/maskview.ts",
+        "src/ui/components/popupview.ts",
         "src/ui/components/Accordion.ts",
         "src/ui/components/TreeItemRenderer.ts",
-        "src/ui/components/TreeNode.ts",
+        "src/ui/components/MenuItemRenderer.ts",
         "src/ui/components/Tree.ts",
         "src/ui/components/Vector3DView.ts",
         "src/ui/components/Object3DComponentView.ts",
+        "src/ui/components/menu.ts",
         //
-        "src/objectview/view/DefaultBaseObjectView.ts",
-        "src/objectview/view/DefaultObjectAttributeView.ts",
-        "src/objectview/view/DefaultObjectBlockView.ts",
-        "src/objectview/view/DefaultObjectView.ts",
+        "src/objectview/view/OVBaseDefault.ts",
+        "src/objectview/view/OAVDefault.ts",
+        "src/objectview/view/OBVDefault.ts",
+        "src/objectview/view/OVDefault.ts",
         "src/objectview/view/BooleanAttrView.ts",
+        "src/objectview/view/OAVNumber.ts",
         //
         "src/objectview/events/ObjectViewEvent.ts",
         //
         "src/objectview/oav/OAVVector3D.ts",
+        "src/objectview/oav/OAVArray.ts",
         "src/objectview/oav/OAVObject3DComponentList.ts",
         //
         "src/ui/inspector/InspectorViewData.ts",
         "src/ui/inspector/InspectorView.ts",
         //
-        "src/ui/hierarchy/CreateObject3DView.ts",
         "src/ui/hierarchy/HierarchyTreeItemRenderer.ts",
         "src/ui/hierarchy/HierarchyView.ts",
         //
-        "src/ui/assets/project.ts",
-        "src/ui/assets/AssetsNode.ts",
+        "src/ui/assets/assets.ts",
+        "src/ui/assets/AssetsFileNode.ts",
+        "src/ui/assets/AssetsTree.ts",
+        "src/ui/assets/AssetsFileItemRenderer.ts",
+        "src/ui/assets/AssetsTreeItemRenderer.ts",
         "src/ui/assets/AssetsView.ts",
         //
         "src/ui/MainView.ts",
@@ -56,7 +78,8 @@
         "src/ui/MainUI.ts",
         "src/ui/ThemeAdapter.ts",
         //
-        "src/feng3d/data/SceneData.ts",
+        "src/ui/editorui.ts",
+        //
         "src/feng3d/data/Editor3DData.ts",
         //
         "src/feng3d/events/Editor3DEvent.ts",
@@ -71,28 +94,28 @@
         "src/feng3d/object3DControllerTool/Object3DScaleTool.ts",
         "src/feng3d/object3DControllerTool/Object3DControllerTool.ts",
         //
-        "src/feng3d/hierarchy/HierarchyNode.ts",
+        "src/feng3d/hierarchy/HierarchyTree.ts",
         "src/feng3d/hierarchy/Hierarchy.ts",
         "src/feng3d/scene/SceneControl.ts",
         "src/feng3d/GroundGrid.ts",
         "src/feng3d/Main3D.ts",
+        "src/feng3d/EditorComponent.ts",
         //
         "src/EditorEnvironment.ts",
         "src/MouseEvent.ts",
         "src/MouseEventEnvironment.ts",
         //
-        "src/client/Client.ts",
-        "src/client/file.ts",
-        "src/client/FileObject.ts",
+        "src/scripts/MouseRayTestScript.ts",
+        "src/scripts/DirectionLightIcon.ts",
+        "src/scripts/PointLightIcon.ts",
+        //
+        "src/loaders/importthreejs.ts",
+        "src/loaders/threejsLoader.ts",
         //configs
         "src/configs/CommonConfig.ts",
         "src/configs/ObjectViewConfig.ts",
         "src/configs/ShortcutConfig.ts",
         "src/EditorEvent.ts",
         "src/Editor.ts"
-    ],
-    "include": [
-        "../objectview/out/**/*.d.ts",
-        "../feng3d/out/**/*.d.ts"
     ]
 }

@@ -1,8 +1,7 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export interface EditorEventMap
     {
-        Create_Object3D
         saveScene
         import
     }

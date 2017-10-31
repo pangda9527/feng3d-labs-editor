@@ -1,0 +1,27 @@
+{
+  "name": "feng3d-editor",
+  "version": "0.0.0",
+  "description": "feng3d引擎编辑器\r 编辑器UI基于[egret](https://www.egret.com/)开发。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.oschina.net/feng3d/feng3d-editor.git"
+  },
+  "keywords": [
+    "editor",
+    "feng3d"
+  ],
+  "author": "feng",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^1.7.8",
+    "fs-extra": "^4.0.2",
+    "ws": "^3.1.0"
+  },
+  "dependencies": {
+    "feng3d": "^201710.30.1"
+  }
+}

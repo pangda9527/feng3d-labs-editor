@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
 	export class Object3DComponentView extends eui.Component
 	{
@@ -36,6 +36,16 @@ namespace feng3d.editor
 			this.accordion.titleName = componentName;
 			this.componentView = objectview.getObjectView(this.component);
 			this.accordion.addContent(this.componentView);
+
+			this.deleteButton.visible = !(this.component instanceof Transform);
+
+			this.deleteButton.addEventListener(MouseEvent.CLICK, this.onDeleteButton, this);
+		}
+
+		private onDeleteButton(event: MouseEvent)
+		{
+			if (this.component.gameObject)
+				this.component.gameObject.removeComponent(this.component);
 		}
 	}
 }

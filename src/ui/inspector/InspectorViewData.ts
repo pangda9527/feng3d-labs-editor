@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export interface InspectorViewDataEventMap
     {
@@ -20,10 +20,8 @@ namespace feng3d.editor
      */
     export class InspectorViewData extends Event
     {
-        hasBackData = false;
-
         viewData: any;
-        private viewDataList = [];
+        viewDataList = [];
 
         constructor(editor3DData: Editor3DData)
         {
@@ -41,7 +39,6 @@ namespace feng3d.editor
             {
                 this.viewDataList.length = 0;
             }
-            this.hasBackData = this.viewDataList.length > 0;
             //
             this.viewData = data;
 
@@ -51,7 +48,6 @@ namespace feng3d.editor
         back()
         {
             this.viewData = this.viewDataList.pop();
-            this.hasBackData = this.viewDataList.length > 0;
             this.dispatch("change");
         }
 

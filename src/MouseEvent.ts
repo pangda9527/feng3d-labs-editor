@@ -1,9 +1,9 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export type MouseEvent = egret.TouchEvent;
     export var MouseEvent: {
         prototype: TouchEvent;
-        new (): TouchEvent;
+        new(): TouchEvent;
         /** 鼠标按下 */
         MOUSE_DOWN: string;
         /** 鼠标弹起 */
@@ -16,6 +16,10 @@ namespace feng3d.editor
         MOUSE_OUT: "mouseout";
         /** 鼠标移入 */
         MOUSE_OVER: "mouseover";
+        /** 右键点击 */
+        RIGHT_CLICK: "rightclick";
+        /** 双击 */
+        DOUBLE_CLICK: "dblclick";
     } = <any>egret.TouchEvent;
 
     //映射事件名称
@@ -24,7 +28,8 @@ namespace feng3d.editor
     MouseEvent.MOUSE_MOVE = egret.TouchEvent.TOUCH_MOVE;
     MouseEvent.CLICK = egret.TouchEvent.TOUCH_TAP;
     MouseEvent.MOUSE_OUT = "mouseout";
-    MouseEvent.MOUSE_OVER = "mouseover";
+    MouseEvent.RIGHT_CLICK = "rightclick";
+    MouseEvent.DOUBLE_CLICK = "dblclick";
     //
 
     //解决TextInput.text绑定Number是不显示0的bug
@@ -32,7 +37,6 @@ namespace feng3d.editor
     var old = p.dispatchEvent;
     p.dispatchEvent = function (event: egret.Event): boolean
     {
-
         if (event.type == MouseEvent.MOUSE_OVER)
         {
             //鼠标已经在对象上时停止over冒泡

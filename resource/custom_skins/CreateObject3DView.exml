@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="CreateObject3DViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
-	<w:Config id="15a9380c143"></w:Config>
-	<e:Rect id="maskSprite" width="20" height="20" fillAlpha="0" strokeAlpha="0"/>
-	<e:List id="object3dList" width="100" y="0" x="0">
-
-	</e:List>
-</e:Skin>

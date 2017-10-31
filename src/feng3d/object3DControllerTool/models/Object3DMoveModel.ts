@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export class Object3DMoveModel extends Component
     {
@@ -12,9 +12,9 @@ namespace feng3d.editor
 
         oCube: CoordinateCube;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
             this.gameObject.name = "Object3DMoveModel";
             this.initModels();
         }
@@ -67,8 +67,8 @@ namespace feng3d.editor
 
         private xArrow: GameObject;
 
-        readonly color = new Color(1, 0, 0)
-        private selectedColor: Color = new Color(1, 1, 0);
+        readonly color = new Color(1, 0, 0, 0.99)
+        private selectedColor: Color = new Color(1, 1, 0, 0.99);
         private length: number = 100;
 
         //
@@ -76,36 +76,42 @@ namespace feng3d.editor
         set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
 
             var xLine = GameObject.create();
-            var segmentGeometry = xLine.addComponent(MeshFilter).mesh = new SegmentGeometry();
+           var meshRenderer =  xLine.addComponent(MeshRenderer);
+            var segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             var segment = new Segment(new Vector3D(), new Vector3D(0, this.length, 0));
             segmentGeometry.addSegment(segment);
-            this.segmentMaterial = xLine.addComponent(MeshRenderer).material = new SegmentMaterial();
+            this.segmentMaterial = meshRenderer.material = new SegmentMaterial();
             this.gameObject.addChild(xLine);
             //
             this.xArrow = GameObject.create();
-            this.xArrow.addComponent(MeshFilter).mesh = new ConeGeometry(5, 18);
-            this.material = this.xArrow.addComponent(MeshRenderer).material = new ColorMaterial();
+            meshRenderer = this.xArrow.addComponent(MeshRenderer);
+            meshRenderer.geometry = new ConeGeometry(5, 18);
+            this.material = meshRenderer.material = new ColorMaterial();
             this.xArrow.transform.y = this.length;
+            this.xArrow.mouselayer = mouselayer.editor;
             this.gameObject.addChild(this.xArrow);
 
             this.update();
 
-            var mouseHit = GameObject.create("hit");
-            mouseHit.addComponent(MeshFilter).mesh = new CylinderGeometry(5, 5, this.length - 20);
+            var mouseHit = GameObject.create("hitCoordinateAxis");
+            meshRenderer = mouseHit.addComponent(MeshRenderer);
+            meshRenderer.geometry = new CylinderGeometry(5, 5, this.length);
+            //meshRenderer.material = new ColorMaterial();
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;
+            mouseHit.mouselayer = mouselayer.editor;
             this.gameObject.addChild(mouseHit);
         }
 
         private update()
         {
-            this.segmentMaterial.color.copyFrom(this.selected ? this.selectedColor : this.color);
+            this.segmentMaterial.color = this.selected ? this.selectedColor : this.color;
             //
             this.material.color = this.selected ? this.selectedColor : this.color;
         }
@@ -116,21 +122,23 @@ namespace feng3d.editor
         private colorMaterial: ColorMaterial;
         private oCube: GameObject;
 
-        color = new Color(1, 1, 1);
-        selectedColor = new Color(1, 1, 0);
+        color = new Color(1, 1, 1, 0.99);
+        selectedColor = new Color(1, 1, 0, 0.99);
         //
         get selected() { return this._selected; }
         set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
             //
             this.oCube = GameObject.create();
-            this.oCube.addComponent(MeshFilter).mesh = new CubeGeometry(8, 8, 8);
-            this.colorMaterial = this.oCube.addComponent(MeshRenderer).material = new ColorMaterial();
+            var meshRenderer= this.oCube.addComponent(MeshRenderer)
+            meshRenderer.geometry = new CubeGeometry(8, 8, 8);
+            this.colorMaterial = meshRenderer.material = new ColorMaterial();
             this.oCube.mouseEnabled = true;
+            this.oCube.mouselayer = mouselayer.editor;
             this.gameObject.addChild(this.oCube);
 
             this.update();
@@ -148,10 +156,10 @@ namespace feng3d.editor
         private segmentGeometry: SegmentGeometry;
 
         color = new Color(1, 0, 0, 0.2);
-        borderColor = new Color(1, 0, 0);
+        borderColor = new Color(1, 0, 0, 0.99);
 
         selectedColor = new Color(1, 0, 0, 0.5);
-        private selectedborderColor = new Color(1, 1, 0);
+        private selectedborderColor = new Color(1, 1, 0, 0.99);
 
         //
         get width() { return this._width; }
@@ -161,21 +169,24 @@ namespace feng3d.editor
         set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
         private _selected = false;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
 
             var plane = GameObject.create("plane");
+            var meshRenderer = plane.addComponent(MeshRenderer);
             plane.transform.x = plane.transform.z = this._width / 2;
-            plane.addComponent(MeshFilter).mesh = new PlaneGeometry(this._width, this._width);
-            this.colorMaterial = plane.addComponent(MeshRenderer).material = new ColorMaterial();
-
+            meshRenderer.geometry = new PlaneGeometry(this._width, this._width);
+            this.colorMaterial = meshRenderer.material = new ColorMaterial();
+            plane.mouselayer = mouselayer.editor;
             plane.mouseEnabled = true;
             this.gameObject.addChild(plane);
 
             var border = GameObject.create("border");
-            this.segmentGeometry = border.addComponent(MeshFilter).mesh = new SegmentGeometry();
-            border.addComponent(MeshRenderer).material = new SegmentMaterial();
+            meshRenderer = border.addComponent(MeshRenderer);
+            this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
+            var material = meshRenderer.material = new SegmentMaterial();
+            material.color = new Color(1, 1, 1, 0.99);
             this.gameObject.addChild(border);
 
             this.update();

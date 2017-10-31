@@ -1,6 +1,6 @@
-namespace feng3d.editor
+module feng3d.editor
 {
-	@OVAComponent()
+	@OAVComponent()
 	export class OAVObject3DComponentList extends eui.Component implements IObjectAttributeView
 	{
 		private _space: GameObject;
@@ -34,14 +34,8 @@ namespace feng3d.editor
 		private onAddComponentButtonClick()
 		{
 			var globalPoint = this.addComponentButton.localToGlobal(0, 0);
-			createObject3DView.showView(createObject3DComponentConfig, this.onCreateComponent.bind(this), globalPoint);
-		}
-
-		private onCreateComponent(item)
-		{
-			var cls = ClassUtils.getDefinitionByName(item.className);
-			var component = this.space.addComponent(cls);
-			this.addComponentView(component);
+			needcreateComponentGameObject = this.space;
+			menu.popup(createObject3DComponentConfig, globalPoint.x, globalPoint.y, 180);
 		}
 
 		get space()
@@ -78,21 +72,47 @@ namespace feng3d.editor
 		{
 			this.accordions.length = 0;
 			(<eui.VerticalLayout>this.group.layout).gap = -1;
+
 			var components = <any>this.attributeValue;
 			for (var i = 0; i < components.length; i++)
 			{
 				this.addComponentView(components[i]);
 			}
+			this.space.on("addedComponent", this.onaddedcompont, this);
+			this.space.on("removedComponent", this.onremovedComponent, this);
+
+			drag.register(this.addComponentButton, null, ["file_script"], (dragdata) =>
+			{
+				if (dragdata.file_script)
+				{
+					GameObjectUtil.addScript(this.space, dragdata.file_script.replace(/\.ts\b/, ".js"));
+				}
+			});
 		}
 
 		private addComponentView(component: Component)
 		{
-			var displayObject: Object3DComponentView = new Object3DComponentView(component);
+			if (component instanceof Transform)
+			{
+				//隐藏拥有以下组件的Transform组件
+				if (
+					this.space.getComponent(Scene3D)
+					|| this.space.getComponent(Trident)
+					|| this.space.getComponent(GroundGrid)
+					// || this.space.getComponent(SkinnedMeshRenderer)
+				)
+					return;
+			}
+			if (component instanceof BoundingComponent)
+				return;
+			if (component instanceof RenderAtomicComponent)
+				return;
+			if (component instanceof WireframeComponent)
+				return;
+
+			var displayObject = new Object3DComponentView(component);
 			displayObject.percentWidth = 100;
 			this.group.addChild(displayObject);
-
-			//
-			displayObject.deleteButton.addEventListener(MouseEvent.CLICK, this.onDeleteButton, this);
 		}
 
 		/**
@@ -108,11 +128,26 @@ namespace feng3d.editor
 			}
 		}
 
-		private onDeleteButton(event: MouseEvent)
+		private removedComponentView(component: Component)
 		{
-			var displayObject: Object3DComponentView = event.currentTarget.parent;
-			this.group.removeChild(displayObject);
-			this.space.removeComponent(displayObject.component);
+			for (var i = this.group.numChildren - 1; i >= 0; i--)
+			{
+				var displayObject = this.group.getChildAt(i);
+				if (displayObject instanceof Object3DComponentView && displayObject.component == component)
+				{
+					this.group.removeChild(displayObject);
+				}
+			}
+		}
+
+		private onaddedcompont(event: EventVO<Component>)
+		{
+			this.addComponentView(event.data);
+		}
+
+		private onremovedComponent(event: EventVO<Component>)
+		{
+			this.removedComponentView(event.data);
 		}
 	}
 }

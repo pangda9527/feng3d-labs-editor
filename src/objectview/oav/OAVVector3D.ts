@@ -1,6 +1,6 @@
-namespace feng3d.editor
+module feng3d.editor
 {
-	@OVAComponent()
+	@OAVComponent()
 	export class OAVVector3D extends eui.Component implements IObjectAttributeView
 	{
 		private _space: Object;
@@ -27,6 +27,17 @@ namespace feng3d.editor
 		{
 			this.vector3DView.vm = <any>this.attributeValue;
 			eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
+
+			if (this.attributeViewInfo.componentParam)
+			{
+				for (var key in this.attributeViewInfo.componentParam)
+				{
+					if (this.attributeViewInfo.componentParam.hasOwnProperty(key))
+					{
+						this.vector3DView[key] = this.attributeViewInfo.componentParam[key];
+					}
+				}
+			}
 
 			this.updateView();
 		}

@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
 
     export class EditorEnvironment
@@ -28,6 +28,20 @@ namespace feng3d.editor
                 var values = this.$TextInput;
                 this.textDisplay.text = String(values[6 /* text */]);
             };
+
+            var oldfocusHandler = egret.InputController.prototype["focusHandler"];
+            egret.InputController.prototype["focusHandler"] = function (event)
+            {
+                oldfocusHandler.call(this, event);
+                shortcut.enable = !this._isFocus;
+            }
+            
+            var oldblurHandler = egret.InputController.prototype["blurHandler"];
+            egret.InputController.prototype["blurHandler"] = function (event)
+            {
+                oldblurHandler.call(this, event);
+                shortcut.enable = !this._isFocus;
+            }
         }
     }
 }

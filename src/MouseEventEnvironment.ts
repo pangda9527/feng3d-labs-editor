@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
     export var mouseEventEnvironment: MouseEventEnvironment;
 
@@ -9,6 +9,7 @@ namespace feng3d.editor
         private touch: egret.sys.TouchHandler;
 
         overDisplayObject: egret.DisplayObject;
+        rightmousedownObject: egret.DisplayObject;
 
         constructor()
         {
@@ -17,6 +18,37 @@ namespace feng3d.editor
             this.touch = this.webTouchHandler.touch;
 
             this.webTouchHandler.canvas.addEventListener("mousemove", this.onMouseMove.bind(this));
+
+            input.on("rightmousedown", (e) =>
+            {
+                var location = this.webTouchHandler.getLocation(e.data.event);
+                var x = location.x;
+                var y = location.y;
+
+                this.rightmousedownObject = this.touch["findTarget"](x, y);
+            });
+            input.on("rightmouseup", (e) =>
+            {
+                var location = this.webTouchHandler.getLocation(e.data.event);
+                var x = location.x;
+                var y = location.y;
+
+                var target: egret.DisplayObject = this.touch["findTarget"](x, y);
+                if (target == this.rightmousedownObject)
+                {
+                    egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.RIGHT_CLICK, true, true, x, y);
+                    this.rightmousedownObject = null;
+                }
+            });
+            input.on("dblclick", (e) =>
+            {
+                var location = this.webTouchHandler.getLocation(e.data.event);
+                var x = location.x;
+                var y = location.y;
+
+                var target: egret.DisplayObject = this.touch["findTarget"](x, y);
+                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.DOUBLE_CLICK, true, true, x, y);
+            });
         }
 
         private onMouseMove(event: MouseEvent)

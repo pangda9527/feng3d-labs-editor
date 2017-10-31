@@ -1,40 +1,54 @@
-namespace feng3d.editor
+module feng3d.editor
 {
 	export class Feng3dView extends eui.Component implements eui.UIComponent
 	{
+		public fullbutton: eui.Button;
 		private canvas: HTMLElement;
 
 		constructor()
 		{
 			super();
-			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "Feng3dViewSkin";
+			Stats.init();
 		}
 
-		private onComplete(): void
+		$onAddToStage(stage: egret.Stage, nestLevel: number)
 		{
-			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+			super.$onAddToStage(stage, nestLevel);
 
-			if (this.stage)
-			{
-				this.onAddedToStage();
-			}
-		}
-
-		private onAddedToStage()
-		{
 			this.canvas = document.getElementById("glcanvas");
 			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
 			this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
+			this.fullbutton.addEventListener(MouseEvent.CLICK, this.onclick, this);
+
 			this.onResize();
+
+			drag.register(this, null, ["file_gameobject", "file_script"], (dragdata) =>
+			{
+				if (dragdata.file_gameobject)
+				{
+					hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, hierarchyTree.rootnode.gameobject);
+				}
+				if (dragdata.file_script)
+				{
+					var gameobject = mouse3DManager.getSelectedObject3D();
+					if (!gameobject || !gameobject.scene)
+						gameobject = hierarchyTree.rootnode.gameobject;
+					GameObjectUtil.addScript(gameobject, dragdata.file_script.replace(/\.ts\b/, ".js"))
+				}
+			});
 		}
 
-		private onRemovedFromStage()
+		$onRemoveFromStage()
 		{
+			super.$onRemoveFromStage()
+
 			this.canvas = null;
 			this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
 			this.removeEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
+			this.fullbutton.removeEventListener(MouseEvent.CLICK, this.onclick, this);
+
+			drag.unregister(this);
 		}
 
 		private onResize()
@@ -55,12 +69,37 @@ namespace feng3d.editor
 			style.width = bound.width + "px";
 			style.height = bound.height + "px";
 
+			Stats.instance.dom.style.left = bound.x + "px";
+			Stats.instance.dom.style.top = bound.y + "px";
+			
 			if (bound.contains(input.clientX, input.clientY))
 			{
 				shortcut.activityState("mouseInView3D");
 			} else
 			{
 				shortcut.deactivityState("mouseInView3D");
+			}
+		}
+
+		private onclick()
+		{
+			var gameObject = mouse3DManager.getSelectedObject3D();
+			if (!gameObject || !gameObject.scene)
+				return;
+			var node = hierarchyTree.getNode(gameObject);
+			while (!node && (gameObject == gameObject.parent));
+			{
+				node = hierarchyTree.getNode(gameObject);
+			}
+			if (node && gameObject)
+			{
+				if (gameObject.scene.gameObject == gameObject)
+				{
+					editor3DData.selectedObject = null;
+				} else
+				{
+					editor3DData.selectedObject = gameObject;
+				}
 			}
 		}
 	}

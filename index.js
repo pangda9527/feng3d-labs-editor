@@ -1,6 +1,49 @@
-/// <reference path="../feng3d-loadModule/loadModule.ts" />
+loadjs([
+    // `../feng3d/out/feng3d.js`, //debug
+    `node_modules/feng3d/out/feng3d.js`,  //release
+    `out/editor.js`,
+], loadComplete);
 
-feng3d.loadmodule.loadModules(["../feng3d","../feng3d-objectview","."],loadComplete)
+function loadjs(path, onload, onerror)
+{
+    if (typeof path == "string")
+    {
+        var script = document.createElement('script');
+        script.src = path;
+        script.onload = (ev) =>
+        {
+            if (onload)
+                onload(ev);
+            else
+            {
+                console.log(`${path} 加载完成`);
+            }
+        }
+        script.onerror = () =>
+        {
+            if (onerror)
+                onerror();
+            else
+            {
+                console.warn(`${path} 加载失败！`);
+            }
+        }
+        document.head.appendChild(script);
+    } else
+    {
+        if (path.length == 0)
+        {
+            onload();
+        } else
+        {
+            loadjs(path.shift(), () =>
+            {
+                loadjs(path, onload, onerror);
+            }, onerror);
+        }
+    }
+
+}
 
 function loadComplete()
 {

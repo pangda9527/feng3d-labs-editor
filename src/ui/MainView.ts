@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
 	export class MainView extends eui.Component implements eui.UIComponent
 	{
@@ -41,10 +41,6 @@ namespace feng3d.editor
 			this.scaleButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
 			this.helpButton.addEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.settingButton.addEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
-			this.mainButton.addEventListener(MouseEvent.CLICK, this.onMainButtonClick, this);
-
-			//
-			createObject3DView = createObject3DView || new CreateObject3DView();
 
 			this.watchers.push(
 				eui.Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this)
@@ -58,18 +54,11 @@ namespace feng3d.editor
 			this.scaleButton.removeEventListener(MouseEvent.CLICK, this.onButtonClick, this);
 			this.helpButton.removeEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.settingButton.removeEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
-			this.mainButton.removeEventListener(MouseEvent.CLICK, this.onMainButtonClick, this);
 
 			while (this.watchers.length > 0)
 			{
 				this.watchers.pop().unwatch();
 			}
-		}
-
-		private onMainButtonClick()
-		{
-			var globalPoint = this.mainButton.localToGlobal(0, 0);
-			createObject3DView.showView(mainMenuConfig, this.onMainMenu.bind(this), globalPoint);
 		}
 
 		private onMainMenu(item: { label: string; command: string; })
@@ -105,6 +94,4 @@ namespace feng3d.editor
 			this.scaleButton.selected = editor3DData.object3DOperationID == 2;
 		}
 	}
-
-	export var createObject3DView: CreateObject3DView;
 }

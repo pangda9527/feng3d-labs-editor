@@ -1,70 +1,158 @@
-namespace feng3d.editor
+module feng3d.editor
 {
-	export interface ITreeNode
+	export interface TreeNode
 	{
-		label: string;
-		children?: ITreeNode[];
+		label?: string;
+		depth?: number;
+		isOpen?: boolean;
+		selected?: boolean;
+        /** 
+         * 父节点
+         */
+		parent?: TreeNode;
+        /**
+         * 子节点列表
+         */
+		children: TreeNode[];
 	}
 
-	function treeMap(treeNode: ITreeNode, callback: (node: ITreeNode, parent: ITreeNode) => void)
+	export interface TreeEventMap
+	{
+		added: TreeNode;
+		removed: TreeNode;
+		changed: TreeNode;
+		openChanged: TreeNode;
+	}
+
+	export interface Tree
+	{
+		once<K extends keyof TreeEventMap>(type: K, listener: (event: TreeEventMap[K]) => void, thisObject?: any, priority?: number): void;
+		dispatch<K extends keyof TreeEventMap>(type: K, data?: TreeEventMap[K], bubbles?: boolean);
+		has<K extends keyof TreeEventMap>(type: K): boolean;
+		on<K extends keyof TreeEventMap>(type: K, listener: (event: TreeEventMap[K]) => any, thisObject?: any, priority?: number, once?: boolean);
+		off<K extends keyof TreeEventMap>(type?: K, listener?: (event: TreeEventMap[K]) => any, thisObject?: any);
+	}
+
+	export class Tree extends Event
+	{
+		_rootnode: TreeNode;
+		get rootnode()
+		{
+			return this._rootnode;
+		}
+		set rootnode(value)
+		{
+			if (this._rootnode == value)
+				return;
+			if (this._rootnode)
+			{
+				watcher.unwatch(this._rootnode, "isOpen", this.isopenchanged, this)
+			}
+			this._rootnode = value;
+			if (this._rootnode)
+			{
+				watcher.watch(this._rootnode, "isOpen", this.isopenchanged, this)
+			}
+		}
+
+        /**
+         * 判断是否包含节点
+         */
+		contain(node: TreeNode, rootnode?: TreeNode)
+		{
+			rootnode = rootnode || this.rootnode;
+			var result = false;
+			treeMap(rootnode, (item) =>
+			{
+				if (item == node)
+					result = true;
+			});
+			return result;
+		}
+
+		addNode(node: TreeNode, parentnode?: TreeNode)
+		{
+			parentnode = parentnode || this.rootnode;
+			debuger && console.assert(!this.contain(parentnode, node), "无法添加到自身节点中!");
+
+			node.parent = parentnode;
+			parentnode.children.push(node);
+			this.updateChildrenDepth(node);
+
+			watcher.watch(node, "isOpen", this.isopenchanged, this)
+
+			this.dispatch("added", node);
+			this.dispatch("changed", node);
+		}
+
+		removeNode(node: TreeNode)
+		{
+			var parentnode = node.parent;
+			if (!parentnode)
+				return;
+			var index = parentnode.children.indexOf(node);
+			debuger && console.assert(index != -1);
+			parentnode.children.splice(index, 1);
+
+			node.parent = null;
+
+			watcher.unwatch(node, "isOpen", this.isopenchanged, this)
+
+			this.dispatch("removed", node);
+			this.dispatch("changed", node);
+		}
+
+		destroy(node: TreeNode)
+		{
+			this.removeNode(node);
+			if (node.children)
+			{
+				for (var i = node.children.length - 1; i >= 0; i--)
+				{
+					this.destroy(node.children[i]);
+				}
+				node.children.length = 0;
+			}
+		}
+
+		updateChildrenDepth(node: TreeNode)
+		{
+			node.depth = ~~node.parent.depth + 1;
+			treeMap(node, (node) =>
+			{
+				node.depth = ~~node.parent.depth + 1;
+			});
+		}
+
+		getShowNodes(node?: TreeNode)
+		{
+			node = node || this.rootnode;
+			var nodes: TreeNode[] = [node];
+			if (node.isOpen)
+			{
+				node.children.forEach(element =>
+				{
+					nodes = nodes.concat(this.getShowNodes(element));
+				});
+			}
+			return nodes;
+		}
+
+		private isopenchanged(host: any, property: string, oldvalue: any)
+		{
+			this.dispatch("openChanged", host);
+		}
+	}
+
+	export function treeMap<T extends TreeNode>(treeNode: T, callback: (node: T, parent: T) => void)
 	{
 		if (treeNode.children)
 		{
 			treeNode.children.forEach(element =>
 			{
-				callback(element, treeNode);
+				callback(<T>element, treeNode);
 				treeMap(element, callback);
 			});
-		}
-	}
-
-	export class TreeCollection extends egret.EventDispatcher implements eui.ICollection
-	{
-		private _rootNode: ITreeNode;
-
-		get length()
-		{
-			if (!this._rootNode || !this._rootNode.children)
-				return 0;
-
-			var len = 0;
-			treeMap(this._rootNode, () =>
-			{
-				len++;
-			});
-			return len;
-		}
-
-		constructor(rootNode: ITreeNode)
-		{
-			super();
-			this._rootNode = rootNode;
-		}
-
-		getItemAt(index: number)
-		{
-			var currentIndex = 0;
-			var item: ITreeNode = null;
-			treeMap(this._rootNode, (node) =>
-			{
-				if (currentIndex == index)
-					item = node;
-				currentIndex++;
-			});
-			return item;
-		}
-
-		getItemIndex(item: ITreeNode)
-		{
-			var itemIndex = -1;
-			var currentIndex = 0;
-			treeMap(this._rootNode, (node) =>
-			{
-				if (item == node)
-					itemIndex = currentIndex;
-				currentIndex++;
-			});
-			return itemIndex;
 		}
 	}
 }

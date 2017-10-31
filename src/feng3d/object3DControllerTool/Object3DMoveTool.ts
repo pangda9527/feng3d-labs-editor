@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
 
     export class Object3DMoveTool extends Object3DControllerToolBase
@@ -12,9 +12,9 @@ namespace feng3d.editor
         private startPlanePos: Vector3D;
         private startPos: Vector3D;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
 
             this.toolModel = GameObject.create().addComponent(Object3DMoveModel);
         }
@@ -45,6 +45,8 @@ namespace feng3d.editor
 
         protected onItemMouseDown(event: EventVO<any>)
         {
+            if (!engine.mouseinview)
+                return;
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -57,7 +59,7 @@ namespace feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor3DData.camera.transform.localToWorldMatrix;
+            var cameraSceneTransform = engine.camera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             var selectedGameObject: GameObject = <any>event.currentTarget;
@@ -139,7 +141,7 @@ namespace feng3d.editor
             //鼠标按下时不更新
             if (this.ismouseDown)
                 return;
-            var cameraPos = editor3DData.camera.transform.scenePosition;
+            var cameraPos = engine.camera.transform.scenePosition;
             var localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformVector(cameraPos);
 
             this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;

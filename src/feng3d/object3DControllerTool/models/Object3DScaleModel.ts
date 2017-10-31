@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
 
     export class Object3DScaleModel extends Component
@@ -8,9 +8,9 @@ namespace feng3d.editor
         zCube: CoordinateScaleCube;
         oCube: CoordinateCube;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
             this.gameObject.name = "Object3DScaleModel";
             this.initModels();
         }
@@ -44,8 +44,8 @@ namespace feng3d.editor
         private coordinateCube: CoordinateCube
         private segmentGeometry: SegmentGeometry;
 
-        readonly color = new Color(1, 0, 0)
-        private selectedColor = new Color(1, 1, 0);
+        readonly color = new Color(1, 0, 0, 0.99)
+        private selectedColor = new Color(1, 1, 0, 0.99);
         private length = 100;
         //
         get selected() { return this._selected; }
@@ -56,22 +56,25 @@ namespace feng3d.editor
         set scaleValue(value) { if (this._scale == value) return; this._scale = value; this.update(); }
         private _scale = 1;
 
-        constructor(gameObject: GameObject)
+        init(gameObject: GameObject)
         {
-            super(gameObject);
+            super.init(gameObject);
             var xLine = GameObject.create();
-            xLine.addComponent(MeshRenderer).material = new SegmentMaterial();
-            this.segmentGeometry = xLine.addComponent(MeshFilter).mesh = new SegmentGeometry();
+            var meshRenderer = xLine.addComponent(MeshRenderer);
+            var material = meshRenderer.material = new SegmentMaterial();
+            material.color = new Color(1, 1, 1, 0.99);
+            this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(xLine);
             this.coordinateCube = GameObject.create("coordinateCube").addComponent(CoordinateCube);
             this.gameObject.addChild(this.coordinateCube.gameObject);
 
             var mouseHit = GameObject.create("hit");
-            mouseHit.addComponent(MeshFilter).mesh = new CylinderGeometry(5, 5, this.length - 4);
-            mouseHit.addComponent(MeshRenderer);
+            meshRenderer = mouseHit.addComponent(MeshRenderer);
+            meshRenderer.geometry = new CylinderGeometry(5, 5, this.length - 4);
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;
+            mouseHit.mouselayer = mouselayer.editor;
             this.gameObject.addChild(mouseHit);
 
             this.update();

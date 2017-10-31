@@ -1,4 +1,4 @@
-namespace feng3d.editor
+module feng3d.editor
 {
 	export class HierarchyView extends eui.Component implements eui.UIComponent
 	{
@@ -6,8 +6,6 @@ namespace feng3d.editor
 		public list: eui.List;
 
 		private listData: eui.ArrayCollection;
-
-		private watchers: eui.Watcher[] = [];
 
 		constructor()
 		{
@@ -35,65 +33,70 @@ namespace feng3d.editor
 		{
 			this.addButton.addEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
 
-			editor3DData.hierarchy.rootNode.on("added", this.onHierarchyNodeAdded, this);
-			editor3DData.hierarchy.rootNode.on("removed", this.onHierarchyNodeRemoved, this);
-			editor3DData.hierarchy.rootNode.on("openChanged", this.onHierarchyNodeRemoved, this);
-			this.list.addEventListener(egret.Event.CHANGE, this.onListChange, this);
+			hierarchyTree.on("added", this.updateHierarchyTree, this);
+			hierarchyTree.on("removed", this.updateHierarchyTree, this);
+			hierarchyTree.on("openChanged", this.updateHierarchyTree, this);
 
-			this.watchers.push(
-				eui.Watcher.watch(editor3DData, ["selectedObject"], this.selectedObject3DChanged, this)
-			);
+			watcher.watch(editor3DData, "selectedObject", this.selectedObject3DChanged, this)
+
+			this.updateHierarchyTree();
 		}
 
 		private onRemovedFromStage()
 		{
 			this.addButton.removeEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
 
-			editor3DData.hierarchy.rootNode.off("added", this.onHierarchyNodeAdded, this);
-			editor3DData.hierarchy.rootNode.off("removed", this.onHierarchyNodeRemoved, this);
-			editor3DData.hierarchy.rootNode.off("openChanged", this.onHierarchyNodeRemoved, this);
-			this.list.removeEventListener(egret.Event.CHANGE, this.onListChange, this);
+			hierarchyTree.off("added", this.updateHierarchyTree, this);
+			hierarchyTree.off("removed", this.updateHierarchyTree, this);
+			hierarchyTree.off("openChanged", this.updateHierarchyTree, this);
 
-			while (this.watchers.length > 0)
+			watcher.unwatch(editor3DData, "selectedObject", this.selectedObject3DChanged, this)
+		}
+
+		private updateHierarchyTree()
+		{
+			var nodes = hierarchyTree.getShowNodes();
+			this.listData.replaceAll(nodes);
+		}
+
+		private selectedObject3DChanged(host: any, property: string, oldvalue: any)
+		{
+			if (oldvalue instanceof GameObject)
 			{
-				this.watchers.pop().unwatch();
+				var newnode = hierarchyTree.getNode(oldvalue);
+				if (newnode)
+				{
+					newnode.selected = false;
+				}
+				//清除选中效果
+				var wireframeComponent = oldvalue.getComponent(WireframeComponent);
+				if (wireframeComponent)
+					oldvalue.removeComponent(wireframeComponent);
 			}
-		}
-
-		private onListChange()
-		{
-			var node: HierarchyNode = this.list.selectedItem;
-			editor3DData.selectedObject = node.object3D;
-		}
-
-		private onHierarchyNodeAdded()
-		{
-			var nodes = editor3DData.hierarchy.rootNode.getShowNodes();
-			this.listData.replaceAll(nodes);
-		}
-
-		private onHierarchyNodeRemoved()
-		{
-			var nodes = editor3DData.hierarchy.rootNode.getShowNodes();
-			this.listData.replaceAll(nodes);
-			this.list.selectedItem = editor3DData.hierarchy.selectedNode;
-		}
-
-		private selectedObject3DChanged()
-		{
-			var node = editor3DData.hierarchy.getNode(editor3DData.selectedObject ? editor3DData.selectedObject : null);
-			this.list.selectedIndex = this.listData.getItemIndex(node);
+			if (editor3DData.selectedObject && editor3DData.selectedObject instanceof GameObject)
+			{
+				var newnode = hierarchyTree.getNode(editor3DData.selectedObject);
+				if (newnode)
+				{
+					newnode.selected = true;
+					var parentNode = newnode.parent;
+					while (parentNode)
+					{
+						parentNode.isOpen = true;
+						parentNode = parentNode.parent;
+					}
+				}
+				//新增选中效果
+				var wireframeComponent = editor3DData.selectedObject.getComponent(WireframeComponent);
+				if (!wireframeComponent)
+					editor3DData.selectedObject.addComponent(WireframeComponent);
+			}
 		}
 
 		private onAddButtonClick()
 		{
 			var globalPoint = this.addButton.localToGlobal(0, 0);
-			createObject3DView.showView(createObjectConfig, this.onCreateObject3d, globalPoint);
-		}
-
-		private onCreateObject3d(selectedItem)
-		{
-			$editorEventDispatcher.dispatch("Create_Object3D", selectedItem);
+			menu.popup(createObjectConfig, globalPoint.x, globalPoint.y);
 		}
 	}
 }

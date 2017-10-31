@@ -1,6 +1,6 @@
-namespace feng3d.editor
+module feng3d.editor
 {
-	@OVAComponent()
+	@OAVComponent()
 	export class BooleanAttrView extends eui.Component implements feng3d.IObjectAttributeView
 	{
 		private _space: any;

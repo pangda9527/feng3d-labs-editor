@@ -27,7 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-namespace feng3d.editor
+module feng3d.editor
 {
 
     export class MainUI extends eui.UILayer
@@ -101,16 +101,29 @@ namespace feng3d.editor
             }
         }
 
-        private mainView: eui.Component;
+        private mainView: MainView;
 
         private createScene()
         {
             if (this.isThemeLoadEnd && this.isResourceLoadEnd)
             {
+                editorui.stage = this.stage;
+                //
                 this.mainView = new MainView();
                 this.stage.addChild(this.mainView);
                 this.onresize();
                 window.onresize = this.onresize.bind(this);
+                editorui.mainview = this.mainView;
+                //
+                var maskLayer = new eui.UILayer();
+                maskLayer.touchEnabled = false;
+                this.stage.addChild(maskLayer);
+                editorui.maskLayer = maskLayer;
+                //
+                var popupLayer = new eui.UILayer();
+                popupLayer.touchEnabled = false;
+                this.stage.addChild(popupLayer);
+                editorui.popupLayer = popupLayer;
             }
         }
 
