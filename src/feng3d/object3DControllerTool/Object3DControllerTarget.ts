@@ -63,7 +63,7 @@ module feng3d.editor
 
         private constructor() { }
 
-        private onShowObjectTransformChanged(event: EventVO<any>)
+        private onShowObjectTransformChanged(event: Event<any>)
         {
             for (var i = 0; i < this._controllerTargets.length; i++)
             {

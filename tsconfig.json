@@ -3,30 +3,30 @@
         "target": "es6",
         "noImplicitAny": false,
         "sourceMap": true,
-        "declaration": true,
         "experimentalDecorators": true,
         "types": [
-            "feng3d",
-            "node"
+            // "feng3d" //release
         ],
-        // "outDir": "debug"
         "outFile": "out/editor.js"
     },
     "files": [
+        "../feng3d/out/feng3d.d.ts", //debug
         //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
         "libs/modules/res/res.d.ts",
         "libs/modules/tween/tween.d.ts",
         "libs/exml.e.d.ts",
+        "io/io.d.ts",
         //
-        "src/io/native/file.ts",
+        "src/constants.ts",
+        //
         "src/io/web/Client.ts",
         "src/io/web/file.ts",
         //
         "src/io/io.ts",
         //
-        "src/electron/rendererprocess.ts",
+        "src/electron.ts",
         //
         "src/caches/editorcache.ts",
         //

@@ -15,5 +15,5 @@ module feng3d.editor
         off<K extends keyof EditorEventMap>(type?: K, listener?: (event: EditorEventMap[K]) => any, thisObject?: any);
     }
 
-    export var $editorEventDispatcher: EditorEvent = new Event();
+    export var $editorEventDispatcher: EditorEvent = new EventDispatcher();
 }

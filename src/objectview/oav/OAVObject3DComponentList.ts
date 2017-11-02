@@ -140,12 +140,12 @@ module feng3d.editor
 			}
 		}
 
-		private onaddedcompont(event: EventVO<Component>)
+		private onaddedcompont(event: Event<Component>)
 		{
 			this.addComponentView(event.data);
 		}
 
-		private onremovedComponent(event: EventVO<Component>)
+		private onremovedComponent(event: Event<Component>)
 		{
 			this.removedComponentView(event.data);
 		}

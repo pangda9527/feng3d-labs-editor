@@ -103,7 +103,7 @@ module feng3d.editor
             }
         }
 
-        private onMouseWheelMoveSceneCamera(event: EventVO<any>)
+        private onMouseWheelMoveSceneCamera(event: Event<any>)
         {
             var inputEvent: InputEvent = event.data;
             var distance = inputEvent.wheelDelta * config.mouseWheelMoveStep;

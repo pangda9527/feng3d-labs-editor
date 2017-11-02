@@ -13,7 +13,7 @@ module feng3d.editor
             onAddedToStage();
         } else
         {
-            displayObject.addEventListener(egret.Event.ADDED_TO_STAGE, onAddedToStage, null);
+            displayObject.once(egret.Event.ADDED_TO_STAGE, onAddedToStage, null);
         }
 
         function onAddedToStage()
@@ -41,11 +41,5 @@ module feng3d.editor
                 maskReck.parent.removeChild(maskReck);
             }
         }
-
-        function unmask()
-        {
-            displayObject.removeEventListener(egret.Event.ADDED_TO_STAGE, onAddedToStage, null);
-        }
-        return unmask;
     }
 }

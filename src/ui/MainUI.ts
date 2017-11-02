@@ -32,6 +32,14 @@ module feng3d.editor
 
     export class MainUI extends eui.UILayer
     {
+        onComplete: () => void
+
+        constructor(onComplete: () => void = null)
+        {
+            super();
+            this.onComplete = onComplete;
+        }
+
         /**
          * 加载进度界面
          * loading process interface
@@ -101,37 +109,12 @@ module feng3d.editor
             }
         }
 
-        private mainView: MainView;
-
         private createScene()
         {
-            if (this.isThemeLoadEnd && this.isResourceLoadEnd)
+            if (this.isThemeLoadEnd && this.isResourceLoadEnd && this.onComplete)
             {
-                editorui.stage = this.stage;
-                //
-                this.mainView = new MainView();
-                this.stage.addChild(this.mainView);
-                this.onresize();
-                window.onresize = this.onresize.bind(this);
-                editorui.mainview = this.mainView;
-                //
-                var maskLayer = new eui.UILayer();
-                maskLayer.touchEnabled = false;
-                this.stage.addChild(maskLayer);
-                editorui.maskLayer = maskLayer;
-                //
-                var popupLayer = new eui.UILayer();
-                popupLayer.touchEnabled = false;
-                this.stage.addChild(popupLayer);
-                editorui.popupLayer = popupLayer;
+                this.onComplete();
             }
-        }
-
-        private onresize()
-        {
-            this.stage.setContentSize(window.innerWidth, window.innerHeight);
-            this.mainView.width = this.stage.stageWidth;
-            this.mainView.height = this.stage.stageHeight;
         }
 
         /**

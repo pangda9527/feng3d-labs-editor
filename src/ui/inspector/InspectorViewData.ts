@@ -18,7 +18,7 @@ module feng3d.editor
      * 巡视界面数据
      * @author feng     2017-03-20
      */
-    export class InspectorViewData extends Event
+    export class InspectorViewData extends EventDispatcher
     {
         viewData: any;
         viewDataList = [];

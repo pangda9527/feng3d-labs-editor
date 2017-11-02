@@ -43,7 +43,7 @@ module feng3d.editor
             this.toolModel.oCube.gameObject.off("mousedown", this.onItemMouseDown, this);
         }
 
-        protected onItemMouseDown(event: EventVO<any>)
+        protected onItemMouseDown(event: Event<any>)
         {
             if (!engine.mouseinview)
                 return;

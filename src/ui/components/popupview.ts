@@ -7,7 +7,7 @@ module feng3d.editor
         popup: popup
     };
 
-    function popup(object: Object, closecallback: () => void, param?: { width?: number, height?: number })
+    function popup<T>(object: T, closecallback?: (object: T) => void, param?: { width?: number, height?: number })
     {
         param = param || {};
         var view: eui.Component = objectview.getObjectView(object);
@@ -23,7 +23,7 @@ module feng3d.editor
         function removefromstage()
         {
             view.removeEventListener(egret.Event.REMOVED_FROM_STAGE, removefromstage, null);
-            closecallback();
+            closecallback && closecallback(object);
         }
     }
 }

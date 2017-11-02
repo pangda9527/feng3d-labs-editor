@@ -1,14 +1,29 @@
 module feng3d.editor
 {
-    export var threejsLoader = { load: load };
+    export var threejsLoader = {
+        load: load,
+    };
     var usenumberfixed = true;
 
-    function load(url: string, onParseComplete?: (group) => void)
+    function load(url: string | File, onParseComplete?: (group) => void)
     {
         var skeletonComponent: SkeletonComponent;
         //
         var loader = new window["THREE"].FBXLoader();
-        loader.load(url, onLoad, onProgress, onError)
+        if (typeof url == "string")
+        {
+            loader.load(url, onLoad, onProgress, onError)
+        }
+        else
+        {
+            var reader = new FileReader();
+            reader.addEventListener('load', function (event)
+            {
+                var scene = loader.parse(event.target["result"]);
+                onLoad(scene);
+            }, false);
+            reader.readAsArrayBuffer(url);
+        }
 
         function onLoad(scene)
         {

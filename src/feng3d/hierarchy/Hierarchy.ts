@@ -15,12 +15,12 @@ module feng3d.editor
             rootObject3D.on("removed", this.ongameobjectremoved, this);
         }
 
-        private ongameobjectadded(event: EventVO<GameObject>)
+        private ongameobjectadded(event: Event<GameObject>)
         {
             hierarchyTree.add(event.data);
         }
 
-        private ongameobjectremoved(event: EventVO<GameObject>)
+        private ongameobjectremoved(event: Event<GameObject>)
         {
             hierarchyTree.remove(event.data);
         }
@@ -35,19 +35,18 @@ module feng3d.editor
 
         private onImport()
         {
-            electron.call("selected-file", {
-                callback: (paths) =>
+            file.selectFile((file) =>
+            {
+                var reader = new FileReader();
+                reader.addEventListener('load', function (event)
                 {
-                    loadjs.load({
-                        paths: paths, onitemload: (url, content) =>
-                        {
-                            var json = JSON.parse(content);
-                            var scene = feng3d.serialization.deserialize(json);
-                            hierarchy.resetScene(scene);
-                        }
-                    });
-                }, param: { name: 'JSON', extensions: ['json'] }
-            });
+                    var content = event.target["result"];
+                    var json = JSON.parse(content);
+                    var scene = feng3d.serialization.deserialize(json);
+                    hierarchy.resetScene(scene);
+                });
+                reader.readAsText(file);
+            }, { name: 'JSON', extensions: ['json'] });
         }
 
         addGameoObjectFromAsset(path: string, parent?: GameObject)

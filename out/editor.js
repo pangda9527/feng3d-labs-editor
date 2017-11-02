@@ -4,174 +4,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-/// <reference path="native.d.ts" />
 var feng3d;
 (function (feng3d) {
-    var native;
-    (function (native) {
-        native.file = {
-            stat: stat,
-            readdir: readdir,
-            writeFile: writeFile,
-            writeJsonFile: writeJsonFile,
-            readFile: readFile,
-            mkdir: mkdir,
-            rename: rename,
-            move: move,
-            remove: remove,
-            detailStat: detailStat,
-        };
-        var fs = require("fs-extra");
-        function stat(path, callback) {
-            var stats = fs.stat(path, (err, stats) => {
-                if (err) {
-                    return callback({ message: err.message }, null);
-                }
-                if (stats) {
-                    var fileInfo = {
-                        path: path,
-                        size: stats.size,
-                        isDirectory: stats.isDirectory(),
-                        birthtime: stats.birthtime.getTime(),
-                        mtime: stats.mtime.getTime(),
-                        children: []
-                    };
-                }
-                callback(null, fileInfo);
-            });
-        }
-        function detailStat(path, depth, callback) {
-            var stats = fs.stat(path, (err, stats) => {
-                if (err) {
-                    return callback({ message: err.message }, null);
-                }
-                if (stats) {
-                    var fileInfo = {
-                        path: path,
-                        size: stats.size,
-                        isDirectory: stats.isDirectory(),
-                        birthtime: stats.birthtime.getTime(),
-                        mtime: stats.mtime.getTime(),
-                        children: []
-                    };
-                    if (fileInfo.isDirectory && depth > 0) {
-                        fileInfo.children = [];
-                        fs.readdir(path, (err, files) => {
-                            if (files.length == 0) {
-                                callback(null, fileInfo);
-                            }
-                            else {
-                                var statfiles = files.concat();
-                                statfiles.forEach(element => {
-                                    detailStat(path + "/" + element, depth - 1, (err, childInfo) => {
-                                        fileInfo.children.push(childInfo);
-                                        files.splice(files.indexOf(element), 1);
-                                        if (files.length == 0) {
-                                            callback(null, fileInfo);
-                                        }
-                                    });
-                                });
-                            }
-                        });
-                    }
-                    else {
-                        callback(null, fileInfo);
-                    }
-                }
-            });
-        }
-        function readdir(path, callback) {
-            fs.readdir(path, (err, files) => {
-                callback(rerr(err), files);
-            });
-        }
-        function writeFile(path, data, callback) {
-            fs.open(path, "w", (err, fd) => {
-                if (err) {
-                    callback && callback(rerr(err));
-                    return;
-                }
-                fs.writeFile(path, data, (err1) => {
-                    callback && callback(rerr(err1));
-                    fs.close(fd, (err) => {
-                    });
-                });
-            });
-        }
-        function readFile(path, callback) {
-            fs.open(path, "r", (err, fd) => {
-                if (err) {
-                    callback(rerr(err), undefined);
-                    return;
-                }
-                fs.readFile(path, 'utf8', (err1, data) => {
-                    callback(rerr(err1), data);
-                    fs.close(fd, (err) => {
-                    });
-                });
-            });
-        }
-        function remove(path, callback) {
-            var stat = fs.statSync(path);
-            if (!stat) {
-                console.warn("给定的路径不存在，请给出正确的路径");
-                return;
-            }
-            if (stat.isDirectory()) {
-                //返回文件和子目录的数组
-                var files = fs.readdirSync(path);
-                files.forEach(function (file, index) {
-                    remove(path + "/" + file, null);
-                });
-                //清除文件夹
-                fs.rmdirSync(path);
-            }
-            else {
-                fs.unlinkSync(path);
-            }
-            callback && callback(null);
-        }
-        function mkdir(path, callback) {
-            fs.mkdir(path, (err) => {
-                callback(rerr(err));
-            });
-        }
-        function rename(oldPath, newPath, callback) {
-            fs.rename(oldPath, newPath, (err) => {
-                callback(rerr(err));
-            });
-        }
-        function move(src, dest, callback) {
-            // var sourceFile = path.join(__dirname, fileName);
-            // var destPath = path.join(__dirname, "dest", fileName);
-            var srcstats = fs.statSync(src);
-            if (!srcstats) {
-                callback({ message: `源文件${src}不存在！` });
-                return;
-            }
-            var deststats = fs.statSync(dest);
-            if (deststats) {
-                callback({ message: `目标路径${dest}存在文件！` });
-                return;
-            }
-            var readStream = fs.createReadStream(src);
-            var writeStream = fs.createWriteStream(dest);
-            readStream.pipe(writeStream);
-            remove(src);
-            callback(null);
-        }
-        function rerr(err) {
-            if (err) {
-                var rerrobj = { message: err.message };
-            }
-            return rerrobj;
-        }
-        function writeJsonFile(path, data, callback) {
-            var content = JSON.stringify(data, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-            writeFile(path, content, callback);
-        }
-    })(native = feng3d.native || (feng3d.native = {}));
+    var editor;
+    (function (editor) {
+        /**
+         * 是否本地应用
+         */
+        editor.isNative = isSuportNative();
+    })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
+/**
+ * 判断是否支持本地操作
+ */
+function isSuportNative() {
+    return typeof require != "undefined" && require("fs") != null;
+}
 var feng3d;
 (function (feng3d) {
     var web;
@@ -245,72 +93,81 @@ var feng3d;
 (function (feng3d) {
     var web;
     (function (web) {
-        web.file = {
-            stat: stat,
-            readdir: readdir,
-            writeFile: writeFile,
-            readFile: readFile,
-            remove: remove,
-            mkdir: mkdir,
-            rename: rename,
-            move: move,
-        };
-        function stat(path, callback) {
-            web.client.callServer("file", "stat", [path], callback);
+        class WebFile {
+            selectedDirectory({ title: string }, callback) {
+            }
+            createproject(path, callback) {
+                web.client.callServer("file", "createproject", [path], callback);
+            }
+            initproject(projectpath, callback) {
+                web.client.callServer("file", "initproject", [projectpath], callback);
+            }
+            stat(path, callback) {
+                web.client.callServer("file", "stat", [path], callback);
+            }
+            detailStat(path, callback) {
+                web.client.callServer("file", "detailStat", [path], callback);
+            }
+            readdir(path, callback) {
+                web.client.callServer("file", "readdir", [path], callback);
+            }
+            writeFile(path, data, callback) {
+                web.client.callServer("file", "writeFile", [path, data], callback);
+            }
+            readFile(path, callback) {
+                web.client.callServer("file", "readFile", [path], callback);
+            }
+            remove(path, callback) {
+                web.client.callServer("file", "remove", [path], callback);
+            }
+            mkdir(path, callback) {
+                web.client.callServer("file", "mkdir", [path], callback);
+            }
+            rename(oldPath, newPath, callback) {
+                web.client.callServer("file", "rename", [oldPath, newPath], callback);
+            }
+            move(src, dest, callback) {
+                web.client.callServer("file", "move", [src, dest], callback);
+            }
         }
-        function detailStat(path, depth, callback) {
-            web.client.callServer("file", "detailStat", [path, depth], callback);
-        }
-        function readdir(path, callback) {
-            web.client.callServer("file", "readdir", [path], callback);
-        }
-        function writeFile(path, data, callback) {
-            web.client.callServer("file", "writeFile", [path, data], callback);
-        }
-        function readFile(path, callback) {
-            web.client.callServer("file", "readFile", [path], callback);
-        }
-        function remove(path, callback) {
-            web.client.callServer("file", "remove", [path], callback);
-        }
-        function mkdir(path, callback) {
-            web.client.callServer("file", "mkdir", [path], callback);
-        }
-        function rename(oldPath, newPath, callback) {
-            web.client.callServer("file", "rename", [oldPath, newPath], callback);
-        }
-        function move(src, dest, callback) {
-            web.client.callServer("file", "move", [src, dest], callback);
-        }
+        web.WebFile = WebFile;
+        web.file = new WebFile();
     })(web = feng3d.web || (feng3d.web = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        editor.file = feng3d.native.file;
-        // export var file = feng3d.web.file;
+        if (editor.isNative) {
+            editor.file = require(__dirname + "/io/native/file.js").file;
+        }
+        else {
+            editor.file = feng3d.web.file;
+        }
+        editor.file.selectFile = (callback) => {
+            selectFileCallback = callback;
+        };
+        var fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.addEventListener('change', function (event) {
+            var file = fileInput.files[0];
+            selectFileCallback(file);
+            selectFileCallback = null;
+        });
+        document.body.appendChild(fileInput);
+        window.addEventListener("click", () => {
+            if (selectFileCallback)
+                fileInput.click();
+        });
+        var selectFileCallback;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        editor.ipc = require('electron').ipcRenderer;
-        editor.shell = require('electron').shell;
-        editor.electron = { call: call };
-        var callbackautoid = 0;
-        var callbacks = {};
-        function call(id, param) {
-            var callbackid = callbackautoid++;
-            callbacks[callbackid] = param && param.callback;
-            editor.ipc.send("electron", id, callbackid, param && param.param);
-        }
-        editor.ipc.on("electron", (e, id, callbackid, param) => {
-            var callback = callbacks[callbackid];
-            callback && callback(param);
-            delete callbacks[callbackid];
-        });
+        if (editor.isNative)
+            editor.electron = require(__dirname + "/electron/rendererprocess.js").electron;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -584,7 +441,7 @@ var feng3d;
                 onAddedToStage();
             }
             else {
-                displayObject.addEventListener(egret.Event.ADDED_TO_STAGE, onAddedToStage, null);
+                displayObject.once(egret.Event.ADDED_TO_STAGE, onAddedToStage, null);
             }
             function onAddedToStage() {
                 maskReck.width = displayObject.stage.stageWidth;
@@ -605,10 +462,6 @@ var feng3d;
                     maskReck.parent.removeChild(maskReck);
                 }
             }
-            function unmask() {
-                displayObject.removeEventListener(egret.Event.ADDED_TO_STAGE, onAddedToStage, null);
-            }
-            return unmask;
         }
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -634,7 +487,7 @@ var feng3d;
             view.addEventListener(egret.Event.REMOVED_FROM_STAGE, removefromstage, null);
             function removefromstage() {
                 view.removeEventListener(egret.Event.REMOVED_FROM_STAGE, removefromstage, null);
-                closecallback();
+                closecallback && closecallback(object);
             }
         }
     })(editor = feng3d.editor || (feng3d.editor = {}));
@@ -779,7 +632,7 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        class Tree extends feng3d.Event {
+        class Tree extends feng3d.EventDispatcher {
             get rootnode() {
                 return this._rootnode;
             }
@@ -845,6 +698,8 @@ var feng3d;
             }
             getShowNodes(node) {
                 node = node || this.rootnode;
+                if (!node)
+                    return [];
                 var nodes = [node];
                 if (node.isOpen) {
                     node.children.forEach(element => {
@@ -1865,7 +1720,7 @@ var feng3d;
          * 巡视界面数据
          * @author feng     2017-03-20
          */
-        class InspectorViewData extends feng3d.Event {
+        class InspectorViewData extends feng3d.EventDispatcher {
             constructor(editor3DData) {
                 super();
                 this.viewDataList = [];
@@ -2112,7 +1967,7 @@ var feng3d;
         function initproject(path, callback) {
             var assetsPath = path + "/Assets";
             editor.file.mkdir(assetsPath, (err) => {
-                editor.file.detailStat(assetsPath, Number.MAX_VALUE, (err, fileInfo) => {
+                editor.file.detailStat(assetsPath, (err, fileInfo) => {
                     editor.assets.projectPath = path;
                     editor.assets.assetsPath = assetsPath;
                     //
@@ -2181,13 +2036,16 @@ var feng3d;
             var parentfileinfo = getFileInfo(parentdir);
             parentfileinfo.children = parentfileinfo.children || [];
             //
-            var has = parentfileinfo.children.reduce((value, a) => { return value || a.path == fileinfo.path; }, false);
-            if (!has) {
-                parentfileinfo.children.push(fileinfo);
-                parentfileinfo.children.sort(fileinfocompare);
-                if (fileinfo.isDirectory) {
-                    editor.assetstree.add(fileinfo);
+            for (var i = 0; i < parentfileinfo.children.length; i++) {
+                if (parentfileinfo.children[i].path == fileinfo.path) {
+                    parentfileinfo.children.splice(i, 1);
+                    break;
                 }
+            }
+            parentfileinfo.children.push(fileinfo);
+            parentfileinfo.children.sort(fileinfocompare);
+            if (fileinfo.isDirectory) {
+                editor.assetstree.add(fileinfo);
             }
             editor.editorui.assetsview.updateShowFloder();
         }
@@ -2253,59 +2111,67 @@ var feng3d;
                 { type: "separator" },
                 {
                     label: "导入模型", click: () => {
-                        editor.electron.call("selected-file", {
-                            callback: (path) => {
-                                if (!path)
-                                    return;
-                                path = path.replace(/\\/g, "/");
-                                var extensions = path.split(".").pop();
-                                switch (extensions) {
-                                    case "mdl":
-                                        feng3d.Loader.loadText(path, (content) => {
-                                            feng3d.war3.MdlParser.parse(content, (war3Model) => {
-                                                war3Model.root = path.substring(0, path.lastIndexOf("/") + 1);
-                                                var gameobject = war3Model.getMesh();
-                                                gameobject.name = path.split("/").pop().split(".").shift();
-                                                saveGameObject(gameobject);
-                                            });
-                                        });
-                                        break;
-                                    case "obj":
-                                        feng3d.ObjLoader.load(path, new feng3d.StandardMaterial(), function (gameobject) {
-                                            gameobject.name = path.split("/").pop().split(".").shift();
+                        editor.file.selectFile((file) => {
+                            if (!file)
+                                return;
+                            var extensions = file.name.split(".").pop();
+                            var reader = new FileReader();
+                            switch (extensions) {
+                                case "mdl":
+                                    reader.addEventListener('load', function (event) {
+                                        feng3d.war3.MdlParser.parse(event.target["result"], (war3Model) => {
+                                            war3Model.root = file.name.substring(0, file.name.lastIndexOf("/") + 1);
+                                            var gameobject = war3Model.getMesh();
+                                            gameobject.name = file.name.split("/").pop().split(".").shift();
                                             saveGameObject(gameobject);
                                         });
-                                        break;
-                                    case "fbx":
-                                        // fbxLoader.load(path, (gameobject) =>
-                                        // {
-                                        //     gameobject.name = path.split("/").pop().split(".").shift();
-                                        //     saveGameObject(gameobject);
-                                        //     // engine.root.addChild(gameobject);
-                                        // });
-                                        editor.threejsLoader.load(path, (gameobject) => {
-                                            gameobject.name = path.split("/").pop().split(".").shift();
+                                    }, false);
+                                    reader.readAsText(file);
+                                    break;
+                                case "obj":
+                                    reader.addEventListener('load', function (event) {
+                                        feng3d.ObjLoader.parse(event.target["result"], function (gameobject) {
+                                            gameobject.name = file.name.split("/").pop().split(".").shift();
+                                            saveGameObject(gameobject);
+                                        });
+                                    }, false);
+                                    reader.readAsText(file);
+                                    break;
+                                case "fbx":
+                                    // fbxLoader.load(path, (gameobject) =>
+                                    // {
+                                    //     gameobject.name = path.split("/").pop().split(".").shift();
+                                    //     saveGameObject(gameobject);
+                                    //     // engine.root.addChild(gameobject);
+                                    // });
+                                    editor.threejsLoader.load(file, (gameobject) => {
+                                        gameobject.name = file.name.split("/").pop().split(".").shift();
+                                        saveGameObject(gameobject);
+                                        // engine.root.addChild(gameobject);
+                                    });
+                                    break;
+                                case "md5mesh":
+                                    reader.addEventListener('load', function (event) {
+                                        feng3d.MD5Loader.parseMD5Mesh(event.target["result"], (gameobject) => {
+                                            gameobject.name = file.name.split("/").pop().split(".").shift();
                                             saveGameObject(gameobject);
                                             // engine.root.addChild(gameobject);
                                         });
-                                        break;
-                                    case "md5mesh":
-                                        feng3d.MD5Loader.load(path, (gameobject) => {
-                                            gameobject.name = path.split("/").pop().split(".").shift();
-                                            saveGameObject(gameobject);
-                                            // engine.root.addChild(gameobject);
-                                        });
-                                        break;
-                                    case "md5anim":
-                                        feng3d.MD5Loader.loadAnim(path, (animationclip) => {
-                                            animationclip.name = path.split("/").pop().split(".").shift();
+                                    }, false);
+                                    reader.readAsText(file);
+                                    break;
+                                case "md5anim":
+                                    reader.addEventListener('load', function (event) {
+                                        feng3d.MD5Loader.parseMD5Anim(event.target["result"], (animationclip) => {
+                                            animationclip.name = file.name.split("/").pop().split(".").shift();
                                             var obj = feng3d.serialization.serialize(animationclip);
                                             editor.assets.saveObject(obj, animationclip.name + ".anim");
                                         });
-                                        break;
-                                }
-                            }, param: { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] }
-                        });
+                                    }, false);
+                                    reader.readAsText(file);
+                                    break;
+                            }
+                        }, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
                     }
                 },
                 { type: "separator" },
@@ -2316,10 +2182,10 @@ var feng3d;
                 }
             ];
             //判断是否为本地应用
-            if (editor.shell) {
+            if (editor.electron) {
                 menuconfig.splice(0, 0, {
                     label: "open folder", click: () => {
-                        editor.shell.showItemInFolder(folderpath + "/.");
+                        editor.electron.showItemInFolder(folderpath + "/.");
                     }
                 });
             }
@@ -2376,14 +2242,13 @@ var feng3d;
             });
         }
         function move(src, dest, callback) {
-            if (dest.indexOf(src) != -1)
+            //禁止向子文件夹移动
+            if (editor.path.isParent(src, dest))
                 return;
-            editor.file.move(src, dest, (err) => {
-                var fileinfo = getFileInfo(src);
+            editor.file.move(src, dest, (err, destfileinfo) => {
                 deletefileinfo(src);
-                fileinfo.path = dest;
-                addfileinfo(fileinfo);
-                if (fileinfo.isDirectory)
+                addfileinfo(destfileinfo);
+                if (destfileinfo.isDirectory)
                     editor.editorui.assetsview.updateAssetsTree();
                 if (editor.assets.showFloder == src) {
                     editor.assets.showFloder = dest;
@@ -2409,6 +2274,17 @@ var feng3d;
             var output = JSON.stringify(object, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
             editor.assets.addfile(editor.assets.showFloder + "/" + filename, output);
         }
+        editor.path = {
+            isParent: function (parenturl, childurl) {
+                var parents = parenturl.split("/");
+                var childs = childurl.split("/");
+                for (var i = 0; i < childs.length; i++) {
+                    if (childs[i] != parent[i])
+                        return false;
+                }
+                return true;
+            }
+        };
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -2450,12 +2326,7 @@ var feng3d;
         var assetsTreeNodeMap = {};
         class AssetsTree extends editor.Tree {
             init(fileinfo) {
-                var node = assetsTreeNodeMap[fileinfo.path] = { isOpen: true, fileinfo: fileinfo, label: fileinfo.path.split("/").pop(), children: [] };
-                this.rootnode = node;
-                //
-                editor.treeMap(fileinfo, (node, parent) => {
-                    this.add(node);
-                });
+                this.rootnode = this.add(fileinfo);
             }
             getAssetsTreeNode(path) {
                 return assetsTreeNodeMap[path];
@@ -2464,19 +2335,32 @@ var feng3d;
                 var assetsTreeNode = assetsTreeNodeMap[path];
                 if (assetsTreeNode)
                     this.removeNode(assetsTreeNode);
-                delete assetsTreeNodeMap[path];
+            }
+            removeNode(assetsTreeNode) {
+                assetsTreeNode.children.forEach(element => {
+                    this.removeNode(element);
+                });
+                super.removeNode(assetsTreeNode);
+                delete assetsTreeNodeMap[assetsTreeNode.path];
             }
             add(fileinfo) {
                 if (!fileinfo.isDirectory)
                     return;
                 if (assetsTreeNodeMap[fileinfo.path])
                     return;
+                assetsTreeNodeMap[fileinfo.path] = { isOpen: true, path: fileinfo.path, fileinfo: fileinfo, label: fileinfo.path.split("/").pop(), children: [] };
+                var node = assetsTreeNodeMap[fileinfo.path];
                 var parentdir = editor.assets.getparentdir(fileinfo.path);
                 var parentassetsTreeNode = this.getAssetsTreeNode(parentdir);
-                //   
-                var node = assetsTreeNodeMap[fileinfo.path] = { isOpen: true, fileinfo: fileinfo, label: fileinfo.path.split("/").pop(), children: [] };
-                this.addNode(node, parentassetsTreeNode);
-                parentassetsTreeNode.children.sort((a, b) => { return a.label < b.label ? -1 : 1; });
+                if (parentassetsTreeNode) {
+                    this.addNode(node, parentassetsTreeNode);
+                    parentassetsTreeNode.children.sort((a, b) => { return a.label < b.label ? -1 : 1; });
+                }
+                for (var i = 0; i < fileinfo.children.length; i++) {
+                    var element = fileinfo.children[i];
+                    this.add(element);
+                }
+                return node;
             }
             getNode(path) {
                 return assetsTreeNodeMap[path];
@@ -2659,6 +2543,8 @@ var feng3d;
         class AssetsView extends eui.Component {
             constructor() {
                 super();
+                //
+                this._assetstreeInvalid = true;
                 this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
                 this.skinName = "AssetsView";
                 editor.editorui.assetsview = this;
@@ -2678,8 +2564,8 @@ var feng3d;
                 this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
                 feng3d.watcher.watch(editor.assets, "showFloder", this.updateShowFloder, this);
                 feng3d.watcher.watch(editor.editor3DData, "selectedObject", this.selectedfilechanged, this);
-                editor.assetstree.on("changed", this.updateAssetsView, this);
-                editor.assetstree.on("openChanged", this.updateAssetsTree, this);
+                editor.assetstree.on("changed", this.invalidateAssetstree, this);
+                editor.assetstree.on("openChanged", this.invalidateAssetstree, this);
                 this.excludeTxt.text = "(\\.d\\.ts|\\.js\\.map|\\.js)\\b";
                 //
                 editor.drag.register(this.filelistgroup, (dragsource) => { }, ["gameobject", "animationclip"], (dragSource) => {
@@ -2703,19 +2589,26 @@ var feng3d;
                 this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
                 feng3d.watcher.unwatch(editor.assets, "showFloder", this.updateShowFloder, this);
                 feng3d.watcher.unwatch(editor.editor3DData, "selectedObject", this.selectedfilechanged, this);
-                editor.assetstree.off("changed", this.updateAssetsView, this);
-                editor.assetstree.off("openChanged", this.updateAssetsTree, this);
+                editor.assetstree.off("changed", this.invalidateAssetstree, this);
+                editor.assetstree.off("openChanged", this.invalidateAssetstree, this);
                 //
                 editor.drag.unregister(this.filelistgroup);
             }
             initlist() {
                 editor.assets.initproject(editor.assets.projectPath, () => {
-                    this.updateAssetsView();
+                    this.invalidateAssetstree();
                 });
             }
-            updateAssetsView() {
-                this.updateAssetsTree();
-                this.updateShowFloder();
+            update() {
+                if (this._assetstreeInvalid) {
+                    this.updateAssetsTree();
+                    this.updateShowFloder();
+                    this._assetstreeInvalid = false;
+                }
+            }
+            invalidateAssetstree() {
+                this._assetstreeInvalid = true;
+                this.once(egret.Event.ENTER_FRAME, this.update, this);
             }
             updateAssetsTree() {
                 var nodes = editor.assetstree.getShowNodes();
@@ -3006,10 +2899,11 @@ var feng3d;
     var editor;
     (function (editor) {
         class MainUI extends eui.UILayer {
-            constructor() {
-                super(...arguments);
+            constructor(onComplete = null) {
+                super();
                 this.isThemeLoadEnd = false;
                 this.isResourceLoadEnd = false;
+                this.onComplete = onComplete;
             }
             createChildren() {
                 super.createChildren();
@@ -3067,30 +2961,9 @@ var feng3d;
                 }
             }
             createScene() {
-                if (this.isThemeLoadEnd && this.isResourceLoadEnd) {
-                    editor.editorui.stage = this.stage;
-                    //
-                    this.mainView = new editor.MainView();
-                    this.stage.addChild(this.mainView);
-                    this.onresize();
-                    window.onresize = this.onresize.bind(this);
-                    editor.editorui.mainview = this.mainView;
-                    //
-                    var maskLayer = new eui.UILayer();
-                    maskLayer.touchEnabled = false;
-                    this.stage.addChild(maskLayer);
-                    editor.editorui.maskLayer = maskLayer;
-                    //
-                    var popupLayer = new eui.UILayer();
-                    popupLayer.touchEnabled = false;
-                    this.stage.addChild(popupLayer);
-                    editor.editorui.popupLayer = popupLayer;
+                if (this.isThemeLoadEnd && this.isResourceLoadEnd && this.onComplete) {
+                    this.onComplete();
                 }
-            }
-            onresize() {
-                this.stage.setContentSize(window.innerWidth, window.innerHeight);
-                this.mainView.width = this.stage.stageWidth;
-                this.mainView.height = this.stage.stageHeight;
             }
             /**
              * 资源组加载出错
@@ -3204,7 +3077,7 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        class Editor3DEvent extends feng3d.Event {
+        class Editor3DEvent extends feng3d.EventDispatcher {
         }
         editor.Editor3DEvent = Editor3DEvent;
     })(editor = feng3d.editor || (feng3d.editor = {}));
@@ -4499,9 +4372,7 @@ var feng3d;
             }
             onSelectedObject3DChange() {
                 if (editor.editor3DData.selectedObject
-                    //选中的是GameObject
                     && editor.editor3DData.selectedObject instanceof feng3d.GameObject
-                    //选中的不是场景
                     && !editor.editor3DData.selectedObject.getComponent(feng3d.Scene3D)
                     && !editor.editor3DData.selectedObject.getComponent(feng3d.Trident)
                     && !editor.editor3DData.selectedObject.getComponent(editor.GroundGrid)
@@ -4634,17 +4505,16 @@ var feng3d;
                 });
             }
             onImport() {
-                editor.electron.call("selected-file", {
-                    callback: (paths) => {
-                        feng3d.loadjs.load({
-                            paths: paths, onitemload: (url, content) => {
-                                var json = JSON.parse(content);
-                                var scene = feng3d.serialization.deserialize(json);
-                                editor.hierarchy.resetScene(scene);
-                            }
-                        });
-                    }, param: { name: 'JSON', extensions: ['json'] }
-                });
+                editor.file.selectFile((file) => {
+                    var reader = new FileReader();
+                    reader.addEventListener('load', function (event) {
+                        var content = event.target["result"];
+                        var json = JSON.parse(content);
+                        var scene = feng3d.serialization.deserialize(json);
+                        editor.hierarchy.resetScene(scene);
+                    });
+                    reader.readAsText(file);
+                }, { name: 'JSON', extensions: ['json'] });
             }
             addGameoObjectFromAsset(path, parent) {
                 editor.file.readFile(path, (err, content) => {
@@ -5433,13 +5303,25 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        editor.threejsLoader = { load: load };
+        editor.threejsLoader = {
+            load: load,
+        };
         var usenumberfixed = true;
         function load(url, onParseComplete) {
             var skeletonComponent;
             //
             var loader = new window["THREE"].FBXLoader();
-            loader.load(url, onLoad, onProgress, onError);
+            if (typeof url == "string") {
+                loader.load(url, onLoad, onProgress, onError);
+            }
+            else {
+                var reader = new FileReader();
+                reader.addEventListener('load', function (event) {
+                    var scene = loader.parse(event.target["result"]);
+                    onLoad(scene);
+                }, false);
+                reader.readAsArrayBuffer(url);
+            }
             function onLoad(scene) {
                 var gameobject = parse(scene);
                 gameobject.transform.sx = -1;
@@ -5808,7 +5690,7 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        editor.$editorEventDispatcher = new feng3d.Event();
+        editor.$editorEventDispatcher = new feng3d.EventDispatcher();
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -5822,26 +5704,54 @@ var feng3d;
         class Editor extends eui.UILayer {
             constructor() {
                 super();
-                this.initeditorcache(this.init.bind(this));
+                var mainui = new editor.MainUI(() => {
+                    editor.editorui.stage = this.stage;
+                    //
+                    var maskLayer = new eui.UILayer();
+                    maskLayer.touchEnabled = false;
+                    this.stage.addChild(maskLayer);
+                    editor.editorui.maskLayer = maskLayer;
+                    //
+                    var popupLayer = new eui.UILayer();
+                    popupLayer.touchEnabled = false;
+                    this.stage.addChild(popupLayer);
+                    editor.editorui.popupLayer = popupLayer;
+                    //初始化配置
+                    editor.objectViewConfig();
+                    this.initeditorcache(this.init.bind(this));
+                    this.removeChild(mainui);
+                });
+                this.addChild(mainui);
             }
             init() {
                 //
                 editor.editor3DData = new editor.Editor3DData();
-                //初始化配置
-                editor.objectViewConfig();
                 document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editor.assets.projectPath;
                 //
                 new editor.EditorEnvironment();
+                this.initMainView();
                 //初始化feng3d
                 new editor.Main3D();
                 feng3d.shortcut.addShortCuts(shortcutConfig);
-                this.addChild(new editor.MainUI());
                 editor.editorshortcut.init();
                 this.once(egret.Event.ENTER_FRAME, function () {
                     //
                     editor.mouseEventEnvironment = new editor.MouseEventEnvironment();
                 }, this);
                 this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
+            }
+            initMainView() {
+                //
+                this.mainView = new editor.MainView();
+                this.stage.addChildAt(this.mainView, 1);
+                this.onresize();
+                window.onresize = this.onresize.bind(this);
+                editor.editorui.mainview = this.mainView;
+            }
+            onresize() {
+                this.stage.setContentSize(window.innerWidth, window.innerHeight);
+                this.mainView.width = this.stage.stageWidth;
+                this.mainView.height = this.stage.stageHeight;
             }
             initeditorcache(callback) {
                 //获取项目路径
@@ -5863,9 +5773,9 @@ var feng3d;
                     editor.file.stat(editor.editorcache.projectpath, (err, stats) => {
                         if (!err) {
                             editor.assets.projectPath = editor.editorcache.projectpath;
-                            editor.file.writeJsonFile("editorcache.json", editor.editorcache);
-                            editor.electron.call("initproject", { param: { path: editor.editorcache.projectpath } });
-                            callback();
+                            var content = JSON.stringify(editor.editorcache, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                            editor.file.writeFile("editorcache.json", content);
+                            editor.file.initproject(editor.editorcache.projectpath, callback);
                             return;
                         }
                         editor.editorcache.historyprojectpaths = editor.editorcache.historyprojectpaths || [];
@@ -5883,22 +5793,25 @@ var feng3d;
                 }
                 function createnewproject() {
                     //选择项目路径
-                    editor.electron.call("selected-directory", {
-                        param: { title: "选择项目路径" },
-                        callback: (path) => {
-                            editor.electron.call("createproject", {
-                                param: { path: path }, callback: () => {
-                                    editor.electron.call("initproject", { param: { path: path } });
-                                    editor.editorcache.projectpath = editor.assets.projectPath = path;
-                                    editor.editorcache.historyprojectpaths = editor.editorcache.historyprojectpaths = [];
-                                    if (editor.editorcache.historyprojectpaths.indexOf(path) == -1)
-                                        editor.editorcache.historyprojectpaths.unshift(path);
-                                    editor.file.writeJsonFile("editorcache.json", editor.editorcache);
-                                    callback();
-                                }
-                            });
-                        }
-                    });
+                    if (editor.isNative) {
+                        editor.electron.call("selected-directory", { param: { title: "选择项目路径" }, callback: onSeletedProjectPath });
+                    }
+                    else {
+                        editor.popupview.popup({ projectName: "" }, (obj) => {
+                            onSeletedProjectPath(obj.projectName);
+                        });
+                    }
+                    function onSeletedProjectPath(path) {
+                        editor.file.createproject(path, () => {
+                            editor.editorcache.projectpath = editor.assets.projectPath = path;
+                            editor.editorcache.historyprojectpaths = editor.editorcache.historyprojectpaths = [];
+                            if (editor.editorcache.historyprojectpaths.indexOf(path) == -1)
+                                editor.editorcache.historyprojectpaths.unshift(path);
+                            var content = JSON.stringify(editor.editorcache, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                            editor.file.writeFile("editorcache.json", content);
+                            editor.file.initproject(path, callback);
+                        });
+                    }
                 }
             }
             _onAddToStage() {
@@ -5909,24 +5822,3 @@ var feng3d;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 //# sourceMappingURL=editor.js.map
-
-(function universalModuleDefinition(root, factory)
-{
-    if (root && root["feng3d"])
-    {
-        return;
-    }
-    if (typeof exports === 'object' && typeof module === 'object')
-        module.exports = factory();
-    else if (typeof define === 'function' && define.amd)
-        define([], factory);
-    else if (typeof exports === 'object')
-        exports["feng3d"] = factory();
-    else
-    {
-        root["feng3d"] = factory();
-    }
-})(this, function ()
-{
-    return feng3d;
-});

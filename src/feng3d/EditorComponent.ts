@@ -13,7 +13,7 @@ module feng3d.editor
             this.scene3D.on("removeComponentFromScene", this.onRemoveComponentFromScene, this);
         }
 
-        private onAddComponentToScene(event: EventVO<Component>)
+        private onAddComponentToScene(event: Event<Component>)
         {
             if (event.data instanceof DirectionalLight)
             {
@@ -24,7 +24,7 @@ module feng3d.editor
             }
         }
 
-        private onRemoveComponentFromScene(event: EventVO<Component>)
+        private onRemoveComponentFromScene(event: Event<Component>)
         {
             if (event.data instanceof DirectionalLight)
             {

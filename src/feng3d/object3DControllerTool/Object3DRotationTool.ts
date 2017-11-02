@@ -35,7 +35,7 @@ module feng3d.editor
         }
 
 
-        protected onItemMouseDown(event: EventVO<any>)
+        protected onItemMouseDown(event: Event<any>)
         {
             if (!engine.mouseinview)
                 return;

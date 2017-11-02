@@ -33,7 +33,7 @@ module feng3d.editor
 		off<K extends keyof TreeEventMap>(type?: K, listener?: (event: TreeEventMap[K]) => any, thisObject?: any);
 	}
 
-	export class Tree extends Event
+	export class Tree extends EventDispatcher
 	{
 		_rootnode: TreeNode;
 		get rootnode()
@@ -127,6 +127,7 @@ module feng3d.editor
 		getShowNodes(node?: TreeNode)
 		{
 			node = node || this.rootnode;
+			if (!node) return [];
 			var nodes: TreeNode[] = [node];
 			if (node.isOpen)
 			{
