@@ -1,29 +1,38 @@
-module feng3d.editor
+namespace feng3d.editor
 {
-    export interface HierarchyNode extends TreeNode
-    {
-        gameobject: GameObject;
-        /** 
-         * 父节点
-         */
-        parent?: HierarchyNode;
-        /**
-         * 子节点列表
-         */
-        children: HierarchyNode[];
-    }
-
     var nodeMap = new Map<GameObject, HierarchyNode>();
 
     export class HierarchyTree extends Tree
     {
         rootnode: HierarchyNode;
 
+        /**
+         * 获取选中节点
+         */
+        getSelectedNode()
+        {
+            for (let i = 0; i < editorData.selectedGameObjects.length; i++)
+            {
+                var node = this.getNode(editorData.selectedGameObjects[i]);
+                if (node)
+                    return node;
+            }
+            return null;
+        }
+
         init(gameobject: GameObject)
         {
-            var hierarchyNode: HierarchyNode = { isOpen: true, gameobject: gameobject, label: gameobject.name, children: [] };
-            nodeMap.push(gameobject, hierarchyNode);
-            this.rootnode = hierarchyNode;
+            if (this.rootnode)
+                this.rootnode.destroy();
+
+            var node = new HierarchyNode({ gameobject: gameobject });
+            nodeMap.set(gameobject, node);
+
+            this.rootnode = node;
+            gameobject.children.forEach(element =>
+            {
+                this.add(element);
+            });
         }
 
         delete(gameobject: GameObject)
@@ -50,8 +59,8 @@ module feng3d.editor
             {
                 if (!node)
                 {
-                    node = { isOpen: true, gameobject: gameobject, label: gameobject.name, children: [] };
-                    nodeMap.push(gameobject, node);
+                    node = new HierarchyNode({ gameobject: gameobject });
+                    nodeMap.set(gameobject, node);
                 }
                 this.addNode(node, parentnode);
             }
@@ -59,6 +68,7 @@ module feng3d.editor
             {
                 this.add(element);
             });
+            return node;
         }
 
         remove(gameobject: GameObject)

@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export var threejsLoader = {
         load: load,
@@ -30,15 +30,15 @@ module feng3d.editor
             var gameobject = parse(scene);
             gameobject.transform.sx = -1;
             onParseComplete && onParseComplete(gameobject);
-            console.log("onLoad");
+            log("onLoad");
         }
         function onProgress(event: ProgressEvent)
         {
-            console.log(event);
+            log(event);
         }
         function onError(err)
         {
-            console.error(err);
+            error(err);
         }
 
         function parse(object3d, parent?: GameObject)
@@ -62,7 +62,7 @@ module feng3d.editor
                     var skinnedMeshRenderer = gameobject.addComponent(SkinnedMeshRenderer);
                     skinnedMeshRenderer.geometry = parseGeometry(object3d.geometry);
                     skinnedMeshRenderer.material = parseMaterial(object3d.material);
-                    console.assert(object3d.bindMode == "attached");
+                    assert(object3d.bindMode == "attached");
                     skinnedMeshRenderer.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
                         skinnedMeshRenderer.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();
@@ -83,7 +83,7 @@ module feng3d.editor
                     //Bone 由SkeletonComponent自动生成，不用解析
                     break;
                 default:
-                    console.warn(`没有提供 ${object3d.type} 类型对象的解析`);
+                    warn(`没有提供 ${object3d.type} 类型对象的解析`);
                     break;
             }
 
@@ -155,7 +155,7 @@ module feng3d.editor
                     propertyClip.propertyName = "orientation";
                     break;
                 default:
-                    console.warn(`没有处理 propertyName ${result[2]}`);
+                    warn(`没有处理 propertyName ${result[2]}`);
                     break;
             }
 
@@ -182,7 +182,7 @@ module feng3d.editor
                     }
                     break;
                 default:
-                    console.warn(`没有提供解析 ${keyframeTrack.ValueTypeName} 类型Track数据`);
+                    warn(`没有提供解析 ${keyframeTrack.ValueTypeName} 类型Track数据`);
                     break;
             }
 
@@ -245,7 +245,7 @@ module feng3d.editor
                 joints[jointsMapitem[0]].matrix3D = new Matrix3D(skinSkeletonData.boneInverses[i].elements).invert();
             } else
             {
-                console.warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);
+                warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);
             }
         }
 
@@ -282,7 +282,7 @@ module feng3d.editor
                         geo.setVAData("a_jointweight0", array, 4);
                         break;
                     default:
-                        console.warn("没有解析顶点数据", key);
+                        warn("没有解析顶点数据", key);
                         break;
                 }
             }
@@ -298,7 +298,7 @@ module feng3d.editor
     function parseMaterial(geometry)
     {
         var material = new StandardMaterial();
-        material.cullFace = GL.NONE;
+        material.cullFace = CullFace.NONE;
         return material;
     }
 

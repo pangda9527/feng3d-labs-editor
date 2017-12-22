@@ -1,32 +1,27 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es5",
         "noImplicitAny": false,
         "sourceMap": true,
         "experimentalDecorators": true,
-        "types": [
-            // "feng3d" //release
-        ],
         "outFile": "out/editor.js"
     },
     "files": [
-        "../feng3d/out/feng3d.d.ts", //debug
+        "libs/feng3d.d.ts", //debug
         //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
         "libs/modules/res/res.d.ts",
         "libs/modules/tween/tween.d.ts",
         "libs/exml.e.d.ts",
-        "io/io.d.ts",
         //
-        "src/constants.ts",
+        "libs/jszip.d.ts",
+        "libs/FileSaver.d.ts",
         //
-        "src/io/web/Client.ts",
-        "src/io/web/file.ts",
+        "src/io/FileObject.ts",
         //
+        "src/io/zipfs.ts",
         "src/io/io.ts",
-        //
-        "src/electron.ts",
         //
         "src/caches/editorcache.ts",
         //
@@ -35,6 +30,7 @@
         "src/shortcut/editorshortcut.ts",
         //
         "src/ui/Feng3dView.ts",
+        "src/ui/components/SplitGroup.ts",
         "src/ui/components/maskview.ts",
         "src/ui/components/popupview.ts",
         "src/ui/components/Accordion.ts",
@@ -42,7 +38,7 @@
         "src/ui/components/MenuItemRenderer.ts",
         "src/ui/components/Tree.ts",
         "src/ui/components/Vector3DView.ts",
-        "src/ui/components/Object3DComponentView.ts",
+        "src/ui/components/ComponentView.ts",
         "src/ui/components/menu.ts",
         //
         "src/objectview/view/OVBaseDefault.ts",
@@ -56,21 +52,21 @@
         //
         "src/objectview/oav/OAVVector3D.ts",
         "src/objectview/oav/OAVArray.ts",
-        "src/objectview/oav/OAVObject3DComponentList.ts",
+        "src/objectview/oav/OAVComponentList.ts",
         //
-        "src/ui/inspector/InspectorViewData.ts",
         "src/ui/inspector/InspectorView.ts",
         //
         "src/ui/hierarchy/HierarchyTreeItemRenderer.ts",
         "src/ui/hierarchy/HierarchyView.ts",
         //
         "src/ui/assets/assets.ts",
-        "src/ui/assets/AssetsFileNode.ts",
-        "src/ui/assets/AssetsTree.ts",
+        "src/ui/assets/AssetsFile.ts",
         "src/ui/assets/AssetsFileItemRenderer.ts",
         "src/ui/assets/AssetsTreeItemRenderer.ts",
         "src/ui/assets/AssetsView.ts",
+        "src/ui/assets/AssetsFileTemplates.ts",
         //
+        "src/ui/TopView.ts",
         "src/ui/MainView.ts",
         //
         "src/ui/AssetAdapter.ts",
@@ -78,32 +74,33 @@
         "src/ui/MainUI.ts",
         "src/ui/ThemeAdapter.ts",
         //
-        "src/ui/editorui.ts",
+        "src/global/native.ts",
+        "src/global/editorui.ts",
         //
-        "src/feng3d/data/Editor3DData.ts",
+        "src/global/EditorData.ts",
         //
-        "src/feng3d/events/Editor3DEvent.ts",
+        "src/feng3d/mrsTool/MRSToolTarget.ts",
+        "src/feng3d/mrsTool/models/MToolModel.ts",
+        "src/feng3d/mrsTool/models/RToolModel.ts",
+        "src/feng3d/mrsTool/models/SToolModel.ts",
+        "src/feng3d/mrsTool/MRSToolBase.ts",
+        "src/feng3d/mrsTool/MTool.ts",
+        "src/feng3d/mrsTool/RTool.ts",
+        "src/feng3d/mrsTool/STool.ts",
+        "src/feng3d/mrsTool/MRSTool.ts",
         //
-        "src/feng3d/object3DControllerTool/Object3DControllerTarget.ts",
-        "src/feng3d/object3DControllerTool/models/Object3DMoveModel.ts",
-        "src/feng3d/object3DControllerTool/models/Object3DRotationModel.ts",
-        "src/feng3d/object3DControllerTool/models/Object3DScaleModel.ts",
-        "src/feng3d/object3DControllerTool/Object3DControllerToolBase.ts",
-        "src/feng3d/object3DControllerTool/Object3DMoveTool.ts",
-        "src/feng3d/object3DControllerTool/Object3DRotationTool.ts",
-        "src/feng3d/object3DControllerTool/Object3DScaleTool.ts",
-        "src/feng3d/object3DControllerTool/Object3DControllerTool.ts",
-        //
+        "src/feng3d/hierarchy/HierarchyNode.ts",
         "src/feng3d/hierarchy/HierarchyTree.ts",
         "src/feng3d/hierarchy/Hierarchy.ts",
+        "src/feng3d/scene/SceneRotateTool.ts",
         "src/feng3d/scene/SceneControl.ts",
         "src/feng3d/GroundGrid.ts",
         "src/feng3d/Main3D.ts",
         "src/feng3d/EditorComponent.ts",
         //
-        "src/EditorEnvironment.ts",
-        "src/MouseEvent.ts",
-        "src/MouseEventEnvironment.ts",
+        "src/global/EditorEnvironment.ts",
+        "src/global/MouseEvent.ts",
+        "src/global/MouseEventEnvironment.ts",
         //
         "src/scripts/MouseRayTestScript.ts",
         "src/scripts/DirectionLightIcon.ts",
@@ -115,7 +112,7 @@
         "src/configs/CommonConfig.ts",
         "src/configs/ObjectViewConfig.ts",
         "src/configs/ShortcutConfig.ts",
-        "src/EditorEvent.ts",
+        "src/global/EditorEvent.ts",
         "src/Editor.ts"
     ]
 }

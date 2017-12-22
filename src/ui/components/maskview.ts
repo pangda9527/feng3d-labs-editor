@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export var maskview = {
         mask: mask,
@@ -22,7 +22,7 @@ module feng3d.editor
             maskReck.height = displayObject.stage.stageHeight;
             editorui.popupLayer.addChildAt(maskReck, 0);
             //
-            maskReck.addEventListener(MouseEvent.CLICK, removeDisplayObject, null);
+            maskReck.addEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
             displayObject.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromStage, null);
         }
 
@@ -34,7 +34,7 @@ module feng3d.editor
 
         function onRemoveFromStage()
         {
-            maskReck.removeEventListener(MouseEvent.CLICK, removeDisplayObject, null);
+            maskReck.removeEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
             displayObject.removeEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromStage, null);
             if (maskReck.parent)
             {

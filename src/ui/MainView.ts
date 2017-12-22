@@ -1,20 +1,7 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class MainView extends eui.Component implements eui.UIComponent
 	{
-		mainGroup: eui.Group;
-		topGroup: eui.Group;
-		mainButton: eui.Button;
-		moveButton: eui.ToggleButton;
-		rotateButton: eui.ToggleButton;
-		scaleButton: eui.ToggleButton;
-		helpButton: eui.Button;
-		settingButton: eui.Button;
-		hierachyGroup: eui.Group;
-		assetsGroup: eui.Group;
-
-		private watchers: eui.Watcher[] = [];
-
 		constructor()
 		{
 			super();
@@ -36,62 +23,10 @@ module feng3d.editor
 
 		private onAddedToStage()
 		{
-			this.moveButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
-			this.rotateButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
-			this.scaleButton.addEventListener(MouseEvent.CLICK, this.onButtonClick, this);
-			this.helpButton.addEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
-			this.settingButton.addEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
-
-			this.watchers.push(
-				eui.Watcher.watch(editor3DData, ["object3DOperationID"], this.onObject3DOperationIDChange, this)
-			);
 		}
 
 		private onRemovedFromStage()
 		{
-			this.moveButton.removeEventListener(MouseEvent.CLICK, this.onButtonClick, this);
-			this.rotateButton.removeEventListener(MouseEvent.CLICK, this.onButtonClick, this);
-			this.scaleButton.removeEventListener(MouseEvent.CLICK, this.onButtonClick, this);
-			this.helpButton.removeEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
-			this.settingButton.removeEventListener(MouseEvent.CLICK, this.onHelpButtonClick, this);
-
-			while (this.watchers.length > 0)
-			{
-				this.watchers.pop().unwatch();
-			}
-		}
-
-		private onMainMenu(item: { label: string; command: string; })
-		{
-			$editorEventDispatcher.dispatch(<any>item.command);
-		}
-
-		private onHelpButtonClick()
-		{
-			window.open("index.md");
-		}
-
-		private onButtonClick(event: egret.TouchEvent)
-		{
-			switch (event.currentTarget)
-			{
-				case this.moveButton:
-					editor3DData.object3DOperationID = 0;
-					break;
-				case this.rotateButton:
-					editor3DData.object3DOperationID = 1;
-					break;
-				case this.scaleButton:
-					editor3DData.object3DOperationID = 2;
-					break;
-			}
-		}
-
-		private onObject3DOperationIDChange()
-		{
-			this.moveButton.selected = editor3DData.object3DOperationID == 0;
-			this.rotateButton.selected = editor3DData.object3DOperationID == 1;
-			this.scaleButton.selected = editor3DData.object3DOperationID == 2;
 		}
 	}
 }

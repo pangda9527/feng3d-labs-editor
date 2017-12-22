@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class TreeItemRenderer extends eui.ItemRenderer
     {
@@ -24,7 +24,7 @@ module feng3d.editor
             super.$onAddToStage(stage, nestLevel)
 
             //
-            this.disclosureButton.addEventListener(MouseEvent.CLICK, this.onDisclosureButtonClick, this);
+            this.disclosureButton.addEventListener(egret.MouseEvent.CLICK, this.onDisclosureButtonClick, this);
 
             this.watchers.push(
                 eui.Watcher.watch(this, ["data", "depth"], this.updateView, this),
@@ -50,7 +50,7 @@ module feng3d.editor
             }
 
             //
-            this.disclosureButton.removeEventListener(MouseEvent.CLICK, this.onDisclosureButtonClick, this);
+            this.disclosureButton.removeEventListener(egret.MouseEvent.CLICK, this.onDisclosureButtonClick, this);
         }
 
         private onDisclosureButtonClick()

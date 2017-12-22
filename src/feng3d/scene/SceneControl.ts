@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class SceneControl
     {
@@ -11,7 +11,7 @@ module feng3d.editor
             this.fpsController = engine.camera.gameObject.addComponent(FPSController);
             this.fpsController.auto = false;
             //
-            shortcut.on("lookToSelectedObject3D", this.onLookToSelectedObject3D, this);
+            shortcut.on("lookToSelectedGameObject", this.onLookToSelectedGameObject, this);
             shortcut.on("dragSceneStart", this.onDragSceneStart, this);
             shortcut.on("dragScene", this.onDragScene, this);
             shortcut.on("fpsViewStart", this.onFpsViewStart, this);
@@ -20,17 +20,59 @@ module feng3d.editor
             shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
             shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
+            editorDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
+        }
+
+        private onEditorCameraRotate(e: Event<Vector3D>)
+        {
+            var resultRotation = e.data;
+            var camera = engine.camera;
+            var forward = camera.transform.forwardVector;
+            var lookDistance: number;
+            if (editorData.selectedGameObjects.length > 0)
+            {
+                //计算观察距离
+                var selectedObj = editorData.selectedGameObjects[0];
+                var lookray = selectedObj.transform.scenePosition.subtract(camera.transform.scenePosition);
+                lookDistance = Math.max(0, forward.dotProduct(lookray));
+            } else
+            {
+                lookDistance = sceneControlConfig.lookDistance;
+            }
+            //旋转中心
+            var rotateCenter = camera.transform.scenePosition.add(forward.scaleBy(lookDistance));
+            //计算目标四元素旋转
+            var targetQuat = new Quaternion();
+            resultRotation.scaleBy(Math.DEG2RAD);
+            targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
+            //
+            var sourceQuat = new Quaternion();
+            sourceQuat.fromEulerAngles(camera.transform.rx * Math.DEG2RAD, camera.transform.ry * Math.DEG2RAD, camera.transform.rz * Math.DEG2RAD)
+            var rate = { rate: 0.0 };
+            egret.Tween.get(rate, {
+                onChange: () =>
+                {
+                    var cameraQuat = new Quaternion();
+                    cameraQuat.slerp(sourceQuat, targetQuat, rate.rate);
+                    camera.transform.orientation = cameraQuat;
+                    //
+                    var translation = camera.transform.forwardVector;
+                    translation.negate();
+                    translation.scaleBy(lookDistance);
+                    camera.transform.position = rotateCenter.add(translation);
+                },
+            }).to({ rate: 1 }, 300, egret.Ease.sineIn);
         }
 
         private onDragSceneStart()
         {
-            this.dragSceneMousePoint = new Point(input.clientX, input.clientY);
+            this.dragSceneMousePoint = new Point(windowEventProxy.clientX, windowEventProxy.clientY);
             this.dragSceneCameraGlobalMatrix3D = engine.camera.transform.localToWorldMatrix.clone();
         }
 
         private onDragScene()
         {
-            var mousePoint = new Point(input.clientX, input.clientY);
+            var mousePoint = new Point(windowEventProxy.clientX, windowEventProxy.clientY);
             var addPoint = mousePoint.subtract(this.dragSceneMousePoint);
             var scale = engine.camera.getScaleByDepth(300);
             var up = this.dragSceneCameraGlobalMatrix3D.up;
@@ -57,16 +99,18 @@ module feng3d.editor
         private rotateSceneMousePoint: Point;
         private onMouseRotateSceneStart()
         {
-            this.rotateSceneMousePoint = new Point(input.clientX, input.clientY);
+            this.rotateSceneMousePoint = new Point(windowEventProxy.clientX, windowEventProxy.clientY);
             this.rotateSceneCameraGlobalMatrix3D = engine.camera.transform.localToWorldMatrix.clone();
             this.rotateSceneCenter = null;
-            if (editor3DData.selectedObject && editor3DData.selectedObject instanceof GameObject)
+            //获取第一个 游戏对象
+            var firstObject = editorData.firstSelectedGameObject;
+            if (firstObject)
             {
-                this.rotateSceneCenter = editor3DData.selectedObject.transform.scenePosition;
+                this.rotateSceneCenter = firstObject.transform.scenePosition;
             } else
             {
                 this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
-                this.rotateSceneCenter.scaleBy(config.lookDistance);
+                this.rotateSceneCenter.scaleBy(sceneControlConfig.lookDistance);
                 this.rotateSceneCenter = this.rotateSceneCenter.add(this.rotateSceneCameraGlobalMatrix3D.position);
             }
         }
@@ -74,7 +118,7 @@ module feng3d.editor
         private onMouseRotateScene()
         {
             var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
-            var mousePoint = new Point(input.clientX, input.clientY);
+            var mousePoint = new Point(windowEventProxy.clientX, windowEventProxy.clientY);
             var view3DRect = engine.viewRect;
             var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
             var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
@@ -84,31 +128,30 @@ module feng3d.editor
             engine.camera.transform.localToWorldMatrix = globalMatrix3D;
         }
 
-        private onLookToSelectedObject3D()
+        private onLookToSelectedGameObject()
         {
-            var selectedObject3D = editor3DData.selectedObject;
-            if (selectedObject3D && selectedObject3D instanceof GameObject)
+            var selectedGameObject = editorData.firstSelectedGameObject;
+            if (selectedGameObject)
             {
-                var cameraObject3D = engine.camera;
-                config.lookDistance = config.defaultLookDistance;
-                var lookPos = cameraObject3D.transform.localToWorldMatrix.forward;
-                lookPos.scaleBy(-config.lookDistance);
-                lookPos.incrementBy(selectedObject3D.transform.scenePosition);
+                var cameraGameObject = engine.camera;
+                sceneControlConfig.lookDistance = sceneControlConfig.defaultLookDistance;
+                var lookPos = cameraGameObject.transform.localToWorldMatrix.forward;
+                lookPos.scaleBy(-sceneControlConfig.lookDistance);
+                lookPos.incrementBy(selectedGameObject.transform.scenePosition);
                 var localLookPos = lookPos.clone();
-                if (cameraObject3D.transform.parent)
+                if (cameraGameObject.transform.parent)
                 {
-                    cameraObject3D.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
+                    cameraGameObject.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
                 }
                 egret.Tween.get(engine.camera.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
             }
         }
 
-        private onMouseWheelMoveSceneCamera(event: Event<any>)
+        private onMouseWheelMoveSceneCamera()
         {
-            var inputEvent: InputEvent = event.data;
-            var distance = inputEvent.wheelDelta * config.mouseWheelMoveStep;
+            var distance = windowEventProxy.wheelDelta * sceneControlConfig.mouseWheelMoveStep;
             engine.camera.transform.localToWorldMatrix = engine.camera.transform.localToWorldMatrix.moveForward(distance);
-            config.lookDistance -= distance;
+            sceneControlConfig.lookDistance -= distance;
         }
     }
 
@@ -119,6 +162,8 @@ module feng3d.editor
 
         //dynamic
         lookDistance = 300;
+
+        sceneCameraForwardBackwardStep = 1;
     }
-    var config = new SceneControlConfig();
+    export var sceneControlConfig = new SceneControlConfig();
 }

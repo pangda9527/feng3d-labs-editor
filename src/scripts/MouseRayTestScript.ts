@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class MouseRayTestScript extends Script
     {
@@ -6,7 +6,7 @@ module feng3d.editor
         {
             super.init(gameObject);
 
-            input.on("click", this.onclick, this);
+            windowEventProxy.on("click", this.onclick, this);
         }
 
         private onclick()
@@ -55,7 +55,7 @@ module feng3d.editor
          */
         dispose()
         {
-            input.off("click", this.onclick, this);
+            windowEventProxy.off("click", this.onclick, this);
         }
     }
 }

@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class Vector3DView extends eui.Component implements eui.UIComponent
 	{

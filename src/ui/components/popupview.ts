@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     /**
      * 弹出一个objectview界面，点击其它区域关闭界面，并且调用关闭回调

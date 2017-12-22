@@ -21,5 +21,3 @@ app.on("ready", function ()
     mainWindow.webContents.openDevTools();
     // console.log('app.ready:...chrome=', process.versions['chrome'], process.versions['v8']);
 });
-
-require("./electron/mainprocess.js");

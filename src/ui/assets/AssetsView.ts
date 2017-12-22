@@ -1,18 +1,22 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class AssetsView extends eui.Component implements eui.UIComponent
     {
-
         public treelist: eui.List;
         public floderpathTxt: eui.Label;
         public includeTxt: eui.TextInput;
         public excludeTxt: eui.TextInput;
         public filelistgroup: eui.Group;
         public filelist: eui.List;
+        public filepathLabel: eui.Label;
+        //
+        private viewdata = { selectfilename: "" };
         //
         private _assetstreeInvalid = true;
         private listData: eui.ArrayCollection;
         private filelistData: eui.ArrayCollection;
+
+        private fileDrag: FileDrag;
 
         constructor()
         {
@@ -20,6 +24,8 @@ module feng3d.editor
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "AssetsView";
             editorui.assetsview = this;
+
+            this.fileDrag = new FileDrag(this);
         }
 
         private onComplete(): void
@@ -35,7 +41,8 @@ module feng3d.editor
         {
             super.$onAddToStage(stage, nestLevel);
 
-            this.filelist.addEventListener(MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
+            this.filelist.addEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
+            this.filelist.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
 
@@ -43,27 +50,40 @@ module feng3d.editor
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
             feng3d.watcher.watch(assets, "showFloder", this.updateShowFloder, this);
-            feng3d.watcher.watch(editor3DData, "selectedObject", this.selectedfilechanged, this);
-            assetstree.on("changed", this.invalidateAssetstree, this);
-            assetstree.on("openChanged", this.invalidateAssetstree, this);
+
+            watcher.watch(editorData, "selectedObjects", this.selectedfilechanged, this);
+
+            assetsDispather.on("changed", this.invalidateAssetstree, this);
+            assetsDispather.on("openChanged", this.invalidateAssetstree, this);
 
             this.excludeTxt.text = "(\\.d\\.ts|\\.js\\.map|\\.js)\\b";
 
             //
-            drag.register(this.filelistgroup, (dragsource) => { }, ["gameobject", "animationclip"], (dragSource) =>
+            drag.register(this.filelistgroup, (dragsource) => { }, ["gameobject", "animationclip", "material", "geometry"], (dragSource) =>
             {
                 if (dragSource.gameobject)
                 {
-                    var gameObject: GameObject = dragSource.gameobject;
-                    assets.saveGameObject(gameObject);
+                    var gameobject: GameObject = dragSource.gameobject;
+                    assets.saveObject(gameobject, gameobject.name + ".gameobject");
                 }
                 if (dragSource.animationclip)
                 {
                     var animationclip = dragSource.animationclip;
-                    var obj = serialization.serialize(animationclip);
-                    assets.saveObject(obj, animationclip.name + ".anim");
+                    assets.saveObject(gameobject, animationclip.name + ".anim");
+                }
+                if (dragSource.material)
+                {
+                    var material = dragSource.material;
+                    assets.saveObject(gameobject, material.shaderName + ".material");
+                }
+                if (dragSource.geometry)
+                {
+                    var geometry = dragSource.geometry;
+                    assets.saveObject(gameobject, geometry.name + ".geometry");
                 }
             });
+
+            this.fileDrag.addEventListener();
 
             this.initlist();
         }
@@ -72,19 +92,24 @@ module feng3d.editor
         {
             super.$onRemoveFromStage();
 
-            this.filelist.removeEventListener(MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
+            this.filelist.removeEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
+            this.filelist.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
 
             this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
             feng3d.watcher.unwatch(assets, "showFloder", this.updateShowFloder, this);
-            feng3d.watcher.unwatch(editor3DData, "selectedObject", this.selectedfilechanged, this);
-            assetstree.off("changed", this.invalidateAssetstree, this);
-            assetstree.off("openChanged", this.invalidateAssetstree, this);
+
+            watcher.unwatch(editorData, "selectedObjects", this.selectedfilechanged, this);
+
+            assetsDispather.off("changed", this.invalidateAssetstree, this);
+            assetsDispather.off("openChanged", this.invalidateAssetstree, this);
 
             //
             drag.unregister(this.filelistgroup);
+
+            this.fileDrag.removeEventListener();
         }
 
         private initlist()
@@ -113,7 +138,19 @@ module feng3d.editor
 
         updateAssetsTree()
         {
-            var nodes = assetstree.getShowNodes();
+            var nodes = assets.filter((file) =>
+            {
+                if (file.isDirectory)
+                {
+                    file.depth = file.parent ? file.parent.depth + 1 : 0;
+                    return true;
+                }
+            }, (assetsFile) =>
+                {
+                    if (assetsFile.isOpen)
+                        return true;
+                });
+
             this.listData.replaceAll(nodes);
         }
 
@@ -121,18 +158,18 @@ module feng3d.editor
         {
             if (oldvalue)
             {
-                var oldnode = assetstree.getAssetsTreeNode(oldvalue);
+                var oldnode = assets.getFile(oldvalue);
                 if (oldnode)
                 {
-                    oldnode.selected = false;
+                    oldnode.currentOpenDirectory = false;
                 }
             }
             if (assets.showFloder)
             {
-                var newnode = assetstree.getAssetsTreeNode(assets.showFloder);
+                var newnode = assets.getFile(assets.showFloder);
                 if (newnode)
                 {
-                    newnode.selected = true;
+                    newnode.currentOpenDirectory = true;
                 }
             }
 
@@ -151,7 +188,7 @@ module feng3d.editor
             while (floders.length > 0)
             this.floderpathTxt.textFlow = textFlow;
 
-            var fileinfo = assets.getFileInfo(assets.showFloder);
+            var fileinfo = assets.getFile(assets.showFloder);
             if (fileinfo)
             {
                 try
@@ -183,7 +220,18 @@ module feng3d.editor
                     }
                     return true;
                 });
-                var nodes = fileinfos.map((value) => { return new AssetsFileNode(value); });
+                var nodes = fileinfos.map((value) => { return value; });
+                nodes = nodes.sort((a, b) =>
+                {
+                    if (a.isDirectory > b.isDirectory)
+                        return -1;
+                    if (a.isDirectory < b.isDirectory)
+                        return 1;
+                    if (a.path < b.path)
+                        return -1;
+                    return 1;
+                });
+
                 this.filelistData.replaceAll(nodes);
             }
             this.selectedfilechanged();
@@ -196,18 +244,31 @@ module feng3d.editor
 
         private selectedfilechanged()
         {
-            this.filelistData.source.forEach(element =>
+            var selectedAssetsFile = editorData.selectedAssetsFile;
+            this.viewdata.selectfilename = "";
+            var assetsFiles: AssetsFile[] = this.filelistData.source;
+            assetsFiles.forEach(element =>
             {
-                element.selected = element.fileinfo == editor3DData.selectedObject;
+                element.selected = selectedAssetsFile.indexOf(element) != -1;
+                if (element.selected)
+                    this.viewdata.selectfilename = element.name;
             });
         }
 
-        private onfilelistrightclick()
+        private onfilelistclick(e: egret.MouseEvent)
         {
-            var fileinfo = assets.getFileInfo(assets.showFloder);
-            if (fileinfo)
+            if (e.target == this.filelist)
             {
-                assets.popupmenu(fileinfo);
+                editorData.selectObject(null)
+            }
+        }
+
+        private onfilelistrightclick(e: egret.MouseEvent)
+        {
+            var assetsFile = assets.getFile(assets.showFloder);
+            if (assetsFile)
+            {
+                assets.popupmenu(assetsFile);
             }
         }
 
@@ -216,4 +277,51 @@ module feng3d.editor
             assets.showFloder = evt.text;
         }
     }
+
+    class FileDrag
+    {
+        addEventListener: () => void
+        removeEventListener: () => void;
+
+        constructor(displayobject: egret.DisplayObject)
+        {
+            this.addEventListener = () =>
+            {
+                document.addEventListener("dragenter", dragenter, false);
+                document.addEventListener("dragover", dragover, false);
+                document.addEventListener("drop", drop, false);
+            }
+
+            this.removeEventListener = () =>
+            {
+                document.removeEventListener("dragenter", dragenter, false);
+                document.removeEventListener("dragover", dragover, false);
+                document.removeEventListener("drop", drop, false);
+            }
+
+            function dragenter(e)
+            {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            function dragover(e)
+            {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            function drop(e: DragEvent)
+            {
+                e.stopPropagation();
+                e.preventDefault();
+                var dt = e.dataTransfer;
+                var files = dt.files;
+                if (displayobject.getTransformedBounds(displayobject.stage).contains(e.clientX, e.clientY))
+                {
+                    assets.inputFiles(files);
+                }
+            }
+        }
+    }
+
+
 }

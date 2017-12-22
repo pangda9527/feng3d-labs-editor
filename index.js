@@ -1,6 +1,16 @@
+var isdebug = true;
+
 loadjs([
-    `../feng3d/out/feng3d.js`, //debug
-    // `node_modules/feng3d/out/feng3d.js`,  //release
+    `libs/feng3d.js`,
+    //
+    isdebug ? "libs/modules/egret/egret.js" : "libs/modules/egret/egret.js",
+    isdebug ? "libs/modules/egret/egret.web.js" : "libs/modules/egret/egret.web.min.js",
+    isdebug ? "libs/modules/res/res.js" : "libs/modules/res/res.min.js",
+    isdebug ? "libs/modules/eui/eui.js" : "libs/modules/eui/eui.min.js",
+    isdebug ? "libs/modules/tween/tween.js" : "libs/modules/tween/tween.min.js",
+    //
+    isdebug ? `libs/jszip.js` : "libs/jszip.min.js",
+    isdebug ? `libs/FileSaver.js` : `libs/FileSaver.min.js`,
     `out/editor.js`,
 ], loadComplete);
 
@@ -42,7 +52,6 @@ function loadjs(path, onload, onerror)
             }, onerror);
         }
     }
-
 }
 
 function loadComplete()

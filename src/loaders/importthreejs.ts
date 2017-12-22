@@ -1,10 +1,12 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     loadjs.load({
         paths: [
             "threejs/three.js",
             // <!-- FBX -->
 
+            "threejs/libs/inflate.min.js",
+            //
             "threejs/loaders/AMFLoader.js",
             "threejs/loaders/AWDLoader.js",
             "threejs/loaders/BabylonLoader.js",
@@ -35,7 +37,7 @@ module feng3d.editor
                 return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
             };
 
-            // console.log("提供解析的 three.js 初始化完成，")
+            // log("提供解析的 three.js 初始化完成，")
         }
     });
 }

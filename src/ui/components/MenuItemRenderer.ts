@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class MenuItemRenderer extends eui.ItemRenderer
     {
@@ -29,14 +29,14 @@ module feng3d.editor
 
         private onAddedToStage()
         {
-            this.addEventListener(MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false, 1000);
+            this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false, 1000);
 
             this.updateView();
         }
 
         private onRemovedFromStage()
         {
-            this.removeEventListener(MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false);
+            this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false);
         }
 
         private updateView()

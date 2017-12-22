@@ -1,6 +1,7 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export var engine: Engine;
+    export var editorCamera: Camera;
 
     /**
     * 编辑器3D入口
@@ -15,28 +16,22 @@ module feng3d.editor
 
         private init()
         {
-            var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
-            engine = new Engine(canvas);
-            engine.scene.background = new Color(0.4, 0.4, 0.4, 1.0);
+            //
+            editorCamera = GameObject.create("editorCamera").addComponent(Camera);
+            editorCamera.transform.z = 500;
+            editorCamera.transform.y = 300;
+            editorCamera.transform.lookAt(new Vector3D());
 
-            engine.root.addComponent(EditorComponent);
+            var scene = this.newScene();
 
-            hierarchy = new Hierarchy(engine.root);
+            hierarchy = new Hierarchy(scene.gameObject);
 
             //
-            var camera = engine.camera;
-            camera.transform.z = 500;
-            camera.transform.y = 300;
-            camera.transform.lookAt(new Vector3D());
+            var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
+            engine = new Engine(canvas, scene, editorCamera);
+            scene.background = new Color(0.4, 0.4, 0.4, 1.0);
 
-            var trident = GameObject.create("Trident");
-            trident.addComponent(Trident);
-            trident.mouseEnabled = false;
-            engine.root.addChild(trident);
-
-            //初始化模块
-            var groundGrid = GameObject.create("GroundGrid").addComponent(GroundGrid);
-            engine.root.addChild(groundGrid.gameObject);
+            engine.root.addComponent(EditorComponent);
 
             var cubeTexture = new TextureCube([
                 'resource/3d/skybox/px.jpg',
@@ -47,23 +42,25 @@ module feng3d.editor
                 'resource/3d/skybox/nz.jpg',
             ]);
 
-            var skybox = GameObject.create("skybox");
-            skybox.mouseEnabled = false;
-            var skyBoxComponent = skybox.addComponent(SkyBox);
+            var skyBoxComponent = scene.gameObject.addComponent(SkyBox);
             skyBoxComponent.texture = cubeTexture;
-            engine.root.addChild(skybox);
+
+            this.test();
+        }
+
+        private newScene()
+        {
+            var scene = GameObject.create("Untitled").addComponent(Scene3D)
+
+            var camera = GameObjectFactory.createCamera("Main Camera");
+            scene.gameObject.addChild(camera);
 
             var directionalLight = GameObject.create("DirectionalLight");
             directionalLight.addComponent(DirectionalLight);
             directionalLight.transform.rx = 120;
-            engine.root.addChild(directionalLight)
+            scene.gameObject.addChild(directionalLight);
 
-            var object3DControllerTool = GameObject.create("object3DControllerTool").addComponent(Object3DControllerTool);
-
-            //
-            var sceneControl = new SceneControl();
-
-            this.test();
+            return scene;
         }
 
         private test()
@@ -77,7 +74,7 @@ module feng3d.editor
                     gameobject = gameobject.parent;
                     names.push(gameobject.name);
                 }
-                // console.log(event.type, names.reverse().join("->"));
+                // log(event.type, names.reverse().join("->"));
             }, this);
         }
     }

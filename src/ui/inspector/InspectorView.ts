@@ -1,7 +1,7 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	/**
-     * 巡视界面
+     * 属性面板（检查器）
      * @author feng     2017-03-20
      */
 	export class InspectorView extends eui.Component implements eui.UIComponent
@@ -12,7 +12,8 @@ module feng3d.editor
 		//
 		private view: eui.Component;
 
-		private inspectorViewData: InspectorViewData
+		viewData: any;
+		viewDataList = [];
 
 		constructor()
 		{
@@ -28,6 +29,8 @@ module feng3d.editor
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
 			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
+			editorui.inspectorView = this;
+
 			if (this.stage)
 			{
 				this.onAddedToStage();
@@ -36,43 +39,73 @@ module feng3d.editor
 
 		private onAddedToStage()
 		{
-			this.inspectorViewData = editor3DData.inspectorViewData;
-			this.inspectorViewData.on("change", this.onDataChange, this);
-			this.backButton.addEventListener(MouseEvent.CLICK, this.onBackClick, this);
+			this.backButton.visible = this.viewDataList.length > 0;
 
-			this.backButton.visible = this.inspectorViewData.viewDataList.length > 0;
+			this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
+			watcher.watch(editorData, "selectedObjects", this.onDataChange, this);
 		}
 
 		private onRemovedFromStage()
 		{
-			this.inspectorViewData.off("change", this.onDataChange, this);
-			this.backButton.removeEventListener(MouseEvent.CLICK, this.onBackClick, this);
-			this.inspectorViewData = null;
+			this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
+			watcher.watch(editorData, "selectedObjects", this.onDataChange, this);
 		}
 
 		private onDataChange()
 		{
-			this.updateView();
+			var selectedObject = editorData.selectedObjects;
+			if (selectedObject && selectedObject.length > 0)
+				this.showData(selectedObject[0], true)
+			else
+				this.showData(null, true)
 		}
 
 		private updateView()
 		{
-			this.backButton.visible = this.inspectorViewData.viewDataList.length > 0;
+			this.backButton.visible = this.viewDataList.length > 0;
 			if (this.view && this.view.parent)
 			{
 				this.view.parent.removeChild(this.view);
 			}
-			if (this.inspectorViewData.viewData)
+			if (this.viewData)
 			{
-				this.view = objectview.getObjectView(this.inspectorViewData.viewData);
-				this.view.percentWidth = 100;
-				this.group.addChild(this.view);
+				if (this.viewData instanceof AssetsFile)
+				{
+					this.viewData.showInspectorData((showdata) =>
+					{
+						this.view = objectview.getObjectView(showdata);
+						this.view.percentWidth = 100;
+						this.group.addChild(this.view);
+					});
+				} else
+				{
+					this.view = objectview.getObjectView(this.viewData);
+					this.view.percentWidth = 100;
+					this.group.addChild(this.view);
+				}
+
 			}
 		}
 
-		private onBackClick()
+		showData(data: any, removeBack = false)
 		{
-			this.inspectorViewData.back();
+			if (this.viewData)
+			{
+				this.viewDataList.push(this.viewData);
+			}
+			if (removeBack)
+			{
+				this.viewDataList.length = 0;
+			}
+			//
+			this.viewData = data;
+			this.updateView();
+		}
+
+		onBackButton()
+		{
+			this.viewData = this.viewDataList.pop();
+			this.updateView();
 		}
 	}
 }

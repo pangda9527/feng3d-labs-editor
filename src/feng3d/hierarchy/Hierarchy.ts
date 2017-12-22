@@ -1,18 +1,17 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export var hierarchy: Hierarchy;
 
     export class Hierarchy
     {
-        constructor(rootObject3D: GameObject)
+        constructor(rootGameObject: GameObject)
         {
-            hierarchyTree.init(rootObject3D);
+            hierarchyTree.init(rootGameObject);
 
             //
-            $editorEventDispatcher.on("saveScene", this.onSaveScene, this);
-            $editorEventDispatcher.on("import", this.onImport, this);
-            rootObject3D.on("added", this.ongameobjectadded, this);
-            rootObject3D.on("removed", this.ongameobjectremoved, this);
+            editorDispatcher.on("import", this.onImport, this);
+            rootGameObject.on("added", this.ongameobjectadded, this);
+            rootGameObject.on("removed", this.ongameobjectremoved, this);
         }
 
         private ongameobjectadded(event: Event<GameObject>)
@@ -29,13 +28,12 @@ module feng3d.editor
         {
             scene.children.forEach(element =>
             {
-                // this.addObject3D(element, null, true);
             });
         }
 
         private onImport()
         {
-            file.selectFile((file) =>
+            fs.selectFile((file) =>
             {
                 var reader = new FileReader();
                 reader.addEventListener('load', function (event)
@@ -45,13 +43,13 @@ module feng3d.editor
                     var scene = feng3d.serialization.deserialize(json);
                     hierarchy.resetScene(scene);
                 });
-                reader.readAsText(file);
+                reader.readAsText(file[0]);
             }, { name: 'JSON', extensions: ['json'] });
         }
 
         addGameoObjectFromAsset(path: string, parent?: GameObject)
         {
-            file.readFile(path, (err, content) =>
+            fs.readFile(path, (err, content) =>
             {
                 var json = JSON.parse(content);
                 var gameobject = serialization.deserialize(json);
@@ -60,13 +58,8 @@ module feng3d.editor
                     parent.addChild(gameobject);
                 else
                     hierarchyTree.rootnode.gameobject.addChild(gameobject);
-                editor3DData.selectedObject = gameobject;
+                editorData.selectObject(gameobject);
             });
-        }
-
-        private onSaveScene()
-        {
-            assets.saveGameObject(hierarchyTree.rootnode.gameobject);
         }
     }
 }

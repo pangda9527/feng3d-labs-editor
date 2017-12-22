@@ -1,5 +1,31 @@
-module feng3d.editor
+namespace feng3d.editor
 {
+    export var mainMenu: MenuItem[] = [
+        {
+            label: "新建项目", click: () =>
+            {
+                popupview.popup({ newprojectname: "newproject" }, (data) =>
+                {
+                    if (data.newprojectname && data.newprojectname.length > 0)
+                    {
+                        fs.createproject(data.newprojectname, () =>
+                        {
+                            editorcache.projectname = data.newprojectname;
+                            window.location.reload();
+                        });
+                    }
+                });
+            }
+        },
+        {
+            label: "保存场景", click: () =>
+            {
+                var gameobject: GameObject = hierarchyTree.rootnode.gameobject;
+                assets.saveObject(gameobject, gameobject.name + ".scene", true);
+            }
+        },
+    ];
+
     /**
      * 层级界面创建3D对象列表数据
      */
@@ -83,8 +109,12 @@ module feng3d.editor
 
     function addToHierarchy(gameobject: GameObject)
     {
-        hierarchyTree.rootnode.gameobject.addChild(gameobject);
-        editor3DData.selectedObject = gameobject;
+        var selectedNode = hierarchyTree.getSelectedNode();
+        if (selectedNode)
+            selectedNode.gameobject.addChild(gameobject);
+        else
+            hierarchyTree.rootnode.gameobject.addChild(gameobject);
+        editorData.selectObject(gameobject);
     }
 
     export var needcreateComponentGameObject: GameObject;
@@ -92,7 +122,7 @@ module feng3d.editor
     /**
      * 层级界面创建3D对象列表数据
      */
-    export var createObject3DComponentConfig: MenuItem[] = [
+    export var createComponentConfig: MenuItem[] = [
         //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
         { label: "ParticleAnimator", click: () => { needcreateComponentGameObject.addComponent(ParticleAnimator); } },
         { label: "Camera", click: () => { needcreateComponentGameObject.addComponent(Camera); } },

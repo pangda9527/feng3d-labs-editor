@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export type MenuItem = { label?: string, accelerator?: string, role?: string, type?: 'separator', click?: () => void, submenu?: MenuItem[] };
     export type Menu = MenuItem[];
@@ -13,8 +13,8 @@ module feng3d.editor
         list.itemRenderer = MenuItemRenderer;
         var dataProvider = new eui.ArrayCollection();
         dataProvider.replaceAll(menu);
-        list.x = mousex || input.clientX;
-        list.y = mousey || input.clientY;
+        list.x = mousex || windowEventProxy.clientX;
+        list.y = mousey || windowEventProxy.clientY;
         if (width !== undefined)
             list.width = width;
         editorui.popupLayer.addChild(list);
@@ -22,7 +22,7 @@ module feng3d.editor
 
         setTimeout(function ()
         {
-            editorui.stage.once(MouseEvent.CLICK, onStageClick, null);
+            editorui.stage.once(egret.MouseEvent.CLICK, onStageClick, null);
         }, 1);
 
         function onStageClick()

@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export function objectViewConfig()
     {

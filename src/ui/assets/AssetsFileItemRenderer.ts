@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class AssetsFileItemRenderer extends eui.ItemRenderer
     {
@@ -6,7 +6,7 @@ module feng3d.editor
         public nameLabel: eui.Label;
         public nameeditTxt: eui.TextInput;
 
-        data: AssetsFileNode;
+        data: AssetsFile;
 
         constructor()
         {
@@ -17,20 +17,20 @@ module feng3d.editor
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
-            this.addEventListener(MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
-            this.addEventListener(MouseEvent.CLICK, this.onclick, this);
-            this.addEventListener(MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-            this.nameLabel.addEventListener(MouseEvent.CLICK, this.onnameLabelclick, this);
+            this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
+            this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            this.nameLabel.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
         }
 
         $onRemoveFromStage()
         {
             super.$onRemoveFromStage();
-            this.removeEventListener(MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
-            this.removeEventListener(MouseEvent.CLICK, this.onclick, this);
-            this.removeEventListener(MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-            this.nameLabel.removeEventListener(MouseEvent.CLICK, this.onnameLabelclick, this);
+            this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
+            this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+            this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            this.nameLabel.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
         }
 
         dataChanged()
@@ -40,38 +40,33 @@ module feng3d.editor
             if (this.data)
             {
                 var accepttypes = [];
-                if (this.data.fileinfo.isDirectory)
+                if (this.data.isDirectory)
                 {
                     drag.register(this, (dragsource) =>
                     {
-                        if (this.data.fileinfo.path.split(".").pop() == "gameobject")
-                        {
-                            dragsource.file_gameobject = this.data.fileinfo.path;
-                        }
-                        dragsource.file = this.data.fileinfo.path;
+                        this.data.setDragSource(dragsource);
                     }, ["file"], (dragdata) =>
                         {
-                            var filepath = dragdata.file;
-                            var dest = this.data.fileinfo.path + "/" + filepath.split("/").pop();
-                            assets.move(filepath, dest);
+                            var movefile = assets.getFile(dragdata.file);
+                            movefile.move(this.data.path);
                         });
                 }
                 else
                 {
                     drag.register(this, (dragsource) =>
                     {
-                        var extension = this.data.fileinfo.path.split(".").pop();
+                        var extension = this.data.path.split(".").pop();
                         if (extension == "gameobject")
                         {
-                            dragsource.file_gameobject = this.data.fileinfo.path;
+                            dragsource.file_gameobject = this.data.path;
                         }
                         if (extension == "ts")
                         {
-                            dragsource.file_script = this.data.fileinfo.path;
+                            dragsource.file_script = this.data.path;
                         }
                         if (extension == "anim")
                         {
-                            var path = this.data.fileinfo.path;
+                            var path = this.data.path;
                             Loader.loadText(path, (content) =>
                             {
                                 var animationclip = serialization.deserialize(JSON.parse(content));
@@ -79,7 +74,27 @@ module feng3d.editor
                                 drag.refreshAcceptables();
                             });
                         }
-                        dragsource.file = this.data.fileinfo.path;
+                        if (extension == "material")
+                        {
+                            var path = this.data.path;
+                            Loader.loadText(path, (content) =>
+                            {
+                                var material = serialization.deserialize(JSON.parse(content));
+                                dragsource.material = material;
+                                drag.refreshAcceptables();
+                            });
+                        }
+                        if (extension == "geometry")
+                        {
+                            var path = this.data.path;
+                            Loader.loadText(path, (content) =>
+                            {
+                                var geometry = serialization.deserialize(JSON.parse(content));
+                                dragsource.geometry = geometry;
+                                drag.refreshAcceptables();
+                            });
+                        }
+                        dragsource.file = this.data.path;
                     }, []);
                 }
             } else
@@ -90,21 +105,21 @@ module feng3d.editor
 
         private ondoubleclick()
         {
-            if (this.data.fileinfo.isDirectory)
+            if (this.data.isDirectory)
             {
-                assets.showFloder = this.data.fileinfo.path;
+                assets.showFloder = this.data.path;
             }
         }
 
         private onclick()
         {
-            editor3DData.selectedObject = this.data.fileinfo;
+            editorData.selectObject(this.data);
         }
 
         private onrightclick(e: egret.Event)
         {
             e.stopPropagation();
-            assets.popupmenu(this.data.fileinfo);
+            assets.popupmenu(this.data);
         }
 
         private onnameLabelclick()
@@ -127,8 +142,8 @@ module feng3d.editor
             this.nameLabel.visible = true;
             if (this.nameLabel.text == this.nameeditTxt.text)
                 return;
-            var newpath = this.data.fileinfo.path.replace(this.nameLabel.text, this.nameeditTxt.text);
-            assets.rename(this.data.fileinfo.path, newpath);
+            var newName = this.data.name.replace(this.nameLabel.text, this.nameeditTxt.text);
+            this.data.rename(newName);
         }
     }
 }

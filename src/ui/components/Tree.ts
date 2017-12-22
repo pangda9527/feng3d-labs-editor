@@ -1,6 +1,6 @@
-module feng3d.editor
+namespace feng3d.editor
 {
-	export interface TreeNode
+	export class TreeNode
 	{
 		label?: string;
 		depth?: number;
@@ -14,6 +14,20 @@ module feng3d.editor
          * 子节点列表
          */
 		children: TreeNode[];
+
+		constructor(obj?: Partial<TreeNode>)
+		{
+			obj && ObjectUtils.copy(this, obj);
+		}
+
+		/**
+         * 销毁
+         */
+		destroy()
+		{
+			this.parent = null;
+			this.children = null;
+		}
 	}
 
 	export interface TreeEventMap
@@ -73,7 +87,7 @@ module feng3d.editor
 		addNode(node: TreeNode, parentnode?: TreeNode)
 		{
 			parentnode = parentnode || this.rootnode;
-			debuger && console.assert(!this.contain(parentnode, node), "无法添加到自身节点中!");
+			debuger && assert(!this.contain(parentnode, node), "无法添加到自身节点中!");
 
 			node.parent = parentnode;
 			parentnode.children.push(node);
@@ -91,7 +105,7 @@ module feng3d.editor
 			if (!parentnode)
 				return;
 			var index = parentnode.children.indexOf(node);
-			debuger && console.assert(index != -1);
+			debuger && assert(index != -1);
 			parentnode.children.splice(index, 1);
 
 			node.parent = null;

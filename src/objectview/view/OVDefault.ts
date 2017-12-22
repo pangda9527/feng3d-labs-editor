@@ -1,9 +1,9 @@
-module feng3d
+namespace feng3d
 {
 	export interface IObjectView extends eui.Component { }
 }
 
-module feng3d.editor
+namespace feng3d.editor
 {
 
 	/**

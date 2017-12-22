@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     @OAVComponent()
     export class OAVArray extends eui.Component implements IObjectAttributeView
@@ -95,14 +95,14 @@ module feng3d.editor
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
-            this.titleButton.addEventListener(MouseEvent.CLICK, this.onTitleButtonClick, this);
+            this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
             this.sizeTxt.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
         }
 
         $onRemoveFromStage()
         {
             super.$onRemoveFromStage()
-            this.titleButton.removeEventListener(MouseEvent.CLICK, this.onTitleButtonClick, this);
+            this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
             this.sizeTxt.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
         }
 
@@ -137,6 +137,9 @@ module feng3d.editor
 
                 for (var i = 0; i < attributeValue.length; i++)
                 {
+                    if (attributeValue[i] == null && this.attributeViewInfo.componentParam)
+                        attributeValue[i] = lazy.getvalue((<any>this.attributeViewInfo.componentParam).defaultItem);
+
                     if (attributeViews[i] == null)
                     {
                         var displayObject = new OAVArrayItem(attributeValue, i, this.attributeViewInfo.componentParam);

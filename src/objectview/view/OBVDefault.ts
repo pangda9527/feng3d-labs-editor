@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	/**
 	 * 默认对象属性块界面
@@ -38,7 +38,7 @@ module feng3d.editor
 
 		private onComplete()
 		{
-			this.titleButton.addEventListener(MouseEvent.CLICK, this.onTitleButtonClick, this);
+			this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
 			this.$updateView();
 		}
 

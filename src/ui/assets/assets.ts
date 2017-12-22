@@ -1,5 +1,12 @@
-module feng3d.editor
+namespace feng3d.editor
 {
+    export interface AssetsEventMap
+    {
+        changed
+        openChanged
+    }
+
+    export var assetsDispather: IEventDispatcher<AssetsEventMap> = new EventDispatcher();
 
     export var assets = {
         //attribute
@@ -9,169 +16,304 @@ module feng3d.editor
         projectPath: "",
         assetsPath: "",
         showFloder: "",
-        rootfileinfo: null,
         //function
         initproject: initproject,
-        getFileInfo: getFileInfo,
+        getFile: getFile,
         deletefile: deletefile,
-        addfile: addfile,
-        addfolder: addfolder,
-        rename: rename,
-        move: move,
+        /**
+        * 移动文件
+        * @param path 移动的文件路径
+        * @param destdirpath   目标文件夹
+        * @param callback      完成回调
+        */
+        movefile: function (path: string, destdirpath: string, callback?: () => void)
+        {
+            var assetsfile = getFile(path);
+            if (assetsfile)
+            {
+                assetsfile.move(destdirpath, callback);
+            } else
+            {
+                var filename = assetsfile.name;
+                var dest = destdirpath + "/" + filename;
+                fs.move(path, dest, callback);
+            }
+        },
         getparentdir: getparentdir,
-        popupmenu: popupmenu,
-        getnewpath: getnewpath,
-        saveGameObject: saveGameObject,
-        saveObject: saveObject,
+        /**
+         * 弹出文件菜单
+         */
+        popupmenu: function (assetsFile: AssetsFile)
+        {
+            var menuconfig: MenuItem[] = [];
+            if (assetsFile.isDirectory)
+            {
+                menuconfig.push(
+                    {
+                        label: "create folder", click: () =>
+                        {
+                            assetsFile.addfolder("New Folder");
+                        }
+                    },
+                    {
+                        label: "create script", click: () =>
+                        {
+                            assetsFile.addfile("NewScript.ts", assetsFileTemplates.NewScript);
+                        }
+                    },
+                    {
+                        label: "create json", click: () =>
+                        {
+                            assetsFile.addfile("new json.json", "{}");
+                        }
+                    },
+                    {
+                        label: "create txt", click: () =>
+                        {
+                            assetsFile.addfile("new text.txt", "");
+                        }
+                    },
+                    { type: "separator" },
+                    {
+                        label: "create material", click: () =>
+                        {
+                            assetsFile.addfile("new material" + ".material", new StandardMaterial());
+                        }
+                    },
+                    { type: "separator" },
+                    {
+                        label: "导入资源", click: () =>
+                        {
+                            fs.selectFile(assets.inputFiles, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
+                        }
+                    });
+            }
+            if (menuconfig.length > 0)
+            {
+                menuconfig.push({ type: "separator" });
+            }
+            menuconfig.push(
+                {
+                    label: "delete", click: () =>
+                    {
+                        assetsFile.deleteFile();
+                    }
+                });
+
+            menu.popup(menuconfig);
+        },
+        /**
+         * 获取一个新路径
+         */
+        getnewpath: function (path: string, callback: (newpath: string) => void)
+        {
+            var index = 0;
+            var basepath = "";
+            var ext = "";
+            if (path.indexOf(".") == -1)
+            {
+                basepath = path;
+                ext = "";
+            } else
+            {
+                basepath = path.substring(0, path.indexOf("."));
+                ext = path.substring(path.indexOf("."));
+            }
+            searchnewpath();
+
+            function newpath()
+            {
+                var path = index == 0 ?
+                    (basepath + ext) :
+                    (basepath + " " + index + ext);
+                index++;
+                return path;
+            }
+
+            function searchnewpath()
+            {
+                var path = newpath();
+                fs.stat(path, (err, stats) =>
+                {
+                    if (err)
+                        callback(path);
+                    else
+                    {
+                        searchnewpath();
+                    }
+                });
+            }
+        },
+        saveObject: function (object: GameObject | AnimationClip, filename: string, override = false, callback?: (file: AssetsFile) => void)
+        {
+            var showFloder = assets.getFile(assets.showFloder);
+            showFloder.addfile(filename, object, override, callback);
+        },
+        /**
+         * 过滤出文件列表
+         * @param fn 过滤函数
+         * @param next 是否继续遍历children
+         */
+        filter: function (fn: (assetsFile: AssetsFile) => boolean, next?: (assetsFile: AssetsFile) => boolean)
+        {
+            var files = rootfileinfo.filter(fn, next);
+            return files;
+        },
+        inputFiles: function (files: File[] | FileList)
+        {
+            for (let i = 0; i < files.length; i++)
+            {
+                const element = files[i];
+                assets.inputFile(element);
+            }
+        },
+        inputFile: function (file: File)
+        {
+            if (!file)
+                return;
+            var extensions = file.name.split(".").pop();
+            var reader = new FileReader();
+            switch (extensions)
+            {
+                case "mdl":
+                    reader.addEventListener('load', (event) =>
+                    {
+                        war3.MdlParser.parse(event.target["result"], (war3Model) =>
+                        {
+                            war3Model.root = file.name.substring(0, file.name.lastIndexOf("/") + 1);
+                            var gameobject = war3Model.getMesh();
+                            gameobject.name = file.name.split("/").pop().split(".").shift();
+                            assets.saveObject(gameobject, gameobject.name + ".gameobject");
+                        });
+                    }, false);
+                    reader.readAsText(file);
+                    break;
+                case "obj":
+                    reader.addEventListener('load', (event) =>
+                    {
+                        ObjLoader.parse(event.target["result"], (gameobject: GameObject) =>
+                        {
+                            gameobject.name = file.name.split("/").pop().split(".").shift();
+                            assets.saveObject(gameobject, gameobject.name + ".gameobject");
+                        });
+                    }, false);
+                    reader.readAsText(file);
+                    break;
+                case "fbx":
+                    // fbxLoader.load(path, (gameobject) =>
+                    // {
+                    //     gameobject.name = path.split("/").pop().split(".").shift();
+                    //     saveGameObject(gameobject);
+                    //     // engine.root.addChild(gameobject);
+                    // });
+                    threejsLoader.load(file, (gameobject) =>
+                    {
+                        gameobject.name = file.name.split("/").pop().split(".").shift();
+                        assets.saveObject(gameobject, gameobject.name + ".gameobject");
+                        // engine.root.addChild(gameobject);
+                    });
+                    break;
+                case "md5mesh":
+                    reader.addEventListener('load', (event) =>
+                    {
+                        MD5Loader.parseMD5Mesh(event.target["result"], (gameobject) =>
+                        {
+                            gameobject.name = file.name.split("/").pop().split(".").shift();
+                            assets.saveObject(gameobject, gameobject.name + ".gameobject");
+                            // engine.root.addChild(gameobject);
+                        });
+                    }, false);
+                    reader.readAsText(file);
+                    break;
+                case "md5anim":
+                    reader.addEventListener('load', (event) =>
+                    {
+                        MD5Loader.parseMD5Anim(event.target["result"], (animationclip) =>
+                        {
+                            animationclip.name = file.name.split("/").pop().split(".").shift();
+                            assets.saveObject(animationclip, animationclip.name + ".anim");
+                        });
+                    }, false);
+                    reader.readAsText(file);
+                    break;
+                default:
+                    reader.addEventListener('load', (event) =>
+                    {
+                        var showFloder = assets.getFile(assets.showFloder);
+                        var arraybuffer: ArrayBuffer = event.target["result"];
+                        var data = new Uint8Array(arraybuffer, 0);
+                        showFloder.addfile(file.name, data);
+                    }, false);
+                    reader.readAsArrayBuffer(file);
+                    break;
+            }
+        }
     };
 
     function initproject(path: string, callback: () => void)
     {
-        var assetsPath = path + "/Assets";
-        file.mkdir(assetsPath, (err) =>
+        var assetsPath = "Assets";
+        assets.projectPath = path;
+        assets.assetsPath = assetsPath;
+        //
+        fs.stat(assetsPath, (err, fileInfo) =>
         {
-            file.detailStat(assetsPath, (err, fileInfo) =>
+            if (err)
             {
-                assets.projectPath = path;
-                assets.assetsPath = assetsPath;
-                //
-                assets.rootfileinfo = fileInfo;
-                assets.showFloder = fileInfo.path;
-                treeMap(fileInfo, (node, parent) =>
+                fs.mkdir(assetsPath, (err) =>
                 {
-                    fileInfo.children && fileInfo.children.sort(fileinfocompare);
+                    if (err)
+                    {
+                        alert("初始化项目失败！");
+                        error(err);
+                        return;
+                    }
+                    fs.stat(assetsPath, (err, fileInfo) =>
+                    {
+                        rootfileinfo = new AssetsFile(fileInfo);
+                        assets.showFloder = fileInfo.path;
+                        rootfileinfo.initChildren(Number.MAX_VALUE, callback);
+                    });
                 });
-                assetstree.init(fileInfo);
-                callback();
-            });
-        });
-    }
-
-    function getFileInfo(path: string, fileinfo: FileInfo = null): FileInfo
-    {
-        fileinfo = fileinfo || assets.rootfileinfo;
-        if (path == fileinfo.path)
-            return fileinfo;
-        if (path.indexOf(fileinfo.path) == -1)
-            return null;
-        if (fileinfo.children)
-        {
-            for (var i = 0; i < fileinfo.children.length; i++)
+            } else
             {
-                var result = getFileInfo(path, fileinfo.children[i]);
-                if (result)
-                    return result;
+                rootfileinfo = new AssetsFile(fileInfo);
+                assets.showFloder = fileInfo.path;
+                rootfileinfo.initChildren(Number.MAX_VALUE, callback);
             }
-        }
-        return null;
-    }
-
-    function deletefile(path: string)
-    {
-        if (path == assets.assetsPath)
-        {
-            alert("无法删除根目录");
-            return;
-        }
-        file.remove(path, (err) =>
-        {
-            deletefileinfo(path);
-        });
-        if (/\.ts\b/.test(path))
-        {
-            deletefile(path.replace(/\.ts\b/, ".js"));
-            deletefile(path.replace(/\.ts\b/, ".js.map"));
-        }
-    }
-
-    function deletefileinfo(path: string)
-    {
-        var paths = path.split("/");
-        paths.pop();
-        var parentdir = paths.join("/");
-        var parentfileinfo = getFileInfo(parentdir);
-        if (!parentfileinfo.children)
-            return;
-        for (var i = parentfileinfo.children.length - 1; i >= 0; i--)
-        {
-            var element = parentfileinfo.children[i];
-            if (element.path == path)
-            {
-                parentfileinfo.children.splice(i, 1);
-                if (element.isDirectory)
-                {
-                    assetstree.remove(element.path);
-                }
-            }
-        }
-        if (path == assets.showFloder)
-            assets.showFloder = getparentdir(path);
-        editorui.assetsview.updateShowFloder();
-    }
-
-    function addfileinfo(fileinfo: FileInfo)
-    {
-        fileinfo.children = fileinfo.children || [];
-        //
-        var parentdir = assets.getparentdir(fileinfo.path);
-        var parentfileinfo = getFileInfo(parentdir);
-        parentfileinfo.children = parentfileinfo.children || [];
-        //
-        for (var i = 0; i < parentfileinfo.children.length; i++)
-        {
-            if (parentfileinfo.children[i].path == fileinfo.path)
-            {
-                parentfileinfo.children.splice(i, 1);
-                break;
-            }
-        }
-        parentfileinfo.children.push(fileinfo);
-        parentfileinfo.children.sort(fileinfocompare);
-        if (fileinfo.isDirectory)
-        {
-            assetstree.add(fileinfo);
-        }
-        editorui.assetsview.updateShowFloder();
-    }
-
-    function addfile(path: string, content: string, newfile = true)
-    {
-        if (newfile)
-        {
-            assets.getnewpath(path, (path) =>
-            {
-                addfile(path, content, false);
-            });
-            return;
-        }
-
-        file.writeFile(path, content, (e) =>
-        {
-            file.stat(path, (err, stats) =>
-            {
-                addfileinfo(stats);
-            });
         });
     }
 
-    function addfolder(folder: string, newfile = true)
-    {
-        if (newfile)
-        {
-            assets.getnewpath(folder, (path) =>
-            {
-                addfolder(path, false);
-            });
-            return;
-        }
+    /**
+     * 根文件
+     */
+    var rootfileinfo: AssetsFile;
 
-        file.mkdir(folder, (e) =>
+    /**
+     * 获取文件
+     * @param path 文件路径
+     */
+    function getFile(path: string): AssetsFile
+    {
+        return rootfileinfo.getFile(path);
+    }
+
+    /**
+     * 删除文件
+     * @param path 文件路径
+     */
+    function deletefile(path: string, callback?: (assetsFile: AssetsFile) => void)
+    {
+        var assetsFile = getFile(path);
+        if (assetsFile)
+            assetsFile.deleteFile(callback);
+        else
         {
-            file.stat(folder, (err, stats) =>
+            fs.remove(path, () =>
             {
-                addfileinfo(stats);
+                callback(null);
             });
-        });
+        }
     }
 
     function getparentdir(path: string)
@@ -181,265 +323,4 @@ module feng3d.editor
         var parentdir = paths.join("/");
         return parentdir;
     }
-
-    function popupmenu(fileinfo: FileInfo)
-    {
-        var folderpath = assets.getparentdir(fileinfo.path);
-        if (fileinfo.isDirectory)
-            folderpath = fileinfo.path;
-
-        var menuconfig: MenuItem[] = [
-            {
-                label: "create folder", click: () =>
-                {
-                    assets.addfolder(folderpath + "/" + "New Folder");
-                }
-            },
-            {
-                label: "create script", click: () =>
-                {
-                    file.readFile("feng3d-editor/template/templates/NewScript.ts", (err, data) =>
-                    {
-                        assets.addfile(folderpath + "/NewScript.ts", data);
-                    });
-                }
-            },
-            {
-                label: "create json", click: () =>
-                {
-                    assets.addfile(folderpath + "/new json.json", "{}");
-                }
-            },
-            {
-                label: "create txt", click: () =>
-                {
-                    assets.addfile(folderpath + "/new text.txt", "");
-                }
-            },
-            { type: "separator" },
-            {
-                label: "导入模型", click: () =>
-                {
-                    file.selectFile((file) =>
-                    {
-                        if (!file)
-                            return;
-                        var extensions = file.name.split(".").pop();
-                        var reader = new FileReader();
-                        switch (extensions)
-                        {
-                            case "mdl":
-                                reader.addEventListener('load', function (event)
-                                {
-                                    war3.MdlParser.parse(event.target["result"], (war3Model) =>
-                                    {
-                                        war3Model.root = file.name.substring(0, file.name.lastIndexOf("/") + 1);
-                                        var gameobject = war3Model.getMesh();
-                                        gameobject.name = file.name.split("/").pop().split(".").shift();
-                                        saveGameObject(gameobject);
-                                    });
-                                }, false);
-                                reader.readAsText(file);
-                                break;
-                            case "obj":
-                                reader.addEventListener('load', function (event)
-                                {
-                                    ObjLoader.parse(event.target["result"], function (gameobject: GameObject)
-                                    {
-                                        gameobject.name = file.name.split("/").pop().split(".").shift();
-                                        saveGameObject(gameobject);
-                                    });
-                                }, false);
-                                reader.readAsText(file);
-                                break;
-                            case "fbx":
-                                // fbxLoader.load(path, (gameobject) =>
-                                // {
-                                //     gameobject.name = path.split("/").pop().split(".").shift();
-                                //     saveGameObject(gameobject);
-                                //     // engine.root.addChild(gameobject);
-                                // });
-                                threejsLoader.load(file, (gameobject) =>
-                                {
-                                    gameobject.name = file.name.split("/").pop().split(".").shift();
-                                    saveGameObject(gameobject);
-                                    // engine.root.addChild(gameobject);
-                                });
-                                break;
-                            case "md5mesh":
-                                reader.addEventListener('load', function (event)
-                                {
-                                    MD5Loader.parseMD5Mesh(event.target["result"], (gameobject) =>
-                                    {
-                                        gameobject.name = file.name.split("/").pop().split(".").shift();
-                                        saveGameObject(gameobject);
-                                        // engine.root.addChild(gameobject);
-                                    });
-                                }, false);
-                                reader.readAsText(file);
-                                break;
-                            case "md5anim":
-                                reader.addEventListener('load', function (event)
-                                {
-                                    MD5Loader.parseMD5Anim(event.target["result"], (animationclip) =>
-                                    {
-                                        animationclip.name = file.name.split("/").pop().split(".").shift();
-                                        var obj = serialization.serialize(animationclip);
-                                        assets.saveObject(obj, animationclip.name + ".anim");
-                                    });
-                                }, false);
-                                reader.readAsText(file);
-                                break;
-                        }
-                    }, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
-                }
-            },
-            { type: "separator" },
-            {
-                label: "delete", click: () =>
-                {
-                    assets.deletefile(fileinfo.path);
-                }
-            }];
-
-
-        //判断是否为本地应用
-        if (electron)
-        {
-            menuconfig.splice(0, 0,
-                {
-                    label: "open folder", click: () =>
-                    {
-                        electron.showItemInFolder(folderpath + "/.");
-                    }
-                }
-            );
-        }
-
-        menu.popup(menuconfig);
-    }
-
-    /**
-     * 获取一个新路径
-     */
-    function getnewpath(path: string, callback: (newpath: string) => void)
-    {
-        var index = 0;
-        var basepath = "";
-        var ext = "";
-        if (path.indexOf(".") == -1)
-        {
-            basepath = path;
-            ext = "";
-        } else
-        {
-            basepath = path.substring(0, path.indexOf("."));
-            ext = path.substring(path.indexOf("."));
-        }
-        searchnewpath();
-
-        function newpath()
-        {
-            var path = index == 0 ?
-                (basepath + ext) :
-                (basepath + " " + index + ext);
-            index++;
-            return path;
-        }
-
-        function searchnewpath()
-        {
-            var path = newpath();
-            file.stat(path, (err, stats) =>
-            {
-                if (err)
-                    callback(path);
-                else
-                {
-                    searchnewpath();
-                }
-            });
-        }
-
-    }
-
-    function rename(oldPath: string, newPath: string, callback?: () => void)
-    {
-        file.rename(oldPath, newPath, (err) =>
-        {
-            if (err)
-                return;
-            var fileinfo = getFileInfo(oldPath);
-            deletefileinfo(oldPath);
-            fileinfo.path = newPath;
-            addfileinfo(fileinfo);
-            if (fileinfo.isDirectory)
-                editorui.assetsview.updateAssetsTree();
-            if (assets.showFloder == oldPath)
-            {
-                assets.showFloder = newPath;
-            }
-            callback && callback();
-        });
-    }
-
-    function move(src: string, dest: string, callback?: (err: { message: string }) => void)
-    {
-        //禁止向子文件夹移动
-        if (path.isParent(src, dest))
-            return;
-
-        file.move(src, dest, (err, destfileinfo) =>
-        {
-            deletefileinfo(src);
-            addfileinfo(destfileinfo);
-            if (destfileinfo.isDirectory)
-                editorui.assetsview.updateAssetsTree();
-            if (assets.showFloder == src)
-            {
-                assets.showFloder = dest;
-            }
-            callback && callback(err);
-        });
-    }
-
-    function fileinfocompare(a: FileInfo, b: FileInfo)
-    {
-        if (a.isDirectory > b.isDirectory)
-            return -1;
-        if (a.isDirectory < b.isDirectory)
-            return 1;
-        if (a.path < b.path)
-            return -1;
-        return 1;
-    }
-
-    function saveGameObject(gameobject: GameObject)
-    {
-        var obj = serialization.serialize(gameobject);
-
-        var output = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-
-        assets.addfile(assets.showFloder + "/" + gameobject.name + ".gameobject", output);
-    }
-
-    function saveObject(object: Object, filename: string)
-    {
-        var output = JSON.stringify(object, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-        assets.addfile(assets.showFloder + "/" + filename, output);
-    }
-
-    export var path = {
-        isParent: function (parenturl: string, childurl: string)
-        {
-            var parents = parenturl.split("/");
-            var childs = childurl.split("/");
-            for (var i = 0; i < childs.length; i++)
-            {
-                if (childs[i] != parent[i])
-                    return false;
-            }
-            return true;
-        }
-    };
 }

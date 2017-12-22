@@ -1,7 +1,12 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class HierarchyTreeItemRenderer extends TreeItemRenderer
     {
+        /**
+         * 上一个选中项
+         */
+        static preSelectedItem: HierarchyTreeItemRenderer;
+
         data: HierarchyNode;
 
         constructor()
@@ -12,8 +17,8 @@ module feng3d.editor
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
-            this.addEventListener(MouseEvent.CLICK, this.onclick, this);
-            this.addEventListener(MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
             drag.register(this, this.setdargSource.bind(this), ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
             {
@@ -40,8 +45,8 @@ module feng3d.editor
         $onRemoveFromStage()
         {
             super.$onRemoveFromStage();
-            this.removeEventListener(MouseEvent.CLICK, this.onclick, this);
-            this.removeEventListener(MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+            this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
             drag.unregister(this);
         }
@@ -53,7 +58,9 @@ module feng3d.editor
 
         private onclick()
         {
-            editor3DData.selectedObject = this.data.gameobject;
+            HierarchyTreeItemRenderer.preSelectedItem = this;
+
+            editorData.selectObject(this.data.gameobject);
         }
 
         private onrightclick(e)
@@ -69,14 +76,8 @@ module feng3d.editor
                     }
                 });
             }
-            menuconfig.push(
-                {
-                    label: "save", click: () =>
-                    {
-                        assets.saveGameObject(this.data.gameobject);
-                    }
-                }
-            );
+
+            menuconfig = menuconfig.concat({ type: 'separator' }, createObjectConfig);
 
             if (menuconfig.length > 0)
                 menu.popup(menuconfig);

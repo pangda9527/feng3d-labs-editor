@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     export class DirectionLightIcon extends Script
     {
@@ -28,14 +28,14 @@ module feng3d.editor
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
             var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
             textureMaterial.texture = new Texture2D("resource/assets/3d/icons/sun.png");
-            textureMaterial.texture.format = GL.RGBA;
+            textureMaterial.texture.format = TextureFormat.RGBA;
             textureMaterial.texture.premulAlpha = true;
             textureMaterial.enableBlend = true;
             this.gameObject.addChild(lightIcon);
-            this.lightIcon.on("click", () =>
-            {
-                editor3DData.selectedObject = this.gameObject;
-            });
+            // this.lightIcon.on("click", () =>
+            // {
+            //     editor3DData.selectObject(this.gameObject);
+            // });
 
             //
             var lightLines = this.lightLines = GameObject.create("Lines");
@@ -76,14 +76,7 @@ module feng3d.editor
         update()
         {
             this.textureMaterial.color = this.directionalLight.color;
-            if (editor3DData.selectedObject == this.gameObject)
-            {
-                this.lightLines.visible = true;
-            }
-            else
-            {
-                this.lightLines.visible = false;
-            }
+            this.lightLines.visible = editorData.selectedGameObjects.indexOf(this.gameObject) != -1;
         }
 
         dispose()

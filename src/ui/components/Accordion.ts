@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class Accordion extends eui.Component implements eui.UIComponent
 	{
@@ -38,7 +38,7 @@ module feng3d.editor
 
 		private onAddedToStage()
 		{
-			this.titleButton.addEventListener(MouseEvent.CLICK, this.onTitleButtonClick, this);
+			this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
 			if (this.components)
 			{
 				for (var i = 0; i < this.components.length; i++)
@@ -52,7 +52,7 @@ module feng3d.editor
 
 		private onRemovedFromStage()
 		{
-			this.titleButton.removeEventListener(MouseEvent.CLICK, this.onTitleButtonClick, this);
+			this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
 		}
 
 		private onTitleButtonClick()

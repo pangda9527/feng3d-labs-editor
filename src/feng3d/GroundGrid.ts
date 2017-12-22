@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     /**
      * 地面网格
@@ -6,55 +6,58 @@ module feng3d.editor
      */
     export class GroundGrid extends Component
     {
+        @oav()
         private num = 100;
-        private segmentGeometry: SegmentGeometry;
-
-        private level: number;
-        private step: number;
-        private groundGridObject: GameObject;
 
         init(gameObject: GameObject)
         {
             super.init(gameObject);
-            this.gameObject.mouseEnabled = false;
 
-            // engine.cameraObject3D.addEventListener(Object3DEvent.SCENETRANSFORM_CHANGED, this.onCameraScenetransformChanged, this);
+            var groundGridObject = GameObject.create("GroundGrid");
+            groundGridObject.mouseEnabled = false;
+            groundGridObject.transform.showInInspector = false;
 
-            var meshRenderer = this.gameObject.addComponent(MeshRenderer);
-            this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
+            gameObject.addChild(groundGridObject);
+
+            var __this = this;
+
+            engine.camera.transform.on("transformChanged", update, this);
+
+            var meshRenderer = groundGridObject.addComponent(MeshRenderer);
+            var segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             var material = meshRenderer.material = new SegmentMaterial();
             material.enableBlend = true;
-            this.update();
-        }
+            update();
 
-        private update()
-        {
-            var cameraGlobalPosition = engine.camera.transform.scenePosition;
-            this.level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
-            this.step = Math.pow(10, this.level - 1);
-
-            var startX: number = Math.round(cameraGlobalPosition.x / (10 * this.step)) * 10 * this.step;
-            var startZ: number = Math.round(cameraGlobalPosition.z / (10 * this.step)) * 10 * this.step;
-
-            //设置在原点
-            startX = startZ = 0;
-            this.step = 100;
-
-            var halfNum = this.num / 2;
-
-            this.segmentGeometry.removeAllSegments();
-            for (var i = -halfNum; i <= halfNum; i++)
+            function update()
             {
-                var color = new Color().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
-                color.a = ((i % 10) == 0) ? 0.5 : 0.1;
-                this.segmentGeometry.addSegment(new Segment(new Vector3D(-halfNum * this.step + startX, 0, i * this.step + startZ), new Vector3D(halfNum * this.step + startX, 0, i * this.step + startZ), color, color));
-                this.segmentGeometry.addSegment(new Segment(new Vector3D(i * this.step + startX, 0, -halfNum * this.step + startZ), new Vector3D(i * this.step + startX, 0, halfNum * this.step + startZ), color, color));
+                var cameraGlobalPosition = engine.camera.transform.scenePosition;
+                var level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
+                var step = Math.pow(10, level - 1);
+
+                var startX: number = Math.round(cameraGlobalPosition.x / (10 * step)) * 10 * step;
+                var startZ: number = Math.round(cameraGlobalPosition.z / (10 * step)) * 10 * step;
+
+                //设置在原点
+                startX = startZ = 0;
+                step = 100;
+
+                var halfNum = __this.num / 2;
+
+                var xcolor = new Color(1, 0, 0, 0.5);
+                var zcolor = new Color(0, 0, 1, 0.5);
+                var color: Color;
+                segmentGeometry.removeAllSegments();
+                for (var i = -halfNum; i <= halfNum; i++)
+                {
+                    var color0 = new Color().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
+                    color0.a = ((i % 10) == 0) ? 0.5 : 0.1;
+                    color = (i * step + startZ == 0) ? xcolor : color0;
+                    segmentGeometry.addSegment(new Segment(new Vector3D(-halfNum * step + startX, 0, i * step + startZ), new Vector3D(halfNum * step + startX, 0, i * step + startZ), color, color));
+                    color = (i * step + startX == 0) ? zcolor : color0;
+                    segmentGeometry.addSegment(new Segment(new Vector3D(i * step + startX, 0, -halfNum * step + startZ), new Vector3D(i * step + startX, 0, halfNum * step + startZ), color, color));
+                }
             }
         }
-
-        // private onCameraScenetransformChanged()
-        // {
-        //     this.update();
-        // }
     }
 }

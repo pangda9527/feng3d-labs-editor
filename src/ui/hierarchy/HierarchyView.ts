@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class HierarchyView extends eui.Component implements eui.UIComponent
 	{
@@ -6,6 +6,11 @@ module feng3d.editor
 		public list: eui.List;
 
 		private listData: eui.ArrayCollection;
+
+		/**
+		 * 选中节点
+		 */
+		private selectedNode: HierarchyNode;
 
 		constructor()
 		{
@@ -31,26 +36,29 @@ module feng3d.editor
 
 		private onAddedToStage()
 		{
-			this.addButton.addEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
+			this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
+			this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-			hierarchyTree.on("added", this.updateHierarchyTree, this);
-			hierarchyTree.on("removed", this.updateHierarchyTree, this);
-			hierarchyTree.on("openChanged", this.updateHierarchyTree, this);
-
-			watcher.watch(editor3DData, "selectedObject", this.selectedObject3DChanged, this)
+			hierarchyTree.on("added", this.invalidHierarchy, this);
+			hierarchyTree.on("removed", this.invalidHierarchy, this);
+			hierarchyTree.on("openChanged", this.invalidHierarchy, this);
 
 			this.updateHierarchyTree();
 		}
 
 		private onRemovedFromStage()
 		{
-			this.addButton.removeEventListener(MouseEvent.CLICK, this.onAddButtonClick, this);
+			this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
+			this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-			hierarchyTree.off("added", this.updateHierarchyTree, this);
-			hierarchyTree.off("removed", this.updateHierarchyTree, this);
-			hierarchyTree.off("openChanged", this.updateHierarchyTree, this);
+			hierarchyTree.off("added", this.invalidHierarchy, this);
+			hierarchyTree.off("removed", this.invalidHierarchy, this);
+			hierarchyTree.off("openChanged", this.invalidHierarchy, this);
+		}
 
-			watcher.unwatch(editor3DData, "selectedObject", this.selectedObject3DChanged, this)
+		private invalidHierarchy()
+		{
+			ticker.onceframe(this.updateHierarchyTree, this);
 		}
 
 		private updateHierarchyTree()
@@ -59,44 +67,26 @@ module feng3d.editor
 			this.listData.replaceAll(nodes);
 		}
 
-		private selectedObject3DChanged(host: any, property: string, oldvalue: any)
+		private onListbackClick()
 		{
-			if (oldvalue instanceof GameObject)
+			log("onListbackClick");
+		}
+
+		private onListClick(e: egret.MouseEvent)
+		{
+			if (e.target == this.list)
 			{
-				var newnode = hierarchyTree.getNode(oldvalue);
-				if (newnode)
-				{
-					newnode.selected = false;
-				}
-				//清除选中效果
-				var wireframeComponent = oldvalue.getComponent(WireframeComponent);
-				if (wireframeComponent)
-					oldvalue.removeComponent(wireframeComponent);
-			}
-			if (editor3DData.selectedObject && editor3DData.selectedObject instanceof GameObject)
-			{
-				var newnode = hierarchyTree.getNode(editor3DData.selectedObject);
-				if (newnode)
-				{
-					newnode.selected = true;
-					var parentNode = newnode.parent;
-					while (parentNode)
-					{
-						parentNode.isOpen = true;
-						parentNode = parentNode.parent;
-					}
-				}
-				//新增选中效果
-				var wireframeComponent = editor3DData.selectedObject.getComponent(WireframeComponent);
-				if (!wireframeComponent)
-					editor3DData.selectedObject.addComponent(WireframeComponent);
+				editorData.selectObject(null)
 			}
 		}
 
-		private onAddButtonClick()
+		private onListRightClick(e: egret.MouseEvent)
 		{
-			var globalPoint = this.addButton.localToGlobal(0, 0);
-			menu.popup(createObjectConfig, globalPoint.x, globalPoint.y);
+			if (e.target == this.list)
+			{
+				editorData.selectObject(null);
+				menu.popup(createObjectConfig, windowEventProxy.clientX, windowEventProxy.clientY);
+			}
 		}
 	}
 }

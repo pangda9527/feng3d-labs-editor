@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export var drag = {
 		register: register,
@@ -11,6 +11,9 @@ module feng3d.editor
 	{
 		gameobject?: GameObject;
 		animationclip?: AnimationClip;
+		material?: Material;
+		geometry?: Geometry;
+		//
 		file_gameobject?: string;
 		file_script?: string;
 		file?: string;
@@ -52,7 +55,7 @@ module feng3d.editor
 				registers.splice(i, 1);
 			}
 		}
-		displayObject.removeEventListener(MouseEvent.MOUSE_DOWN, onItemMouseDown, null);
+		displayObject.removeEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null);
 	}
 
 	function register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragData)[], onDragDrop?: (dragSource: DragData) => void)
@@ -61,7 +64,7 @@ module feng3d.editor
 		registers.push({ displayObject: displayObject, setdargSource: setdargSource, accepttypes: accepttypes, onDragDrop: onDragDrop });
 
 		if (setdargSource)
-			displayObject.addEventListener(MouseEvent.MOUSE_DOWN, onItemMouseDown, null, false, 1000);
+			displayObject.addEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null, false, 1000);
 	}
 
 	function getitem(displayObject: egret.DisplayObject)
@@ -100,20 +103,20 @@ module feng3d.editor
 		if (dragitem)
 		{
 			stage = dragitem.displayObject.stage;
-			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, null);
-			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp, null);
+			stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
+			stage.addEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
 		}
 	}
 
-	function onMouseUp(event: MouseEvent)
+	function onMouseUp(event: egret.MouseEvent)
 	{
-		stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, null);
-		stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp, null);
+		stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
+		stage.removeEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
 
 		acceptableitems && acceptableitems.forEach(element =>
 		{
-			element.displayObject.removeEventListener(MouseEvent.MOUSE_OVER, onMouseOver, null)
-			element.displayObject.removeEventListener(MouseEvent.MOUSE_OUT, onMouseOut, null)
+			element.displayObject.removeEventListener(egret.MouseEvent.MOUSE_OVER, onMouseOver, null)
+			element.displayObject.removeEventListener(egret.MouseEvent.MOUSE_OUT, onMouseOut, null)
 		});
 		acceptableitems = null;
 
@@ -128,9 +131,9 @@ module feng3d.editor
 		dragitem = null;
 	}
 
-	function onMouseMove(event: MouseEvent)
+	function onMouseMove(event: egret.MouseEvent)
 	{
-		stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, null);
+		stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
 
 		//获取拖拽数据
 		dragSource = {};
@@ -148,8 +151,8 @@ module feng3d.editor
 
 		acceptableitems.forEach(element =>
 		{
-			element.displayObject.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver, null)
-			element.displayObject.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut, null)
+			element.displayObject.addEventListener(egret.MouseEvent.MOUSE_OVER, onMouseOver, null)
+			element.displayObject.addEventListener(egret.MouseEvent.MOUSE_OUT, onMouseOut, null)
 		});
 	}
 
@@ -157,8 +160,8 @@ module feng3d.editor
 	{
 		acceptableitems && acceptableitems.forEach(element =>
 		{
-			element.displayObject.removeEventListener(MouseEvent.MOUSE_OVER, onMouseOver, null)
-			element.displayObject.removeEventListener(MouseEvent.MOUSE_OUT, onMouseOut, null)
+			element.displayObject.removeEventListener(egret.MouseEvent.MOUSE_OVER, onMouseOver, null)
+			element.displayObject.removeEventListener(egret.MouseEvent.MOUSE_OUT, onMouseOut, null)
 		});
 		acceptableitems = null;
 
@@ -174,8 +177,8 @@ module feng3d.editor
 
 		acceptableitems.forEach(element =>
 		{
-			element.displayObject.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver, null)
-			element.displayObject.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut, null)
+			element.displayObject.addEventListener(egret.MouseEvent.MOUSE_OVER, onMouseOver, null)
+			element.displayObject.addEventListener(egret.MouseEvent.MOUSE_OUT, onMouseOut, null)
 		});
 	}
 

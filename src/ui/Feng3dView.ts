@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	export class Feng3dView extends eui.Component implements eui.UIComponent
 	{
@@ -19,7 +19,6 @@ module feng3d.editor
 			this.canvas = document.getElementById("glcanvas");
 			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
 			this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
-			this.fullbutton.addEventListener(MouseEvent.CLICK, this.onclick, this);
 
 			this.onResize();
 
@@ -31,7 +30,7 @@ module feng3d.editor
 				}
 				if (dragdata.file_script)
 				{
-					var gameobject = mouse3DManager.getSelectedObject3D();
+					var gameobject = engine.mouse3DManager.getSelectedGameObject();
 					if (!gameobject || !gameobject.scene)
 						gameobject = hierarchyTree.rootnode.gameobject;
 					GameObjectUtil.addScript(gameobject, dragdata.file_script.replace(/\.ts\b/, ".js"))
@@ -46,7 +45,6 @@ module feng3d.editor
 			this.canvas = null;
 			this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
 			this.removeEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
-			this.fullbutton.removeEventListener(MouseEvent.CLICK, this.onclick, this);
 
 			drag.unregister(this);
 		}
@@ -55,6 +53,8 @@ module feng3d.editor
 		{
 			if (!this.stage)
 				return;
+
+
 			var lt = this.localToGlobal(0, 0);
 			var rb = this.localToGlobal(this.width, this.height);
 			var bound1 = new Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
@@ -68,38 +68,19 @@ module feng3d.editor
 			style.top = bound.y + "px";
 			style.width = bound.width + "px";
 			style.height = bound.height + "px";
+			style.cursor = "hand";
 
 			Stats.instance.dom.style.left = bound.x + "px";
 			Stats.instance.dom.style.top = bound.y + "px";
-			
-			if (bound.contains(input.clientX, input.clientY))
+
+			var canvasRect = this.canvas.getBoundingClientRect();
+			var bound = new Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
+			if (bound.contains(windowEventProxy.clientX, windowEventProxy.clientY))
 			{
 				shortcut.activityState("mouseInView3D");
 			} else
 			{
 				shortcut.deactivityState("mouseInView3D");
-			}
-		}
-
-		private onclick()
-		{
-			var gameObject = mouse3DManager.getSelectedObject3D();
-			if (!gameObject || !gameObject.scene)
-				return;
-			var node = hierarchyTree.getNode(gameObject);
-			while (!node && (gameObject == gameObject.parent));
-			{
-				node = hierarchyTree.getNode(gameObject);
-			}
-			if (node && gameObject)
-			{
-				if (gameObject.scene.gameObject == gameObject)
-				{
-					editor3DData.selectedObject = null;
-				} else
-				{
-					editor3DData.selectedObject = gameObject;
-				}
 			}
 		}
 	}

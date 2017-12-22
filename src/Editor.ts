@@ -1,7 +1,7 @@
-module feng3d.editor
+namespace feng3d.editor
 {
     //
-    export var editor3DData: Editor3DData;
+    export var editorData: EditorData;
 
     /**
      * 编辑器
@@ -33,7 +33,13 @@ module feng3d.editor
                 //初始化配置
                 objectViewConfig();
 
-                this.initeditorcache(this.init.bind(this));
+                this.initeditorcache(() =>
+                {
+                    setTimeout(() =>
+                    {
+                        this.init();
+                    }, 1);
+                });
                 this.removeChild(mainui);
             });
             this.addChild(mainui);
@@ -42,7 +48,7 @@ module feng3d.editor
         private init()
         {
             //
-            editor3DData = new Editor3DData();
+            editorData = new EditorData();
 
             document.head.getElementsByTagName("title")[0].innerText = "editor -- " + assets.projectPath;
 
@@ -61,7 +67,7 @@ module feng3d.editor
             this.once(egret.Event.ENTER_FRAME, function ()
             {
                 //
-                mouseEventEnvironment = new MouseEventEnvironment();
+                egret.mouseEventEnvironment = new egret.MouseEventEnvironment();
             }, this);
 
             this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
@@ -87,87 +93,50 @@ module feng3d.editor
         private initeditorcache(callback: () => void)
         {
             //获取项目路径
-            file.readFile("editorcache.json", (err, data) =>
+            try
             {
-                if (err)
-                {
-                    createnewproject();
-                } else
-                {
-                    try
-                    {
-                        editorcache = JSON.parse(data);
-                        tryprojectpath();
-                    } catch (e)
-                    {
-                        createnewproject();
-                    }
-                }
-            });
-
-            function tryprojectpath()
+                tryprojectpath(callback);
+            } catch (e)
             {
-                file.stat(editorcache.projectpath, (err, stats) =>
-                {
-                    if (!err)
-                    {
-                        assets.projectPath = editorcache.projectpath;
-                        var content = JSON.stringify(editorcache, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                        file.writeFile("editorcache.json", content);
-
-                        file.initproject(editorcache.projectpath, callback);
-                        return;
-                    }
-                    editorcache.historyprojectpaths = editorcache.historyprojectpaths || [];
-                    var index = editorcache.historyprojectpaths.indexOf(editorcache.projectpath);
-                    if (index != -1)
-                        editorcache.historyprojectpaths.splice(index, 1);
-                    if (editorcache.historyprojectpaths.length > 0)
-                    {
-                        editorcache.projectpath = editorcache.historyprojectpaths[0];
-                        tryprojectpath();
-                    } else
-                    {
-                        createnewproject();
-                    }
-                });
+                createnewproject(callback);
             }
 
-            function createnewproject()
+            function tryprojectpath(callback: () => void)
             {
-                //选择项目路径
-                if (isNative)
+                if (editorcache.projectname)
                 {
-                    electron.call("selected-directory", { param: { title: "选择项目路径" }, callback: onSeletedProjectPath });
+                    var projectname = editorcache.projectname;
+                    fs.hasProject(projectname, (has) =>
+                    {
+                        if (has)
+                        {
+                            assets.projectPath = projectname;
+                            fs.initproject(projectname, callback);
+                        } else
+                        {
+                            createnewproject(callback);
+                        }
+                    });
                 } else
                 {
-                    popupview.popup({ projectName: "" }, (obj) =>
-                    {
-                        onSeletedProjectPath(obj.projectName);
-                    });
+                    createnewproject(callback);
                 }
+            }
 
-                function onSeletedProjectPath(path)
+            function createnewproject(callback: () => void)
+            {
+                var projectname = "testproject";
+                fs.createproject(projectname, () =>
                 {
-                    file.createproject(path, () =>
-                    {
-                        editorcache.projectpath = assets.projectPath = path;
-                        editorcache.historyprojectpaths = editorcache.historyprojectpaths = [];
-                        if (editorcache.historyprojectpaths.indexOf(path) == -1)
-                            editorcache.historyprojectpaths.unshift(path);
-
-                        var content = JSON.stringify(editorcache, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                        file.writeFile("editorcache.json", content);
-
-                        file.initproject(path, callback);
-                    });
-                }
+                    editorcache.projectname = assets.projectPath = projectname;
+                    fs.initproject(projectname, callback);
+                });
             }
         }
 
         private _onAddToStage()
         {
-            editor3DData.stage = this.stage;
+            editorData.stage = this.stage;
         }
     }
 }

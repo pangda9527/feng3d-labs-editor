@@ -1,4 +1,4 @@
-module feng3d.editor
+namespace feng3d.editor
 {
 	/**
 	 * 默认对象属性界面
@@ -147,13 +147,13 @@ module feng3d.editor
 				this.text.enabled = false;
 				var valuename = this.attributeValue["name"] || "";
 				this.text.text = valuename + " (" + ClassUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
-				this.once(MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+				this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
 			}
 		}
 
 		private onDoubleClick()
 		{
-			editor3DData.inspectorViewData.showData(this.attributeValue);
+			editorui.inspectorView.showData(this.attributeValue);
 		}
 
 		private onTextChange()

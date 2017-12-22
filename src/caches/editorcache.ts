@@ -1,16 +1,55 @@
-module feng3d.editor
+namespace feng3d.editor
 {
-    export interface EditorCache
+    export class EditorCache
     {
         /**
          * 保存最后一次打开的项目路径
          */
-        projectpath?: string;
-        /**
-         * 历史项目路径列表
-         */
-        historyprojectpaths?: string[];
+        projectname: string;
+
+        constructor()
+        {
+            var value = localStorage.getItem("feng3d-editor");
+            if (!value) return;
+            var obj = JSON.parse(value);
+            for (var key in obj)
+            {
+                if (obj.hasOwnProperty(key))
+                {
+                    this[key] = obj[key];
+                }
+            }
+        }
+
+        save()
+        {
+            localStorage.setItem("feng3d-editor", JSON.stringify(this));
+        }
     }
 
-    export var editorcache: EditorCache = {};
+    export var editorcache = new EditorCache();
+
+    window.addEventListener("beforeunload", () =>
+    {
+        editorcache.save();
+    });
+
+
+    export class A
+    {
+        @oav()
+        a = 1;
+    }
+    
+    export class AA extends A
+    {
+        @oav()
+        aa = 1;
+    }
+
+    export class AAA extends AA
+    {
+        @oav()
+        aaa = 1;
+    }
 }
