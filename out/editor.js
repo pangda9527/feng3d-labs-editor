@@ -412,7 +412,7 @@ var feng3d;
                     callback && callback(error);
                 }
             },
-            readFile: function (path, callback) {
+            readFile: function (path, encoding, callback) {
                 try {
                     zip.file(path).async("string").then(function (data) {
                         callback(null, data);
@@ -492,6 +492,12 @@ var feng3d;
                 catch (error) {
                     callback && callback(error);
                 }
+            },
+            /**
+             * 获取文件绝对路径
+             */
+            getAbsolutePath: function (path, callback) {
+                callback(null, null);
             }
         };
     })(editor = feng3d.editor || (feng3d.editor = {}));
@@ -500,8 +506,12 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        // export var fs: FS = require(__dirname + "/io/file.js").file;
-        editor.fs = editor.zipfs;
+        if (typeof require == "undefined") {
+            editor.fs = editor.zipfs;
+        }
+        else {
+            editor.fs = require(__dirname + "/io/file.js").file;
+        }
         var isSelectFile = false;
         editor.fs.selectFile = function (callback) {
             selectFileCallback = callback;
@@ -1723,7 +1733,17 @@ var feng3d;
              * 更新界面
              */
             OVBaseDefault.prototype.updateView = function () {
-                this.label.text = String(this._space);
+                this.image.visible = false;
+                this.label.visible = true;
+                var value = this._space;
+                if (typeof value == "string" && value.indexOf("data:image") != -1) {
+                    this.image.visible = true;
+                    this.label.visible = false;
+                    this.image.source = value;
+                }
+                else {
+                    this.label.text = String(this._space);
+                }
             };
             OVBaseDefault = __decorate([
                 feng3d.OVComponent()
@@ -1842,6 +1862,7 @@ var feng3d;
              */
             OAVDefault.prototype.updateView = function () {
                 this.text.enabled = this.attributeViewInfo.writable;
+                var value = this.attributeValue;
                 if (this.attributeValue === undefined) {
                     this.text.text = String(this.attributeValue);
                 }
@@ -2911,11 +2932,15 @@ var feng3d;
                     default:
                         reader.addEventListener('load', function (event) {
                             var showFloder = editor.assets.getFile(editor.assets.showFloder);
-                            var arraybuffer = event.target["result"];
-                            var data = new Uint8Array(arraybuffer, 0);
-                            showFloder.addfile(file.name, data);
+                            var result = event.target["result"];
+                            showFloder.addfile(file.name, result);
                         }, false);
-                        reader.readAsArrayBuffer(file);
+                        if (/(jpg|png)/.test(extensions)) {
+                            reader.readAsDataURL(file);
+                        }
+                        else {
+                            reader.readAsArrayBuffer(file);
+                        }
                         break;
                 }
             }
@@ -3000,10 +3025,6 @@ var feng3d;
                 _this.depth = 0;
                 _this._isOpen = true;
                 /**
-                 * 图标名称或者路径
-                 */
-                _this.image = "resource/assets/icons/json.png";
-                /**
                  * 是否选中
                  */
                 _this.selected = false;
@@ -3020,9 +3041,6 @@ var feng3d;
                 if (fileinfo.isDirectory) {
                     _this.image = "folder_png";
                 }
-                else if (/(.jpg|.png)\b/.test(fileinfo.path)) {
-                    _this.image = fileinfo.path;
-                }
                 else {
                     var filename = fileinfo.path.split("/").pop();
                     var extension = filename.split(".").pop();
@@ -3032,6 +3050,26 @@ var feng3d;
                     else {
                         _this.image = "file_png";
                     }
+                }
+                if (/(.jpg|.png)\b/.test(fileinfo.path)) {
+                    _this.getData(function (data) {
+                        _this.image = data;
+                    });
+                    // fs.readFile(this._path, "buffer", (err, data: Buffer) =>
+                    // {
+                    //     function toArrayBuffer(buf)
+                    //     {
+                    //         var ab = new ArrayBuffer(buf.length);
+                    //         var view = new Uint8Array(ab);
+                    //         for (var i = 0; i < buf.length; ++i)
+                    //         {
+                    //             view[i] = buf[i];
+                    //         }
+                    //         return ab;
+                    //     }
+                    //     this.image = new egret.Texture();
+                    //     this.image.bitmapData = egret.BitmapData.create("arraybuffer", toArrayBuffer(data));
+                    // });
                 }
                 return _this;
             }
@@ -3187,14 +3225,14 @@ var feng3d;
                 }
                 if (this.extension == AssetExtension.material
                     || this.extension == AssetExtension.gameobject) {
-                    editor.fs.readFile(this._path, function (err, content) {
+                    editor.fs.readFile(this._path, "utf8", function (err, content) {
                         var json = JSON.parse(content);
                         _this._data = feng3d.serialization.deserialize(json);
                         callback(_this._data);
                     });
                     return;
                 }
-                editor.fs.readFile(this._path, function (err, content) {
+                editor.fs.readFile(this._path, "utf8", function (err, content) {
                     _this._data = content;
                     callback(_this._data);
                 });
@@ -3444,6 +3482,8 @@ var feng3d;
                 else if (saveContent instanceof feng3d.AnimationClip) {
                     var obj = feng3d.serialization.serialize(content);
                     saveContent = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                }
+                else if (/(.jpg|.png)\b/.test(filename)) {
                 }
                 editor.fs.writeFile(filepath, saveContent, function (e) {
                     editor.fs.stat(filepath, function (err, stats) {
@@ -6191,7 +6231,7 @@ var feng3d;
                 }, { name: 'JSON', extensions: ['json'] });
             };
             Hierarchy.prototype.addGameoObjectFromAsset = function (path, parent) {
-                editor.fs.readFile(path, function (err, content) {
+                editor.fs.readFile(path, "utf8", function (err, content) {
                     var json = JSON.parse(content);
                     var gameobject = feng3d.serialization.deserialize(json);
                     gameobject.name = path.split("/").pop().split(".").shift();

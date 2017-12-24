@@ -97,10 +97,10 @@ exports.file = {
                 callback && callback(err);
             });
         });
-    }
-    ,
-    readFile: function (path, callback)
+    },
+    readFile(path, encoding, callback)
     {
+        encoding = encoding || "utf8";
         path = getProjectPath(path);
         fs.open(path, "r", (err, fd) =>
         {
@@ -109,7 +109,7 @@ exports.file = {
                 callback(err, null);
                 return;
             }
-            fs.readFile(path, "utf8", (err, data) =>
+            fs.readFile(path, encoding, (err, data) =>
             {
                 fs.close(fd);
                 callback(err, data);
@@ -157,7 +157,14 @@ exports.file = {
         {
             callback(!err);
         });
-    }
+    },
+    /**
+     * 获取文件绝对路径
+     */
+    getAbsolutePath(path, callback)
+    {
+        callback(null, getProjectPath(path));
+    },
 };
 
 function getProjectPath(path)

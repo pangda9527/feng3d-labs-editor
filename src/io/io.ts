@@ -1,7 +1,13 @@
 namespace feng3d.editor
 {
-    // export var fs: FS = require(__dirname + "/io/file.js").file;
-    export var fs: FS = zipfs;
+    export var fs: FS;
+    if (typeof require == "undefined")
+    {
+        fs = zipfs;
+    } else
+    {
+        fs = require(__dirname + "/io/file.js").file;
+    }
 
     var isSelectFile = false;
 
@@ -47,10 +53,14 @@ namespace feng3d.editor
         stat(path: string, callback: (err: { message: string; }, stats: FileInfo) => void): void;
         readdir(path: string, callback: (err: { message: string; }, files: string[]) => void): void;
         writeFile(path: string, data: string | ArrayBuffer | Uint8Array, callback?: (err: { message: string; }) => void): void;
-        readFile(path: string, callback: (err: { message: string; }, data: string) => void): void;
+        readFile(path: string, encoding: "utf8" | "buffer", callback: (err: { message: string; }, data: string | Buffer) => void): void;
         mkdir(path: string, callback: (err: { message: string; }) => void): void;
         rename(oldPath: string, newPath: string, callback: (err: { message: string; }) => void): void;
         move(src: string, dest: string, callback?: (err: { message: string; }, destfileinfo: FileInfo) => void): void;
         remove(path: string, callback?: (err: { message: string; }) => void): void;
+        /**
+         * 获取文件绝对路径
+         */
+        getAbsolutePath(path: string, callback: (err, absolutePath: string) => void): void;
     }
 }

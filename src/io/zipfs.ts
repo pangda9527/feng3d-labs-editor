@@ -85,7 +85,7 @@ namespace feng3d.editor
                 callback && callback(error);
             }
         },
-        readFile(path: string, callback: (err: { message: string; }, data: string) => void): void
+        readFile(path: string, encoding: string, callback: (err: { message: string; }, data: string) => void): void
         {
             try
             {
@@ -187,6 +187,13 @@ namespace feng3d.editor
             {
                 callback && callback(error);
             }
+        },
+        /**
+         * 获取文件绝对路径
+         */
+        getAbsolutePath(path: string, callback: (err, absolutePath: string) => void): void
+        {
+            callback(null, null);
         }
     };
 }

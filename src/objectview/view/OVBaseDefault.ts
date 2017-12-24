@@ -7,9 +7,10 @@ namespace feng3d.editor
 	@OVComponent()
 	export class OVBaseDefault extends eui.Component implements IObjectView
 	{
+		public label: eui.Label;
+		public image: eui.Image;
+		//
 		private _space: Object;
-
-		label: eui.Label;
 
 		constructor(objectViewInfo: ObjectViewInfo)
 		{
@@ -51,7 +52,18 @@ namespace feng3d.editor
 		 */
 		updateView(): void
 		{
-			this.label.text = String(this._space);
+			this.image.visible = false;
+			this.label.visible = true;
+			var value = this._space;
+			if (typeof value == "string" && value.indexOf("data:image") != -1)
+			{
+				this.image.visible = true;
+				this.label.visible = false;
+				this.image.source = value;
+			} else
+			{
+				this.label.text = String(this._space);
+			}
 		}
 	}
 }

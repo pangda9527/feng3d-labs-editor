@@ -240,11 +240,16 @@ namespace feng3d.editor
                     reader.addEventListener('load', (event) =>
                     {
                         var showFloder = assets.getFile(assets.showFloder);
-                        var arraybuffer: ArrayBuffer = event.target["result"];
-                        var data = new Uint8Array(arraybuffer, 0);
-                        showFloder.addfile(file.name, data);
+                        var result = event.target["result"];
+                        showFloder.addfile(file.name, result);
                     }, false);
-                    reader.readAsArrayBuffer(file);
+                    if (/(jpg|png)/.test(extensions))
+                    {
+                        reader.readAsDataURL(file);
+                    } else
+                    {
+                        reader.readAsArrayBuffer(file);
+                    }
                     break;
             }
         }

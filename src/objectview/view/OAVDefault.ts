@@ -7,13 +7,14 @@ namespace feng3d.editor
 	@OAVComponent()
 	export class OAVDefault extends eui.Component implements IObjectAttributeView
 	{
+		public label: eui.Label;
+		public text: eui.TextInput;
+		//
 		private textTemp: string;
 		private _space: Object;
 		private _attributeName: string;
 		private _attributeType: string;
 		private attributeViewInfo: AttributeViewInfo;
-		label: eui.Label;
-		text: eui.TextInput;
 
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
@@ -136,6 +137,7 @@ namespace feng3d.editor
 		updateView(): void
 		{
 			this.text.enabled = this.attributeViewInfo.writable;
+			var value = this.attributeValue;
 			if (this.attributeValue === undefined)
 			{
 				this.text.text = String(this.attributeValue);

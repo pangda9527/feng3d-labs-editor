@@ -237,6 +237,15 @@ var feng3d;
      * @return
      */
     function getObjectInfo(object) {
+        if (typeof object == "string" || typeof object == "number" || typeof object == "boolean") {
+            return {
+                objectAttributeInfos: [],
+                objectBlockInfos: [],
+                owner: object,
+                component: "",
+                componentParam: undefined
+            };
+        }
         var classConfig = getInheritClassDefinition(object);
         var objectAttributeInfos = [];
         classConfig.attributeDefinitionVec.forEach(function (attributeDefinition) {
