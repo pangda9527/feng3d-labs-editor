@@ -97,10 +97,10 @@ exports.file = {
                 callback && callback(err);
             });
         });
-    }
-    ,
-    readFile: function (path, callback)
+    },
+    readFile(path, encoding, callback)
     {
+        encoding = encoding || "utf8";
         path = getProjectPath(path);
         fs.open(path, "r", (err, fd) =>
         {
@@ -109,7 +109,7 @@ exports.file = {
                 callback(err, null);
                 return;
             }
-            fs.readFile(path, "utf8", (err, data) =>
+            fs.readFile(path, encoding, (err, data) =>
             {
                 fs.close(fd);
                 callback(err, data);
@@ -157,7 +157,40 @@ exports.file = {
         {
             callback(!err);
         });
-    }
+    },
+    /**
+     * 获取文件绝对路径
+     */
+    getAbsolutePath(path, callback)
+    {
+        callback(null, getProjectPath(path));
+    },
+    getAllfilepathInFolder(dirpath, callback)
+    {
+        var totalfiles = [];
+        var folders = [getProjectPath(dirpath)];
+
+        while (folders.length > 0)
+        {
+            var dirtemp = folders.shift();
+            fs.readdirSync(dirtemp).forEach(element =>
+            {
+                var realelementpath = dirtemp + "/" + element;
+                if (fs.statSync(realelementpath).isDirectory())
+                {
+                    folders.push(realelementpath);
+                } else
+                {
+                    totalfiles.push(realelementpath);
+                }
+            });
+        }
+        for (let i = 0; i < totalfiles.length; i++)
+        {
+            totalfiles[i] = totalfiles[i].replace(projectpath + "/", "");
+        }
+        callback(null, totalfiles);
+    },
 };
 
 function getProjectPath(path)
@@ -166,5 +199,7 @@ function getProjectPath(path)
         return path;
     if (path.indexOf(projectpath) != -1)
         return path;
+    if (path == "")
+        return projectpath;
     return projectpath + "/" + path;
 }

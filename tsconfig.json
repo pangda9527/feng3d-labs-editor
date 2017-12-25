@@ -21,6 +21,7 @@
         "src/io/FileObject.ts",
         //
         "src/io/zipfs.ts",
+        "src/io/ossfs.ts",
         "src/io/io.ts",
         //
         "src/caches/editorcache.ts",

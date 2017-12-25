@@ -49,7 +49,7 @@ namespace feng3d.editor
 
         addGameoObjectFromAsset(path: string, parent?: GameObject)
         {
-            fs.readFile(path, (err, content) =>
+            fs.readFile(path, "utf8", (err, content: string) =>
             {
                 var json = JSON.parse(content);
                 var gameobject = serialization.deserialize(json);

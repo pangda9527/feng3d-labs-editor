@@ -24,6 +24,16 @@ namespace feng3d.editor
                 assets.saveObject(gameobject, gameobject.name + ".scene", true);
             }
         },
+        {
+            label: "导出项目", click: () =>
+            {
+                fs.exportProject(function (err, content)
+                {
+                    // see FileSaver.js
+                    saveAs(content, "example.zip");
+                });
+            }
+        },
     ];
 
     /**

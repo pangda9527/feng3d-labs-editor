@@ -85,7 +85,7 @@ namespace feng3d.editor
                 callback && callback(error);
             }
         },
-        readFile(path: string, callback: (err: { message: string; }, data: string) => void): void
+        readFile(path: string, encoding: string, callback: (err: { message: string; }, data: string) => void): void
         {
             try
             {
@@ -187,6 +187,42 @@ namespace feng3d.editor
             {
                 callback && callback(error);
             }
-        }
+        },
+        /**
+         * 获取文件绝对路径
+         */
+        getAbsolutePath(path: string, callback: (err, absolutePath: string) => void): void
+        {
+            callback(null, null);
+        },
+        /**
+         * 获取指定文件下所有文件路径列表
+         */
+        getAllfilepathInFolder(dirpath: string, callback: (err: Error, filepaths: string[]) => void): void
+        {
+            var allfilepaths = Object.keys(zip.files);
+            var subfilemap = {};
+            var files: string[] = [];
+            allfilepaths.forEach(element =>
+            {
+                var result = new RegExp(dirpath + "\\/([\\w.]+)\\b").exec(element);
+                if (result != null)
+                {
+                    files.push(element);
+                }
+            });
+            callback(null, files);
+        },
+        /**
+         * 导出项目
+         */
+        exportProject(callback: (err: Error, data: Blob) => void)
+        {
+            zip.generateAsync({ type: "blob" }).then(function (content)
+            {
+                callback(null, content);
+            });
+        },
+
     };
 }

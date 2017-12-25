@@ -88,7 +88,7 @@ namespace feng3d.editor
         /**
          * 图标名称或者路径
          */
-        image = "resource/assets/icons/json.png";
+        image: egret.Texture | string;
 
         /**
          * 文件夹名称
@@ -146,10 +146,6 @@ namespace feng3d.editor
             {
                 this.image = "folder_png";
             }
-            else if (/(.jpg|.png)\b/.test(fileinfo.path))
-            {
-                this.image = fileinfo.path;
-            }
             else
             {
                 var filename = fileinfo.path.split("/").pop();
@@ -161,6 +157,29 @@ namespace feng3d.editor
                 {
                     this.image = "file_png";
                 }
+            }
+            if (/(.jpg|.png)\b/.test(fileinfo.path))
+            {
+                this.getData((data) =>
+                {
+                    this.image = data;
+                });
+
+                // fs.readFile(this._path, "buffer", (err, data: Buffer) =>
+                // {
+                //     function toArrayBuffer(buf)
+                //     {
+                //         var ab = new ArrayBuffer(buf.length);
+                //         var view = new Uint8Array(ab);
+                //         for (var i = 0; i < buf.length; ++i)
+                //         {
+                //             view[i] = buf[i];
+                //         }
+                //         return ab;
+                //     }
+                //     this.image = new egret.Texture();
+                //     this.image.bitmapData = egret.BitmapData.create("arraybuffer", toArrayBuffer(data));
+                // });
             }
         }
 
@@ -201,7 +220,7 @@ namespace feng3d.editor
             if (this.extension == AssetExtension.material
                 || this.extension == AssetExtension.gameobject)
             {
-                fs.readFile(this._path, (err, content) =>
+                fs.readFile(this._path, "utf8", (err, content: string) =>
                 {
                     var json = JSON.parse(content);
                     this._data = serialization.deserialize(json);
@@ -209,7 +228,7 @@ namespace feng3d.editor
                 });
                 return;
             }
-            fs.readFile(this._path, (err, content) =>
+            fs.readFile(this._path, "utf8", (err, content) =>
             {
                 this._data = content;
                 callback(this._data);
@@ -524,6 +543,9 @@ namespace feng3d.editor
             {
                 var obj = serialization.serialize(content);
                 saveContent = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+            } else if (/(.jpg|.png)\b/.test(filename))
+            {
+
             }
 
             fs.writeFile(filepath, saveContent, (e) =>
