@@ -4,7 +4,7 @@ namespace feng3d.editor
     {
         label?: string;
         depth?: number;
-        isOpen = true;
+        isOpen = false;
 
         /**
          * 是否选中

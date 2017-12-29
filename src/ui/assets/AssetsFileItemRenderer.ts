@@ -47,7 +47,7 @@ namespace feng3d.editor
                         this.data.setDragSource(dragsource);
                     }, ["file"], (dragdata) =>
                         {
-                            var movefile = assets.getFile(dragdata.file);
+                            var movefile = editorAssets.getFile(dragdata.file);
                             movefile.move(this.data.path);
                         });
                 }
@@ -55,44 +55,39 @@ namespace feng3d.editor
                 {
                     drag.register(this, (dragsource) =>
                     {
-                        var extension = this.data.path.split(".").pop();
-                        if (extension == "gameobject")
+                        var extension = this.data.extension;
+                        switch (extension)
                         {
-                            dragsource.file_gameobject = this.data.path;
-                        }
-                        if (extension == "ts")
-                        {
-                            dragsource.file_script = this.data.path;
-                        }
-                        if (extension == "anim")
-                        {
-                            var path = this.data.path;
-                            Loader.loadText(path, (content) =>
-                            {
-                                var animationclip = serialization.deserialize(JSON.parse(content));
-                                dragsource.animationclip = animationclip;
-                                drag.refreshAcceptables();
-                            });
-                        }
-                        if (extension == "material")
-                        {
-                            var path = this.data.path;
-                            Loader.loadText(path, (content) =>
-                            {
-                                var material = serialization.deserialize(JSON.parse(content));
-                                dragsource.material = material;
-                                drag.refreshAcceptables();
-                            });
-                        }
-                        if (extension == "geometry")
-                        {
-                            var path = this.data.path;
-                            Loader.loadText(path, (content) =>
-                            {
-                                var geometry = serialization.deserialize(JSON.parse(content));
-                                dragsource.geometry = geometry;
-                                drag.refreshAcceptables();
-                            });
+                            case AssetExtension.gameobject:
+                                dragsource.file_gameobject = this.data.path;
+                                break;
+                            case AssetExtension.ts:
+                                dragsource.file_script = this.data.path;
+                                break;
+                            case AssetExtension.anim:
+                                var path = this.data.path;
+                                this.data.getData((data) =>
+                                {
+                                    dragsource.animationclip = data;
+                                    drag.refreshAcceptables();
+                                });
+                                break;
+                            case AssetExtension.material:
+                                var path = this.data.path;
+                                this.data.getData((data) =>
+                                {
+                                    dragsource.material = data;
+                                    drag.refreshAcceptables();
+                                });
+                                break;
+                            case AssetExtension.geometry:
+                                var path = this.data.path;
+                                this.data.getData((data) =>
+                                {
+                                    dragsource.geometry = data;
+                                    drag.refreshAcceptables();
+                                });
+                                break;
                         }
                         dragsource.file = this.data.path;
                     }, []);
@@ -107,7 +102,15 @@ namespace feng3d.editor
         {
             if (this.data.isDirectory)
             {
-                assets.showFloder = this.data.path;
+                editorAssets.showFloder = this.data.path;
+            } else if (this.data.extension == AssetExtension.scene)
+            {
+                this.data.getData((data: GameObject) =>
+                {
+                    var scene = data.getComponent(Scene3D);
+                    scene.initCollectComponents();
+                    engine.scene = scene;
+                });
             }
         }
 
@@ -119,7 +122,7 @@ namespace feng3d.editor
         private onrightclick(e: egret.Event)
         {
             e.stopPropagation();
-            assets.popupmenu(this.data);
+            editorAssets.popupmenu(this.data);
         }
 
         private onnameLabelclick()

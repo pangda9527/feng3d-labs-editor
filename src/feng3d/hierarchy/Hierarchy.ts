@@ -1,17 +1,30 @@
 namespace feng3d.editor
 {
-    export var hierarchy: Hierarchy;
-
     export class Hierarchy
     {
-        constructor(rootGameObject: GameObject)
+        get rootGameObject()
         {
-            hierarchyTree.init(rootGameObject);
+            return this._rootGameObject;
+        }
+        set rootGameObject(value)
+        {
+            if (this._rootGameObject)
+            {
+                this._rootGameObject.off("added", this.ongameobjectadded, this);
+                this._rootGameObject.off("removed", this.ongameobjectremoved, this);
+            }
+            this._rootGameObject = value;
+            if (this._rootGameObject)
+            {
+                hierarchyTree.init(this._rootGameObject);
+                this._rootGameObject.on("added", this.ongameobjectadded, this);
+                this._rootGameObject.on("removed", this.ongameobjectremoved, this);
+            }
+        }
+        private _rootGameObject: GameObject;
 
-            //
-            editorDispatcher.on("import", this.onImport, this);
-            rootGameObject.on("added", this.ongameobjectadded, this);
-            rootGameObject.on("removed", this.ongameobjectremoved, this);
+        constructor()
+        {
         }
 
         private ongameobjectadded(event: Event<GameObject>)
@@ -24,32 +37,9 @@ namespace feng3d.editor
             hierarchyTree.remove(event.data);
         }
 
-        resetScene(scene: GameObject)
-        {
-            scene.children.forEach(element =>
-            {
-            });
-        }
-
-        private onImport()
-        {
-            fs.selectFile((file) =>
-            {
-                var reader = new FileReader();
-                reader.addEventListener('load', function (event)
-                {
-                    var content = event.target["result"];
-                    var json = JSON.parse(content);
-                    var scene = feng3d.serialization.deserialize(json);
-                    hierarchy.resetScene(scene);
-                });
-                reader.readAsText(file[0]);
-            }, { name: 'JSON', extensions: ['json'] });
-        }
-
         addGameoObjectFromAsset(path: string, parent?: GameObject)
         {
-            fs.readFile(path, "utf8", (err, content: string) =>
+            fs.readFileAsString(path, (err, content: string) =>
             {
                 var json = JSON.parse(content);
                 var gameobject = serialization.deserialize(json);
@@ -62,4 +52,6 @@ namespace feng3d.editor
             });
         }
     }
+
+    export var hierarchy = new Hierarchy();
 }

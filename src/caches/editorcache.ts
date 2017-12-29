@@ -33,23 +33,4 @@ namespace feng3d.editor
     {
         editorcache.save();
     });
-
-
-    export class A
-    {
-        @oav()
-        a = 1;
-    }
-    
-    export class AA extends A
-    {
-        @oav()
-        aa = 1;
-    }
-
-    export class AAA extends AA
-    {
-        @oav()
-        aaa = 1;
-    }
 }

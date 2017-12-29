@@ -21,6 +21,7 @@
         "src/io/FileObject.ts",
         //
         "src/io/zipfs.ts",
+        "src/io/ossfs.ts",
         "src/io/io.ts",
         //
         "src/caches/editorcache.ts",
@@ -30,6 +31,7 @@
         "src/shortcut/editorshortcut.ts",
         //
         "src/ui/Feng3dView.ts",
+        "src/ui/CameraPreview.ts",
         "src/ui/components/SplitGroup.ts",
         "src/ui/components/maskview.ts",
         "src/ui/components/popupview.ts",
@@ -41,15 +43,17 @@
         "src/ui/components/ComponentView.ts",
         "src/ui/components/menu.ts",
         //
-        "src/objectview/view/OVBaseDefault.ts",
-        "src/objectview/view/OAVDefault.ts",
-        "src/objectview/view/OBVDefault.ts",
-        "src/objectview/view/OVDefault.ts",
-        "src/objectview/view/BooleanAttrView.ts",
-        "src/objectview/view/OAVNumber.ts",
+        "src/objectview/ov/OVBaseDefault.ts",
+        "src/objectview/ov/OVDefault.ts",
+        "src/objectview/ov/OVTransform.ts",
+        //
+        "src/objectview/obv/OBVDefault.ts",
         //
         "src/objectview/events/ObjectViewEvent.ts",
         //
+        "src/objectview/oav/OAVDefault.ts",
+        "src/objectview/oav/BooleanAttrView.ts",
+        "src/objectview/oav/OAVNumber.ts",
         "src/objectview/oav/OAVVector3D.ts",
         "src/objectview/oav/OAVArray.ts",
         "src/objectview/oav/OAVComponentList.ts",
@@ -59,7 +63,7 @@
         "src/ui/hierarchy/HierarchyTreeItemRenderer.ts",
         "src/ui/hierarchy/HierarchyView.ts",
         //
-        "src/ui/assets/assets.ts",
+        "src/ui/assets/editorAssets.ts",
         "src/ui/assets/AssetsFile.ts",
         "src/ui/assets/AssetsFileItemRenderer.ts",
         "src/ui/assets/AssetsTreeItemRenderer.ts",
@@ -93,7 +97,6 @@
         "src/feng3d/hierarchy/HierarchyTree.ts",
         "src/feng3d/hierarchy/Hierarchy.ts",
         "src/feng3d/scene/SceneRotateTool.ts",
-        "src/feng3d/scene/SceneControl.ts",
         "src/feng3d/GroundGrid.ts",
         "src/feng3d/Main3D.ts",
         "src/feng3d/EditorComponent.ts",
@@ -102,6 +105,7 @@
         "src/global/MouseEvent.ts",
         "src/global/MouseEventEnvironment.ts",
         //
+        "src/scripts/EditorScript.ts",
         "src/scripts/MouseRayTestScript.ts",
         "src/scripts/DirectionLightIcon.ts",
         "src/scripts/PointLightIcon.ts",

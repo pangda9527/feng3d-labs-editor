@@ -61,7 +61,7 @@ namespace feng3d.editor
             var oy = py.subtract(po);
             var oz = pz.subtract(po);
             //摄像机前方方向
-            var cameraSceneTransform = engine.camera.transform.localToWorldMatrix;
+            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new Plane3D();
             var selectedGameObject: GameObject = <any>event.currentTarget;
@@ -143,7 +143,7 @@ namespace feng3d.editor
             //鼠标按下时不更新
             if (this.ismouseDown)
                 return;
-            var cameraPos = engine.camera.transform.scenePosition;
+            var cameraPos = editorCamera.transform.scenePosition;
             var localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformVector(cameraPos);
 
             this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;

@@ -19,6 +19,7 @@
 			<e:HorizontalLayout gap="6"/>
 		</e:layout>
 		</e:Group>
+		<e:Button id="playBtn" label="播放" scaleX="1" scaleY="1" verticalCenter="0" horizontalCenter="0"/>
 		<e:layout>
 		<e:BasicLayout/>
 		</e:layout>

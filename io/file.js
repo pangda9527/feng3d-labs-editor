@@ -83,6 +83,7 @@ exports.file = {
     },
     writeFile: function (path, data, callback)
     {
+        var buffer = new Buffer(data);
         path = getProjectPath(path);
         fs.open(path, "w", (err, fd) =>
         {
@@ -91,16 +92,18 @@ exports.file = {
                 callback && callback(err);
                 return;
             }
-            fs.writeFile(path, data, (err) =>
+            fs.writeFile(path, buffer, "binary", (err) =>
             {
                 fs.close(fd);
                 callback && callback(err);
             });
         });
     },
-    readFile(path, encoding, callback)
+    /**
+     * 读取文件为字符串
+     */
+    readFileAsString(path, callback)
     {
-        encoding = encoding || "utf8";
         path = getProjectPath(path);
         fs.open(path, "r", (err, fd) =>
         {
@@ -109,7 +112,24 @@ exports.file = {
                 callback(err, null);
                 return;
             }
-            fs.readFile(path, encoding, (err, data) =>
+            fs.readFile(path, "utf8", (err, data) =>
+            {
+                fs.close(fd);
+                callback(err, data);
+            });
+        });
+    },
+    readFile(path, callback)
+    {
+        path = getProjectPath(path);
+        fs.open(path, "r", (err, fd) =>
+        {
+            if (err)
+            {
+                callback(err, null);
+                return;
+            }
+            fs.readFile(path, (err, data) =>
             {
                 fs.close(fd);
                 callback(err, data);
@@ -165,6 +185,47 @@ exports.file = {
     {
         callback(null, getProjectPath(path));
     },
+    getAllfilepathInFolder(dirpath, callback)
+    {
+        var totalfiles = [];
+        var folders = [getProjectPath(dirpath)];
+
+        while (folders.length > 0)
+        {
+            var dirtemp = folders.shift();
+            fs.readdirSync(dirtemp).forEach(element =>
+            {
+                var realelementpath = dirtemp + "/" + element;
+                if (fs.statSync(realelementpath).isDirectory())
+                {
+                    folders.push(realelementpath);
+                } else
+                {
+                    totalfiles.push(realelementpath);
+                }
+            });
+        }
+        for (let i = 0; i < totalfiles.length; i++)
+        {
+            totalfiles[i] = totalfiles[i].replace(projectpath + "/", "");
+        }
+        callback(null, totalfiles);
+    },
+    /**
+     * 清空项目
+     */
+    clearProject(callback)
+    {
+        fs.remove(projectpath, (err) =>
+        {
+            if (err) return;
+            fs.mkdir(projectpath, (err) =>
+            {
+                if (err) return;
+                callback();
+            });
+        });
+    }
 };
 
 function getProjectPath(path)
@@ -173,5 +234,7 @@ function getProjectPath(path)
         return path;
     if (path.indexOf(projectpath) != -1)
         return path;
+    if (path == "")
+        return projectpath;
     return projectpath + "/" + path;
 }

@@ -2,14 +2,16 @@ namespace feng3d.editor
 {
 	export class TopView extends eui.Component implements eui.UIComponent
 	{
-		mainButton: eui.Button;
-		moveButton: eui.ToggleButton;
-		rotateButton: eui.ToggleButton;
-		scaleButton: eui.ToggleButton;
-		worldButton: eui.ToggleButton;
-		centerButton: eui.ToggleButton;
-		helpButton: eui.Button;
-		settingButton: eui.Button;
+		public topGroup: eui.Group;
+		public mainButton: eui.Button;
+		public moveButton: eui.ToggleButton;
+		public rotateButton: eui.ToggleButton;
+		public scaleButton: eui.ToggleButton;
+		public worldButton: eui.ToggleButton;
+		public centerButton: eui.ToggleButton;
+		public helpButton: eui.Button;
+		public settingButton: eui.Button;
+		public playBtn: eui.Button;
 
 		constructor()
 		{
@@ -39,6 +41,7 @@ namespace feng3d.editor
 			this.scaleButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.worldButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.centerButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.playBtn.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
 			this.helpButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
@@ -56,6 +59,7 @@ namespace feng3d.editor
 			this.scaleButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.worldButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.centerButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.playBtn.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
 			this.helpButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
@@ -94,6 +98,30 @@ namespace feng3d.editor
 					break;
 				case this.centerButton:
 					mrsTool.isBaryCenter = !mrsTool.isBaryCenter;
+					break;
+				case this.playBtn:
+					editorAssets.saveScene("default.scene", engine.scene, (err) =>
+					{
+						if (err)
+						{
+							warn(err);
+							return;
+						}
+						if (fs == indexedDBfs)
+						{
+							window.open(`run.html?project=${editorcache.projectname}`);
+							return;
+						}
+						fs.getAbsolutePath("index.html", (err, path) =>
+						{
+							if (err)
+							{
+								warn(err);
+								return;
+							}
+							window.open(path);
+						});
+					});
 					break;
 			}
 		}

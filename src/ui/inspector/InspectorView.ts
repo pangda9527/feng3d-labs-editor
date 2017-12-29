@@ -48,7 +48,7 @@ namespace feng3d.editor
 		private onRemovedFromStage()
 		{
 			this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-			watcher.watch(editorData, "selectedObjects", this.onDataChange, this);
+			watcher.unwatch(editorData, "selectedObjects", this.onDataChange, this);
 		}
 
 		private onDataChange()

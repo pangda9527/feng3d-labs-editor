@@ -8,7 +8,12 @@ namespace feng3d.editor
 
     export var assetsDispather: IEventDispatcher<AssetsEventMap> = new EventDispatcher();
 
-    export var assets = {
+    /**
+     * 根文件
+     */
+    var rootfileinfo: AssetsFile;
+
+    export var editorAssets = {
         //attribute
         /**
          * 项目根路径
@@ -17,9 +22,94 @@ namespace feng3d.editor
         assetsPath: "",
         showFloder: "",
         //function
-        initproject: initproject,
-        getFile: getFile,
-        deletefile: deletefile,
+        initproject(path: string, callback: () => void)
+        {
+            var assetsPath = "Assets";
+            editorAssets.projectPath = path;
+            editorAssets.assetsPath = assetsPath;
+            //
+            fs.stat(assetsPath, (err, fileInfo) =>
+            {
+                if (err)
+                {
+                    fs.mkdir(assetsPath, (err) =>
+                    {
+                        if (err)
+                        {
+                            alert("初始化项目失败！");
+                            error(err);
+                            return;
+                        }
+                        fs.stat(assetsPath, (err, fileInfo) =>
+                        {
+                            rootfileinfo = new AssetsFile(fileInfo);
+                            editorAssets.showFloder = fileInfo.path;
+                            rootfileinfo.initChildren(Number.MAX_VALUE, callback);
+                        });
+                    });
+                } else
+                {
+                    rootfileinfo = new AssetsFile(fileInfo);
+                    editorAssets.showFloder = fileInfo.path;
+                    rootfileinfo.initChildren(Number.MAX_VALUE, callback);
+                }
+            });
+        },
+        /**
+         * 获取文件
+         * @param path 文件路径
+         */
+        getFile(path: string): AssetsFile
+        {
+            return rootfileinfo.getFile(path);
+        },
+        /**
+         * 删除文件
+         * @param path 文件路径
+         */
+        deletefile(path: string, callback?: (assetsFile: AssetsFile) => void)
+        {
+            var assetsFile = editorAssets.getFile(path);
+            if (assetsFile)
+                assetsFile.deleteFile(callback);
+            else
+            {
+                fs.remove(path, () =>
+                {
+                    callback(null);
+                });
+            }
+        },
+        readScene(path: string, callback: (err: Error, scene: Scene3D) => void)
+        {
+            fs.readFileAsString(path, (err, data) =>
+            {
+                if (err)
+                {
+                    callback(err, null);
+                    return;
+                }
+                var json = JSON.parse(data);
+                var sceneobject = serialization.deserialize(json);
+                var scene = sceneobject.getComponent(Scene3D);
+                scene.initCollectComponents();
+                callback(null, scene);
+            });
+        },
+        /**
+         * 保存场景到文件
+         * @param path 场景路径
+         * @param scene 保存的场景
+         */
+        saveScene(path: string, scene: Scene3D, callback: (err: Error) => void = (err) => { })
+        {
+            var obj = serialization.serialize(scene.gameObject);
+            var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+            dataTransform.stringToUint8Array(str, (uint8Array) =>
+            {
+                fs.writeFile(path, uint8Array, callback)
+            });
+        },
         /**
         * 移动文件
         * @param path 移动的文件路径
@@ -28,7 +118,7 @@ namespace feng3d.editor
         */
         movefile: function (path: string, destdirpath: string, callback?: () => void)
         {
-            var assetsfile = getFile(path);
+            var assetsfile = editorAssets.getFile(path);
             if (assetsfile)
             {
                 assetsfile.move(destdirpath, callback);
@@ -39,7 +129,13 @@ namespace feng3d.editor
                 fs.move(path, dest, callback);
             }
         },
-        getparentdir: getparentdir,
+        getparentdir(path: string)
+        {
+            var paths = path.split("/");
+            paths.pop();
+            var parentdir = paths.join("/");
+            return parentdir;
+        },
         /**
          * 弹出文件菜单
          */
@@ -84,7 +180,7 @@ namespace feng3d.editor
                     {
                         label: "导入资源", click: () =>
                         {
-                            fs.selectFile(assets.inputFiles, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
+                            fs.selectFile(editorAssets.inputFiles, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
                         }
                     });
             }
@@ -144,9 +240,9 @@ namespace feng3d.editor
                 });
             }
         },
-        saveObject: function (object: GameObject | AnimationClip, filename: string, override = false, callback?: (file: AssetsFile) => void)
+        saveObject: function (object: GameObject | AnimationClip | Material | Geometry, filename: string, override = false, callback?: (file: AssetsFile) => void)
         {
-            var showFloder = assets.getFile(assets.showFloder);
+            var showFloder = editorAssets.getFile(editorAssets.showFloder);
             showFloder.addfile(filename, object, override, callback);
         },
         /**
@@ -164,7 +260,7 @@ namespace feng3d.editor
             for (let i = 0; i < files.length; i++)
             {
                 const element = files[i];
-                assets.inputFile(element);
+                editorAssets.inputFile(element);
             }
         },
         inputFile: function (file: File)
@@ -183,7 +279,7 @@ namespace feng3d.editor
                             war3Model.root = file.name.substring(0, file.name.lastIndexOf("/") + 1);
                             var gameobject = war3Model.getMesh();
                             gameobject.name = file.name.split("/").pop().split(".").shift();
-                            assets.saveObject(gameobject, gameobject.name + ".gameobject");
+                            editorAssets.saveObject(gameobject, gameobject.name + ".gameobject");
                         });
                     }, false);
                     reader.readAsText(file);
@@ -194,7 +290,7 @@ namespace feng3d.editor
                         ObjLoader.parse(event.target["result"], (gameobject: GameObject) =>
                         {
                             gameobject.name = file.name.split("/").pop().split(".").shift();
-                            assets.saveObject(gameobject, gameobject.name + ".gameobject");
+                            editorAssets.saveObject(gameobject, gameobject.name + ".gameobject");
                         });
                     }, false);
                     reader.readAsText(file);
@@ -209,7 +305,7 @@ namespace feng3d.editor
                     threejsLoader.load(file, (gameobject) =>
                     {
                         gameobject.name = file.name.split("/").pop().split(".").shift();
-                        assets.saveObject(gameobject, gameobject.name + ".gameobject");
+                        editorAssets.saveObject(gameobject, gameobject.name + ".gameobject");
                         // engine.root.addChild(gameobject);
                     });
                     break;
@@ -219,7 +315,7 @@ namespace feng3d.editor
                         MD5Loader.parseMD5Mesh(event.target["result"], (gameobject) =>
                         {
                             gameobject.name = file.name.split("/").pop().split(".").shift();
-                            assets.saveObject(gameobject, gameobject.name + ".gameobject");
+                            editorAssets.saveObject(gameobject, gameobject.name + ".gameobject");
                             // engine.root.addChild(gameobject);
                         });
                     }, false);
@@ -231,7 +327,7 @@ namespace feng3d.editor
                         MD5Loader.parseMD5Anim(event.target["result"], (animationclip) =>
                         {
                             animationclip.name = file.name.split("/").pop().split(".").shift();
-                            assets.saveObject(animationclip, animationclip.name + ".anim");
+                            editorAssets.saveObject(animationclip, animationclip.name + ".anim");
                         });
                     }, false);
                     reader.readAsText(file);
@@ -239,93 +335,13 @@ namespace feng3d.editor
                 default:
                     reader.addEventListener('load', (event) =>
                     {
-                        var showFloder = assets.getFile(assets.showFloder);
+                        var showFloder = editorAssets.getFile(editorAssets.showFloder);
                         var result = event.target["result"];
                         showFloder.addfile(file.name, result);
                     }, false);
-                    if (/(jpg|png)/.test(extensions))
-                    {
-                        reader.readAsDataURL(file);
-                    } else
-                    {
-                        reader.readAsArrayBuffer(file);
-                    }
+                    reader.readAsArrayBuffer(file);
                     break;
             }
         }
     };
-
-    function initproject(path: string, callback: () => void)
-    {
-        var assetsPath = "Assets";
-        assets.projectPath = path;
-        assets.assetsPath = assetsPath;
-        //
-        fs.stat(assetsPath, (err, fileInfo) =>
-        {
-            if (err)
-            {
-                fs.mkdir(assetsPath, (err) =>
-                {
-                    if (err)
-                    {
-                        alert("初始化项目失败！");
-                        error(err);
-                        return;
-                    }
-                    fs.stat(assetsPath, (err, fileInfo) =>
-                    {
-                        rootfileinfo = new AssetsFile(fileInfo);
-                        assets.showFloder = fileInfo.path;
-                        rootfileinfo.initChildren(Number.MAX_VALUE, callback);
-                    });
-                });
-            } else
-            {
-                rootfileinfo = new AssetsFile(fileInfo);
-                assets.showFloder = fileInfo.path;
-                rootfileinfo.initChildren(Number.MAX_VALUE, callback);
-            }
-        });
-    }
-
-    /**
-     * 根文件
-     */
-    var rootfileinfo: AssetsFile;
-
-    /**
-     * 获取文件
-     * @param path 文件路径
-     */
-    function getFile(path: string): AssetsFile
-    {
-        return rootfileinfo.getFile(path);
-    }
-
-    /**
-     * 删除文件
-     * @param path 文件路径
-     */
-    function deletefile(path: string, callback?: (assetsFile: AssetsFile) => void)
-    {
-        var assetsFile = getFile(path);
-        if (assetsFile)
-            assetsFile.deleteFile(callback);
-        else
-        {
-            fs.remove(path, () =>
-            {
-                callback(null);
-            });
-        }
-    }
-
-    function getparentdir(path: string)
-    {
-        var paths = path.split("/");
-        paths.pop();
-        var parentdir = paths.join("/");
-        return parentdir;
-    }
 }

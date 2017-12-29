@@ -21,7 +21,7 @@ namespace feng3d.editor
 
             var __this = this;
 
-            engine.camera.transform.on("transformChanged", update, this);
+            editorCamera.transform.on("transformChanged", update, this);
 
             var meshRenderer = groundGridObject.addComponent(MeshRenderer);
             var segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
@@ -31,7 +31,7 @@ namespace feng3d.editor
 
             function update()
             {
-                var cameraGlobalPosition = engine.camera.transform.scenePosition;
+                var cameraGlobalPosition = editorCamera.transform.scenePosition;
                 var level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
                 var step = Math.pow(10, level - 1);
 
@@ -40,7 +40,7 @@ namespace feng3d.editor
 
                 //设置在原点
                 startX = startZ = 0;
-                step = 100;
+                step = 1;
 
                 var halfNum = __this.num / 2;
 

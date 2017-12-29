@@ -12,36 +12,14 @@ namespace feng3d.editor
         {
             callback(null, []);
         },
-        /**
-         * 创建项目
-         */
-        createproject(projectname: string, callback: () => void)
-        {
-            _projectname = projectname;
-            zip = new JSZip();
-            var request = new XMLHttpRequest();
-            request.open('Get', "./templates/template.zip", true);
-            request.responseType = "arraybuffer";
-            request.onload = (ev) =>
-            {
-                zip.loadAsync(request.response).then((value) =>
-                {
-                    callback();
-                });
-            };
-            request.onerror = (ev) =>
-            {
-                error(request.responseURL + "不存在，无法初始化项目！");
-            }
-            request.send();
-        },
         initproject(projectname: string, callback: () => void)
         {
             _projectname = projectname;
+            // todo 启动监听 ts代码变化自动编译
             callback();
         },
         //
-        stat(path: string, callback: (err: { message: string; }, stats: FileInfo) => void): void
+        stat(path: string, callback: (err: Error, stats: FileInfo) => void): void
         {
             var file = zip.files[path] || zip.files[path + "/"];
             if (file)
@@ -56,16 +34,16 @@ namespace feng3d.editor
                 callback(null, fileInfo);
             } else
             {
-                callback({ message: path + " 不存在" }, null);
+                callback(new Error(path + " 不存在"), null);
             }
         },
-        readdir(path: string, callback: (err: { message: string; }, files: string[]) => void): void
+        readdir(path: string, callback: (err: Error, files: string[]) => void): void
         {
             var allfilepaths = Object.keys(zip.files);
             var subfilemap = {};
             allfilepaths.forEach(element =>
             {
-                var result = new RegExp(path + "\\/([\\w.]+)\\b").exec(element);
+                var result = new RegExp(path + "\\/([\\w\\s\\(\\).\\u4e00-\\u9fa5]+)\\b").exec(element);
                 if (result != null)
                 {
                     subfilemap[result[1]] = 1;
@@ -74,7 +52,7 @@ namespace feng3d.editor
             var files = Object.keys(subfilemap);
             callback(null, files);
         },
-        writeFile(path: string, data: string, callback?: (err: { message: string; }) => void): void
+        writeFile(path: string, data: ArrayBuffer, callback?: (err: Error) => void): void
         {
             try
             {
@@ -85,7 +63,26 @@ namespace feng3d.editor
                 callback && callback(error);
             }
         },
-        readFile(path: string, encoding: string, callback: (err: { message: string; }, data: string) => void): void
+        readFile(path: string, callback: (err: Error, data: ArrayBuffer) => void): void
+        {
+            try
+            {
+                zip.file(path).async("arraybuffer").then((data) =>
+                {
+                    callback(null, data);
+                }, (reason) =>
+                    {
+                        callback(reason, null);
+                    });
+            } catch (error)
+            {
+                callback(error, null);
+            }
+        },
+        /**
+        * 读取文件为字符串
+        */
+        readFileAsString(path: string, callback: (err: Error, data: string) => void): void
         {
             try
             {
@@ -101,12 +98,12 @@ namespace feng3d.editor
                 callback(error, null);
             }
         },
-        mkdir(path: string, callback: (err: { message: string; }) => void): void
+        mkdir(path: string, callback: (err: Error) => void): void
         {
             zip.folder(path);
             callback(null);
         },
-        rename(oldPath: string, newPath: string, callback: (err: { message: string; }) => void): void
+        rename(oldPath: string, newPath: string, callback: (err: Error) => void): void
         {
             try
             {
@@ -124,7 +121,7 @@ namespace feng3d.editor
                 callback && callback(error);
             }
         },
-        move(src: string, dest: string, callback?: (err: { message: string; }, destfileinfo: FileInfo) => void): void
+        move(src: string, dest: string, callback?: (err: Error) => void): void
         {
             try
             {
@@ -150,19 +147,13 @@ namespace feng3d.editor
                     //使用重命名移动文件
                     zipfs.rename(src, dest, null)
                 }
-                if (callback)
-                {
-                    zipfs.stat(dest, (err, destfileinfo) =>
-                    {
-                        callback(null, destfileinfo);
-                    });
-                }
+                callback && callback(null);
             } catch (error)
             {
-                callback && callback(error, null);
+                callback && callback(error);
             }
         },
-        remove(path: string, callback?: (err: { message: string; }) => void): void
+        remove(path: string, callback?: (err: Error) => void): void
         {
             try
             {
@@ -194,6 +185,24 @@ namespace feng3d.editor
         getAbsolutePath(path: string, callback: (err, absolutePath: string) => void): void
         {
             callback(null, null);
-        }
+        },
+        /**
+         * 获取指定文件下所有文件路径列表
+         */
+        getAllfilepathInFolder(dirpath: string, callback: (err: Error, filepaths: string[]) => void): void
+        {
+            var allfilepaths = Object.keys(zip.files);
+            var subfilemap = {};
+            var files: string[] = [];
+            allfilepaths.forEach(element =>
+            {
+                var result = new RegExp(dirpath + "\\/([\\w.]+)\\b").exec(element);
+                if (result != null)
+                {
+                    files.push(element);
+                }
+            });
+            callback(null, files);
+        },
     };
 }

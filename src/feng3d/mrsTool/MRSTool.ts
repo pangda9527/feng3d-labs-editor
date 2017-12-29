@@ -98,11 +98,33 @@ namespace feng3d.editor
             this.rTool.gameobjectControllerTarget = this.controllerTarget;
             this.sTool.gameobjectControllerTarget = this.controllerTarget;
             //
-
             this.currentTool = this.mTool;
-
+            //
             watcher.watch(editorData, "selectedObjects", this.onSelectedGameObjectChange, this);
             watcher.watch(mrsTool, "toolType", this.onToolTypeChange, this);
+        }
+
+        dispose()
+        {
+            //
+            this.currentTool = null;
+            //
+            this.mrsToolObject.dispose();
+            this.mrsToolObject = null;
+            editorData.mrsToolObject = null;
+            //
+            this.controllerTarget = null;
+            this.mTool.dispose();
+            this.mTool = null;
+            this.rTool.dispose();
+            this.rTool = null;
+            this.sTool.dispose();
+            this.sTool = null;
+            //
+            watcher.unwatch(editorData, "selectedObjects", this.onSelectedGameObjectChange, this);
+            watcher.unwatch(mrsTool, "toolType", this.onToolTypeChange, this);
+
+            super.dispose();
         }
 
         private onSelectedGameObjectChange()

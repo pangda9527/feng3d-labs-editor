@@ -1,6 +1,6 @@
 namespace feng3d.editor
 {
-    export class MouseRayTestScript extends Script
+    export class MouseRayTestScript extends EditorScript
     {
         init(gameObject: GameObject)
         {

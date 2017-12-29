@@ -55,7 +55,7 @@ namespace feng3d.editor
 			this.image.visible = false;
 			this.label.visible = true;
 			var value = this._space;
-			if (typeof value == "string" && value.indexOf("data:image") != -1)
+			if (typeof value == "string" && value.indexOf("data:") != -1)
 			{
 				this.image.visible = true;
 				this.label.visible = false;

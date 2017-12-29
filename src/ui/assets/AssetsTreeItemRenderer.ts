@@ -43,7 +43,7 @@ namespace feng3d.editor
                     dragsource.file = this.data.path;
                 }, ["file"], (dragdata) =>
                     {
-                        var movefile = assets.getFile(dragdata.file);
+                        var movefile = editorAssets.getFile(dragdata.file);
                         movefile.move(this.data.path);
                     });
             } else
@@ -53,12 +53,12 @@ namespace feng3d.editor
         }
         private onclick()
         {
-            assets.showFloder = this.data.path;
+            editorAssets.showFloder = this.data.path;
         }
 
         private onrightclick(e)
         {
-            assets.popupmenu(this.data);
+            editorAssets.popupmenu(this.data);
         }
 
         private onnameLabelclick()
