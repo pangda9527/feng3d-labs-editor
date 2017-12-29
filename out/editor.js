@@ -8696,7 +8696,7 @@ var feng3d;
                 label: "导出项目", click: function () {
                     editor.fs.exportProject(function (err, content) {
                         // see FileSaver.js
-                        saveAs(content, "example.feng3d");
+                        saveAs(content, "example.feng3d.zip");
                     });
                 }
             },

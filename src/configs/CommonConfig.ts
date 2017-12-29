@@ -50,7 +50,7 @@ namespace feng3d.editor
                 fs.exportProject(function (err, content)
                 {
                     // see FileSaver.js
-                    saveAs(content, "example.feng3d");
+                    saveAs(content, "example.feng3d.zip");
                 });
             }
         },

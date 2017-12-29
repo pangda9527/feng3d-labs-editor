@@ -11419,7 +11419,8 @@ var feng3d;
             feng3d.oav({ componentParam: { dragparam: { accepttype: "file_script" } } })
         ], Script.prototype, "url", null);
         __decorate([
-            feng3d.oav()
+            feng3d.oav(),
+            feng3d.serialize()
         ], Script.prototype, "enabled", void 0);
         return Script;
     }(feng3d.Component));
