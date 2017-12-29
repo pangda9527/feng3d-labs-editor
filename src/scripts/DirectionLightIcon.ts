@@ -2,6 +2,9 @@ namespace feng3d.editor
 {
     export class DirectionLightIcon extends Script
     {
+        showInInspector = false;
+        serializable = false;
+        
         private lightIcon: GameObject;
         private lightLines: GameObject;
         private textureMaterial: TextureMaterial;
@@ -15,7 +18,7 @@ namespace feng3d.editor
 
         initicon()
         {
-            var size = 100;
+            var size = 1;
             var linesize = 10;
             this.directionalLight = this.getComponent(DirectionalLight);
 
@@ -23,7 +26,7 @@ namespace feng3d.editor
             lightIcon.serializable = false;
             lightIcon.showinHierarchy = false;
             var billboardComponent = lightIcon.addComponent(BillboardComponent);
-            billboardComponent.camera = engine.camera;
+            billboardComponent.camera = editorCamera;
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
             var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
@@ -43,7 +46,7 @@ namespace feng3d.editor
             lightLines.serializable = false;
             lightLines.showinHierarchy = false;
             var holdSizeComponent = lightLines.addComponent(HoldSizeComponent);
-            holdSizeComponent.camera = engine.camera;
+            holdSizeComponent.camera = editorCamera;
             holdSizeComponent.holdSize = 1;
             var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
             var material = meshRenderer.material = new feng3d.SegmentMaterial();

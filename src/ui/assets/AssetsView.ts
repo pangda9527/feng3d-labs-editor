@@ -49,7 +49,7 @@ namespace feng3d.editor
             this.floderpathTxt.touchEnabled = true;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
-            feng3d.watcher.watch(assets, "showFloder", this.updateShowFloder, this);
+            feng3d.watcher.watch(editorAssets, "showFloder", this.updateShowFloder, this);
 
             watcher.watch(editorData, "selectedObjects", this.selectedfilechanged, this);
 
@@ -64,22 +64,22 @@ namespace feng3d.editor
                 if (dragSource.gameobject)
                 {
                     var gameobject: GameObject = dragSource.gameobject;
-                    assets.saveObject(gameobject, gameobject.name + ".gameobject");
+                    editorAssets.saveObject(gameobject, gameobject.name + ".gameobject");
                 }
                 if (dragSource.animationclip)
                 {
                     var animationclip = dragSource.animationclip;
-                    assets.saveObject(gameobject, animationclip.name + ".anim");
+                    editorAssets.saveObject(animationclip, animationclip.name + ".anim");
                 }
                 if (dragSource.material)
                 {
                     var material = dragSource.material;
-                    assets.saveObject(gameobject, material.shaderName + ".material");
+                    editorAssets.saveObject(material, material.shaderName + ".material");
                 }
                 if (dragSource.geometry)
                 {
                     var geometry = dragSource.geometry;
-                    assets.saveObject(gameobject, geometry.name + ".geometry");
+                    editorAssets.saveObject(geometry, geometry.name + ".geometry");
                 }
             });
 
@@ -99,7 +99,7 @@ namespace feng3d.editor
 
             this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
-            feng3d.watcher.unwatch(assets, "showFloder", this.updateShowFloder, this);
+            feng3d.watcher.unwatch(editorAssets, "showFloder", this.updateShowFloder, this);
 
             watcher.unwatch(editorData, "selectedObjects", this.selectedfilechanged, this);
 
@@ -114,7 +114,7 @@ namespace feng3d.editor
 
         private initlist()
         {
-            assets.initproject(assets.projectPath, () =>
+            editorAssets.initproject(editorAssets.projectPath, () =>
             {
                 this.invalidateAssetstree();
             });
@@ -138,7 +138,7 @@ namespace feng3d.editor
 
         updateAssetsTree()
         {
-            var nodes = assets.filter((file) =>
+            var nodes = editorAssets.filter((file) =>
             {
                 if (file.isDirectory)
                 {
@@ -158,22 +158,22 @@ namespace feng3d.editor
         {
             if (oldvalue)
             {
-                var oldnode = assets.getFile(oldvalue);
+                var oldnode = editorAssets.getFile(oldvalue);
                 if (oldnode)
                 {
                     oldnode.currentOpenDirectory = false;
                 }
             }
-            if (assets.showFloder)
+            if (editorAssets.showFloder)
             {
-                var newnode = assets.getFile(assets.showFloder);
+                var newnode = editorAssets.getFile(editorAssets.showFloder);
                 if (newnode)
                 {
                     newnode.currentOpenDirectory = true;
                 }
             }
 
-            var floders = assets.showFloder.split("/");
+            var floders = editorAssets.showFloder.split("/");
 
             var textFlow = new Array<egret.ITextElement>();
             do
@@ -182,13 +182,13 @@ namespace feng3d.editor
                 if (textFlow.length > 0)
                     textFlow.unshift({ text: " > " });
                 textFlow.unshift({ text: floders.pop(), style: { "href": `event:${path}` } });
-                if (path == assets.assetsPath)
+                if (path == editorAssets.assetsPath)
                     break;
             }
             while (floders.length > 0)
             this.floderpathTxt.textFlow = textFlow;
 
-            var fileinfo = assets.getFile(assets.showFloder);
+            var fileinfo = editorAssets.getFile(editorAssets.showFloder);
             if (fileinfo)
             {
                 try
@@ -265,16 +265,16 @@ namespace feng3d.editor
 
         private onfilelistrightclick(e: egret.MouseEvent)
         {
-            var assetsFile = assets.getFile(assets.showFloder);
+            var assetsFile = editorAssets.getFile(editorAssets.showFloder);
             if (assetsFile)
             {
-                assets.popupmenu(assetsFile);
+                editorAssets.popupmenu(assetsFile);
             }
         }
 
         private onfloderpathTxtLink(evt: egret.TextEvent)
         {
-            assets.showFloder = evt.text;
+            editorAssets.showFloder = evt.text;
         }
     }
 
@@ -317,7 +317,7 @@ namespace feng3d.editor
                 var files = dt.files;
                 if (displayobject.getTransformedBounds(displayobject.stage).contains(e.clientX, e.clientY))
                 {
-                    assets.inputFiles(files);
+                    editorAssets.inputFiles(files);
                 }
             }
         }

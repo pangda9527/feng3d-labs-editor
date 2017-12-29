@@ -48,7 +48,7 @@ namespace feng3d.editor
             var yDir = globalMatrix3D.up;
             var zDir = globalMatrix3D.forward;
             //摄像机前方方向
-            var cameraSceneTransform = engine.camera.transform.localToWorldMatrix;
+            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.position;
             this.movePlane3D = new Plane3D();
@@ -121,7 +121,7 @@ namespace feng3d.editor
                 case this.toolModel.freeAxis:
                     var endPoint = engine.mousePos.clone();
                     var offset = endPoint.subtract(this.startMousePos);
-                    var cameraSceneTransform = engine.camera.transform.localToWorldMatrix;
+                    var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
                     this.gameobjectControllerTarget.rotate2(-offset.y, right, -offset.x, up);
@@ -150,7 +150,7 @@ namespace feng3d.editor
 
         protected updateToolModel()
         {
-            var cameraSceneTransform = engine.camera.transform.localToWorldMatrix.clone();
+            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix.clone();
             var cameraDir = cameraSceneTransform.forward;
             cameraDir.negate();
             //

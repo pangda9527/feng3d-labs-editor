@@ -8,11 +8,8 @@ namespace feng3d.editor
                 {
                     if (data.newprojectname && data.newprojectname.length > 0)
                     {
-                        fs.createproject(data.newprojectname, () =>
-                        {
-                            editorcache.projectname = data.newprojectname;
-                            window.location.reload();
-                        });
+                        editorcache.projectname = data.newprojectname;
+                        window.location.reload();
                     }
                 });
             }
@@ -21,7 +18,30 @@ namespace feng3d.editor
             label: "保存场景", click: () =>
             {
                 var gameobject: GameObject = hierarchyTree.rootnode.gameobject;
-                assets.saveObject(gameobject, gameobject.name + ".scene", true);
+                editorAssets.saveObject(gameobject, gameobject.name + ".scene", true);
+            }
+        },
+        {
+            label: "导入项目", click: () =>
+            {
+                fs.selectFile((filelist) =>
+                {
+                    fs.importProject(filelist.item(0), () =>
+                    {
+                        console.log("导入项目完成");
+                        editorAssets.initproject(editorAssets.projectPath, () =>
+                        {
+                            editorAssets.readScene("default.scene", (err, scene) =>
+                            {
+                                engine.scene = scene;
+                                editorui.assetsview.updateShowFloder();
+                                assetsDispather.dispatch("changed");
+                                console.log("导入项目完成!");
+                            });
+
+                        });
+                    });
+                });
             }
         },
         {
@@ -30,7 +50,7 @@ namespace feng3d.editor
                 fs.exportProject(function (err, content)
                 {
                     // see FileSaver.js
-                    saveAs(content, "example.zip");
+                    saveAs(content, "example.feng3d");
                 });
             }
         },
@@ -139,12 +159,12 @@ namespace feng3d.editor
         { label: "PointLight", click: () => { needcreateComponentGameObject.addComponent(PointLight); } },
         { label: "DirectionalLight", click: () => { needcreateComponentGameObject.addComponent(DirectionalLight); } },
         { label: "Script", click: () => { needcreateComponentGameObject.addComponent(Script); } },
-        { label: "MouseRayTestScript", click: () => { needcreateComponentGameObject.addComponent(MouseRayTestScript); } },
         { label: "OutLineComponent", click: () => { needcreateComponentGameObject.addComponent(OutLineComponent); } },
         { label: "HoldSizeComponent", click: () => { needcreateComponentGameObject.addComponent(HoldSizeComponent); } },
         { label: "BillboardComponent", click: () => { needcreateComponentGameObject.addComponent(BillboardComponent); } },
         { label: "Animation", click: () => { needcreateComponentGameObject.addComponent(Animation); } },
         // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
         { label: "CartoonComponent", click: () => { needcreateComponentGameObject.addComponent(CartoonComponent); } },
+        { label: "FPSController", click: () => { needcreateComponentGameObject.addComponent(FPSController); } },
     ];
 }

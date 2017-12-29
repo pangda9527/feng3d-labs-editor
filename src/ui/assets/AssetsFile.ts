@@ -4,7 +4,13 @@ namespace feng3d.editor
     {
         folder = "folder",
         material = "material",
+        geometry = "geometry",
         gameobject = "gameobject",
+        anim = "anim",
+        png = "png",
+        jpg = "jpg",
+        ts = "ts",
+        scene = "scene",
     }
 
     export class AssetsFile extends TreeNode
@@ -129,9 +135,9 @@ namespace feng3d.editor
         {
             return this._data;
         }
-        private _data: string | ArrayBuffer | Uint8Array | StandardMaterial | GameObject | AnimationClip;
+        private _data: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry;
 
-        constructor(fileinfo: FileInfo)
+        constructor(fileinfo: FileInfo, data?: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry)
         {
             super()
 
@@ -141,6 +147,7 @@ namespace feng3d.editor
             this._isDirectory = fileinfo.isDirectory;
             this._size = fileinfo.size;
             this._children = [];
+            this._data = data;
 
             if (fileinfo.isDirectory)
             {
@@ -164,22 +171,6 @@ namespace feng3d.editor
                 {
                     this.image = data;
                 });
-
-                // fs.readFile(this._path, "buffer", (err, data: Buffer) =>
-                // {
-                //     function toArrayBuffer(buf)
-                //     {
-                //         var ab = new ArrayBuffer(buf.length);
-                //         var view = new Uint8Array(ab);
-                //         for (var i = 0; i < buf.length; ++i)
-                //         {
-                //             view[i] = buf[i];
-                //         }
-                //         return ab;
-                //     }
-                //     this.image = new egret.Texture();
-                //     this.image.bitmapData = egret.BitmapData.create("arraybuffer", toArrayBuffer(data));
-                // });
             }
         }
 
@@ -194,16 +185,10 @@ namespace feng3d.editor
                 callback(this._data);
                 return;
             }
-            if (this.extension == AssetExtension.material
-                || this.extension == AssetExtension.gameobject)
+            this.getData((data) =>
             {
-                this.getData((data) =>
-                {
-                    callback(data);
-                });
-                return;
-            }
-            callback(this);
+                callback(data);
+            });
         }
 
         /**
@@ -218,9 +203,13 @@ namespace feng3d.editor
                 return;
             }
             if (this.extension == AssetExtension.material
-                || this.extension == AssetExtension.gameobject)
+                || this.extension == AssetExtension.gameobject
+                || this.extension == AssetExtension.anim
+                || this.extension == AssetExtension.scene
+                || this.extension == AssetExtension.geometry
+            )
             {
-                fs.readFile(this._path, "utf8", (err, content: string) =>
+                fs.readFileAsString(this._path, (err, content: string) =>
                 {
                     var json = JSON.parse(content);
                     this._data = serialization.deserialize(json);
@@ -228,7 +217,19 @@ namespace feng3d.editor
                 });
                 return;
             }
-            fs.readFile(this._path, "utf8", (err, content) =>
+            if (this.extension == AssetExtension.png || this.extension == AssetExtension.jpg)
+            {
+                fs.readFile(this._path, (err, data) =>
+                {
+                    dataTransform.arrayBufferToDataURL(data, (dataurl) =>
+                    {
+                        this._data = dataurl;
+                        callback(this._data);
+                    });
+                });
+                return;
+            }
+            fs.readFileAsString(this._path, (err, content) =>
             {
                 this._data = content;
                 callback(this._data);
@@ -243,7 +244,7 @@ namespace feng3d.editor
         {
             switch (this.extension)
             {
-                case "gameobject":
+                case AssetExtension.gameobject:
                     dragsource.file_gameobject = this.path;
                     break;
                 case AssetExtension.material:
@@ -384,7 +385,7 @@ namespace feng3d.editor
          */
         deleteFile(callback?: (assetsFile: AssetsFile) => void)
         {
-            if (this._path == assets.assetsPath)
+            if (this._path == editorAssets.assetsPath)
             {
                 alert("无法删除根目录");
                 return;
@@ -404,8 +405,8 @@ namespace feng3d.editor
                 });
                 if (/\.ts\b/.test(this._path))
                 {
-                    assets.deletefile(this._path.replace(/\.ts\b/, ".js"), () => { });
-                    assets.deletefile(this._path.replace(/\.ts\b/, ".js.map"), () => { });
+                    editorAssets.deletefile(this._path.replace(/\.ts\b/, ".js"), () => { });
+                    editorAssets.deletefile(this._path.replace(/\.ts\b/, ".js.map"), () => { });
                 }
             }
 
@@ -446,9 +447,9 @@ namespace feng3d.editor
                 this._path = newPath;
                 if (this.isDirectory)
                     editorui.assetsview.updateAssetsTree();
-                if (assets.showFloder == oldPath)
+                if (editorAssets.showFloder == oldPath)
                 {
-                    assets.showFloder = newPath;
+                    editorAssets.showFloder = newPath;
                 }
                 callback && callback(this);
             });
@@ -463,9 +464,9 @@ namespace feng3d.editor
         {
             var oldpath = this._path;
             var newpath = destdirpath + "/" + this.name;
-            var destDir = assets.getFile(destdirpath);
+            var destDir = editorAssets.getFile(destdirpath);
             //禁止向子文件夹移动
-            if (isParent(oldpath, destdirpath))
+            if (oldpath == editorAssets.getparentdir(destdirpath))
                 return;
 
             if (/\.ts\b/.test(this._path))
@@ -473,11 +474,11 @@ namespace feng3d.editor
                 var jspath = this._path.replace(/\.ts\b/, ".js");
                 var jsmappath = this._path.replace(/\.ts\b/, ".js.map");
 
-                assets.movefile(jspath, destdirpath);
-                assets.movefile(jsmappath, destdirpath);
+                editorAssets.movefile(jspath, destdirpath);
+                editorAssets.movefile(jsmappath, destdirpath);
             }
 
-            fs.move(oldpath, newpath, (err, destfileinfo) =>
+            fs.move(oldpath, newpath, (err) =>
             {
                 assert(!err);
 
@@ -486,9 +487,9 @@ namespace feng3d.editor
 
                 if (this.isDirectory)
                     editorui.assetsview.updateAssetsTree();
-                if (assets.showFloder == oldpath)
+                if (editorAssets.showFloder == oldpath)
                 {
-                    assets.showFloder = newpath;
+                    editorAssets.showFloder = newpath;
                 }
                 callback && callback(this);
             });
@@ -522,7 +523,7 @@ namespace feng3d.editor
          * @param content 文件内容
          * @param callback 完成回调
          */
-        addfile(filename: string, content: string | ArrayBuffer | Uint8Array | StandardMaterial | GameObject | AnimationClip, override = false, callback?: (file: AssetsFile) => void)
+        addfile(filename: string, content: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry, override = false, callback?: (file: AssetsFile) => void)
         {
             if (!override)
             {
@@ -530,34 +531,44 @@ namespace feng3d.editor
             }
             var filepath = this._path + "/" + filename;
 
-            var saveContent = content;
-            if (saveContent instanceof StandardMaterial)
+            getcontent((savedata, data) =>
             {
-                var obj = serialization.serialize(content);
-                saveContent = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-            } else if (saveContent instanceof GameObject)
-            {
-                var obj = serialization.serialize(content);
-                saveContent = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-            } else if (saveContent instanceof AnimationClip)
-            {
-                var obj = serialization.serialize(content);
-                saveContent = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-            } else if (/(.jpg|.png)\b/.test(filename))
-            {
-
-            }
-
-            fs.writeFile(filepath, saveContent, (e) =>
-            {
-                fs.stat(filepath, (err, stats) =>
+                fs.writeFile(filepath, savedata, (e) =>
                 {
-                    var assetsFile = new AssetsFile(stats);
-                    assetsFile._data = content;
-                    assetsFile.addto(this);
-                    callback && callback(this);
+                    fs.stat(filepath, (err, stats) =>
+                    {
+                        var assetsFile = new AssetsFile(stats, data);
+                        assetsFile.addto(this);
+                        callback && callback(this);
+                    });
                 });
             });
+
+            function getcontent(callback: (savedata: ArrayBuffer, data: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry) => void)
+            {
+                var saveContent = content;
+                if (content instanceof StandardMaterial
+                    || content instanceof GameObject
+                    || content instanceof AnimationClip
+                )
+                {
+                    var obj = serialization.serialize(content);
+                    var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                    dataTransform.stringToUint8Array(str, (uint8Array) =>
+                    {
+                        callback(uint8Array, saveContent);
+                    });
+                } else if (/(\.jpg\b|\.png\b)/.test(filename))
+                {
+                    dataTransform.arrayBufferToDataURL(<ArrayBuffer>content, (datarul) =>
+                    {
+                        callback(<ArrayBuffer>content, datarul);
+                    });
+                } else
+                {
+                    callback(<ArrayBuffer>content, content);
+                }
+            }
         }
 
         /**
@@ -614,25 +625,5 @@ namespace feng3d.editor
             } while (childrennames.indexOf(path) != -1);
             return path;
         }
-    }
-
-    function getparentdir(path: string)
-    {
-        var paths = path.split("/");
-        paths.pop();
-        var parentdir = paths.join("/");
-        return parentdir;
-    }
-
-    function isParent(parenturl: string, childurl: string)
-    {
-        var parents = parenturl.split("/");
-        var childs = childurl.split("/");
-        for (var i = 0; i < childs.length; i++)
-        {
-            if (childs[i] != parent[i])
-                return false;
-        }
-        return true;
     }
 }

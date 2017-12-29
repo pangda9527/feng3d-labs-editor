@@ -2,6 +2,9 @@ namespace feng3d.editor
 {
     export class PointLightIcon extends Script
     {
+        showInInspector = false;
+        serializable = false;
+
         private lightIcon: GameObject;
         private lightLines: GameObject;
         private lightLines1: GameObject;
@@ -19,14 +22,14 @@ namespace feng3d.editor
 
         initicon()
         {
-            var size = 100;
+            var size = 1;
             this.pointLight = this.getComponent(PointLight);
 
             var lightIcon = this.lightIcon = GameObject.create("Icon");
             lightIcon.serializable = false;
             lightIcon.showinHierarchy = false;
             var billboardComponent = lightIcon.addComponent(BillboardComponent);
-            billboardComponent.camera = engine.camera;
+            billboardComponent.camera = editorCamera;
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
             var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
@@ -46,7 +49,7 @@ namespace feng3d.editor
             lightLines.serializable = false;
             lightLines.showinHierarchy = false;
             var lightLines1 = this.lightLines1 = GameObject.create("Lines1");
-            lightLines1.addComponent(BillboardComponent).camera = engine.camera;
+            lightLines1.addComponent(BillboardComponent).camera = editorCamera;
             lightLines1.mouseEnabled = false;
             lightLines1.serializable = false;
             lightLines1.showinHierarchy = false;
@@ -111,7 +114,7 @@ namespace feng3d.editor
             if (editorData.selectedGameObjects.indexOf(this.gameObject) != -1)
             {
                 //
-                var camerapos = this.gameObject.transform.inverseTransformPoint(engine.camera.gameObject.transform.scenePosition);
+                var camerapos = this.gameObject.transform.inverseTransformPoint(editorCamera.gameObject.transform.scenePosition);
                 //
                 this.segmentGeometry.removeAllSegments();
                 var alpha = 1;

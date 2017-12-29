@@ -199,7 +199,7 @@ namespace feng3d.editor
          * @param onError 错误时回调 onError([object FileObject])
          * @param thisPtr 执行域
          */
-        createFile(content: string, onComplete: Function, onError: Function, thisPtr: any): void
+        createFile(content: string | ArrayBuffer, onComplete: Function, onError: Function, thisPtr: any): void
         {
             this.saveFile(content, onComplete, onError, thisPtr);
         }
@@ -211,8 +211,17 @@ namespace feng3d.editor
          * @param onError 错误时回调 onError([object FileObject])
          * @param thisPtr 执行域
          */
-        saveFile(content: string, onComplete: Function, onError: Function, thisPtr: any): void
+        saveFile(content: string | ArrayBuffer, onComplete: Function, onError: Function, thisPtr: any): void
         {
+            if (typeof content == "string")
+            {
+                dataTransform.stringToUint8Array(content, (uint8Array) =>
+                {
+                    this.saveFile(uint8Array, onComplete, onError, thisPtr);
+                })
+                return;
+            }
+
             fs.writeFile(this._path, content, (err) =>
             {
                 if (err)
@@ -263,7 +272,7 @@ namespace feng3d.editor
          */
         move(newPath: string, onComplete: Function, onError: Function, thisPtr: any): void
         {
-            fs.move(this._path, newPath, (err, destfileinfo) =>
+            fs.move(this._path, newPath, (err) =>
             {
                 if (err)
                 {

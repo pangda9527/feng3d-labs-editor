@@ -2,11 +2,6 @@ namespace feng3d.editor
 {
     export class SceneRotateTool extends Component
     {
-        /**
-         * 离摄像机距离，用于控制模型显示大小
-         */
-        cameraDistance = new Vector3D(0, 0, 500);
-
         showInInspector = false;
         serializable = false;
 
@@ -21,7 +16,10 @@ namespace feng3d.editor
             var { toolEngine, canvas } = newEngine();
 
             toolEngine.root.addChild(rotationToolModel);
-            rotationToolModel.transform.z = 80
+            rotationToolModel.transform.sx = 0.01
+            rotationToolModel.transform.sy = 0.01
+            rotationToolModel.transform.sz = 0.01
+            rotationToolModel.transform.z = 0.80
 
             var arr = [arrowsX, arrowsY, arrowsZ, arrowsNX, arrowsNY, arrowsNZ, planeX, planeY, planeZ, planeNX, planeNY, planeNZ];
             arr.forEach(element =>
@@ -36,7 +34,7 @@ namespace feng3d.editor
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
 
-                var rotation = engine.camera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleBy(180 / Math.PI);
+                var rotation = editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleBy(180 / Math.PI);
                 rotationToolModel.transform.rotation = rotation;
 
                 //隐藏角度

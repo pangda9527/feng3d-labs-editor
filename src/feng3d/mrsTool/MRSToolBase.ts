@@ -19,7 +19,7 @@ namespace feng3d.editor
             super.init(gameObject);
             var holdSizeComponent = this.gameObject.addComponent(HoldSizeComponent);
             holdSizeComponent.holdSize = 1;
-            holdSizeComponent.camera = engine.camera;
+            holdSizeComponent.camera = editorCamera;
             //
             this.gameObject.on("addedToScene", this.onAddedToScene, this);
             this.gameObject.on("removedFromScene", this.onRemovedFromScene, this);
@@ -33,7 +33,7 @@ namespace feng3d.editor
             windowEventProxy.on("mousedown", this.onMouseDown, this);
             windowEventProxy.on("mouseup", this.onMouseUp, this);
             this.gameObject.on("scenetransformChanged", this.onScenetransformChanged, this);
-            engine.camera.gameObject.on("scenetransformChanged", this.onCameraScenetransformChanged, this);
+            editorCamera.gameObject.on("scenetransformChanged", this.onCameraScenetransformChanged, this);
         }
 
         protected onRemovedFromScene()
@@ -43,7 +43,7 @@ namespace feng3d.editor
             windowEventProxy.off("mousedown", this.onMouseDown, this);
             windowEventProxy.off("mouseup", this.onMouseUp, this);
             this.gameObject.off("scenetransformChanged", this.onScenetransformChanged, this);
-            engine.camera.gameObject.off("scenetransformChanged", this.onCameraScenetransformChanged, this);
+            editorCamera.gameObject.off("scenetransformChanged", this.onCameraScenetransformChanged, this);
         }
 
         protected get toolModel()
@@ -132,7 +132,7 @@ namespace feng3d.editor
 
         protected getMousePlaneCross()
         {
-            var line3D = engine.camera.getMouseRay3D();
+            var line3D = editorCamera.getMouseRay3D();
             //射线与平面交点
             var crossPos = this.movePlane3D.lineCross(line3D);
             return crossPos;

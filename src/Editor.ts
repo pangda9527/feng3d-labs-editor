@@ -33,7 +33,7 @@ namespace feng3d.editor
                 //初始化配置
                 objectViewConfig();
 
-                this.initeditorcache(() =>
+                this.initproject(() =>
                 {
                     setTimeout(() =>
                     {
@@ -50,7 +50,7 @@ namespace feng3d.editor
             //
             editorData = new EditorData();
 
-            document.head.getElementsByTagName("title")[0].innerText = "editor -- " + assets.projectPath;
+            document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorAssets.projectPath;
 
             //
             new EditorEnvironment();
@@ -90,48 +90,24 @@ namespace feng3d.editor
             this.mainView.height = this.stage.stageHeight;
         }
 
-        private initeditorcache(callback: () => void)
+        private initproject(callback: () => void)
         {
-            //获取项目路径
-            try
+            editorcache.projectname = editorcache.projectname || "newproject";
+            fs.hasProject(editorcache.projectname, (has) =>
             {
-                tryprojectpath(callback);
-            } catch (e)
-            {
-                createnewproject(callback);
-            }
-
-            function tryprojectpath(callback: () => void)
-            {
-                if (editorcache.projectname)
+                if (has)
                 {
-                    var projectname = editorcache.projectname;
-                    fs.hasProject(projectname, (has) =>
-                    {
-                        if (has)
-                        {
-                            assets.projectPath = projectname;
-                            fs.initproject(projectname, callback);
-                        } else
-                        {
-                            createnewproject(callback);
-                        }
-                    });
+                    editorAssets.projectPath = editorcache.projectname;
+                    fs.initproject(editorcache.projectname, callback);
                 } else
                 {
-                    createnewproject(callback);
+                    fs.createproject(editorcache.projectname, () =>
+                    {
+                        editorAssets.projectPath = editorcache.projectname;
+                        fs.initproject(editorcache.projectname, callback);
+                    });
                 }
-            }
-
-            function createnewproject(callback: () => void)
-            {
-                var projectname = "testproject";
-                fs.createproject(projectname, () =>
-                {
-                    editorcache.projectname = assets.projectPath = projectname;
-                    fs.initproject(projectname, callback);
-                });
-            }
+            });
         }
 
         private _onAddToStage()

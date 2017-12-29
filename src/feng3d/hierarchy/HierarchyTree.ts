@@ -25,8 +25,11 @@ namespace feng3d.editor
             if (this.rootnode)
                 this.rootnode.destroy();
 
+            nodeMap.clear();
+
             var node = new HierarchyNode({ gameobject: gameobject });
             nodeMap.set(gameobject, node);
+            node.isOpen = true;
 
             this.rootnode = node;
             gameobject.children.forEach(element =>

@@ -4,59 +4,88 @@ namespace feng3d.editor
     {
         serializable = false;
         showInInspector = false;
-
-        private scene3D: Scene3D;
-        private editorObject: GameObject;
+        scene: Scene3D
 
         init(gameobject: GameObject)
         {
             super.init(gameobject);
 
-            var editorObject = this.editorObject = GameObject.create("editorObject");
-            editorObject.serializable = false;
-            editorObject.showinHierarchy = false;
-            gameobject.addChild(editorObject);
+            this.gameObject.on("addedToScene", this.onAddedToScene, this);
+            this.gameObject.on("removedFromScene", this.onRemovedFromScene, this);
+        }
 
-            editorObject.addComponent(SceneRotateTool);
+        /**
+         * 销毁
+         */
+        dispose()
+        {
+            this.gameObject.off("addedToScene", this.onAddedToScene, this);
+            this.gameObject.off("removedFromScene", this.onRemovedFromScene, this);
 
-            //
-            editorObject.addComponent(Trident);
+            this.onRemovedFromScene();
 
-            //初始化模块
-            editorObject.addComponent(GroundGrid);
+            super.dispose();
+        }
 
-            editorObject.addComponent(MRSTool);
+        private onAddedToScene()
+        {
+            this.scene = this.gameObject.scene;
+            var lights = this.scene.getComponentsInChildren(Light);
+            lights.forEach(element =>
+            {
+                this.addLightIcon(element);
+            });
 
-            //
-            var sceneControl = new SceneControl();
+            this.scene.on("addComponentToScene", this.onAddComponentToScene, this);
+            this.scene.on("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+        }
 
-            //
-            this.scene3D = this.getComponent(Scene3D);
-            this.scene3D.on("addComponentToScene", this.onAddComponentToScene, this);
-            this.scene3D.on("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+        private onRemovedFromScene()
+        {
+            if (!this.scene)
+                return;
+
+            this.scene.off("addComponentToScene", this.onAddComponentToScene, this);
+            this.scene.off("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+
+            var lights = this.scene.getComponentsInChildren(Light);
+            lights.forEach(element =>
+            {
+                this.removeLightIcon(element);
+            });
+            this.scene = null;
         }
 
         private onAddComponentToScene(event: Event<Component>)
         {
-            if (event.data instanceof DirectionalLight)
-            {
-                event.data.gameObject.addComponent(DirectionLightIcon);
-            } else if (event.data instanceof PointLight)
-            {
-                event.data.gameObject.addComponent(PointLightIcon);
-            }
+            this.addLightIcon(event.data);
         }
 
         private onRemoveComponentFromScene(event: Event<Component>)
         {
-            if (event.data instanceof DirectionalLight)
+            this.removeLightIcon(event.data);
+        }
+
+        private addLightIcon(light: Component)
+        {
+            if (light instanceof DirectionalLight)
             {
-                event.data.gameObject.removeComponentsByType(DirectionLightIcon);
-            } else if (event.data instanceof PointLight)
+                light.gameObject.addComponent(DirectionLightIcon);
+            } else if (light instanceof PointLight)
             {
-                event.data.gameObject.removeComponentsByType(PointLightIcon);
+                light.gameObject.addComponent(PointLightIcon);
             }
         }
 
+        private removeLightIcon(light: Component)
+        {
+            if (light instanceof DirectionalLight)
+            {
+                light.gameObject.removeComponentsByType(DirectionLightIcon);
+            } else if (light instanceof PointLight)
+            {
+                light.gameObject.removeComponentsByType(PointLightIcon);
+            }
+        }
     }
 }
