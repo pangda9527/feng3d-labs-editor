@@ -15,25 +15,19 @@ var workspace = "e:/editorworkspace";
 var projectpath;
 
 exports.file = {
-    createproject: function (projectname, callback)
-    {
-        var templatepath = path.join(__dirname, "../templates/template");
-        var projectpath = workspace + "/" + projectname;
-        if (fs.existsSync(projectpath))
-        {
-            fs.copy(templatepath, workspace + "/" + projectname, { overwrite: true }, callback);
-        } else
-        {
-            fs.mkdir(projectpath, (err) =>
-            {
-                fs.copy(templatepath, workspace + "/" + projectname, { overwrite: true }, callback);
-            });
-        }
-    },
     initproject: function (projectname, callback)
     {
-        console.log(`exec tsc -w -p ${projectname}`)
-        var childProcess = process.exec('tsc -w -p ' + workspace + "/" + projectname, function (error, stdout, stderr)
+        if (!fs.existsSync(workspace + "/" + projectname))
+        {
+            fs.mkdirpSync(workspace + "/" + projectname);
+        }
+        projectpath = workspace + "/" + projectname;
+        callback();
+    },
+    watchCompileScript(callback)
+    {
+        console.log(`exec tsc -w -p ${projectpath}`)
+        var childProcess = process.exec('tsc -w -p ' + projectpath, function (error, stdout, stderr)
         {
             if (error !== null)
             {
@@ -52,7 +46,6 @@ exports.file = {
             data = data.trim();
             console.error(data);
         });
-        projectpath = workspace + "/" + projectname;
         callback();
     },
     stat: function (path, callback)

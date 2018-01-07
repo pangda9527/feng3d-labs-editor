@@ -348,182 +348,7 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        var zip;
-        var _projectname;
-        editor.zipfs = {
-            hasProject: function (projectname, callback) {
-                callback(false);
-            },
-            getProjectList: function (callback) {
-                callback(null, []);
-            },
-            initproject: function (projectname, callback) {
-                _projectname = projectname;
-                // todo 启动监听 ts代码变化自动编译
-                callback();
-            },
-            //
-            stat: function (path, callback) {
-                var file = zip.files[path] || zip.files[path + "/"];
-                if (file) {
-                    var fileInfo = {
-                        path: path,
-                        size: 0 /*file.size*/,
-                        isDirectory: file.dir,
-                        birthtime: file.date.getTime(),
-                        mtime: file.date.getTime(),
-                    };
-                    callback(null, fileInfo);
-                }
-                else {
-                    callback(new Error(path + " 不存在"), null);
-                }
-            },
-            readdir: function (path, callback) {
-                var allfilepaths = Object.keys(zip.files);
-                var subfilemap = {};
-                allfilepaths.forEach(function (element) {
-                    var result = new RegExp(path + "\\/([\\w\\s\\(\\).\\u4e00-\\u9fa5]+)\\b").exec(element);
-                    if (result != null) {
-                        subfilemap[result[1]] = 1;
-                    }
-                });
-                var files = Object.keys(subfilemap);
-                callback(null, files);
-            },
-            writeFile: function (path, data, callback) {
-                try {
-                    zip.file(path, data);
-                    callback && callback(null);
-                }
-                catch (error) {
-                    callback && callback(error);
-                }
-            },
-            readFile: function (path, callback) {
-                try {
-                    zip.file(path).async("arraybuffer").then(function (data) {
-                        callback(null, data);
-                    }, function (reason) {
-                        callback(reason, null);
-                    });
-                }
-                catch (error) {
-                    callback(error, null);
-                }
-            },
-            /**
-            * 读取文件为字符串
-            */
-            readFileAsString: function (path, callback) {
-                try {
-                    zip.file(path).async("string").then(function (data) {
-                        callback(null, data);
-                    }, function (reason) {
-                        callback(reason, null);
-                    });
-                }
-                catch (error) {
-                    callback(error, null);
-                }
-            },
-            mkdir: function (path, callback) {
-                zip.folder(path);
-                callback(null);
-            },
-            rename: function (oldPath, newPath, callback) {
-                try {
-                    zip.file(oldPath).async("arraybuffer").then(function (value) {
-                        zip.file(newPath, value);
-                        zip.remove(oldPath);
-                        callback && callback(null);
-                    }, function (reason) {
-                        callback && callback(reason);
-                    });
-                }
-                catch (error) {
-                    callback && callback(error);
-                }
-            },
-            move: function (src, dest, callback) {
-                try {
-                    var srcstats = zip.file(src);
-                    var destexists = zip.file(dest);
-                    if (destexists && !destexists.dir) {
-                        zip.remove(dest);
-                    }
-                    if (srcstats.dir) {
-                        if (!destexists)
-                            zip.folder(dest);
-                        var files = Object.keys(zip.folder(src).files);
-                        files.forEach(function (file, index) {
-                            editor.zipfs.move(src + "/" + file, dest + "/" + file);
-                        });
-                        zip.remove(src);
-                    }
-                    else {
-                        //使用重命名移动文件
-                        editor.zipfs.rename(src, dest, null);
-                    }
-                    callback && callback(null);
-                }
-                catch (error) {
-                    callback && callback(error);
-                }
-            },
-            remove: function (path, callback) {
-                try {
-                    var file = zip.file(path);
-                    if (file.dir) {
-                        //返回文件和子目录的数组
-                        var files = Object.keys(zip.folder(path).files);
-                        files.forEach(function (file, index) {
-                            editor.zipfs.remove(path + "/" + file, null);
-                        });
-                        //清除文件夹
-                        zip.remove(path);
-                    }
-                    else {
-                        zip.remove(path);
-                    }
-                    callback && callback(null);
-                }
-                catch (error) {
-                    callback && callback(error);
-                }
-            },
-            /**
-             * 获取文件绝对路径
-             */
-            getAbsolutePath: function (path, callback) {
-                callback(null, null);
-            },
-            /**
-             * 获取指定文件下所有文件路径列表
-             */
-            getAllfilepathInFolder: function (dirpath, callback) {
-                var allfilepaths = Object.keys(zip.files);
-                var subfilemap = {};
-                var files = [];
-                allfilepaths.forEach(function (element) {
-                    var result = new RegExp(dirpath + "\\/([\\w.]+)\\b").exec(element);
-                    if (result != null) {
-                        files.push(element);
-                    }
-                });
-                callback(null, files);
-            },
-        };
-    })(editor = feng3d.editor || (feng3d.editor = {}));
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    var editor;
-    (function (editor) {
-        if (1) 
-        // if (typeof require == "undefined")
-        {
-            // fs = zipfs;
+        if (typeof require == "undefined") {
             editor.fs = feng3d.indexedDBfs;
         }
         else {
@@ -565,6 +390,10 @@ var feng3d;
                                     }
                                 }
                                 else {
+                                    if (editor.fs.watchCompileScript) {
+                                        editor.fs.watchCompileScript(callback);
+                                        return;
+                                    }
                                     callback();
                                 }
                             }
@@ -921,7 +750,7 @@ var feng3d;
         function onDragScene() {
             var mousePoint = new feng3d.Point(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var addPoint = mousePoint.subtract(dragSceneMousePoint);
-            var scale = editor.editorCamera.getScaleByDepth(300);
+            var scale = editor.editorCamera.getScaleByDepth(editor.sceneControlConfig.lookDistance);
             var up = dragSceneCameraGlobalMatrix3D.up;
             var right = dragSceneCameraGlobalMatrix3D.right;
             up.scaleBy(addPoint.y * scale);
@@ -2141,6 +1970,8 @@ var feng3d;
                 this.updateView();
             };
             OVTransform.prototype.onAddedToStage = function () {
+                this._space.on("transformChanged", this.updateView, this);
+                //
                 this.xTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
                 this.yTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
                 this.zTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -2152,6 +1983,8 @@ var feng3d;
                 this.szTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
             };
             OVTransform.prototype.onRemovedFromStage = function () {
+                this._space.off("transformChanged", this.updateView, this);
+                //
                 this.xTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
                 this.yTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
                 this.zTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -2364,6 +2197,67 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        var OAVBase = /** @class */ (function (_super) {
+            __extends(OAVBase, _super);
+            function OAVBase(attributeViewInfo) {
+                var _this = _super.call(this) || this;
+                _this._space = attributeViewInfo.owner;
+                _this._attributeName = attributeViewInfo.name;
+                _this._attributeType = attributeViewInfo.type;
+                _this.attributeViewInfo = attributeViewInfo;
+                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                return _this;
+            }
+            OAVBase.prototype.onComplete = function () {
+                this.label.text = this._attributeName;
+                this.updateView();
+            };
+            Object.defineProperty(OAVBase.prototype, "space", {
+                get: function () {
+                    return this._space;
+                },
+                set: function (value) {
+                    this._space = value;
+                    this.updateView();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            OAVBase.prototype.updateView = function () {
+            };
+            Object.defineProperty(OAVBase.prototype, "attributeName", {
+                get: function () {
+                    return this._attributeName;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(OAVBase.prototype, "attributeValue", {
+                get: function () {
+                    return this._space[this._attributeName];
+                },
+                set: function (value) {
+                    if (this._space[this._attributeName] != value) {
+                        this._space[this._attributeName] = value;
+                        var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+                        objectViewEvent.space = this._space;
+                        objectViewEvent.attributeName = this._attributeName;
+                        objectViewEvent.attributeValue = this.attributeValue;
+                        this.dispatchEvent(objectViewEvent);
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return OAVBase;
+        }(eui.Component));
+        editor.OAVBase = OAVBase;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
         /**
          * 默认对象属性界面
          * @author feng 2016-3-10
@@ -2371,12 +2265,7 @@ var feng3d;
         var OAVDefault = /** @class */ (function (_super) {
             __extends(OAVDefault, _super);
             function OAVDefault(attributeViewInfo) {
-                var _this = _super.call(this) || this;
-                _this._space = attributeViewInfo.owner;
-                _this._attributeName = attributeViewInfo.name;
-                _this._attributeType = attributeViewInfo.type;
-                _this.attributeViewInfo = attributeViewInfo;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                var _this = _super.call(this, attributeViewInfo) || this;
                 _this.skinName = "OAVDefault";
                 return _this;
             }
@@ -2434,36 +2323,6 @@ var feng3d;
                     return;
                 this.updateView();
             };
-            Object.defineProperty(OAVDefault.prototype, "space", {
-                get: function () {
-                    return this._space;
-                },
-                set: function (value) {
-                    this._space = value;
-                    this.updateView();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(OAVDefault.prototype, "attributeName", {
-                get: function () {
-                    return this._attributeName;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(OAVDefault.prototype, "attributeValue", {
-                get: function () {
-                    return this._space[this._attributeName];
-                },
-                set: function (value) {
-                    if (this._space[this._attributeName] != value) {
-                        this._space[this._attributeName] = value;
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
             /**
              * 更新界面
              */
@@ -2507,7 +2366,7 @@ var feng3d;
                 feng3d.OAVComponent()
             ], OAVDefault);
             return OAVDefault;
-        }(eui.Component));
+        }(editor.OAVBase));
         editor.OAVDefault = OAVDefault;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -2518,65 +2377,26 @@ var feng3d;
         var BooleanAttrView = /** @class */ (function (_super) {
             __extends(BooleanAttrView, _super);
             function BooleanAttrView(attributeViewInfo) {
-                var _this = _super.call(this) || this;
-                _this._space = attributeViewInfo.owner;
-                _this._attributeName = attributeViewInfo.name;
-                _this._attributeType = attributeViewInfo.type;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                var _this = _super.call(this, attributeViewInfo) || this;
                 _this.skinName = "BooleanAttrViewSkin";
                 return _this;
             }
             BooleanAttrView.prototype.onComplete = function () {
+                _super.prototype.onComplete.call(this);
                 this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
-                this.label.text = this._attributeName;
                 this.updateView();
             };
-            Object.defineProperty(BooleanAttrView.prototype, "space", {
-                get: function () {
-                    return this._space;
-                },
-                set: function (value) {
-                    this._space = value;
-                    this.updateView();
-                },
-                enumerable: true,
-                configurable: true
-            });
             BooleanAttrView.prototype.updateView = function () {
                 this.checkBox["selected"] = this.attributeValue;
             };
             BooleanAttrView.prototype.onChange = function (event) {
                 this.attributeValue = this.checkBox["selected"];
             };
-            Object.defineProperty(BooleanAttrView.prototype, "attributeName", {
-                get: function () {
-                    return this._attributeName;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(BooleanAttrView.prototype, "attributeValue", {
-                get: function () {
-                    return this._space[this._attributeName];
-                },
-                set: function (value) {
-                    if (this._space[this._attributeName] != value) {
-                        this._space[this._attributeName] = value;
-                        var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
-                        objectViewEvent.space = this._space;
-                        objectViewEvent.attributeName = this._attributeName;
-                        objectViewEvent.attributeValue = this.attributeValue;
-                        this.dispatchEvent(objectViewEvent);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
             BooleanAttrView = __decorate([
                 feng3d.OAVComponent()
             ], BooleanAttrView);
             return BooleanAttrView;
-        }(eui.Component));
+        }(editor.OAVBase));
         editor.BooleanAttrView = BooleanAttrView;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -2935,6 +2755,35 @@ var feng3d;
             return OAVComponentList;
         }(eui.Component));
         editor.OAVComponentList = OAVComponentList;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        var OAVFunction = /** @class */ (function (_super) {
+            __extends(OAVFunction, _super);
+            function OAVFunction(attributeViewInfo) {
+                var _this = _super.call(this, attributeViewInfo) || this;
+                _this.skinName = "OAVFunction";
+                return _this;
+            }
+            OAVFunction.prototype.onComplete = function () {
+                _super.prototype.onComplete.call(this);
+                this.button.addEventListener(egret.MouseEvent.CLICK, this.click, this);
+                this.updateView();
+            };
+            OAVFunction.prototype.updateView = function () {
+            };
+            OAVFunction.prototype.click = function (event) {
+                this._space[this._attributeName]();
+            };
+            OAVFunction = __decorate([
+                feng3d.OAVComponent()
+            ], OAVFunction);
+            return OAVFunction;
+        }(editor.OAVBase));
+        editor.OAVFunction = OAVFunction;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -7732,7 +7581,7 @@ var feng3d;
                     if (this._scene) {
                         this._scene.iseditor = true;
                         this._scene.gameObject.addChild(editorObject);
-                        this._scene.updateScriptFlag = feng3d.ScriptFlag.feng3d | feng3d.ScriptFlag.editor;
+                        this._scene.updateScriptFlag = feng3d.ScriptFlag.editor;
                         editor.hierarchy.rootGameObject = this._scene.gameObject;
                     }
                 },
@@ -7924,6 +7773,376 @@ var feng3d;
         editor.EditorComponent = EditorComponent;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        /**
+         * 导航组件，提供生成导航网格功能
+         */
+        var Navigation = /** @class */ (function (_super) {
+            __extends(Navigation, _super);
+            function Navigation() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                /**
+                 * 距离边缘半径
+                 */
+                _this.agentRadius = 0.5;
+                /**
+                 * 允许行走高度
+                 */
+                _this.agentHeight = 2;
+                /**
+                 * 允许行走坡度
+                 */
+                _this.maxSlope = 45; //[0,60]
+                return _this;
+            }
+            Navigation.prototype.init = function (gameobject) {
+                _super.prototype.init.call(this, gameobject);
+            };
+            /**
+             * 清楚oav网格模型
+             */
+            Navigation.prototype.clear = function () {
+                this._navobject && this._navobject.remove();
+            };
+            /**
+             * 计算导航网格数据
+             */
+            Navigation.prototype.bake = function () {
+                var geometrys = getNavGeometry(this.gameObject.scene.gameObject);
+                if (geometrys.length == 0) {
+                    this._navobject && this._navobject.remove();
+                    return;
+                }
+                var geometry = mergeGeometry(geometrys);
+                //
+                var geometrydata = getGeometryData(geometry);
+                var process = new navigation.NavigationTriangleProcess(geometrydata);
+                //
+                process.checkMaxSlope(this.maxSlope);
+                process.checkAgentRadius(this.agentRadius);
+                //
+                geometrydata = process.getGeometry();
+                if (geometrydata.indices.length == 0) {
+                    this._navobject && this._navobject.remove();
+                    return;
+                }
+                //
+                var navobject = this._navobject = this._navobject || createNavObject();
+                navobject.getComponent(feng3d.MeshRenderer).geometry = getGeometry(geometrydata);
+                var parentobject = this.gameObject.scene.gameObject.find("editorObject") || this.gameObject.scene.gameObject;
+                parentobject.addChild(navobject);
+                function getGeometry(geometrydata) {
+                    var customGeometry = new feng3d.CustomGeometry();
+                    customGeometry.positions = geometrydata.positions;
+                    customGeometry.indices = geometrydata.indices;
+                    return customGeometry;
+                }
+                function getGeometryData(geometry) {
+                    var positions = [];
+                    var indices = [];
+                    positions.push.apply(positions, geometry.positions);
+                    indices.push.apply(indices, geometry.indices);
+                    return { positions: positions, indices: indices };
+                }
+                function createNavObject() {
+                    var navobject = feng3d.GameObject.create("navigation");
+                    navobject.mouseEnabled = false;
+                    navobject.addComponent(feng3d.MeshRenderer).set(function (space) {
+                        space.geometry = new feng3d.CustomGeometry();
+                        space.material = new feng3d.ColorMaterial(new feng3d.Color(0, 1, 0, 0.5));
+                    });
+                    navobject.transform.y = 0.01;
+                    return navobject;
+                }
+                function mergeGeometry(geometrys) {
+                    var customGeometry = new feng3d.CustomGeometry();
+                    geometrys.forEach(function (element) {
+                        customGeometry.addGeometry(element);
+                    });
+                    return customGeometry;
+                }
+                function getNavGeometry(gameobject, geometrys) {
+                    geometrys = geometrys || [];
+                    if (!gameobject.visible)
+                        return geometrys;
+                    var meshRenderer = gameobject.getComponent(feng3d.MeshRenderer);
+                    var geometry = meshRenderer && meshRenderer.geometry;
+                    if (geometry && gameobject.navigationArea != -1) {
+                        var matrix3d = gameobject.transform.localToWorldMatrix;
+                        var positions = Array.apply(null, geometry.positions);
+                        matrix3d.transformVectors(positions, positions);
+                        var indices = Array.apply(null, geometry.indices);
+                        //
+                        var customGeometry = new feng3d.CustomGeometry();
+                        customGeometry.positions = positions;
+                        customGeometry.indices = indices;
+                        geometrys.push(customGeometry);
+                    }
+                    gameobject.children.forEach(function (element) {
+                        getNavGeometry(element, geometrys);
+                    });
+                    return geometrys;
+                }
+            };
+            __decorate([
+                feng3d.oav()
+            ], Navigation.prototype, "agentRadius", void 0);
+            __decorate([
+                feng3d.oav()
+            ], Navigation.prototype, "agentHeight", void 0);
+            __decorate([
+                feng3d.oav()
+            ], Navigation.prototype, "maxSlope", void 0);
+            __decorate([
+                feng3d.oav()
+            ], Navigation.prototype, "clear", null);
+            __decorate([
+                feng3d.oav()
+            ], Navigation.prototype, "bake", null);
+            return Navigation;
+        }(feng3d.Component));
+        editor.Navigation = Navigation;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var navigation;
+(function (navigation) {
+    var NavigationTriangleProcess = /** @class */ (function () {
+        function NavigationTriangleProcess(geometry) {
+            this.geometry = geometry;
+            this.initTriangles(geometry.positions, geometry.indices);
+        }
+        NavigationTriangleProcess.prototype.initTriangles = function (positions, indices) {
+            feng3d.assert(indices.length % 3 == 0);
+            var pointmap = this.pointmap = new Map();
+            var linemap = this.linemap = new Map();
+            var trianglemap = this.trianglemap = new Map();
+            // 合并相同点
+            var pointAutoIndex = 0;
+            var pointcache = {};
+            var pointindexmap = {}; //通过点原来索引映射到新索引
+            //
+            var lineAutoIndex = 0;
+            var linecache = {};
+            //
+            for (var i = 0, n = positions.length; i < n; i += 3) {
+                var point = createPoint(positions[i], positions[i + 1], positions[i + 2]);
+                pointindexmap[i / 3] = point.index;
+            }
+            indices = indices.map(function (pointindex) { return pointindexmap[pointindex]; });
+            //
+            for (var i = 0, n = indices.length; i < n; i += 3) {
+                var triangle = new Triangle();
+                triangle.index = i / 3;
+                triangle.points = [indices[i], indices[i + 1], indices[i + 2]];
+                trianglemap.set(triangle.index, triangle);
+                //
+                pointmap.get(indices[i]).triangles.push(triangle.index);
+                pointmap.get(indices[i + 1]).triangles.push(triangle.index);
+                pointmap.get(indices[i + 2]).triangles.push(triangle.index);
+                //
+                var points = triangle.points.concat().sort().map(function (value) { return pointmap.get(value); });
+                createLine(points[0], points[1], triangle);
+                createLine(points[0], points[2], triangle);
+                createLine(points[1], points[2], triangle);
+            }
+            function createLine(point0, point1, triangle) {
+                linecache[point0.index] = linecache[point0.index] || {};
+                var line = linecache[point0.index][point1.index];
+                if (!line) {
+                    line = linecache[point0.index][point1.index] = new Line();
+                    line.index = lineAutoIndex++;
+                    line.points = [point0.index, point1.index];
+                    linemap.set(line.index, line);
+                    //
+                    point0.lines.push(line.index);
+                    point1.lines.push(line.index);
+                }
+                line.triangles.push(triangle.index);
+                //
+                triangle.lines.push(line.index);
+            }
+            function createPoint(x, y, z) {
+                var xs = x.toPrecision(6);
+                var ys = y.toPrecision(6);
+                var zs = z.toPrecision(6);
+                pointcache[xs] = pointcache[xs] || {};
+                pointcache[xs][ys] = pointcache[xs][ys] || {};
+                var point = pointcache[xs][ys][zs];
+                if (!point) {
+                    point = pointcache[xs][ys][zs] = new Point();
+                    point.index = pointAutoIndex++;
+                    point.value = [x, y, z];
+                    pointmap.set(point.index, point);
+                }
+                return point;
+            }
+        };
+        NavigationTriangleProcess.prototype.checkMaxSlope = function (maxSlope) {
+            var _this = this;
+            var up = new feng3d.Vector3D(0, 1, 0);
+            var mincos = Math.cos(maxSlope * Math.DEG2RAD);
+            var keys = this.trianglemap.getKeys();
+            keys.forEach(function (element) {
+                var normal = _this.getTriangleNormal(element);
+                var dot = normal.dotProduct(up);
+                if (dot < mincos) {
+                    _this.trianglemap.delete(element);
+                }
+            });
+        };
+        NavigationTriangleProcess.prototype.checkAgentRadius = function (agentRadius) {
+            //获取所有独立边
+            var lines = this.getAllSingleLine();
+            //调试独立边
+            // this.debugShowLines(lines);
+            var trianglemap = this.trianglemap;
+            var pointmap = this.pointmap;
+            lines.forEach(function (element) {
+                singleLineAgentRadius(element);
+            });
+            function singleLineAgentRadius(line) {
+                var triangle = trianglemap.get(line.triangles[0]);
+                if (!triangle)
+                    return;
+                var linepoints = line.points.map(function (v) { return pointmap.get(v); });
+                var otherPoint = pointmap.get(triangle.points.filter(function (v) {
+                    return line.points.indexOf(v) == -1;
+                })[0]);
+                var distance = pointToLineDistance(otherPoint, linepoints[0], linepoints[1]);
+                if (distance < agentRadius) {
+                    trianglemap.delete(triangle.index);
+                }
+            }
+            function pointToLineDistance(point, linePoint0, linePoint1) {
+                var p = new feng3d.Vector3D(point.value[0], point.value[1], point.value[2]);
+                var lp0 = new feng3d.Vector3D(linePoint0.value[0], linePoint0.value[1], linePoint0.value[2]);
+                var lp1 = new feng3d.Vector3D(linePoint1.value[0], linePoint1.value[1], linePoint1.value[2]);
+                var cos = p.subtract(lp0).normalize().dotProduct(lp1.subtract(lp0).normalize());
+                var sin = Math.sqrt(1 - cos * cos);
+                var distance = sin * p.subtract(lp0).length;
+                distance = Number(distance.toPrecision(6));
+                return distance;
+            }
+        };
+        NavigationTriangleProcess.prototype.getGeometry = function () {
+            var positions = [];
+            var pointIndexMap = new Map();
+            var autoId = 0;
+            this.pointmap.forEach(function (point) {
+                pointIndexMap.set(point.index, autoId++);
+                positions.push.apply(positions, point.value);
+            });
+            var indices = [];
+            this.trianglemap.forEach(function (element) {
+                var points = element.points.map(function (value) { return pointIndexMap.get(value); });
+                indices.push.apply(indices, points);
+            });
+            this.geometry.positions = positions;
+            this.geometry.indices = indices;
+            return this.geometry;
+        };
+        NavigationTriangleProcess.prototype.debugShowLines = function (lines) {
+            var _this = this;
+            var segment = feng3d.GameObject.create("segment");
+            segment.serializable = false;
+            //初始化材质
+            var meshRenderer = segment.addComponent(feng3d.MeshRenderer);
+            var material = meshRenderer.material = new feng3d.SegmentMaterial();
+            material.color.setTo(1.0, 0, 0);
+            var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+            lines.forEach(function (element) {
+                var points = element.points.map(function (pointindex) {
+                    var value = _this.pointmap.get(pointindex).value;
+                    return new feng3d.Vector3D(value[0], value[1], value[2]);
+                });
+                segmentGeometry.addSegment(new feng3d.Segment(points[0], points[1]));
+            });
+            feng3d.editor.engine.root.addChild(segment);
+        };
+        /**
+         * 获取三角形法线
+         * @param triangleIndex 三角形索引
+         */
+        NavigationTriangleProcess.prototype.getTriangleNormal = function (triangleIndex) {
+            var _this = this;
+            var triangle = this.trianglemap.get(triangleIndex);
+            var points = [];
+            triangle.points.forEach(function (element) {
+                var pointvalue = _this.pointmap.get(element).value;
+                points.push(new feng3d.Vector3D(pointvalue[0], pointvalue[1], pointvalue[2]));
+            });
+            var line0 = points[0].subtract(points[1]);
+            var line1 = points[1].subtract(points[2]);
+            var normal = line0.crossProduct(line1);
+            normal.normalize();
+            return normal;
+        };
+        /**
+         * 获取所有独立边
+         */
+        NavigationTriangleProcess.prototype.getAllSingleLine = function () {
+            var _this = this;
+            var lines = [];
+            var needLine = [];
+            this.linemap.forEach(function (element) {
+                element.triangles = element.triangles.filter(function (triangleIndex) { return _this.trianglemap.has(triangleIndex); });
+                if (element.triangles.length == 1)
+                    lines.push(element);
+                else if (element.triangles.length == 0)
+                    needLine.push(element);
+            });
+            needLine.forEach(function (element) {
+                _this.linemap.delete(element.index);
+            });
+            return lines;
+        };
+        return NavigationTriangleProcess;
+    }());
+    navigation.NavigationTriangleProcess = NavigationTriangleProcess;
+    /**
+     * 点
+     */
+    var Point = /** @class */ (function () {
+        function Point() {
+            /**
+             * 点连接的线段索引列表
+             */
+            this.lines = [];
+            /**
+             * 点连接的三角形索引列表
+             */
+            this.triangles = [];
+        }
+        return Point;
+    }());
+    /**
+     * 边
+     */
+    var Line = /** @class */ (function () {
+        function Line() {
+            /**
+             * 线段连接的三角形索引列表
+             */
+            this.triangles = [];
+        }
+        return Line;
+    }());
+    /**
+     * 三角形
+     */
+    var Triangle = /** @class */ (function () {
+        function Triangle() {
+            /**
+             * 包含的三个边索引
+             */
+            this.lines = [];
+        }
+        return Triangle;
+    }());
+})(navigation || (navigation = {}));
 var feng3d;
 (function (feng3d) {
     var editor;
@@ -8865,7 +9084,8 @@ var feng3d;
             { label: "Animation", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Animation); } },
             // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
             { label: "CartoonComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.CartoonComponent); } },
-            { label: "FPSController", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.FPSController); } },
+            { label: "FPSControllerScript", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.FPSControllerScript); } },
+            { label: "Navigation", click: function () { editor.needcreateComponentGameObject.addComponent(editor.Navigation); } },
         ];
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -8884,6 +9104,7 @@ var feng3d;
             feng3d.objectview.defaultTypeAttributeView["number"] = { component: "OAVNumber" };
             feng3d.objectview.defaultTypeAttributeView["Vector3D"] = { component: "OAVVector3D" };
             feng3d.objectview.defaultTypeAttributeView["Array"] = { component: "OAVArray" };
+            feng3d.objectview.defaultTypeAttributeView["Function"] = { component: "OAVFunction" };
             function setObjectview(cls, classDefinition) {
                 cls["objectview"] = classDefinition;
             }

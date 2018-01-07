@@ -165,6 +165,7 @@ namespace feng3d.editor
         { label: "Animation", click: () => { needcreateComponentGameObject.addComponent(Animation); } },
         // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
         { label: "CartoonComponent", click: () => { needcreateComponentGameObject.addComponent(CartoonComponent); } },
-        { label: "FPSController", click: () => { needcreateComponentGameObject.addComponent(FPSController); } },
+        { label: "FPSControllerScript", click: () => { needcreateComponentGameObject.addComponent(FPSControllerScript); } },
+        { label: "Navigation", click: () => { needcreateComponentGameObject.addComponent(Navigation); } },
     ];
 }

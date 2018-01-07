@@ -23,7 +23,7 @@ namespace feng3d.editor
             {
                 this._scene.iseditor = true;
                 this._scene.gameObject.addChild(editorObject);
-                this._scene.updateScriptFlag = ScriptFlag.feng3d | ScriptFlag.editor;
+                this._scene.updateScriptFlag = ScriptFlag.editor;
                 hierarchy.rootGameObject = this._scene.gameObject;
             }
         }

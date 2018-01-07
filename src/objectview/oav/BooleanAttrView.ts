@@ -1,40 +1,22 @@
 namespace feng3d.editor
 {
 	@OAVComponent()
-	export class BooleanAttrView extends eui.Component implements feng3d.IObjectAttributeView
+	export class BooleanAttrView extends OAVBase
 	{
-		private _space: any;
-		private _attributeName: string;
-		private _attributeType: string;
 		label: eui.Label;
 		checkBox: eui.CheckBox;
 
 		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 		{
-			super();
-			this._space = attributeViewInfo.owner;
-			this._attributeName = attributeViewInfo.name;
-			this._attributeType = attributeViewInfo.type;
+			super(attributeViewInfo);
 
-			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "BooleanAttrViewSkin";
 		}
 
-		private onComplete(): void
+		protected onComplete(): void
 		{
+			super.onComplete();
 			this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
-			this.label.text = this._attributeName;
-			this.updateView();
-		}
-
-		get space(): any
-		{
-			return this._space;
-		}
-
-		set space(value: any)
-		{
-			this._space = value;
 			this.updateView();
 		}
 
@@ -46,29 +28,6 @@ namespace feng3d.editor
 		protected onChange(event: egret.Event)
 		{
 			this.attributeValue = this.checkBox["selected"];
-		}
-
-		get attributeName(): string
-		{
-			return this._attributeName;
-		}
-
-		get attributeValue(): any
-		{
-			return this._space[this._attributeName];
-		}
-
-		set attributeValue(value: any)
-		{
-			if (this._space[this._attributeName] != value)
-			{
-				this._space[this._attributeName] = value;
-				var objectViewEvent = <any>new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
-				objectViewEvent.space = this._space;
-				objectViewEvent.attributeName = this._attributeName;
-				objectViewEvent.attributeValue = this.attributeValue;
-				this.dispatchEvent(objectViewEvent);
-			}
 		}
 	}
 }

@@ -1,11 +1,9 @@
 # editor
 feng3d引擎编辑器
-编辑器UI基于[egret](https://www.egret.com/)开发。
+    
+    http://feng3d.gitee.io/editor/
 
 ## 运行项目
-1. 更新（下载）Submodule Update 
-
-    `git submodule update --init --recursive`
 
 1. 安装npm依赖
 

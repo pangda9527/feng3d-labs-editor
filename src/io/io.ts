@@ -1,10 +1,8 @@
 namespace feng3d.editor
 {
     export var fs: EditorFS;
-    if (1)
-    // if (typeof require == "undefined")
+    if (typeof require == "undefined")
     {
-        // fs = zipfs;
         fs = <EditorFS>indexedDBfs;
     } else
     {
@@ -26,6 +24,10 @@ namespace feng3d.editor
          * 导入项目
          */
         importProject?(file: File, callback: () => void);
+        /**
+         * 监听编译脚本
+         */
+        watchCompileScript?(callback: () => void);
     }
 
     (() =>
@@ -75,6 +77,11 @@ namespace feng3d.editor
                                 }
                             } else
                             {
+                                if (fs.watchCompileScript)
+                                {
+                                    fs.watchCompileScript(callback);
+                                    return;
+                                }
                                 callback();
                             }
                         }

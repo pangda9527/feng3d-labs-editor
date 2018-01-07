@@ -5,26 +5,17 @@ namespace feng3d.editor
 	 * @author feng 2016-3-10
 	 */
 	@OAVComponent()
-	export class OAVDefault extends eui.Component implements IObjectAttributeView
+	export class OAVDefault extends OAVBase
 	{
 		public label: eui.Label;
 		public text: eui.TextInput;
 		//
 		private textTemp: string;
-		private _space: Object;
-		private _attributeName: string;
-		private _attributeType: string;
-		private attributeViewInfo: AttributeViewInfo;
 
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
-			super();
-			this._space = attributeViewInfo.owner;
-			this._attributeName = attributeViewInfo.name;
-			this._attributeType = attributeViewInfo.type;
-			this.attributeViewInfo = attributeViewInfo;
+			super(attributeViewInfo);
 
-			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "OAVDefault";
 		}
 
@@ -100,35 +91,6 @@ namespace feng3d.editor
 				return;
 
 			this.updateView();
-		}
-
-		get space(): Object
-		{
-			return this._space;
-		}
-
-		set space(value: Object)
-		{
-			this._space = value;
-			this.updateView();
-		}
-
-		get attributeName(): string
-		{
-			return this._attributeName;
-		}
-
-		get attributeValue(): Object
-		{
-			return this._space[this._attributeName];
-		}
-
-		set attributeValue(value: Object)
-		{
-			if (this._space[this._attributeName] != value)
-			{
-				this._space[this._attributeName] = value;
-			}
 		}
 
 		/**

@@ -37,6 +37,8 @@
         "resource/custom_skins/OBVDefault.exml",
         "resource/custom_skins/OVDefault.exml",
         "resource/custom_skins/OVTransform.exml",
+        "resource/custom_skins/OAVFunction.exml",
+
         "resource/custom_skins/TreeDisclosureButtonSkin.exml",
         "resource/custom_skins/TreeItemRendererSkin.exml",
         "resource/custom_skins/MenuItemRender.exml",

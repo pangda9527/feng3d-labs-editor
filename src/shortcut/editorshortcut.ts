@@ -116,7 +116,7 @@ namespace feng3d.editor
     {
         var mousePoint = new Point(windowEventProxy.clientX, windowEventProxy.clientY);
         var addPoint = mousePoint.subtract(dragSceneMousePoint);
-        var scale = editorCamera.getScaleByDepth(300);
+        var scale = editorCamera.getScaleByDepth(sceneControlConfig.lookDistance);
         var up = dragSceneCameraGlobalMatrix3D.up;
         var right = dragSceneCameraGlobalMatrix3D.right;
         up.scaleBy(addPoint.y * scale);

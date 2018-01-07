@@ -42,6 +42,8 @@ namespace feng3d.editor
 
 		private onAddedToStage()
 		{
+			this._space.on("transformChanged", this.updateView, this);
+			//
 			this.xTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
 			this.yTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
 			this.zTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -55,6 +57,8 @@ namespace feng3d.editor
 
 		private onRemovedFromStage()
 		{
+			this._space.off("transformChanged", this.updateView, this);
+			//
 			this.xTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
 			this.yTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
 			this.zTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
