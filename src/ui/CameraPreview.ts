@@ -2,7 +2,8 @@ namespace feng3d.editor
 {
     export class CameraPreview extends eui.Component implements eui.UIComponent
     {
-        public fullbutton: eui.Button;
+        public group: eui.Group;
+        //
         private canvas: HTMLElement;
         private previewEngine: Engine;
 
@@ -36,6 +37,7 @@ namespace feng3d.editor
             //
             var canvas = this.canvas = <HTMLCanvasElement>document.getElementById("cameraPreviewCanvas");;
             this.previewEngine = new Engine(canvas);
+            this.previewEngine.mouse3DManager.setEnable(false);
             this.previewEngine.stop();
         }
 
@@ -64,8 +66,8 @@ namespace feng3d.editor
             if (!this.stage)
                 return;
 
-            var lt = this.localToGlobal(0, 0);
-            var rb = this.localToGlobal(this.width, this.height);
+            var lt = this.group.localToGlobal(0, 0);
+            var rb = this.group.localToGlobal(this.group.width, this.group.height);
             var bound1 = new Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
 
             // var bound2 = this.getTransformedBounds(this.stage);
