@@ -7,23 +7,27 @@ namespace feng3d.editor
 
     function load(url: string | File, onParseComplete?: (group) => void)
     {
+
         var skeletonComponent: SkeletonComponent;
-        //
-        var loader = new window["THREE"].FBXLoader();
-        if (typeof url == "string")
+        prepare(() =>
         {
-            loader.load(url, onLoad, onProgress, onError)
-        }
-        else
-        {
-            var reader = new FileReader();
-            reader.addEventListener('load', function (event)
+            //
+            var loader = new window["THREE"].FBXLoader();
+            if (typeof url == "string")
             {
-                var scene = loader.parse(event.target["result"]);
-                onLoad(scene);
-            }, false);
-            reader.readAsArrayBuffer(url);
-        }
+                loader.load(url, onLoad, onProgress, onError)
+            }
+            else
+            {
+                var reader = new FileReader();
+                reader.addEventListener('load', function (event)
+                {
+                    var scene = loader.parse(event.target["result"]);
+                    onLoad(scene);
+                }, false);
+                reader.readAsArrayBuffer(url);
+            }
+        });
 
         function onLoad(scene)
         {
@@ -47,9 +51,9 @@ namespace feng3d.editor
                 return null;
 
             var gameobject = GameObject.create(object3d.name);
-            gameobject.transform.position = new Vector3D(object3d.position.x, object3d.position.y, object3d.position.z);
+            gameobject.transform.position = new Vector3(object3d.position.x, object3d.position.y, object3d.position.z);
             gameobject.transform.orientation = new Quaternion(object3d.quaternion.x, object3d.quaternion.y, object3d.quaternion.z, object3d.quaternion.w);
-            gameobject.transform.scale = new Vector3D(object3d.scale.x, object3d.scale.y, object3d.scale.z);
+            gameobject.transform.scale = new Vector3(object3d.scale.x, object3d.scale.y, object3d.scale.z);
             if (parent)
                 parent.addChild(gameobject);
 
@@ -113,7 +117,7 @@ namespace feng3d.editor
     {
         var matrixTemp = new window["THREE"].Matrix4();
         var quaternionTemp = new window["THREE"].Quaternion();
-        var fmatrix3d = new Matrix3D();
+        var fmatrix3d = new Matrix4x4();
 
         //
         var animationClip = new AnimationClip();
@@ -138,7 +142,7 @@ namespace feng3d.editor
 
             var trackName: string = keyframeTrack.name;
             var result = /\.bones\[(\w+)\]\.(\w+)/.exec(trackName);
-            propertyClip.path = [
+            propertyClip.path = <any>[
                 [PropertyClipPathItemType.GameObject, result[1]],
                 [PropertyClipPathItemType.Component, , "feng3d.Transform"],
             ];
@@ -162,13 +166,13 @@ namespace feng3d.editor
             propertyClip.propertyValues = [];
             var propertyValues = propertyClip.propertyValues;
             var times: number[] = keyframeTrack.times;
-            var values = usenumberfixed ? numberutils.fixed(keyframeTrack.values, 6, []) : keyframeTrack.values;
+            var values = usenumberfixed ? keyframeTrack.values.map((v) => { return Number(v.toFixed(6)); }) : keyframeTrack.values;
 
             var len = times.length;
             switch (keyframeTrack.ValueTypeName)
             {
                 case "vector":
-                    propertyClip.type = "Vector3D";
+                    propertyClip.type = "Vector3";
                     for (var i = 0; i < len; i++)
                     {
                         propertyValues.push([times[i] * 1000, [values[i * 3], values[i * 3 + 1], values[i * 3 + 2]]]);
@@ -206,7 +210,7 @@ namespace feng3d.editor
             var skeletonJoint = joints[i] = new SkeletonJoint();
             //
             skeletonJoint.name = bone.name;
-            skeletonJoint.matrix3D = new Matrix3D(bone.matrixWorld.elements);
+            skeletonJoint.matrix3D = new Matrix4x4(bone.matrixWorld.elements);
 
             var parentId = skeNameDic[bone.parent.name];
             if (parentId === undefined)
@@ -242,7 +246,7 @@ namespace feng3d.editor
             if (jointsMapitem)
             {
                 skinSkeleton.joints[i] = jointsMapitem;
-                joints[jointsMapitem[0]].matrix3D = new Matrix3D(skinSkeletonData.boneInverses[i].elements).invert();
+                joints[jointsMapitem[0]].matrix3D = new Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
             } else
             {
                 warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);
@@ -263,7 +267,7 @@ namespace feng3d.editor
             if (attributes.hasOwnProperty(key))
             {
                 var element = attributes[key];
-                var array = usenumberfixed ? numberutils.fixed(element.array, 6, []) : element.array;
+                var array = usenumberfixed ? element.array.map((v) => { return Number(v.toFixed(6)); }) : element.array;
                 switch (key)
                 {
                     case "position":
@@ -313,4 +317,69 @@ namespace feng3d.editor
 
         return perspectiveLen;
     }
+
+    var prepare = (() =>
+    {
+        var isprepare = false;
+        var prepareCallbacks = [];
+        var preparing = false;
+        return (callback: () => void) =>
+        {
+            if (isprepare)
+            {
+                callback();
+                return;
+            }
+            prepareCallbacks.push(callback);
+            if (preparing)
+                return;
+
+            preparing = true;
+            loadjs.load({
+                paths: [
+                    "threejs/three.js",
+                    // <!-- FBX -->
+                    "threejs/libs/inflate.min.js",
+                    //
+                    "threejs/loaders/AMFLoader.js",
+                    "threejs/loaders/AWDLoader.js",
+                    "threejs/loaders/BabylonLoader.js",
+                    "threejs/loaders/ColladaLoader.js",
+                    "threejs/loaders/FBXLoader.js",
+                    "threejs/loaders/GLTFLoader.js",
+                    "threejs/loaders/KMZLoader.js",
+                    "threejs/loaders/MD2Loader.js",
+                    "threejs/loaders/OBJLoader.js",
+                    "threejs/loaders/MTLLoader.js",
+                    "threejs/loaders/PlayCanvasLoader.js",
+                    "threejs/loaders/PLYLoader.js",
+                    "threejs/loaders/STLLoader.js",
+                    "threejs/loaders/TGALoader.js",
+                    "threejs/loaders/TDSLoader.js",
+                    "threejs/loaders/UTF8Loader.js",
+                    "threejs/loaders/VRMLLoader.js",
+                    "threejs/loaders/VTKLoader.js",
+                    "threejs/loaders/ctm/lzma.js",
+                    "threejs/loaders/ctm/ctm.js",
+                    "threejs/loaders/ctm/CTMLoader.js",
+                ].map((value) => { return editorAssetsRoot + "/" + value; }),
+                bundleId: "threejs",
+                success: () =>
+                {
+                    Number.prototype["format"] = function ()        
+                    {
+                        return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                    };
+
+                    // log("提供解析的 three.js 初始化完成，")
+                    isprepare = true;
+                    preparing = false;
+                    prepareCallbacks.forEach(element =>
+                    {
+                        element();
+                    });
+                }
+            });
+        }
+    })();
 }

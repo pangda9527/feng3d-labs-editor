@@ -2,7 +2,7 @@ namespace feng3d.editor
 {
 	export class Vector3DView extends eui.Component implements eui.UIComponent
 	{
-		vm = new Vector3D(1, 2, 3);
+		vm = new Vector3(1, 2, 3);
 
 		public group: eui.Group;
 		public xTextInput: eui.TextInput;
@@ -70,7 +70,7 @@ namespace feng3d.editor
 					this.vm.z = Number(this.zTextInput.text);
 					break;
 				case this.wTextInput:
-					this.vm.w = Number(this.wTextInput.text);
+					// this.vm.w = Number(this.wTextInput.text);
 					break;
 			}
 		}

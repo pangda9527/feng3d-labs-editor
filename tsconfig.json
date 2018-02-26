@@ -78,7 +78,6 @@
         "src/ui/MainUI.ts",
         "src/ui/ThemeAdapter.ts",
         //
-        "src/global/native.ts",
         "src/global/editorui.ts",
         //
         "src/global/EditorData.ts",
@@ -101,7 +100,9 @@
         "src/feng3d/Main3D.ts",
         "src/feng3d/EditorComponent.ts",
         "src/navigation/Navigation.ts",
-        "src/navigation/NavigationTriangleProcess.ts",
+        "src/navigation/ThreeBSP.ts",
+        "src/navigation/GeometryOperation.ts",
+        "src/navigation/NavigationProcess.ts",
         //
         "src/global/EditorEnvironment.ts",
         "src/global/MouseEvent.ts",
@@ -112,7 +113,6 @@
         "src/scripts/DirectionLightIcon.ts",
         "src/scripts/PointLightIcon.ts",
         //
-        "src/loaders/importthreejs.ts",
         "src/loaders/threejsLoader.ts",
         //configs
         "src/configs/CommonConfig.ts",

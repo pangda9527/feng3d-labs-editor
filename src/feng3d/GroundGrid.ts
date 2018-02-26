@@ -53,9 +53,9 @@ namespace feng3d.editor
                     var color0 = new Color().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
                     color0.a = ((i % 10) == 0) ? 0.5 : 0.1;
                     color = (i * step + startZ == 0) ? xcolor : color0;
-                    segmentGeometry.addSegment(new Segment(new Vector3D(-halfNum * step + startX, 0, i * step + startZ), new Vector3D(halfNum * step + startX, 0, i * step + startZ), color, color));
+                    segmentGeometry.addSegment(new Segment(new Vector3(-halfNum * step + startX, 0, i * step + startZ), new Vector3(halfNum * step + startX, 0, i * step + startZ), color, color));
                     color = (i * step + startX == 0) ? zcolor : color0;
-                    segmentGeometry.addSegment(new Segment(new Vector3D(i * step + startX, 0, -halfNum * step + startZ), new Vector3D(i * step + startX, 0, halfNum * step + startZ), color, color));
+                    segmentGeometry.addSegment(new Segment(new Vector3(i * step + startX, 0, -halfNum * step + startZ), new Vector3(i * step + startX, 0, halfNum * step + startZ), color, color));
                 }
             }
         }

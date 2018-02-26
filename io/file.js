@@ -7,7 +7,7 @@ var path = require("path");
 /**
  * 工作空间路径，工作空间内存放所有编辑器项目
  */
-var workspace = "e:/editorworkspace";
+var workspace = "c:/editorworkspace";
 
 /**
  * 项目路径

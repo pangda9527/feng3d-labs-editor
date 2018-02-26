@@ -10,9 +10,9 @@ namespace feng3d.editor
         /**
          * 用于判断是否改变了XYZ
          */
-        private changeXYZ: Vector3D = new Vector3D();
-        private startPlanePos: Vector3D;
-        private startPos: Vector3D;
+        private changeXYZ: Vector3 = new Vector3();
+        private startPlanePos: Vector3;
+        private startPos: Vector3;
 
         init(gameObject: GameObject)
         {
@@ -52,14 +52,14 @@ namespace feng3d.editor
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
-            var po = globalMatrix3D.transformVector(new Vector3D(0, 0, 0));
-            var px = globalMatrix3D.transformVector(new Vector3D(1, 0, 0));
-            var py = globalMatrix3D.transformVector(new Vector3D(0, 1, 0));
-            var pz = globalMatrix3D.transformVector(new Vector3D(0, 0, 1));
+            var po = globalMatrix3D.transformVector(new Vector3(0, 0, 0));
+            var px = globalMatrix3D.transformVector(new Vector3(1, 0, 0));
+            var py = globalMatrix3D.transformVector(new Vector3(0, 1, 0));
+            var pz = globalMatrix3D.transformVector(new Vector3(0, 0, 1));
             //
-            var ox = px.subtract(po);
-            var oy = py.subtract(po);
-            var oz = pz.subtract(po);
+            var ox = px.subTo(po);
+            var oy = py.subTo(po);
+            var oz = pz.subTo(po);
             //摄像机前方方向
             var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
@@ -70,38 +70,38 @@ namespace feng3d.editor
             {
                 case this.toolModel.xAxis.gameObject:
                     this.selectedItem = this.toolModel.xAxis;
-                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
-                    this.changeXYZ.setTo(1, 0, 0);
+                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(ox).crossTo(ox), po);
+                    this.changeXYZ.init(1, 0, 0);
                     break;
                 case this.toolModel.yAxis.gameObject:
                     this.selectedItem = this.toolModel.yAxis;
-                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
-                    this.changeXYZ.setTo(0, 1, 0);
+                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oy).crossTo(oy), po);
+                    this.changeXYZ.init(0, 1, 0);
                     break;
                 case this.toolModel.zAxis.gameObject:
                     this.selectedItem = this.toolModel.zAxis;
-                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
-                    this.changeXYZ.setTo(0, 0, 1);
+                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oz).crossTo(oz), po);
+                    this.changeXYZ.init(0, 0, 1);
                     break;
                 case this.toolModel.yzPlane.gameObject:
                     this.selectedItem = this.toolModel.yzPlane;
                     this.movePlane3D.fromPoints(po, py, pz);
-                    this.changeXYZ.setTo(0, 1, 1);
+                    this.changeXYZ.init(0, 1, 1);
                     break;
                 case this.toolModel.xzPlane.gameObject:
                     this.selectedItem = this.toolModel.xzPlane;
                     this.movePlane3D.fromPoints(po, px, pz);
-                    this.changeXYZ.setTo(1, 0, 1);
+                    this.changeXYZ.init(1, 0, 1);
                     break;
                 case this.toolModel.xyPlane.gameObject:
                     this.selectedItem = this.toolModel.xyPlane;
                     this.movePlane3D.fromPoints(po, px, py);
-                    this.changeXYZ.setTo(1, 1, 0);
+                    this.changeXYZ.init(1, 1, 0);
                     break;
                 case this.toolModel.oCube.gameObject:
                     this.selectedItem = this.toolModel.oCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir, po);
-                    this.changeXYZ.setTo(1, 1, 1);
+                    this.changeXYZ.init(1, 1, 1);
                     break;
             }
             //
@@ -116,13 +116,13 @@ namespace feng3d.editor
         private onMouseMove()
         {
             var crossPos = this.getLocalMousePlaneCross();
-            var addPos = crossPos.subtract(this.startPlanePos);
+            var addPos = crossPos.subTo(this.startPlanePos);
             addPos.x *= this.changeXYZ.x;
             addPos.y *= this.changeXYZ.y;
             addPos.z *= this.changeXYZ.z;
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
-            var sceneAddpos = sceneTransform.position.subtract(this.startSceneTransform.position);
+            var sceneAddpos = sceneTransform.position.subTo(this.startSceneTransform.position);
             this.gameobjectControllerTarget.translation(sceneAddpos);
         }
 

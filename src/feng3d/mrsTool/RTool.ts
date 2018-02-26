@@ -3,9 +3,9 @@ namespace feng3d.editor
     export class RTool extends MRSToolBase
     {
         protected toolModel: RToolModel;
-        private startPlanePos: Vector3D;
-        private stepPlaneCross: Vector3D;
-        private startMousePos: Point;
+        private startPlanePos: Vector3;
+        private stepPlaneCross: Vector3;
+        private startMousePos: Vector2;
 
         init(gameObject: GameObject)
         {
@@ -97,20 +97,20 @@ namespace feng3d.editor
                 case this.toolModel.cameraAxis:
                     var origin = this.startSceneTransform.position;
                     var planeCross = this.getMousePlaneCross();
-                    var startDir = this.stepPlaneCross.subtract(origin);
+                    var startDir = this.stepPlaneCross.subTo(origin);
                     startDir.normalize();
-                    var endDir = planeCross.subtract(origin);
+                    var endDir = planeCross.subTo(origin);
                     endDir.normalize();
                     //计算夹角
-                    var cosValue = startDir.dotProduct(endDir);
-                    var angle = Math.acos(cosValue) * MathConsts.RADIANS_TO_DEGREES;
+                    var cosValue = startDir.dot(endDir);
+                    var angle = Math.acos(cosValue) * FMath.RAD2DEG;
                     //计算是否顺时针
-                    var sign = this.movePlane3D.normal.crossProduct(startDir).dotProduct(endDir);
+                    var sign = this.movePlane3D.getNormal().cross(startDir).dot(endDir);
                     sign = sign > 0 ? 1 : -1;
                     angle = angle * sign;
                     //
-                    this.gameobjectControllerTarget.rotate1(angle, this.movePlane3D.normal);
-                    this.stepPlaneCross.copyFrom(planeCross);
+                    this.gameobjectControllerTarget.rotate1(angle, this.movePlane3D.getNormal());
+                    this.stepPlaneCross.copy(planeCross);
                     this.gameobjectControllerTarget.startRotate();
                     //绘制扇形区域
                     if (this.selectedItem instanceof CoordinateRotationAxis)
@@ -120,7 +120,7 @@ namespace feng3d.editor
                     break;
                 case this.toolModel.freeAxis:
                     var endPoint = engine.mousePos.clone();
-                    var offset = endPoint.subtract(this.startMousePos);
+                    var offset = endPoint.subTo(this.startMousePos);
                     var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
@@ -164,7 +164,7 @@ namespace feng3d.editor
             var temp = cameraSceneTransform.clone();
             temp.append(this.toolModel.transform.worldToLocalMatrix);
             var rotation = temp.decompose()[1];
-            rotation.scaleBy(MathConsts.RADIANS_TO_DEGREES);
+            rotation.scale(FMath.RAD2DEG);
             this.toolModel.freeAxis.transform.rotation = rotation;
             this.toolModel.cameraAxis.transform.rotation = rotation;
         }

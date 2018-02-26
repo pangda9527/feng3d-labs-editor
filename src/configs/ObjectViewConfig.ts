@@ -10,7 +10,7 @@ namespace feng3d.editor
         //
         objectview.defaultTypeAttributeView["Boolean"] = { component: "BooleanAttrView" };
         objectview.defaultTypeAttributeView["number"] = { component: "OAVNumber" };
-        objectview.defaultTypeAttributeView["Vector3D"] = { component: "OAVVector3D" };
+        objectview.defaultTypeAttributeView["Vector3"] = { component: "OAVVector3D" };
         objectview.defaultTypeAttributeView["Array"] = { component: "OAVArray" };
         objectview.defaultTypeAttributeView["Function"] = { component: "OAVFunction" };
 

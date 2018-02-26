@@ -10,7 +10,7 @@ namespace feng3d.editor
 
         //平移平面，该平面处于场景空间，用于计算位移量
         protected movePlane3D: Plane3D;
-        protected startSceneTransform: Matrix3D;
+        protected startSceneTransform: Matrix4x4;
 
         protected _gameobjectControllerTarget: MRSToolTarget;
 
@@ -134,7 +134,7 @@ namespace feng3d.editor
         {
             var line3D = editorCamera.getMouseRay3D();
             //射线与平面交点
-            var crossPos = this.movePlane3D.lineCross(line3D);
+            var crossPos = <Vector3>this.movePlane3D.intersectWithLine3D(line3D);
             return crossPos;
         }
     }

@@ -34,15 +34,15 @@ namespace feng3d.editor
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
 
-                var rotation = editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleBy(180 / Math.PI);
+                var rotation = editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scale(180 / Math.PI);
                 rotationToolModel.transform.rotation = rotation;
 
                 //隐藏角度
-                var visibleAngle = Math.cos(15 * Math.DEG2RAD);
+                var visibleAngle = Math.cos(15 * FMath.DEG2RAD);
                 //隐藏正面箭头
                 arrowsArr.forEach(element =>
                 {
-                    if (Math.abs(element.transform.localToWorldMatrix.up.dotProduct(Vector3D.Z_AXIS)) < visibleAngle)
+                    if (Math.abs(element.transform.localToWorldMatrix.up.dot(Vector3.Z_AXIS)) < visibleAngle)
                         element.visible = true;
                     else
                         element.visible = false;
@@ -144,14 +144,14 @@ namespace feng3d.editor
 
             function onclick(e: Event<any>)
             {
-                var front_view = new Vector3D(0, 0, 0);//前视图
-                var back_view = new Vector3D(0, 180, 0);//后视图
-                var right_view = new Vector3D(0, -90, 0);//右视图
-                var left_view = new Vector3D(0, 90, 0);//左视图
-                var top_view = new Vector3D(-90, 0, 180);//顶视图
-                var bottom_view = new Vector3D(-90, 180, 0);//底视图
+                var front_view = new Vector3(0, 0, 0);//前视图
+                var back_view = new Vector3(0, 180, 0);//后视图
+                var right_view = new Vector3(0, -90, 0);//右视图
+                var left_view = new Vector3(0, 90, 0);//左视图
+                var top_view = new Vector3(-90, 0, 180);//顶视图
+                var bottom_view = new Vector3(-90, 180, 0);//底视图
 
-                var rotation: Vector3D;
+                var rotation: Vector3;
                 switch (e.currentTarget)
                 {
                     case arrowsX:
@@ -175,10 +175,10 @@ namespace feng3d.editor
                 }
                 if (rotation)
                 {
-                    var cameraTargetMatrix3D = Matrix3D.fromRotation(rotation);
+                    var cameraTargetMatrix3D = Matrix4x4.fromRotation(rotation);
                     cameraTargetMatrix3D.invert();
                     var result = cameraTargetMatrix3D.decompose()[1];
-                    result.scaleBy(180 / Math.PI);
+                    result.scale(180 / Math.PI);
 
                     editorDispatcher.dispatch("editorCameraRotate", result);
                 }

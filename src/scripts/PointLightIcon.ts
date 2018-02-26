@@ -33,7 +33,7 @@ namespace feng3d.editor
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
             var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
-            textureMaterial.texture = new Texture2D("resource/assets/3d/icons/light.png");
+            textureMaterial.texture = new Texture2D(editorAssetsRoot + "/assets/3d/icons/light.png");
             textureMaterial.texture.format = TextureFormat.RGBA;
             textureMaterial.texture.premulAlpha = true;
             textureMaterial.enableBlend = true;
@@ -74,10 +74,10 @@ namespace feng3d.editor
                 var angle1 = (i + 1) * Math.PI * 2 / num;
                 var x1 = Math.sin(angle1);
                 var y1 = Math.cos(angle1);
-                segmentGeometry.addSegment(new Segment(new Vector3D(0, x, y), new Vector3D(0, x1, y1)));
-                segmentGeometry.addSegment(new Segment(new Vector3D(x, 0, y), new Vector3D(x1, 0, y1)));
-                segmentGeometry.addSegment(new Segment(new Vector3D(x, y, 0), new Vector3D(x1, y1, 0)));
-                segmentGeometry1.addSegment(new Segment(new Vector3D(x, y, 0), new Vector3D(x1, y1, 0)));
+                segmentGeometry.addSegment(new Segment(new Vector3(0, x, y), new Vector3(0, x1, y1)));
+                segmentGeometry.addSegment(new Segment(new Vector3(x, 0, y), new Vector3(x1, 0, y1)));
+                segmentGeometry.addSegment(new Segment(new Vector3(x, y, 0), new Vector3(x1, y1, 0)));
+                segmentGeometry1.addSegment(new Segment(new Vector3(x, y, 0), new Vector3(x1, y1, 0)));
             }
             this.gameObject.addChild(lightLines);
             this.gameObject.addChild(lightLines1);
@@ -88,12 +88,12 @@ namespace feng3d.editor
             lightpoints.showinHierarchy = false;
             var meshRenderer = lightpoints.addComponent(MeshRenderer);
             var pointGeometry = this.pointGeometry = meshRenderer.geometry = new PointGeometry();
-            pointGeometry.addPoint(new PointInfo(new Vector3D(1, 0, 0), new Color(1, 0, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3D(-1, 0, 0), new Color(1, 0, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3D(0, 1, 0), new Color(0, 1, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3D(0, -1, 0), new Color(0, 1, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3D(0, 0, 1), new Color(0, 0, 1)));
-            pointGeometry.addPoint(new PointInfo(new Vector3D(0, 0, -1), new Color(0, 0, 1)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(1, 0, 0), new Color(1, 0, 0)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(-1, 0, 0), new Color(1, 0, 0)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(0, 1, 0), new Color(0, 1, 0)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(0, -1, 0), new Color(0, 1, 0)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, 1), new Color(0, 0, 1)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, -1), new Color(0, 0, 1)));
             var pointMaterial = meshRenderer.material = new PointMaterial();
             pointMaterial.enableBlend = true;
             pointMaterial.pointSize = 5;
@@ -109,7 +109,7 @@ namespace feng3d.editor
             this.lightLines.transform.scale =
                 this.lightLines1.transform.scale =
                 this.lightpoints.transform.scale =
-                new Vector3D(this.pointLight.range, this.pointLight.range, this.pointLight.range);
+                new Vector3(this.pointLight.range, this.pointLight.range, this.pointLight.range);
 
             if (editorData.selectedGameObjects.indexOf(this.gameObject) != -1)
             {
@@ -120,8 +120,8 @@ namespace feng3d.editor
                 var alpha = 1;
                 var backalpha = 0.5;
                 var num = 36;
-                var point0: Vector3D;
-                var point1: Vector3D;
+                var point0: Vector3;
+                var point1: Vector3;
                 for (var i = 0; i < num; i++)
                 {
                     var angle = i * Math.PI * 2 / num;
@@ -131,23 +131,23 @@ namespace feng3d.editor
                     var x1 = Math.sin(angle1);
                     var y1 = Math.cos(angle1);
                     //
-                    point0 = new Vector3D(0, x, y);
-                    point1 = new Vector3D(0, x1, y1);
-                    if (point0.dotProduct(camerapos) < 0 || point1.dotProduct(camerapos) < 0)
+                    point0 = new Vector3(0, x, y);
+                    point1 = new Vector3(0, x1, y1);
+                    if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
                     this.segmentGeometry.addSegment(new Segment(point0, point1, new Color(1, 0, 0, alpha), new Color(1, 0, 0, alpha)));
-                    point0 = new Vector3D(x, 0, y);
-                    point1 = new Vector3D(x1, 0, y1);
-                    if (point0.dotProduct(camerapos) < 0 || point1.dotProduct(camerapos) < 0)
+                    point0 = new Vector3(x, 0, y);
+                    point1 = new Vector3(x1, 0, y1);
+                    if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
                     this.segmentGeometry.addSegment(new Segment(point0, point1, new Color(0, 1, 0, alpha), new Color(0, 1, 0, alpha)));
-                    point0 = new Vector3D(x, y, 0);
-                    point1 = new Vector3D(x1, y1, 0);
-                    if (point0.dotProduct(camerapos) < 0 || point1.dotProduct(camerapos) < 0)
+                    point0 = new Vector3(x, y, 0);
+                    point1 = new Vector3(x1, y1, 0);
+                    if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
@@ -155,38 +155,38 @@ namespace feng3d.editor
                 }
 
                 this.pointGeometry.removeAllPoints();
-                var point = new Vector3D(1, 0, 0);
-                if (point.dotProduct(camerapos) < 0)
+                var point = new Vector3(1, 0, 0);
+                if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
                 this.pointGeometry.addPoint(new PointInfo(point, new Color(1, 0, 0, alpha)));
-                point = new Vector3D(-1, 0, 0);
-                if (point.dotProduct(camerapos) < 0)
+                point = new Vector3(-1, 0, 0);
+                if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
                 this.pointGeometry.addPoint(new PointInfo(point, new Color(1, 0, 0, alpha)));
-                point = new Vector3D(0, 1, 0);
-                if (point.dotProduct(camerapos) < 0)
+                point = new Vector3(0, 1, 0);
+                if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
                 this.pointGeometry.addPoint(new PointInfo(point, new Color(0, 1, 0, alpha)));
-                point = new Vector3D(0, -1, 0);
-                if (point.dotProduct(camerapos) < 0)
+                point = new Vector3(0, -1, 0);
+                if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
                 this.pointGeometry.addPoint(new PointInfo(point, new Color(0, 1, 0, alpha)));
-                point = new Vector3D(0, 0, 1);
-                if (point.dotProduct(camerapos) < 0)
+                point = new Vector3(0, 0, 1);
+                if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
                 this.pointGeometry.addPoint(new PointInfo(point, new Color(0, 0, 1, alpha)));
-                point = new Vector3D(0, 0, -1);
-                if (point.dotProduct(camerapos) < 0)
+                point = new Vector3(0, 0, -1);
+                if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;

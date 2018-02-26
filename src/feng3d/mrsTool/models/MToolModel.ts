@@ -86,7 +86,7 @@ namespace feng3d.editor
             var xLine = GameObject.create();
             var meshRenderer = xLine.addComponent(MeshRenderer);
             var segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
-            var segment = new Segment(new Vector3D(), new Vector3D(0, this.length, 0));
+            var segment = new Segment(new Vector3(), new Vector3(0, this.length, 0));
             segmentGeometry.addSegment(segment);
             this.segmentMaterial = meshRenderer.material = new SegmentMaterial();
             this.gameObject.addChild(xLine);
@@ -201,19 +201,19 @@ namespace feng3d.editor
 
             this.segmentGeometry.removeAllSegments();
 
-            var segment = new Segment(new Vector3D(0, 0, 0), new Vector3D(this._width, 0, 0));
+            var segment = new Segment(new Vector3(0, 0, 0), new Vector3(this._width, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
             this.segmentGeometry.addSegment(segment);
 
-            var segment = new Segment(new Vector3D(this._width, 0, 0), new Vector3D(this._width, 0, this._width));
+            var segment = new Segment(new Vector3(this._width, 0, 0), new Vector3(this._width, 0, this._width));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
             this.segmentGeometry.addSegment(segment);
 
-            var segment = new Segment(new Vector3D(this._width, 0, this._width), new Vector3D(0, 0, this._width));
+            var segment = new Segment(new Vector3(this._width, 0, this._width), new Vector3(0, 0, this._width));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
             this.segmentGeometry.addSegment(segment);
 
-            var segment = new Segment(new Vector3D(0, 0, this._width), new Vector3D(0, 0, 0));
+            var segment = new Segment(new Vector3(0, 0, this._width), new Vector3(0, 0, 0));
             segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
             this.segmentGeometry.addSegment(segment);
         }

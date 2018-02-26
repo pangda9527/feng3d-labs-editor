@@ -3,6 +3,8 @@ namespace feng3d.editor
     //
     export var editorData: EditorData;
 
+    export var editorAssetsRoot = "./resource";
+
     /**
      * 编辑器
      * @author feng 2016-10-29

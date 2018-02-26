@@ -3,12 +3,12 @@ namespace feng3d.editor
     export class STool extends MRSToolBase
     {
         protected toolModel: SToolModel;
-        private startMousePos: Point;
+        private startMousePos: Vector2;
         /**
          * 用于判断是否改变了XYZ
          */
-        private changeXYZ: Vector3D = new Vector3D();
-        private startPlanePos: Vector3D;
+        private changeXYZ: Vector3 = new Vector3();
+        private startPlanePos: Vector3;
 
         init(gameObject: GameObject)
         {
@@ -43,14 +43,14 @@ namespace feng3d.editor
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
-            var po = globalMatrix3D.transformVector(new Vector3D(0, 0, 0));
-            var px = globalMatrix3D.transformVector(new Vector3D(1, 0, 0));
-            var py = globalMatrix3D.transformVector(new Vector3D(0, 1, 0));
-            var pz = globalMatrix3D.transformVector(new Vector3D(0, 0, 1));
+            var po = globalMatrix3D.transformVector(new Vector3(0, 0, 0));
+            var px = globalMatrix3D.transformVector(new Vector3(1, 0, 0));
+            var py = globalMatrix3D.transformVector(new Vector3(0, 1, 0));
+            var pz = globalMatrix3D.transformVector(new Vector3(0, 0, 1));
             //
-            var ox = px.subtract(po);
-            var oy = py.subtract(po);
-            var oz = pz.subtract(po);
+            var ox = px.subTo(po);
+            var oy = py.subTo(po);
+            var oz = pz.subTo(po);
             //摄像机前方方向
             var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
@@ -60,23 +60,23 @@ namespace feng3d.editor
             {
                 case this.toolModel.xCube.gameObject:
                     this.selectedItem = this.toolModel.xCube;
-                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
-                    this.changeXYZ.setTo(1, 0, 0);
+                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(ox).crossTo(ox), po);
+                    this.changeXYZ.init(1, 0, 0);
                     break;
                 case this.toolModel.yCube.gameObject:
                     this.selectedItem = this.toolModel.yCube;
-                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
-                    this.changeXYZ.setTo(0, 1, 0);
+                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oy).crossTo(oy), po);
+                    this.changeXYZ.init(0, 1, 0);
                     break;
                 case this.toolModel.zCube.gameObject:
                     this.selectedItem = this.toolModel.zCube;
-                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
-                    this.changeXYZ.setTo(0, 0, 1);
+                    this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oz).crossTo(oz), po);
+                    this.changeXYZ.init(0, 0, 1);
                     break;
                 case this.toolModel.oCube.gameObject:
                     this.selectedItem = this.toolModel.oCube;
                     this.startMousePos = engine.mousePos.clone();
-                    this.changeXYZ.setTo(1, 1, 1);
+                    this.changeXYZ.init(1, 1, 1);
                     break;
             }
             this.startSceneTransform = globalMatrix3D.clone();
@@ -89,19 +89,19 @@ namespace feng3d.editor
 
         private onMouseMove()
         {
-            var addPos = new Vector3D();
-            var addScale = new Vector3D();
+            var addPos = new Vector3();
+            var addScale = new Vector3();
             if (this.selectedItem == this.toolModel.oCube)
             {
                 var currentMouse = engine.mousePos;
                 var distance = currentMouse.x - currentMouse.y - this.startMousePos.x + this.startMousePos.y;
-                addPos.setTo(distance, distance, distance);
+                addPos.init(distance, distance, distance);
                 var scale = 1 + (addPos.x + addPos.y) / (engine.viewRect.height);
-                addScale.setTo(scale, scale, scale);
+                addScale.init(scale, scale, scale);
             } else
             {
                 var crossPos = this.getLocalMousePlaneCross();
-                var offset = crossPos.subtract(this.startPlanePos);
+                var offset = crossPos.subTo(this.startPlanePos);
                 if (this.changeXYZ.x && this.startPlanePos.x && offset.x != 0)
                 {
                     addScale.x = offset.x / this.startPlanePos.x;

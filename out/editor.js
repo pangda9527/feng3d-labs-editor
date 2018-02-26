@@ -363,7 +363,7 @@ var feng3d;
                     //
                     var zip = new JSZip();
                     var request = new XMLHttpRequest();
-                    request.open('Get', "./templates/template.zip", true);
+                    request.open('Get', editor.editorAssetsRoot + "/templates/template.zip", true);
                     request.responseType = "arraybuffer";
                     request.onload = function (ev) {
                         zip.loadAsync(request.response).then(function () {
@@ -705,15 +705,15 @@ var feng3d;
             });
             var preMousePoint;
             feng3d.shortcut.on("sceneCameraForwardBackMouseMoveStart", function () {
-                preMousePoint = new feng3d.Point(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+                preMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             });
             feng3d.shortcut.on("sceneCameraForwardBackMouseMove", function () {
-                var currentMousePoint = new feng3d.Point(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+                var currentMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
                 var moveDistance = (currentMousePoint.x + currentMousePoint.y - preMousePoint.x - preMousePoint.y) * editor.sceneControlConfig.sceneCameraForwardBackwardStep;
                 editor.sceneControlConfig.lookDistance -= moveDistance;
                 var forward = editor.editorCamera.transform.localToWorldMatrix.forward;
                 var camerascenePosition = editor.editorCamera.transform.scenePosition;
-                var newCamerascenePosition = new feng3d.Vector3D(forward.x * moveDistance + camerascenePosition.x, forward.y * moveDistance + camerascenePosition.y, forward.z * moveDistance + camerascenePosition.z);
+                var newCamerascenePosition = new feng3d.Vector3(forward.x * moveDistance + camerascenePosition.x, forward.y * moveDistance + camerascenePosition.y, forward.z * moveDistance + camerascenePosition.z);
                 var newCameraPosition = editor.editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
                 editor.editorCamera.transform.position = newCameraPosition;
                 preMousePoint = currentMousePoint;
@@ -744,17 +744,17 @@ var feng3d;
             editor.editorData.selectedObjects = null;
         }
         function onDragSceneStart() {
-            dragSceneMousePoint = new feng3d.Point(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            dragSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             dragSceneCameraGlobalMatrix3D = editor.editorCamera.transform.localToWorldMatrix.clone();
         }
         function onDragScene() {
-            var mousePoint = new feng3d.Point(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var addPoint = mousePoint.subtract(dragSceneMousePoint);
+            var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var addPoint = mousePoint.subTo(dragSceneMousePoint);
             var scale = editor.editorCamera.getScaleByDepth(editor.sceneControlConfig.lookDistance);
             var up = dragSceneCameraGlobalMatrix3D.up;
             var right = dragSceneCameraGlobalMatrix3D.right;
-            up.scaleBy(addPoint.y * scale);
-            right.scaleBy(-addPoint.x * scale);
+            up.scale(addPoint.y * scale);
+            right.scale(-addPoint.x * scale);
             var globalMatrix3D = dragSceneCameraGlobalMatrix3D.clone();
             globalMatrix3D.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
             editor.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
@@ -774,7 +774,7 @@ var feng3d;
             fpsController.update();
         }
         function onMouseRotateSceneStart() {
-            rotateSceneMousePoint = new feng3d.Point(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             rotateSceneCameraGlobalMatrix3D = editor.editorCamera.transform.localToWorldMatrix.clone();
             rotateSceneCenter = null;
             //获取第一个 游戏对象
@@ -784,17 +784,17 @@ var feng3d;
             }
             else {
                 rotateSceneCenter = rotateSceneCameraGlobalMatrix3D.forward;
-                rotateSceneCenter.scaleBy(editor.sceneControlConfig.lookDistance);
-                rotateSceneCenter = rotateSceneCenter.add(rotateSceneCameraGlobalMatrix3D.position);
+                rotateSceneCenter.scale(editor.sceneControlConfig.lookDistance);
+                rotateSceneCenter = rotateSceneCenter.addTo(rotateSceneCameraGlobalMatrix3D.position);
             }
         }
         function onMouseRotateScene() {
             var globalMatrix3D = rotateSceneCameraGlobalMatrix3D.clone();
-            var mousePoint = new feng3d.Point(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var view3DRect = editor.engine.viewRect;
             var rotateX = (mousePoint.y - rotateSceneMousePoint.y) / view3DRect.height * 180;
             var rotateY = (mousePoint.x - rotateSceneMousePoint.x) / view3DRect.width * 180;
-            globalMatrix3D.appendRotation(feng3d.Vector3D.Y_AXIS, rotateY, rotateSceneCenter);
+            globalMatrix3D.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, rotateSceneCenter);
             var rotateAxisX = globalMatrix3D.right;
             globalMatrix3D.appendRotation(rotateAxisX, rotateX, rotateSceneCenter);
             editor.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
@@ -805,8 +805,8 @@ var feng3d;
                 var cameraGameObject = editor.editorCamera;
                 editor.sceneControlConfig.lookDistance = editor.sceneControlConfig.defaultLookDistance;
                 var lookPos = cameraGameObject.transform.localToWorldMatrix.forward;
-                lookPos.scaleBy(-editor.sceneControlConfig.lookDistance);
-                lookPos.incrementBy(selectedGameObject.transform.scenePosition);
+                lookPos.scale(-editor.sceneControlConfig.lookDistance);
+                lookPos.add(selectedGameObject.transform.scenePosition);
                 var localLookPos = lookPos.clone();
                 if (cameraGameObject.transform.parent) {
                     cameraGameObject.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
@@ -1170,7 +1170,7 @@ var feng3d;
             SplitGroup.prototype.onMouseDown = function (e) {
                 if (splitdragData.splitGroupState == SplitGroupState.onSplit) {
                     splitdragData.splitGroupState = SplitGroupState.draging;
-                    splitdragData.dragingMousePoint = new feng3d.Point(e.layerX, e.layerY);
+                    splitdragData.dragingMousePoint = new feng3d.Vector2(e.layerX, e.layerY);
                     //
                     var preElement = splitdragData.preElement;
                     var nextElement = splitdragData.nextElement;
@@ -1411,7 +1411,9 @@ var feng3d;
     (function (editor) {
         var TreeNode = /** @class */ (function () {
             function TreeNode(obj) {
-                obj && feng3d.ObjectUtils.copy(this, obj);
+                if (obj) {
+                    Object.assign(this, obj);
+                }
             }
             /**
              * 销毁
@@ -1533,7 +1535,7 @@ var feng3d;
             __extends(Vector3DView, _super);
             function Vector3DView() {
                 var _this = _super.call(this) || this;
-                _this.vm = new feng3d.Vector3D(1, 2, 3);
+                _this.vm = new feng3d.Vector3(1, 2, 3);
                 _this._showw = false;
                 _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "Vector3DViewSkin";
@@ -1581,7 +1583,7 @@ var feng3d;
                         this.vm.z = Number(this.zTextInput.text);
                         break;
                     case this.wTextInput:
-                        this.vm.w = Number(this.wTextInput.text);
+                        // this.vm.w = Number(this.wTextInput.text);
                         break;
                 }
             };
@@ -4557,7 +4559,7 @@ var feng3d;
                 // initialize the Resource loading library
                 //初始化Resource资源加载库
                 RES.addEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
-                RES.loadConfig("resource/default.res.json", "resource/");
+                RES.loadConfig(editor.editorAssetsRoot + "/default.res.json", editor.editorAssetsRoot + "/");
             };
             /**
              * 配置文件加载完成,开始预加载皮肤主题资源和preload资源组。
@@ -4567,7 +4569,7 @@ var feng3d;
                 RES.removeEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
                 // load skin theme configuration file, you can manually modify the file. And replace the default skin.
                 //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
-                var theme = new eui.Theme("resource/default.thm.json", this.stage);
+                var theme = new eui.Theme(editor.editorAssetsRoot + "/default.thm.json", this.stage);
                 theme.once(eui.UIEvent.COMPLETE, this.onThemeLoadComplete, this);
                 RES.addEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
                 RES.addEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
@@ -4695,22 +4697,6 @@ var feng3d;
         editor.ThemeAdapter = ThemeAdapter;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    var editor;
-    (function (editor) {
-        /**
-         * 是否本地应用
-         */
-        editor.isNative = isSuportNative();
-    })(editor = feng3d.editor || (feng3d.editor = {}));
-})(feng3d || (feng3d = {}));
-/**
- * 判断是否支持本地操作
- */
-function isSuportNative() {
-    return typeof require != "undefined" && require("fs") != null;
-}
 var feng3d;
 (function (feng3d) {
     var editor;
@@ -4891,17 +4877,17 @@ var feng3d;
                 if (!this._controllerTargets || this._controllerTargets.length == 0)
                     return;
                 var transform = this._controllerTargets[0];
-                var position = new feng3d.Vector3D();
+                var position = new feng3d.Vector3();
                 if (editor.mrsTool.isBaryCenter) {
-                    position.copyFrom(transform.scenePosition);
+                    position.copy(transform.scenePosition);
                 }
                 else {
                     for (var i = 0; i < this._controllerTargets.length; i++) {
-                        position.incrementBy(this._controllerTargets[i].scenePosition);
+                        position.add(this._controllerTargets[i].scenePosition);
                     }
-                    position.scaleBy(1 / this._controllerTargets.length);
+                    position.scale(1 / this._controllerTargets.length);
                 }
-                var rotation = new feng3d.Vector3D();
+                var rotation = new feng3d.Vector3();
                 if (!editor.mrsTool.isWoldCoordinate) {
                     rotation = this._showGameObject.rotation;
                 }
@@ -4935,7 +4921,7 @@ var feng3d;
                     var localMove = addPos.clone();
                     if (gameobject.parent)
                         localMove = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localMove);
-                    gameobject.position = transform.position.add(localMove);
+                    gameobject.position = transform.position.addTo(localMove);
                 }
             };
             MRSToolTarget.prototype.stopTranslation = function () {
@@ -4981,7 +4967,7 @@ var feng3d;
                             var localPivotPoint = this._controllerToolTransfrom.position;
                             if (gameobject.parent)
                                 localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
-                            gameobject.position = feng3d.Matrix3D.fromPosition(tempTransform.position).appendRotation(localnormal, angle, localPivotPoint).position;
+                            gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position).appendRotation(localnormal, angle, localPivotPoint).position;
                             gameobject.rotation = rotateRotation(tempTransform.rotation, localnormal, angle);
                         }
                     }
@@ -5029,8 +5015,8 @@ var feng3d;
                             if (gameobject.parent)
                                 localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
                             //
-                            tempPosition = feng3d.Matrix3D.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
-                            gameobject.position = feng3d.Matrix3D.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
+                            tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
+                            gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
                             tempRotation = rotateRotation(tempRotation, localnormal1, angle1);
                             gameobject.rotation = rotateRotation(tempRotation, localnormal2, angle2);
                         }
@@ -5048,7 +5034,7 @@ var feng3d;
             MRSToolTarget.prototype.doScale = function (scale) {
                 feng3d.debuger && feng3d.assert(!!scale.length);
                 for (var i = 0; i < this._controllerTargets.length; i++) {
-                    var result = this._startScaleVec[i].multiply(scale);
+                    var result = this._startScaleVec[i].multiplyTo(scale);
                     this._controllerTargets[i].sx = result.x;
                     this._controllerTargets[i].sy = result.y;
                     this._controllerTargets[i].sz = result.z;
@@ -5064,13 +5050,13 @@ var feng3d;
             return { position: transform.position.clone(), rotation: transform.rotation.clone(), scale: transform.scale.clone() };
         }
         function rotateRotation(rotation, axis, angle) {
-            var rotationmatrix3d = new feng3d.Matrix3D();
-            rotationmatrix3d.appendRotation(feng3d.Vector3D.X_AXIS, rotation.x);
-            rotationmatrix3d.appendRotation(feng3d.Vector3D.Y_AXIS, rotation.y);
-            rotationmatrix3d.appendRotation(feng3d.Vector3D.Z_AXIS, rotation.z);
+            var rotationmatrix3d = new feng3d.Matrix4x4();
+            rotationmatrix3d.appendRotation(feng3d.Vector3.X_AXIS, rotation.x);
+            rotationmatrix3d.appendRotation(feng3d.Vector3.Y_AXIS, rotation.y);
+            rotationmatrix3d.appendRotation(feng3d.Vector3.Z_AXIS, rotation.z);
             rotationmatrix3d.appendRotation(axis, angle);
             var newrotation = rotationmatrix3d.decompose()[1];
-            newrotation.scaleBy(180 / Math.PI);
+            newrotation.scale(180 / Math.PI);
             var v = Math.round((newrotation.x - rotation.x) / 180);
             if (v % 2 != 0) {
                 newrotation.x += 180;
@@ -5163,7 +5149,7 @@ var feng3d;
                 var xLine = feng3d.GameObject.create();
                 var meshRenderer = xLine.addComponent(feng3d.MeshRenderer);
                 var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
-                var segment = new feng3d.Segment(new feng3d.Vector3D(), new feng3d.Vector3D(0, this.length, 0));
+                var segment = new feng3d.Segment(new feng3d.Vector3(), new feng3d.Vector3(0, this.length, 0));
                 segmentGeometry.addSegment(segment);
                 this.segmentMaterial = meshRenderer.material = new feng3d.SegmentMaterial();
                 this.gameObject.addChild(xLine);
@@ -5276,16 +5262,16 @@ var feng3d;
             CoordinatePlane.prototype.update = function () {
                 this.colorMaterial.color = this.selected ? this.selectedColor : this.color;
                 this.segmentGeometry.removeAllSegments();
-                var segment = new feng3d.Segment(new feng3d.Vector3D(0, 0, 0), new feng3d.Vector3D(this._width, 0, 0));
+                var segment = new feng3d.Segment(new feng3d.Vector3(0, 0, 0), new feng3d.Vector3(this._width, 0, 0));
                 segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
                 this.segmentGeometry.addSegment(segment);
-                var segment = new feng3d.Segment(new feng3d.Vector3D(this._width, 0, 0), new feng3d.Vector3D(this._width, 0, this._width));
+                var segment = new feng3d.Segment(new feng3d.Vector3(this._width, 0, 0), new feng3d.Vector3(this._width, 0, this._width));
                 segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
                 this.segmentGeometry.addSegment(segment);
-                var segment = new feng3d.Segment(new feng3d.Vector3D(this._width, 0, this._width), new feng3d.Vector3D(0, 0, this._width));
+                var segment = new feng3d.Segment(new feng3d.Vector3(this._width, 0, this._width), new feng3d.Vector3(0, 0, this._width));
                 segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
                 this.segmentGeometry.addSegment(segment);
-                var segment = new feng3d.Segment(new feng3d.Vector3D(0, 0, this._width), new feng3d.Vector3D(0, 0, 0));
+                var segment = new feng3d.Segment(new feng3d.Vector3(0, 0, this._width), new feng3d.Vector3(0, 0, 0));
                 segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
                 this.segmentGeometry.addSegment(segment);
             };
@@ -5401,12 +5387,12 @@ var feng3d;
                 this.segmentGeometry.removeAllSegments();
                 var points = [];
                 for (var i = 0; i <= 360; i++) {
-                    points[i] = new feng3d.Vector3D(Math.sin(i * feng3d.MathConsts.DEGREES_TO_RADIANS), Math.cos(i * feng3d.MathConsts.DEGREES_TO_RADIANS), 0);
-                    points[i].scaleBy(this.radius);
+                    points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
+                    points[i].scale(this.radius);
                     if (i > 0) {
                         var show = true;
                         if (localNormal) {
-                            show = points[i - 1].dotProduct(localNormal) > 0 && points[i].dotProduct(localNormal) > 0;
+                            show = points[i - 1].dot(localNormal) > 0 && points[i].dot(localNormal) > 0;
                         }
                         if (show) {
                             var segment = new feng3d.Segment(points[i - 1], points[i]);
@@ -5425,8 +5411,8 @@ var feng3d;
                 var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
                 var localStartPos = inverseGlobalMatrix3D.transformVector(startPos);
                 var localEndPos = inverseGlobalMatrix3D.transformVector(endPos);
-                var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * feng3d.MathConsts.RADIANS_TO_DEGREES;
-                var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * feng3d.MathConsts.RADIANS_TO_DEGREES;
+                var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * feng3d.FMath.RAD2DEG;
+                var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * feng3d.FMath.RAD2DEG;
                 //
                 var min = Math.min(startAngle, endAngle);
                 var max = Math.max(startAngle, endAngle);
@@ -5487,8 +5473,8 @@ var feng3d;
                 vertexPositionData[1] = 0;
                 vertexPositionData[2] = 0;
                 for (var i = 0; i < length; i++) {
-                    vertexPositionData[i * 3 + 3] = this.radius * Math.cos((i + this._start) * feng3d.MathConsts.DEGREES_TO_RADIANS);
-                    vertexPositionData[i * 3 + 4] = this.radius * Math.sin((i + this._start) * feng3d.MathConsts.DEGREES_TO_RADIANS);
+                    vertexPositionData[i * 3 + 3] = this.radius * Math.cos((i + this._start) * feng3d.FMath.DEG2RAD);
+                    vertexPositionData[i * 3 + 4] = this.radius * Math.sin((i + this._start) * feng3d.FMath.DEG2RAD);
                     vertexPositionData[i * 3 + 5] = 0;
                     if (i > 0) {
                         indices[(i - 1) * 3] = 0;
@@ -5499,14 +5485,14 @@ var feng3d;
                 this.geometry.setVAData("a_position", vertexPositionData, 3);
                 this.geometry.indices = indices;
                 //绘制边界
-                var startPoint = new feng3d.Vector3D(this.radius * Math.cos((this._start - 0.1) * feng3d.MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._start - 0.1) * feng3d.MathConsts.DEGREES_TO_RADIANS), 0);
-                var endPoint = new feng3d.Vector3D(this.radius * Math.cos((this._end + 0.1) * feng3d.MathConsts.DEGREES_TO_RADIANS), this.radius * Math.sin((this._end + 0.1) * feng3d.MathConsts.DEGREES_TO_RADIANS), 0);
+                var startPoint = new feng3d.Vector3(this.radius * Math.cos((this._start - 0.1) * feng3d.FMath.DEG2RAD), this.radius * Math.sin((this._start - 0.1) * feng3d.FMath.DEG2RAD), 0);
+                var endPoint = new feng3d.Vector3(this.radius * Math.cos((this._end + 0.1) * feng3d.FMath.DEG2RAD), this.radius * Math.sin((this._end + 0.1) * feng3d.FMath.DEG2RAD), 0);
                 //
                 this.segmentGeometry.removeAllSegments();
-                var segment = new feng3d.Segment(new feng3d.Vector3D(), startPoint);
+                var segment = new feng3d.Segment(new feng3d.Vector3(), startPoint);
                 segment.startColor = segment.endColor = this.borderColor;
                 this.segmentGeometry.addSegment(segment);
-                var segment = new feng3d.Segment(new feng3d.Vector3D(), endPoint);
+                var segment = new feng3d.Segment(new feng3d.Vector3(), endPoint);
                 segment.startColor = segment.endColor = this.borderColor;
                 this.segmentGeometry.addSegment(segment);
             };
@@ -5558,8 +5544,8 @@ var feng3d;
                 this.segmentGeometry.removeAllSegments();
                 var points = [];
                 for (var i = 0; i <= 360; i++) {
-                    points[i] = new feng3d.Vector3D(Math.sin(i * feng3d.MathConsts.DEGREES_TO_RADIANS), Math.cos(i * feng3d.MathConsts.DEGREES_TO_RADIANS), 0);
-                    points[i].scaleBy(this.radius);
+                    points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
+                    points[i].scale(this.radius);
                     if (i > 0) {
                         var segment = new feng3d.Segment(points[i - 1], points[i]);
                         segment.startColor = segment.endColor = color;
@@ -5662,7 +5648,7 @@ var feng3d;
                 this.coordinateCube.selectedColor = this.selectedColor;
                 this.coordinateCube.update();
                 this.segmentGeometry.removeAllSegments();
-                var segment = new feng3d.Segment(new feng3d.Vector3D(), new feng3d.Vector3D(0, this._scale * this.length, 0));
+                var segment = new feng3d.Segment(new feng3d.Vector3(), new feng3d.Vector3(0, this._scale * this.length, 0));
                 segment.startColor = segment.endColor = this.selected ? this.selectedColor : this.color;
                 this.segmentGeometry.addSegment(segment);
                 //
@@ -5785,7 +5771,7 @@ var feng3d;
             MRSToolBase.prototype.getMousePlaneCross = function () {
                 var line3D = editor.editorCamera.getMouseRay3D();
                 //射线与平面交点
-                var crossPos = this.movePlane3D.lineCross(line3D);
+                var crossPos = this.movePlane3D.intersectWithLine3D(line3D);
                 return crossPos;
             };
             return MRSToolBase;
@@ -5807,7 +5793,7 @@ var feng3d;
                 /**
                  * 用于判断是否改变了XYZ
                  */
-                _this.changeXYZ = new feng3d.Vector3D();
+                _this.changeXYZ = new feng3d.Vector3();
                 return _this;
             }
             MTool.prototype.init = function (gameObject) {
@@ -5840,14 +5826,14 @@ var feng3d;
                 //全局矩阵
                 var globalMatrix3D = this.transform.localToWorldMatrix;
                 //中心与X,Y,Z轴上点坐标
-                var po = globalMatrix3D.transformVector(new feng3d.Vector3D(0, 0, 0));
-                var px = globalMatrix3D.transformVector(new feng3d.Vector3D(1, 0, 0));
-                var py = globalMatrix3D.transformVector(new feng3d.Vector3D(0, 1, 0));
-                var pz = globalMatrix3D.transformVector(new feng3d.Vector3D(0, 0, 1));
+                var po = globalMatrix3D.transformVector(new feng3d.Vector3(0, 0, 0));
+                var px = globalMatrix3D.transformVector(new feng3d.Vector3(1, 0, 0));
+                var py = globalMatrix3D.transformVector(new feng3d.Vector3(0, 1, 0));
+                var pz = globalMatrix3D.transformVector(new feng3d.Vector3(0, 0, 1));
                 //
-                var ox = px.subtract(po);
-                var oy = py.subtract(po);
-                var oz = pz.subtract(po);
+                var ox = px.subTo(po);
+                var oy = py.subTo(po);
+                var oz = pz.subTo(po);
                 //摄像机前方方向
                 var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix;
                 var cameraDir = cameraSceneTransform.forward;
@@ -5857,38 +5843,38 @@ var feng3d;
                 switch (selectedGameObject) {
                     case this.toolModel.xAxis.gameObject:
                         this.selectedItem = this.toolModel.xAxis;
-                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
-                        this.changeXYZ.setTo(1, 0, 0);
+                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(ox).crossTo(ox), po);
+                        this.changeXYZ.init(1, 0, 0);
                         break;
                     case this.toolModel.yAxis.gameObject:
                         this.selectedItem = this.toolModel.yAxis;
-                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
-                        this.changeXYZ.setTo(0, 1, 0);
+                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oy).crossTo(oy), po);
+                        this.changeXYZ.init(0, 1, 0);
                         break;
                     case this.toolModel.zAxis.gameObject:
                         this.selectedItem = this.toolModel.zAxis;
-                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
-                        this.changeXYZ.setTo(0, 0, 1);
+                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oz).crossTo(oz), po);
+                        this.changeXYZ.init(0, 0, 1);
                         break;
                     case this.toolModel.yzPlane.gameObject:
                         this.selectedItem = this.toolModel.yzPlane;
                         this.movePlane3D.fromPoints(po, py, pz);
-                        this.changeXYZ.setTo(0, 1, 1);
+                        this.changeXYZ.init(0, 1, 1);
                         break;
                     case this.toolModel.xzPlane.gameObject:
                         this.selectedItem = this.toolModel.xzPlane;
                         this.movePlane3D.fromPoints(po, px, pz);
-                        this.changeXYZ.setTo(1, 0, 1);
+                        this.changeXYZ.init(1, 0, 1);
                         break;
                     case this.toolModel.xyPlane.gameObject:
                         this.selectedItem = this.toolModel.xyPlane;
                         this.movePlane3D.fromPoints(po, px, py);
-                        this.changeXYZ.setTo(1, 1, 0);
+                        this.changeXYZ.init(1, 1, 0);
                         break;
                     case this.toolModel.oCube.gameObject:
                         this.selectedItem = this.toolModel.oCube;
                         this.movePlane3D.fromNormalAndPoint(cameraDir, po);
-                        this.changeXYZ.setTo(1, 1, 1);
+                        this.changeXYZ.init(1, 1, 1);
                         break;
                 }
                 //
@@ -5901,13 +5887,13 @@ var feng3d;
             };
             MTool.prototype.onMouseMove = function () {
                 var crossPos = this.getLocalMousePlaneCross();
-                var addPos = crossPos.subtract(this.startPlanePos);
+                var addPos = crossPos.subTo(this.startPlanePos);
                 addPos.x *= this.changeXYZ.x;
                 addPos.y *= this.changeXYZ.y;
                 addPos.z *= this.changeXYZ.z;
                 var sceneTransform = this.startSceneTransform.clone();
                 sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
-                var sceneAddpos = sceneTransform.position.subtract(this.startSceneTransform.position);
+                var sceneAddpos = sceneTransform.position.subTo(this.startSceneTransform.position);
                 this.gameobjectControllerTarget.translation(sceneAddpos);
             };
             MTool.prototype.onMouseUp = function () {
@@ -6022,20 +6008,20 @@ var feng3d;
                     case this.toolModel.cameraAxis:
                         var origin = this.startSceneTransform.position;
                         var planeCross = this.getMousePlaneCross();
-                        var startDir = this.stepPlaneCross.subtract(origin);
+                        var startDir = this.stepPlaneCross.subTo(origin);
                         startDir.normalize();
-                        var endDir = planeCross.subtract(origin);
+                        var endDir = planeCross.subTo(origin);
                         endDir.normalize();
                         //计算夹角
-                        var cosValue = startDir.dotProduct(endDir);
-                        var angle = Math.acos(cosValue) * feng3d.MathConsts.RADIANS_TO_DEGREES;
+                        var cosValue = startDir.dot(endDir);
+                        var angle = Math.acos(cosValue) * feng3d.FMath.RAD2DEG;
                         //计算是否顺时针
-                        var sign = this.movePlane3D.normal.crossProduct(startDir).dotProduct(endDir);
+                        var sign = this.movePlane3D.getNormal().cross(startDir).dot(endDir);
                         sign = sign > 0 ? 1 : -1;
                         angle = angle * sign;
                         //
-                        this.gameobjectControllerTarget.rotate1(angle, this.movePlane3D.normal);
-                        this.stepPlaneCross.copyFrom(planeCross);
+                        this.gameobjectControllerTarget.rotate1(angle, this.movePlane3D.getNormal());
+                        this.stepPlaneCross.copy(planeCross);
                         this.gameobjectControllerTarget.startRotate();
                         //绘制扇形区域
                         if (this.selectedItem instanceof editor.CoordinateRotationAxis) {
@@ -6044,7 +6030,7 @@ var feng3d;
                         break;
                     case this.toolModel.freeAxis:
                         var endPoint = editor.engine.mousePos.clone();
-                        var offset = endPoint.subtract(this.startMousePos);
+                        var offset = endPoint.subTo(this.startMousePos);
                         var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix;
                         var right = cameraSceneTransform.right;
                         var up = cameraSceneTransform.up;
@@ -6080,7 +6066,7 @@ var feng3d;
                 var temp = cameraSceneTransform.clone();
                 temp.append(this.toolModel.transform.worldToLocalMatrix);
                 var rotation = temp.decompose()[1];
-                rotation.scaleBy(feng3d.MathConsts.RADIANS_TO_DEGREES);
+                rotation.scale(feng3d.FMath.RAD2DEG);
                 this.toolModel.freeAxis.transform.rotation = rotation;
                 this.toolModel.cameraAxis.transform.rotation = rotation;
             };
@@ -6100,7 +6086,7 @@ var feng3d;
                 /**
                  * 用于判断是否改变了XYZ
                  */
-                _this.changeXYZ = new feng3d.Vector3D();
+                _this.changeXYZ = new feng3d.Vector3();
                 return _this;
             }
             STool.prototype.init = function (gameObject) {
@@ -6127,14 +6113,14 @@ var feng3d;
                 //全局矩阵
                 var globalMatrix3D = this.transform.localToWorldMatrix;
                 //中心与X,Y,Z轴上点坐标
-                var po = globalMatrix3D.transformVector(new feng3d.Vector3D(0, 0, 0));
-                var px = globalMatrix3D.transformVector(new feng3d.Vector3D(1, 0, 0));
-                var py = globalMatrix3D.transformVector(new feng3d.Vector3D(0, 1, 0));
-                var pz = globalMatrix3D.transformVector(new feng3d.Vector3D(0, 0, 1));
+                var po = globalMatrix3D.transformVector(new feng3d.Vector3(0, 0, 0));
+                var px = globalMatrix3D.transformVector(new feng3d.Vector3(1, 0, 0));
+                var py = globalMatrix3D.transformVector(new feng3d.Vector3(0, 1, 0));
+                var pz = globalMatrix3D.transformVector(new feng3d.Vector3(0, 0, 1));
                 //
-                var ox = px.subtract(po);
-                var oy = py.subtract(po);
-                var oz = pz.subtract(po);
+                var ox = px.subTo(po);
+                var oy = py.subTo(po);
+                var oz = pz.subTo(po);
                 //摄像机前方方向
                 var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix;
                 var cameraDir = cameraSceneTransform.forward;
@@ -6143,23 +6129,23 @@ var feng3d;
                 switch (selectedGameObject) {
                     case this.toolModel.xCube.gameObject:
                         this.selectedItem = this.toolModel.xCube;
-                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(ox).crossProduct(ox), po);
-                        this.changeXYZ.setTo(1, 0, 0);
+                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(ox).crossTo(ox), po);
+                        this.changeXYZ.init(1, 0, 0);
                         break;
                     case this.toolModel.yCube.gameObject:
                         this.selectedItem = this.toolModel.yCube;
-                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oy).crossProduct(oy), po);
-                        this.changeXYZ.setTo(0, 1, 0);
+                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oy).crossTo(oy), po);
+                        this.changeXYZ.init(0, 1, 0);
                         break;
                     case this.toolModel.zCube.gameObject:
                         this.selectedItem = this.toolModel.zCube;
-                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossProduct(oz).crossProduct(oz), po);
-                        this.changeXYZ.setTo(0, 0, 1);
+                        this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oz).crossTo(oz), po);
+                        this.changeXYZ.init(0, 0, 1);
                         break;
                     case this.toolModel.oCube.gameObject:
                         this.selectedItem = this.toolModel.oCube;
                         this.startMousePos = editor.engine.mousePos.clone();
-                        this.changeXYZ.setTo(1, 1, 1);
+                        this.changeXYZ.init(1, 1, 1);
                         break;
                 }
                 this.startSceneTransform = globalMatrix3D.clone();
@@ -6169,18 +6155,18 @@ var feng3d;
                 feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
             };
             STool.prototype.onMouseMove = function () {
-                var addPos = new feng3d.Vector3D();
-                var addScale = new feng3d.Vector3D();
+                var addPos = new feng3d.Vector3();
+                var addScale = new feng3d.Vector3();
                 if (this.selectedItem == this.toolModel.oCube) {
                     var currentMouse = editor.engine.mousePos;
                     var distance = currentMouse.x - currentMouse.y - this.startMousePos.x + this.startMousePos.y;
-                    addPos.setTo(distance, distance, distance);
+                    addPos.init(distance, distance, distance);
                     var scale = 1 + (addPos.x + addPos.y) / (editor.engine.viewRect.height);
-                    addScale.setTo(scale, scale, scale);
+                    addScale.init(scale, scale, scale);
                 }
                 else {
                     var crossPos = this.getLocalMousePlaneCross();
-                    var offset = crossPos.subtract(this.startPlanePos);
+                    var offset = crossPos.subTo(this.startPlanePos);
                     if (this.changeXYZ.x && this.startPlanePos.x && offset.x != 0) {
                         addScale.x = offset.x / this.startPlanePos.x;
                     }
@@ -6590,13 +6576,13 @@ var feng3d;
                     var rect = editor.engine.canvas.getBoundingClientRect();
                     canvas.style.top = rect.top + "px";
                     canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
-                    var rotation = editor.editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleBy(180 / Math.PI);
+                    var rotation = editor.editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scale(180 / Math.PI);
                     rotationToolModel.transform.rotation = rotation;
                     //隐藏角度
-                    var visibleAngle = Math.cos(15 * Math.DEG2RAD);
+                    var visibleAngle = Math.cos(15 * feng3d.FMath.DEG2RAD);
                     //隐藏正面箭头
                     arrowsArr.forEach(function (element) {
-                        if (Math.abs(element.transform.localToWorldMatrix.up.dotProduct(feng3d.Vector3D.Z_AXIS)) < visibleAngle)
+                        if (Math.abs(element.transform.localToWorldMatrix.up.dot(feng3d.Vector3.Z_AXIS)) < visibleAngle)
                             element.visible = true;
                         else
                             element.visible = false;
@@ -6680,12 +6666,12 @@ var feng3d;
                     return { toolEngine: toolEngine, canvas: canvas };
                 }
                 function onclick(e) {
-                    var front_view = new feng3d.Vector3D(0, 0, 0); //前视图
-                    var back_view = new feng3d.Vector3D(0, 180, 0); //后视图
-                    var right_view = new feng3d.Vector3D(0, -90, 0); //右视图
-                    var left_view = new feng3d.Vector3D(0, 90, 0); //左视图
-                    var top_view = new feng3d.Vector3D(-90, 0, 180); //顶视图
-                    var bottom_view = new feng3d.Vector3D(-90, 180, 0); //底视图
+                    var front_view = new feng3d.Vector3(0, 0, 0); //前视图
+                    var back_view = new feng3d.Vector3(0, 180, 0); //后视图
+                    var right_view = new feng3d.Vector3(0, -90, 0); //右视图
+                    var left_view = new feng3d.Vector3(0, 90, 0); //左视图
+                    var top_view = new feng3d.Vector3(-90, 0, 180); //顶视图
+                    var bottom_view = new feng3d.Vector3(-90, 180, 0); //底视图
                     var rotation;
                     switch (e.currentTarget) {
                         case arrowsX:
@@ -6708,10 +6694,10 @@ var feng3d;
                             break;
                     }
                     if (rotation) {
-                        var cameraTargetMatrix3D = feng3d.Matrix3D.fromRotation(rotation);
+                        var cameraTargetMatrix3D = feng3d.Matrix4x4.fromRotation(rotation);
                         cameraTargetMatrix3D.invert();
                         var result = cameraTargetMatrix3D.decompose()[1];
-                        result.scaleBy(180 / Math.PI);
+                        result.scale(180 / Math.PI);
                         editor.editorDispatcher.dispatch("editorCameraRotate", result);
                     }
                 }
@@ -7544,9 +7530,9 @@ var feng3d;
                         var color0 = new feng3d.Color().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
                         color0.a = ((i % 10) == 0) ? 0.5 : 0.1;
                         color = (i * step + startZ == 0) ? xcolor : color0;
-                        segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3D(-halfNum * step + startX, 0, i * step + startZ), new feng3d.Vector3D(halfNum * step + startX, 0, i * step + startZ), color, color));
+                        segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(-halfNum * step + startX, 0, i * step + startZ), new feng3d.Vector3(halfNum * step + startX, 0, i * step + startZ), color, color));
                         color = (i * step + startX == 0) ? zcolor : color0;
-                        segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3D(i * step + startX, 0, -halfNum * step + startZ), new feng3d.Vector3D(i * step + startX, 0, halfNum * step + startZ), color, color));
+                        segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(i * step + startX, 0, -halfNum * step + startZ), new feng3d.Vector3(i * step + startX, 0, halfNum * step + startZ), color, color));
                     }
                 }
             };
@@ -7606,7 +7592,7 @@ var feng3d;
                 editor.editorCamera.transform.x = 5;
                 editor.editorCamera.transform.y = 3;
                 editor.editorCamera.transform.z = 5;
-                editor.editorCamera.transform.lookAt(new feng3d.Vector3D());
+                editor.editorCamera.transform.lookAt(new feng3d.Vector3());
                 //
                 editor.editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
                 //
@@ -7635,16 +7621,6 @@ var feng3d;
                 window.addEventListener("beforeunload", function () {
                     editor.editorAssets.saveScene("default.scene", editor.engine.scene);
                 });
-                // var cubeTexture = new TextureCube([
-                //     'resource/3d/skybox/px.jpg',
-                //     'resource/3d/skybox/py.jpg',
-                //     'resource/3d/skybox/pz.jpg',
-                //     'resource/3d/skybox/nx.jpg',
-                //     'resource/3d/skybox/ny.jpg',
-                //     'resource/3d/skybox/nz.jpg',
-                // ]);
-                // var skyBoxComponent = scene.gameObject.addComponent(SkyBox);
-                // skyBoxComponent.texture = cubeTexture;
             };
             Main3D.prototype.onEditorCameraRotate = function (e) {
                 var resultRotation = e.data;
@@ -7654,21 +7630,21 @@ var feng3d;
                 if (editor.editorData.selectedGameObjects.length > 0) {
                     //计算观察距离
                     var selectedObj = editor.editorData.selectedGameObjects[0];
-                    var lookray = selectedObj.transform.scenePosition.subtract(camera.transform.scenePosition);
-                    lookDistance = Math.max(0, forward.dotProduct(lookray));
+                    var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
+                    lookDistance = Math.max(0, forward.dot(lookray));
                 }
                 else {
                     lookDistance = editor.sceneControlConfig.lookDistance;
                 }
                 //旋转中心
-                var rotateCenter = camera.transform.scenePosition.add(forward.scaleBy(lookDistance));
+                var rotateCenter = camera.transform.scenePosition.addTo(forward.scale(lookDistance));
                 //计算目标四元素旋转
                 var targetQuat = new feng3d.Quaternion();
-                resultRotation.scaleBy(Math.DEG2RAD);
+                resultRotation.scale(feng3d.FMath.DEG2RAD);
                 targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
                 //
                 var sourceQuat = new feng3d.Quaternion();
-                sourceQuat.fromEulerAngles(camera.transform.rx * Math.DEG2RAD, camera.transform.ry * Math.DEG2RAD, camera.transform.rz * Math.DEG2RAD);
+                sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.FMath.DEG2RAD, camera.transform.ry * feng3d.FMath.DEG2RAD, camera.transform.rz * feng3d.FMath.DEG2RAD);
                 var rate = { rate: 0.0 };
                 egret.Tween.get(rate, {
                     onChange: function () {
@@ -7678,8 +7654,8 @@ var feng3d;
                         //
                         var translation = camera.transform.forwardVector;
                         translation.negate();
-                        translation.scaleBy(lookDistance);
-                        camera.transform.position = rotateCenter.add(translation);
+                        translation.scale(lookDistance);
+                        camera.transform.position = rotateCenter.addTo(translation);
                     },
                 }).to({ rate: 1 }, 300, egret.Ease.sineIn);
             };
@@ -7820,10 +7796,11 @@ var feng3d;
                 var geometry = mergeGeometry(geometrys);
                 //
                 var geometrydata = getGeometryData(geometry);
-                var process = new navigation.NavigationTriangleProcess(geometrydata);
+                var process = new navigation.NavigationProcess(geometrydata);
                 //
                 process.checkMaxSlope(this.maxSlope);
                 process.checkAgentRadius(this.agentRadius);
+                process.checkAgentHeight(this.agentHeight);
                 //
                 geometrydata = process.getGeometry();
                 if (geometrydata.indices.length == 0) {
@@ -7908,14 +7885,821 @@ var feng3d;
         editor.Navigation = Navigation;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
+// see https://github.com/sshirokov/ThreeBSP
+var feng3d;
+(function (feng3d) {
+    /**
+     * 精度值
+     */
+    var EPSILON = 1e-5;
+    /**
+     * 共面
+     */
+    var COPLANAR = 0;
+    /**
+     * 正面
+     */
+    var FRONT = 1;
+    /**
+     * 反面
+     */
+    var BACK = 2;
+    /**
+     * 横跨
+     */
+    var SPANNING = 3;
+    var ThreeBSP = /** @class */ (function () {
+        function ThreeBSP(geometry) {
+            if (geometry instanceof ThreeBSPNode) {
+                this.tree = geometry;
+            }
+            else {
+                this.tree = new ThreeBSPNode(geometry);
+            }
+        }
+        ThreeBSP.prototype.toGeometry = function () {
+            var data = this.tree.getGeometryData();
+            return data;
+        };
+        /**
+         * 相减
+         * @param other
+         */
+        ThreeBSP.prototype.subtract = function (other) {
+            var them = other.tree.clone(), us = this.tree.clone();
+            us.invert().clipTo(them);
+            them.clipTo(us).invert().clipTo(us).invert();
+            return new ThreeBSP(us.build(them.allPolygons()).invert());
+        };
+        ;
+        /**
+         * 相加
+         * @param other
+         */
+        ThreeBSP.prototype.union = function (other) {
+            var them = other.tree.clone(), us = this.tree.clone();
+            us.clipTo(them);
+            them.clipTo(us).invert().clipTo(us).invert();
+            return new ThreeBSP(us.build(them.allPolygons()));
+        };
+        ;
+        /**
+         * 相交
+         * @param other
+         */
+        ThreeBSP.prototype.intersect = function (other) {
+            var them = other.tree.clone(), us = this.tree.clone();
+            them.clipTo(us.invert()).invert().clipTo(us.clipTo(them));
+            return new ThreeBSP(us.build(them.allPolygons()).invert());
+        };
+        ;
+        return ThreeBSP;
+    }());
+    feng3d.ThreeBSP = ThreeBSP;
+    /**
+     * 顶点
+     */
+    var ThreeBSPVertex = /** @class */ (function () {
+        function ThreeBSPVertex(position, normal, uv) {
+            this.position = position;
+            this.normal = normal || new feng3d.Vector3();
+            this.uv = uv || new feng3d.Vector2();
+        }
+        /**
+         * 克隆
+         */
+        ThreeBSPVertex.prototype.clone = function () {
+            return new ThreeBSPVertex(this.position.clone(), this.normal.clone(), this.uv.clone());
+        };
+        ;
+        /**
+         *
+         * @param v 线性插值
+         * @param alpha
+         */
+        ThreeBSPVertex.prototype.lerp = function (v, alpha) {
+            this.position.lerpNumber(v.position, alpha);
+            this.uv.lerpNumber(v.uv, alpha);
+            this.normal.lerpNumber(v.position, alpha);
+            return this;
+        };
+        ;
+        ThreeBSPVertex.prototype.interpolate = function (v, alpha) {
+            return this.clone().lerp(v, alpha);
+        };
+        ;
+        return ThreeBSPVertex;
+    }());
+    /**
+     * 多边形
+     */
+    var ThreeBSPPolygon = /** @class */ (function () {
+        function ThreeBSPPolygon(vertices) {
+            this.vertices = vertices || [];
+            if (this.vertices.length) {
+                this.calculateProperties();
+            }
+        }
+        /**
+         * 获取多边形几何体数据
+         * @param data
+         */
+        ThreeBSPPolygon.prototype.getGeometryData = function (data) {
+            data = data || { positions: [], uvs: [], normals: [] };
+            var vertices = data.positions = data.positions || [];
+            var uvs = data.uvs = data.uvs || [];
+            var normals = data.normals = data.normals || [];
+            for (var i = 2, n = this.vertices.length; i < n; i++) {
+                var v0 = this.vertices[0], v1 = this.vertices[i - 1], v2 = this.vertices[i];
+                vertices.push(v0.position.x, v0.position.y, v0.position.z, v1.position.x, v1.position.y, v1.position.z, v2.position.x, v2.position.y, v2.position.z);
+                uvs.push(v0.uv.x, v0.uv.y, v1.uv.x, v1.uv.y, v2.uv.x, v2.uv.y);
+                normals.push(this.normal.x, this.normal.y, this.normal.z, this.normal.x, this.normal.y, this.normal.z, this.normal.x, this.normal.y, this.normal.z);
+            }
+            return data;
+        };
+        /**
+         * 计算法线与w值
+         */
+        ThreeBSPPolygon.prototype.calculateProperties = function () {
+            var a = this.vertices[0].position, b = this.vertices[1].position, c = this.vertices[2].position;
+            this.normal = b.clone().subTo(a).crossTo(c.clone().subTo(a)).normalize();
+            this.w = this.normal.clone().dot(a);
+            return this;
+        };
+        ;
+        /**
+         * 克隆
+         */
+        ThreeBSPPolygon.prototype.clone = function () {
+            var vertices = this.vertices.map(function (v) { return v.clone(); });
+            return new ThreeBSPPolygon(vertices);
+        };
+        ;
+        /**
+         * 翻转多边形
+         */
+        ThreeBSPPolygon.prototype.invert = function () {
+            this.normal.scale(-1);
+            this.w *= -1;
+            this.vertices.reverse();
+            return this;
+        };
+        ;
+        /**
+         * 获取顶点与多边形所在平面相对位置
+         * @param vertex
+         */
+        ThreeBSPPolygon.prototype.classifyVertex = function (vertex) {
+            var side = this.normal.dot(vertex.position) - this.w;
+            if (side < -EPSILON)
+                return BACK;
+            if (side > EPSILON)
+                return FRONT;
+            return COPLANAR;
+        };
+        /**
+         * 计算与另外一个多边形的相对位置
+         * @param polygon
+         */
+        ThreeBSPPolygon.prototype.classifySide = function (polygon) {
+            var _this = this;
+            var front = 0, back = 0;
+            polygon.vertices.forEach(function (v) {
+                var side = _this.classifyVertex(v);
+                if (side == FRONT)
+                    front += 1;
+                else if (side == BACK)
+                    back += 1;
+            });
+            if (front > 0 && back === 0) {
+                return FRONT;
+            }
+            if (front === 0 && back > 0) {
+                return BACK;
+            }
+            if (front === back && back === 0) {
+                return COPLANAR;
+            }
+            return SPANNING;
+        };
+        /**
+         * 切割多边形
+         * @param poly
+         */
+        ThreeBSPPolygon.prototype.tessellate = function (poly) {
+            var _this = this;
+            if (this.classifySide(poly) !== SPANNING) {
+                return [poly];
+            }
+            var f = [];
+            var b = [];
+            var count = poly.vertices.length;
+            //切割多边形的每条边
+            poly.vertices.forEach(function (item, i) {
+                var vi = poly.vertices[i];
+                var vj = poly.vertices[(i + 1) % count];
+                var ti = _this.classifyVertex(vi);
+                var tj = _this.classifyVertex(vj);
+                if (ti !== BACK) {
+                    f.push(vi);
+                }
+                if (ti !== FRONT) {
+                    b.push(vi);
+                }
+                // 切割横跨多边形的边
+                if ((ti | tj) === SPANNING) {
+                    var t = (_this.w - _this.normal.dot(vi.position)) / _this.normal.dot(vj.clone().position.subTo(vi.position));
+                    var v = vi.interpolate(vj, t);
+                    f.push(v);
+                    b.push(v);
+                }
+            });
+            // 处理切割后的多边形
+            var polys = [];
+            if (f.length >= 3) {
+                polys.push(new ThreeBSPPolygon(f));
+            }
+            if (b.length >= 3) {
+                polys.push(new ThreeBSPPolygon(b));
+            }
+            return polys;
+        };
+        /**
+         * 切割多边形并进行分类
+         * @param polygon 被切割多边形
+         * @param coplanar_front    切割后的平面正面多边形
+         * @param coplanar_back     切割后的平面反面多边形
+         * @param front 多边形在正面
+         * @param back 多边形在反面
+         */
+        ThreeBSPPolygon.prototype.subdivide = function (polygon, coplanar_front, coplanar_back, front, back) {
+            var _this = this;
+            this.tessellate(polygon).forEach(function (poly) {
+                var side = _this.classifySide(poly);
+                switch (side) {
+                    case FRONT:
+                        front.push(poly);
+                        break;
+                    case BACK:
+                        back.push(poly);
+                        break;
+                    case COPLANAR:
+                        if (_this.normal.dot(poly.normal) > 0) {
+                            coplanar_front.push(poly);
+                        }
+                        else {
+                            coplanar_back.push(poly);
+                        }
+                        break;
+                    default:
+                        throw new Error("BUG: Polygon of classification " + side + " in subdivision");
+                }
+            });
+        };
+        ;
+        return ThreeBSPPolygon;
+    }());
+    /**
+     * 节点
+     */
+    var ThreeBSPNode = /** @class */ (function () {
+        function ThreeBSPNode(data) {
+            this.polygons = [];
+            if (!data)
+                return;
+            var positions = data.positions;
+            var normals = data.normals;
+            var uvs = data.uvs;
+            var indices = data.indices;
+            // 初始化多边形
+            var polygons = [];
+            for (var i = 0, n = indices.length; i < n; i += 3) {
+                var polygon = new ThreeBSPPolygon();
+                var i0 = indices[i];
+                var i1 = indices[i + 1];
+                var i2 = indices[i + 2];
+                polygon.vertices = [
+                    new ThreeBSPVertex(new feng3d.Vector3(positions[i0 * 3], positions[i0 * 3 + 1], positions[i0 * 3 + 2]), new feng3d.Vector3(normals[i0 * 3], normals[i0 * 3 + 1], normals[i0 * 3 + 2]), new feng3d.Vector2(uvs[i0 * 2], uvs[i0 * 2 + 1])),
+                    new ThreeBSPVertex(new feng3d.Vector3(positions[i1 * 3], positions[i1 * 3 + 1], positions[i1 * 3 + 2]), new feng3d.Vector3(normals[i1 * 3], normals[i1 * 3 + 1], normals[i1 * 3 + 2]), new feng3d.Vector2(uvs[i1 * 2], uvs[i1 * 2 + 1])),
+                    new ThreeBSPVertex(new feng3d.Vector3(positions[i2 * 3], positions[i2 * 3 + 1], positions[i2 * 3 + 2]), new feng3d.Vector3(normals[i2 * 3], normals[i2 * 3 + 1], normals[i2 * 3 + 2]), new feng3d.Vector2(uvs[i2 * 2], uvs[i2 * 2 + 1])),
+                ];
+                polygon.calculateProperties();
+                polygons.push(polygon);
+            }
+            if (polygons.length) {
+                this.build(polygons);
+            }
+        }
+        /**
+         * 获取几何体数据
+         */
+        ThreeBSPNode.prototype.getGeometryData = function () {
+            var data = { positions: [], uvs: [], normals: [], indices: [] };
+            var polygons = this.allPolygons();
+            polygons.forEach(function (polygon) {
+                polygon.getGeometryData(data);
+            });
+            for (var i = 0, indices = data.indices, n = data.positions.length / 3; i < n; i++) {
+                indices.push(i);
+            }
+            return data;
+        };
+        /**
+         * 克隆
+         */
+        ThreeBSPNode.prototype.clone = function () {
+            var node = new ThreeBSPNode();
+            node.divider = this.divider && this.divider.clone();
+            node.polygons = this.polygons.map(function (element) {
+                return element.clone();
+            });
+            node.front = this.front && this.front.clone();
+            node.back = this.back && this.back.clone();
+            return node;
+        };
+        ;
+        /**
+         * 构建树节点
+         * @param polygons 多边形列表
+         */
+        ThreeBSPNode.prototype.build = function (polygons) {
+            var _this = this;
+            // 以第一个多边形为切割面
+            if (this.divider == null) {
+                this.divider = polygons[0].clone();
+            }
+            var front = [], back = [];
+            //进行切割并分类
+            polygons.forEach(function (poly) {
+                _this.divider.subdivide(poly, _this.polygons, _this.polygons, front, back);
+            });
+            // 继续切割平面前的多边形
+            if (front.length > 0) {
+                this.front = this.front || new ThreeBSPNode();
+                this.front.build(front);
+            }
+            // 继续切割平面后的多边形
+            if (back.length > 0) {
+                this.back = this.back || new ThreeBSPNode();
+                this.back.build(back);
+            }
+            return this;
+        };
+        ;
+        /**
+         * 判定是否为凸面体
+         * @param polys
+         */
+        ThreeBSPNode.prototype.isConvex = function (polys) {
+            polys.every(function (inner) {
+                return polys.every(function (outer) {
+                    if (inner !== outer && outer.classifySide(inner) !== BACK) {
+                        return false;
+                    }
+                    return true;
+                });
+            });
+            return true;
+        };
+        ;
+        /**
+         * 所有多边形
+         */
+        ThreeBSPNode.prototype.allPolygons = function () {
+            var front = (this.front && this.front.allPolygons()) || [];
+            var back = (this.back && this.back.allPolygons()) || [];
+            var polygons = this.polygons.slice().concat(front).concat(back);
+            return polygons;
+        };
+        ;
+        /**
+         * 翻转
+         */
+        ThreeBSPNode.prototype.invert = function () {
+            this.polygons.forEach(function (poly) {
+                poly.invert();
+            });
+            this.divider && this.divider.invert();
+            this.front && this.front.invert();
+            this.back && this.back.invert();
+            var temp = this.back;
+            this.back = this.front;
+            this.front = temp;
+            return this;
+        };
+        ;
+        /**
+         * 裁剪多边形
+         * @param polygons
+         */
+        ThreeBSPNode.prototype.clipPolygons = function (polygons) {
+            var _this = this;
+            if (!this.divider) {
+                return polygons.slice();
+            }
+            var front = [];
+            var back = [];
+            polygons.forEach(function (polygon) {
+                _this.divider.subdivide(polygon, front, back, front, back);
+            });
+            if (this.front) {
+                front = this.front.clipPolygons(front);
+            }
+            if (this.back) {
+                back = this.back.clipPolygons(back);
+            }
+            if (this.back) {
+                return front.concat(back);
+            }
+            return front;
+        };
+        ;
+        ThreeBSPNode.prototype.clipTo = function (node) {
+            this.polygons = node.clipPolygons(this.polygons);
+            this.front && this.front.clipTo(node);
+            this.back && this.back.clipTo(node);
+            return this;
+        };
+        ;
+        return ThreeBSPNode;
+    }());
+})(feng3d || (feng3d = {}));
 var navigation;
 (function (navigation) {
-    var NavigationTriangleProcess = /** @class */ (function () {
-        function NavigationTriangleProcess(geometry) {
-            this.geometry = geometry;
-            this.initTriangles(geometry.positions, geometry.indices);
+    var NavigationProcess = /** @class */ (function () {
+        function NavigationProcess(geometry) {
+            this.data = new NavigationData();
+            this.data.init(geometry);
         }
-        NavigationTriangleProcess.prototype.initTriangles = function (positions, indices) {
+        NavigationProcess.prototype.checkMaxSlope = function (maxSlope) {
+            var _this = this;
+            var up = new feng3d.Vector3(0, 1, 0);
+            var mincos = Math.cos(maxSlope * feng3d.FMath.DEG2RAD);
+            var keys = this.data.trianglemap.getKeys();
+            keys.forEach(function (element) {
+                var normal = _this.data.trianglemap.get(element).getNormal();
+                var dot = normal.dot(up);
+                if (dot < mincos) {
+                    _this.data.trianglemap.delete(element);
+                }
+            });
+        };
+        NavigationProcess.prototype.checkAgentRadius = function (agentRadius) {
+            var trianglemap = this.data.trianglemap;
+            var linemap = this.data.linemap;
+            var pointmap = this.data.pointmap;
+            var line0map = new Map();
+            //获取所有独立边
+            var lines = this.getAllSingleLine();
+            //调试独立边
+            this.debugShowLines(lines);
+            // 计算创建边缘边
+            var line0s = lines.map(createLine0);
+            // 调试边缘边内部方向
+            this.debugShowLines1(line0s, agentRadius);
+            // 方案1：遍历每个点，使得该点对所有边缘边保持大于agentRadius的距离
+            // pointmap.getValues().forEach(handlePoint);
+            // 方案2：遍历所有边缘边，把所有在边缘边左边角内的点移到左边角平分线上，所有在边缘边右边角内的移到右边角平分线上，
+            line0s.forEach(handleLine0);
+            trianglemap.getValues().forEach(function (triangle) {
+                if (triangle.getNormal().dot(new feng3d.Vector3(0, 1, 0)) < 0)
+                    trianglemap.delete(triangle.index);
+            }); //删除面向-y方向的三角形
+            // 方案3：在原有模型上减去 以独立边为轴以agentRadius为半径的圆柱（此处需要基于模型之间的剔除等运算）
+            /**
+             * 把所有在边缘边左边角内的点移到左边角平分线上，所有在边缘边右边角内的移到右边角平分线上
+             * @param line0
+             */
+            function handleLine0(line0) {
+                // 三条线段
+                var ls = line0map.get(line0.leftline).segment;
+                var cs = line0.segment;
+                var rs = line0map.get(line0.rightline).segment;
+                //
+                var ld = line0map.get(line0.leftline).direction;
+                var cd = line0.direction;
+                var rd = line0map.get(line0.rightline).direction;
+                // 顶点坐标
+                var p0 = [ls.p0, ls.p1].filter(function (p) { return !cs.p0.equals(p) && !cs.p1.equals(p); })[0];
+                var p1 = [ls.p0, ls.p1].filter(function (p) { return cs.p0.equals(p) || cs.p1.equals(p); })[0];
+                var p2 = [rs.p0, rs.p1].filter(function (p) { return cs.p0.equals(p) || cs.p1.equals(p); })[0];
+                var p3 = [rs.p0, rs.p1].filter(function (p) { return !cs.p0.equals(p) && !cs.p1.equals(p); })[0];
+                // 角平分线上点坐标
+                var lp = getHalfAnglePoint(p1, ld, cd, agentRadius);
+                var rp = getHalfAnglePoint(p2, cd, rd, agentRadius);
+                //debug
+                pointGeometry.addPoint(new feng3d.PointInfo(lp));
+                pointGeometry.addPoint(new feng3d.PointInfo(rp));
+                //
+                var hpmap = {};
+                var points = linemap.get(line0.index).points.concat();
+                handlePoints();
+                function handlePoints() {
+                    if (points.length == 0)
+                        return;
+                    var point = pointmap.get(points.shift());
+                    //
+                    var ld = ls.getPointDistance(point.getPoint());
+                    var cd = cs.getPointDistance(point.getPoint());
+                    var rd = rs.getPointDistance(point.getPoint());
+                    //
+                    if (cd < agentRadius) {
+                        if (ld < agentRadius) {
+                            point.setPoint(lp);
+                        }
+                        else if (rd < agentRadius) {
+                            point.setPoint(rp);
+                        }
+                        else {
+                            point.setPoint(point.getPoint().addTo(line0.direction.clone().scale(agentRadius - cd)));
+                        }
+                        //标记该点以被处理
+                        hpmap[point.index] = true;
+                        // 搜索临近点
+                        point.getNearbyPoints().forEach(function (p) {
+                            if (hpmap[p])
+                                return;
+                            if (points.indexOf(p) != -1)
+                                return;
+                            points.push(p);
+                        });
+                    }
+                    handlePoints();
+                }
+                /**
+                 * 获取对角线上距离角的两边距离为 distance 的点
+                 * @param pa 角的第一个点
+                 * @param d1 角点
+                 * @param d2 角的第二个点
+                 * @param distance 距离
+                 */
+                function getHalfAnglePoint(p0, d1, d2, distance) {
+                    //对角线方向
+                    var djx = d1.addTo(d2).normalize();
+                    var cos = djx.dot(d1);
+                    var targetPoint = p0.addTo(djx.clone().normalize(distance / cos));
+                    return targetPoint;
+                }
+            }
+            /**
+             * 使得该点对所有边缘边保持大于agentRadius的距离
+             * @param point
+             */
+            function handlePoint(point) {
+                var p = point.getPoint();
+                var crossline0s = line0s.reduce(function (result, line0) {
+                    var distance = line0.segment.getPointDistance(p);
+                    if (distance < agentRadius) {
+                        result.push([line0, distance]);
+                    }
+                    return result;
+                }, []);
+                if (crossline0s.length == 0)
+                    return;
+                if (crossline0s.length == 1) {
+                    point.setPoint(point.getPoint().addTo(crossline0s[0][0].direction.clone().scale(agentRadius - crossline0s[0][1])));
+                }
+                else {
+                    //如果多于两条线段，取距离最近两条
+                    if (crossline0s.length > 2) {
+                        crossline0s.sort(function (a, b) { return a[1] - b[1]; });
+                    }
+                    //对角线方向
+                    var djx = crossline0s[0][0].direction.addTo(crossline0s[1][0].direction).normalize();
+                    //查找两条线段的共同点
+                    var points0 = linemap.get(crossline0s[0][0].index).points;
+                    var points1 = linemap.get(crossline0s[1][0].index).points;
+                    var ps = points0.filter(function (v) { return points1.indexOf(v) != -1; });
+                    if (ps.length == 1) {
+                        var cross = pointmap.get(ps[0]).getPoint();
+                        var cos = djx.dot(crossline0s[0][0].segment.p1.subTo(crossline0s[0][0].segment.p0).normalize());
+                        var sin = Math.sqrt(1 - cos * cos);
+                        var length = agentRadius / sin;
+                        var targetPoint = cross.addTo(djx.clone().scale(length));
+                        point.setPoint(targetPoint);
+                    }
+                    else {
+                        ps.length;
+                    }
+                }
+            }
+            /**
+             * 创建边缘边
+             * @param line
+             */
+            function createLine0(line) {
+                var line0 = new Line0();
+                line0.index = line.index;
+                var points = line.points.map(function (v) { var point = pointmap.get(v); return new feng3d.Vector3(point.value[0], point.value[1], point.value[2]); });
+                line0.segment = new feng3d.Segment3D(points[0], points[1]);
+                //
+                var triangle = trianglemap.get(line.triangles[0]);
+                if (!triangle)
+                    return;
+                var linepoints = line.points.map(function (v) { return pointmap.get(v); });
+                var otherPoint = pointmap.get(triangle.points.filter(function (v) {
+                    return line.points.indexOf(v) == -1;
+                })[0]).getPoint();
+                line0.direction = line0.segment.getNormalWithPoint(otherPoint);
+                line0.leftline = pointmap.get(line.points[0]).lines.filter(function (line) {
+                    if (line == line0.index)
+                        return false;
+                    var prelines = lines.filter(function (l) {
+                        return l.index == line;
+                    });
+                    return prelines.length == 1;
+                })[0];
+                line0.rightline = pointmap.get(line.points[1]).lines.filter(function (line) {
+                    if (line == line0.index)
+                        return false;
+                    var prelines = lines.filter(function (l) {
+                        return l.index == line;
+                    });
+                    return prelines.length == 1;
+                })[0];
+                line0map.set(line0.index, line0);
+                return line0;
+            }
+        };
+        NavigationProcess.prototype.checkAgentHeight = function (agentHeight) {
+            this.data.resetData();
+            //
+            var pointmap = this.data.pointmap;
+            var linemap = this.data.linemap;
+            var trianglemap = this.data.trianglemap;
+            //
+            var triangle0s = trianglemap.getValues().map(createTriangle);
+            pointmap.getValues().forEach(handlePoint);
+            //
+            function createTriangle(triangle) {
+                var triangle3D = triangle.getTriangle3D();
+                return { triangle3D: triangle3D, index: triangle.index };
+            }
+            //
+            function handlePoint(point) {
+                // 测试点是否通过所有三角形测试
+                var result = triangle0s.every(function (triangle0) {
+                    return true;
+                });
+                // 测试失败时删除该点关联的三角形
+                if (!result) {
+                    point.triangles.forEach(function (triangleindex) {
+                        trianglemap.delete(triangleindex);
+                    });
+                }
+            }
+        };
+        NavigationProcess.prototype.getGeometry = function () {
+            return this.data.getGeometry();
+        };
+        NavigationProcess.prototype.debugShowLines1 = function (line0s, length) {
+            line0s.forEach(function (element) {
+                var p0 = element.segment.p0.addTo(element.segment.p1).scale(0.5);
+                var p1 = p0.addTo(element.direction.clone().normalize(length));
+                segmentGeometry.addSegment(new feng3d.Segment(p0, p1, new feng3d.Color(1), new feng3d.Color(0, 1)));
+            });
+        };
+        NavigationProcess.prototype.debugShowLines = function (lines) {
+            var _this = this;
+            createSegment();
+            segmentGeometry.removeAllSegments();
+            lines.forEach(function (element) {
+                var points = element.points.map(function (pointindex) {
+                    var value = _this.data.pointmap.get(pointindex).value;
+                    return new feng3d.Vector3(value[0], value[1], value[2]);
+                });
+                segmentGeometry.addSegment(new feng3d.Segment(points[0], points[1]));
+            });
+        };
+        /**
+         * 获取所有独立边
+         */
+        NavigationProcess.prototype.getAllSingleLine = function () {
+            var _this = this;
+            var lines = [];
+            var needLine = [];
+            this.data.linemap.forEach(function (element) {
+                element.triangles = element.triangles.filter(function (triangleIndex) { return _this.data.trianglemap.has(triangleIndex); });
+                if (element.triangles.length == 1)
+                    lines.push(element);
+                else if (element.triangles.length == 0)
+                    needLine.push(element);
+            });
+            needLine.forEach(function (element) {
+                _this.data.linemap.delete(element.index);
+            });
+            return lines;
+        };
+        return NavigationProcess;
+    }());
+    navigation.NavigationProcess = NavigationProcess;
+    /**
+     * 点
+     */
+    var Point = /** @class */ (function () {
+        function Point(pointmap, linemap, trianglemap) {
+            /**
+             * 点连接的线段索引列表
+             */
+            this.lines = [];
+            /**
+             * 点连接的三角形索引列表
+             */
+            this.triangles = [];
+            this.pointmap = pointmap;
+            this.linemap = linemap;
+            this.trianglemap = trianglemap;
+        }
+        /**
+         * 设置该点位置
+         * @param p
+         */
+        Point.prototype.setPoint = function (p) {
+            this.value = [p.x, p.y, p.z];
+        };
+        /**
+         * 获取该点位置
+         */
+        Point.prototype.getPoint = function () {
+            return new feng3d.Vector3(this.value[0], this.value[1], this.value[2]);
+        };
+        /**
+         * 获取相邻点索引列表
+         */
+        Point.prototype.getNearbyPoints = function () {
+            var _this = this;
+            var points = this.triangles.reduce(function (points, triangleid) {
+                var triangle = _this.trianglemap.get(triangleid);
+                if (!triangle)
+                    return points;
+                triangle.points.forEach(function (point) {
+                    if (point != _this.index)
+                        points.push(point);
+                });
+                return points;
+            }, []);
+            return points;
+        };
+        return Point;
+    }());
+    /**
+     * 边
+     */
+    var Line = /** @class */ (function () {
+        function Line() {
+            /**
+             * 线段连接的三角形索引列表
+             */
+            this.triangles = [];
+        }
+        return Line;
+    }());
+    /**
+     * 三角形
+     */
+    var Triangle = /** @class */ (function () {
+        function Triangle(pointmap, linemap, trianglemap) {
+            /**
+             * 包含的三个边索引
+             */
+            this.lines = [];
+            this.pointmap = pointmap;
+            this.linemap = linemap;
+            this.trianglemap = trianglemap;
+        }
+        Triangle.prototype.getTriangle3D = function () {
+            var _this = this;
+            var points = [];
+            this.points.forEach(function (element) {
+                var pointvalue = _this.pointmap.get(element).value;
+                points.push(new feng3d.Vector3(pointvalue[0], pointvalue[1], pointvalue[2]));
+            });
+            var triangle3D = new feng3d.Triangle3D(points[0], points[1], points[2]);
+            return triangle3D;
+        };
+        /**
+         * 获取法线
+         */
+        Triangle.prototype.getNormal = function () {
+            var normal = this.getTriangle3D().getNormal();
+            return normal;
+        };
+        return Triangle;
+    }());
+    /**
+     * 边
+     */
+    var Line0 = /** @class */ (function () {
+        function Line0() {
+        }
+        return Line0;
+    }());
+    var NavigationData = /** @class */ (function () {
+        function NavigationData() {
+        }
+        NavigationData.prototype.init = function (geometry) {
+            var positions = geometry.positions;
+            var indices = geometry.indices;
             feng3d.assert(indices.length % 3 == 0);
             var pointmap = this.pointmap = new Map();
             var linemap = this.linemap = new Map();
@@ -7935,7 +8719,7 @@ var navigation;
             indices = indices.map(function (pointindex) { return pointindexmap[pointindex]; });
             //
             for (var i = 0, n = indices.length; i < n; i += 3) {
-                var triangle = new Triangle();
+                var triangle = new Triangle(pointmap, linemap, trianglemap);
                 triangle.index = i / 3;
                 triangle.points = [indices[i], indices[i + 1], indices[i + 2]];
                 trianglemap.set(triangle.index, triangle);
@@ -7973,7 +8757,7 @@ var navigation;
                 pointcache[xs][ys] = pointcache[xs][ys] || {};
                 var point = pointcache[xs][ys][zs];
                 if (!point) {
-                    point = pointcache[xs][ys][zs] = new Point();
+                    point = pointcache[xs][ys][zs] = new Point(pointmap, linemap, trianglemap);
                     point.index = pointAutoIndex++;
                     point.value = [x, y, z];
                     pointmap.set(point.index, point);
@@ -7981,237 +8765,75 @@ var navigation;
                 return point;
             }
         };
-        NavigationTriangleProcess.prototype.checkMaxSlope = function (maxSlope) {
+        NavigationData.prototype.getGeometry = function () {
             var _this = this;
-            var up = new feng3d.Vector3D(0, 1, 0);
-            var mincos = Math.cos(maxSlope * Math.DEG2RAD);
-            var keys = this.trianglemap.getKeys();
-            keys.forEach(function (element) {
-                var normal = _this.getTriangleNormal(element);
-                var dot = normal.dotProduct(up);
-                if (dot < mincos) {
-                    _this.trianglemap.delete(element);
-                }
-            });
-        };
-        NavigationTriangleProcess.prototype.checkAgentRadius = function (agentRadius) {
-            //获取所有独立边
-            var lines = this.getAllSingleLine();
-            //调试独立边
-            this.debugShowLines(lines);
-            var trianglemap = this.trianglemap;
-            var pointmap = this.pointmap;
-            // 计算边所在直线以及可行走区域的内部方向
-            var line0s = lines.map((function (line) {
-                var line0 = new Line0();
-                line0.index = line.index;
-                var points = line.points.map(function (v) { var point = pointmap.get(v); return new feng3d.Vector3D(point.value[0], point.value[1], point.value[2]); });
-                line0.line = new feng3d.Line3D(points[0], points[1].subtract(points[0]));
-                //
-                var triangle = trianglemap.get(line.triangles[0]);
-                if (!triangle)
-                    return;
-                var linepoints = line.points.map(function (v) { return pointmap.get(v); });
-                var otherPoint = pointmap.get(triangle.points.filter(function (v) {
-                    return line.points.indexOf(v) == -1;
-                })[0]).getPoint();
-                line0.direction = line0.line.direction.crossProduct(otherPoint.subtract(line0.line.position)).crossProduct(line0.line.direction).normalize();
-                return line0;
-            }));
-            pointmap.getValues().forEach(function (point) {
-                var p = point.getPoint();
-                var crossline0s = line0s.reduce(function (result, line0) {
-                    var distance = line0.line.getPointDistance(p);
-                    if (distance < agentRadius) {
-                        result.push([line0, distance]);
-                    }
-                    return result;
-                }, []);
-                if (crossline0s.length == 0)
-                    return;
-                if (crossline0s.length == 1) {
-                    point.setPoint(point.getPoint().add(crossline0s[0][0].direction.clone().scaleBy(agentRadius - crossline0s[0][1])));
-                }
-            });
-            // lines.forEach(element =>
-            // {
-            //     singleLineAgentRadius(element);
-            // });
-            // function singleLineAgentRadius(line: Line)
-            // {
-            //     var triangle = trianglemap.get(line.triangles[0]);
-            //     if (!triangle)
-            //         return;
-            //     var linepoints = line.points.map((v) => { return pointmap.get(v); })
-            //     var otherPoint = pointmap.get(triangle.points.filter((v) =>
-            //     {
-            //         return line.points.indexOf(v) == -1;
-            //     })[0]);
-            //     var distance = pointToLineDistance(otherPoint, linepoints[0], linepoints[1]);
-            //     if (distance < agentRadius)
-            //     {
-            //         trianglemap.delete(triangle.index);
-            //     }
-            // }
-            // function pointToLineDistance(point: Point, linePoint0: Point, linePoint1: Point)
-            // {
-            //     var p = new feng3d.Vector3D(point.value[0], point.value[1], point.value[2])
-            //     var lp0 = new feng3d.Vector3D(linePoint0.value[0], linePoint0.value[1], linePoint0.value[2])
-            //     var lp1 = new feng3d.Vector3D(linePoint1.value[0], linePoint1.value[1], linePoint1.value[2])
-            //     var cos = p.subtract(lp0).normalize().dotProduct(lp1.subtract(lp0).normalize());
-            //     var sin = Math.sqrt(1 - cos * cos);
-            //     var distance = sin * p.subtract(lp0).length;
-            //     distance = Number(distance.toPrecision(6));
-            //     return distance;
-            // }
-        };
-        NavigationTriangleProcess.prototype.getGeometry = function () {
             var positions = [];
             var pointIndexMap = new Map();
             var autoId = 0;
-            this.pointmap.forEach(function (point) {
-                pointIndexMap.set(point.index, autoId++);
-                positions.push.apply(positions, point.value);
-            });
             var indices = [];
             this.trianglemap.forEach(function (element) {
-                var points = element.points.map(function (value) { return pointIndexMap.get(value); });
+                var points = element.points.map(function (pointIndex) {
+                    if (pointIndexMap.has(pointIndex)) {
+                        return pointIndexMap.get(pointIndex);
+                    }
+                    positions.push.apply(positions, _this.pointmap.get(pointIndex).value);
+                    pointIndexMap.set(pointIndex, autoId++);
+                    return autoId - 1;
+                });
                 indices.push.apply(indices, points);
             });
-            this.geometry.positions = positions;
-            this.geometry.indices = indices;
-            return this.geometry;
+            return { positions: positions, indices: indices };
         };
-        NavigationTriangleProcess.prototype.debugShowLines = function (lines) {
-            var _this = this;
-            if (!debugSegment) {
-                createSegment();
-            }
-            segmentGeometry.removeAllSegments();
-            lines.forEach(function (element) {
-                var points = element.points.map(function (pointindex) {
-                    var value = _this.pointmap.get(pointindex).value;
-                    return new feng3d.Vector3D(value[0], value[1], value[2]);
-                });
-                segmentGeometry.addSegment(new feng3d.Segment(points[0], points[1]));
+        NavigationData.prototype.resetData = function () {
+            var geometry = this.getGeometry();
+            this.clearData();
+            this.init(geometry);
+        };
+        NavigationData.prototype.clearData = function () {
+            this.pointmap.forEach(function (point) {
+                point.pointmap = point.linemap = point.trianglemap = null;
             });
-            var parentobject = feng3d.editor.engine.root.find("editorObject") || feng3d.editor.engine.root;
-            parentobject.addChild(debugSegment);
-        };
-        /**
-         * 获取三角形法线
-         * @param triangleIndex 三角形索引
-         */
-        NavigationTriangleProcess.prototype.getTriangleNormal = function (triangleIndex) {
-            var _this = this;
-            var triangle = this.trianglemap.get(triangleIndex);
-            var points = [];
-            triangle.points.forEach(function (element) {
-                var pointvalue = _this.pointmap.get(element).value;
-                points.push(new feng3d.Vector3D(pointvalue[0], pointvalue[1], pointvalue[2]));
+            this.pointmap.clear();
+            this.linemap.forEach(function (line) {
             });
-            var line0 = points[0].subtract(points[1]);
-            var line1 = points[1].subtract(points[2]);
-            var normal = line0.crossProduct(line1);
-            normal.normalize();
-            return normal;
-        };
-        /**
-         * 获取所有独立边
-         */
-        NavigationTriangleProcess.prototype.getAllSingleLine = function () {
-            var _this = this;
-            var lines = [];
-            var needLine = [];
-            this.linemap.forEach(function (element) {
-                element.triangles = element.triangles.filter(function (triangleIndex) { return _this.trianglemap.has(triangleIndex); });
-                if (element.triangles.length == 1)
-                    lines.push(element);
-                else if (element.triangles.length == 0)
-                    needLine.push(element);
+            this.linemap.clear();
+            this.trianglemap.forEach(function (triangle) {
             });
-            needLine.forEach(function (element) {
-                _this.linemap.delete(element.index);
-            });
-            return lines;
+            this.trianglemap.clear();
         };
-        return NavigationTriangleProcess;
-    }());
-    navigation.NavigationTriangleProcess = NavigationTriangleProcess;
-    /**
-     * 点
-     */
-    var Point = /** @class */ (function () {
-        function Point() {
-            /**
-             * 点连接的线段索引列表
-             */
-            this.lines = [];
-            /**
-             * 点连接的三角形索引列表
-             */
-            this.triangles = [];
-        }
-        Point.prototype.setPoint = function (p) {
-            this.value = [p.x, p.y, p.z];
-        };
-        Point.prototype.getPoint = function () {
-            return new feng3d.Vector3D(this.value[0], this.value[1], this.value[2]);
-        };
-        return Point;
-    }());
-    /**
-     * 边
-     */
-    var Line = /** @class */ (function () {
-        function Line() {
-            /**
-             * 线段连接的三角形索引列表
-             */
-            this.triangles = [];
-        }
-        return Line;
-    }());
-    /**
-     * 三角形
-     */
-    var Triangle = /** @class */ (function () {
-        function Triangle() {
-            /**
-             * 包含的三个边索引
-             */
-            this.lines = [];
-        }
-        return Triangle;
-    }());
-    /**
-     * 边
-     */
-    var Line0 = /** @class */ (function () {
-        function Line0() {
-        }
-        return Line0;
+        return NavigationData;
     }());
 })(navigation || (navigation = {}));
 var segmentGeometry;
 var debugSegment;
+//
+var pointGeometry;
+var debugPoint;
 function createSegment() {
-    debugSegment = feng3d.GameObject.create("segment");
-    debugSegment.mouseEnabled = false;
-    //初始化材质
-    var meshRenderer = debugSegment.addComponent(feng3d.MeshRenderer);
-    var material = meshRenderer.material = new feng3d.SegmentMaterial();
-    material.color.setTo(1.0, 0, 0);
-    segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+    var parentobject = feng3d.editor.engine.root.find("editorObject") || feng3d.editor.engine.root;
+    if (!debugSegment) {
+        debugSegment = feng3d.GameObject.create("segment");
+        debugSegment.mouseEnabled = false;
+        //初始化材质
+        var meshRenderer = debugSegment.addComponent(feng3d.MeshRenderer);
+        var material = meshRenderer.material = new feng3d.SegmentMaterial();
+        material.color.setTo(1.0, 0, 0);
+        segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+    }
+    parentobject.addChild(debugSegment);
+    //
+    if (!debugPoint) {
+        debugPoint = feng3d.GameObject.create("points");
+        debugPoint.mouseEnabled = false;
+        var meshRenderer = debugPoint.addComponent(feng3d.MeshRenderer);
+        pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
+        var materialp = meshRenderer.material = new feng3d.PointMaterial();
+        materialp.pointSize = 5;
+        materialp.color.setTo(0, 0, 0);
+    }
+    pointGeometry.removeAllPoints();
+    parentobject.addChild(debugPoint);
 }
-// function pointToLineDistance(p: feng3d.Vector3D, lp0: feng3d.Vector3D, lp1: feng3d.Vector3D)
-// {
-//     var cos = p.subtract(lp0).normalize().dotProduct(lp1.subtract(lp0).normalize());
-//     var sin = Math.sqrt(1 - cos * cos);
-//     var distance = sin * p.subtract(lp0).length;
-//     distance = Number(distance.toPrecision(6));
-//     return distance;
-// } 
 var feng3d;
 (function (feng3d) {
     var editor;
@@ -8461,7 +9083,7 @@ var feng3d;
                 var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.PlaneGeometry(size, size, 1, 1, false);
                 var textureMaterial = this.textureMaterial = meshRenderer.material = new feng3d.TextureMaterial();
-                textureMaterial.texture = new feng3d.Texture2D("resource/assets/3d/icons/sun.png");
+                textureMaterial.texture = new feng3d.Texture2D(editor.editorAssetsRoot + "/assets/3d/icons/sun.png");
                 textureMaterial.texture.format = feng3d.TextureFormat.RGBA;
                 textureMaterial.texture.premulAlpha = true;
                 textureMaterial.enableBlend = true;
@@ -8483,7 +9105,7 @@ var feng3d;
                     var angle = i * Math.PI * 2 / num;
                     var x = Math.sin(angle) * linesize;
                     var y = Math.cos(angle) * linesize;
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3D(x, y, 0), new feng3d.Vector3D(x, y, linesize * 5)));
+                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(x, y, 0), new feng3d.Vector3(x, y, linesize * 5)));
                 }
                 num = 36;
                 for (var i = 0; i < num; i++) {
@@ -8493,7 +9115,7 @@ var feng3d;
                     var angle1 = (i + 1) * Math.PI * 2 / num;
                     var x1 = Math.sin(angle1) * linesize;
                     var y1 = Math.cos(angle1) * linesize;
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3D(x, y, 0), new feng3d.Vector3D(x1, y1, 0)));
+                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(x, y, 0), new feng3d.Vector3(x1, y1, 0)));
                 }
                 this.gameObject.addChild(lightLines);
                 this.enabled = true;
@@ -8545,7 +9167,7 @@ var feng3d;
                 var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.PlaneGeometry(size, size, 1, 1, false);
                 var textureMaterial = this.textureMaterial = meshRenderer.material = new feng3d.TextureMaterial();
-                textureMaterial.texture = new feng3d.Texture2D("resource/assets/3d/icons/light.png");
+                textureMaterial.texture = new feng3d.Texture2D(editor.editorAssetsRoot + "/assets/3d/icons/light.png");
                 textureMaterial.texture.format = feng3d.TextureFormat.RGBA;
                 textureMaterial.texture.premulAlpha = true;
                 textureMaterial.enableBlend = true;
@@ -8584,10 +9206,10 @@ var feng3d;
                     var angle1 = (i + 1) * Math.PI * 2 / num;
                     var x1 = Math.sin(angle1);
                     var y1 = Math.cos(angle1);
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3D(0, x, y), new feng3d.Vector3D(0, x1, y1)));
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3D(x, 0, y), new feng3d.Vector3D(x1, 0, y1)));
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3D(x, y, 0), new feng3d.Vector3D(x1, y1, 0)));
-                    segmentGeometry1.addSegment(new feng3d.Segment(new feng3d.Vector3D(x, y, 0), new feng3d.Vector3D(x1, y1, 0)));
+                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(0, x, y), new feng3d.Vector3(0, x1, y1)));
+                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(x, 0, y), new feng3d.Vector3(x1, 0, y1)));
+                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(x, y, 0), new feng3d.Vector3(x1, y1, 0)));
+                    segmentGeometry1.addSegment(new feng3d.Segment(new feng3d.Vector3(x, y, 0), new feng3d.Vector3(x1, y1, 0)));
                 }
                 this.gameObject.addChild(lightLines);
                 this.gameObject.addChild(lightLines1);
@@ -8598,12 +9220,12 @@ var feng3d;
                 lightpoints.showinHierarchy = false;
                 var meshRenderer = lightpoints.addComponent(feng3d.MeshRenderer);
                 var pointGeometry = this.pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3D(1, 0, 0), new feng3d.Color(1, 0, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3D(-1, 0, 0), new feng3d.Color(1, 0, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3D(0, 1, 0), new feng3d.Color(0, 1, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3D(0, -1, 0), new feng3d.Color(0, 1, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3D(0, 0, 1), new feng3d.Color(0, 0, 1)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3D(0, 0, -1), new feng3d.Color(0, 0, 1)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(1, 0, 0), new feng3d.Color(1, 0, 0)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(-1, 0, 0), new feng3d.Color(1, 0, 0)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 1, 0), new feng3d.Color(0, 1, 0)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, -1, 0), new feng3d.Color(0, 1, 0)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, 1), new feng3d.Color(0, 0, 1)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, -1), new feng3d.Color(0, 0, 1)));
                 var pointMaterial = meshRenderer.material = new feng3d.PointMaterial();
                 pointMaterial.enableBlend = true;
                 pointMaterial.pointSize = 5;
@@ -8616,7 +9238,7 @@ var feng3d;
                 this.lightLines.transform.scale =
                     this.lightLines1.transform.scale =
                         this.lightpoints.transform.scale =
-                            new feng3d.Vector3D(this.pointLight.range, this.pointLight.range, this.pointLight.range);
+                            new feng3d.Vector3(this.pointLight.range, this.pointLight.range, this.pointLight.range);
                 if (editor.editorData.selectedGameObjects.indexOf(this.gameObject) != -1) {
                     //
                     var camerapos = this.gameObject.transform.inverseTransformPoint(editor.editorCamera.gameObject.transform.scenePosition);
@@ -8635,61 +9257,61 @@ var feng3d;
                         var x1 = Math.sin(angle1);
                         var y1 = Math.cos(angle1);
                         //
-                        point0 = new feng3d.Vector3D(0, x, y);
-                        point1 = new feng3d.Vector3D(0, x1, y1);
-                        if (point0.dotProduct(camerapos) < 0 || point1.dotProduct(camerapos) < 0)
+                        point0 = new feng3d.Vector3(0, x, y);
+                        point1 = new feng3d.Vector3(0, x1, y1);
+                        if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                             alpha = backalpha;
                         else
                             alpha = 1.0;
                         this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color(1, 0, 0, alpha), new feng3d.Color(1, 0, 0, alpha)));
-                        point0 = new feng3d.Vector3D(x, 0, y);
-                        point1 = new feng3d.Vector3D(x1, 0, y1);
-                        if (point0.dotProduct(camerapos) < 0 || point1.dotProduct(camerapos) < 0)
+                        point0 = new feng3d.Vector3(x, 0, y);
+                        point1 = new feng3d.Vector3(x1, 0, y1);
+                        if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                             alpha = backalpha;
                         else
                             alpha = 1.0;
                         this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color(0, 1, 0, alpha), new feng3d.Color(0, 1, 0, alpha)));
-                        point0 = new feng3d.Vector3D(x, y, 0);
-                        point1 = new feng3d.Vector3D(x1, y1, 0);
-                        if (point0.dotProduct(camerapos) < 0 || point1.dotProduct(camerapos) < 0)
+                        point0 = new feng3d.Vector3(x, y, 0);
+                        point1 = new feng3d.Vector3(x1, y1, 0);
+                        if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                             alpha = backalpha;
                         else
                             alpha = 1.0;
                         this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color(0, 0, 1, alpha), new feng3d.Color(0, 0, 1, alpha)));
                     }
                     this.pointGeometry.removeAllPoints();
-                    var point = new feng3d.Vector3D(1, 0, 0);
-                    if (point.dotProduct(camerapos) < 0)
+                    var point = new feng3d.Vector3(1, 0, 0);
+                    if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
                     this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(1, 0, 0, alpha)));
-                    point = new feng3d.Vector3D(-1, 0, 0);
-                    if (point.dotProduct(camerapos) < 0)
+                    point = new feng3d.Vector3(-1, 0, 0);
+                    if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
                     this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(1, 0, 0, alpha)));
-                    point = new feng3d.Vector3D(0, 1, 0);
-                    if (point.dotProduct(camerapos) < 0)
+                    point = new feng3d.Vector3(0, 1, 0);
+                    if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
                     this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(0, 1, 0, alpha)));
-                    point = new feng3d.Vector3D(0, -1, 0);
-                    if (point.dotProduct(camerapos) < 0)
+                    point = new feng3d.Vector3(0, -1, 0);
+                    if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
                     this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(0, 1, 0, alpha)));
-                    point = new feng3d.Vector3D(0, 0, 1);
-                    if (point.dotProduct(camerapos) < 0)
+                    point = new feng3d.Vector3(0, 0, 1);
+                    if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
                     this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(0, 0, 1, alpha)));
-                    point = new feng3d.Vector3D(0, 0, -1);
-                    if (point.dotProduct(camerapos) < 0)
+                    point = new feng3d.Vector3(0, 0, -1);
+                    if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
@@ -8730,67 +9352,27 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        feng3d.loadjs.load({
-            paths: [
-                "threejs/three.js",
-                // <!-- FBX -->
-                "threejs/libs/inflate.min.js",
-                //
-                "threejs/loaders/AMFLoader.js",
-                "threejs/loaders/AWDLoader.js",
-                "threejs/loaders/BabylonLoader.js",
-                "threejs/loaders/ColladaLoader.js",
-                "threejs/loaders/FBXLoader.js",
-                "threejs/loaders/GLTFLoader.js",
-                "threejs/loaders/KMZLoader.js",
-                "threejs/loaders/MD2Loader.js",
-                "threejs/loaders/OBJLoader.js",
-                "threejs/loaders/MTLLoader.js",
-                "threejs/loaders/PlayCanvasLoader.js",
-                "threejs/loaders/PLYLoader.js",
-                "threejs/loaders/STLLoader.js",
-                "threejs/loaders/TGALoader.js",
-                "threejs/loaders/TDSLoader.js",
-                "threejs/loaders/UTF8Loader.js",
-                "threejs/loaders/VRMLLoader.js",
-                "threejs/loaders/VTKLoader.js",
-                "threejs/loaders/ctm/lzma.js",
-                "threejs/loaders/ctm/ctm.js",
-                "threejs/loaders/ctm/CTMLoader.js",
-            ],
-            bundleId: "threejs",
-            success: function () {
-                Number.prototype["format"] = function () {
-                    return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-                };
-                // log("提供解析的 three.js 初始化完成，")
-            }
-        });
-    })(editor = feng3d.editor || (feng3d.editor = {}));
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    var editor;
-    (function (editor) {
         editor.threejsLoader = {
             load: load,
         };
         var usenumberfixed = true;
         function load(url, onParseComplete) {
             var skeletonComponent;
-            //
-            var loader = new window["THREE"].FBXLoader();
-            if (typeof url == "string") {
-                loader.load(url, onLoad, onProgress, onError);
-            }
-            else {
-                var reader = new FileReader();
-                reader.addEventListener('load', function (event) {
-                    var scene = loader.parse(event.target["result"]);
-                    onLoad(scene);
-                }, false);
-                reader.readAsArrayBuffer(url);
-            }
+            prepare(function () {
+                //
+                var loader = new window["THREE"].FBXLoader();
+                if (typeof url == "string") {
+                    loader.load(url, onLoad, onProgress, onError);
+                }
+                else {
+                    var reader = new FileReader();
+                    reader.addEventListener('load', function (event) {
+                        var scene = loader.parse(event.target["result"]);
+                        onLoad(scene);
+                    }, false);
+                    reader.readAsArrayBuffer(url);
+                }
+            });
             function onLoad(scene) {
                 var gameobject = parse(scene);
                 gameobject.transform.sx = -1;
@@ -8807,9 +9389,9 @@ var feng3d;
                 if (object3d.type == "Bone")
                     return null;
                 var gameobject = feng3d.GameObject.create(object3d.name);
-                gameobject.transform.position = new feng3d.Vector3D(object3d.position.x, object3d.position.y, object3d.position.z);
+                gameobject.transform.position = new feng3d.Vector3(object3d.position.x, object3d.position.y, object3d.position.z);
                 gameobject.transform.orientation = new feng3d.Quaternion(object3d.quaternion.x, object3d.quaternion.y, object3d.quaternion.z, object3d.quaternion.w);
-                gameobject.transform.scale = new feng3d.Vector3D(object3d.scale.x, object3d.scale.y, object3d.scale.z);
+                gameobject.transform.scale = new feng3d.Vector3(object3d.scale.x, object3d.scale.y, object3d.scale.z);
                 if (parent)
                     parent.addChild(gameobject);
                 switch (object3d.type) {
@@ -8860,7 +9442,7 @@ var feng3d;
         function parseAnimations(animationClipData) {
             var matrixTemp = new window["THREE"].Matrix4();
             var quaternionTemp = new window["THREE"].Quaternion();
-            var fmatrix3d = new feng3d.Matrix3D();
+            var fmatrix3d = new feng3d.Matrix4x4();
             //
             var animationClip = new feng3d.AnimationClip();
             animationClip.name = animationClipData.name;
@@ -8898,11 +9480,11 @@ var feng3d;
                 propertyClip.propertyValues = [];
                 var propertyValues = propertyClip.propertyValues;
                 var times = keyframeTrack.times;
-                var values = usenumberfixed ? feng3d.numberutils.fixed(keyframeTrack.values, 6, []) : keyframeTrack.values;
+                var values = usenumberfixed ? keyframeTrack.values.map(function (v) { return Number(v.toFixed(6)); }) : keyframeTrack.values;
                 var len = times.length;
                 switch (keyframeTrack.ValueTypeName) {
                     case "vector":
-                        propertyClip.type = "Vector3D";
+                        propertyClip.type = "Vector3";
                         for (var i = 0; i < len; i++) {
                             propertyValues.push([times[i] * 1000, [values[i * 3], values[i * 3 + 1], values[i * 3 + 2]]]);
                         }
@@ -8932,7 +9514,7 @@ var feng3d;
                 var skeletonJoint = joints[i] = new feng3d.SkeletonJoint();
                 //
                 skeletonJoint.name = bone.name;
-                skeletonJoint.matrix3D = new feng3d.Matrix3D(bone.matrixWorld.elements);
+                skeletonJoint.matrix3D = new feng3d.Matrix4x4(bone.matrixWorld.elements);
                 var parentId = skeNameDic[bone.parent.name];
                 if (parentId === undefined)
                     parentId = -1;
@@ -8957,7 +9539,7 @@ var feng3d;
                 }
                 if (jointsMapitem) {
                     skinSkeleton.joints[i] = jointsMapitem;
-                    joints[jointsMapitem[0]].matrix3D = new feng3d.Matrix3D(skinSkeletonData.boneInverses[i].elements).invert();
+                    joints[jointsMapitem[0]].matrix3D = new feng3d.Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
                 }
                 else {
                     feng3d.warn("\u6CA1\u6709\u5728\u9AA8\u67B6\u4E2D\u627E\u5230 \u9AA8\u9ABC " + bones[i].name);
@@ -8971,7 +9553,7 @@ var feng3d;
             for (var key in attributes) {
                 if (attributes.hasOwnProperty(key)) {
                     var element = attributes[key];
-                    var array = usenumberfixed ? feng3d.numberutils.fixed(element.array, 6, []) : element.array;
+                    var array = usenumberfixed ? element.array.map(function (v) { return Number(v.toFixed(6)); }) : element.array;
                     switch (key) {
                         case "position":
                             geo.positions = array;
@@ -9012,6 +9594,62 @@ var feng3d;
             perspectiveLen.fieldOfView = perspectiveCamera.fov;
             return perspectiveLen;
         }
+        var prepare = (function () {
+            var isprepare = false;
+            var prepareCallbacks = [];
+            var preparing = false;
+            return function (callback) {
+                if (isprepare) {
+                    callback();
+                    return;
+                }
+                prepareCallbacks.push(callback);
+                if (preparing)
+                    return;
+                preparing = true;
+                feng3d.loadjs.load({
+                    paths: [
+                        "threejs/three.js",
+                        // <!-- FBX -->
+                        "threejs/libs/inflate.min.js",
+                        //
+                        "threejs/loaders/AMFLoader.js",
+                        "threejs/loaders/AWDLoader.js",
+                        "threejs/loaders/BabylonLoader.js",
+                        "threejs/loaders/ColladaLoader.js",
+                        "threejs/loaders/FBXLoader.js",
+                        "threejs/loaders/GLTFLoader.js",
+                        "threejs/loaders/KMZLoader.js",
+                        "threejs/loaders/MD2Loader.js",
+                        "threejs/loaders/OBJLoader.js",
+                        "threejs/loaders/MTLLoader.js",
+                        "threejs/loaders/PlayCanvasLoader.js",
+                        "threejs/loaders/PLYLoader.js",
+                        "threejs/loaders/STLLoader.js",
+                        "threejs/loaders/TGALoader.js",
+                        "threejs/loaders/TDSLoader.js",
+                        "threejs/loaders/UTF8Loader.js",
+                        "threejs/loaders/VRMLLoader.js",
+                        "threejs/loaders/VTKLoader.js",
+                        "threejs/loaders/ctm/lzma.js",
+                        "threejs/loaders/ctm/ctm.js",
+                        "threejs/loaders/ctm/CTMLoader.js",
+                    ].map(function (value) { return editor.editorAssetsRoot + "/" + value; }),
+                    bundleId: "threejs",
+                    success: function () {
+                        Number.prototype["format"] = function () {
+                            return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                        };
+                        // log("提供解析的 three.js 初始化完成，")
+                        isprepare = true;
+                        preparing = false;
+                        prepareCallbacks.forEach(function (element) {
+                            element();
+                        });
+                    }
+                });
+            };
+        })();
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -9171,7 +9809,7 @@ var feng3d;
             //
             feng3d.objectview.defaultTypeAttributeView["Boolean"] = { component: "BooleanAttrView" };
             feng3d.objectview.defaultTypeAttributeView["number"] = { component: "OAVNumber" };
-            feng3d.objectview.defaultTypeAttributeView["Vector3D"] = { component: "OAVVector3D" };
+            feng3d.objectview.defaultTypeAttributeView["Vector3"] = { component: "OAVVector3D" };
             feng3d.objectview.defaultTypeAttributeView["Array"] = { component: "OAVArray" };
             feng3d.objectview.defaultTypeAttributeView["Function"] = { component: "OAVFunction" };
             function setObjectview(cls, classDefinition) {
@@ -9219,6 +9857,7 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        editor.editorAssetsRoot = "./resource";
         /**
          * 编辑器
          * @author feng 2016-10-29

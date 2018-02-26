@@ -17,7 +17,10 @@ namespace feng3d.editor
 
 		constructor(obj?: Partial<TreeNode>)
 		{
-			obj && ObjectUtils.copy(this, obj);
+			if (obj)
+			{
+				Object.assign(this, obj);
+			}
 		}
 
 		/**

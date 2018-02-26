@@ -55,10 +55,11 @@ namespace feng3d.editor
 
             //
             var geometrydata = getGeometryData(geometry);
-            var process = new navigation.NavigationTriangleProcess(geometrydata);
+            var process = new navigation.NavigationProcess(geometrydata);
             //
             process.checkMaxSlope(this.maxSlope);
             process.checkAgentRadius(this.agentRadius);
+            process.checkAgentHeight(this.agentHeight);
             //
             geometrydata = process.getGeometry();
             if (geometrydata.indices.length == 0)

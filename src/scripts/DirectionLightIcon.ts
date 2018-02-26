@@ -27,7 +27,7 @@ namespace feng3d.editor
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
             var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
-            textureMaterial.texture = new Texture2D("resource/assets/3d/icons/sun.png");
+            textureMaterial.texture = new Texture2D(editorAssetsRoot + "/assets/3d/icons/sun.png");
             textureMaterial.texture.format = TextureFormat.RGBA;
             textureMaterial.texture.premulAlpha = true;
             textureMaterial.enableBlend = true;
@@ -51,7 +51,7 @@ namespace feng3d.editor
                 var angle = i * Math.PI * 2 / num;
                 var x = Math.sin(angle) * linesize;
                 var y = Math.cos(angle) * linesize;
-                segmentGeometry.addSegment(new Segment(new Vector3D(x, y, 0), new Vector3D(x, y, linesize * 5)));
+                segmentGeometry.addSegment(new Segment(new Vector3(x, y, 0), new Vector3(x, y, linesize * 5)));
             }
             num = 36;
             for (var i = 0; i < num; i++)
@@ -62,7 +62,7 @@ namespace feng3d.editor
                 var angle1 = (i + 1) * Math.PI * 2 / num;
                 var x1 = Math.sin(angle1) * linesize;
                 var y1 = Math.cos(angle1) * linesize;
-                segmentGeometry.addSegment(new Segment(new Vector3D(x, y, 0), new Vector3D(x1, y1, 0)));
+                segmentGeometry.addSegment(new Segment(new Vector3(x, y, 0), new Vector3(x1, y1, 0)));
             }
             this.gameObject.addChild(lightLines);
 

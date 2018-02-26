@@ -5,7 +5,7 @@ namespace feng3d.editor
         /**
          * 旋转场景摄像机
          */
-        editorCameraRotate: Vector3D
+        editorCameraRotate: Vector3
     }
 
     export var editorDispatcher: IEventDispatcher<EditorEventMap> = new EventDispatcher();

@@ -63,7 +63,7 @@ namespace feng3d.editor
         preElementRect: egret.Rectangle;
         nextElementRect: egret.Rectangle;
         dragRect: egret.Rectangle;
-        dragingMousePoint: Point;
+        dragingMousePoint: Vector2;
     }
 
     var egretDiv = <HTMLDivElement>document.getElementsByClassName("egret-player")[0];
@@ -218,7 +218,7 @@ namespace feng3d.editor
             if (splitdragData.splitGroupState == SplitGroupState.onSplit)
             {
                 splitdragData.splitGroupState = SplitGroupState.draging;
-                splitdragData.dragingMousePoint = new Point(e.layerX, e.layerY);
+                splitdragData.dragingMousePoint = new Vector2(e.layerX, e.layerY);
                 //
                 var preElement = splitdragData.preElement;
                 var nextElement = splitdragData.nextElement;
