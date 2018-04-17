@@ -3838,7 +3838,6 @@ var feng3d;
                 this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
                 this.nameLabel.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
-                this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
             };
             AssetsFileItemRenderer.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
@@ -3851,6 +3850,7 @@ var feng3d;
                 var _this = this;
                 _super.prototype.dataChanged.call(this);
                 if (this.data) {
+                    this.nameLabel.text = this.data.label;
                     var accepttypes = [];
                     if (this.data.isDirectory) {
                         editor.drag.register(this, function (dragsource) {
@@ -3925,17 +3925,26 @@ var feng3d;
                     this.nameLabel.visible = false;
                     this.nameeditTxt.visible = true;
                     this.nameeditTxt.textDisplay.setFocus();
+                    //
                     this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
+                    feng3d.windowEventProxy.on("keyup", this.onnameeditChanged, this);
                 }
             };
             AssetsFileItemRenderer.prototype.onnameeditend = function () {
                 this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
+                feng3d.windowEventProxy.off("keyup", this.onnameeditChanged, this);
+                //
                 this.nameeditTxt.visible = false;
                 this.nameLabel.visible = true;
                 if (this.nameLabel.text == this.nameeditTxt.text)
                     return;
                 var newName = this.data.name.replace(this.nameLabel.text, this.nameeditTxt.text);
-                this.data.rename(newName);
+                this.data.rename(newName, this.dataChanged.bind(this));
+            };
+            AssetsFileItemRenderer.prototype.onnameeditChanged = function () {
+                if (feng3d.windowEventProxy.key == "Enter" || feng3d.windowEventProxy.key == "Escape") {
+                    this.onnameeditend();
+                }
             };
             return AssetsFileItemRenderer;
         }(eui.ItemRenderer));

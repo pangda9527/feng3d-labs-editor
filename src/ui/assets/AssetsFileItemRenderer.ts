@@ -21,7 +21,6 @@ namespace feng3d.editor
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
             this.nameLabel.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
-            this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
         }
 
         $onRemoveFromStage()
@@ -39,6 +38,8 @@ namespace feng3d.editor
 
             if (this.data)
             {
+                this.nameLabel.text = this.data.label;
+
                 var accepttypes = [];
                 if (this.data.isDirectory)
                 {
@@ -133,20 +134,31 @@ namespace feng3d.editor
                 this.nameLabel.visible = false;
                 this.nameeditTxt.visible = true;
                 this.nameeditTxt.textDisplay.setFocus();
-
+                //
                 this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
+                windowEventProxy.on("keyup", this.onnameeditChanged, this);
             }
         }
 
         private onnameeditend()
         {
             this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
+            windowEventProxy.off("keyup", this.onnameeditChanged, this);
+            //
             this.nameeditTxt.visible = false;
             this.nameLabel.visible = true;
             if (this.nameLabel.text == this.nameeditTxt.text)
                 return;
             var newName = this.data.name.replace(this.nameLabel.text, this.nameeditTxt.text);
-            this.data.rename(newName);
+            this.data.rename(newName, this.dataChanged.bind(this));
+        }
+
+        private onnameeditChanged()
+        {
+            if (windowEventProxy.key == "Enter" || windowEventProxy.key == "Escape")
+            {
+                this.onnameeditend();
+            }
         }
     }
 }
