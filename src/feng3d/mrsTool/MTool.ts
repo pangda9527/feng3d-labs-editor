@@ -135,7 +135,6 @@ namespace feng3d.editor
             this.startPos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
-            this.updateToolModel();
         }
 
         protected updateToolModel()

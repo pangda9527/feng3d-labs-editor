@@ -27,13 +27,12 @@ namespace feng3d.editor
 
         protected onAddedToScene()
         {
-            this.updateToolModel();
             this._gameobjectControllerTarget.controllerTool = this.transform;
             //
             windowEventProxy.on("mousedown", this.onMouseDown, this);
             windowEventProxy.on("mouseup", this.onMouseUp, this);
-            this.gameObject.on("scenetransformChanged", this.onScenetransformChanged, this);
-            editorCamera.gameObject.on("scenetransformChanged", this.onCameraScenetransformChanged, this);
+
+            ticker.onframe(this.updateToolModel, this);
         }
 
         protected onRemovedFromScene()
@@ -42,8 +41,8 @@ namespace feng3d.editor
             //
             windowEventProxy.off("mousedown", this.onMouseDown, this);
             windowEventProxy.off("mouseup", this.onMouseUp, this);
-            this.gameObject.off("scenetransformChanged", this.onScenetransformChanged, this);
-            editorCamera.gameObject.off("scenetransformChanged", this.onCameraScenetransformChanged, this);
+
+            ticker.offframe(this.updateToolModel, this);
         }
 
         protected get toolModel()
@@ -104,16 +103,6 @@ namespace feng3d.editor
             this.ismouseDown = false;
             this.movePlane3D = null;
             this.startSceneTransform = null;
-        }
-
-        protected onScenetransformChanged()
-        {
-            this.updateToolModel();
-        }
-
-        protected onCameraScenetransformChanged()
-        {
-            this.updateToolModel();
         }
 
         /**

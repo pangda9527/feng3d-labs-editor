@@ -5690,21 +5690,18 @@ var feng3d;
                 this.gameObject.on("removedFromScene", this.onRemovedFromScene, this);
             };
             MRSToolBase.prototype.onAddedToScene = function () {
-                this.updateToolModel();
                 this._gameobjectControllerTarget.controllerTool = this.transform;
                 //
                 feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
                 feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
-                this.gameObject.on("scenetransformChanged", this.onScenetransformChanged, this);
-                editor.editorCamera.gameObject.on("scenetransformChanged", this.onCameraScenetransformChanged, this);
+                feng3d.ticker.onframe(this.updateToolModel, this);
             };
             MRSToolBase.prototype.onRemovedFromScene = function () {
                 this._gameobjectControllerTarget.controllerTool = null;
                 //
                 feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
                 feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
-                this.gameObject.off("scenetransformChanged", this.onScenetransformChanged, this);
-                editor.editorCamera.gameObject.off("scenetransformChanged", this.onCameraScenetransformChanged, this);
+                feng3d.ticker.offframe(this.updateToolModel, this);
             };
             Object.defineProperty(MRSToolBase.prototype, "toolModel", {
                 get: function () {
@@ -5758,12 +5755,6 @@ var feng3d;
                 this.ismouseDown = false;
                 this.movePlane3D = null;
                 this.startSceneTransform = null;
-            };
-            MRSToolBase.prototype.onScenetransformChanged = function () {
-                this.updateToolModel();
-            };
-            MRSToolBase.prototype.onCameraScenetransformChanged = function () {
-                this.updateToolModel();
             };
             /**
              * 获取鼠标射线与移动平面的交点（模型空间）
@@ -5912,7 +5903,6 @@ var feng3d;
                 this.startPos = null;
                 this.startPlanePos = null;
                 this.startSceneTransform = null;
-                this.updateToolModel();
             };
             MTool.prototype.updateToolModel = function () {
                 //鼠标按下时不更新
