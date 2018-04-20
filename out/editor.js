@@ -348,21 +348,13 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        /**
-         * 文件系统类型
-         */
-        var FSType;
-        (function (FSType) {
-            FSType["native"] = "native";
-            FSType["indexedDB"] = "indexedDB";
-        })(FSType = editor.FSType || (editor.FSType = {}));
         if (typeof require == "undefined") {
             editor.fs = feng3d.indexedDBfs;
-            editor.fstype = FSType.indexedDB;
+            feng3d.fstype = feng3d.FSType.indexedDB;
         }
         else {
             editor.fs = require(__dirname + "/io/file.js").file;
-            editor.fstype = FSType.native;
+            feng3d.fstype = feng3d.FSType.native;
         }
         (function () {
             /**
@@ -2279,6 +2271,7 @@ var feng3d;
             __extends(OAVDefault, _super);
             function OAVDefault(attributeViewInfo) {
                 var _this = _super.call(this, attributeViewInfo) || this;
+                _this._textEnabled = undefined;
                 _this.skinName = "OAVDefault";
                 return _this;
             }
@@ -2294,6 +2287,14 @@ var feng3d;
                             _this.attributeValue = dragSource[param.accepttype];
                         });
                     }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(OAVDefault.prototype, "textEnabled", {
+                set: function (v) {
+                    this.text.enabled = v;
+                    this._textEnabled = v;
                 },
                 enumerable: true,
                 configurable: true
@@ -2354,6 +2355,8 @@ var feng3d;
                     this.text.text = valuename + " (" + feng3d.ClassUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
                     this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
                 }
+                if (this._textEnabled !== undefined)
+                    this.text.enabled = this._textEnabled;
             };
             OAVDefault.prototype.onDoubleClick = function () {
                 editor.editorui.inspectorView.showData(this.attributeValue);
@@ -2726,7 +2729,7 @@ var feng3d;
                 this.space.on("removedComponent", this.onremovedComponent, this);
                 editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
                     if (dragdata.file_script) {
-                        feng3d.GameObjectUtil.addScript(_this.space, dragdata.file_script.replace(/\.ts\b/, ".js"));
+                        _this.space.addComponent(feng3d.Script).url = dragdata.file_script;
                     }
                 });
             };
@@ -3922,7 +3925,7 @@ var feng3d;
                     });
                 }
                 else if (this.data.extension == editor.AssetExtension.ts) {
-                    var url = "codeeditor.html?fstype=" + editor.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorAssets.projectPath + "&path=" + this.data.path;
+                    var url = "codeeditor.html?fstype=" + feng3d.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path;
                     url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                     window.open(url);
                 }
@@ -4357,7 +4360,7 @@ var feng3d;
                                 return;
                             }
                             if (editor.fs == feng3d.indexedDBfs) {
-                                window.open("run.html?project=" + editor.editorcache.projectname);
+                                window.open("run.html?fstype=" + feng3d.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorAssets.projectPath);
                                 return;
                             }
                             editor.fs.getAbsolutePath("index.html", function (err, path) {
@@ -9922,6 +9925,7 @@ var feng3d;
                 //
                 editor.editorData = new editor.EditorData();
                 document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editor.editorAssets.projectPath;
+                feng3d.runEnvironment = feng3d.RunEnvironment.editor;
                 //
                 new editor.EditorEnvironment();
                 this.initMainView();

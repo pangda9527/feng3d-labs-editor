@@ -54,6 +54,8 @@ namespace feng3d.editor
 
             document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorAssets.projectPath;
 
+            feng3d.runEnvironment = RunEnvironment.editor;
+            
             //
             new EditorEnvironment();
 

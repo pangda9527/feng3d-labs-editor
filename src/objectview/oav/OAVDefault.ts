@@ -37,6 +37,13 @@ namespace feng3d.editor
 			}
 		}
 
+		private _textEnabled: undefined | boolean = undefined;
+		set textEnabled(v: boolean)
+		{
+			this.text.enabled = v;
+			this._textEnabled = v;
+		}
+
 		protected onComplete()
 		{
 			this.text.percentWidth = 100;
@@ -113,6 +120,8 @@ namespace feng3d.editor
 				this.text.text = valuename + " (" + ClassUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
 				this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
 			}
+			if (this._textEnabled !== undefined)
+				this.text.enabled = this._textEnabled;
 		}
 
 		private onDoubleClick()

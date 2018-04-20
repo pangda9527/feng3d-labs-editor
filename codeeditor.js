@@ -6,39 +6,133 @@ var editor;
 {
     var fstype = GetQueryString("fstype");
     var code;
+    var codedata;
 
     if (fstype == "indexedDB")
     {
-        var DBname = GetQueryString("DBname");
-        var project = GetQueryString("project");
-        var path = GetQueryString("path");
+        var DBname = decodeURI(GetQueryString("DBname"));
+        var project = decodeURI(GetQueryString("project"));
+        var path = decodeURI(GetQueryString("path"));
 
         feng3d.storage.get(DBname, project, path, function (err, data)
         {
-            console.log(err, data);
             if (data && data.data)
                 code = data.data;
             else
                 code = "";
+            codedata = data;
+
+            initEditor(function ()
+            {
+                editor.setValue(code);
+                triggerCompile();
+                editor.onDidChangeModelContent(function ()
+                {
+                    triggerCompile();
+                });
+            });
+
         });
     }
 
-    require.config({ paths: { 'vs': 'node_modules/monaco-editor/min/vs' } });
-    require(['vs/editor/editor.main'], function ()
+    function initEditor(callback)
     {
-        xhr('libs/feng3d.d.ts').then(function (response)
+        require.config({ paths: { 'vs': 'node_modules/monaco-editor/min/vs' } });
+        require(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function ()
         {
-            monaco.languages.typescript.typescriptDefaults.addExtraLib(response.responseText, 'feng3d.d.ts');
-            editor = monaco.editor.create(document.getElementById('container'), {
-                value: "",
-                language: 'typescript',
-                formatOnType: true
+            xhr('libs/feng3d.d.ts').then(function (response)
+            {
+                var compilerOptions = {
+                    allowNonTsExtensions: true,
+                    module: monaco.languages.typescript.ModuleKind.AMD,
+                    noResolve: true,
+                    suppressOutputPathCheck: true,
+                    skipLibCheck: true,
+                    skipDefaultLibCheck: true,
+                    target: monaco.languages.typescript.ScriptTarget.ES5,
+                    noImplicitAny: false,
+                    strictNullChecks: false,
+                    noImplicitThis: false,
+                    noImplicitReturns: false,
+                    experimentalDecorators: true,
+                    noUnusedLocals: false,
+                    noUnusedParameters: false,
+                };
+
+                monaco.languages.typescript.typescriptDefaults.addExtraLib(response.responseText, 'feng3d.d.ts');
+                editor = monaco.editor.create(document.getElementById('container'), {
+                    value: "",
+                    language: 'typescript',
+                    formatOnType: true
+                });
+                monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
+
+                callback();
             });
-            editor.setValue(code);
         });
-    });
+    }
 
-
+    // ------------ Compilation logic
+    var compilerTriggerTimeoutID = null;
+    function triggerCompile()
+    {
+        if (compilerTriggerTimeoutID !== null)
+        {
+            window.clearTimeout(compilerTriggerTimeoutID);
+        }
+        compilerTriggerTimeoutID = window.setTimeout(function ()
+        {
+            try
+            {
+                var output = transpileModule(editor.getValue(), {
+                    // module: ts.ModuleKind.AMD,
+                    target: ts.ScriptTarget.ES5,
+                    noLib: true,
+                    noResolve: true,
+                    suppressOutputPathCheck: true
+                });
+                if (typeof output === "string")
+                {
+                    codedata.data = editor.getValue();
+                    feng3d.storage.set(DBname, project, path, codedata);
+                    codedata.data = output;
+                    feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
+                }
+            }
+            catch (e)
+            {
+                console.log("Error from compilation: " + e + "  " + (e.stack || ""));
+            }
+        }, 100);
+    }
+    function transpileModule(input, options)
+    {
+        var inputFileName = options.jsx ? "module.tsx" : "module.ts";
+        var sourceFile = ts.createSourceFile(inputFileName, input, options.target || ts.ScriptTarget.ES5);
+        // Output
+        var outputText;
+        var program = ts.createProgram([inputFileName], options, {
+            getSourceFile: function (fileName) { return fileName.indexOf("module") === 0 ? sourceFile : undefined; },
+            writeFile: function (_name, text) { outputText = text; },
+            getDefaultLibFileName: function () { return "lib.d.ts"; },
+            useCaseSensitiveFileNames: function () { return false; },
+            getCanonicalFileName: function (fileName) { return fileName; },
+            getCurrentDirectory: function () { return ""; },
+            getNewLine: function () { return "\r\n"; },
+            fileExists: function (fileName) { return fileName === inputFileName; },
+            readFile: function () { return ""; },
+            directoryExists: function () { return true; },
+            getDirectories: function () { return []; }
+        });
+        // Emit
+        program.emit();
+        if (outputText === undefined)
+        {
+            throw new Error("Output generation failed");
+        }
+        return outputText;
+    }
+    // ------------ Execution logic
     function GetQueryString(name)
     {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
@@ -78,9 +172,9 @@ var editor;
 
             req.send(null);
         }, function ()
-        {
-            req._canceled = true;
-            req.abort();
-        });
+            {
+                req._canceled = true;
+                req.abort();
+            });
     }
 })();

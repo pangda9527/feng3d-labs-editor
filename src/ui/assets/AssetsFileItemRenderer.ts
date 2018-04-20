@@ -114,7 +114,7 @@ namespace feng3d.editor
                 });
             } else if (this.data.extension == AssetExtension.ts)
             {
-                var url = `codeeditor.html?fstype=${fstype}&DBname=${editorData.DBname}&project=${editorAssets.projectPath}&path=${this.data.path}`;
+                var url = `codeeditor.html?fstype=${fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${this.data.path}`;
                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                 window.open(url);
             }
