@@ -7,6 +7,7 @@ var editor;
     var fstype = GetQueryString("fstype");
     var code;
     var codedata;
+    var feng3ddts;
 
     if (fstype == "indexedDB")
     {
@@ -59,7 +60,8 @@ var editor;
                     noUnusedParameters: false,
                 };
 
-                monaco.languages.typescript.typescriptDefaults.addExtraLib(response.responseText, 'feng3d.d.ts');
+                feng3ddts = response.responseText;
+                monaco.languages.typescript.typescriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
                 editor = monaco.editor.create(document.getElementById('container'), {
                     value: "",
                     language: 'typescript',
@@ -108,7 +110,7 @@ var editor;
     function transpileModule(input, options)
     {
         var inputFileName = options.jsx ? "module.tsx" : "module.ts";
-        var sourceFile = ts.createSourceFile(inputFileName, input, options.target || ts.ScriptTarget.ES5);
+        var sourceFile = ts.createSourceFile(inputFileName, feng3ddts + input, options.target || ts.ScriptTarget.ES5);
         // Output
         var outputText;
         var program = ts.createProgram([inputFileName], options, {
