@@ -348,11 +348,21 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        /**
+         * 文件系统类型
+         */
+        var FSType;
+        (function (FSType) {
+            FSType["native"] = "native";
+            FSType["indexedDB"] = "indexedDB";
+        })(FSType = editor.FSType || (editor.FSType = {}));
         if (typeof require == "undefined") {
             editor.fs = feng3d.indexedDBfs;
+            editor.fstype = FSType.indexedDB;
         }
         else {
             editor.fs = require(__dirname + "/io/file.js").file;
+            editor.fstype = FSType.native;
         }
         (function () {
             /**
@@ -3911,6 +3921,11 @@ var feng3d;
                         editor.engine.scene = scene;
                     });
                 }
+                else if (this.data.extension == editor.AssetExtension.ts) {
+                    var url = "codeeditor.html?fstype=" + editor.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorAssets.projectPath + "&path=" + this.data.path;
+                    url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                    window.open(url);
+                }
             };
             AssetsFileItemRenderer.prototype.onclick = function () {
                 editor.editorData.selectObject(this.data);
@@ -4310,7 +4325,10 @@ var feng3d;
                 editor.editorDispatcher.dispatch(item.command);
             };
             TopView.prototype.onHelpButtonClick = function () {
-                window.open("index.md");
+                var url = "index.md";
+                // var url = "codeeditor.html";
+                url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                window.open(url);
             };
             TopView.prototype.onButtonClick = function (event) {
                 switch (event.currentTarget) {
@@ -4722,7 +4740,18 @@ var feng3d;
          */
         var EditorData = /** @class */ (function () {
             function EditorData() {
+                this.DBname = "feng3d-editor";
             }
+            Object.defineProperty(EditorData.prototype, "DBname", {
+                get: function () {
+                    return feng3d.DBname;
+                },
+                set: function (v) {
+                    feng3d.DBname = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
             /**
              * 选择对象
              * 该方法会处理 按ctrl键附加选中对象操作

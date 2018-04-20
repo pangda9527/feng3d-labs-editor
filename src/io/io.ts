@@ -1,12 +1,24 @@
 namespace feng3d.editor
 {
+    /**
+     * 文件系统类型
+     */
+    export enum FSType
+    {
+        native = "native",
+        indexedDB = "indexedDB"
+    }
+
     export var fs: EditorFS;
+    export var fstype: FSType;
     if (typeof require == "undefined")
     {
         fs = <EditorFS>indexedDBfs;
+        fstype = FSType.indexedDB;
     } else
     {
         fs = require(__dirname + "/io/file.js").file;
+        fstype = FSType.native;
     }
 
     export interface EditorFS extends FS
