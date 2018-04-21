@@ -198,7 +198,7 @@ namespace feng3d.editor
 
     function onMouseWheelMoveSceneCamera()
     {
-        var distance = windowEventProxy.wheelDelta * sceneControlConfig.mouseWheelMoveStep;
+        var distance = windowEventProxy.wheelDelta * sceneControlConfig.mouseWheelMoveStep * sceneControlConfig.lookDistance / 10;
         editorCamera.transform.localToWorldMatrix = editorCamera.transform.localToWorldMatrix.moveForward(distance);
         sceneControlConfig.lookDistance -= distance;
     }

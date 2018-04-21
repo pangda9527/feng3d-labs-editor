@@ -817,7 +817,7 @@ var feng3d;
             }
         }
         function onMouseWheelMoveSceneCamera() {
-            var distance = feng3d.windowEventProxy.wheelDelta * editor.sceneControlConfig.mouseWheelMoveStep;
+            var distance = feng3d.windowEventProxy.wheelDelta * editor.sceneControlConfig.mouseWheelMoveStep * editor.sceneControlConfig.lookDistance / 10;
             editor.editorCamera.transform.localToWorldMatrix = editor.editorCamera.transform.localToWorldMatrix.moveForward(distance);
             editor.sceneControlConfig.lookDistance -= distance;
         }
@@ -7791,7 +7791,7 @@ var feng3d;
         editor.Main3D = Main3D;
         function newScene() {
             var scene = feng3d.GameObject.create("Untitled").addComponent(feng3d.Scene3D);
-            scene.background = new feng3d.Color(0.4, 0.4, 0.4, 1.0);
+            scene.background = new feng3d.Color(0.408, 0.38, 0.357, 1.0);
             var camera = feng3d.GameObjectFactory.createCamera("Main Camera");
             scene.gameObject.addChild(camera);
             var directionalLight = feng3d.GameObject.create("DirectionalLight");
