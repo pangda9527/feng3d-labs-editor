@@ -10,6 +10,9 @@ namespace feng3d.editor
         png = "png",
         jpg = "jpg",
         ts = "ts",
+        js = "js",
+        txt = "txt",
+        json = "json",
         scene = "scene",
     }
 

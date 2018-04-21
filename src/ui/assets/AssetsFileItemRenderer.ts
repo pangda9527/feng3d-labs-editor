@@ -112,9 +112,22 @@ namespace feng3d.editor
                     scene.initCollectComponents();
                     engine.scene = scene;
                 });
-            } else if (this.data.extension == AssetExtension.ts)
+            } else if (this.data.extension == AssetExtension.ts
+                || this.data.extension == AssetExtension.js
+                || this.data.extension == AssetExtension.txt
+            )
             {
-                var url = `codeeditor.html?fstype=${fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${this.data.path}`;
+                var url = `codeeditor.html?fstype=${fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${this.data.path}&extension=${this.data.extension}`;
+                url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                window.open(url);
+            } else if (this.data.extension == AssetExtension.json
+                || this.data.extension == AssetExtension.material
+                || this.data.extension == AssetExtension.gameobject
+                || this.data.extension == AssetExtension.geometry
+                || this.data.extension == AssetExtension.anim
+            )
+            {
+                var url = `codeeditor.html?fstype=${fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${this.data.path}&extension=${AssetExtension.json}`;
                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                 window.open(url);
             }

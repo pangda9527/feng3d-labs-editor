@@ -3307,6 +3307,9 @@ var feng3d;
             AssetExtension["png"] = "png";
             AssetExtension["jpg"] = "jpg";
             AssetExtension["ts"] = "ts";
+            AssetExtension["js"] = "js";
+            AssetExtension["txt"] = "txt";
+            AssetExtension["json"] = "json";
             AssetExtension["scene"] = "scene";
         })(AssetExtension = editor.AssetExtension || (editor.AssetExtension = {}));
         var AssetsFile = /** @class */ (function (_super) {
@@ -3924,8 +3927,19 @@ var feng3d;
                         editor.engine.scene = scene;
                     });
                 }
-                else if (this.data.extension == editor.AssetExtension.ts) {
-                    var url = "codeeditor.html?fstype=" + feng3d.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path;
+                else if (this.data.extension == editor.AssetExtension.ts
+                    || this.data.extension == editor.AssetExtension.js
+                    || this.data.extension == editor.AssetExtension.txt) {
+                    var url = "codeeditor.html?fstype=" + feng3d.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path + "&extension=" + this.data.extension;
+                    url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                    window.open(url);
+                }
+                else if (this.data.extension == editor.AssetExtension.json
+                    || this.data.extension == editor.AssetExtension.material
+                    || this.data.extension == editor.AssetExtension.gameobject
+                    || this.data.extension == editor.AssetExtension.geometry
+                    || this.data.extension == editor.AssetExtension.anim) {
+                    var url = "codeeditor.html?fstype=" + feng3d.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path + "&extension=" + editor.AssetExtension.json;
                     url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                     window.open(url);
                 }

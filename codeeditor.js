@@ -14,61 +14,102 @@ var editor;
         var DBname = decodeURI(GetQueryString("DBname"));
         var project = decodeURI(GetQueryString("project"));
         var path = decodeURI(GetQueryString("path"));
+        var extension = decodeURI(GetQueryString("extension"));
+        if (!extension)
+            extension = path.split(".").pop();
 
         feng3d.storage.get(DBname, project, path, function (err, data)
         {
             if (data && data.data)
+            {
                 code = data.data;
+                if (code.constructor == Uint8Array)
+                {
+                    feng3d.dataTransform.uint8ArrayToString(code, function (str)
+                    {
+                        code = str;
+                    });
+                }
+            }
             else
                 code = "";
             codedata = data;
 
-            initEditor(function ()
+            initEditor(extension, function ()
             {
                 editor.setValue(code);
-                triggerCompile();
+                if (extension == "ts")
+                    triggerCompile();
                 editor.onDidChangeModelContent(function ()
                 {
-                    triggerCompile();
+                    codedata.data = editor.getValue();
+                    feng3d.storage.set(DBname, project, path, codedata);
+                    if (extension == "ts")
+                        triggerCompile();
                 });
             });
 
         });
     }
 
-    function initEditor(callback)
+    function initEditor(extension, callback)
     {
         require.config({ paths: { 'vs': 'node_modules/monaco-editor/min/vs' } });
         require(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function ()
         {
             xhr('libs/feng3d.d.ts').then(function (response)
             {
-                var compilerOptions = {
-                    allowNonTsExtensions: true,
-                    module: monaco.languages.typescript.ModuleKind.AMD,
-                    noResolve: true,
-                    suppressOutputPathCheck: true,
-                    skipLibCheck: true,
-                    skipDefaultLibCheck: true,
-                    target: monaco.languages.typescript.ScriptTarget.ES5,
-                    noImplicitAny: false,
-                    strictNullChecks: false,
-                    noImplicitThis: false,
-                    noImplicitReturns: false,
-                    experimentalDecorators: true,
-                    noUnusedLocals: false,
-                    noUnusedParameters: false,
-                };
+                if (extension == "ts")
+                {
+                    var compilerOptions = {
+                        allowNonTsExtensions: true,
+                        module: monaco.languages.typescript.ModuleKind.AMD,
+                        noResolve: true,
+                        suppressOutputPathCheck: true,
+                        skipLibCheck: true,
+                        skipDefaultLibCheck: true,
+                        target: monaco.languages.typescript.ScriptTarget.ES5,
+                        noImplicitAny: false,
+                        strictNullChecks: false,
+                        noImplicitThis: false,
+                        noImplicitReturns: false,
+                        experimentalDecorators: true,
+                        noUnusedLocals: false,
+                        noUnusedParameters: false,
+                    };
 
-                feng3ddts = response.responseText;
-                monaco.languages.typescript.typescriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
-                editor = monaco.editor.create(document.getElementById('container'), {
-                    value: "",
-                    language: 'typescript',
-                    formatOnType: true
-                });
-                monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
-
+                    feng3ddts = response.responseText;
+                    monaco.languages.typescript.typescriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
+                    editor = monaco.editor.create(document.getElementById('container'), {
+                        value: "",
+                        language: 'typescript',
+                        formatOnType: true
+                    });
+                    monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
+                } else if (extension == "js")
+                {
+                    feng3ddts = response.responseText;
+                    monaco.languages.typescript.javascriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
+                    editor = monaco.editor.create(document.getElementById('container'), {
+                        value: "",
+                        language: 'javascript',
+                        formatOnType: true
+                    });
+                } else if (extension == "json")
+                {
+                    editor = monaco.editor.create(document.getElementById('container'), {
+                        value: "",
+                        language: 'json',
+                        formatOnType: true
+                    });
+                } else 
+                {
+                    editor = monaco.editor.create(document.getElementById('container'), {
+                        value: "",
+                        language: 'text',
+                        formatOnType: true
+                    });
+                }
                 callback();
             });
         });
@@ -95,8 +136,6 @@ var editor;
                 });
                 if (typeof output === "string")
                 {
-                    codedata.data = editor.getValue();
-                    feng3d.storage.set(DBname, project, path, codedata);
                     codedata.data = output;
                     feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
                 }
