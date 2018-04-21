@@ -1385,15 +1385,15 @@ var feng3d;
                 }
             };
             MenuItemRenderer.prototype.onAddedToStage = function () {
-                this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false, 1000);
+                this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
                 this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
-                this.list = this.parent;
+                this.menuUI = this.parent;
                 this.updateView();
             };
             MenuItemRenderer.prototype.onRemovedFromStage = function () {
-                this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false);
+                this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
                 this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
-                this.list = null;
+                this.menuUI = null;
             };
             MenuItemRenderer.prototype.updateView = function () {
                 if (!this.data)
@@ -1407,10 +1407,15 @@ var feng3d;
             };
             MenuItemRenderer.prototype.onItemMouseDown = function (event) {
                 this.data.click && this.data.click();
+                this.menuUI.topMenu.remove();
             };
             MenuItemRenderer.prototype.onItemMouseOver = function () {
-                if (this.data.submenu)
-                    console.log(this.data.submenu);
+                if (this.data.submenu) {
+                    this.menuUI.subMenuUI = editor.MenuUI.create(this.data.submenu);
+                }
+                else {
+                    this.menuUI.subMenuUI = null;
+                }
             };
             return MenuItemRenderer;
         }(eui.ItemRenderer));
@@ -1656,9 +1661,32 @@ var feng3d;
             function MenuUI() {
                 var _this = _super.call(this) || this;
                 _this.itemRenderer = editor.MenuItemRenderer;
+                _this.onComplete();
                 return _this;
             }
-            MenuUI.popup = function (menu, mousex, mousey, width) {
+            Object.defineProperty(MenuUI.prototype, "subMenuUI", {
+                get: function () {
+                    return this._subMenuUI;
+                },
+                set: function (v) {
+                    if (this._subMenuUI)
+                        this._subMenuUI.remove();
+                    this._subMenuUI = v;
+                    if (this._subMenuUI)
+                        this._subMenuUI.parentMenuUI = this;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(MenuUI.prototype, "topMenu", {
+                get: function () {
+                    var m = this.parentMenuUI ? this.parentMenuUI.topMenu : this;
+                    return m;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            MenuUI.create = function (menu, mousex, mousey, width) {
                 if (width === void 0) { width = 150; }
                 var menuUI = new MenuUI();
                 var dataProvider = new eui.ArrayCollection();
@@ -1682,15 +1710,20 @@ var feng3d;
                 this.updateView();
             };
             MenuUI.prototype.onRemovedFromStage = function () {
+                this.subMenuUI = null;
+                this.parentMenuUI = null;
             };
             MenuUI.prototype.updateView = function () {
+            };
+            MenuUI.prototype.remove = function () {
+                this.parent && this.parent.removeChild(this);
             };
             return MenuUI;
         }(eui.List));
         editor.MenuUI = MenuUI;
         function popup(menu, mousex, mousey, width) {
             if (width === void 0) { width = 150; }
-            var menuUI = MenuUI.popup(menu, mousex, mousey, width);
+            var menuUI = MenuUI.create(menu, mousex, mousey, width);
             editor.maskview.mask(menuUI);
         }
         // let template = [{

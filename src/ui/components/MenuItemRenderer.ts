@@ -3,8 +3,7 @@ namespace feng3d.editor
     export class MenuItemRenderer extends eui.ItemRenderer
     {
         data: MenuItem;
-        list: eui.List;
-        
+        menuUI: MenuUI;
 
         protected dataChanged()
         {
@@ -32,20 +31,20 @@ namespace feng3d.editor
 
         private onAddedToStage()
         {
-            this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false, 1000);
+            this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
             this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
 
-            this.list = <any>this.parent;
+            this.menuUI = <any>this.parent;
 
             this.updateView();
         }
 
         private onRemovedFromStage()
         {
-            this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false);
+            this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
             this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
 
-            this.list = null;
+            this.menuUI = null;
         }
 
         private updateView()
@@ -64,12 +63,18 @@ namespace feng3d.editor
         private onItemMouseDown(event: egret.TouchEvent): void
         {
             this.data.click && this.data.click();
+            this.menuUI.topMenu.remove();
         }
 
         private onItemMouseOver()
         {
             if (this.data.submenu)
-                console.log(this.data.submenu);
+            {
+                this.menuUI.subMenuUI = MenuUI.create(this.data.submenu);
+            } else
+            {
+                this.menuUI.subMenuUI = null;
+            }
         }
     }
 }

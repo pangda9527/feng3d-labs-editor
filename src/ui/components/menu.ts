@@ -9,13 +9,36 @@ namespace feng3d.editor
 
     export class MenuUI extends eui.List
     {
+        get subMenuUI()
+        {
+            return this._subMenuUI;
+        }
+        set subMenuUI(v)
+        {
+            if (this._subMenuUI)
+                this._subMenuUI.remove();
+            this._subMenuUI = v;
+            if (this._subMenuUI)
+                this._subMenuUI.parentMenuUI = this;
+        }
+        private _subMenuUI: MenuUI;
+
+        private parentMenuUI: MenuUI;
+
+        get topMenu()
+        {
+            var m: MenuUI = this.parentMenuUI ? this.parentMenuUI.topMenu : this;
+            return m;
+        }
+
         constructor()
         {
             super();
             this.itemRenderer = MenuItemRenderer;
+            this.onComplete();
         }
 
-        static popup(menu: Menu, mousex?: number, mousey?: number, width = 150)
+        static create(menu: Menu, mousex?: number, mousey?: number, width = 150)
         {
             var menuUI = new MenuUI();
             var dataProvider = new eui.ArrayCollection();
@@ -47,17 +70,23 @@ namespace feng3d.editor
 
         private onRemovedFromStage()
         {
-
+            this.subMenuUI = null;
+            this.parentMenuUI = null;
         }
 
         private updateView()
         {
         }
+
+        remove()
+        {
+            this.parent && this.parent.removeChild(this);
+        }
     }
 
     function popup(menu: Menu, mousex?: number, mousey?: number, width = 150)
     {
-        var menuUI = MenuUI.popup(menu, mousex, mousey, width);
+        var menuUI = MenuUI.create(menu, mousex, mousey, width);
         maskview.mask(menuUI);
     }
 
