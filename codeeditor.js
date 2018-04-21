@@ -1,5 +1,5 @@
 /// <reference path="libs/feng3d.d.ts" />
-/// <reference path="node_modules/monaco-editor/monaco.d.ts" />
+/// <reference path="libs/monaco-editor/monaco.d.ts" />
 
 var editor;
 (function ()
@@ -54,7 +54,7 @@ var editor;
 
     function initEditor(extension, callback)
     {
-        require.config({ paths: { 'vs': 'node_modules/monaco-editor/min/vs' } });
+        require.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
         require(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function ()
         {
             xhr('libs/feng3d.d.ts').then(function (response)

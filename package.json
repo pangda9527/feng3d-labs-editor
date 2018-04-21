@@ -20,7 +20,6 @@
   "dependencies": {
     "@types/node": "^8.0.47",
     "electron": "^1.7.8",
-    "fs-extra": "^4.0.2",
-    "monaco-editor": "^0.12.0"
+    "fs-extra": "^4.0.2"
   }
 }
