@@ -9877,7 +9877,7 @@ var feng3d;
                     },
                     {
                         label: "Terrain", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createTorus());
+                            addToHierarchy(feng3d.GameObjectFactory.createTerrain());
                         }
                     },
                 ],
