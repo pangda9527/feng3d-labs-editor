@@ -3203,25 +3203,35 @@ var feng3d;
                 var menuconfig = [];
                 if (assetsFile.isDirectory) {
                     menuconfig.push({
-                        label: "create folder", click: function () {
-                            assetsFile.addfolder("New Folder");
-                        }
-                    }, {
-                        label: "create script", click: function () {
-                            assetsFile.addfile("NewScript.ts", editor.assetsFileTemplates.NewScript);
-                        }
-                    }, {
-                        label: "create json", click: function () {
-                            assetsFile.addfile("new json.json", "{}");
-                        }
-                    }, {
-                        label: "create txt", click: function () {
-                            assetsFile.addfile("new text.txt", "");
-                        }
-                    }, { type: "separator" }, {
-                        label: "create material", click: function () {
-                            assetsFile.addfile("new material" + ".material", new feng3d.StandardMaterial());
-                        }
+                        label: "Create",
+                        submenu: [
+                            {
+                                label: "Folder", click: function () {
+                                    assetsFile.addfolder("New Folder");
+                                }
+                            },
+                            {
+                                label: "Script", click: function () {
+                                    assetsFile.addfile("NewScript.ts", editor.assetsFileTemplates.NewScript);
+                                }
+                            },
+                            {
+                                label: "Json", click: function () {
+                                    assetsFile.addfile("new json.json", "{}");
+                                }
+                            },
+                            {
+                                label: "Txt", click: function () {
+                                    assetsFile.addfile("new text.txt", "");
+                                }
+                            },
+                            { type: "separator" },
+                            {
+                                label: "Material", click: function () {
+                                    assetsFile.addfile("new material" + ".material", new feng3d.StandardMaterial());
+                                }
+                            },
+                        ]
                     }, { type: "separator" }, {
                         label: "导入资源", click: function () {
                             editor.fs.selectFile(editor.editorAssets.inputFiles, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });

@@ -146,35 +146,40 @@ namespace feng3d.editor
             {
                 menuconfig.push(
                     {
-                        label: "create folder", click: () =>
-                        {
-                            assetsFile.addfolder("New Folder");
-                        }
-                    },
-                    {
-                        label: "create script", click: () =>
-                        {
-                            assetsFile.addfile("NewScript.ts", assetsFileTemplates.NewScript);
-                        }
-                    },
-                    {
-                        label: "create json", click: () =>
-                        {
-                            assetsFile.addfile("new json.json", "{}");
-                        }
-                    },
-                    {
-                        label: "create txt", click: () =>
-                        {
-                            assetsFile.addfile("new text.txt", "");
-                        }
-                    },
-                    { type: "separator" },
-                    {
-                        label: "create material", click: () =>
-                        {
-                            assetsFile.addfile("new material" + ".material", new StandardMaterial());
-                        }
+                        label: "Create",
+                        submenu: [
+                            {
+                                label: "Folder", click: () =>
+                                {
+                                    assetsFile.addfolder("New Folder");
+                                }
+                            },
+                            {
+                                label: "Script", click: () =>
+                                {
+                                    assetsFile.addfile("NewScript.ts", assetsFileTemplates.NewScript);
+                                }
+                            },
+                            {
+                                label: "Json", click: () =>
+                                {
+                                    assetsFile.addfile("new json.json", "{}");
+                                }
+                            },
+                            {
+                                label: "Txt", click: () =>
+                                {
+                                    assetsFile.addfile("new text.txt", "");
+                                }
+                            },
+                            { type: "separator" },
+                            {
+                                label: "Material", click: () =>
+                                {
+                                    assetsFile.addfile("new material" + ".material", new StandardMaterial());
+                                }
+                            },
+                        ]
                     },
                     { type: "separator" },
                     {
