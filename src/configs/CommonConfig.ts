@@ -135,6 +135,53 @@ namespace feng3d.editor
                 addToHierarchy(gameobject);
             }
         },
+        { type: "separator" },
+        {
+            label: "3D Object",
+            submenu: [
+                {
+                    label: "Plane", click: () =>
+                    {
+                        addToHierarchy(GameObjectFactory.createPlane());
+                    }
+                },
+                {
+                    label: "Cube", click: () =>
+                    {
+                        addToHierarchy(GameObjectFactory.createCube());
+                    }
+                },
+                {
+                    label: "Sphere", click: () =>
+                    {
+                        addToHierarchy(GameObjectFactory.createSphere());
+                    }
+                },
+                {
+                    label: "Capsule", click: () =>
+                    {
+                        addToHierarchy(GameObjectFactory.createCapsule());
+                    }
+                },
+                {
+                    label: "Cylinder", click: () =>
+                    {
+                        addToHierarchy(GameObjectFactory.createCylinder());
+                    }
+                },
+                {
+                    label: "Cone", click: () =>
+                    {
+                        addToHierarchy(GameObjectFactory.createCone());
+                    }
+                },
+                {
+                    label: "Torus", click: () =>
+                    {
+                        addToHierarchy(GameObjectFactory.createTorus());
+                    }
+                },],
+        },
     ];
 
     function addToHierarchy(gameobject: GameObject)

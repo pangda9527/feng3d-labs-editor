@@ -7,28 +7,58 @@ namespace feng3d.editor
         popup: popup,
     };
 
+    export class MenuUI extends eui.List
+    {
+        constructor()
+        {
+            super();
+            this.itemRenderer = MenuItemRenderer;
+        }
+
+        static popup(menu: Menu, mousex?: number, mousey?: number, width = 150)
+        {
+            var menuUI = new MenuUI();
+            var dataProvider = new eui.ArrayCollection();
+            dataProvider.replaceAll(menu);
+            menuUI.x = mousex || windowEventProxy.clientX;
+            menuUI.y = mousey || windowEventProxy.clientY;
+            if (width !== undefined)
+                menuUI.width = width;
+            editorui.popupLayer.addChild(menuUI);
+            menuUI.dataProvider = dataProvider;
+            return menuUI;
+        }
+
+        private onComplete(): void
+        {
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+            if (this.stage)
+            {
+                this.onAddedToStage();
+            }
+        }
+
+        private onAddedToStage()
+        {
+            this.updateView();
+        }
+
+        private onRemovedFromStage()
+        {
+
+        }
+
+        private updateView()
+        {
+        }
+    }
+
     function popup(menu: Menu, mousex?: number, mousey?: number, width = 150)
     {
-        var list = new eui.List();
-        list.itemRenderer = MenuItemRenderer;
-        var dataProvider = new eui.ArrayCollection();
-        dataProvider.replaceAll(menu);
-        list.x = mousex || windowEventProxy.clientX;
-        list.y = mousey || windowEventProxy.clientY;
-        if (width !== undefined)
-            list.width = width;
-        editorui.popupLayer.addChild(list);
-        list.dataProvider = dataProvider;
-
-        setTimeout(function ()
-        {
-            editorui.stage.once(egret.MouseEvent.CLICK, onStageClick, null);
-        }, 1);
-
-        function onStageClick()
-        {
-            editorui.popupLayer.removeChild(list);
-        }
+        var menuUI = MenuUI.popup(menu, mousex, mousey, width);
+        maskview.mask(menuUI);
     }
 
     // let template = [{

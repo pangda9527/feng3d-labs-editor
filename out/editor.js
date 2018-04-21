@@ -1204,7 +1204,8 @@ var feng3d;
         editor.maskview = {
             mask: mask,
         };
-        function mask(displayObject) {
+        function mask(displayObject, onMaskClick) {
+            if (onMaskClick === void 0) { onMaskClick = null; }
             var maskReck = new eui.Rect();
             maskReck.alpha = 0;
             if (displayObject.stage) {
@@ -1224,6 +1225,7 @@ var feng3d;
             function removeDisplayObject() {
                 if (displayObject.parent)
                     displayObject.parent.removeChild(displayObject);
+                onMaskClick && onMaskClick();
             }
             function onRemoveFromStage() {
                 maskReck.removeEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
@@ -1384,10 +1386,14 @@ var feng3d;
             };
             MenuItemRenderer.prototype.onAddedToStage = function () {
                 this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false, 1000);
+                this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
+                this.list = this.parent;
                 this.updateView();
             };
             MenuItemRenderer.prototype.onRemovedFromStage = function () {
                 this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onItemMouseDown, this, false);
+                this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
+                this.list = null;
             };
             MenuItemRenderer.prototype.updateView = function () {
                 if (!this.data)
@@ -1401,6 +1407,10 @@ var feng3d;
             };
             MenuItemRenderer.prototype.onItemMouseDown = function (event) {
                 this.data.click && this.data.click();
+            };
+            MenuItemRenderer.prototype.onItemMouseOver = function () {
+                if (this.data.submenu)
+                    console.log(this.data.submenu);
             };
             return MenuItemRenderer;
         }(eui.ItemRenderer));
@@ -1641,24 +1651,47 @@ var feng3d;
         editor.menu = {
             popup: popup,
         };
+        var MenuUI = /** @class */ (function (_super) {
+            __extends(MenuUI, _super);
+            function MenuUI() {
+                var _this = _super.call(this) || this;
+                _this.itemRenderer = editor.MenuItemRenderer;
+                return _this;
+            }
+            MenuUI.popup = function (menu, mousex, mousey, width) {
+                if (width === void 0) { width = 150; }
+                var menuUI = new MenuUI();
+                var dataProvider = new eui.ArrayCollection();
+                dataProvider.replaceAll(menu);
+                menuUI.x = mousex || feng3d.windowEventProxy.clientX;
+                menuUI.y = mousey || feng3d.windowEventProxy.clientY;
+                if (width !== undefined)
+                    menuUI.width = width;
+                editor.editorui.popupLayer.addChild(menuUI);
+                menuUI.dataProvider = dataProvider;
+                return menuUI;
+            };
+            MenuUI.prototype.onComplete = function () {
+                this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+                this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+                if (this.stage) {
+                    this.onAddedToStage();
+                }
+            };
+            MenuUI.prototype.onAddedToStage = function () {
+                this.updateView();
+            };
+            MenuUI.prototype.onRemovedFromStage = function () {
+            };
+            MenuUI.prototype.updateView = function () {
+            };
+            return MenuUI;
+        }(eui.List));
+        editor.MenuUI = MenuUI;
         function popup(menu, mousex, mousey, width) {
             if (width === void 0) { width = 150; }
-            var list = new eui.List();
-            list.itemRenderer = editor.MenuItemRenderer;
-            var dataProvider = new eui.ArrayCollection();
-            dataProvider.replaceAll(menu);
-            list.x = mousex || feng3d.windowEventProxy.clientX;
-            list.y = mousey || feng3d.windowEventProxy.clientY;
-            if (width !== undefined)
-                list.width = width;
-            editor.editorui.popupLayer.addChild(list);
-            list.dataProvider = dataProvider;
-            setTimeout(function () {
-                editor.editorui.stage.once(egret.MouseEvent.CLICK, onStageClick, null);
-            }, 1);
-            function onStageClick() {
-                editor.editorui.popupLayer.removeChild(list);
-            }
+            var menuUI = MenuUI.popup(menu, mousex, mousey, width);
+            editor.maskview.mask(menuUI);
         }
         // let template = [{
         //     label: 'Edit',
@@ -9810,6 +9843,47 @@ var feng3d;
                     gameobject.addComponent(feng3d.DirectionalLight);
                     addToHierarchy(gameobject);
                 }
+            },
+            { type: "separator" },
+            {
+                label: "3D Object",
+                submenu: [
+                    {
+                        label: "Plane", click: function () {
+                            addToHierarchy(feng3d.GameObjectFactory.createPlane());
+                        }
+                    },
+                    {
+                        label: "Cube", click: function () {
+                            addToHierarchy(feng3d.GameObjectFactory.createCube());
+                        }
+                    },
+                    {
+                        label: "Sphere", click: function () {
+                            addToHierarchy(feng3d.GameObjectFactory.createSphere());
+                        }
+                    },
+                    {
+                        label: "Capsule", click: function () {
+                            addToHierarchy(feng3d.GameObjectFactory.createCapsule());
+                        }
+                    },
+                    {
+                        label: "Cylinder", click: function () {
+                            addToHierarchy(feng3d.GameObjectFactory.createCylinder());
+                        }
+                    },
+                    {
+                        label: "Cone", click: function () {
+                            addToHierarchy(feng3d.GameObjectFactory.createCone());
+                        }
+                    },
+                    {
+                        label: "Torus", click: function () {
+                            addToHierarchy(feng3d.GameObjectFactory.createTorus());
+                        }
+                    },
+                ],
             },
         ];
         function addToHierarchy(gameobject) {

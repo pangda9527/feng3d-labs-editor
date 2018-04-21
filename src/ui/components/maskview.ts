@@ -4,7 +4,7 @@ namespace feng3d.editor
         mask: mask,
     };
 
-    function mask(displayObject: egret.DisplayObject)
+    function mask(displayObject: egret.DisplayObject, onMaskClick: () => void = null)
     {
         var maskReck = new eui.Rect();
         maskReck.alpha = 0;
@@ -30,6 +30,8 @@ namespace feng3d.editor
         {
             if (displayObject.parent)
                 displayObject.parent.removeChild(displayObject);
+
+            onMaskClick && onMaskClick();
         }
 
         function onRemoveFromStage()
