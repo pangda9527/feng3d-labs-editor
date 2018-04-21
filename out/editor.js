@@ -1415,6 +1415,8 @@ var feng3d;
             MenuItemRenderer.prototype.onItemMouseOver = function () {
                 if (this.data.submenu) {
                     var rect = this.getTransformedBounds(this.stage);
+                    if (rect.right + 300 > this.stage.stageWidth)
+                        rect.x -= rect.width + 150;
                     this.menuUI.subMenuUI = editor.MenuUI.create(this.data.submenu, rect.right, rect.top);
                 }
                 else {
@@ -9916,19 +9918,48 @@ var feng3d;
          */
         editor.createComponentConfig = [
             //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
-            { label: "ParticleAnimator", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.ParticleAnimator); } },
-            { label: "Camera", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Camera); } },
-            { label: "PointLight", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.PointLight); } },
-            { label: "DirectionalLight", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.DirectionalLight); } },
-            { label: "Script", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Script); } },
-            { label: "OutLineComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.OutLineComponent); } },
-            { label: "HoldSizeComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.HoldSizeComponent); } },
-            { label: "BillboardComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.BillboardComponent); } },
-            { label: "Animation", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Animation); } },
-            // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
-            { label: "CartoonComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.CartoonComponent); } },
-            { label: "FPSControllerScript", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.FPSControllerScript); } },
-            { label: "Navigation", click: function () { editor.needcreateComponentGameObject.addComponent(editor.Navigation); } },
+            {
+                label: "Animator",
+                submenu: [
+                    { label: "ParticleAnimator", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.ParticleAnimator); } },
+                    { label: "Animation", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Animation); } },
+                ]
+            },
+            {
+                label: "Rendering",
+                submenu: [
+                    { label: "Camera", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Camera); } },
+                    { label: "PointLight", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.PointLight); } },
+                    { label: "DirectionalLight", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.DirectionalLight); } },
+                    { label: "OutLineComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.OutLineComponent); } },
+                    { label: "CartoonComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.CartoonComponent); } },
+                ]
+            },
+            {
+                label: "Controller",
+                submenu: [
+                    { label: "FPSControllerScript", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.FPSControllerScript); } },
+                ]
+            },
+            {
+                label: "Layout",
+                submenu: [
+                    { label: "HoldSizeComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.HoldSizeComponent); } },
+                    { label: "BillboardComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.BillboardComponent); } },
+                ]
+            },
+            {
+                label: "Navigation",
+                submenu: [
+                    { label: "Navigation", click: function () { editor.needcreateComponentGameObject.addComponent(editor.Navigation); } },
+                ]
+            },
+            {
+                label: "Script",
+                submenu: [
+                    { label: "Script", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Script); } },
+                ]
+            },
         ];
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));

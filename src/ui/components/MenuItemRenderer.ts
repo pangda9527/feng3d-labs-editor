@@ -76,6 +76,8 @@ namespace feng3d.editor
             if (this.data.submenu)
             {
                 var rect = this.getTransformedBounds(this.stage);
+                if (rect.right + 300 > this.stage.stageWidth)
+                    rect.x -= rect.width + 150;
                 this.menuUI.subMenuUI = MenuUI.create(this.data.submenu, rect.right, rect.top);
             } else
             {

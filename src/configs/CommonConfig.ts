@@ -164,18 +164,48 @@ namespace feng3d.editor
      */
     export var createComponentConfig: MenuItem[] = [
         //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
-        { label: "ParticleAnimator", click: () => { needcreateComponentGameObject.addComponent(ParticleAnimator); } },
-        { label: "Camera", click: () => { needcreateComponentGameObject.addComponent(Camera); } },
-        { label: "PointLight", click: () => { needcreateComponentGameObject.addComponent(PointLight); } },
-        { label: "DirectionalLight", click: () => { needcreateComponentGameObject.addComponent(DirectionalLight); } },
-        { label: "Script", click: () => { needcreateComponentGameObject.addComponent(Script); } },
-        { label: "OutLineComponent", click: () => { needcreateComponentGameObject.addComponent(OutLineComponent); } },
-        { label: "HoldSizeComponent", click: () => { needcreateComponentGameObject.addComponent(HoldSizeComponent); } },
-        { label: "BillboardComponent", click: () => { needcreateComponentGameObject.addComponent(BillboardComponent); } },
-        { label: "Animation", click: () => { needcreateComponentGameObject.addComponent(Animation); } },
-        // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
-        { label: "CartoonComponent", click: () => { needcreateComponentGameObject.addComponent(CartoonComponent); } },
-        { label: "FPSControllerScript", click: () => { needcreateComponentGameObject.addComponent(FPSControllerScript); } },
-        { label: "Navigation", click: () => { needcreateComponentGameObject.addComponent(Navigation); } },
+        {
+            label: "Animator",
+            submenu: [
+                { label: "ParticleAnimator", click: () => { needcreateComponentGameObject.addComponent(ParticleAnimator); } },
+                { label: "Animation", click: () => { needcreateComponentGameObject.addComponent(Animation); } },
+            ]
+        },
+        {
+            label: "Rendering",
+            submenu: [
+                { label: "Camera", click: () => { needcreateComponentGameObject.addComponent(Camera); } },
+                { label: "PointLight", click: () => { needcreateComponentGameObject.addComponent(PointLight); } },
+                { label: "DirectionalLight", click: () => { needcreateComponentGameObject.addComponent(DirectionalLight); } },
+                { label: "OutLineComponent", click: () => { needcreateComponentGameObject.addComponent(OutLineComponent); } },
+                { label: "CartoonComponent", click: () => { needcreateComponentGameObject.addComponent(CartoonComponent); } },
+                // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
+            ]
+        },
+        {
+            label: "Controller",
+            submenu: [
+                { label: "FPSControllerScript", click: () => { needcreateComponentGameObject.addComponent(FPSControllerScript); } },
+            ]
+        },
+        {
+            label: "Layout",
+            submenu: [
+                { label: "HoldSizeComponent", click: () => { needcreateComponentGameObject.addComponent(HoldSizeComponent); } },
+                { label: "BillboardComponent", click: () => { needcreateComponentGameObject.addComponent(BillboardComponent); } },
+            ]
+        },
+        {
+            label: "Navigation",
+            submenu: [
+                { label: "Navigation", click: () => { needcreateComponentGameObject.addComponent(Navigation); } },
+            ]
+        },
+        {
+            label: "Script",
+            submenu: [
+                { label: "Script", click: () => { needcreateComponentGameObject.addComponent(Script); } },
+            ]
+        },
     ];
 }
