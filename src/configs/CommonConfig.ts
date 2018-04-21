@@ -112,7 +112,14 @@ namespace feng3d.editor
                     {
                         addToHierarchy(GameObjectFactory.createTorus());
                     }
-                },],
+                },
+                {
+                    label: "Terrain", click: () =>
+                    {
+                        addToHierarchy(GameObjectFactory.createTorus());
+                    }
+                },
+            ],
         },
         {
             label: "Light",
