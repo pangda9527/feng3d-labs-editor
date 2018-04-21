@@ -62,77 +62,9 @@ namespace feng3d.editor
     export var createObjectConfig: MenuItem[] = [
         //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
         {
-            label: "GameObject", click: () =>
+            label: "Create Empty", click: () =>
             {
                 addToHierarchy(GameObjectFactory.createGameObject());
-            }
-        },
-        {
-            label: "Plane", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createPlane());
-            }
-        },
-        {
-            label: "Cube", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createCube());
-            }
-        },
-        {
-            label: "Sphere", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createSphere());
-            }
-        },
-        {
-            label: "Capsule", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createCapsule());
-            }
-        },
-        {
-            label: "Cylinder", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createCylinder());
-            }
-        },
-        {
-            label: "Cone", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createCone());
-            }
-        },
-        {
-            label: "Torus", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createTorus());
-            }
-        },
-        {
-            label: "Particle", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createParticle());
-            }
-        },
-        {
-            label: "Camera", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createCamera());
-            }
-        },
-        {
-            label: "PointLight", click: () =>
-            {
-                addToHierarchy(GameObjectFactory.createPointLight());
-            }
-        },
-        {
-            label: "DirectionalLight", click: () =>
-            {
-                var gameobject = GameObject.create("DirectionalLight");
-                gameobject.addComponent(DirectionalLight);
-                addToHierarchy(gameobject);
             }
         },
         { type: "separator" },
@@ -181,6 +113,37 @@ namespace feng3d.editor
                         addToHierarchy(GameObjectFactory.createTorus());
                     }
                 },],
+        },
+        {
+            label: "Light",
+            submenu: [
+                {
+                    label: "PointLight", click: () =>
+                    {
+                        addToHierarchy(GameObjectFactory.createPointLight());
+                    }
+                },
+                {
+                    label: "DirectionalLight", click: () =>
+                    {
+                        var gameobject = GameObject.create("DirectionalLight");
+                        gameobject.addComponent(DirectionalLight);
+                        addToHierarchy(gameobject);
+                    }
+                },
+            ],
+        },
+        {
+            label: "Particle System", click: () =>
+            {
+                addToHierarchy(GameObjectFactory.createParticle());
+            }
+        },
+        {
+            label: "Camera", click: () =>
+            {
+                addToHierarchy(GameObjectFactory.createCamera());
+            }
         },
     ];
 

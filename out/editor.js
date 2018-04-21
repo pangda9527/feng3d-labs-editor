@@ -1401,6 +1401,9 @@ var feng3d;
                 if (this.data.type == 'separator') {
                     this.skin.currentState = "separator";
                 }
+                else if (this.data.submenu) {
+                    this.skin.currentState = "sub";
+                }
                 else {
                     this.skin.currentState = "normal";
                 }
@@ -1411,7 +1414,8 @@ var feng3d;
             };
             MenuItemRenderer.prototype.onItemMouseOver = function () {
                 if (this.data.submenu) {
-                    this.menuUI.subMenuUI = editor.MenuUI.create(this.data.submenu);
+                    var rect = this.getTransformedBounds(this.stage);
+                    this.menuUI.subMenuUI = editor.MenuUI.create(this.data.submenu, rect.right, rect.top);
                 }
                 else {
                     this.menuUI.subMenuUI = null;
@@ -9816,65 +9820,8 @@ var feng3d;
         editor.createObjectConfig = [
             //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
             {
-                label: "GameObject", click: function () {
+                label: "Create Empty", click: function () {
                     addToHierarchy(feng3d.GameObjectFactory.createGameObject());
-                }
-            },
-            {
-                label: "Plane", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createPlane());
-                }
-            },
-            {
-                label: "Cube", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createCube());
-                }
-            },
-            {
-                label: "Sphere", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createSphere());
-                }
-            },
-            {
-                label: "Capsule", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createCapsule());
-                }
-            },
-            {
-                label: "Cylinder", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createCylinder());
-                }
-            },
-            {
-                label: "Cone", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createCone());
-                }
-            },
-            {
-                label: "Torus", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createTorus());
-                }
-            },
-            {
-                label: "Particle", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createParticle());
-                }
-            },
-            {
-                label: "Camera", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createCamera());
-                }
-            },
-            {
-                label: "PointLight", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createPointLight());
-                }
-            },
-            {
-                label: "DirectionalLight", click: function () {
-                    var gameobject = feng3d.GameObject.create("DirectionalLight");
-                    gameobject.addComponent(feng3d.DirectionalLight);
-                    addToHierarchy(gameobject);
                 }
             },
             { type: "separator" },
@@ -9917,6 +9864,33 @@ var feng3d;
                         }
                     },
                 ],
+            },
+            {
+                label: "Light",
+                submenu: [
+                    {
+                        label: "PointLight", click: function () {
+                            addToHierarchy(feng3d.GameObjectFactory.createPointLight());
+                        }
+                    },
+                    {
+                        label: "DirectionalLight", click: function () {
+                            var gameobject = feng3d.GameObject.create("DirectionalLight");
+                            gameobject.addComponent(feng3d.DirectionalLight);
+                            addToHierarchy(gameobject);
+                        }
+                    },
+                ],
+            },
+            {
+                label: "Particle System", click: function () {
+                    addToHierarchy(feng3d.GameObjectFactory.createParticle());
+                }
+            },
+            {
+                label: "Camera", click: function () {
+                    addToHierarchy(feng3d.GameObjectFactory.createCamera());
+                }
             },
         ];
         function addToHierarchy(gameobject) {

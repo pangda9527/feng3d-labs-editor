@@ -54,7 +54,12 @@ namespace feng3d.editor
             if (this.data.type == 'separator')
             {
                 this.skin.currentState = "separator";
-            } else
+            }
+            else if (this.data.submenu)
+            {
+                this.skin.currentState = "sub";
+            }
+            else
             {
                 this.skin.currentState = "normal";
             }
@@ -70,7 +75,8 @@ namespace feng3d.editor
         {
             if (this.data.submenu)
             {
-                this.menuUI.subMenuUI = MenuUI.create(this.data.submenu);
+                var rect = this.getTransformedBounds(this.stage);
+                this.menuUI.subMenuUI = MenuUI.create(this.data.submenu, rect.right, rect.top);
             } else
             {
                 this.menuUI.subMenuUI = null;
