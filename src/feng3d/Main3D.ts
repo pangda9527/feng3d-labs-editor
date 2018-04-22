@@ -74,6 +74,7 @@ namespace feng3d.editor
 
             editorAssets.readScene("default.scene", (err, scene) =>
             {
+                scene.background = new Color(0.408, 0.38, 0.357, 1.0);
                 engine.scene = scene;
             });
 

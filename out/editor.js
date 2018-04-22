@@ -808,6 +808,7 @@ var feng3d;
                 var size = 1;
                 if (worldBounds)
                     size = worldBounds.getSize().length;
+                size = Math.max(size, 1);
                 //
                 var cameraGameObject = editor.editorCamera;
                 editor.sceneControlConfig.lookDistance = size;
@@ -5389,6 +5390,7 @@ var feng3d;
                 plane.transform.x = plane.transform.z = this._width / 2;
                 meshRenderer.geometry = new feng3d.PlaneGeometry(this._width, this._width);
                 this.colorMaterial = meshRenderer.material = new feng3d.ColorMaterial();
+                this.colorMaterial.cullFace = feng3d.CullFace.NONE;
                 plane.mouselayer = feng3d.mouselayer.editor;
                 plane.mouseEnabled = true;
                 this.gameObject.addChild(plane);
@@ -7747,6 +7749,7 @@ var feng3d;
                 editor.engine = new EditorEngine(canvas, scene, editor.editorCamera);
                 editor.engine.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
                 editor.editorAssets.readScene("default.scene", function (err, scene) {
+                    scene.background = new feng3d.Color(0.408, 0.38, 0.357, 1.0);
                     editor.engine.scene = scene;
                 });
                 window.addEventListener("beforeunload", function () {

@@ -181,6 +181,7 @@ namespace feng3d.editor
             plane.transform.x = plane.transform.z = this._width / 2;
             meshRenderer.geometry = new PlaneGeometry(this._width, this._width);
             this.colorMaterial = meshRenderer.material = new ColorMaterial();
+            this.colorMaterial.cullFace = CullFace.NONE;
             plane.mouselayer = mouselayer.editor;
             plane.mouseEnabled = true;
             this.gameObject.addChild(plane);

@@ -186,6 +186,7 @@ namespace feng3d.editor
             var size = 1;
             if (worldBounds)
                 size = worldBounds.getSize().length;
+            size = Math.max(size, 1);
             //
             var cameraGameObject = editorCamera;
             sceneControlConfig.lookDistance = size;
