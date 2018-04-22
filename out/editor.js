@@ -2801,7 +2801,7 @@ var feng3d;
                 this.space.on("removedComponent", this.onremovedComponent, this);
                 editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
                     if (dragdata.file_script) {
-                        _this.space.addComponent(feng3d.Script).url = dragdata.file_script;
+                        _this.space.addComponent(feng3d.ScriptComponent).url = dragdata.file_script;
                     }
                 });
             };
@@ -4372,7 +4372,7 @@ var feng3d;
     var editor;
     (function (editor) {
         editor.assetsFileTemplates = {
-            NewScript: "\nnamespace feng3d\n{\n    export class NewScript extends Script\n    {\n        /**\n         * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n         */\n        start()\n        {\n\n        }\n\n        /**\n         * \u66F4\u65B0\n         */\n        update()\n        {\n            log(this.gameObject.transform.position);\n        }\n\n        /**\n         * \u9500\u6BC1\u65F6\u8C03\u7528\n         */\n        end()\n        {\n\n        }\n    }\n}\n"
+            NewScript: "namespace feng3d\n{\n    export class NewScript extends Script\n    {\n        /**\n         * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n         */\n        init()\n        {\n\n        }\n\n        /**\n         * \u66F4\u65B0\n         */\n        update()\n        {\n            log(this.transform.position);\n        }\n\n        /**\n         * \u9500\u6BC1\u65F6\u8C03\u7528\n         */\n        dispose()\n        {\n\n        }\n    }\n}"
         };
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -9127,7 +9127,7 @@ var feng3d;
                 return _this;
             }
             return EditorScript;
-        }(feng3d.Script));
+        }(feng3d.ScriptComponent));
         editor.EditorScript = EditorScript;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -9962,7 +9962,7 @@ var feng3d;
             {
                 label: "Script",
                 submenu: [
-                    { label: "Script", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Script); } },
+                    { label: "Script", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.ScriptComponent); } },
                 ]
             },
         ];

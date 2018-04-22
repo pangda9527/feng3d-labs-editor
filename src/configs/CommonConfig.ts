@@ -211,7 +211,7 @@ namespace feng3d.editor
         {
             label: "Script",
             submenu: [
-                { label: "Script", click: () => { needcreateComponentGameObject.addComponent(Script); } },
+                { label: "Script", click: () => { needcreateComponentGameObject.addComponent(ScriptComponent); } },
             ]
         },
     ];

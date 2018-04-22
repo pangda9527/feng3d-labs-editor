@@ -85,7 +85,7 @@ namespace feng3d.editor
 			{
 				if (dragdata.file_script)
 				{
-					this.space.addComponent(Script).url = dragdata.file_script;
+					this.space.addComponent(ScriptComponent).url = dragdata.file_script;
 				}
 			});
 		}
