@@ -804,8 +804,13 @@ var feng3d;
         function onLookToSelectedGameObject() {
             var selectedGameObject = editor.editorData.firstSelectedGameObject;
             if (selectedGameObject) {
+                var worldBounds = selectedGameObject.getComponent(feng3d.BoundingComponent).worldBounds;
+                var size = 1;
+                if (worldBounds)
+                    size = worldBounds.getSize().length;
+                //
                 var cameraGameObject = editor.editorCamera;
-                editor.sceneControlConfig.lookDistance = editor.sceneControlConfig.defaultLookDistance;
+                editor.sceneControlConfig.lookDistance = size;
                 var lookPos = cameraGameObject.transform.localToWorldMatrix.forward;
                 lookPos.scale(-editor.sceneControlConfig.lookDistance);
                 lookPos.add(selectedGameObject.transform.scenePosition);
@@ -824,7 +829,6 @@ var feng3d;
         var SceneControlConfig = /** @class */ (function () {
             function SceneControlConfig() {
                 this.mouseWheelMoveStep = 0.004;
-                this.defaultLookDistance = 3;
                 //dynamic
                 this.lookDistance = 3;
                 this.sceneCameraForwardBackwardStep = 0.01;

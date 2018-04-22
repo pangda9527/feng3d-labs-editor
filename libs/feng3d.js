@@ -11275,7 +11275,7 @@ var feng3d;
             /**
              * Enabled Behaviours are Updated, disabled Behaviours are not.
              */
-            _this.enabled = false;
+            _this.enabled = true;
             return _this;
         }
         Object.defineProperty(Behaviour.prototype, "isVisibleAndEnabled", {
@@ -13786,10 +13786,7 @@ var feng3d;
     var MeshRenderer = /** @class */ (function (_super) {
         __extends(MeshRenderer, _super);
         function MeshRenderer() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this._geometry = new feng3d.CubeGeometry();
-            _this._material = new feng3d.StandardMaterial();
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         Object.defineProperty(MeshRenderer.prototype, "single", {
             get: function () { return true; },
@@ -13840,6 +13837,10 @@ var feng3d;
         MeshRenderer.prototype.init = function (gameObject) {
             var _this = this;
             _super.prototype.init.call(this, gameObject);
+            if (!this.geometry)
+                this.geometry = new feng3d.CubeGeometry();
+            if (!this.material)
+                this.material = new feng3d.StandardMaterial();
             //
             this.createUniformData("u_modelMatrix", function () { return _this.transform.localToWorldMatrix; });
             this.createUniformData("u_ITModelMatrix", function () { return _this.transform.ITlocalToWorldMatrix; });
@@ -13864,7 +13865,7 @@ var feng3d;
             feng3d.serialize()
         ], MeshRenderer.prototype, "material", null);
         return MeshRenderer;
-    }(feng3d.Component));
+    }(feng3d.Behaviour));
     feng3d.MeshRenderer = MeshRenderer;
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -19854,7 +19855,7 @@ var feng3d;
         function TerrainGeometry(heightMapUrl, width, height, depth, segmentsW, segmentsH, maxElevation, minElevation) {
             if (heightMapUrl === void 0) { heightMapUrl = null; }
             if (width === void 0) { width = 500; }
-            if (height === void 0) { height = 600; }
+            if (height === void 0) { height = 200; }
             if (depth === void 0) { depth = 500; }
             if (segmentsW === void 0) { segmentsW = 30; }
             if (segmentsH === void 0) { segmentsH = 30; }
@@ -20300,15 +20301,150 @@ var feng3d;
 var feng3d;
 (function (feng3d) {
     /**
+     * The TerrainData class stores heightmaps, detail mesh positions, tree instances, and terrain texture alpha maps.
+     *
+     * The Terrain component links to the terrain data and renders it.
+     */
+    var TerrainData = /** @class */ (function () {
+        function TerrainData() {
+            /**
+             * Resolution of the heightmap.
+             */
+            this.heightmapResolution = 513;
+            /**
+             * The total size in world units of the terrain.
+             */
+            this.size = new feng3d.Vector3(500, 600, 500);
+            // /**
+            //  * Height of the alpha map.
+            //  * 混合贴图高度
+            //  * @see https://blog.csdn.net/qq_29523119/article/details/52776731
+            //  */
+            // alphamapHeight
+            // /**
+            //  * Number of alpha map layers.
+            //  */
+            // alphamapLayers
+            // /**
+            //  * Resolution of the alpha map.
+            //  */
+            // alphamapResolution
+            // /**
+            //  * Alpha map textures used by the Terrain. Used by Terrain Inspector for undo.
+            //  */
+            // alphamapTextures
+            // /**
+            //  * Width of the alpha map.
+            //  */
+            // alphamapWidth
+            // /**
+            //  * Resolution of the base map used for rendering far patches on the terrain.
+            //  */
+            // baseMapResolution
+            // /**
+            //  * Detail height of the TerrainData.
+            //  */
+            // detailHeight
+            // /**
+            //  * Contains the detail texture / meshes that the terrain has.
+            //  */
+            // detailPrototypes
+            // /**
+            //  * Detail Resolution of the TerrainData.
+            //  */
+            // detailResolution
+            // /**
+            //  * Detail width of the TerrainData.
+            //  */
+            // detailWidth
+            // /**
+            //  * Splat texture used by the terrain.
+            //  */
+            // splatPrototypes
+            // /**
+            //  * The thickness of the terrain used for collision detection.
+            //  */
+            // thickness
+            // /**
+            //  * Returns the number of tree instances.
+            //  */
+            // treeInstanceCount
+            // /**
+            //  * Contains the current trees placed in the terrain.
+            //  */
+            // treeInstances
+            // /**
+            //  * The list of tree prototypes this are the ones available in the inspector.
+            //  */
+            // treePrototypes
+            // /**
+            //  * Amount of waving grass in the terrain.
+            //  */
+            // wavingGrassAmount
+            // /**
+            //  * Speed of the waving grass.
+            //  */
+            // wavingGrassSpeed
+            // /**
+            //  * Strength of the waving grass in the terrain.
+            //  */
+            // wavingGrassStrength
+            // /**
+            //  * Color of the waving grass that the terrain has.
+            //  */
+            // wavingGrassTint
+        }
+        Object.defineProperty(TerrainData.prototype, "heightmapWidth", {
+            /**
+             * Width of the terrain in samples(Read Only).
+             */
+            get: function () {
+                return this.heightmapResolution;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TerrainData.prototype, "heightmapHeight", {
+            /**
+             * Height of the terrain in samples(Read Only).
+             */
+            get: function () {
+                return this.heightmapResolution;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TerrainData.prototype, "heightmapScale", {
+            /**
+             * The size of each heightmap sample.
+             */
+            get: function () {
+                return this.size.divideNumberTo(this.heightmapResolution);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return TerrainData;
+    }());
+    feng3d.TerrainData = TerrainData;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
      * The Terrain component renders the terrain.
      */
     var Terrain = /** @class */ (function (_super) {
         __extends(Terrain, _super);
         function Terrain() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            /**
+             * 地形几何体数据
+             */
+            _this.geometry = new feng3d.TerrainGeometry();
+            return _this;
         }
         return Terrain;
-    }(feng3d.Behaviour));
+    }(feng3d.MeshRenderer));
     feng3d.Terrain = Terrain;
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -24421,7 +24557,6 @@ var feng3d;
         var gameobject = feng3d.GameObject.create(name);
         var model = gameobject.addComponent(feng3d.MeshRenderer);
         model.geometry = new feng3d.CubeGeometry();
-        model.material = new feng3d.StandardMaterial();
         return gameobject;
     }
     function createPlane(name) {
@@ -24459,10 +24594,7 @@ var feng3d;
     function createTerrain(name) {
         if (name === void 0) { name = "Terrain"; }
         var gameobject = feng3d.GameObject.create(name);
-        var terrain = gameobject.addComponent(feng3d.Terrain);
-        var model = gameobject.addComponent(feng3d.MeshRenderer);
-        model.geometry = new feng3d.TerrainGeometry();
-        model.material = new feng3d.StandardMaterial();
+        gameobject.addComponent(feng3d.Terrain);
         return gameobject;
     }
     function createSphere(name) {

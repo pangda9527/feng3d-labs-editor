@@ -182,8 +182,13 @@ namespace feng3d.editor
         var selectedGameObject = editorData.firstSelectedGameObject;
         if (selectedGameObject)
         {
+            var worldBounds = selectedGameObject.getComponent(BoundingComponent).worldBounds;
+            var size = 1;
+            if (worldBounds)
+                size = worldBounds.getSize().length;
+            //
             var cameraGameObject = editorCamera;
-            sceneControlConfig.lookDistance = sceneControlConfig.defaultLookDistance;
+            sceneControlConfig.lookDistance = size;
             var lookPos = cameraGameObject.transform.localToWorldMatrix.forward;
             lookPos.scale(- sceneControlConfig.lookDistance);
             lookPos.add(selectedGameObject.transform.scenePosition);
@@ -206,7 +211,6 @@ namespace feng3d.editor
     export class SceneControlConfig
     {
         mouseWheelMoveStep = 0.004;
-        defaultLookDistance = 3;
 
         //dynamic
         lookDistance = 3;
