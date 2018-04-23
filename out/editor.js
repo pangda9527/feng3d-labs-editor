@@ -8538,10 +8538,12 @@ var navigation;
                     var rd = rs.getPointDistance(point.getPoint());
                     //
                     if (cd < agentRadius) {
-                        if (ld < agentRadius) {
+                        if (ld < agentRadius) //处理左夹角内点点
+                         {
                             point.setPoint(lp);
                         }
-                        else if (rd < agentRadius) {
+                        else if (rd < agentRadius) //处理右夹角内点点
+                         {
                             point.setPoint(rp);
                         }
                         else {
