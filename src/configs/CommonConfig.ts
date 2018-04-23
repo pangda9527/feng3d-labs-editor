@@ -192,7 +192,7 @@ namespace feng3d.editor
         {
             label: "Controller",
             submenu: [
-                { label: "FPSControllerScript", click: () => { needcreateComponentGameObject.addComponent(FPSControllerScript); } },
+                { label: "FPSController", click: () => { needcreateComponentGameObject.addComponent(FPSController); } },
             ]
         },
         {

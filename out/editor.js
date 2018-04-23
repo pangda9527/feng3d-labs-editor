@@ -9950,7 +9950,7 @@ var feng3d;
             {
                 label: "Controller",
                 submenu: [
-                    { label: "FPSControllerScript", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.FPSControllerScript); } },
+                    { label: "FPSController", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.FPSController); } },
                 ]
             },
             {
