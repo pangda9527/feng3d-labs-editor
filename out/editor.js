@@ -866,7 +866,7 @@ var feng3d;
                         var gameobject = editor.engine.mouse3DManager.getSelectedGameObject();
                         if (!gameobject || !gameobject.scene)
                             gameobject = editor.hierarchyTree.rootnode.gameobject;
-                        feng3d.GameObjectUtil.addScript(gameobject, dragdata.file_script.replace(/\.ts\b/, ".js"));
+                        gameobject.addScript(dragdata.file_script);
                     }
                 });
             };
@@ -2989,7 +2989,7 @@ var feng3d;
                         editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, _this.data.gameobject);
                     }
                     if (dragdata.file_script) {
-                        feng3d.GameObjectUtil.addScript(_this.data.gameobject, dragdata.file_script.replace(/\.ts\b/, ".js"));
+                        _this.data.gameobject.addScript(dragdata.file_script);
                     }
                 });
             };

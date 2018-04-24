@@ -37,7 +37,7 @@ namespace feng3d.editor
                 }
                 if (dragdata.file_script)
                 {
-                    GameObjectUtil.addScript(this.data.gameobject, dragdata.file_script.replace(/\.ts\b/, ".js"));
+                    this.data.gameobject.addScript(dragdata.file_script);
                 }
             });
         }
