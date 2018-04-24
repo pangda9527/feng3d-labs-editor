@@ -27,6 +27,10 @@ namespace feng3d.editor
                 hierarchy.rootGameObject = this._scene.gameObject;
             }
         }
+        get camera()
+        {
+            return editorCamera;
+        }
         private _scene: Scene3D;
     }
 
@@ -66,16 +70,15 @@ namespace feng3d.editor
             //
             editorDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             //
-            var scene = newScene();
-            //
             var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
-            engine = new EditorEngine(canvas, scene, editorCamera);
-            engine.renderObjectflag = GameObjectFlag.feng3d | GameObjectFlag.editor;
-
+            engine = new EditorEngine(canvas, null, editorCamera);
+            //
             editorAssets.readScene("default.scene", (err, scene) =>
             {
-                scene.background = new Color(0.408, 0.38, 0.357, 1.0);
+                if (err)
+                    scene = newScene();
                 engine.scene = scene;
+                engine.renderObjectflag = GameObjectFlag.feng3d | GameObjectFlag.editor;
             });
 
             window.addEventListener("beforeunload", () =>
@@ -132,6 +135,7 @@ namespace feng3d.editor
         scene.background = new Color(0.408, 0.38, 0.357, 1.0);
 
         var camera = GameObjectFactory.createCamera("Main Camera");
+        camera.transform.position = new Vector3(0, 1, -10);
         scene.gameObject.addChild(camera);
 
         var directionalLight = GameObject.create("DirectionalLight");

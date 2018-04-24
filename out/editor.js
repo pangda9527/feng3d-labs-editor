@@ -7708,6 +7708,13 @@ var feng3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(EditorEngine.prototype, "camera", {
+                get: function () {
+                    return editor.editorCamera;
+                },
+                enumerable: true,
+                configurable: true
+            });
             return EditorEngine;
         }(feng3d.Engine));
         editor.EditorEngine = EditorEngine;
@@ -7743,14 +7750,14 @@ var feng3d;
                 //
                 editor.editorDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
                 //
-                var scene = newScene();
-                //
                 var canvas = document.getElementById("glcanvas");
-                editor.engine = new EditorEngine(canvas, scene, editor.editorCamera);
-                editor.engine.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
+                editor.engine = new EditorEngine(canvas, null, editor.editorCamera);
+                //
                 editor.editorAssets.readScene("default.scene", function (err, scene) {
-                    scene.background = new feng3d.Color(0.408, 0.38, 0.357, 1.0);
+                    if (err)
+                        scene = newScene();
                     editor.engine.scene = scene;
+                    editor.engine.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
                 });
                 window.addEventListener("beforeunload", function () {
                     editor.editorAssets.saveScene("default.scene", editor.engine.scene);
@@ -7800,6 +7807,7 @@ var feng3d;
             var scene = feng3d.GameObject.create("Untitled").addComponent(feng3d.Scene3D);
             scene.background = new feng3d.Color(0.408, 0.38, 0.357, 1.0);
             var camera = feng3d.GameObjectFactory.createCamera("Main Camera");
+            camera.transform.position = new feng3d.Vector3(0, 1, -10);
             scene.gameObject.addChild(camera);
             var directionalLight = feng3d.GameObject.create("DirectionalLight");
             directionalLight.addComponent(feng3d.DirectionalLight);
