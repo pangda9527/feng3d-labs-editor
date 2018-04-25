@@ -1634,6 +1634,7 @@ var feng3d;
                 _this.component = component;
                 _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "ComponentSkin";
+                _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this.onRemovedFromStage, _this);
                 return _this;
             }
             /**
@@ -1644,16 +1645,44 @@ var feng3d;
                     this.componentView.updateView();
             };
             ComponentView.prototype.onComplete = function () {
+                var _this = this;
                 var componentName = feng3d.ClassUtils.getQualifiedClassName(this.component).split(".").pop();
                 this.accordion.titleName = componentName;
                 this.componentView = feng3d.objectview.getObjectView(this.component);
                 this.accordion.addContent(this.componentView);
                 this.deleteButton.visible = !(this.component instanceof feng3d.Transform);
                 this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
+                // 初始化Script属性面板
+                if (this.component instanceof feng3d.ScriptComponent) {
+                    var component = this.component;
+                    feng3d.ScriptComponent.addScript(component.url, function (scriptClass) {
+                        _this.script = new scriptClass(new feng3d.ScriptComponent());
+                        var scriptData = component.scriptData = component.scriptData || {};
+                        for (var key in scriptData) {
+                            if (scriptData.hasOwnProperty(key)) {
+                                _this.script[key] = scriptData[key];
+                            }
+                        }
+                        _this.accordion.addContent(feng3d.objectview.getObjectView(_this.script));
+                    });
+                }
             };
             ComponentView.prototype.onDeleteButton = function (event) {
                 if (this.component.gameObject)
                     this.component.gameObject.removeComponent(this.component);
+            };
+            ComponentView.prototype.onRemovedFromStage = function () {
+                //保存脚本数据
+                if (this.script) {
+                    var component = this.component;
+                    var scriptData = component.scriptData || {};
+                    var objectAttributeInfos = feng3d.objectview.getObjectInfo(this.script).objectAttributeInfos;
+                    for (var i = 0; i < objectAttributeInfos.length; i++) {
+                        var element = objectAttributeInfos[i];
+                        scriptData[element.name] = this.script[element.name];
+                    }
+                    component.scriptData = scriptData;
+                }
             };
             return ComponentView;
         }(eui.Component));
