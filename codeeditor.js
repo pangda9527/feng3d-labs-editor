@@ -82,7 +82,6 @@ var editor;
 
                     feng3ddts = response.responseText;
                     monaco.languages.typescript.typescriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
-                    // typescript.format.placeOpenBraceOnNewLineForFunctions
 
                     editor = monaco.editor.create(document.getElementById('container'), {
                         value: "",

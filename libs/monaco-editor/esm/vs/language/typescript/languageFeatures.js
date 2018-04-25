@@ -518,8 +518,8 @@ var FormatHelper = /** @class */ (function (_super) {
             InsertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis: false,
             InsertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets: false,
             InsertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces: false,
-            PlaceOpenBraceOnNewLineForControlBlocks: false,
-            PlaceOpenBraceOnNewLineForFunctions: false
+            PlaceOpenBraceOnNewLineForControlBlocks: true,
+            PlaceOpenBraceOnNewLineForFunctions: true
         };
     };
     FormatHelper.prototype._convertTextChanges = function (uri, change) {

@@ -519,8 +519,8 @@ define(["require", "exports", "./lib/typescriptServices"], function (require, ex
                 InsertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis: false,
                 InsertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets: false,
                 InsertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces: false,
-                PlaceOpenBraceOnNewLineForControlBlocks: false,
-                PlaceOpenBraceOnNewLineForFunctions: false
+                PlaceOpenBraceOnNewLineForControlBlocks: true,
+                PlaceOpenBraceOnNewLineForFunctions: true
             };
         };
         FormatHelper.prototype._convertTextChanges = function (uri, change) {
