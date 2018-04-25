@@ -1732,7 +1732,6 @@ var feng3d;
                 _this.component = component;
                 _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "ComponentSkin";
-                _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this.onRemovedFromStage, _this);
                 return _this;
             }
             /**
@@ -1748,15 +1747,27 @@ var feng3d;
                 this.componentView = feng3d.objectview.getObjectView(this.component);
                 this.accordion.addContent(this.componentView);
                 this.deleteButton.visible = !(this.component instanceof feng3d.Transform);
-                this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
-                this.initScriptView();
+                this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
+                this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+                if (this.stage)
+                    this.onAddToStage();
             };
             ComponentView.prototype.onDeleteButton = function (event) {
                 if (this.component.gameObject)
                     this.component.gameObject.removeComponent(this.component);
             };
+            ComponentView.prototype.onAddToStage = function () {
+                this.initScriptView();
+                this.updateView();
+                this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
+                if (this.scriptView)
+                    this.scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+            };
             ComponentView.prototype.onRemovedFromStage = function () {
                 this.saveScriptData();
+                this.deleteButton.removeEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
+                if (this.scriptView)
+                    this.scriptView.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
             };
             ComponentView.prototype.initScriptView = function () {
                 var _this = this;
@@ -1771,9 +1782,8 @@ var feng3d;
                                 _this.script[key] = scriptData[key];
                             }
                         }
-                        var scriptView = feng3d.objectview.getObjectView(_this.script, false);
-                        _this.accordion.addContent(scriptView);
-                        scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, _this.saveScriptData, _this);
+                        _this.scriptView = feng3d.objectview.getObjectView(_this.script, false);
+                        _this.accordion.addContent(_this.scriptView);
                     });
                 }
             };
@@ -2904,8 +2914,19 @@ var feng3d;
                 return _this;
             }
             OAVComponentList.prototype.onComplete = function () {
-                this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
+                this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
+                this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+                if (this.stage)
+                    this.onAddToStage();
+            };
+            OAVComponentList.prototype.onAddToStage = function () {
                 this.initView();
+                this.updateView();
+                this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
+            };
+            OAVComponentList.prototype.onRemovedFromStage = function () {
+                this.disposeView();
+                this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
             };
             OAVComponentList.prototype.onAddComponentButtonClick = function () {
                 var globalPoint = this.addComponentButton.localToGlobal(0, 0);
@@ -2958,6 +2979,15 @@ var feng3d;
                         _this.space.addComponent(feng3d.ScriptComponent).url = dragdata.file_script;
                     }
                 });
+            };
+            OAVComponentList.prototype.disposeView = function () {
+                var components = this.attributeValue;
+                for (var i = 0; i < components.length; i++) {
+                    this.removedComponentView(components[i]);
+                }
+                this.space.off("addedComponent", this.onaddedcompont, this);
+                this.space.off("removedComponent", this.onremovedComponent, this);
+                editor.drag.unregister(this.addComponentButton);
             };
             OAVComponentList.prototype.addComponentView = function (component) {
                 var o;
@@ -3418,6 +3448,7 @@ var feng3d;
                             {
                                 label: "Script", click: function () {
                                     assetsFile.addfile("NewScript.ts", editor.assetsFileTemplates.NewScript);
+                                    assetsFile.addfile("NewScript.js", editor.assetsFileTemplates.scriptCompile);
                                 }
                             },
                             {
@@ -4575,7 +4606,8 @@ var feng3d;
     var editor;
     (function (editor) {
         editor.assetsFileTemplates = {
-            NewScript: "namespace feng3d\n{\n    export class NewScript extends Script\n    {\n        /**\n         * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n         */\n        init()\n        {\n\n        }\n\n        /**\n         * \u66F4\u65B0\n         */\n        update()\n        {\n            log(this.transform.position);\n        }\n\n        /**\n         * \u9500\u6BC1\u65F6\u8C03\u7528\n         */\n        dispose()\n        {\n\n        }\n    }\n}"
+            NewScript: "namespace feng3d\n{\n    export class NewScript extends Script\n    {\n        /**\n         * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n         */\n        init()\n        {\n\n        }\n\n        /**\n         * \u66F4\u65B0\n         */\n        update()\n        {\n            log(this.transform.position);\n        }\n\n        /**\n         * \u9500\u6BC1\u65F6\u8C03\u7528\n         */\n        dispose()\n        {\n\n        }\n    }\n}",
+            scriptCompile: "var __extends = (this && this.__extends) || (function () {\n    var extendStatics = Object.setPrototypeOf ||\n        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||\n        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };\n    return function (d, b) {\n        extendStatics(d, b);\n        function __() { this.constructor = d; }\n        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\n    };\n})();\nvar feng3d;\n(function (feng3d) {\n    var NewScript = /** @class */ (function (_super) {\n        __extends(NewScript, _super);\n        function NewScript() {\n            return _super !== null && _super.apply(this, arguments) || this;\n        }\n        /**\n         * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n         */\n        NewScript.prototype.init = function () {\n        };\n        /**\n         * \u66F4\u65B0\n         */\n        NewScript.prototype.update = function () {\n            feng3d.log(this.transform.position);\n        };\n        /**\n         * \u9500\u6BC1\u65F6\u8C03\u7528\n         */\n        NewScript.prototype.dispose = function () {\n        };\n        return NewScript;\n    }(feng3d.Script));\n    feng3d.NewScript = NewScript;\n})(feng3d || (feng3d = {}));\n"
         };
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));

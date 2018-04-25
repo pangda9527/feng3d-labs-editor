@@ -27,8 +27,26 @@ namespace feng3d.editor
 
 		private onComplete()
 		{
-			this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+			if (this.stage)
+				this.onAddToStage();
+		}
+
+		private onAddToStage()
+		{
 			this.initView();
+			this.updateView();
+
+			this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
+		}
+
+		private onRemovedFromStage()
+		{
+			this.disposeView();
+
+			this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
 		}
 
 		private onAddComponentButtonClick()
@@ -88,6 +106,20 @@ namespace feng3d.editor
 					this.space.addComponent(ScriptComponent).url = dragdata.file_script;
 				}
 			});
+		}
+
+		private disposeView()
+		{
+			var components = <any>this.attributeValue;
+			for (var i = 0; i < components.length; i++)
+			{
+				this.removedComponentView(components[i]);
+			}
+
+			this.space.off("addedComponent", this.onaddedcompont, this);
+			this.space.off("removedComponent", this.onremovedComponent, this);
+
+			drag.unregister(this.addComponentButton);
 		}
 
 		private addComponentView(component: Component)

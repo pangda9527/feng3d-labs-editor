@@ -10,6 +10,7 @@ namespace feng3d.editor
 		deleteButton: eui.Button;
 
 		script: Script;
+		scriptView: IObjectView & eui.Component
 
 		/**
 		 * 对象界面数据
@@ -21,8 +22,6 @@ namespace feng3d.editor
 
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "ComponentSkin";
-
-			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 		}
 
 		/**
@@ -40,12 +39,13 @@ namespace feng3d.editor
 			this.accordion.titleName = componentName;
 			this.componentView = objectview.getObjectView(this.component);
 			this.accordion.addContent(this.componentView);
-
 			this.deleteButton.visible = !(this.component instanceof Transform);
 
-			this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
-			this.initScriptView();
+			if (this.stage)
+				this.onAddToStage();
 		}
 
 		private onDeleteButton(event: egret.MouseEvent)
@@ -54,9 +54,23 @@ namespace feng3d.editor
 				this.component.gameObject.removeComponent(this.component);
 		}
 
+		private onAddToStage()
+		{
+			this.initScriptView();
+			this.updateView();
+
+			this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
+			if (this.scriptView)
+				this.scriptView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+		}
+
 		private onRemovedFromStage()
 		{
 			this.saveScriptData();
+
+			this.deleteButton.removeEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
+			if (this.scriptView)
+				this.scriptView.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
 		}
 
 		private initScriptView()
@@ -76,9 +90,8 @@ namespace feng3d.editor
 							this.script[key] = scriptData[key];
 						}
 					}
-					var scriptView: IObjectView & eui.Component = objectview.getObjectView(this.script, false);
-					this.accordion.addContent(scriptView);
-					scriptView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+					this.scriptView = objectview.getObjectView(this.script, false);
+					this.accordion.addContent(this.scriptView);
 				});
 			}
 		}
