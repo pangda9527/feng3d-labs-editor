@@ -13,6 +13,7 @@ namespace feng3d.editor
         objectview.defaultTypeAttributeView["Vector3"] = { component: "OAVVector3D" };
         objectview.defaultTypeAttributeView["Array"] = { component: "OAVArray" };
         objectview.defaultTypeAttributeView["Function"] = { component: "OAVFunction" };
+        objectview.defaultTypeAttributeView["Color"] = { component: "OAVColorPicker" };
 
         function setObjectview(cls: any, classDefinition: ClassDefinition)
         {

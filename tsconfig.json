@@ -34,6 +34,7 @@
         "src/ui/components/maskview.ts",
         "src/ui/components/popupview.ts",
         "src/ui/components/Accordion.ts",
+        "src/ui/components/ColorPicker.ts",
         "src/ui/components/TreeItemRenderer.ts",
         "src/ui/components/MenuItemRenderer.ts",
         "src/ui/components/Tree.ts",
@@ -57,6 +58,7 @@
         "src/objectview/oav/OAVArray.ts",
         "src/objectview/oav/OAVComponentList.ts",
         "src/objectview/oav/OAVFunction.ts",
+        "src/objectview/oav/OAVColorPicker.ts",
         //
         "src/ui/inspector/InspectorView.ts",
         //

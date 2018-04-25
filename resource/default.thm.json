@@ -30,6 +30,7 @@
         "resource/eui_skins/VScrollBarSkin.exml",
         "resource/eui_skins/VSliderSkin.exml",
 
+        
         "resource/custom_skins/BooleanAttrView.exml",
         "resource/custom_skins/OAVArray.exml",
         "resource/custom_skins/OVBaseDefault.exml",
@@ -38,15 +39,17 @@
         "resource/custom_skins/OVDefault.exml",
         "resource/custom_skins/OVTransform.exml",
         "resource/custom_skins/OAVFunction.exml",
-
+        "resource/custom_skins/OAVColorPicker.exml",
+        "resource/custom_skins/OAVComponentListSkin.exml",
+        "resource/custom_skins/OAVVector3DSkin.exml",
+        
+        "resource/custom_skins/ColorPicker.exml",
         "resource/custom_skins/TreeDisclosureButtonSkin.exml",
         "resource/custom_skins/TreeItemRendererSkin.exml",
         "resource/custom_skins/MenuItemRender.exml",
         "resource/custom_skins/Accordion.exml",
         "resource/custom_skins/Vector3DViewSkin.exml",
-        "resource/custom_skins/OAVVector3DSkin.exml",
         "resource/custom_skins/Component.exml",
-        "resource/custom_skins/OAVComponentListSkin.exml",
         "resource/custom_skins/TopView.exml",
         "resource/custom_skins/InspectorView.exml",
         "resource/custom_skins/Feng3dView.exml",

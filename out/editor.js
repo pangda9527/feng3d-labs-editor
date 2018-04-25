@@ -1321,6 +1321,63 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        var ColorPicker = /** @class */ (function (_super) {
+            __extends(ColorPicker, _super);
+            function ColorPicker() {
+                var _this = _super.call(this) || this;
+                _this._value = new feng3d.Color();
+                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                _this.skinName = "ColorPicker";
+                return _this;
+            }
+            Object.defineProperty(ColorPicker.prototype, "value", {
+                get: function () {
+                    if (this.picker)
+                        this._value.fromUnit(this.picker.fillColor);
+                    return this._value;
+                },
+                set: function (v) {
+                    this._value.fromUnit(v.toInt());
+                    if (this.picker)
+                        this.picker.fillColor = this._value.toInt();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ColorPicker.prototype.onComplete = function () {
+                this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+                this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+                if (this.stage) {
+                    this.onAddedToStage();
+                }
+            };
+            ColorPicker.prototype.onAddedToStage = function () {
+                this.picker.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            };
+            ColorPicker.prototype.onRemovedFromStage = function () {
+                this.picker.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            };
+            ColorPicker.prototype.onClick = function () {
+                var _this = this;
+                var c = document.getElementById("color");
+                c.value = this.value.toHexString();
+                c.click();
+                c.onchange = function () {
+                    var v = c.value; //"#189a56"
+                    _this.value = new feng3d.Color().fromUnit(Number("0x" + v.substr(1)));
+                    c.onchange = null;
+                    _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                };
+            };
+            return ColorPicker;
+        }(eui.Component));
+        editor.ColorPicker = ColorPicker;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
         var TreeItemRenderer = /** @class */ (function (_super) {
             __extends(TreeItemRenderer, _super);
             function TreeItemRenderer() {
@@ -2906,6 +2963,55 @@ var feng3d;
             return OAVFunction;
         }(editor.OAVBase));
         editor.OAVFunction = OAVFunction;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        var OAVColorPicker = /** @class */ (function (_super) {
+            __extends(OAVColorPicker, _super);
+            function OAVColorPicker(attributeViewInfo) {
+                var _this = _super.call(this, attributeViewInfo) || this;
+                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                _this.skinName = "OAVColorPicker";
+                return _this;
+            }
+            OAVColorPicker.prototype.onComplete = function () {
+                _super.prototype.onComplete.call(this);
+                this.colorPicker.addEventListener(egret.Event.CHANGE, this.onChange, this);
+                this.input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                this.input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+                this.input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+                this.updateView();
+            };
+            OAVColorPicker.prototype.updateView = function () {
+                this.colorPicker.value = this.attributeValue;
+                this.input.text = this.colorPicker.value.toHexString();
+            };
+            OAVColorPicker.prototype.onChange = function (event) {
+                this.attributeValue = this.colorPicker.value;
+                this.input.text = this.colorPicker.value.toHexString();
+            };
+            OAVColorPicker.prototype.ontxtfocusin = function () {
+                this._textfocusintxt = true;
+            };
+            OAVColorPicker.prototype.ontxtfocusout = function () {
+                this._textfocusintxt = false;
+                this.input.text = this.colorPicker.value.toHexString();
+            };
+            OAVColorPicker.prototype.onTextChange = function () {
+                if (this._textfocusintxt) {
+                    var text = this.input.text;
+                    this.colorPicker.value = this.attributeValue = new feng3d.Color().fromUnit(Number("0x" + text.substr(1)));
+                }
+            };
+            OAVColorPicker = __decorate([
+                feng3d.OAVComponent()
+            ], OAVColorPicker);
+            return OAVColorPicker;
+        }(editor.OAVBase));
+        editor.OAVColorPicker = OAVColorPicker;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -10028,6 +10134,7 @@ var feng3d;
             feng3d.objectview.defaultTypeAttributeView["Vector3"] = { component: "OAVVector3D" };
             feng3d.objectview.defaultTypeAttributeView["Array"] = { component: "OAVArray" };
             feng3d.objectview.defaultTypeAttributeView["Function"] = { component: "OAVFunction" };
+            feng3d.objectview.defaultTypeAttributeView["Color"] = { component: "OAVColorPicker" };
             function setObjectview(cls, classDefinition) {
                 cls["objectview"] = classDefinition;
             }
