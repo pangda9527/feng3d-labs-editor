@@ -51,7 +51,7 @@ namespace feng3d.editor
 				var component = this.component;
 				ScriptComponent.addScript(component.url, (scriptClass) =>
 				{
-					this.script = new scriptClass(new ScriptComponent());
+					this.script = new scriptClass(new ScriptComponent(), false);
 					var scriptData = component.scriptData = component.scriptData || {};
 					for (const key in scriptData)
 					{
