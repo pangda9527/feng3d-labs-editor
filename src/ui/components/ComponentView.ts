@@ -45,6 +45,22 @@ namespace feng3d.editor
 
 			this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
 
+			this.initScriptView();
+		}
+
+		private onDeleteButton(event: egret.MouseEvent)
+		{
+			if (this.component.gameObject)
+				this.component.gameObject.removeComponent(this.component);
+		}
+
+		private onRemovedFromStage()
+		{
+			this.saveScriptData();
+		}
+
+		private initScriptView()
+		{
 			// 初始化Script属性面板
 			if (this.component instanceof ScriptComponent)
 			{
@@ -60,18 +76,14 @@ namespace feng3d.editor
 							this.script[key] = scriptData[key];
 						}
 					}
-					this.accordion.addContent(objectview.getObjectView(this.script, false));
+					var scriptView: IObjectView & eui.Component = objectview.getObjectView(this.script, false);
+					this.accordion.addContent(scriptView);
+					scriptView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
 				});
 			}
 		}
 
-		private onDeleteButton(event: egret.MouseEvent)
-		{
-			if (this.component.gameObject)
-				this.component.gameObject.removeComponent(this.component);
-		}
-
-		private onRemovedFromStage()
+		private saveScriptData()
 		{
 			//保存脚本数据
 			if (this.script)

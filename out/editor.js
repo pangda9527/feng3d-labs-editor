@@ -1743,13 +1743,23 @@ var feng3d;
                     this.componentView.updateView();
             };
             ComponentView.prototype.onComplete = function () {
-                var _this = this;
                 var componentName = feng3d.ClassUtils.getQualifiedClassName(this.component).split(".").pop();
                 this.accordion.titleName = componentName;
                 this.componentView = feng3d.objectview.getObjectView(this.component);
                 this.accordion.addContent(this.componentView);
                 this.deleteButton.visible = !(this.component instanceof feng3d.Transform);
                 this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
+                this.initScriptView();
+            };
+            ComponentView.prototype.onDeleteButton = function (event) {
+                if (this.component.gameObject)
+                    this.component.gameObject.removeComponent(this.component);
+            };
+            ComponentView.prototype.onRemovedFromStage = function () {
+                this.saveScriptData();
+            };
+            ComponentView.prototype.initScriptView = function () {
+                var _this = this;
                 // 初始化Script属性面板
                 if (this.component instanceof feng3d.ScriptComponent) {
                     var component = this.component;
@@ -1761,15 +1771,13 @@ var feng3d;
                                 _this.script[key] = scriptData[key];
                             }
                         }
-                        _this.accordion.addContent(feng3d.objectview.getObjectView(_this.script, false));
+                        var scriptView = feng3d.objectview.getObjectView(_this.script, false);
+                        _this.accordion.addContent(scriptView);
+                        scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, _this.saveScriptData, _this);
                     });
                 }
             };
-            ComponentView.prototype.onDeleteButton = function (event) {
-                if (this.component.gameObject)
-                    this.component.gameObject.removeComponent(this.component);
-            };
-            ComponentView.prototype.onRemovedFromStage = function () {
+            ComponentView.prototype.saveScriptData = function () {
                 //保存脚本数据
                 if (this.script) {
                     var component = this.component;
