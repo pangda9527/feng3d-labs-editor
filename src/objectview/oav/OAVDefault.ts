@@ -131,21 +131,24 @@ namespace feng3d.editor
 
 		private onTextChange()
 		{
-			switch (this._attributeType)
+			if (this._textfocusintxt)
 			{
-				case "String":
-					this.attributeValue = this.text.text;
-					break;
-				case "number":
-					var num = Number(this.text.text);
-					num = isNaN(num) ? 0 : num;
-					this.attributeValue = num;
-					break;
-				case "Boolean":
-					this.attributeValue = Boolean(this.text.text);
-					break;
-				default:
-					throw `无法处理类型${this._attributeType}!`;
+				switch (this._attributeType)
+				{
+					case "String":
+						this.attributeValue = this.text.text;
+						break;
+					case "number":
+						var num = Number(this.text.text);
+						num = isNaN(num) ? 0 : num;
+						this.attributeValue = num;
+						break;
+					case "Boolean":
+						this.attributeValue = Boolean(this.text.text);
+						break;
+					default:
+						throw `无法处理类型${this._attributeType}!`;
+				}
 			}
 		}
 	}

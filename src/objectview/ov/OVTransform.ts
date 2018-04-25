@@ -44,34 +44,54 @@ namespace feng3d.editor
 		{
 			this._space.on("transformChanged", this.updateView, this);
 			//
-			this.xTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.yTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.zTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.rxTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.ryTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.rzTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.sxTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.syTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.szTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+			this.updateView();
+
+			[this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach((item) =>
+			{
+				this.addItemEventListener(item);
+			});
 		}
 
 		private onRemovedFromStage()
 		{
 			this._space.off("transformChanged", this.updateView, this);
 			//
-			this.xTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.yTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.zTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.rxTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.ryTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.rzTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.sxTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.syTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.szTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+			[this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach((item) =>
+			{
+				this.removeItemEventListener(item);
+			});
+		}
+
+		private addItemEventListener(input: eui.TextInput)
+		{
+			input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+			input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+			input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+		}
+
+		private removeItemEventListener(input: eui.TextInput)
+		{
+			input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+			input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+			input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+		}
+
+		private _textfocusintxt: boolean;
+		private ontxtfocusin()
+		{
+			this._textfocusintxt = true;
+		}
+
+		private ontxtfocusout()
+		{
+			this._textfocusintxt = false;
+			this.updateView();
 		}
 
 		private onTextChange(event: egret.Event)
 		{
+			if (!this._textfocusintxt) return;
+
 			var transfrom: Transform = <any>this.space;
 			var value = 0;
 			if (event.currentTarget.text != undefined)
@@ -139,6 +159,7 @@ namespace feng3d.editor
 		 */
 		updateView(): void
 		{
+			if (this._textfocusintxt) return;
 			var transfrom: Transform = <any>this.space;
 			if (!transfrom)
 				return;

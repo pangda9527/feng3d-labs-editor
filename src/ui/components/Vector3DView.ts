@@ -2,14 +2,23 @@ namespace feng3d.editor
 {
 	export class Vector3DView extends eui.Component implements eui.UIComponent
 	{
-		vm = new Vector3(1, 2, 3);
-
 		public group: eui.Group;
 		public xTextInput: eui.TextInput;
 		public yTextInput: eui.TextInput;
 		public zTextInput: eui.TextInput;
 		public wGroup: eui.Group;
 		public wTextInput: eui.TextInput;
+
+		get vm()
+		{
+			return this._vm;
+		}
+		set vm(v)
+		{
+			this._vm.copy(v);
+			this.updateView();
+		}
+		private _vm = new Vector3(1, 2, 3);
 
 		constructor()
 		{
@@ -41,23 +50,63 @@ namespace feng3d.editor
 		private onAddedToStage()
 		{
 			this.skin.currentState = this._showw ? "showw" : "default";
+			this.updateView();
 
-			this.xTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.yTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.zTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.wTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+			[this.xTextInput, this.yTextInput, this.zTextInput, this.wTextInput].forEach((item) =>
+			{
+				this.addItemEventListener(item);
+			});
+
 		}
 
 		private onRemovedFromStage()
 		{
-			this.xTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.yTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.zTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			this.wTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+			[this.xTextInput, this.yTextInput, this.zTextInput, this.wTextInput].forEach((item) =>
+			{
+				this.removeItemEventListener(item);
+			});
+		}
+
+		private addItemEventListener(input: eui.TextInput)
+		{
+			input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+			input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+			input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+		}
+
+		private removeItemEventListener(input: eui.TextInput)
+		{
+			input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+			input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+			input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+		}
+
+		private _textfocusintxt: boolean;
+		private ontxtfocusin()
+		{
+			this._textfocusintxt = true;
+		}
+
+		private ontxtfocusout()
+		{
+			this._textfocusintxt = false;
+			this.updateView();
+		}
+
+		updateView()
+		{
+			if (this._textfocusintxt) return;
+			if (!this.xTextInput) return;
+			this.xTextInput.text = "" + this.vm.x;
+			this.yTextInput.text = "" + this.vm.y;
+			this.zTextInput.text = "" + this.vm.z;
+			// this.wTextInput.text = "" + this.vm.w;
 		}
 
 		private onTextChange(event: egret.Event)
 		{
+			if (!this._textfocusintxt) return;
+
 			switch (event.currentTarget)
 			{
 				case this.xTextInput:

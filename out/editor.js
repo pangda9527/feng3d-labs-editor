@@ -1620,12 +1620,23 @@ var feng3d;
             __extends(Vector3DView, _super);
             function Vector3DView() {
                 var _this = _super.call(this) || this;
-                _this.vm = new feng3d.Vector3(1, 2, 3);
+                _this._vm = new feng3d.Vector3(1, 2, 3);
                 _this._showw = false;
                 _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "Vector3DViewSkin";
                 return _this;
             }
+            Object.defineProperty(Vector3DView.prototype, "vm", {
+                get: function () {
+                    return this._vm;
+                },
+                set: function (v) {
+                    this._vm.copy(v);
+                    this.updateView();
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(Vector3DView.prototype, "showw", {
                 set: function (value) {
                     if (this._showw == value)
@@ -1644,19 +1655,49 @@ var feng3d;
                 }
             };
             Vector3DView.prototype.onAddedToStage = function () {
+                var _this = this;
                 this.skin.currentState = this._showw ? "showw" : "default";
-                this.xTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.yTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.zTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.wTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+                this.updateView();
+                [this.xTextInput, this.yTextInput, this.zTextInput, this.wTextInput].forEach(function (item) {
+                    _this.addItemEventListener(item);
+                });
             };
             Vector3DView.prototype.onRemovedFromStage = function () {
-                this.xTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.yTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.zTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.wTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+                var _this = this;
+                [this.xTextInput, this.yTextInput, this.zTextInput, this.wTextInput].forEach(function (item) {
+                    _this.removeItemEventListener(item);
+                });
+            };
+            Vector3DView.prototype.addItemEventListener = function (input) {
+                input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+                input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            };
+            Vector3DView.prototype.removeItemEventListener = function (input) {
+                input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+                input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            };
+            Vector3DView.prototype.ontxtfocusin = function () {
+                this._textfocusintxt = true;
+            };
+            Vector3DView.prototype.ontxtfocusout = function () {
+                this._textfocusintxt = false;
+                this.updateView();
+            };
+            Vector3DView.prototype.updateView = function () {
+                if (this._textfocusintxt)
+                    return;
+                if (!this.xTextInput)
+                    return;
+                this.xTextInput.text = "" + this.vm.x;
+                this.yTextInput.text = "" + this.vm.y;
+                this.zTextInput.text = "" + this.vm.z;
+                // this.wTextInput.text = "" + this.vm.w;
             };
             Vector3DView.prototype.onTextChange = function (event) {
+                if (!this._textfocusintxt)
+                    return;
                 switch (event.currentTarget) {
                     case this.xTextInput:
                         this.vm.x = Number(this.xTextInput.text);
@@ -2138,32 +2179,42 @@ var feng3d;
                 this.updateView();
             };
             OVTransform.prototype.onAddedToStage = function () {
+                var _this = this;
                 this._space.on("transformChanged", this.updateView, this);
                 //
-                this.xTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.yTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.zTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.rxTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.ryTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.rzTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.sxTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.syTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.szTextInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+                this.updateView();
+                [this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach(function (item) {
+                    _this.addItemEventListener(item);
+                });
             };
             OVTransform.prototype.onRemovedFromStage = function () {
+                var _this = this;
                 this._space.off("transformChanged", this.updateView, this);
                 //
-                this.xTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.yTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.zTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.rxTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.ryTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.rzTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.sxTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.syTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.szTextInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+                [this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach(function (item) {
+                    _this.removeItemEventListener(item);
+                });
+            };
+            OVTransform.prototype.addItemEventListener = function (input) {
+                input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+                input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            };
+            OVTransform.prototype.removeItemEventListener = function (input) {
+                input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+                input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            };
+            OVTransform.prototype.ontxtfocusin = function () {
+                this._textfocusintxt = true;
+            };
+            OVTransform.prototype.ontxtfocusout = function () {
+                this._textfocusintxt = false;
+                this.updateView();
             };
             OVTransform.prototype.onTextChange = function (event) {
+                if (!this._textfocusintxt)
+                    return;
                 var transfrom = this.space;
                 var value = 0;
                 if (event.currentTarget.text != undefined) {
@@ -2225,6 +2276,8 @@ var feng3d;
              * 更新界面
              */
             OVTransform.prototype.updateView = function () {
+                if (this._textfocusintxt)
+                    return;
                 var transfrom = this.space;
                 if (!transfrom)
                     return;
@@ -2525,20 +2578,22 @@ var feng3d;
                 editor.editorui.inspectorView.showData(this.attributeValue);
             };
             OAVDefault.prototype.onTextChange = function () {
-                switch (this._attributeType) {
-                    case "String":
-                        this.attributeValue = this.text.text;
-                        break;
-                    case "number":
-                        var num = Number(this.text.text);
-                        num = isNaN(num) ? 0 : num;
-                        this.attributeValue = num;
-                        break;
-                    case "Boolean":
-                        this.attributeValue = Boolean(this.text.text);
-                        break;
-                    default:
-                        throw "\u65E0\u6CD5\u5904\u7406\u7C7B\u578B" + this._attributeType + "!";
+                if (this._textfocusintxt) {
+                    switch (this._attributeType) {
+                        case "String":
+                            this.attributeValue = this.text.text;
+                            break;
+                        case "number":
+                            var num = Number(this.text.text);
+                            num = isNaN(num) ? 0 : num;
+                            this.attributeValue = num;
+                            break;
+                        case "Boolean":
+                            this.attributeValue = Boolean(this.text.text);
+                            break;
+                        default:
+                            throw "\u65E0\u6CD5\u5904\u7406\u7C7B\u578B" + this._attributeType + "!";
+                    }
                 }
             };
             OAVDefault = __decorate([
