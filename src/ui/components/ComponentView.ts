@@ -51,7 +51,7 @@ namespace feng3d.editor
 				var component = this.component;
 				ScriptComponent.addScript(component.url, (scriptClass) =>
 				{
-					this.script = new scriptClass(new ScriptComponent(), false);
+					this.script = new scriptClass();
 					var scriptData = component.scriptData = component.scriptData || {};
 					for (const key in scriptData)
 					{
@@ -60,7 +60,7 @@ namespace feng3d.editor
 							this.script[key] = scriptData[key];
 						}
 					}
-					this.accordion.addContent(objectview.getObjectView(this.script));
+					this.accordion.addContent(objectview.getObjectView(this.script, false));
 				});
 			}
 		}
@@ -78,7 +78,7 @@ namespace feng3d.editor
 			{
 				var component: ScriptComponent = <ScriptComponent>this.component;
 				var scriptData = component.scriptData || {};
-				var objectAttributeInfos = objectview.getObjectInfo(this.script).objectAttributeInfos;
+				var objectAttributeInfos = objectview.getObjectInfo(this.script, false).objectAttributeInfos;
 				for (let i = 0; i < objectAttributeInfos.length; i++)
 				{
 					const element = objectAttributeInfos[i];

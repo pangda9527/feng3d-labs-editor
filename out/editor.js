@@ -1656,14 +1656,14 @@ var feng3d;
                 if (this.component instanceof feng3d.ScriptComponent) {
                     var component = this.component;
                     feng3d.ScriptComponent.addScript(component.url, function (scriptClass) {
-                        _this.script = new scriptClass(new feng3d.ScriptComponent(), false);
+                        _this.script = new scriptClass();
                         var scriptData = component.scriptData = component.scriptData || {};
                         for (var key in scriptData) {
                             if (scriptData.hasOwnProperty(key)) {
                                 _this.script[key] = scriptData[key];
                             }
                         }
-                        _this.accordion.addContent(feng3d.objectview.getObjectView(_this.script));
+                        _this.accordion.addContent(feng3d.objectview.getObjectView(_this.script, false));
                     });
                 }
             };
@@ -1676,7 +1676,7 @@ var feng3d;
                 if (this.script) {
                     var component = this.component;
                     var scriptData = component.scriptData || {};
-                    var objectAttributeInfos = feng3d.objectview.getObjectInfo(this.script).objectAttributeInfos;
+                    var objectAttributeInfos = feng3d.objectview.getObjectInfo(this.script, false).objectAttributeInfos;
                     for (var i = 0; i < objectAttributeInfos.length; i++) {
                         var element = objectAttributeInfos[i];
                         scriptData[element.name] = this.script[element.name];
