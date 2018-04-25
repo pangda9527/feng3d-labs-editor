@@ -1,6 +1,8 @@
 /// <reference path="libs/feng3d.d.ts" />
 /// <reference path="libs/monaco-editor/monaco.d.ts" />
 
+// 参考 https://microsoft.github.io/monaco-editor/api/index.html
+
 var editor;
 (function ()
 {
@@ -80,6 +82,8 @@ var editor;
 
                     feng3ddts = response.responseText;
                     monaco.languages.typescript.typescriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
+                    // typescript.format.placeOpenBraceOnNewLineForFunctions
+
                     editor = monaco.editor.create(document.getElementById('container'), {
                         value: "",
                         language: 'typescript',
@@ -217,5 +221,27 @@ var editor;
                 req._canceled = true;
                 req.abort();
             });
+    }
+
+
+    layout();
+    window.onresize = layout;
+
+
+    function layout()
+    {
+        var GLOBAL_PADDING = 20;
+
+        var WIDTH = window.innerWidth - 2 * GLOBAL_PADDING;
+        var HEIGHT = window.innerHeight - 2 * GLOBAL_PADDING;
+
+        var editorContainer = document.getElementById('container')
+
+        editorContainer.style.position = 'absolute';
+        editorContainer.style.boxSizing = 'border-box';
+        editorContainer.style.top = GLOBAL_PADDING + 'px';
+        editorContainer.style.left = GLOBAL_PADDING + 'px';
+        editorContainer.style.width = WIDTH + 'px';
+        editorContainer.style.height = HEIGHT + 'px';
     }
 })();
