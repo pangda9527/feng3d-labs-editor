@@ -158,6 +158,7 @@ namespace feng3d.editor
                                 label: "Script", click: () =>
                                 {
                                     assetsFile.addfile("NewScript.ts", assetsFileTemplates.NewScript);
+                                    assetsFile.addfile("NewScript.js", assetsFileTemplates.scriptCompile);
                                 }
                             },
                             {
