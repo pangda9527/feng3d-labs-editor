@@ -3615,12 +3615,14 @@ var feng3d;
             AssetExtension["anim"] = "anim";
             AssetExtension["png"] = "png";
             AssetExtension["jpg"] = "jpg";
+            AssetExtension["jpeg"] = "jpeg";
             AssetExtension["ts"] = "ts";
             AssetExtension["js"] = "js";
             AssetExtension["txt"] = "txt";
             AssetExtension["json"] = "json";
             AssetExtension["scene"] = "scene";
         })(AssetExtension = editor.AssetExtension || (editor.AssetExtension = {}));
+        var imageReg = /(.jpg|.png|.jpeg)\b/;
         var AssetsFile = /** @class */ (function (_super) {
             __extends(AssetsFile, _super);
             function AssetsFile(fileinfo, data) {
@@ -3658,7 +3660,7 @@ var feng3d;
                         _this.image = "file_png";
                     }
                 }
-                if (/(.jpg|.png)\b/.test(fileinfo.path)) {
+                if (imageReg.test(fileinfo.path)) {
                     _this.getData(function (data) {
                         _this.image = data;
                     });
@@ -3822,7 +3824,9 @@ var feng3d;
                     });
                     return;
                 }
-                if (this.extension == AssetExtension.png || this.extension == AssetExtension.jpg) {
+                if (this.extension == AssetExtension.png
+                    || this.extension == AssetExtension.jpg
+                    || this.extension == AssetExtension.jpeg) {
                     editor.fs.readFile(this._path, function (err, data) {
                         feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                             _this._data = dataurl;
@@ -4089,7 +4093,7 @@ var feng3d;
                             callback(uint8Array, saveContent);
                         });
                     }
-                    else if (/(\.jpg\b|\.png\b)/.test(filename)) {
+                    else if (imageReg.test(filename)) {
                         feng3d.dataTransform.arrayBufferToDataURL(content, function (datarul) {
                             callback(content, datarul);
                         });
@@ -5179,6 +5183,7 @@ var feng3d;
             return EditorData;
         }());
         editor.EditorData = EditorData;
+        editor.editorData = new EditorData();
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -10300,8 +10305,6 @@ var feng3d;
                 return _this;
             }
             Editor.prototype.init = function () {
-                //
-                editor.editorData = new editor.EditorData();
                 document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editor.editorAssets.projectPath;
                 feng3d.runEnvironment = feng3d.RunEnvironment.editor;
                 //

@@ -9,6 +9,7 @@ namespace feng3d.editor
         anim = "anim",
         png = "png",
         jpg = "jpg",
+        jpeg = "jpeg",
         ts = "ts",
         js = "js",
         txt = "txt",
@@ -16,6 +17,7 @@ namespace feng3d.editor
         scene = "scene",
     }
 
+    var imageReg = /(.jpg|.png|.jpeg)\b/;
     export class AssetsFile extends TreeNode
     {
         /**
@@ -168,7 +170,7 @@ namespace feng3d.editor
                     this.image = "file_png";
                 }
             }
-            if (/(.jpg|.png)\b/.test(fileinfo.path))
+            if (imageReg.test(fileinfo.path))
             {
                 this.getData((data) =>
                 {
@@ -220,7 +222,10 @@ namespace feng3d.editor
                 });
                 return;
             }
-            if (this.extension == AssetExtension.png || this.extension == AssetExtension.jpg)
+            if (this.extension == AssetExtension.png
+                || this.extension == AssetExtension.jpg
+                || this.extension == AssetExtension.jpeg
+            )
             {
                 fs.readFile(this._path, (err, data) =>
                 {
@@ -561,7 +566,7 @@ namespace feng3d.editor
                     {
                         callback(uint8Array, saveContent);
                     });
-                } else if (/(\.jpg\b|\.png\b)/.test(filename))
+                } else if (imageReg.test(filename))
                 {
                     dataTransform.arrayBufferToDataURL(<ArrayBuffer>content, (datarul) =>
                     {

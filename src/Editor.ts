@@ -47,8 +47,6 @@ namespace feng3d.editor
 
         private init()
         {
-            //
-            editorData = new EditorData();
 
             document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorAssets.projectPath;
 

@@ -1,5 +1,11 @@
 namespace feng3d.editor
 {
+
+    /**
+     * 编辑器数据
+     */
+    export var editorData: EditorData;
+
     /**
      * 编辑器数据
      */
@@ -136,5 +142,5 @@ namespace feng3d.editor
         }
     }
 
-    export var editorData: EditorData;
+    editorData = new EditorData();
 }
