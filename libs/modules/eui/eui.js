@@ -2576,7 +2576,9 @@ var eui;
             if (target || this.$Group[5 /* touchThrough */]) {
                 return target;
             }
-            if (!this.$visible || !this.touchEnabled) {
+            //Bug: 当 group.sacleX or scaleY ==0 的时候，随便点击那里都点击成功
+            //虽然 super.$hitTest里面检测过一次 宽高大小，但是没有直接退出这个函数，所以要再判断一次;（width,height可以不判断）
+            if (!this.$visible || !this.touchEnabled || this.scaleX === 0 || this.scaleY === 0 || this.width === 0 || this.height === 0) {
                 return null;
             }
             var point = this.globalToLocal(stageX, stageY, egret.$TempPoint);
@@ -4555,7 +4557,7 @@ var eui;
          */
         DataGroup.prototype.measureRendererSize = function () {
             var values = this.$DataGroup;
-            if (!values[12 /* typicalItem */]) {
+            if (values[12 /* typicalItem */] == undefined) {
                 this.setTypicalLayoutRect(null);
                 return;
             }
@@ -16696,7 +16698,7 @@ var eui;
                 if (isEnded && this.endFunction) {
                     this.endFunction.call(this.thisObject, this);
                 }
-                return false;
+                return true;
             };
             return Animation;
         }());
@@ -18997,6 +18999,10 @@ var eui;
             if (data.styles) {
                 this.$styles = data.styles;
             }
+            var paths = data.paths;
+            for (var path in paths) {
+                window[path] = EXML.update(path, paths[path]);
+            }
             if (!data.exmls || data.exmls.length == 0) {
                 this.onLoaded();
             }
@@ -20813,14 +20819,17 @@ var eui;
             var font = this.$font;
             if (typeof font == "string") {
                 eui.getAssets(font, function (bitmapFont) {
-                    _this.$setFontData(bitmapFont);
+                    _this.$setFontData(bitmapFont, font);
                 });
             }
             else {
                 this.$setFontData(font);
             }
         };
-        BitmapLabel.prototype.$setFontData = function (value) {
+        BitmapLabel.prototype.$setFontData = function (value, font) {
+            if (font && font != this.$font) {
+                return;
+            }
             if (value == this.$BitmapText[5 /* font */]) {
                 return false;
             }
@@ -21212,6 +21221,18 @@ var EXML;
         });
         callBack && callBack.call(thisObject, clazzes, urls);
     }
+    function update(url, clazz) {
+        parsedClasses[url] = clazz;
+        var list = callBackMap[url];
+        delete callBackMap[url];
+        var length = list ? list.length : 0;
+        for (var i = 0; i < length; i++) {
+            var arr = list[i];
+            if (arr[0] && arr[1])
+                arr[0].call(arr[1], clazz, url);
+        }
+    }
+    EXML.update = update;
     /**
      * @private
      * @param url
@@ -21221,19 +21242,8 @@ var EXML;
         var clazz = null;
         if (text) {
             clazz = parser.$parseCode(text, className);
+            update(url, clazz);
         }
-        if (url) {
-            parsedClasses[url] = clazz;
-            var list = callBackMap[url];
-            delete callBackMap[url];
-            var length_30 = list ? list.length : 0;
-            for (var i = 0; i < length_30; i++) {
-                var arr = list[i];
-                if (arr[0] && arr[1])
-                    arr[0].call(arr[1], clazz, url);
-            }
-        }
-        return clazz;
     }
     EXML.$parseURLContentAsJs = $parseURLContentAsJs;
     /**
@@ -21255,8 +21265,8 @@ var EXML;
             }
             var list = callBackMap[url];
             delete callBackMap[url];
-            var length_31 = list ? list.length : 0;
-            for (var i = 0; i < length_31; i++) {
+            var length_30 = list ? list.length : 0;
+            for (var i = 0; i < length_30; i++) {
                 var arr = list[i];
                 if (arr[0] && arr[1])
                     arr[0].call(arr[1], clazz, url);
@@ -22248,8 +22258,8 @@ var eui;
                 if (totalPercentWidth > 0) {
                     this.flexChildrenProportionally(targetWidth, widthToDistribute, totalPercentWidth, childInfoArray);
                     var roundOff_1 = 0;
-                    var length_32 = childInfoArray.length;
-                    for (i = 0; i < length_32; i++) {
+                    var length_31 = childInfoArray.length;
+                    for (i = 0; i < length_31; i++) {
                         childInfo = childInfoArray[i];
                         var childSize = Math.round(childInfo.size + roundOff_1);
                         roundOff_1 += childInfo.size - childSize;
@@ -24322,8 +24332,8 @@ var eui;
                 if (totalPercentHeight > 0) {
                     this.flexChildrenProportionally(targetHeight, heightToDistribute, totalPercentHeight, childInfoArray);
                     var roundOff_2 = 0;
-                    var length_33 = childInfoArray.length;
-                    for (i = 0; i < length_33; i++) {
+                    var length_32 = childInfoArray.length;
+                    for (i = 0; i < length_32; i++) {
                         childInfo = childInfoArray[i];
                         var childSize = Math.round(childInfo.size + roundOff_2);
                         roundOff_2 += childInfo.size - childSize;

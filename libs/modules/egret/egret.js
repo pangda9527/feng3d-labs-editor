@@ -3913,7 +3913,15 @@ var egret;
             var xMin = 0, xMax = 0, yMin = 0, yMax = 0;
             var found = false;
             for (var i = -1; i < length; i++) {
-                var childBounds = i == -1 ? bounds : children[i].$getTransformedBounds(this, egret.$TempRectangle);
+                var childBounds = void 0;
+                if (i == -1) {
+                    childBounds = bounds;
+                }
+                else {
+                    children[i].getBounds(egret.$TempRectangle);
+                    children[i].$getMatrix().$transformBounds(egret.$TempRectangle);
+                    childBounds = egret.$TempRectangle;
+                }
                 if (childBounds.isEmpty()) {
                     continue;
                 }
@@ -7489,7 +7497,7 @@ var egret;
         }
         var text = egret.sys.tr.apply(null, arguments);
         if (true) {
-            egret.sys.$logToFPS("Error #" + code + ": " + text);
+            egret.sys.$errorToFPS("Error #" + code + ": " + text);
         }
         throw new Error("#" + code + ": " + text); //使用这种方式报错能够终止后续代码继续运行
     }
@@ -7501,7 +7509,7 @@ var egret;
         }
         var text = egret.sys.tr.apply(null, arguments);
         if (true) {
-            egret.sys.$logToFPS("Warning #" + code + ": " + text);
+            egret.sys.$warnToFPS("Warning #" + code + ": " + text);
         }
         egret.warn("Warning #" + code + ": " + text);
     }
@@ -9156,7 +9164,7 @@ var egret;
             var tempList = BitmapData._displayList[hashCode];
             var index = tempList.indexOf(displayObject);
             if (index >= 0) {
-                tempList.splice(index);
+                tempList.splice(index, 1);
             }
         };
         BitmapData.$invalidate = function (bitmapData) {
@@ -11850,8 +11858,8 @@ var egret;
          */
         Matrix.prototype.$getScaleX = function () {
             var m = this;
-            if (m.a == 1 && m.b == 0) {
-                return 1;
+            if (m.b == 0) {
+                return m.a;
             }
             var result = Math.sqrt(m.a * m.a + m.b * m.b);
             return this.getDeterminant() < 0 ? -result : result;
@@ -11861,8 +11869,8 @@ var egret;
          */
         Matrix.prototype.$getScaleY = function () {
             var m = this;
-            if (m.c == 0 && m.d == 1) {
-                return 1;
+            if (m.c == 0) {
+                return m.d;
             }
             var result = Math.sqrt(m.c * m.c + m.d * m.d);
             return this.getDeterminant() < 0 ? -result : result;
@@ -11871,13 +11879,23 @@ var egret;
          * @private
          */
         Matrix.prototype.$getSkewX = function () {
-            return Math.atan2(this.d, this.c) - (PI / 2);
+            if (this.d < 0) {
+                return Math.atan2(this.d, this.c) + (PI / 2);
+            }
+            else {
+                return Math.atan2(this.d, this.c) - (PI / 2);
+            }
         };
         /**
          * @private
          */
         Matrix.prototype.$getSkewY = function () {
-            return Math.atan2(this.b, this.a);
+            if (this.a < 0) {
+                return Math.atan2(this.b, this.a) - PI;
+            }
+            else {
+                return Math.atan2(this.b, this.a);
+            }
         };
         /**
          * @private
@@ -13675,15 +13693,31 @@ var egret;
         }(egret.HashObject));
         sys.Player = Player;
         __reflect(Player.prototype, "egret.sys.Player");
-        var infoLines = [];
+        var logLines = [];
+        var warnLines = [];
+        var errorLines = [];
         var fpsDisplay;
         var fpsStyle;
         sys.$logToFPS = function (info) {
             if (!fpsDisplay) {
-                infoLines.push(info);
+                logLines.push(info);
                 return;
             }
             fpsDisplay.updateInfo(info);
+        };
+        sys.$warnToFPS = function (info) {
+            if (!fpsDisplay) {
+                warnLines.push(info);
+                return;
+            }
+            fpsDisplay.updateWarn(info);
+        };
+        sys.$errorToFPS = function (info) {
+            if (!fpsDisplay) {
+                errorLines.push(info);
+                return;
+            }
+            fpsDisplay.updateError(info);
         };
         function displayFPS(showFPS, showLog, logFilter, styles) {
             if (showLog) {
@@ -13696,6 +13730,24 @@ var egret;
                     sys.$logToFPS(info);
                     console.log.apply(console, toArray(arguments));
                 };
+                egret.warn = function () {
+                    var length = arguments.length;
+                    var info = "";
+                    for (var i = 0; i < length; i++) {
+                        info += arguments[i] + " ";
+                    }
+                    sys.$warnToFPS(info);
+                    console.warn.apply(console, toArray(arguments));
+                };
+                egret.error = function () {
+                    var length = arguments.length;
+                    var info = "";
+                    for (var i = 0; i < length; i++) {
+                        info += arguments[i] + " ";
+                    }
+                    sys.$errorToFPS(info);
+                    console.error.apply(console, toArray(arguments));
+                };
             }
             fpsStyle = styles ? {} : styles;
             showLog = !!showLog;
@@ -13707,11 +13759,21 @@ var egret;
                 fpsDisplay = this.fps = new FPS(this.stage, showFPS, showLog, logFilter, styles);
                 fpsDisplay.x = x;
                 fpsDisplay.y = y;
-                var length_5 = infoLines.length;
-                for (var i = 0; i < length_5; i++) {
-                    fpsDisplay.updateInfo(infoLines[i]);
+                var logLength = logLines.length;
+                for (var i = 0; i < logLength; i++) {
+                    fpsDisplay.updateInfo(logLines[i]);
                 }
-                infoLines = null;
+                logLines = null;
+                var warnLength = warnLines.length;
+                for (var i = 0; i < warnLength; i++) {
+                    fpsDisplay.updateWarn(warnLines[i]);
+                }
+                warnLines = null;
+                var errorLength = errorLines.length;
+                for (var i = 0; i < errorLength; i++) {
+                    fpsDisplay.updateError(errorLines[i]);
+                }
+                errorLines = null;
             }
         }
         function showPaintRect(value) {
@@ -13865,6 +13927,40 @@ var egret;
                     return;
                 }
                 this.fpsDisplay.updateInfo(info);
+            };
+            FPSImpl.prototype.updateWarn = function (info) {
+                if (!info) {
+                    return;
+                }
+                if (!this.showLog) {
+                    return;
+                }
+                if (!this.filter(info)) {
+                    return;
+                }
+                if (this.fpsDisplay.updateWarn) {
+                    this.fpsDisplay.updateWarn(info);
+                }
+                else {
+                    this.fpsDisplay.updateInfo("[Warning]" + info);
+                }
+            };
+            FPSImpl.prototype.updateError = function (info) {
+                if (!info) {
+                    return;
+                }
+                if (!this.showLog) {
+                    return;
+                }
+                if (!this.filter(info)) {
+                    return;
+                }
+                if (this.fpsDisplay.updateError) {
+                    this.fpsDisplay.updateError(info);
+                }
+                else {
+                    this.fpsDisplay.updateInfo("[Error]" + info);
+                }
             };
             return FPSImpl;
         })(egret.Sprite);
@@ -14956,8 +15052,8 @@ var egret;
                     egret.$callLaterArgsList = [];
                 }
                 if (functionList) {
-                    var length_6 = functionList.length;
-                    for (var i = 0; i < length_6; i++) {
+                    var length_5 = functionList.length;
+                    for (var i = 0; i < length_5; i++) {
                         var func = functionList[i];
                         if (func != null) {
                             func.apply(thisList[i], argsList[i]);
@@ -15484,6 +15580,7 @@ var egret;
                 else {
                     this.drawData.push(path);
                 }
+                this.renderCount++;
                 return path;
             };
             /**
@@ -15524,6 +15621,7 @@ var egret;
                 else {
                     this.drawData.push(path);
                 }
+                this.renderCount++;
                 return path;
             };
             /**
@@ -15552,6 +15650,7 @@ var egret;
                 path.joints = joints;
                 path.miterLimit = miterLimit;
                 this.drawData.push(path);
+                this.renderCount++;
                 return path;
             };
             /**
@@ -15560,6 +15659,7 @@ var egret;
             GraphicsNode.prototype.clear = function () {
                 this.drawData.length = 0;
                 this.dirtyRender = true;
+                this.renderCount = 0;
             };
             /**
              * 覆盖父类方法，不自动清空缓存的绘图数据，改为手动调用clear()方法清空。
@@ -16401,8 +16501,8 @@ var egret;
                 if (renderBufferPool.length > 6) {
                     renderBufferPool.length = 6;
                 }
-                var length_7 = renderBufferPool.length;
-                for (var i = 0; i < length_7; i++) {
+                var length_6 = renderBufferPool.length;
+                for (var i = 0; i < length_6; i++) {
                     renderBufferPool[i].resize(0, 0);
                 }
                 if (renderBufferPool_Filters.length > 1) {
@@ -16493,8 +16593,8 @@ var egret;
             }
             var children = displayObject.$children;
             if (children) {
-                var length_8 = children.length;
-                for (var i = 0; i < length_8; i++) {
+                var length_7 = children.length;
+                for (var i = 0; i < length_7; i++) {
                     var child = children[i];
                     if (!child.$visible || child.$alpha <= 0 || child.$maskedObject) {
                         continue;
@@ -16526,6 +16626,9 @@ var egret;
          * @private
          */
         CanvasRenderer.prototype.drawWithFilter = function (displayObject, context, dirtyList, matrix, clipRegion, root) {
+            if (displayObject.$children && displayObject.$children.length == 0 && (!displayObject.$renderNode || displayObject.$renderNode.$getRenderCount() == 0)) {
+                return 0;
+            }
             if (egret.Capabilities.runtimeType == egret.RuntimeType.NATIVE) {
                 var drawCalls_1 = 0;
                 var filters_1 = displayObject.$getFilters();
@@ -18085,7 +18188,7 @@ var egret;
              * @language zh_CN
              */
             get: function () {
-                return "5.0.14";
+                return "5.0.15";
             },
             enumerable: true,
             configurable: true
@@ -18545,7 +18648,7 @@ var egret;
          */
         BitmapFont.prototype.getConfigByKey = function (configText, key) {
             var itemConfigTextList = configText.split(" ");
-            for (var i = 0, length_9 = itemConfigTextList.length; i < length_9; i++) {
+            for (var i = 0, length_8 = itemConfigTextList.length; i < length_8; i++) {
                 var itemConfigText = itemConfigTextList[i];
                 if (key == itemConfigText.substring(0, key.length)) {
                     var value = itemConfigText.substring(key.length + 1);
@@ -19049,6 +19152,8 @@ var egret;
             var lineHeights = [];
             this.$lineHeights = lineHeights;
             if (!values[2 /* text */] || !values[5 /* font */]) {
+                values[8 /* textWidth */] = 0;
+                values[9 /* textHeight */] = 0;
                 return textLines;
             }
             var lineSpacing = values[3 /* lineSpacing */];
@@ -21220,8 +21325,8 @@ var egret;
                 if (lines && lines.length > 0) {
                     var textColor = values[2 /* textColor */];
                     var lastColor = -1;
-                    var length_10 = lines.length;
-                    for (var i = 0; i < length_10; i += 4) {
+                    var length_9 = lines.length;
+                    for (var i = 0; i < length_9; i += 4) {
                         var x = lines[i];
                         var y = lines[i + 1];
                         var w = lines[i + 2];
@@ -22986,7 +23091,10 @@ var egret;
                 egret.$error(1025);
                 return;
             }
+            var position = bytes._position;
+            bytes._position = 0;
             bytes.validateBuffer(offset + length);
+            bytes._position = position;
             bytes._bytes.set(this._bytes.subarray(pos, pos + length), offset);
             this.position += length;
         };
@@ -23956,8 +24064,8 @@ var egret;
         }
         var superTypes = prototype.__types__;
         if (prototype.__types__) {
-            var length_11 = superTypes.length;
-            for (var i = 0; i < length_11; i++) {
+            var length_10 = superTypes.length;
+            for (var i = 0; i < length_10; i++) {
                 var name_1 = superTypes[i];
                 if (types.indexOf(name_1) == -1) {
                     types.push(name_1);

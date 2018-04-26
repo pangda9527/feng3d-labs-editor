@@ -117,7 +117,7 @@ namespace feng3d.editor
                 || this.data.extension == AssetExtension.txt
             )
             {
-                var url = `codeeditor.html?fstype=${fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${this.data.path}&extension=${this.data.extension}`;
+                var url = `codeeditor.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${this.data.path}&extension=${this.data.extension}`;
                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                 window.open(url);
             } else if (this.data.extension == AssetExtension.json
@@ -127,7 +127,7 @@ namespace feng3d.editor
                 || this.data.extension == AssetExtension.anim
             )
             {
-                var url = `codeeditor.html?fstype=${fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${this.data.path}&extension=${AssetExtension.json}`;
+                var url = `codeeditor.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${this.data.path}&extension=${AssetExtension.json}`;
                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                 window.open(url);
             }

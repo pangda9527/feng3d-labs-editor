@@ -9,8 +9,6 @@ namespace feng3d.editor
 	{
 		public label: eui.Label;
 		public text: eui.TextInput;
-		//
-		private textTemp: string;
 
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
@@ -48,13 +46,11 @@ namespace feng3d.editor
 		{
 			this.text.percentWidth = 100;
 			this.label.text = this._attributeName;
-			this.updateView();
 		}
 
 		$onAddToStage(stage: egret.Stage, nestLevel: number)
 		{
 			super.$onAddToStage(stage, nestLevel);
-			this.addEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
 			this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
 			this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
 			this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -69,12 +65,12 @@ namespace feng3d.editor
 					}
 				}
 			}
+			this.updateView();
 		}
 
 		$onRemoveFromStage()
 		{
 			super.$onRemoveFromStage()
-			this.removeEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
 			this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
 			this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
 			this.text.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -90,14 +86,6 @@ namespace feng3d.editor
 		private ontxtfocusout()
 		{
 			this._textfocusintxt = false;
-		}
-
-		private onEnterFrame()
-		{
-			if (this._textfocusintxt)
-				return;
-
-			this.updateView();
 		}
 
 		/**

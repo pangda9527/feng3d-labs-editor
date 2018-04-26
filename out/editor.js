@@ -350,11 +350,11 @@ var feng3d;
     (function (editor) {
         if (typeof require == "undefined") {
             editor.fs = feng3d.indexedDBfs;
-            feng3d.fstype = feng3d.FSType.indexedDB;
+            feng3d.assets.fstype = feng3d.FSType.indexedDB;
         }
         else {
             editor.fs = require(__dirname + "/io/file.js").file;
-            feng3d.fstype = feng3d.FSType.native;
+            feng3d.assets.fstype = feng3d.FSType.native;
         }
         (function () {
             /**
@@ -2536,11 +2536,9 @@ var feng3d;
             OAVDefault.prototype.onComplete = function () {
                 this.text.percentWidth = 100;
                 this.label.text = this._attributeName;
-                this.updateView();
             };
             OAVDefault.prototype.$onAddToStage = function (stage, nestLevel) {
                 _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-                this.addEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
                 this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
                 this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -2551,10 +2549,10 @@ var feng3d;
                         }
                     }
                 }
+                this.updateView();
             };
             OAVDefault.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
-                this.removeEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
                 this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
                 this.text.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -2565,11 +2563,6 @@ var feng3d;
             };
             OAVDefault.prototype.ontxtfocusout = function () {
                 this._textfocusintxt = false;
-            };
-            OAVDefault.prototype.onEnterFrame = function () {
-                if (this._textfocusintxt)
-                    return;
-                this.updateView();
             };
             /**
              * 更新界面
@@ -4246,7 +4239,7 @@ var feng3d;
                 else if (this.data.extension == editor.AssetExtension.ts
                     || this.data.extension == editor.AssetExtension.js
                     || this.data.extension == editor.AssetExtension.txt) {
-                    var url = "codeeditor.html?fstype=" + feng3d.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path + "&extension=" + this.data.extension;
+                    var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path + "&extension=" + this.data.extension;
                     url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                     window.open(url);
                 }
@@ -4255,7 +4248,7 @@ var feng3d;
                     || this.data.extension == editor.AssetExtension.gameobject
                     || this.data.extension == editor.AssetExtension.geometry
                     || this.data.extension == editor.AssetExtension.anim) {
-                    var url = "codeeditor.html?fstype=" + feng3d.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path + "&extension=" + editor.AssetExtension.json;
+                    var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path + "&extension=" + editor.AssetExtension.json;
                     url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                     window.open(url);
                 }
@@ -4691,7 +4684,7 @@ var feng3d;
                                 return;
                             }
                             if (editor.fs == feng3d.indexedDBfs) {
-                                window.open("run.html?fstype=" + feng3d.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorAssets.projectPath);
+                                window.open("run.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorAssets.projectPath);
                                 return;
                             }
                             editor.fs.getAbsolutePath("index.html", function (err, path) {
@@ -9221,14 +9214,6 @@ var feng3d;
                 feng3d.ClassUtils.addClassNameSpace("egret");
                 //调整默认字体大小
                 egret.TextField.default_size = 12;
-                //解决TextInput.text绑定Number是不显示0的bug
-                var p = eui.TextInput.prototype;
-                var old = p["textDisplayAdded"];
-                p["textDisplayAdded"] = function () {
-                    old.call(this);
-                    var values = this.$TextInput;
-                    this.textDisplay.text = String(values[6 /* text */]);
-                };
                 var oldfocusHandler = egret.InputController.prototype["focusHandler"];
                 egret.InputController.prototype["focusHandler"] = function (event) {
                     oldfocusHandler.call(this, event);
