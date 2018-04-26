@@ -60,7 +60,7 @@ namespace feng3d.editor
             // initialize the Resource loading library
             //初始化Resource资源加载库
             RES.addEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
-            RES.loadConfig(editorAssetsRoot + "/default.res.json", editorAssetsRoot + "/");
+            RES.loadConfig("./resource/default.res.json", "./resource/");
         }
         /**
          * 配置文件加载完成,开始预加载皮肤主题资源和preload资源组。
@@ -71,7 +71,7 @@ namespace feng3d.editor
             RES.removeEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
             // load skin theme configuration file, you can manually modify the file. And replace the default skin.
             //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
-            let theme = new eui.Theme(editorAssetsRoot + "/default.thm.json", this.stage);
+            let theme = new eui.Theme("./resource/default.thm.json", this.stage);
             theme.once(eui.UIEvent.COMPLETE, this.onThemeLoadComplete, this);
 
             RES.addEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);

@@ -365,7 +365,7 @@ var feng3d;
                     //
                     var zip = new JSZip();
                     var request = new XMLHttpRequest();
-                    request.open('Get', editor.editorAssetsRoot + "/templates/template.zip", true);
+                    request.open('Get', editor.editorData.getEditorAssetsPath("/templates/template.zip"), true);
                     request.responseType = "arraybuffer";
                     request.onload = function (ev) {
                         zip.loadAsync(request.response).then(function () {
@@ -4913,7 +4913,7 @@ var feng3d;
                 // initialize the Resource loading library
                 //初始化Resource资源加载库
                 RES.addEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
-                RES.loadConfig(editor.editorAssetsRoot + "/default.res.json", editor.editorAssetsRoot + "/");
+                RES.loadConfig("./resource/default.res.json", "./resource/");
             };
             /**
              * 配置文件加载完成,开始预加载皮肤主题资源和preload资源组。
@@ -4923,7 +4923,7 @@ var feng3d;
                 RES.removeEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
                 // load skin theme configuration file, you can manually modify the file. And replace the default skin.
                 //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
-                var theme = new eui.Theme(editor.editorAssetsRoot + "/default.thm.json", this.stage);
+                var theme = new eui.Theme("./resource/default.thm.json", this.stage);
                 theme.once(eui.UIEvent.COMPLETE, this.onThemeLoadComplete, this);
                 RES.addEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
                 RES.addEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
@@ -5169,6 +5169,13 @@ var feng3d;
                 enumerable: true,
                 configurable: true
             });
+            /**
+             * 获取编辑器资源绝对路径
+             * @param url 编辑器资源相对路径
+             */
+            EditorData.prototype.getEditorAssetsPath = function (url) {
+                return document.URL + "/resource" + url;
+            };
             return EditorData;
         }());
         editor.EditorData = EditorData;
@@ -9440,7 +9447,7 @@ var feng3d;
                 var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.PlaneGeometry(size, size, 1, 1, false);
                 var textureMaterial = this.textureMaterial = meshRenderer.material = new feng3d.TextureMaterial();
-                textureMaterial.texture = new feng3d.Texture2D(editor.editorAssetsRoot + "/assets/3d/icons/sun.png");
+                textureMaterial.texture = new feng3d.Texture2D(editor.editorData.getEditorAssetsPath("/assets/3d/icons/sun.png"));
                 textureMaterial.texture.format = feng3d.TextureFormat.RGBA;
                 textureMaterial.texture.premulAlpha = true;
                 textureMaterial.enableBlend = true;
@@ -9524,7 +9531,7 @@ var feng3d;
                 var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.PlaneGeometry(size, size, 1, 1, false);
                 var textureMaterial = this.textureMaterial = meshRenderer.material = new feng3d.TextureMaterial();
-                textureMaterial.texture = new feng3d.Texture2D(editor.editorAssetsRoot + "/assets/3d/icons/light.png");
+                textureMaterial.texture = new feng3d.Texture2D(editor.editorData.getEditorAssetsPath("/assets/3d/icons/light.png"));
                 textureMaterial.texture.format = feng3d.TextureFormat.RGBA;
                 textureMaterial.texture.premulAlpha = true;
                 textureMaterial.enableBlend = true;
@@ -9991,7 +9998,7 @@ var feng3d;
                         "threejs/loaders/ctm/lzma.js",
                         "threejs/loaders/ctm/ctm.js",
                         "threejs/loaders/ctm/CTMLoader.js",
-                    ].map(function (value) { return editor.editorAssetsRoot + "/" + value; }),
+                    ].map(function (value) { return editor.editorData.getEditorAssetsPath("/" + value); }),
                     bundleId: "threejs",
                     success: function () {
                         Number.prototype["format"] = function () {
@@ -10260,7 +10267,6 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        editor.editorAssetsRoot = "./resource";
         /**
          * 编辑器
          * @author feng 2016-10-29

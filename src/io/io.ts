@@ -44,7 +44,7 @@ namespace feng3d.editor
                 //
                 var zip = new JSZip();
                 var request = new XMLHttpRequest();
-                request.open('Get', editorAssetsRoot + "/templates/template.zip", true);
+                request.open('Get', editorData.getEditorAssetsPath("/templates/template.zip"), true);
                 request.responseType = "arraybuffer";
                 request.onload = (ev) =>
                 {

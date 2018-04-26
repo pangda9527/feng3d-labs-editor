@@ -27,7 +27,7 @@ namespace feng3d.editor
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
             var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
-            textureMaterial.texture = new Texture2D(editorAssetsRoot + "/assets/3d/icons/sun.png");
+            textureMaterial.texture = new Texture2D(editorData.getEditorAssetsPath("/assets/3d/icons/sun.png"));
             textureMaterial.texture.format = TextureFormat.RGBA;
             textureMaterial.texture.premulAlpha = true;
             textureMaterial.enableBlend = true;

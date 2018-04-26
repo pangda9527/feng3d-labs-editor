@@ -121,6 +121,15 @@ namespace feng3d.editor
             return result;
         }
 
+        /**
+         * 获取编辑器资源绝对路径
+         * @param url 编辑器资源相对路径
+         */
+        getEditorAssetsPath(url: string)
+        {
+            return document.URL + "/resource" + url;
+        }
+
         constructor()
         {
             this.DBname = "feng3d-editor";

@@ -2,9 +2,9 @@
 
 var view3D = new feng3d.Engine();
 
-feng3d.fstype = GetQueryString("fstype");
+var fstype = feng3d.assets.fstype = GetQueryString("fstype");
 
-if (feng3d.fstype == "indexedDB")
+if (fstype == "indexedDB")
 {
     feng3d.DBname = decodeURI(GetQueryString("DBname"));
     var project = decodeURI(GetQueryString("project"));

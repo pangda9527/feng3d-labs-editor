@@ -362,7 +362,7 @@ namespace feng3d.editor
                     "threejs/loaders/ctm/lzma.js",
                     "threejs/loaders/ctm/ctm.js",
                     "threejs/loaders/ctm/CTMLoader.js",
-                ].map((value) => { return editorAssetsRoot + "/" + value; }),
+                ].map((value) => { return editorData.getEditorAssetsPath("/" + value); }),
                 bundleId: "threejs",
                 success: () =>
                 {
