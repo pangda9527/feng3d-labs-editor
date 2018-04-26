@@ -442,7 +442,8 @@ var feng3d;
                             if (filepaths.length > 0) {
                                 var filepath = filepaths.shift();
                                 editor.fs.readFile(filepath, function (err, data) {
-                                    zip.file(filepath, data);
+                                    //处理文件夹
+                                    data && zip.file(filepath, data);
                                     readfiles();
                                 });
                             }
