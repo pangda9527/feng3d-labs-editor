@@ -13,7 +13,7 @@
 
 			<e:Group x="5" y="2" touchChildren="false" touchEnabled="false">
 				<e:Label text="-" text.show="-" text.hide="+" size="16" textColor="0x000000" bold="true" x="0" y="0" touchEnabled="false" width="10"/>
-				<e:Label size="14" bold="true" text="{blockName}" textColor="0x000000" x="15" y="1" width="100%" touchEnabled="false"/>
+				<e:Label size="12" bold="true" text="{blockName}" textColor="0x000000" x="15" y="1" width="100%" touchEnabled="false"/>
 				<e:layout>
 					<e:HorizontalLayout verticalAlign="middle"/>
 				</e:layout>

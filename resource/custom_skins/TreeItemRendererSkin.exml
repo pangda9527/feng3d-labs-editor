@@ -6,7 +6,7 @@
 	<e:Group id="contentGroup" top="0" bottom="0" width.disabled="100%" height.disabled="100%">
 		<e:ToggleButton id="disclosureButton" label="ToggleButton" x="232" y="167" scaleX="1" scaleY="1"
 		                skinName="TreeDisclosureButtonSkin" width="10" height="10" />
-		<e:Label text="{data.label}" x="86" y="8" size="14" verticalAlign="middle" multiline="false" width="100%"
+		<e:Label text="{data.label}" x="86" y="8" size="12" verticalAlign="middle" multiline="false" width="100%"
 		         textColor.disabled="0x636e71" textColor="0x000000" />
 		<e:layout>
 			<e:HorizontalLayout verticalAlign="middle" gap="2" />

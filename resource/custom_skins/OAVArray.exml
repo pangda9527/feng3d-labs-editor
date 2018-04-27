@@ -12,7 +12,7 @@
 
 				<e:Label size="12" textColor="0x000000" x="15" y="1" width="80"
 				         touchEnabled="false"  text="{attributeName}" anchorOffsetY="0" multiline="false"/>
-				<e:Label text="-" text.show="- Array" text.hide="+ Array" size="14" textColor="0x000000" bold="true" x="0" y="0" touchEnabled="false" width="100%" textAlign="left"/>
+				<e:Label text="-" text.show="- Array" text.hide="+ Array" size="12" textColor="0x000000" bold="true" x="0" y="0" touchEnabled="false" width="100%" textAlign="left"/>
 				<e:layout>
 					<e:HorizontalLayout verticalAlign="middle"  gap="0"/>
 				</e:layout>
@@ -23,7 +23,7 @@
 				<e:VerticalLayout horizontalAlign="left" verticalAlign="middle"  paddingLeft="20" gap="0"/>
 			</e:layout>
 			<e:Group width="100%" x="-2" y="-20" scaleX="1" scaleY="1">
-				<e:Label text="size" size="14" width="60" y="0" x="0" textColor="0x000000" verticalAlign="middle" multiline="false" scaleX="1" scaleY="1"/>
+				<e:Label text="size" size="12" width="60" y="0" x="0" textColor="0x000000" verticalAlign="middle" multiline="false" scaleX="1" scaleY="1"/>
 				<e:TextInput id="sizeTxt" y="0" x="0" width="100%" scaleX="1" scaleY="1" restrict="0-9"/>
 				<e:layout>
 				<e:HorizontalLayout verticalAlign="middle" paddingLeft="0"/>

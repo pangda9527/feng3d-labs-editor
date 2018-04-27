@@ -3,7 +3,7 @@
         xmlns:w="http://ns.egret.com/wing">
 	<e:Rect width="100%" height="100%" scaleX="1" scaleY="1" fillColor="0xc2c2c2"  strokeColor="0x525252"/>
 	<e:Group width="100%" height="100%">
-		<e:Label text="Assets....." y="3" size="14" bold="true" x="5" textColor="0x000000" />
+		<e:Label text="Assets....." y="3" size="12" bold="true" x="5" textColor="0x000000" />
 		<e:Group top="20" left="0" x="-600" y="-132" scaleX="1" scaleY="1" width="100%" height="100%">
 			<e:Group width="200" height="100%" x="605" y="191" scaleX="1" scaleY="1">
 				<e:List id="treelist" top="0" bottom="0" y="0" scaleX="1" scaleY="1" left="0" right="0" />
@@ -12,12 +12,12 @@
 			<e:Group width="100%" height="100%" x="607" y="227">
 				<e:Group width="100%" height="20">
 					<e:Rect width="100%" height="100%" scaleX="1" scaleY="1" fillAlpha="1" fillColor="0xDDDDDD"/>
-					<e:Label id="floderpathTxt" scaleX="1" scaleY="1" size="14" verticalCenter="0" text="文件夹路径" bold="true" x="0" y="0" textColor="0x000000"/>
+					<e:Label id="floderpathTxt" scaleX="1" scaleY="1" size="12" verticalCenter="0" text="文件夹路径" bold="true" x="0" y="0" textColor="0x000000"/>
 
 					<e:Group right="0" verticalCenter="0">
-						<e:Label text="包含的文件" x="-138" scaleX="1" scaleY="1" size="14" verticalCenter="0" y="-356" textColor="0x000000"/>
+						<e:Label text="包含的文件" x="-138" scaleX="1" scaleY="1" size="12" verticalCenter="0" y="-356" textColor="0x000000"/>
 						<e:TextInput id="includeTxt" x="-67" y="-358" scaleX="1" scaleY="1"/>
-						<e:Label text="排除的文件" scaleX="1" scaleY="1" size="14" verticalCenter="0" x="31" y="-356" textColor="0x000000"/>
+						<e:Label text="排除的文件" scaleX="1" scaleY="1" size="12" verticalCenter="0" x="31" y="-356" textColor="0x000000"/>
 						<e:TextInput id="excludeTxt" y="-358" x="103" scaleX="1" scaleY="1"/>
 						<e:layout>
 							<e:HorizontalLayout verticalAlign="middle"/>
@@ -36,7 +36,7 @@
 				</e:Group>
 				<e:Group width="100%" height="20" x="436" y="372">
 					<e:Rect width="100%" height="100%" scaleX="1" scaleY="1" fillAlpha="1" fillColor="0xdddddd"/>
-					<e:Label id="filepathLabel" text="{viewdata.selectfilename}" x="0" scaleX="1" scaleY="1" size="14" verticalCenter="0" y="26" textColor="0x000000"/>
+					<e:Label id="filepathLabel" text="{viewdata.selectfilename}" x="0" scaleX="1" scaleY="1" size="12" verticalCenter="0" y="26" textColor="0x000000"/>
 				</e:Group>
 				<e:layout>
 					<e:VerticalLayout gap="0"/>
