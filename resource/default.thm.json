@@ -14,7 +14,16 @@
         "eui.VSlider": "resource/eui_skins/VSliderSkin.exml",
         "eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml",
         
-        "feng3d.editor.ColorPicker": "resource/custom_skins/ColorPicker.exml"
+        "feng3d.editor.ColorPicker": "resource/custom_skins/ColorPicker.exml",
+
+        "feng3d.editor.TopView": "resource/custom_skins/TopView.exml",
+        "feng3d.editor.InspectorView": "resource/custom_skins/InspectorView.exml",
+        "feng3d.editor.Feng3dView": "resource/custom_skins/Feng3dView.exml",
+        "feng3d.editor.CameraPreview": "resource/custom_skins/CameraPreview.exml",
+        "feng3d.editor.HierarchyView": "resource/custom_skins/HierarchyView.exml",
+        "feng3d.editor.AssetsView": "resource/custom_skins/AssetsView.exml",
+        "feng3d.editor.MainView": "resource/custom_skins/MainView.exml",
+        "feng3d.editor.BooleanAttrView": "resource/custom_skins/BooleanAttrView.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [
