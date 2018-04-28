@@ -9,6 +9,6 @@
 		<e:TextInput id="nameeditTxt" width="100%" anchorOffsetX="0" anchorOffsetY="0" scaleX="1" scaleY="1"
 		             verticalCenter="0"  visible="false"/>
 		<e:Label id="nameLabel" size="12" textAlign="center" x="0" scaleX="1" scaleY="1" verticalCenter="0"
-		         width="100%"  text="{data.label}"/>
+		         width="100%"  text="{data.label}" textColor="0x000000"/>
 	</e:Group>
 </e:Skin>
