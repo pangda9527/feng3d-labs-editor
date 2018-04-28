@@ -10,13 +10,13 @@ namespace feng3d.editor
         public filelist: eui.List;
         public filepathLabel: eui.Label;
         //
-        private viewdata = { selectfilename: "" };
-        //
         private _assetstreeInvalid = true;
         private listData: eui.ArrayCollection;
         private filelistData: eui.ArrayCollection;
 
         private fileDrag: FileDrag;
+        //
+        private selectfile: AssetsFile;
 
         constructor()
         {
@@ -41,22 +41,8 @@ namespace feng3d.editor
         {
             super.$onAddToStage(stage, nestLevel);
 
-            this.filelist.addEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
-            this.filelist.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
-            this.includeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
-            this.excludeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
-
-            this.floderpathTxt.touchEnabled = true;
-            this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
-
-            feng3d.watcher.watch(editorAssets, "showFloder", this.updateShowFloder, this);
-
-            watcher.watch(editorData, "selectedObjects", this.selectedfilechanged, this);
-
-            assetsDispather.on("changed", this.invalidateAssetstree, this);
-            assetsDispather.on("openChanged", this.invalidateAssetstree, this);
-
             this.excludeTxt.text = "(\\.d\\.ts|\\.js\\.map|\\.js)\\b";
+            this.filepathLabel.text = "";
 
             //
             drag.register(this.filelistgroup, (dragsource) => { }, ["gameobject", "animationclip", "material", "geometry"], (dragSource) =>
@@ -83,9 +69,26 @@ namespace feng3d.editor
                 }
             });
 
+            this.initlist();
+
+            //
             this.fileDrag.addEventListener();
 
-            this.initlist();
+            this.filelist.addEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
+            this.filelist.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
+            this.includeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
+            this.excludeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
+
+            this.floderpathTxt.touchEnabled = true;
+            this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
+
+            feng3d.watcher.watch(editorAssets, "showFloder", this.updateShowFloder, this);
+
+            watcher.watch(editorData, "selectedObjects", this.selectedfilechanged, this);
+            watcher.watchchain(this, "selectfile.name", this.selectfile_nameChanged, this);
+
+            assetsDispather.on("changed", this.invalidateAssetstree, this);
+            assetsDispather.on("openChanged", this.invalidateAssetstree, this);
         }
 
         $onRemoveFromStage()
@@ -245,14 +248,21 @@ namespace feng3d.editor
         private selectedfilechanged()
         {
             var selectedAssetsFile = editorData.selectedAssetsFile;
-            this.viewdata.selectfilename = "";
             var assetsFiles: AssetsFile[] = this.filelistData.source;
             assetsFiles.forEach(element =>
             {
                 element.selected = selectedAssetsFile.indexOf(element) != -1;
                 if (element.selected)
-                    this.viewdata.selectfilename = element.name;
+                    this.selectfile = element;
             });
+        }
+
+        private selectfile_nameChanged()
+        {
+            if (this.selectfile)
+                this.filepathLabel.text = this.selectfile.name;
+            else
+                this.filepathLabel.text = "";
         }
 
         private onfilelistclick(e: egret.MouseEvent)

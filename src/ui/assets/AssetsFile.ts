@@ -23,11 +23,7 @@ namespace feng3d.editor
         /**
          * 路径
          */
-        get path()
-        {
-            return this._path;
-        }
-        private _path: string;
+        path: string;
         /**
          * 创建时间
          */
@@ -104,10 +100,7 @@ namespace feng3d.editor
         /**
          * 文件夹名称
          */
-        get name()
-        {
-            return this._path.split("/").pop();
-        }
+        name: string;
 
         /**
          * 显示标签
@@ -123,7 +116,7 @@ namespace feng3d.editor
         {
             if (this._isDirectory)
                 return AssetExtension.folder;
-            return <AssetExtension>this._path.split(".").pop();
+            return <AssetExtension>this.path.split(".").pop();
         }
 
         /**
@@ -146,7 +139,12 @@ namespace feng3d.editor
         {
             super()
 
-            this._path = fileinfo.path;
+            feng3d.watcher.watch(this, "path", () =>
+            {
+                this.name = this.path.split("/").pop();
+            });
+
+            this.path = fileinfo.path;
             this._birthtime = fileinfo.birthtime;
             this._mtime = fileinfo.mtime;
             this._isDirectory = fileinfo.isDirectory;
@@ -214,7 +212,7 @@ namespace feng3d.editor
                 || this.extension == AssetExtension.geometry
             )
             {
-                fs.readFileAsString(this._path, (err, content: string) =>
+                fs.readFileAsString(this.path, (err, content: string) =>
                 {
                     var json = JSON.parse(content);
                     this._data = serialization.deserialize(json);
@@ -227,7 +225,7 @@ namespace feng3d.editor
                 || this.extension == AssetExtension.jpeg
             )
             {
-                fs.readFile(this._path, (err, data) =>
+                fs.readFile(this.path, (err, data) =>
                 {
                     dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                     {
@@ -237,7 +235,7 @@ namespace feng3d.editor
                 });
                 return;
             }
-            fs.readFileAsString(this._path, (err, content) =>
+            fs.readFileAsString(this.path, (err, content) =>
             {
                 this._data = content;
                 callback(this._data);
@@ -275,7 +273,7 @@ namespace feng3d.editor
                 callback();
                 return;
             }
-            fs.readdir(this._path, (err, files) =>
+            fs.readdir(this.path, (err, files) =>
             {
                 var initfiles = () =>
                 {
@@ -286,7 +284,7 @@ namespace feng3d.editor
                     }
 
                     var file = files.shift();
-                    fs.stat(this._path + "/" + file, (err, stats) =>
+                    fs.stat(this.path + "/" + file, (err, stats) =>
                     {
                         assert(!err);
                         var child = new AssetsFile(stats);
@@ -307,8 +305,8 @@ namespace feng3d.editor
         {
             if (typeof path == "string")
             {
-                path = path.replace(this._path + "/", "");
-                path = path.replace(this._path, "");
+                path = path.replace(this.path + "/", "");
+                path = path.replace(this.path, "");
                 path = path.split("/");
             }
             if (path.join("/") == "")
@@ -393,7 +391,7 @@ namespace feng3d.editor
          */
         deleteFile(callback?: (assetsFile: AssetsFile) => void)
         {
-            if (this._path == editorAssets.assetsPath)
+            if (this.path == editorAssets.assetsPath)
             {
                 alert("无法删除根目录");
                 return;
@@ -401,7 +399,7 @@ namespace feng3d.editor
 
             var deletefile = () =>
             {
-                fs.remove(this._path, (err) =>
+                fs.remove(this.path, (err) =>
                 {
                     assert(!err);
 
@@ -411,10 +409,10 @@ namespace feng3d.editor
                     this._parent = null;
                     callback && callback(this);
                 });
-                if (/\.ts\b/.test(this._path))
+                if (/\.ts\b/.test(this.path))
                 {
-                    editorAssets.deletefile(this._path.replace(/\.ts\b/, ".js"), () => { });
-                    editorAssets.deletefile(this._path.replace(/\.ts\b/, ".js.map"), () => { });
+                    editorAssets.deletefile(this.path.replace(/\.ts\b/, ".js"), () => { });
+                    editorAssets.deletefile(this.path.replace(/\.ts\b/, ".js.map"), () => { });
                 }
             }
 
@@ -447,12 +445,12 @@ namespace feng3d.editor
          */
         rename(newname: string, callback?: (file: AssetsFile) => void)
         {
-            var oldPath = this._path;
+            var oldPath = this.path;
             var newPath = this.parent.path + "/" + newname;
             fs.rename(oldPath, this.parent.path + "/" + newname, (err) =>
             {
                 assert(!err);
-                this._path = newPath;
+                this.path = newPath;
                 if (this.isDirectory)
                     editorui.assetsview.updateAssetsTree();
                 if (editorAssets.showFloder == oldPath)
@@ -470,17 +468,17 @@ namespace feng3d.editor
          */
         move(destdirpath: string, callback?: (file: AssetsFile) => void)
         {
-            var oldpath = this._path;
+            var oldpath = this.path;
             var newpath = destdirpath + "/" + this.name;
             var destDir = editorAssets.getFile(destdirpath);
             //禁止向子文件夹移动
             if (oldpath == editorAssets.getparentdir(destdirpath))
                 return;
 
-            if (/\.ts\b/.test(this._path))
+            if (/\.ts\b/.test(this.path))
             {
-                var jspath = this._path.replace(/\.ts\b/, ".js");
-                var jsmappath = this._path.replace(/\.ts\b/, ".js.map");
+                var jspath = this.path.replace(/\.ts\b/, ".js");
+                var jsmappath = this.path.replace(/\.ts\b/, ".js.map");
 
                 editorAssets.movefile(jspath, destdirpath);
                 editorAssets.movefile(jsmappath, destdirpath);
@@ -490,7 +488,7 @@ namespace feng3d.editor
             {
                 assert(!err);
 
-                this._path = newpath;
+                this.path = newpath;
                 this.addto(destDir);
 
                 if (this.isDirectory)
@@ -511,7 +509,7 @@ namespace feng3d.editor
         addfolder(newfoldername: string, callback?: (file: AssetsFile) => void)
         {
             newfoldername = this.getnewchildname(newfoldername);
-            var folderpath = this._path + "/" + newfoldername;
+            var folderpath = this.path + "/" + newfoldername;
 
             fs.mkdir(folderpath, (e) =>
             {
@@ -537,7 +535,7 @@ namespace feng3d.editor
             {
                 filename = this.getnewchildname(filename);
             }
-            var filepath = this._path + "/" + filename;
+            var filepath = this.path + "/" + filename;
 
             getcontent((savedata, data) =>
             {
