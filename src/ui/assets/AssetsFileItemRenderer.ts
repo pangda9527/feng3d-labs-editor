@@ -148,6 +148,7 @@ namespace feng3d.editor
         {
             if (this.data.selected)
             {
+                this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
                 this.nameeditTxt.text = this.nameLabel.text;
                 this.nameLabel.visible = false;
                 this.nameeditTxt.visible = true;

@@ -4267,6 +4267,7 @@ var feng3d;
             };
             AssetsFileItemRenderer.prototype.onnameLabelclick = function () {
                 if (this.data.selected) {
+                    this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
                     this.nameeditTxt.text = this.nameLabel.text;
                     this.nameLabel.visible = false;
                     this.nameeditTxt.visible = true;
