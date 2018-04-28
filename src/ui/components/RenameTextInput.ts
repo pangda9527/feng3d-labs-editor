@@ -1,4 +1,14 @@
-
+var defaultTextFiled: egret.TextField;
+function lostFocus(display: egret.DisplayObject)
+{
+	if (!defaultTextFiled)
+	{
+		defaultTextFiled = new egret.TextField();
+		defaultTextFiled.visible = false;
+		display.stage.addChild(defaultTextFiled);
+	}
+	defaultTextFiled.setFocus();
+}
 /**
  * 重命名组件
  */
@@ -67,6 +77,7 @@ class RenameTextInput extends eui.Component implements eui.UIComponent
 			return;
 		this.nameLabel.text = this.nameeditTxt.text
 		this.callback && this.callback();
+		this.callback = null;
 		this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
 	}
 
@@ -74,7 +85,9 @@ class RenameTextInput extends eui.Component implements eui.UIComponent
 	{
 		if (feng3d.windowEventProxy.key == "Enter" || feng3d.windowEventProxy.key == "Escape")
 		{
-			this.nameeditTxt.textDisplay.dispatchEvent(new egret.FocusEvent(egret.FocusEvent.FOCUS_OUT));
+			//拾取焦点
+			var inputUtils: egret.InputController = this.nameeditTxt.textDisplay["inputUtils"];
+			inputUtils["onStageDownHandler"](new egret.Event(""))
 		}
 	}
 

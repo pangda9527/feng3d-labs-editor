@@ -62,7 +62,7 @@ namespace feng3d.editor
         private updateView()
         {
             this.disclosureButton.visible = this.data ? (this.data.children && this.data.children.length > 0) : false;
-            this.contentGroup.x = (this.data ? this.data.depth : 0) * this.indentation;
+            this.contentGroup.left = (this.data ? this.data.depth : 0) * this.indentation;
             this.disclosureButton.selected = this.data ? this.data.isOpen : false;
         }
     }

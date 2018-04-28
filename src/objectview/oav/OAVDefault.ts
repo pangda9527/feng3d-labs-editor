@@ -66,16 +66,19 @@ namespace feng3d.editor
 				}
 			}
 			this.updateView();
+
+			watcher.watch(this.space, this.attributeName, this.updateView, this);
 		}
 
 		$onRemoveFromStage()
 		{
+			drag.unregister(this);
+			watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+
 			super.$onRemoveFromStage()
 			this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
 			this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
 			this.text.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-
-			drag.unregister(this);
 		}
 		private _textfocusintxt: boolean;
 		private ontxtfocusin()

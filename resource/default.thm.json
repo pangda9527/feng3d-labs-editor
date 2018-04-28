@@ -22,6 +22,7 @@
         "feng3d.editor.AssetsView": "resource/custom_skins/AssetsView.exml",
         "feng3d.editor.MainView": "resource/custom_skins/MainView.exml",
         "feng3d.editor.BooleanAttrView": "resource/custom_skins/BooleanAttrView.exml",
+        "feng3d.editor.HierarchyTreeItemRenderer": "resource/custom_skins/HierarchyTreeItemRenderer.exml",
         "RenameTextInput": "resource/eui_skins/RenameTextInput.exml"
     },
     "autoGenerateExmlsList": true,
@@ -54,6 +55,7 @@
         "resource/custom_skins/ColorPicker.exml",
         "resource/custom_skins/TreeDisclosureButtonSkin.exml",
         "resource/custom_skins/TreeItemRendererSkin.exml",
+        "resource/custom_skins/HierarchyTreeItemRenderer.exml",
         "resource/custom_skins/MenuItemRender.exml",
         "resource/custom_skins/Accordion.exml",
         "resource/custom_skins/Vector3DViewSkin.exml",

@@ -2,6 +2,8 @@ namespace feng3d.editor
 {
     export class HierarchyTreeItemRenderer extends TreeItemRenderer
     {
+        public renameInput: RenameTextInput;
+
         /**
          * 上一个选中项
          */
@@ -12,13 +14,12 @@ namespace feng3d.editor
         constructor()
         {
             super();
+            this.skinName = "HierarchyTreeItemRenderer";
         }
 
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
-            this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
             drag.register(this, this.setdargSource.bind(this), ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
             {
@@ -40,15 +41,20 @@ namespace feng3d.editor
                     this.data.gameobject.addScript(dragdata.file_script);
                 }
             });
+            //
+            this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
         }
 
         $onRemoveFromStage()
         {
+            drag.unregister(this);
+
             super.$onRemoveFromStage();
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-
-            drag.unregister(this);
+            this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
         }
 
         private setdargSource(dragSource: DragData)
@@ -61,6 +67,18 @@ namespace feng3d.editor
             HierarchyTreeItemRenderer.preSelectedItem = this;
 
             editorData.selectObject(this.data.gameobject);
+        }
+
+        dataChanged()
+        {
+            super.dataChanged();
+
+            if (this.data)
+            {
+                this.renameInput.text = this.data.label;
+            } else
+            {
+            }
         }
 
         private onrightclick(e)
@@ -81,6 +99,17 @@ namespace feng3d.editor
 
             if (menuconfig.length > 0)
                 menu.popup(menuconfig);
+        }
+
+        private onnameLabelclick()
+        {
+            if (this.selected && !windowEventProxy.rightmouse)
+            {
+                this.renameInput.edit(() =>
+                {
+                    this.data.gameobject.name = this.renameInput.text;
+                });
+            }
         }
     }
 }

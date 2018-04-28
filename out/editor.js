@@ -1000,6 +1000,15 @@ var feng3d;
         editor.CameraPreview = CameraPreview;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
+var defaultTextFiled;
+function lostFocus(display) {
+    if (!defaultTextFiled) {
+        defaultTextFiled = new egret.TextField();
+        defaultTextFiled.visible = false;
+        display.stage.addChild(defaultTextFiled);
+    }
+    defaultTextFiled.setFocus();
+}
 /**
  * 重命名组件
  */
@@ -1060,11 +1069,14 @@ var RenameTextInput = /** @class */ (function (_super) {
             return;
         this.nameLabel.text = this.nameeditTxt.text;
         this.callback && this.callback();
+        this.callback = null;
         this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
     };
     RenameTextInput.prototype.onnameeditChanged = function () {
         if (feng3d.windowEventProxy.key == "Enter" || feng3d.windowEventProxy.key == "Escape") {
-            this.nameeditTxt.textDisplay.dispatchEvent(new egret.FocusEvent(egret.FocusEvent.FOCUS_OUT));
+            //拾取焦点
+            var inputUtils = this.nameeditTxt.textDisplay["inputUtils"];
+            inputUtils["onStageDownHandler"](new egret.Event(""));
         }
     };
     return RenameTextInput;
@@ -1485,7 +1497,7 @@ var feng3d;
             };
             TreeItemRenderer.prototype.updateView = function () {
                 this.disclosureButton.visible = this.data ? (this.data.children && this.data.children.length > 0) : false;
-                this.contentGroup.x = (this.data ? this.data.depth : 0) * this.indentation;
+                this.contentGroup.left = (this.data ? this.data.depth : 0) * this.indentation;
                 this.disclosureButton.selected = this.data ? this.data.isOpen : false;
             };
             return TreeItemRenderer;
@@ -2620,13 +2632,15 @@ var feng3d;
                     }
                 }
                 this.updateView();
+                feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
             };
             OAVDefault.prototype.$onRemoveFromStage = function () {
+                editor.drag.unregister(this);
+                feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
                 _super.prototype.$onRemoveFromStage.call(this);
                 this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
                 this.text.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                editor.drag.unregister(this);
             };
             OAVDefault.prototype.ontxtfocusin = function () {
                 this._textfocusintxt = true;
@@ -3261,13 +3275,13 @@ var feng3d;
         var HierarchyTreeItemRenderer = /** @class */ (function (_super) {
             __extends(HierarchyTreeItemRenderer, _super);
             function HierarchyTreeItemRenderer() {
-                return _super.call(this) || this;
+                var _this = _super.call(this) || this;
+                _this.skinName = "HierarchyTreeItemRenderer";
+                return _this;
             }
             HierarchyTreeItemRenderer.prototype.$onAddToStage = function (stage, nestLevel) {
                 var _this = this;
                 _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-                this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-                this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
                 editor.drag.register(this, this.setdargSource.bind(this), ["gameobject", "file_gameobject", "file_script"], function (dragdata) {
                     if (dragdata.gameobject) {
                         if (!dragdata.gameobject.contains(_this.data.gameobject)) {
@@ -3283,12 +3297,17 @@ var feng3d;
                         _this.data.gameobject.addScript(dragdata.file_script);
                     }
                 });
+                //
+                this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+                this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+                this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             HierarchyTreeItemRenderer.prototype.$onRemoveFromStage = function () {
+                editor.drag.unregister(this);
                 _super.prototype.$onRemoveFromStage.call(this);
                 this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                editor.drag.unregister(this);
+                this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             HierarchyTreeItemRenderer.prototype.setdargSource = function (dragSource) {
                 dragSource.gameobject = this.data.gameobject;
@@ -3296,6 +3315,14 @@ var feng3d;
             HierarchyTreeItemRenderer.prototype.onclick = function () {
                 HierarchyTreeItemRenderer.preSelectedItem = this;
                 editor.editorData.selectObject(this.data.gameobject);
+            };
+            HierarchyTreeItemRenderer.prototype.dataChanged = function () {
+                _super.prototype.dataChanged.call(this);
+                if (this.data) {
+                    this.renameInput.text = this.data.label;
+                }
+                else {
+                }
             };
             HierarchyTreeItemRenderer.prototype.onrightclick = function (e) {
                 var _this = this;
@@ -3311,6 +3338,14 @@ var feng3d;
                 menuconfig = menuconfig.concat({ type: 'separator' }, editor.createObjectConfig);
                 if (menuconfig.length > 0)
                     editor.menu.popup(menuconfig);
+            };
+            HierarchyTreeItemRenderer.prototype.onnameLabelclick = function () {
+                var _this = this;
+                if (this.selected && !feng3d.windowEventProxy.rightmouse) {
+                    this.renameInput.edit(function () {
+                        _this.data.gameobject.name = _this.renameInput.text;
+                    });
+                }
             };
             return HierarchyTreeItemRenderer;
         }(editor.TreeItemRenderer));
