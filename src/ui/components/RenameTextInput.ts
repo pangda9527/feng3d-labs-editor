@@ -7,6 +7,8 @@ class RenameTextInput extends eui.Component implements eui.UIComponent
 	public nameeditTxt: eui.TextInput;
 	public nameLabel: eui.Label;
 
+	callback: () => void;
+
 	/**
 	 * 显示文本
 	 */
@@ -19,6 +21,16 @@ class RenameTextInput extends eui.Component implements eui.UIComponent
 		this.nameLabel.text = v;
 	}
 
+	get textAlign()
+	{
+		return this.nameLabel.textAlign;
+	}
+
+	set textAlign(v)
+	{
+		this.nameeditTxt.textDisplay.textAlign = this.nameLabel.textAlign = v;
+	}
+
 	public constructor()
 	{
 		super();
@@ -28,9 +40,10 @@ class RenameTextInput extends eui.Component implements eui.UIComponent
 	/**
 	 * 启动编辑
 	 */
-	edit()
+	edit(callback?: () => void)
 	{
-		this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
+		this.callback = callback;
+		this.textAlign = this.textAlign;
 		this.nameeditTxt.text = this.nameLabel.text;
 		this.nameLabel.visible = false;
 		this.nameeditTxt.visible = true;
@@ -53,6 +66,7 @@ class RenameTextInput extends eui.Component implements eui.UIComponent
 		if (this.nameLabel.text == this.nameeditTxt.text)
 			return;
 		this.nameLabel.text = this.nameeditTxt.text
+		this.callback && this.callback();
 		this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
 	}
 

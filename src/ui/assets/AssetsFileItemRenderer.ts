@@ -22,7 +22,6 @@ namespace feng3d.editor
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
             this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
-            this.renameInput.addEventListener(egret.Event.CHANGE, this.reanmeInputChange, this);
         }
 
         $onRemoveFromStage()
@@ -32,7 +31,6 @@ namespace feng3d.editor
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
             this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
-            this.renameInput.addEventListener(egret.Event.CHANGE, this.reanmeInputChange, this);
         }
 
         dataChanged()
@@ -42,6 +40,7 @@ namespace feng3d.editor
             if (this.data)
             {
                 this.renameInput.text = this.data.label;
+                this.renameInput.textAlign = egret.HorizontalAlign.CENTER;
 
                 var accepttypes = [];
                 if (this.data.isDirectory)
@@ -151,14 +150,12 @@ namespace feng3d.editor
         {
             if (this.data.selected)
             {
-                this.renameInput.edit();
+                this.renameInput.edit(() =>
+                {
+                    var newName = this.data.name.replace(this.data.label, this.renameInput.text);
+                    this.data.rename(newName);
+                });
             }
-        }
-
-        private reanmeInputChange()
-        {
-            var newName = this.renameInput.text;
-            this.data.rename(newName, this.dataChanged.bind(this));
         }
     }
 }

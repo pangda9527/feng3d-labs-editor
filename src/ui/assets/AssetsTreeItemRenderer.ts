@@ -2,8 +2,9 @@ namespace feng3d.editor
 {
     export class AssetsTreeItemRenderer extends TreeItemRenderer
     {
-        public namelabel: eui.Label;
-        public nameeditTxt: eui.TextInput;
+        public contentGroup: eui.Group;
+        public disclosureButton: eui.ToggleButton;
+        public renameInput: RenameTextInput;
 
         data: AssetsFile;
 
@@ -19,7 +20,7 @@ namespace feng3d.editor
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-            this.namelabel.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+            this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
         }
 
         $onRemoveFromStage()
@@ -28,7 +29,7 @@ namespace feng3d.editor
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-            this.namelabel.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+            this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
         }
 
         dataChanged()
@@ -37,6 +38,8 @@ namespace feng3d.editor
 
             if (this.data)
             {
+                this.renameInput.text = this.data.label;
+
                 var accepttypes = [];
                 drag.register(this, (dragsource) =>
                 {
@@ -66,26 +69,14 @@ namespace feng3d.editor
             if (this.data.parent == null)
                 return;
 
-            if (this.data.selected && !windowEventProxy.rightmouse)
+            if (this.selected && !windowEventProxy.rightmouse)
             {
-                this.nameeditTxt.text = this.namelabel.text;
-                this.namelabel.visible = false;
-                this.nameeditTxt.visible = true;
-                this.nameeditTxt.textDisplay.setFocus();
-
-                this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
+                this.renameInput.edit(() =>
+                {
+                    var newName = this.data.name.replace(this.data.label, this.renameInput.text);
+                    this.data.rename(newName);
+                });
             }
-        }
-
-        private onnameeditend()
-        {
-            this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
-            this.nameeditTxt.visible = false;
-            this.namelabel.visible = true;
-            if (this.nameeditTxt.text == this.namelabel.text)
-                return;
-            var newName = this.data.name.replace(this.namelabel.text, this.nameeditTxt.text);
-            this.data.rename(newName);
         }
     }
 }

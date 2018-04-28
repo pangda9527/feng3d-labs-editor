@@ -1023,11 +1023,22 @@ var RenameTextInput = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(RenameTextInput.prototype, "textAlign", {
+        get: function () {
+            return this.nameLabel.textAlign;
+        },
+        set: function (v) {
+            this.nameeditTxt.textDisplay.textAlign = this.nameLabel.textAlign = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * 启动编辑
      */
-    RenameTextInput.prototype.edit = function () {
-        this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
+    RenameTextInput.prototype.edit = function (callback) {
+        this.callback = callback;
+        this.textAlign = this.textAlign;
         this.nameeditTxt.text = this.nameLabel.text;
         this.nameLabel.visible = false;
         this.nameeditTxt.visible = true;
@@ -1048,6 +1059,7 @@ var RenameTextInput = /** @class */ (function (_super) {
         if (this.nameLabel.text == this.nameeditTxt.text)
             return;
         this.nameLabel.text = this.nameeditTxt.text;
+        this.callback && this.callback();
         this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
     };
     RenameTextInput.prototype.onnameeditChanged = function () {
@@ -4225,7 +4237,6 @@ var feng3d;
                 this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
                 this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
-                this.renameInput.addEventListener(egret.Event.CHANGE, this.reanmeInputChange, this);
             };
             AssetsFileItemRenderer.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
@@ -4233,13 +4244,13 @@ var feng3d;
                 this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
                 this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
-                this.renameInput.addEventListener(egret.Event.CHANGE, this.reanmeInputChange, this);
             };
             AssetsFileItemRenderer.prototype.dataChanged = function () {
                 var _this = this;
                 _super.prototype.dataChanged.call(this);
                 if (this.data) {
                     this.renameInput.text = this.data.label;
+                    this.renameInput.textAlign = egret.HorizontalAlign.CENTER;
                     var accepttypes = [];
                     if (this.data.isDirectory) {
                         editor.drag.register(this, function (dragsource) {
@@ -4325,13 +4336,13 @@ var feng3d;
                 editor.editorAssets.popupmenu(this.data);
             };
             AssetsFileItemRenderer.prototype.onnameLabelclick = function () {
+                var _this = this;
                 if (this.data.selected) {
-                    this.renameInput.edit();
+                    this.renameInput.edit(function () {
+                        var newName = _this.data.name.replace(_this.data.label, _this.renameInput.text);
+                        _this.data.rename(newName);
+                    });
                 }
-            };
-            AssetsFileItemRenderer.prototype.reanmeInputChange = function () {
-                var newName = this.renameInput.text;
-                this.data.rename(newName, this.dataChanged.bind(this));
             };
             return AssetsFileItemRenderer;
         }(eui.ItemRenderer));
@@ -4353,18 +4364,19 @@ var feng3d;
                 _super.prototype.$onAddToStage.call(this, stage, nestLevel);
                 this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.namelabel.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+                this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             AssetsTreeItemRenderer.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
                 this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.namelabel.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+                this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             AssetsTreeItemRenderer.prototype.dataChanged = function () {
                 var _this = this;
                 _super.prototype.dataChanged.call(this);
                 if (this.data) {
+                    this.renameInput.text = this.data.label;
                     var accepttypes = [];
                     editor.drag.register(this, function (dragsource) {
                         dragsource.file = _this.data.path;
@@ -4384,24 +4396,15 @@ var feng3d;
                 editor.editorAssets.popupmenu(this.data);
             };
             AssetsTreeItemRenderer.prototype.onnameLabelclick = function () {
+                var _this = this;
                 if (this.data.parent == null)
                     return;
-                if (this.data.selected && !feng3d.windowEventProxy.rightmouse) {
-                    this.nameeditTxt.text = this.namelabel.text;
-                    this.namelabel.visible = false;
-                    this.nameeditTxt.visible = true;
-                    this.nameeditTxt.textDisplay.setFocus();
-                    this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
+                if (this.selected && !feng3d.windowEventProxy.rightmouse) {
+                    this.renameInput.edit(function () {
+                        var newName = _this.data.name.replace(_this.data.label, _this.renameInput.text);
+                        _this.data.rename(newName);
+                    });
                 }
-            };
-            AssetsTreeItemRenderer.prototype.onnameeditend = function () {
-                this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
-                this.nameeditTxt.visible = false;
-                this.namelabel.visible = true;
-                if (this.nameeditTxt.text == this.namelabel.text)
-                    return;
-                var newName = this.data.name.replace(this.namelabel.text, this.nameeditTxt.text);
-                this.data.rename(newName);
             };
             return AssetsTreeItemRenderer;
         }(editor.TreeItemRenderer));
