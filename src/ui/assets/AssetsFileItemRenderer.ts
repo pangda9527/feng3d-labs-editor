@@ -3,8 +3,8 @@ namespace feng3d.editor
     export class AssetsFileItemRenderer extends eui.ItemRenderer
     {
         public icon: eui.Image;
-        public nameLabel: eui.Label;
-        public nameeditTxt: eui.TextInput;
+
+        public renameInput: RenameTextInput;
 
         data: AssetsFile;
 
@@ -17,10 +17,12 @@ namespace feng3d.editor
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
+
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-            this.nameLabel.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+            this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+            this.renameInput.addEventListener(egret.Event.CHANGE, this.reanmeInputChange, this);
         }
 
         $onRemoveFromStage()
@@ -29,7 +31,8 @@ namespace feng3d.editor
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-            this.nameLabel.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+            this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+            this.renameInput.addEventListener(egret.Event.CHANGE, this.reanmeInputChange, this);
         }
 
         dataChanged()
@@ -38,7 +41,7 @@ namespace feng3d.editor
 
             if (this.data)
             {
-                this.nameLabel.text = this.data.label;
+                this.renameInput.text = this.data.label;
 
                 var accepttypes = [];
                 if (this.data.isDirectory)
@@ -148,36 +151,14 @@ namespace feng3d.editor
         {
             if (this.data.selected)
             {
-                this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
-                this.nameeditTxt.text = this.nameLabel.text;
-                this.nameLabel.visible = false;
-                this.nameeditTxt.visible = true;
-                this.nameeditTxt.textDisplay.setFocus();
-                //
-                this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
-                windowEventProxy.on("keyup", this.onnameeditChanged, this);
+                this.renameInput.edit();
             }
         }
 
-        private onnameeditend()
+        private reanmeInputChange()
         {
-            this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
-            windowEventProxy.off("keyup", this.onnameeditChanged, this);
-            //
-            this.nameeditTxt.visible = false;
-            this.nameLabel.visible = true;
-            if (this.nameLabel.text == this.nameeditTxt.text)
-                return;
-            var newName = this.data.name.replace(this.nameLabel.text, this.nameeditTxt.text);
+            var newName = this.renameInput.text;
             this.data.rename(newName, this.dataChanged.bind(this));
-        }
-
-        private onnameeditChanged()
-        {
-            if (windowEventProxy.key == "Enter" || windowEventProxy.key == "Escape")
-            {
-                this.onnameeditend();
-            }
         }
     }
 }

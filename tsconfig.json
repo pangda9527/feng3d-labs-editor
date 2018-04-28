@@ -30,6 +30,7 @@
         //
         "src/ui/Feng3dView.ts",
         "src/ui/CameraPreview.ts",
+        "src/ui/components/RenameTextInput.ts",
         "src/ui/components/SplitGroup.ts",
         "src/ui/components/maskview.ts",
         "src/ui/components/popupview.ts",

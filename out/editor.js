@@ -1000,6 +1000,63 @@ var feng3d;
         editor.CameraPreview = CameraPreview;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
+/**
+ * 重命名组件
+ */
+var RenameTextInput = /** @class */ (function (_super) {
+    __extends(RenameTextInput, _super);
+    function RenameTextInput() {
+        var _this = _super.call(this) || this;
+        _this.skinName = "RenameTextInputSkin";
+        return _this;
+    }
+    Object.defineProperty(RenameTextInput.prototype, "text", {
+        /**
+         * 显示文本
+         */
+        get: function () {
+            return this.nameLabel.text;
+        },
+        set: function (v) {
+            this.nameLabel.text = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /**
+     * 启动编辑
+     */
+    RenameTextInput.prototype.edit = function () {
+        this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
+        this.nameeditTxt.text = this.nameLabel.text;
+        this.nameLabel.visible = false;
+        this.nameeditTxt.visible = true;
+        this.nameeditTxt.textDisplay.setFocus();
+        //
+        this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
+        feng3d.windowEventProxy.on("keyup", this.onnameeditChanged, this);
+    };
+    /**
+     * 取消编辑
+     */
+    RenameTextInput.prototype.cancelEdit = function () {
+        this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
+        feng3d.windowEventProxy.off("keyup", this.onnameeditChanged, this);
+        //
+        this.nameeditTxt.visible = false;
+        this.nameLabel.visible = true;
+        if (this.nameLabel.text == this.nameeditTxt.text)
+            return;
+        this.nameLabel.text = this.nameeditTxt.text;
+        this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+    };
+    RenameTextInput.prototype.onnameeditChanged = function () {
+        if (feng3d.windowEventProxy.key == "Enter" || feng3d.windowEventProxy.key == "Escape") {
+            this.nameeditTxt.textDisplay.dispatchEvent(new egret.FocusEvent(egret.FocusEvent.FOCUS_OUT));
+        }
+    };
+    return RenameTextInput;
+}(eui.Component));
 var feng3d;
 (function (feng3d) {
     var editor;
@@ -4167,20 +4224,22 @@ var feng3d;
                 this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
                 this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.nameLabel.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+                this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+                this.renameInput.addEventListener(egret.Event.CHANGE, this.reanmeInputChange, this);
             };
             AssetsFileItemRenderer.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
                 this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
                 this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.nameLabel.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+                this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
+                this.renameInput.addEventListener(egret.Event.CHANGE, this.reanmeInputChange, this);
             };
             AssetsFileItemRenderer.prototype.dataChanged = function () {
                 var _this = this;
                 _super.prototype.dataChanged.call(this);
                 if (this.data) {
-                    this.nameLabel.text = this.data.label;
+                    this.renameInput.text = this.data.label;
                     var accepttypes = [];
                     if (this.data.isDirectory) {
                         editor.drag.register(this, function (dragsource) {
@@ -4267,31 +4326,12 @@ var feng3d;
             };
             AssetsFileItemRenderer.prototype.onnameLabelclick = function () {
                 if (this.data.selected) {
-                    this.nameeditTxt.textDisplay.textAlign = egret.HorizontalAlign.CENTER;
-                    this.nameeditTxt.text = this.nameLabel.text;
-                    this.nameLabel.visible = false;
-                    this.nameeditTxt.visible = true;
-                    this.nameeditTxt.textDisplay.setFocus();
-                    //
-                    this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
-                    feng3d.windowEventProxy.on("keyup", this.onnameeditChanged, this);
+                    this.renameInput.edit();
                 }
             };
-            AssetsFileItemRenderer.prototype.onnameeditend = function () {
-                this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onnameeditend, this);
-                feng3d.windowEventProxy.off("keyup", this.onnameeditChanged, this);
-                //
-                this.nameeditTxt.visible = false;
-                this.nameLabel.visible = true;
-                if (this.nameLabel.text == this.nameeditTxt.text)
-                    return;
-                var newName = this.data.name.replace(this.nameLabel.text, this.nameeditTxt.text);
+            AssetsFileItemRenderer.prototype.reanmeInputChange = function () {
+                var newName = this.renameInput.text;
                 this.data.rename(newName, this.dataChanged.bind(this));
-            };
-            AssetsFileItemRenderer.prototype.onnameeditChanged = function () {
-                if (feng3d.windowEventProxy.key == "Enter" || feng3d.windowEventProxy.key == "Escape") {
-                    this.onnameeditend();
-                }
             };
             return AssetsFileItemRenderer;
         }(eui.ItemRenderer));

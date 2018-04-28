@@ -13,9 +13,7 @@
         "eui.VScrollBar": "resource/eui_skins/VScrollBarSkin.exml",
         "eui.VSlider": "resource/eui_skins/VSliderSkin.exml",
         "eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml",
-        
         "feng3d.editor.ColorPicker": "resource/custom_skins/ColorPicker.exml",
-
         "feng3d.editor.TopView": "resource/custom_skins/TopView.exml",
         "feng3d.editor.InspectorView": "resource/custom_skins/InspectorView.exml",
         "feng3d.editor.Feng3dView": "resource/custom_skins/Feng3dView.exml",
@@ -23,7 +21,8 @@
         "feng3d.editor.HierarchyView": "resource/custom_skins/HierarchyView.exml",
         "feng3d.editor.AssetsView": "resource/custom_skins/AssetsView.exml",
         "feng3d.editor.MainView": "resource/custom_skins/MainView.exml",
-        "feng3d.editor.BooleanAttrView": "resource/custom_skins/BooleanAttrView.exml"
+        "feng3d.editor.BooleanAttrView": "resource/custom_skins/BooleanAttrView.exml",
+        "RenameTextInput": "resource/eui_skins/RenameTextInput.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [
@@ -40,8 +39,7 @@
         "resource/eui_skins/ToggleSwitchSkin.exml",
         "resource/eui_skins/VScrollBarSkin.exml",
         "resource/eui_skins/VSliderSkin.exml",
-
-        
+        "resource/eui_skins/RenameTextInput.exml",
         "resource/custom_skins/BooleanAttrView.exml",
         "resource/custom_skins/OAVArray.exml",
         "resource/custom_skins/OVBaseDefault.exml",
@@ -53,7 +51,6 @@
         "resource/custom_skins/OAVColorPicker.exml",
         "resource/custom_skins/OAVComponentListSkin.exml",
         "resource/custom_skins/OAVVector3DSkin.exml",
-        
         "resource/custom_skins/ColorPicker.exml",
         "resource/custom_skins/TreeDisclosureButtonSkin.exml",
         "resource/custom_skins/TreeItemRendererSkin.exml",
