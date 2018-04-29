@@ -1845,7 +1845,7 @@ var feng3d;
             ComponentView.prototype.onComplete = function () {
                 var componentName = feng3d.ClassUtils.getQualifiedClassName(this.component).split(".").pop();
                 this.accordion.titleName = componentName;
-                this.componentView = feng3d.objectview.getObjectView(this.component);
+                this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
                 this.accordion.addContent(this.componentView);
                 this.deleteButton.visible = !(this.component instanceof feng3d.Transform);
                 this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);

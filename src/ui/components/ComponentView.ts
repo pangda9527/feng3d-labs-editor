@@ -39,7 +39,7 @@ namespace feng3d.editor
 		{
 			var componentName = ClassUtils.getQualifiedClassName(this.component).split(".").pop();
 			this.accordion.titleName = componentName;
-			this.componentView = objectview.getObjectView(this.component);
+			this.componentView = objectview.getObjectView(this.component, false, ["enabled"]);
 			this.accordion.addContent(this.componentView);
 			this.deleteButton.visible = !(this.component instanceof Transform);
 
