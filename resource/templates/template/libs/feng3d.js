@@ -10776,7 +10776,7 @@ var feng3d;
         ], TextureInfo.prototype, "format", null);
         __decorate([
             feng3d.serialize(feng3d.TextureDataType.UNSIGNED_BYTE),
-            feng3d.oav()
+            feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.TextureDataType } })
         ], TextureInfo.prototype, "type", null);
         __decorate([
             feng3d.serialize(false),
@@ -10792,19 +10792,19 @@ var feng3d;
         ], TextureInfo.prototype, "premulAlpha", null);
         __decorate([
             feng3d.serialize(feng3d.TextureMinFilter.LINEAR),
-            feng3d.oav()
+            feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.TextureMinFilter } })
         ], TextureInfo.prototype, "minFilter", void 0);
         __decorate([
             feng3d.serialize(feng3d.TextureMagFilter.LINEAR),
-            feng3d.oav()
+            feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.TextureMagFilter } })
         ], TextureInfo.prototype, "magFilter", void 0);
         __decorate([
             feng3d.serialize(feng3d.TextureWrap.REPEAT),
-            feng3d.oav()
+            feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.TextureWrap } })
         ], TextureInfo.prototype, "wrapS", void 0);
         __decorate([
             feng3d.serialize(feng3d.TextureWrap.REPEAT),
-            feng3d.oav()
+            feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.TextureWrap } })
         ], TextureInfo.prototype, "wrapT", void 0);
         __decorate([
             feng3d.serialize(0),
