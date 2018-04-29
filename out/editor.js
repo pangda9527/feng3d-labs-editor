@@ -1848,6 +1848,19 @@ var feng3d;
                 this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
                 this.accordion.addContent(this.componentView);
                 this.deleteButton.visible = !(this.component instanceof feng3d.Transform);
+                this.enabledCB = this.accordion["enabledCB"];
+                this.componentIcon = this.accordion["componentIcon"];
+                this.helpBtn = this.accordion["helpBtn"];
+                this.operationBtn = this.accordion["operationBtn"];
+                if (this.component instanceof feng3d.Transform) {
+                    this.componentIcon.source = "Transform_png";
+                }
+                else if (this.component instanceof feng3d.MeshRenderer) {
+                    this.componentIcon.source = "MeshRenderer_png";
+                }
+                else if (this.component instanceof feng3d.ScriptComponent) {
+                    this.componentIcon.source = "ScriptComponent_png";
+                }
                 this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
                 this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
                 if (this.stage)
@@ -1866,6 +1879,8 @@ var feng3d;
                 this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
                 if (this.component instanceof feng3d.Behaviour)
                     feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+                this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
+                this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
             };
             ComponentView.prototype.onRemovedFromStage = function () {
                 this.saveScriptData();
@@ -1875,6 +1890,8 @@ var feng3d;
                 this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
                 if (this.component instanceof feng3d.Behaviour)
                     feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+                this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
+                this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
             };
             ComponentView.prototype.updateEnableCB = function () {
                 if (this.component instanceof feng3d.Behaviour) {
@@ -1920,6 +1937,11 @@ var feng3d;
                     }
                     component.scriptData = scriptData;
                 }
+            };
+            ComponentView.prototype.onOperationBtnClick = function () {
+            };
+            ComponentView.prototype.onHelpBtnClick = function () {
+                window.open("http://feng3d.gitee.io/#/script");
             };
             return ComponentView;
         }(eui.Component));

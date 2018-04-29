@@ -8,7 +8,13 @@ namespace feng3d.editor
 		//
 		public accordion: feng3d.editor.Accordion;
 		public deleteButton: eui.Button;
+
+		//
 		public enabledCB: eui.CheckBox;
+		public componentIcon: eui.Image;
+		public helpBtn: eui.Button;
+		public operationBtn: eui.Button;
+
 
 		script: Script;
 		scriptView: IObjectView & eui.Component
@@ -43,6 +49,22 @@ namespace feng3d.editor
 			this.accordion.addContent(this.componentView);
 			this.deleteButton.visible = !(this.component instanceof Transform);
 
+			this.enabledCB = this.accordion["enabledCB"];
+			this.componentIcon = this.accordion["componentIcon"];
+			this.helpBtn = this.accordion["helpBtn"];
+			this.operationBtn = this.accordion["operationBtn"];
+
+			if (this.component instanceof Transform)
+			{
+				this.componentIcon.source = "Transform_png";
+			} else if (this.component instanceof MeshRenderer)
+			{
+				this.componentIcon.source = "MeshRenderer_png";
+			} else if (this.component instanceof ScriptComponent)
+			{
+				this.componentIcon.source = "ScriptComponent_png";
+			}
+
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
 			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
@@ -68,6 +90,9 @@ namespace feng3d.editor
 			this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
 			if (this.component instanceof feng3d.Behaviour)
 				feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+
+			this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
+			this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
 		}
 
 		private onRemovedFromStage()
@@ -81,6 +106,9 @@ namespace feng3d.editor
 			this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
 			if (this.component instanceof feng3d.Behaviour)
 				feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+
+			this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
+			this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
 		}
 
 		private updateEnableCB()
@@ -142,6 +170,16 @@ namespace feng3d.editor
 				}
 				component.scriptData = scriptData;
 			}
+		}
+
+		private onOperationBtnClick()
+		{
+
+		}
+
+		private onHelpBtnClick()
+		{
+			window.open(`http://feng3d.gitee.io/#/script`);
 		}
 	}
 }
