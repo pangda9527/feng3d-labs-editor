@@ -34,6 +34,7 @@
         "src/ui/components/SplitGroup.ts",
         "src/ui/components/maskview.ts",
         "src/ui/components/popupview.ts",
+        "src/ui/components/ComboBox.ts",
         "src/ui/components/Accordion.ts",
         "src/ui/components/ColorPicker.ts",
         "src/ui/components/TreeItemRenderer.ts",

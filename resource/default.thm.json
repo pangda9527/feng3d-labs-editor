@@ -24,7 +24,8 @@
         "feng3d.editor.BooleanAttrView": "resource/custom_skins/BooleanAttrView.exml",
         "feng3d.editor.HierarchyTreeItemRenderer": "resource/custom_skins/HierarchyTreeItemRenderer.exml",
         "feng3d.editor.Accordion": "resource/custom_skins/Accordion.exml",
-        "RenameTextInput": "resource/eui_skins/RenameTextInput.exml"
+        "RenameTextInput": "resource/eui_skins/RenameTextInput.exml",
+        "ComboBox": "resource/eui_skins/ComboBox.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [
@@ -42,6 +43,7 @@
         "resource/eui_skins/VScrollBarSkin.exml",
         "resource/eui_skins/VSliderSkin.exml",
         "resource/eui_skins/RenameTextInput.exml",
+        "resource/eui_skins/ComboBox.exml",
         "resource/custom_skins/BooleanAttrView.exml",
         "resource/custom_skins/OAVArray.exml",
         "resource/custom_skins/OVBaseDefault.exml",

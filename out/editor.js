@@ -1351,6 +1351,69 @@ var feng3d;
         }
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
+/**
+ * 下拉列表
+ */
+var ComboBox = /** @class */ (function (_super) {
+    __extends(ComboBox, _super);
+    function ComboBox() {
+        var _this = _super.call(this) || this;
+        /**
+         * 数据
+         */
+        // dataProvider: { label: string, value: any }[] = [];
+        _this.dataProvider = [
+            { label: "1", value: 1 },
+            { label: "2", value: 1 },
+            { label: "3", value: 1 },
+            { label: "4", value: 1 },
+        ];
+        _this.skinName = "ComboBoxSkin";
+        return _this;
+    }
+    ComboBox.prototype.$onAddToStage = function (stage, nestLevel) {
+        _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+        this.init();
+        this.updateview();
+        this.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+        this.list.addEventListener(egret.Event.CHANGE, this.onlistChange, this);
+    };
+    ComboBox.prototype.$onRemoveFromStage = function () {
+        _super.prototype.$onRemoveFromStage.call(this);
+        this.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+        this.list.removeEventListener(egret.Event.CHANGE, this.onlistChange, this);
+    };
+    ComboBox.prototype.init = function () {
+        this.list = new eui.List();
+        this.list.itemRenderer = eui.ItemRenderer;
+    };
+    ComboBox.prototype.updateview = function () {
+        if (this.data == null && this.dataProvider != null)
+            this.data = this.dataProvider[0];
+        if (this.data)
+            this.label.text = this.data.label;
+        else
+            this.label.text = "";
+    };
+    ComboBox.prototype.onClick = function () {
+        if (!this.dataProvider)
+            return;
+        this.list.dataProvider = new eui.ArrayCollection(this.dataProvider);
+        var rect = this.getTransformedBounds(this.stage);
+        this.list.x = rect.left;
+        this.list.y = rect.bottom;
+        this.list.selectedIndex = this.dataProvider.indexOf(this.data);
+        feng3d.editor.editorui.popupLayer.addChild(this.list);
+        feng3d.editor.maskview.mask(this.list);
+    };
+    ComboBox.prototype.onlistChange = function () {
+        this.data = this.list.selectedItem;
+        this.updateview();
+        if (this.list.parent)
+            this.list.parent.removeChild(this.list);
+    };
+    return ComboBox;
+}(eui.Component));
 var feng3d;
 (function (feng3d) {
     var editor;

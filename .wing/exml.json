@@ -23,7 +23,7 @@
     "globalBackgroundY": 0,
     "globalBackgroundWidth": -1,
     "globalBackgroundHeight": -1,
-    "globalBackgroundColor": "#c2c2c2",
+    "globalBackgroundColor": "#a2a2a2",
     "globalBackgroundImage": ""
   },
   "15a64cb93c1": {
@@ -99,5 +99,12 @@
     "path": "ui\\components\\RenameTextInput.ts",
     "class": "RenameTextInput",
     "parentPath": ""
+  },
+  "1631153cabe": {
+    "backgroundType": "user",
+    "backgroundColor": "#a2a2a2",
+    "backgroundAlpha": 100,
+    "useBgImage": false,
+    "useBgColor": true
   }
 }

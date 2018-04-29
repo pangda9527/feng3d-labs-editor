@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="TopView" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" width="800">
+<e:Skin class="TopView" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:ns1="*" width="800">
+	<w:Config id="1631153cabe"/>
 	<e:Group id="topGroup" width="100%" height="100%">
 		<e:Button id="mainButton" icon="favicon_png" width="32" height="32">
 		</e:Button>
@@ -91,6 +92,7 @@
 				<e:HorizontalLayout gap="-1"/>
 			</e:layout>
 		</e:Group>
+		<ns1:ComboBox width="100" x="527" y="8.5" anchorOffsetX="0"/>
 		<e:layout>
 			<e:BasicLayout/>
 		</e:layout>
