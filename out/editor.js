@@ -1847,7 +1847,6 @@ var feng3d;
                 this.accordion.titleName = componentName;
                 this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
                 this.accordion.addContent(this.componentView);
-                this.deleteButton.visible = !(this.component instanceof feng3d.Transform);
                 this.enabledCB = this.accordion["enabledCB"];
                 this.componentIcon = this.accordion["componentIcon"];
                 this.helpBtn = this.accordion["helpBtn"];
@@ -1873,7 +1872,6 @@ var feng3d;
             ComponentView.prototype.onAddToStage = function () {
                 this.initScriptView();
                 this.updateView();
-                this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
                 if (this.scriptView)
                     this.scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
                 this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
@@ -1884,7 +1882,6 @@ var feng3d;
             };
             ComponentView.prototype.onRemovedFromStage = function () {
                 this.saveScriptData();
-                this.deleteButton.removeEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
                 if (this.scriptView)
                     this.scriptView.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
                 this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
@@ -1939,6 +1936,18 @@ var feng3d;
                 }
             };
             ComponentView.prototype.onOperationBtnClick = function () {
+                var _this = this;
+                var menus = [];
+                if (!(this.component instanceof feng3d.Transform)) {
+                    menus.push({
+                        label: "移除组件",
+                        click: function () {
+                            if (_this.component.gameObject)
+                                _this.component.gameObject.removeComponent(_this.component);
+                        }
+                    });
+                }
+                editor.menu.popup(menus, this.stage.stageWidth - 150);
             };
             ComponentView.prototype.onHelpBtnClick = function () {
                 window.open("http://feng3d.gitee.io/#/script");

@@ -7,7 +7,6 @@ namespace feng3d.editor
 
 		//
 		public accordion: feng3d.editor.Accordion;
-		public deleteButton: eui.Button;
 
 		//
 		public enabledCB: eui.CheckBox;
@@ -47,7 +46,6 @@ namespace feng3d.editor
 			this.accordion.titleName = componentName;
 			this.componentView = objectview.getObjectView(this.component, false, ["enabled"]);
 			this.accordion.addContent(this.componentView);
-			this.deleteButton.visible = !(this.component instanceof Transform);
 
 			this.enabledCB = this.accordion["enabledCB"];
 			this.componentIcon = this.accordion["componentIcon"];
@@ -83,7 +81,6 @@ namespace feng3d.editor
 			this.initScriptView();
 			this.updateView();
 
-			this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
 			if (this.scriptView)
 				this.scriptView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
 
@@ -99,7 +96,6 @@ namespace feng3d.editor
 		{
 			this.saveScriptData();
 
-			this.deleteButton.removeEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
 			if (this.scriptView)
 				this.scriptView.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
 
@@ -174,7 +170,21 @@ namespace feng3d.editor
 
 		private onOperationBtnClick()
 		{
+			var menus: MenuItem[] = [];
 
+			if (!(this.component instanceof Transform))
+			{
+				menus.push({
+					label: "移除组件",
+					click: () =>
+					{
+						if (this.component.gameObject)
+							this.component.gameObject.removeComponent(this.component);
+					}
+				});
+			}
+
+			menu.popup(menus, this.stage.stageWidth - 150);
 		}
 
 		private onHelpBtnClick()

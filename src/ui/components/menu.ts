@@ -1,6 +1,20 @@
 namespace feng3d.editor
 {
-    export type MenuItem = { label?: string, accelerator?: string, role?: string, type?: 'separator', click?: () => void, submenu?: MenuItem[] };
+    export type MenuItem = {
+        /**
+         * 显示标签
+         */
+        label?: string,
+        accelerator?: string, role?: string, type?: 'separator',
+        /**
+         * 点击事件
+         */
+        click?: () => void,
+        /**
+         * 子菜单
+         */
+        submenu?: MenuItem[]
+    };
     export type Menu = MenuItem[];
 
     export var menu = {
