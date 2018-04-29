@@ -10329,12 +10329,12 @@ var feng3d;
             feng3d.objectview.defaultObjectAttributeViewClass = "OAVDefault";
             feng3d.objectview.defaultObjectAttributeBlockView = "OBVDefault";
             //
-            feng3d.objectview.defaultTypeAttributeView["Boolean"] = { component: "BooleanAttrView" };
-            feng3d.objectview.defaultTypeAttributeView["number"] = { component: "OAVNumber" };
-            feng3d.objectview.defaultTypeAttributeView["Vector3"] = { component: "OAVVector3D" };
-            feng3d.objectview.defaultTypeAttributeView["Array"] = { component: "OAVArray" };
-            feng3d.objectview.defaultTypeAttributeView["Function"] = { component: "OAVFunction" };
-            feng3d.objectview.defaultTypeAttributeView["Color"] = { component: "OAVColorPicker" };
+            feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "BooleanAttrView" });
+            feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
+            feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
+            feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });
+            feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
+            feng3d.objectview.setDefaultTypeAttributeView("Color", { component: "OAVColorPicker" });
             function setObjectview(cls, classDefinition) {
                 cls["objectview"] = classDefinition;
             }

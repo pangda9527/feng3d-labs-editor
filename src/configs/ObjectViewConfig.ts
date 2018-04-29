@@ -8,12 +8,12 @@ namespace feng3d.editor
         objectview.defaultObjectAttributeViewClass = "OAVDefault";
         objectview.defaultObjectAttributeBlockView = "OBVDefault";
         //
-        objectview.defaultTypeAttributeView["Boolean"] = { component: "BooleanAttrView" };
-        objectview.defaultTypeAttributeView["number"] = { component: "OAVNumber" };
-        objectview.defaultTypeAttributeView["Vector3"] = { component: "OAVVector3D" };
-        objectview.defaultTypeAttributeView["Array"] = { component: "OAVArray" };
-        objectview.defaultTypeAttributeView["Function"] = { component: "OAVFunction" };
-        objectview.defaultTypeAttributeView["Color"] = { component: "OAVColorPicker" };
+        objectview.setDefaultTypeAttributeView("Boolean", { component: "BooleanAttrView" });
+        objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
+        objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
+        objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });
+        objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
+        objectview.setDefaultTypeAttributeView("Color", { component: "OAVColorPicker" });
 
         function setObjectview(cls: any, classDefinition: ClassDefinition)
         {
