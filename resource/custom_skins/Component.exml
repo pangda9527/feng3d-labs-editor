@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <e:Skin class="ComponentSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:editor="feng3d.editor.*">
 	<w:Config id="15abcab17e0" ></w:Config>
-	<editor:Accordion id="accordion" width="100%" x="0" y="0" height="100%"/>
+	<editor:Accordion id="accordion" width="100%" x="0" y="0" skinName="ComponentAccordion"/>
 	<e:Button id="deleteButton" label="-" width="20" y="0" right="10"/>
+	<e:CheckBox id="enabledCB" label="" left="17"/>
 
 
 </e:Skin>

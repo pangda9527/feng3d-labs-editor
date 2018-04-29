@@ -6,8 +6,9 @@ namespace feng3d.editor
 		componentView: IObjectView;
 
 		//
-		accordion: feng3d.editor.Accordion;
-		deleteButton: eui.Button;
+		public accordion: feng3d.editor.Accordion;
+		public deleteButton: eui.Button;
+		public enabledCB: eui.CheckBox;
 
 		script: Script;
 		scriptView: IObjectView & eui.Component
@@ -29,6 +30,7 @@ namespace feng3d.editor
 		 */
 		updateView(): void
 		{
+			this.updateEnableCB();
 			if (this.componentView)
 				this.componentView.updateView();
 		}
@@ -62,6 +64,10 @@ namespace feng3d.editor
 			this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
 			if (this.scriptView)
 				this.scriptView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+
+			this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+			if (this.component instanceof feng3d.Behaviour)
+				feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
 		}
 
 		private onRemovedFromStage()
@@ -71,6 +77,31 @@ namespace feng3d.editor
 			this.deleteButton.removeEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
 			if (this.scriptView)
 				this.scriptView.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+
+			this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+			if (this.component instanceof feng3d.Behaviour)
+				feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+		}
+
+		private updateEnableCB()
+		{
+			if (this.component instanceof feng3d.Behaviour)
+			{
+				this.enabledCB.selected = this.component.enabled;
+				this.enabledCB.visible = true;
+			}
+			else
+			{
+				this.enabledCB.visible = false;
+			}
+		}
+
+		private onEnableCBChange()
+		{
+			if (this.component instanceof feng3d.Behaviour)
+			{
+				this.component.enabled = this.enabledCB.selected;
+			}
 		}
 
 		private initScriptView()

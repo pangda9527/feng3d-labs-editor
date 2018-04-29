@@ -1838,6 +1838,7 @@ var feng3d;
              * 更新界面
              */
             ComponentView.prototype.updateView = function () {
+                this.updateEnableCB();
                 if (this.componentView)
                     this.componentView.updateView();
             };
@@ -1862,12 +1863,32 @@ var feng3d;
                 this.deleteButton.addEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
                 if (this.scriptView)
                     this.scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+                this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+                if (this.component instanceof feng3d.Behaviour)
+                    feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
             };
             ComponentView.prototype.onRemovedFromStage = function () {
                 this.saveScriptData();
                 this.deleteButton.removeEventListener(egret.MouseEvent.CLICK, this.onDeleteButton, this);
                 if (this.scriptView)
                     this.scriptView.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+                this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+                if (this.component instanceof feng3d.Behaviour)
+                    feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+            };
+            ComponentView.prototype.updateEnableCB = function () {
+                if (this.component instanceof feng3d.Behaviour) {
+                    this.enabledCB.selected = this.component.enabled;
+                    this.enabledCB.visible = true;
+                }
+                else {
+                    this.enabledCB.visible = false;
+                }
+            };
+            ComponentView.prototype.onEnableCBChange = function () {
+                if (this.component instanceof feng3d.Behaviour) {
+                    this.component.enabled = this.enabledCB.selected;
+                }
             };
             ComponentView.prototype.initScriptView = function () {
                 var _this = this;

@@ -60,6 +60,7 @@
         "resource/custom_skins/MenuItemRender.exml",
         "resource/custom_skins/Accordion.exml",
         "resource/custom_skins/Vector3DViewSkin.exml",
+        "resource/custom_skins/ComponentAccordion.exml",
         "resource/custom_skins/Component.exml",
         "resource/custom_skins/TopView.exml",
         "resource/custom_skins/InspectorView.exml",
