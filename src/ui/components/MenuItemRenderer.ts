@@ -5,6 +5,8 @@ namespace feng3d.editor
         data: MenuItem;
         menuUI: MenuUI;
 
+        public selectedRect: eui.Rect;
+
         protected dataChanged()
         {
             super.dataChanged();
@@ -33,6 +35,7 @@ namespace feng3d.editor
         {
             this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
             this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
+            this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
 
             this.menuUI = <any>this.parent;
 
@@ -43,6 +46,7 @@ namespace feng3d.editor
         {
             this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
             this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
+            this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
 
             this.menuUI = null;
         }
@@ -63,6 +67,7 @@ namespace feng3d.editor
             {
                 this.skin.currentState = "normal";
             }
+            this.selectedRect.visible = false;
         }
 
         private onItemMouseDown(event: egret.TouchEvent): void
@@ -79,10 +84,25 @@ namespace feng3d.editor
                 if (rect.right + 300 > this.stage.stageWidth)
                     rect.x -= rect.width + 150;
                 this.menuUI.subMenuUI = MenuUI.create(this.data.submenu, rect.right, rect.top);
+                this.menuUI.subMenuUI.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
             } else
             {
                 this.menuUI.subMenuUI = null;
             }
+            this.selectedRect.visible = true;
+        }
+
+        private onItemMouseOut()
+        {
+            if (!this.menuUI.subMenuUI)
+                this.selectedRect.visible = false;
+        }
+
+        private onsubMenuUIRemovedFromeStage(e: egret.Event)
+        {
+            var current = e.currentTarget;
+            current.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
+            this.selectedRect.visible = false;
         }
     }
 }

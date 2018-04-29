@@ -1531,12 +1531,14 @@ var feng3d;
             MenuItemRenderer.prototype.onAddedToStage = function () {
                 this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
                 this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
+                this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
                 this.menuUI = this.parent;
                 this.updateView();
             };
             MenuItemRenderer.prototype.onRemovedFromStage = function () {
                 this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
                 this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
+                this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
                 this.menuUI = null;
             };
             MenuItemRenderer.prototype.updateView = function () {
@@ -1551,6 +1553,7 @@ var feng3d;
                 else {
                     this.skin.currentState = "normal";
                 }
+                this.selectedRect.visible = false;
             };
             MenuItemRenderer.prototype.onItemMouseDown = function (event) {
                 this.data.click && this.data.click();
@@ -1562,10 +1565,21 @@ var feng3d;
                     if (rect.right + 300 > this.stage.stageWidth)
                         rect.x -= rect.width + 150;
                     this.menuUI.subMenuUI = editor.MenuUI.create(this.data.submenu, rect.right, rect.top);
+                    this.menuUI.subMenuUI.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
                 }
                 else {
                     this.menuUI.subMenuUI = null;
                 }
+                this.selectedRect.visible = true;
+            };
+            MenuItemRenderer.prototype.onItemMouseOut = function () {
+                if (!this.menuUI.subMenuUI)
+                    this.selectedRect.visible = false;
+            };
+            MenuItemRenderer.prototype.onsubMenuUIRemovedFromeStage = function (e) {
+                var current = e.currentTarget;
+                current.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
+                this.selectedRect.visible = false;
             };
             return MenuItemRenderer;
         }(eui.ItemRenderer));
