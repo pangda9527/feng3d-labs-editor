@@ -134,7 +134,7 @@ namespace feng3d.editor
 			if (this.component instanceof ScriptComponent)
 			{
 				var component = this.component;
-				ScriptComponent.addScript(component.url, (scriptClass) =>
+				ScriptComponent.addScript(component.script, (scriptClass) =>
 				{
 					this.script = new scriptClass();
 					var scriptData = component.scriptData = component.scriptData || {};

@@ -1909,7 +1909,7 @@ var feng3d;
                 // 初始化Script属性面板
                 if (this.component instanceof feng3d.ScriptComponent) {
                     var component = this.component;
-                    feng3d.ScriptComponent.addScript(component.url, function (scriptClass) {
+                    feng3d.ScriptComponent.addScript(component.script, function (scriptClass) {
                         _this.script = new scriptClass();
                         var scriptData = component.scriptData = component.scriptData || {};
                         for (var key in scriptData) {
@@ -3123,7 +3123,7 @@ var feng3d;
                 this.space.on("removedComponent", this.onremovedComponent, this);
                 editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
                     if (dragdata.file_script) {
-                        _this.space.addComponent(feng3d.ScriptComponent).url = dragdata.file_script;
+                        _this.space.addComponent(feng3d.ScriptComponent).script = dragdata.file_script;
                     }
                 });
             };
