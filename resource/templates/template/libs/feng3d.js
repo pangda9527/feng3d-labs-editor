@@ -10772,7 +10772,7 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize(feng3d.TextureFormat.RGB),
-            feng3d.oav()
+            feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.TextureFormat } })
         ], TextureInfo.prototype, "format", null);
         __decorate([
             feng3d.serialize(feng3d.TextureDataType.UNSIGNED_BYTE),

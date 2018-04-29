@@ -19,7 +19,22 @@ class ComboBox extends eui.Component implements eui.UIComponent
 	/**
 	 * 选中数据
 	 */
-	data: { label: string, value: any };
+	get data()
+	{
+		return this._data;
+	}
+	set data(v)
+	{
+		this._data = v;
+		if (this.label)
+		{
+			if (this._data)
+				this.label.text = this._data.label;
+			else
+				this.label.text = "";
+		}
+	}
+	_data: { label: string, value: any };
 
 	public constructor()
 	{
@@ -86,5 +101,7 @@ class ComboBox extends eui.Component implements eui.UIComponent
 
 		if (this.list.parent)
 			this.list.parent.removeChild(this.list);
+
+		this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
 	}
 }

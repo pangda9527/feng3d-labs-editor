@@ -1371,6 +1371,25 @@ var ComboBox = /** @class */ (function (_super) {
         _this.skinName = "ComboBoxSkin";
         return _this;
     }
+    Object.defineProperty(ComboBox.prototype, "data", {
+        /**
+         * 选中数据
+         */
+        get: function () {
+            return this._data;
+        },
+        set: function (v) {
+            this._data = v;
+            if (this.label) {
+                if (this._data)
+                    this.label.text = this._data.label;
+                else
+                    this.label.text = "";
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     ComboBox.prototype.$onAddToStage = function (stage, nestLevel) {
         _super.prototype.$onAddToStage.call(this, stage, nestLevel);
         this.init();
@@ -1411,6 +1430,7 @@ var ComboBox = /** @class */ (function (_super) {
         this.updateview();
         if (this.list.parent)
             this.list.parent.removeChild(this.list);
+        this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
     };
     return ComboBox;
 }(eui.Component));
@@ -2677,6 +2697,19 @@ var feng3d;
                 enumerable: true,
                 configurable: true
             });
+            OAVBase.prototype.$onAddToStage = function (stage, nestLevel) {
+                _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+                if (this.attributeViewInfo.componentParam) {
+                    for (var key in this.attributeViewInfo.componentParam) {
+                        if (this.attributeViewInfo.componentParam.hasOwnProperty(key)) {
+                            this[key] = this.attributeViewInfo.componentParam[key];
+                        }
+                    }
+                }
+            };
+            OAVBase.prototype.$onRemoveFromStage = function () {
+                _super.prototype.$onRemoveFromStage.call(this);
+            };
             OAVBase.prototype.updateView = function () {
             };
             Object.defineProperty(OAVBase.prototype, "attributeName", {
@@ -2757,13 +2790,6 @@ var feng3d;
                 this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
                 this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                if (this.attributeViewInfo.componentParam) {
-                    for (var key in this.attributeViewInfo.componentParam) {
-                        if (this.attributeViewInfo.componentParam.hasOwnProperty(key)) {
-                            this[key] = this.attributeViewInfo.componentParam[key];
-                        }
-                    }
-                }
                 this.updateView();
                 feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
             };
@@ -3104,6 +3130,63 @@ var feng3d;
             return OAVArrayItem;
         }(editor.OAVDefault));
         editor.OAVArrayItem = OAVArrayItem;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        var OAVEnum = /** @class */ (function (_super) {
+            __extends(OAVEnum, _super);
+            function OAVEnum(attributeViewInfo) {
+                var _this = _super.call(this, attributeViewInfo) || this;
+                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                _this.skinName = "OAVEnum";
+                return _this;
+            }
+            Object.defineProperty(OAVEnum.prototype, "enumClass", {
+                set: function (obj) {
+                    this.list = [];
+                    for (var key in obj) {
+                        if (obj.hasOwnProperty(key) && !isNaN(Number(key))) {
+                            this.list.push({ label: obj[key], value: Number(key) });
+                        }
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            OAVEnum.prototype.$onAddToStage = function (stage, nestLevel) {
+                _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+                this.updateView();
+                this.combobox.addEventListener(egret.Event.CHANGE, this.onComboxChange, this);
+            };
+            OAVEnum.prototype.$onRemoveFromStage = function () {
+                _super.prototype.$onRemoveFromStage.call(this);
+                this.combobox.removeEventListener(egret.Event.CHANGE, this.onComboxChange, this);
+            };
+            OAVEnum.prototype.updateView = function () {
+                var _this = this;
+                this.combobox.dataProvider = this.list;
+                if (this.list) {
+                    this.combobox.data = this.list.reduce(function (prevalue, item) {
+                        if (prevalue)
+                            return prevalue;
+                        if (item.value == _this.attributeValue)
+                            return item;
+                        return null;
+                    }, null);
+                }
+            };
+            OAVEnum.prototype.onComboxChange = function () {
+                this.attributeValue = this.combobox.data.value;
+            };
+            OAVEnum = __decorate([
+                feng3d.OAVComponent()
+            ], OAVEnum);
+            return OAVEnum;
+        }(editor.OAVBase));
+        editor.OAVEnum = OAVEnum;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;

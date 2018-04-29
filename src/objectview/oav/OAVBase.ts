@@ -16,7 +16,7 @@ namespace feng3d.editor
             this._attributeName = attributeViewInfo.name;
             this._attributeType = attributeViewInfo.type;
             this.attributeViewInfo = attributeViewInfo;
-            
+
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
         }
 
@@ -35,6 +35,27 @@ namespace feng3d.editor
         {
             this._space = value;
             this.updateView();
+        }
+
+        $onAddToStage(stage: egret.Stage, nestLevel: number)
+        {
+            super.$onAddToStage(stage, nestLevel);
+
+            if (this.attributeViewInfo.componentParam)
+            {
+                for (var key in this.attributeViewInfo.componentParam)
+                {
+                    if (this.attributeViewInfo.componentParam.hasOwnProperty(key))
+                    {
+                        this[key] = this.attributeViewInfo.componentParam[key];
+                    }
+                }
+            }
+        }
+
+        $onRemoveFromStage()
+        {
+            super.$onRemoveFromStage()
         }
 
         updateView()

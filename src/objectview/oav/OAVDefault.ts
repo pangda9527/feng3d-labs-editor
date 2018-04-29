@@ -55,16 +55,6 @@ namespace feng3d.editor
 			this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
 			this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
 
-			if (this.attributeViewInfo.componentParam)
-			{
-				for (var key in this.attributeViewInfo.componentParam)
-				{
-					if (this.attributeViewInfo.componentParam.hasOwnProperty(key))
-					{
-						this[key] = this.attributeViewInfo.componentParam[key];
-					}
-				}
-			}
 			this.updateView();
 
 			watcher.watch(this.space, this.attributeName, this.updateView, this);
