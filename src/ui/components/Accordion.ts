@@ -10,11 +10,11 @@ namespace feng3d.editor
 		private components: eui.Component[] = [];
 		titleName = "";
 
-		constructor()
+		constructor(skinName = "AccordionSkin")
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.skinName = "AccordionSkin";
+			this.skinName = skinName;
 		}
 
 		addContent(component: eui.Component)
@@ -25,7 +25,7 @@ namespace feng3d.editor
 				this.contentGroup.addChild(component);
 		}
 
-		private onComplete()
+		protected onComplete()
 		{
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
 			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
@@ -36,9 +36,9 @@ namespace feng3d.editor
 			}
 		}
 
-		private onAddedToStage()
+		protected onAddedToStage()
 		{
-			this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+			this.titleGroup.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
 			if (this.components)
 			{
 				for (var i = 0; i < this.components.length; i++)
@@ -50,9 +50,9 @@ namespace feng3d.editor
 			}
 		}
 
-		private onRemovedFromStage()
+		protected onRemovedFromStage()
 		{
-			this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+			this.titleGroup.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
 		}
 
 		private onTitleButtonClick()

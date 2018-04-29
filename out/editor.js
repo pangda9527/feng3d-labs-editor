@@ -1357,12 +1357,13 @@ var feng3d;
     (function (editor) {
         var Accordion = /** @class */ (function (_super) {
             __extends(Accordion, _super);
-            function Accordion() {
+            function Accordion(skinName) {
+                if (skinName === void 0) { skinName = "AccordionSkin"; }
                 var _this = _super.call(this) || this;
                 _this.components = [];
                 _this.titleName = "";
                 _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
-                _this.skinName = "AccordionSkin";
+                _this.skinName = skinName;
                 return _this;
             }
             Accordion.prototype.addContent = function (component) {
@@ -1379,7 +1380,7 @@ var feng3d;
                 }
             };
             Accordion.prototype.onAddedToStage = function () {
-                this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+                this.titleGroup.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
                 if (this.components) {
                     for (var i = 0; i < this.components.length; i++) {
                         this.contentGroup.addChild(this.components[i]);
@@ -1389,7 +1390,7 @@ var feng3d;
                 }
             };
             Accordion.prototype.onRemovedFromStage = function () {
-                this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+                this.titleGroup.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
             };
             Accordion.prototype.onTitleButtonClick = function () {
                 this.currentState = this.currentState == "hide" ? "show" : "hide";
