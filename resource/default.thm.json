@@ -23,6 +23,7 @@
         "feng3d.editor.MainView": "resource/custom_skins/MainView.exml",
         "feng3d.editor.BooleanAttrView": "resource/custom_skins/BooleanAttrView.exml",
         "feng3d.editor.HierarchyTreeItemRenderer": "resource/custom_skins/HierarchyTreeItemRenderer.exml",
+        "feng3d.editor.Accordion": "resource/custom_skins/Accordion.exml",
         "RenameTextInput": "resource/eui_skins/RenameTextInput.exml"
     },
     "autoGenerateExmlsList": true,

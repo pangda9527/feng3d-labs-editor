@@ -1357,13 +1357,15 @@ var feng3d;
     (function (editor) {
         var Accordion = /** @class */ (function (_super) {
             __extends(Accordion, _super);
-            function Accordion(skinName) {
-                if (skinName === void 0) { skinName = "AccordionSkin"; }
+            function Accordion() {
                 var _this = _super.call(this) || this;
-                _this.components = [];
+                /**
+                 * 标签名称
+                 */
                 _this.titleName = "";
+                _this.components = [];
                 _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
-                _this.skinName = skinName;
+                _this.skinName = "Accordion";
                 return _this;
             }
             Accordion.prototype.addContent = function (component) {
@@ -1381,6 +1383,7 @@ var feng3d;
             };
             Accordion.prototype.onAddedToStage = function () {
                 this.titleGroup.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+                this.titleLabel.text = this.titleName;
                 if (this.components) {
                     for (var i = 0; i < this.components.length; i++) {
                         this.contentGroup.addChild(this.components[i]);
