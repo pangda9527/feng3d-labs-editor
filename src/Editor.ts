@@ -48,7 +48,7 @@ namespace feng3d.editor
         private init()
         {
 
-            document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorAssets.projectPath;
+            document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorAssets.projectname;
 
             feng3d.runEnvironment = RunEnvironment.editor;
             
@@ -97,13 +97,13 @@ namespace feng3d.editor
             {
                 if (has)
                 {
-                    editorAssets.projectPath = editorcache.projectname;
+                    editorAssets.projectname = editorcache.projectname;
                     fs.initproject(editorcache.projectname, callback);
                 } else
                 {
                     fs.createproject(editorcache.projectname, () =>
                     {
-                        editorAssets.projectPath = editorcache.projectname;
+                        editorAssets.projectname = editorcache.projectname;
                         fs.initproject(editorcache.projectname, callback);
                     });
                 }

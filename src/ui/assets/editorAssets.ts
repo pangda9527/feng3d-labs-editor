@@ -16,23 +16,21 @@ namespace feng3d.editor
     export var editorAssets = {
         //attribute
         /**
-         * 项目根路径
+         * 项目名称
          */
-        projectPath: "",
-        assetsPath: "",
+        projectname: "",
+        assetsPath: "Assets",
         showFloder: "",
         //function
         initproject(path: string, callback: () => void)
         {
-            var assetsPath = "Assets";
-            editorAssets.projectPath = path;
-            editorAssets.assetsPath = assetsPath;
+            editorAssets.projectname = path;
             //
-            fs.stat(assetsPath, (err, fileInfo) =>
+            fs.stat(editorAssets.assetsPath, (err, fileInfo) =>
             {
                 if (err)
                 {
-                    fs.mkdir(assetsPath, (err) =>
+                    fs.mkdir(editorAssets.assetsPath, (err) =>
                     {
                         if (err)
                         {
@@ -40,7 +38,7 @@ namespace feng3d.editor
                             error(err);
                             return;
                         }
-                        fs.stat(assetsPath, (err, fileInfo) =>
+                        fs.stat(editorAssets.assetsPath, (err, fileInfo) =>
                         {
                             rootfileinfo = new AssetsFile(fileInfo);
                             editorAssets.showFloder = fileInfo.path;
@@ -123,8 +121,8 @@ namespace feng3d.editor
             {
                 assetsfile.move(destdirpath, callback);
             } else
-            {
-                var filename = assetsfile.name;
+            {   
+                var filename = path.split("/").pop();
                 var dest = destdirpath + "/" + filename;
                 fs.move(path, dest, callback);
             }

@@ -117,7 +117,7 @@ namespace feng3d.editor
 
         private initlist()
         {
-            editorAssets.initproject(editorAssets.projectPath, () =>
+            editorAssets.initproject(editorAssets.projectname, () =>
             {
                 this.invalidateAssetstree();
             });

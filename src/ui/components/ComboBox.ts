@@ -9,13 +9,7 @@ class ComboBox extends eui.Component implements eui.UIComponent
 	/**
 	 * 数据
 	 */
-	// dataProvider: { label: string, value: any }[] = [];
-	dataProvider: { label: string, value: any }[] = [
-		{ label: "1", value: 1 },
-		{ label: "2", value: 1 },
-		{ label: "3", value: 1 },
-		{ label: "4", value: 1 },
-	];
+	dataProvider: { label: string, value: any }[] = [];
 	/**
 	 * 选中数据
 	 */

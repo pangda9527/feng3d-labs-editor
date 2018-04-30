@@ -112,7 +112,7 @@ namespace feng3d.editor
 						}
 						if (fs == indexedDBfs)
 						{
-							window.open(`run.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorAssets.projectPath}`);
+							window.open(`run.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorAssets.projectname}`);
 							return;
 						}
 						fs.getAbsolutePath("index.html", (err, path) =>

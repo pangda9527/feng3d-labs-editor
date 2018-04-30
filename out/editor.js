@@ -1361,13 +1361,7 @@ var ComboBox = /** @class */ (function (_super) {
         /**
          * 数据
          */
-        // dataProvider: { label: string, value: any }[] = [];
-        _this.dataProvider = [
-            { label: "1", value: 1 },
-            { label: "2", value: 1 },
-            { label: "3", value: 1 },
-            { label: "4", value: 1 },
-        ];
+        _this.dataProvider = [];
         _this.skinName = "ComboBoxSkin";
         return _this;
     }
@@ -3642,26 +3636,24 @@ var feng3d;
         editor.editorAssets = {
             //attribute
             /**
-             * 项目根路径
+             * 项目名称
              */
-            projectPath: "",
-            assetsPath: "",
+            projectname: "",
+            assetsPath: "Assets",
             showFloder: "",
             //function
             initproject: function (path, callback) {
-                var assetsPath = "Assets";
-                editor.editorAssets.projectPath = path;
-                editor.editorAssets.assetsPath = assetsPath;
+                editor.editorAssets.projectname = path;
                 //
-                editor.fs.stat(assetsPath, function (err, fileInfo) {
+                editor.fs.stat(editor.editorAssets.assetsPath, function (err, fileInfo) {
                     if (err) {
-                        editor.fs.mkdir(assetsPath, function (err) {
+                        editor.fs.mkdir(editor.editorAssets.assetsPath, function (err) {
                             if (err) {
                                 alert("初始化项目失败！");
                                 feng3d.error(err);
                                 return;
                             }
-                            editor.fs.stat(assetsPath, function (err, fileInfo) {
+                            editor.fs.stat(editor.editorAssets.assetsPath, function (err, fileInfo) {
                                 rootfileinfo = new editor.AssetsFile(fileInfo);
                                 editor.editorAssets.showFloder = fileInfo.path;
                                 rootfileinfo.initChildren(Number.MAX_VALUE, callback);
@@ -3734,7 +3726,7 @@ var feng3d;
                     assetsfile.move(destdirpath, callback);
                 }
                 else {
-                    var filename = assetsfile.name;
+                    var filename = path.split("/").pop();
                     var dest = destdirpath + "/" + filename;
                     editor.fs.move(path, dest, callback);
                 }
@@ -4722,7 +4714,7 @@ var feng3d;
             };
             AssetsView.prototype.initlist = function () {
                 var _this = this;
-                editor.editorAssets.initproject(editor.editorAssets.projectPath, function () {
+                editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
                     _this.invalidateAssetstree();
                 });
             };
@@ -4973,7 +4965,7 @@ var feng3d;
                                 return;
                             }
                             if (editor.fs == feng3d.indexedDBfs) {
-                                window.open("run.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorAssets.projectPath);
+                                window.open("run.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorAssets.projectname);
                                 return;
                             }
                             editor.fs.getAbsolutePath("index.html", function (err, path) {
@@ -10332,7 +10324,7 @@ var feng3d;
                     editor.fs.selectFile(function (filelist) {
                         editor.fs.importProject(filelist.item(0), function () {
                             console.log("导入项目完成");
-                            editor.editorAssets.initproject(editor.editorAssets.projectPath, function () {
+                            editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
                                 editor.editorAssets.readScene("default.scene", function (err, scene) {
                                     editor.engine.scene = scene;
                                     editor.editorui.assetsview.updateShowFloder();
@@ -10590,7 +10582,7 @@ var feng3d;
                 return _this;
             }
             Editor.prototype.init = function () {
-                document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editor.editorAssets.projectPath;
+                document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editor.editorAssets.projectname;
                 feng3d.runEnvironment = feng3d.RunEnvironment.editor;
                 //
                 new editor.EditorEnvironment();
@@ -10622,12 +10614,12 @@ var feng3d;
                 editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
                 editor.fs.hasProject(editor.editorcache.projectname, function (has) {
                     if (has) {
-                        editor.editorAssets.projectPath = editor.editorcache.projectname;
+                        editor.editorAssets.projectname = editor.editorcache.projectname;
                         editor.fs.initproject(editor.editorcache.projectname, callback);
                     }
                     else {
                         editor.fs.createproject(editor.editorcache.projectname, function () {
-                            editor.editorAssets.projectPath = editor.editorcache.projectname;
+                            editor.editorAssets.projectname = editor.editorcache.projectname;
                             editor.fs.initproject(editor.editorcache.projectname, callback);
                         });
                     }

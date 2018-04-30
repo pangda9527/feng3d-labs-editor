@@ -29,7 +29,7 @@ namespace feng3d.editor
                     fs.importProject(filelist.item(0), () =>
                     {
                         console.log("导入项目完成");
-                        editorAssets.initproject(editorAssets.projectPath, () =>
+                        editorAssets.initproject(editorAssets.projectname, () =>
                         {
                             editorAssets.readScene("default.scene", (err, scene) =>
                             {
