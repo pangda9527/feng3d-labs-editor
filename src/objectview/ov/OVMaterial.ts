@@ -47,7 +47,7 @@ namespace feng3d.editor
 		{
 			this.nameLabel.text = this.space.shaderName;
 
-			var data = ShaderLib.getShaderNames().sort().map((v) => { return { label: v, value: v } });
+			var data = shaderlib.getShaderNames().sort().map((v) => { return { label: v, value: v } });
 			var selected = data.reduce((prevalue, item) =>
 			{
 				if (prevalue) return prevalue;

@@ -2578,7 +2578,7 @@ var feng3d;
             OVMaterial.prototype.updateView = function () {
                 var _this = this;
                 this.nameLabel.text = this.space.shaderName;
-                var data = feng3d.ShaderLib.getShaderNames().sort().map(function (v) { return { label: v, value: v }; });
+                var data = feng3d.shaderlib.getShaderNames().sort().map(function (v) { return { label: v, value: v }; });
                 var selected = data.reduce(function (prevalue, item) {
                     if (prevalue)
                         return prevalue;
