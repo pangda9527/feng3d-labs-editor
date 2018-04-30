@@ -2551,6 +2551,57 @@ var feng3d;
     var editor;
     (function (editor) {
         /**
+         * 默认基础对象界面
+         * @author feng 2016-3-11
+         */
+        var OVMaterial = /** @class */ (function (_super) {
+            __extends(OVMaterial, _super);
+            function OVMaterial(objectViewInfo) {
+                var _this = _super.call(this) || this;
+                _this.space = objectViewInfo.owner;
+                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                _this.skinName = "OVMaterial";
+                return _this;
+            }
+            OVMaterial.prototype.onComplete = function () {
+                this.updateView();
+            };
+            OVMaterial.prototype.getAttributeView = function (attributeName) {
+                return null;
+            };
+            OVMaterial.prototype.getblockView = function (blockName) {
+                return null;
+            };
+            /**
+             * 更新界面
+             */
+            OVMaterial.prototype.updateView = function () {
+                var _this = this;
+                this.nameLabel.text = this.space.shaderName;
+                var data = feng3d.ShaderLib.getShaderNames().sort().map(function (v) { return { label: v, value: v }; });
+                var selected = data.reduce(function (prevalue, item) {
+                    if (prevalue)
+                        return prevalue;
+                    if (item.value.indexOf(_this.space.shaderName) != -1)
+                        return item;
+                    return null;
+                }, null);
+                this.shaderComboBox.dataProvider = data;
+                this.shaderComboBox.data = selected;
+            };
+            OVMaterial = __decorate([
+                feng3d.OVComponent()
+            ], OVMaterial);
+            return OVMaterial;
+        }(eui.Component));
+        editor.OVMaterial = OVMaterial;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        /**
          * 默认对象属性块界面
          * @author feng 2016-3-22
          */
