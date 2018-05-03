@@ -114,9 +114,11 @@ namespace feng3d.editor
 
         private update()
         {
-            this.segmentMaterial.color = this.selected ? this.selectedColor : this.color;
+            var color = this.selected ? this.selectedColor : this.color;
+            this.segmentMaterial.uniforms.u_segmentColor = color;
             //
-            this.material.color = this.selected ? this.selectedColor : this.color;
+            this.material.uniforms.u_diffuseInput = color;
+            this.segmentMaterial.renderParams.enableBlend = this.material.renderParams.enableBlend = color.a < 1;
         }
     }
 
@@ -149,7 +151,7 @@ namespace feng3d.editor
 
         update()
         {
-            this.colorMaterial.color = this.selected ? this.selectedColor : this.color;
+            this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
         }
     }
 
@@ -190,7 +192,8 @@ namespace feng3d.editor
             meshRenderer = border.addComponent(MeshRenderer);
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             var material = meshRenderer.material = new SegmentMaterial();
-            material.color = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.renderParams.enableBlend = true;
             this.gameObject.addChild(border);
 
             this.update();
@@ -198,7 +201,7 @@ namespace feng3d.editor
 
         update()
         {
-            this.colorMaterial.color = this.selected ? this.selectedColor : this.color;
+            this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
 
             this.segmentGeometry.removeAllSegments();
 

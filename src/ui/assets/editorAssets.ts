@@ -173,9 +173,15 @@ namespace feng3d.editor
                             },
                             { type: "separator" },
                             {
-                                label: "Material", click: () =>
+                                label: "StandardMaterial", click: () =>
                                 {
                                     assetsFile.addfile("new material" + ".material", new StandardMaterial());
+                                }
+                            },
+                            {
+                                label: "ColorMaterial", click: () =>
+                                {
+                                    assetsFile.addfile("new material" + ".material", new ColorMaterial());
                                 }
                             },
                         ]

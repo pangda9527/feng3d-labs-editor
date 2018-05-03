@@ -27,9 +27,10 @@ namespace feng3d.editor
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
             var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
-            textureMaterial.texture = new Texture2D(editorData.getEditorAssetsPath("/assets/3d/icons/sun.png"));
-            textureMaterial.texture.format = TextureFormat.RGBA;
-            textureMaterial.texture.premulAlpha = true;
+            var texture = new Texture2D(editorData.getEditorAssetsPath("/assets/3d/icons/sun.png"));
+            texture.format = TextureFormat.RGBA;
+            texture.premulAlpha = true;
+            textureMaterial.uniforms.s_texture = texture;
             textureMaterial.renderParams.enableBlend = true;
             this.gameObject.addChild(lightIcon);
 
@@ -43,7 +44,7 @@ namespace feng3d.editor
             holdSizeComponent.holdSize = 1;
             var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
             var material = meshRenderer.material = new feng3d.SegmentMaterial();
-            material.color = new Color(163 / 255, 162 / 255, 107 / 255);
+            material.uniforms.u_segmentColor = new Color(163 / 255, 162 / 255, 107 / 255);
             var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             var num = 10;
             for (var i = 0; i < num; i++)
@@ -71,7 +72,7 @@ namespace feng3d.editor
 
         update()
         {
-            this.textureMaterial.color = this.directionalLight.color;
+            this.textureMaterial.uniforms.u_color = this.directionalLight.color;
             this.lightLines.visible = editorData.selectedGameObjects.indexOf(this.gameObject) != -1;
         }
 

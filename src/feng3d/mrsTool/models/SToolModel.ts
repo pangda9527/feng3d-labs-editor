@@ -64,7 +64,8 @@ namespace feng3d.editor
             var xLine = GameObject.create();
             var meshRenderer = xLine.addComponent(MeshRenderer);
             var material = meshRenderer.material = new SegmentMaterial();
-            material.color = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(xLine);
             this.coordinateCube = GameObject.create("coordinateCube").addComponent(CoordinateCube);

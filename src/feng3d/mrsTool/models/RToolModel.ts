@@ -84,7 +84,8 @@ namespace feng3d.editor
             var border = GameObject.create();
             var meshRenderer = border.addComponent(MeshRenderer);
             var material = meshRenderer.material = new SegmentMaterial();
-            material.color = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(border);
             this.sector = GameObject.create("sector").addComponent(SectorGameObject);
@@ -194,11 +195,13 @@ namespace feng3d.editor
             var meshRenderer = this.gameObject.addComponent(MeshRenderer);
             this.geometry = meshRenderer.geometry = new CustomGeometry();
             meshRenderer.material = new ColorMaterial(new Color(0.5, 0.5, 0.5, 0.2));
+            meshRenderer.material.renderParams.enableBlend = true;
 
             var border = GameObject.create("border");
             meshRenderer = border.addComponent(MeshRenderer);
             var material = meshRenderer.material = new SegmentMaterial();
-            material.color = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(border);
 
@@ -271,7 +274,8 @@ namespace feng3d.editor
             var border = GameObject.create("border");
             var meshRenderer = border.addComponent(MeshRenderer);
             var material = meshRenderer.material = new SegmentMaterial();
-            material.color = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(border);
 

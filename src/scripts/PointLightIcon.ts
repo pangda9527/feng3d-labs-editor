@@ -33,9 +33,10 @@ namespace feng3d.editor
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
             var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
-            textureMaterial.texture = new Texture2D(editorData.getEditorAssetsPath("/assets/3d/icons/light.png"));
-            textureMaterial.texture.format = TextureFormat.RGBA;
-            textureMaterial.texture.premulAlpha = true;
+            var texture = new Texture2D(editorData.getEditorAssetsPath("/assets/3d/icons/light.png"));
+            texture.format = TextureFormat.RGBA;
+            texture.premulAlpha = true;
+            textureMaterial.uniforms.s_texture = texture;
             textureMaterial.renderParams.enableBlend = true;
             this.gameObject.addChild(lightIcon);
             // this.lightIcon.on("click", () =>
@@ -57,11 +58,11 @@ namespace feng3d.editor
             var meshRenderer1 = lightLines1.addComponent(feng3d.MeshRenderer);
             var material = meshRenderer.material = new feng3d.SegmentMaterial();
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
-            material.color = new Color(1, 1, 1, 0.5);
+            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
             var material = meshRenderer1.material = new feng3d.SegmentMaterial();
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
-            material.color = new Color(1, 1, 1, 0.5);
+            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
             var segmentGeometry = this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             var segmentGeometry1 = meshRenderer1.geometry = new feng3d.SegmentGeometry();
@@ -105,7 +106,7 @@ namespace feng3d.editor
 
         update()
         {
-            this.textureMaterial.color = this.pointLight.color;
+            this.textureMaterial.uniforms.u_color = this.pointLight.color;
             this.lightLines.transform.scale =
                 this.lightLines1.transform.scale =
                 this.lightpoints.transform.scale =
