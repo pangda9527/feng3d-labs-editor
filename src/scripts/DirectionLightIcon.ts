@@ -30,7 +30,7 @@ namespace feng3d.editor
             textureMaterial.texture = new Texture2D(editorData.getEditorAssetsPath("/assets/3d/icons/sun.png"));
             textureMaterial.texture.format = TextureFormat.RGBA;
             textureMaterial.texture.premulAlpha = true;
-            textureMaterial.enableBlend = true;
+            textureMaterial.renderParams.enableBlend = true;
             this.gameObject.addChild(lightIcon);
 
             //

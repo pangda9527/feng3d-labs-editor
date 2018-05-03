@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="OVMaterial" width="400" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:ns1="*">
+<e:Skin class="OVMaterial" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:ns1="*">
 	<e:Group width="100%" height="42">
 		<e:Rect width="100%" height="100%" scaleX="1" scaleY="1" fillColor="0xdcdcdc"/>
 		<e:Image id="tileIcon" x="5" verticalCenter="0" source="material_small_png"/>
@@ -22,5 +22,10 @@
 			</e:skinName>
 		</e:Button>
 		<ns1:ComboBox id="shaderComboBox" y="21" anchorOffsetX="0" anchorOffsetY="0" right="6" left="92"/>
+	</e:Group>
+	<e:Group id="group" width="100%" x="0" top="42">
+		<e:layout>
+		<e:VerticalLayout gap="-1" horizontalAlign="justify"/>
+		</e:layout>
 	</e:Group>
 </e:Skin>

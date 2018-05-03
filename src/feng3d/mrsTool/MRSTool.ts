@@ -56,7 +56,7 @@ namespace feng3d.editor
             if (element.material)
             {
                 // element.material.depthMask = false;
-                element.material.depthtest = false;
+                element.material.renderParams.depthtest = false;
             }
         });
     }

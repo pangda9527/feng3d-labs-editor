@@ -36,7 +36,7 @@ namespace feng3d.editor
             textureMaterial.texture = new Texture2D(editorData.getEditorAssetsPath("/assets/3d/icons/light.png"));
             textureMaterial.texture.format = TextureFormat.RGBA;
             textureMaterial.texture.premulAlpha = true;
-            textureMaterial.enableBlend = true;
+            textureMaterial.renderParams.enableBlend = true;
             this.gameObject.addChild(lightIcon);
             // this.lightIcon.on("click", () =>
             // {
@@ -58,11 +58,11 @@ namespace feng3d.editor
             var material = meshRenderer.material = new feng3d.SegmentMaterial();
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
             material.color = new Color(1, 1, 1, 0.5);
-            material.enableBlend = true;
+            material.renderParams.enableBlend = true;
             var material = meshRenderer1.material = new feng3d.SegmentMaterial();
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
             material.color = new Color(1, 1, 1, 0.5);
-            material.enableBlend = true;
+            material.renderParams.enableBlend = true;
             var segmentGeometry = this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             var segmentGeometry1 = meshRenderer1.geometry = new feng3d.SegmentGeometry();
             var num = 36;
@@ -95,7 +95,7 @@ namespace feng3d.editor
             pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, 1), new Color(0, 0, 1)));
             pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, -1), new Color(0, 0, 1)));
             var pointMaterial = meshRenderer.material = new PointMaterial();
-            pointMaterial.enableBlend = true;
+            pointMaterial.renderParams.enableBlend = true;
             pointMaterial.pointSize = 5;
             // pointMaterial.color = new Color(163 / 255 * 1.2, 162 / 255 * 1.2, 107 / 255 * 1.2);
             this.gameObject.addChild(lightpoints);

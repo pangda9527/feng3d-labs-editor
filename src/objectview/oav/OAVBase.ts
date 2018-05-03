@@ -22,7 +22,8 @@ namespace feng3d.editor
 
         protected onComplete(): void
         {
-            this.label.text = this._attributeName;
+            if (this.label)
+                this.label.text = this._attributeName;
             this.updateView();
         }
 

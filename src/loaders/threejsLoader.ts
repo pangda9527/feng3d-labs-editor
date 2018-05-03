@@ -302,7 +302,7 @@ namespace feng3d.editor
     function parseMaterial(geometry)
     {
         var material = new StandardMaterial();
-        material.cullFace = CullFace.NONE;
+        material.renderParams.cullFace = CullFace.NONE;
         return material;
     }
 

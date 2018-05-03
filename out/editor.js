@@ -2564,6 +2564,7 @@ var feng3d;
                 return _this;
             }
             OVMaterial.prototype.onComplete = function () {
+                this.initView();
                 this.updateView();
             };
             OVMaterial.prototype.getAttributeView = function (attributeName) {
@@ -2572,17 +2573,21 @@ var feng3d;
             OVMaterial.prototype.getblockView = function (blockName) {
                 return null;
             };
+            OVMaterial.prototype.initView = function () {
+                this.renderParamsView = feng3d.objectview.getObjectView(this.space.renderParams, false);
+                this.group.addChild(this.renderParamsView);
+            };
             /**
              * 更新界面
              */
             OVMaterial.prototype.updateView = function () {
-                var _this = this;
-                this.nameLabel.text = this.space.shaderName;
+                var material = this.space;
+                this.nameLabel.text = material.shaderName;
                 var data = feng3d.shaderlib.getShaderNames().sort().map(function (v) { return { label: v, value: v }; });
                 var selected = data.reduce(function (prevalue, item) {
                     if (prevalue)
                         return prevalue;
-                    if (item.value.indexOf(_this.space.shaderName) != -1)
+                    if (item.value.indexOf(material.shaderName) != -1)
                         return item;
                     return null;
                 }, null);
@@ -2728,7 +2733,8 @@ var feng3d;
                 return _this;
             }
             OAVBase.prototype.onComplete = function () {
-                this.label.text = this._attributeName;
+                if (this.label)
+                    this.label.text = this._attributeName;
                 this.updateView();
             };
             Object.defineProperty(OAVBase.prototype, "space", {
@@ -3443,6 +3449,71 @@ var feng3d;
             return OAVColorPicker;
         }(editor.OAVBase));
         editor.OAVColorPicker = OAVColorPicker;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        var OAVMaterialName = /** @class */ (function (_super) {
+            __extends(OAVMaterialName, _super);
+            function OAVMaterialName(attributeViewInfo) {
+                var _this = _super.call(this, attributeViewInfo) || this;
+                _this.skinName = "OVMaterial";
+                return _this;
+            }
+            OAVMaterialName.prototype.onComplete = function () {
+                _super.prototype.onComplete.call(this);
+                this.updateView();
+            };
+            OAVMaterialName.prototype.updateView = function () {
+                var material = this.space;
+                this.nameLabel.text = material.shaderName;
+                var data = feng3d.shaderlib.getShaderNames().sort().map(function (v) { return { label: v, value: v }; });
+                var selected = data.reduce(function (prevalue, item) {
+                    if (prevalue)
+                        return prevalue;
+                    if (item.value.indexOf(material.shaderName) != -1)
+                        return item;
+                    return null;
+                }, null);
+                this.shaderComboBox.dataProvider = data;
+                this.shaderComboBox.data = selected;
+            };
+            OAVMaterialName = __decorate([
+                feng3d.OAVComponent()
+            ], OAVMaterialName);
+            return OAVMaterialName;
+        }(editor.OAVBase));
+        editor.OAVMaterialName = OAVMaterialName;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        var OAVMaterialData = /** @class */ (function (_super) {
+            __extends(OAVMaterialData, _super);
+            function OAVMaterialData(attributeViewInfo) {
+                return _super.call(this, attributeViewInfo) || this;
+                // this.skinName = "OVMaterial";
+            }
+            OAVMaterialData.prototype.onComplete = function () {
+                _super.prototype.onComplete.call(this);
+                this.initView();
+                this.updateView();
+            };
+            OAVMaterialData.prototype.initView = function () {
+            };
+            OAVMaterialData.prototype.updateView = function () {
+                var uniforms = this.attributeValue;
+            };
+            OAVMaterialData = __decorate([
+                feng3d.OAVComponent()
+            ], OAVMaterialData);
+            return OAVMaterialData;
+        }(editor.OAVBase));
+        editor.OAVMaterialData = OAVMaterialData;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -5953,7 +6024,7 @@ var feng3d;
                 plane.transform.x = plane.transform.z = this._width / 2;
                 meshRenderer.geometry = new feng3d.PlaneGeometry(this._width, this._width);
                 this.colorMaterial = meshRenderer.material = new feng3d.ColorMaterial();
-                this.colorMaterial.cullFace = feng3d.CullFace.NONE;
+                this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
                 plane.mouselayer = feng3d.mouselayer.editor;
                 plane.mouseEnabled = true;
                 this.gameObject.addChild(plane);
@@ -6953,7 +7024,7 @@ var feng3d;
             meshRenderers.forEach(function (element) {
                 if (element.material) {
                     // element.material.depthMask = false;
-                    element.material.depthtest = false;
+                    element.material.renderParams.depthtest = false;
                 }
             });
         }
@@ -8206,7 +8277,7 @@ var feng3d;
                 var meshRenderer = groundGridObject.addComponent(feng3d.MeshRenderer);
                 var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 var material = meshRenderer.material = new feng3d.SegmentMaterial();
-                material.enableBlend = true;
+                material.renderParams.enableBlend = true;
                 update();
                 function update() {
                     var cameraGlobalPosition = editor.editorCamera.transform.scenePosition;
@@ -9783,7 +9854,7 @@ var feng3d;
                 textureMaterial.texture = new feng3d.Texture2D(editor.editorData.getEditorAssetsPath("/assets/3d/icons/sun.png"));
                 textureMaterial.texture.format = feng3d.TextureFormat.RGBA;
                 textureMaterial.texture.premulAlpha = true;
-                textureMaterial.enableBlend = true;
+                textureMaterial.renderParams.enableBlend = true;
                 this.gameObject.addChild(lightIcon);
                 //
                 var lightLines = this.lightLines = feng3d.GameObject.create("Lines");
@@ -9867,7 +9938,7 @@ var feng3d;
                 textureMaterial.texture = new feng3d.Texture2D(editor.editorData.getEditorAssetsPath("/assets/3d/icons/light.png"));
                 textureMaterial.texture.format = feng3d.TextureFormat.RGBA;
                 textureMaterial.texture.premulAlpha = true;
-                textureMaterial.enableBlend = true;
+                textureMaterial.renderParams.enableBlend = true;
                 this.gameObject.addChild(lightIcon);
                 // this.lightIcon.on("click", () =>
                 // {
@@ -9888,11 +9959,11 @@ var feng3d;
                 var material = meshRenderer.material = new feng3d.SegmentMaterial();
                 // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
                 material.color = new feng3d.Color(1, 1, 1, 0.5);
-                material.enableBlend = true;
+                material.renderParams.enableBlend = true;
                 var material = meshRenderer1.material = new feng3d.SegmentMaterial();
                 // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
                 material.color = new feng3d.Color(1, 1, 1, 0.5);
-                material.enableBlend = true;
+                material.renderParams.enableBlend = true;
                 var segmentGeometry = this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 var segmentGeometry1 = meshRenderer1.geometry = new feng3d.SegmentGeometry();
                 var num = 36;
@@ -9924,7 +9995,7 @@ var feng3d;
                 pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, 1), new feng3d.Color(0, 0, 1)));
                 pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, -1), new feng3d.Color(0, 0, 1)));
                 var pointMaterial = meshRenderer.material = new feng3d.PointMaterial();
-                pointMaterial.enableBlend = true;
+                pointMaterial.renderParams.enableBlend = true;
                 pointMaterial.pointSize = 5;
                 // pointMaterial.color = new Color(163 / 255 * 1.2, 162 / 255 * 1.2, 107 / 255 * 1.2);
                 this.gameObject.addChild(lightpoints);
@@ -10280,7 +10351,7 @@ var feng3d;
         }
         function parseMaterial(geometry) {
             var material = new feng3d.StandardMaterial();
-            material.cullFace = feng3d.CullFace.NONE;
+            material.renderParams.cullFace = feng3d.CullFace.NONE;
             return material;
         }
         function parsePerspectiveCamera(perspectiveCamera) {
