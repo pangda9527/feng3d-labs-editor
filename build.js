@@ -5,7 +5,6 @@ var fs = require("fs");
 var path = require("path");
 
 watchcopyDir("../feng3d/out", "libs");
-watchcopyDir("../feng3d/out", "resource/templates/template/libs");
 
 /**
  * Watch for changes in TypeScript

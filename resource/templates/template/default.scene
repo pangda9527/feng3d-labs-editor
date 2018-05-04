@@ -48,7 +48,7 @@
 						"__class__": "feng3d.DirectionalLight",
 						"castsShadows": false,
 						"color": {
-							"__class__": "feng3d.Color"
+							"__class__": "feng3d.Color3"
 						},
 						"intensity": 1,
 						"lightType": 1
@@ -65,13 +65,13 @@
 			{
 				"__class__": "feng3d.Scene3D",
 				"ambientColor": {
-					"__class__": "feng3d.Color",
+					"__class__": "feng3d.Color4",
 					"b": 0.4,
 					"g": 0.4,
 					"r": 0.4
 				},
 				"background": {
-					"__class__": "feng3d.Color",
+					"__class__": "feng3d.Color4",
 					"b": 0.4,
 					"g": 0.4,
 					"r": 0.4

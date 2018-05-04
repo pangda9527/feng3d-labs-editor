@@ -72,13 +72,14 @@ namespace feng3d.editor
             //
             var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
             engine = new EditorEngine(canvas, null, editorCamera);
+            engine.renderObjectflag = GameObjectFlag.feng3d | GameObjectFlag.editor;
             //
             editorAssets.readScene("default.scene", (err, scene) =>
             {
                 if (err)
-                    scene = newScene();
-                engine.scene = scene;
-                engine.renderObjectflag = GameObjectFlag.feng3d | GameObjectFlag.editor;
+                    engine.scene = newScene();
+                else
+                    engine.scene = scene;
             });
 
             window.addEventListener("beforeunload", () =>
@@ -132,7 +133,8 @@ namespace feng3d.editor
     function newScene()
     {
         var scene = GameObject.create("Untitled").addComponent(Scene3D)
-        scene.background = new Color4(0.408, 0.38, 0.357, 1.0);
+        scene.background.setTo(0.408, 0.38, 0.357);
+        scene.ambientColor.setTo(0.4, 0.4, 0.4);
 
         var camera = GameObjectFactory.createCamera("Main Camera");
         camera.transform.position = new Vector3(0, 1, -10);
@@ -140,7 +142,9 @@ namespace feng3d.editor
 
         var directionalLight = GameObject.create("DirectionalLight");
         directionalLight.addComponent(DirectionalLight);
-        directionalLight.transform.rx = 120;
+        directionalLight.transform.rx = 50;
+        directionalLight.transform.ry = -30;
+        directionalLight.transform.y = 3;
         scene.gameObject.addChild(directionalLight);
 
         return scene;

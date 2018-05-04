@@ -8560,12 +8560,13 @@ var feng3d;
                 //
                 var canvas = document.getElementById("glcanvas");
                 editor.engine = new EditorEngine(canvas, null, editor.editorCamera);
+                editor.engine.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
                 //
                 editor.editorAssets.readScene("default.scene", function (err, scene) {
                     if (err)
-                        scene = newScene();
-                    editor.engine.scene = scene;
-                    editor.engine.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
+                        editor.engine.scene = newScene();
+                    else
+                        editor.engine.scene = scene;
                 });
                 window.addEventListener("beforeunload", function () {
                     editor.editorAssets.saveScene("default.scene", editor.engine.scene);
@@ -8613,13 +8614,16 @@ var feng3d;
         editor.Main3D = Main3D;
         function newScene() {
             var scene = feng3d.GameObject.create("Untitled").addComponent(feng3d.Scene3D);
-            scene.background = new feng3d.Color4(0.408, 0.38, 0.357, 1.0);
+            scene.background.setTo(0.408, 0.38, 0.357);
+            scene.ambientColor.setTo(0.4, 0.4, 0.4);
             var camera = feng3d.GameObjectFactory.createCamera("Main Camera");
             camera.transform.position = new feng3d.Vector3(0, 1, -10);
             scene.gameObject.addChild(camera);
             var directionalLight = feng3d.GameObject.create("DirectionalLight");
             directionalLight.addComponent(feng3d.DirectionalLight);
-            directionalLight.transform.rx = 120;
+            directionalLight.transform.rx = 50;
+            directionalLight.transform.ry = -30;
+            directionalLight.transform.y = 3;
             scene.gameObject.addChild(directionalLight);
             return scene;
         }
@@ -10801,7 +10805,7 @@ var feng3d;
             feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
             feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });
             feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
-            feng3d.objectview.setDefaultTypeAttributeView("Color", { component: "OAVColorPicker" });
+            feng3d.objectview.setDefaultTypeAttributeView("Color3", { component: "OAVColorPicker" });
             function setObjectview(cls, classDefinition) {
                 cls["objectview"] = classDefinition;
             }
