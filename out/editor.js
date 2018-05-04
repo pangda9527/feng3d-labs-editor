@@ -3423,24 +3423,44 @@ var feng3d;
                 this.updateView();
             };
             OAVColorPicker.prototype.updateView = function () {
-                this.colorPicker.value = this.attributeValue;
-                this.input.text = this.colorPicker.value.toHexString();
+                var color = this.attributeValue;
+                if (color instanceof feng3d.Color3) {
+                    this.colorPicker.value = color;
+                }
+                else {
+                    this.colorPicker.value = color.toColor3();
+                }
+                this.input.text = color.toHexString();
             };
             OAVColorPicker.prototype.onChange = function (event) {
-                this.attributeValue = this.colorPicker.value;
-                this.input.text = this.colorPicker.value.toHexString();
+                var color = this.attributeValue;
+                var pickerValue = this.colorPicker.value;
+                color.r = pickerValue.r;
+                color.g = pickerValue.g;
+                color.b = pickerValue.b;
+                //
+                this.attributeValue = color;
+                this.input.text = color.toHexString();
             };
             OAVColorPicker.prototype.ontxtfocusin = function () {
                 this._textfocusintxt = true;
             };
             OAVColorPicker.prototype.ontxtfocusout = function () {
                 this._textfocusintxt = false;
-                this.input.text = this.colorPicker.value.toHexString();
+                this.input.text = this.attributeValue.toHexString();
             };
             OAVColorPicker.prototype.onTextChange = function () {
                 if (this._textfocusintxt) {
                     var text = this.input.text;
-                    this.colorPicker.value = this.attributeValue = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
+                    var color = this.attributeValue;
+                    color.fromUnit(Number("0x" + text.substr(1)));
+                    this.attributeValue = color;
+                    if (color instanceof feng3d.Color3) {
+                        this.colorPicker.value = color;
+                    }
+                    else {
+                        this.colorPicker.value = color.toColor3();
+                    }
                 }
             };
             OAVColorPicker = __decorate([
@@ -10806,6 +10826,7 @@ var feng3d;
             feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });
             feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
             feng3d.objectview.setDefaultTypeAttributeView("Color3", { component: "OAVColorPicker" });
+            feng3d.objectview.setDefaultTypeAttributeView("Color4", { component: "OAVColorPicker" });
             function setObjectview(cls, classDefinition) {
                 cls["objectview"] = classDefinition;
             }

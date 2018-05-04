@@ -7,6 +7,8 @@ namespace feng3d.editor
         public colorPicker: feng3d.editor.ColorPicker;
         public input: eui.TextInput;
 
+        attributeValue: Color3 | Color4;
+
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
@@ -27,14 +29,27 @@ namespace feng3d.editor
 
         updateView()
         {
-            this.colorPicker.value = this.attributeValue;
-            this.input.text = this.colorPicker.value.toHexString();
+            var color = this.attributeValue;
+            if (color instanceof Color3)
+            {
+                this.colorPicker.value = color;
+            } else
+            {
+                this.colorPicker.value = color.toColor3();
+            }
+            this.input.text = color.toHexString();
         }
 
         protected onChange(event: egret.Event)
         {
-            this.attributeValue = this.colorPicker.value;
-            this.input.text = this.colorPicker.value.toHexString();
+            var color = this.attributeValue;
+            var pickerValue = this.colorPicker.value;
+            color.r = pickerValue.r;
+            color.g = pickerValue.g;
+            color.b = pickerValue.b;
+            //
+            this.attributeValue = color;
+            this.input.text = color.toHexString();
         }
 
         private _textfocusintxt: boolean;
@@ -46,7 +61,7 @@ namespace feng3d.editor
         private ontxtfocusout()
         {
             this._textfocusintxt = false;
-            this.input.text = this.colorPicker.value.toHexString();
+            this.input.text = this.attributeValue.toHexString();
         }
 
         private onTextChange()
@@ -54,7 +69,17 @@ namespace feng3d.editor
             if (this._textfocusintxt)
             {
                 var text = this.input.text;
-                this.colorPicker.value = this.attributeValue = new Color3().fromUnit(Number("0x" + text.substr(1)));
+                var color = this.attributeValue;
+                color.fromUnit(Number("0x" + text.substr(1)));
+                this.attributeValue = color;
+
+                if (color instanceof Color3)
+                {
+                    this.colorPicker.value = color;
+                } else
+                {
+                    this.colorPicker.value = color.toColor3();
+                }
             }
         }
     }
