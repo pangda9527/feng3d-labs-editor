@@ -660,7 +660,7 @@ function createSegment()
         var meshRenderer = debugPoint.addComponent(feng3d.MeshRenderer);
         pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
         var materialp = meshRenderer.material = new feng3d.PointMaterial();
-        materialp.pointSize = 5;
+        materialp.uniforms.u_PointSize = 5;
         materialp.uniforms.u_color.setTo(0, 0, 0);
     }
     pointGeometry.removeAllPoints();

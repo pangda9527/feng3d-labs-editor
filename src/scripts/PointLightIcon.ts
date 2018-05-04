@@ -97,7 +97,7 @@ namespace feng3d.editor
             pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, -1), new Color4(0, 0, 1)));
             var pointMaterial = meshRenderer.material = new PointMaterial();
             pointMaterial.renderParams.enableBlend = true;
-            pointMaterial.pointSize = 5;
+            pointMaterial.uniforms.u_PointSize = 5;
             // pointMaterial.color = new Color(163 / 255 * 1.2, 162 / 255 * 1.2, 107 / 255 * 1.2);
             this.gameObject.addChild(lightpoints);
 

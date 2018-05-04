@@ -3540,6 +3540,37 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        var OAVObjectView = /** @class */ (function (_super) {
+            __extends(OAVObjectView, _super);
+            function OAVObjectView(attributeViewInfo) {
+                var _this = _super.call(this, attributeViewInfo) || this;
+                _this.skinName = "OVDefault";
+                return _this;
+            }
+            OAVObjectView.prototype.onComplete = function () {
+                _super.prototype.onComplete.call(this);
+                this.initView();
+                this.updateView();
+            };
+            OAVObjectView.prototype.initView = function () {
+                this.view = feng3d.objectview.getObjectView(this.attributeValue);
+                this.view.percentWidth = 100;
+                this.group.addChild(this.view);
+            };
+            OAVObjectView.prototype.updateView = function () {
+            };
+            OAVObjectView = __decorate([
+                feng3d.OAVComponent()
+            ], OAVObjectView);
+            return OAVObjectView;
+        }(editor.OAVBase));
+        editor.OAVObjectView = OAVObjectView;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
         /**
          * 属性面板（检查器）
          * @author feng     2017-03-20
@@ -9802,7 +9833,7 @@ function createSegment() {
         var meshRenderer = debugPoint.addComponent(feng3d.MeshRenderer);
         pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
         var materialp = meshRenderer.material = new feng3d.PointMaterial();
-        materialp.pointSize = 5;
+        materialp.uniforms.u_PointSize = 5;
         materialp.uniforms.u_color.setTo(0, 0, 0);
     }
     pointGeometry.removeAllPoints();
@@ -10196,7 +10227,7 @@ var feng3d;
                 pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, -1), new feng3d.Color4(0, 0, 1)));
                 var pointMaterial = meshRenderer.material = new feng3d.PointMaterial();
                 pointMaterial.renderParams.enableBlend = true;
-                pointMaterial.pointSize = 5;
+                pointMaterial.uniforms.u_PointSize = 5;
                 // pointMaterial.color = new Color(163 / 255 * 1.2, 162 / 255 * 1.2, 107 / 255 * 1.2);
                 this.gameObject.addChild(lightpoints);
                 this.enabled = true;
