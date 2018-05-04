@@ -228,7 +228,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -258,16 +258,16 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color",
+                                        "__class__": "feng3d.Color4",
                                         "b": 0,
                                         "g": 0
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -307,7 +307,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -337,14 +337,14 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -384,7 +384,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -414,16 +414,16 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color",
+                                        "__class__": "feng3d.Color4",
                                         "b": 0,
                                         "r": 0
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -462,7 +462,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -492,14 +492,14 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -539,7 +539,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -569,16 +569,16 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color",
+                                        "__class__": "feng3d.Color4",
                                         "g": 0.058823529411764705,
                                         "r": 0
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -618,7 +618,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -648,14 +648,14 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -691,7 +691,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -721,14 +721,14 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -764,7 +764,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -794,14 +794,14 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -836,7 +836,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -866,14 +866,14 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -909,7 +909,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -939,14 +939,14 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -982,7 +982,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -1012,14 +1012,14 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
@@ -1055,7 +1055,7 @@ namespace feng3d.editor
                                     "density": 0.1,
                                     "enable": false,
                                     "fogColor": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     },
                                     "maxDistance": 100,
                                     "minDistance": 0,
@@ -1085,14 +1085,14 @@ namespace feng3d.editor
                                         "__class__": "feng3d.Texture2D"
                                     },
                                     "u_ambient": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_diffuse": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color4"
                                     },
                                     "u_reflectivity": 1,
                                     "u_specular": {
-                                        "__class__": "feng3d.Color"
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }

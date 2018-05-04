@@ -132,7 +132,7 @@ namespace feng3d.editor
     function newScene()
     {
         var scene = GameObject.create("Untitled").addComponent(Scene3D)
-        scene.background = new Color(0.408, 0.38, 0.357, 1.0);
+        scene.background = new Color4(0.408, 0.38, 0.357, 1.0);
 
         var camera = GameObjectFactory.createCamera("Main Camera");
         camera.transform.position = new Vector3(0, 1, -10);

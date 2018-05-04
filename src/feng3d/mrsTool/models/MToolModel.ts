@@ -25,36 +25,36 @@ namespace feng3d.editor
         private initModels()
         {
             this.xAxis = GameObject.create("xAxis").addComponent(CoordinateAxis);
-            this.xAxis.color.setTo(1, 0, 0);
+            this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.transform.rz = -90;
             this.gameObject.addChild(this.xAxis.gameObject);
 
             this.yAxis = GameObject.create("yAxis").addComponent(CoordinateAxis);
-            this.yAxis.color.setTo(0, 1, 0);
+            this.yAxis.color.setTo(0, 1, 0, 1);
             this.gameObject.addChild(this.yAxis.gameObject);
 
             this.zAxis = GameObject.create("zAxis").addComponent(CoordinateAxis);
-            this.zAxis.color.setTo(0, 0, 1);
+            this.zAxis.color.setTo(0, 0, 1, 1);
             this.zAxis.transform.rx = 90;
             this.gameObject.addChild(this.zAxis.gameObject);
 
             this.yzPlane = GameObject.create("yzPlane").addComponent(CoordinatePlane);
             this.yzPlane.color.setTo(1, 0, 0, 0.2);
             this.yzPlane.selectedColor.setTo(1, 0, 0, 0.5);
-            this.yzPlane.borderColor.setTo(1, 0, 0);
+            this.yzPlane.borderColor.setTo(1, 0, 0, 1);
             this.yzPlane.transform.rz = 90;
             this.gameObject.addChild(this.yzPlane.gameObject);
 
             this.xzPlane = GameObject.create("xzPlane").addComponent(CoordinatePlane);
             this.xzPlane.color.setTo(0, 1, 0, 0.2);
             this.xzPlane.selectedColor.setTo(0, 1, 0, 0.5);
-            this.xzPlane.borderColor.setTo(0, 1, 0);
+            this.xzPlane.borderColor.setTo(0, 1, 0, 1);
             this.gameObject.addChild(this.xzPlane.gameObject);
 
             this.xyPlane = GameObject.create("xyPlane").addComponent(CoordinatePlane);
             this.xyPlane.color.setTo(0, 0, 1, 0.2);
             this.xyPlane.selectedColor.setTo(0, 0, 1, 0.5);
-            this.xyPlane.borderColor.setTo(0, 0, 1);
+            this.xyPlane.borderColor.setTo(0, 0, 1, 1);
             this.xyPlane.transform.rx = -90;
             this.gameObject.addChild(this.xyPlane.gameObject);
 
@@ -70,8 +70,8 @@ namespace feng3d.editor
 
         private xArrow: GameObject;
 
-        readonly color = new Color(1, 0, 0, 0.99)
-        private selectedColor: Color = new Color(1, 1, 0, 0.99);
+        readonly color = new Color4(1, 0, 0, 0.99)
+        private selectedColor = new Color4(1, 1, 0, 0.99);
         private length: number = 100;
 
         //
@@ -127,8 +127,8 @@ namespace feng3d.editor
         private colorMaterial: ColorMaterial;
         private oCube: GameObject;
 
-        color = new Color(1, 1, 1, 0.99);
-        selectedColor = new Color(1, 1, 0, 0.99);
+        color = new Color4(1, 1, 1, 0.99);
+        selectedColor = new Color4(1, 1, 0, 0.99);
         //
         get selected() { return this._selected; }
         set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
@@ -160,11 +160,11 @@ namespace feng3d.editor
         private colorMaterial: ColorMaterial;
         private segmentGeometry: SegmentGeometry;
 
-        color = new Color(1, 0, 0, 0.2);
-        borderColor = new Color(1, 0, 0, 0.99);
+        color = new Color4(1, 0, 0, 0.2);
+        borderColor = new Color4(1, 0, 0, 0.99);
 
-        selectedColor = new Color(1, 0, 0, 0.5);
-        private selectedborderColor = new Color(1, 1, 0, 0.99);
+        selectedColor = new Color4(1, 0, 0, 0.5);
+        private selectedborderColor = new Color4(1, 1, 0, 0.99);
 
         //
         get width() { return this._width; }
@@ -192,7 +192,7 @@ namespace feng3d.editor
             meshRenderer = border.addComponent(MeshRenderer);
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             var material = meshRenderer.material = new SegmentMaterial();
-            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.gameObject.addChild(border);
 

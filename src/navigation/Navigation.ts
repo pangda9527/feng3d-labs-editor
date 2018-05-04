@@ -97,7 +97,7 @@ namespace feng3d.editor
                 navobject.addComponent(MeshRenderer).set((space) =>
                 {
                     space.geometry = new CustomGeometry();
-                    space.material = new ColorMaterial(new Color(0, 1, 0, 0.5));
+                    space.material = new ColorMaterial(new Color4(0, 1, 0, 0.5));
                 });
                 navobject.transform.y = 0.01;
                 return navobject;

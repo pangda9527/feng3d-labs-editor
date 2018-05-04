@@ -283,7 +283,7 @@ namespace navigation
             {
                 var p0 = element.segment.p0.addTo(element.segment.p1).scale(0.5);
                 var p1 = p0.addTo(element.direction.clone().normalize(length));
-                segmentGeometry.addSegment(new feng3d.Segment(p0, p1, new feng3d.Color(1), new feng3d.Color(0, 1)));
+                segmentGeometry.addSegment(new feng3d.Segment(p0, p1, new feng3d.Color4(1), new feng3d.Color4(0, 1)));
             });
         }
 

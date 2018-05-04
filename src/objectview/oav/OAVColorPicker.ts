@@ -54,7 +54,7 @@ namespace feng3d.editor
             if (this._textfocusintxt)
             {
                 var text = this.input.text;
-                this.colorPicker.value = this.attributeValue = new Color().fromUnit(Number("0x" + text.substr(1)));
+                this.colorPicker.value = this.attributeValue = new Color3().fromUnit(Number("0x" + text.substr(1)));
             }
         }
     }

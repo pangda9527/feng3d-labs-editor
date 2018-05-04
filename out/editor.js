@@ -1488,7 +1488,7 @@ var feng3d;
             __extends(ColorPicker, _super);
             function ColorPicker() {
                 var _this = _super.call(this) || this;
-                _this._value = new feng3d.Color();
+                _this._value = new feng3d.Color3();
                 _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "ColorPicker";
                 return _this;
@@ -1527,7 +1527,7 @@ var feng3d;
                 c.click();
                 c.onchange = function () {
                     var v = c.value; //"#189a56"
-                    _this.value = new feng3d.Color().fromUnit(Number("0x" + v.substr(1)));
+                    _this.value = new feng3d.Color3().fromUnit(Number("0x" + v.substr(1)));
                     c.onchange = null;
                     _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
                 };
@@ -3440,7 +3440,7 @@ var feng3d;
             OAVColorPicker.prototype.onTextChange = function () {
                 if (this._textfocusintxt) {
                     var text = this.input.text;
-                    this.colorPicker.value = this.attributeValue = new feng3d.Color().fromUnit(Number("0x" + text.substr(1)));
+                    this.colorPicker.value = this.attributeValue = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
                 }
             };
             OAVColorPicker = __decorate([
@@ -5874,31 +5874,31 @@ var feng3d;
             };
             MToolModel.prototype.initModels = function () {
                 this.xAxis = feng3d.GameObject.create("xAxis").addComponent(CoordinateAxis);
-                this.xAxis.color.setTo(1, 0, 0);
+                this.xAxis.color.setTo(1, 0, 0, 1);
                 this.xAxis.transform.rz = -90;
                 this.gameObject.addChild(this.xAxis.gameObject);
                 this.yAxis = feng3d.GameObject.create("yAxis").addComponent(CoordinateAxis);
-                this.yAxis.color.setTo(0, 1, 0);
+                this.yAxis.color.setTo(0, 1, 0, 1);
                 this.gameObject.addChild(this.yAxis.gameObject);
                 this.zAxis = feng3d.GameObject.create("zAxis").addComponent(CoordinateAxis);
-                this.zAxis.color.setTo(0, 0, 1);
+                this.zAxis.color.setTo(0, 0, 1, 1);
                 this.zAxis.transform.rx = 90;
                 this.gameObject.addChild(this.zAxis.gameObject);
                 this.yzPlane = feng3d.GameObject.create("yzPlane").addComponent(CoordinatePlane);
                 this.yzPlane.color.setTo(1, 0, 0, 0.2);
                 this.yzPlane.selectedColor.setTo(1, 0, 0, 0.5);
-                this.yzPlane.borderColor.setTo(1, 0, 0);
+                this.yzPlane.borderColor.setTo(1, 0, 0, 1);
                 this.yzPlane.transform.rz = 90;
                 this.gameObject.addChild(this.yzPlane.gameObject);
                 this.xzPlane = feng3d.GameObject.create("xzPlane").addComponent(CoordinatePlane);
                 this.xzPlane.color.setTo(0, 1, 0, 0.2);
                 this.xzPlane.selectedColor.setTo(0, 1, 0, 0.5);
-                this.xzPlane.borderColor.setTo(0, 1, 0);
+                this.xzPlane.borderColor.setTo(0, 1, 0, 1);
                 this.gameObject.addChild(this.xzPlane.gameObject);
                 this.xyPlane = feng3d.GameObject.create("xyPlane").addComponent(CoordinatePlane);
                 this.xyPlane.color.setTo(0, 0, 1, 0.2);
                 this.xyPlane.selectedColor.setTo(0, 0, 1, 0.5);
-                this.xyPlane.borderColor.setTo(0, 0, 1);
+                this.xyPlane.borderColor.setTo(0, 0, 1, 1);
                 this.xyPlane.transform.rx = -90;
                 this.gameObject.addChild(this.xyPlane.gameObject);
                 this.oCube = feng3d.GameObject.create("oCube").addComponent(CoordinateCube);
@@ -5911,8 +5911,8 @@ var feng3d;
             __extends(CoordinateAxis, _super);
             function CoordinateAxis() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.color = new feng3d.Color(1, 0, 0, 0.99);
-                _this.selectedColor = new feng3d.Color(1, 1, 0, 0.99);
+                _this.color = new feng3d.Color4(1, 0, 0, 0.99);
+                _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
                 _this.length = 100;
                 _this._selected = false;
                 return _this;
@@ -5967,8 +5967,8 @@ var feng3d;
             __extends(CoordinateCube, _super);
             function CoordinateCube() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.color = new feng3d.Color(1, 1, 1, 0.99);
-                _this.selectedColor = new feng3d.Color(1, 1, 0, 0.99);
+                _this.color = new feng3d.Color4(1, 1, 1, 0.99);
+                _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
                 _this._selected = false;
                 return _this;
             }
@@ -6002,10 +6002,10 @@ var feng3d;
             __extends(CoordinatePlane, _super);
             function CoordinatePlane() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.color = new feng3d.Color(1, 0, 0, 0.2);
-                _this.borderColor = new feng3d.Color(1, 0, 0, 0.99);
-                _this.selectedColor = new feng3d.Color(1, 0, 0, 0.5);
-                _this.selectedborderColor = new feng3d.Color(1, 1, 0, 0.99);
+                _this.color = new feng3d.Color4(1, 0, 0, 0.2);
+                _this.borderColor = new feng3d.Color4(1, 0, 0, 0.99);
+                _this.selectedColor = new feng3d.Color4(1, 0, 0, 0.5);
+                _this.selectedborderColor = new feng3d.Color4(1, 1, 0, 0.99);
                 _this._width = 20;
                 _this._selected = false;
                 return _this;
@@ -6039,7 +6039,7 @@ var feng3d;
                 meshRenderer = border.addComponent(feng3d.MeshRenderer);
                 this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 var material = meshRenderer.material = new feng3d.SegmentMaterial();
-                material.uniforms.u_segmentColor = new feng3d.Color(1, 1, 1, 0.99);
+                material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
                 material.renderParams.enableBlend = true;
                 this.gameObject.addChild(border);
                 this.update();
@@ -6084,7 +6084,7 @@ var feng3d;
             };
             RToolModel.prototype.initModels = function () {
                 this.xAxis = feng3d.GameObject.create("xAxis").addComponent(CoordinateRotationAxis);
-                this.xAxis.color.setTo(1, 0, 0);
+                this.xAxis.color.setTo(1, 0, 0, 1);
                 this.xAxis.update();
                 this.xAxis.transform.ry = 90;
                 this.gameObject.addChild(this.xAxis.gameObject);
@@ -6115,9 +6115,9 @@ var feng3d;
             function CoordinateRotationAxis() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.radius = 80;
-                _this.color = new feng3d.Color(1, 0, 0, 0.99);
-                _this.backColor = new feng3d.Color(0.6, 0.6, 0.6, 0.99);
-                _this.selectedColor = new feng3d.Color(1, 1, 0, 0.99);
+                _this.color = new feng3d.Color4(1, 0, 0, 0.99);
+                _this.backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
+                _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
                 _this._selected = false;
                 return _this;
             }
@@ -6146,7 +6146,7 @@ var feng3d;
                 var border = feng3d.GameObject.create();
                 var meshRenderer = border.addComponent(feng3d.MeshRenderer);
                 var material = meshRenderer.material = new feng3d.SegmentMaterial();
-                material.uniforms.u_segmentColor = new feng3d.Color(1, 1, 1, 0.99);
+                material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
                 material.renderParams.enableBlend = true;
                 this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 this.gameObject.addChild(border);
@@ -6222,7 +6222,7 @@ var feng3d;
             __extends(SectorGameObject, _super);
             function SectorGameObject() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.borderColor = new feng3d.Color(0, 1, 1, 0.6);
+                _this.borderColor = new feng3d.Color4(0, 1, 1, 0.6);
                 _this.radius = 80;
                 _this._start = 0;
                 _this._end = 0;
@@ -6236,12 +6236,12 @@ var feng3d;
                 this.gameObject.name = "sector";
                 var meshRenderer = this.gameObject.addComponent(feng3d.MeshRenderer);
                 this.geometry = meshRenderer.geometry = new feng3d.CustomGeometry();
-                meshRenderer.material = new feng3d.ColorMaterial(new feng3d.Color(0.5, 0.5, 0.5, 0.2));
+                meshRenderer.material = new feng3d.ColorMaterial(new feng3d.Color4(0.5, 0.5, 0.5, 0.2));
                 meshRenderer.material.renderParams.enableBlend = true;
                 var border = feng3d.GameObject.create("border");
                 meshRenderer = border.addComponent(feng3d.MeshRenderer);
                 var material = meshRenderer.material = new feng3d.SegmentMaterial();
-                material.uniforms.u_segmentColor = new feng3d.Color(1, 1, 1, 0.99);
+                material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
                 material.renderParams.enableBlend = true;
                 this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 this.gameObject.addChild(border);
@@ -6292,9 +6292,9 @@ var feng3d;
             function CoordinateRotationFreeAxis() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.radius = 80;
-                _this.color = new feng3d.Color(1, 0, 0, 0.99);
-                _this.backColor = new feng3d.Color(0.6, 0.6, 0.6, 0.99);
-                _this.selectedColor = new feng3d.Color(1, 1, 0, 0.99);
+                _this.color = new feng3d.Color4(1, 0, 0, 0.99);
+                _this.backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
+                _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
                 _this._selected = false;
                 return _this;
             }
@@ -6314,7 +6314,7 @@ var feng3d;
                 var border = feng3d.GameObject.create("border");
                 var meshRenderer = border.addComponent(feng3d.MeshRenderer);
                 var material = meshRenderer.material = new feng3d.SegmentMaterial();
-                material.uniforms.u_segmentColor = new feng3d.Color(1, 1, 1, 0.99);
+                material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
                 material.renderParams.enableBlend = true;
                 this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 this.gameObject.addChild(border);
@@ -6366,16 +6366,16 @@ var feng3d;
             };
             SToolModel.prototype.initModels = function () {
                 this.xCube = feng3d.GameObject.create("xCube").addComponent(CoordinateScaleCube);
-                this.xCube.color.setTo(1, 0, 0);
+                this.xCube.color.setTo(1, 0, 0, 1);
                 this.xCube.update();
                 this.xCube.transform.rz = -90;
                 this.gameObject.addChild(this.xCube.gameObject);
                 this.yCube = feng3d.GameObject.create("yCube").addComponent(CoordinateScaleCube);
-                this.yCube.color.setTo(0, 1, 0);
+                this.yCube.color.setTo(0, 1, 0, 1);
                 this.yCube.update();
                 this.gameObject.addChild(this.yCube.gameObject);
                 this.zCube = feng3d.GameObject.create("zCube").addComponent(CoordinateScaleCube);
-                this.zCube.color.setTo(0, 0, 1);
+                this.zCube.color.setTo(0, 0, 1, 1);
                 this.zCube.update();
                 this.zCube.transform.rx = 90;
                 this.gameObject.addChild(this.zCube.gameObject);
@@ -6389,8 +6389,8 @@ var feng3d;
             __extends(CoordinateScaleCube, _super);
             function CoordinateScaleCube() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.color = new feng3d.Color(1, 0, 0, 0.99);
-                _this.selectedColor = new feng3d.Color(1, 1, 0, 0.99);
+                _this.color = new feng3d.Color4(1, 0, 0, 0.99);
+                _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
                 _this.length = 100;
                 _this._selected = false;
                 _this._scale = 1;
@@ -6417,7 +6417,7 @@ var feng3d;
                 var xLine = feng3d.GameObject.create();
                 var meshRenderer = xLine.addComponent(feng3d.MeshRenderer);
                 var material = meshRenderer.material = new feng3d.SegmentMaterial();
-                material.uniforms.u_segmentColor = new feng3d.Color(1, 1, 1, 0.99);
+                material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
                 material.renderParams.enableBlend = true;
                 this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 this.gameObject.addChild(xLine);
@@ -7527,7 +7527,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -7557,16 +7557,16 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color",
+                                            "__class__": "feng3d.Color4",
                                             "b": 0,
                                             "g": 0
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -7607,7 +7607,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -7637,14 +7637,14 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -7685,7 +7685,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -7715,16 +7715,16 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color",
+                                            "__class__": "feng3d.Color4",
                                             "b": 0,
                                             "r": 0
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -7764,7 +7764,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -7794,14 +7794,14 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -7842,7 +7842,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -7872,16 +7872,16 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color",
+                                            "__class__": "feng3d.Color4",
                                             "g": 0.058823529411764705,
                                             "r": 0
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -7922,7 +7922,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -7952,14 +7952,14 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -7996,7 +7996,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -8026,14 +8026,14 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -8070,7 +8070,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -8100,14 +8100,14 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -8143,7 +8143,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -8173,14 +8173,14 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -8217,7 +8217,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -8247,14 +8247,14 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -8291,7 +8291,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -8321,14 +8321,14 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -8365,7 +8365,7 @@ var feng3d;
                                         "density": 0.1,
                                         "enable": false,
                                         "fogColor": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         },
                                         "maxDistance": 100,
                                         "minDistance": 0,
@@ -8395,14 +8395,14 @@ var feng3d;
                                             "__class__": "feng3d.Texture2D"
                                         },
                                         "u_ambient": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_diffuse": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color4"
                                         },
                                         "u_reflectivity": 1,
                                         "u_specular": {
-                                            "__class__": "feng3d.Color"
+                                            "__class__": "feng3d.Color3"
                                         }
                                     }
                                 }
@@ -8463,12 +8463,12 @@ var feng3d;
                     startX = startZ = 0;
                     step = 1;
                     var halfNum = __this.num / 2;
-                    var xcolor = new feng3d.Color(1, 0, 0, 0.5);
-                    var zcolor = new feng3d.Color(0, 0, 1, 0.5);
+                    var xcolor = new feng3d.Color4(1, 0, 0, 0.5);
+                    var zcolor = new feng3d.Color4(0, 0, 1, 0.5);
                     var color;
                     segmentGeometry.removeAllSegments();
                     for (var i = -halfNum; i <= halfNum; i++) {
-                        var color0 = new feng3d.Color().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
+                        var color0 = new feng3d.Color4().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
                         color0.a = ((i % 10) == 0) ? 0.5 : 0.1;
                         color = (i * step + startZ == 0) ? xcolor : color0;
                         segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(-halfNum * step + startX, 0, i * step + startZ), new feng3d.Vector3(halfNum * step + startX, 0, i * step + startZ), color, color));
@@ -8613,7 +8613,7 @@ var feng3d;
         editor.Main3D = Main3D;
         function newScene() {
             var scene = feng3d.GameObject.create("Untitled").addComponent(feng3d.Scene3D);
-            scene.background = new feng3d.Color(0.408, 0.38, 0.357, 1.0);
+            scene.background = new feng3d.Color4(0.408, 0.38, 0.357, 1.0);
             var camera = feng3d.GameObjectFactory.createCamera("Main Camera");
             camera.transform.position = new feng3d.Vector3(0, 1, -10);
             scene.gameObject.addChild(camera);
@@ -8780,7 +8780,7 @@ var feng3d;
                     navobject.mouseEnabled = false;
                     navobject.addComponent(feng3d.MeshRenderer).set(function (space) {
                         space.geometry = new feng3d.CustomGeometry();
-                        space.material = new feng3d.ColorMaterial(new feng3d.Color(0, 1, 0, 0.5));
+                        space.material = new feng3d.ColorMaterial(new feng3d.Color4(0, 1, 0, 0.5));
                     });
                     navobject.transform.y = 0.01;
                     return navobject;
@@ -9506,7 +9506,7 @@ var navigation;
             line0s.forEach(function (element) {
                 var p0 = element.segment.p0.addTo(element.segment.p1).scale(0.5);
                 var p1 = p0.addTo(element.direction.clone().normalize(length));
-                segmentGeometry.addSegment(new feng3d.Segment(p0, p1, new feng3d.Color(1), new feng3d.Color(0, 1)));
+                segmentGeometry.addSegment(new feng3d.Segment(p0, p1, new feng3d.Color4(1), new feng3d.Color4(0, 1)));
             });
         };
         NavigationProcess.prototype.debugShowLines = function (lines) {
@@ -10041,7 +10041,7 @@ var feng3d;
                 holdSizeComponent.holdSize = 1;
                 var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
                 var material = meshRenderer.material = new feng3d.SegmentMaterial();
-                material.uniforms.u_segmentColor = new feng3d.Color(163 / 255, 162 / 255, 107 / 255);
+                material.uniforms.u_segmentColor = new feng3d.Color4(163 / 255, 162 / 255, 107 / 255);
                 var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 var num = 10;
                 for (var i = 0; i < num; i++) {
@@ -10064,7 +10064,7 @@ var feng3d;
                 this.enabled = true;
             };
             DirectionLightIcon.prototype.update = function () {
-                this.textureMaterial.uniforms.u_color = this.directionalLight.color;
+                this.textureMaterial.uniforms.u_color = this.directionalLight.color.toColor4();
                 this.lightLines.visible = editor.editorData.selectedGameObjects.indexOf(this.gameObject) != -1;
             };
             DirectionLightIcon.prototype.dispose = function () {
@@ -10134,11 +10134,11 @@ var feng3d;
                 var meshRenderer1 = lightLines1.addComponent(feng3d.MeshRenderer);
                 var material = meshRenderer.material = new feng3d.SegmentMaterial();
                 // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
-                material.uniforms.u_segmentColor = new feng3d.Color(1, 1, 1, 0.5);
+                material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
                 material.renderParams.enableBlend = true;
                 var material = meshRenderer1.material = new feng3d.SegmentMaterial();
                 // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
-                material.uniforms.u_segmentColor = new feng3d.Color(1, 1, 1, 0.5);
+                material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
                 material.renderParams.enableBlend = true;
                 var segmentGeometry = this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 var segmentGeometry1 = meshRenderer1.geometry = new feng3d.SegmentGeometry();
@@ -10164,12 +10164,12 @@ var feng3d;
                 lightpoints.showinHierarchy = false;
                 var meshRenderer = lightpoints.addComponent(feng3d.MeshRenderer);
                 var pointGeometry = this.pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(1, 0, 0), new feng3d.Color(1, 0, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(-1, 0, 0), new feng3d.Color(1, 0, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 1, 0), new feng3d.Color(0, 1, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, -1, 0), new feng3d.Color(0, 1, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, 1), new feng3d.Color(0, 0, 1)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, -1), new feng3d.Color(0, 0, 1)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(1, 0, 0), new feng3d.Color4(1, 0, 0)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(-1, 0, 0), new feng3d.Color4(1, 0, 0)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 1, 0), new feng3d.Color4(0, 1, 0)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, -1, 0), new feng3d.Color4(0, 1, 0)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, 1), new feng3d.Color4(0, 0, 1)));
+                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, -1), new feng3d.Color4(0, 0, 1)));
                 var pointMaterial = meshRenderer.material = new feng3d.PointMaterial();
                 pointMaterial.renderParams.enableBlend = true;
                 pointMaterial.pointSize = 5;
@@ -10178,7 +10178,7 @@ var feng3d;
                 this.enabled = true;
             };
             PointLightIcon.prototype.update = function () {
-                this.textureMaterial.uniforms.u_color = this.pointLight.color;
+                this.textureMaterial.uniforms.u_color = this.pointLight.color.toColor4();
                 this.lightLines.transform.scale =
                     this.lightLines1.transform.scale =
                         this.lightpoints.transform.scale =
@@ -10207,21 +10207,21 @@ var feng3d;
                             alpha = backalpha;
                         else
                             alpha = 1.0;
-                        this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color(1, 0, 0, alpha), new feng3d.Color(1, 0, 0, alpha)));
+                        this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color4(1, 0, 0, alpha), new feng3d.Color4(1, 0, 0, alpha)));
                         point0 = new feng3d.Vector3(x, 0, y);
                         point1 = new feng3d.Vector3(x1, 0, y1);
                         if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                             alpha = backalpha;
                         else
                             alpha = 1.0;
-                        this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color(0, 1, 0, alpha), new feng3d.Color(0, 1, 0, alpha)));
+                        this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color4(0, 1, 0, alpha), new feng3d.Color4(0, 1, 0, alpha)));
                         point0 = new feng3d.Vector3(x, y, 0);
                         point1 = new feng3d.Vector3(x1, y1, 0);
                         if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                             alpha = backalpha;
                         else
                             alpha = 1.0;
-                        this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color(0, 0, 1, alpha), new feng3d.Color(0, 0, 1, alpha)));
+                        this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color4(0, 0, 1, alpha), new feng3d.Color4(0, 0, 1, alpha)));
                     }
                     this.pointGeometry.removeAllPoints();
                     var point = new feng3d.Vector3(1, 0, 0);
@@ -10229,37 +10229,37 @@ var feng3d;
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(1, 0, 0, alpha)));
+                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(1, 0, 0, alpha)));
                     point = new feng3d.Vector3(-1, 0, 0);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(1, 0, 0, alpha)));
+                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(1, 0, 0, alpha)));
                     point = new feng3d.Vector3(0, 1, 0);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(0, 1, 0, alpha)));
+                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(0, 1, 0, alpha)));
                     point = new feng3d.Vector3(0, -1, 0);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(0, 1, 0, alpha)));
+                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(0, 1, 0, alpha)));
                     point = new feng3d.Vector3(0, 0, 1);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(0, 0, 1, alpha)));
+                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(0, 0, 1, alpha)));
                     point = new feng3d.Vector3(0, 0, -1);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color(0, 0, 1, alpha)));
+                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(0, 0, 1, alpha)));
                     //
                     this.lightLines.visible = true;
                     this.lightLines1.visible = true;

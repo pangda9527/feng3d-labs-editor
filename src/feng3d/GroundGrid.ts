@@ -44,14 +44,14 @@ namespace feng3d.editor
 
                 var halfNum = __this.num / 2;
 
-                var xcolor = new Vector4(1, 0, 0, 0.5);
-                var zcolor = new Vector4(0, 0, 1, 0.5);
-                var color: Vector4;
+                var xcolor = new Color4(1, 0, 0, 0.5);
+                var zcolor = new Color4(0, 0, 1, 0.5);
+                var color: Color4;
                 segmentGeometry.removeAllSegments();
                 for (var i = -halfNum; i <= halfNum; i++)
                 {
-                    var color0 = new Color().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777).toVector3().toVector4();
-                    color0.w = ((i % 10) == 0) ? 0.5 : 0.1;
+                    var color0 = new Color4().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
+                    color0.a = ((i % 10) == 0) ? 0.5 : 0.1;
                     color = (i * step + startZ == 0) ? xcolor : color0;
                     segmentGeometry.addSegment(new Segment(new Vector3(-halfNum * step + startX, 0, i * step + startZ), new Vector3(halfNum * step + startX, 0, i * step + startZ), color, color));
                     color = (i * step + startX == 0) ? zcolor : color0;

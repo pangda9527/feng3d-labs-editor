@@ -44,7 +44,7 @@ namespace feng3d.editor
             holdSizeComponent.holdSize = 1;
             var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
             var material = meshRenderer.material = new feng3d.SegmentMaterial();
-            material.uniforms.u_segmentColor = new Color(163 / 255, 162 / 255, 107 / 255);
+            material.uniforms.u_segmentColor = new Color4(163 / 255, 162 / 255, 107 / 255);
             var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             var num = 10;
             for (var i = 0; i < num; i++)
@@ -72,7 +72,7 @@ namespace feng3d.editor
 
         update()
         {
-            this.textureMaterial.uniforms.u_color = this.directionalLight.color;
+            this.textureMaterial.uniforms.u_color = this.directionalLight.color.toColor4();
             this.lightLines.visible = editorData.selectedGameObjects.indexOf(this.gameObject) != -1;
         }
 

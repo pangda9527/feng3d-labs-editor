@@ -20,18 +20,18 @@ namespace feng3d.editor
         private initModels()
         {
             this.xCube = GameObject.create("xCube").addComponent(CoordinateScaleCube);
-            this.xCube.color.setTo(1, 0, 0);
+            this.xCube.color.setTo(1, 0, 0, 1);
             this.xCube.update();
             this.xCube.transform.rz = -90;
             this.gameObject.addChild(this.xCube.gameObject);
 
             this.yCube = GameObject.create("yCube").addComponent(CoordinateScaleCube);
-            this.yCube.color.setTo(0, 1, 0);
+            this.yCube.color.setTo(0, 1, 0, 1);
             this.yCube.update();
             this.gameObject.addChild(this.yCube.gameObject);
 
             this.zCube = GameObject.create("zCube").addComponent(CoordinateScaleCube);
-            this.zCube.color.setTo(0, 0, 1);
+            this.zCube.color.setTo(0, 0, 1, 1);
             this.zCube.update();
             this.zCube.transform.rx = 90;
             this.gameObject.addChild(this.zCube.gameObject);
@@ -46,8 +46,8 @@ namespace feng3d.editor
         private coordinateCube: CoordinateCube
         private segmentGeometry: SegmentGeometry;
 
-        readonly color = new Color(1, 0, 0, 0.99)
-        private selectedColor = new Color(1, 1, 0, 0.99);
+        readonly color = new Color4(1, 0, 0, 0.99)
+        private selectedColor = new Color4(1, 1, 0, 0.99);
         private length = 100;
         //
         get selected() { return this._selected; }
@@ -64,7 +64,7 @@ namespace feng3d.editor
             var xLine = GameObject.create();
             var meshRenderer = xLine.addComponent(MeshRenderer);
             var material = meshRenderer.material = new SegmentMaterial();
-            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(xLine);

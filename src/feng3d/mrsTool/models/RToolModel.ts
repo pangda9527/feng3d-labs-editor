@@ -21,7 +21,7 @@ namespace feng3d.editor
         private initModels()
         {
             this.xAxis = GameObject.create("xAxis").addComponent(CoordinateRotationAxis);
-            this.xAxis.color.setTo(1, 0, 0);
+            this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.update();
             this.xAxis.transform.ry = 90;
             this.gameObject.addChild(this.xAxis.gameObject);
@@ -57,9 +57,9 @@ namespace feng3d.editor
         private sector: SectorGameObject;
 
         radius = 80;
-        readonly color = new Color(1, 0, 0, 0.99)
-        private backColor: Color = new Color(0.6, 0.6, 0.6, 0.99);
-        private selectedColor: Color = new Color(1, 1, 0, 0.99);
+        readonly color = new Color4(1, 0, 0, 0.99)
+        private backColor = new Color4(0.6, 0.6, 0.6, 0.99);
+        private selectedColor = new Color4(1, 1, 0, 0.99);
 
         //
         get selected() { return this._selected; }
@@ -84,7 +84,7 @@ namespace feng3d.editor
             var border = GameObject.create();
             var meshRenderer = border.addComponent(MeshRenderer);
             var material = meshRenderer.material = new SegmentMaterial();
-            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(border);
@@ -177,7 +177,7 @@ namespace feng3d.editor
     {
         private segmentGeometry: SegmentGeometry;
         private geometry: Geometry;
-        private borderColor = new Color(0, 1, 1, 0.6);
+        private borderColor = new Color4(0, 1, 1, 0.6);
 
         radius = 80;
 
@@ -194,13 +194,13 @@ namespace feng3d.editor
 
             var meshRenderer = this.gameObject.addComponent(MeshRenderer);
             this.geometry = meshRenderer.geometry = new CustomGeometry();
-            meshRenderer.material = new ColorMaterial(new Color(0.5, 0.5, 0.5, 0.2));
+            meshRenderer.material = new ColorMaterial(new Color4(0.5, 0.5, 0.5, 0.2));
             meshRenderer.material.renderParams.enableBlend = true;
 
             var border = GameObject.create("border");
             meshRenderer = border.addComponent(MeshRenderer);
             var material = meshRenderer.material = new SegmentMaterial();
-            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(border);
@@ -254,9 +254,9 @@ namespace feng3d.editor
         private sector: SectorGameObject;
 
         private radius = 80;
-        color = new Color(1, 0, 0, 0.99)
-        private backColor: Color = new Color(0.6, 0.6, 0.6, 0.99);
-        private selectedColor: Color = new Color(1, 1, 0, 0.99);
+        color = new Color4(1, 0, 0, 0.99)
+        private backColor = new Color4(0.6, 0.6, 0.6, 0.99);
+        private selectedColor = new Color4(1, 1, 0, 0.99);
 
         //
         get selected() { return this._selected; }
@@ -274,7 +274,7 @@ namespace feng3d.editor
             var border = GameObject.create("border");
             var meshRenderer = border.addComponent(MeshRenderer);
             var material = meshRenderer.material = new SegmentMaterial();
-            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.99);
+            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(border);

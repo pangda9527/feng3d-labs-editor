@@ -58,11 +58,11 @@ namespace feng3d.editor
             var meshRenderer1 = lightLines1.addComponent(feng3d.MeshRenderer);
             var material = meshRenderer.material = new feng3d.SegmentMaterial();
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
-            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.5);
+            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
             var material = meshRenderer1.material = new feng3d.SegmentMaterial();
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
-            material.uniforms.u_segmentColor = new Color(1, 1, 1, 0.5);
+            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
             var segmentGeometry = this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             var segmentGeometry1 = meshRenderer1.geometry = new feng3d.SegmentGeometry();
@@ -89,12 +89,12 @@ namespace feng3d.editor
             lightpoints.showinHierarchy = false;
             var meshRenderer = lightpoints.addComponent(MeshRenderer);
             var pointGeometry = this.pointGeometry = meshRenderer.geometry = new PointGeometry();
-            pointGeometry.addPoint(new PointInfo(new Vector3(1, 0, 0), new Color(1, 0, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(-1, 0, 0), new Color(1, 0, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(0, 1, 0), new Color(0, 1, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(0, -1, 0), new Color(0, 1, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, 1), new Color(0, 0, 1)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, -1), new Color(0, 0, 1)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(1, 0, 0), new Color4(1, 0, 0)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(-1, 0, 0), new Color4(1, 0, 0)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(0, 1, 0), new Color4(0, 1, 0)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(0, -1, 0), new Color4(0, 1, 0)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, 1), new Color4(0, 0, 1)));
+            pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, -1), new Color4(0, 0, 1)));
             var pointMaterial = meshRenderer.material = new PointMaterial();
             pointMaterial.renderParams.enableBlend = true;
             pointMaterial.pointSize = 5;
@@ -106,7 +106,7 @@ namespace feng3d.editor
 
         update()
         {
-            this.textureMaterial.uniforms.u_color = this.pointLight.color;
+            this.textureMaterial.uniforms.u_color = this.pointLight.color.toColor4();
             this.lightLines.transform.scale =
                 this.lightLines1.transform.scale =
                 this.lightpoints.transform.scale =
@@ -138,21 +138,21 @@ namespace feng3d.editor
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.addSegment(new Segment(point0, point1, new Color(1, 0, 0, alpha), new Color(1, 0, 0, alpha)));
+                    this.segmentGeometry.addSegment(new Segment(point0, point1, new Color4(1, 0, 0, alpha), new Color4(1, 0, 0, alpha)));
                     point0 = new Vector3(x, 0, y);
                     point1 = new Vector3(x1, 0, y1);
                     if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.addSegment(new Segment(point0, point1, new Color(0, 1, 0, alpha), new Color(0, 1, 0, alpha)));
+                    this.segmentGeometry.addSegment(new Segment(point0, point1, new Color4(0, 1, 0, alpha), new Color4(0, 1, 0, alpha)));
                     point0 = new Vector3(x, y, 0);
                     point1 = new Vector3(x1, y1, 0);
                     if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.addSegment(new Segment(point0, point1, new Color(0, 0, 1, alpha), new Color(0, 0, 1, alpha)));
+                    this.segmentGeometry.addSegment(new Segment(point0, point1, new Color4(0, 0, 1, alpha), new Color4(0, 0, 1, alpha)));
                 }
 
                 this.pointGeometry.removeAllPoints();
@@ -161,37 +161,37 @@ namespace feng3d.editor
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color(1, 0, 0, alpha)));
+                this.pointGeometry.addPoint(new PointInfo(point, new Color4(1, 0, 0, alpha)));
                 point = new Vector3(-1, 0, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color(1, 0, 0, alpha)));
+                this.pointGeometry.addPoint(new PointInfo(point, new Color4(1, 0, 0, alpha)));
                 point = new Vector3(0, 1, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color(0, 1, 0, alpha)));
+                this.pointGeometry.addPoint(new PointInfo(point, new Color4(0, 1, 0, alpha)));
                 point = new Vector3(0, -1, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color(0, 1, 0, alpha)));
+                this.pointGeometry.addPoint(new PointInfo(point, new Color4(0, 1, 0, alpha)));
                 point = new Vector3(0, 0, 1);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color(0, 0, 1, alpha)));
+                this.pointGeometry.addPoint(new PointInfo(point, new Color4(0, 0, 1, alpha)));
                 point = new Vector3(0, 0, -1);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color(0, 0, 1, alpha)));
+                this.pointGeometry.addPoint(new PointInfo(point, new Color4(0, 0, 1, alpha)));
                 //
                 this.lightLines.visible = true;
                 this.lightLines1.visible = true;
