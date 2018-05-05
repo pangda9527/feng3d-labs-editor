@@ -21,9 +21,10 @@ namespace feng3d.editor
             this.list = [];
             for (const key in obj)
             {
-                if (obj.hasOwnProperty(key) && !isNaN(Number(key)))
+                if (obj.hasOwnProperty(key))
                 {
-                    this.list.push({ label: obj[key], value: Number(key) });
+                    if (isNaN(Number(key)))
+                        this.list.push({ label: key, value: obj[key] });
                 }
             }
         }

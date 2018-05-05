@@ -3199,8 +3199,9 @@ var feng3d;
                 set: function (obj) {
                     this.list = [];
                     for (var key in obj) {
-                        if (obj.hasOwnProperty(key) && !isNaN(Number(key))) {
-                            this.list.push({ label: obj[key], value: Number(key) });
+                        if (obj.hasOwnProperty(key)) {
+                            if (isNaN(Number(key)))
+                                this.list.push({ label: key, value: obj[key] });
                         }
                     }
                 },
@@ -10080,7 +10081,8 @@ var feng3d;
                 var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.PlaneGeometry(size, size, 1, 1, false);
                 var textureMaterial = this.textureMaterial = meshRenderer.material = new feng3d.TextureMaterial();
-                var texture = new feng3d.Texture2D(editor.editorData.getEditorAssetsPath("/assets/3d/icons/sun.png"));
+                var texture = new feng3d.Texture2D();
+                texture.url = editor.editorData.getEditorAssetsPath("/assets/3d/icons/sun.png");
                 texture.format = feng3d.TextureFormat.RGBA;
                 texture.premulAlpha = true;
                 textureMaterial.uniforms.s_texture = texture;
@@ -10165,7 +10167,8 @@ var feng3d;
                 var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.PlaneGeometry(size, size, 1, 1, false);
                 var textureMaterial = this.textureMaterial = meshRenderer.material = new feng3d.TextureMaterial();
-                var texture = new feng3d.Texture2D(editor.editorData.getEditorAssetsPath("/assets/3d/icons/light.png"));
+                var texture = new feng3d.Texture2D();
+                texture.url = editor.editorData.getEditorAssetsPath("/assets/3d/icons/light.png");
                 texture.format = feng3d.TextureFormat.RGBA;
                 texture.premulAlpha = true;
                 textureMaterial.uniforms.s_texture = texture;
