@@ -219,17 +219,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -298,17 +287,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -375,17 +353,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -453,17 +420,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -530,17 +486,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -609,17 +554,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -682,17 +616,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -755,17 +678,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -827,17 +739,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -900,17 +801,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -973,17 +863,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
@@ -1046,17 +925,6 @@ namespace feng3d.editor
                         },
                         "material": {
                             "__class__": "feng3d.StandardMaterial",
-                            "fogMethod": {
-                                "__class__": "feng3d.FogMethod",
-                                "density": 0.1,
-                                "enable": false,
-                                "fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "maxDistance": 100,
-                                "minDistance": 0,
-                                "mode": 3
-                            },
                             "renderParams": {
                                 "__class__": "feng3d.RenderParams"
                             },
