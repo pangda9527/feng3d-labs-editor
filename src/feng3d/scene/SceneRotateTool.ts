@@ -196,7 +196,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "arrowsX",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -216,38 +215,10 @@ namespace feng3d.editor
                             "shaderName": "standard",
                             "uniforms": {
                                 "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
                                 "u_diffuse": {
-                                    "__class__": "feng3d.Color4",
                                     "g": 0,
                                     "b": 0
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
                                 }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
                             }
                         }
                     }]
@@ -255,7 +226,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "arrowsNX",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -274,37 +244,7 @@ namespace feng3d.editor
                             "__class__": "feng3d.Material",
                             "shaderName": "standard",
                             "uniforms": {
-                                "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_diffuse": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
+                                "__class__": "feng3d.StandardUniforms"
                             }
                         }
                     }]
@@ -312,7 +252,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "arrowsY",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -332,38 +271,10 @@ namespace feng3d.editor
                             "shaderName": "standard",
                             "uniforms": {
                                 "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
                                 "u_diffuse": {
-                                    "__class__": "feng3d.Color4",
                                     "r": 0,
                                     "b": 0
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
                                 }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
                             }
                         }
                     }]
@@ -371,7 +282,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "arrowsNY",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -389,37 +299,7 @@ namespace feng3d.editor
                             "__class__": "feng3d.Material",
                             "shaderName": "standard",
                             "uniforms": {
-                                "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_diffuse": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
+                                "__class__": "feng3d.StandardUniforms"
                             }
                         }
                     }]
@@ -427,7 +307,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "arrowsZ",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -447,38 +326,10 @@ namespace feng3d.editor
                             "shaderName": "standard",
                             "uniforms": {
                                 "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
                                 "u_diffuse": {
-                                    "__class__": "feng3d.Color4",
                                     "r": 0,
                                     "g": 0
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
                                 }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
                             }
                         }
                     }]
@@ -486,7 +337,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "arrowsNZ",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -505,37 +355,7 @@ namespace feng3d.editor
                             "__class__": "feng3d.Material",
                             "shaderName": "standard",
                             "uniforms": {
-                                "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_diffuse": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
+                                "__class__": "feng3d.StandardUniforms"
                             }
                         }
                     }]
@@ -543,7 +363,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "planeX",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -562,37 +381,7 @@ namespace feng3d.editor
                             "__class__": "feng3d.Material",
                             "shaderName": "standard",
                             "uniforms": {
-                                "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_diffuse": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
+                                "__class__": "feng3d.StandardUniforms"
                             }
                         }
                     }]
@@ -600,7 +389,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "planeNX",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -619,37 +407,7 @@ namespace feng3d.editor
                             "__class__": "feng3d.Material",
                             "shaderName": "standard",
                             "uniforms": {
-                                "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_diffuse": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
+                                "__class__": "feng3d.StandardUniforms"
                             }
                         }
                     }]
@@ -657,7 +415,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "planeY",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -675,37 +432,7 @@ namespace feng3d.editor
                             "__class__": "feng3d.Material",
                             "shaderName": "standard",
                             "uniforms": {
-                                "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_diffuse": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
+                                "__class__": "feng3d.StandardUniforms"
                             }
                         }
                     }]
@@ -713,7 +440,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "planeNY",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -732,37 +458,7 @@ namespace feng3d.editor
                             "__class__": "feng3d.Material",
                             "shaderName": "standard",
                             "uniforms": {
-                                "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_diffuse": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
+                                "__class__": "feng3d.StandardUniforms"
                             }
                         }
                     }]
@@ -770,7 +466,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "planeZ",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -789,37 +484,7 @@ namespace feng3d.editor
                             "__class__": "feng3d.Material",
                             "shaderName": "standard",
                             "uniforms": {
-                                "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_diffuse": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
+                                "__class__": "feng3d.StandardUniforms"
                             }
                         }
                     }]
@@ -827,7 +492,6 @@ namespace feng3d.editor
             {
                 "__class__": "feng3d.GameObject",
                 "name": "planeNZ",
-                "children": [],
                 "components": [
                     null,
                     {
@@ -846,37 +510,7 @@ namespace feng3d.editor
                             "__class__": "feng3d.Material",
                             "shaderName": "standard",
                             "uniforms": {
-                                "__class__": "feng3d.StandardUniforms",
-                                "s_diffuse": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_diffuse": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_normal": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "s_specular": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_specular": {
-                                    "__class__": "feng3d.Color3"
-                                },
-                                "s_ambient": {
-                                    "__class__": "feng3d.Texture2D"
-                                },
-                                "u_ambient": {
-                                    "__class__": "feng3d.Color4"
-                                },
-                                "s_envMap": {
-                                    "__class__": "feng3d.TextureCube"
-                                },
-                                "u_fogColor": {
-                                    "__class__": "feng3d.Color3"
-                                }
-                            },
-                            "renderParams": {
-                                "__class__": "feng3d.RenderParams"
+                                "__class__": "feng3d.StandardUniforms"
                             }
                         }
                     }]
