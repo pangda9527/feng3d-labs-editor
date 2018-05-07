@@ -3944,7 +3944,7 @@ var feng3d;
                             { type: "separator" },
                             {
                                 label: "StandardMaterial", click: function () {
-                                    assetsFile.addfile("new material" + ".material", new feng3d.StandardMaterial());
+                                    assetsFile.addfile("new material" + ".material", feng3d.materialFactory.create("standard"));
                                 }
                             },
                             {
@@ -4559,7 +4559,7 @@ var feng3d;
                 });
                 function getcontent(callback) {
                     var saveContent = content;
-                    if (content instanceof feng3d.StandardMaterial
+                    if (content instanceof feng3d.Material
                         || content instanceof feng3d.GameObject
                         || content instanceof feng3d.AnimationClip) {
                         var obj = feng3d.serialization.serialize(content);
@@ -6206,7 +6206,7 @@ var feng3d;
                 var mouseHit = feng3d.GameObject.create("hit");
                 meshRenderer = mouseHit.addComponent(feng3d.MeshRenderer);
                 this.torusGeometry = meshRenderer.geometry = new feng3d.TorusGeometry(this.radius, 2);
-                meshRenderer.material = new feng3d.StandardMaterial();
+                meshRenderer.material = feng3d.materialFactory.create("standard");
                 mouseHit.transform.rx = 90;
                 mouseHit.visible = false;
                 mouseHit.mouselayer = feng3d.mouselayer.editor;
@@ -9881,7 +9881,7 @@ var feng3d;
             MouseRayTestScript.prototype.onclick = function () {
                 var gameobject = feng3d.GameObject.create("test");
                 var meshRenderer = gameobject.addComponent(feng3d.MeshRenderer);
-                meshRenderer.material = new feng3d.StandardMaterial();
+                meshRenderer.material = feng3d.materialFactory.create("standard");
                 meshRenderer.geometry = new feng3d.SphereGeometry(10);
                 gameobject.mouseEnabled = false;
                 var mouseRay3D = editor.engine.camera.getMouseRay3D();
@@ -10447,7 +10447,7 @@ var feng3d;
             return geo;
         }
         function parseMaterial(geometry) {
-            var material = new feng3d.StandardMaterial();
+            var material = feng3d.materialFactory.create("standard");
             material.renderParams.cullFace = feng3d.CullFace.NONE;
             return material;
         }

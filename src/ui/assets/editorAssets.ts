@@ -175,7 +175,7 @@ namespace feng3d.editor
                             {
                                 label: "StandardMaterial", click: () =>
                                 {
-                                    assetsFile.addfile("new material" + ".material", new StandardMaterial());
+                                    assetsFile.addfile("new material" + ".material", materialFactory.create("standard"));
                                 }
                             },
                             {

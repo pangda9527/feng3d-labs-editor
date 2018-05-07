@@ -553,7 +553,7 @@ namespace feng3d.editor
             function getcontent(callback: (savedata: ArrayBuffer, data: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry) => void)
             {
                 var saveContent = content;
-                if (content instanceof StandardMaterial
+                if (content instanceof Material
                     || content instanceof GameObject
                     || content instanceof AnimationClip
                 )
