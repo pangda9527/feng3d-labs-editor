@@ -103,7 +103,7 @@ namespace feng3d.editor
 					mrsTool.isBaryCenter = !mrsTool.isBaryCenter;
 					break;
 				case this.playBtn:
-					editorAssets.saveScene("default.scene", engine.scene, (err) =>
+					editorAssets.saveScene("default.scene.json", engine.scene, (err) =>
 					{
 						if (err)
 						{

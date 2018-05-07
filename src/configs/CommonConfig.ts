@@ -31,7 +31,7 @@ namespace feng3d.editor
                         console.log("导入项目完成");
                         editorAssets.initproject(editorAssets.projectname, () =>
                         {
-                            editorAssets.readScene("default.scene", (err, scene) =>
+                            editorAssets.readScene("default.scene.json", (err, scene) =>
                             {
                                 engine.scene = scene;
                                 editorui.assetsview.updateShowFloder();

@@ -5138,7 +5138,7 @@ var feng3d;
                         editor.mrsTool.isBaryCenter = !editor.mrsTool.isBaryCenter;
                         break;
                     case this.playBtn:
-                        editor.editorAssets.saveScene("default.scene", editor.engine.scene, function (err) {
+                        editor.editorAssets.saveScene("default.scene.json", editor.engine.scene, function (err) {
                             if (err) {
                                 feng3d.warn(err);
                                 return;
@@ -7541,939 +7541,934 @@ var feng3d;
          * 旋转工具模型，该模型由editor生成 RotationToolModel.gameobject
          */
         var rotateToolModelJson = {
-            "defaultvaluedontsave": true,
-            "compress": false,
-            "strings": [],
-            "value": {
-                "__class__": "feng3d.GameObject",
-                "children": [
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rz": 90,
-                                "x": 19
+            "__class__": "feng3d.GameObject",
+            "children": [
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rz": 90,
+                            "x": 19
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.ConeGeometry",
+                                "bottomClosed": true,
+                                "bottomRadius": 7,
+                                "height": 21,
+                                "segmentsH": 1,
+                                "segmentsW": 16,
+                                "surfaceClosed": true,
+                                "topClosed": false,
+                                "topRadius": 0,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.ConeGeometry",
-                                    "bottomClosed": true,
-                                    "bottomRadius": 7,
-                                    "height": 21,
-                                    "segmentsH": 1,
-                                    "segmentsW": 16,
-                                    "surfaceClosed": true,
-                                    "topClosed": false,
-                                    "topRadius": 0,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4",
-                                            "b": 0,
-                                            "g": 0
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4",
+                                        "b": 0,
+                                        "g": 0
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "arrowsX",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rz": -90,
-                                "x": -19
+                        }
+                    ],
+                    "name": "arrowsX",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rz": -90,
+                            "x": -19
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.ConeGeometry",
+                                "bottomClosed": true,
+                                "bottomRadius": 7,
+                                "height": 21,
+                                "segmentsH": 1,
+                                "segmentsW": 16,
+                                "surfaceClosed": true,
+                                "topClosed": false,
+                                "topRadius": 0,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.ConeGeometry",
-                                    "bottomClosed": true,
-                                    "bottomRadius": 7,
-                                    "height": 21,
-                                    "segmentsH": 1,
-                                    "segmentsW": 16,
-                                    "surfaceClosed": true,
-                                    "topClosed": false,
-                                    "topRadius": 0,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "arrowsNX",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rz": 180,
-                                "y": 19
+                        }
+                    ],
+                    "name": "arrowsNX",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rz": 180,
+                            "y": 19
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.ConeGeometry",
+                                "bottomClosed": true,
+                                "bottomRadius": 7,
+                                "height": 21,
+                                "segmentsH": 1,
+                                "segmentsW": 16,
+                                "surfaceClosed": true,
+                                "topClosed": false,
+                                "topRadius": 0,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.ConeGeometry",
-                                    "bottomClosed": true,
-                                    "bottomRadius": 7,
-                                    "height": 21,
-                                    "segmentsH": 1,
-                                    "segmentsW": 16,
-                                    "surfaceClosed": true,
-                                    "topClosed": false,
-                                    "topRadius": 0,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4",
-                                            "b": 0,
-                                            "r": 0
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4",
+                                        "b": 0,
+                                        "r": 0
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "arrowsY",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "y": -19
+                        }
+                    ],
+                    "name": "arrowsY",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "y": -19
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.ConeGeometry",
+                                "bottomClosed": true,
+                                "bottomRadius": 7,
+                                "height": 21,
+                                "segmentsH": 1,
+                                "segmentsW": 16,
+                                "surfaceClosed": true,
+                                "topClosed": false,
+                                "topRadius": 0,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.ConeGeometry",
-                                    "bottomClosed": true,
-                                    "bottomRadius": 7,
-                                    "height": 21,
-                                    "segmentsH": 1,
-                                    "segmentsW": 16,
-                                    "surfaceClosed": true,
-                                    "topClosed": false,
-                                    "topRadius": 0,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "arrowsNY",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rx": -90,
-                                "z": 19
+                        }
+                    ],
+                    "name": "arrowsNY",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rx": -90,
+                            "z": 19
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.ConeGeometry",
+                                "bottomClosed": true,
+                                "bottomRadius": 7,
+                                "height": 21,
+                                "segmentsH": 1,
+                                "segmentsW": 16,
+                                "surfaceClosed": true,
+                                "topClosed": false,
+                                "topRadius": 0,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.ConeGeometry",
-                                    "bottomClosed": true,
-                                    "bottomRadius": 7,
-                                    "height": 21,
-                                    "segmentsH": 1,
-                                    "segmentsW": 16,
-                                    "surfaceClosed": true,
-                                    "topClosed": false,
-                                    "topRadius": 0,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4",
-                                            "g": 0.058823529411764705,
-                                            "r": 0
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4",
+                                        "g": 0.058823529411764705,
+                                        "r": 0
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "arrowsZ",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rx": 90,
-                                "z": -19
+                        }
+                    ],
+                    "name": "arrowsZ",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rx": 90,
+                            "z": -19
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.ConeGeometry",
+                                "bottomClosed": true,
+                                "bottomRadius": 7,
+                                "height": 21,
+                                "segmentsH": 1,
+                                "segmentsW": 16,
+                                "surfaceClosed": true,
+                                "topClosed": false,
+                                "topRadius": 0,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.ConeGeometry",
-                                    "bottomClosed": true,
-                                    "bottomRadius": 7,
-                                    "height": 21,
-                                    "segmentsH": 1,
-                                    "segmentsW": 16,
-                                    "surfaceClosed": true,
-                                    "topClosed": false,
-                                    "topRadius": 0,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "arrowsNZ",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rz": -90,
-                                "x": 7
+                        }
+                    ],
+                    "name": "arrowsNZ",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rz": -90,
+                            "x": 7
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.PlaneGeometry",
+                                "height": 14,
+                                "segmentsH": 1,
+                                "segmentsW": 1,
+                                "width": 14,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.PlaneGeometry",
-                                    "height": 14,
-                                    "segmentsH": 1,
-                                    "segmentsW": 1,
-                                    "width": 14,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "planeX",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rz": 90,
-                                "x": -7
+                        }
+                    ],
+                    "name": "planeX",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rz": 90,
+                            "x": -7
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.PlaneGeometry",
+                                "height": 14,
+                                "segmentsH": 1,
+                                "segmentsW": 1,
+                                "width": 14,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.PlaneGeometry",
-                                    "height": 14,
-                                    "segmentsH": 1,
-                                    "segmentsW": 1,
-                                    "width": 14,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "planeNX",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "y": 7
+                        }
+                    ],
+                    "name": "planeNX",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "y": 7
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.PlaneGeometry",
+                                "height": 14,
+                                "segmentsH": 1,
+                                "segmentsW": 1,
+                                "width": 14,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.PlaneGeometry",
-                                    "height": 14,
-                                    "segmentsH": 1,
-                                    "segmentsW": 1,
-                                    "width": 14,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "planeY",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rz": 180,
-                                "y": -7
+                        }
+                    ],
+                    "name": "planeY",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rz": 180,
+                            "y": -7
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.PlaneGeometry",
+                                "height": 14,
+                                "segmentsH": 1,
+                                "segmentsW": 1,
+                                "width": 14,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.PlaneGeometry",
-                                    "height": 14,
-                                    "segmentsH": 1,
-                                    "segmentsW": 1,
-                                    "width": 14,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "planeNY",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rx": 90,
-                                "z": 7
+                        }
+                    ],
+                    "name": "planeNY",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rx": 90,
+                            "z": 7
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.PlaneGeometry",
+                                "height": 14,
+                                "segmentsH": 1,
+                                "segmentsW": 1,
+                                "width": 14,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.PlaneGeometry",
-                                    "height": 14,
-                                    "segmentsH": 1,
-                                    "segmentsW": 1,
-                                    "width": 14,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "planeZ",
-                        "navigationArea": -1
-                    },
-                    {
-                        "__class__": "feng3d.GameObject",
-                        "children": [],
-                        "components": [
-                            null,
-                            {
-                                "__class__": "feng3d.Transform",
-                                "rx": -90,
-                                "z": -7
+                        }
+                    ],
+                    "name": "planeZ",
+                    "navigationArea": -1
+                },
+                {
+                    "__class__": "feng3d.GameObject",
+                    "children": [],
+                    "components": [
+                        null,
+                        {
+                            "__class__": "feng3d.Transform",
+                            "rx": -90,
+                            "z": -7
+                        },
+                        {
+                            "__class__": "feng3d.MeshRenderer",
+                            "enabled": true,
+                            "geometry": {
+                                "__class__": "feng3d.PlaneGeometry",
+                                "height": 14,
+                                "segmentsH": 1,
+                                "segmentsW": 1,
+                                "width": 14,
+                                "yUp": true
                             },
-                            {
-                                "__class__": "feng3d.MeshRenderer",
-                                "enabled": true,
-                                "geometry": {
-                                    "__class__": "feng3d.PlaneGeometry",
-                                    "height": 14,
-                                    "segmentsH": 1,
-                                    "segmentsW": 1,
-                                    "width": 14,
-                                    "yUp": true
+                            "material": {
+                                "__class__": "feng3d.StandardMaterial",
+                                "fogMethod": {
+                                    "__class__": "feng3d.FogMethod",
+                                    "density": 0.1,
+                                    "enable": false,
+                                    "fogColor": {
+                                        "__class__": "feng3d.Color3"
+                                    },
+                                    "maxDistance": 100,
+                                    "minDistance": 0,
+                                    "mode": 3
                                 },
-                                "material": {
-                                    "__class__": "feng3d.StandardMaterial",
-                                    "fogMethod": {
-                                        "__class__": "feng3d.FogMethod",
-                                        "density": 0.1,
-                                        "enable": false,
-                                        "fogColor": {
-                                            "__class__": "feng3d.Color3"
-                                        },
-                                        "maxDistance": 100,
-                                        "minDistance": 0,
-                                        "mode": 3
+                                "renderParams": {
+                                    "__class__": "feng3d.RenderParams"
+                                },
+                                "terrainMethod": {
+                                    "__class__": "feng3d.TerrainMethod"
+                                },
+                                "uniforms": {
+                                    "__class__": "feng3d.StandardUniforms",
+                                    "s_ambient": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "renderParams": {
-                                        "__class__": "feng3d.RenderParams"
+                                    "s_diffuse": {
+                                        "__class__": "feng3d.Texture2D"
                                     },
-                                    "terrainMethod": {
-                                        "__class__": "feng3d.TerrainMethod"
+                                    "s_envMap": {
+                                        "__class__": "feng3d.TextureCube"
                                     },
-                                    "uniforms": {
-                                        "__class__": "feng3d.StandardUniforms",
-                                        "s_ambient": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_diffuse": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_envMap": {
-                                            "__class__": "feng3d.TextureCube"
-                                        },
-                                        "s_normal": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "s_specular": {
-                                            "__class__": "feng3d.Texture2D"
-                                        },
-                                        "u_ambient": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_diffuse": {
-                                            "__class__": "feng3d.Color4"
-                                        },
-                                        "u_reflectivity": 1,
-                                        "u_specular": {
-                                            "__class__": "feng3d.Color3"
-                                        }
+                                    "s_normal": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "s_specular": {
+                                        "__class__": "feng3d.Texture2D"
+                                    },
+                                    "u_ambient": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_diffuse": {
+                                        "__class__": "feng3d.Color4"
+                                    },
+                                    "u_reflectivity": 1,
+                                    "u_specular": {
+                                        "__class__": "feng3d.Color3"
                                     }
                                 }
                             }
-                        ],
-                        "name": "planeNZ",
-                        "navigationArea": -1
-                    }
-                ],
-                "components": [
-                    null,
-                    {
-                        "__class__": "feng3d.Transform"
-                    },
-                    null
-                ],
-                "name": "RotationToolModel",
-                "navigationArea": -1
-            }
+                        }
+                    ],
+                    "name": "planeNZ",
+                    "navigationArea": -1
+                }
+            ],
+            "components": [
+                null,
+                {
+                    "__class__": "feng3d.Transform"
+                },
+                null
+            ],
+            "name": "RotationToolModel",
+            "navigationArea": -1
         };
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -8614,14 +8609,14 @@ var feng3d;
                 editor.engine = new EditorEngine(canvas, null, editor.editorCamera);
                 editor.engine.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
                 //
-                editor.editorAssets.readScene("default.scene", function (err, scene) {
+                editor.editorAssets.readScene("default.scene.json", function (err, scene) {
                     if (err)
                         editor.engine.scene = newScene();
                     else
                         editor.engine.scene = scene;
                 });
                 window.addEventListener("beforeunload", function () {
-                    editor.editorAssets.saveScene("default.scene", editor.engine.scene);
+                    editor.editorAssets.saveScene("default.scene.json", editor.engine.scene);
                 });
             };
             Main3D.prototype.onEditorCameraRotate = function (e) {
@@ -10681,7 +10676,7 @@ var feng3d;
                         editor.fs.importProject(filelist.item(0), function () {
                             console.log("导入项目完成");
                             editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
-                                editor.editorAssets.readScene("default.scene", function (err, scene) {
+                                editor.editorAssets.readScene("default.scene.json", function (err, scene) {
                                     editor.engine.scene = scene;
                                     editor.editorui.assetsview.updateShowFloder();
                                     editor.assetsDispather.dispatch("changed");

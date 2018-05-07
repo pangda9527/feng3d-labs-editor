@@ -11,7 +11,7 @@ if (fstype == "indexedDB")
 
     feng3d.indexedDBfs.initproject(project, () =>
     {
-        feng3d.indexedDBfs.readFileAsString("default.scene", (err, content) =>
+        feng3d.indexedDBfs.readFileAsString("default.scene.json", (err, content) =>
         {
             var json = JSON.parse(content);
             var scene = feng3d.serialization.deserialize(json);

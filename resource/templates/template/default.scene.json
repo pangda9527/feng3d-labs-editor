@@ -1,8 +1,4 @@
 {
-	"defaultvaluedontsave": true,
-	"compress": false,
-	"strings": [],
-	"value": {
 		"__class__": "feng3d.GameObject",
 		"children": [
 			{
@@ -79,4 +75,3 @@
 			}],
 		"name": "default"
 	}
-}

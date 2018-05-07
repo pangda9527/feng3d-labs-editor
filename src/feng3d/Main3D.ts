@@ -74,7 +74,7 @@ namespace feng3d.editor
             engine = new EditorEngine(canvas, null, editorCamera);
             engine.renderObjectflag = GameObjectFlag.feng3d | GameObjectFlag.editor;
             //
-            editorAssets.readScene("default.scene", (err, scene) =>
+            editorAssets.readScene("default.scene.json", (err, scene) =>
             {
                 if (err)
                     engine.scene = newScene();
@@ -84,7 +84,7 @@ namespace feng3d.editor
 
             window.addEventListener("beforeunload", () =>
             {
-                editorAssets.saveScene("default.scene", engine.scene);
+                editorAssets.saveScene("default.scene.json", engine.scene);
             });
         }
 
