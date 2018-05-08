@@ -7471,7 +7471,7 @@ var feng3d;
                     }
                 });
                 function initModel() {
-                    var rotationToolModel = feng3d.rawData.create(rotateToolModelJson);
+                    var rotationToolModel = feng3d.serialization.deserialize(rotateToolModelJson);
                     var arrowsX = rotationToolModel.find("arrowsX");
                     var arrowsY = rotationToolModel.find("arrowsY");
                     var arrowsZ = rotationToolModel.find("arrowsZ");

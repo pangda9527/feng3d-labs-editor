@@ -114,7 +114,7 @@ namespace feng3d.editor
 
             function initModel()
             {
-                var rotationToolModel = rawData.create(<any>rotateToolModelJson);
+                var rotationToolModel = serialization.deserialize(<any>rotateToolModelJson);
                 var arrowsX = rotationToolModel.find("arrowsX");
                 var arrowsY = rotationToolModel.find("arrowsY");
                 var arrowsZ = rotationToolModel.find("arrowsZ");
