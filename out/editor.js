@@ -3949,7 +3949,7 @@ var feng3d;
                             },
                             {
                                 label: "ColorMaterial", click: function () {
-                                    assetsFile.addfile("new material" + ".material", new feng3d.ColorMaterial());
+                                    assetsFile.addfile("new material" + ".material", feng3d.materialFactory.create("color"));
                                 }
                             },
                         ]
@@ -5990,7 +5990,7 @@ var feng3d;
                 this.xArrow = feng3d.GameObject.create();
                 meshRenderer = this.xArrow.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.ConeGeometry(5, 18);
-                this.material = meshRenderer.material = new feng3d.ColorMaterial();
+                this.material = meshRenderer.material = feng3d.materialFactory.create("color");
                 this.xArrow.transform.y = this.length;
                 this.xArrow.mouselayer = feng3d.mouselayer.editor;
                 this.gameObject.addChild(this.xArrow);
@@ -5998,7 +5998,7 @@ var feng3d;
                 var mouseHit = feng3d.GameObject.create("hitCoordinateAxis");
                 meshRenderer = mouseHit.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.CylinderGeometry(5, 5, this.length);
-                //meshRenderer.material = new ColorMaterial();
+                //meshRenderer.material = materialFactory.create("color");
                 mouseHit.transform.y = 20 + (this.length - 20) / 2;
                 mouseHit.visible = false;
                 mouseHit.mouseEnabled = true;
@@ -6038,7 +6038,7 @@ var feng3d;
                 this.oCube = feng3d.GameObject.create();
                 var meshRenderer = this.oCube.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.CubeGeometry(8, 8, 8);
-                this.colorMaterial = meshRenderer.material = new feng3d.ColorMaterial();
+                this.colorMaterial = meshRenderer.material = feng3d.materialFactory.create("color");
                 this.oCube.mouseEnabled = true;
                 this.oCube.mouselayer = feng3d.mouselayer.editor;
                 this.gameObject.addChild(this.oCube);
@@ -6082,7 +6082,7 @@ var feng3d;
                 var meshRenderer = plane.addComponent(feng3d.MeshRenderer);
                 plane.transform.x = plane.transform.z = this._width / 2;
                 meshRenderer.geometry = new feng3d.PlaneGeometry(this._width, this._width);
-                this.colorMaterial = meshRenderer.material = new feng3d.ColorMaterial();
+                this.colorMaterial = meshRenderer.material = feng3d.materialFactory.create("color");
                 this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
                 plane.mouselayer = feng3d.mouselayer.editor;
                 plane.mouseEnabled = true;
@@ -6288,7 +6288,7 @@ var feng3d;
                 this.gameObject.name = "sector";
                 var meshRenderer = this.gameObject.addComponent(feng3d.MeshRenderer);
                 this.geometry = meshRenderer.geometry = new feng3d.CustomGeometry();
-                meshRenderer.material = new feng3d.ColorMaterial(new feng3d.Color4(0.5, 0.5, 0.5, 0.2));
+                meshRenderer.material = feng3d.materialFactory.create("color", { uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
                 meshRenderer.material.renderParams.enableBlend = true;
                 var border = feng3d.GameObject.create("border");
                 meshRenderer = border.addComponent(feng3d.MeshRenderer);
@@ -8248,7 +8248,7 @@ var feng3d;
                     navobject.mouseEnabled = false;
                     navobject.addComponent(feng3d.MeshRenderer).set(function (space) {
                         space.geometry = new feng3d.CustomGeometry();
-                        space.material = new feng3d.ColorMaterial(new feng3d.Color4(0, 1, 0, 0.5));
+                        space.material = feng3d.materialFactory.create("color", { uniforms: { u_diffuseInput: new feng3d.Color4(0, 1, 0, 0.5) } });
                     });
                     navobject.transform.y = 0.01;
                     return navobject;

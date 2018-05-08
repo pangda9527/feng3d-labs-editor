@@ -181,7 +181,7 @@ namespace feng3d.editor
                             {
                                 label: "ColorMaterial", click: () =>
                                 {
-                                    assetsFile.addfile("new material" + ".material", new ColorMaterial());
+                                    assetsFile.addfile("new material" + ".material", materialFactory.create("color"));
                                 }
                             },
                         ]

@@ -194,7 +194,7 @@ namespace feng3d.editor
 
             var meshRenderer = this.gameObject.addComponent(MeshRenderer);
             this.geometry = meshRenderer.geometry = new CustomGeometry();
-            meshRenderer.material = new ColorMaterial(new Color4(0.5, 0.5, 0.5, 0.2));
+            meshRenderer.material = materialFactory.create("color", { uniforms: { u_diffuseInput: new Color4(0.5, 0.5, 0.5, 0.2) } });
             meshRenderer.material.renderParams.enableBlend = true;
 
             var border = GameObject.create("border");
