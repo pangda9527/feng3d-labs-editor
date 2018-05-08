@@ -100,7 +100,7 @@ namespace feng3d.editor
             pointGeometry.addPoint(new PointInfo(new Vector3(0, -1, 0), new Color4(0, 1, 0)));
             pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, 1), new Color4(0, 0, 1)));
             pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, -1), new Color4(0, 0, 1)));
-            var pointMaterial = meshRenderer.material = new PointMaterial();
+            var pointMaterial = meshRenderer.material = materialFactory.create("point", { renderParams: { renderMode: RenderMode.POINTS } });
             pointMaterial.renderParams.enableBlend = true;
             pointMaterial.uniforms.u_PointSize = 5;
             // pointMaterial.color = new Color(163 / 255 * 1.2, 162 / 255 * 1.2, 107 / 255 * 1.2);

@@ -9217,7 +9217,7 @@ function createSegment() {
         debugPoint.mouseEnabled = false;
         var meshRenderer = debugPoint.addComponent(feng3d.MeshRenderer);
         pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
-        var materialp = meshRenderer.material = new feng3d.PointMaterial();
+        var materialp = meshRenderer.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
         materialp.uniforms.u_PointSize = 5;
         materialp.uniforms.u_color.setTo(0, 0, 0);
     }
@@ -9615,7 +9615,7 @@ var feng3d;
                 pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, -1, 0), new feng3d.Color4(0, 1, 0)));
                 pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, 1), new feng3d.Color4(0, 0, 1)));
                 pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, -1), new feng3d.Color4(0, 0, 1)));
-                var pointMaterial = meshRenderer.material = new feng3d.PointMaterial();
+                var pointMaterial = meshRenderer.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
                 pointMaterial.renderParams.enableBlend = true;
                 pointMaterial.uniforms.u_PointSize = 5;
                 // pointMaterial.color = new Color(163 / 255 * 1.2, 162 / 255 * 1.2, 107 / 255 * 1.2);
