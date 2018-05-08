@@ -61,11 +61,11 @@ namespace feng3d.editor
             lightLines1.showinHierarchy = false;
             var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
             var meshRenderer1 = lightLines1.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = new feng3d.SegmentMaterial();
+            var material = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
             material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
-            var material = meshRenderer1.material = new feng3d.SegmentMaterial();
+            var material = meshRenderer1.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
             material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;

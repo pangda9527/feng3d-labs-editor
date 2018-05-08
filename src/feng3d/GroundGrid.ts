@@ -25,7 +25,7 @@ namespace feng3d.editor
 
             var meshRenderer = groundGridObject.addComponent(MeshRenderer);
             var segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
-            var material = meshRenderer.material = new SegmentMaterial();
+            var material = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
             material.renderParams.enableBlend = true;
             update();
 

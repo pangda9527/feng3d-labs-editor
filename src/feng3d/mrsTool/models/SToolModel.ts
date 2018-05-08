@@ -63,7 +63,7 @@ namespace feng3d.editor
             super.init(gameObject);
             var xLine = GameObject.create();
             var meshRenderer = xLine.addComponent(MeshRenderer);
-            var material = meshRenderer.material = new SegmentMaterial();
+            var material = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
             material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();

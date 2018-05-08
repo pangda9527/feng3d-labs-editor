@@ -647,7 +647,7 @@ function createSegment()
         debugSegment.mouseEnabled = false;
         //初始化材质
         var meshRenderer = debugSegment.addComponent(feng3d.MeshRenderer);
-        var material = meshRenderer.material = new feng3d.SegmentMaterial();
+        var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
         material.uniforms.u_segmentColor.setTo(1.0, 0, 0);
         segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
     }

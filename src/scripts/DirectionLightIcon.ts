@@ -44,7 +44,7 @@ namespace feng3d.editor
             holdSizeComponent.camera = editorCamera;
             holdSizeComponent.holdSize = 1;
             var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = new feng3d.SegmentMaterial();
+            var material = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
             material.uniforms.u_segmentColor = new Color4(163 / 255, 162 / 255, 107 / 255);
             var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             var num = 10;
