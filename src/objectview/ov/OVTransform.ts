@@ -145,12 +145,12 @@ namespace feng3d.editor
 			this.updateView();
 		}
 
-		getAttributeView(attributeName: String): IObjectAttributeView
+		getAttributeView(attributeName: String)
 		{
 			return null;
 		}
 
-		getblockView(blockName: String): IObjectBlockView
+		getblockView(blockName: String)
 		{
 			return null;
 		}

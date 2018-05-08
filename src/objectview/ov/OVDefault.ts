@@ -1,11 +1,12 @@
 namespace feng3d
 {
 	export interface IObjectView extends eui.Component { }
+	export interface IObjectBlockView extends eui.Component { }
+	export interface IObjectAttributeView extends eui.Component { }
 }
 
 namespace feng3d.editor
 {
-
 	/**
 	 * 默认使用块的对象界面
 	 * @author feng 2016-3-22
@@ -28,25 +29,46 @@ namespace feng3d.editor
 
 			this._objectViewInfo = objectViewInfo;
 			this._space = objectViewInfo.owner;
-
-			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "OVDefault";
 		}
 
-		private onComplete()
+		$onAddToStage(stage: egret.Stage, nestLevel: number)
 		{
+			super.$onAddToStage(stage, nestLevel);
 			//
+			this.initview();
+			this.updateView();
+		}
+
+		$onRemoveFromStage()
+		{
+			super.$onRemoveFromStage();
+			this.dispose();
+		}
+
+		initview()
+		{
 			this.blockViews = [];
 			var objectBlockInfos: BlockViewInfo[] = this._objectViewInfo.objectBlockInfos;
 			for (var i = 0; i < objectBlockInfos.length; i++)
 			{
-				var displayObject: eui.Component = objectview.getBlockView(objectBlockInfos[i]);
+				var displayObject = <any>objectview.getBlockView(objectBlockInfos[i]);
 				displayObject.percentWidth = 100;
+				displayObject.objectView = this;
 				this.group.addChild(displayObject);
-				this.blockViews.push(<any>displayObject);
+				this.blockViews.push(displayObject);
 			}
+		}
 
-			this.$updateView();
+		dispose()
+		{
+			for (var i = 0; i < this.blockViews.length; i++)
+			{
+				var displayObject = this.blockViews[i];
+				displayObject.objectView = null;
+				this.group.removeChild(displayObject);
+			}
+			this.blockViews = null;
 		}
 
 		get space(): Object
@@ -57,12 +79,9 @@ namespace feng3d.editor
 		set space(value: Object)
 		{
 			this._space = value;
-			for (var i = 0; i < this.blockViews.length; i++)
-			{
-				this.blockViews[i].space = this._space;
-			}
-
-			this.$updateView();
+			this.dispose();
+			this.initview();
+			this.updateView();
 		}
 
 		/**
@@ -70,7 +89,7 @@ namespace feng3d.editor
 		 */
 		updateView(): void
 		{
-			this.$updateView();
+			if (!this.stage) return;
 
 			for (var i = 0; i < this.blockViews.length; i++)
 			{
@@ -78,15 +97,7 @@ namespace feng3d.editor
 			}
 		}
 
-		/**
-		 * 更新自身界面
-		 */
-		private $updateView(): void
-		{
-
-		}
-
-		getblockView(blockName: string): IObjectBlockView
+		getblockView(blockName: string)
 		{
 			for (var i = 0; i < this.blockViews.length; i++)
 			{
@@ -98,11 +109,11 @@ namespace feng3d.editor
 			return null;
 		}
 
-		getAttributeView(attributeName: string): IObjectAttributeView
+		getAttributeView(attributeName: string)
 		{
 			for (var i = 0; i < this.blockViews.length; i++)
 			{
-				var attributeView: IObjectAttributeView = this.blockViews[i].getAttributeView(attributeName);
+				var attributeView = this.blockViews[i].getAttributeView(attributeName);
 				if (attributeView != null)
 				{
 					return attributeView;

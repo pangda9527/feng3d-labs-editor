@@ -12,7 +12,6 @@ namespace feng3d.editor
 
 		private attributeViews: IObjectAttributeView[];
 		private itemList: AttributeViewInfo[];
-		private isInitView: boolean;
 
 		group: eui.Group;
 		titleGroup: eui.Group;
@@ -20,6 +19,8 @@ namespace feng3d.editor
 		contentGroup: eui.Group;
 
 		border: eui.Rect;
+
+		objectView: IObjectView;
 
 		/**
 		 * @inheritDoc
@@ -31,18 +32,26 @@ namespace feng3d.editor
 			this._space = blockViewInfo.owner;
 			this._blockName = blockViewInfo.name;
 			this.itemList = blockViewInfo.itemList;
-
-			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "OBVDefault";
 		}
 
-		private onComplete()
+		$onAddToStage(stage: egret.Stage, nestLevel: number)
 		{
+			super.$onAddToStage(stage, nestLevel);
+
+			this.initView();
 			this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
-			this.$updateView();
 		}
 
-		private initView(): void
+		$onRemoveFromStage()
+		{
+			super.$onRemoveFromStage();
+
+			this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+			this.dispose();
+		}
+
+		initView(): void
 		{
 			if (this._blockName != null && this._blockName.length > 0)
 			{
@@ -58,13 +67,25 @@ namespace feng3d.editor
 			var objectAttributeInfos = this.itemList;
 			for (var i = 0; i < objectAttributeInfos.length; i++)
 			{
-				var displayObject: eui.Component = objectview.getAttributeView(objectAttributeInfos[i]);
+				var displayObject = objectview.getAttributeView(objectAttributeInfos[i]);
 				displayObject.percentWidth = 100;
+				displayObject.objectView = this.objectView;
+				displayObject.objectBlockView = this;
 				this.contentGroup.addChild(displayObject);
 				this.attributeViews.push(<any>displayObject);
 			}
+		}
 
-			this.isInitView = true;
+		dispose()
+		{
+			for (var i = 0; i < this.attributeViews.length; i++)
+			{
+				var displayObject = this.attributeViews[i];
+				displayObject.objectView = null;
+				displayObject.objectBlockView = null;
+				this.contentGroup.removeChild(displayObject);
+			}
+			this.attributeViews = null;
 		}
 
 		get space(): Object
@@ -79,8 +100,6 @@ namespace feng3d.editor
 			{
 				this.attributeViews[i].space = this._space;
 			}
-
-			this.$updateView();
 		}
 
 		get blockName(): string
@@ -88,27 +107,15 @@ namespace feng3d.editor
 			return this._blockName;
 		}
 
-		/**
-		 * 更新自身界面
-		 */
-		private $updateView(): void
-		{
-			if (!this.isInitView)
-			{
-				this.initView();
-			}
-		}
-
 		updateView(): void
 		{
-			this.$updateView();
 			for (var i = 0; i < this.attributeViews.length; i++)
 			{
 				this.attributeViews[i].updateView();
 			}
 		}
 
-		getAttributeView(attributeName: String): IObjectAttributeView
+		getAttributeView(attributeName: String)
 		{
 			for (var i = 0; i < this.attributeViews.length; i++)
 			{

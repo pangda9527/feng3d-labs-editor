@@ -11,8 +11,6 @@ namespace feng3d.editor
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
-
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "OAVEnum";
         }
 
@@ -29,19 +27,13 @@ namespace feng3d.editor
             }
         }
 
-        $onAddToStage(stage: egret.Stage, nestLevel: number): void
+        initView()
         {
-            super.$onAddToStage(stage, nestLevel);
-
-            this.updateView();
-
             this.combobox.addEventListener(egret.Event.CHANGE, this.onComboxChange, this);
         }
 
-        $onRemoveFromStage(): void
+        dispose()
         {
-            super.$onRemoveFromStage();
-
             this.combobox.removeEventListener(egret.Event.CHANGE, this.onComboxChange, this);
         }
 

@@ -14,9 +14,8 @@ namespace feng3d.editor
 		public helpBtn: eui.Button;
 		public operationBtn: eui.Button;
 
-
 		script: Script;
-		scriptView: IObjectView & eui.Component
+		scriptView: IObjectView;
 
 		/**
 		 * 对象界面数据

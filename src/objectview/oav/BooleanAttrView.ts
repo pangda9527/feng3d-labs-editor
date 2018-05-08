@@ -9,25 +9,27 @@ namespace feng3d.editor
 		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 		{
 			super(attributeViewInfo);
-
 			this.skinName = "BooleanAttrViewSkin";
 		}
 
-		protected onComplete(): void
+		initView()
 		{
-			super.onComplete();
 			this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
-			this.updateView();
+		}
+
+		dispose()
+		{
+			this.checkBox.removeEventListener(egret.Event.CHANGE, this.onChange, this);
 		}
 
 		updateView()
 		{
-			this.checkBox["selected"] = this.attributeValue;
+			this.checkBox.selected = this.attributeValue;
 		}
 
 		protected onChange(event: egret.Event)
 		{
-			this.attributeValue = this.checkBox["selected"];
+			this.attributeValue = this.checkBox.selected;
 		}
 	}
 }

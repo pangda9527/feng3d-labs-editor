@@ -16,13 +16,12 @@ namespace feng3d.editor
 		{
 			super();
 			this._space = objectViewInfo.owner;
-
-			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "OVBaseDefault";
 		}
 
-		private onComplete(): void
+		$onAddToStage(stage: egret.Stage, nestLevel: number)
 		{
+			super.$onAddToStage(stage, nestLevel)
 			this.updateView();
 		}
 
@@ -37,12 +36,12 @@ namespace feng3d.editor
 			this.updateView();
 		}
 
-		getAttributeView(attributeName: String): IObjectAttributeView
+		getAttributeView(attributeName: String)
 		{
 			return null;
 		}
 
-		getblockView(blockName: String): IObjectBlockView
+		getblockView(blockName: String)
 		{
 			return null;
 		}

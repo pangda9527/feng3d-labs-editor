@@ -1,14 +1,8 @@
 namespace feng3d.editor
 {
     @OAVComponent()
-    export class OAVArray extends eui.Component implements IObjectAttributeView
+    export class OAVArray extends OAVBase
     {
-        private _space: Object;
-        private _attributeName: string;
-        private _attributeType: string;
-        private attributeViewInfo: AttributeViewInfo;
-        private isInitView: boolean;
-
         public group: eui.Group;
         public titleGroup: eui.Group;
         public titleButton: eui.Rect;
@@ -19,19 +13,8 @@ namespace feng3d.editor
 
         constructor(attributeViewInfo: AttributeViewInfo)
         {
-            super();
-            this._space = attributeViewInfo.owner;
-            this._attributeName = attributeViewInfo.name;
-            this._attributeType = attributeViewInfo.type;
-            this.attributeViewInfo = attributeViewInfo;
-
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+            super(attributeViewInfo);
             this.skinName = "OAVArray";
-        }
-
-        private onComplete()
-        {
-            this.$updateView();
         }
 
         get space(): Object
@@ -64,18 +47,7 @@ namespace feng3d.editor
             this.updateView();
         }
 
-        /**
-		 * 更新自身界面
-		 */
-        private $updateView(): void
-        {
-            if (!this.isInitView)
-            {
-                this.initView();
-            }
-        }
-
-        private initView(): void
+        initView(): void
         {
             this.attributeViews = [];
             var attributeValue = this.attributeValue;
@@ -87,31 +59,23 @@ namespace feng3d.editor
                 this.contentGroup.addChild(displayObject);
                 this.attributeViews[i] = <any>displayObject;
             }
-
             this.currentState = "hide";
-            this.isInitView = true;
-        }
-
-        $onAddToStage(stage: egret.Stage, nestLevel: number)
-        {
-            super.$onAddToStage(stage, nestLevel);
             this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
             this.sizeTxt.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
         }
 
-        $onRemoveFromStage()
+        dispose()
         {
-            super.$onRemoveFromStage()
             this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
             this.sizeTxt.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
-        }
 
-		/**
-		 * 更新界面
-		 */
-        updateView(): void
-        {
-            this.$updateView();
+            this.attributeViews = [];
+            for (var i = 0; i < this.attributeViews.length; i++)
+            {
+                var displayObject = this.attributeViews[i];
+                this.contentGroup.removeChild(displayObject);
+            }
+            this.attributeViews = null;
         }
 
         private onTitleButtonClick()
@@ -166,9 +130,9 @@ namespace feng3d.editor
             super(attributeViewInfo);
         }
 
-        protected onComplete()
+        initView()
         {
-            super.onComplete();
+            super.initView();
             this.label.width = 60;
         }
     }

@@ -10,15 +10,7 @@ namespace feng3d.editor
 		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 		{
 			super(attributeViewInfo);
-
 			this.skinName = "OVDefault";
-		}
-
-		protected onComplete(): void
-		{
-			super.onComplete();
-			this.initView();
-			this.updateView();
 		}
 
 		initView()

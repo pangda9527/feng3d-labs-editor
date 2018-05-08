@@ -47,7 +47,6 @@
         "src/objectview/ov/OVBaseDefault.ts",
         "src/objectview/ov/OVDefault.ts",
         "src/objectview/ov/OVTransform.ts",
-        "src/objectview/ov/OVMaterial.ts",
         //
         "src/objectview/obv/OBVDefault.ts",
         //

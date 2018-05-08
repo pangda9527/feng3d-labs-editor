@@ -10,20 +10,23 @@ namespace feng3d.editor
         public shaderComboBox: ComboBox;
         public group: eui.Group;
 
-		//
-		space: Material;
+        //
+        space: Material;
 
         constructor(attributeViewInfo: AttributeViewInfo)
         {
             super(attributeViewInfo);
-
             this.skinName = "OVMaterial";
         }
 
-        protected onComplete(): void
+        initView()
         {
-            super.onComplete();
-            this.updateView();
+            this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
+        }
+
+        dispose()
+        {
+            this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
         }
 
         updateView()
@@ -35,12 +38,18 @@ namespace feng3d.editor
             var selected = data.reduce((prevalue, item) =>
             {
                 if (prevalue) return prevalue;
-                if (item.value.indexOf(material.shaderName) != -1)
+                if (item.value == material.shaderName)
                     return item;
                 return null;
             }, null);
             this.shaderComboBox.dataProvider = data;
             this.shaderComboBox.data = selected;
+        }
+
+        private onShaderComboBoxChange()
+        {
+            this.attributeValue = this.shaderComboBox.data.value;
+            this.objectView.space = this.space;
         }
     }
 }

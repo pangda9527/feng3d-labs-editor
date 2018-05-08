@@ -42,34 +42,28 @@ namespace feng3d.editor
 			this._textEnabled = v;
 		}
 
-		protected onComplete()
+		initView()
 		{
 			this.text.percentWidth = 100;
 			this.label.text = this._attributeName;
-		}
 
-		$onAddToStage(stage: egret.Stage, nestLevel: number)
-		{
-			super.$onAddToStage(stage, nestLevel);
 			this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
 			this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
 			this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
 
-			this.updateView();
-
 			watcher.watch(this.space, this.attributeName, this.updateView, this);
 		}
 
-		$onRemoveFromStage()
+		dispose()
 		{
 			drag.unregister(this);
 			watcher.unwatch(this.space, this.attributeName, this.updateView, this);
 
-			super.$onRemoveFromStage()
 			this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
 			this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
 			this.text.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
 		}
+
 		private _textfocusintxt: boolean;
 		private ontxtfocusin()
 		{

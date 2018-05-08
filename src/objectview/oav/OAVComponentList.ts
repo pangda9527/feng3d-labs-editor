@@ -1,12 +1,8 @@
 namespace feng3d.editor
 {
 	@OAVComponent()
-	export class OAVComponentList extends eui.Component implements IObjectAttributeView
+	export class OAVComponentList extends OAVBase
 	{
-		private _space: GameObject;
-		private _attributeName: string;
-		private _attributeType: string;
-		private attributeViewInfo: AttributeViewInfo;
 		private accordions: Accordion[] = [];
 
 		//
@@ -15,38 +11,8 @@ namespace feng3d.editor
 
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
-			super();
-			this._space = <GameObject>attributeViewInfo.owner;
-			this._attributeName = attributeViewInfo.name;
-			this._attributeType = attributeViewInfo.type;
-			this.attributeViewInfo = attributeViewInfo;
-
-			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+			super(attributeViewInfo);
 			this.skinName = "OAVComponentListSkin";
-		}
-
-		private onComplete()
-		{
-			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
-			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-
-			if (this.stage)
-				this.onAddToStage();
-		}
-
-		private onAddToStage()
-		{
-			this.initView();
-			this.updateView();
-
-			this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
-		}
-
-		private onRemovedFromStage()
-		{
-			this.disposeView();
-
-			this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
 		}
 
 		private onAddComponentButtonClick()
@@ -64,7 +30,8 @@ namespace feng3d.editor
 		set space(value)
 		{
 			this._space = value;
-			this.updateView();
+			this.dispose();
+			this.initView();
 		}
 
 		get attributeName(): string
@@ -86,7 +53,7 @@ namespace feng3d.editor
 			this.updateView();
 		}
 
-		private initView(): void
+		initView(): void
 		{
 			this.accordions.length = 0;
 			(<eui.VerticalLayout>this.group.layout).gap = -1;
@@ -106,9 +73,11 @@ namespace feng3d.editor
 					this.space.addComponent(ScriptComponent).script = dragdata.file_script;
 				}
 			});
+
+			this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
 		}
 
-		private disposeView()
+		dispose()
 		{
 			var components = <any>this.attributeValue;
 			for (var i = 0; i < components.length; i++)
@@ -120,6 +89,8 @@ namespace feng3d.editor
 			this.space.off("removedComponent", this.onremovedComponent, this);
 
 			drag.unregister(this.addComponentButton);
+
+			this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
 		}
 
 		private addComponentView(component: Component)

@@ -13,18 +13,23 @@ namespace feng3d.editor
         {
             super(attributeViewInfo);
 
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "OAVColorPicker";
         }
 
-        protected onComplete(): void
+        initView()
         {
-            super.onComplete();
             this.colorPicker.addEventListener(egret.Event.CHANGE, this.onChange, this);
             this.input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            this.updateView();
+        }
+
+        dispose()
+        {
+            this.colorPicker.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+            this.input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+            this.input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            this.input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
         }
 
         updateView()

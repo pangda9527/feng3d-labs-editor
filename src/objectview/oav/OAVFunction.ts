@@ -9,15 +9,17 @@ namespace feng3d.editor
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
-
             this.skinName = "OAVFunction";
         }
 
-        protected onComplete(): void
+        initView()
         {
-            super.onComplete();
             this.button.addEventListener(egret.MouseEvent.CLICK, this.click, this);
-            this.updateView();
+        }
+
+        dispose()
+        {
+            this.button.removeEventListener(egret.MouseEvent.CLICK, this.click, this);
         }
 
         updateView()

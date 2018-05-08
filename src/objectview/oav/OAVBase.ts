@@ -9,6 +9,15 @@ namespace feng3d.editor
         //
         label: eui.Label;
 
+        /**
+         * 对象属性界面
+         */
+        objectView: IObjectView;
+        /**
+         * 对象属性块界面
+         */
+        objectBlockView: IObjectBlockView;
+
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super();
@@ -16,15 +25,6 @@ namespace feng3d.editor
             this._attributeName = attributeViewInfo.name;
             this._attributeType = attributeViewInfo.type;
             this.attributeViewInfo = attributeViewInfo;
-
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-        }
-
-        protected onComplete(): void
-        {
-            if (this.label)
-                this.label.text = this._attributeName;
-            this.updateView();
         }
 
         get space(): any
@@ -35,6 +35,8 @@ namespace feng3d.editor
         set space(value: any)
         {
             this._space = value;
+            this.dispose();
+            this.initView();
             this.updateView();
         }
 
@@ -52,13 +54,38 @@ namespace feng3d.editor
                     }
                 }
             }
+            if (this.label)
+                this.label.text = this._attributeName;
+
+            this.initView();
+            this.updateView();
         }
 
         $onRemoveFromStage()
         {
             super.$onRemoveFromStage()
+            this.dispose();
         }
 
+        /**
+         * 初始化
+         */
+        initView()
+        {
+
+        }
+
+        /**
+         * 销毁
+         */
+        dispose()
+        {
+
+        }
+
+        /**
+         * 更新
+         */
         updateView()
         {
 
@@ -85,6 +112,7 @@ namespace feng3d.editor
                 objectViewEvent.attributeValue = this.attributeValue;
                 this.dispatchEvent(objectViewEvent);
             }
+            this.updateView();
         }
     }
 }

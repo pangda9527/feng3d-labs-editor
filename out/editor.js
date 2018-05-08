@@ -2269,11 +2269,11 @@ var feng3d;
             function OVBaseDefault(objectViewInfo) {
                 var _this = _super.call(this) || this;
                 _this._space = objectViewInfo.owner;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "OVBaseDefault";
                 return _this;
             }
-            OVBaseDefault.prototype.onComplete = function () {
+            OVBaseDefault.prototype.$onAddToStage = function (stage, nestLevel) {
+                _super.prototype.$onAddToStage.call(this, stage, nestLevel);
                 this.updateView();
             };
             Object.defineProperty(OVBaseDefault.prototype, "space", {
@@ -2334,21 +2334,37 @@ var feng3d;
                 var _this = _super.call(this) || this;
                 _this._objectViewInfo = objectViewInfo;
                 _this._space = objectViewInfo.owner;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "OVDefault";
                 return _this;
             }
-            OVDefault.prototype.onComplete = function () {
+            OVDefault.prototype.$onAddToStage = function (stage, nestLevel) {
+                _super.prototype.$onAddToStage.call(this, stage, nestLevel);
                 //
+                this.initview();
+                this.updateView();
+            };
+            OVDefault.prototype.$onRemoveFromStage = function () {
+                _super.prototype.$onRemoveFromStage.call(this);
+                this.dispose();
+            };
+            OVDefault.prototype.initview = function () {
                 this.blockViews = [];
                 var objectBlockInfos = this._objectViewInfo.objectBlockInfos;
                 for (var i = 0; i < objectBlockInfos.length; i++) {
                     var displayObject = feng3d.objectview.getBlockView(objectBlockInfos[i]);
                     displayObject.percentWidth = 100;
+                    displayObject.objectView = this;
                     this.group.addChild(displayObject);
                     this.blockViews.push(displayObject);
                 }
-                this.$updateView();
+            };
+            OVDefault.prototype.dispose = function () {
+                for (var i = 0; i < this.blockViews.length; i++) {
+                    var displayObject = this.blockViews[i];
+                    displayObject.objectView = null;
+                    this.group.removeChild(displayObject);
+                }
+                this.blockViews = null;
             };
             Object.defineProperty(OVDefault.prototype, "space", {
                 get: function () {
@@ -2356,10 +2372,9 @@ var feng3d;
                 },
                 set: function (value) {
                     this._space = value;
-                    for (var i = 0; i < this.blockViews.length; i++) {
-                        this.blockViews[i].space = this._space;
-                    }
-                    this.$updateView();
+                    this.dispose();
+                    this.initview();
+                    this.updateView();
                 },
                 enumerable: true,
                 configurable: true
@@ -2368,15 +2383,11 @@ var feng3d;
              * 更新界面
              */
             OVDefault.prototype.updateView = function () {
-                this.$updateView();
+                if (!this.stage)
+                    return;
                 for (var i = 0; i < this.blockViews.length; i++) {
                     this.blockViews[i].updateView();
                 }
-            };
-            /**
-             * 更新自身界面
-             */
-            OVDefault.prototype.$updateView = function () {
             };
             OVDefault.prototype.getblockView = function (blockName) {
                 for (var i = 0; i < this.blockViews.length; i++) {
@@ -2551,62 +2562,6 @@ var feng3d;
     var editor;
     (function (editor) {
         /**
-         * 默认基础对象界面
-         * @author feng 2016-3-11
-         */
-        var OVMaterial = /** @class */ (function (_super) {
-            __extends(OVMaterial, _super);
-            function OVMaterial(objectViewInfo) {
-                var _this = _super.call(this) || this;
-                _this.space = objectViewInfo.owner;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
-                _this.skinName = "OVMaterial";
-                return _this;
-            }
-            OVMaterial.prototype.onComplete = function () {
-                this.initView();
-                this.updateView();
-            };
-            OVMaterial.prototype.getAttributeView = function (attributeName) {
-                return null;
-            };
-            OVMaterial.prototype.getblockView = function (blockName) {
-                return null;
-            };
-            OVMaterial.prototype.initView = function () {
-                this.renderParamsView = feng3d.objectview.getObjectView(this.space.renderParams, false);
-                this.group.addChild(this.renderParamsView);
-            };
-            /**
-             * 更新界面
-             */
-            OVMaterial.prototype.updateView = function () {
-                var material = this.space;
-                this.nameLabel.text = material.shaderName;
-                var data = feng3d.shaderlib.getShaderNames().sort().map(function (v) { return { label: v, value: v }; });
-                var selected = data.reduce(function (prevalue, item) {
-                    if (prevalue)
-                        return prevalue;
-                    if (item.value.indexOf(material.shaderName) != -1)
-                        return item;
-                    return null;
-                }, null);
-                this.shaderComboBox.dataProvider = data;
-                this.shaderComboBox.data = selected;
-            };
-            OVMaterial = __decorate([
-                feng3d.OVComponent()
-            ], OVMaterial);
-            return OVMaterial;
-        }(eui.Component));
-        editor.OVMaterial = OVMaterial;
-    })(editor = feng3d.editor || (feng3d.editor = {}));
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    var editor;
-    (function (editor) {
-        /**
          * 默认对象属性块界面
          * @author feng 2016-3-22
          */
@@ -2620,13 +2575,18 @@ var feng3d;
                 _this._space = blockViewInfo.owner;
                 _this._blockName = blockViewInfo.name;
                 _this.itemList = blockViewInfo.itemList;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "OBVDefault";
                 return _this;
             }
-            OBVDefault.prototype.onComplete = function () {
+            OBVDefault.prototype.$onAddToStage = function (stage, nestLevel) {
+                _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+                this.initView();
                 this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
-                this.$updateView();
+            };
+            OBVDefault.prototype.$onRemoveFromStage = function () {
+                _super.prototype.$onRemoveFromStage.call(this);
+                this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+                this.dispose();
             };
             OBVDefault.prototype.initView = function () {
                 if (this._blockName != null && this._blockName.length > 0) {
@@ -2642,10 +2602,20 @@ var feng3d;
                 for (var i = 0; i < objectAttributeInfos.length; i++) {
                     var displayObject = feng3d.objectview.getAttributeView(objectAttributeInfos[i]);
                     displayObject.percentWidth = 100;
+                    displayObject.objectView = this.objectView;
+                    displayObject.objectBlockView = this;
                     this.contentGroup.addChild(displayObject);
                     this.attributeViews.push(displayObject);
                 }
-                this.isInitView = true;
+            };
+            OBVDefault.prototype.dispose = function () {
+                for (var i = 0; i < this.attributeViews.length; i++) {
+                    var displayObject = this.attributeViews[i];
+                    displayObject.objectView = null;
+                    displayObject.objectBlockView = null;
+                    this.contentGroup.removeChild(displayObject);
+                }
+                this.attributeViews = null;
             };
             Object.defineProperty(OBVDefault.prototype, "space", {
                 get: function () {
@@ -2656,7 +2626,6 @@ var feng3d;
                     for (var i = 0; i < this.attributeViews.length; i++) {
                         this.attributeViews[i].space = this._space;
                     }
-                    this.$updateView();
                 },
                 enumerable: true,
                 configurable: true
@@ -2668,16 +2637,7 @@ var feng3d;
                 enumerable: true,
                 configurable: true
             });
-            /**
-             * 更新自身界面
-             */
-            OBVDefault.prototype.$updateView = function () {
-                if (!this.isInitView) {
-                    this.initView();
-                }
-            };
             OBVDefault.prototype.updateView = function () {
-                this.$updateView();
                 for (var i = 0; i < this.attributeViews.length; i++) {
                     this.attributeViews[i].updateView();
                 }
@@ -2729,20 +2689,16 @@ var feng3d;
                 _this._attributeName = attributeViewInfo.name;
                 _this._attributeType = attributeViewInfo.type;
                 _this.attributeViewInfo = attributeViewInfo;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 return _this;
             }
-            OAVBase.prototype.onComplete = function () {
-                if (this.label)
-                    this.label.text = this._attributeName;
-                this.updateView();
-            };
             Object.defineProperty(OAVBase.prototype, "space", {
                 get: function () {
                     return this._space;
                 },
                 set: function (value) {
                     this._space = value;
+                    this.dispose();
+                    this.initView();
                     this.updateView();
                 },
                 enumerable: true,
@@ -2757,10 +2713,28 @@ var feng3d;
                         }
                     }
                 }
+                if (this.label)
+                    this.label.text = this._attributeName;
+                this.initView();
+                this.updateView();
             };
             OAVBase.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
+                this.dispose();
             };
+            /**
+             * 初始化
+             */
+            OAVBase.prototype.initView = function () {
+            };
+            /**
+             * 销毁
+             */
+            OAVBase.prototype.dispose = function () {
+            };
+            /**
+             * 更新
+             */
             OAVBase.prototype.updateView = function () {
             };
             Object.defineProperty(OAVBase.prototype, "attributeName", {
@@ -2783,6 +2757,7 @@ var feng3d;
                         objectViewEvent.attributeValue = this.attributeValue;
                         this.dispatchEvent(objectViewEvent);
                     }
+                    this.updateView();
                 },
                 enumerable: true,
                 configurable: true
@@ -2832,22 +2807,17 @@ var feng3d;
                 enumerable: true,
                 configurable: true
             });
-            OAVDefault.prototype.onComplete = function () {
+            OAVDefault.prototype.initView = function () {
                 this.text.percentWidth = 100;
                 this.label.text = this._attributeName;
-            };
-            OAVDefault.prototype.$onAddToStage = function (stage, nestLevel) {
-                _super.prototype.$onAddToStage.call(this, stage, nestLevel);
                 this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
                 this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.updateView();
                 feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
             };
-            OAVDefault.prototype.$onRemoveFromStage = function () {
+            OAVDefault.prototype.dispose = function () {
                 editor.drag.unregister(this);
                 feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
-                _super.prototype.$onRemoveFromStage.call(this);
                 this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
                 this.text.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -2920,16 +2890,17 @@ var feng3d;
                 _this.skinName = "BooleanAttrViewSkin";
                 return _this;
             }
-            BooleanAttrView.prototype.onComplete = function () {
-                _super.prototype.onComplete.call(this);
+            BooleanAttrView.prototype.initView = function () {
                 this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
-                this.updateView();
+            };
+            BooleanAttrView.prototype.dispose = function () {
+                this.checkBox.removeEventListener(egret.Event.CHANGE, this.onChange, this);
             };
             BooleanAttrView.prototype.updateView = function () {
-                this.checkBox["selected"] = this.attributeValue;
+                this.checkBox.selected = this.attributeValue;
             };
             BooleanAttrView.prototype.onChange = function (event) {
-                this.attributeValue = this.checkBox["selected"];
+                this.attributeValue = this.checkBox.selected;
             };
             BooleanAttrView = __decorate([
                 feng3d.OAVComponent()
@@ -2977,68 +2948,23 @@ var feng3d;
         var OAVVector3D = /** @class */ (function (_super) {
             __extends(OAVVector3D, _super);
             function OAVVector3D(attributeViewInfo) {
-                var _this = _super.call(this) || this;
-                _this._space = attributeViewInfo.owner;
-                _this._attributeName = attributeViewInfo.name;
-                _this._attributeType = attributeViewInfo.type;
-                _this.attributeViewInfo = attributeViewInfo;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                var _this = _super.call(this, attributeViewInfo) || this;
                 _this.skinName = "OAVVector3DSkin";
                 return _this;
             }
-            OAVVector3D.prototype.onComplete = function () {
+            OAVVector3D.prototype.initView = function () {
                 this.vector3DView.vm = this.attributeValue;
                 eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
-                if (this.attributeViewInfo.componentParam) {
-                    for (var key in this.attributeViewInfo.componentParam) {
-                        if (this.attributeViewInfo.componentParam.hasOwnProperty(key)) {
-                            this.vector3DView[key] = this.attributeViewInfo.componentParam[key];
-                        }
-                    }
-                }
-                this.updateView();
             };
-            Object.defineProperty(OAVVector3D.prototype, "space", {
-                get: function () {
-                    return this._space;
-                },
-                set: function (value) {
-                    this._space = value;
-                    this.updateView();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(OAVVector3D.prototype, "attributeName", {
-                get: function () {
-                    return this._attributeName;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(OAVVector3D.prototype, "attributeValue", {
-                get: function () {
-                    return this._space[this._attributeName];
-                },
-                set: function (value) {
-                    if (this._space[this._attributeName] != value) {
-                        this._space[this._attributeName] = value;
-                    }
-                    this.updateView();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            /**
-             * 更新界面
-             */
-            OAVVector3D.prototype.updateView = function () {
+            OAVVector3D.prototype.dispose = function () {
+                // this.vector3DView.vm = <any>this.attributeValue;
+                // eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
             };
             OAVVector3D = __decorate([
                 feng3d.OAVComponent()
             ], OAVVector3D);
             return OAVVector3D;
-        }(eui.Component));
+        }(editor.OAVBase));
         editor.OAVVector3D = OAVVector3D;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -3049,18 +2975,10 @@ var feng3d;
         var OAVArray = /** @class */ (function (_super) {
             __extends(OAVArray, _super);
             function OAVArray(attributeViewInfo) {
-                var _this = _super.call(this) || this;
-                _this._space = attributeViewInfo.owner;
-                _this._attributeName = attributeViewInfo.name;
-                _this._attributeType = attributeViewInfo.type;
-                _this.attributeViewInfo = attributeViewInfo;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+                var _this = _super.call(this, attributeViewInfo) || this;
                 _this.skinName = "OAVArray";
                 return _this;
             }
-            OAVArray.prototype.onComplete = function () {
-                this.$updateView();
-            };
             Object.defineProperty(OAVArray.prototype, "space", {
                 get: function () {
                     return this._space;
@@ -3092,14 +3010,6 @@ var feng3d;
                 enumerable: true,
                 configurable: true
             });
-            /**
-             * 更新自身界面
-             */
-            OAVArray.prototype.$updateView = function () {
-                if (!this.isInitView) {
-                    this.initView();
-                }
-            };
             OAVArray.prototype.initView = function () {
                 this.attributeViews = [];
                 var attributeValue = this.attributeValue;
@@ -3111,23 +3021,18 @@ var feng3d;
                     this.attributeViews[i] = displayObject;
                 }
                 this.currentState = "hide";
-                this.isInitView = true;
-            };
-            OAVArray.prototype.$onAddToStage = function (stage, nestLevel) {
-                _super.prototype.$onAddToStage.call(this, stage, nestLevel);
                 this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
                 this.sizeTxt.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
             };
-            OAVArray.prototype.$onRemoveFromStage = function () {
-                _super.prototype.$onRemoveFromStage.call(this);
+            OAVArray.prototype.dispose = function () {
                 this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
                 this.sizeTxt.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
-            };
-            /**
-             * 更新界面
-             */
-            OAVArray.prototype.updateView = function () {
-                this.$updateView();
+                this.attributeViews = [];
+                for (var i = 0; i < this.attributeViews.length; i++) {
+                    var displayObject = this.attributeViews[i];
+                    this.contentGroup.removeChild(displayObject);
+                }
+                this.attributeViews = null;
             };
             OAVArray.prototype.onTitleButtonClick = function () {
                 this.currentState = this.currentState == "hide" ? "show" : "hide";
@@ -3159,7 +3064,7 @@ var feng3d;
                 feng3d.OAVComponent()
             ], OAVArray);
             return OAVArray;
-        }(eui.Component));
+        }(editor.OAVBase));
         editor.OAVArray = OAVArray;
         var OAVArrayItem = /** @class */ (function (_super) {
             __extends(OAVArrayItem, _super);
@@ -3174,8 +3079,8 @@ var feng3d;
                 _this = _super.call(this, attributeViewInfo) || this;
                 return _this;
             }
-            OAVArrayItem.prototype.onComplete = function () {
-                _super.prototype.onComplete.call(this);
+            OAVArrayItem.prototype.initView = function () {
+                _super.prototype.initView.call(this);
                 this.label.width = 60;
             };
             return OAVArrayItem;
@@ -3191,7 +3096,6 @@ var feng3d;
             __extends(OAVEnum, _super);
             function OAVEnum(attributeViewInfo) {
                 var _this = _super.call(this, attributeViewInfo) || this;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "OAVEnum";
                 return _this;
             }
@@ -3208,13 +3112,10 @@ var feng3d;
                 enumerable: true,
                 configurable: true
             });
-            OAVEnum.prototype.$onAddToStage = function (stage, nestLevel) {
-                _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-                this.updateView();
+            OAVEnum.prototype.initView = function () {
                 this.combobox.addEventListener(egret.Event.CHANGE, this.onComboxChange, this);
             };
-            OAVEnum.prototype.$onRemoveFromStage = function () {
-                _super.prototype.$onRemoveFromStage.call(this);
+            OAVEnum.prototype.dispose = function () {
                 this.combobox.removeEventListener(egret.Event.CHANGE, this.onComboxChange, this);
             };
             OAVEnum.prototype.updateView = function () {
@@ -3248,31 +3149,11 @@ var feng3d;
         var OAVComponentList = /** @class */ (function (_super) {
             __extends(OAVComponentList, _super);
             function OAVComponentList(attributeViewInfo) {
-                var _this = _super.call(this) || this;
+                var _this = _super.call(this, attributeViewInfo) || this;
                 _this.accordions = [];
-                _this._space = attributeViewInfo.owner;
-                _this._attributeName = attributeViewInfo.name;
-                _this._attributeType = attributeViewInfo.type;
-                _this.attributeViewInfo = attributeViewInfo;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "OAVComponentListSkin";
                 return _this;
             }
-            OAVComponentList.prototype.onComplete = function () {
-                this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
-                this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-                if (this.stage)
-                    this.onAddToStage();
-            };
-            OAVComponentList.prototype.onAddToStage = function () {
-                this.initView();
-                this.updateView();
-                this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
-            };
-            OAVComponentList.prototype.onRemovedFromStage = function () {
-                this.disposeView();
-                this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
-            };
             OAVComponentList.prototype.onAddComponentButtonClick = function () {
                 var globalPoint = this.addComponentButton.localToGlobal(0, 0);
                 editor.needcreateComponentGameObject = this.space;
@@ -3284,7 +3165,8 @@ var feng3d;
                 },
                 set: function (value) {
                     this._space = value;
-                    this.updateView();
+                    this.dispose();
+                    this.initView();
                 },
                 enumerable: true,
                 configurable: true
@@ -3324,8 +3206,9 @@ var feng3d;
                         _this.space.addComponent(feng3d.ScriptComponent).script = dragdata.file_script;
                     }
                 });
+                this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
             };
-            OAVComponentList.prototype.disposeView = function () {
+            OAVComponentList.prototype.dispose = function () {
                 var components = this.attributeValue;
                 for (var i = 0; i < components.length; i++) {
                     this.removedComponentView(components[i]);
@@ -3333,6 +3216,7 @@ var feng3d;
                 this.space.off("addedComponent", this.onaddedcompont, this);
                 this.space.off("removedComponent", this.onremovedComponent, this);
                 editor.drag.unregister(this.addComponentButton);
+                this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
             };
             OAVComponentList.prototype.addComponentView = function (component) {
                 var o;
@@ -3370,7 +3254,7 @@ var feng3d;
                 feng3d.OAVComponent()
             ], OAVComponentList);
             return OAVComponentList;
-        }(eui.Component));
+        }(editor.OAVBase));
         editor.OAVComponentList = OAVComponentList;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -3385,10 +3269,11 @@ var feng3d;
                 _this.skinName = "OAVFunction";
                 return _this;
             }
-            OAVFunction.prototype.onComplete = function () {
-                _super.prototype.onComplete.call(this);
+            OAVFunction.prototype.initView = function () {
                 this.button.addEventListener(egret.MouseEvent.CLICK, this.click, this);
-                this.updateView();
+            };
+            OAVFunction.prototype.dispose = function () {
+                this.button.removeEventListener(egret.MouseEvent.CLICK, this.click, this);
             };
             OAVFunction.prototype.updateView = function () {
             };
@@ -3411,17 +3296,20 @@ var feng3d;
             __extends(OAVColorPicker, _super);
             function OAVColorPicker(attributeViewInfo) {
                 var _this = _super.call(this, attributeViewInfo) || this;
-                _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
                 _this.skinName = "OAVColorPicker";
                 return _this;
             }
-            OAVColorPicker.prototype.onComplete = function () {
-                _super.prototype.onComplete.call(this);
+            OAVColorPicker.prototype.initView = function () {
                 this.colorPicker.addEventListener(egret.Event.CHANGE, this.onChange, this);
                 this.input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
                 this.input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-                this.updateView();
+            };
+            OAVColorPicker.prototype.dispose = function () {
+                this.colorPicker.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+                this.input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                this.input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+                this.input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
             };
             OAVColorPicker.prototype.updateView = function () {
                 var color = this.attributeValue;
@@ -3483,9 +3371,11 @@ var feng3d;
                 _this.skinName = "OVMaterial";
                 return _this;
             }
-            OAVMaterialName.prototype.onComplete = function () {
-                _super.prototype.onComplete.call(this);
-                this.updateView();
+            OAVMaterialName.prototype.initView = function () {
+                this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
+            };
+            OAVMaterialName.prototype.dispose = function () {
+                this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
             };
             OAVMaterialName.prototype.updateView = function () {
                 var material = this.space;
@@ -3494,12 +3384,16 @@ var feng3d;
                 var selected = data.reduce(function (prevalue, item) {
                     if (prevalue)
                         return prevalue;
-                    if (item.value.indexOf(material.shaderName) != -1)
+                    if (item.value == material.shaderName)
                         return item;
                     return null;
                 }, null);
                 this.shaderComboBox.dataProvider = data;
                 this.shaderComboBox.data = selected;
+            };
+            OAVMaterialName.prototype.onShaderComboBoxChange = function () {
+                this.attributeValue = this.shaderComboBox.data.value;
+                this.objectView.space = this.space;
             };
             OAVMaterialName = __decorate([
                 feng3d.OAVComponent()
@@ -3520,11 +3414,6 @@ var feng3d;
                 _this.skinName = "OVDefault";
                 return _this;
             }
-            OAVObjectView.prototype.onComplete = function () {
-                _super.prototype.onComplete.call(this);
-                this.initView();
-                this.updateView();
-            };
             OAVObjectView.prototype.initView = function () {
                 this.view = feng3d.objectview.getObjectView(this.attributeValue);
                 this.view.percentWidth = 100;
