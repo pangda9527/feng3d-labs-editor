@@ -3513,34 +3513,6 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        var OAVMaterialData = /** @class */ (function (_super) {
-            __extends(OAVMaterialData, _super);
-            function OAVMaterialData(attributeViewInfo) {
-                return _super.call(this, attributeViewInfo) || this;
-                // this.skinName = "OVMaterial";
-            }
-            OAVMaterialData.prototype.onComplete = function () {
-                _super.prototype.onComplete.call(this);
-                this.initView();
-                this.updateView();
-            };
-            OAVMaterialData.prototype.initView = function () {
-            };
-            OAVMaterialData.prototype.updateView = function () {
-                var uniforms = this.attributeValue;
-            };
-            OAVMaterialData = __decorate([
-                feng3d.OAVComponent()
-            ], OAVMaterialData);
-            return OAVMaterialData;
-        }(editor.OAVBase));
-        editor.OAVMaterialData = OAVMaterialData;
-    })(editor = feng3d.editor || (feng3d.editor = {}));
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    var editor;
-    (function (editor) {
         var OAVObjectView = /** @class */ (function (_super) {
             __extends(OAVObjectView, _super);
             function OAVObjectView(attributeViewInfo) {
