@@ -10123,25 +10123,19 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        function objectViewConfig() {
-            //
-            feng3d.objectview.defaultBaseObjectViewClass = "OVBaseDefault";
-            feng3d.objectview.defaultObjectViewClass = "OVDefault";
-            feng3d.objectview.defaultObjectAttributeViewClass = "OAVDefault";
-            feng3d.objectview.defaultObjectAttributeBlockView = "OBVDefault";
-            //
-            feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "BooleanAttrView" });
-            feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
-            feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
-            feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });
-            feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
-            feng3d.objectview.setDefaultTypeAttributeView("Color3", { component: "OAVColorPicker" });
-            feng3d.objectview.setDefaultTypeAttributeView("Color4", { component: "OAVColorPicker" });
-            function setObjectview(cls, classDefinition) {
-                cls["objectview"] = classDefinition;
-            }
-        }
-        editor.objectViewConfig = objectViewConfig;
+        //
+        feng3d.objectview.defaultBaseObjectViewClass = "OVBaseDefault";
+        feng3d.objectview.defaultObjectViewClass = "OVDefault";
+        feng3d.objectview.defaultObjectAttributeViewClass = "OAVDefault";
+        feng3d.objectview.defaultObjectAttributeBlockView = "OBVDefault";
+        //
+        feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "BooleanAttrView" });
+        feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
+        feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
+        feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });
+        feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
+        feng3d.objectview.setDefaultTypeAttributeView("Color3", { component: "OAVColorPicker" });
+        feng3d.objectview.setDefaultTypeAttributeView("Color4", { component: "OAVColorPicker" });
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 /**
@@ -10202,8 +10196,6 @@ var feng3d;
                     popupLayer.touchEnabled = false;
                     _this.stage.addChild(popupLayer);
                     editor.editorui.popupLayer = popupLayer;
-                    //初始化配置
-                    editor.objectViewConfig();
                     _this.initproject(function () {
                         setTimeout(function () {
                             _this.init();

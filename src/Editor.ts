@@ -30,9 +30,6 @@ namespace feng3d.editor
                 this.stage.addChild(popupLayer);
                 editorui.popupLayer = popupLayer;
 
-                //初始化配置
-                objectViewConfig();
-
                 this.initproject(() =>
                 {
                     setTimeout(() =>
