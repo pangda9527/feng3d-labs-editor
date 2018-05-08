@@ -32,12 +32,16 @@ namespace feng3d.editor
             billboardComponent.camera = editorCamera;
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
-            var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
-            var texture = new Texture2D();
-            texture.url = editorData.getEditorAssetsPath("/assets/3d/icons/light.png");
-            texture.format = TextureFormat.RGBA;
-            texture.premulAlpha = true;
-            textureMaterial.uniforms.s_texture = texture;
+            var textureMaterial = this.textureMaterial = meshRenderer.material = materialFactory.create("texture",
+                {
+                    uniforms: {
+                        s_texture: {
+                            url: editorData.getEditorAssetsPath("/assets/3d/icons/light.png"),
+                            format: TextureFormat.RGBA,
+                            premulAlpha: true,
+                        }
+                    }
+                });
             textureMaterial.renderParams.enableBlend = true;
             this.gameObject.addChild(lightIcon);
             // this.lightIcon.on("click", () =>

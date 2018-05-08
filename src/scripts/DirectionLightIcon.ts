@@ -26,7 +26,7 @@ namespace feng3d.editor
             billboardComponent.camera = editorCamera;
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
             meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
-            var textureMaterial = this.textureMaterial = meshRenderer.material = new TextureMaterial();
+            var textureMaterial = this.textureMaterial = meshRenderer.material = materialFactory.create("texture");
             var texture = new Texture2D();
             texture.url = editorData.getEditorAssetsPath("/assets/3d/icons/sun.png");
             texture.format = TextureFormat.RGBA;

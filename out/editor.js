@@ -9492,7 +9492,7 @@ var feng3d;
                 billboardComponent.camera = editor.editorCamera;
                 var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.PlaneGeometry(size, size, 1, 1, false);
-                var textureMaterial = this.textureMaterial = meshRenderer.material = new feng3d.TextureMaterial();
+                var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture");
                 var texture = new feng3d.Texture2D();
                 texture.url = editor.editorData.getEditorAssetsPath("/assets/3d/icons/sun.png");
                 texture.format = feng3d.TextureFormat.RGBA;
@@ -9578,12 +9578,15 @@ var feng3d;
                 billboardComponent.camera = editor.editorCamera;
                 var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.PlaneGeometry(size, size, 1, 1, false);
-                var textureMaterial = this.textureMaterial = meshRenderer.material = new feng3d.TextureMaterial();
-                var texture = new feng3d.Texture2D();
-                texture.url = editor.editorData.getEditorAssetsPath("/assets/3d/icons/light.png");
-                texture.format = feng3d.TextureFormat.RGBA;
-                texture.premulAlpha = true;
-                textureMaterial.uniforms.s_texture = texture;
+                var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture", {
+                    uniforms: {
+                        s_texture: {
+                            url: editor.editorData.getEditorAssetsPath("/assets/3d/icons/light.png"),
+                            format: feng3d.TextureFormat.RGBA,
+                            premulAlpha: true,
+                        }
+                    }
+                });
                 textureMaterial.renderParams.enableBlend = true;
                 this.gameObject.addChild(lightIcon);
                 // this.lightIcon.on("click", () =>
