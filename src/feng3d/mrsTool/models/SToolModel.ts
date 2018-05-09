@@ -73,7 +73,7 @@ namespace feng3d.editor
 
             var mouseHit = GameObject.create("hit");
             meshRenderer = mouseHit.addComponent(MeshRenderer);
-            meshRenderer.geometry = new CylinderGeometry(5, 5, this.length - 4);
+            meshRenderer.geometry = new CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length - 4 });
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;

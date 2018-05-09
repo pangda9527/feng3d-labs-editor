@@ -31,7 +31,7 @@ namespace feng3d.editor
             var billboardComponent = lightIcon.addComponent(BillboardComponent);
             billboardComponent.camera = editorCamera;
             var meshRenderer = lightIcon.addComponent(MeshRenderer);
-            meshRenderer.geometry = new PlaneGeometry(size, size, 1, 1, false);
+            meshRenderer.geometry = new PlaneGeometry({ width: size, height: size, segmentsW: 1, segmentsH: 1, yUp: false });
             var textureMaterial = this.textureMaterial = meshRenderer.material = materialFactory.create("texture",
                 {
                     uniforms: {

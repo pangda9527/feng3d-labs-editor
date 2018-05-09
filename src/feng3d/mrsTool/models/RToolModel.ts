@@ -93,7 +93,7 @@ namespace feng3d.editor
 
             var mouseHit = GameObject.create("hit");
             meshRenderer = mouseHit.addComponent(MeshRenderer);
-            this.torusGeometry = meshRenderer.geometry = new TorusGeometry(this.radius, 2);
+            this.torusGeometry = meshRenderer.geometry = new TorusGeometry({ radius: this.radius, tubeRadius: 2 });
             meshRenderer.material = materialFactory.create("standard");
             mouseHit.transform.rx = 90;
             mouseHit.visible = false;

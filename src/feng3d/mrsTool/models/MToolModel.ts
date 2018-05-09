@@ -93,7 +93,7 @@ namespace feng3d.editor
             //
             this.xArrow = GameObject.create();
             meshRenderer = this.xArrow.addComponent(MeshRenderer);
-            meshRenderer.geometry = new ConeGeometry(5, 18);
+            meshRenderer.geometry = new ConeGeometry({ bottomRadius: 5, height: 18 });
             this.material = meshRenderer.material = materialFactory.create("color");
             this.xArrow.transform.y = this.length;
             this.xArrow.mouselayer = mouselayer.editor;
@@ -103,7 +103,7 @@ namespace feng3d.editor
 
             var mouseHit = GameObject.create("hitCoordinateAxis");
             meshRenderer = mouseHit.addComponent(MeshRenderer);
-            meshRenderer.geometry = new CylinderGeometry(5, 5, this.length);
+            meshRenderer.geometry = new CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length });
             //meshRenderer.material = materialFactory.create("color");
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
@@ -140,7 +140,7 @@ namespace feng3d.editor
             //
             this.oCube = GameObject.create();
             var meshRenderer = this.oCube.addComponent(MeshRenderer)
-            meshRenderer.geometry = new CubeGeometry(8, 8, 8);
+            meshRenderer.geometry = new CubeGeometry({ width: 8, height: 8, depth: 8 });
             this.colorMaterial = meshRenderer.material = materialFactory.create("color");
             this.oCube.mouseEnabled = true;
             this.oCube.mouselayer = mouselayer.editor;
@@ -181,7 +181,7 @@ namespace feng3d.editor
             var plane = GameObject.create("plane");
             var meshRenderer = plane.addComponent(MeshRenderer);
             plane.transform.x = plane.transform.z = this._width / 2;
-            meshRenderer.geometry = new PlaneGeometry(this._width, this._width);
+            meshRenderer.geometry = new PlaneGeometry({ width: this._width, height: this._width });
             this.colorMaterial = meshRenderer.material = materialFactory.create("color");
             this.colorMaterial.renderParams.cullFace = CullFace.NONE;
             plane.mouselayer = mouselayer.editor;

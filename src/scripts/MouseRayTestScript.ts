@@ -14,7 +14,7 @@ namespace feng3d.editor
             var gameobject = GameObject.create("test");
             var meshRenderer = gameobject.addComponent(MeshRenderer);
             meshRenderer.material = materialFactory.create("standard");
-            meshRenderer.geometry = new SphereGeometry(10);
+            meshRenderer.geometry = new SphereGeometry({ radius: 10 });
             gameobject.mouseEnabled = false;
 
             var mouseRay3D = engine.camera.getMouseRay3D();
