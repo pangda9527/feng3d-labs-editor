@@ -17,7 +17,7 @@ namespace feng3d.editor
         scene = "scene",
     }
 
-    var imageReg = /(.jpg|.png|.jpeg)\b/;
+    var imageReg = /(.jpg|.png|.jpeg)\b/i;
     export class AssetsFile extends TreeNode
     {
         /**
@@ -116,7 +116,7 @@ namespace feng3d.editor
         {
             if (this._isDirectory)
                 return AssetExtension.folder;
-            return <AssetExtension>this.path.split(".").pop();
+            return <AssetExtension>this.path.split(".").pop().toLowerCase();
         }
 
         /**

@@ -3779,38 +3779,33 @@ var feng3d;
                 var menuconfig = [];
                 if (assetsFile.isDirectory) {
                     menuconfig.push({
-                        label: "Create",
+                        label: "新建",
                         submenu: [
                             {
-                                label: "Folder", click: function () {
+                                label: "文件夹", click: function () {
                                     assetsFile.addfolder("New Folder");
                                 }
                             },
                             {
-                                label: "Script", click: function () {
+                                label: "脚本文件", click: function () {
                                     assetsFile.addfile("NewScript.ts", editor.assetsFileTemplates.NewScript);
                                     assetsFile.addfile("NewScript.js", editor.assetsFileTemplates.scriptCompile);
                                 }
                             },
                             {
-                                label: "Json", click: function () {
+                                label: "Json文件", click: function () {
                                     assetsFile.addfile("new json.json", "{}");
                                 }
                             },
                             {
-                                label: "Txt", click: function () {
+                                label: "文本文件", click: function () {
                                     assetsFile.addfile("new text.txt", "");
                                 }
                             },
                             { type: "separator" },
                             {
-                                label: "StandardMaterial", click: function () {
+                                label: "材质", click: function () {
                                     assetsFile.addfile("new material" + ".material", feng3d.materialFactory.create("standard"));
-                                }
-                            },
-                            {
-                                label: "ColorMaterial", click: function () {
-                                    assetsFile.addfile("new material" + ".material", feng3d.materialFactory.create("color"));
                                 }
                             },
                         ]
@@ -3823,12 +3818,44 @@ var feng3d;
                 if (menuconfig.length > 0) {
                     menuconfig.push({ type: "separator" });
                 }
+                var openMenu = getOpenCodeEditorMenu(assetsFile);
+                if (openMenu)
+                    menuconfig.push(openMenu);
                 menuconfig.push({
-                    label: "delete", click: function () {
+                    label: "删除", click: function () {
                         assetsFile.deleteFile();
                     }
                 });
                 editor.menu.popup(menuconfig);
+                function getOpenCodeEditorMenu(file) {
+                    var menu;
+                    // 使用编辑器打开
+                    if (file.extension == editor.AssetExtension.ts
+                        || file.extension == editor.AssetExtension.js
+                        || file.extension == editor.AssetExtension.txt) {
+                        menu = {
+                            label: "使用代码编辑器打开", click: function () {
+                                var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + file.extension;
+                                url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                                window.open(url);
+                            }
+                        };
+                    }
+                    else if (file.extension == editor.AssetExtension.json
+                        || file.extension == editor.AssetExtension.material
+                        || file.extension == editor.AssetExtension.gameobject
+                        || file.extension == editor.AssetExtension.geometry
+                        || file.extension == editor.AssetExtension.anim) {
+                        menu = {
+                            label: "使用代码编辑器打开", click: function () {
+                                var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + editor.AssetExtension.json;
+                                url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                                window.open(url);
+                            }
+                        };
+                    }
+                    return menu;
+                }
             },
             /**
              * 获取一个新路径
@@ -3975,7 +4002,7 @@ var feng3d;
             AssetExtension["json"] = "json";
             AssetExtension["scene"] = "scene";
         })(AssetExtension = editor.AssetExtension || (editor.AssetExtension = {}));
-        var imageReg = /(.jpg|.png|.jpeg)\b/;
+        var imageReg = /(.jpg|.png|.jpeg)\b/i;
         var AssetsFile = /** @class */ (function (_super) {
             __extends(AssetsFile, _super);
             function AssetsFile(fileinfo, data) {
@@ -4113,7 +4140,7 @@ var feng3d;
                 get: function () {
                     if (this._isDirectory)
                         return AssetExtension.folder;
-                    return this.path.split(".").pop();
+                    return this.path.split(".").pop().toLowerCase();
                 },
                 enumerable: true,
                 configurable: true
@@ -4557,6 +4584,11 @@ var feng3d;
                                         editor.drag.refreshAcceptables();
                                     });
                                     break;
+                                case editor.AssetExtension.png:
+                                case editor.AssetExtension.jpg:
+                                case editor.AssetExtension.jpeg:
+                                    dragsource.image = _this.data.path;
+                                    break;
                             }
                             dragsource.file = _this.data.path;
                         }, []);
@@ -4576,22 +4608,6 @@ var feng3d;
                         scene.initCollectComponents();
                         editor.engine.scene = scene;
                     });
-                }
-                else if (this.data.extension == editor.AssetExtension.ts
-                    || this.data.extension == editor.AssetExtension.js
-                    || this.data.extension == editor.AssetExtension.txt) {
-                    var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path + "&extension=" + this.data.extension;
-                    url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                    window.open(url);
-                }
-                else if (this.data.extension == editor.AssetExtension.json
-                    || this.data.extension == editor.AssetExtension.material
-                    || this.data.extension == editor.AssetExtension.gameobject
-                    || this.data.extension == editor.AssetExtension.geometry
-                    || this.data.extension == editor.AssetExtension.anim) {
-                    var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + this.data.path + "&extension=" + editor.AssetExtension.json;
-                    url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                    window.open(url);
                 }
             };
             AssetsFileItemRenderer.prototype.onclick = function () {

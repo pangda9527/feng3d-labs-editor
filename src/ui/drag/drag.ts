@@ -7,6 +7,9 @@ namespace feng3d.editor
 		refreshAcceptables: refreshAcceptables,
 	};
 
+	/**
+	 * 拖拽数据
+	 */
 	export interface DragData
 	{
 		gameobject?: GameObject;
@@ -15,8 +18,18 @@ namespace feng3d.editor
 		geometry?: Geometry;
 		//
 		file_gameobject?: string;
+		/**
+		 * 脚本路径
+		 */
 		file_script?: string;
+		/**
+		 * 文件路径
+		 */
 		file?: string;
+		/**
+		 * 图片路径
+		 */
+		image?: string;
 	}
 
 	interface DragItem

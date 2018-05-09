@@ -121,7 +121,7 @@ namespace feng3d.editor
             {
                 assetsfile.move(destdirpath, callback);
             } else
-            {   
+            {
                 var filename = path.split("/").pop();
                 var dest = destdirpath + "/" + filename;
                 fs.move(path, dest, callback);
@@ -144,44 +144,38 @@ namespace feng3d.editor
             {
                 menuconfig.push(
                     {
-                        label: "Create",
+                        label: "新建",
                         submenu: [
                             {
-                                label: "Folder", click: () =>
+                                label: "文件夹", click: () =>
                                 {
                                     assetsFile.addfolder("New Folder");
                                 }
                             },
                             {
-                                label: "Script", click: () =>
+                                label: "脚本文件", click: () =>
                                 {
                                     assetsFile.addfile("NewScript.ts", assetsFileTemplates.NewScript);
                                     assetsFile.addfile("NewScript.js", assetsFileTemplates.scriptCompile);
                                 }
                             },
                             {
-                                label: "Json", click: () =>
+                                label: "Json文件", click: () =>
                                 {
                                     assetsFile.addfile("new json.json", "{}");
                                 }
                             },
                             {
-                                label: "Txt", click: () =>
+                                label: "文本文件", click: () =>
                                 {
                                     assetsFile.addfile("new text.txt", "");
                                 }
                             },
                             { type: "separator" },
                             {
-                                label: "StandardMaterial", click: () =>
+                                label: "材质", click: () =>
                                 {
                                     assetsFile.addfile("new material" + ".material", materialFactory.create("standard"));
-                                }
-                            },
-                            {
-                                label: "ColorMaterial", click: () =>
-                                {
-                                    assetsFile.addfile("new material" + ".material", materialFactory.create("color"));
                                 }
                             },
                         ]
@@ -198,15 +192,56 @@ namespace feng3d.editor
             {
                 menuconfig.push({ type: "separator" });
             }
+
+            var openMenu = getOpenCodeEditorMenu(assetsFile);
+            if (openMenu)
+                menuconfig.push(openMenu);
+
             menuconfig.push(
                 {
-                    label: "delete", click: () =>
+                    label: "删除", click: () =>
                     {
                         assetsFile.deleteFile();
                     }
                 });
 
             menu.popup(menuconfig);
+
+            function getOpenCodeEditorMenu(file: AssetsFile)
+            {
+                var menu: MenuItem;
+                // 使用编辑器打开
+                if (file.extension == AssetExtension.ts
+                    || file.extension == AssetExtension.js
+                    || file.extension == AssetExtension.txt
+                )
+                {
+                    menu = {
+                        label: "使用代码编辑器打开", click: () =>
+                        {
+                            var url = `codeeditor.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${file.path}&extension=${file.extension}`;
+                            url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                            window.open(url);
+                        }
+                    }
+                } else if (file.extension == AssetExtension.json
+                    || file.extension == AssetExtension.material
+                    || file.extension == AssetExtension.gameobject
+                    || file.extension == AssetExtension.geometry
+                    || file.extension == AssetExtension.anim
+                )
+                {
+                    menu = {
+                        label: "使用代码编辑器打开", click: () =>
+                        {
+                            var url = `codeeditor.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${file.path}&extension=${AssetExtension.json}`;
+                            url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                            window.open(url);
+                        }
+                    }
+                }
+                return menu;
+            }
         },
         /**
          * 获取一个新路径
