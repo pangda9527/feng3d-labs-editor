@@ -64,6 +64,7 @@
         "src/objectview/oav/OAVColorPicker.ts",
         "src/objectview/oav/OAVMaterialName.ts",
         "src/objectview/oav/OAVObjectView.ts",
+        "src/objectview/oav/OAVGameObjectName.ts",
         //
         "src/ui/inspector/InspectorView.ts",
         //

@@ -3433,6 +3433,61 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        var OAVGameObjectName = /** @class */ (function (_super) {
+            __extends(OAVGameObjectName, _super);
+            function OAVGameObjectName(attributeViewInfo) {
+                var _this = _super.call(this, attributeViewInfo) || this;
+                _this.skinName = "OAVGameObjectName";
+                return _this;
+            }
+            OAVGameObjectName.prototype.initView = function () {
+                this.visibleCB.addEventListener(egret.MouseEvent.CLICK, this.onVisibleCBClick, this);
+                this.mouseEnabledCB.addEventListener(egret.MouseEvent.CLICK, this.onMouseEnabledCBClick, this);
+                this.nameInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                this.nameInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+                this.nameInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            };
+            OAVGameObjectName.prototype.dispose = function () {
+                this.visibleCB.removeEventListener(egret.MouseEvent.CLICK, this.onVisibleCBClick, this);
+                this.mouseEnabledCB.removeEventListener(egret.MouseEvent.CLICK, this.onMouseEnabledCBClick, this);
+                this.nameInput.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                this.nameInput.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+                this.nameInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            };
+            OAVGameObjectName.prototype.updateView = function () {
+                this.visibleCB.selected = this.space.visible;
+                this.mouseEnabledCB.selected = this.space.mouseEnabled;
+                this.nameInput.text = this.space.name;
+            };
+            OAVGameObjectName.prototype.onVisibleCBClick = function () {
+                this.space.visible = !this.space.visible;
+            };
+            OAVGameObjectName.prototype.onMouseEnabledCBClick = function () {
+                this.space.mouseEnabled = !this.space.mouseEnabled;
+            };
+            OAVGameObjectName.prototype.ontxtfocusin = function () {
+                this._textfocusintxt = true;
+            };
+            OAVGameObjectName.prototype.ontxtfocusout = function () {
+                this._textfocusintxt = false;
+            };
+            OAVGameObjectName.prototype.onTextChange = function () {
+                if (this._textfocusintxt) {
+                    this.space.name = this.nameInput.text;
+                }
+            };
+            OAVGameObjectName = __decorate([
+                feng3d.OAVComponent()
+            ], OAVGameObjectName);
+            return OAVGameObjectName;
+        }(editor.OAVBase));
+        editor.OAVGameObjectName = OAVGameObjectName;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
         /**
          * 属性面板（检查器）
          * @author feng     2017-03-20
