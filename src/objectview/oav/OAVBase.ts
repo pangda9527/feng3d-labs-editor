@@ -8,7 +8,7 @@ namespace feng3d.editor
         protected attributeViewInfo: AttributeViewInfo;
         //
         label: eui.Label;
-
+        
         /**
          * 对象属性界面
          */
