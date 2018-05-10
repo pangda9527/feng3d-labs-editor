@@ -850,7 +850,7 @@ var feng3d;
             function Feng3dView() {
                 var _this = _super.call(this) || this;
                 _this.skinName = "Feng3dViewSkin";
-                feng3d.Stats.init();
+                feng3d.Stats.init(document.getElementById("stats"));
                 return _this;
             }
             Feng3dView.prototype.$onAddToStage = function (stage, nestLevel) {
@@ -9968,19 +9968,18 @@ var feng3d;
                     });
                 }
             },
-            // {
-            //     label: "打开项目", click: () =>
-            //     {
-            //         popupview.popup({ newprojectname: "newproject" }, (data) =>
-            //         {
-            //             if (data.newprojectname && data.newprojectname.length > 0)
-            //             {
-            //                 editorcache.projectname = data.newprojectname;
-            //                 window.location.reload();
-            //             }
-            //         });
-            //     }
-            // },
+            {
+                label: "打开项目",
+                submenu: getProjectsMenu(),
+                click: function () {
+                    editor.popupview.popup({ newprojectname: "newproject" }, function (data) {
+                        if (data.newprojectname && data.newprojectname.length > 0) {
+                            editor.editorcache.projectname = data.newprojectname;
+                            window.location.reload();
+                        }
+                    });
+                }
+            },
             {
                 label: "保存场景", click: function () {
                     var gameobject = editor.hierarchyTree.rootnode.gameobject;
@@ -10176,11 +10175,28 @@ var feng3d;
                             editor.engine.scene = scene;
                             editor.editorui.assetsview.updateShowFloder();
                             editor.assetsDispather.dispatch("changed");
-                            console.log("下载项目完成!");
+                            console.log("projectname 项目下载完成!");
                         });
                     });
                 });
             });
+        }
+        /**
+         * 获取项目菜单
+         */
+        function getProjectsMenu() {
+            var projects = [];
+            editor.fs.getProjectList(function (err, ps) {
+                ps.forEach(function (element) {
+                    projects.push({
+                        label: element, click: function () {
+                            editor.editorcache.projectname = element;
+                            window.location.reload();
+                        }
+                    });
+                });
+            });
+            return projects;
         }
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));

@@ -14,19 +14,21 @@ namespace feng3d.editor
                 });
             }
         },
-        // {
-        //     label: "打开项目", click: () =>
-        //     {
-        //         popupview.popup({ newprojectname: "newproject" }, (data) =>
-        //         {
-        //             if (data.newprojectname && data.newprojectname.length > 0)
-        //             {
-        //                 editorcache.projectname = data.newprojectname;
-        //                 window.location.reload();
-        //             }
-        //         });
-        //     }
-        // },
+        {
+            label: "打开项目",
+            submenu: getProjectsMenu(),
+            click: () =>
+            {
+                popupview.popup({ newprojectname: "newproject" }, (data) =>
+                {
+                    if (data.newprojectname && data.newprojectname.length > 0)
+                    {
+                        editorcache.projectname = data.newprojectname;
+                        window.location.reload();
+                    }
+                });
+            }
+        },
         {
             label: "保存场景", click: () =>
             {
@@ -258,10 +260,35 @@ namespace feng3d.editor
                         engine.scene = scene;
                         editorui.assetsview.updateShowFloder();
                         assetsDispather.dispatch("changed");
-                        console.log("下载项目完成!");
+                        console.log("projectname 项目下载完成!");
                     });
                 });
             });
         });
+    }
+
+    /**
+     * 获取项目菜单
+     */
+    function getProjectsMenu()
+    {
+        var projects: MenuItem[] = [];
+
+        fs.getProjectList((err, ps) =>
+        {
+            ps.forEach(element =>
+            {
+                projects.push(
+                    {
+                        label: element, click: () =>
+                        {
+                            editorcache.projectname = element;
+                            window.location.reload();
+                        }
+                    });
+            });
+        });
+
+        return projects;
     }
 }
