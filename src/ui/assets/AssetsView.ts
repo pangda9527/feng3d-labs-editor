@@ -177,11 +177,13 @@ namespace feng3d.editor
             }
 
             var floders = editorAssets.showFloder.split("/");
+            // 除去尾部 ""
+            floders.pop();
 
             var textFlow = new Array<egret.ITextElement>();
             do
             {
-                var path = floders.join("/");
+                var path = floders.join("/") + "/";
                 if (textFlow.length > 0)
                     textFlow.unshift({ text: " > " });
                 textFlow.unshift({ text: floders.pop(), style: { "href": `event:${path}` } });

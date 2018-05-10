@@ -62,59 +62,59 @@ namespace feng3d.editor
     export var createObjectConfig: MenuItem[] = [
         //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
         {
-            label: "Create Empty", click: () =>
+            label: "游戏对象", click: () =>
             {
                 addToHierarchy(GameObjectFactory.createGameObject());
             }
         },
         { type: "separator" },
         {
-            label: "3D Object",
+            label: "3D对象",
             submenu: [
                 {
-                    label: "Plane", click: () =>
+                    label: "平面", click: () =>
                     {
                         addToHierarchy(GameObjectFactory.createPlane());
                     }
                 },
                 {
-                    label: "Cube", click: () =>
+                    label: "立方体", click: () =>
                     {
                         addToHierarchy(GameObjectFactory.createCube());
                     }
                 },
                 {
-                    label: "Sphere", click: () =>
+                    label: "球体", click: () =>
                     {
                         addToHierarchy(GameObjectFactory.createSphere());
                     }
                 },
                 {
-                    label: "Capsule", click: () =>
+                    label: "胶囊体", click: () =>
                     {
                         addToHierarchy(GameObjectFactory.createCapsule());
                     }
                 },
                 {
-                    label: "Cylinder", click: () =>
+                    label: "圆柱体", click: () =>
                     {
                         addToHierarchy(GameObjectFactory.createCylinder());
                     }
                 },
                 {
-                    label: "Cone", click: () =>
+                    label: "圆锥体", click: () =>
                     {
                         addToHierarchy(GameObjectFactory.createCone());
                     }
                 },
                 {
-                    label: "Torus", click: () =>
+                    label: "圆环", click: () =>
                     {
                         addToHierarchy(GameObjectFactory.createTorus());
                     }
                 },
                 {
-                    label: "Terrain", click: () =>
+                    label: "地形", click: () =>
                     {
                         addToHierarchy(GameObjectFactory.createTerrain());
                     }

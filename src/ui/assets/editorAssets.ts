@@ -19,8 +19,8 @@ namespace feng3d.editor
          * 项目名称
          */
         projectname: "",
-        assetsPath: "Assets",
-        showFloder: "",
+        assetsPath: "Assets/",
+        showFloder: "Assets/",
         //function
         initproject(path: string, callback: () => void)
         {
@@ -41,14 +41,12 @@ namespace feng3d.editor
                         fs.stat(editorAssets.assetsPath, (err, fileInfo) =>
                         {
                             rootfileinfo = new AssetsFile(fileInfo);
-                            editorAssets.showFloder = fileInfo.path;
                             rootfileinfo.initChildren(Number.MAX_VALUE, callback);
                         });
                     });
                 } else
                 {
                     rootfileinfo = new AssetsFile(fileInfo);
-                    editorAssets.showFloder = fileInfo.path;
                     rootfileinfo.initChildren(Number.MAX_VALUE, callback);
                 }
             });

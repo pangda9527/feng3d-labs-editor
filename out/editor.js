@@ -3674,8 +3674,8 @@ var feng3d;
              * 项目名称
              */
             projectname: "",
-            assetsPath: "Assets",
-            showFloder: "",
+            assetsPath: "Assets/",
+            showFloder: "Assets/",
             //function
             initproject: function (path, callback) {
                 editor.editorAssets.projectname = path;
@@ -3690,14 +3690,12 @@ var feng3d;
                             }
                             editor.fs.stat(editor.editorAssets.assetsPath, function (err, fileInfo) {
                                 rootfileinfo = new editor.AssetsFile(fileInfo);
-                                editor.editorAssets.showFloder = fileInfo.path;
                                 rootfileinfo.initChildren(Number.MAX_VALUE, callback);
                             });
                         });
                     }
                     else {
                         rootfileinfo = new editor.AssetsFile(fileInfo);
-                        editor.editorAssets.showFloder = fileInfo.path;
                         rootfileinfo.initChildren(Number.MAX_VALUE, callback);
                     }
                 });
@@ -4021,7 +4019,10 @@ var feng3d;
                  */
                 _this.currentOpenDirectory = false;
                 feng3d.watcher.watch(_this, "path", function () {
-                    _this.name = _this.path.split("/").pop();
+                    var paths = _this.path.split("/");
+                    _this.name = paths.pop();
+                    if (_this.name == "")
+                        _this.name = paths.pop();
                 });
                 _this.path = fileinfo.path;
                 _this._birthtime = fileinfo.birthtime;
@@ -4237,7 +4238,7 @@ var feng3d;
                             return;
                         }
                         var file = files.shift();
-                        editor.fs.stat(_this.path + "/" + file, function (err, stats) {
+                        editor.fs.stat(_this.path + file, function (err, stats) {
                             feng3d.assert(!err);
                             var child = new AssetsFile(stats);
                             child._parent = _this;
@@ -4363,8 +4364,10 @@ var feng3d;
             AssetsFile.prototype.rename = function (newname, callback) {
                 var _this = this;
                 var oldPath = this.path;
-                var newPath = this.parent.path + "/" + newname;
-                editor.fs.rename(oldPath, this.parent.path + "/" + newname, function (err) {
+                var newPath = this.parent.path + newname;
+                if (this.isDirectory)
+                    newPath = newPath + "/";
+                editor.fs.rename(oldPath, newPath, function (err) {
                     feng3d.assert(!err);
                     _this.path = newPath;
                     if (_this.isDirectory)
@@ -4383,7 +4386,9 @@ var feng3d;
             AssetsFile.prototype.move = function (destdirpath, callback) {
                 var _this = this;
                 var oldpath = this.path;
-                var newpath = destdirpath + "/" + this.name;
+                var newpath = destdirpath + this.name;
+                if (this.isDirectory)
+                    newpath += "/";
                 var destDir = editor.editorAssets.getFile(destdirpath);
                 //禁止向子文件夹移动
                 if (oldpath == editor.editorAssets.getparentdir(destdirpath))
@@ -4414,7 +4419,7 @@ var feng3d;
             AssetsFile.prototype.addfolder = function (newfoldername, callback) {
                 var _this = this;
                 newfoldername = this.getnewchildname(newfoldername);
-                var folderpath = this.path + "/" + newfoldername;
+                var folderpath = this.path + newfoldername + "/";
                 editor.fs.mkdir(folderpath, function (e) {
                     feng3d.assert(!e);
                     editor.fs.stat(folderpath, function (err, stats) {
@@ -4435,7 +4440,7 @@ var feng3d;
                 if (!override) {
                     filename = this.getnewchildname(filename);
                 }
-                var filepath = this.path + "/" + filename;
+                var filepath = this.path + filename;
                 getcontent(function (savedata, data) {
                     editor.fs.writeFile(filepath, savedata, function (e) {
                         editor.fs.stat(filepath, function (err, stats) {
@@ -4812,9 +4817,11 @@ var feng3d;
                     }
                 }
                 var floders = editor.editorAssets.showFloder.split("/");
+                // 除去尾部 ""
+                floders.pop();
                 var textFlow = new Array();
                 do {
-                    var path = floders.join("/");
+                    var path = floders.join("/") + "/";
                     if (textFlow.length > 0)
                         textFlow.unshift({ text: " > " });
                     textFlow.unshift({ text: floders.pop(), style: { "href": "event:" + path } });
@@ -9999,51 +10006,51 @@ var feng3d;
         editor.createObjectConfig = [
             //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
             {
-                label: "Create Empty", click: function () {
+                label: "游戏对象", click: function () {
                     addToHierarchy(feng3d.GameObjectFactory.createGameObject());
                 }
             },
             { type: "separator" },
             {
-                label: "3D Object",
+                label: "3D对象",
                 submenu: [
                     {
-                        label: "Plane", click: function () {
+                        label: "平面", click: function () {
                             addToHierarchy(feng3d.GameObjectFactory.createPlane());
                         }
                     },
                     {
-                        label: "Cube", click: function () {
+                        label: "立方体", click: function () {
                             addToHierarchy(feng3d.GameObjectFactory.createCube());
                         }
                     },
                     {
-                        label: "Sphere", click: function () {
+                        label: "球体", click: function () {
                             addToHierarchy(feng3d.GameObjectFactory.createSphere());
                         }
                     },
                     {
-                        label: "Capsule", click: function () {
+                        label: "胶囊体", click: function () {
                             addToHierarchy(feng3d.GameObjectFactory.createCapsule());
                         }
                     },
                     {
-                        label: "Cylinder", click: function () {
+                        label: "圆柱体", click: function () {
                             addToHierarchy(feng3d.GameObjectFactory.createCylinder());
                         }
                     },
                     {
-                        label: "Cone", click: function () {
+                        label: "圆锥体", click: function () {
                             addToHierarchy(feng3d.GameObjectFactory.createCone());
                         }
                     },
                     {
-                        label: "Torus", click: function () {
+                        label: "圆环", click: function () {
                             addToHierarchy(feng3d.GameObjectFactory.createTorus());
                         }
                     },
                     {
-                        label: "Terrain", click: function () {
+                        label: "地形", click: function () {
                             addToHierarchy(feng3d.GameObjectFactory.createTerrain());
                         }
                     },

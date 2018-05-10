@@ -141,7 +141,10 @@ namespace feng3d.editor
 
             feng3d.watcher.watch(this, "path", () =>
             {
-                this.name = this.path.split("/").pop();
+                var paths = this.path.split("/");
+                this.name = paths.pop();
+                if (this.name == "")
+                    this.name = paths.pop();
             });
 
             this.path = fileinfo.path;
@@ -284,7 +287,7 @@ namespace feng3d.editor
                     }
 
                     var file = files.shift();
-                    fs.stat(this.path + "/" + file, (err, stats) =>
+                    fs.stat(this.path + file, (err, stats) =>
                     {
                         assert(!err);
                         var child = new AssetsFile(stats);
@@ -446,8 +449,10 @@ namespace feng3d.editor
         rename(newname: string, callback?: (file: AssetsFile) => void)
         {
             var oldPath = this.path;
-            var newPath = this.parent.path + "/" + newname;
-            fs.rename(oldPath, this.parent.path + "/" + newname, (err) =>
+            var newPath = this.parent.path + newname;
+            if (this.isDirectory)
+                newPath = newPath + "/";
+            fs.rename(oldPath, newPath, (err) =>
             {
                 assert(!err);
                 this.path = newPath;
@@ -469,7 +474,9 @@ namespace feng3d.editor
         move(destdirpath: string, callback?: (file: AssetsFile) => void)
         {
             var oldpath = this.path;
-            var newpath = destdirpath + "/" + this.name;
+            var newpath = destdirpath + this.name;
+            if (this.isDirectory)
+                newpath += "/";
             var destDir = editorAssets.getFile(destdirpath);
             //禁止向子文件夹移动
             if (oldpath == editorAssets.getparentdir(destdirpath))
@@ -509,7 +516,7 @@ namespace feng3d.editor
         addfolder(newfoldername: string, callback?: (file: AssetsFile) => void)
         {
             newfoldername = this.getnewchildname(newfoldername);
-            var folderpath = this.path + "/" + newfoldername;
+            var folderpath = this.path + newfoldername + "/";
 
             fs.mkdir(folderpath, (e) =>
             {
@@ -535,7 +542,7 @@ namespace feng3d.editor
             {
                 filename = this.getnewchildname(filename);
             }
-            var filepath = this.path + "/" + filename;
+            var filepath = this.path + filename;
 
             getcontent((savedata, data) =>
             {
