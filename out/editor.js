@@ -3641,7 +3641,7 @@ var feng3d;
             };
             HierarchyTreeItemRenderer.prototype.onnameLabelclick = function () {
                 var _this = this;
-                if (this.selected && !feng3d.windowEventProxy.rightmouse) {
+                if (this.data.selected && !feng3d.windowEventProxy.rightmouse) {
                     this.renameInput.edit(function () {
                         _this.data.gameobject.name = _this.renameInput.text;
                     });
@@ -4741,7 +4741,7 @@ var feng3d;
                 var _this = this;
                 if (this.data.parent == null)
                     return;
-                if (this.selected && !feng3d.windowEventProxy.rightmouse) {
+                if (this.data.selected && !feng3d.windowEventProxy.rightmouse) {
                     this.renameInput.edit(function () {
                         var newName = _this.data.name.replace(_this.data.label, _this.renameInput.text);
                         _this.data.rename(newName);

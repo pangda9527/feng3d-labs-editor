@@ -69,7 +69,7 @@ namespace feng3d.editor
             if (this.data.parent == null)
                 return;
 
-            if (this.selected && !windowEventProxy.rightmouse)
+            if (this.data.selected && !windowEventProxy.rightmouse)
             {
                 this.renameInput.edit(() =>
                 {

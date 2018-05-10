@@ -103,7 +103,7 @@ namespace feng3d.editor
 
         private onnameLabelclick()
         {
-            if (this.selected && !windowEventProxy.rightmouse)
+            if (this.data.selected && !windowEventProxy.rightmouse)
             {
                 this.renameInput.edit(() =>
                 {
