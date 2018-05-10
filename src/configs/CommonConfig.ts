@@ -246,7 +246,7 @@ namespace feng3d.editor
      */
     function downloadProject(projectname: string)
     {
-        var path = "../projects/" + projectname;
+        var path = "../project/" + projectname;
         Loader.loadBinary(path, (content) =>
         {
             fs.importProject(<any>content, () =>

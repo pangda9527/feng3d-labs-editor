@@ -10168,7 +10168,7 @@ var feng3d;
          * @param projectname
          */
         function downloadProject(projectname) {
-            var path = "../projects/" + projectname;
+            var path = "../project/" + projectname;
             feng3d.Loader.loadBinary(path, function (content) {
                 editor.fs.importProject(content, function () {
                     editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
