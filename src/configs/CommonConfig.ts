@@ -14,6 +14,19 @@ namespace feng3d.editor
                 });
             }
         },
+        // {
+        //     label: "打开项目", click: () =>
+        //     {
+        //         popupview.popup({ newprojectname: "newproject" }, (data) =>
+        //         {
+        //             if (data.newprojectname && data.newprojectname.length > 0)
+        //             {
+        //                 editorcache.projectname = data.newprojectname;
+        //                 window.location.reload();
+        //             }
+        //         });
+        //     }
+        // },
         {
             label: "保存场景", click: () =>
             {
@@ -53,6 +66,17 @@ namespace feng3d.editor
                     saveAs(content, "example.feng3d.zip");
                 });
             }
+        },
+        {
+            label: "下载项目",
+            submenu: [
+                {
+                    label: "地形", click: () =>
+                    {
+                        downloadProject("terrain.feng3d.zip");
+                    },
+                }
+            ],
         },
     ];
 
@@ -122,16 +146,16 @@ namespace feng3d.editor
             ],
         },
         {
-            label: "Light",
+            label: "光源",
             submenu: [
                 {
-                    label: "PointLight", click: () =>
+                    label: "点光源", click: () =>
                     {
                         addToHierarchy(GameObjectFactory.createPointLight());
                     }
                 },
                 {
-                    label: "DirectionalLight", click: () =>
+                    label: "方向光源", click: () =>
                     {
                         var gameobject = GameObject.create("DirectionalLight");
                         gameobject.addComponent(DirectionalLight);
@@ -141,13 +165,13 @@ namespace feng3d.editor
             ],
         },
         {
-            label: "Particle System", click: () =>
+            label: "粒子系统", click: () =>
             {
                 addToHierarchy(GameObjectFactory.createParticle());
             }
         },
         {
-            label: "Camera", click: () =>
+            label: "摄像机", click: () =>
             {
                 addToHierarchy(GameObjectFactory.createCamera());
             }
@@ -215,4 +239,29 @@ namespace feng3d.editor
             ]
         },
     ];
+
+    /**
+     * 下载项目
+     * @param projectname 
+     */
+    function downloadProject(projectname: string)
+    {
+        var path = "../projects/" + projectname;
+        Loader.loadBinary(path, (content) =>
+        {
+            fs.importProject(<any>content, () =>
+            {
+                editorAssets.initproject(editorAssets.projectname, () =>
+                {
+                    editorAssets.readScene("default.scene.json", (err, scene) =>
+                    {
+                        engine.scene = scene;
+                        editorui.assetsview.updateShowFloder();
+                        assetsDispather.dispatch("changed");
+                        console.log("下载项目完成!");
+                    });
+                });
+            });
+        });
+    }
 }

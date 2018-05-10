@@ -9968,6 +9968,19 @@ var feng3d;
                     });
                 }
             },
+            // {
+            //     label: "打开项目", click: () =>
+            //     {
+            //         popupview.popup({ newprojectname: "newproject" }, (data) =>
+            //         {
+            //             if (data.newprojectname && data.newprojectname.length > 0)
+            //             {
+            //                 editorcache.projectname = data.newprojectname;
+            //                 window.location.reload();
+            //             }
+            //         });
+            //     }
+            // },
             {
                 label: "保存场景", click: function () {
                     var gameobject = editor.hierarchyTree.rootnode.gameobject;
@@ -9998,6 +10011,16 @@ var feng3d;
                         saveAs(content, "example.feng3d.zip");
                     });
                 }
+            },
+            {
+                label: "下载项目",
+                submenu: [
+                    {
+                        label: "地形", click: function () {
+                            downloadProject("terrain.feng3d.zip");
+                        },
+                    }
+                ],
             },
         ];
         /**
@@ -10057,15 +10080,15 @@ var feng3d;
                 ],
             },
             {
-                label: "Light",
+                label: "光源",
                 submenu: [
                     {
-                        label: "PointLight", click: function () {
+                        label: "点光源", click: function () {
                             addToHierarchy(feng3d.GameObjectFactory.createPointLight());
                         }
                     },
                     {
-                        label: "DirectionalLight", click: function () {
+                        label: "方向光源", click: function () {
                             var gameobject = feng3d.GameObject.create("DirectionalLight");
                             gameobject.addComponent(feng3d.DirectionalLight);
                             addToHierarchy(gameobject);
@@ -10074,12 +10097,12 @@ var feng3d;
                 ],
             },
             {
-                label: "Particle System", click: function () {
+                label: "粒子系统", click: function () {
                     addToHierarchy(feng3d.GameObjectFactory.createParticle());
                 }
             },
             {
-                label: "Camera", click: function () {
+                label: "摄像机", click: function () {
                     addToHierarchy(feng3d.GameObjectFactory.createCamera());
                 }
             },
@@ -10140,6 +10163,25 @@ var feng3d;
                 ]
             },
         ];
+        /**
+         * 下载项目
+         * @param projectname
+         */
+        function downloadProject(projectname) {
+            var path = "../projects/" + projectname;
+            feng3d.Loader.loadBinary(path, function (content) {
+                editor.fs.importProject(content, function () {
+                    editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
+                        editor.editorAssets.readScene("default.scene.json", function (err, scene) {
+                            editor.engine.scene = scene;
+                            editor.editorui.assetsview.updateShowFloder();
+                            editor.assetsDispather.dispatch("changed");
+                            console.log("下载项目完成!");
+                        });
+                    });
+                });
+            });
+        }
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
