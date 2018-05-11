@@ -19,6 +19,26 @@ var feng3d;
     var editor;
     (function (editor) {
         /**
+         * 常用正则表示式
+         */
+        var RegExps = /** @class */ (function () {
+            function RegExps() {
+                /**
+                 * 图片
+                 */
+                this.image = /(.jpg|.png|.jpeg)\b/i;
+            }
+            return RegExps;
+        }());
+        editor.RegExps = RegExps;
+        editor.regExps = new RegExps();
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        /**
          * Created by 黑暗之神KDS on 2017/2/17.
          */
         /**
@@ -3489,6 +3509,91 @@ var feng3d;
     var editor;
     (function (editor) {
         /**
+         * 挑选（拾取）OAV界面
+         * @author feng 2016-3-10
+         */
+        var OAVPick = /** @class */ (function (_super) {
+            __extends(OAVPick, _super);
+            function OAVPick(attributeViewInfo) {
+                var _this = _super.call(this, attributeViewInfo) || this;
+                _this.skinName = "OAVPick";
+                return _this;
+            }
+            OAVPick.prototype.initView = function () {
+                var _this = this;
+                this.label.text = this._attributeName;
+                this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+                this.text.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+                feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
+                var param = this.attributeViewInfo.componentParam;
+                editor.drag.register(this, function (dragsource) {
+                    if (param.datatype)
+                        dragsource[param.datatype] = _this.attributeValue;
+                }, [param.accepttype], function (dragSource) {
+                    _this.attributeValue = dragSource[param.accepttype];
+                });
+            };
+            OAVPick.prototype.dispose = function () {
+                this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+                this.text.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+                editor.drag.unregister(this);
+                feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+            };
+            OAVPick.prototype.ontxtClick = function () {
+                var _this = this;
+                var param = this.attributeViewInfo.componentParam;
+                if (param.accepttype) {
+                    if (param.accepttype == "image") {
+                        var menus = editor.editorAssets.filter(function (file) {
+                            return editor.regExps.image.test(file.path);
+                        }).reduce(function (prev, item) {
+                            prev.push({
+                                label: item.name, click: function () {
+                                    _this.attributeValue = item.path;
+                                }
+                            });
+                            return prev;
+                        }, []);
+                        if (menus.length == 0) {
+                            menus.push({ label: "\u6CA1\u6709 " + param.accepttype + " \u8D44\u6E90" });
+                        }
+                        editor.menu.popup(menus);
+                    }
+                }
+            };
+            /**
+             * 更新界面
+             */
+            OAVPick.prototype.updateView = function () {
+                if (this.attributeValue === undefined) {
+                    this.text.text = String(this.attributeValue);
+                }
+                else if (!(this.attributeValue instanceof Object)) {
+                    this.text.text = String(this.attributeValue);
+                }
+                else {
+                    var valuename = this.attributeValue["name"] || "";
+                    this.text.text = valuename + " (" + feng3d.ClassUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
+                    this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+                }
+            };
+            OAVPick.prototype.onDoubleClick = function () {
+                if (this.attributeValue && typeof this.attributeValue == "object")
+                    editor.editorui.inspectorView.showData(this.attributeValue);
+            };
+            OAVPick = __decorate([
+                feng3d.OAVComponent()
+            ], OAVPick);
+            return OAVPick;
+        }(editor.OAVBase));
+        editor.OAVPick = OAVPick;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        /**
          * 属性面板（检查器）
          * @author feng     2017-03-20
          */
@@ -4031,7 +4136,7 @@ var feng3d;
                         reader.readAsArrayBuffer(file);
                         break;
                 }
-            }
+            },
         };
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -4055,7 +4160,6 @@ var feng3d;
             AssetExtension["json"] = "json";
             AssetExtension["scene"] = "scene";
         })(AssetExtension = editor.AssetExtension || (editor.AssetExtension = {}));
-        var imageReg = /(.jpg|.png|.jpeg)\b/i;
         var AssetsFile = /** @class */ (function (_super) {
             __extends(AssetsFile, _super);
             function AssetsFile(fileinfo, data) {
@@ -4099,7 +4203,7 @@ var feng3d;
                         _this.image = "file_png";
                     }
                 }
-                if (imageReg.test(fileinfo.path)) {
+                if (editor.regExps.image.test(fileinfo.path)) {
                     _this.getData(function (data) {
                         _this.image = data;
                     });
@@ -4516,7 +4620,7 @@ var feng3d;
                             callback(uint8Array, saveContent);
                         });
                     }
-                    else if (imageReg.test(filename)) {
+                    else if (editor.regExps.image.test(filename)) {
                         feng3d.dataTransform.arrayBufferToDataURL(content, function (datarul) {
                             callback(content, datarul);
                         });
@@ -10062,7 +10166,7 @@ var feng3d;
                 label: "导出项目", click: function () {
                     editor.fs.exportProject(function (err, content) {
                         // see FileSaver.js
-                        saveAs(content, "example.feng3d.zip");
+                        saveAs(content, editor.editorAssets.projectname + ".feng3d.zip");
                     });
                 }
             },

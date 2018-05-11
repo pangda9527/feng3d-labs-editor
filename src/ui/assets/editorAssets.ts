@@ -385,6 +385,6 @@ namespace feng3d.editor
                     reader.readAsArrayBuffer(file);
                     break;
             }
-        }
+        },
     };
 }
