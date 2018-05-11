@@ -391,9 +391,9 @@ namespace feng3d.editor
         /**
          * 删除文件（夹）
          */
-        deleteFile(callback?: (assetsFile: AssetsFile) => void)
+        deleteFile(callback?: (assetsFile: AssetsFile) => void, includeRoot = false)
         {
-            if (this.path == editorAssets.assetsPath)
+            if (this.path == editorAssets.assetsPath && !includeRoot)
             {
                 alert("无法删除根目录");
                 return;
@@ -535,7 +535,7 @@ namespace feng3d.editor
          * @param content 文件内容
          * @param callback 完成回调
          */
-        addfile(filename: string, content: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry, override = false, callback?: (file: AssetsFile) => void)
+        addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry, override = false, callback?: (file: AssetsFile) => void)
         {
             if (!override)
             {
@@ -556,19 +556,19 @@ namespace feng3d.editor
                 });
             });
 
-            function getcontent(callback: (savedata: ArrayBuffer, data: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry) => void)
+            function getcontent(callback: (savedata: ArrayBuffer, data: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry) => void)
             {
-                var saveContent = content;
                 if (content instanceof Material
                     || content instanceof GameObject
                     || content instanceof AnimationClip
+                    || content instanceof Geometry
                 )
                 {
                     var obj = serialization.serialize(content);
                     var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                    dataTransform.stringToUint8Array(str, (uint8Array) =>
+                    dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
                     {
-                        callback(uint8Array, saveContent);
+                        callback(arrayBuffer, content);
                     });
                 } else if (regExps.image.test(filename))
                 {
@@ -576,9 +576,15 @@ namespace feng3d.editor
                     {
                         callback(<ArrayBuffer>content, datarul);
                     });
+                } else if (typeof content == "string")
+                {
+                    dataTransform.stringToArrayBuffer(content, (uint8Array) =>
+                    {
+                        callback(uint8Array, content);
+                    });
                 } else
                 {
-                    callback(<ArrayBuffer>content, content);
+                    callback(content, content);
                 }
             }
         }

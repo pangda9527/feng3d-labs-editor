@@ -25,13 +25,11 @@ var editor;
             if (data && data.data)
             {
                 code = data.data;
-                if (code.constructor == Uint8Array)
+                feng3d.assert(code.constructor == ArrayBuffer, "读取的数据不是 ArrayBuffer");
+                feng3d.dataTransform.arrayBufferToString(code, function (str)
                 {
-                    feng3d.dataTransform.uint8ArrayToString(code, function (str)
-                    {
-                        code = str;
-                    });
-                }
+                    code = str;
+                });
             }
             else
                 code = "";
@@ -44,10 +42,14 @@ var editor;
                     triggerCompile();
                 editor.onDidChangeModelContent(function ()
                 {
-                    codedata.data = editor.getValue();
-                    feng3d.storage.set(DBname, project, path, codedata);
-                    if (extension == "ts")
-                        triggerCompile();
+                    code = editor.getValue();
+                    feng3d.dataTransform.stringToArrayBuffer(code, (arrayBuffer) =>
+                    {
+                        codedata.data = arrayBuffer;
+                        feng3d.storage.set(DBname, project, path, codedata);
+                        if (extension == "ts")
+                            triggerCompile();
+                    })
                 });
             });
 
@@ -139,8 +141,11 @@ var editor;
                 });
                 if (typeof output === "string")
                 {
-                    codedata.data = output;
-                    feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
+                    feng3d.dataTransform.stringToArrayBuffer(output, (arrayBuffer) =>
+                    {
+                        codedata.data = arrayBuffer;
+                        feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
+                    });
                 }
             }
             catch (e)

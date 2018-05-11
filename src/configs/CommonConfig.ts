@@ -86,6 +86,25 @@ namespace feng3d.editor
                 },
             ],
         },
+        {
+            label: "清空项目",
+            click: () =>
+            {
+                editorAssets.deletefile(editorAssets.assetsPath, () =>
+                {
+                    editorAssets.initproject(editorAssets.projectname, () =>
+                    {
+                        editorAssets.readScene("default.scene.json", (err, scene) =>
+                        {
+                            engine.scene = scene;
+                            editorui.assetsview.updateShowFloder();
+                            assetsDispather.dispatch("changed");
+                            console.log("导入项目完成!");
+                        });
+                    });
+                }, true);
+            },
+        }
     ];
 
     /**

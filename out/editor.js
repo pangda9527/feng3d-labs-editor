@@ -3875,10 +3875,11 @@ var feng3d;
              * 删除文件
              * @param path 文件路径
              */
-            deletefile: function (path, callback) {
+            deletefile: function (path, callback, includeRoot) {
+                if (includeRoot === void 0) { includeRoot = false; }
                 var assetsFile = editor.editorAssets.getFile(path);
                 if (assetsFile)
-                    assetsFile.deleteFile(callback);
+                    assetsFile.deleteFile(callback, includeRoot);
                 else {
                     editor.fs.remove(path, function () {
                         callback(null);
@@ -4484,9 +4485,10 @@ var feng3d;
             /**
              * 删除文件（夹）
              */
-            AssetsFile.prototype.deleteFile = function (callback) {
+            AssetsFile.prototype.deleteFile = function (callback, includeRoot) {
                 var _this = this;
-                if (this.path == editor.editorAssets.assetsPath) {
+                if (includeRoot === void 0) { includeRoot = false; }
+                if (this.path == editor.editorAssets.assetsPath && !includeRoot) {
                     alert("无法删除根目录");
                     return;
                 }
@@ -4614,19 +4616,24 @@ var feng3d;
                     });
                 });
                 function getcontent(callback) {
-                    var saveContent = content;
                     if (content instanceof feng3d.Material
                         || content instanceof feng3d.GameObject
-                        || content instanceof feng3d.AnimationClip) {
+                        || content instanceof feng3d.AnimationClip
+                        || content instanceof feng3d.Geometry) {
                         var obj = feng3d.serialization.serialize(content);
                         var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                        feng3d.dataTransform.stringToUint8Array(str, function (uint8Array) {
-                            callback(uint8Array, saveContent);
+                        feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
+                            callback(arrayBuffer, content);
                         });
                     }
                     else if (editor.regExps.image.test(filename)) {
                         feng3d.dataTransform.arrayBufferToDataURL(content, function (datarul) {
                             callback(content, datarul);
+                        });
+                    }
+                    else if (typeof content == "string") {
+                        feng3d.dataTransform.stringToArrayBuffer(content, function (uint8Array) {
+                            callback(uint8Array, content);
                         });
                     }
                     else {
@@ -10189,6 +10196,21 @@ var feng3d;
                     },
                 ],
             },
+            {
+                label: "清空项目",
+                click: function () {
+                    editor.editorAssets.deletefile(editor.editorAssets.assetsPath, function () {
+                        editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
+                            editor.editorAssets.readScene("default.scene.json", function (err, scene) {
+                                editor.engine.scene = scene;
+                                editor.editorui.assetsview.updateShowFloder();
+                                editor.assetsDispather.dispatch("changed");
+                                console.log("导入项目完成!");
+                            });
+                        });
+                    }, true);
+                },
+            }
         ];
         /**
          * 层级界面创建3D对象列表数据

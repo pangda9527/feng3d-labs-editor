@@ -63,11 +63,11 @@ namespace feng3d.editor
          * 删除文件
          * @param path 文件路径
          */
-        deletefile(path: string, callback?: (assetsFile: AssetsFile) => void)
+        deletefile(path: string, callback?: (assetsFile: AssetsFile) => void, includeRoot = false)
         {
             var assetsFile = editorAssets.getFile(path);
             if (assetsFile)
-                assetsFile.deleteFile(callback);
+                assetsFile.deleteFile(callback, includeRoot);
             else
             {
                 fs.remove(path, () =>
