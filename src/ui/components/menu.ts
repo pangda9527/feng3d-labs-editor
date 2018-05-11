@@ -57,12 +57,21 @@ namespace feng3d.editor
             var menuUI = new MenuUI();
             var dataProvider = new eui.ArrayCollection();
             dataProvider.replaceAll(menu);
-            menuUI.x = mousex || windowEventProxy.clientX;
-            menuUI.y = mousey || windowEventProxy.clientY;
+
+            menuUI.dataProvider = dataProvider;
+            editorui.popupLayer.addChild(menuUI);
+
             if (width !== undefined)
                 menuUI.width = width;
-            editorui.popupLayer.addChild(menuUI);
-            menuUI.dataProvider = dataProvider;
+            menuUI.x = mousex || windowEventProxy.clientX;
+            menuUI.y = mousey || windowEventProxy.clientY;
+
+            if (menuUI.x + menuUI.width > editorui.popupLayer.stage.stageWidth)
+                menuUI.x -= menuUI.width;
+
+            if (menuUI.y + menuUI.height > editorui.popupLayer.stage.stageHeight)
+                menuUI.y -= menuUI.height;
+
             return menuUI;
         }
 

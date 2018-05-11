@@ -2096,12 +2096,16 @@ var feng3d;
                 var menuUI = new MenuUI();
                 var dataProvider = new eui.ArrayCollection();
                 dataProvider.replaceAll(menu);
-                menuUI.x = mousex || feng3d.windowEventProxy.clientX;
-                menuUI.y = mousey || feng3d.windowEventProxy.clientY;
+                menuUI.dataProvider = dataProvider;
+                editor.editorui.popupLayer.addChild(menuUI);
                 if (width !== undefined)
                     menuUI.width = width;
-                editor.editorui.popupLayer.addChild(menuUI);
-                menuUI.dataProvider = dataProvider;
+                menuUI.x = mousex || feng3d.windowEventProxy.clientX;
+                menuUI.y = mousey || feng3d.windowEventProxy.clientY;
+                if (menuUI.x + menuUI.width > editor.editorui.popupLayer.stage.stageWidth)
+                    menuUI.x -= menuUI.width;
+                if (menuUI.y + menuUI.height > editor.editorui.popupLayer.stage.stageHeight)
+                    menuUI.y -= menuUI.height;
                 return menuUI;
             };
             MenuUI.prototype.onComplete = function () {
@@ -3523,7 +3527,7 @@ var feng3d;
                 var _this = this;
                 this.label.text = this._attributeName;
                 this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-                this.text.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+                this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
                 feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
                 var param = this.attributeViewInfo.componentParam;
                 editor.drag.register(this, function (dragsource) {
@@ -3535,7 +3539,7 @@ var feng3d;
             };
             OAVPick.prototype.dispose = function () {
                 this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-                this.text.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+                this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
                 editor.drag.unregister(this);
                 feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
             };

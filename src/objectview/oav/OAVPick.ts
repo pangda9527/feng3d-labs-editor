@@ -9,6 +9,7 @@ namespace feng3d.editor
     {
         public label: eui.Label;
         public text: eui.Label;
+        public pickBtn: eui.Button;
 
         constructor(attributeViewInfo: AttributeViewInfo)
         {
@@ -22,7 +23,7 @@ namespace feng3d.editor
             this.label.text = this._attributeName;
 
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.text.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
             watcher.watch(this.space, this.attributeName, this.updateView, this);
 
@@ -42,7 +43,7 @@ namespace feng3d.editor
         dispose()
         {
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.text.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+            this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
             drag.unregister(this);
             watcher.unwatch(this.space, this.attributeName, this.updateView, this);
