@@ -77,7 +77,13 @@ namespace feng3d.editor
                     {
                         downloadProject("terrain.feng3d.zip");
                     },
-                }
+                },
+                {
+                    label: "自定义材质", click: () =>
+                    {
+                        downloadProject("customshader.feng3d.zip");
+                    },
+                },
             ],
         },
     ];

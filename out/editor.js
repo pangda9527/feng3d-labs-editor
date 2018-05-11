@@ -10181,7 +10181,12 @@ var feng3d;
                         label: "地形", click: function () {
                             downloadProject("terrain.feng3d.zip");
                         },
-                    }
+                    },
+                    {
+                        label: "自定义材质", click: function () {
+                            downloadProject("customshader.feng3d.zip");
+                        },
+                    },
                 ],
             },
         ];
