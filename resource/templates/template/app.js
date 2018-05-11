@@ -1,8 +1,8 @@
-/// <reference path="libs/feng3d.d.ts" />
+/// <reference path="../../../libs/feng3d.d.ts" />
 
 var view3D = new feng3d.Engine();
 
-feng3d.Loader.loadText("default.scene", (content) =>
+feng3d.Loader.loadText("default.scene.json", (content) =>
 {
     var json = JSON.parse(content);
     var scene = feng3d.serialization.deserialize(json);
