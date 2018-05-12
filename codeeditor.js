@@ -200,7 +200,7 @@ var editor;
     {
         try
         {
-            var code = tslist.map((v) => v.code).join("/n");
+            var code = tslist.map((v) => v.code).join("\n");
 
             var output = transpileModule(code, {
                 // module: ts.ModuleKind.AMD,

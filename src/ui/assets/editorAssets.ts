@@ -389,12 +389,18 @@ namespace feng3d.editor
         {
             fs.readFileAsString("project.js", (err, content) =>
             {
-                //
-                var windowEval = eval.bind(window);
-                // 运行project.js
-                windowEval(content);
+                if (content != this.preProjectJsContent)
+                {
+                    //
+                    var windowEval = eval.bind(window);
+                    // 运行project.js
+                    windowEval(content);
+                }
+                this.preProjectJsContent = content;
                 callback();
             });
-        }
+        },
+        //上次执行的项目脚本
+        preProjectJsContent: null,
     };
 }

@@ -73,6 +73,37 @@ namespace feng3d.editor
                         menus.push({ label: `没有 ${param.accepttype} 资源` });
                     }
                     menu.popup(menus);
+                } else if (param.accepttype == "file_script")
+                {
+                    var tsfiles = editorAssets.filter((file) =>
+                    {
+                        return file.extension == AssetExtension.ts;
+                    })
+
+                    if (tsfiles.length > 0)
+                    {
+                        var scriptClassNames = [];
+
+                        getScriptClassNames(tsfiles, (scriptClassNames) =>
+                        {
+                            var menus: MenuItem[] = [];
+                            scriptClassNames.forEach(element =>
+                            {
+                                menus.push({
+                                    label: element,
+                                    click: () =>
+                                    {
+                                        this.attributeValue = element;
+                                    }
+                                });
+                            });
+                            menu.popup(menus);
+                        });
+
+                    } else
+                    {
+                        menu.popup([{ label: `没有 ${param.accepttype} 资源` }]);
+                    }
                 }
             }
         }
@@ -101,5 +132,19 @@ namespace feng3d.editor
             if (this.attributeValue && typeof this.attributeValue == "object")
                 editorui.inspectorView.showData(this.attributeValue);
         }
+    }
+
+    function getScriptClassNames(tsfiles: AssetsFile[], callback: (scriptClassNames: string[]) => void, scriptClassNames: string[] = [])
+    {
+        if (tsfiles.length == 0)
+        {
+            callback(scriptClassNames);
+            return;
+        }
+        tsfiles.shift().getScriptClassName((scriptClassName) =>
+        {
+            scriptClassNames.push(scriptClassName);
+            getScriptClassNames(tsfiles, callback, scriptClassNames);
+        });
     }
 }

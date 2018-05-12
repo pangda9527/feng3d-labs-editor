@@ -18,6 +18,7 @@
         "libs/jszip.d.ts",
         "libs/FileSaver.d.ts",
         //
+        "src/utils/Utils.ts",
         "src/utils/RegExps.ts",
         //
         "src/io/FileObject.ts",

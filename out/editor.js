@@ -18,6 +18,28 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        var Utils = /** @class */ (function () {
+            function Utils() {
+            }
+            /**
+             * 获取所有类
+             */
+            Utils.prototype.getAllClasss = function (root, rootpath, depth) {
+                if (root === void 0) { root = window; }
+                if (depth === void 0) { depth = 5; }
+                Object.keys(root).forEach(function (key) {
+                });
+            };
+            return Utils;
+        }());
+        editor.Utils = Utils;
+        editor.utils = new Utils();
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
         /**
          * 常用正则表示式
          */
@@ -3577,6 +3599,29 @@ var feng3d;
                         }
                         editor.menu.popup(menus);
                     }
+                    else if (param.accepttype == "file_script") {
+                        var tsfiles = editor.editorAssets.filter(function (file) {
+                            return file.extension == editor.AssetExtension.ts;
+                        });
+                        if (tsfiles.length > 0) {
+                            var scriptClassNames = [];
+                            getScriptClassNames(tsfiles, function (scriptClassNames) {
+                                var menus = [];
+                                scriptClassNames.forEach(function (element) {
+                                    menus.push({
+                                        label: element,
+                                        click: function () {
+                                            _this.attributeValue = element;
+                                        }
+                                    });
+                                });
+                                editor.menu.popup(menus);
+                            });
+                        }
+                        else {
+                            editor.menu.popup([{ label: "\u6CA1\u6709 " + param.accepttype + " \u8D44\u6E90" }]);
+                        }
+                    }
                 }
             };
             /**
@@ -3605,6 +3650,17 @@ var feng3d;
             return OAVPick;
         }(editor.OAVBase));
         editor.OAVPick = OAVPick;
+        function getScriptClassNames(tsfiles, callback, scriptClassNames) {
+            if (scriptClassNames === void 0) { scriptClassNames = []; }
+            if (tsfiles.length == 0) {
+                callback(scriptClassNames);
+                return;
+            }
+            tsfiles.shift().getScriptClassName(function (scriptClassName) {
+                scriptClassNames.push(scriptClassName);
+                getScriptClassNames(tsfiles, callback, scriptClassNames);
+            });
+        }
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -4156,14 +4212,20 @@ var feng3d;
                 }
             },
             runProjectScript: function (callback) {
+                var _this = this;
                 editor.fs.readFileAsString("project.js", function (err, content) {
-                    //
-                    var windowEval = eval.bind(window);
-                    // 运行project.js
-                    windowEval(content);
+                    if (content != _this.preProjectJsContent) {
+                        //
+                        var windowEval = eval.bind(window);
+                        // 运行project.js
+                        windowEval(content);
+                    }
+                    _this.preProjectJsContent = content;
                     callback();
                 });
-            }
+            },
+            //上次执行的项目脚本
+            preProjectJsContent: null,
         };
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -4713,6 +4775,7 @@ var feng3d;
                 var _this = this;
                 if (this.extension != AssetExtension.ts)
                     return "";
+                this._data = null;
                 this.getData(function (code) {
                     // 获取脚本类名称
                     var result = editor.regExps.scriptClass.exec(code);

@@ -652,6 +652,7 @@ namespace feng3d.editor
         {
             if (this.extension != AssetExtension.ts)
                 return "";
+            this._data = null;
             this.getData((code: string) =>
             {
                 // 获取脚本类名称
