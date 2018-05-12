@@ -39,6 +39,8 @@ var editor;
     var code;
     var codedata;
     var feng3ddts;
+    // ts 列表
+    var tslist = [];
 
     if (fstype == "indexedDB")
     {
@@ -51,47 +53,83 @@ var editor;
 
         document.head.getElementsByTagName("title")[0].innerText = path;
 
-        feng3d.storage.get(DBname, project, path, function (err, data)
+        // 加载所有ts文件
+        function loadallts(callback)
         {
-            if (data && data.data)
+            feng3d.storage.getAllKeys(DBname, project, (err, keys) =>
             {
-                code = data.data;
-                feng3d.assert(code.constructor == ArrayBuffer, "读取的数据不是 ArrayBuffer");
-                feng3d.dataTransform.arrayBufferToString(code, function (str)
-                {
-                    code = str;
-                });
-            }
-            else
-                code = "";
-            codedata = data;
+                var tspaths = keys.filter((v) => v.split(".").pop() == "ts");
+                loadts();
 
-            initEditor(extension, function ()
-            {
-                editor.setValue(code);
-                if (extension == "ts")
+                function loadts()
                 {
-                    logLabel.textContent = "初次编译中。。。。";
-                    triggerCompile();
-                }
-                editor.onDidChangeModelContent(function ()
-                {
-                    logLabel.textContent = "";
-                    code = editor.getValue();
-                    feng3d.dataTransform.stringToArrayBuffer(code, (arrayBuffer) =>
+                    logLabel.textContent = "加载脚本中。。。。";
+                    if (tspaths.length > 0)
                     {
-                        codedata.data = arrayBuffer;
-                        feng3d.storage.set(DBname, project, path, codedata);
-                        if (extension == "ts" && watch.checked)
+                        var path = tspaths.pop();
+                        feng3d.storage.get(DBname, project, path, (err, data) =>
                         {
-                            autoCompile();
+                            feng3d.dataTransform.arrayBufferToString(data.data, function (str)
+                            {
+                                tslist.push({ path: path, code: str });
+                                loadts();
+                            });
+                        });
+                    } else
+                    {
+                        callback();
+                    }
+                }
+            });
+        }
+
+        init();
+
+        function init()
+        {
+            // 获取文件内容
+            feng3d.storage.get(DBname, project, path, function (err, data)
+            {
+                codedata = data;
+                feng3d.assert(data.data.constructor == ArrayBuffer, "读取的数据不是 ArrayBuffer");
+                feng3d.dataTransform.arrayBufferToString(data.data, function (str)
+                {
+                    var code = str;
+                    initEditor(extension, function ()
+                    {
+                        editor.setValue(code);
+                        if (extension == "ts")
+                        {
+                            loadallts(() =>
+                            {
+                                logLabel.textContent = "初次编译中。。。。";
+                                triggerCompile();
+                            });
                         }
-                    })
+                        editor.onDidChangeModelContent(function ()
+                        {
+                            logLabel.textContent = "";
+                            code = editor.getValue();
+                            feng3d.dataTransform.stringToArrayBuffer(code, (arrayBuffer) =>
+                            {
+                                codedata.data = arrayBuffer;
+                                feng3d.storage.set(DBname, project, path, codedata);
+                                if (extension == "ts")
+                                {
+                                    tslist.filter((v) => v.path == path)[0].code = code;
+                                    if (watch.checked)
+                                    {
+                                        autoCompile();
+                                    }
+                                }
+                            })
+                        });
+                    });
                 });
             });
-
-        });
+        }
     }
+
 
     function initEditor(extension, callback)
     {
@@ -158,40 +196,34 @@ var editor;
     }
 
     // ------------ Compilation logic
-    var compilerTriggerTimeoutID = null;
     function triggerCompile()
     {
-        if (compilerTriggerTimeoutID !== null)
+        try
         {
-            window.clearTimeout(compilerTriggerTimeoutID);
-        }
-        compilerTriggerTimeoutID = window.setTimeout(function ()
-        {
-            try
+            var text = editor.getValue();
+
+            var output = transpileModule(editor.getValue(), {
+                // module: ts.ModuleKind.AMD,
+                target: ts.ScriptTarget.ES5,
+                noLib: true,
+                noResolve: true,
+                suppressOutputPathCheck: true
+            });
+            if (typeof output === "string")
             {
-                var output = transpileModule(editor.getValue(), {
-                    // module: ts.ModuleKind.AMD,
-                    target: ts.ScriptTarget.ES5,
-                    noLib: true,
-                    noResolve: true,
-                    suppressOutputPathCheck: true
-                });
-                if (typeof output === "string")
+                feng3d.dataTransform.stringToArrayBuffer(output, (arrayBuffer) =>
                 {
-                    feng3d.dataTransform.stringToArrayBuffer(output, (arrayBuffer) =>
-                    {
-                        codedata.data = arrayBuffer;
-                        feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
-                        logLabel.textContent = "编译完成！";
-                    });
-                }
+                    codedata.data = arrayBuffer;
+                    feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
+                    logLabel.textContent = "编译完成！";
+                });
             }
-            catch (e)
-            {
-                logLabel.textContent = "Error from compilation: " + e + "  " + (e.stack || "");
-                console.log("Error from compilation: " + e + "  " + (e.stack || ""));
-            }
-        }, 100);
+        }
+        catch (e)
+        {
+            logLabel.textContent = "Error from compilation: " + e + "  " + (e.stack || "");
+            console.log("Error from compilation: " + e + "  " + (e.stack || ""));
+        }
     }
     function transpileModule(input, options)
     {
