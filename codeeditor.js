@@ -6,6 +6,15 @@
 var editor;
 (function ()
 {
+    var compileButton = document.getElementById("compile");
+    var watchCB = document.getElementById("watch");
+    var logLabel = document.getElementById("log");
+
+    compileButton.onclick = () =>
+    {
+        triggerCompile();
+    };
+
     var fstype = GetQueryString("fstype");
     var code;
     var codedata;
@@ -39,16 +48,23 @@ var editor;
             {
                 editor.setValue(code);
                 if (extension == "ts")
+                {
+                    logLabel.textContent = "初次编译中。。。。";
                     triggerCompile();
+                }
                 editor.onDidChangeModelContent(function ()
                 {
+                    logLabel.textContent = "";
                     code = editor.getValue();
                     feng3d.dataTransform.stringToArrayBuffer(code, (arrayBuffer) =>
                     {
                         codedata.data = arrayBuffer;
                         feng3d.storage.set(DBname, project, path, codedata);
-                        if (extension == "ts")
+                        if (extension == "ts" && watch.checked)
+                        {
+                            logLabel.textContent = "自动编译中。。。。";
                             triggerCompile();
+                        }
                     })
                 });
             });
@@ -145,11 +161,13 @@ var editor;
                     {
                         codedata.data = arrayBuffer;
                         feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
+                        logLabel.textContent = "编译完成！";
                     });
                 }
             }
             catch (e)
             {
+                logLabel.textContent = "Error from compilation: " + e + "  " + (e.stack || "");
                 console.log("Error from compilation: " + e + "  " + (e.stack || ""));
             }
         }, 100);
@@ -225,27 +243,5 @@ var editor;
                 req._canceled = true;
                 req.abort();
             });
-    }
-
-
-    layout();
-    window.onresize = layout;
-
-
-    function layout()
-    {
-        var GLOBAL_PADDING = 20;
-
-        var WIDTH = window.innerWidth - 2 * GLOBAL_PADDING;
-        var HEIGHT = window.innerHeight - 2 * GLOBAL_PADDING;
-
-        var editorContainer = document.getElementById('container')
-
-        editorContainer.style.position = 'absolute';
-        editorContainer.style.boxSizing = 'border-box';
-        editorContainer.style.top = GLOBAL_PADDING + 'px';
-        editorContainer.style.left = GLOBAL_PADDING + 'px';
-        editorContainer.style.width = WIDTH + 'px';
-        editorContainer.style.height = HEIGHT + 'px';
     }
 })();
