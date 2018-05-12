@@ -116,11 +116,11 @@ namespace feng3d.editor
      * 层级界面创建3D对象列表数据
      */
     export var createObjectConfig: MenuItem[] = [
-        //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
+        //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
         {
             label: "游戏对象", click: () =>
             {
-                addToHierarchy(GameObjectFactory.createGameObject());
+                addToHierarchy(gameObjectFactory.createGameObject());
             }
         },
         { type: "separator" },
@@ -130,49 +130,49 @@ namespace feng3d.editor
                 {
                     label: "平面", click: () =>
                     {
-                        addToHierarchy(GameObjectFactory.createPlane());
+                        addToHierarchy(gameObjectFactory.createPlane());
                     }
                 },
                 {
                     label: "立方体", click: () =>
                     {
-                        addToHierarchy(GameObjectFactory.createCube());
+                        addToHierarchy(gameObjectFactory.createCube());
                     }
                 },
                 {
                     label: "球体", click: () =>
                     {
-                        addToHierarchy(GameObjectFactory.createSphere());
+                        addToHierarchy(gameObjectFactory.createSphere());
                     }
                 },
                 {
                     label: "胶囊体", click: () =>
                     {
-                        addToHierarchy(GameObjectFactory.createCapsule());
+                        addToHierarchy(gameObjectFactory.createCapsule());
                     }
                 },
                 {
                     label: "圆柱体", click: () =>
                     {
-                        addToHierarchy(GameObjectFactory.createCylinder());
+                        addToHierarchy(gameObjectFactory.createCylinder());
                     }
                 },
                 {
                     label: "圆锥体", click: () =>
                     {
-                        addToHierarchy(GameObjectFactory.createCone());
+                        addToHierarchy(gameObjectFactory.createCone());
                     }
                 },
                 {
                     label: "圆环", click: () =>
                     {
-                        addToHierarchy(GameObjectFactory.createTorus());
+                        addToHierarchy(gameObjectFactory.createTorus());
                     }
                 },
                 {
                     label: "地形", click: () =>
                     {
-                        addToHierarchy(GameObjectFactory.createTerrain());
+                        addToHierarchy(gameObjectFactory.createTerrain());
                     }
                 },
             ],
@@ -183,7 +183,7 @@ namespace feng3d.editor
                 {
                     label: "点光源", click: () =>
                     {
-                        addToHierarchy(GameObjectFactory.createPointLight());
+                        addToHierarchy(gameObjectFactory.createPointLight());
                     }
                 },
                 {
@@ -199,13 +199,13 @@ namespace feng3d.editor
         {
             label: "粒子系统", click: () =>
             {
-                addToHierarchy(GameObjectFactory.createParticle());
+                addToHierarchy(gameObjectFactory.createParticle());
             }
         },
         {
             label: "摄像机", click: () =>
             {
-                addToHierarchy(GameObjectFactory.createCamera());
+                addToHierarchy(gameObjectFactory.createCamera());
             }
         },
     ];
@@ -226,7 +226,7 @@ namespace feng3d.editor
      * 层级界面创建3D对象列表数据
      */
     export var createComponentConfig: MenuItem[] = [
-        //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
+        //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
         {
             label: "Animator",
             submenu: [

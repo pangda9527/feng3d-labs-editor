@@ -1974,7 +1974,7 @@ var feng3d;
                     this.componentView.updateView();
             };
             ComponentView.prototype.onComplete = function () {
-                var componentName = feng3d.ClassUtils.getQualifiedClassName(this.component).split(".").pop();
+                var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
                 this.accordion.titleName = componentName;
                 this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
                 this.accordion.addContent(this.componentView);
@@ -2039,7 +2039,7 @@ var feng3d;
                 // 初始化Script属性面板
                 if (this.component instanceof feng3d.ScriptComponent) {
                     var component = this.component;
-                    var scriptClass = feng3d.ClassUtils.getDefinitionByName(component.script);
+                    var scriptClass = feng3d.classUtils.getDefinitionByName(component.script);
                     if (scriptClass) {
                         this.script = new scriptClass();
                         var scriptData = component.scriptData = component.scriptData || {};
@@ -2903,7 +2903,7 @@ var feng3d;
                 else {
                     this.text.enabled = false;
                     var valuename = this.attributeValue["name"] || "";
-                    this.text.text = valuename + " (" + feng3d.ClassUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
+                    this.text.text = valuename + " (" + feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
                     this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
                 }
                 if (this._textEnabled !== undefined)
@@ -3636,7 +3636,7 @@ var feng3d;
                 }
                 else {
                     var valuename = this.attributeValue["name"] || "";
-                    this.text.text = valuename + " (" + feng3d.ClassUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
+                    this.text.text = valuename + " (" + feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
                     this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
                 }
             };
@@ -7656,7 +7656,7 @@ var feng3d;
                     canvas.height = 80;
                     var toolEngine = new feng3d.Engine(canvas);
                     toolEngine.scene.background.a = 0.0;
-                    toolEngine.root.addChild(feng3d.GameObjectFactory.createPointLight());
+                    toolEngine.root.addChild(feng3d.gameObjectFactory.createPointLight());
                     return { toolEngine: toolEngine, canvas: canvas };
                 }
                 function onclick(e) {
@@ -8244,7 +8244,7 @@ var feng3d;
             var scene = feng3d.GameObject.create("Untitled").addComponent(feng3d.Scene3D);
             scene.background.setTo(0.408, 0.38, 0.357);
             scene.ambientColor.setTo(0.4, 0.4, 0.4);
-            var camera = feng3d.GameObjectFactory.createCamera("Main Camera");
+            var camera = feng3d.gameObjectFactory.createCamera("Main Camera");
             camera.transform.position = new feng3d.Vector3(0, 1, -10);
             scene.gameObject.addChild(camera);
             var directionalLight = feng3d.GameObject.create("DirectionalLight");
@@ -9427,8 +9427,8 @@ var feng3d;
             EditorEnvironment.prototype.init = function () {
                 document.body.oncontextmenu = function () { return false; };
                 //给反射添加查找的空间
-                feng3d.ClassUtils.addClassNameSpace("feng3d.editor");
-                feng3d.ClassUtils.addClassNameSpace("egret");
+                feng3d.classUtils.addClassNameSpace("feng3d.editor");
+                feng3d.classUtils.addClassNameSpace("egret");
                 //调整默认字体大小
                 egret.TextField.default_size = 12;
                 var oldfocusHandler = egret.InputController.prototype["focusHandler"];
@@ -10330,10 +10330,10 @@ var feng3d;
          * 层级界面创建3D对象列表数据
          */
         editor.createObjectConfig = [
-            //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
+            //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
             {
                 label: "游戏对象", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createGameObject());
+                    addToHierarchy(feng3d.gameObjectFactory.createGameObject());
                 }
             },
             { type: "separator" },
@@ -10342,42 +10342,42 @@ var feng3d;
                 submenu: [
                     {
                         label: "平面", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createPlane());
+                            addToHierarchy(feng3d.gameObjectFactory.createPlane());
                         }
                     },
                     {
                         label: "立方体", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createCube());
+                            addToHierarchy(feng3d.gameObjectFactory.createCube());
                         }
                     },
                     {
                         label: "球体", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createSphere());
+                            addToHierarchy(feng3d.gameObjectFactory.createSphere());
                         }
                     },
                     {
                         label: "胶囊体", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createCapsule());
+                            addToHierarchy(feng3d.gameObjectFactory.createCapsule());
                         }
                     },
                     {
                         label: "圆柱体", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createCylinder());
+                            addToHierarchy(feng3d.gameObjectFactory.createCylinder());
                         }
                     },
                     {
                         label: "圆锥体", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createCone());
+                            addToHierarchy(feng3d.gameObjectFactory.createCone());
                         }
                     },
                     {
                         label: "圆环", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createTorus());
+                            addToHierarchy(feng3d.gameObjectFactory.createTorus());
                         }
                     },
                     {
                         label: "地形", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createTerrain());
+                            addToHierarchy(feng3d.gameObjectFactory.createTerrain());
                         }
                     },
                 ],
@@ -10387,7 +10387,7 @@ var feng3d;
                 submenu: [
                     {
                         label: "点光源", click: function () {
-                            addToHierarchy(feng3d.GameObjectFactory.createPointLight());
+                            addToHierarchy(feng3d.gameObjectFactory.createPointLight());
                         }
                     },
                     {
@@ -10401,12 +10401,12 @@ var feng3d;
             },
             {
                 label: "粒子系统", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createParticle());
+                    addToHierarchy(feng3d.gameObjectFactory.createParticle());
                 }
             },
             {
                 label: "摄像机", click: function () {
-                    addToHierarchy(feng3d.GameObjectFactory.createCamera());
+                    addToHierarchy(feng3d.gameObjectFactory.createCamera());
                 }
             },
         ];
@@ -10422,7 +10422,7 @@ var feng3d;
          * 层级界面创建3D对象列表数据
          */
         editor.createComponentConfig = [
-            //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过ClassUtils.getDefinitionByName获取定义
+            //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
             {
                 label: "Animator",
                 submenu: [

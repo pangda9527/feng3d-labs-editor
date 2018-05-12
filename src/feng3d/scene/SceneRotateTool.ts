@@ -138,7 +138,7 @@ namespace feng3d.editor
                 canvas.height = 80;
                 var toolEngine = new Engine(canvas);
                 toolEngine.scene.background.a = 0.0;
-                toolEngine.root.addChild(GameObjectFactory.createPointLight());
+                toolEngine.root.addChild(gameObjectFactory.createPointLight());
                 return { toolEngine, canvas };
             }
 

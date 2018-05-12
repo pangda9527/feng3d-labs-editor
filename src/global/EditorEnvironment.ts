@@ -13,8 +13,8 @@ namespace feng3d.editor
             document.body.oncontextmenu = function () { return false; }
 
             //给反射添加查找的空间
-            ClassUtils.addClassNameSpace("feng3d.editor");
-            ClassUtils.addClassNameSpace("egret");
+            classUtils.addClassNameSpace("feng3d.editor");
+            classUtils.addClassNameSpace("egret");
 
             //调整默认字体大小
             egret.TextField.default_size = 12;

@@ -92,7 +92,7 @@ namespace feng3d.editor
 			{
 				this.text.enabled = false;
 				var valuename = this.attributeValue["name"] || "";
-				this.text.text = valuename + " (" + ClassUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
+				this.text.text = valuename + " (" + classUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
 				this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
 			}
 			if (this._textEnabled !== undefined)

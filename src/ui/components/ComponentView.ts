@@ -41,7 +41,7 @@ namespace feng3d.editor
 
 		private onComplete()
 		{
-			var componentName = ClassUtils.getQualifiedClassName(this.component).split(".").pop();
+			var componentName = classUtils.getQualifiedClassName(this.component).split(".").pop();
 			this.accordion.titleName = componentName;
 			this.componentView = objectview.getObjectView(this.component, false, ["enabled"]);
 			this.accordion.addContent(this.componentView);
@@ -133,7 +133,7 @@ namespace feng3d.editor
 			if (this.component instanceof ScriptComponent)
 			{
 				var component = this.component;
-				var scriptClass = ClassUtils.getDefinitionByName(component.script);
+				var scriptClass = classUtils.getDefinitionByName(component.script);
 				if (scriptClass)
 				{
 					this.script = new scriptClass();
