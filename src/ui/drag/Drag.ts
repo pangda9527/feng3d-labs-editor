@@ -1,11 +1,58 @@
 namespace feng3d.editor
 {
-	export var drag = {
-		register: register,
-		unregister: unregister,
+	export var drag: Drag;
+
+	export class Drag
+	{
+		register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragData)[], onDragDrop?: (dragSource: DragData) => void)
+		{
+			this.unregister(displayObject);
+			registers.push({ displayObject: displayObject, setdargSource: setdargSource, accepttypes: accepttypes, onDragDrop: onDragDrop });
+
+			if (setdargSource)
+				displayObject.addEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null, false, 1000);
+		}
+		unregister(displayObject: egret.DisplayObject)
+		{
+			for (var i = registers.length - 1; i >= 0; i--)
+			{
+				if (registers[i].displayObject == displayObject)
+				{
+					registers.splice(i, 1);
+				}
+			}
+			displayObject.removeEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null);
+		}
 		/** 当拖拽过程中拖拽数据发生变化时调用该方法刷新可接受对象列表 */
-		refreshAcceptables: refreshAcceptables,
+		refreshAcceptables()
+		{
+			acceptableitems && acceptableitems.forEach(element =>
+			{
+				element.displayObject.removeEventListener(egret.MouseEvent.MOUSE_OVER, onMouseOver, null)
+				element.displayObject.removeEventListener(egret.MouseEvent.MOUSE_OUT, onMouseOut, null)
+			});
+			acceptableitems = null;
+
+			//获取可接受数据的对象列表
+			acceptableitems = registers.reduce((value: DragItem[], item) =>
+			{
+				if (item != dragitem && acceptData(item, dragSource))
+				{
+					value.push(item);
+				}
+				return value;
+			}, []);
+
+			acceptableitems.forEach(element =>
+			{
+				element.displayObject.addEventListener(egret.MouseEvent.MOUSE_OVER, onMouseOver, null)
+				element.displayObject.addEventListener(egret.MouseEvent.MOUSE_OUT, onMouseOut, null)
+			});
+		}
 	};
+
+
+	drag = new Drag();
 
 	/**
 	 * 拖拽数据
@@ -58,27 +105,6 @@ namespace feng3d.editor
 	 * 可接受拖拽数据对象列表
 	 */
 	var acceptableitems: DragItem[];
-
-	function unregister(displayObject: egret.DisplayObject)
-	{
-		for (var i = registers.length - 1; i >= 0; i--)
-		{
-			if (registers[i].displayObject == displayObject)
-			{
-				registers.splice(i, 1);
-			}
-		}
-		displayObject.removeEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null);
-	}
-
-	function register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragData)[], onDragDrop?: (dragSource: DragData) => void)
-	{
-		unregister(displayObject);
-		registers.push({ displayObject: displayObject, setdargSource: setdargSource, accepttypes: accepttypes, onDragDrop: onDragDrop });
-
-		if (setdargSource)
-			displayObject.addEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null, false, 1000);
-	}
 
 	function getitem(displayObject: egret.DisplayObject)
 	{
@@ -151,32 +177,6 @@ namespace feng3d.editor
 		//获取拖拽数据
 		dragSource = {};
 		dragitem.setdargSource(dragSource);
-
-		//获取可接受数据的对象列表
-		acceptableitems = registers.reduce((value: DragItem[], item) =>
-		{
-			if (item != dragitem && acceptData(item, dragSource))
-			{
-				value.push(item);
-			}
-			return value;
-		}, []);
-
-		acceptableitems.forEach(element =>
-		{
-			element.displayObject.addEventListener(egret.MouseEvent.MOUSE_OVER, onMouseOver, null)
-			element.displayObject.addEventListener(egret.MouseEvent.MOUSE_OUT, onMouseOut, null)
-		});
-	}
-
-	function refreshAcceptables()
-	{
-		acceptableitems && acceptableitems.forEach(element =>
-		{
-			element.displayObject.removeEventListener(egret.MouseEvent.MOUSE_OVER, onMouseOver, null)
-			element.displayObject.removeEventListener(egret.MouseEvent.MOUSE_OUT, onMouseOut, null)
-		});
-		acceptableitems = null;
 
 		//获取可接受数据的对象列表
 		acceptableitems = registers.reduce((value: DragItem[], item) =>

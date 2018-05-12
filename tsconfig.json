@@ -25,18 +25,18 @@
         //
         "src/io/io.ts",
         //
-        "src/caches/editorcache.ts",
+        "src/caches/Editorcache.ts",
         //
-        "src/ui/drag/drag.ts",
+        "src/ui/drag/Drag.ts",
         //
-        "src/shortcut/editorshortcut.ts",
+        "src/shortcut/Editorshortcut.ts",
         //
         "src/ui/Feng3dView.ts",
         "src/ui/CameraPreview.ts",
         "src/ui/components/RenameTextInput.ts",
         "src/ui/components/SplitGroup.ts",
-        "src/ui/components/maskview.ts",
-        "src/ui/components/popupview.ts",
+        "src/ui/components/Maskview.ts",
+        "src/ui/components/Popupview.ts",
         "src/ui/components/ComboBox.ts",
         "src/ui/components/Accordion.ts",
         "src/ui/components/ColorPicker.ts",
@@ -45,7 +45,7 @@
         "src/ui/components/Tree.ts",
         "src/ui/components/Vector3DView.ts",
         "src/ui/components/ComponentView.ts",
-        "src/ui/components/menu.ts",
+        "src/ui/components/Menu.ts",
         //
         "src/objectview/ov/OVBaseDefault.ts",
         "src/objectview/ov/OVDefault.ts",
@@ -75,7 +75,7 @@
         "src/ui/hierarchy/HierarchyTreeItemRenderer.ts",
         "src/ui/hierarchy/HierarchyView.ts",
         //
-        "src/ui/assets/editorAssets.ts",
+        "src/ui/assets/EditorAssets.ts",
         "src/ui/assets/AssetsFile.ts",
         "src/ui/assets/AssetsFileItemRenderer.ts",
         "src/ui/assets/AssetsTreeItemRenderer.ts",

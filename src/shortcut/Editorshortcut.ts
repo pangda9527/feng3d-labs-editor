@@ -1,90 +1,92 @@
 namespace feng3d.editor
 {
-    export var editorshortcut = {
-        init: init,
-    };
+    export var editorshortcut: Editorshortcut;
+    export class Editorshortcut
+    {
+        init()
+        {
+            //监听命令
+            shortcut.on("deleteSeletedGameObject", onDeleteSeletedGameObject);
+
+            shortcut.on("gameobjectMoveTool", () =>
+            {
+                mrsTool.toolType = MRSToolType.MOVE;
+            });
+            shortcut.on("gameobjectRotationTool", () =>
+            {
+                mrsTool.toolType = MRSToolType.ROTATION;
+            });
+            shortcut.on("gameobjectScaleTool", () =>
+            {
+                mrsTool.toolType = MRSToolType.SCALE;
+            });
+            shortcut.on("selectGameObject", () =>
+            {
+                var gameObject = engine.mouse3DManager.getSelectedGameObject();
+                if (!gameObject || !gameObject.scene)
+                {
+                    editorData.selectedObjects = null;
+                    return;
+                }
+                if (editorData.mrsToolObject == gameObject)
+                    return;
+                var node = hierarchyTree.getNode(gameObject);
+                while (!node && gameObject.parent)
+                {
+                    if (editorData.mrsToolObject == gameObject)
+                        return;
+                    gameObject = gameObject.parent;
+                    node = hierarchyTree.getNode(gameObject);
+                }
+                if (gameObject != gameObject.scene.gameObject)
+                {
+                    editorData.selectObject(gameObject);
+                } else
+                {
+                    editorData.selectedObjects = null;
+                }
+            });
+            var preMousePoint: Vector2;
+            shortcut.on("sceneCameraForwardBackMouseMoveStart", () =>
+            {
+                preMousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+            });
+            shortcut.on("sceneCameraForwardBackMouseMove", () =>
+            {
+                var currentMousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+                var moveDistance = (currentMousePoint.x + currentMousePoint.y - preMousePoint.x - preMousePoint.y) * sceneControlConfig.sceneCameraForwardBackwardStep;
+                sceneControlConfig.lookDistance -= moveDistance;
+
+                var forward = editorCamera.transform.localToWorldMatrix.forward;
+                var camerascenePosition = editorCamera.transform.scenePosition;
+                var newCamerascenePosition = new Vector3(
+                    forward.x * moveDistance + camerascenePosition.x,
+                    forward.y * moveDistance + camerascenePosition.y,
+                    forward.z * moveDistance + camerascenePosition.z);
+                var newCameraPosition = editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
+                editorCamera.transform.position = newCameraPosition;
+
+                preMousePoint = currentMousePoint;
+            });
+            //
+            shortcut.on("lookToSelectedGameObject", onLookToSelectedGameObject);
+            shortcut.on("dragSceneStart", onDragSceneStart);
+            shortcut.on("dragScene", onDragScene);
+            shortcut.on("fpsViewStart", onFpsViewStart);
+            shortcut.on("fpsViewStop", onFpsViewStop);
+            shortcut.on("mouseRotateSceneStart", onMouseRotateSceneStart);
+            shortcut.on("mouseRotateScene", onMouseRotateScene);
+            shortcut.on("mouseWheelMoveSceneCamera", onMouseWheelMoveSceneCamera);
+        }
+    }
+
+    editorshortcut = new Editorshortcut();
 
     var dragSceneMousePoint: Vector2;
     var dragSceneCameraGlobalMatrix3D: Matrix4x4;
     var rotateSceneCenter: Vector3;
     var rotateSceneCameraGlobalMatrix3D: Matrix4x4;
     var rotateSceneMousePoint: Vector2;
-
-    function init()
-    {
-        //监听命令
-        shortcut.on("deleteSeletedGameObject", onDeleteSeletedGameObject);
-
-        shortcut.on("gameobjectMoveTool", () =>
-        {
-            mrsTool.toolType = MRSToolType.MOVE;
-        });
-        shortcut.on("gameobjectRotationTool", () =>
-        {
-            mrsTool.toolType = MRSToolType.ROTATION;
-        });
-        shortcut.on("gameobjectScaleTool", () =>
-        {
-            mrsTool.toolType = MRSToolType.SCALE;
-        });
-        shortcut.on("selectGameObject", () =>
-        {
-            var gameObject = engine.mouse3DManager.getSelectedGameObject();
-            if (!gameObject || !gameObject.scene)
-            {
-                editorData.selectedObjects = null;
-                return;
-            }
-            if (editorData.mrsToolObject == gameObject)
-                return;
-            var node = hierarchyTree.getNode(gameObject);
-            while (!node && gameObject.parent)
-            {
-                if (editorData.mrsToolObject == gameObject)
-                    return;
-                gameObject = gameObject.parent;
-                node = hierarchyTree.getNode(gameObject);
-            }
-            if (gameObject != gameObject.scene.gameObject)
-            {
-                editorData.selectObject(gameObject);
-            } else
-            {
-                editorData.selectedObjects = null;
-            }
-        });
-        var preMousePoint: Vector2;
-        shortcut.on("sceneCameraForwardBackMouseMoveStart", () =>
-        {
-            preMousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-        });
-        shortcut.on("sceneCameraForwardBackMouseMove", () =>
-        {
-            var currentMousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-            var moveDistance = (currentMousePoint.x + currentMousePoint.y - preMousePoint.x - preMousePoint.y) * sceneControlConfig.sceneCameraForwardBackwardStep;
-            sceneControlConfig.lookDistance -= moveDistance;
-
-            var forward = editorCamera.transform.localToWorldMatrix.forward;
-            var camerascenePosition = editorCamera.transform.scenePosition;
-            var newCamerascenePosition = new Vector3(
-                forward.x * moveDistance + camerascenePosition.x,
-                forward.y * moveDistance + camerascenePosition.y,
-                forward.z * moveDistance + camerascenePosition.z);
-            var newCameraPosition = editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
-            editorCamera.transform.position = newCameraPosition;
-
-            preMousePoint = currentMousePoint;
-        });
-        //
-        shortcut.on("lookToSelectedGameObject", onLookToSelectedGameObject);
-        shortcut.on("dragSceneStart", onDragSceneStart);
-        shortcut.on("dragScene", onDragScene);
-        shortcut.on("fpsViewStart", onFpsViewStart);
-        shortcut.on("fpsViewStop", onFpsViewStop);
-        shortcut.on("mouseRotateSceneStart", onMouseRotateSceneStart);
-        shortcut.on("mouseRotateScene", onMouseRotateScene);
-        shortcut.on("mouseWheelMoveSceneCamera", onMouseWheelMoveSceneCamera);
-    }
 
     function onDeleteSeletedGameObject()
     {

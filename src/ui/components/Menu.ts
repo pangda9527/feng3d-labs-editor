@@ -1,5 +1,10 @@
 namespace feng3d.editor
 {
+    /**
+     * 菜单
+     */
+    export var menu: Menu;
+
     export type MenuItem = {
         /**
          * 显示标签
@@ -15,11 +20,17 @@ namespace feng3d.editor
          */
         submenu?: MenuItem[]
     };
-    export type Menu = MenuItem[];
 
-    export var menu = {
-        popup: popup,
+    export class Menu
+    {
+        popup(menu: MenuItem[], mousex?: number, mousey?: number, width = 150)
+        {
+            var menuUI = MenuUI.create(menu, mousex, mousey, width);
+            maskview.mask(menuUI);
+        }
     };
+
+    menu = new Menu();
 
     export class MenuUI extends eui.List
     {
@@ -52,7 +63,7 @@ namespace feng3d.editor
             this.onComplete();
         }
 
-        static create(menu: Menu, mousex?: number, mousey?: number, width = 150)
+        static create(menu: MenuItem[], mousex?: number, mousey?: number, width = 150)
         {
             var menuUI = new MenuUI();
             var dataProvider = new eui.ArrayCollection();
@@ -105,12 +116,6 @@ namespace feng3d.editor
         {
             this.parent && this.parent.removeChild(this);
         }
-    }
-
-    function popup(menu: Menu, mousex?: number, mousey?: number, width = 150)
-    {
-        var menuUI = MenuUI.create(menu, mousex, mousey, width);
-        maskview.mask(menuUI);
     }
 
     // let template = [{
