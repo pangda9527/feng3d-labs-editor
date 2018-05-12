@@ -46,14 +46,16 @@ namespace feng3d.editor
                         console.log("导入项目完成");
                         editorAssets.initproject(editorAssets.projectname, () =>
                         {
-                            editorAssets.readScene("default.scene.json", (err, scene) =>
+                            editorAssets.runProjectScript(() =>
                             {
-                                engine.scene = scene;
-                                editorui.assetsview.updateShowFloder();
-                                assetsDispather.dispatch("changed");
-                                console.log("导入项目完成!");
+                                editorAssets.readScene("default.scene.json", (err, scene) =>
+                                {
+                                    engine.scene = scene;
+                                    editorui.assetsview.updateShowFloder();
+                                    assetsDispather.dispatch("changed");
+                                    console.log("导入项目完成!");
+                                });
                             });
-
                         });
                     });
                 });
@@ -94,12 +96,15 @@ namespace feng3d.editor
                 {
                     editorAssets.initproject(editorAssets.projectname, () =>
                     {
-                        editorAssets.readScene("default.scene.json", (err, scene) =>
+                        editorAssets.runProjectScript(() =>
                         {
-                            engine.scene = scene;
-                            editorui.assetsview.updateShowFloder();
-                            assetsDispather.dispatch("changed");
-                            console.log("导入项目完成!");
+                            editorAssets.readScene("default.scene.json", (err, scene) =>
+                            {
+                                engine.scene = scene;
+                                editorui.assetsview.updateShowFloder();
+                                assetsDispather.dispatch("changed");
+                                console.log("导入项目完成!");
+                            });
                         });
                     });
                 }, true);
@@ -280,12 +285,15 @@ namespace feng3d.editor
             {
                 editorAssets.initproject(editorAssets.projectname, () =>
                 {
-                    editorAssets.readScene("default.scene.json", (err, scene) =>
+                    editorAssets.runProjectScript(() =>
                     {
-                        engine.scene = scene;
-                        editorui.assetsview.updateShowFloder();
-                        assetsDispather.dispatch("changed");
-                        console.log("projectname 项目下载完成!");
+                        editorAssets.readScene("default.scene.json", (err, scene) =>
+                        {
+                            engine.scene = scene;
+                            editorui.assetsview.updateShowFloder();
+                            assetsDispather.dispatch("changed");
+                            console.log("projectname 项目下载完成!");
+                        });
                     });
                 });
             });

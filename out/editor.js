@@ -27,6 +27,18 @@ var feng3d;
                  * 图片
                  */
                 this.image = /(.jpg|.png|.jpeg)\b/i;
+                /**
+                 * 命名空间
+                 */
+                this.namespace = /namespace\s+([\w$_\d\.]+)/;
+                /**
+                 * 导出类
+                 */
+                this.exportClass = /export\s+(abstract\s+)?class\s+([\w$_\d]+)(\s+extends\s+([\w$_\d]+))?/;
+                /**
+                 * 导出脚本类
+                 */
+                this.scriptClass = /(export\s+)?class\s+([\w$_\d]+)\s+extends\s+((feng3d\.)?Script)/;
             }
             return RegExps;
         }());
@@ -2002,22 +2014,22 @@ var feng3d;
                 }
             };
             ComponentView.prototype.initScriptView = function () {
-                var _this = this;
                 // 初始化Script属性面板
                 if (this.component instanceof feng3d.ScriptComponent) {
                     var component = this.component;
-                    feng3d.ScriptComponent.addScript(component.script, function (scriptClass) {
-                        _this.script = new scriptClass();
+                    var scriptClass = feng3d.ClassUtils.getDefinitionByName(component.script);
+                    if (scriptClass) {
+                        this.script = new scriptClass();
                         var scriptData = component.scriptData = component.scriptData || {};
                         for (var key in scriptData) {
                             if (scriptData.hasOwnProperty(key)) {
-                                _this.script[key] = scriptData[key];
+                                this.script[key] = scriptData[key];
                             }
                         }
-                        _this.scriptView = feng3d.objectview.getObjectView(_this.script, false);
-                        _this.scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, _this.saveScriptData, _this);
-                        _this.accordion.addContent(_this.scriptView);
-                    });
+                        this.scriptView = feng3d.objectview.getObjectView(this.script, false);
+                        this.scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+                        this.accordion.addContent(this.scriptView);
+                    }
                 }
             };
             ComponentView.prototype.saveScriptData = function () {
@@ -3954,7 +3966,6 @@ var feng3d;
                             {
                                 label: "脚本文件", click: function () {
                                     assetsFile.addfile("NewScript.ts", editor.assetsFileTemplates.NewScript);
-                                    assetsFile.addfile("NewScript.js", editor.assetsFileTemplates.scriptCompile);
                                 }
                             },
                             {
@@ -4144,6 +4155,15 @@ var feng3d;
                         break;
                 }
             },
+            runProjectScript: function (callback) {
+                editor.fs.readFileAsString("project.js", function (err, content) {
+                    //
+                    var windowEval = eval.bind(window);
+                    // 运行project.js
+                    windowEval(content);
+                    callback();
+                });
+            }
         };
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -4685,6 +4705,28 @@ var feng3d;
                 } while (childrennames.indexOf(path) != -1);
                 return path;
             };
+            /**
+             * 获取脚本类名称
+             * @param callback 回调函数
+             */
+            AssetsFile.prototype.getScriptClassName = function (callback) {
+                var _this = this;
+                if (this.extension != AssetExtension.ts)
+                    return "";
+                this.getData(function (code) {
+                    // 获取脚本类名称
+                    var result = editor.regExps.scriptClass.exec(code);
+                    feng3d.assert(result != null, "\u5728\u811A\u672C " + _this.path + " \u4E2D\u6CA1\u6709\u627E\u5230 \u811A\u672C\u7C7B\u5B9A\u4E49");
+                    var script = result[2];
+                    // 获取导出类命名空间
+                    if (result[1]) {
+                        result = editor.regExps.namespace.exec(code);
+                        feng3d.assert(result != null, "\u83B7\u53D6\u811A\u672C " + _this.path + " \u547D\u540D\u7A7A\u95F4\u5931\u8D25");
+                        script = result[1] + "." + script;
+                    }
+                    callback(script);
+                });
+            };
             return AssetsFile;
         }(editor.TreeNode));
         editor.AssetsFile = AssetsFile;
@@ -4738,7 +4780,9 @@ var feng3d;
                                     dragsource.file_gameobject = _this.data.path;
                                     break;
                                 case editor.AssetExtension.ts:
-                                    dragsource.file_script = _this.data.path;
+                                    _this.data.getScriptClassName(function (scriptClassName) {
+                                        dragsource.file_script = scriptClassName;
+                                    });
                                     break;
                                 case editor.AssetExtension.anim:
                                     var path = _this.data.path;
@@ -5116,7 +5160,6 @@ var feng3d;
     (function (editor) {
         editor.assetsFileTemplates = {
             NewScript: "namespace feng3d\n{\n    export class NewScript extends Script\n    {\n        /**\n         * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n         */\n        init()\n        {\n\n        }\n\n        /**\n         * \u66F4\u65B0\n         */\n        update()\n        {\n            log(this.transform.position);\n        }\n\n        /**\n         * \u9500\u6BC1\u65F6\u8C03\u7528\n         */\n        dispose()\n        {\n\n        }\n    }\n}",
-            scriptCompile: "var __extends = (this && this.__extends) || (function () {\n    var extendStatics = Object.setPrototypeOf ||\n        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||\n        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };\n    return function (d, b) {\n        extendStatics(d, b);\n        function __() { this.constructor = d; }\n        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\n    };\n})();\nvar feng3d;\n(function (feng3d) {\n    var NewScript = /** @class */ (function (_super) {\n        __extends(NewScript, _super);\n        function NewScript() {\n            return _super !== null && _super.apply(this, arguments) || this;\n        }\n        /**\n         * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n         */\n        NewScript.prototype.init = function () {\n        };\n        /**\n         * \u66F4\u65B0\n         */\n        NewScript.prototype.update = function () {\n            feng3d.log(this.transform.position);\n        };\n        /**\n         * \u9500\u6BC1\u65F6\u8C03\u7528\n         */\n        NewScript.prototype.dispose = function () {\n        };\n        return NewScript;\n    }(feng3d.Script));\n    feng3d.NewScript = NewScript;\n})(feng3d || (feng3d = {}));\n"
         };
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
@@ -8082,11 +8125,13 @@ var feng3d;
                 editor.engine = new EditorEngine(canvas, null, editor.editorCamera);
                 editor.engine.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
                 //
-                editor.editorAssets.readScene("default.scene.json", function (err, scene) {
-                    if (err)
-                        editor.engine.scene = newScene();
-                    else
-                        editor.engine.scene = scene;
+                editor.editorAssets.runProjectScript(function () {
+                    editor.editorAssets.readScene("default.scene.json", function (err, scene) {
+                        if (err)
+                            editor.engine.scene = newScene();
+                        else
+                            editor.engine.scene = scene;
+                    });
                 });
                 window.addEventListener("beforeunload", function () {
                     editor.editorAssets.saveScene("default.scene.json", editor.engine.scene);
@@ -10164,11 +10209,13 @@ var feng3d;
                         editor.fs.importProject(filelist.item(0), function () {
                             console.log("导入项目完成");
                             editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
-                                editor.editorAssets.readScene("default.scene.json", function (err, scene) {
-                                    editor.engine.scene = scene;
-                                    editor.editorui.assetsview.updateShowFloder();
-                                    editor.assetsDispather.dispatch("changed");
-                                    console.log("导入项目完成!");
+                                editor.editorAssets.runProjectScript(function () {
+                                    editor.editorAssets.readScene("default.scene.json", function (err, scene) {
+                                        editor.engine.scene = scene;
+                                        editor.editorui.assetsview.updateShowFloder();
+                                        editor.assetsDispather.dispatch("changed");
+                                        console.log("导入项目完成!");
+                                    });
                                 });
                             });
                         });
@@ -10203,11 +10250,13 @@ var feng3d;
                 click: function () {
                     editor.editorAssets.deletefile(editor.editorAssets.assetsPath, function () {
                         editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
-                            editor.editorAssets.readScene("default.scene.json", function (err, scene) {
-                                editor.engine.scene = scene;
-                                editor.editorui.assetsview.updateShowFloder();
-                                editor.assetsDispather.dispatch("changed");
-                                console.log("导入项目完成!");
+                            editor.editorAssets.runProjectScript(function () {
+                                editor.editorAssets.readScene("default.scene.json", function (err, scene) {
+                                    editor.engine.scene = scene;
+                                    editor.editorui.assetsview.updateShowFloder();
+                                    editor.assetsDispather.dispatch("changed");
+                                    console.log("导入项目完成!");
+                                });
                             });
                         });
                     }, true);
@@ -10363,11 +10412,13 @@ var feng3d;
             feng3d.Loader.loadBinary(path, function (content) {
                 editor.fs.importProject(content, function () {
                     editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
-                        editor.editorAssets.readScene("default.scene.json", function (err, scene) {
-                            editor.engine.scene = scene;
-                            editor.editorui.assetsview.updateShowFloder();
-                            editor.assetsDispather.dispatch("changed");
-                            console.log("projectname 项目下载完成!");
+                        editor.editorAssets.runProjectScript(function () {
+                            editor.editorAssets.readScene("default.scene.json", function (err, scene) {
+                                editor.engine.scene = scene;
+                                editor.editorui.assetsview.updateShowFloder();
+                                editor.assetsDispather.dispatch("changed");
+                                console.log("projectname 项目下载完成!");
+                            });
                         });
                     });
                 });

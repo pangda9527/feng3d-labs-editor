@@ -133,7 +133,8 @@ namespace feng3d.editor
 			if (this.component instanceof ScriptComponent)
 			{
 				var component = this.component;
-				ScriptComponent.addScript(component.script, (scriptClass) =>
+				var scriptClass = ClassUtils.getDefinitionByName(component.script);
+				if (scriptClass)
 				{
 					this.script = new scriptClass();
 					var scriptData = component.scriptData = component.scriptData || {};
@@ -147,7 +148,7 @@ namespace feng3d.editor
 					this.scriptView = objectview.getObjectView(this.script, false);
 					this.scriptView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
 					this.accordion.addContent(this.scriptView);
-				});
+				}
 			}
 		}
 

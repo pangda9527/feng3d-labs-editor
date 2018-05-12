@@ -200,9 +200,9 @@ var editor;
     {
         try
         {
-            var text = editor.getValue();
+            var code = tslist.map((v) => v.code).join("/n");
 
-            var output = transpileModule(editor.getValue(), {
+            var output = transpileModule(code, {
                 // module: ts.ModuleKind.AMD,
                 target: ts.ScriptTarget.ES5,
                 noLib: true,
@@ -211,10 +211,12 @@ var editor;
             });
             if (typeof output === "string")
             {
+                output += `\n//# sourceURL=project.js`;
                 feng3d.dataTransform.stringToArrayBuffer(output, (arrayBuffer) =>
                 {
                     codedata.data = arrayBuffer;
-                    feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
+                    // feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
+                    feng3d.storage.set(DBname, project, "project.js", codedata);
                     logLabel.textContent = "编译完成！";
                 });
             }
@@ -228,6 +230,7 @@ var editor;
     function transpileModule(input, options)
     {
         var inputFileName = options.jsx ? "module.tsx" : "module.ts";
+
         var sourceFile = ts.createSourceFile(inputFileName, feng3ddts + input, options.target || ts.ScriptTarget.ES5);
         // Output
         var outputText;

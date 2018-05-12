@@ -154,7 +154,6 @@ namespace feng3d.editor
                                 label: "脚本文件", click: () =>
                                 {
                                     assetsFile.addfile("NewScript.ts", assetsFileTemplates.NewScript);
-                                    assetsFile.addfile("NewScript.js", assetsFileTemplates.scriptCompile);
                                 }
                             },
                             {
@@ -386,5 +385,16 @@ namespace feng3d.editor
                     break;
             }
         },
+        runProjectScript(callback: () => void)
+        {
+            fs.readFileAsString("project.js", (err, content) =>
+            {
+                //
+                var windowEval = eval.bind(window);
+                // 运行project.js
+                windowEval(content);
+                callback();
+            });
+        }
     };
 }

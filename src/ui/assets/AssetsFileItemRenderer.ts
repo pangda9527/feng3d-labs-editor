@@ -65,7 +65,10 @@ namespace feng3d.editor
                                 dragsource.file_gameobject = this.data.path;
                                 break;
                             case AssetExtension.ts:
-                                dragsource.file_script = this.data.path;
+                                this.data.getScriptClassName((scriptClassName) =>
+                                {
+                                    dragsource.file_script = scriptClassName;
+                                });
                                 break;
                             case AssetExtension.anim:
                                 var path = this.data.path;
