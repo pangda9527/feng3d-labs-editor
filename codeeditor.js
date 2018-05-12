@@ -3,12 +3,21 @@
 
 // 参考 https://microsoft.github.io/monaco-editor/api/index.html
 
-var editor;
+var monacoEditor;
 (function ()
 {
     var compileButton = document.getElementById("compile");
     var watchCB = document.getElementById("watch");
     var logLabel = document.getElementById("log");
+    var codeeditorDiv = document.getElementById("codeeditorDiv");
+
+    window.onkeyup = (e) =>
+    {
+        if (e.key == "Escape")
+        {
+            codeeditorDiv.style.display = "none";
+        }
+    }
 
     compileButton.onclick = () =>
     {
@@ -97,7 +106,7 @@ var editor;
                     var code = str;
                     initEditor(extension, function ()
                     {
-                        editor.setValue(code);
+                        monacoEditor.setValue(code);
                         if (extension == "ts")
                         {
                             loadallts(() =>
@@ -106,10 +115,10 @@ var editor;
                                 triggerCompile();
                             });
                         }
-                        editor.onDidChangeModelContent(function ()
+                        monacoEditor.onDidChangeModelContent(function ()
                         {
                             logLabel.textContent = "";
-                            code = editor.getValue();
+                            code = monacoEditor.getValue();
                             feng3d.dataTransform.stringToArrayBuffer(code, (arrayBuffer) =>
                             {
                                 codedata.data = arrayBuffer;
@@ -129,7 +138,6 @@ var editor;
             });
         }
     }
-
 
     function initEditor(extension, callback)
     {
@@ -160,7 +168,7 @@ var editor;
                     feng3ddts = response.responseText;
                     monaco.languages.typescript.typescriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
 
-                    editor = monaco.editor.create(document.getElementById('container'), {
+                    monacoEditor = monaco.editor.create(document.getElementById('container'), {
                         value: "",
                         language: 'typescript',
                         formatOnType: true
@@ -170,26 +178,27 @@ var editor;
                 {
                     feng3ddts = response.responseText;
                     monaco.languages.typescript.javascriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
-                    editor = monaco.editor.create(document.getElementById('container'), {
+                    monacoEditor = monaco.editor.create(document.getElementById('container'), {
                         value: "",
                         language: 'javascript',
                         formatOnType: true
                     });
                 } else if (extension == "json")
                 {
-                    editor = monaco.editor.create(document.getElementById('container'), {
+                    monacoEditor = monaco.editor.create(document.getElementById('container'), {
                         value: "",
                         language: 'json',
                         formatOnType: true
                     });
                 } else 
                 {
-                    editor = monaco.editor.create(document.getElementById('container'), {
+                    monacoEditor = monaco.editor.create(document.getElementById('container'), {
                         value: "",
                         language: 'text',
                         formatOnType: true
                     });
                 }
+
                 callback();
             });
         });
