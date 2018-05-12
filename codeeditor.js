@@ -15,6 +15,26 @@ var editor;
         triggerCompile();
     };
 
+    var timeoutid = 0;
+
+    function autoCompile()
+    {
+        logLabel.textContent = "编码中。。。。";
+
+        if (timeoutid)
+            clearTimeout(timeoutid);
+
+        timeoutid = setTimeout(() =>
+        {
+            if (timeoutid)
+            {
+                clearTimeout(timeoutid);
+                logLabel.textContent = "自动编译中。。。。";
+                triggerCompile();
+            }
+        }, 1000);
+    }
+
     var fstype = GetQueryString("fstype");
     var code;
     var codedata;
@@ -28,6 +48,8 @@ var editor;
         var extension = decodeURI(GetQueryString("extension"));
         if (!extension)
             extension = path.split(".").pop();
+
+        document.head.getElementsByTagName("title")[0].innerText = path;
 
         feng3d.storage.get(DBname, project, path, function (err, data)
         {
@@ -62,8 +84,7 @@ var editor;
                         feng3d.storage.set(DBname, project, path, codedata);
                         if (extension == "ts" && watch.checked)
                         {
-                            logLabel.textContent = "自动编译中。。。。";
-                            triggerCompile();
+                            autoCompile();
                         }
                     })
                 });
