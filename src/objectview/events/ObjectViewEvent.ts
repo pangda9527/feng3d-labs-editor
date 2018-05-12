@@ -3,7 +3,7 @@ namespace feng3d
 
 	export class ObjectViewEvent extends egret.Event
 	{
-		static VALUE_CHANGE: string;
+		static VALUE_CHANGE = "valuechange";
 		space: any;
 		attributeName: string;
 		attributeValue: any;

@@ -145,6 +145,7 @@ namespace feng3d.editor
 						}
 					}
 					this.scriptView = objectview.getObjectView(this.script, false);
+					this.scriptView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
 					this.accordion.addContent(this.scriptView);
 				});
 			}

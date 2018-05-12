@@ -2015,6 +2015,7 @@ var feng3d;
                             }
                         }
                         _this.scriptView = feng3d.objectview.getObjectView(_this.script, false);
+                        _this.scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, _this.saveScriptData, _this);
                         _this.accordion.addContent(_this.scriptView);
                     });
                 }
@@ -2697,6 +2698,7 @@ var feng3d;
         ObjectViewEvent.prototype.toString = function () {
             return "[{0} type=\"{1}\" space=\"{2}\"  attributeName=\"{3}\" attributeValue={4}]".replace("{0}", egret.getQualifiedClassName(this).split("::").pop()).replace("{1}", this.type).replace("{2}", egret.getQualifiedClassName(this).split("::").pop()).replace("{3}", this.attributeName).replace("{4}", JSON.stringify(this.attributeValue));
         };
+        ObjectViewEvent.VALUE_CHANGE = "valuechange";
         return ObjectViewEvent;
     }(egret.Event));
     feng3d.ObjectViewEvent = ObjectViewEvent;
