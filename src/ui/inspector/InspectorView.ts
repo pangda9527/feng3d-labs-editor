@@ -24,8 +24,6 @@ namespace feng3d.editor
 
 		private onComplete(): void
 		{
-			this.group.percentWidth = 100;
-
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
 			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
@@ -75,12 +73,14 @@ namespace feng3d.editor
 					{
 						this.view = objectview.getObjectView(showdata);
 						this.view.percentWidth = 100;
+						this.view.percentHeight = 100;
 						this.group.addChild(this.view);
 					});
 				} else
 				{
 					this.view = objectview.getObjectView(this.viewData);
 					this.view.percentWidth = 100;
+					this.view.percentHeight = 100;
 					this.group.addChild(this.view);
 				}
 

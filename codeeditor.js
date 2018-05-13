@@ -234,6 +234,8 @@ var monacoEditor;
         {
             tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
         });
+        tslist.sort((a, b) => a.path > b.path);
+
         tslist.forEach((item) =>
         {
             tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);

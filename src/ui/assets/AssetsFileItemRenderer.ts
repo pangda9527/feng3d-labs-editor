@@ -68,6 +68,7 @@ namespace feng3d.editor
                                 this.data.getScriptClassName((scriptClassName) =>
                                 {
                                     dragsource.file_script = scriptClassName;
+                                    drag.refreshAcceptables();
                                 });
                                 break;
                             case AssetExtension.anim:

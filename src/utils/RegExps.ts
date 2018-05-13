@@ -26,9 +26,9 @@ namespace feng3d.editor
         exportClass = /export\s+(abstract\s+)?class\s+([\w$_\d]+)(\s+extends\s+([\w$_\d]+))?/;
 
         /**
-         * 导出脚本类
+         * 脚本中的类
          */
-        scriptClass = /(export\s+)?class\s+([\w$_\d]+)\s+extends\s+((feng3d\.)?Script)/;
+        scriptClass = /(export\s+)?class\s+([\w$_\d]+)\s+extends\s+(([\w$_\d\.]+))/;
     }
 
     regExps = new RegExps();

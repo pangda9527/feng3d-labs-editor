@@ -58,9 +58,9 @@ var feng3d;
                  */
                 this.exportClass = /export\s+(abstract\s+)?class\s+([\w$_\d]+)(\s+extends\s+([\w$_\d]+))?/;
                 /**
-                 * 导出脚本类
+                 * 脚本中的类
                  */
-                this.scriptClass = /(export\s+)?class\s+([\w$_\d]+)\s+extends\s+((feng3d\.)?Script)/;
+                this.scriptClass = /(export\s+)?class\s+([\w$_\d]+)\s+extends\s+(([\w$_\d\.]+))/;
             }
             return RegExps;
         }());
@@ -3703,7 +3703,6 @@ var feng3d;
                 return _this;
             }
             InspectorView.prototype.onComplete = function () {
-                this.group.percentWidth = 100;
                 this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
                 this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
                 editor.editorui.inspectorView = this;
@@ -3738,12 +3737,14 @@ var feng3d;
                         this.viewData.showInspectorData(function (showdata) {
                             _this.view = feng3d.objectview.getObjectView(showdata);
                             _this.view.percentWidth = 100;
+                            _this.view.percentHeight = 100;
                             _this.group.addChild(_this.view);
                         });
                     }
                     else {
                         this.view = feng3d.objectview.getObjectView(this.viewData);
                         this.view.percentWidth = 100;
+                        this.view.percentHeight = 100;
                         this.group.addChild(this.view);
                     }
                 }
@@ -4882,6 +4883,7 @@ var feng3d;
                                 case editor.AssetExtension.ts:
                                     _this.data.getScriptClassName(function (scriptClassName) {
                                         dragsource.file_script = scriptClassName;
+                                        editor.drag.refreshAcceptables();
                                     });
                                     break;
                                 case editor.AssetExtension.anim:
