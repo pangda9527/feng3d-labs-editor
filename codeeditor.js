@@ -92,8 +92,9 @@ var monacoEditor;
             });
         }
 
+        loadallts(init);
+
         var modelMap = { ts: "typescript", js: "javascript", json: "json", text: "text" };
-        init();
 
         function init()
         {
@@ -115,11 +116,8 @@ var monacoEditor;
                         // monacoEditor.setValue(code);
                         if (extension == "ts")
                         {
-                            loadallts(() =>
-                            {
-                                logLabel.textContent = "初次编译中。。。。";
-                                triggerCompile();
-                            });
+                            logLabel.textContent = "初次编译中。。。。";
+                            triggerCompile();
                         }
                         monacoEditor.onDidChangeModelContent(function ()
                         {
@@ -166,6 +164,12 @@ var monacoEditor;
                 experimentalDecorators: true,
                 noUnusedLocals: false,
                 noUnusedParameters: false,
+            });
+
+            tslist.forEach(item =>
+            {
+                if (item.path != path)
+                    monaco.languages.typescript.typescriptDefaults.addExtraLib(item.code, item.path);
             });
 
             loadLibs(['libs/feng3d.d.ts'], () =>
@@ -219,6 +223,10 @@ var monacoEditor;
                 codedata.data = arrayBuffer;
                 feng3d.storage.set(DBname, project, "project.js", codedata);
                 logLabel.textContent = "编译完成！";
+                if (window.opener)
+                {
+                    window.opener.feng3d.editor.editorAssets.runProjectScript();
+                }
             });
         }
         catch (e)

@@ -2056,7 +2056,7 @@ var feng3d;
                 // 初始化Script属性面板
                 if (this.component instanceof feng3d.ScriptComponent) {
                     var component = this.component;
-                    var scriptClass = feng3d.classUtils.getDefinitionByName(component.script);
+                    var scriptClass = feng3d.classUtils.getDefinitionByName(component.script, false);
                     if (scriptClass) {
                         this.script = new scriptClass();
                         var scriptData = component.scriptData = component.scriptData || {};
@@ -4252,13 +4252,15 @@ var feng3d;
                         try {
                             // 运行project.js
                             windowEval(content);
+                            // 刷新属性界面（界面中可能有脚本）
+                            editor.editorui.inspectorView.updateView();
                         }
                         catch (error) {
                             feng3d.warn(error);
                         }
                     }
                     _this._preProjectJsContent = content;
-                    callback();
+                    callback && callback();
                 });
             };
             return EditorAssets;

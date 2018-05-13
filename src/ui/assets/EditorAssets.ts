@@ -394,7 +394,7 @@ namespace feng3d.editor
                     break;
             }
         }
-        runProjectScript(callback: () => void)
+        runProjectScript(callback?: () => void)
         {
             fs.readFileAsString("project.js", (err, content) =>
             {
@@ -406,13 +406,15 @@ namespace feng3d.editor
                     {
                         // 运行project.js
                         windowEval(content);
+                        // 刷新属性界面（界面中可能有脚本）
+                        editorui.inspectorView.updateView();
                     } catch (error)
                     {
                         warn(error);
                     }
                 }
                 this._preProjectJsContent = content;
-                callback();
+                callback && callback();
             });
         }
     }

@@ -133,7 +133,7 @@ namespace feng3d.editor
 			if (this.component instanceof ScriptComponent)
 			{
 				var component = this.component;
-				var scriptClass = classUtils.getDefinitionByName(component.script);
+				var scriptClass = classUtils.getDefinitionByName(component.script, false);
 				if (scriptClass)
 				{
 					this.script = new scriptClass();

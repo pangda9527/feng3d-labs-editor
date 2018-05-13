@@ -58,7 +58,7 @@ namespace feng3d.editor
 				this.showData(null, true)
 		}
 
-		private updateView()
+		updateView()
 		{
 			this.backButton.visible = this.viewDataList.length > 0;
 			if (this.view && this.view.parent)
