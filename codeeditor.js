@@ -9,15 +9,15 @@ var monacoEditor;
     var compileButton = document.getElementById("compile");
     var watchCB = document.getElementById("watch");
     var logLabel = document.getElementById("log");
-    var codeeditorDiv = document.getElementById("codeeditorDiv");
+    // var codeeditorDiv = document.getElementById("codeeditorDiv");
 
-    window.onkeyup = (e) =>
-    {
-        if (e.key == "Escape")
-        {
-            codeeditorDiv.style.display = "none";
-        }
-    }
+    // window.onkeyup = (e) =>
+    // {
+    //     if (e.key == "Escape")
+    //     {
+    //         codeeditorDiv.style.display = "none";
+    //     }
+    // }
 
     compileButton.onclick = () =>
     {
@@ -242,7 +242,9 @@ var monacoEditor;
         {
             tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
         });
-        tslist.sort((a, b) => a.path > b.path);
+        tssort(tslist);
+
+        // tslist.sort((a, b) => a.path > b.path);
 
         tslist.forEach((item) =>
         {
@@ -325,5 +327,75 @@ var monacoEditor;
                 req._canceled = true;
                 req.abort();
             });
+    }
+    /**
+     * 脚本中的类
+     */
+    var scriptClassReg = /(export\s+)?(abstract\s+)?class\s+([\w$_\d]+)(\s+extends\s+([\w$_\d\.]+))?/;
+
+    /**
+     * ts 文件排序
+     */
+    function tssort(tsfiles)
+    {
+        var filelist = [{ path: "", class: [""], extends: [""] }];
+
+        filelist = tsfiles.map((v) =>
+        {
+            var result = v.code.match(scriptClassReg);
+            //目前只处理了ts文件中单个导出对象
+            var item = { path: v.path, code: v.code, class: [], extends: [] }
+            if (result)
+            {
+                item.class.push(result[3]);
+                if (result[5])
+                    item.extends.push(result[5].split(".").pop());
+            }
+            return item;
+        });
+        //按照字母排序
+        filelist.sort((a, b) =>
+        {
+            if (a.class.length != b.class.length)
+                return a.class.length - b.class.length;
+            return a.path - b.path;
+        })
+
+        //按继承排序
+        for (let i = 0; i < filelist.length; i++)
+        {
+            var item = filelist[i];
+            var newpos = i;
+            if (item.extends.length > 0)
+            {
+                for (let j = 0; j < item.extends.length; j++)
+                {
+                    var extendsclass = item.extends[j];
+                    for (let k = i + 1; k < filelist.length; k++)
+                    {
+                        var itemk = filelist[k];
+                        if (itemk.class.indexOf(extendsclass) != -1 && newpos < k)
+                        {
+                            newpos = k;
+                        }
+                    }
+                }
+            }
+            if (newpos > i)
+            {
+                filelist[i] = null;
+                filelist.splice(newpos + 1, 0, item);
+            }
+        }
+
+        tsfiles.length = 0;
+        for (let i = 0; i < filelist.length; i++)
+        {
+            const element = filelist[i];
+            if (element)
+            {
+                tsfiles.push({ path: element.path, code: element.code });
+            }
+        }
     }
 })();
