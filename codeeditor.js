@@ -49,6 +49,7 @@ var monacoEditor;
     var codedata;
     // ts 列表
     var tslist = [];
+    var tslibs = [];
 
     if (fstype == "indexedDB")
     {
@@ -178,18 +179,20 @@ var monacoEditor;
         });
     }
 
-    function loadLibs(libs, callback)
+    function loadLibs(libpaths, callback)
     {
-        if (libs == null || libs.length == 0)
+        if (libpaths == null || libpaths.length == 0)
         {
             callback();
             return;
         }
-        var lib = libs.shift();
-        xhr(lib).then(function (response)
+        var libpath = libpaths.shift();
+        xhr(libpath).then(function (response)
         {
-            monaco.languages.typescript.typescriptDefaults.addExtraLib(response.responseText, lib.split("/").pop());
-            loadLibs(libs, callback);
+            var libcode = response.responseText;
+            monaco.languages.typescript.typescriptDefaults.addExtraLib(libcode, libpath.split("/").pop());
+            tslibs.push({ path: libpath, code: libcode });
+            loadLibs(libpaths, callback);
         });
     }
 
@@ -227,6 +230,10 @@ var monacoEditor;
     function transpileModule(options)
     {
         var tsSourceMap = {};
+        tslibs.forEach(item =>
+        {
+            tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
+        });
         tslist.forEach((item) =>
         {
             tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
