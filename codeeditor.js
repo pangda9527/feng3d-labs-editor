@@ -47,7 +47,6 @@ var monacoEditor;
     var fstype = GetQueryString("fstype");
     var code;
     var codedata;
-    var feng3ddts;
     // ts 列表
     var tslist = [];
 
@@ -92,6 +91,7 @@ var monacoEditor;
             });
         }
 
+        var modelMap = { ts: "typescript", js: "javascript", json: "json", text: "text" };
         init();
 
         function init()
@@ -106,7 +106,12 @@ var monacoEditor;
                     var code = str;
                     initEditor(extension, function ()
                     {
-                        monacoEditor.setValue(code);
+                        var oldModel = monacoEditor.getModel();
+                        var newModel = monaco.editor.createModel(code, modelMap[extension] || modelMap.text);
+                        monacoEditor.setModel(newModel);
+                        if (oldModel) oldModel.dispose();
+
+                        // monacoEditor.setValue(code);
                         if (extension == "ts")
                         {
                             loadallts(() =>
@@ -144,63 +149,47 @@ var monacoEditor;
         require.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
         require(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function ()
         {
-            xhr('libs/feng3d.d.ts').then(function (response)
+            // 设置ts编译选项
+            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+                allowNonTsExtensions: true,
+                module: monaco.languages.typescript.ModuleKind.AMD,
+                noResolve: true,
+                suppressOutputPathCheck: true,
+                skipLibCheck: true,
+                skipDefaultLibCheck: true,
+                target: monaco.languages.typescript.ScriptTarget.ES5,
+                noImplicitAny: false,
+                strictNullChecks: false,
+                noImplicitThis: false,
+                noImplicitReturns: false,
+                experimentalDecorators: true,
+                noUnusedLocals: false,
+                noUnusedParameters: false,
+            });
+
+            loadLibs(['libs/feng3d.d.ts'], () =>
             {
-                if (extension == "ts")
-                {
-                    var compilerOptions = {
-                        allowNonTsExtensions: true,
-                        module: monaco.languages.typescript.ModuleKind.AMD,
-                        noResolve: true,
-                        suppressOutputPathCheck: true,
-                        skipLibCheck: true,
-                        skipDefaultLibCheck: true,
-                        target: monaco.languages.typescript.ScriptTarget.ES5,
-                        noImplicitAny: false,
-                        strictNullChecks: false,
-                        noImplicitThis: false,
-                        noImplicitReturns: false,
-                        experimentalDecorators: true,
-                        noUnusedLocals: false,
-                        noUnusedParameters: false,
-                    };
-
-                    feng3ddts = response.responseText;
-                    monaco.languages.typescript.typescriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
-
-                    monacoEditor = monaco.editor.create(document.getElementById('container'), {
-                        value: "",
-                        language: 'typescript',
-                        formatOnType: true
-                    });
-                    monaco.languages.typescript.typescriptDefaults.setCompilerOptions(compilerOptions);
-                } else if (extension == "js")
-                {
-                    feng3ddts = response.responseText;
-                    monaco.languages.typescript.javascriptDefaults.addExtraLib(feng3ddts, 'feng3d.d.ts');
-                    monacoEditor = monaco.editor.create(document.getElementById('container'), {
-                        value: "",
-                        language: 'javascript',
-                        formatOnType: true
-                    });
-                } else if (extension == "json")
-                {
-                    monacoEditor = monaco.editor.create(document.getElementById('container'), {
-                        value: "",
-                        language: 'json',
-                        formatOnType: true
-                    });
-                } else 
-                {
-                    monacoEditor = monaco.editor.create(document.getElementById('container'), {
-                        value: "",
-                        language: 'text',
-                        formatOnType: true
-                    });
-                }
-
+                monacoEditor = monaco.editor.create(document.getElementById('container'), {
+                    model: null,
+                    formatOnType: true,
+                });
                 callback();
             });
+        });
+    }
+
+    function loadLibs(libs, callback)
+    {
+        if (libs == null || libs.length == 0)
+        {
+            callback();
+            return;
+        }
+        var lib = libs.shift();
+        xhr(lib).then(function (response)
+        {
+            monaco.languages.typescript.typescriptDefaults.addExtraLib(response.responseText, lib.split("/").pop());
+            loadLibs(libs, callback);
         });
     }
 
@@ -209,26 +198,25 @@ var monacoEditor;
     {
         try
         {
-            var code = tslist.map((v) => v.code).join("\n");
-
-            var output = transpileModule(code, {
+            var output = transpileModule({
                 // module: ts.ModuleKind.AMD,
                 target: ts.ScriptTarget.ES5,
                 noLib: true,
                 noResolve: true,
                 suppressOutputPathCheck: true
             });
-            if (typeof output === "string")
+            var outputStr = output.reduce((prev, item) =>
             {
-                output += `\n//# sourceURL=project.js`;
-                feng3d.dataTransform.stringToArrayBuffer(output, (arrayBuffer) =>
-                {
-                    codedata.data = arrayBuffer;
-                    // feng3d.storage.set(DBname, project, path.replace(/\.ts\b/, ".js"), codedata);
-                    feng3d.storage.set(DBname, project, "project.js", codedata);
-                    logLabel.textContent = "编译完成！";
-                });
-            }
+                return prev + item.text;
+            }, "");
+
+            outputStr += `\n//# sourceURL=project.js`;
+            feng3d.dataTransform.stringToArrayBuffer(outputStr, (arrayBuffer) =>
+            {
+                codedata.data = arrayBuffer;
+                feng3d.storage.set(DBname, project, "project.js", codedata);
+                logLabel.textContent = "编译完成！";
+            });
         }
         catch (e)
         {
@@ -236,33 +224,45 @@ var monacoEditor;
             console.log("Error from compilation: " + e + "  " + (e.stack || ""));
         }
     }
-    function transpileModule(input, options)
+    function transpileModule(options)
     {
-        var inputFileName = options.jsx ? "module.tsx" : "module.ts";
+        var tsSourceMap = {};
+        tslist.forEach((item) =>
+        {
+            tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
+        })
 
-        var sourceFile = ts.createSourceFile(inputFileName, feng3ddts + input, options.target || ts.ScriptTarget.ES5);
         // Output
-        var outputText;
-        var program = ts.createProgram([inputFileName], options, {
-            getSourceFile: function (fileName) { return fileName.indexOf("module") === 0 ? sourceFile : undefined; },
-            writeFile: function (_name, text) { outputText = text; },
+        var outputs = [];
+        var program = ts.createProgram(Object.keys(tsSourceMap), options, {
+            getSourceFile: function (fileName)
+            {
+                return tsSourceMap[fileName];
+            },
+            writeFile: function (_name, text)
+            {
+                outputs.push({ name: _name, text: text });
+            },
             getDefaultLibFileName: function () { return "lib.d.ts"; },
             useCaseSensitiveFileNames: function () { return false; },
             getCanonicalFileName: function (fileName) { return fileName; },
             getCurrentDirectory: function () { return ""; },
             getNewLine: function () { return "\r\n"; },
-            fileExists: function (fileName) { return fileName === inputFileName; },
+            fileExists: function (fileName)
+            {
+                return !!tsSourceMap[fileName];
+            },
             readFile: function () { return ""; },
             directoryExists: function () { return true; },
             getDirectories: function () { return []; }
         });
         // Emit
         program.emit();
-        if (outputText === undefined)
+        if (outputs === undefined)
         {
             throw new Error("Output generation failed");
         }
-        return outputText;
+        return outputs;
     }
     // ------------ Execution logic
     function GetQueryString(name)

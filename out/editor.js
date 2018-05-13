@@ -4248,8 +4248,13 @@ var feng3d;
                     if (content != _this._preProjectJsContent) {
                         //
                         var windowEval = eval.bind(window);
-                        // 运行project.js
-                        windowEval(content);
+                        try {
+                            // 运行project.js
+                            windowEval(content);
+                        }
+                        catch (error) {
+                            feng3d.warn(error);
+                        }
                     }
                     _this._preProjectJsContent = content;
                     callback();

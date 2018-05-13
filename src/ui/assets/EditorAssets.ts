@@ -402,8 +402,14 @@ namespace feng3d.editor
                 {
                     //
                     var windowEval = eval.bind(window);
-                    // 运行project.js
-                    windowEval(content);
+                    try
+                    {
+                        // 运行project.js
+                        windowEval(content);
+                    } catch (error)
+                    {
+                        warn(error);
+                    }
                 }
                 this._preProjectJsContent = content;
                 callback();
