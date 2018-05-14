@@ -5315,9 +5315,7 @@ var feng3d;
                 editor.editorDispatcher.dispatch(item.command);
             };
             TopView.prototype.onHelpButtonClick = function () {
-                var url = "index.md";
-                url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                window.open(url);
+                window.open("http://feng3d.gitee.io");
             };
             TopView.prototype.onButtonClick = function (event) {
                 switch (event.currentTarget) {

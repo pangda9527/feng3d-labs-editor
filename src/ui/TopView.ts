@@ -74,9 +74,7 @@ namespace feng3d.editor
 
 		private onHelpButtonClick()
 		{
-			var url = "index.md";
-			url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-			window.open(url);
+			window.open("http://feng3d.gitee.io");
 		}
 
 		private onButtonClick(event: egret.TouchEvent)
