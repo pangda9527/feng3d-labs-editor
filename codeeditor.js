@@ -9,15 +9,6 @@ var monacoEditor;
     var compileButton = document.getElementById("compile");
     var watchCB = document.getElementById("watch");
     var logLabel = document.getElementById("log");
-    // var codeeditorDiv = document.getElementById("codeeditorDiv");
-
-    // window.onkeyup = (e) =>
-    // {
-    //     if (e.key == "Escape")
-    //     {
-    //         codeeditorDiv.style.display = "none";
-    //     }
-    // }
 
     compileButton.onclick = () =>
     {

@@ -79,7 +79,7 @@ namespace feng3d.editor
                 editorAssets.readScene("default.scene.json", (err, scene) =>
                 {
                     if (err)
-                        engine.scene = newScene();
+                        engine.scene = creatNewScene();
                     else
                         engine.scene = scene;
                 });
@@ -133,7 +133,7 @@ namespace feng3d.editor
         }
     }
 
-    function newScene()
+    export function creatNewScene()
     {
         var scene = GameObject.create("Untitled").addComponent(Scene3D)
         scene.background.setTo(0.408, 0.38, 0.357);

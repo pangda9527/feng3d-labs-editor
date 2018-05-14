@@ -72,7 +72,24 @@ namespace feng3d.editor
             }
         },
         {
-            label: "下载项目",
+            label: "打开网络项目",
+            submenu: [
+                {
+                    label: "地形", click: () =>
+                    {
+                        openDownloadProject("terrain.feng3d.zip");
+                    },
+                },
+                {
+                    label: "自定义材质", click: () =>
+                    {
+                        openDownloadProject("customshader.feng3d.zip");
+                    },
+                },
+            ],
+        },
+        {
+            label: "下载网络项目",
             submenu: [
                 {
                     label: "地形", click: () =>
@@ -98,13 +115,10 @@ namespace feng3d.editor
                     {
                         editorAssets.runProjectScript(() =>
                         {
-                            editorAssets.readScene("default.scene.json", (err, scene) =>
-                            {
-                                engine.scene = scene;
-                                editorui.assetsview.updateShowFloder();
-                                assetsDispather.dispatch("changed");
-                                console.log("导入项目完成!");
-                            });
+                            engine.scene = creatNewScene()
+                            editorui.assetsview.updateShowFloder();
+                            assetsDispather.dispatch("changed");
+                            console.log("清空项目完成!");
                         });
                     });
                 }, true);
@@ -276,7 +290,18 @@ namespace feng3d.editor
      * 下载项目
      * @param projectname 
      */
-    function downloadProject(projectname: string)
+    function openDownloadProject(projectname: string, callback?: () => void)
+    {
+        editorAssets.deletefile(editorAssets.assetsPath, () =>
+        {
+            downloadProject(projectname, callback);
+        }, true);
+    }
+    /**
+     * 下载项目
+     * @param projectname 
+     */
+    function downloadProject(projectname: string, callback?: () => void)
     {
         var path = "../project/" + projectname;
         Loader.loadBinary(path, (content) =>
@@ -293,6 +318,7 @@ namespace feng3d.editor
                             editorui.assetsview.updateShowFloder();
                             assetsDispather.dispatch("changed");
                             console.log("projectname 项目下载完成!");
+                            callback && callback();
                         });
                     });
                 });

@@ -12,15 +12,13 @@
 
 <body>
 
-    <div id="codeeditorDiv" style="background: white;  border: 1px solid grey; position: absolute; box-sizing: border-box; top: 0px; left: 0px; right: 0px; bottom: 0px;">
-        <div style="position: absolute;left: 25px;top: 20px;">
-            <button id="compile">编译</button>
-            <input type="checkbox" id="watch" checked="checked">监听
-            <b>状态:</b>
-            <label id="log"></label>
-        </div>
-        <div id="container" style="border: 1px solid grey; position: absolute; box-sizing: border-box; top: 50px; left: 25px; right: 25px; bottom: 25px;">
-        </div>
+    <div style="position: absolute;left: 25px;top: 20px;">
+        <button id="compile">编译</button>
+        <input type="checkbox" id="watch" checked="checked">监听
+        <b>状态:</b>
+        <label id="log"></label>
+    </div>
+    <div id="container" style="border: 1px solid grey; position: absolute; box-sizing: border-box; top: 50px; left: 25px; right: 25px; bottom: 25px;">
     </div>
 
     <script src="libs/monaco-editor/min/vs/loader.js"></script>

@@ -5316,7 +5316,6 @@ var feng3d;
             };
             TopView.prototype.onHelpButtonClick = function () {
                 var url = "index.md";
-                // var url = "codeeditor.html";
                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                 window.open(url);
             };
@@ -8232,7 +8231,7 @@ var feng3d;
                 editor.editorAssets.runProjectScript(function () {
                     editor.editorAssets.readScene("default.scene.json", function (err, scene) {
                         if (err)
-                            editor.engine.scene = newScene();
+                            editor.engine.scene = creatNewScene();
                         else
                             editor.engine.scene = scene;
                     });
@@ -8281,7 +8280,7 @@ var feng3d;
             return Main3D;
         }());
         editor.Main3D = Main3D;
-        function newScene() {
+        function creatNewScene() {
             var scene = feng3d.GameObject.create("Untitled").addComponent(feng3d.Scene3D);
             scene.background.setTo(0.408, 0.38, 0.357);
             scene.ambientColor.setTo(0.4, 0.4, 0.4);
@@ -8296,6 +8295,7 @@ var feng3d;
             scene.gameObject.addChild(directionalLight);
             return scene;
         }
+        editor.creatNewScene = creatNewScene;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -10335,7 +10335,22 @@ var feng3d;
                 }
             },
             {
-                label: "下载项目",
+                label: "打开网络项目",
+                submenu: [
+                    {
+                        label: "地形", click: function () {
+                            openDownloadProject("terrain.feng3d.zip");
+                        },
+                    },
+                    {
+                        label: "自定义材质", click: function () {
+                            openDownloadProject("customshader.feng3d.zip");
+                        },
+                    },
+                ],
+            },
+            {
+                label: "下载网络项目",
                 submenu: [
                     {
                         label: "地形", click: function () {
@@ -10355,12 +10370,10 @@ var feng3d;
                     editor.editorAssets.deletefile(editor.editorAssets.assetsPath, function () {
                         editor.editorAssets.initproject(editor.editorAssets.projectname, function () {
                             editor.editorAssets.runProjectScript(function () {
-                                editor.editorAssets.readScene("default.scene.json", function (err, scene) {
-                                    editor.engine.scene = scene;
-                                    editor.editorui.assetsview.updateShowFloder();
-                                    editor.assetsDispather.dispatch("changed");
-                                    console.log("导入项目完成!");
-                                });
+                                editor.engine.scene = editor.creatNewScene();
+                                editor.editorui.assetsview.updateShowFloder();
+                                editor.assetsDispather.dispatch("changed");
+                                console.log("清空项目完成!");
                             });
                         });
                     }, true);
@@ -10511,7 +10524,16 @@ var feng3d;
          * 下载项目
          * @param projectname
          */
-        function downloadProject(projectname) {
+        function openDownloadProject(projectname, callback) {
+            editor.editorAssets.deletefile(editor.editorAssets.assetsPath, function () {
+                downloadProject(projectname, callback);
+            }, true);
+        }
+        /**
+         * 下载项目
+         * @param projectname
+         */
+        function downloadProject(projectname, callback) {
             var path = "../project/" + projectname;
             feng3d.Loader.loadBinary(path, function (content) {
                 editor.fs.importProject(content, function () {
@@ -10522,6 +10544,7 @@ var feng3d;
                                 editor.editorui.assetsview.updateShowFloder();
                                 editor.assetsDispather.dispatch("changed");
                                 console.log("projectname 项目下载完成!");
+                                callback && callback();
                             });
                         });
                     });

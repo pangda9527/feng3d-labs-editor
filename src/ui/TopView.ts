@@ -75,7 +75,6 @@ namespace feng3d.editor
 		private onHelpButtonClick()
 		{
 			var url = "index.md";
-			// var url = "codeeditor.html";
 			url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
 			window.open(url);
 		}
