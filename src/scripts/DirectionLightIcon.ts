@@ -28,7 +28,7 @@ namespace feng3d.editor
             meshRenderer.geometry = new PlaneGeometry({ width: size, height: size, segmentsH: 1, segmentsW: 1, yUp: false });
             var textureMaterial = this.textureMaterial = meshRenderer.material = materialFactory.create("texture");
             var texture = new Texture2D();
-            texture.url = editorData.getEditorAssetsPath("/assets/3d/icons/sun.png");
+            texture.url = editorData.getEditorAssetsPath("assets/3d/icons/sun.png");
             texture.format = TextureFormat.RGBA;
             texture.premulAlpha = true;
             textureMaterial.uniforms.s_texture = texture;

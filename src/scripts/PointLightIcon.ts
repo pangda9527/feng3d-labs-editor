@@ -36,7 +36,7 @@ namespace feng3d.editor
                 {
                     uniforms: {
                         s_texture: {
-                            url: editorData.getEditorAssetsPath("/assets/3d/icons/light.png"),
+                            url: editorData.getEditorAssetsPath("assets/3d/icons/light.png"),
                             format: TextureFormat.RGBA,
                             premulAlpha: true,
                         }

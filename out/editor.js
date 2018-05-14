@@ -419,7 +419,7 @@ var feng3d;
                     //
                     var zip = new JSZip();
                     var request = new XMLHttpRequest();
-                    request.open('Get', editor.editorData.getEditorAssetsPath("/templates/template.zip"), true);
+                    request.open('Get', editor.editorData.getEditorAssetsPath("templates/template.zip"), true);
                     request.responseType = "arraybuffer";
                     request.onload = function (ev) {
                         zip.loadAsync(request.response).then(function () {
@@ -4064,7 +4064,14 @@ var feng3d;
                             },
                             {
                                 label: "脚本文件", click: function () {
-                                    assetsFile.addfile("NewScript.ts", editor.assetsFileTemplates.NewScript);
+                                    var scriptName = "NewScript";
+                                    assetsFile.addfile(scriptName + ".ts", editor.assetsFileTemplates.getNewScript(scriptName));
+                                }
+                            },
+                            {
+                                label: "shader文件", click: function () {
+                                    var shadername = "NewShader";
+                                    assetsFile.addfile(shadername + ".shader", editor.assetsFileTemplates.getNewShader(shadername));
                                 }
                             },
                             {
@@ -4107,7 +4114,8 @@ var feng3d;
                     // 使用编辑器打开
                     if (file.extension == editor.AssetExtension.ts
                         || file.extension == editor.AssetExtension.js
-                        || file.extension == editor.AssetExtension.txt) {
+                        || file.extension == editor.AssetExtension.txt
+                        || file.extension == editor.AssetExtension.shader) {
                         menu = {
                             label: "使用代码编辑器打开", click: function () {
                                 var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + file.extension;
@@ -4292,6 +4300,7 @@ var feng3d;
             AssetExtension["geometry"] = "geometry";
             AssetExtension["gameobject"] = "gameobject";
             AssetExtension["anim"] = "anim";
+            AssetExtension["shader"] = "shader";
             AssetExtension["png"] = "png";
             AssetExtension["jpg"] = "jpg";
             AssetExtension["jpeg"] = "jpeg";
@@ -4350,10 +4359,8 @@ var feng3d;
                     this.image = "folder_png";
                 }
                 else {
-                    var filename = this.path.split("/").pop();
-                    var extension = filename.split(".").pop();
-                    if (RES.getRes(extension + "_png")) {
-                        this.image = extension + "_png";
+                    if (RES.getRes(this.extension + "_png")) {
+                        this.image = this.extension + "_png";
                     }
                     else {
                         this.image = "file_png";
@@ -5195,9 +5202,29 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        editor.assetsFileTemplates = {
-            NewScript: "namespace feng3d\n{\n    export class NewScript extends Script\n    {\n        /**\n         * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n         */\n        init()\n        {\n\n        }\n\n        /**\n         * \u66F4\u65B0\n         */\n        update()\n        {\n            log(this.transform.position);\n        }\n\n        /**\n         * \u9500\u6BC1\u65F6\u8C03\u7528\n         */\n        dispose()\n        {\n\n        }\n    }\n}",
-        };
+        var AssetsFileTemplates = /** @class */ (function () {
+            function AssetsFileTemplates() {
+            }
+            /**
+             *
+             * @param scriptName 脚本名称（类名）
+             */
+            AssetsFileTemplates.prototype.getNewScript = function (scriptName) {
+                return scriptTemplate.replace("NewScript", scriptName);
+            };
+            /**
+             *
+             * @param shadername shader名称
+             */
+            AssetsFileTemplates.prototype.getNewShader = function (shadername) {
+                return shaderTemplate.replace(new RegExp("NewShader", "g"), shadername);
+            };
+            return AssetsFileTemplates;
+        }());
+        editor.AssetsFileTemplates = AssetsFileTemplates;
+        editor.assetsFileTemplates = new AssetsFileTemplates();
+        var scriptTemplate = "namespace feng3d\n    {\n        export class NewScript extends Script\n        {\n            /**\n             * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n             */\n            init()\n            {\n    \n            }\n    \n            /**\n             * \u66F4\u65B0\n             */\n            update()\n            {\n    \n            }\n    \n            /**\n             * \u9500\u6BC1\u65F6\u8C03\u7528\n             */\n            dispose()\n            {\n    \n            }\n        }\n    }";
+        var shaderTemplate = "\nclass NewShaderUniforms\n{\n    /** \n     * \u989C\u8272 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    u_color = new feng3d.Color4();\n}\n\nfeng3d.shaderConfig.shaders[\"NewShader\"] = {\n    cls: NewShaderUniforms,\n    vertex: `\n    \n    attribute vec3 a_position;\n    \n    uniform mat4 u_modelMatrix;\n    uniform mat4 u_viewProjection;\n    \n    void main(void) {\n    \n        vec4 globalPosition = u_modelMatrix * vec4(a_position, 1.0);\n        gl_Position = u_viewProjection * globalPosition;\n    }`,\n    fragment: `\n    \n    precision mediump float;\n    \n    uniform vec4 u_color;\n    \n    void main(void) {\n        \n        gl_FragColor = u_color;\n    }\n    `,\n};\n\ntype NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };\ninterface MaterialFactory\n{\n    create(shader: \"NewShader\", raw?: NewShaderMaterialRaw): NewShaderMaterial;\n}\n\ninterface MaterialRawMap\n{\n    NewShader: NewShaderMaterialRaw\n}\n\ninterface NewShaderMaterialRaw extends feng3d.MaterialBaseRaw\n{\n    shaderName?: \"NewShader\",\n    uniforms?: NewShaderUniformsRaw;\n}\n\ninterface NewShaderUniformsRaw\n{\n    __class__?: \"feng3d.NewShaderUniforms\",\n    u_time?: number,\n}";
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -5767,7 +5794,7 @@ var feng3d;
              * @param url 编辑器资源相对路径
              */
             EditorData.prototype.getEditorAssetsPath = function (url) {
-                return document.URL + "/resource" + url;
+                return document.URL + "resource/" + url;
             };
             return EditorData;
         }());
@@ -9630,7 +9657,7 @@ var feng3d;
                 meshRenderer.geometry = new feng3d.PlaneGeometry({ width: size, height: size, segmentsH: 1, segmentsW: 1, yUp: false });
                 var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture");
                 var texture = new feng3d.Texture2D();
-                texture.url = editor.editorData.getEditorAssetsPath("/assets/3d/icons/sun.png");
+                texture.url = editor.editorData.getEditorAssetsPath("assets/3d/icons/sun.png");
                 texture.format = feng3d.TextureFormat.RGBA;
                 texture.premulAlpha = true;
                 textureMaterial.uniforms.s_texture = texture;
@@ -9717,7 +9744,7 @@ var feng3d;
                 var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture", {
                     uniforms: {
                         s_texture: {
-                            url: editor.editorData.getEditorAssetsPath("/assets/3d/icons/light.png"),
+                            url: editor.editorData.getEditorAssetsPath("assets/3d/icons/light.png"),
                             format: feng3d.TextureFormat.RGBA,
                             premulAlpha: true,
                         }
@@ -10187,7 +10214,7 @@ var feng3d;
                         "threejs/loaders/ctm/lzma.js",
                         "threejs/loaders/ctm/ctm.js",
                         "threejs/loaders/ctm/CTMLoader.js",
-                    ].map(function (value) { return editor.editorData.getEditorAssetsPath("/" + value); }),
+                    ].map(function (value) { return editor.editorData.getEditorAssetsPath(value); }),
                     bundleId: "threejs",
                     success: function () {
                         Number.prototype["format"] = function () {

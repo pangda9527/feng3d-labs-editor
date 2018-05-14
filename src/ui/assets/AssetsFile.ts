@@ -7,6 +7,7 @@ namespace feng3d.editor
         geometry = "geometry",
         gameobject = "gameobject",
         anim = "anim",
+        shader = "shader",
         png = "png",
         jpg = "jpg",
         jpeg = "jpeg",
@@ -129,11 +130,9 @@ namespace feng3d.editor
             }
             else
             {
-                var filename = this.path.split("/").pop();
-                var extension = filename.split(".").pop();
-                if (RES.getRes(extension + "_png"))
+                if (RES.getRes(this.extension + "_png"))
                 {
-                    this.image = extension + "_png";
+                    this.image = this.extension + "_png";
                 } else
                 {
                     this.image = "file_png";

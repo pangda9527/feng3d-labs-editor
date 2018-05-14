@@ -162,7 +162,15 @@ namespace feng3d.editor
                             {
                                 label: "脚本文件", click: () =>
                                 {
-                                    assetsFile.addfile("NewScript.ts", assetsFileTemplates.NewScript);
+                                    var scriptName = "NewScript";
+                                    assetsFile.addfile(`${scriptName}.ts`, assetsFileTemplates.getNewScript(scriptName));
+                                }
+                            },
+                            {
+                                label: "shader文件", click: () =>
+                                {
+                                    var shadername = "NewShader"
+                                    assetsFile.addfile(`${shadername}.shader`, assetsFileTemplates.getNewShader(shadername));
                                 }
                             },
                             {
@@ -220,6 +228,7 @@ namespace feng3d.editor
                 if (file.extension == AssetExtension.ts
                     || file.extension == AssetExtension.js
                     || file.extension == AssetExtension.txt
+                    || file.extension == AssetExtension.shader
                 )
                 {
                     menu = {

@@ -58,7 +58,11 @@ var monacoEditor;
         {
             feng3d.storage.getAllKeys(DBname, project, (err, keys) =>
             {
-                var tspaths = keys.filter((v) => v.split(".").pop() == "ts");
+                var tspaths = keys.filter((v) =>
+                {
+                    var ext = v.split(".").pop();
+                    return ext == "ts" || ext == "shader";
+                });
                 loadts();
 
                 function loadts()
@@ -77,6 +81,7 @@ var monacoEditor;
                         });
                     } else
                     {
+                        logLabel.textContent = "加载脚本完成！";
                         callback();
                     }
                 }
@@ -85,7 +90,7 @@ var monacoEditor;
 
         loadallts(init);
 
-        var modelMap = { ts: "typescript", js: "javascript", json: "json", text: "text" };
+        var modelMap = { ts: "typescript", shader: "typescript", js: "javascript", json: "json", text: "text" };
 
         function init()
         {
@@ -105,7 +110,7 @@ var monacoEditor;
                         if (oldModel) oldModel.dispose();
 
                         // monacoEditor.setValue(code);
-                        if (extension == "ts")
+                        if (extension == "ts" || extension == "shader")
                         {
                             logLabel.textContent = "初次编译中。。。。";
                             triggerCompile();
@@ -118,7 +123,8 @@ var monacoEditor;
                             {
                                 codedata.data = arrayBuffer;
                                 feng3d.storage.set(DBname, project, path, codedata);
-                                if (extension == "ts")
+                                logLabel.textContent = "自动保存完成！";
+                                if (extension == "ts" || extension == "shader")
                                 {
                                     tslist.filter((v) => v.path == path)[0].code = code;
                                     if (watch.checked)
@@ -243,7 +249,9 @@ var monacoEditor;
 
         tslist.forEach((item) =>
         {
-            tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
+            var path = item.path;
+            path = path.replace(".shader", ".shader.ts")
+            tsSourceMap[path] = ts.createSourceFile(path, item.code, options.target || ts.ScriptTarget.ES5);
         })
 
         // Output
