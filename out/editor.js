@@ -4067,24 +4067,24 @@ var feng3d;
                                 }
                             },
                             {
-                                label: "脚本文件", click: function () {
+                                label: "脚本", click: function () {
                                     var scriptName = "NewScript";
                                     assetsFile.addfile(scriptName + ".ts", editor.assetsFileTemplates.getNewScript(scriptName));
                                 }
                             },
                             {
-                                label: "shader文件", click: function () {
+                                label: "着色器", click: function () {
                                     var shadername = "NewShader";
                                     assetsFile.addfile(shadername + ".shader", editor.assetsFileTemplates.getNewShader(shadername));
                                 }
                             },
                             {
-                                label: "Json文件", click: function () {
+                                label: "Json", click: function () {
                                     assetsFile.addfile("new json.json", "{}");
                                 }
                             },
                             {
-                                label: "文本文件", click: function () {
+                                label: "文本", click: function () {
                                     assetsFile.addfile("new text.txt", "");
                                 }
                             },
@@ -4121,7 +4121,7 @@ var feng3d;
                         || file.extension == editor.AssetExtension.txt
                         || file.extension == editor.AssetExtension.shader) {
                         menu = {
-                            label: "使用代码编辑器打开", click: function () {
+                            label: "编辑", click: function () {
                                 var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + file.extension;
                                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                                 window.open(url);
@@ -4134,7 +4134,7 @@ var feng3d;
                         || file.extension == editor.AssetExtension.geometry
                         || file.extension == editor.AssetExtension.anim) {
                         menu = {
-                            label: "使用代码编辑器打开", click: function () {
+                            label: "编辑", click: function () {
                                 var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + editor.AssetExtension.json;
                                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                                 window.open(url);

@@ -160,27 +160,27 @@ namespace feng3d.editor
                                 }
                             },
                             {
-                                label: "脚本文件", click: () =>
+                                label: "脚本", click: () =>
                                 {
                                     var scriptName = "NewScript";
                                     assetsFile.addfile(`${scriptName}.ts`, assetsFileTemplates.getNewScript(scriptName));
                                 }
                             },
                             {
-                                label: "shader文件", click: () =>
+                                label: "着色器", click: () =>
                                 {
                                     var shadername = "NewShader"
                                     assetsFile.addfile(`${shadername}.shader`, assetsFileTemplates.getNewShader(shadername));
                                 }
                             },
                             {
-                                label: "Json文件", click: () =>
+                                label: "Json", click: () =>
                                 {
                                     assetsFile.addfile("new json.json", "{}");
                                 }
                             },
                             {
-                                label: "文本文件", click: () =>
+                                label: "文本", click: () =>
                                 {
                                     assetsFile.addfile("new text.txt", "");
                                 }
@@ -232,7 +232,7 @@ namespace feng3d.editor
                 )
                 {
                     menu = {
-                        label: "使用代码编辑器打开", click: () =>
+                        label: "编辑", click: () =>
                         {
                             var url = `codeeditor.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${file.path}&extension=${file.extension}`;
                             url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
@@ -247,7 +247,7 @@ namespace feng3d.editor
                 )
                 {
                     menu = {
-                        label: "使用代码编辑器打开", click: () =>
+                        label: "编辑", click: () =>
                         {
                             var url = `codeeditor.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${file.path}&extension=${AssetExtension.json}`;
                             url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
