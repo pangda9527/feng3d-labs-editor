@@ -80,23 +80,18 @@ namespace feng3d.editor
 			this.initScriptView();
 			this.updateView();
 
-			if (this.scriptView)
-				this.scriptView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
-
 			this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
 			if (this.component instanceof feng3d.Behaviour)
 				feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
 
 			this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 			this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
+			globalEvent.on("scriptChanged", this.onScriptChanged, this);
 		}
 
 		private onRemovedFromStage()
 		{
 			this.saveScriptData();
-
-			if (this.scriptView)
-				this.scriptView.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
 
 			this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
 			if (this.component instanceof feng3d.Behaviour)
@@ -104,6 +99,7 @@ namespace feng3d.editor
 
 			this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 			this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
+			globalEvent.off("scriptChanged", this.onScriptChanged, this);
 		}
 
 		private updateEnableCB()
@@ -152,6 +148,17 @@ namespace feng3d.editor
 			}
 		}
 
+		private removeScriptView()
+		{
+			// 移除Script属性面板
+			if (this.scriptView)
+			{
+				this.scriptView.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+				if (this.scriptView.parent)
+					this.scriptView.parent.removeChild(this.scriptView);
+			}
+		}
+
 		private saveScriptData()
 		{
 			//保存脚本数据
@@ -191,6 +198,12 @@ namespace feng3d.editor
 		private onHelpBtnClick()
 		{
 			window.open(`http://feng3d.gitee.io/#/script`);
+		}
+
+		private onScriptChanged()
+		{
+			this.removeScriptView();
+			this.initScriptView();
 		}
 	}
 }

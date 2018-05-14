@@ -22,55 +22,32 @@ namespace feng3d.editor
         /**
          * 路径
          */
+        @watch("pathChanged")
         path: string;
         /**
          * 创建时间
          */
-        get birthtime()
-        {
-            return this._birthtime;
-        }
-        private _birthtime: number;
+        birthtime: number;
         /**
          * 修改时间
          */
-        get mtime()
-        {
-            return this._mtime;
-        }
-        private _mtime: number;
+        mtime: number;
         /**
          * 是否文件夹
          */
-        get isDirectory()
-        {
-            return this._isDirectory;
-        }
-        private _isDirectory: boolean;
+        isDirectory: boolean;
         /**
          * 文件尺寸
          */
-        get size()
-        {
-            return this._size;
-        }
-        private _size: number;
+        size: number;
         /**
          * 父节点
          */
-        get parent()
-        {
-            return this._parent;
-        }
-        private _parent: AssetsFile;
+        parent: AssetsFile;
         /**
          * 子节点列表
          */
-        get children()
-        {
-            return this._children;
-        }
-        private _children: AssetsFile[];
+        children: AssetsFile[] = [];
 
         /**
          * 目录深度
@@ -80,16 +57,8 @@ namespace feng3d.editor
         /**
          * 文件夹是否打开
          */
-        get isOpen()
-        {
-            return this._isOpen;
-        }
-        set isOpen(value)
-        {
-            this._isOpen = value;
-            assetsDispather.dispatch("openChanged");
-        }
-        private _isOpen = true;
+        @watch("openChanged")
+        isOpen = true;
 
         /**
          * 图标名称或者路径
@@ -104,19 +73,12 @@ namespace feng3d.editor
         /**
          * 显示标签
          */
-        get label()
-        {
-            var label = this.name;
-            label = label.split(".").shift();
-            return label;
-        }
+        label: string;
 
-        get extension(): AssetExtension
-        {
-            if (this._isDirectory)
-                return AssetExtension.folder;
-            return <AssetExtension>this.path.split(".").pop().toLowerCase();
-        }
+        /**
+         * 扩展名
+         */
+        extension: AssetExtension
 
         /**
          * 是否选中
@@ -128,39 +90,46 @@ namespace feng3d.editor
          */
         currentOpenDirectory = false;
 
-        get data()
-        {
-            return this._data;
-        }
-        private _data: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry;
+        /**
+         * 缓存下来的数据 避免从文件再次加载解析数据
+         */
+        cacheData: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry;
 
         constructor(fileinfo: FileInfo, data?: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry)
         {
             super()
 
-            feng3d.watcher.watch(this, "path", () =>
-            {
-                var paths = this.path.split("/");
-                this.name = paths.pop();
-                if (this.name == "")
-                    this.name = paths.pop();
-            });
-
+            this.isDirectory = fileinfo.isDirectory;
             this.path = fileinfo.path;
-            this._birthtime = fileinfo.birthtime;
-            this._mtime = fileinfo.mtime;
-            this._isDirectory = fileinfo.isDirectory;
-            this._size = fileinfo.size;
-            this._children = [];
-            this._data = data;
+            this.birthtime = fileinfo.birthtime;
+            this.mtime = fileinfo.mtime;
+            this.size = fileinfo.size;
+            this.cacheData = data;
+        }
 
-            if (fileinfo.isDirectory)
+        pathChanged()
+        {
+            // 更新名字
+            var paths = this.path.split("/");
+            this.name = paths.pop();
+            if (this.name == "")
+                this.name = paths.pop();
+
+            this.label = this.name.split(".").shift();
+
+            if (this.isDirectory)
+                this.extension = AssetExtension.folder;
+            else
+                this.extension = <AssetExtension>this.path.split(".").pop().toLowerCase();
+
+            // 更新图标
+            if (this.isDirectory)
             {
                 this.image = "folder_png";
             }
             else
             {
-                var filename = fileinfo.path.split("/").pop();
+                var filename = this.path.split("/").pop();
                 var extension = filename.split(".").pop();
                 if (RES.getRes(extension + "_png"))
                 {
@@ -170,7 +139,7 @@ namespace feng3d.editor
                     this.image = "file_png";
                 }
             }
-            if (regExps.image.test(fileinfo.path))
+            if (regExps.image.test(this.path))
             {
                 this.getData((data) =>
                 {
@@ -185,9 +154,9 @@ namespace feng3d.editor
          */
         showInspectorData(callback: (showdata: Object) => void)
         {
-            if (this._data)
+            if (this.cacheData)
             {
-                callback(this._data);
+                callback(this.cacheData);
                 return;
             }
             this.getData((data) =>
@@ -202,9 +171,9 @@ namespace feng3d.editor
          */
         getData(callback: (data: any) => void)
         {
-            if (this._data)
+            if (this.cacheData)
             {
-                callback(this._data);
+                callback(this.cacheData);
                 return;
             }
             if (this.extension == AssetExtension.material
@@ -217,8 +186,8 @@ namespace feng3d.editor
                 fs.readFileAsString(this.path, (err, content: string) =>
                 {
                     var json = JSON.parse(content);
-                    this._data = serialization.deserialize(json);
-                    callback(this._data);
+                    this.cacheData = serialization.deserialize(json);
+                    callback(this.cacheData);
                 });
                 return;
             }
@@ -231,16 +200,16 @@ namespace feng3d.editor
                 {
                     dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                     {
-                        this._data = dataurl;
-                        callback(this._data);
+                        this.cacheData = dataurl;
+                        callback(this.cacheData);
                     });
                 });
                 return;
             }
             fs.readFileAsString(this.path, (err, content) =>
             {
-                this._data = content;
-                callback(this._data);
+                this.cacheData = content;
+                callback(this.cacheData);
             });
         }
 
@@ -270,7 +239,7 @@ namespace feng3d.editor
          */
         initChildren(depth = 0, callback: () => void)
         {
-            if (!this._isDirectory || depth < 0)
+            if (!this.isDirectory || depth < 0)
             {
                 callback();
                 return;
@@ -290,7 +259,7 @@ namespace feng3d.editor
                     {
                         assert(!err);
                         var child = new AssetsFile(stats);
-                        child._parent = this;
+                        child.parent = this;
                         this.children.push(child);
                         child.initChildren(depth - 1, initfiles);
                     });
@@ -344,7 +313,7 @@ namespace feng3d.editor
                 var index = this.parent.children.indexOf(this);
                 assert(index != -1);
                 this.parent.children.splice(index, 1);
-                this._parent = null;
+                this.parent = null;
 
                 editorui.assetsview.updateShowFloder();
                 assetsDispather.dispatch("changed");
@@ -370,7 +339,6 @@ namespace feng3d.editor
         {
             this.remove();
             this.removeChildren();
-            this._children = null;
         }
 
         /**
@@ -382,7 +350,7 @@ namespace feng3d.editor
             this.remove();
             assert(!!parent);
             parent.children.push(this);
-            this._parent = parent;
+            this.parent = parent;
 
             editorui.assetsview.updateShowFloder();
             assetsDispather.dispatch("changed");
@@ -403,12 +371,13 @@ namespace feng3d.editor
             {
                 fs.remove(this.path, (err) =>
                 {
-                    assert(!err);
+                    if (err)
+                        warn(`删除文件 ${this.path} 出现问题 ${err}`);
 
                     this.destroy();
 
                     //
-                    this._parent = null;
+                    this.parent = null;
                     callback && callback(this);
                 });
                 if (/\.ts\b/.test(this.path))
@@ -424,7 +393,7 @@ namespace feng3d.editor
                     deletefile();
             }
 
-            if (this._isDirectory)
+            if (this.isDirectory)
             {
                 this.children.forEach(element =>
                 {
@@ -652,7 +621,7 @@ namespace feng3d.editor
         {
             if (this.extension != AssetExtension.ts)
                 return "";
-            this._data = null;
+            this.cacheData = null;
             this.getData((code: string) =>
             {
                 // 获取脚本类名称
@@ -668,6 +637,11 @@ namespace feng3d.editor
                 }
                 callback(script);
             });
+        }
+
+        private openChanged()
+        {
+            assetsDispather.dispatch("openChanged");
         }
     }
 }

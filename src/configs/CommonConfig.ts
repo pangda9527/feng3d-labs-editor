@@ -317,7 +317,7 @@ namespace feng3d.editor
                             engine.scene = scene;
                             editorui.assetsview.updateShowFloder();
                             assetsDispather.dispatch("changed");
-                            console.log("projectname 项目下载完成!");
+                            console.log(`${projectname} 项目下载完成!`);
                             callback && callback();
                         });
                     });

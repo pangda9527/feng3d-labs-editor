@@ -2020,23 +2020,21 @@ var feng3d;
             ComponentView.prototype.onAddToStage = function () {
                 this.initScriptView();
                 this.updateView();
-                if (this.scriptView)
-                    this.scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
                 this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
                 if (this.component instanceof feng3d.Behaviour)
                     feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
                 this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
                 this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
+                feng3d.globalEvent.on("scriptChanged", this.onScriptChanged, this);
             };
             ComponentView.prototype.onRemovedFromStage = function () {
                 this.saveScriptData();
-                if (this.scriptView)
-                    this.scriptView.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
                 this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
                 if (this.component instanceof feng3d.Behaviour)
                     feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
                 this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
                 this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
+                feng3d.globalEvent.off("scriptChanged", this.onScriptChanged, this);
             };
             ComponentView.prototype.updateEnableCB = function () {
                 if (this.component instanceof feng3d.Behaviour) {
@@ -2071,6 +2069,14 @@ var feng3d;
                     }
                 }
             };
+            ComponentView.prototype.removeScriptView = function () {
+                // 移除Script属性面板
+                if (this.scriptView) {
+                    this.scriptView.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+                    if (this.scriptView.parent)
+                        this.scriptView.parent.removeChild(this.scriptView);
+                }
+            };
             ComponentView.prototype.saveScriptData = function () {
                 //保存脚本数据
                 if (this.script) {
@@ -2100,6 +2106,10 @@ var feng3d;
             };
             ComponentView.prototype.onHelpBtnClick = function () {
                 window.open("http://feng3d.gitee.io/#/script");
+            };
+            ComponentView.prototype.onScriptChanged = function () {
+                this.removeScriptView();
+                this.initScriptView();
             };
             return ComponentView;
         }(eui.Component));
@@ -3455,9 +3465,11 @@ var feng3d;
             }
             OAVMaterialName.prototype.initView = function () {
                 this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
+                feng3d.globalEvent.on("shaderChanged", this.onShaderComboBoxChange, this);
             };
             OAVMaterialName.prototype.dispose = function () {
                 this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
+                feng3d.globalEvent.off("shaderChanged", this.onShaderComboBoxChange, this);
             };
             OAVMaterialName.prototype.updateView = function () {
                 var material = this.space;
@@ -4294,10 +4306,17 @@ var feng3d;
             function AssetsFile(fileinfo, data) {
                 var _this = _super.call(this) || this;
                 /**
+                 * 子节点列表
+                 */
+                _this.children = [];
+                /**
                  * 目录深度
                  */
                 _this.depth = 0;
-                _this._isOpen = true;
+                /**
+                 * 文件夹是否打开
+                 */
+                _this.isOpen = true;
                 /**
                  * 是否选中
                  */
@@ -4306,148 +4325,53 @@ var feng3d;
                  * 当前打开文件夹
                  */
                 _this.currentOpenDirectory = false;
-                feng3d.watcher.watch(_this, "path", function () {
-                    var paths = _this.path.split("/");
-                    _this.name = paths.pop();
-                    if (_this.name == "")
-                        _this.name = paths.pop();
-                });
+                _this.isDirectory = fileinfo.isDirectory;
                 _this.path = fileinfo.path;
-                _this._birthtime = fileinfo.birthtime;
-                _this._mtime = fileinfo.mtime;
-                _this._isDirectory = fileinfo.isDirectory;
-                _this._size = fileinfo.size;
-                _this._children = [];
-                _this._data = data;
-                if (fileinfo.isDirectory) {
-                    _this.image = "folder_png";
+                _this.birthtime = fileinfo.birthtime;
+                _this.mtime = fileinfo.mtime;
+                _this.size = fileinfo.size;
+                _this.cacheData = data;
+                return _this;
+            }
+            AssetsFile.prototype.pathChanged = function () {
+                var _this = this;
+                // 更新名字
+                var paths = this.path.split("/");
+                this.name = paths.pop();
+                if (this.name == "")
+                    this.name = paths.pop();
+                this.label = this.name.split(".").shift();
+                if (this.isDirectory)
+                    this.extension = AssetExtension.folder;
+                else
+                    this.extension = this.path.split(".").pop().toLowerCase();
+                // 更新图标
+                if (this.isDirectory) {
+                    this.image = "folder_png";
                 }
                 else {
-                    var filename = fileinfo.path.split("/").pop();
+                    var filename = this.path.split("/").pop();
                     var extension = filename.split(".").pop();
                     if (RES.getRes(extension + "_png")) {
-                        _this.image = extension + "_png";
+                        this.image = extension + "_png";
                     }
                     else {
-                        _this.image = "file_png";
+                        this.image = "file_png";
                     }
                 }
-                if (editor.regExps.image.test(fileinfo.path)) {
-                    _this.getData(function (data) {
+                if (editor.regExps.image.test(this.path)) {
+                    this.getData(function (data) {
                         _this.image = data;
                     });
                 }
-                return _this;
-            }
-            Object.defineProperty(AssetsFile.prototype, "birthtime", {
-                /**
-                 * 创建时间
-                 */
-                get: function () {
-                    return this._birthtime;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AssetsFile.prototype, "mtime", {
-                /**
-                 * 修改时间
-                 */
-                get: function () {
-                    return this._mtime;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AssetsFile.prototype, "isDirectory", {
-                /**
-                 * 是否文件夹
-                 */
-                get: function () {
-                    return this._isDirectory;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AssetsFile.prototype, "size", {
-                /**
-                 * 文件尺寸
-                 */
-                get: function () {
-                    return this._size;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AssetsFile.prototype, "parent", {
-                /**
-                 * 父节点
-                 */
-                get: function () {
-                    return this._parent;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AssetsFile.prototype, "children", {
-                /**
-                 * 子节点列表
-                 */
-                get: function () {
-                    return this._children;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AssetsFile.prototype, "isOpen", {
-                /**
-                 * 文件夹是否打开
-                 */
-                get: function () {
-                    return this._isOpen;
-                },
-                set: function (value) {
-                    this._isOpen = value;
-                    editor.assetsDispather.dispatch("openChanged");
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AssetsFile.prototype, "label", {
-                /**
-                 * 显示标签
-                 */
-                get: function () {
-                    var label = this.name;
-                    label = label.split(".").shift();
-                    return label;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AssetsFile.prototype, "extension", {
-                get: function () {
-                    if (this._isDirectory)
-                        return AssetExtension.folder;
-                    return this.path.split(".").pop().toLowerCase();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(AssetsFile.prototype, "data", {
-                get: function () {
-                    return this._data;
-                },
-                enumerable: true,
-                configurable: true
-            });
+            };
             /**
              * 获取属性显示数据
              * @param callback 获取属性面板显示数据回调
              */
             AssetsFile.prototype.showInspectorData = function (callback) {
-                if (this._data) {
-                    callback(this._data);
+                if (this.cacheData) {
+                    callback(this.cacheData);
                     return;
                 }
                 this.getData(function (data) {
@@ -4460,8 +4384,8 @@ var feng3d;
              */
             AssetsFile.prototype.getData = function (callback) {
                 var _this = this;
-                if (this._data) {
-                    callback(this._data);
+                if (this.cacheData) {
+                    callback(this.cacheData);
                     return;
                 }
                 if (this.extension == AssetExtension.material
@@ -4471,8 +4395,8 @@ var feng3d;
                     || this.extension == AssetExtension.geometry) {
                     editor.fs.readFileAsString(this.path, function (err, content) {
                         var json = JSON.parse(content);
-                        _this._data = feng3d.serialization.deserialize(json);
-                        callback(_this._data);
+                        _this.cacheData = feng3d.serialization.deserialize(json);
+                        callback(_this.cacheData);
                     });
                     return;
                 }
@@ -4481,15 +4405,15 @@ var feng3d;
                     || this.extension == AssetExtension.jpeg) {
                     editor.fs.readFile(this.path, function (err, data) {
                         feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
-                            _this._data = dataurl;
-                            callback(_this._data);
+                            _this.cacheData = dataurl;
+                            callback(_this.cacheData);
                         });
                     });
                     return;
                 }
                 editor.fs.readFileAsString(this.path, function (err, content) {
-                    _this._data = content;
-                    callback(_this._data);
+                    _this.cacheData = content;
+                    callback(_this.cacheData);
                 });
             };
             /**
@@ -4515,7 +4439,7 @@ var feng3d;
             AssetsFile.prototype.initChildren = function (depth, callback) {
                 var _this = this;
                 if (depth === void 0) { depth = 0; }
-                if (!this._isDirectory || depth < 0) {
+                if (!this.isDirectory || depth < 0) {
                     callback();
                     return;
                 }
@@ -4529,7 +4453,7 @@ var feng3d;
                         editor.fs.stat(_this.path + file, function (err, stats) {
                             feng3d.assert(!err);
                             var child = new AssetsFile(stats);
-                            child._parent = _this;
+                            child.parent = _this;
                             _this.children.push(child);
                             child.initChildren(depth - 1, initfiles);
                         });
@@ -4572,7 +4496,7 @@ var feng3d;
                     var index = this.parent.children.indexOf(this);
                     feng3d.assert(index != -1);
                     this.parent.children.splice(index, 1);
-                    this._parent = null;
+                    this.parent = null;
                     editor.editorui.assetsview.updateShowFloder();
                     editor.assetsDispather.dispatch("changed");
                 }
@@ -4592,7 +4516,6 @@ var feng3d;
             AssetsFile.prototype.destroy = function () {
                 this.remove();
                 this.removeChildren();
-                this._children = null;
             };
             /**
              * 添加到父节点
@@ -4602,7 +4525,7 @@ var feng3d;
                 this.remove();
                 feng3d.assert(!!parent);
                 parent.children.push(this);
-                this._parent = parent;
+                this.parent = parent;
                 editor.editorui.assetsview.updateShowFloder();
                 editor.assetsDispather.dispatch("changed");
             };
@@ -4618,10 +4541,11 @@ var feng3d;
                 }
                 var deletefile = function () {
                     editor.fs.remove(_this.path, function (err) {
-                        feng3d.assert(!err);
+                        if (err)
+                            feng3d.warn("\u5220\u9664\u6587\u4EF6 " + _this.path + " \u51FA\u73B0\u95EE\u9898 " + err);
                         _this.destroy();
                         //
-                        _this._parent = null;
+                        _this.parent = null;
                         callback && callback(_this);
                     });
                     if (/\.ts\b/.test(_this.path)) {
@@ -4633,7 +4557,7 @@ var feng3d;
                     if (_this.children.length == 0)
                         deletefile();
                 };
-                if (this._isDirectory) {
+                if (this.isDirectory) {
                     this.children.forEach(function (element) {
                         element.deleteFile(function () {
                             checkDirDelete();
@@ -4815,7 +4739,7 @@ var feng3d;
                 var _this = this;
                 if (this.extension != AssetExtension.ts)
                     return "";
-                this._data = null;
+                this.cacheData = null;
                 this.getData(function (code) {
                     // 获取脚本类名称
                     var result = editor.regExps.scriptClass.exec(code);
@@ -4830,6 +4754,15 @@ var feng3d;
                     callback(script);
                 });
             };
+            AssetsFile.prototype.openChanged = function () {
+                editor.assetsDispather.dispatch("openChanged");
+            };
+            __decorate([
+                feng3d.watch("pathChanged")
+            ], AssetsFile.prototype, "path", void 0);
+            __decorate([
+                feng3d.watch("openChanged")
+            ], AssetsFile.prototype, "isOpen", void 0);
             return AssetsFile;
         }(editor.TreeNode));
         editor.AssetsFile = AssetsFile;
@@ -10541,7 +10474,7 @@ var feng3d;
                                 editor.engine.scene = scene;
                                 editor.editorui.assetsview.updateShowFloder();
                                 editor.assetsDispather.dispatch("changed");
-                                console.log("projectname 项目下载完成!");
+                                console.log(projectname + " \u9879\u76EE\u4E0B\u8F7D\u5B8C\u6210!");
                                 callback && callback();
                             });
                         });

@@ -216,7 +216,11 @@ var monacoEditor;
                 logLabel.textContent = "编译完成！";
                 if (window.opener)
                 {
-                    window.opener.feng3d.editor.editorAssets.runProjectScript();
+                    window.opener.feng3d.editor.editorAssets.runProjectScript(() =>
+                    {
+                        window.opener.feng3d.globalEvent.dispatch("shaderChanged");
+                        window.opener.feng3d.globalEvent.dispatch("scriptChanged");
+                    });
                 }
             });
         }
