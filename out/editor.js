@@ -2053,6 +2053,7 @@ var feng3d;
             ComponentView.prototype.initScriptView = function () {
                 // 初始化Script属性面板
                 if (this.component instanceof feng3d.ScriptComponent) {
+                    feng3d.watcher.watch(this.component, "script", this.onScriptChanged, this);
                     var component = this.component;
                     var scriptClass = feng3d.classUtils.getDefinitionByName(component.script, false);
                     if (scriptClass) {
@@ -2071,6 +2072,9 @@ var feng3d;
             };
             ComponentView.prototype.removeScriptView = function () {
                 // 移除Script属性面板
+                if (this.component instanceof feng3d.ScriptComponent) {
+                    feng3d.watcher.unwatch(this.component, "script", this.onScriptChanged, this);
+                }
                 if (this.scriptView) {
                     this.scriptView.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
                     if (this.scriptView.parent)
@@ -5223,7 +5227,7 @@ var feng3d;
         }());
         editor.AssetsFileTemplates = AssetsFileTemplates;
         editor.assetsFileTemplates = new AssetsFileTemplates();
-        var scriptTemplate = "namespace feng3d\n    {\n        export class NewScript extends Script\n        {\n            /**\n             * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n             */\n            init()\n            {\n    \n            }\n    \n            /**\n             * \u66F4\u65B0\n             */\n            update()\n            {\n    \n            }\n    \n            /**\n             * \u9500\u6BC1\u65F6\u8C03\u7528\n             */\n            dispose()\n            {\n    \n            }\n        }\n    }";
+        var scriptTemplate = "\nclass NewScript extends feng3d.Script\n{\n\n    /** \n     * \u6D4B\u8BD5\u5C5E\u6027 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    t_attr = new feng3d.Color4();\n\n    /**\n     * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n     */\n    init()\n    {\n\n    }\n\n    /**\n     * \u66F4\u65B0\n     */\n    update()\n    {\n\n    }\n\n    /**\n     * \u9500\u6BC1\u65F6\u8C03\u7528\n     */\n    dispose()\n    {\n\n    }\n}";
         var shaderTemplate = "\nclass NewShaderUniforms\n{\n    /** \n     * \u989C\u8272 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    u_color = new feng3d.Color4();\n}\n\nfeng3d.shaderConfig.shaders[\"NewShader\"] = {\n    cls: NewShaderUniforms,\n    vertex: `\n    \n    attribute vec3 a_position;\n    \n    uniform mat4 u_modelMatrix;\n    uniform mat4 u_viewProjection;\n    \n    void main(void) {\n    \n        vec4 globalPosition = u_modelMatrix * vec4(a_position, 1.0);\n        gl_Position = u_viewProjection * globalPosition;\n    }`,\n    fragment: `\n    \n    precision mediump float;\n    \n    uniform vec4 u_color;\n    \n    void main(void) {\n        \n        gl_FragColor = u_color;\n    }\n    `,\n};\n\ntype NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };\ninterface MaterialFactory\n{\n    create(shader: \"NewShader\", raw?: NewShaderMaterialRaw): NewShaderMaterial;\n}\n\ninterface MaterialRawMap\n{\n    NewShader: NewShaderMaterialRaw\n}\n\ninterface NewShaderMaterialRaw extends feng3d.MaterialBaseRaw\n{\n    shaderName?: \"NewShader\",\n    uniforms?: NewShaderUniformsRaw;\n}\n\ninterface NewShaderUniformsRaw\n{\n    __class__?: \"feng3d.NewShaderUniforms\",\n    u_time?: number,\n}";
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));

@@ -24,35 +24,41 @@ namespace feng3d.editor
 
     assetsFileTemplates = new AssetsFileTemplates();
 
-    var scriptTemplate = `namespace feng3d
+    var scriptTemplate = `
+class NewScript extends feng3d.Script
+{
+
+    /** 
+     * 测试属性 
+     */
+    @feng3d.serialize
+    @feng3d.oav()
+    t_attr = new feng3d.Color4();
+
+    /**
+     * 初始化时调用
+     */
+    init()
     {
-        export class NewScript extends Script
-        {
-            /**
-             * 初始化时调用
-             */
-            init()
-            {
-    
-            }
-    
-            /**
-             * 更新
-             */
-            update()
-            {
-    
-            }
-    
-            /**
-             * 销毁时调用
-             */
-            dispose()
-            {
-    
-            }
-        }
-    }`;
+
+    }
+
+    /**
+     * 更新
+     */
+    update()
+    {
+
+    }
+
+    /**
+     * 销毁时调用
+     */
+    dispose()
+    {
+
+    }
+}`;
 
     var shaderTemplate = `
 class NewShaderUniforms

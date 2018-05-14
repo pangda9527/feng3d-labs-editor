@@ -128,6 +128,7 @@ namespace feng3d.editor
 			// 初始化Script属性面板
 			if (this.component instanceof ScriptComponent)
 			{
+				watcher.watch(this.component, "script", this.onScriptChanged, this);
 				var component = this.component;
 				var scriptClass = classUtils.getDefinitionByName(component.script, false);
 				if (scriptClass)
@@ -151,6 +152,10 @@ namespace feng3d.editor
 		private removeScriptView()
 		{
 			// 移除Script属性面板
+			if (this.component instanceof ScriptComponent)
+			{
+				watcher.unwatch(this.component, "script", this.onScriptChanged, this);
+			}
 			if (this.scriptView)
 			{
 				this.scriptView.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
