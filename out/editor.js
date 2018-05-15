@@ -4097,7 +4097,9 @@ var feng3d;
                         ]
                     }, { type: "separator" }, {
                         label: "导入资源", click: function () {
-                            editor.fs.selectFile(_this.inputFiles, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
+                            editor.fs.selectFile(function (file) {
+                                _this.inputFiles(file);
+                            }, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
                         }
                     });
                 }

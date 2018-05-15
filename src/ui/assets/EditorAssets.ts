@@ -198,7 +198,10 @@ namespace feng3d.editor
                     {
                         label: "导入资源", click: () =>
                         {
-                            fs.selectFile(this.inputFiles, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
+                            fs.selectFile((file: FileList) =>
+                            {
+                                this.inputFiles(file);
+                            }, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
                         }
                     });
             }
