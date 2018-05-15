@@ -133,7 +133,7 @@ namespace feng3d.editor
          */
         getEditorAssetsPath(url: string)
         {
-            return document.URL + "resource/" + url;
+            return document.URL.substring(0, document.URL.lastIndexOf("/") + 1) + "resource/" + url;
         }
 
         constructor()
