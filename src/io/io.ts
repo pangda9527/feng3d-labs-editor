@@ -146,7 +146,7 @@ namespace feng3d.editor
                         if (filepaths.length > 0)
                         {
                             var filepath = filepaths.shift();
-                            fs.readFile(filepath, (err, data: Buffer) =>
+                            fs.readFile(filepath, (err, data: ArrayBuffer) =>
                             {
                                 //处理文件夹
                                 data && zip.file(filepath, data);
