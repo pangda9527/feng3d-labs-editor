@@ -4675,6 +4675,8 @@ var feng3d;
                             var assetsFile = new AssetsFile(stats, data);
                             assetsFile.addto(_this);
                             callback && callback(_this);
+                            if (editor.regExps.image.test(assetsFile.path))
+                                feng3d.globalEvent.dispatch("imageAssetsChanged", { url: assetsFile.path });
                         });
                     });
                 });

@@ -522,6 +522,8 @@ namespace feng3d.editor
                         var assetsFile = new AssetsFile(stats, data);
                         assetsFile.addto(this);
                         callback && callback(this);
+                        if (regExps.image.test(assetsFile.path))
+                            globalEvent.dispatch("imageAssetsChanged", { url: assetsFile.path });
                     });
                 });
             });
