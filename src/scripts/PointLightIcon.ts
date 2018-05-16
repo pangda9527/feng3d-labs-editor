@@ -95,12 +95,13 @@ namespace feng3d.editor
             lightpoints.showinHierarchy = false;
             var meshRenderer = lightpoints.addComponent(MeshRenderer);
             var pointGeometry = this.pointGeometry = meshRenderer.geometry = new PointGeometry();
-            pointGeometry.addPoint(new PointInfo(new Vector3(1, 0, 0), new Color4(1, 0, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(-1, 0, 0), new Color4(1, 0, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(0, 1, 0), new Color4(0, 1, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(0, -1, 0), new Color4(0, 1, 0)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, 1), new Color4(0, 0, 1)));
-            pointGeometry.addPoint(new PointInfo(new Vector3(0, 0, -1), new Color4(0, 0, 1)));
+            pointGeometry.points = [
+                { position: new Vector3(1, 0, 0), color: new Color4(1, 0, 0) },
+                { position: new Vector3(-1, 0, 0), color: new Color4(1, 0, 0) },
+                { position: new Vector3(0, 1, 0), color: new Color4(0, 1, 0) },
+                { position: new Vector3(0, -1, 0), color: new Color4(0, 1, 0) },
+                { position: new Vector3(0, 0, 1), color: new Color4(0, 0, 1) },
+                { position: new Vector3(0, 0, -1), color: new Color4(0, 0, 1) }];
             var pointMaterial = meshRenderer.material = materialFactory.create("point", { renderParams: { renderMode: RenderMode.POINTS } });
             pointMaterial.renderParams.enableBlend = true;
             pointMaterial.uniforms.u_PointSize = 5;
@@ -162,43 +163,43 @@ namespace feng3d.editor
                 }
                 this.segmentGeometry.invalidateGeometry();
 
-                this.pointGeometry.removeAllPoints();
+                this.pointGeometry.points = [];
                 var point = new Vector3(1, 0, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color4(1, 0, 0, alpha)));
+                this.pointGeometry.points.push({ position: point, color: new Color4(1, 0, 0, alpha) });
                 point = new Vector3(-1, 0, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color4(1, 0, 0, alpha)));
+                this.pointGeometry.points.push({ position: point, color: new Color4(1, 0, 0, alpha) });
                 point = new Vector3(0, 1, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color4(0, 1, 0, alpha)));
+                this.pointGeometry.points.push({ position: point, color: new Color4(0, 1, 0, alpha) });
                 point = new Vector3(0, -1, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color4(0, 1, 0, alpha)));
+                this.pointGeometry.points.push({ position: point, color: new Color4(0, 1, 0, alpha) });
                 point = new Vector3(0, 0, 1);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color4(0, 0, 1, alpha)));
+                this.pointGeometry.points.push({ position: point, color: new Color4(0, 0, 1, alpha) });
                 point = new Vector3(0, 0, -1);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.addPoint(new PointInfo(point, new Color4(0, 0, 1, alpha)));
+                this.pointGeometry.points.push({ position: point, color: new Color4(0, 0, 1, alpha) });
                 //
                 this.lightLines.visible = true;
                 this.lightLines1.visible = true;

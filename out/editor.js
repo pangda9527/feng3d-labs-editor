@@ -8960,8 +8960,9 @@ var navigation;
                 var lp = getHalfAnglePoint(p1, ld, cd, agentRadius);
                 var rp = getHalfAnglePoint(p2, cd, rd, agentRadius);
                 //debug
-                pointGeometry.addPoint(new feng3d.PointInfo(lp));
-                pointGeometry.addPoint(new feng3d.PointInfo(rp));
+                pointGeometry.points.push({ position: lp });
+                pointGeometry.points.push({ position: rp });
+                pointGeometry.invalidateGeometry();
                 //
                 var hpmap = {};
                 var points = linemap.get(line0.index).points.concat();
@@ -9406,7 +9407,7 @@ function createSegment() {
         materialp.uniforms.u_PointSize = 5;
         materialp.uniforms.u_color.setTo(0, 0, 0);
     }
-    pointGeometry.removeAllPoints();
+    pointGeometry.points = [];
     parentobject.addChild(debugPoint);
 }
 var feng3d;
@@ -9791,12 +9792,14 @@ var feng3d;
                 lightpoints.showinHierarchy = false;
                 var meshRenderer = lightpoints.addComponent(feng3d.MeshRenderer);
                 var pointGeometry = this.pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(1, 0, 0), new feng3d.Color4(1, 0, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(-1, 0, 0), new feng3d.Color4(1, 0, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 1, 0), new feng3d.Color4(0, 1, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, -1, 0), new feng3d.Color4(0, 1, 0)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, 1), new feng3d.Color4(0, 0, 1)));
-                pointGeometry.addPoint(new feng3d.PointInfo(new feng3d.Vector3(0, 0, -1), new feng3d.Color4(0, 0, 1)));
+                pointGeometry.points = [
+                    { position: new feng3d.Vector3(1, 0, 0), color: new feng3d.Color4(1, 0, 0) },
+                    { position: new feng3d.Vector3(-1, 0, 0), color: new feng3d.Color4(1, 0, 0) },
+                    { position: new feng3d.Vector3(0, 1, 0), color: new feng3d.Color4(0, 1, 0) },
+                    { position: new feng3d.Vector3(0, -1, 0), color: new feng3d.Color4(0, 1, 0) },
+                    { position: new feng3d.Vector3(0, 0, 1), color: new feng3d.Color4(0, 0, 1) },
+                    { position: new feng3d.Vector3(0, 0, -1), color: new feng3d.Color4(0, 0, 1) }
+                ];
                 var pointMaterial = meshRenderer.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
                 pointMaterial.renderParams.enableBlend = true;
                 pointMaterial.uniforms.u_PointSize = 5;
@@ -9851,43 +9854,43 @@ var feng3d;
                         this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 0, 1, alpha), endColor: new feng3d.Color4(0, 0, 1, alpha) });
                     }
                     this.segmentGeometry.invalidateGeometry();
-                    this.pointGeometry.removeAllPoints();
+                    this.pointGeometry.points = [];
                     var point = new feng3d.Vector3(1, 0, 0);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(1, 0, 0, alpha)));
+                    this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(1, 0, 0, alpha) });
                     point = new feng3d.Vector3(-1, 0, 0);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(1, 0, 0, alpha)));
+                    this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(1, 0, 0, alpha) });
                     point = new feng3d.Vector3(0, 1, 0);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(0, 1, 0, alpha)));
+                    this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 1, 0, alpha) });
                     point = new feng3d.Vector3(0, -1, 0);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(0, 1, 0, alpha)));
+                    this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 1, 0, alpha) });
                     point = new feng3d.Vector3(0, 0, 1);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(0, 0, 1, alpha)));
+                    this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 0, 1, alpha) });
                     point = new feng3d.Vector3(0, 0, -1);
                     if (point.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.pointGeometry.addPoint(new feng3d.PointInfo(point, new feng3d.Color4(0, 0, 1, alpha)));
+                    this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 0, 1, alpha) });
                     //
                     this.lightLines.visible = true;
                     this.lightLines1.visible = true;

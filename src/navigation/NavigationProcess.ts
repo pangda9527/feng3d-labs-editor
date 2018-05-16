@@ -78,8 +78,9 @@ namespace navigation
                 var lp = getHalfAnglePoint(p1, ld, cd, agentRadius);
                 var rp = getHalfAnglePoint(p2, cd, rd, agentRadius);
                 //debug
-                pointGeometry.addPoint(new feng3d.PointInfo(lp));
-                pointGeometry.addPoint(new feng3d.PointInfo(rp));
+                pointGeometry.points.push({ position: lp });
+                pointGeometry.points.push({ position: rp });
+                pointGeometry.invalidateGeometry();
                 //
                 var hpmap: { [point: number]: true } = {};
                 var points = linemap.get(line0.index).points.concat();
@@ -666,6 +667,6 @@ function createSegment()
         materialp.uniforms.u_PointSize = 5;
         materialp.uniforms.u_color.setTo(0, 0, 0);
     }
-    pointGeometry.removeAllPoints();
+    pointGeometry.points = [];
     parentobject.addChild(debugPoint);
 }
