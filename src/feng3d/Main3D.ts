@@ -62,11 +62,17 @@ namespace feng3d.editor
             editorObject.showinHierarchy = false;
             editorObject.addComponent(SceneRotateTool);
             //
-            editorObject.addComponent(Trident);
             //初始化模块
             editorObject.addComponent(GroundGrid);
             editorObject.addComponent(MRSTool);
             editorObject.addComponent(EditorComponent);
+
+            Loader.loadText(editorData.getEditorAssetsPath("gameobjects/Trident.gameobject"), (content) =>
+            {
+                var trident = serialization.deserialize(JSON.parse(content));
+                editorObject.addChild(trident);
+            });
+
             //
             editorDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             //

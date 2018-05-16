@@ -279,18 +279,20 @@ namespace navigation
 
         private debugShowLines1(line0s: Line0[], length: number)
         {
+            var segments: feng3d.Segment[] = [];
             line0s.forEach(element =>
             {
                 var p0 = element.segment.p0.addTo(element.segment.p1).scale(0.5);
                 var p1 = p0.addTo(element.direction.clone().normalize(length));
-                segmentGeometry.addSegment(new feng3d.Segment(p0, p1, new feng3d.Color4(1), new feng3d.Color4(0, 1)));
+                segments.push({ start: p0, end: p1, startColor: new feng3d.Color4(1), endColor: new feng3d.Color4(0, 1) });
             });
+            segmentGeometry.segments = segments;
         }
 
         private debugShowLines(lines: Line[])
         {
             createSegment();
-            segmentGeometry.removeAllSegments();
+            var segments: feng3d.Segment[] = [];
             lines.forEach(element =>
             {
                 var points = element.points.map((pointindex) =>
@@ -298,8 +300,9 @@ namespace navigation
                     var value = this.data.pointmap.get(pointindex).value;
                     return new feng3d.Vector3(value[0], value[1], value[2]);
                 });
-                segmentGeometry.addSegment(new feng3d.Segment(points[0], points[1]));
+                segments.push({ start: points[0], end: points[1] });
             });
+            segmentGeometry.segments = segments;
         }
 
         /**

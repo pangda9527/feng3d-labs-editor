@@ -80,10 +80,11 @@ namespace feng3d.editor
                 var angle1 = (i + 1) * Math.PI * 2 / num;
                 var x1 = Math.sin(angle1);
                 var y1 = Math.cos(angle1);
-                segmentGeometry.addSegment(new Segment(new Vector3(0, x, y), new Vector3(0, x1, y1)));
-                segmentGeometry.addSegment(new Segment(new Vector3(x, 0, y), new Vector3(x1, 0, y1)));
-                segmentGeometry.addSegment(new Segment(new Vector3(x, y, 0), new Vector3(x1, y1, 0)));
-                segmentGeometry1.addSegment(new Segment(new Vector3(x, y, 0), new Vector3(x1, y1, 0)));
+                segmentGeometry.segments.push(
+                    { start: new Vector3(0, x, y), end: new Vector3(0, x1, y1) },
+                    { start: new Vector3(x, 0, y), end: new Vector3(x1, 0, y1) },
+                    { start: new Vector3(x, y, 0), end: new Vector3(x1, y1, 0) },
+                    { start: new Vector3(x, y, 0), end: new Vector3(x1, y1, 0) });
             }
             this.gameObject.addChild(lightLines);
             this.gameObject.addChild(lightLines1);
@@ -122,7 +123,7 @@ namespace feng3d.editor
                 //
                 var camerapos = this.gameObject.transform.inverseTransformPoint(editorCamera.gameObject.transform.scenePosition);
                 //
-                this.segmentGeometry.removeAllSegments();
+                this.segmentGeometry.segments.length = 0;
                 var alpha = 1;
                 var backalpha = 0.5;
                 var num = 36;
@@ -143,22 +144,23 @@ namespace feng3d.editor
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.addSegment(new Segment(point0, point1, new Color4(1, 0, 0, alpha), new Color4(1, 0, 0, alpha)));
+                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new Color4(1, 0, 0, alpha), endColor: new Color4(1, 0, 0, alpha) });
                     point0 = new Vector3(x, 0, y);
                     point1 = new Vector3(x1, 0, y1);
                     if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.addSegment(new Segment(point0, point1, new Color4(0, 1, 0, alpha), new Color4(0, 1, 0, alpha)));
+                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new Color4(0, 1, 0, alpha), endColor: new Color4(0, 1, 0, alpha) });
                     point0 = new Vector3(x, y, 0);
                     point1 = new Vector3(x1, y1, 0);
                     if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.addSegment(new Segment(point0, point1, new Color4(0, 0, 1, alpha), new Color4(0, 0, 1, alpha)));
+                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new Color4(0, 0, 1, alpha), endColor: new Color4(0, 0, 1, alpha) });
                 }
+                this.segmentGeometry.invalidateGeometry();
 
                 this.pointGeometry.removeAllPoints();
                 var point = new Vector3(1, 0, 0);

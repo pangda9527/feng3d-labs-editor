@@ -97,8 +97,6 @@ namespace feng3d.editor
             {
                 if (item.getComponent(Scene3D))
                     return result;
-                if (item.getComponent(Trident))
-                    return result;
                 if (item.getComponent(GroundGrid))
                     return result;
                 if (item.getComponent(SkinnedMeshRenderer))

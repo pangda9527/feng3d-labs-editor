@@ -116,7 +116,7 @@ namespace feng3d.editor
                 var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this._filterNormal);
             }
 
-            this.segmentGeometry.removeAllSegments();
+            this.segmentGeometry.segments.length = 0;
             var points: Vector3[] = [];
             for (var i = 0; i <= 360; i++)
             {
@@ -131,14 +131,10 @@ namespace feng3d.editor
                     }
                     if (show)
                     {
-                        var segment = new Segment(points[i - 1], points[i]);
-                        segment.startColor = segment.endColor = color;
-                        this.segmentGeometry.addSegment(segment);
+                        this.segmentGeometry.segments = [{ start: points[i - 1], end: points[i], startColor: color, endColor: color }];
                     } else if (this.selected)
                     {
-                        var segment = new Segment(points[i - 1], points[i]);
-                        segment.startColor = segment.endColor = this.backColor;
-                        this.segmentGeometry.addSegment(segment);
+                        this.segmentGeometry.segments = [{ start: points[i - 1], end: points[i], startColor: this.backColor, endColor: this.backColor }];
                     }
                 }
             }
@@ -238,13 +234,10 @@ namespace feng3d.editor
             var startPoint = new Vector3(this.radius * Math.cos((this._start - 0.1) * FMath.DEG2RAD), this.radius * Math.sin((this._start - 0.1) * FMath.DEG2RAD), 0);
             var endPoint = new Vector3(this.radius * Math.cos((this._end + 0.1) * FMath.DEG2RAD), this.radius * Math.sin((this._end + 0.1) * FMath.DEG2RAD), 0);
             //
-            this.segmentGeometry.removeAllSegments();
-            var segment = new Segment(new Vector3(), startPoint);
-            segment.startColor = segment.endColor = this.borderColor;
-            this.segmentGeometry.addSegment(segment);
-            var segment = new Segment(new Vector3(), endPoint);
-            segment.startColor = segment.endColor = this.borderColor;
-            this.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.segments = [
+                { start: new Vector3(), end: startPoint, startColor: this.borderColor, endColor: this.borderColor },
+                { start: new Vector3(), end: endPoint, startColor: this.borderColor, endColor: this.borderColor },
+            ];
         }
     }
 
@@ -296,7 +289,7 @@ namespace feng3d.editor
 
             var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
 
-            this.segmentGeometry.removeAllSegments();
+            var segments: Segment[] = [];
             var points: Vector3[] = [];
             for (var i = 0; i <= 360; i++)
             {
@@ -304,11 +297,10 @@ namespace feng3d.editor
                 points[i].scale(this.radius);
                 if (i > 0)
                 {
-                    var segment = new Segment(points[i - 1], points[i]);
-                    segment.startColor = segment.endColor = color;
-                    this.segmentGeometry.addSegment(segment);
+                    segments.push({ start: points[i - 1], end: points[i], startColor: color, endColor: color });
                 }
             }
+            this.segmentGeometry.segments = segments;
         }
     }
 }

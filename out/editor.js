@@ -5764,8 +5764,6 @@ var feng3d;
                     var transforms = this.selectedGameObjects.reduce(function (result, item) {
                         if (item.getComponent(feng3d.Scene3D))
                             return result;
-                        if (item.getComponent(feng3d.Trident))
-                            return result;
                         if (item.getComponent(editor.GroundGrid))
                             return result;
                         if (item.getComponent(feng3d.SkinnedMeshRenderer))
@@ -6148,8 +6146,7 @@ var feng3d;
                 var xLine = feng3d.GameObject.create();
                 var meshRenderer = xLine.addComponent(feng3d.MeshRenderer);
                 var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
-                var segment = new feng3d.Segment(new feng3d.Vector3(), new feng3d.Vector3(0, this.length, 0));
-                segmentGeometry.addSegment(segment);
+                segmentGeometry.segments.push({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
                 this.segmentMaterial = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
                 this.gameObject.addChild(xLine);
                 //
@@ -6264,19 +6261,14 @@ var feng3d;
             };
             CoordinatePlane.prototype.update = function () {
                 this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
-                this.segmentGeometry.removeAllSegments();
-                var segment = new feng3d.Segment(new feng3d.Vector3(0, 0, 0), new feng3d.Vector3(this._width, 0, 0));
-                segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-                this.segmentGeometry.addSegment(segment);
-                var segment = new feng3d.Segment(new feng3d.Vector3(this._width, 0, 0), new feng3d.Vector3(this._width, 0, this._width));
-                segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-                this.segmentGeometry.addSegment(segment);
-                var segment = new feng3d.Segment(new feng3d.Vector3(this._width, 0, this._width), new feng3d.Vector3(0, 0, this._width));
-                segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-                this.segmentGeometry.addSegment(segment);
-                var segment = new feng3d.Segment(new feng3d.Vector3(0, 0, this._width), new feng3d.Vector3(0, 0, 0));
-                segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-                this.segmentGeometry.addSegment(segment);
+                var color = this.selected ? this.selectedborderColor : this.borderColor;
+                this.segmentGeometry.segments = [{ start: new feng3d.Vector3(0, 0, 0), end: new feng3d.Vector3(this._width, 0, 0), startColor: color, endColor: color }];
+                color = this.selected ? this.selectedborderColor : this.borderColor;
+                this.segmentGeometry.segments.push({ start: new feng3d.Vector3(this._width, 0, 0), end: new feng3d.Vector3(this._width, 0, this._width), startColor: color, endColor: color });
+                color = this.selected ? this.selectedborderColor : this.borderColor;
+                this.segmentGeometry.segments.push({ start: new feng3d.Vector3(this._width, 0, this._width), end: new feng3d.Vector3(0, 0, this._width), startColor: color, endColor: color });
+                color = this.selected ? this.selectedborderColor : this.borderColor;
+                this.segmentGeometry.segments.push({ start: new feng3d.Vector3(0, 0, this._width), end: new feng3d.Vector3(0, 0, 0), startColor: color, endColor: color });
             };
             return CoordinatePlane;
         }(feng3d.Component));
@@ -6388,7 +6380,7 @@ var feng3d;
                 if (this._filterNormal) {
                     var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this._filterNormal);
                 }
-                this.segmentGeometry.removeAllSegments();
+                this.segmentGeometry.segments.length = 0;
                 var points = [];
                 for (var i = 0; i <= 360; i++) {
                     points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
@@ -6399,14 +6391,10 @@ var feng3d;
                             show = points[i - 1].dot(localNormal) > 0 && points[i].dot(localNormal) > 0;
                         }
                         if (show) {
-                            var segment = new feng3d.Segment(points[i - 1], points[i]);
-                            segment.startColor = segment.endColor = color;
-                            this.segmentGeometry.addSegment(segment);
+                            this.segmentGeometry.segments = [{ start: points[i - 1], end: points[i], startColor: color, endColor: color }];
                         }
                         else if (this.selected) {
-                            var segment = new feng3d.Segment(points[i - 1], points[i]);
-                            segment.startColor = segment.endColor = this.backColor;
-                            this.segmentGeometry.addSegment(segment);
+                            this.segmentGeometry.segments = [{ start: points[i - 1], end: points[i], startColor: this.backColor, endColor: this.backColor }];
                         }
                     }
                 }
@@ -6494,13 +6482,10 @@ var feng3d;
                 var startPoint = new feng3d.Vector3(this.radius * Math.cos((this._start - 0.1) * feng3d.FMath.DEG2RAD), this.radius * Math.sin((this._start - 0.1) * feng3d.FMath.DEG2RAD), 0);
                 var endPoint = new feng3d.Vector3(this.radius * Math.cos((this._end + 0.1) * feng3d.FMath.DEG2RAD), this.radius * Math.sin((this._end + 0.1) * feng3d.FMath.DEG2RAD), 0);
                 //
-                this.segmentGeometry.removeAllSegments();
-                var segment = new feng3d.Segment(new feng3d.Vector3(), startPoint);
-                segment.startColor = segment.endColor = this.borderColor;
-                this.segmentGeometry.addSegment(segment);
-                var segment = new feng3d.Segment(new feng3d.Vector3(), endPoint);
-                segment.startColor = segment.endColor = this.borderColor;
-                this.segmentGeometry.addSegment(segment);
+                this.segmentGeometry.segments = [
+                    { start: new feng3d.Vector3(), end: startPoint, startColor: this.borderColor, endColor: this.borderColor },
+                    { start: new feng3d.Vector3(), end: endPoint, startColor: this.borderColor, endColor: this.borderColor },
+                ];
             };
             return SectorGameObject;
         }(feng3d.Component));
@@ -6548,17 +6533,16 @@ var feng3d;
                 this.sector.radius = this.radius;
                 var color = this._selected ? this.selectedColor : this.color;
                 var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
-                this.segmentGeometry.removeAllSegments();
+                var segments = [];
                 var points = [];
                 for (var i = 0; i <= 360; i++) {
                     points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
                     points[i].scale(this.radius);
                     if (i > 0) {
-                        var segment = new feng3d.Segment(points[i - 1], points[i]);
-                        segment.startColor = segment.endColor = color;
-                        this.segmentGeometry.addSegment(segment);
+                        segments.push({ start: points[i - 1], end: points[i], startColor: color, endColor: color });
                     }
                 }
+                this.segmentGeometry.segments = segments;
             };
             return CoordinateRotationFreeAxis;
         }(feng3d.Component));
@@ -6655,10 +6639,7 @@ var feng3d;
                 this.coordinateCube.color = this.color;
                 this.coordinateCube.selectedColor = this.selectedColor;
                 this.coordinateCube.update();
-                this.segmentGeometry.removeAllSegments();
-                var segment = new feng3d.Segment(new feng3d.Vector3(), new feng3d.Vector3(0, this._scale * this.length, 0));
-                segment.startColor = segment.endColor = this.selected ? this.selectedColor : this.color;
-                this.segmentGeometry.addSegment(segment);
+                this.segmentGeometry.segments = [{ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this._scale * this.length, 0), startColor: this.color, endColor: this.color }];
                 //
                 this.coordinateCube.transform.y = this.length * this._scale;
                 this.coordinateCube.selected = this.selected;
@@ -8096,15 +8077,16 @@ var feng3d;
                     var xcolor = new feng3d.Color4(1, 0, 0, 0.5);
                     var zcolor = new feng3d.Color4(0, 0, 1, 0.5);
                     var color;
-                    segmentGeometry.removeAllSegments();
+                    var segments = [];
                     for (var i = -halfNum; i <= halfNum; i++) {
                         var color0 = new feng3d.Color4().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
                         color0.a = ((i % 10) == 0) ? 0.5 : 0.1;
                         color = (i * step + startZ == 0) ? xcolor : color0;
-                        segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(-halfNum * step + startX, 0, i * step + startZ), new feng3d.Vector3(halfNum * step + startX, 0, i * step + startZ), color, color));
+                        segments.push({ start: new feng3d.Vector3(-halfNum * step + startX, 0, i * step + startZ), end: new feng3d.Vector3(halfNum * step + startX, 0, i * step + startZ), startColor: color, endColor: color });
                         color = (i * step + startX == 0) ? zcolor : color0;
-                        segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(i * step + startX, 0, -halfNum * step + startZ), new feng3d.Vector3(i * step + startX, 0, halfNum * step + startZ), color, color));
+                        segments.push({ start: new feng3d.Vector3(i * step + startX, 0, -halfNum * step + startZ), end: new feng3d.Vector3(i * step + startX, 0, halfNum * step + startZ), startColor: color, endColor: color });
                     }
+                    segmentGeometry.segments = segments;
                 }
             };
             __decorate([
@@ -8180,11 +8162,14 @@ var feng3d;
                 editorObject.showinHierarchy = false;
                 editorObject.addComponent(editor.SceneRotateTool);
                 //
-                editorObject.addComponent(feng3d.Trident);
                 //初始化模块
                 editorObject.addComponent(editor.GroundGrid);
                 editorObject.addComponent(editor.MRSTool);
                 editorObject.addComponent(editor.EditorComponent);
+                feng3d.Loader.loadText(editor.editorData.getEditorAssetsPath("gameobjects/Trident.gameobject"), function (content) {
+                    var trident = feng3d.serialization.deserialize(JSON.parse(content));
+                    editorObject.addChild(trident);
+                });
                 //
                 editor.editorDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
                 //
@@ -9140,23 +9125,26 @@ var navigation;
             return this.data.getGeometry();
         };
         NavigationProcess.prototype.debugShowLines1 = function (line0s, length) {
+            var segments = [];
             line0s.forEach(function (element) {
                 var p0 = element.segment.p0.addTo(element.segment.p1).scale(0.5);
                 var p1 = p0.addTo(element.direction.clone().normalize(length));
-                segmentGeometry.addSegment(new feng3d.Segment(p0, p1, new feng3d.Color4(1), new feng3d.Color4(0, 1)));
+                segments.push({ start: p0, end: p1, startColor: new feng3d.Color4(1), endColor: new feng3d.Color4(0, 1) });
             });
+            segmentGeometry.segments = segments;
         };
         NavigationProcess.prototype.debugShowLines = function (lines) {
             var _this = this;
             createSegment();
-            segmentGeometry.removeAllSegments();
+            var segments = [];
             lines.forEach(function (element) {
                 var points = element.points.map(function (pointindex) {
                     var value = _this.data.pointmap.get(pointindex).value;
                     return new feng3d.Vector3(value[0], value[1], value[2]);
                 });
-                segmentGeometry.addSegment(new feng3d.Segment(points[0], points[1]));
+                segments.push({ start: points[0], end: points[1] });
             });
+            segmentGeometry.segments = segments;
         };
         /**
          * 获取所有独立边
@@ -9686,7 +9674,7 @@ var feng3d;
                     var angle = i * Math.PI * 2 / num;
                     var x = Math.sin(angle) * linesize;
                     var y = Math.cos(angle) * linesize;
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(x, y, 0), new feng3d.Vector3(x, y, linesize * 5)));
+                    segmentGeometry.segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x, y, linesize * 5) });
                 }
                 num = 36;
                 for (var i = 0; i < num; i++) {
@@ -9696,7 +9684,7 @@ var feng3d;
                     var angle1 = (i + 1) * Math.PI * 2 / num;
                     var x1 = Math.sin(angle1) * linesize;
                     var y1 = Math.cos(angle1) * linesize;
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(x, y, 0), new feng3d.Vector3(x1, y1, 0)));
+                    segmentGeometry.segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
                 }
                 this.gameObject.addChild(lightLines);
                 this.enabled = true;
@@ -9792,10 +9780,7 @@ var feng3d;
                     var angle1 = (i + 1) * Math.PI * 2 / num;
                     var x1 = Math.sin(angle1);
                     var y1 = Math.cos(angle1);
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(0, x, y), new feng3d.Vector3(0, x1, y1)));
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(x, 0, y), new feng3d.Vector3(x1, 0, y1)));
-                    segmentGeometry.addSegment(new feng3d.Segment(new feng3d.Vector3(x, y, 0), new feng3d.Vector3(x1, y1, 0)));
-                    segmentGeometry1.addSegment(new feng3d.Segment(new feng3d.Vector3(x, y, 0), new feng3d.Vector3(x1, y1, 0)));
+                    segmentGeometry.segments.push({ start: new feng3d.Vector3(0, x, y), end: new feng3d.Vector3(0, x1, y1) }, { start: new feng3d.Vector3(x, 0, y), end: new feng3d.Vector3(x1, 0, y1) }, { start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) }, { start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
                 }
                 this.gameObject.addChild(lightLines);
                 this.gameObject.addChild(lightLines1);
@@ -9829,7 +9814,7 @@ var feng3d;
                     //
                     var camerapos = this.gameObject.transform.inverseTransformPoint(editor.editorCamera.gameObject.transform.scenePosition);
                     //
-                    this.segmentGeometry.removeAllSegments();
+                    this.segmentGeometry.segments.length = 0;
                     var alpha = 1;
                     var backalpha = 0.5;
                     var num = 36;
@@ -9849,22 +9834,23 @@ var feng3d;
                             alpha = backalpha;
                         else
                             alpha = 1.0;
-                        this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color4(1, 0, 0, alpha), new feng3d.Color4(1, 0, 0, alpha)));
+                        this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(1, 0, 0, alpha), endColor: new feng3d.Color4(1, 0, 0, alpha) });
                         point0 = new feng3d.Vector3(x, 0, y);
                         point1 = new feng3d.Vector3(x1, 0, y1);
                         if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                             alpha = backalpha;
                         else
                             alpha = 1.0;
-                        this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color4(0, 1, 0, alpha), new feng3d.Color4(0, 1, 0, alpha)));
+                        this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 1, 0, alpha), endColor: new feng3d.Color4(0, 1, 0, alpha) });
                         point0 = new feng3d.Vector3(x, y, 0);
                         point1 = new feng3d.Vector3(x1, y1, 0);
                         if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                             alpha = backalpha;
                         else
                             alpha = 1.0;
-                        this.segmentGeometry.addSegment(new feng3d.Segment(point0, point1, new feng3d.Color4(0, 0, 1, alpha), new feng3d.Color4(0, 0, 1, alpha)));
+                        this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 0, 1, alpha), endColor: new feng3d.Color4(0, 0, 1, alpha) });
                     }
+                    this.segmentGeometry.invalidateGeometry();
                     this.pointGeometry.removeAllPoints();
                     var point = new feng3d.Vector3(1, 0, 0);
                     if (point.dot(camerapos) < 0)

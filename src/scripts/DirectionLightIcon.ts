@@ -53,7 +53,7 @@ namespace feng3d.editor
                 var angle = i * Math.PI * 2 / num;
                 var x = Math.sin(angle) * linesize;
                 var y = Math.cos(angle) * linesize;
-                segmentGeometry.addSegment(new Segment(new Vector3(x, y, 0), new Vector3(x, y, linesize * 5)));
+                segmentGeometry.segments.push({ start: new Vector3(x, y, 0), end: new Vector3(x, y, linesize * 5) });
             }
             num = 36;
             for (var i = 0; i < num; i++)
@@ -64,7 +64,7 @@ namespace feng3d.editor
                 var angle1 = (i + 1) * Math.PI * 2 / num;
                 var x1 = Math.sin(angle1) * linesize;
                 var y1 = Math.cos(angle1) * linesize;
-                segmentGeometry.addSegment(new Segment(new Vector3(x, y, 0), new Vector3(x1, y1, 0)));
+                segmentGeometry.segments.push({ start: new Vector3(x, y, 0), end: new Vector3(x1, y1, 0) });
             }
             this.gameObject.addChild(lightLines);
 

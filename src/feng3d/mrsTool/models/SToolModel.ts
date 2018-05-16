@@ -89,10 +89,7 @@ namespace feng3d.editor
             this.coordinateCube.selectedColor = this.selectedColor;
             this.coordinateCube.update();
 
-            this.segmentGeometry.removeAllSegments();
-            var segment = new Segment(new Vector3(), new Vector3(0, this._scale * this.length, 0));
-            segment.startColor = segment.endColor = this.selected ? this.selectedColor : this.color;
-            this.segmentGeometry.addSegment(segment);
+            this.segmentGeometry.segments = [{ start: new Vector3(), end: new Vector3(0, this._scale * this.length, 0), startColor: this.color, endColor: this.color }];
 
             //
             this.coordinateCube.transform.y = this.length * this._scale;

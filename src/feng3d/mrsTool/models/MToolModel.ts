@@ -86,8 +86,7 @@ namespace feng3d.editor
             var xLine = GameObject.create();
             var meshRenderer = xLine.addComponent(MeshRenderer);
             var segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
-            var segment = new Segment(new Vector3(), new Vector3(0, this.length, 0));
-            segmentGeometry.addSegment(segment);
+            segmentGeometry.segments.push({ start: new Vector3(), end: new Vector3(0, this.length, 0) });
             this.segmentMaterial = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
             this.gameObject.addChild(xLine);
             //
@@ -203,23 +202,17 @@ namespace feng3d.editor
         {
             this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
 
-            this.segmentGeometry.removeAllSegments();
+            var color = this.selected ? this.selectedborderColor : this.borderColor;
+            this.segmentGeometry.segments = [{ start: new Vector3(0, 0, 0), end: new Vector3(this._width, 0, 0), startColor: color, endColor: color }];
 
-            var segment = new Segment(new Vector3(0, 0, 0), new Vector3(this._width, 0, 0));
-            segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            this.segmentGeometry.addSegment(segment);
+            color = this.selected ? this.selectedborderColor : this.borderColor;
+            this.segmentGeometry.segments.push({ start: new Vector3(this._width, 0, 0), end: new Vector3(this._width, 0, this._width), startColor: color, endColor: color });
 
-            var segment = new Segment(new Vector3(this._width, 0, 0), new Vector3(this._width, 0, this._width));
-            segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            this.segmentGeometry.addSegment(segment);
+            color = this.selected ? this.selectedborderColor : this.borderColor;
+            this.segmentGeometry.segments.push({ start: new Vector3(this._width, 0, this._width), end: new Vector3(0, 0, this._width), startColor: color, endColor: color });
 
-            var segment = new Segment(new Vector3(this._width, 0, this._width), new Vector3(0, 0, this._width));
-            segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            this.segmentGeometry.addSegment(segment);
-
-            var segment = new Segment(new Vector3(0, 0, this._width), new Vector3(0, 0, 0));
-            segment.startColor = segment.endColor = this.selected ? this.selectedborderColor : this.borderColor;
-            this.segmentGeometry.addSegment(segment);
+            color = this.selected ? this.selectedborderColor : this.borderColor;
+            this.segmentGeometry.segments.push({ start: new Vector3(0, 0, this._width), end: new Vector3(0, 0, 0), startColor: color, endColor: color });
         }
     }
 }

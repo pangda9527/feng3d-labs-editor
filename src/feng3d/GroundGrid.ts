@@ -47,16 +47,17 @@ namespace feng3d.editor
                 var xcolor = new Color4(1, 0, 0, 0.5);
                 var zcolor = new Color4(0, 0, 1, 0.5);
                 var color: Color4;
-                segmentGeometry.removeAllSegments();
+                var segments: Segment[] = [];
                 for (var i = -halfNum; i <= halfNum; i++)
                 {
                     var color0 = new Color4().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
                     color0.a = ((i % 10) == 0) ? 0.5 : 0.1;
                     color = (i * step + startZ == 0) ? xcolor : color0;
-                    segmentGeometry.addSegment(new Segment(new Vector3(-halfNum * step + startX, 0, i * step + startZ), new Vector3(halfNum * step + startX, 0, i * step + startZ), color, color));
+                    segments.push({ start: new Vector3(-halfNum * step + startX, 0, i * step + startZ), end: new Vector3(halfNum * step + startX, 0, i * step + startZ), startColor: color, endColor: color });
                     color = (i * step + startX == 0) ? zcolor : color0;
-                    segmentGeometry.addSegment(new Segment(new Vector3(i * step + startX, 0, -halfNum * step + startZ), new Vector3(i * step + startX, 0, halfNum * step + startZ), color, color));
+                    segments.push({ start: new Vector3(i * step + startX, 0, -halfNum * step + startZ), end: new Vector3(i * step + startX, 0, halfNum * step + startZ), startColor: color, endColor: color });
                 }
+                segmentGeometry.segments = segments;
             }
         }
     }
