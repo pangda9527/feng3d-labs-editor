@@ -98,6 +98,7 @@ namespace feng3d.editor
                             case AssetExtension.png:
                             case AssetExtension.jpg:
                             case AssetExtension.jpeg:
+                            case AssetExtension.gif:
                                 dragsource.image = this.data.path;
                                 break;
                         }

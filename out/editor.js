@@ -48,7 +48,7 @@ var feng3d;
                 /**
                  * 图片
                  */
-                this.image = /(.jpg|.png|.jpeg)\b/i;
+                this.image = /(\.jpg|\.png|\.jpeg|\.gif)\b/i;
                 /**
                  * 命名空间
                  */
@@ -4310,6 +4310,7 @@ var feng3d;
             AssetExtension["png"] = "png";
             AssetExtension["jpg"] = "jpg";
             AssetExtension["jpeg"] = "jpeg";
+            AssetExtension["gif"] = "gif";
             AssetExtension["ts"] = "ts";
             AssetExtension["js"] = "js";
             AssetExtension["txt"] = "txt";
@@ -4415,7 +4416,8 @@ var feng3d;
                 }
                 if (this.extension == AssetExtension.png
                     || this.extension == AssetExtension.jpg
-                    || this.extension == AssetExtension.jpeg) {
+                    || this.extension == AssetExtension.jpeg
+                    || this.extension == AssetExtension.gif) {
                     editor.fs.readFile(this.path, function (err, data) {
                         feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                             _this.cacheData = dataurl;
@@ -4858,6 +4860,7 @@ var feng3d;
                                 case editor.AssetExtension.png:
                                 case editor.AssetExtension.jpg:
                                 case editor.AssetExtension.jpeg:
+                                case editor.AssetExtension.gif:
                                     dragsource.image = _this.data.path;
                                     break;
                             }
@@ -9976,7 +9979,7 @@ var feng3d;
                     case "SkinnedMesh":
                         var skinnedMeshRenderer = gameobject.addComponent(feng3d.SkinnedMeshRenderer);
                         skinnedMeshRenderer.geometry = parseGeometry(object3d.geometry);
-                        skinnedMeshRenderer.material = parseMaterial(object3d.material);
+                        skinnedMeshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
                         feng3d.assert(object3d.bindMode == "attached");
                         skinnedMeshRenderer.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                         if (parent)
@@ -9985,7 +9988,7 @@ var feng3d;
                     case "Mesh":
                         var meshRenderer = gameobject.addComponent(feng3d.MeshRenderer);
                         meshRenderer.geometry = parseGeometry(object3d.geometry);
-                        meshRenderer.material = parseMaterial(object3d.material);
+                        skinnedMeshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
                         break;
                     case "Group":
                         if (object3d.skeleton) {
@@ -10055,7 +10058,7 @@ var feng3d;
                 propertyClip.propertyValues = [];
                 var propertyValues = propertyClip.propertyValues;
                 var times = keyframeTrack.times;
-                var values = usenumberfixed ? keyframeTrack.values.map(function (v) { return Number(v.toFixed(6)); }) : keyframeTrack.values;
+                var values = Array.from(keyframeTrack.values, usenumberfixed ? function (v) { return Number(v.toFixed(6)); } : null);
                 var len = times.length;
                 switch (keyframeTrack.ValueTypeName) {
                     case "vector":
@@ -10128,7 +10131,7 @@ var feng3d;
             for (var key in attributes) {
                 if (attributes.hasOwnProperty(key)) {
                     var element = attributes[key];
-                    var array = usenumberfixed ? element.array.map(function (v) { return Number(v.toFixed(6)); }) : element.array;
+                    var array = Array.from(element.array, usenumberfixed ? function (v) { return Number(v.toFixed(6)); } : null);
                     switch (key) {
                         case "position":
                             geo.positions = array;
@@ -10155,11 +10158,6 @@ var feng3d;
                 geo.indices = geometry.index;
             }
             return geo;
-        }
-        function parseMaterial(geometry) {
-            var material = feng3d.materialFactory.create("standard");
-            material.renderParams.cullFace = feng3d.CullFace.NONE;
-            return material;
         }
         function parsePerspectiveCamera(perspectiveCamera) {
             var perspectiveLen = new feng3d.PerspectiveLens();

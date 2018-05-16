@@ -11,6 +11,7 @@ namespace feng3d.editor
         png = "png",
         jpg = "jpg",
         jpeg = "jpeg",
+        gif = "gif",
         ts = "ts",
         js = "js",
         txt = "txt",
@@ -193,6 +194,7 @@ namespace feng3d.editor
             if (this.extension == AssetExtension.png
                 || this.extension == AssetExtension.jpg
                 || this.extension == AssetExtension.jpeg
+                || this.extension == AssetExtension.gif
             )
             {
                 fs.readFile(this.path, (err, data) =>

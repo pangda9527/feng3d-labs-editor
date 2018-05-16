@@ -13,7 +13,7 @@ namespace feng3d.editor
         /**
          * 图片
          */
-        image = /(.jpg|.png|.jpeg)\b/i;
+        image = /(\.jpg|\.png|\.jpeg|\.gif)\b/i;
 
         /**
          * 命名空间

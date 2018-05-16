@@ -65,7 +65,7 @@ namespace feng3d.editor
                 case "SkinnedMesh":
                     var skinnedMeshRenderer = gameobject.addComponent(SkinnedMeshRenderer);
                     skinnedMeshRenderer.geometry = parseGeometry(object3d.geometry);
-                    skinnedMeshRenderer.material = parseMaterial(object3d.material);
+                    skinnedMeshRenderer.material.renderParams.cullFace = CullFace.NONE;
                     assert(object3d.bindMode == "attached");
                     skinnedMeshRenderer.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
@@ -74,7 +74,7 @@ namespace feng3d.editor
                 case "Mesh":
                     var meshRenderer = gameobject.addComponent(MeshRenderer);
                     meshRenderer.geometry = parseGeometry(object3d.geometry);
-                    meshRenderer.material = parseMaterial(object3d.material);
+                    skinnedMeshRenderer.material.renderParams.cullFace = CullFace.NONE;
                     break;
                 case "Group":
                     if (object3d.skeleton)
@@ -166,7 +166,7 @@ namespace feng3d.editor
             propertyClip.propertyValues = [];
             var propertyValues = propertyClip.propertyValues;
             var times: number[] = keyframeTrack.times;
-            var values = usenumberfixed ? keyframeTrack.values.map((v) => { return Number(v.toFixed(6)); }) : keyframeTrack.values;
+            var values = <number[]>Array.from(keyframeTrack.values, usenumberfixed ? (v: number) => { return Number(v.toFixed(6)); } : null)
 
             var len = times.length;
             switch (keyframeTrack.ValueTypeName)
@@ -267,7 +267,7 @@ namespace feng3d.editor
             if (attributes.hasOwnProperty(key))
             {
                 var element = attributes[key];
-                var array = usenumberfixed ? element.array.map((v) => { return Number(v.toFixed(6)); }) : element.array;
+                var array = <number[]>Array.from(element.array, usenumberfixed ? (v: number) => { return Number(v.toFixed(6)); } : null)
                 switch (key)
                 {
                     case "position":
@@ -297,13 +297,6 @@ namespace feng3d.editor
             geo.indices = geometry.index;
         }
         return geo;
-    }
-
-    function parseMaterial(geometry)
-    {
-        var material = materialFactory.create("standard");
-        material.renderParams.cullFace = CullFace.NONE;
-        return material;
     }
 
     function parsePerspectiveCamera(perspectiveCamera)
