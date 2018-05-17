@@ -244,7 +244,7 @@ namespace feng3d.editor
         {
             label: "Animator",
             submenu: [
-                { label: "ParticleAnimator", click: () => { needcreateComponentGameObject.addComponent(ParticleAnimator); } },
+                { label: "ParticleSystem", click: () => { needcreateComponentGameObject.addComponent(ParticleSystem); } },
                 { label: "Animation", click: () => { needcreateComponentGameObject.addComponent(Animation); } },
             ]
         },

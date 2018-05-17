@@ -10456,7 +10456,7 @@ var feng3d;
             {
                 label: "Animator",
                 submenu: [
-                    { label: "ParticleAnimator", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.ParticleAnimator); } },
+                    { label: "ParticleSystem", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.ParticleSystem); } },
                     { label: "Animation", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Animation); } },
                 ]
             },
