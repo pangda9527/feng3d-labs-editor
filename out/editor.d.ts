@@ -185,25 +185,22 @@ declare namespace feng3d.editor {
     }
 }
 declare namespace feng3d.editor {
-    var fs: EditorFS;
-    interface EditorFS extends ReadWriteFS {
+    var fs: EditorAssets1;
+    class EditorAssets1 extends ReadWriteAssets {
+        constructor(readWriteFS?: ReadWriteFS);
         /**
          * 创建项目
          */
-        createproject(projectname: string, callback: () => void): any;
-        selectFile?: (callback: (file: FileList) => void) => void;
+        createproject(projectname: string, callback: () => void): void;
+        selectFile(callback: (file: FileList) => void): void;
         /**
          * 导出项目
          */
-        exportProject?(callback: (err: Error, data: Blob) => void): any;
+        exportProject(callback: (err: Error, data: Blob) => void): void;
         /**
          * 导入项目
          */
-        importProject?(file: File, callback: () => void): any;
-        /**
-         * 监听编译脚本
-         */
-        watchCompileScript?(callback: () => void): any;
+        importProject(file: File, callback: () => void): void;
     }
 }
 declare namespace feng3d.editor {

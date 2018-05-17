@@ -404,13 +404,23 @@ var feng3d;
     (function (editor) {
         // if (typeof require == "undefined")
         // {
-        editor.fs = feng3d.indexedDBfs;
-        feng3d.assets.readFS = feng3d.indexedDBfs;
-        (function () {
+        // } else
+        // {
+        //     fs = require(__dirname + "/io/file.js").file;
+        //     // assets.fstype = FSType.native;
+        // }
+        var EditorAssets1 = /** @class */ (function (_super) {
+            __extends(EditorAssets1, _super);
+            function EditorAssets1(readWriteFS) {
+                var _this = _super.call(this) || this;
+                if (readWriteFS)
+                    _this.fs = readWriteFS;
+                return _this;
+            }
             /**
              * 创建项目
              */
-            editor.fs.createproject = function (projectname, callback) {
+            EditorAssets1.prototype.createproject = function (projectname, callback) {
                 editor.fs.initproject(projectname, function () {
                     //
                     var zip = new JSZip();
@@ -442,10 +452,6 @@ var feng3d;
                                     }
                                 }
                                 else {
-                                    if (editor.fs.watchCompileScript) {
-                                        editor.fs.watchCompileScript(callback);
-                                        return;
-                                    }
                                     callback();
                                 }
                             }
@@ -457,58 +463,38 @@ var feng3d;
                     request.send();
                 });
             };
-        })();
-        (function () {
-            var isSelectFile = false;
-            editor.fs.selectFile = function (callback) {
+            EditorAssets1.prototype.selectFile = function (callback) {
                 selectFileCallback = callback;
                 isSelectFile = true;
             };
-            var fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.multiple = true;
-            fileInput.style.display = "none";
-            fileInput.addEventListener('change', function (event) {
-                selectFileCallback && selectFileCallback(fileInput.files);
-                selectFileCallback = null;
-                fileInput.value = null;
-            });
-            // document.body.appendChild(fileInput);
-            window.addEventListener("click", function () {
-                if (isSelectFile)
-                    fileInput.click();
-                isSelectFile = false;
-            });
-            var selectFileCallback;
-        })();
-        (function () {
-            if (!editor.fs.exportProject) {
-                editor.fs.exportProject = readdirToZip;
-                function readdirToZip(callback) {
-                    var zip = new JSZip();
-                    editor.fs.getAllfilepathInFolder("", function (err, filepaths) {
-                        readfiles();
-                        function readfiles() {
-                            if (filepaths.length > 0) {
-                                var filepath = filepaths.shift();
-                                editor.fs.readFile(filepath, function (err, data) {
-                                    //处理文件夹
-                                    data && zip.file(filepath, data);
-                                    readfiles();
-                                });
-                            }
-                            else {
-                                zip.generateAsync({ type: "blob" }).then(function (content) {
-                                    callback(null, content);
-                                });
-                            }
+            /**
+             * 导出项目
+             */
+            EditorAssets1.prototype.exportProject = function (callback) {
+                var zip = new JSZip();
+                editor.fs.getAllfilepathInFolder("", function (err, filepaths) {
+                    readfiles();
+                    function readfiles() {
+                        if (filepaths.length > 0) {
+                            var filepath = filepaths.shift();
+                            editor.fs.readFile(filepath, function (err, data) {
+                                //处理文件夹
+                                data && zip.file(filepath, data);
+                                readfiles();
+                            });
                         }
-                    });
-                }
-            }
-        })();
-        (function () {
-            editor.fs.importProject = function (file, callback) {
+                        else {
+                            zip.generateAsync({ type: "blob" }).then(function (content) {
+                                callback(null, content);
+                            });
+                        }
+                    }
+                });
+            };
+            /**
+             * 导入项目
+             */
+            EditorAssets1.prototype.importProject = function (file, callback) {
                 var zip = new JSZip();
                 zip.loadAsync(file).then(function (value) {
                     var filepaths = Object.keys(value.files);
@@ -537,7 +523,28 @@ var feng3d;
                     }
                 });
             };
-        })();
+            return EditorAssets1;
+        }(feng3d.ReadWriteAssets));
+        editor.EditorAssets1 = EditorAssets1;
+        feng3d.assets = editor.fs = new EditorAssets1(feng3d.indexedDBfs);
+        //
+        var isSelectFile = false;
+        var fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.multiple = true;
+        fileInput.style.display = "none";
+        fileInput.addEventListener('change', function (event) {
+            selectFileCallback && selectFileCallback(fileInput.files);
+            selectFileCallback = null;
+            fileInput.value = null;
+        });
+        // document.body.appendChild(fileInput);
+        window.addEventListener("click", function () {
+            if (isSelectFile)
+                fileInput.click();
+            isSelectFile = false;
+        });
+        var selectFileCallback;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;

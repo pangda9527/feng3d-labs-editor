@@ -1,43 +1,29 @@
 namespace feng3d.editor
 {
-    export var fs: EditorFS;
+    export var fs: EditorAssets1;
+
     // if (typeof require == "undefined")
     // {
-        fs = <EditorFS><any>indexedDBfs;
-        assets.readFS = indexedDBfs;
     // } else
     // {
     //     fs = require(__dirname + "/io/file.js").file;
     //     // assets.fstype = FSType.native;
     // }
 
-    export interface EditorFS extends ReadWriteFS
-    {
-        /**
-         * 创建项目
-         */
-        createproject(projectname: string, callback: () => void);
-        selectFile?: (callback: (file: FileList) => void) => void;
-        /**
-         * 导出项目
-         */
-        exportProject?(callback: (err: Error, data: Blob) => void);
-        /**
-         * 导入项目
-         */
-        importProject?(file: File, callback: () => void);
-        /**
-         * 监听编译脚本
-         */
-        watchCompileScript?(callback: () => void);
-    }
 
-    (() =>
+    export class EditorAssets1 extends ReadWriteAssets
     {
+        constructor(readWriteFS?: ReadWriteFS)
+        {
+            super();
+            if (readWriteFS)
+                this.fs = readWriteFS;
+        }
+
         /**
          * 创建项目
          */
-        fs.createproject = (projectname: string, callback: () => void) =>
+        createproject(projectname: string, callback: () => void)
         {
             fs.initproject(projectname, () =>
             {
@@ -79,11 +65,6 @@ namespace feng3d.editor
                                 }
                             } else
                             {
-                                if (fs.watchCompileScript)
-                                {
-                                    fs.watchCompileScript(callback);
-                                    return;
-                                }
                                 callback();
                             }
                         }
@@ -96,77 +77,47 @@ namespace feng3d.editor
                 request.send();
             });
         }
-    })();
 
-    (() =>
-    {
-        var isSelectFile = false;
-
-        fs.selectFile = (callback: (file: FileList) => void) =>
+        selectFile(callback: (file: FileList) => void)
         {
             selectFileCallback = callback;
             isSelectFile = true;
         }
 
-        var fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.multiple = true;
-        fileInput.style.display = "none";
-        fileInput.addEventListener('change', function (event)
+        /**
+         * 导出项目
+         */
+        exportProject(callback: (err: Error, data: Blob) => void)
         {
-            selectFileCallback && selectFileCallback(fileInput.files);
-            selectFileCallback = null;
-            fileInput.value = null;
-        });
-        // document.body.appendChild(fileInput);
-        window.addEventListener("click", () =>
-        {
-            if (isSelectFile)
-                fileInput.click();
-            isSelectFile = false;
-        });
-
-        var selectFileCallback: (file: FileList) => void;
-    })();
-
-    (() =>
-    {
-        if (!fs.exportProject)
-        {
-            fs.exportProject = readdirToZip;
-
-            function readdirToZip(callback: (err: Error, data: Blob) => void)
+            var zip = new JSZip();
+            fs.getAllfilepathInFolder("", (err, filepaths) =>
             {
-                var zip = new JSZip();
-                fs.getAllfilepathInFolder("", (err, filepaths) =>
+                readfiles();
+                function readfiles()
                 {
-                    readfiles();
-                    function readfiles()
+                    if (filepaths.length > 0)
                     {
-                        if (filepaths.length > 0)
+                        var filepath = filepaths.shift();
+                        fs.readFile(filepath, (err, data: ArrayBuffer) =>
                         {
-                            var filepath = filepaths.shift();
-                            fs.readFile(filepath, (err, data: ArrayBuffer) =>
-                            {
-                                //处理文件夹
-                                data && zip.file(filepath, data);
-                                readfiles();
-                            });
-                        } else
+                            //处理文件夹
+                            data && zip.file(filepath, data);
+                            readfiles();
+                        });
+                    } else
+                    {
+                        zip.generateAsync({ type: "blob" }).then(function (content)
                         {
-                            zip.generateAsync({ type: "blob" }).then(function (content)
-                            {
-                                callback(null, content);
-                            });
-                        }
+                            callback(null, content);
+                        });
                     }
-                });
-            }
+                }
+            });
         }
-    })();
-    (() =>
-    {
-        fs.importProject = (file: File, callback: () => void) =>
+        /**
+         * 导入项目
+         */
+        importProject(file: File, callback: () => void)
         {
             var zip = new JSZip();
             zip.loadAsync(file).then((value) =>
@@ -206,5 +157,29 @@ namespace feng3d.editor
                 }
             });
         }
-    })();
+    }
+
+    assets = fs = new EditorAssets1(indexedDBfs);
+
+    //
+    var isSelectFile = false;
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.multiple = true;
+    fileInput.style.display = "none";
+    fileInput.addEventListener('change', function (event)
+    {
+        selectFileCallback && selectFileCallback(fileInput.files);
+        selectFileCallback = null;
+        fileInput.value = null;
+    });
+    // document.body.appendChild(fileInput);
+    window.addEventListener("click", () =>
+    {
+        if (isSelectFile)
+            fileInput.click();
+        isSelectFile = false;
+    });
+
+    var selectFileCallback: (file: FileList) => void;
 }
