@@ -1,17 +1,17 @@
 namespace feng3d.editor
 {
     export var fs: EditorFS;
-    if (typeof require == "undefined")
-    {
+    // if (typeof require == "undefined")
+    // {
         fs = <EditorFS><any>indexedDBfs;
-        assets.readFS = new IndexedDBfs();
-    } else
-    {
-        fs = require(__dirname + "/io/file.js").file;
-        // assets.fstype = FSType.native;
-    }
+        assets.readFS = indexedDBfs;
+    // } else
+    // {
+    //     fs = require(__dirname + "/io/file.js").file;
+    //     // assets.fstype = FSType.native;
+    // }
 
-    export interface EditorFS extends FS
+    export interface EditorFS extends ReadWriteFS
     {
         /**
          * 创建项目

@@ -186,7 +186,7 @@ declare namespace feng3d.editor {
 }
 declare namespace feng3d.editor {
     var fs: EditorFS;
-    interface EditorFS extends FS {
+    interface EditorFS extends ReadWriteFS {
         /**
          * 创建项目
          */

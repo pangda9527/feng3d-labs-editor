@@ -402,14 +402,10 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        if (typeof require == "undefined") {
-            editor.fs = feng3d.indexedDBfs;
-            feng3d.assets.readFS = new feng3d.IndexedDBfs();
-        }
-        else {
-            editor.fs = require(__dirname + "/io/file.js").file;
-            // assets.fstype = FSType.native;
-        }
+        // if (typeof require == "undefined")
+        // {
+        editor.fs = feng3d.indexedDBfs;
+        feng3d.assets.readFS = feng3d.indexedDBfs;
         (function () {
             /**
              * 创建项目
