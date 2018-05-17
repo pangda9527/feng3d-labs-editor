@@ -240,7 +240,7 @@ namespace feng3d.editor
                     menu = {
                         label: "编辑", click: () =>
                         {
-                            var url = `codeeditor.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${file.path}&extension=${file.extension}`;
+                            var url = `codeeditor.html?fstype=${assets.fstype}&project=${editorcache.projectname}&path=${file.path}&extension=${file.extension}`;
                             url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                             window.open(url);
                         }
@@ -255,7 +255,7 @@ namespace feng3d.editor
                     menu = {
                         label: "编辑", click: () =>
                         {
-                            var url = `codeeditor.html?fstype=${assets.fstype}&DBname=${editorData.DBname}&project=${editorcache.projectname}&path=${file.path}&extension=${AssetExtension.json}`;
+                            var url = `codeeditor.html?fstype=${assets.fstype}&project=${editorcache.projectname}&path=${file.path}&extension=${AssetExtension.json}`;
                             url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                             window.open(url);
                         }

@@ -11,16 +11,6 @@ namespace feng3d.editor
      */
     export class EditorData
     {
-        get DBname()
-        {
-            return feng3d.DBname;
-        }
-
-        set DBname(v)
-        {
-            feng3d.DBname = v;
-        }
-
         /**
          * 2D UI舞台
          */
@@ -132,11 +122,6 @@ namespace feng3d.editor
         getEditorAssetsPath(url: string)
         {
             return document.URL.substring(0, document.URL.lastIndexOf("/") + 1) + "resource/" + url;
-        }
-
-        constructor()
-        {
-            this.DBname = "feng3d-editor";
         }
     }
 

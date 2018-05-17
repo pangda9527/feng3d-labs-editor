@@ -21,9 +21,10 @@
         "src/utils/Utils.ts",
         "src/utils/RegExps.ts",
         //
-        "src/io/FileObject.ts",
-        //
-        "src/io/io.ts",
+        "src/assets/storage.ts",
+        "src/assets/indexedDBfs.ts",
+        "src/assets/FileObject.ts",
+        "src/assets/io.ts",
         //
         "src/caches/Editorcache.ts",
         //

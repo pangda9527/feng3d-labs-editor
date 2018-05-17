@@ -70,6 +70,432 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
+    var databases = {};
+    feng3d.storage = {
+        /**
+         * 是否支持 indexedDB
+         */
+        support: function () {
+            if (typeof indexedDB == "undefined") {
+                indexedDB = window.indexedDB || window["mozIndexedDB"] || window["webkitIndexedDB"] || window["msIndexedDB"];
+                if (indexedDB == undefined) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        getDatabase: function (dbname, callback) {
+            if (databases[dbname]) {
+                callback(null, databases[dbname]);
+                return;
+            }
+            var request = indexedDB.open(dbname);
+            request.onsuccess = function (event) {
+                databases[dbname] = event.target["result"];
+                callback(null, databases[dbname]);
+                request.onsuccess = null;
+            };
+            request.onerror = function (event) {
+                callback(event, null);
+                request.onerror = null;
+            };
+        },
+        deleteDatabase: function (dbname, callback) {
+            var request = indexedDB.deleteDatabase(dbname);
+            request.onsuccess = function (event) {
+                delete databases[dbname];
+                callback && callback(null);
+                request.onsuccess = null;
+            };
+            request.onerror = function (event) {
+                callback && callback(event);
+                request.onerror = null;
+            };
+        },
+        hasObjectStore: function (dbname, objectStroreName, callback) {
+            feng3d.storage.getDatabase(dbname, function (err, database) {
+                callback(database.objectStoreNames.contains(objectStroreName));
+            });
+        },
+        getObjectStoreNames: function (dbname, callback) {
+            feng3d.storage.getDatabase(dbname, function (err, database) {
+                var objectStoreNames = [];
+                for (var i = 0; i < database.objectStoreNames.length; i++) {
+                    objectStoreNames.push(database.objectStoreNames.item(i));
+                }
+                callback(null, objectStoreNames);
+            });
+        },
+        createObjectStore: function (dbname, objectStroreName, callback) {
+            feng3d.storage.getDatabase(dbname, function (err, database) {
+                if (database.objectStoreNames.contains(objectStroreName)) {
+                    callback && callback(null);
+                    return;
+                }
+                database.close();
+                var request = indexedDB.open(database.name, database.version + 1);
+                request.onupgradeneeded = function (event) {
+                    var newdatabase = event.target["result"];
+                    newdatabase.createObjectStore(objectStroreName);
+                    callback && callback(null);
+                    request.onupgradeneeded = null;
+                };
+                request.onsuccess = function (event) {
+                    var newdatabase = event.target["result"];
+                    databases[newdatabase.name] = newdatabase;
+                    request.onsuccess = null;
+                };
+                request.onerror = function (event) {
+                    callback && callback(event);
+                    request.onerror = null;
+                };
+            });
+        },
+        deleteObjectStore: function (dbname, objectStroreName, callback) {
+            feng3d.storage.getDatabase(dbname, function (err, database) {
+                if (!database.objectStoreNames.contains(objectStroreName)) {
+                    callback && callback(null);
+                    return;
+                }
+                database.close();
+                var request = indexedDB.open(database.name, database.version + 1);
+                request.onupgradeneeded = function (event) {
+                    var newdatabase = event.target["result"];
+                    newdatabase.deleteObjectStore(objectStroreName);
+                    callback && callback(null);
+                    request.onupgradeneeded = null;
+                };
+                request.onsuccess = function (event) {
+                    var newdatabase = event.target["result"];
+                    databases[newdatabase.name] = newdatabase;
+                    request.onsuccess = null;
+                };
+                request.onerror = function (event) {
+                    callback && callback(event);
+                    request.onerror = null;
+                };
+            });
+        },
+        getAllKeys: function (dbname, objectStroreName, callback) {
+            feng3d.storage.getDatabase(dbname, function (err, database) {
+                try {
+                    var transaction = database.transaction([objectStroreName], 'readwrite');
+                    var objectStore = transaction.objectStore(objectStroreName);
+                    var request = objectStore.getAllKeys();
+                    request.onsuccess = function (event) {
+                        callback && callback(null, event.target["result"]);
+                        request.onsuccess = null;
+                    };
+                }
+                catch (error) {
+                    callback && callback(error, null);
+                }
+            });
+        },
+        get: function (dbname, objectStroreName, key, callback) {
+            feng3d.storage.getDatabase(dbname, function (err, database) {
+                var transaction = database.transaction([objectStroreName], 'readwrite');
+                var objectStore = transaction.objectStore(objectStroreName);
+                var request = objectStore.get(key);
+                request.onsuccess = function (event) {
+                    var result = event.target["result"];
+                    callback && callback(result ? null : new Error("\u6CA1\u6709\u627E\u5230\u8D44\u6E90 " + key), result);
+                    request.onsuccess = null;
+                };
+            });
+        },
+        set: function (dbname, objectStroreName, key, data, callback) {
+            feng3d.storage.getDatabase(dbname, function (err, database) {
+                try {
+                    var transaction = database.transaction([objectStroreName], 'readwrite');
+                    var objectStore = transaction.objectStore(objectStroreName);
+                    var request = objectStore.put(data, key);
+                    request.onsuccess = function (event) {
+                        callback && callback(null);
+                        request.onsuccess = null;
+                    };
+                }
+                catch (error) {
+                    callback && callback(error);
+                }
+            });
+        },
+        delete: function (dbname, objectStroreName, key, callback) {
+            feng3d.storage.getDatabase(dbname, function (err, database) {
+                try {
+                    var transaction = database.transaction([objectStroreName], 'readwrite');
+                    var objectStore = transaction.objectStore(objectStroreName);
+                    var request = objectStore.delete(key);
+                    request.onsuccess = function (event) {
+                        callback && callback();
+                        request.onsuccess = null;
+                    };
+                }
+                catch (error) {
+                    callback && callback(error);
+                }
+            });
+        },
+        clear: function (dbname, objectStroreName, callback) {
+            feng3d.storage.getDatabase(dbname, function (err, database) {
+                try {
+                    var transaction = database.transaction([objectStroreName], 'readwrite');
+                    var objectStore = transaction.objectStore(objectStroreName);
+                    var request = objectStore.clear();
+                    request.onsuccess = function (event) {
+                        callback && callback();
+                        request.onsuccess = null;
+                    };
+                }
+                catch (error) {
+                    callback && callback(error);
+                }
+            });
+        }
+    };
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        editor.DBname = "feng3d-editor";
+        editor.projectname = "testproject";
+        var IndexedDBAssets = /** @class */ (function () {
+            function IndexedDBAssets() {
+            }
+            IndexedDBAssets.prototype.loadImage = function (url, callback) {
+                editor.indexedDBfs.readFile(url, function (err, data) {
+                    if (data) {
+                        feng3d.dataTransform.arrayBufferToImage(data, callback);
+                    }
+                    else {
+                        callback(null);
+                    }
+                });
+            };
+            return IndexedDBAssets;
+        }());
+        editor.IndexedDBAssets = IndexedDBAssets;
+        feng3d.assetsmap[feng3d.FSType.indexedDB] = editor.indexedDBAssets = new IndexedDBAssets();
+        function set(key, data, callback) {
+            feng3d.storage.set(editor.DBname, editor.projectname, key, data, callback);
+        }
+        function get(key, callback) {
+            feng3d.storage.get(editor.DBname, editor.projectname, key, callback);
+        }
+        function copy(sourcekey, targetkey, callback) {
+            get(sourcekey, function (err, data) {
+                if (err) {
+                    callback && callback(err);
+                    return;
+                }
+                set(targetkey, data, callback);
+            });
+        }
+        function move(sourcekey, targetkey, callback) {
+            copy(sourcekey, targetkey, function (err) {
+                if (err) {
+                    callback && callback(err);
+                    return;
+                }
+                deletedata(sourcekey, callback);
+            });
+        }
+        function deletedata(key, callback) {
+            feng3d.storage.delete(editor.DBname, editor.projectname, key, callback);
+        }
+        function getAllKeys(callback) {
+            feng3d.storage.getAllKeys(editor.DBname, editor.projectname, callback);
+        }
+        function movefiles(movelists, callback) {
+            copyfiles(movelists.concat(), function (err) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+                var deletelists = movelists.reduce(function (value, current) { value.push(current[0]); return value; }, []);
+                deletefiles(deletelists, callback);
+            });
+        }
+        function copyfiles(copylists, callback) {
+            if (copylists.length > 0) {
+                var copyitem = copylists.shift();
+                copy(copyitem[0], copyitem[1], function (err) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+                    copyfiles(copylists, callback);
+                });
+                return;
+            }
+            callback(null);
+        }
+        function deletefiles(deletelists, callback) {
+            if (deletelists.length > 0) {
+                deletedata(deletelists.shift(), function (err) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+                    deletefiles(deletelists, callback);
+                });
+                return;
+            }
+            callback(null);
+        }
+        editor.indexedDBfs = {
+            hasProject: function (projectname, callback) {
+                feng3d.storage.hasObjectStore(editor.DBname, projectname, callback);
+            },
+            getProjectList: function (callback) {
+                feng3d.storage.getObjectStoreNames(editor.DBname, callback);
+            },
+            initproject: function (projectname1, callback) {
+                feng3d.storage.createObjectStore(editor.DBname, projectname1, function (err) {
+                    if (err) {
+                        feng3d.warn(err);
+                        return;
+                    }
+                    editor.projectname = projectname1;
+                    // todo 启动监听 ts代码变化自动编译
+                    callback();
+                });
+            },
+            // selectFile?: (callback: (file: FileList) => void, param?: Object) => void;
+            // //
+            stat: function (path, callback) {
+                get(path, function (err, data) {
+                    if (data) {
+                        callback(err, {
+                            path: path,
+                            birthtime: data.birthtime.getTime(),
+                            mtime: data.birthtime.getTime(),
+                            isDirectory: data.isDirectory,
+                            size: 0
+                        });
+                    }
+                    else {
+                        callback(new Error(path + " 不存在"), null);
+                    }
+                });
+            },
+            readdir: function (path, callback) {
+                feng3d.assert(path.charAt(path.length - 1) == "/", "\u6587\u4EF6\u5939\u8DEF\u5F84\u5FC5\u987B\u4EE5 / \u7ED3\u5C3E\uFF01");
+                getAllKeys(function (err, allfilepaths) {
+                    if (!allfilepaths) {
+                        callback(err, null);
+                        return;
+                    }
+                    var subfilemap = {};
+                    allfilepaths.forEach(function (element) {
+                        if (element.substr(0, path.length) == path && element != path) {
+                            var result = element.substr(path.length);
+                            var index = result.indexOf("/");
+                            if (index != -1)
+                                result = result.substring(0, index + 1);
+                            subfilemap[result] = 1;
+                        }
+                    });
+                    var files = Object.keys(subfilemap);
+                    callback(null, files);
+                });
+            },
+            writeFile: function (path, data, callback) {
+                set(path, { isDirectory: false, birthtime: new Date(), data: data }, callback);
+            },
+            /**
+             * 读取文件为字符串
+             */
+            readFileAsString: function (path, callback) {
+                get(path, function (err, data) {
+                    path;
+                    if (err) {
+                        callback(err, null);
+                        return;
+                    }
+                    var str = feng3d.dataTransform.arrayBufferToString(data.data, function (content) {
+                        callback(null, content);
+                    });
+                });
+            },
+            /**
+             * 读取文件为Buffer
+             */
+            readFile: function (path, callback) {
+                get(path, function (err, data) {
+                    callback(null, data ? data.data : null);
+                });
+            },
+            mkdir: function (path, callback) {
+                feng3d.assert(path.charAt(path.length - 1) == "/", "\u6587\u4EF6\u5939\u8DEF\u5F84\u5FC5\u987B\u4EE5 / \u7ED3\u5C3E\uFF01");
+                set(path, { isDirectory: true, birthtime: new Date() }, callback);
+            },
+            rename: function (oldPath, newPath, callback) {
+                getAllKeys(function (err, allfilepaths) {
+                    if (!allfilepaths) {
+                        callback(err);
+                        return;
+                    }
+                    var renamelists = [[oldPath, newPath]];
+                    allfilepaths.forEach(function (element) {
+                        var result = new RegExp(oldPath + "\\b").exec(element);
+                        if (result != null && result.index == 0) {
+                            renamelists.push([element, element.replace(oldPath, newPath)]);
+                        }
+                    });
+                    movefiles(renamelists, callback);
+                });
+            },
+            move: function (src, dest, callback) {
+                editor.indexedDBfs.rename(src, dest, callback || (function () { }));
+            },
+            remove: function (path, callback) {
+                getAllKeys(function (err, allfilepaths) {
+                    if (!allfilepaths) {
+                        callback && callback(err);
+                        return;
+                    }
+                    var removelists = [path];
+                    allfilepaths.forEach(function (element) {
+                        var result = new RegExp(path + "\\b").exec(element);
+                        if (result != null && result.index == 0) {
+                            removelists.push(element);
+                        }
+                    });
+                    deletefiles(removelists, callback || (function () { }));
+                });
+            },
+            /**
+             * 获取文件绝对路径
+             */
+            getAbsolutePath: function (path, callback) {
+                callback(null, null);
+            },
+            /**
+             * 获取指定文件下所有文件路径列表
+             */
+            getAllfilepathInFolder: function (dirpath, callback) {
+                getAllKeys(function (err, allfilepaths) {
+                    if (!allfilepaths) {
+                        callback(err, null);
+                        return;
+                    }
+                    var files = [];
+                    allfilepaths.forEach(function (element) {
+                        var result = new RegExp(dirpath + "\\b").exec(element);
+                        if (result != null && result.index == 0) {
+                            files.push(element);
+                        }
+                    });
+                    callback(null, files);
+                });
+            },
+        };
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     var editor;
     (function (editor) {
         /**
@@ -403,7 +829,7 @@ var feng3d;
     var editor;
     (function (editor) {
         if (typeof require == "undefined") {
-            editor.fs = feng3d.indexedDBfs;
+            editor.fs = editor.indexedDBfs;
             feng3d.assets.fstype = feng3d.FSType.indexedDB;
         }
         else {
@@ -4126,7 +4552,7 @@ var feng3d;
                         || file.extension == editor.AssetExtension.shader) {
                         menu = {
                             label: "编辑", click: function () {
-                                var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + file.extension;
+                                var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + file.extension;
                                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                                 window.open(url);
                             }
@@ -4139,7 +4565,7 @@ var feng3d;
                         || file.extension == editor.AssetExtension.anim) {
                         menu = {
                             label: "编辑", click: function () {
-                                var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + editor.AssetExtension.json;
+                                var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + editor.AssetExtension.json;
                                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                                 window.open(url);
                             }
@@ -5333,8 +5759,8 @@ var feng3d;
                                 feng3d.warn(err);
                                 return;
                             }
-                            if (editor.fs == feng3d.indexedDBfs) {
-                                window.open("run.html?fstype=" + feng3d.assets.fstype + "&DBname=" + editor.editorData.DBname + "&project=" + editor.editorAssets.projectname);
+                            if (editor.fs == editor.indexedDBfs) {
+                                window.open("run.html?fstype=" + feng3d.assets.fstype + "&project=" + editor.editorAssets.projectname);
                                 return;
                             }
                             editor.fs.getAbsolutePath("index.html", function (err, path) {
@@ -5717,18 +6143,7 @@ var feng3d;
          */
         var EditorData = /** @class */ (function () {
             function EditorData() {
-                this.DBname = "feng3d-editor";
             }
-            Object.defineProperty(EditorData.prototype, "DBname", {
-                get: function () {
-                    return feng3d.DBname;
-                },
-                set: function (v) {
-                    feng3d.DBname = v;
-                },
-                enumerable: true,
-                configurable: true
-            });
             /**
              * 选择对象
              * 该方法会处理 按ctrl键附加选中对象操作
