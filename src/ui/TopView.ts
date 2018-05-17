@@ -107,7 +107,7 @@ namespace feng3d.editor
 							warn(err);
 							return;
 						}
-						if (fs == <any>indexedDBfs)
+						if (fs.type == FSType.indexedDB)
 						{
 							window.open(`run.html?fstype=${assets.type}&project=${editorAssets.projectname}`);
 							return;

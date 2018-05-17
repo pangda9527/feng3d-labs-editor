@@ -217,6 +217,14 @@ namespace feng3d.editor
                 }
             });
         }
+
+        /**
+         * 获取文件绝对路径
+         */
+        getAbsolutePath(path: string, callback: (err: Error | null, absolutePath: string | null) => void): void
+        {
+            callback(null, null);
+        }
     }
 
     assets = fs = new EditorAssets1(indexedDBfs);

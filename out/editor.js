@@ -572,6 +572,12 @@ var feng3d;
                     }
                 });
             };
+            /**
+             * 获取文件绝对路径
+             */
+            EditorAssets1.prototype.getAbsolutePath = function (path, callback) {
+                callback(null, null);
+            };
             return EditorAssets1;
         }(feng3d.ReadWriteAssets));
         editor.EditorAssets1 = EditorAssets1;
@@ -5385,7 +5391,7 @@ var feng3d;
                                 feng3d.warn(err);
                                 return;
                             }
-                            if (editor.fs == feng3d.indexedDBfs) {
+                            if (editor.fs.type == feng3d.FSType.indexedDB) {
                                 window.open("run.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorAssets.projectname);
                                 return;
                             }
