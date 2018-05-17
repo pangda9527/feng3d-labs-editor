@@ -4,7 +4,7 @@ namespace feng3d.editor
     if (typeof require == "undefined")
     {
         fs = <EditorFS><any>indexedDBfs;
-        assets.readFS = indexedDBAssets;
+        assets.readFS = new IndexedDBfs();
     } else
     {
         fs = require(__dirname + "/io/file.js").file;

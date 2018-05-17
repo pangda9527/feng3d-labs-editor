@@ -404,7 +404,7 @@ var feng3d;
     (function (editor) {
         if (typeof require == "undefined") {
             editor.fs = feng3d.indexedDBfs;
-            feng3d.assets.readFS = feng3d.indexedDBAssets;
+            feng3d.assets.readFS = new feng3d.IndexedDBfs();
         }
         else {
             editor.fs = require(__dirname + "/io/file.js").file;
