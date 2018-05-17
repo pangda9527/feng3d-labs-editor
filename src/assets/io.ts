@@ -17,7 +17,7 @@ namespace feng3d.editor
         {
             super();
             if (readWriteFS)
-                this.fs = readWriteFS;
+                this.fs = <any>readWriteFS;
         }
 
         /**
