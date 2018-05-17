@@ -1062,7 +1062,7 @@ declare namespace feng3d {
          * @param url 图片路径
          * @param callback 加载完成回调
          */
-        loadImage(url: string, callback: (image: HTMLImageElement) => void): void;
+        loadImage(url: string, callback: (err: Error, image: HTMLImageElement) => void): void;
         /**
          * 获取图片数据
          * @param image 加载完成的图片元素
@@ -10350,36 +10350,59 @@ declare namespace feng3d {
         native = "native",
         indexedDB = "indexedDB",
     }
+    /**
+     * 资源系统
+     */
     var assets: Assets;
-    var assetsmap: any;
-    interface IAssets {
+    /**
+     * 资源
+     * 在可读文件系统上进行加工，比如把读取数据转换为图片或者文本
+     */
+    class Assets implements ReadFS {
+        /**
+         * 可读文件系统
+         */
+        readFS: ReadFS;
+        readonly type: FSType;
+        /**
+         * 读取文件
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        readFile(path: string, callback: (err, data: ArrayBuffer) => void): void;
         /**
          * 加载图片
-         * @param url 图片路径
+         * @param path 图片路径
          * @param callback 加载完成回调
          */
-        loadImage(url: string, callback: (img: HTMLImageElement) => void): void;
+        loadImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
     }
-    class Assets implements IAssets {
-        fstype: FSType;
-        private getAssets(url);
+    /**
+     * 可读文件系统
+     */
+    interface ReadFS {
         /**
-         * 加载图片
-         * @param url 图片路径
-         * @param callback 加载完成回调
+         * 文件系统类型
          */
-        loadImage(url: string, callback: (img: HTMLImageElement) => void): void;
+        readonly type: FSType;
+        /**
+         * 读取文件
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        readFile(path: string, callback: (err, data: ArrayBuffer) => void): any;
     }
 }
 declare namespace feng3d {
     var httpAssets: HttpAssets;
-    class HttpAssets implements IAssets {
+    class HttpAssets implements ReadFS {
+        readonly type: FSType;
         /**
-         * 加载图片
-         * @param url 图片路径
-         * @param callback 加载完成回调
+         * 读取文件
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        loadImage(url: string, callback: (img: HTMLImageElement) => void): void;
+        readFile(path: string, callback: (err, data: ArrayBuffer) => void): void;
     }
 }
 interface IDBObjectStore {
@@ -10409,8 +10432,14 @@ declare namespace feng3d {
     /**
      * 索引数据资源
      */
-    class IndexedDBAssets implements IAssets {
-        loadImage(url: string, callback: (img: HTMLImageElement) => void): void;
+    class IndexedDBAssets implements ReadFS {
+        readonly type: FSType;
+        /**
+         * 读取文件
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        readFile(path: string, callback: (err, data: ArrayBuffer) => void): void;
     }
     /**
      * 索引数据文件系统

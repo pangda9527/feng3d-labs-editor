@@ -6,7 +6,8 @@ var fstype = feng3d.assets.fstype = GetQueryString("fstype");
 
 if (fstype == "indexedDB")
 {
-    feng3d.DBname = decodeURI(GetQueryString("DBname"));
+    feng3d.assets.readFS = feng3d.indexedDBAssets;
+    
     var project = decodeURI(GetQueryString("project"));
 
     feng3d.indexedDBfs.initproject(project, () =>

@@ -404,11 +404,11 @@ var feng3d;
     (function (editor) {
         if (typeof require == "undefined") {
             editor.fs = feng3d.indexedDBfs;
-            feng3d.assets.fstype = feng3d.FSType.indexedDB;
+            feng3d.assets.readFS = feng3d.indexedDBAssets;
         }
         else {
             editor.fs = require(__dirname + "/io/file.js").file;
-            feng3d.assets.fstype = feng3d.FSType.native;
+            // assets.fstype = FSType.native;
         }
         (function () {
             /**
@@ -4126,7 +4126,7 @@ var feng3d;
                         || file.extension == editor.AssetExtension.shader) {
                         menu = {
                             label: "编辑", click: function () {
-                                var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + file.extension;
+                                var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + file.extension;
                                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                                 window.open(url);
                             }
@@ -4139,7 +4139,7 @@ var feng3d;
                         || file.extension == editor.AssetExtension.anim) {
                         menu = {
                             label: "编辑", click: function () {
-                                var url = "codeeditor.html?fstype=" + feng3d.assets.fstype + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + editor.AssetExtension.json;
+                                var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + editor.AssetExtension.json;
                                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                                 window.open(url);
                             }
@@ -5334,7 +5334,7 @@ var feng3d;
                                 return;
                             }
                             if (editor.fs == feng3d.indexedDBfs) {
-                                window.open("run.html?fstype=" + feng3d.assets.fstype + "&project=" + editor.editorAssets.projectname);
+                                window.open("run.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorAssets.projectname);
                                 return;
                             }
                             editor.fs.getAbsolutePath("index.html", function (err, path) {

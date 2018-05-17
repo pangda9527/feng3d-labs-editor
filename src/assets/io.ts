@@ -4,11 +4,11 @@ namespace feng3d.editor
     if (typeof require == "undefined")
     {
         fs = <EditorFS><any>indexedDBfs;
-        assets.fstype = FSType.indexedDB;
+        assets.readFS = indexedDBAssets;
     } else
     {
         fs = require(__dirname + "/io/file.js").file;
-        assets.fstype = FSType.native;
+        // assets.fstype = FSType.native;
     }
 
     export interface EditorFS extends FS
