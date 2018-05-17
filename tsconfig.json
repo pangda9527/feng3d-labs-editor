@@ -22,8 +22,6 @@
         "src/utils/Utils.ts",
         "src/utils/RegExps.ts",
         //
-        "src/assets/storage.ts",
-        "src/assets/indexedDBfs.ts",
         "src/assets/FileObject.ts",
         "src/assets/io.ts",
         //
