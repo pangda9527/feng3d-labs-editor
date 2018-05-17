@@ -201,7 +201,7 @@ namespace feng3d.editor
                             fs.selectFile((file: FileList) =>
                             {
                                 this.inputFiles(file);
-                            }, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
+                            });
                         }
                     });
             }
@@ -213,6 +213,9 @@ namespace feng3d.editor
             var openMenu = getOpenCodeEditorMenu(assetsFile);
             if (openMenu)
                 menuconfig.push(openMenu);
+
+            // 解析菜单
+            this.parserMenu(menuconfig, assetsFile);
 
             menuconfig.push(
                 {
@@ -322,88 +325,15 @@ namespace feng3d.editor
         {
             for (let i = 0; i < files.length; i++)
             {
-                const element = files[i];
-                this.inputFile(element);
-            }
-        }
-        inputFile(file: File)
-        {
-            if (!file)
-                return;
-            var extensions = file.name.split(".").pop();
-            var reader = new FileReader();
-            switch (extensions)
-            {
-                case "mdl":
-                    reader.addEventListener('load', (event) =>
-                    {
-                        war3.MdlParser.parse(event.target["result"], (war3Model) =>
-                        {
-                            war3Model.root = file.name.substring(0, file.name.lastIndexOf("/") + 1);
-                            var gameobject = war3Model.getMesh();
-                            gameobject.name = file.name.split("/").pop().split(".").shift();
-                            this.saveObject(gameobject, gameobject.name + ".gameobject");
-                        });
-                    }, false);
-                    reader.readAsText(file);
-                    break;
-                case "obj":
-                    reader.addEventListener('load', (event) =>
-                    {
-                        ObjLoader.parse(event.target["result"], (gameobject: GameObject) =>
-                        {
-                            gameobject.name = file.name.split("/").pop().split(".").shift();
-                            this.saveObject(gameobject, gameobject.name + ".gameobject");
-                        });
-                    }, false);
-                    reader.readAsText(file);
-                    break;
-                case "fbx":
-                    // fbxLoader.load(path, (gameobject) =>
-                    // {
-                    //     gameobject.name = path.split("/").pop().split(".").shift();
-                    //     saveGameObject(gameobject);
-                    //     // engine.root.addChild(gameobject);
-                    // });
-                    threejsLoader.load(file, (gameobject) =>
-                    {
-                        gameobject.name = file.name.split("/").pop().split(".").shift();
-                        this.saveObject(gameobject, gameobject.name + ".gameobject");
-                        // engine.root.addChild(gameobject);
-                    });
-                    break;
-                case "md5mesh":
-                    reader.addEventListener('load', (event) =>
-                    {
-                        MD5Loader.parseMD5Mesh(event.target["result"], (gameobject) =>
-                        {
-                            gameobject.name = file.name.split("/").pop().split(".").shift();
-                            this.saveObject(gameobject, gameobject.name + ".gameobject");
-                            // engine.root.addChild(gameobject);
-                        });
-                    }, false);
-                    reader.readAsText(file);
-                    break;
-                case "md5anim":
-                    reader.addEventListener('load', (event) =>
-                    {
-                        MD5Loader.parseMD5Anim(event.target["result"], (animationclip) =>
-                        {
-                            animationclip.name = file.name.split("/").pop().split(".").shift();
-                            this.saveObject(animationclip, animationclip.name + ".anim");
-                        });
-                    }, false);
-                    reader.readAsText(file);
-                    break;
-                default:
-                    reader.addEventListener('load', (event) =>
-                    {
-                        var showFloder = this.getFile(this.showFloder);
-                        var result = event.target["result"];
-                        showFloder.addfile(file.name, result);
-                    }, false);
-                    reader.readAsArrayBuffer(file);
-                    break;
+                const file = files[i];
+                var reader = new FileReader();
+                reader.addEventListener('load', (event) =>
+                {
+                    var showFloder = this.getFile(this.showFloder);
+                    var result = event.target["result"];
+                    showFloder.addfile(file.name, result);
+                }, false);
+                reader.readAsArrayBuffer(file);
             }
         }
         runProjectScript(callback?: () => void)
@@ -428,6 +358,102 @@ namespace feng3d.editor
                 this._preProjectJsContent = content;
                 callback && callback();
             });
+        }
+        /**
+         * 解析菜单
+         * @param menuconfig 菜单
+         * @param assetsFile 文件
+         */
+        private parserMenu(menuconfig: MenuItem[], file: AssetsFile)
+        {
+            var extensions = file.path.split(".").pop();
+            switch (extensions)
+            {
+                case "mdl":
+                    menuconfig.push({
+                        label: "解析", click: () =>
+                        {
+                            fs.readFileAsString(file.path, (err, content) =>
+                            {
+                                war3.MdlParser.parse(content, (war3Model) =>
+                                {
+                                    war3Model.root = file.parent.name;
+                                    var gameobject = war3Model.getMesh();
+                                    gameobject.name = file.name;
+                                    this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                });
+                            });
+                        }
+                    });
+                    break;
+                case "obj":
+                    menuconfig.push({
+                        label: "解析", click: () =>
+                        {
+                            fs.readFileAsString(file.path, (err, content) =>
+                            {
+                                ObjLoader.parse(content, (gameobject: GameObject) =>
+                                {
+                                    gameobject.name = file.name;
+                                    this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                });
+                            });
+                        }
+                    });
+                    break;
+                case "fbx":
+
+                    menuconfig.push({
+                        label: "解析", click: () =>
+                        {
+
+                            fs.readFile(file.path, (err, data) =>
+                            {
+                                threejsLoader.load(data, (gameobject) =>
+                                {
+                                    gameobject.name = file.name;
+                                    this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                    // engine.root.addChild(gameobject);
+                                });
+                            });
+                        }
+                    });
+                    break;
+                case "md5mesh":
+
+                    menuconfig.push({
+                        label: "解析", click: () =>
+                        {
+
+                            fs.readFileAsString(file.path, (err, content) =>
+                            {
+                                MD5Loader.parseMD5Mesh(content, (gameobject) =>
+                                {
+                                    gameobject.name = file.name.split("/").pop().split(".").shift();
+                                    this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                    // engine.root.addChild(gameobject);
+                                });
+
+                            });
+                        }
+                    });
+                    break;
+                case "md5anim":
+                    menuconfig.push({
+                        label: "解析", click: () =>
+                        {
+                            fs.readFileAsString(file.path, (err, content) =>
+                            {
+                                MD5Loader.parseMD5Anim(content, (animationclip) =>
+                                {
+                                    animationclip.name = file.name.split("/").pop().split(".").shift();
+                                    this.saveObject(animationclip, animationclip.name + ".anim");
+                                });
+                            });
+                        }
+                    });
+                    break;
+            }
         }
     }
 

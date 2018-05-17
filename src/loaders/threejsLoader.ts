@@ -5,7 +5,7 @@ namespace feng3d.editor
     };
     var usenumberfixed = true;
 
-    function load(url: string | File, onParseComplete?: (group) => void)
+    function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => void)
     {
 
         var skeletonComponent: SkeletonComponent;
@@ -16,6 +16,11 @@ namespace feng3d.editor
             if (typeof url == "string")
             {
                 loader.load(url, onLoad, onProgress, onError)
+            }
+            else if (url instanceof ArrayBuffer)
+            {
+                var scene = loader.parse(url);
+                onLoad(scene);
             }
             else
             {

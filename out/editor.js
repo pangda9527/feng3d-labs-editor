@@ -4099,7 +4099,7 @@ var feng3d;
                         label: "导入资源", click: function () {
                             editor.fs.selectFile(function (file) {
                                 _this.inputFiles(file);
-                            }, { name: '模型文件', extensions: ["obj", 'mdl', 'fbx', "md5mesh", 'md5anim'] });
+                            });
                         }
                     });
                 }
@@ -4109,6 +4109,8 @@ var feng3d;
                 var openMenu = getOpenCodeEditorMenu(assetsFile);
                 if (openMenu)
                     menuconfig.push(openMenu);
+                // 解析菜单
+                this.parserMenu(menuconfig, assetsFile);
                 menuconfig.push({
                     label: "删除", click: function () {
                         assetsFile.deleteFile();
@@ -4195,78 +4197,20 @@ var feng3d;
                 return files;
             };
             EditorAssets.prototype.inputFiles = function (files) {
-                for (var i = 0; i < files.length; i++) {
-                    var element = files[i];
-                    this.inputFile(element);
-                }
-            };
-            EditorAssets.prototype.inputFile = function (file) {
                 var _this = this;
-                if (!file)
-                    return;
-                var extensions = file.name.split(".").pop();
-                var reader = new FileReader();
-                switch (extensions) {
-                    case "mdl":
-                        reader.addEventListener('load', function (event) {
-                            feng3d.war3.MdlParser.parse(event.target["result"], function (war3Model) {
-                                war3Model.root = file.name.substring(0, file.name.lastIndexOf("/") + 1);
-                                var gameobject = war3Model.getMesh();
-                                gameobject.name = file.name.split("/").pop().split(".").shift();
-                                _this.saveObject(gameobject, gameobject.name + ".gameobject");
-                            });
-                        }, false);
-                        reader.readAsText(file);
-                        break;
-                    case "obj":
-                        reader.addEventListener('load', function (event) {
-                            feng3d.ObjLoader.parse(event.target["result"], function (gameobject) {
-                                gameobject.name = file.name.split("/").pop().split(".").shift();
-                                _this.saveObject(gameobject, gameobject.name + ".gameobject");
-                            });
-                        }, false);
-                        reader.readAsText(file);
-                        break;
-                    case "fbx":
-                        // fbxLoader.load(path, (gameobject) =>
-                        // {
-                        //     gameobject.name = path.split("/").pop().split(".").shift();
-                        //     saveGameObject(gameobject);
-                        //     // engine.root.addChild(gameobject);
-                        // });
-                        editor.threejsLoader.load(file, function (gameobject) {
-                            gameobject.name = file.name.split("/").pop().split(".").shift();
-                            _this.saveObject(gameobject, gameobject.name + ".gameobject");
-                            // engine.root.addChild(gameobject);
-                        });
-                        break;
-                    case "md5mesh":
-                        reader.addEventListener('load', function (event) {
-                            feng3d.MD5Loader.parseMD5Mesh(event.target["result"], function (gameobject) {
-                                gameobject.name = file.name.split("/").pop().split(".").shift();
-                                _this.saveObject(gameobject, gameobject.name + ".gameobject");
-                                // engine.root.addChild(gameobject);
-                            });
-                        }, false);
-                        reader.readAsText(file);
-                        break;
-                    case "md5anim":
-                        reader.addEventListener('load', function (event) {
-                            feng3d.MD5Loader.parseMD5Anim(event.target["result"], function (animationclip) {
-                                animationclip.name = file.name.split("/").pop().split(".").shift();
-                                _this.saveObject(animationclip, animationclip.name + ".anim");
-                            });
-                        }, false);
-                        reader.readAsText(file);
-                        break;
-                    default:
-                        reader.addEventListener('load', function (event) {
-                            var showFloder = _this.getFile(_this.showFloder);
-                            var result = event.target["result"];
-                            showFloder.addfile(file.name, result);
-                        }, false);
-                        reader.readAsArrayBuffer(file);
-                        break;
+                var _loop_1 = function (i) {
+                    var file = files[i];
+                    reader = new FileReader();
+                    reader.addEventListener('load', function (event) {
+                        var showFloder = _this.getFile(_this.showFloder);
+                        var result = event.target["result"];
+                        showFloder.addfile(file.name, result);
+                    }, false);
+                    reader.readAsArrayBuffer(file);
+                };
+                var reader;
+                for (var i = 0; i < files.length; i++) {
+                    _loop_1(i);
                 }
             };
             EditorAssets.prototype.runProjectScript = function (callback) {
@@ -4288,6 +4232,81 @@ var feng3d;
                     _this._preProjectJsContent = content;
                     callback && callback();
                 });
+            };
+            /**
+             * 解析菜单
+             * @param menuconfig 菜单
+             * @param assetsFile 文件
+             */
+            EditorAssets.prototype.parserMenu = function (menuconfig, file) {
+                var _this = this;
+                var extensions = file.path.split(".").pop();
+                switch (extensions) {
+                    case "mdl":
+                        menuconfig.push({
+                            label: "解析", click: function () {
+                                editor.fs.readFileAsString(file.path, function (err, content) {
+                                    feng3d.war3.MdlParser.parse(content, function (war3Model) {
+                                        war3Model.root = file.parent.name;
+                                        var gameobject = war3Model.getMesh();
+                                        gameobject.name = file.name;
+                                        _this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                    });
+                                });
+                            }
+                        });
+                        break;
+                    case "obj":
+                        menuconfig.push({
+                            label: "解析", click: function () {
+                                editor.fs.readFileAsString(file.path, function (err, content) {
+                                    feng3d.ObjLoader.parse(content, function (gameobject) {
+                                        gameobject.name = file.name;
+                                        _this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                    });
+                                });
+                            }
+                        });
+                        break;
+                    case "fbx":
+                        menuconfig.push({
+                            label: "解析", click: function () {
+                                editor.fs.readFile(file.path, function (err, data) {
+                                    editor.threejsLoader.load(data, function (gameobject) {
+                                        gameobject.name = file.name;
+                                        _this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                        // engine.root.addChild(gameobject);
+                                    });
+                                });
+                            }
+                        });
+                        break;
+                    case "md5mesh":
+                        menuconfig.push({
+                            label: "解析", click: function () {
+                                editor.fs.readFileAsString(file.path, function (err, content) {
+                                    feng3d.MD5Loader.parseMD5Mesh(content, function (gameobject) {
+                                        gameobject.name = file.name.split("/").pop().split(".").shift();
+                                        _this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                        // engine.root.addChild(gameobject);
+                                    });
+                                });
+                            }
+                        });
+                        break;
+                    case "md5anim":
+                        menuconfig.push({
+                            label: "解析", click: function () {
+                                editor.fs.readFileAsString(file.path, function (err, content) {
+                                    feng3d.MD5Loader.parseMD5Anim(content, function (animationclip) {
+                                        animationclip.name = file.name.split("/").pop().split(".").shift();
+                                        _this.saveObject(animationclip, animationclip.name + ".anim");
+                                    });
+                                });
+                            }
+                        });
+                        break;
+                }
             };
             return EditorAssets;
         }());
@@ -9943,6 +9962,10 @@ var feng3d;
                 var loader = new window["THREE"].FBXLoader();
                 if (typeof url == "string") {
                     loader.load(url, onLoad, onProgress, onError);
+                }
+                else if (url instanceof ArrayBuffer) {
+                    var scene = loader.parse(url);
+                    onLoad(scene);
                 }
                 else {
                     var reader = new FileReader();

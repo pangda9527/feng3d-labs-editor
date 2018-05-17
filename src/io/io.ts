@@ -17,7 +17,7 @@ namespace feng3d.editor
          * 创建项目
          */
         createproject(projectname: string, callback: () => void);
-        selectFile?: (callback: (file: FileList) => void, param?: Object) => void;
+        selectFile?: (callback: (file: FileList) => void) => void;
         /**
          * 导出项目
          */
