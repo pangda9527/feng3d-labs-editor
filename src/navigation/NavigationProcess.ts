@@ -2,7 +2,7 @@ namespace navigation
 {
     export class NavigationProcess
     {
-        data: NavigationData;
+        private data: NavigationData;
 
         constructor(geometry: { positions: number[], indices: number[] })
         {

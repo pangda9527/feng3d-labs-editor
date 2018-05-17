@@ -9001,6 +9001,7 @@ var feng3d;
         ;
         return ThreeBSPVertex;
     }());
+    feng3d.ThreeBSPVertex = ThreeBSPVertex;
     /**
      * 多边形
      */
@@ -9170,6 +9171,7 @@ var feng3d;
         ;
         return ThreeBSPPolygon;
     }());
+    feng3d.ThreeBSPPolygon = ThreeBSPPolygon;
     /**
      * 节点
      */
@@ -9334,6 +9336,7 @@ var feng3d;
         ;
         return ThreeBSPNode;
     }());
+    feng3d.ThreeBSPNode = ThreeBSPNode;
 })(feng3d || (feng3d = {}));
 var navigation;
 (function (navigation) {

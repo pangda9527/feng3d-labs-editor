@@ -83,7 +83,7 @@ namespace feng3d
     /**
      * 顶点
      */
-    class ThreeBSPVertex
+    export class ThreeBSPVertex
     {
         /**
          * 坐标
@@ -135,7 +135,7 @@ namespace feng3d
     /**
      * 多边形
      */
-    class ThreeBSPPolygon
+    export class ThreeBSPPolygon
     {
         /**
          * 多边形所在面w值
@@ -356,7 +356,7 @@ namespace feng3d
     /**
      * 节点
      */
-    class ThreeBSPNode
+    export class ThreeBSPNode
     {
         /**
          * 多边形列表
