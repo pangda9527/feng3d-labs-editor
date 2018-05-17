@@ -3,7 +3,7 @@ namespace feng3d.editor
     export var fs: EditorFS;
     if (typeof require == "undefined")
     {
-        fs = <EditorFS>indexedDBfs;
+        fs = <EditorFS><any>indexedDBfs;
         assets.fstype = FSType.indexedDB;
     } else
     {
