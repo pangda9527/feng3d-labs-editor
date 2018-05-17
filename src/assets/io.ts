@@ -21,6 +21,66 @@ namespace feng3d.editor
         }
 
         /**
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        hasProject(projectname: string, callback: (has: boolean) => void)
+        {
+            var readWriteFS = this.fs;
+            if (readWriteFS instanceof IndexedDBfs)
+            {
+                storage.hasObjectStore(readWriteFS.DBname, projectname, callback);
+            } else
+            {
+                throw "未完成 hasProject 功能！";
+            }
+        }
+
+        /**
+         * 获取项目列表
+         * @param callback 回调函数
+         */
+        getProjectList(callback: (err: Error, projects: string[]) => void)
+        {
+            var readWriteFS = this.fs;
+            if (readWriteFS instanceof IndexedDBfs)
+            {
+                storage.getObjectStoreNames(readWriteFS.DBname, callback)
+            } else
+            {
+                throw "未完成 hasProject 功能！";
+            }
+        }
+
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        initproject(projectname: string, callback: () => void)
+        {
+            var readWriteFS = this.fs;
+            if (readWriteFS instanceof IndexedDBfs)
+            {
+                storage.createObjectStore(readWriteFS.DBname, projectname, (err) =>
+                {
+                    if (err)
+                    {
+                        warn(err);
+                        return;
+                    }
+                    readWriteFS.projectname = projectname;
+                    // todo 启动监听 ts代码变化自动编译
+                    callback();
+                });
+            } else
+            {
+                throw "未完成 hasProject 功能！";
+            }
+        }
+
+        /**
          * 创建项目
          */
         createproject(projectname: string, callback: () => void)

@@ -189,6 +189,23 @@ declare namespace feng3d.editor {
     class EditorAssets1 extends ReadWriteAssets {
         constructor(readWriteFS?: ReadWriteFS);
         /**
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        hasProject(projectname: string, callback: (has: boolean) => void): void;
+        /**
+         * 获取项目列表
+         * @param callback 回调函数
+         */
+        getProjectList(callback: (err: Error, projects: string[]) => void): void;
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        initproject(projectname: string, callback: () => void): void;
+        /**
          * 创建项目
          */
         createproject(projectname: string, callback: () => void): void;

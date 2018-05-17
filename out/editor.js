@@ -418,6 +418,55 @@ var feng3d;
                 return _this;
             }
             /**
+             * 是否存在指定项目
+             * @param projectname 项目名称
+             * @param callback 回调函数
+             */
+            EditorAssets1.prototype.hasProject = function (projectname, callback) {
+                var readWriteFS = this.fs;
+                if (readWriteFS instanceof feng3d.IndexedDBfs) {
+                    feng3d.storage.hasObjectStore(readWriteFS.DBname, projectname, callback);
+                }
+                else {
+                    throw "未完成 hasProject 功能！";
+                }
+            };
+            /**
+             * 获取项目列表
+             * @param callback 回调函数
+             */
+            EditorAssets1.prototype.getProjectList = function (callback) {
+                var readWriteFS = this.fs;
+                if (readWriteFS instanceof feng3d.IndexedDBfs) {
+                    feng3d.storage.getObjectStoreNames(readWriteFS.DBname, callback);
+                }
+                else {
+                    throw "未完成 hasProject 功能！";
+                }
+            };
+            /**
+             * 初始化项目
+             * @param projectname 项目名称
+             * @param callback 回调函数
+             */
+            EditorAssets1.prototype.initproject = function (projectname, callback) {
+                var readWriteFS = this.fs;
+                if (readWriteFS instanceof feng3d.IndexedDBfs) {
+                    feng3d.storage.createObjectStore(readWriteFS.DBname, projectname, function (err) {
+                        if (err) {
+                            feng3d.warn(err);
+                            return;
+                        }
+                        readWriteFS.projectname = projectname;
+                        // todo 启动监听 ts代码变化自动编译
+                        callback();
+                    });
+                }
+                else {
+                    throw "未完成 hasProject 功能！";
+                }
+            };
+            /**
              * 创建项目
              */
             EditorAssets1.prototype.createproject = function (projectname, callback) {

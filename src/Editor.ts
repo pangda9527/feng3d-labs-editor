@@ -90,6 +90,7 @@ namespace feng3d.editor
         private initproject(callback: () => void)
         {
             editorcache.projectname = editorcache.projectname || "newproject";
+            
             fs.hasProject(editorcache.projectname, (has) =>
             {
                 if (has)
