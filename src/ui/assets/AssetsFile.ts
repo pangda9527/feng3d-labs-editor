@@ -370,7 +370,7 @@ namespace feng3d.editor
 
             var deletefile = () =>
             {
-                fs.remove(this.path, (err) =>
+                fs.delete(this.path, (err) =>
                 {
                     if (err)
                         warn(`删除文件 ${this.path} 出现问题 ${err}`);

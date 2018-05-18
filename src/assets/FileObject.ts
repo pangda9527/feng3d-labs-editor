@@ -295,7 +295,7 @@ namespace feng3d.editor
          */
         delete(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            fs.remove(this._path, (err) =>
+            fs.delete(this._path, (err) =>
             {
                 if (err)
                 {

@@ -79,7 +79,7 @@ namespace feng3d.editor
                 assetsFile.deleteFile(callback, includeRoot);
             else
             {
-                fs.remove(path, () =>
+                fs.delete(path, () =>
                 {
                     callback(null);
                 });

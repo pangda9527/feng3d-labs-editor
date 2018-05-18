@@ -352,7 +352,7 @@ var feng3d;
              */
             FileObject.prototype.delete = function (onComplete, onError, thisPtr) {
                 var _this = this;
-                editor.fs.remove(this._path, function (err) {
+                editor.fs.delete(this._path, function (err) {
                     if (err) {
                         feng3d.warn(err);
                         onError(_this);
@@ -4055,7 +4055,7 @@ var feng3d;
                 if (assetsFile)
                     assetsFile.deleteFile(callback, includeRoot);
                 else {
-                    editor.fs.remove(path, function () {
+                    editor.fs.delete(path, function () {
                         callback(null);
                     });
                 }
@@ -4632,7 +4632,7 @@ var feng3d;
                     return;
                 }
                 var deletefile = function () {
-                    editor.fs.remove(_this.path, function (err) {
+                    editor.fs.delete(_this.path, function (err) {
                         if (err)
                             feng3d.warn("\u5220\u9664\u6587\u4EF6 " + _this.path + " \u51FA\u73B0\u95EE\u9898 " + err);
                         _this.destroy();
@@ -5363,7 +5363,7 @@ var feng3d;
                 editor.editorDispatcher.dispatch(item.command);
             };
             TopView.prototype.onHelpButtonClick = function () {
-                window.open("http://feng3d.gitee.io");
+                window.open("http://feng3d.com");
             };
             TopView.prototype.onButtonClick = function (event) {
                 switch (event.currentTarget) {

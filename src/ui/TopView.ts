@@ -74,7 +74,7 @@ namespace feng3d.editor
 
 		private onHelpButtonClick()
 		{
-			window.open("http://feng3d.gitee.io");
+			window.open("http://feng3d.com");
 		}
 
 		private onButtonClick(event: egret.TouchEvent)
