@@ -9501,6 +9501,7 @@ var egret;
     (function () {
         //调整默认字体大小
         egret.TextField.default_size = 12;
+        // 扩展焦点在文本中时 禁止出发快捷键
         var oldfocusHandler = egret.InputController.prototype["focusHandler"];
         egret.InputController.prototype["focusHandler"] = function (event) {
             oldfocusHandler.call(this, event);

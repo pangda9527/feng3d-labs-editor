@@ -16,6 +16,7 @@ namespace egret
         //调整默认字体大小
         egret.TextField.default_size = 12;
 
+        // 扩展焦点在文本中时 禁止出发快捷键
         var oldfocusHandler = egret.InputController.prototype["focusHandler"];
         egret.InputController.prototype["focusHandler"] = function (event)
         {
@@ -31,6 +32,8 @@ namespace egret
         }
     })();
 
+    
+    
     // 扩展鼠标事件，增加鼠标 按下、弹起、移动、点击、移入、移出、右击、双击事件
     export type MouseEvent = egret.TouchEvent;
     export var MouseEvent: {
