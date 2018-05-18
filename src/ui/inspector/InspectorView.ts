@@ -73,14 +73,12 @@ namespace feng3d.editor
 					{
 						this.view = objectview.getObjectView(showdata);
 						this.view.percentWidth = 100;
-						this.view.percentHeight = 100;
 						this.group.addChild(this.view);
 					});
 				} else
 				{
 					this.view = objectview.getObjectView(this.viewData);
 					this.view.percentWidth = 100;
-					this.view.percentHeight = 100;
 					this.group.addChild(this.view);
 				}
 

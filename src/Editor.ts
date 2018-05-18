@@ -49,9 +49,6 @@ namespace feng3d.editor
 
             feng3d.runEnvironment = RunEnvironment.editor;
             
-            //
-            new EditorEnvironment();
-
             this.initMainView()
 
             //初始化feng3d
@@ -64,9 +61,9 @@ namespace feng3d.editor
             this.once(egret.Event.ENTER_FRAME, function ()
             {
                 //
-                egret.mouseEventEnvironment = new egret.MouseEventEnvironment();
+                egret.mouseEventEnvironment();
             }, this);
-
+            
             this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
         }
 

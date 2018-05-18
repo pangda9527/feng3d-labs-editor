@@ -2206,12 +2206,6 @@ declare var debugSegment: feng3d.GameObject;
 declare var pointGeometry: feng3d.PointGeometry;
 declare var debugPoint: feng3d.GameObject;
 declare function createSegment(): void;
-declare namespace feng3d.editor {
-    class EditorEnvironment {
-        constructor();
-        private init();
-    }
-}
 declare namespace egret {
     type MouseEvent = egret.TouchEvent;
     var MouseEvent: {
@@ -2234,19 +2228,7 @@ declare namespace egret {
         /** 双击 */
         DOUBLE_CLICK: "dblclick";
     };
-}
-declare namespace egret {
-    var mouseEventEnvironment: MouseEventEnvironment;
-    class MouseEventEnvironment {
-        private webTouchHandler;
-        private canvas;
-        private touch;
-        overDisplayObject: egret.DisplayObject;
-        rightmousedownObject: egret.DisplayObject;
-        constructor();
-        private onMouseMove(event);
-        private getWebTouchHandler();
-    }
+    var mouseEventEnvironment: () => void;
 }
 declare namespace feng3d.editor {
     /**

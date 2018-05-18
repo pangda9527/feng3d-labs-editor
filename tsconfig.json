@@ -118,9 +118,7 @@
         "src/navigation/GeometryOperation.ts",
         "src/navigation/NavigationProcess.ts",
         //
-        "src/global/EditorEnvironment.ts",
-        "src/global/MouseEvent.ts",
-        "src/global/MouseEventEnvironment.ts",
+        "src/global/EgretExtend.ts",
         //
         "src/scripts/EditorScript.ts",
         "src/scripts/MouseRayTestScript.ts",
