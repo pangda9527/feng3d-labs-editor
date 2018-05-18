@@ -11,6 +11,7 @@ namespace feng3d.editor
 		public centerButton: eui.ToggleButton;
 		public helpButton: eui.Button;
 		public settingButton: eui.Button;
+		public qrcodeButton: eui.Button;
 		public playBtn: eui.Button;
 
 		constructor()
@@ -45,6 +46,7 @@ namespace feng3d.editor
 
 			this.helpButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
 			watcher.watch(mrsTool, "toolType", this.updateview, this);
 
@@ -63,6 +65,7 @@ namespace feng3d.editor
 
 			this.helpButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
 			watcher.unwatch(mrsTool, "toolType", this.updateview, this);
 		}
@@ -122,6 +125,12 @@ namespace feng3d.editor
 							window.open(path);
 						});
 					});
+					break;
+				case this.qrcodeButton:
+					setTimeout(() =>
+					{
+						$('#output').show();
+					}, 10);
 					break;
 			}
 		}

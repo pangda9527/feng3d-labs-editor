@@ -5344,6 +5344,7 @@ var feng3d;
                 this.playBtn.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
                 this.helpButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
                 this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
+                this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
                 feng3d.watcher.watch(editor.mrsTool, "toolType", this.updateview, this);
                 this.updateview();
             };
@@ -5357,6 +5358,7 @@ var feng3d;
                 this.playBtn.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
                 this.helpButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
                 this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
+                this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
                 feng3d.watcher.unwatch(editor.mrsTool, "toolType", this.updateview, this);
             };
             TopView.prototype.onMainMenu = function (item) {
@@ -5403,6 +5405,11 @@ var feng3d;
                                 window.open(path);
                             });
                         });
+                        break;
+                    case this.qrcodeButton:
+                        setTimeout(function () {
+                            $('#output').show();
+                        }, 10);
                         break;
                 }
             };

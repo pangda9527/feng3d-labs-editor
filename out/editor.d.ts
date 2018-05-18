@@ -1371,6 +1371,7 @@ declare namespace feng3d.editor {
         centerButton: eui.ToggleButton;
         helpButton: eui.Button;
         settingButton: eui.Button;
+        qrcodeButton: eui.Button;
         playBtn: eui.Button;
         constructor();
         private onComplete();
