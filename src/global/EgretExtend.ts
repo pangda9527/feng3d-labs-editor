@@ -32,8 +32,8 @@ namespace egret
         }
     })();
 
-    
-    
+
+
     // 扩展鼠标事件，增加鼠标 按下、弹起、移动、点击、移入、移出、右击、双击事件
     export type MouseEvent = egret.TouchEvent;
     export var MouseEvent: {
@@ -227,7 +227,10 @@ namespace egret
         function onMouseWheel(event: WheelEvent)
         {
             var scroller: eui.Scroller = this;
-            scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV + event.wheelDelta * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
+            if (scroller.hitTestPoint(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
+            {
+                scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV - event.wheelDelta * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
+            }
         }
     })();
 

@@ -984,6 +984,27 @@ declare namespace feng3d.editor {
 }
 declare namespace feng3d.editor {
     /**
+     * 挑选（拾取）OAV界面
+     * @author feng 2016-3-10
+     */
+    class OAVTexture2D extends OAVBase {
+        image: eui.Image;
+        img_border: eui.Image;
+        pickBtn: eui.Button;
+        label: eui.Label;
+        constructor(attributeViewInfo: AttributeViewInfo);
+        initView(): void;
+        dispose(): void;
+        private ontxtClick();
+        /**
+         * 更新界面
+         */
+        updateView(): void;
+        private onDoubleClick();
+    }
+}
+declare namespace feng3d.editor {
+    /**
      * 属性面板（检查器）
      * @author feng     2017-03-20
      */

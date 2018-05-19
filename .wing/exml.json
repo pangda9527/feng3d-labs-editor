@@ -23,7 +23,7 @@
     "globalBackgroundY": 0,
     "globalBackgroundWidth": -1,
     "globalBackgroundHeight": -1,
-    "globalBackgroundColor": "#a2a2a2",
+    "globalBackgroundColor": "#c2c2c2",
     "globalBackgroundImage": ""
   },
   "15a64cb93c1": {
@@ -106,5 +106,10 @@
     "backgroundAlpha": 100,
     "useBgImage": false,
     "useBgColor": true
+  },
+  "163779dbbcc": {
+    "backgroundType": "user",
+    "backgroundColor": "#c2c2c2",
+    "backgroundAlpha": 100
   }
 }

@@ -3764,6 +3764,83 @@ var feng3d;
     var editor;
     (function (editor) {
         /**
+         * 挑选（拾取）OAV界面
+         * @author feng 2016-3-10
+         */
+        var OAVTexture2D = /** @class */ (function (_super) {
+            __extends(OAVTexture2D, _super);
+            function OAVTexture2D(attributeViewInfo) {
+                var _this = _super.call(this, attributeViewInfo) || this;
+                _this.skinName = "OAVTexture2D";
+                return _this;
+            }
+            OAVTexture2D.prototype.initView = function () {
+                this.label.text = this._attributeName;
+                this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+                this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+                feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
+            };
+            OAVTexture2D.prototype.dispose = function () {
+                this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+                this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+                feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+            };
+            OAVTexture2D.prototype.ontxtClick = function () {
+                var _this = this;
+                var menus = editor.editorAssets.filter(function (file) {
+                    return editor.regExps.image.test(file.path);
+                }).reduce(function (prev, item) {
+                    prev.push({
+                        label: item.name, click: function () {
+                            var text = _this.attributeValue;
+                            text.url = item.path;
+                            _this.updateView();
+                        }
+                    });
+                    return prev;
+                }, []);
+                if (menus.length == 0) {
+                    menus.push({ label: "\u6CA1\u6709 \u56FE\u7247 \u8D44\u6E90" });
+                }
+                editor.menu.popup(menus);
+            };
+            /**
+             * 更新界面
+             */
+            OAVTexture2D.prototype.updateView = function () {
+                var _this = this;
+                var text = this.attributeValue;
+                this.image.visible = false;
+                this.img_border.visible = false;
+                var url = text.url;
+                if (url) {
+                    editor.fs.readFile(url, function (err, data) {
+                        feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
+                            _this.image.source = dataurl;
+                            _this.image.visible = true;
+                            _this.img_border.visible = true;
+                        });
+                    });
+                }
+                feng3d.assets.readFileAsImage;
+            };
+            OAVTexture2D.prototype.onDoubleClick = function () {
+                if (this.attributeValue && typeof this.attributeValue == "object")
+                    editor.editorui.inspectorView.showData(this.attributeValue);
+            };
+            OAVTexture2D = __decorate([
+                feng3d.OAVComponent()
+            ], OAVTexture2D);
+            return OAVTexture2D;
+        }(editor.OAVBase));
+        editor.OAVTexture2D = OAVTexture2D;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
+        /**
          * 属性面板（检查器）
          * @author feng     2017-03-20
          */
@@ -9647,7 +9724,9 @@ var egret;
         };
         function onMouseWheel(event) {
             var scroller = this;
-            scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV + event.wheelDelta * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
+            if (scroller.hitTestPoint(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY)) {
+                scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV - event.wheelDelta * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
+            }
         }
     })();
 })(egret || (egret = {}));
@@ -10639,6 +10718,7 @@ var feng3d;
         feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
         feng3d.objectview.setDefaultTypeAttributeView("Color3", { component: "OAVColorPicker" });
         feng3d.objectview.setDefaultTypeAttributeView("Color4", { component: "OAVColorPicker" });
+        feng3d.objectview.setDefaultTypeAttributeView("Texture2D", { component: "OAVTexture2D" });
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 /**

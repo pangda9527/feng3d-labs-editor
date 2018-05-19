@@ -71,6 +71,7 @@
         "src/objectview/oav/OAVObjectView.ts",
         "src/objectview/oav/OAVGameObjectName.ts",
         "src/objectview/oav/OAVPick.ts",
+        "src/objectview/oav/OAVTexture2D.ts",
         //
         "src/ui/inspector/InspectorView.ts",
         //
