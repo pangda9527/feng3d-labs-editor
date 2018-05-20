@@ -29,6 +29,10 @@ var NativeFS = /** @class */ (function () {
      * @param callback 读取完成回调 当err不为null时表示读取失败
      */
     NativeFS.prototype.readFile = function (path, callback) {
+        if (path.charAt(path.length - 1) == "/") {
+            callback(null, null);
+            return;
+        }
         this.getAbsolutePath(path, function (err, absolutePath) {
             fs.open(absolutePath, "r", function (err, fd) {
                 if (err) {
@@ -73,7 +77,6 @@ var NativeFS = /** @class */ (function () {
     NativeFS.prototype.readdir = function (path, callback) {
         this.getAbsolutePath(path, function (err, absolutePath) {
             fs.readdir(absolutePath, function (err, files) {
-                console.log("readdir " + files);
                 files = files.map(function (file) {
                     // 文件夹添加结尾标记 "/"
                     if (fs.statSync(absolutePath + file).isDirectory()) {
@@ -92,7 +95,10 @@ var NativeFS = /** @class */ (function () {
      */
     NativeFS.prototype.mkdir = function (path, callback) {
         this.getAbsolutePath(path, function (err, absolutePath) {
-            fs.mkdir(absolutePath, callback);
+            if (fs.existsSync(absolutePath))
+                callback(null);
+            else
+                fs.mkdir(absolutePath, callback);
         });
     };
     /**
@@ -102,7 +108,10 @@ var NativeFS = /** @class */ (function () {
      */
     NativeFS.prototype.deleteFile = function (path, callback) {
         this.getAbsolutePath(path, function (err, absolutePath) {
-            fs.unlink(absolutePath, callback);
+            if (absolutePath.charAt(absolutePath.length - 1) == "/")
+                fs.rmdir(absolutePath, callback);
+            else
+                fs.unlink(absolutePath, callback);
         });
     };
     /**
@@ -146,4 +155,3 @@ var NativeFS = /** @class */ (function () {
 }());
 exports.NativeFS = NativeFS;
 exports.nativeFS = new NativeFS();
-//# sourceMappingURL=NativeFS.js.map

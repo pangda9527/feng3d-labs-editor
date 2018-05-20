@@ -79,7 +79,13 @@ namespace feng3d.editor
             } else if (readWriteFS.type == FSType.native)
             {
                 readWriteFS.projectname = projectname;
-                callback();
+                readWriteFS.mkdir("", (err) =>
+                {
+                    if (err)
+                        error(err);
+                    callback();
+                });
+
             } else
             {
                 throw "未完成 hasProject 功能！";
@@ -122,7 +128,12 @@ namespace feng3d.editor
                                 {
                                     file.async("arraybuffer").then((data) =>
                                     {
-                                        fs.writeFile(filepath, data, readfiles);
+                                        fs.writeFile(filepath, data, (err: Error) =>
+                                        {
+                                            if (err)
+                                                console.log(err);
+                                            readfiles()
+                                        });
                                     }, (reason) =>
                                         {
                                             console.warn(reason);
@@ -223,16 +234,7 @@ namespace feng3d.editor
                 }
             });
         }
-
-        /**
-         * 获取文件绝对路径
-         */
-        getAbsolutePath(path: string, callback: (err: Error | null, absolutePath: string | null) => void): void
-        {
-            callback(null, null);
-        }
     }
-
 
     if (typeof require == "undefined")
     {

@@ -176,6 +176,11 @@ namespace feng3d.editor
                 callback(this.cacheData);
                 return;
             }
+            if (this.isDirectory)
+            {
+                callback({ isDirectory: true });
+                return;
+            }
             if (this.extension == AssetExtension.material
                 || this.extension == AssetExtension.gameobject
                 || this.extension == AssetExtension.anim

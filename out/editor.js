@@ -467,7 +467,11 @@ var feng3d;
                 }
                 else if (readWriteFS.type == feng3d.FSType.native) {
                     readWriteFS.projectname = projectname;
-                    callback();
+                    readWriteFS.mkdir("", function (err) {
+                        if (err)
+                            feng3d.error(err);
+                        callback();
+                    });
                 }
                 else {
                     throw "未完成 hasProject 功能！";
@@ -500,7 +504,11 @@ var feng3d;
                                     }
                                     else {
                                         file.async("arraybuffer").then(function (data) {
-                                            editor.fs.writeFile(filepath, data, readfiles);
+                                            editor.fs.writeFile(filepath, data, function (err) {
+                                                if (err)
+                                                    console.log(err);
+                                                readfiles();
+                                            });
                                         }, function (reason) {
                                             console.warn(reason);
                                             readfiles();
@@ -578,12 +586,6 @@ var feng3d;
                         }
                     }
                 });
-            };
-            /**
-             * 获取文件绝对路径
-             */
-            EditorAssets1.prototype.getAbsolutePath = function (path, callback) {
-                callback(null, null);
             };
             return EditorAssets1;
         }(feng3d.ReadWriteAssets));
@@ -4565,6 +4567,10 @@ var feng3d;
                 var _this = this;
                 if (this.cacheData) {
                     callback(this.cacheData);
+                    return;
+                }
+                if (this.isDirectory) {
+                    callback({ isDirectory: true });
                     return;
                 }
                 if (this.extension == AssetExtension.material

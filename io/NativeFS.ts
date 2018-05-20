@@ -38,6 +38,11 @@ export class NativeFS implements feng3d.ReadWriteFS
      */
     readFile(path: string, callback: (err, data: ArrayBuffer) => void)
     {
+        if (path.charAt(path.length - 1) == "/")
+        {
+            callback(null, null);
+            return;
+        }
         this.getAbsolutePath(path, (err, absolutePath) =>
         {
             fs.open(absolutePath, "r", (err, fd) =>
@@ -96,7 +101,6 @@ export class NativeFS implements feng3d.ReadWriteFS
         {
             fs.readdir(absolutePath, (err, files) =>
             {
-                console.log(`readdir ${files}`);
                 files = files.map(file =>
                 {
                     // 文件夹添加结尾标记 "/"
@@ -120,7 +124,10 @@ export class NativeFS implements feng3d.ReadWriteFS
     {
         this.getAbsolutePath(path, (err, absolutePath) =>
         {
-            fs.mkdir(absolutePath, callback);
+            if (fs.existsSync(absolutePath))
+                callback(null);
+            else
+                fs.mkdir(absolutePath, callback);
         });
     }
 
@@ -133,7 +140,10 @@ export class NativeFS implements feng3d.ReadWriteFS
     {
         this.getAbsolutePath(path, (err, absolutePath) =>
         {
-            fs.unlink(absolutePath, callback);
+            if (absolutePath.charAt(absolutePath.length - 1) == "/")
+                fs.rmdir(absolutePath, callback);
+            else
+                fs.unlink(absolutePath, callback);
         });
     }
 
