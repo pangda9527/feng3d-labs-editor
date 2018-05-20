@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.oschina.net/feng3d/feng3d-editor.git"
+    "url": "https://gitee.com/feng3d/editor.git"
   },
   "keywords": [
     "editor",
@@ -16,7 +16,9 @@
   ],
   "author": "feng",
   "license": "ISC",
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/fs-extra": "^5.0.2"
+  },
   "dependencies": {
     "@types/node": "^8.0.47",
     "electron": "^1.7.8",

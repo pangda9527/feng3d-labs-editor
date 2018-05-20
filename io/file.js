@@ -2,7 +2,6 @@
 
 var fs = require("fs-extra");
 var process = require('child_process');
-var path = require("path");
 
 /**
  * 工作空间路径，工作空间内存放所有编辑器项目

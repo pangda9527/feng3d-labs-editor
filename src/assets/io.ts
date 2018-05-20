@@ -2,15 +2,6 @@ namespace feng3d.editor
 {
     export var fs: EditorAssets1;
 
-    // if (typeof require == "undefined")
-    // {
-    // } else
-    // {
-    //     fs = require(__dirname + "/io/file.js").file;
-    //     // assets.fstype = FSType.native;
-    // }
-
-
     export class EditorAssets1 extends ReadWriteAssets
     {
         constructor(readWriteFS?: ReadWriteFS)
@@ -31,6 +22,14 @@ namespace feng3d.editor
             if (readWriteFS instanceof IndexedDBfs)
             {
                 storage.hasObjectStore(readWriteFS.DBname, projectname, callback);
+            } else if (readWriteFS["getProjectList"] != null)
+            {
+                readWriteFS["getProjectList"]((err: Error, projects: string[]) =>
+                {
+                    if (err)
+                        throw err;
+                    callback(projects.indexOf(projectname) != -1);
+                });
             } else
             {
                 throw "未完成 hasProject 功能！";
@@ -47,6 +46,9 @@ namespace feng3d.editor
             if (readWriteFS instanceof IndexedDBfs)
             {
                 storage.getObjectStoreNames(readWriteFS.DBname, callback)
+            } else if (readWriteFS["getProjectList"] != null)
+            {
+                readWriteFS["getProjectList"](callback);
             } else
             {
                 throw "未完成 hasProject 功能！";
@@ -74,6 +76,10 @@ namespace feng3d.editor
                     // todo 启动监听 ts代码变化自动编译
                     callback();
                 });
+            } else if (readWriteFS.type == FSType.native)
+            {
+                readWriteFS.projectname = projectname;
+                callback();
             } else
             {
                 throw "未完成 hasProject 功能！";
@@ -227,7 +233,15 @@ namespace feng3d.editor
         }
     }
 
-    assets = fs = new EditorAssets1(indexedDBfs);
+
+    if (typeof require == "undefined")
+    {
+        assets = fs = new EditorAssets1(indexedDBfs);
+    } else
+    {
+        var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
+        assets = fs = new EditorAssets1(nativeFS);
+    }
 
     //
     var isSelectFile = false;
