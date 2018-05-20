@@ -10628,6 +10628,10 @@ var feng3d;
         editor.createComponentConfig = [
             //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
             {
+                label: "SkyBox",
+                click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.SkyBox); }
+            },
+            {
                 label: "Animator",
                 submenu: [
                     { label: "ParticleSystem", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.ParticleSystem); } },

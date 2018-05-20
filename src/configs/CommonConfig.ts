@@ -242,6 +242,10 @@ namespace feng3d.editor
     export var createComponentConfig: MenuItem[] = [
         //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
         {
+            label: "SkyBox",
+            click: () => { needcreateComponentGameObject.addComponent(SkyBox); }
+        },
+        {
             label: "Animator",
             submenu: [
                 { label: "ParticleSystem", click: () => { needcreateComponentGameObject.addComponent(ParticleSystem); } },
