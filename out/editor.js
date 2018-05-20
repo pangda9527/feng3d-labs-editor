@@ -4276,7 +4276,13 @@ var feng3d;
                             label: "编辑", click: function () {
                                 var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + file.extension;
                                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                                // if (assets.type == FSType.native)
+                                // {
+                                //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
+                                // } else
+                                // {
                                 window.open(url);
+                                // }
                             }
                         };
                     }
@@ -4289,7 +4295,13 @@ var feng3d;
                             label: "编辑", click: function () {
                                 var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + editor.AssetExtension.json;
                                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                                // if (assets.type == FSType.native)
+                                // {
+                                //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
+                                // } else
+                                // {
                                 window.open(url);
+                                // }
                             }
                         };
                     }

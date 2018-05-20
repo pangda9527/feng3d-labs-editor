@@ -242,7 +242,13 @@ namespace feng3d.editor
                         {
                             var url = `codeeditor.html?fstype=${assets.type}&project=${editorcache.projectname}&path=${file.path}&extension=${file.extension}`;
                             url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                            window.open(url);
+                            // if (assets.type == FSType.native)
+                            // {
+                            //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
+                            // } else
+                            // {
+                                window.open(url);
+                            // }
                         }
                     }
                 } else if (file.extension == AssetExtension.json
@@ -257,7 +263,13 @@ namespace feng3d.editor
                         {
                             var url = `codeeditor.html?fstype=${assets.type}&project=${editorcache.projectname}&path=${file.path}&extension=${AssetExtension.json}`;
                             url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                            window.open(url);
+                            // if (assets.type == FSType.native)
+                            // {
+                            //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
+                            // } else
+                            // {
+                                window.open(url);
+                            // }
                         }
                     }
                 }
