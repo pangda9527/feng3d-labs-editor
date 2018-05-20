@@ -6,6 +6,8 @@
 
 // 解决monaco-editor在electron下运行问题
 // https://github.com/Microsoft/monaco-editor-samples/blob/master/electron-amd/electron-index.html
+
+var ts;
 var monacoEditor;
 (function ()
 {
@@ -165,13 +167,17 @@ var monacoEditor;
             }
 
             amdRequire.config({
-                baseUrl: uriFromPath(path.join(__dirname, 'libs/monaco-editor/min'))
+                baseUrl: uriFromPath(nodepath.join(__dirname, 'libs/monaco-editor/min'))
             });
             // workaround monaco-css not understanding the environment
             self.module = undefined;
             // workaround monaco-typescript not understanding the environment
             self.process.browser = true;
-            amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], init);
+            amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], () =>
+            {
+                ts = amdRequire("vs/language/typescript/lib/typescriptServices");
+                init();
+            });
         } else
         {
             amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
