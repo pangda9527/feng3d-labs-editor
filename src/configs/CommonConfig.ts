@@ -106,6 +106,16 @@ namespace feng3d.editor
             ],
         },
         {
+            label: "升级项目",
+            click: () =>
+            {
+                fs.upgradeProject(() =>
+                {
+                    alert("升级完成！");
+                });
+            },
+        },
+        {
             label: "清空项目",
             click: () =>
             {

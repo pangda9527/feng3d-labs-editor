@@ -209,6 +209,7 @@ declare namespace feng3d.editor {
          * 创建项目
          */
         createproject(projectname: string, callback: () => void): void;
+        upgradeProject(callback: () => void): void;
         selectFile(callback: (file: FileList) => void): void;
         /**
          * 导出项目

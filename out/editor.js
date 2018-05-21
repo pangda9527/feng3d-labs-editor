@@ -527,6 +527,58 @@ var feng3d;
                     request.send();
                 });
             };
+            EditorAssets1.prototype.upgradeProject = function (callback) {
+                //
+                var zip = new JSZip();
+                var request = new XMLHttpRequest();
+                request.open('Get', editor.editorData.getEditorAssetsPath("templates/template.zip"), true);
+                request.responseType = "arraybuffer";
+                request.onload = function (ev) {
+                    zip.loadAsync(request.response).then(function () {
+                        var filepaths = Object.keys(zip.files);
+                        filepaths = filepaths.filter(function (item) {
+                            if (item.indexOf("project.js") != -1)
+                                return false;
+                            if (item.indexOf("default.scene.json") != -1)
+                                return false;
+                            return true;
+                        });
+                        filepaths.sort();
+                        readfiles();
+                        /**
+                         * 读取zip中所有文件
+                         */
+                        function readfiles() {
+                            if (filepaths.length > 0) {
+                                var filepath = filepaths.shift();
+                                var file = zip.files[filepath];
+                                if (file.dir) {
+                                    editor.fs.mkdir(filepath, readfiles);
+                                }
+                                else {
+                                    file.async("arraybuffer").then(function (data) {
+                                        editor.fs.writeFile(filepath, data, function (err) {
+                                            if (err)
+                                                console.log(err);
+                                            readfiles();
+                                        });
+                                    }, function (reason) {
+                                        console.warn(reason);
+                                        readfiles();
+                                    });
+                                }
+                            }
+                            else {
+                                callback();
+                            }
+                        }
+                    });
+                };
+                request.onerror = function (ev) {
+                    feng3d.error(request.responseURL + "不存在，无法初始化项目！");
+                };
+                request.send();
+            };
             EditorAssets1.prototype.selectFile = function (callback) {
                 selectFileCallback = callback;
                 isSelectFile = true;
@@ -10525,6 +10577,14 @@ var feng3d;
                         },
                     },
                 ],
+            },
+            {
+                label: "升级项目",
+                click: function () {
+                    editor.fs.upgradeProject(function () {
+                        alert("升级完成！");
+                    });
+                },
             },
             {
                 label: "清空项目",

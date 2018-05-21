@@ -155,6 +155,71 @@ namespace feng3d.editor
             });
         }
 
+        upgradeProject(callback: () => void)
+        {
+            //
+            var zip = new JSZip();
+            var request = new XMLHttpRequest();
+            request.open('Get', editorData.getEditorAssetsPath("templates/template.zip"), true);
+            request.responseType = "arraybuffer";
+            request.onload = (ev) =>
+            {
+                zip.loadAsync(request.response).then(() =>
+                {
+                    var filepaths = Object.keys(zip.files);
+                    filepaths = filepaths.filter((item) =>
+                    {
+                        if (item.indexOf("project.js") != -1)
+                            return false;
+                        if (item.indexOf("default.scene.json") != -1)
+                            return false;
+                        return true;
+                    });
+                    filepaths.sort();
+
+                    readfiles()
+                    /**
+                     * 读取zip中所有文件
+                     */
+                    function readfiles()
+                    {
+                        if (filepaths.length > 0)
+                        {
+                            var filepath = filepaths.shift();
+                            var file = zip.files[filepath];
+                            if (file.dir)
+                            {
+                                fs.mkdir(filepath, readfiles);
+                            } else
+                            {
+                                file.async("arraybuffer").then((data) =>
+                                {
+                                    fs.writeFile(filepath, data, (err: Error) =>
+                                    {
+                                        if (err)
+                                            console.log(err);
+                                        readfiles()
+                                    });
+                                }, (reason) =>
+                                    {
+                                        console.warn(reason);
+                                        readfiles();
+                                    });
+                            }
+                        } else
+                        {
+                            callback();
+                        }
+                    }
+                });
+            };
+            request.onerror = (ev) =>
+            {
+                error(request.responseURL + "不存在，无法初始化项目！");
+            }
+            request.send();
+        }
+
         selectFile(callback: (file: FileList) => void)
         {
             selectFileCallback = callback;
