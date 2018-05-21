@@ -18,10 +18,6 @@ namespace feng3d.editor
     export class EditorAssets
     {
         //attribute
-        /**
-         * 项目名称
-         */
-        projectname = "";
         assetsPath = "Assets/";
         showFloder = "Assets/";
 
@@ -31,9 +27,8 @@ namespace feng3d.editor
         private _preProjectJsContent = null
 
         //function
-        initproject(path: string, callback: () => void)
+        initproject(callback: () => void)
         {
-            this.projectname = path;
             //
             fs.exists(this.assetsPath, (exists) =>
             {

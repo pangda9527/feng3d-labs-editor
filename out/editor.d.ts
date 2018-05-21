@@ -1070,17 +1070,13 @@ declare namespace feng3d.editor {
     var assetsDispather: IEventDispatcher<AssetsEventMap>;
     var editorAssets: EditorAssets;
     class EditorAssets {
-        /**
-         * 项目名称
-         */
-        projectname: string;
         assetsPath: string;
         showFloder: string;
         /**
          * 上次执行的项目脚本
          */
         private _preProjectJsContent;
-        initproject(path: string, callback: () => void): void;
+        initproject(callback: () => void): void;
         /**
          * 获取文件
          * @param path 文件路径

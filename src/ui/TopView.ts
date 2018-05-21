@@ -116,7 +116,7 @@ namespace feng3d.editor
 						if (fs.type == FSType.indexedDB)
 						{
 							if (runwin) runwin.close();
-							runwin = window.open(`run.html?fstype=${assets.type}&project=${editorAssets.projectname}`);
+							runwin = window.open(`run.html?fstype=${assets.type}&project=${editorcache.projectname}`);
 							return;
 						}
 						fs.getAbsolutePath("index.html", (err, path) =>

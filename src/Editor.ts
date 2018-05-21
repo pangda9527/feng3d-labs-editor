@@ -45,10 +45,10 @@ namespace feng3d.editor
         private init()
         {
 
-            document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorAssets.projectname;
+            document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorcache.projectname;
 
             feng3d.runEnvironment = RunEnvironment.editor;
-            
+
             this.initMainView()
 
             //初始化feng3d
@@ -63,7 +63,7 @@ namespace feng3d.editor
                 //
                 egret.mouseEventEnvironment();
             }, this);
-            
+
             this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
         }
 
@@ -87,18 +87,16 @@ namespace feng3d.editor
         private initproject(callback: () => void)
         {
             editorcache.projectname = editorcache.projectname || "newproject";
-            
+
             fs.hasProject(editorcache.projectname, (has) =>
             {
                 if (has)
                 {
-                    editorAssets.projectname = editorcache.projectname;
                     fs.initproject(editorcache.projectname, callback);
                 } else
                 {
                     fs.createproject(editorcache.projectname, () =>
                     {
-                        editorAssets.projectname = editorcache.projectname;
                         fs.initproject(editorcache.projectname, callback);
                     });
                 }

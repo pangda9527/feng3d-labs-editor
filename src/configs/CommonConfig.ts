@@ -44,7 +44,7 @@ namespace feng3d.editor
                     fs.importProject(filelist.item(0), () =>
                     {
                         console.log("导入项目完成");
-                        editorAssets.initproject(editorAssets.projectname, () =>
+                        editorAssets.initproject(() =>
                         {
                             editorAssets.runProjectScript(() =>
                             {
@@ -67,7 +67,7 @@ namespace feng3d.editor
                 fs.exportProject(function (err, content)
                 {
                     // see FileSaver.js
-                    saveAs(content, `${editorAssets.projectname}.feng3d.zip`);
+                    saveAs(content, `${editorcache.projectname}.feng3d.zip`);
                 });
             }
         },
@@ -121,7 +121,7 @@ namespace feng3d.editor
             {
                 editorAssets.deletefile(editorAssets.assetsPath, () =>
                 {
-                    editorAssets.initproject(editorAssets.projectname, () =>
+                    editorAssets.initproject(() =>
                     {
                         editorAssets.runProjectScript(() =>
                         {
@@ -322,7 +322,7 @@ namespace feng3d.editor
         {
             fs.importProject(<any>content, () =>
             {
-                editorAssets.initproject(editorAssets.projectname, () =>
+                editorAssets.initproject(() =>
                 {
                     editorAssets.runProjectScript(() =>
                     {
