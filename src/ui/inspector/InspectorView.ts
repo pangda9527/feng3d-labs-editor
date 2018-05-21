@@ -95,6 +95,10 @@ namespace feng3d.editor
 			{
 				this.viewDataList.length = 0;
 			}
+			if (this.viewData instanceof AssetsFile)
+			{
+				this.viewData.save();
+			}
 			//
 			this.viewData = data;
 			this.updateView();

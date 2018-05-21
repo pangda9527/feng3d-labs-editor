@@ -46,6 +46,10 @@ var feng3d;
         var RegExps = /** @class */ (function () {
             function RegExps() {
                 /**
+                 * json文件
+                 */
+                this.json = /(\.json)\b/i;
+                /**
                  * 图片
                  */
                 this.image = /(\.jpg|\.png|\.jpeg|\.gif)\b/i;
@@ -376,18 +380,18 @@ var feng3d;
              */
             FileObject.prototype.updateStats = function (path, callback, onComplete, onError) {
                 var _this = this;
-                editor.fs.stat(path, function (err, stats) {
-                    if (err) {
+                editor.fs.exists(path, function (exists) {
+                    if (!exists) {
                         _this._exists = false;
                         onError && onError(_this);
                     }
                     else {
                         _this._exists = true;
-                        _this._size = stats.size;
-                        _this._path = stats.path;
-                        _this._isDirectory = stats.isDirectory;
-                        _this._createDate = new Date(stats.birthtime);
-                        _this._lastModifyDate = new Date(stats.mtime);
+                        _this._size = 0;
+                        _this._path = path;
+                        _this._isDirectory = path.charAt(path.length - 1) == "/";
+                        _this._createDate = new Date();
+                        _this._lastModifyDate = new Date();
                         onError && onComplete(_this);
                     }
                     callback && callback();
@@ -3956,6 +3960,9 @@ var feng3d;
                 if (removeBack) {
                     this.viewDataList.length = 0;
                 }
+                if (this.viewData instanceof editor.AssetsFile) {
+                    this.viewData.save();
+                }
                 //
                 this.viewData = data;
                 this.updateView();
@@ -4143,23 +4150,21 @@ var feng3d;
                 var _this = this;
                 this.projectname = path;
                 //
-                editor.fs.stat(this.assetsPath, function (err, fileInfo) {
-                    if (err) {
+                editor.fs.exists(this.assetsPath, function (exists) {
+                    if (exists) {
+                        rootfileinfo = new editor.AssetsFile(_this.assetsPath);
+                        rootfileinfo.initChildren(Number.MAX_VALUE, callback);
+                    }
+                    else {
                         editor.fs.mkdir(_this.assetsPath, function (err) {
                             if (err) {
                                 alert("初始化项目失败！");
                                 feng3d.error(err);
                                 return;
                             }
-                            editor.fs.stat(_this.assetsPath, function (err, fileInfo) {
-                                rootfileinfo = new editor.AssetsFile(fileInfo);
-                                rootfileinfo.initChildren(Number.MAX_VALUE, callback);
-                            });
+                            rootfileinfo = new editor.AssetsFile(_this.assetsPath);
+                            rootfileinfo.initChildren(Number.MAX_VALUE, callback);
                         });
-                    }
-                    else {
-                        rootfileinfo = new editor.AssetsFile(fileInfo);
-                        rootfileinfo.initChildren(Number.MAX_VALUE, callback);
                     }
                 });
             };
@@ -4283,6 +4288,11 @@ var feng3d;
                             },
                             { type: "separator" },
                             {
+                                label: "贴图", click: function () {
+                                    assetsFile.addfile("new texture" + ".texture.json", new feng3d.Texture2D());
+                                }
+                            },
+                            {
                                 label: "材质", click: function () {
                                     assetsFile.addfile("new material" + ".material.json", feng3d.materialFactory.create("standard"));
                                 }
@@ -4367,12 +4377,11 @@ var feng3d;
                 }
                 function searchnewpath() {
                     var path = newpath();
-                    editor.fs.stat(path, function (err, stats) {
-                        if (err)
-                            callback(path);
-                        else {
+                    editor.fs.exists(path, function (exists) {
+                        if (exists)
                             searchnewpath();
-                        }
+                        else
+                            callback(path);
                     });
                 }
             };
@@ -4582,7 +4591,7 @@ var feng3d;
         })(AssetExtension = editor.AssetExtension || (editor.AssetExtension = {}));
         var AssetsFile = /** @class */ (function (_super) {
             __extends(AssetsFile, _super);
-            function AssetsFile(fileinfo, data) {
+            function AssetsFile(path, data) {
                 var _this = _super.call(this) || this;
                 /**
                  * 子节点列表
@@ -4604,11 +4613,8 @@ var feng3d;
                  * 当前打开文件夹
                  */
                 _this.currentOpenDirectory = false;
-                _this.isDirectory = fileinfo.isDirectory;
-                _this.path = fileinfo.path;
-                _this.birthtime = fileinfo.birthtime;
-                _this.mtime = fileinfo.mtime;
-                _this.size = fileinfo.size;
+                _this.path = path;
+                _this.isDirectory = path.charAt(path.length - 1) == "/";
                 _this.cacheData = data;
                 return _this;
             }
@@ -4669,11 +4675,7 @@ var feng3d;
                     callback({ isDirectory: true });
                     return;
                 }
-                if (this.extension == AssetExtension.material
-                    || this.extension == AssetExtension.gameobject
-                    || this.extension == AssetExtension.anim
-                    || this.extension == AssetExtension.scene
-                    || this.extension == AssetExtension.geometry) {
+                if (editor.regExps.json.test(this.path)) {
                     editor.fs.readFileAsString(this.path, function (err, content) {
                         var json = JSON.parse(content);
                         _this.cacheData = feng3d.serialization.deserialize(json);
@@ -4681,10 +4683,7 @@ var feng3d;
                     });
                     return;
                 }
-                if (this.extension == AssetExtension.png
-                    || this.extension == AssetExtension.jpg
-                    || this.extension == AssetExtension.jpeg
-                    || this.extension == AssetExtension.gif) {
+                if (editor.regExps.image.test(this.path)) {
                     editor.fs.readFile(this.path, function (err, data) {
                         feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                             _this.cacheData = dataurl;
@@ -4732,13 +4731,10 @@ var feng3d;
                             return;
                         }
                         var file = files.shift();
-                        editor.fs.stat(_this.path + file, function (err, stats) {
-                            feng3d.assert(!err);
-                            var child = new AssetsFile(stats);
-                            child.parent = _this;
-                            _this.children.push(child);
-                            child.initChildren(depth - 1, initfiles);
-                        });
+                        var child = new AssetsFile(_this.path + file);
+                        child.parent = _this;
+                        _this.children.push(child);
+                        child.initChildren(depth - 1, initfiles);
                     };
                     initfiles();
                 });
@@ -4917,10 +4913,8 @@ var feng3d;
                 var folderpath = this.path + newfoldername + "/";
                 editor.fs.mkdir(folderpath, function (e) {
                     feng3d.assert(!e);
-                    editor.fs.stat(folderpath, function (err, stats) {
-                        var assetsFile = new AssetsFile(stats);
-                        assetsFile.addto(_this);
-                    });
+                    var assetsFile = new AssetsFile(folderpath);
+                    assetsFile.addto(_this);
                 });
             };
             /**
@@ -4936,42 +4930,43 @@ var feng3d;
                     filename = this.getnewchildname(filename);
                 }
                 var filepath = this.path + filename;
-                getcontent(function (savedata, data) {
+                getcontent(content, function (savedata) {
                     editor.fs.writeFile(filepath, savedata, function (e) {
-                        editor.fs.stat(filepath, function (err, stats) {
-                            var assetsFile = new AssetsFile(stats, data);
-                            assetsFile.addto(_this);
-                            callback && callback(_this);
-                            if (editor.regExps.image.test(assetsFile.path))
-                                feng3d.globalEvent.dispatch("imageAssetsChanged", { url: assetsFile.path });
-                        });
+                        var assetsFile = new AssetsFile(filepath, content);
+                        assetsFile.addto(_this);
+                        callback && callback(_this);
+                        if (editor.regExps.image.test(assetsFile.path))
+                            feng3d.globalEvent.dispatch("imageAssetsChanged", { url: assetsFile.path });
                     });
                 });
-                function getcontent(callback) {
+                function getcontent(content, callback) {
                     if (content instanceof feng3d.Material
                         || content instanceof feng3d.GameObject
                         || content instanceof feng3d.AnimationClip
-                        || content instanceof feng3d.Geometry) {
+                        || content instanceof feng3d.Geometry
+                        || content instanceof feng3d.Texture2D) {
                         var obj = feng3d.serialization.serialize(content);
                         var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
                         feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
-                            callback(arrayBuffer, content);
+                            callback(arrayBuffer);
                         });
                     }
                     else if (editor.regExps.image.test(filename)) {
                         feng3d.dataTransform.arrayBufferToDataURL(content, function (datarul) {
-                            callback(content, datarul);
+                            callback(content);
                         });
                     }
                     else if (typeof content == "string") {
-                        feng3d.dataTransform.stringToArrayBuffer(content, function (uint8Array) {
-                            callback(uint8Array, content);
+                        feng3d.dataTransform.stringToArrayBuffer(content, function (arrayBuffer) {
+                            callback(arrayBuffer);
                         });
                     }
                     else {
-                        callback(content, content);
+                        callback(content);
                     }
                 }
+            };
+            AssetsFile.prototype.save = function (callback) {
             };
             /**
              * 过滤出文件列表

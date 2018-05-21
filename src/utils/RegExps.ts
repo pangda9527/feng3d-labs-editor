@@ -11,6 +11,11 @@ namespace feng3d.editor
     export class RegExps
     {
         /**
+         * json文件
+         */
+        json = /(\.json)\b/i;
+
+        /**
          * 图片
          */
         image = /(\.jpg|\.png|\.jpeg|\.gif)\b/i;

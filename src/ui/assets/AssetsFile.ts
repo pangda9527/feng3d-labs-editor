@@ -77,21 +77,9 @@ namespace feng3d.editor
         @watch("pathChanged")
         path: string;
         /**
-         * 创建时间
-         */
-        birthtime: number;
-        /**
-         * 修改时间
-         */
-        mtime: number;
-        /**
          * 是否文件夹
          */
         isDirectory: boolean;
-        /**
-         * 文件尺寸
-         */
-        size: number;
         /**
          * 父节点
          */
@@ -145,17 +133,14 @@ namespace feng3d.editor
         /**
          * 缓存下来的数据 避免从文件再次加载解析数据
          */
-        cacheData: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry;
+        cacheData: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D;
 
-        constructor(fileinfo: FileInfo, data?: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry)
+        constructor(path: string, data?: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D)
         {
             super()
 
-            this.isDirectory = fileinfo.isDirectory;
-            this.path = fileinfo.path;
-            this.birthtime = fileinfo.birthtime;
-            this.mtime = fileinfo.mtime;
-            this.size = fileinfo.size;
+            this.path = path;
+            this.isDirectory = path.charAt(path.length - 1) == "/";
             this.cacheData = data;
         }
 
@@ -231,12 +216,7 @@ namespace feng3d.editor
                 callback({ isDirectory: true });
                 return;
             }
-            if (this.extension == AssetExtension.material
-                || this.extension == AssetExtension.gameobject
-                || this.extension == AssetExtension.anim
-                || this.extension == AssetExtension.scene
-                || this.extension == AssetExtension.geometry
-            )
+            if (regExps.json.test(this.path))
             {
                 fs.readFileAsString(this.path, (err, content: string) =>
                 {
@@ -246,11 +226,7 @@ namespace feng3d.editor
                 });
                 return;
             }
-            if (this.extension == AssetExtension.png
-                || this.extension == AssetExtension.jpg
-                || this.extension == AssetExtension.jpeg
-                || this.extension == AssetExtension.gif
-            )
+            if (regExps.image.test(this.path))
             {
                 fs.readFile(this.path, (err, data) =>
                 {
@@ -311,14 +287,10 @@ namespace feng3d.editor
                     }
 
                     var file = files.shift();
-                    fs.stat(this.path + file, (err, stats) =>
-                    {
-                        assert(!err);
-                        var child = new AssetsFile(stats);
-                        child.parent = this;
-                        this.children.push(child);
-                        child.initChildren(depth - 1, initfiles);
-                    });
+                    var child = new AssetsFile(this.path + file);
+                    child.parent = this;
+                    this.children.push(child);
+                    child.initChildren(depth - 1, initfiles);
                 }
                 initfiles();
             });
@@ -546,11 +518,8 @@ namespace feng3d.editor
             {
                 assert(!e);
 
-                fs.stat(folderpath, (err, stats) =>
-                {
-                    var assetsFile = new AssetsFile(stats);
-                    assetsFile.addto(this);
-                });
+                var assetsFile = new AssetsFile(folderpath);
+                assetsFile.addto(this);
             });
         }
 
@@ -560,7 +529,7 @@ namespace feng3d.editor
          * @param content 文件内容
          * @param callback 完成回调
          */
-        addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry, override = false, callback?: (file: AssetsFile) => void)
+        addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry | Texture2D, override = false, callback?: (file: AssetsFile) => void)
         {
             if (!override)
             {
@@ -568,52 +537,55 @@ namespace feng3d.editor
             }
             var filepath = this.path + filename;
 
-            getcontent((savedata, data) =>
+            getcontent(content, (savedata) =>
             {
                 fs.writeFile(filepath, savedata, (e) =>
                 {
-                    fs.stat(filepath, (err, stats) =>
-                    {
-                        var assetsFile = new AssetsFile(stats, data);
-                        assetsFile.addto(this);
-                        callback && callback(this);
-                        if (regExps.image.test(assetsFile.path))
-                            globalEvent.dispatch("imageAssetsChanged", { url: assetsFile.path });
-                    });
+                    var assetsFile = new AssetsFile(filepath, content);
+                    assetsFile.addto(this);
+                    callback && callback(this);
+                    if (regExps.image.test(assetsFile.path))
+                        globalEvent.dispatch("imageAssetsChanged", { url: assetsFile.path });
                 });
             });
 
-            function getcontent(callback: (savedata: ArrayBuffer, data: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry) => void)
+            function getcontent(content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry | Texture2D, callback: (savedata: ArrayBuffer) => void)
             {
                 if (content instanceof Material
                     || content instanceof GameObject
                     || content instanceof AnimationClip
                     || content instanceof Geometry
+                    || content instanceof Texture2D
                 )
                 {
                     var obj = serialization.serialize(content);
                     var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
                     dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
                     {
-                        callback(arrayBuffer, content);
+                        callback(arrayBuffer);
                     });
                 } else if (regExps.image.test(filename))
                 {
                     dataTransform.arrayBufferToDataURL(<ArrayBuffer>content, (datarul) =>
                     {
-                        callback(<ArrayBuffer>content, datarul);
+                        callback(<ArrayBuffer>content);
                     });
                 } else if (typeof content == "string")
                 {
-                    dataTransform.stringToArrayBuffer(content, (uint8Array) =>
+                    dataTransform.stringToArrayBuffer(content, (arrayBuffer) =>
                     {
-                        callback(uint8Array, content);
+                        callback(arrayBuffer);
                     });
                 } else
                 {
-                    callback(content, content);
+                    callback(content);
                 }
             }
+        }
+
+        save(callback?: () => void)
+        {
+
         }
 
         /**

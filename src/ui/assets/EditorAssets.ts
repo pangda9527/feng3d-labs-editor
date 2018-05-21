@@ -35,9 +35,13 @@ namespace feng3d.editor
         {
             this.projectname = path;
             //
-            fs.stat(this.assetsPath, (err, fileInfo) =>
+            fs.exists(this.assetsPath, (exists) =>
             {
-                if (err)
+                if (exists)
+                {
+                    rootfileinfo = new AssetsFile(this.assetsPath);
+                    rootfileinfo.initChildren(Number.MAX_VALUE, callback);
+                } else
                 {
                     fs.mkdir(this.assetsPath, (err) =>
                     {
@@ -47,16 +51,9 @@ namespace feng3d.editor
                             error(err);
                             return;
                         }
-                        fs.stat(this.assetsPath, (err, fileInfo) =>
-                        {
-                            rootfileinfo = new AssetsFile(fileInfo);
-                            rootfileinfo.initChildren(Number.MAX_VALUE, callback);
-                        });
+                        rootfileinfo = new AssetsFile(this.assetsPath);
+                        rootfileinfo.initChildren(Number.MAX_VALUE, callback);
                     });
-                } else
-                {
-                    rootfileinfo = new AssetsFile(fileInfo);
-                    rootfileinfo.initChildren(Number.MAX_VALUE, callback);
                 }
             });
         }
@@ -199,6 +196,12 @@ namespace feng3d.editor
                             },
                             { type: "separator" },
                             {
+                                label: "贴图", click: () =>
+                                {
+                                    assetsFile.addfile("new texture" + ".texture.json", new Texture2D());
+                                }
+                            },
+                            {
                                 label: "材质", click: () =>
                                 {
                                     assetsFile.addfile("new material" + ".material.json", materialFactory.create("standard"));
@@ -305,14 +308,12 @@ namespace feng3d.editor
             function searchnewpath()
             {
                 var path = newpath();
-                fs.stat(path, (err, stats) =>
+                fs.exists(path, (exists) =>
                 {
-                    if (err)
-                        callback(path);
-                    else
-                    {
+                    if (exists)
                         searchnewpath();
-                    }
+                    else
+                        callback(path);
                 });
             }
         }

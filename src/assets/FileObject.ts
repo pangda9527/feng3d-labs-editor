@@ -324,20 +324,20 @@ namespace feng3d.editor
          */
         private updateStats(path: string, callback: () => void, onComplete?: Function, onError?: Function)
         {
-            fs.stat(path, (err, stats) =>
+            fs.exists(path, (exists) =>
             {
-                if (err)
+                if (!exists)
                 {
                     this._exists = false;
                     onError && onError(this);
                 } else
                 {
                     this._exists = true;
-                    this._size = stats.size;
-                    this._path = stats.path;
-                    this._isDirectory = stats.isDirectory;
-                    this._createDate = new Date(stats.birthtime);
-                    this._lastModifyDate = new Date(stats.mtime);
+                    this._size = 0;
+                    this._path = path;
+                    this._isDirectory = path.charAt(path.length - 1) == "/";
+                    this._createDate = new Date();
+                    this._lastModifyDate = new Date();
                     onError && onComplete(this);
                 }
                 callback && callback();

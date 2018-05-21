@@ -64,29 +64,15 @@ export class NativeFS implements feng3d.ReadWriteFS
     }
 
     /**
-     * 获取文件信息
+     * 文件是否存在
      * @param path 文件路径
      * @param callback 回调函数
      */
-    stat(path: string, callback: (err: Error, stats: feng3d.FileInfo) => void): void
+    exists(path: string, callback: (exists: boolean) => void): void
     {
         this.getAbsolutePath(path, (err, absolutePath) =>
         {
-            fs.stat(absolutePath, (err, stats) =>
-            {
-                if (err)
-                {
-                    callback(err, null);
-                    return;
-                }
-                callback(err, {
-                    path: path,
-                    size: stats.size,
-                    isDirectory: stats.isDirectory(),
-                    birthtime: stats.birthtime.getTime(),
-                    mtime: stats.mtime.getTime(),
-                });
-            });
+            fs.exists(absolutePath, callback);
         });
     }
 

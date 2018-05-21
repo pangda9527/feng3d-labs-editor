@@ -17,6 +17,10 @@ declare namespace feng3d.editor {
      */
     class RegExps {
         /**
+         * json文件
+         */
+        json: RegExp;
+        /**
          * 图片
          */
         image: RegExp;
@@ -1201,21 +1205,9 @@ declare namespace feng3d.editor {
          */
         path: string;
         /**
-         * 创建时间
-         */
-        birthtime: number;
-        /**
-         * 修改时间
-         */
-        mtime: number;
-        /**
          * 是否文件夹
          */
         isDirectory: boolean;
-        /**
-         * 文件尺寸
-         */
-        size: number;
         /**
          * 父节点
          */
@@ -1259,8 +1251,8 @@ declare namespace feng3d.editor {
         /**
          * 缓存下来的数据 避免从文件再次加载解析数据
          */
-        cacheData: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry;
-        constructor(fileinfo: FileInfo, data?: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry);
+        cacheData: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D;
+        constructor(path: string, data?: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D);
         pathChanged(): void;
         /**
          * 获取属性显示数据
@@ -1332,7 +1324,8 @@ declare namespace feng3d.editor {
          * @param content 文件内容
          * @param callback 完成回调
          */
-        addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry, override?: boolean, callback?: (file: AssetsFile) => void): void;
+        addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry | Texture2D, override?: boolean, callback?: (file: AssetsFile) => void): void;
+        save(callback?: () => void): void;
         /**
          * 过滤出文件列表
          * @param fn 过滤函数
