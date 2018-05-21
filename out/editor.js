@@ -2157,7 +2157,6 @@ var feng3d;
                 feng3d.globalEvent.on("scriptChanged", this.onScriptChanged, this);
             };
             ComponentView.prototype.onRemovedFromStage = function () {
-                this.saveScriptData();
                 this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
                 if (this.component instanceof feng3d.Behaviour)
                     feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
@@ -2184,17 +2183,8 @@ var feng3d;
                 if (this.component instanceof feng3d.ScriptComponent) {
                     feng3d.watcher.watch(this.component, "script", this.onScriptChanged, this);
                     var component = this.component;
-                    var scriptClass = feng3d.classUtils.getDefinitionByName(component.script, false);
-                    if (scriptClass) {
-                        this.script = new scriptClass();
-                        var scriptData = component.scriptData = component.scriptData || {};
-                        for (var key in scriptData) {
-                            if (scriptData.hasOwnProperty(key)) {
-                                this.script[key] = scriptData[key];
-                            }
-                        }
-                        this.scriptView = feng3d.objectview.getObjectView(this.script, false);
-                        this.scriptView.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+                    if (component.scriptInstance) {
+                        this.scriptView = feng3d.objectview.getObjectView(component.scriptInstance, false);
                         this.accordion.addContent(this.scriptView);
                     }
                 }
@@ -2205,22 +2195,8 @@ var feng3d;
                     feng3d.watcher.unwatch(this.component, "script", this.onScriptChanged, this);
                 }
                 if (this.scriptView) {
-                    this.scriptView.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
                     if (this.scriptView.parent)
                         this.scriptView.parent.removeChild(this.scriptView);
-                }
-            };
-            ComponentView.prototype.saveScriptData = function () {
-                //保存脚本数据
-                if (this.script) {
-                    var component = this.component;
-                    var scriptData = component.scriptData || {};
-                    var objectAttributeInfos = feng3d.objectview.getObjectInfo(this.script, false).objectAttributeInfos;
-                    for (var i = 0; i < objectAttributeInfos.length; i++) {
-                        var element = objectAttributeInfos[i];
-                        scriptData[element.name] = this.script[element.name];
-                    }
-                    component.scriptData = scriptData;
                 }
             };
             ComponentView.prototype.onOperationBtnClick = function () {
@@ -2241,8 +2217,11 @@ var feng3d;
                 window.open("http://feng3d.gitee.io/#/script");
             };
             ComponentView.prototype.onScriptChanged = function () {
-                this.removeScriptView();
-                this.initScriptView();
+                var _this = this;
+                setTimeout(function () {
+                    _this.removeScriptView();
+                    _this.initScriptView();
+                }, 10);
             };
             return ComponentView;
         }(eui.Component));
@@ -3428,7 +3407,7 @@ var feng3d;
                 this.space.on("removedComponent", this.onremovedComponent, this);
                 editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
                     if (dragdata.file_script) {
-                        _this.space.addComponent(feng3d.ScriptComponent).script = dragdata.file_script;
+                        _this.space.addScript(dragdata.file_script);
                     }
                 });
                 this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
@@ -3768,7 +3747,7 @@ var feng3d;
                     }
                     else if (param.accepttype == "file_script") {
                         var tsfiles = editor.editorAssets.filter(function (file) {
-                            return file.extension == editor.AssetExtension.ts;
+                            return file.extension == editor.AssetExtension.script;
                         });
                         if (tsfiles.length > 0) {
                             var scriptClassNames = [];

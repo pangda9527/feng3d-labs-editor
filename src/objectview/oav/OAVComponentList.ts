@@ -4,10 +4,12 @@ namespace feng3d.editor
 	export class OAVComponentList extends OAVBase
 	{
 		private accordions: Accordion[] = [];
+		protected _space: GameObject;
 
 		//
 		group: eui.Group;
 		addComponentButton: eui.Button;
+
 
 		constructor(attributeViewInfo: AttributeViewInfo)
 		{
@@ -70,7 +72,7 @@ namespace feng3d.editor
 			{
 				if (dragdata.file_script)
 				{
-					this.space.addComponent(ScriptComponent).script = dragdata.file_script;
+					this.space.addScript(dragdata.file_script);
 				}
 			});
 

@@ -77,7 +77,7 @@ namespace feng3d.editor
                 {
                     var tsfiles = editorAssets.filter((file) =>
                     {
-                        return file.extension == AssetExtension.ts;
+                        return file.extension == AssetExtension.script;
                     })
 
                     if (tsfiles.length > 0)

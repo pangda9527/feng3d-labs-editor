@@ -543,7 +543,6 @@ declare namespace feng3d.editor {
         componentIcon: eui.Image;
         helpBtn: eui.Button;
         operationBtn: eui.Button;
-        script: Script;
         scriptView: IObjectView;
         /**
          * 对象界面数据
@@ -561,7 +560,6 @@ declare namespace feng3d.editor {
         private onEnableCBChange();
         private initScriptView();
         private removeScriptView();
-        private saveScriptData();
         private onOperationBtnClick();
         private onHelpBtnClick();
         private onScriptChanged();
@@ -869,11 +867,12 @@ declare namespace feng3d.editor {
 declare namespace feng3d.editor {
     class OAVComponentList extends OAVBase {
         private accordions;
+        protected _space: GameObject;
         group: eui.Group;
         addComponentButton: eui.Button;
         constructor(attributeViewInfo: AttributeViewInfo);
         private onAddComponentButtonClick();
-        space: any;
+        space: GameObject;
         readonly attributeName: string;
         attributeValue: Object;
         initView(): void;

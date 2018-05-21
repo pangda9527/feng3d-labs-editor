@@ -14,7 +14,6 @@ namespace feng3d.editor
 		public helpBtn: eui.Button;
 		public operationBtn: eui.Button;
 
-		script: Script;
 		scriptView: IObjectView;
 
 		/**
@@ -91,8 +90,6 @@ namespace feng3d.editor
 
 		private onRemovedFromStage()
 		{
-			this.saveScriptData();
-
 			this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
 			if (this.component instanceof feng3d.Behaviour)
 				feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
@@ -130,20 +127,9 @@ namespace feng3d.editor
 			{
 				watcher.watch(this.component, "script", this.onScriptChanged, this);
 				var component = this.component;
-				var scriptClass = classUtils.getDefinitionByName(component.script, false);
-				if (scriptClass)
+				if (component.scriptInstance)
 				{
-					this.script = new scriptClass();
-					var scriptData = component.scriptData = component.scriptData || {};
-					for (const key in scriptData)
-					{
-						if (scriptData.hasOwnProperty(key))
-						{
-							this.script[key] = scriptData[key];
-						}
-					}
-					this.scriptView = objectview.getObjectView(this.script, false);
-					this.scriptView.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
+					this.scriptView = objectview.getObjectView(component.scriptInstance, false);
 					this.accordion.addContent(this.scriptView);
 				}
 			}
@@ -158,26 +144,8 @@ namespace feng3d.editor
 			}
 			if (this.scriptView)
 			{
-				this.scriptView.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.saveScriptData, this);
 				if (this.scriptView.parent)
 					this.scriptView.parent.removeChild(this.scriptView);
-			}
-		}
-
-		private saveScriptData()
-		{
-			//保存脚本数据
-			if (this.script)
-			{
-				var component: ScriptComponent = <ScriptComponent>this.component;
-				var scriptData = component.scriptData || {};
-				var objectAttributeInfos = objectview.getObjectInfo(this.script, false).objectAttributeInfos;
-				for (let i = 0; i < objectAttributeInfos.length; i++)
-				{
-					const element = objectAttributeInfos[i];
-					scriptData[element.name] = this.script[element.name];
-				}
-				component.scriptData = scriptData;
 			}
 		}
 
@@ -207,8 +175,11 @@ namespace feng3d.editor
 
 		private onScriptChanged()
 		{
-			this.removeScriptView();
-			this.initScriptView();
+			setTimeout(() =>
+			{
+				this.removeScriptView();
+				this.initScriptView();
+			}, 10);
 		}
 	}
 }
