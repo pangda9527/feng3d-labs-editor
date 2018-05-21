@@ -139,8 +139,8 @@ namespace feng3d.editor
         {
             super()
 
-            this.path = path;
             this.isDirectory = path.charAt(path.length - 1) == "/";
+            this.path = path;
             this.cacheData = data;
         }
 

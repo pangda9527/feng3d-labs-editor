@@ -4613,8 +4613,8 @@ var feng3d;
                  * 当前打开文件夹
                  */
                 _this.currentOpenDirectory = false;
-                _this.path = path;
                 _this.isDirectory = path.charAt(path.length - 1) == "/";
+                _this.path = path;
                 _this.cacheData = data;
                 return _this;
             }
