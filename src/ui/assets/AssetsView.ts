@@ -50,22 +50,22 @@ namespace feng3d.editor
                 if (dragSource.gameobject)
                 {
                     var gameobject: GameObject = dragSource.gameobject;
-                    editorAssets.saveObject(gameobject, gameobject.name + ".gameobject");
+                    editorAssets.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                 }
                 if (dragSource.animationclip)
                 {
                     var animationclip = dragSource.animationclip;
-                    editorAssets.saveObject(animationclip, animationclip.name + ".anim");
+                    editorAssets.saveObject(animationclip, animationclip.name + "." + AssetExtension.anim);
                 }
                 if (dragSource.material)
                 {
                     var material = dragSource.material;
-                    editorAssets.saveObject(material, material.shaderName + ".material");
+                    editorAssets.saveObject(material, material.shaderName + "." + AssetExtension.material);
                 }
                 if (dragSource.geometry)
                 {
                     var geometry = dragSource.geometry;
-                    editorAssets.saveObject(geometry, geometry.name + ".geometry");
+                    editorAssets.saveObject(geometry, geometry.name + "." + AssetExtension.geometry);
                 }
             });
 

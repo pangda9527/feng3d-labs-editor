@@ -163,14 +163,14 @@ namespace feng3d.editor
                                 label: "脚本", click: () =>
                                 {
                                     var scriptName = "NewScript";
-                                    assetsFile.addfile(`${scriptName}.ts`, assetsFileTemplates.getNewScript(scriptName));
+                                    assetsFile.addfile(`${scriptName}.script.ts`, assetsFileTemplates.getNewScript(scriptName));
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
                                     var shadername = "NewShader"
-                                    assetsFile.addfile(`${shadername}.shader`, assetsFileTemplates.getNewShader(shadername));
+                                    assetsFile.addfile(`${shadername}.shader.ts`, assetsFileTemplates.getNewShader(shadername));
                                 }
                             },
                             {
@@ -189,7 +189,7 @@ namespace feng3d.editor
                             {
                                 label: "材质", click: () =>
                                 {
-                                    assetsFile.addfile("new material" + ".material", materialFactory.create("standard"));
+                                    assetsFile.addfile("new material" + ".material.json", materialFactory.create("standard"));
                                 }
                             },
                         ]
@@ -247,7 +247,7 @@ namespace feng3d.editor
                             //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
                             // } else
                             // {
-                                window.open(url);
+                            window.open(url);
                             // }
                         }
                     }
@@ -268,7 +268,7 @@ namespace feng3d.editor
                             //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
                             // } else
                             // {
-                                window.open(url);
+                            window.open(url);
                             // }
                         }
                     }
@@ -392,7 +392,7 @@ namespace feng3d.editor
                                     war3Model.root = file.parent.name;
                                     var gameobject = war3Model.getMesh();
                                     gameobject.name = file.name;
-                                    this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                    this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                                 });
                             });
                         }
@@ -407,7 +407,7 @@ namespace feng3d.editor
                                 ObjLoader.parse(content, (gameobject: GameObject) =>
                                 {
                                     gameobject.name = file.name;
-                                    this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                    this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                                 });
                             });
                         }
@@ -424,7 +424,7 @@ namespace feng3d.editor
                                 threejsLoader.load(data, (gameobject) =>
                                 {
                                     gameobject.name = file.name;
-                                    this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                    this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                                     // engine.root.addChild(gameobject);
                                 });
                             });
@@ -442,7 +442,7 @@ namespace feng3d.editor
                                 MD5Loader.parseMD5Mesh(content, (gameobject) =>
                                 {
                                     gameobject.name = file.name.split("/").pop().split(".").shift();
-                                    this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                    this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                                     // engine.root.addChild(gameobject);
                                 });
 
@@ -459,7 +459,7 @@ namespace feng3d.editor
                                 MD5Loader.parseMD5Anim(content, (animationclip) =>
                                 {
                                     animationclip.name = file.name.split("/").pop().split(".").shift();
-                                    this.saveObject(animationclip, animationclip.name + ".anim");
+                                    this.saveObject(animationclip, animationclip.name + "." + AssetExtension.anim);
                                 });
                             });
                         }

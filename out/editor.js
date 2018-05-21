@@ -4269,13 +4269,13 @@ var feng3d;
                             {
                                 label: "脚本", click: function () {
                                     var scriptName = "NewScript";
-                                    assetsFile.addfile(scriptName + ".ts", editor.assetsFileTemplates.getNewScript(scriptName));
+                                    assetsFile.addfile(scriptName + ".script.ts", editor.assetsFileTemplates.getNewScript(scriptName));
                                 }
                             },
                             {
                                 label: "着色器", click: function () {
                                     var shadername = "NewShader";
-                                    assetsFile.addfile(shadername + ".shader", editor.assetsFileTemplates.getNewShader(shadername));
+                                    assetsFile.addfile(shadername + ".shader.ts", editor.assetsFileTemplates.getNewShader(shadername));
                                 }
                             },
                             {
@@ -4291,7 +4291,7 @@ var feng3d;
                             { type: "separator" },
                             {
                                 label: "材质", click: function () {
-                                    assetsFile.addfile("new material" + ".material", feng3d.materialFactory.create("standard"));
+                                    assetsFile.addfile("new material" + ".material.json", feng3d.materialFactory.create("standard"));
                                 }
                             },
                         ]
@@ -4462,7 +4462,7 @@ var feng3d;
                                         war3Model.root = file.parent.name;
                                         var gameobject = war3Model.getMesh();
                                         gameobject.name = file.name;
-                                        _this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                        _this.saveObject(gameobject, gameobject.name + "." + editor.AssetExtension.gameobject);
                                     });
                                 });
                             }
@@ -4474,7 +4474,7 @@ var feng3d;
                                 editor.fs.readFileAsString(file.path, function (err, content) {
                                     feng3d.ObjLoader.parse(content, function (gameobject) {
                                         gameobject.name = file.name;
-                                        _this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                        _this.saveObject(gameobject, gameobject.name + "." + editor.AssetExtension.gameobject);
                                     });
                                 });
                             }
@@ -4486,7 +4486,7 @@ var feng3d;
                                 editor.fs.readFile(file.path, function (err, data) {
                                     editor.threejsLoader.load(data, function (gameobject) {
                                         gameobject.name = file.name;
-                                        _this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                        _this.saveObject(gameobject, gameobject.name + "." + editor.AssetExtension.gameobject);
                                         // engine.root.addChild(gameobject);
                                     });
                                 });
@@ -4499,7 +4499,7 @@ var feng3d;
                                 editor.fs.readFileAsString(file.path, function (err, content) {
                                     feng3d.MD5Loader.parseMD5Mesh(content, function (gameobject) {
                                         gameobject.name = file.name.split("/").pop().split(".").shift();
-                                        _this.saveObject(gameobject, gameobject.name + ".gameobject");
+                                        _this.saveObject(gameobject, gameobject.name + "." + editor.AssetExtension.gameobject);
                                         // engine.root.addChild(gameobject);
                                     });
                                 });
@@ -4512,7 +4512,7 @@ var feng3d;
                                 editor.fs.readFileAsString(file.path, function (err, content) {
                                     feng3d.MD5Loader.parseMD5Anim(content, function (animationclip) {
                                         animationclip.name = file.name.split("/").pop().split(".").shift();
-                                        _this.saveObject(animationclip, animationclip.name + ".anim");
+                                        _this.saveObject(animationclip, animationclip.name + "." + editor.AssetExtension.anim);
                                     });
                                 });
                             }
@@ -4532,21 +4532,71 @@ var feng3d;
     (function (editor) {
         var AssetExtension;
         (function (AssetExtension) {
+            /**
+             * 文件夹
+             */
             AssetExtension["folder"] = "folder";
-            AssetExtension["material"] = "material";
-            AssetExtension["geometry"] = "geometry";
-            AssetExtension["gameobject"] = "gameobject";
-            AssetExtension["anim"] = "anim";
-            AssetExtension["shader"] = "shader";
+            /**
+             * png 图片
+             */
             AssetExtension["png"] = "png";
+            /**
+             * jpg图片
+             */
             AssetExtension["jpg"] = "jpg";
+            /**
+             * jpeg图片
+             */
             AssetExtension["jpeg"] = "jpeg";
+            /**
+             * gif图片
+             */
             AssetExtension["gif"] = "gif";
+            /**
+             * ts文件
+             */
             AssetExtension["ts"] = "ts";
+            /**
+             * js文件
+             */
             AssetExtension["js"] = "js";
+            /**
+             * 文本文件
+             */
             AssetExtension["txt"] = "txt";
+            /**
+             * json文件
+             */
             AssetExtension["json"] = "json";
-            AssetExtension["scene"] = "scene";
+            // -- feng3d中的类型
+            /**
+             * 材质
+             */
+            AssetExtension["material"] = "material.json";
+            /**
+             * 几何体
+             */
+            AssetExtension["geometry"] = "geometry.json";
+            /**
+             * 游戏对象
+             */
+            AssetExtension["gameobject"] = "gameobject.json";
+            /**
+             * 场景文件
+             */
+            AssetExtension["scene"] = "scene.json";
+            /**
+             * 动画文件
+             */
+            AssetExtension["anim"] = "anim.json";
+            /**
+             * 着色器文件
+             */
+            AssetExtension["shader"] = "shader.ts";
+            /**
+             * 脚本文件
+             */
+            AssetExtension["script"] = "script.ts";
         })(AssetExtension = editor.AssetExtension || (editor.AssetExtension = {}));
         var AssetsFile = /** @class */ (function (_super) {
             __extends(AssetsFile, _super);
@@ -4591,14 +4641,14 @@ var feng3d;
                 if (this.isDirectory)
                     this.extension = AssetExtension.folder;
                 else
-                    this.extension = this.path.split(".").pop().toLowerCase();
+                    this.extension = this.name.substr(this.name.indexOf(".") + 1);
                 // 更新图标
                 if (this.isDirectory) {
                     this.image = "folder_png";
                 }
                 else {
-                    if (RES.getRes(this.extension + "_png")) {
-                        this.image = this.extension + "_png";
+                    if (RES.getRes(this.extension.split(".").shift() + "_png")) {
+                        this.image = this.extension.split(".").shift() + "_png";
                     }
                     else {
                         this.image = "file_png";
@@ -5234,19 +5284,19 @@ var feng3d;
                 editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject", "animationclip", "material", "geometry"], function (dragSource) {
                     if (dragSource.gameobject) {
                         var gameobject = dragSource.gameobject;
-                        editor.editorAssets.saveObject(gameobject, gameobject.name + ".gameobject");
+                        editor.editorAssets.saveObject(gameobject, gameobject.name + "." + editor.AssetExtension.gameobject);
                     }
                     if (dragSource.animationclip) {
                         var animationclip = dragSource.animationclip;
-                        editor.editorAssets.saveObject(animationclip, animationclip.name + ".anim");
+                        editor.editorAssets.saveObject(animationclip, animationclip.name + "." + editor.AssetExtension.anim);
                     }
                     if (dragSource.material) {
                         var material = dragSource.material;
-                        editor.editorAssets.saveObject(material, material.shaderName + ".material");
+                        editor.editorAssets.saveObject(material, material.shaderName + "." + editor.AssetExtension.material);
                     }
                     if (dragSource.geometry) {
                         var geometry = dragSource.geometry;
-                        editor.editorAssets.saveObject(geometry, geometry.name + ".geometry");
+                        editor.editorAssets.saveObject(geometry, geometry.name + "." + editor.AssetExtension.geometry);
                     }
                 });
                 this.initlist();
@@ -8402,7 +8452,7 @@ var feng3d;
                 editorObject.addComponent(editor.GroundGrid);
                 editorObject.addComponent(editor.MRSTool);
                 editorObject.addComponent(editor.EditorComponent);
-                feng3d.Loader.loadText(editor.editorData.getEditorAssetsPath("gameobjects/Trident.gameobject"), function (content) {
+                feng3d.Loader.loadText(editor.editorData.getEditorAssetsPath("gameobjects/Trident.gameobject.json"), function (content) {
                     var trident = feng3d.serialization.deserialize(JSON.parse(content));
                     editorObject.addChild(trident);
                 });

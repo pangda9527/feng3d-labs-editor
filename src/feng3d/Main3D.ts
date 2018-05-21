@@ -67,7 +67,7 @@ namespace feng3d.editor
             editorObject.addComponent(MRSTool);
             editorObject.addComponent(EditorComponent);
 
-            Loader.loadText(editorData.getEditorAssetsPath("gameobjects/Trident.gameobject"), (content) =>
+            Loader.loadText(editorData.getEditorAssetsPath("gameobjects/Trident.gameobject.json"), (content) =>
             {
                 var trident = serialization.deserialize(JSON.parse(content));
                 editorObject.addChild(trident);

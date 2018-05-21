@@ -2,21 +2,71 @@ namespace feng3d.editor
 {
     export enum AssetExtension
     {
+        /**
+         * 文件夹
+         */
         folder = "folder",
-        material = "material",
-        geometry = "geometry",
-        gameobject = "gameobject",
-        anim = "anim",
-        shader = "shader",
+        /**
+         * png 图片
+         */
         png = "png",
+        /**
+         * jpg图片
+         */
         jpg = "jpg",
+        /**
+         * jpeg图片
+         */
         jpeg = "jpeg",
+        /**
+         * gif图片
+         */
         gif = "gif",
+        /**
+         * ts文件
+         */
         ts = "ts",
+        /**
+         * js文件
+         */
         js = "js",
+        /**
+         * 文本文件
+         */
         txt = "txt",
+        /**
+         * json文件
+         */
         json = "json",
-        scene = "scene",
+        // -- feng3d中的类型
+        /**
+         * 材质
+         */
+        material = "material.json",
+        /**
+         * 几何体
+         */
+        geometry = "geometry.json",
+        /**
+         * 游戏对象
+         */
+        gameobject = "gameobject.json",
+        /**
+         * 场景文件
+         */
+        scene = "scene.json",
+        /**
+         * 动画文件
+         */
+        anim = "anim.json",
+        /**
+         * 着色器文件
+         */
+        shader = "shader.ts",
+        /**
+         * 脚本文件
+         */
+        script = "script.ts",
     }
 
     export class AssetsFile extends TreeNode
@@ -122,7 +172,7 @@ namespace feng3d.editor
             if (this.isDirectory)
                 this.extension = AssetExtension.folder;
             else
-                this.extension = <AssetExtension>this.path.split(".").pop().toLowerCase();
+                this.extension = <AssetExtension>this.name.substr(this.name.indexOf(".") + 1);
 
             // 更新图标
             if (this.isDirectory)
@@ -131,9 +181,9 @@ namespace feng3d.editor
             }
             else
             {
-                if (RES.getRes(this.extension + "_png"))
+                if (RES.getRes(this.extension.split(".").shift() + "_png"))
                 {
-                    this.image = this.extension + "_png";
+                    this.image = this.extension.split(".").shift() + "_png";
                 } else
                 {
                     this.image = "file_png";
