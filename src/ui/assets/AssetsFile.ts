@@ -139,7 +139,6 @@ namespace feng3d.editor
         {
             super()
 
-            this.isDirectory = path.charAt(path.length - 1) == "/";
             this.path = path;
             this.cacheData = data;
         }
@@ -153,6 +152,8 @@ namespace feng3d.editor
                 this.name = paths.pop();
 
             this.label = this.name.split(".").shift();
+
+            this.isDirectory = this.path.charAt(this.path.length - 1) == "/";
 
             if (this.isDirectory)
                 this.extension = AssetExtension.folder;
@@ -243,27 +244,6 @@ namespace feng3d.editor
                 this.cacheData = content;
                 callback(this.cacheData);
             });
-        }
-
-        /**
-         * 设置拖拽数据
-         * @param dragsource 拖拽数据
-         */
-        setDragSource(dragsource: DragData)
-        {
-            switch (this.extension)
-            {
-                case AssetExtension.gameobject:
-                    dragsource.file_gameobject = this.path;
-                    break;
-                case AssetExtension.material:
-                    this.getData((data) =>
-                    {
-                        dragsource.material = data;
-                    });
-                    break;
-            }
-            dragsource.file = this.path;
         }
 
         /**
@@ -469,23 +449,14 @@ namespace feng3d.editor
          */
         move(destdirpath: string, callback?: (file: AssetsFile) => void)
         {
+            //禁止向子文件夹移动
+            if (destdirpath.indexOf(this.path) != -1)
+                return;
             var oldpath = this.path;
             var newpath = destdirpath + this.name;
             if (this.isDirectory)
                 newpath += "/";
             var destDir = editorAssets.getFile(destdirpath);
-            //禁止向子文件夹移动
-            if (oldpath == editorAssets.getparentdir(destdirpath))
-                return;
-
-            if (/\.ts\b/.test(this.path))
-            {
-                var jspath = this.path.replace(/\.ts\b/, ".js");
-                var jsmappath = this.path.replace(/\.ts\b/, ".js.map");
-
-                editorAssets.movefile(jspath, destdirpath);
-                editorAssets.movefile(jsmappath, destdirpath);
-            }
 
             fs.move(oldpath, newpath, (err) =>
             {

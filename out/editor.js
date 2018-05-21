@@ -4613,7 +4613,6 @@ var feng3d;
                  * 当前打开文件夹
                  */
                 _this.currentOpenDirectory = false;
-                _this.isDirectory = path.charAt(path.length - 1) == "/";
                 _this.path = path;
                 _this.cacheData = data;
                 return _this;
@@ -4626,6 +4625,7 @@ var feng3d;
                 if (this.name == "")
                     this.name = paths.pop();
                 this.label = this.name.split(".").shift();
+                this.isDirectory = this.path.charAt(this.path.length - 1) == "/";
                 if (this.isDirectory)
                     this.extension = AssetExtension.folder;
                 else
@@ -4696,23 +4696,6 @@ var feng3d;
                     _this.cacheData = content;
                     callback(_this.cacheData);
                 });
-            };
-            /**
-             * 设置拖拽数据
-             * @param dragsource 拖拽数据
-             */
-            AssetsFile.prototype.setDragSource = function (dragsource) {
-                switch (this.extension) {
-                    case AssetExtension.gameobject:
-                        dragsource.file_gameobject = this.path;
-                        break;
-                    case AssetExtension.material:
-                        this.getData(function (data) {
-                            dragsource.material = data;
-                        });
-                        break;
-                }
-                dragsource.file = this.path;
             };
             /**
              * 初始化子文件
@@ -4876,20 +4859,14 @@ var feng3d;
              */
             AssetsFile.prototype.move = function (destdirpath, callback) {
                 var _this = this;
+                //禁止向子文件夹移动
+                if (destdirpath.indexOf(this.path) != -1)
+                    return;
                 var oldpath = this.path;
                 var newpath = destdirpath + this.name;
                 if (this.isDirectory)
                     newpath += "/";
                 var destDir = editor.editorAssets.getFile(destdirpath);
-                //禁止向子文件夹移动
-                if (oldpath == editor.editorAssets.getparentdir(destdirpath))
-                    return;
-                if (/\.ts\b/.test(this.path)) {
-                    var jspath = this.path.replace(/\.ts\b/, ".js");
-                    var jsmappath = this.path.replace(/\.ts\b/, ".js.map");
-                    editor.editorAssets.movefile(jspath, destdirpath);
-                    editor.editorAssets.movefile(jsmappath, destdirpath);
-                }
                 editor.fs.move(oldpath, newpath, function (err) {
                     feng3d.assert(!err);
                     _this.path = newpath;
@@ -5081,7 +5058,7 @@ var feng3d;
                     var accepttypes = [];
                     if (this.data.isDirectory) {
                         editor.drag.register(this, function (dragsource) {
-                            _this.data.setDragSource(dragsource);
+                            dragsource.file = _this.data.path;
                         }, ["file"], function (dragdata) {
                             var movefile = editor.editorAssets.getFile(dragdata.file);
                             movefile.move(_this.data.path);

@@ -47,7 +47,7 @@ namespace feng3d.editor
                 {
                     drag.register(this, (dragsource) =>
                     {
-                        this.data.setDragSource(dragsource);
+                        dragsource.file = this.data.path;
                     }, ["file"], (dragdata) =>
                         {
                             var movefile = editorAssets.getFile(dragdata.file);

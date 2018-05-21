@@ -1265,11 +1265,6 @@ declare namespace feng3d.editor {
          */
         getData(callback: (data: any) => void): void;
         /**
-         * 设置拖拽数据
-         * @param dragsource 拖拽数据
-         */
-        setDragSource(dragsource: DragData): void;
-        /**
          * 初始化子文件
          */
         initChildren(depth: number, callback: () => void): void;
