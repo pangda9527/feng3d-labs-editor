@@ -1127,6 +1127,7 @@ declare namespace feng3d.editor {
          */
         private parserMenu(menuconfig, file);
     }
+    var codeeditoWin: Window;
 }
 declare namespace feng3d.editor {
     enum AssetExtension {
@@ -1449,6 +1450,7 @@ declare namespace feng3d.editor {
         private onButtonClick(event);
         private updateview();
     }
+    var runwin: Window;
 }
 declare namespace feng3d.editor {
     class MainView extends eui.Component implements eui.UIComponent {

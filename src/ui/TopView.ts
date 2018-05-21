@@ -68,6 +68,9 @@ namespace feng3d.editor
 			this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
 			watcher.unwatch(mrsTool, "toolType", this.updateview, this);
+
+			if (runwin) runwin.close();
+			runwin = null;
 		}
 
 		private onMainMenu(item: { label: string; command: string; })
@@ -112,7 +115,8 @@ namespace feng3d.editor
 						}
 						if (fs.type == FSType.indexedDB)
 						{
-							window.open(`run.html?fstype=${assets.type}&project=${editorAssets.projectname}`);
+							if (runwin) runwin.close();
+							runwin = window.open(`run.html?fstype=${assets.type}&project=${editorAssets.projectname}`);
 							return;
 						}
 						fs.getAbsolutePath("index.html", (err, path) =>
@@ -122,7 +126,8 @@ namespace feng3d.editor
 								warn(err);
 								return;
 							}
-							window.open(path);
+							if (runwin) runwin.close();
+							runwin = window.open(path);
 						});
 					});
 					break;
@@ -144,4 +149,6 @@ namespace feng3d.editor
 			this.centerButton.selected = mrsTool.isBaryCenter;
 		}
 	}
+	// 运行窗口
+	export var runwin: Window;
 }

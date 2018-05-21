@@ -677,7 +677,7 @@ namespace feng3d.editor
          */
         getScriptClassName(callback: (scriptClassName: string) => void)
         {
-            if (this.extension != AssetExtension.ts)
+            if (this.extension != AssetExtension.script)
                 return "";
             this.cacheData = null;
             this.getData((code: string) =>

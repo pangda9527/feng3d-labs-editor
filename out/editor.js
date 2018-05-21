@@ -693,6 +693,10 @@ var feng3d;
         editor.EditorCache = EditorCache;
         editor.editorcache = new EditorCache();
         window.addEventListener("beforeunload", function () {
+            if (editor.codeeditoWin)
+                editor.codeeditoWin.close();
+            if (editor.runwin)
+                editor.runwin.close();
             editor.editorcache.save();
         });
     })(editor = feng3d.editor || (feng3d.editor = {}));
@@ -3064,7 +3068,7 @@ var feng3d;
                 else {
                     this.text.enabled = false;
                     var valuename = this.attributeValue["name"] || "";
-                    this.text.text = valuename + " (" + feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
+                    this.text.text = valuename + " (" + this.attributeValue.constructor.name + ")";
                     this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
                 }
                 if (this._textEnabled !== undefined)
@@ -4279,6 +4283,16 @@ var feng3d;
                                 }
                             },
                             {
+                                label: "ts", click: function () {
+                                    assetsFile.addfile("new file.ts", "");
+                                }
+                            },
+                            {
+                                label: "js", click: function () {
+                                    assetsFile.addfile("new file.js", "");
+                                }
+                            },
+                            {
                                 label: "Json", click: function () {
                                     assetsFile.addfile("new json.json", "{}");
                                 }
@@ -4323,36 +4337,25 @@ var feng3d;
                     if (file.extension == editor.AssetExtension.ts
                         || file.extension == editor.AssetExtension.js
                         || file.extension == editor.AssetExtension.txt
-                        || file.extension == editor.AssetExtension.shader) {
-                        menu = {
-                            label: "编辑", click: function () {
-                                var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + file.extension;
-                                url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                                // if (assets.type == FSType.native)
-                                // {
-                                //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
-                                // } else
-                                // {
-                                window.open(url);
-                                // }
-                            }
-                        };
-                    }
-                    else if (file.extension == editor.AssetExtension.json
+                        || file.extension == editor.AssetExtension.shader
+                        || file.extension == editor.AssetExtension.json
                         || file.extension == editor.AssetExtension.material
                         || file.extension == editor.AssetExtension.gameobject
                         || file.extension == editor.AssetExtension.geometry
-                        || file.extension == editor.AssetExtension.anim) {
+                        || file.extension == editor.AssetExtension.scene
+                        || file.extension == editor.AssetExtension.script) {
                         menu = {
                             label: "编辑", click: function () {
-                                var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + file.path + "&extension=" + editor.AssetExtension.json;
+                                var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + file.path;
                                 url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                                 // if (assets.type == FSType.native)
                                 // {
                                 //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
                                 // } else
                                 // {
-                                window.open(url);
+                                if (editor.codeeditoWin)
+                                    editor.codeeditoWin.close();
+                                editor.codeeditoWin = window.open(url);
                                 // }
                             }
                         };
@@ -5039,7 +5042,7 @@ var feng3d;
              */
             AssetsFile.prototype.getScriptClassName = function (callback) {
                 var _this = this;
-                if (this.extension != AssetExtension.ts)
+                if (this.extension != AssetExtension.script)
                     return "";
                 this.cacheData = null;
                 this.getData(function (code) {
@@ -5117,7 +5120,7 @@ var feng3d;
                                 case editor.AssetExtension.gameobject:
                                     dragsource.file_gameobject = _this.data.path;
                                     break;
-                                case editor.AssetExtension.ts:
+                                case editor.AssetExtension.script:
                                     _this.data.getScriptClassName(function (scriptClassName) {
                                         dragsource.file_script = scriptClassName;
                                         editor.drag.refreshAcceptables();
@@ -5284,7 +5287,10 @@ var feng3d;
                 editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject", "animationclip", "material", "geometry"], function (dragSource) {
                     if (dragSource.gameobject) {
                         var gameobject = dragSource.gameobject;
-                        editor.editorAssets.saveObject(gameobject, gameobject.name + "." + editor.AssetExtension.gameobject);
+                        if (gameobject.getComponent(feng3d.Scene3D) != null)
+                            editor.editorAssets.saveObject(gameobject, gameobject.name + "." + editor.AssetExtension.scene);
+                        else
+                            editor.editorAssets.saveObject(gameobject, gameobject.name + "." + editor.AssetExtension.gameobject);
                     }
                     if (dragSource.animationclip) {
                         var animationclip = dragSource.animationclip;
@@ -5568,6 +5574,9 @@ var feng3d;
                 this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
                 this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
                 feng3d.watcher.unwatch(editor.mrsTool, "toolType", this.updateview, this);
+                if (editor.runwin)
+                    editor.runwin.close();
+                editor.runwin = null;
             };
             TopView.prototype.onMainMenu = function (item) {
                 editor.editorDispatcher.dispatch(item.command);
@@ -5602,7 +5611,9 @@ var feng3d;
                                 return;
                             }
                             if (editor.fs.type == feng3d.FSType.indexedDB) {
-                                window.open("run.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorAssets.projectname);
+                                if (editor.runwin)
+                                    editor.runwin.close();
+                                editor.runwin = window.open("run.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorAssets.projectname);
                                 return;
                             }
                             editor.fs.getAbsolutePath("index.html", function (err, path) {
@@ -5610,7 +5621,9 @@ var feng3d;
                                     feng3d.warn(err);
                                     return;
                                 }
-                                window.open(path);
+                                if (editor.runwin)
+                                    editor.runwin.close();
+                                editor.runwin = window.open(path);
                             });
                         });
                         break;

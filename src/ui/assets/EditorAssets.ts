@@ -174,6 +174,18 @@ namespace feng3d.editor
                                 }
                             },
                             {
+                                label: "ts", click: () =>
+                                {
+                                    assetsFile.addfile("new file.ts", "");
+                                }
+                            },
+                            {
+                                label: "js", click: () =>
+                                {
+                                    assetsFile.addfile("new file.js", "");
+                                }
+                            },
+                            {
                                 label: "Json", click: () =>
                                 {
                                     assetsFile.addfile("new json.json", "{}");
@@ -235,40 +247,26 @@ namespace feng3d.editor
                     || file.extension == AssetExtension.js
                     || file.extension == AssetExtension.txt
                     || file.extension == AssetExtension.shader
-                )
-                {
-                    menu = {
-                        label: "编辑", click: () =>
-                        {
-                            var url = `codeeditor.html?fstype=${assets.type}&project=${editorcache.projectname}&path=${file.path}&extension=${file.extension}`;
-                            url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                            // if (assets.type == FSType.native)
-                            // {
-                            //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
-                            // } else
-                            // {
-                            window.open(url);
-                            // }
-                        }
-                    }
-                } else if (file.extension == AssetExtension.json
+                    || file.extension == AssetExtension.json
                     || file.extension == AssetExtension.material
                     || file.extension == AssetExtension.gameobject
                     || file.extension == AssetExtension.geometry
-                    || file.extension == AssetExtension.anim
+                    || file.extension == AssetExtension.scene
+                    || file.extension == AssetExtension.script
                 )
                 {
                     menu = {
                         label: "编辑", click: () =>
                         {
-                            var url = `codeeditor.html?fstype=${assets.type}&project=${editorcache.projectname}&path=${file.path}&extension=${AssetExtension.json}`;
+                            var url = `codeeditor.html?fstype=${assets.type}&project=${editorcache.projectname}&path=${file.path}`;
                             url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                             // if (assets.type == FSType.native)
                             // {
                             //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
                             // } else
                             // {
-                            window.open(url);
+                            if (codeeditoWin) codeeditoWin.close();
+                            codeeditoWin = window.open(url);
                             // }
                         }
                     }
@@ -470,4 +468,5 @@ namespace feng3d.editor
     }
 
     editorAssets = new EditorAssets();
+    export var codeeditoWin: Window;
 }

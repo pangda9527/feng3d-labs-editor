@@ -31,6 +31,8 @@ namespace feng3d.editor
 
     window.addEventListener("beforeunload", () =>
     {
+        if (codeeditoWin) codeeditoWin.close();
+        if (runwin) runwin.close();
         editorcache.save();
     });
 }

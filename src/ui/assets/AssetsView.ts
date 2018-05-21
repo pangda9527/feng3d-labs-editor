@@ -50,7 +50,10 @@ namespace feng3d.editor
                 if (dragSource.gameobject)
                 {
                     var gameobject: GameObject = dragSource.gameobject;
-                    editorAssets.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
+                    if (gameobject.getComponent(Scene3D) != null)
+                        editorAssets.saveObject(gameobject, gameobject.name + "." + AssetExtension.scene);
+                    else
+                        editorAssets.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                 }
                 if (dragSource.animationclip)
                 {
