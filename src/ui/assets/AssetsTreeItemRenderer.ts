@@ -6,7 +6,7 @@ namespace feng3d.editor
         public disclosureButton: eui.ToggleButton;
         public renameInput: RenameTextInput;
 
-        data: AssetsFile;
+        assetsFile: AssetsFile;
 
         constructor()
         {

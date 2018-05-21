@@ -144,19 +144,24 @@ namespace feng3d.editor
 
         updateAssetsTree()
         {
-            var nodes = editorAssets.filter((file) =>
-            {
-                if (file.isDirectory)
-                {
-                    file.depth = file.parent ? file.parent.depth + 1 : 0;
-                    return true;
-                }
-            }, (assetsFile) =>
-                {
-                    if (assetsFile.isOpen)
-                        return true;
-                });
+            var paths = Object.keys(editorAssets.files).filter((item) => pathUtils.isDirectory(item)).sort();
 
+            var nodes: AssetsFile[] = [];
+            var closepath: string;
+            for (let i = 0, n = paths.length; i < n; i++)
+            {
+                const element = paths[i];
+                if (closepath)
+                {
+                    if (element.substr(0, closepath.length) == closepath)
+                        continue;
+                    closepath = null;
+                }
+                var assetsFile = editorAssets.getFile(element);
+                if (!assetsFile.isOpen)
+                    closepath = assetsFile.path;
+                nodes.push(assetsFile);
+            }
             this.listData.replaceAll(nodes);
         }
 
@@ -196,52 +201,52 @@ namespace feng3d.editor
             while (floders.length > 0)
             this.floderpathTxt.textFlow = textFlow;
 
-            var fileinfo = editorAssets.getFile(editorAssets.showFloder);
-            if (fileinfo)
+            var children = editorAssets.filter((item) => pathUtils.getParentPath(item.path) == editorAssets.showFloder);
+
+
+            try
             {
-                try
-                {
-                    var excludeReg = new RegExp(this.excludeTxt.text);
-                } catch (error)
-                {
-                    excludeReg = new RegExp("");
-                }
-                try
-                {
-                    var includeReg = new RegExp(this.includeTxt.text);
-                } catch (error)
-                {
-                    includeReg = new RegExp("");
-                }
-
-                var fileinfos = fileinfo.children.filter((value) =>
-                {
-                    if (this.includeTxt.text)
-                    {
-                        if (!includeReg.test(value.path))
-                            return false;
-                    }
-                    if (this.excludeTxt.text)
-                    {
-                        if (excludeReg.test(value.path))
-                            return false;
-                    }
-                    return true;
-                });
-                var nodes = fileinfos.map((value) => { return value; });
-                nodes = nodes.sort((a, b) =>
-                {
-                    if (a.isDirectory > b.isDirectory)
-                        return -1;
-                    if (a.isDirectory < b.isDirectory)
-                        return 1;
-                    if (a.path < b.path)
-                        return -1;
-                    return 1;
-                });
-
-                this.filelistData.replaceAll(nodes);
+                var excludeReg = new RegExp(this.excludeTxt.text);
+            } catch (error)
+            {
+                excludeReg = new RegExp("");
             }
+            try
+            {
+                var includeReg = new RegExp(this.includeTxt.text);
+            } catch (error)
+            {
+                includeReg = new RegExp("");
+            }
+
+            var fileinfos = children.filter((value) =>
+            {
+                if (this.includeTxt.text)
+                {
+                    if (!includeReg.test(value.path))
+                        return false;
+                }
+                if (this.excludeTxt.text)
+                {
+                    if (excludeReg.test(value.path))
+                        return false;
+                }
+                return true;
+            });
+            var nodes = fileinfos.map((value) => { return value; });
+            nodes = nodes.sort((a, b) =>
+            {
+                if (a.isDirectory > b.isDirectory)
+                    return -1;
+                if (a.isDirectory < b.isDirectory)
+                    return 1;
+                if (a.path < b.path)
+                    return -1;
+                return 1;
+            });
+
+            this.filelistData.replaceAll(nodes);
+
             this.selectedfilechanged();
         }
 

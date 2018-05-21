@@ -1076,6 +1076,9 @@ declare namespace feng3d.editor {
          * 上次执行的项目脚本
          */
         private _preProjectJsContent;
+        files: {
+            [path: string]: AssetsFile;
+        };
         initproject(callback: () => void): void;
         /**
          * 获取文件
@@ -1086,7 +1089,7 @@ declare namespace feng3d.editor {
          * 删除文件
          * @param path 文件路径
          */
-        deletefile(path: string, callback?: (assetsFile: AssetsFile) => void, includeRoot?: boolean): void;
+        deletefile(path: string, callback?: () => void, includeRoot?: boolean): void;
         readScene(path: string, callback: (err: Error, scene: Scene3D) => void): void;
         /**
          * 保存场景到文件
@@ -1116,7 +1119,7 @@ declare namespace feng3d.editor {
          * @param fn 过滤函数
          * @param next 是否继续遍历children
          */
-        filter(fn: (assetsFile: AssetsFile) => boolean, next?: (assetsFile: AssetsFile) => boolean): AssetsFile[];
+        filter(fn: (assetsFile: AssetsFile) => boolean): AssetsFile[];
         inputFiles(files: File[] | FileList): void;
         runProjectScript(callback?: () => void): void;
         /**
@@ -1195,7 +1198,7 @@ declare namespace feng3d.editor {
          */
         script = "script.ts",
     }
-    class AssetsFile extends TreeNode {
+    class AssetsFile {
         /**
          * 路径
          */
@@ -1204,14 +1207,6 @@ declare namespace feng3d.editor {
          * 是否文件夹
          */
         isDirectory: boolean;
-        /**
-         * 父节点
-         */
-        parent: AssetsFile;
-        /**
-         * 子节点列表
-         */
-        children: AssetsFile[];
         /**
          * 目录深度
          */
@@ -1261,37 +1256,6 @@ declare namespace feng3d.editor {
          */
         getData(callback: (data: any) => void): void;
         /**
-         * 初始化子文件
-         */
-        initChildren(depth: number, callback: () => void): void;
-        /**
-         * 根据相对路径获取子文件
-         * @param path 相对路径
-         */
-        getFile(path: string | string[]): AssetsFile;
-        removeChild(file: AssetsFile): void;
-        /**
-         * 从父节点移除
-         */
-        remove(): void;
-        /**
-         * 移除所有子节点
-         */
-        removeChildren(): void;
-        /**
-         * 销毁
-         */
-        destroy(): void;
-        /**
-         * 添加到父节点
-         * @param parent 父节点
-         */
-        addto(parent: AssetsFile): void;
-        /**
-         * 删除文件（夹）
-         */
-        deleteFile(callback?: (assetsFile: AssetsFile) => void, includeRoot?: boolean): void;
-        /**
          * 重命名
          * @param newname 新文件名称
          * @param callback 重命名完成回调
@@ -1318,15 +1282,9 @@ declare namespace feng3d.editor {
         addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry | Texture2D, override?: boolean, callback?: (file: AssetsFile) => void): void;
         save(callback?: () => void): void;
         /**
-         * 过滤出文件列表
-         * @param fn 过滤函数
-         * @param next 是否继续遍历children
-         */
-        filter(fn: (assetsFile: AssetsFile) => boolean, next?: (assetsFile: AssetsFile) => boolean): this[];
-        /**
          * 获取一个新的不重名子文件名称
          */
-        private getnewchildname(childname);
+        private getnewname(path);
         /**
          * 获取脚本类名称
          * @param callback 回调函数
@@ -1355,7 +1313,7 @@ declare namespace feng3d.editor {
         contentGroup: eui.Group;
         disclosureButton: eui.ToggleButton;
         renameInput: RenameTextInput;
-        data: AssetsFile;
+        assetsFile: AssetsFile;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;

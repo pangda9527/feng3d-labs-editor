@@ -69,7 +69,7 @@ namespace feng3d.editor
         script = "script.ts",
     }
 
-    export class AssetsFile extends TreeNode
+    export class AssetsFile
     {
         /**
          * 路径
@@ -80,14 +80,6 @@ namespace feng3d.editor
          * 是否文件夹
          */
         isDirectory: boolean;
-        /**
-         * 父节点
-         */
-        parent: AssetsFile;
-        /**
-         * 子节点列表
-         */
-        children: AssetsFile[] = [];
 
         /**
          * 目录深度
@@ -137,8 +129,6 @@ namespace feng3d.editor
 
         constructor(path: string, data?: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D)
         {
-            super()
-
             this.path = path;
             this.cacheData = data;
         }
@@ -146,19 +136,17 @@ namespace feng3d.editor
         pathChanged()
         {
             // 更新名字
-            var paths = this.path.split("/");
-            this.name = paths.pop();
-            if (this.name == "")
-                this.name = paths.pop();
-
+            this.name = pathUtils.getName(this.path);
             this.label = this.name.split(".").shift();
 
-            this.isDirectory = this.path.charAt(this.path.length - 1) == "/";
+            this.isDirectory = pathUtils.isDirectory(this.path);
 
             if (this.isDirectory)
                 this.extension = AssetExtension.folder;
             else
-                this.extension = <AssetExtension>this.name.substr(this.name.indexOf(".") + 1);
+                this.extension = <AssetExtension>pathUtils.getExtension(this.path);
+
+            this.depth = pathUtils.getDirDepth(this.path);
 
             // 更新图标
             if (this.isDirectory)
@@ -247,177 +235,6 @@ namespace feng3d.editor
         }
 
         /**
-         * 初始化子文件
-         */
-        initChildren(depth = 0, callback: () => void)
-        {
-            if (!this.isDirectory || depth < 0)
-            {
-                callback();
-                return;
-            }
-            fs.readdir(this.path, (err, files) =>
-            {
-                var initfiles = () =>
-                {
-                    if (files.length == 0)
-                    {
-                        callback();
-                        return;
-                    }
-
-                    var file = files.shift();
-                    var child = new AssetsFile(this.path + file);
-                    child.parent = this;
-                    this.children.push(child);
-                    child.initChildren(depth - 1, initfiles);
-                }
-                initfiles();
-            });
-        }
-
-        /**
-         * 根据相对路径获取子文件
-         * @param path 相对路径
-         */
-        getFile(path: string | string[]): AssetsFile
-        {
-            if (typeof path == "string")
-            {
-                path = path.replace(this.path + "/", "");
-                path = path.replace(this.path, "");
-                path = path.split("/");
-            }
-            if (path.join("/") == "")
-                return this;
-            var childname = path.shift();
-            if (this.children)
-            {
-                for (var i = 0; i < this.children.length; i++)
-                {
-                    if (this.children[i].name == childname)
-                    {
-                        var result = this.children[i].getFile(path);
-                        if (result)
-                            return result;
-                    }
-                }
-            }
-            return null;
-        }
-
-        removeChild(file: AssetsFile)
-        {
-            file.remove();
-        }
-
-        /**
-         * 从父节点移除
-         */
-        remove()
-        {
-            if (this.parent)
-            {
-                var index = this.parent.children.indexOf(this);
-                assert(index != -1);
-                this.parent.children.splice(index, 1);
-                this.parent = null;
-
-                editorui.assetsview.updateShowFloder();
-                assetsDispather.dispatch("changed");
-            }
-        }
-
-        /**
-         * 移除所有子节点
-         */
-        removeChildren()
-        {
-            var children = this.children.concat();
-            children.forEach(element =>
-            {
-                element.remove();
-            });
-        }
-
-        /**
-         * 销毁
-         */
-        destroy()
-        {
-            this.remove();
-            this.removeChildren();
-        }
-
-        /**
-         * 添加到父节点
-         * @param parent 父节点
-         */
-        addto(parent: AssetsFile)
-        {
-            this.remove();
-            assert(!!parent);
-            parent.children.push(this);
-            this.parent = parent;
-
-            editorui.assetsview.updateShowFloder();
-            assetsDispather.dispatch("changed");
-        }
-
-        /**
-         * 删除文件（夹）
-         */
-        deleteFile(callback?: (assetsFile: AssetsFile) => void, includeRoot = false)
-        {
-            if (this.path == editorAssets.assetsPath && !includeRoot)
-            {
-                alert("无法删除根目录");
-                return;
-            }
-
-            var deletefile = () =>
-            {
-                fs.delete(this.path, (err) =>
-                {
-                    if (err)
-                        warn(`删除文件 ${this.path} 出现问题 ${err}`);
-
-                    this.destroy();
-
-                    //
-                    this.parent = null;
-                    callback && callback(this);
-                });
-                if (/\.ts\b/.test(this.path))
-                {
-                    editorAssets.deletefile(this.path.replace(/\.ts\b/, ".js"), () => { });
-                    editorAssets.deletefile(this.path.replace(/\.ts\b/, ".js.map"), () => { });
-                }
-            }
-
-            var checkDirDelete = () =>
-            {
-                if (this.children.length == 0)
-                    deletefile();
-            }
-
-            if (this.isDirectory)
-            {
-                this.children.forEach(element =>
-                {
-                    element.deleteFile(() =>
-                    {
-                        checkDirDelete();
-                    });
-                });
-                checkDirDelete();
-            } else
-            {
-                deletefile();
-            }
-        }
-
-        /**
          * 重命名
          * @param newname 新文件名称
          * @param callback 重命名完成回调
@@ -425,7 +242,7 @@ namespace feng3d.editor
         rename(newname: string, callback?: (file: AssetsFile) => void)
         {
             var oldPath = this.path;
-            var newPath = this.parent.path + newname;
+            var newPath = pathUtils.getParentPath(this.path) + newname;
             if (this.isDirectory)
                 newPath = newPath + "/";
             fs.rename(oldPath, newPath, (err) =>
@@ -462,8 +279,20 @@ namespace feng3d.editor
             {
                 assert(!err);
 
+                if (this.isDirectory)
+                {
+                    var movefiles = editorAssets.filter((item) => item.path.substr(0, oldpath.length) == oldpath);
+                    movefiles.forEach(element =>
+                    {
+                        debugger;
+                        delete editorAssets.files[element.path];
+                        element.path = newpath + element.path.substr(oldpath.length);
+                        editorAssets.files[element.path] = element;
+                    });
+                }
+                delete editorAssets.files[this.path];
                 this.path = newpath;
-                this.addto(destDir);
+                editorAssets.files[this.path] = this;
 
                 if (this.isDirectory)
                     editorui.assetsview.updateAssetsTree();
@@ -482,15 +311,17 @@ namespace feng3d.editor
          */
         addfolder(newfoldername: string, callback?: (file: AssetsFile) => void)
         {
-            newfoldername = this.getnewchildname(newfoldername);
-            var folderpath = this.path + newfoldername + "/";
+            var folderpath = this.getnewname(this.path + newfoldername);
+            folderpath = folderpath + "/";
 
             fs.mkdir(folderpath, (e) =>
             {
                 assert(!e);
 
-                var assetsFile = new AssetsFile(folderpath);
-                assetsFile.addto(this);
+                editorAssets.files[folderpath] = new AssetsFile(folderpath);
+
+                editorui.assetsview.updateAssetsTree();
+                editorui.assetsview.updateShowFloder();
             });
         }
 
@@ -502,18 +333,19 @@ namespace feng3d.editor
          */
         addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry | Texture2D, override = false, callback?: (file: AssetsFile) => void)
         {
+            var filepath = this.path + filename;
             if (!override)
             {
-                filename = this.getnewchildname(filename);
+                filepath = this.getnewname(filepath);
             }
-            var filepath = this.path + filename;
 
             getcontent(content, (savedata) =>
             {
                 fs.writeFile(filepath, savedata, (e) =>
                 {
                     var assetsFile = new AssetsFile(filepath, content);
-                    assetsFile.addto(this);
+                    editorAssets.files[filepath] = assetsFile;
+
                     callback && callback(this);
                     if (regExps.image.test(assetsFile.path))
                         globalEvent.dispatch("imageAssetsChanged", { url: assetsFile.path });
@@ -560,49 +392,23 @@ namespace feng3d.editor
         }
 
         /**
-         * 过滤出文件列表
-         * @param fn 过滤函数
-         * @param next 是否继续遍历children
-         */
-        filter(fn: (assetsFile: AssetsFile) => boolean, next?: (assetsFile: AssetsFile) => boolean): this[]
-        {
-            var result = [];
-
-            next = next || (() => true);
-
-            if (fn(this))
-                result.push(this);
-
-            if (next(this))
-            {
-                this.children.forEach(element =>
-                {
-                    var childResult = element.filter(fn, next);
-                    result = result.concat(childResult);
-                });
-            }
-            return result;
-        }
-
-        /**
          * 获取一个新的不重名子文件名称
          */
-        private getnewchildname(childname: string)
+        private getnewname(path: string)
         {
-            var childrennames: string[] = this.children.reduce((arr, item) => { arr.push(item.name); return arr; }, []);
-            if (childrennames.indexOf(childname) == -1)
-                return childname;
+            if (editorAssets.getFile(path) == null && editorAssets.getFile(path + "/") == null)
+                return path;
 
             var basepath = "";
             var ext = "";
-            if (childname.indexOf(".") == -1)
+            if (path.indexOf(".") == -1)
             {
-                basepath = childname;
+                basepath = path;
                 ext = "";
             } else
             {
-                basepath = childname.substring(0, childname.indexOf("."));
-                ext = childname.substring(childname.indexOf("."));
+                basepath = path.substring(0, path.indexOf("."));
+                ext = path.substring(path.indexOf("."));
             }
 
             var index = 1;
@@ -610,7 +416,7 @@ namespace feng3d.editor
             {
                 var path = basepath + " " + index + ext;
                 index++;
-            } while (childrennames.indexOf(path) != -1);
+            } while (!(editorAssets.getFile(path) == null && editorAssets.getFile(path + "/") == null));
             return path;
         }
 

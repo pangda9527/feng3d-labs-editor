@@ -8,11 +8,6 @@ namespace feng3d.editor
 
     export var assetsDispather: IEventDispatcher<AssetsEventMap> = new EventDispatcher();
 
-    /**
-     * 根文件
-     */
-    var rootfileinfo: AssetsFile;
-
     export var editorAssets: EditorAssets;
 
     export class EditorAssets
@@ -26,56 +21,67 @@ namespace feng3d.editor
          */
         private _preProjectJsContent = null
 
+        files: { [path: string]: AssetsFile } = {};
+
         //function
         initproject(callback: () => void)
         {
-            //
-            fs.exists(this.assetsPath, (exists) =>
+            fs.mkdir(this.assetsPath, (err) =>
             {
-                if (exists)
+                if (err)
                 {
-                    rootfileinfo = new AssetsFile(this.assetsPath);
-                    rootfileinfo.initChildren(Number.MAX_VALUE, callback);
-                } else
-                {
-                    fs.mkdir(this.assetsPath, (err) =>
-                    {
-                        if (err)
-                        {
-                            alert("初始化项目失败！");
-                            error(err);
-                            return;
-                        }
-                        rootfileinfo = new AssetsFile(this.assetsPath);
-                        rootfileinfo.initChildren(Number.MAX_VALUE, callback);
-                    });
+                    alert("初始化项目失败！");
+                    error(err);
+                    return;
                 }
+                fs.getAllfilepathInFolder("", (err, filepaths) =>
+                {
+                    assert(!err);
+                    filepaths.forEach(element =>
+                    {
+                        this.files[element] = new AssetsFile(element);
+                    });
+                    callback();
+                });
             });
         }
+
         /**
          * 获取文件
          * @param path 文件路径
          */
         getFile(path: string): AssetsFile
         {
-            return rootfileinfo.getFile(path);
+            return this.files[path];
         }
         /**
          * 删除文件
          * @param path 文件路径
          */
-        deletefile(path: string, callback?: (assetsFile: AssetsFile) => void, includeRoot = false)
+        deletefile(path: string, callback?: () => void, includeRoot = false)
         {
-            var assetsFile = this.getFile(path);
-            if (assetsFile)
-                assetsFile.deleteFile(callback, includeRoot);
-            else
+            if (path == this.assetsPath && !includeRoot)
             {
-                fs.delete(path, () =>
-                {
-                    callback(null);
-                });
+                alert("无法删除根目录");
+                return;
             }
+            fs.delete(path, (err) =>
+            {
+                if (err) error(err);
+
+                if (pathUtils.isDirectory)
+                {
+                    Object.keys(this.files).forEach(element =>
+                    {
+                        if (element.indexOf(path) == 0)
+                        {
+                            delete this.files[element];
+                        }
+                    });
+                }
+                delete this.files[path];
+                callback && callback();
+            });
         }
         readScene(path: string, callback: (err: Error, scene: Scene3D) => void)
         {
@@ -231,7 +237,7 @@ namespace feng3d.editor
                 {
                     label: "删除", click: () =>
                     {
-                        assetsFile.deleteFile();
+                        editorAssets.deletefile(assetsFile.path);
                     }
                 });
 
@@ -322,10 +328,16 @@ namespace feng3d.editor
          * @param fn 过滤函数
          * @param next 是否继续遍历children
          */
-        filter(fn: (assetsFile: AssetsFile) => boolean, next?: (assetsFile: AssetsFile) => boolean)
+        filter(fn: (assetsFile: AssetsFile) => boolean)
         {
-            var files = rootfileinfo.filter(fn, next);
-            return files;
+            var results: AssetsFile[] = [];
+            for (const path in this.files)
+            {
+                const element = this.files[path];
+                if (fn(element))
+                    results.push(element);
+            }
+            return results;
         }
         inputFiles(files: File[] | FileList)
         {
@@ -383,7 +395,9 @@ namespace feng3d.editor
                             {
                                 war3.MdlParser.parse(content, (war3Model) =>
                                 {
-                                    war3Model.root = file.parent.name;
+                                    var paths = file.path.split("/");
+                                    paths.pop();
+                                    war3Model.root = paths.join("/") + "/";
                                     var gameobject = war3Model.getMesh();
                                     gameobject.name = file.name;
                                     this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);

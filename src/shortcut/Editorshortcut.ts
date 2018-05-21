@@ -101,7 +101,7 @@ namespace feng3d.editor
                 element.remove();
             } else if (element instanceof AssetsFile)
             {
-                element.deleteFile();
+                editorAssets.deletefile(element.path);
             }
         });
         //
