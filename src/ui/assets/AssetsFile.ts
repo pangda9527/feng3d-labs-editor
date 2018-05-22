@@ -1,74 +1,5 @@
 namespace feng3d.editor
 {
-    export enum AssetExtension
-    {
-        /**
-         * 文件夹
-         */
-        folder = "folder",
-        /**
-         * png 图片
-         */
-        png = "png",
-        /**
-         * jpg图片
-         */
-        jpg = "jpg",
-        /**
-         * jpeg图片
-         */
-        jpeg = "jpeg",
-        /**
-         * gif图片
-         */
-        gif = "gif",
-        /**
-         * ts文件
-         */
-        ts = "ts",
-        /**
-         * js文件
-         */
-        js = "js",
-        /**
-         * 文本文件
-         */
-        txt = "txt",
-        /**
-         * json文件
-         */
-        json = "json",
-        // -- feng3d中的类型
-        /**
-         * 材质
-         */
-        material = "material.json",
-        /**
-         * 几何体
-         */
-        geometry = "geometry.json",
-        /**
-         * 游戏对象
-         */
-        gameobject = "gameobject.json",
-        /**
-         * 场景文件
-         */
-        scene = "scene.json",
-        /**
-         * 动画文件
-         */
-        anim = "anim.json",
-        /**
-         * 着色器文件
-         */
-        shader = "shader.ts",
-        /**
-         * 脚本文件
-         */
-        script = "script.ts",
-    }
-
     export class AssetsFile
     {
         /**
@@ -120,7 +51,7 @@ namespace feng3d.editor
         pathChanged()
         {
             // 更新名字
-            this.name = pathUtils.getName(this.path);
+            this.name = pathUtils.getNameWithExtension(this.path);
             this.label = this.name.split(".").shift();
 
             this.isDirectory = pathUtils.isDirectory(this.path);
@@ -193,6 +124,7 @@ namespace feng3d.editor
                 {
                     var json = JSON.parse(content);
                     this.cacheData = serialization.deserialize(json);
+                    this.cacheData["path"] = this.path;
                     callback(this.cacheData);
                 });
                 return;
@@ -323,6 +255,8 @@ namespace feng3d.editor
                 {
                     var assetsFile = new AssetsFile(filepath, content);
                     editorAssets.files[filepath] = assetsFile;
+
+                    editorui.assetsview.invalidateAssetstree();
 
                     callback && callback(this);
                     if (regExps.image.test(assetsFile.path))

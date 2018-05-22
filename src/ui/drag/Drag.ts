@@ -77,6 +77,11 @@ namespace feng3d.editor
 		 * 图片路径
 		 */
 		image?: string;
+
+		/**
+		 * 立方体贴图
+		 */
+		texturecube?: TextureCube;
 	}
 
 	interface DragItem

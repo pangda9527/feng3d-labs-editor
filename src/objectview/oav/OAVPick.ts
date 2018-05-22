@@ -68,23 +68,23 @@ namespace feng3d.editor
                             }
                         }); return prev;
                     }, []);
-                    if (menus.length == 0)
-                    {
-                        menus.push({ label: `没有 ${param.accepttype} 资源` });
-                    }
+                    menus.unshift({
+                        label: `空图片`, click: () =>
+                        {
+                            this.attributeValue = "";
+                        }
+                    });
                     menu.popup(menus);
                 } else if (param.accepttype == "file_script")
                 {
-                    var tsfiles = editorAssets.filter((file) =>
+                    var materialfiles = editorAssets.filter((file) =>
                     {
                         return file.extension == AssetExtension.script;
                     })
 
-                    if (tsfiles.length > 0)
+                    if (materialfiles.length > 0)
                     {
-                        var scriptClassNames = [];
-
-                        getScriptClassNames(tsfiles, (scriptClassNames) =>
+                        getScriptClassNames(materialfiles, (scriptClassNames) =>
                         {
                             var menus: MenuItem[] = [];
                             scriptClassNames.forEach(element =>
@@ -99,7 +99,34 @@ namespace feng3d.editor
                             });
                             menu.popup(menus);
                         });
+                    } else
+                    {
+                        menu.popup([{ label: `没有 ${param.accepttype} 资源` }]);
+                    }
+                } else if (param.accepttype == "material")
+                {
+                    var materialfiles = editorAssets.filter((file) =>
+                    {
+                        return file.extension == AssetExtension.material;
+                    });
 
+                    if (materialfiles.length > 0)
+                    {
+                        getMaterials(materialfiles, (materials) =>
+                        {
+                            var menus: MenuItem[] = [];
+                            materials.forEach(element =>
+                            {
+                                menus.push({
+                                    label: element.name,
+                                    click: () =>
+                                    {
+                                        this.attributeValue = element;
+                                    }
+                                });
+                            });
+                            menu.popup(menus);
+                        });
                     } else
                     {
                         menu.popup([{ label: `没有 ${param.accepttype} 资源` }]);
@@ -145,6 +172,20 @@ namespace feng3d.editor
         {
             scriptClassNames.push(scriptClassName);
             getScriptClassNames(tsfiles, callback, scriptClassNames);
+        });
+    }
+
+    function getMaterials(tsfiles: AssetsFile[], callback: (materials: Material[]) => void, materials: Material[] = [])
+    {
+        if (tsfiles.length == 0)
+        {
+            callback(materials);
+            return;
+        }
+        tsfiles.shift().getData((material) =>
+        {
+            materials.push(material);
+            getMaterials(tsfiles, callback, materials);
         });
     }
 }

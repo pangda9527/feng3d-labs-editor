@@ -53,10 +53,14 @@ namespace feng3d.editor
                     }
                 }); return prev;
             }, []);
-            if (menus.length == 0)
-            {
-                menus.push({ label: `没有 图片 资源` });
-            }
+            menus.unshift({
+                label: `空`, click: () =>
+                {
+                    var text: Texture2D = this.attributeValue;
+                    text.url = "";
+                    this.updateView();
+                }
+            });
             menu.popup(menus);
         }
 
@@ -81,6 +85,9 @@ namespace feng3d.editor
                         this.img_border.visible = true;
                     });
                 });
+            } else
+            {
+                this.image.source = "";
             }
 
             assets.readFileAsImage
