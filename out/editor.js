@@ -870,7 +870,7 @@ var feng3d;
                     editor.mrsTool.toolType = editor.MRSToolType.SCALE;
                 });
                 feng3d.shortcut.on("selectGameObject", function () {
-                    var gameObject = editor.engine.mouse3DManager.getSelectedGameObject();
+                    var gameObject = editor.engine.mouse3DManager.selectedGameObject;
                     if (!gameObject || !gameObject.scene) {
                         editor.editorData.selectedObjects = null;
                         return;
@@ -1058,7 +1058,7 @@ var feng3d;
                         editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, editor.hierarchyTree.rootnode.gameobject);
                     }
                     if (dragdata.file_script) {
-                        var gameobject = editor.engine.mouse3DManager.getSelectedGameObject();
+                        var gameobject = editor.engine.mouse3DManager.selectedGameObject;
                         if (!gameobject || !gameobject.scene)
                             gameobject = editor.hierarchyTree.rootnode.gameobject;
                         gameobject.addScript(dragdata.file_script);
@@ -1117,7 +1117,7 @@ var feng3d;
                 var canvas = _this.canvas = document.getElementById("cameraPreviewCanvas");
                 ;
                 _this.previewEngine = new feng3d.Engine(canvas);
-                _this.previewEngine.mouse3DManager.setEnable(false);
+                _this.previewEngine.mouse3DManager.enable = false;
                 _this.previewEngine.stop();
                 return _this;
             }

@@ -22,7 +22,7 @@ namespace feng3d.editor
             });
             shortcut.on("selectGameObject", () =>
             {
-                var gameObject = engine.mouse3DManager.getSelectedGameObject();
+                var gameObject = engine.mouse3DManager.selectedGameObject;
                 if (!gameObject || !gameObject.scene)
                 {
                     editorData.selectedObjects = null;

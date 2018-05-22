@@ -37,7 +37,7 @@ namespace feng3d.editor
             //
             var canvas = this.canvas = <HTMLCanvasElement>document.getElementById("cameraPreviewCanvas");;
             this.previewEngine = new Engine(canvas);
-            this.previewEngine.mouse3DManager.setEnable(false);
+            this.previewEngine.mouse3DManager.enable = false;
             this.previewEngine.stop();
         }
 

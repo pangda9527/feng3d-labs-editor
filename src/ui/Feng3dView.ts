@@ -30,7 +30,7 @@ namespace feng3d.editor
 				}
 				if (dragdata.file_script)
 				{
-					var gameobject = engine.mouse3DManager.getSelectedGameObject();
+					var gameobject = engine.mouse3DManager.selectedGameObject;
 					if (!gameobject || !gameobject.scene)
 						gameobject = hierarchyTree.rootnode.gameobject;
 					gameobject.addScript(dragdata.file_script);
