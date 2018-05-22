@@ -466,14 +466,26 @@ declare namespace feng3d.editor {
 }
 declare namespace feng3d.editor {
     class TreeNode {
-        label?: string;
-        depth?: number;
-        isOpen?: boolean;
-        selected?: boolean;
+        /**
+         * 标签
+         */
+        label: string;
+        /**
+         * 目录深度
+         */
+        depth: number;
+        /**
+         * 是否打开
+         */
+        isOpen: boolean;
+        /**
+         * 是否选中
+         */
+        selected: boolean;
         /**
          * 父节点
          */
-        parent?: TreeNode;
+        parent: TreeNode;
         /**
          * 子节点列表
          */
@@ -1062,15 +1074,30 @@ declare namespace feng3d.editor {
         private onListRightClick(e);
     }
 }
-declare namespace feng3d.editor {
-    interface AssetsEventMap {
-        changed: any;
-        openChanged: any;
+declare namespace feng3d {
+    interface Feng3dEventMap {
+        /**
+         * 资源显示文件夹发生变化
+         */
+        "assets.showFloderChanged": {
+            oldpath: string;
+            newpath: string;
+        };
+        /**
+         * 删除文件
+         */
+        "assets.deletefile": {
+            path: string;
+        };
     }
-    var assetsDispather: IEventDispatcher<AssetsEventMap>;
+}
+declare namespace feng3d.editor {
     var editorAssets: EditorAssets;
     class EditorAssets {
         assetsPath: string;
+        /**
+         * 显示文件夹
+         */
         showFloder: string;
         /**
          * 上次执行的项目脚本
@@ -1128,6 +1155,7 @@ declare namespace feng3d.editor {
          * @param assetsFile 文件
          */
         private parserMenu(menuconfig, file);
+        private showFloderChanged(property, oldValue, newValue);
     }
     var codeeditoWin: Window;
 }
@@ -1208,14 +1236,6 @@ declare namespace feng3d.editor {
          */
         isDirectory: boolean;
         /**
-         * 目录深度
-         */
-        depth: number;
-        /**
-         * 文件夹是否打开
-         */
-        isOpen: boolean;
-        /**
          * 图标名称或者路径
          */
         image: egret.Texture | string;
@@ -1235,10 +1255,6 @@ declare namespace feng3d.editor {
          * 是否选中
          */
         selected: boolean;
-        /**
-         * 当前打开文件夹
-         */
-        currentOpenDirectory: boolean;
         /**
          * 缓存下来的数据 避免从文件再次加载解析数据
          */
@@ -1290,7 +1306,6 @@ declare namespace feng3d.editor {
          * @param callback 回调函数
          */
         getScriptClassName(callback: (scriptClassName: string) => void): string;
-        private openChanged();
     }
 }
 declare namespace feng3d.editor {
@@ -1309,11 +1324,35 @@ declare namespace feng3d.editor {
     }
 }
 declare namespace feng3d.editor {
+    var assetsTree: AssetsTree;
+    class AssetsTree {
+        nodes: {
+            [path: string]: AssetsTreeNode;
+        };
+        constructor();
+        getNode(path: string): AssetsTreeNode;
+        private onShowFloderChanged(event);
+    }
+    class AssetsTreeNode extends TreeNode {
+        path: string;
+        /**
+         * 文件夹是否打开
+         */
+        isOpen: boolean;
+        readonly label: string;
+        readonly parent: AssetsTreeNode;
+        readonly assetsFile: AssetsFile;
+        children: AssetsTreeNode[];
+        constructor(path: string);
+        private openChanged();
+    }
+}
+declare namespace feng3d.editor {
     class AssetsTreeItemRenderer extends TreeItemRenderer {
         contentGroup: eui.Group;
         disclosureButton: eui.ToggleButton;
         renameInput: RenameTextInput;
-        assetsFile: AssetsFile;
+        data: AssetsTreeNode;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -1342,10 +1381,10 @@ declare namespace feng3d.editor {
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         private initlist();
-        update(): void;
-        private invalidateAssetstree();
-        updateAssetsTree(): void;
-        updateShowFloder(host?: any, property?: string, oldvalue?: any): void;
+        private update();
+        invalidateAssetstree(): void;
+        private updateAssetsTree();
+        private updateShowFloder(host?, property?, oldvalue?);
         private onfilter();
         private selectedfilechanged();
         private selectfile_nameChanged();
@@ -1861,13 +1900,7 @@ declare namespace feng3d.editor {
 }
 declare namespace feng3d.editor {
     class HierarchyNode extends TreeNode {
-        label?: string;
-        depth?: number;
         isOpen: boolean;
-        /**
-         * 是否选中
-         */
-        selected?: boolean;
         /**
          * 游戏对象
          */
@@ -1875,7 +1908,7 @@ declare namespace feng3d.editor {
         /**
          * 父节点
          */
-        parent?: HierarchyNode;
+        parent: HierarchyNode;
         /**
          * 子节点列表
          */

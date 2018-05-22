@@ -82,17 +82,6 @@ namespace feng3d.editor
         isDirectory: boolean;
 
         /**
-         * 目录深度
-         */
-        depth = 0;
-
-        /**
-         * 文件夹是否打开
-         */
-        @watch("openChanged")
-        isOpen = true;
-
-        /**
          * 图标名称或者路径
          */
         image: egret.Texture | string;
@@ -118,11 +107,6 @@ namespace feng3d.editor
         selected = false;
 
         /**
-         * 当前打开文件夹
-         */
-        currentOpenDirectory = false;
-
-        /**
          * 缓存下来的数据 避免从文件再次加载解析数据
          */
         cacheData: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D;
@@ -145,8 +129,6 @@ namespace feng3d.editor
                 this.extension = AssetExtension.folder;
             else
                 this.extension = <AssetExtension>pathUtils.getExtension(this.path);
-
-            this.depth = pathUtils.getDirDepth(this.path);
 
             // 更新图标
             if (this.isDirectory)
@@ -250,7 +232,7 @@ namespace feng3d.editor
                 assert(!err);
                 this.path = newPath;
                 if (this.isDirectory)
-                    editorui.assetsview.updateAssetsTree();
+                    editorui.assetsview.invalidateAssetstree();
                 if (editorAssets.showFloder == oldPath)
                 {
                     editorAssets.showFloder = newPath;
@@ -295,7 +277,7 @@ namespace feng3d.editor
                 editorAssets.files[this.path] = this;
 
                 if (this.isDirectory)
-                    editorui.assetsview.updateAssetsTree();
+                    editorui.assetsview.invalidateAssetstree();
                 if (editorAssets.showFloder == oldpath)
                 {
                     editorAssets.showFloder = newpath;
@@ -319,9 +301,7 @@ namespace feng3d.editor
                 assert(!e);
 
                 editorAssets.files[folderpath] = new AssetsFile(folderpath);
-
-                editorui.assetsview.updateAssetsTree();
-                editorui.assetsview.updateShowFloder();
+                editorui.assetsview.invalidateAssetstree();
             });
         }
 
@@ -348,7 +328,7 @@ namespace feng3d.editor
 
                     callback && callback(this);
                     if (regExps.image.test(assetsFile.path))
-                        globalEvent.dispatch("imageAssetsChanged", { url: assetsFile.path });
+                    feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
                 });
             });
 
@@ -444,11 +424,6 @@ namespace feng3d.editor
                 }
                 callback(script);
             });
-        }
-
-        private openChanged()
-        {
-            assetsDispather.dispatch("openChanged");
         }
     }
 }

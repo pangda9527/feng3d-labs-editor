@@ -2,14 +2,8 @@ namespace feng3d.editor
 {
     export class HierarchyNode extends TreeNode
     {
-        label?: string;
-        depth?: number;
         isOpen = false;
 
-        /**
-         * 是否选中
-         */
-        selected?: boolean;
         /**
          * 游戏对象
          */
@@ -17,7 +11,7 @@ namespace feng3d.editor
         /** 
          * 父节点
          */
-        parent?: HierarchyNode;
+        parent: HierarchyNode = null;
         /**
          * 子节点列表
          */

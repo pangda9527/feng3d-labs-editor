@@ -2,14 +2,26 @@ namespace feng3d.editor
 {
 	export class TreeNode
 	{
-		label?: string;
-		depth?: number;
-		isOpen?: boolean;
-		selected?: boolean;
+		/**
+		 * 标签
+		 */
+		label = "";
+		/**
+         * 目录深度
+         */
+		depth = 0;
+		/**
+		 * 是否打开
+		 */
+		isOpen = true;
+		/**
+		 * 是否选中
+		 */
+		selected = false;
         /** 
          * 父节点
          */
-		parent?: TreeNode;
+		parent: TreeNode = null;
         /**
          * 子节点列表
          */

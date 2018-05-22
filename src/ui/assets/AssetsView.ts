@@ -41,7 +41,7 @@ namespace feng3d.editor
         {
             super.$onAddToStage(stage, nestLevel);
 
-            this.excludeTxt.text = "(\\.d\\.ts|\\.js\\.map|\\.js)\\b";
+            this.excludeTxt.text = "";
             this.filepathLabel.text = "";
 
             //
@@ -89,9 +89,6 @@ namespace feng3d.editor
 
             watcher.watch(editorData, "selectedObjects", this.selectedfilechanged, this);
             watcher.watchchain(this, "selectfile.name", this.selectfile_nameChanged, this);
-
-            assetsDispather.on("changed", this.invalidateAssetstree, this);
-            assetsDispather.on("openChanged", this.invalidateAssetstree, this);
         }
 
         $onRemoveFromStage()
@@ -109,9 +106,6 @@ namespace feng3d.editor
 
             watcher.unwatch(editorData, "selectedObjects", this.selectedfilechanged, this);
 
-            assetsDispather.off("changed", this.invalidateAssetstree, this);
-            assetsDispather.off("openChanged", this.invalidateAssetstree, this);
-
             //
             drag.unregister(this.filelistgroup);
 
@@ -126,7 +120,7 @@ namespace feng3d.editor
             });
         }
 
-        update()
+        private update()
         {
             if (this._assetstreeInvalid)
             {
@@ -136,54 +130,43 @@ namespace feng3d.editor
             }
         }
 
-        private invalidateAssetstree()
+        invalidateAssetstree()
         {
             this._assetstreeInvalid = true;
             this.once(egret.Event.ENTER_FRAME, this.update, this);
         }
 
-        updateAssetsTree()
+        private updateAssetsTree()
         {
             var paths = Object.keys(editorAssets.files).filter((item) => pathUtils.isDirectory(item)).sort();
 
-            var nodes: AssetsFile[] = [];
+            var nodes: AssetsTreeNode[] = [];
             var closepath: string;
             for (let i = 0, n = paths.length; i < n; i++)
             {
                 const element = paths[i];
+                var node = assetsTree.getNode(element);
+                node.children.length = 0;
+                var nodeparent = node.parent;
+                if (nodeparent)
+                    nodeparent.children.push(node);
+                // node.selected = element == editorAssets.showFloder;
+
                 if (closepath)
                 {
                     if (element.substr(0, closepath.length) == closepath)
                         continue;
                     closepath = null;
                 }
-                var assetsFile = editorAssets.getFile(element);
-                if (!assetsFile.isOpen)
-                    closepath = assetsFile.path;
-                nodes.push(assetsFile);
+                if (!node.isOpen)
+                    closepath = element;
+                nodes.push(node);
             }
             this.listData.replaceAll(nodes);
         }
 
-        updateShowFloder(host?: any, property?: string, oldvalue?: any)
+        private updateShowFloder(host?: any, property?: string, oldvalue?: any)
         {
-            if (oldvalue)
-            {
-                var oldnode = editorAssets.getFile(oldvalue);
-                if (oldnode)
-                {
-                    oldnode.currentOpenDirectory = false;
-                }
-            }
-            if (editorAssets.showFloder)
-            {
-                var newnode = editorAssets.getFile(editorAssets.showFloder);
-                if (newnode)
-                {
-                    newnode.currentOpenDirectory = true;
-                }
-            }
-
             var floders = editorAssets.showFloder.split("/");
             // 除去尾部 ""
             floders.pop();
@@ -342,6 +325,4 @@ namespace feng3d.editor
             }
         }
     }
-
-
 }

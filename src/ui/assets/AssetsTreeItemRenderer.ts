@@ -6,7 +6,7 @@ namespace feng3d.editor
         public disclosureButton: eui.ToggleButton;
         public renameInput: RenameTextInput;
 
-        assetsFile: AssetsFile;
+        data: AssetsTreeNode;
 
         constructor()
         {
@@ -36,6 +36,8 @@ namespace feng3d.editor
         {
             super.dataChanged();
 
+            
+
             if (this.data)
             {
                 this.renameInput.text = this.data.label;
@@ -61,7 +63,7 @@ namespace feng3d.editor
 
         private onrightclick(e)
         {
-            editorAssets.popupmenu(this.data);
+            editorAssets.popupmenu(this.data.assetsFile);
         }
 
         private onnameLabelclick()
@@ -73,8 +75,8 @@ namespace feng3d.editor
             {
                 this.renameInput.edit(() =>
                 {
-                    var newName = this.data.name.replace(this.data.label, this.renameInput.text);
-                    this.data.rename(newName);
+                    var newName = this.data.assetsFile.name.replace(this.data.label, this.renameInput.text);
+                    this.data.assetsFile.rename(newName);
                 });
             }
         }

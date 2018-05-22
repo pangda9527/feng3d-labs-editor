@@ -1877,6 +1877,26 @@ var feng3d;
     (function (editor) {
         var TreeNode = /** @class */ (function () {
             function TreeNode(obj) {
+                /**
+                 * 标签
+                 */
+                this.label = "";
+                /**
+                 * 目录深度
+                 */
+                this.depth = 0;
+                /**
+                 * 是否打开
+                 */
+                this.isOpen = true;
+                /**
+                 * 是否选中
+                 */
+                this.selected = false;
+                /**
+                 * 父节点
+                 */
+                this.parent = null;
                 if (obj) {
                     Object.assign(this, obj);
                 }
@@ -2158,7 +2178,7 @@ var feng3d;
                     feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
                 this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
                 this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-                feng3d.globalEvent.on("scriptChanged", this.onScriptChanged, this);
+                feng3d.feng3dDispatcher.on("assets.scriptChanged", this.onScriptChanged, this);
             };
             ComponentView.prototype.onRemovedFromStage = function () {
                 this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
@@ -2166,7 +2186,7 @@ var feng3d;
                     feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
                 this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
                 this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-                feng3d.globalEvent.off("scriptChanged", this.onScriptChanged, this);
+                feng3d.feng3dDispatcher.off("assets.scriptChanged", this.onScriptChanged, this);
             };
             ComponentView.prototype.updateEnableCB = function () {
                 if (this.component instanceof feng3d.Behaviour) {
@@ -3581,11 +3601,11 @@ var feng3d;
             }
             OAVMaterialName.prototype.initView = function () {
                 this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-                feng3d.globalEvent.on("shaderChanged", this.onShaderComboBoxChange, this);
+                feng3d.feng3dDispatcher.on("assets.shaderChanged", this.onShaderComboBoxChange, this);
             };
             OAVMaterialName.prototype.dispose = function () {
                 this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-                feng3d.globalEvent.off("shaderChanged", this.onShaderComboBoxChange, this);
+                feng3d.feng3dDispatcher.off("assets.shaderChanged", this.onShaderComboBoxChange, this);
             };
             OAVMaterialName.prototype.updateView = function () {
                 var material = this.space;
@@ -4126,11 +4146,13 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        editor.assetsDispather = new feng3d.EventDispatcher();
         var EditorAssets = /** @class */ (function () {
             function EditorAssets() {
                 //attribute
                 this.assetsPath = "Assets/";
+                /**
+                 * 显示文件夹
+                 */
                 this.showFloder = "Assets/";
                 /**
                  * 上次执行的项目脚本
@@ -4181,10 +4203,16 @@ var feng3d;
                         Object.keys(_this.files).forEach(function (element) {
                             if (element.indexOf(path) == 0) {
                                 delete _this.files[element];
+                                feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: element });
                             }
                         });
+                        if (editor.editorAssets.showFloder == path) {
+                            editor.editorAssets.showFloder = feng3d.pathUtils.getParentPath(path);
+                        }
+                        editor.editorui.assetsview.invalidateAssetstree();
                     }
                     delete _this.files[path];
+                    feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: path });
                     callback && callback();
                 });
             };
@@ -4516,6 +4544,12 @@ var feng3d;
                         break;
                 }
             };
+            EditorAssets.prototype.showFloderChanged = function (property, oldValue, newValue) {
+                feng3d.feng3dDispatcher.dispatch("assets.showFloderChanged", { oldpath: oldValue, newpath: newValue });
+            };
+            __decorate([
+                feng3d.watch("showFloderChanged")
+            ], EditorAssets.prototype, "showFloder", void 0);
             return EditorAssets;
         }());
         editor.EditorAssets = EditorAssets;
@@ -4597,21 +4631,9 @@ var feng3d;
         var AssetsFile = /** @class */ (function () {
             function AssetsFile(path, data) {
                 /**
-                 * 目录深度
-                 */
-                this.depth = 0;
-                /**
-                 * 文件夹是否打开
-                 */
-                this.isOpen = true;
-                /**
                  * 是否选中
                  */
                 this.selected = false;
-                /**
-                 * 当前打开文件夹
-                 */
-                this.currentOpenDirectory = false;
                 this.path = path;
                 this.cacheData = data;
             }
@@ -4625,7 +4647,6 @@ var feng3d;
                     this.extension = AssetExtension.folder;
                 else
                     this.extension = feng3d.pathUtils.getExtension(this.path);
-                this.depth = feng3d.pathUtils.getDirDepth(this.path);
                 // 更新图标
                 if (this.isDirectory) {
                     this.image = "folder_png";
@@ -4708,7 +4729,7 @@ var feng3d;
                     feng3d.assert(!err);
                     _this.path = newPath;
                     if (_this.isDirectory)
-                        editor.editorui.assetsview.updateAssetsTree();
+                        editor.editorui.assetsview.invalidateAssetstree();
                     if (editor.editorAssets.showFloder == oldPath) {
                         editor.editorAssets.showFloder = newPath;
                     }
@@ -4745,7 +4766,7 @@ var feng3d;
                     _this.path = newpath;
                     editor.editorAssets.files[_this.path] = _this;
                     if (_this.isDirectory)
-                        editor.editorui.assetsview.updateAssetsTree();
+                        editor.editorui.assetsview.invalidateAssetstree();
                     if (editor.editorAssets.showFloder == oldpath) {
                         editor.editorAssets.showFloder = newpath;
                     }
@@ -4763,8 +4784,7 @@ var feng3d;
                 editor.fs.mkdir(folderpath, function (e) {
                     feng3d.assert(!e);
                     editor.editorAssets.files[folderpath] = new AssetsFile(folderpath);
-                    editor.editorui.assetsview.updateAssetsTree();
-                    editor.editorui.assetsview.updateShowFloder();
+                    editor.editorui.assetsview.invalidateAssetstree();
                 });
             };
             /**
@@ -4786,7 +4806,7 @@ var feng3d;
                         editor.editorAssets.files[filepath] = assetsFile;
                         callback && callback(_this);
                         if (editor.regExps.image.test(assetsFile.path))
-                            feng3d.globalEvent.dispatch("imageAssetsChanged", { url: assetsFile.path });
+                            feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
                     });
                 });
                 function getcontent(content, callback) {
@@ -4864,15 +4884,9 @@ var feng3d;
                     callback(script);
                 });
             };
-            AssetsFile.prototype.openChanged = function () {
-                editor.assetsDispather.dispatch("openChanged");
-            };
             __decorate([
                 feng3d.watch("pathChanged")
             ], AssetsFile.prototype, "path", void 0);
-            __decorate([
-                feng3d.watch("openChanged")
-            ], AssetsFile.prototype, "isOpen", void 0);
             return AssetsFile;
         }());
         editor.AssetsFile = AssetsFile;
@@ -5004,6 +5018,81 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
+        var AssetsTree = /** @class */ (function () {
+            function AssetsTree() {
+                this.nodes = {};
+                feng3d.feng3dDispatcher.on("assets.showFloderChanged", this.onShowFloderChanged, this);
+            }
+            AssetsTree.prototype.getNode = function (path) {
+                var node = this.nodes[path];
+                if (!node)
+                    node = this.nodes[path] = new AssetsTreeNode(path);
+                if (path == editor.editorAssets.showFloder)
+                    node.selected = true;
+                return node;
+            };
+            AssetsTree.prototype.onShowFloderChanged = function (event) {
+                var oldnode = this.getNode(event.data.oldpath);
+                if (oldnode)
+                    oldnode.selected = false;
+                var node = this.getNode(event.data.newpath);
+                if (node)
+                    node.selected = true;
+            };
+            return AssetsTree;
+        }());
+        editor.AssetsTree = AssetsTree;
+        editor.assetsTree = new AssetsTree();
+        var AssetsTreeNode = /** @class */ (function (_super) {
+            __extends(AssetsTreeNode, _super);
+            function AssetsTreeNode(path) {
+                var _this = _super.call(this) || this;
+                /**
+                 * 文件夹是否打开
+                 */
+                _this.isOpen = true;
+                _this.children = [];
+                _this.path = path;
+                _this.depth = feng3d.pathUtils.getDirDepth(path);
+                return _this;
+            }
+            Object.defineProperty(AssetsTreeNode.prototype, "label", {
+                get: function () {
+                    return this.assetsFile.label;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(AssetsTreeNode.prototype, "parent", {
+                get: function () {
+                    var parentpath = feng3d.pathUtils.getParentPath(this.path);
+                    return editor.assetsTree.nodes[parentpath];
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(AssetsTreeNode.prototype, "assetsFile", {
+                get: function () {
+                    return editor.editorAssets.getFile(this.path);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AssetsTreeNode.prototype.openChanged = function () {
+                editor.editorui.assetsview.invalidateAssetstree();
+            };
+            __decorate([
+                feng3d.watch("openChanged")
+            ], AssetsTreeNode.prototype, "isOpen", void 0);
+            return AssetsTreeNode;
+        }(editor.TreeNode));
+        editor.AssetsTreeNode = AssetsTreeNode;
+    })(editor = feng3d.editor || (feng3d.editor = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var editor;
+    (function (editor) {
         var AssetsTreeItemRenderer = /** @class */ (function (_super) {
             __extends(AssetsTreeItemRenderer, _super);
             function AssetsTreeItemRenderer() {
@@ -5044,7 +5133,7 @@ var feng3d;
                 editor.editorAssets.showFloder = this.data.path;
             };
             AssetsTreeItemRenderer.prototype.onrightclick = function (e) {
-                editor.editorAssets.popupmenu(this.data);
+                editor.editorAssets.popupmenu(this.data.assetsFile);
             };
             AssetsTreeItemRenderer.prototype.onnameLabelclick = function () {
                 var _this = this;
@@ -5052,8 +5141,8 @@ var feng3d;
                     return;
                 if (this.data.selected && !feng3d.windowEventProxy.rightmouse) {
                     this.renameInput.edit(function () {
-                        var newName = _this.data.name.replace(_this.data.label, _this.renameInput.text);
-                        _this.data.rename(newName);
+                        var newName = _this.data.assetsFile.name.replace(_this.data.label, _this.renameInput.text);
+                        _this.data.assetsFile.rename(newName);
                     });
                 }
             };
@@ -5086,7 +5175,7 @@ var feng3d;
             };
             AssetsView.prototype.$onAddToStage = function (stage, nestLevel) {
                 _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-                this.excludeTxt.text = "(\\.d\\.ts|\\.js\\.map|\\.js)\\b";
+                this.excludeTxt.text = "";
                 this.filepathLabel.text = "";
                 //
                 editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject", "animationclip", "material", "geometry"], function (dragSource) {
@@ -5122,8 +5211,6 @@ var feng3d;
                 feng3d.watcher.watch(editor.editorAssets, "showFloder", this.updateShowFloder, this);
                 feng3d.watcher.watch(editor.editorData, "selectedObjects", this.selectedfilechanged, this);
                 feng3d.watcher.watchchain(this, "selectfile.name", this.selectfile_nameChanged, this);
-                editor.assetsDispather.on("changed", this.invalidateAssetstree, this);
-                editor.assetsDispather.on("openChanged", this.invalidateAssetstree, this);
             };
             AssetsView.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
@@ -5134,8 +5221,6 @@ var feng3d;
                 this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
                 feng3d.watcher.unwatch(editor.editorAssets, "showFloder", this.updateShowFloder, this);
                 feng3d.watcher.unwatch(editor.editorData, "selectedObjects", this.selectedfilechanged, this);
-                editor.assetsDispather.off("changed", this.invalidateAssetstree, this);
-                editor.assetsDispather.off("openChanged", this.invalidateAssetstree, this);
                 //
                 editor.drag.unregister(this.filelistgroup);
                 this.fileDrag.removeEventListener();
@@ -5163,32 +5248,25 @@ var feng3d;
                 var closepath;
                 for (var i = 0, n = paths.length; i < n; i++) {
                     var element = paths[i];
+                    var node = editor.assetsTree.getNode(element);
+                    node.children.length = 0;
+                    var nodeparent = node.parent;
+                    if (nodeparent)
+                        nodeparent.children.push(node);
+                    // node.selected = element == editorAssets.showFloder;
                     if (closepath) {
                         if (element.substr(0, closepath.length) == closepath)
                             continue;
                         closepath = null;
                     }
-                    var assetsFile = editor.editorAssets.getFile(element);
-                    if (!assetsFile.isOpen)
-                        closepath = assetsFile.path;
-                    nodes.push(assetsFile);
+                    if (!node.isOpen)
+                        closepath = element;
+                    nodes.push(node);
                 }
                 this.listData.replaceAll(nodes);
             };
             AssetsView.prototype.updateShowFloder = function (host, property, oldvalue) {
                 var _this = this;
-                if (oldvalue) {
-                    var oldnode = editor.editorAssets.getFile(oldvalue);
-                    if (oldnode) {
-                        oldnode.currentOpenDirectory = false;
-                    }
-                }
-                if (editor.editorAssets.showFloder) {
-                    var newnode = editor.editorAssets.getFile(editor.editorAssets.showFloder);
-                    if (newnode) {
-                        newnode.currentOpenDirectory = true;
-                    }
-                }
                 var floders = editor.editorAssets.showFloder.split("/");
                 // 除去尾部 ""
                 floders.pop();
@@ -7452,6 +7530,10 @@ var feng3d;
             function HierarchyNode(obj) {
                 var _this = _super.call(this, obj) || this;
                 _this.isOpen = false;
+                /**
+                 * 父节点
+                 */
+                _this.parent = null;
                 /**
                  * 子节点列表
                  */
@@ -10402,8 +10484,7 @@ var feng3d;
                                 editor.editorAssets.runProjectScript(function () {
                                     editor.editorAssets.readScene("default.scene.json", function (err, scene) {
                                         editor.engine.scene = scene;
-                                        editor.editorui.assetsview.updateShowFloder();
-                                        editor.assetsDispather.dispatch("changed");
+                                        editor.editorui.assetsview.invalidateAssetstree();
                                         console.log("导入项目完成!");
                                     });
                                 });
@@ -10465,8 +10546,7 @@ var feng3d;
                         editor.editorAssets.initproject(function () {
                             editor.editorAssets.runProjectScript(function () {
                                 editor.engine.scene = editor.creatNewScene();
-                                editor.editorui.assetsview.updateShowFloder();
-                                editor.assetsDispather.dispatch("changed");
+                                editor.editorui.assetsview.invalidateAssetstree();
                                 console.log("清空项目完成!");
                             });
                         });
@@ -10639,8 +10719,7 @@ var feng3d;
                         editor.editorAssets.runProjectScript(function () {
                             editor.editorAssets.readScene("default.scene.json", function (err, scene) {
                                 editor.engine.scene = scene;
-                                editor.editorui.assetsview.updateShowFloder();
-                                editor.assetsDispather.dispatch("changed");
+                                editor.editorui.assetsview.invalidateAssetstree();
                                 console.log(projectname + " \u9879\u76EE\u4E0B\u8F7D\u5B8C\u6210!");
                                 callback && callback();
                             });

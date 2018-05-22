@@ -1,12 +1,20 @@
+namespace feng3d
+{
+    export interface Feng3dEventMap
+    {
+        /**
+         * 资源显示文件夹发生变化
+         */
+        "assets.showFloderChanged": { oldpath: string, newpath: string };
+        /**
+         * 删除文件
+         */
+        "assets.deletefile": { path: string };
+    }
+}
+
 namespace feng3d.editor
 {
-    export interface AssetsEventMap
-    {
-        changed
-        openChanged
-    }
-
-    export var assetsDispather: IEventDispatcher<AssetsEventMap> = new EventDispatcher();
 
     export var editorAssets: EditorAssets;
 
@@ -14,6 +22,11 @@ namespace feng3d.editor
     {
         //attribute
         assetsPath = "Assets/";
+
+        /**
+         * 显示文件夹
+         */
+        @watch("showFloderChanged")
         showFloder = "Assets/";
 
         /**
@@ -76,10 +89,17 @@ namespace feng3d.editor
                         if (element.indexOf(path) == 0)
                         {
                             delete this.files[element];
+                            feng3dDispatcher.dispatch("assets.deletefile", { path: element });
                         }
                     });
+                    if (editorAssets.showFloder == path)
+                    {
+                        editorAssets.showFloder = pathUtils.getParentPath(path);
+                    }
+                    editorui.assetsview.invalidateAssetstree();
                 }
                 delete this.files[path];
+                feng3dDispatcher.dispatch("assets.deletefile", { path: path });
                 callback && callback();
             });
         }
@@ -474,6 +494,11 @@ namespace feng3d.editor
                     });
                     break;
             }
+        }
+
+        private showFloderChanged(property, oldValue, newValue)
+        {
+            feng3dDispatcher.dispatch("assets.showFloderChanged", { oldpath: oldValue, newpath: newValue });
         }
     }
 

@@ -22,13 +22,13 @@ namespace feng3d.editor
         initView()
         {
             this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-            globalEvent.on("shaderChanged", this.onShaderComboBoxChange, this);
+            feng3dDispatcher.on("assets.shaderChanged", this.onShaderComboBoxChange, this);
         }
 
         dispose()
         {
             this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-            globalEvent.off("shaderChanged", this.onShaderComboBoxChange, this);
+            feng3dDispatcher.off("assets.shaderChanged", this.onShaderComboBoxChange, this);
         }
 
         updateView()
