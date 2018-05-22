@@ -65,6 +65,7 @@ namespace feng3d.editor
 
     export class CoordinateAxis extends Component
     {
+        private isinit: boolean;
         private segmentMaterial: SegmentMaterial;
         private material: ColorMaterial;
 
@@ -75,9 +76,8 @@ namespace feng3d.editor
         private length: number = 100;
 
         //
-        get selected() { return this._selected; }
-        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
-        private _selected = false;
+        @watch("update")
+        selected = false;
 
         init(gameObject: GameObject)
         {
@@ -98,8 +98,6 @@ namespace feng3d.editor
             this.xArrow.mouselayer = mouselayer.editor;
             this.gameObject.addChild(this.xArrow);
 
-            this.update();
-
             var mouseHit = GameObject.create("hitCoordinateAxis");
             meshRenderer = mouseHit.addComponent(MeshRenderer);
             meshRenderer.geometry = new CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length });
@@ -109,10 +107,14 @@ namespace feng3d.editor
             mouseHit.mouseEnabled = true;
             mouseHit.mouselayer = mouselayer.editor;
             this.gameObject.addChild(mouseHit);
+            
+            this.isinit = true;
+            this.update();
         }
 
-        private update()
+        update()
         {
+            if (!this.isinit) return;
             var color = this.selected ? this.selectedColor : this.color;
             this.segmentMaterial.uniforms.u_segmentColor = color;
             //
@@ -123,15 +125,15 @@ namespace feng3d.editor
 
     export class CoordinateCube extends Component
     {
+        private isinit = false;
         private colorMaterial: ColorMaterial;
         private oCube: GameObject;
 
         color = new Color4(1, 1, 1, 0.99);
         selectedColor = new Color4(1, 1, 0, 0.99);
         //
-        get selected() { return this._selected; }
-        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
-        private _selected = false;
+        @watch("update")
+        selected = false;
 
         init(gameObject: GameObject)
         {
@@ -145,17 +147,20 @@ namespace feng3d.editor
             this.oCube.mouselayer = mouselayer.editor;
             this.gameObject.addChild(this.oCube);
 
+            this.isinit = true;
             this.update();
         }
 
         update()
         {
+            if (!this.isinit) return;
             this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
         }
     }
 
     export class CoordinatePlane extends Component
     {
+        private isinit: boolean;
         private colorMaterial: ColorMaterial;
         private segmentGeometry: SegmentGeometry;
 
@@ -169,9 +174,8 @@ namespace feng3d.editor
         get width() { return this._width; }
         private _width = 20
         //
-        get selected() { return this._selected; }
-        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
-        private _selected = false;
+        @watch("update")
+        selected = false;
 
         init(gameObject: GameObject)
         {
@@ -195,11 +199,14 @@ namespace feng3d.editor
             material.renderParams.enableBlend = true;
             this.gameObject.addChild(border);
 
+            this.isinit = true;
             this.update();
         }
 
         update()
         {
+            if (!this.isinit) return;
+
             this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
 
             var color = this.selected ? this.selectedborderColor : this.borderColor;

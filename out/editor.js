@@ -1502,6 +1502,7 @@ var feng3d;
                     //
                     maskReck.addEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
                     displayObject.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromStage, null);
+                    feng3d.shortcut.activityState("inMode");
                 }
                 function removeDisplayObject() {
                     if (displayObject.parent)
@@ -1514,6 +1515,9 @@ var feng3d;
                     if (maskReck.parent) {
                         maskReck.parent.removeChild(maskReck);
                     }
+                    feng3d.ticker.onceframe(function () {
+                        feng3d.shortcut.deactivityState("inMode");
+                    });
                 }
             };
             return Maskview;
@@ -6321,17 +6325,10 @@ var feng3d;
                 _this.color = new feng3d.Color4(1, 0, 0, 0.99);
                 _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
                 _this.length = 100;
-                _this._selected = false;
+                //
+                _this.selected = false;
                 return _this;
             }
-            Object.defineProperty(CoordinateAxis.prototype, "selected", {
-                //
-                get: function () { return this._selected; },
-                set: function (value) { if (this._selected == value)
-                    return; this._selected = value; this.update(); },
-                enumerable: true,
-                configurable: true
-            });
             CoordinateAxis.prototype.init = function (gameObject) {
                 _super.prototype.init.call(this, gameObject);
                 var xLine = feng3d.GameObject.create();
@@ -6348,7 +6345,6 @@ var feng3d;
                 this.xArrow.transform.y = this.length;
                 this.xArrow.mouselayer = feng3d.mouselayer.editor;
                 this.gameObject.addChild(this.xArrow);
-                this.update();
                 var mouseHit = feng3d.GameObject.create("hitCoordinateAxis");
                 meshRenderer = mouseHit.addComponent(feng3d.MeshRenderer);
                 meshRenderer.geometry = new feng3d.CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length });
@@ -6358,14 +6354,21 @@ var feng3d;
                 mouseHit.mouseEnabled = true;
                 mouseHit.mouselayer = feng3d.mouselayer.editor;
                 this.gameObject.addChild(mouseHit);
+                this.isinit = true;
+                this.update();
             };
             CoordinateAxis.prototype.update = function () {
+                if (!this.isinit)
+                    return;
                 var color = this.selected ? this.selectedColor : this.color;
                 this.segmentMaterial.uniforms.u_segmentColor = color;
                 //
                 this.material.uniforms.u_diffuseInput = color;
                 this.segmentMaterial.renderParams.enableBlend = this.material.renderParams.enableBlend = color.a < 1;
             };
+            __decorate([
+                feng3d.watch("update")
+            ], CoordinateAxis.prototype, "selected", void 0);
             return CoordinateAxis;
         }(feng3d.Component));
         editor.CoordinateAxis = CoordinateAxis;
@@ -6373,19 +6376,13 @@ var feng3d;
             __extends(CoordinateCube, _super);
             function CoordinateCube() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.isinit = false;
                 _this.color = new feng3d.Color4(1, 1, 1, 0.99);
                 _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
-                _this._selected = false;
+                //
+                _this.selected = false;
                 return _this;
             }
-            Object.defineProperty(CoordinateCube.prototype, "selected", {
-                //
-                get: function () { return this._selected; },
-                set: function (value) { if (this._selected == value)
-                    return; this._selected = value; this.update(); },
-                enumerable: true,
-                configurable: true
-            });
             CoordinateCube.prototype.init = function (gameObject) {
                 _super.prototype.init.call(this, gameObject);
                 //
@@ -6396,11 +6393,17 @@ var feng3d;
                 this.oCube.mouseEnabled = true;
                 this.oCube.mouselayer = feng3d.mouselayer.editor;
                 this.gameObject.addChild(this.oCube);
+                this.isinit = true;
                 this.update();
             };
             CoordinateCube.prototype.update = function () {
+                if (!this.isinit)
+                    return;
                 this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
             };
+            __decorate([
+                feng3d.watch("update")
+            ], CoordinateCube.prototype, "selected", void 0);
             return CoordinateCube;
         }(feng3d.Component));
         editor.CoordinateCube = CoordinateCube;
@@ -6413,20 +6416,13 @@ var feng3d;
                 _this.selectedColor = new feng3d.Color4(1, 0, 0, 0.5);
                 _this.selectedborderColor = new feng3d.Color4(1, 1, 0, 0.99);
                 _this._width = 20;
-                _this._selected = false;
+                //
+                _this.selected = false;
                 return _this;
             }
             Object.defineProperty(CoordinatePlane.prototype, "width", {
                 //
                 get: function () { return this._width; },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(CoordinatePlane.prototype, "selected", {
-                //
-                get: function () { return this._selected; },
-                set: function (value) { if (this._selected == value)
-                    return; this._selected = value; this.update(); },
                 enumerable: true,
                 configurable: true
             });
@@ -6448,9 +6444,12 @@ var feng3d;
                 material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
                 material.renderParams.enableBlend = true;
                 this.gameObject.addChild(border);
+                this.isinit = true;
                 this.update();
             };
             CoordinatePlane.prototype.update = function () {
+                if (!this.isinit)
+                    return;
                 this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
                 var color = this.selected ? this.selectedborderColor : this.borderColor;
                 this.segmentGeometry.segments = [{ start: new feng3d.Vector3(0, 0, 0), end: new feng3d.Vector3(this._width, 0, 0), startColor: color, endColor: color }];
@@ -6461,6 +6460,9 @@ var feng3d;
                 color = this.selected ? this.selectedborderColor : this.borderColor;
                 this.segmentGeometry.segments.push({ start: new feng3d.Vector3(0, 0, this._width), end: new feng3d.Vector3(0, 0, 0), startColor: color, endColor: color });
             };
+            __decorate([
+                feng3d.watch("update")
+            ], CoordinatePlane.prototype, "selected", void 0);
             return CoordinatePlane;
         }(feng3d.Component));
         editor.CoordinatePlane = CoordinatePlane;
@@ -6519,26 +6521,10 @@ var feng3d;
                 _this.color = new feng3d.Color4(1, 0, 0, 0.99);
                 _this.backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
                 _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
-                _this._selected = false;
+                //
+                _this.selected = false;
                 return _this;
             }
-            Object.defineProperty(CoordinateRotationAxis.prototype, "selected", {
-                //
-                get: function () { return this._selected; },
-                set: function (value) { if (this._selected == value)
-                    return; this._selected = value; this.update(); },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(CoordinateRotationAxis.prototype, "filterNormal", {
-                /**
-                 * 过滤法线显示某一面线条
-                 */
-                get: function () { return this._filterNormal; },
-                set: function (value) { this._filterNormal = value; this.update(); },
-                enumerable: true,
-                configurable: true
-            });
             CoordinateRotationAxis.prototype.init = function (gameObject) {
                 _super.prototype.init.call(this, gameObject);
                 this.initModels();
@@ -6561,17 +6547,20 @@ var feng3d;
                 mouseHit.mouselayer = feng3d.mouselayer.editor;
                 mouseHit.mouseEnabled = true;
                 this.gameObject.addChild(mouseHit);
+                this.isinit = true;
                 this.update();
             };
             CoordinateRotationAxis.prototype.update = function () {
+                if (!this.isinit)
+                    return;
                 this.sector.radius = this.radius;
                 this.torusGeometry.radius = this.radius;
-                var color = this._selected ? this.selectedColor : this.color;
+                var color = this.selected ? this.selectedColor : this.color;
                 var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
-                if (this._filterNormal) {
-                    var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this._filterNormal);
+                if (this.filterNormal) {
+                    var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this.filterNormal);
                 }
-                this.segmentGeometry.segments.length = 0;
+                this.segmentGeometry.segments = [];
                 var points = [];
                 for (var i = 0; i <= 360; i++) {
                     points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
@@ -6582,10 +6571,10 @@ var feng3d;
                             show = points[i - 1].dot(localNormal) > 0 && points[i].dot(localNormal) > 0;
                         }
                         if (show) {
-                            this.segmentGeometry.segments = [{ start: points[i - 1], end: points[i], startColor: color, endColor: color }];
+                            this.segmentGeometry.segments.push({ start: points[i - 1], end: points[i], startColor: color, endColor: color });
                         }
                         else if (this.selected) {
-                            this.segmentGeometry.segments = [{ start: points[i - 1], end: points[i], startColor: this.backColor, endColor: this.backColor }];
+                            this.segmentGeometry.segments.push({ start: points[i - 1], end: points[i], startColor: this.backColor, endColor: this.backColor });
                         }
                     }
                 }
@@ -6609,6 +6598,12 @@ var feng3d;
                 if (this.sector.gameObject.parent)
                     this.sector.gameObject.parent.removeChild(this.sector.gameObject);
             };
+            __decorate([
+                feng3d.watch("update")
+            ], CoordinateRotationAxis.prototype, "selected", void 0);
+            __decorate([
+                feng3d.watch("update")
+            ], CoordinateRotationAxis.prototype, "filterNormal", void 0);
             return CoordinateRotationAxis;
         }(feng3d.Component));
         editor.CoordinateRotationAxis = CoordinateRotationAxis;
@@ -6635,6 +6630,7 @@ var feng3d;
                 this.geometry = meshRenderer.geometry = new feng3d.CustomGeometry();
                 meshRenderer.material = feng3d.materialFactory.create("color", { uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
                 meshRenderer.material.renderParams.enableBlend = true;
+                meshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
                 var border = feng3d.GameObject.create("border");
                 meshRenderer = border.addComponent(feng3d.MeshRenderer);
                 var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
@@ -6642,11 +6638,14 @@ var feng3d;
                 material.renderParams.enableBlend = true;
                 this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
                 this.gameObject.addChild(border);
+                this.isinit = true;
                 this.update(0, 0);
             };
             SectorGameObject.prototype.update = function (start, end) {
                 if (start === void 0) { start = 0; }
                 if (end === void 0) { end = 0; }
+                if (!this.isinit)
+                    return;
                 this._start = Math.min(start, end);
                 this._end = Math.max(start, end);
                 var length = Math.floor(this._end - this._start);
@@ -6689,17 +6688,10 @@ var feng3d;
                 _this.color = new feng3d.Color4(1, 0, 0, 0.99);
                 _this.backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
                 _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
-                _this._selected = false;
+                //
+                _this.selected = false;
                 return _this;
             }
-            Object.defineProperty(CoordinateRotationFreeAxis.prototype, "selected", {
-                //
-                get: function () { return this._selected; },
-                set: function (value) { if (this._selected == value)
-                    return; this._selected = value; this.update(); },
-                enumerable: true,
-                configurable: true
-            });
             CoordinateRotationFreeAxis.prototype.init = function (gameObject) {
                 _super.prototype.init.call(this, gameObject);
                 this.initModels();
@@ -6718,11 +6710,14 @@ var feng3d;
                 this.sector.gameObject.mouseEnabled = true;
                 this.sector.gameObject.mouselayer = feng3d.mouselayer.editor;
                 this.gameObject.addChild(this.sector.gameObject);
+                this.isinit = true;
                 this.update();
             };
             CoordinateRotationFreeAxis.prototype.update = function () {
+                if (!this.isinit)
+                    return;
                 this.sector.radius = this.radius;
-                var color = this._selected ? this.selectedColor : this.color;
+                var color = this.selected ? this.selectedColor : this.color;
                 var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
                 var segments = [];
                 var points = [];
@@ -6735,6 +6730,9 @@ var feng3d;
                 }
                 this.segmentGeometry.segments = segments;
             };
+            __decorate([
+                feng3d.watch("update")
+            ], CoordinateRotationFreeAxis.prototype, "selected", void 0);
             return CoordinateRotationFreeAxis;
         }(feng3d.Component));
         editor.CoordinateRotationFreeAxis = CoordinateRotationFreeAxis;
@@ -6785,26 +6783,12 @@ var feng3d;
                 _this.color = new feng3d.Color4(1, 0, 0, 0.99);
                 _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
                 _this.length = 100;
-                _this._selected = false;
-                _this._scale = 1;
+                //
+                _this.selected = false;
+                //
+                _this.scaleValue = 1;
                 return _this;
             }
-            Object.defineProperty(CoordinateScaleCube.prototype, "selected", {
-                //
-                get: function () { return this._selected; },
-                set: function (value) { if (this._selected == value)
-                    return; this._selected = value; this.update(); },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(CoordinateScaleCube.prototype, "scaleValue", {
-                //
-                get: function () { return this._scale; },
-                set: function (value) { if (this._scale == value)
-                    return; this._scale = value; this.update(); },
-                enumerable: true,
-                configurable: true
-            });
             CoordinateScaleCube.prototype.init = function (gameObject) {
                 _super.prototype.init.call(this, gameObject);
                 var xLine = feng3d.GameObject.create();
@@ -6824,17 +6808,26 @@ var feng3d;
                 mouseHit.mouseEnabled = true;
                 mouseHit.mouselayer = feng3d.mouselayer.editor;
                 this.gameObject.addChild(mouseHit);
+                this.isinit = true;
                 this.update();
             };
             CoordinateScaleCube.prototype.update = function () {
+                if (!this.isinit)
+                    return;
                 this.coordinateCube.color = this.color;
                 this.coordinateCube.selectedColor = this.selectedColor;
                 this.coordinateCube.update();
-                this.segmentGeometry.segments = [{ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this._scale * this.length, 0), startColor: this.color, endColor: this.color }];
+                this.segmentGeometry.segments = [{ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.scaleValue * this.length, 0), startColor: this.color, endColor: this.color }];
                 //
-                this.coordinateCube.transform.y = this.length * this._scale;
+                this.coordinateCube.transform.y = this.length * this.scaleValue;
                 this.coordinateCube.selected = this.selected;
             };
+            __decorate([
+                feng3d.watch("update")
+            ], CoordinateScaleCube.prototype, "selected", void 0);
+            __decorate([
+                feng3d.watch("update")
+            ], CoordinateScaleCube.prototype, "scaleValue", void 0);
             return CoordinateScaleCube;
         }(feng3d.Component));
         editor.CoordinateScaleCube = CoordinateScaleCube;
@@ -6994,6 +6987,8 @@ var feng3d;
             MTool.prototype.onItemMouseDown = function (event) {
                 if (!editor.engine.mouseinview)
                     return;
+                if (feng3d.shortcut.keyState.getKeyState("alt"))
+                    return;
                 //全局矩阵
                 var globalMatrix3D = this.transform.localToWorldMatrix;
                 //中心与X,Y,Z轴上点坐标
@@ -7124,6 +7119,8 @@ var feng3d;
             };
             RTool.prototype.onItemMouseDown = function (event) {
                 if (!editor.engine.mouseinview)
+                    return;
+                if (feng3d.shortcut.keyState.getKeyState("alt"))
                     return;
                 //全局矩阵
                 var globalMatrix3D = this.transform.localToWorldMatrix;
@@ -7279,6 +7276,8 @@ var feng3d;
             };
             STool.prototype.onItemMouseDown = function (event) {
                 if (!editor.engine.mouseinview)
+                    return;
+                if (feng3d.shortcut.keyState.getKeyState("alt"))
                     return;
                 //全局矩阵
                 var globalMatrix3D = this.transform.localToWorldMatrix;
@@ -10797,7 +10796,7 @@ var shortcutConfig = [
     { key: "e", command: "gameobjectRotationTool", when: "!fpsViewing" },
     { key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
     { key: "del", command: "deleteSeletedGameObject", when: "" },
-    { key: "click+!alt", command: "selectGameObject", when: "mouseInView3D+!mouseInSceneRotateTool" },
+    { key: "click+!alt", command: "selectGameObject", when: "!inMode+mouseInView3D+!mouseInSceneRotateTool" },
 ];
 var feng3d;
 (function (feng3d) {

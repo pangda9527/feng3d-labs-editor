@@ -52,6 +52,7 @@ namespace feng3d.editor
 
     export class CoordinateRotationAxis extends Component
     {
+        private isinit: boolean;
         private segmentGeometry: SegmentGeometry;
         private torusGeometry: TorusGeometry;
         private sector: SectorGameObject;
@@ -62,16 +63,14 @@ namespace feng3d.editor
         private selectedColor = new Color4(1, 1, 0, 0.99);
 
         //
-        get selected() { return this._selected; }
-        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
-        private _selected = false;
+        @watch("update")
+        selected = false;
 
         /**
          * 过滤法线显示某一面线条
          */
-        get filterNormal() { return this._filterNormal; }
-        set filterNormal(value) { this._filterNormal = value; this.update(); }
-        private _filterNormal: Vector3;
+        @watch("update")
+        filterNormal: Vector3;
 
         init(gameObject: GameObject)
         {
@@ -101,22 +100,25 @@ namespace feng3d.editor
             mouseHit.mouseEnabled = true;
             this.gameObject.addChild(mouseHit);
 
+            this.isinit = true;
             this.update();
         }
 
         update()
         {
+            if (!this.isinit) return;
+
             this.sector.radius = this.radius;
             this.torusGeometry.radius = this.radius;
-            var color = this._selected ? this.selectedColor : this.color;
+            var color = this.selected ? this.selectedColor : this.color;
 
             var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
-            if (this._filterNormal)
+            if (this.filterNormal)
             {
-                var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this._filterNormal);
+                var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this.filterNormal);
             }
 
-            this.segmentGeometry.segments.length = 0;
+            this.segmentGeometry.segments = [];
             var points: Vector3[] = [];
             for (var i = 0; i <= 360; i++)
             {
@@ -131,10 +133,10 @@ namespace feng3d.editor
                     }
                     if (show)
                     {
-                        this.segmentGeometry.segments = [{ start: points[i - 1], end: points[i], startColor: color, endColor: color }];
+                        this.segmentGeometry.segments.push({ start: points[i - 1], end: points[i], startColor: color, endColor: color });
                     } else if (this.selected)
                     {
-                        this.segmentGeometry.segments = [{ start: points[i - 1], end: points[i], startColor: this.backColor, endColor: this.backColor }];
+                        this.segmentGeometry.segments.push({ start: points[i - 1], end: points[i], startColor: this.backColor, endColor: this.backColor });
                     }
                 }
             }
@@ -171,6 +173,7 @@ namespace feng3d.editor
      */
     export class SectorGameObject extends Component
     {
+        private isinit: boolean;
         private segmentGeometry: SegmentGeometry;
         private geometry: Geometry;
         private borderColor = new Color4(0, 1, 1, 0.6);
@@ -192,6 +195,7 @@ namespace feng3d.editor
             this.geometry = meshRenderer.geometry = new CustomGeometry();
             meshRenderer.material = materialFactory.create("color", { uniforms: { u_diffuseInput: new Color4(0.5, 0.5, 0.5, 0.2) } });
             meshRenderer.material.renderParams.enableBlend = true;
+            meshRenderer.material.renderParams.cullFace = CullFace.NONE;
 
             var border = GameObject.create("border");
             meshRenderer = border.addComponent(MeshRenderer);
@@ -201,11 +205,14 @@ namespace feng3d.editor
             this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
             this.gameObject.addChild(border);
 
+            this.isinit = true;
             this.update(0, 0);
         }
 
         update(start = 0, end = 0)
         {
+            if (!this.isinit) return;
+
             this._start = Math.min(start, end);
             this._end = Math.max(start, end);
             var length = Math.floor(this._end - this._start);
@@ -243,6 +250,7 @@ namespace feng3d.editor
 
     export class CoordinateRotationFreeAxis extends Component
     {
+        private isinit: boolean;
         private segmentGeometry: SegmentGeometry;
         private sector: SectorGameObject;
 
@@ -252,9 +260,8 @@ namespace feng3d.editor
         private selectedColor = new Color4(1, 1, 0, 0.99);
 
         //
-        get selected() { return this._selected; }
-        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
-        private _selected = false;
+        @watch("update")
+        selected = false;
 
         init(gameObject: GameObject)
         {
@@ -279,13 +286,16 @@ namespace feng3d.editor
             this.sector.gameObject.mouselayer = mouselayer.editor;
             this.gameObject.addChild(this.sector.gameObject);
 
+            this.isinit = true;
             this.update();
         }
 
         update()
         {
+            if (!this.isinit) return;
+
             this.sector.radius = this.radius;
-            var color = this._selected ? this.selectedColor : this.color;
+            var color = this.selected ? this.selectedColor : this.color;
 
             var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
 

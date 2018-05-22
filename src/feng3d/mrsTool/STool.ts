@@ -40,6 +40,8 @@ namespace feng3d.editor
         {
             if (!engine.mouseinview)
                 return;
+            if (shortcut.keyState.getKeyState("alt"))
+                return;
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标

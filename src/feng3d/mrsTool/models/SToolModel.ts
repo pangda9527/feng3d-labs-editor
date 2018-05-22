@@ -43,6 +43,7 @@ namespace feng3d.editor
 
     export class CoordinateScaleCube extends Component
     {
+        private isinit: boolean;
         private coordinateCube: CoordinateCube
         private segmentGeometry: SegmentGeometry;
 
@@ -50,13 +51,11 @@ namespace feng3d.editor
         private selectedColor = new Color4(1, 1, 0, 0.99);
         private length = 100;
         //
-        get selected() { return this._selected; }
-        set selected(value) { if (this._selected == value) return; this._selected = value; this.update(); }
-        private _selected = false;
+        @watch("update")
+        selected = false;
         //
-        get scaleValue() { return this._scale; }
-        set scaleValue(value) { if (this._scale == value) return; this._scale = value; this.update(); }
-        private _scale = 1;
+        @watch("update")
+        scaleValue = 1;
 
         init(gameObject: GameObject)
         {
@@ -80,19 +79,22 @@ namespace feng3d.editor
             mouseHit.mouselayer = mouselayer.editor;
             this.gameObject.addChild(mouseHit);
 
+            this.isinit = true;
             this.update();
         }
 
         update()
         {
+            if (!this.isinit) return;
+
             this.coordinateCube.color = this.color;
             this.coordinateCube.selectedColor = this.selectedColor;
             this.coordinateCube.update();
 
-            this.segmentGeometry.segments = [{ start: new Vector3(), end: new Vector3(0, this._scale * this.length, 0), startColor: this.color, endColor: this.color }];
+            this.segmentGeometry.segments = [{ start: new Vector3(), end: new Vector3(0, this.scaleValue * this.length, 0), startColor: this.color, endColor: this.color }];
 
             //
-            this.coordinateCube.transform.y = this.length * this._scale;
+            this.coordinateCube.transform.y = this.length * this.scaleValue;
             this.coordinateCube.selected = this.selected;
         }
     }

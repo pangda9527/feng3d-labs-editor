@@ -24,6 +24,8 @@ namespace feng3d.editor
                 //
                 maskReck.addEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
                 displayObject.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromStage, null);
+
+                shortcut.activityState("inMode");
             }
 
             function removeDisplayObject()
@@ -42,6 +44,10 @@ namespace feng3d.editor
                 {
                     maskReck.parent.removeChild(maskReck);
                 }
+                ticker.onceframe(() =>
+                {
+                    shortcut.deactivityState("inMode");
+                });
             }
         }
     };

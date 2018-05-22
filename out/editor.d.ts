@@ -1645,6 +1645,7 @@ declare namespace feng3d.editor {
         private initModels();
     }
     class CoordinateAxis extends Component {
+        private isinit;
         private segmentMaterial;
         private material;
         private xArrow;
@@ -1652,21 +1653,21 @@ declare namespace feng3d.editor {
         private selectedColor;
         private length;
         selected: boolean;
-        private _selected;
         init(gameObject: GameObject): void;
-        private update();
+        update(): void;
     }
     class CoordinateCube extends Component {
+        private isinit;
         private colorMaterial;
         private oCube;
         color: Color4;
         selectedColor: Color4;
         selected: boolean;
-        private _selected;
         init(gameObject: GameObject): void;
         update(): void;
     }
     class CoordinatePlane extends Component {
+        private isinit;
         private colorMaterial;
         private segmentGeometry;
         color: Color4;
@@ -1676,7 +1677,6 @@ declare namespace feng3d.editor {
         readonly width: number;
         private _width;
         selected: boolean;
-        private _selected;
         init(gameObject: GameObject): void;
         update(): void;
     }
@@ -1695,6 +1695,7 @@ declare namespace feng3d.editor {
         private initModels();
     }
     class CoordinateRotationAxis extends Component {
+        private isinit;
         private segmentGeometry;
         private torusGeometry;
         private sector;
@@ -1703,12 +1704,10 @@ declare namespace feng3d.editor {
         private backColor;
         private selectedColor;
         selected: boolean;
-        private _selected;
         /**
          * 过滤法线显示某一面线条
          */
         filterNormal: Vector3;
-        private _filterNormal;
         init(gameObject: GameObject): void;
         private initModels();
         update(): void;
@@ -1719,6 +1718,7 @@ declare namespace feng3d.editor {
      * 扇形对象
      */
     class SectorGameObject extends Component {
+        private isinit;
         private segmentGeometry;
         private geometry;
         private borderColor;
@@ -1732,6 +1732,7 @@ declare namespace feng3d.editor {
         update(start?: number, end?: number): void;
     }
     class CoordinateRotationFreeAxis extends Component {
+        private isinit;
         private segmentGeometry;
         private sector;
         private radius;
@@ -1739,7 +1740,6 @@ declare namespace feng3d.editor {
         private backColor;
         private selectedColor;
         selected: boolean;
-        private _selected;
         init(gameObject: GameObject): void;
         private initModels();
         update(): void;
@@ -1758,15 +1758,14 @@ declare namespace feng3d.editor {
         private initModels();
     }
     class CoordinateScaleCube extends Component {
+        private isinit;
         private coordinateCube;
         private segmentGeometry;
         readonly color: Color4;
         private selectedColor;
         private length;
         selected: boolean;
-        private _selected;
         scaleValue: number;
-        private _scale;
         init(gameObject: GameObject): void;
         update(): void;
     }

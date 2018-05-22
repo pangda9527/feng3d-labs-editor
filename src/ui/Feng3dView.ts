@@ -54,7 +54,6 @@ namespace feng3d.editor
 			if (!this.stage)
 				return;
 
-
 			var lt = this.localToGlobal(0, 0);
 			var rb = this.localToGlobal(this.width, this.height);
 			var bound1 = new Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
