@@ -1051,7 +1051,6 @@ declare namespace feng3d.editor {
         private onclick();
         dataChanged(): void;
         private onrightclick(e);
-        private onnameLabelclick();
     }
 }
 declare namespace feng3d.editor {
@@ -1135,7 +1134,9 @@ declare namespace feng3d.editor {
         /**
          * 弹出文件菜单
          */
-        popupmenu(assetsFile: AssetsFile): void;
+        popupmenu(assetsFile: AssetsFile, othermenus?: {
+            rename?: MenuItem;
+        }): void;
         /**
          * 获取一个新路径
          */
@@ -1282,7 +1283,14 @@ declare namespace feng3d.editor {
          * @param destdirpath 目标文件夹路径
          * @param callback 移动文件完成回调
          */
-        move(destdirpath: string, callback?: (file: AssetsFile) => void): void;
+        moveToDir(destdirpath: string, callback?: (file: AssetsFile) => void): void;
+        /**
+         * 移动文件（夹）
+         * @param oldpath 老路径
+         * @param newpath 新路径
+         * @param callback 回调函数
+         */
+        move(oldpath: string, newpath: string, callback?: (file: AssetsFile) => void): void;
         /**
          * 新增子文件夹
          * @param newfoldername 新增文件夹名称
@@ -1320,7 +1328,6 @@ declare namespace feng3d.editor {
         private ondoubleclick();
         private onclick();
         private onrightclick(e);
-        private onnameLabelclick();
     }
 }
 declare namespace feng3d.editor {
@@ -1359,7 +1366,6 @@ declare namespace feng3d.editor {
         dataChanged(): void;
         private onclick();
         private onrightclick(e);
-        private onnameLabelclick();
     }
 }
 declare namespace feng3d.editor {

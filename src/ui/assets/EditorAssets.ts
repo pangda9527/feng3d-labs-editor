@@ -144,7 +144,7 @@ namespace feng3d.editor
             var assetsfile = this.getFile(path);
             if (assetsfile)
             {
-                assetsfile.move(destdirpath, callback);
+                assetsfile.moveToDir(destdirpath, callback);
             } else
             {
                 var filename = path.split("/").pop();
@@ -162,7 +162,7 @@ namespace feng3d.editor
         /**
          * 弹出文件菜单
          */
-        popupmenu(assetsFile: AssetsFile)
+        popupmenu(assetsFile: AssetsFile, othermenus?: { rename?: MenuItem })
         {
             var menuconfig: MenuItem[] = [];
             if (assetsFile.isDirectory)
@@ -260,6 +260,11 @@ namespace feng3d.editor
                         editorAssets.deletefile(assetsFile.path);
                     }
                 });
+
+            if (othermenus && othermenus.rename)
+            {
+                menuconfig.push(othermenus.rename);
+            }
 
             menu.popup(menuconfig);
 

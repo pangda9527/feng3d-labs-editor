@@ -21,7 +21,6 @@ namespace feng3d.editor
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-            this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
         }
 
         $onRemoveFromStage()
@@ -30,7 +29,6 @@ namespace feng3d.editor
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-            this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
         }
 
         dataChanged()
@@ -51,7 +49,7 @@ namespace feng3d.editor
                     }, ["file"], (dragdata) =>
                         {
                             var movefile = editorAssets.getFile(dragdata.file);
-                            movefile.move(this.data.path);
+                            movefile.moveToDir(this.data.path);
                         });
                 }
                 else
@@ -135,19 +133,21 @@ namespace feng3d.editor
         private onrightclick(e: egret.Event)
         {
             e.stopPropagation();
-            editorAssets.popupmenu(this.data);
-        }
 
-        private onnameLabelclick()
-        {
-            if (this.data.selected)
-            {
-                this.renameInput.edit(() =>
-                {
-                    var newName = this.data.name.replace(this.data.label, this.renameInput.text);
-                    this.data.rename(newName);
-                });
+            var othermenus = {
+                rename: {
+                    label: "重命名",
+                    click: () =>
+                    {
+                        this.renameInput.edit(() =>
+                        {
+                            var newName = this.data.name.replace(this.data.label, this.renameInput.text);
+                            this.data.rename(newName);
+                        });
+                    }
+                }
             }
+            editorAssets.popupmenu(this.data, othermenus);
         }
     }
 }

@@ -223,22 +223,11 @@ namespace feng3d.editor
          */
         rename(newname: string, callback?: (file: AssetsFile) => void)
         {
-            var oldPath = this.path;
-            var newPath = pathUtils.getParentPath(this.path) + newname;
+            var oldpath = this.path;
+            var newpath = pathUtils.getParentPath(this.path) + newname;
             if (this.isDirectory)
-                newPath = newPath + "/";
-            fs.rename(oldPath, newPath, (err) =>
-            {
-                assert(!err);
-                this.path = newPath;
-                if (this.isDirectory)
-                    editorui.assetsview.invalidateAssetstree();
-                if (editorAssets.showFloder == oldPath)
-                {
-                    editorAssets.showFloder = newPath;
-                }
-                callback && callback(this);
-            });
+                newpath = newpath + "/";
+            this.move(oldpath, newpath, callback);
         }
 
         /**
@@ -246,7 +235,7 @@ namespace feng3d.editor
          * @param destdirpath 目标文件夹路径
          * @param callback 移动文件完成回调
          */
-        move(destdirpath: string, callback?: (file: AssetsFile) => void)
+        moveToDir(destdirpath: string, callback?: (file: AssetsFile) => void)
         {
             //禁止向子文件夹移动
             if (destdirpath.indexOf(this.path) != -1)
@@ -256,7 +245,17 @@ namespace feng3d.editor
             if (this.isDirectory)
                 newpath += "/";
             var destDir = editorAssets.getFile(destdirpath);
+            this.move(oldpath, newpath, callback);
+        }
 
+        /**
+         * 移动文件（夹）
+         * @param oldpath 老路径
+         * @param newpath 新路径
+         * @param callback 回调函数
+         */
+        move(oldpath: string, newpath: string, callback?: (file: AssetsFile) => void)
+        {
             fs.move(oldpath, newpath, (err) =>
             {
                 assert(!err);
@@ -266,7 +265,6 @@ namespace feng3d.editor
                     var movefiles = editorAssets.filter((item) => item.path.substr(0, oldpath.length) == oldpath);
                     movefiles.forEach(element =>
                     {
-                        debugger;
                         delete editorAssets.files[element.path];
                         element.path = newpath + element.path.substr(oldpath.length);
                         editorAssets.files[element.path] = element;
@@ -328,7 +326,7 @@ namespace feng3d.editor
 
                     callback && callback(this);
                     if (regExps.image.test(assetsFile.path))
-                    feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
+                        feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
                 });
             });
 

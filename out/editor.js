@@ -2527,13 +2527,16 @@ var feng3d;
                 this.image.visible = false;
                 this.label.visible = true;
                 var value = this._space;
-                if (typeof value == "string" && value.indexOf("data:") != -1) {
+                if (typeof value == "string" && value.indexOf("data:") == 0) {
                     this.image.visible = true;
                     this.label.visible = false;
                     this.image.source = value;
                 }
                 else {
-                    this.label.text = String(this._space);
+                    var string = String(value);
+                    if (string.length > 1000)
+                        string = string.substr(0, 1000) + "\n.......";
+                    this.label.text = string;
                 }
             };
             OVBaseDefault = __decorate([
@@ -4028,14 +4031,12 @@ var feng3d;
                 //
                 this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             HierarchyTreeItemRenderer.prototype.$onRemoveFromStage = function () {
                 editor.drag.unregister(this);
                 _super.prototype.$onRemoveFromStage.call(this);
                 this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             HierarchyTreeItemRenderer.prototype.setdargSource = function (dragSource) {
                 dragSource.gameobject = this.data.gameobject;
@@ -4058,22 +4059,20 @@ var feng3d;
                 //scene3d无法删除
                 if (this.data.gameobject.scene.gameObject != this.data.gameobject) {
                     menuconfig.push({
-                        label: "delete", click: function () {
+                        label: "删除", click: function () {
                             _this.data.gameobject.parent.removeChild(_this.data.gameobject);
+                        }
+                    }, {
+                        label: "重命名", click: function () {
+                            _this.renameInput.edit(function () {
+                                _this.data.gameobject.name = _this.renameInput.text;
+                            });
                         }
                     });
                 }
                 menuconfig = menuconfig.concat({ type: 'separator' }, editor.createObjectConfig);
                 if (menuconfig.length > 0)
                     editor.menu.popup(menuconfig);
-            };
-            HierarchyTreeItemRenderer.prototype.onnameLabelclick = function () {
-                var _this = this;
-                if (this.data.selected && !feng3d.windowEventProxy.rightmouse) {
-                    this.renameInput.edit(function () {
-                        _this.data.gameobject.name = _this.renameInput.text;
-                    });
-                }
             };
             return HierarchyTreeItemRenderer;
         }(editor.TreeItemRenderer));
@@ -4251,7 +4250,7 @@ var feng3d;
             EditorAssets.prototype.movefile = function (path, destdirpath, callback) {
                 var assetsfile = this.getFile(path);
                 if (assetsfile) {
-                    assetsfile.move(destdirpath, callback);
+                    assetsfile.moveToDir(destdirpath, callback);
                 }
                 else {
                     var filename = path.split("/").pop();
@@ -4268,7 +4267,7 @@ var feng3d;
             /**
              * 弹出文件菜单
              */
-            EditorAssets.prototype.popupmenu = function (assetsFile) {
+            EditorAssets.prototype.popupmenu = function (assetsFile, othermenus) {
                 var _this = this;
                 var menuconfig = [];
                 if (assetsFile.isDirectory) {
@@ -4345,6 +4344,9 @@ var feng3d;
                         editor.editorAssets.deletefile(assetsFile.path);
                     }
                 });
+                if (othermenus && othermenus.rename) {
+                    menuconfig.push(othermenus.rename);
+                }
                 editor.menu.popup(menuconfig);
                 function getOpenCodeEditorMenu(file) {
                     var menu;
@@ -4720,29 +4722,18 @@ var feng3d;
              * @param callback 重命名完成回调
              */
             AssetsFile.prototype.rename = function (newname, callback) {
-                var _this = this;
-                var oldPath = this.path;
-                var newPath = feng3d.pathUtils.getParentPath(this.path) + newname;
+                var oldpath = this.path;
+                var newpath = feng3d.pathUtils.getParentPath(this.path) + newname;
                 if (this.isDirectory)
-                    newPath = newPath + "/";
-                editor.fs.rename(oldPath, newPath, function (err) {
-                    feng3d.assert(!err);
-                    _this.path = newPath;
-                    if (_this.isDirectory)
-                        editor.editorui.assetsview.invalidateAssetstree();
-                    if (editor.editorAssets.showFloder == oldPath) {
-                        editor.editorAssets.showFloder = newPath;
-                    }
-                    callback && callback(_this);
-                });
+                    newpath = newpath + "/";
+                this.move(oldpath, newpath, callback);
             };
             /**
              * 移动文件（夹）到指定文件夹
              * @param destdirpath 目标文件夹路径
              * @param callback 移动文件完成回调
              */
-            AssetsFile.prototype.move = function (destdirpath, callback) {
-                var _this = this;
+            AssetsFile.prototype.moveToDir = function (destdirpath, callback) {
                 //禁止向子文件夹移动
                 if (destdirpath.indexOf(this.path) != -1)
                     return;
@@ -4751,12 +4742,21 @@ var feng3d;
                 if (this.isDirectory)
                     newpath += "/";
                 var destDir = editor.editorAssets.getFile(destdirpath);
+                this.move(oldpath, newpath, callback);
+            };
+            /**
+             * 移动文件（夹）
+             * @param oldpath 老路径
+             * @param newpath 新路径
+             * @param callback 回调函数
+             */
+            AssetsFile.prototype.move = function (oldpath, newpath, callback) {
+                var _this = this;
                 editor.fs.move(oldpath, newpath, function (err) {
                     feng3d.assert(!err);
                     if (_this.isDirectory) {
                         var movefiles = editor.editorAssets.filter(function (item) { return item.path.substr(0, oldpath.length) == oldpath; });
                         movefiles.forEach(function (element) {
-                            debugger;
                             delete editor.editorAssets.files[element.path];
                             element.path = newpath + element.path.substr(oldpath.length);
                             editor.editorAssets.files[element.path] = element;
@@ -4908,14 +4908,12 @@ var feng3d;
                 this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
                 this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             AssetsFileItemRenderer.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
                 this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
                 this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             AssetsFileItemRenderer.prototype.dataChanged = function () {
                 var _this = this;
@@ -4929,7 +4927,7 @@ var feng3d;
                             dragsource.file = _this.data.path;
                         }, ["file"], function (dragdata) {
                             var movefile = editor.editorAssets.getFile(dragdata.file);
-                            movefile.move(_this.data.path);
+                            movefile.moveToDir(_this.data.path);
                         });
                     }
                     else {
@@ -4997,17 +4995,20 @@ var feng3d;
                 editor.editorData.selectObject(this.data);
             };
             AssetsFileItemRenderer.prototype.onrightclick = function (e) {
-                e.stopPropagation();
-                editor.editorAssets.popupmenu(this.data);
-            };
-            AssetsFileItemRenderer.prototype.onnameLabelclick = function () {
                 var _this = this;
-                if (this.data.selected) {
-                    this.renameInput.edit(function () {
-                        var newName = _this.data.name.replace(_this.data.label, _this.renameInput.text);
-                        _this.data.rename(newName);
-                    });
-                }
+                e.stopPropagation();
+                var othermenus = {
+                    rename: {
+                        label: "重命名",
+                        click: function () {
+                            _this.renameInput.edit(function () {
+                                var newName = _this.data.name.replace(_this.data.label, _this.renameInput.text);
+                                _this.data.rename(newName);
+                            });
+                        }
+                    }
+                };
+                editor.editorAssets.popupmenu(this.data, othermenus);
             };
             return AssetsFileItemRenderer;
         }(eui.ItemRenderer));
@@ -5104,13 +5105,11 @@ var feng3d;
                 _super.prototype.$onAddToStage.call(this, stage, nestLevel);
                 this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             AssetsTreeItemRenderer.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
                 this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
                 this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-                this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
             };
             AssetsTreeItemRenderer.prototype.dataChanged = function () {
                 var _this = this;
@@ -5122,7 +5121,7 @@ var feng3d;
                         dragsource.file = _this.data.path;
                     }, ["file"], function (dragdata) {
                         var movefile = editor.editorAssets.getFile(dragdata.file);
-                        movefile.move(_this.data.path);
+                        movefile.moveToDir(_this.data.path);
                     });
                 }
                 else {
@@ -5133,17 +5132,23 @@ var feng3d;
                 editor.editorAssets.showFloder = this.data.path;
             };
             AssetsTreeItemRenderer.prototype.onrightclick = function (e) {
-                editor.editorAssets.popupmenu(this.data.assetsFile);
-            };
-            AssetsTreeItemRenderer.prototype.onnameLabelclick = function () {
                 var _this = this;
-                if (this.data.parent == null)
-                    return;
-                if (this.data.selected && !feng3d.windowEventProxy.rightmouse) {
-                    this.renameInput.edit(function () {
-                        var newName = _this.data.assetsFile.name.replace(_this.data.label, _this.renameInput.text);
-                        _this.data.assetsFile.rename(newName);
-                    });
+                if (this.data.parent != null) {
+                    var othermenus = {
+                        rename: {
+                            label: "重命名",
+                            click: function () {
+                                _this.renameInput.edit(function () {
+                                    var newName = _this.data.assetsFile.name.replace(_this.data.label, _this.renameInput.text);
+                                    _this.data.assetsFile.rename(newName);
+                                });
+                            }
+                        }
+                    };
+                    editor.editorAssets.popupmenu(this.data.assetsFile, othermenus);
+                }
+                else {
+                    editor.editorAssets.popupmenu(this.data.assetsFile);
                 }
             };
             return AssetsTreeItemRenderer;

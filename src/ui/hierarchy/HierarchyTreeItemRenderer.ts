@@ -44,7 +44,6 @@ namespace feng3d.editor
             //
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-            this.renameInput.addEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
         }
 
         $onRemoveFromStage()
@@ -54,7 +53,6 @@ namespace feng3d.editor
             super.$onRemoveFromStage();
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-            this.renameInput.removeEventListener(egret.MouseEvent.CLICK, this.onnameLabelclick, this);
         }
 
         private setdargSource(dragSource: DragData)
@@ -87,29 +85,29 @@ namespace feng3d.editor
             //scene3d无法删除
             if (this.data.gameobject.scene.gameObject != this.data.gameobject)
             {
-                menuconfig.push({
-                    label: "delete", click: () =>
+                menuconfig.push(
                     {
-                        this.data.gameobject.parent.removeChild(this.data.gameobject);
+                        label: "删除", click: () =>
+                        {
+                            this.data.gameobject.parent.removeChild(this.data.gameobject);
+                        }
+                    },
+                    {
+                        label: "重命名", click: () =>
+                        {
+                            this.renameInput.edit(() =>
+                            {
+                                this.data.gameobject.name = this.renameInput.text;
+                            });
+                        }
                     }
-                });
+                );
             }
 
             menuconfig = menuconfig.concat({ type: 'separator' }, createObjectConfig);
 
             if (menuconfig.length > 0)
                 menu.popup(menuconfig);
-        }
-
-        private onnameLabelclick()
-        {
-            if (this.data.selected && !windowEventProxy.rightmouse)
-            {
-                this.renameInput.edit(() =>
-                {
-                    this.data.gameobject.name = this.renameInput.text;
-                });
-            }
         }
     }
 }

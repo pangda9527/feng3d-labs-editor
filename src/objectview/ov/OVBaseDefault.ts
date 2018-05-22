@@ -54,14 +54,17 @@ namespace feng3d.editor
 			this.image.visible = false;
 			this.label.visible = true;
 			var value = this._space;
-			if (typeof value == "string" && value.indexOf("data:") != -1)
+			if (typeof value == "string" && value.indexOf("data:") == 0)
 			{
 				this.image.visible = true;
 				this.label.visible = false;
 				this.image.source = value;
 			} else
 			{
-				this.label.text = String(this._space);
+				var string = String(value);
+				if (string.length > 1000)
+					string = string.substr(0, 1000) + "\n......."
+				this.label.text = string;
 			}
 		}
 	}
