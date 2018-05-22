@@ -1117,7 +1117,7 @@ var feng3d;
                 var canvas = _this.canvas = document.getElementById("cameraPreviewCanvas");
                 ;
                 _this.previewEngine = new feng3d.Engine(canvas);
-                _this.previewEngine.mouse3DManager.enable = false;
+                _this.previewEngine.mouse3DManager.mouseInput.enable = false;
                 _this.previewEngine.stop();
                 return _this;
             }
