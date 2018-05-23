@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "types": [
+      "jquery",
+      "jqueryui"
+    ],
+    "outFile": "out/app.js"
+  },
+  "files": [
+    "../libs/feng3d.d.ts", //debug
+    //
+    "src/defaults/OVBaseDefault.ts",
+    "src/App.ts"
+  ]
+}
