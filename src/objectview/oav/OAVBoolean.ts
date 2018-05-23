@@ -1,7 +1,7 @@
 namespace feng3d.editor
 {
 	@OAVComponent()
-	export class BooleanAttrView extends OAVBase
+	export class OAVBoolean extends OAVBase
 	{
 		label: eui.Label;
 		checkBox: eui.CheckBox;

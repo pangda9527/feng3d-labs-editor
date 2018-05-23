@@ -57,7 +57,7 @@
         //
         "src/objectview/oav/OAVBase.ts",
         "src/objectview/oav/OAVDefault.ts",
-        "src/objectview/oav/BooleanAttrView.ts",
+        "src/objectview/oav/OAVBoolean.ts",
         "src/objectview/oav/OAVNumber.ts",
         "src/objectview/oav/OAVVector3D.ts",
         "src/objectview/oav/OAVArray.ts",

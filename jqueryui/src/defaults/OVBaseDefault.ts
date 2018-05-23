@@ -3,10 +3,10 @@
  * @author feng 2016-3-11
  */
 @feng3d.OVComponent()
-class OVBaseDefault extends UI.Div implements feng3d.IObjectView
+class OVBaseDefault extends ui.Div implements feng3d.IObjectView
 {
-    public label: UI.Span;
-    public image: UI.Image;
+    public label: ui.Span;
+    public image: ui.Image;
     //
     private _space: Object;
 
@@ -14,8 +14,8 @@ class OVBaseDefault extends UI.Div implements feng3d.IObjectView
     {
         super();
 
-        this.label = new UI.Span();
-        this.image = new UI.Image();
+        this.label = new ui.Span();
+        this.image = new ui.Image();
         this.addChild(this.label);
         this.addChild(this.image);
 

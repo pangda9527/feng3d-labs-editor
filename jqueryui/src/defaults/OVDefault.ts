@@ -1,8 +1,8 @@
 namespace feng3d
 {
-	export interface IObjectView extends UI.Element { }
-	export interface IObjectBlockView extends UI.Element { }
-	export interface IObjectAttributeView extends UI.Element { }
+	export interface IObjectView extends ui.Element { }
+	export interface IObjectBlockView extends ui.Element { }
+	export interface IObjectAttributeView extends ui.Element { }
 }
 
 /**
@@ -10,13 +10,13 @@ namespace feng3d
  * @author feng 2016-3-22
  */
 @feng3d.OVComponent()
-class OVDefault extends UI.Div implements feng3d.IObjectView
+class OVDefault extends ui.Div implements feng3d.IObjectView
 {
 	private _space: Object;
 	private _objectViewInfo: feng3d.ObjectViewInfo;
 	private blockViews: feng3d.IObjectBlockView[];
 
-	group: UI.Div;
+	group: ui.Div;
 
 	/**
 	 * 对象界面数据
@@ -28,7 +28,7 @@ class OVDefault extends UI.Div implements feng3d.IObjectView
 		this._objectViewInfo = objectViewInfo;
 		this._space = objectViewInfo.owner;
 
-		this.group = new UI.Div();
+		this.group = new ui.Div();
 		this.addChild(this.group);
 
 		this.initview();

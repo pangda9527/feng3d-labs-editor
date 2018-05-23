@@ -29,6 +29,8 @@ class OAVDefault extends OAVBase
 		// this.text.percentWidth = 100;
 		this.label.text = this._attributeName;
 
+		this.text
+
 		this.text.on("focus", this.ontxtfocusin, this);
 		this.text.on("blur", this.ontxtfocusout, this);
 		this.text.on("change", this.onTextChange, this);

@@ -2,8 +2,27 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-namespace UI
+namespace ui
 {
+    interface ElementMap extends HTMLElementEventMap
+    {
+        /**
+         * 值发生变化
+         */
+        "added": any;
+
+        "removed": any;
+    }
+
+    interface OAVBase
+    {
+        once<K extends keyof ElementMap>(type: K, listener: (event: feng3d.Event<ElementMap[K]>) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof ElementMap>(type: K, data?: ElementMap[K], bubbles?: boolean);
+        has<K extends keyof ElementMap>(type: K): boolean;
+        on<K extends keyof ElementMap>(type: K, listener: (event: feng3d.Event<ElementMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
+        off<K extends keyof ElementMap>(type?: K, listener?: (event: feng3d.Event<ElementMap[K]>) => any, thisObject?: any);
+    }
+
     export class Element extends feng3d.EventDispatcher
     {
         dom: HTMLElement;
@@ -70,6 +89,8 @@ namespace UI
                 if (argument instanceof Element)
                 {
                     this.dom.appendChild(argument.dom);
+                    argument.onAdded();
+                    argument.dispatch("added");
                 } else
                 {
                     console.error('UI.Element:', argument, 'is not an instance of UI.Element.');
@@ -87,73 +108,14 @@ namespace UI
                 if (argument instanceof Element)
                 {
                     this.dom.removeChild(argument.dom);
+                    argument.onRemoved();
+                    argument.dispatch("removed");
                 } else
                 {
                     console.error('Element:', argument, 'is not an instance of Element.');
                 }
             }
             return this;
-        }
-
-        /**
-         * 监听一次事件后将会被移除
-		 * @param type						事件的类型。
-		 * @param listener					处理事件的侦听器函数。
-		 * @param thisObject                listener函数作用域
-         * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
-         */
-        once<K extends keyof HTMLElementEventMap>(type: K, listener: (event: feng3d.Event<HTMLElementEventMap[K]>) => void, thisObject?: any, priority?: number): void
-        {
-            this.on(type, listener, thisObject, priority, true)
-        }
-
-        /**
-         * 添加监听
-		 * @param type						事件的类型。
-		 * @param listener					处理事件的侦听器函数。
-         * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
-         */
-        on<K extends keyof HTMLElementEventMap>(type: K, listener: (event: feng3d.Event<HTMLElementEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any
-        {
-            super.on(type, listener, thisObject, priority, once);
-            if (this.listentypes.indexOf(type) == -1)
-            {
-                this.listentypes.push(type);
-                this.dom.addEventListener(type, this.onMouseKey);
-            }
-        }
-
-        /**
-         * 移除监听
-         * @param dispatcher 派发器
-		 * @param type						事件的类型。
-		 * @param listener					要删除的侦听器对象。
-         */
-        off<K extends keyof HTMLElementEventMap>(type?: K, listener?: (event: feng3d.Event<HTMLElementEventMap[K]>) => any, thisObject?: any): any
-        {
-            super.off(type, listener, thisObject);
-            if (!type)
-            {
-                this.listentypes.forEach(element =>
-                {
-                    this.dom.removeEventListener(element, this.onMouseKey);
-                });
-                this.listentypes.length = 0;
-            } else if (!this.has(<any>type))
-            {
-                this.dom.removeEventListener(type, this.onMouseKey);
-                this.listentypes.splice(this.listentypes.indexOf(type), 1);
-            }
-        }
-
-        dispatch<K extends keyof HTMLElementEventMap>(type: K, data?: HTMLElementEventMap[K], bubbles?: boolean): any
-        {
-            super.dispatch(type, data, bubbles);
-        }
-
-        has<K extends keyof HTMLElementEventMap>(type: K): boolean
-        {
-            return super.has(type);
         }
 
         clear()
@@ -165,11 +127,83 @@ namespace UI
         }
 
         /**
+         * 被添加
+         */
+        onAdded()
+        {
+
+        }
+
+        /**
+         * 被移除
+         */
+        onRemoved()
+        {
+
+        }
+
+        /**
 		 * 键盘按下事件
 		 */
         private onMouseKey = (event) =>
         {
             this.dispatch(event.type, { data: event });
+        }
+    }
+
+    /**
+     * 监听一次事件后将会被移除
+     * @param type						事件的类型。
+     * @param listener					处理事件的侦听器函数。
+     * @param thisObject                listener函数作用域
+     * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
+     */
+    // once<K extends keyof HTMLElementEventMap>(type: K, listener: (event: feng3d.Event<HTMLElementEventMap[K]>) => void, thisObject?: any, priority?: number): void
+    Element.prototype.once = function (type: string, listener: (event: feng3d.Event<any>) => void, thisObject?: any, priority?: number): void
+    {
+        this.on(type, listener, thisObject, priority, true)
+    }
+
+    /**
+     * 添加监听
+     * @param type						事件的类型。
+     * @param listener					处理事件的侦听器函数。
+     * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
+     */
+    // on<K extends keyof HTMLElementEventMap>(type: K, listener: (event: feng3d.Event<HTMLElementEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any
+    var oldElementOn = Element.prototype.on;
+    Element.prototype.on = function (type: string, listener: (event: feng3d.Event<any>) => any, thisObject?: any, priority?: number, once?: boolean): any
+    {
+        oldElementOn.call(this, type, listener, thisObject, priority, once);
+        if (this.listentypes.indexOf(type) == -1)
+        {
+            this.listentypes.push(type);
+            this.dom.addEventListener(type, this.onMouseKey);
+        }
+    }
+
+    /**
+     * 移除监听
+     * @param dispatcher 派发器
+     * @param type						事件的类型。
+     * @param listener					要删除的侦听器对象。
+     */
+    // off<K extends keyof HTMLElementEventMap>(type?: K, listener?: (event: feng3d.Event<HTMLElementEventMap[K]>) => any, thisObject?: any): any
+    var oldElementOff = Element.prototype.off;
+    Element.prototype.off = function (type?: string, listener?: (event: feng3d.Event<any>) => any, thisObject?: any): any
+    {
+        oldElementOff.call(this, type, listener, thisObject);
+        if (!type)
+        {
+            this.listentypes.forEach(element =>
+            {
+                this.dom.removeEventListener(element, this.onMouseKey);
+            });
+            this.listentypes.length = 0;
+        } else if (!this.has(<any>type))
+        {
+            this.dom.removeEventListener(type, this.onMouseKey);
+            this.listentypes.splice(this.listentypes.indexOf(type), 1);
         }
     }
 
@@ -192,17 +226,17 @@ namespace UI
 
     // events
 
-    var events = ['KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change'];
+    // var events = ['KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change'];
 
-    events.forEach(function (event)
-    {
-        var method = 'on' + event;
-        UI.Element.prototype[method] = function (callback)
-        {
-            this.dom.addEventListener(event.toLowerCase(), callback.bind(this), false);
-            return this;
-        };
-    });
+    // events.forEach(function (event)
+    // {
+    //     var method = 'on' + event;
+    //     UI.Element.prototype[method] = function (callback)
+    //     {
+    //         this.dom.addEventListener(event.toLowerCase(), callback.bind(this), false);
+    //         return this;
+    //     };
+    // });
 
     // Span
 
@@ -445,28 +479,27 @@ namespace UI
     export class Checkbox extends Element
     {
         dom: HTMLInputElement
-        constructor(boolean)
+        constructor(boolean = false)
         {
             super();
             var dom = document.createElement('input');
             dom.className = 'Checkbox';
             dom.type = 'checkbox';
             this.dom = dom;
-            this.setValue(boolean);
+            this.value = boolean;
         }
 
-        getValue()
+        get value()
         {
             return this.dom.checked;
         }
 
-        setValue(value)
+        set value(value)
         {
             if (value !== undefined)
             {
                 this.dom.checked = value;
             }
-            return this;
         }
     }
 
@@ -863,7 +896,7 @@ namespace UI
     export class Button extends Element
     {
         dom: HTMLButtonElement;
-        constructor(value)
+        constructor(value = "")
         {
             super()
 
@@ -933,7 +966,7 @@ namespace UI
 
             this.dom = dom;
 
-            this.container = new UI.Panel();
+            this.container = new ui.Panel();
             this.container.dom.style.width = '200px';
             this.container.dom.style.padding = '20px';
             this.container.dom.style.backgroundColor = '#ffffff';

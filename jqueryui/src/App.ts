@@ -6,7 +6,8 @@ feng3d.objectview.defaultObjectViewClass = "OVDefault";
 feng3d.objectview.defaultObjectAttributeViewClass = "OAVDefault";
 feng3d.objectview.defaultObjectAttributeBlockView = "OBVDefault";
 
-
+feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "OAVBoolean" });
+feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
 
 $("body").ready(() =>
 {
@@ -43,6 +44,8 @@ $("body").ready(() =>
     });
     // });
 
+    var stage = new ui.Element(document.body);
 
-})
-
+    var view = feng3d.objectview.getObjectView({ a: 1, b: false, c: "abcd" });
+    stage.addChild(view);
+});

@@ -1,28 +1,41 @@
-interface OAVBaseMap
+interface OAVBaseMap extends HTMLElementEventMap
 {
     /**
      * 值发生变化
      */
-    "valuechanged": { space: Object, attributeName: string, attributeValue: any };
+    "valuechanged": {
+        /**
+         * 宿主
+         */
+        space: Object,
+        /**
+         * 属性名称
+         */
+        attributeName: string,
+        /**
+         * 属性值
+         */
+        attributeValue: any
+    };
 }
 
-// interface OAVBase
-// {
-//     once<K extends keyof OAVBaseMap>(type: K, listener: (event: feng3d.Event<OAVBaseMap[K]>) => void, thisObject?: any, priority?: number): void;
-//     dispatch<K extends keyof OAVBaseMap>(type: K, data?: OAVBaseMap[K], bubbles?: boolean);
-//     has<K extends keyof OAVBaseMap>(type: K): boolean;
-//     on<K extends keyof OAVBaseMap>(type: K, listener: (event: feng3d.Event<OAVBaseMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
-//     off<K extends keyof OAVBaseMap>(type?: K, listener?: (event: feng3d.Event<OAVBaseMap[K]>) => any, thisObject?: any);
-// }
+interface OAVBase
+{
+    once<K extends keyof OAVBaseMap>(type: K, listener: (event: feng3d.Event<OAVBaseMap[K]>) => void, thisObject?: any, priority?: number): void;
+    dispatch<K extends keyof OAVBaseMap>(type: K, data?: OAVBaseMap[K], bubbles?: boolean);
+    has<K extends keyof OAVBaseMap>(type: K): boolean;
+    on<K extends keyof OAVBaseMap>(type: K, listener: (event: feng3d.Event<OAVBaseMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
+    off<K extends keyof OAVBaseMap>(type?: K, listener?: (event: feng3d.Event<OAVBaseMap[K]>) => any, thisObject?: any);
+}
 
-class OAVBase extends UI.Div implements feng3d.IObjectAttributeView
+class OAVBase extends ui.Div implements feng3d.IObjectAttributeView
 {
     protected _space: any;
     protected _attributeName: string;
     protected _attributeType: string;
     protected attributeViewInfo: feng3d.AttributeViewInfo;
     //
-    label: UI.Span;
+    label: ui.Span;
 
     /**
      * 对象属性界面
@@ -51,11 +64,6 @@ class OAVBase extends UI.Div implements feng3d.IObjectAttributeView
                 }
             }
         }
-        if (this.label)
-            this.label.text = this._attributeName;
-
-        this.initView();
-        this.updateView();
     }
 
     get space(): any
@@ -71,12 +79,20 @@ class OAVBase extends UI.Div implements feng3d.IObjectAttributeView
         this.updateView();
     }
 
+    onAdded()
+    {
+        super.onAdded();
+        this.initView();
+        this.updateView();
+    }
+
     /**
      * 初始化
      */
     initView()
     {
-
+        if (this.label)
+            this.label.text = this._attributeName;
     }
 
     /**

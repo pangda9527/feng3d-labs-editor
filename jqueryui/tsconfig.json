@@ -14,12 +14,17 @@
   "files": [
     "../libs/feng3d.d.ts", //debug
     //
-    "src/UI.ts",
+    "src/components/UI.ts",
+    "src/components/JQueryUI.ts",
     // objectview
     "src/defaults/OAVBase.ts",
     "src/defaults/OAVDefault.ts",
+    "src/defaults/OBVDefault.ts",
     "src/defaults/OVBaseDefault.ts",
     "src/defaults/OVDefault.ts",
+    //
+    "src/oav/OAVBoolean.ts",
+    "src/oav/OAVNumber.ts",
     //
     "src/App.ts"
   ]
