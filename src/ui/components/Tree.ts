@@ -27,7 +27,7 @@ namespace feng3d.editor
          */
 		children: TreeNode[];
 
-		constructor(obj?: Partial<TreeNode>)
+		constructor(obj?: gPartial<TreeNode>)
 		{
 			if (obj)
 			{

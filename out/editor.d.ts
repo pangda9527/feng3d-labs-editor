@@ -494,7 +494,7 @@ declare namespace feng3d.editor {
          * 子节点列表
          */
         children: TreeNode[];
-        constructor(obj?: Partial<TreeNode>);
+        constructor(obj?: gPartial<TreeNode>);
         /**
          * 销毁
          */
@@ -1856,7 +1856,7 @@ declare namespace feng3d.editor {
          * 子节点列表
          */
         children: HierarchyNode[];
-        constructor(obj: Partial<HierarchyNode>);
+        constructor(obj: gPartial<HierarchyNode>);
         /**
          * 销毁
          */

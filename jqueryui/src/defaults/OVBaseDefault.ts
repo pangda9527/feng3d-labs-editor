@@ -72,6 +72,8 @@ class B
      * b.b
      */
     b = false;
+
+    bb = 1;
 }
 
 class ABase
@@ -86,7 +88,7 @@ class ABase
      */
     b: B;
 
-    constructor(p: Partial<ABase>)
+    constructor(p: Partial1<ABase>)
     {
         if (p)
         {
@@ -101,13 +103,17 @@ class ABase
     }
 }
 
+type Partial1<T> = {
+    [P in keyof T]?: Partial1<T[P]>;
+};
+
 class A extends ABase
 {
     /**
      * a
      */
     a = 1;
-    constructor(p: Partial<A>)
+    constructor(p: Partial1<A>)
     {
         super(p);
     }
