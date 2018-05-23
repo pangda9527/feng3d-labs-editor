@@ -3,10 +3,8 @@
  * @author feng 2016-3-11
  */
 @feng3d.OVComponent()
-class OVBaseDefault extends eui.Component implements feng3d.IObjectView
+class OVBaseDefault extends Element implements feng3d.IObjectView
 {
-    public dom = document.createElement("div");
-
     public label = document.createElement("label");
     public image = document.createElement("image");
     //
@@ -15,6 +13,8 @@ class OVBaseDefault extends eui.Component implements feng3d.IObjectView
     constructor(objectViewInfo: feng3d.ObjectViewInfo)
     {
         super();
+
+        var dom = document.createAttribute
 
         this.dom.innerHTML = `<div><span>Type</span><span>source texture</span></div>`;
         this._space = objectViewInfo.owner;

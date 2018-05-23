@@ -14,6 +14,7 @@
   "files": [
     "../libs/feng3d.d.ts", //debug
     //
+    "src/UI.ts",
     "src/defaults/OVBaseDefault.ts",
     "src/App.ts"
   ]
