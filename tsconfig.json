@@ -16,8 +16,6 @@
         "libs/modules/tween/tween.d.ts",
         "libs/exml.e.d.ts",
         //
-        "libs/jquery.d.ts",
-        //
         "libs/jszip.d.ts",
         "libs/FileSaver.d.ts",
         //

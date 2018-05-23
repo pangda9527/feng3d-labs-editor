@@ -1502,7 +1502,7 @@ var feng3d;
                     //
                     maskReck.addEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
                     displayObject.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromStage, null);
-                    feng3d.shortcut.activityState("inMode");
+                    feng3d.shortcut.activityState("inModal");
                 }
                 function removeDisplayObject() {
                     if (displayObject.parent)
@@ -1516,7 +1516,7 @@ var feng3d;
                         maskReck.parent.removeChild(maskReck);
                     }
                     feng3d.ticker.onceframe(function () {
-                        feng3d.shortcut.deactivityState("inMode");
+                        feng3d.shortcut.deactivityState("inModal");
                     });
                 }
             };
@@ -10771,7 +10771,7 @@ var shortcutConfig = [
     { key: "e", command: "gameobjectRotationTool", when: "!fpsViewing" },
     { key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
     { key: "del", command: "deleteSeletedGameObject", when: "" },
-    { key: "click+!alt", command: "selectGameObject", when: "!inMode+mouseInView3D+!mouseInSceneRotateTool" },
+    { key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool" },
 ];
 var feng3d;
 (function (feng3d) {

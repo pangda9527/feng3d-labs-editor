@@ -18000,6 +18000,7 @@ var feng3d;
      */
     var Texture2D = /** @class */ (function (_super) {
         __extends(Texture2D, _super);
+        // Partial
         function Texture2D(raw) {
             var _this = _super.call(this, raw) || this;
             _this.url = "";

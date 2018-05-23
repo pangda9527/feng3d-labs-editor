@@ -1093,21 +1093,6 @@ declare namespace feng3d {
 interface Performance {
     memory: any;
 }
-interface Element {
-    style: {
-        display;
-        cssText;
-        cursor;
-        position;
-        top;
-        width;
-        height;
-        textAlign;
-        opacity;
-        left;
-        textDecoration;
-    };
-}
 declare namespace feng3d {
     class Stats {
         static instance: Stats;

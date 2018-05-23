@@ -8,6 +8,21 @@ namespace UI
     {
         dom: HTMLElement;
 
+        get visible()
+        {
+            return this.dom.style.display == "none";
+        }
+        set visible(v: boolean)
+        {
+            if (v)
+            {
+                delete this.dom.style.display;
+            } else
+            {
+                this.dom.style.display = "none";
+            }
+        }
+
         constructor(dom?: HTMLElement)
         {
             this.dom = dom;
@@ -119,11 +134,22 @@ namespace UI
     {
         dom: HTMLSpanElement
 
+        get text()
+        {
+            return this.dom.textContent;
+        }
+        set text(v)
+        {
+            this.dom.textContent = v;
+        }
+
         constructor()
         {
             super()
             this.dom = document.createElement('span');
         }
+
+
     }
 
     // Div
@@ -774,7 +800,7 @@ namespace UI
     {
         dom: HTMLImageElement;
 
-        constructor(source)
+        constructor(source?: string)
         {
             super();
             var dom = new window["Image"]();
@@ -782,12 +808,12 @@ namespace UI
             this.dom.src = source;
         }
 
-        getSource()
+        get source()
         {
             return this.dom.src;
         }
 
-        setSource(v)
+        set source(v)
         {
             this.dom.src = v;
         }

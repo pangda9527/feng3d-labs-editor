@@ -15,17 +15,10 @@ class OVBaseDefault extends UI.Div implements feng3d.IObjectView
         super();
 
         this.label = new UI.Span();
+        this.image = new UI.Image();
+        this.add(this.label);
+        this.add(this.image);
 
-        
-        var dom = document.createAttribute
-
-        this.dom.innerHTML = `<div><span>Type</span><span>source texture</span></div>`;
-        this._space = objectViewInfo.owner;
-    }
-
-    $onAddToStage(stage: egret.Stage, nestLevel: number)
-    {
-        super.$onAddToStage(stage, nestLevel)
         this.updateView();
     }
 
@@ -72,3 +65,52 @@ class OVBaseDefault extends UI.Div implements feng3d.IObjectView
         }
     }
 }
+
+class B
+{
+    /**
+     * b.b
+     */
+    b = false;
+}
+
+class ABase
+{
+    /**
+     * base
+     */
+    base = "";
+
+    /**
+     * b
+     */
+    b: B;
+
+    constructor(p: Partial<ABase>)
+    {
+        if (p)
+        {
+            for (const key in p)
+            {
+                if (p.hasOwnProperty(key))
+                {
+                    this[key] = p[key];
+                }
+            }
+        }
+    }
+}
+
+class A extends ABase
+{
+    /**
+     * a
+     */
+    a = 1;
+    constructor(p: Partial<A>)
+    {
+        super(p);
+    }
+}
+
+new A({ a: 1, b: { b: false } });
