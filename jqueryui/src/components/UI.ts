@@ -78,7 +78,8 @@ namespace ui
         constructor(dom?: HTMLElement)
         {
             super();
-            this.dom = dom;
+            if (dom)
+                this.dom = dom;
         }
 
         addChild(...args: Element[])

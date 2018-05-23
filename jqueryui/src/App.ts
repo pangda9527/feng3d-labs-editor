@@ -8,6 +8,7 @@ feng3d.objectview.defaultObjectAttributeBlockView = "OBVDefault";
 
 feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "OAVBoolean" });
 feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
+feng3d.objectview.setDefaultTypeAttributeView("Date", { component: "OAVDatepicker" });
 
 $("body").ready(() =>
 {
@@ -46,6 +47,9 @@ $("body").ready(() =>
 
     var stage = new ui.Element(document.body);
 
-    var view = feng3d.objectview.getObjectView({ a: 1, b: false, c: "abcd" });
+    var view = feng3d.objectview.getObjectView({
+        a: 1, b: false, c: "abcd",
+        date: new Date(),
+    });
     stage.addChild(view);
 });

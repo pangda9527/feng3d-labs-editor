@@ -30,7 +30,8 @@ var ui;
             _this.onMouseKey = function (event) {
                 _this.dispatch(event.type, { data: event });
             };
-            _this.dom = dom;
+            if (dom)
+                _this.dom = dom;
             return _this;
         }
         Object.defineProperty(Element.prototype, "id", {
@@ -810,6 +811,36 @@ var ui;
         return Spinner;
     }(ui.Element));
     ui.Spinner = Spinner;
+    var Datepicker = /** @class */ (function (_super) {
+        __extends(Datepicker, _super);
+        function Datepicker() {
+            var _this = _super.call(this) || this;
+            var dom = document.createElement("input");
+            dom.type = "text";
+            _this.dom = dom;
+            return _this;
+            // <input type="text" id = "datepicker" >
+        }
+        Datepicker.prototype.onAdded = function () {
+            var _this = this;
+            _super.prototype.onAdded.call(this);
+            $(this.dom).datepicker().change(function () {
+                _this.dispatch("change");
+            });
+        };
+        Object.defineProperty(Datepicker.prototype, "value", {
+            get: function () {
+                return $(this.dom).datepicker("getDate");
+            },
+            set: function (v) {
+                $(this.dom).datepicker("setDate", v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Datepicker;
+    }(ui.Element));
+    ui.Datepicker = Datepicker;
 })(ui || (ui = {}));
 var OAVBase = /** @class */ (function (_super) {
     __extends(OAVBase, _super);
@@ -1260,6 +1291,34 @@ var OAVNumber = /** @class */ (function (_super) {
     ], OAVNumber);
     return OAVNumber;
 }(OAVDefault));
+var OAVDatepicker = /** @class */ (function (_super) {
+    __extends(OAVDatepicker, _super);
+    function OAVDatepicker(attributeViewInfo) {
+        var _this = _super.call(this, attributeViewInfo) || this;
+        _this.label = new ui.Span();
+        _this.datepicker = new ui.Datepicker();
+        _this.addChild(_this.label);
+        _this.addChild(_this.datepicker);
+        return _this;
+    }
+    OAVDatepicker.prototype.initView = function () {
+        _super.prototype.initView.call(this);
+        this.datepicker.on("change", this.onChange, this);
+    };
+    OAVDatepicker.prototype.dispose = function () {
+        this.datepicker.on("change", this.onChange, this);
+    };
+    OAVDatepicker.prototype.updateView = function () {
+        this.datepicker.value = this.attributeValue;
+    };
+    OAVDatepicker.prototype.onChange = function () {
+        this.attributeValue = this.datepicker.value;
+    };
+    OAVDatepicker = __decorate([
+        feng3d.OAVComponent()
+    ], OAVDatepicker);
+    return OAVDatepicker;
+}(OAVBase));
 // $("body").append(`<input id="autocomplete" title="type &quot;a&quot;">`);
 //
 feng3d.objectview.defaultBaseObjectViewClass = "OVBaseDefault";
@@ -1268,6 +1327,7 @@ feng3d.objectview.defaultObjectAttributeViewClass = "OAVDefault";
 feng3d.objectview.defaultObjectAttributeBlockView = "OBVDefault";
 feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "OAVBoolean" });
 feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
+feng3d.objectview.setDefaultTypeAttributeView("Date", { component: "OAVDatepicker" });
 $("body").ready(function () {
     $("body").append("<input id=\"autocomplete\">");
     // $("body").append(`<input id="autocomplete">`).ready(function ()
@@ -1301,7 +1361,10 @@ $("body").ready(function () {
     });
     // });
     var stage = new ui.Element(document.body);
-    var view = feng3d.objectview.getObjectView({ a: 1, b: false, c: "abcd" });
+    var view = feng3d.objectview.getObjectView({
+        a: 1, b: false, c: "abcd",
+        date: new Date(),
+    });
     stage.addChild(view);
 });
 //# sourceMappingURL=app.js.map

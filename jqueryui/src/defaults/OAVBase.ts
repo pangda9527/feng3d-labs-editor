@@ -108,7 +108,7 @@ class OAVBase extends ui.Div implements feng3d.IObjectAttributeView
      */
     updateView()
     {
-
+        
     }
 
     get attributeName(): string

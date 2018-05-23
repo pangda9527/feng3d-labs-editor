@@ -25,6 +25,7 @@
     //
     "src/oav/OAVBoolean.ts",
     "src/oav/OAVNumber.ts",
+    "src/oav/OAVDatepicker.ts",
     //
     "src/App.ts"
   ]
