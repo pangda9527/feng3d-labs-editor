@@ -15,7 +15,12 @@
     "../libs/feng3d.d.ts", //debug
     //
     "src/UI.ts",
+    // objectview
+    "src/defaults/OAVBase.ts",
+    "src/defaults/OAVDefault.ts",
     "src/defaults/OVBaseDefault.ts",
+    "src/defaults/OVDefault.ts",
+    //
     "src/App.ts"
   ]
 }

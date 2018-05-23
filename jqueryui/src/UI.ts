@@ -4,14 +4,45 @@
 
 namespace UI
 {
-    export class Element
+    export class Element extends feng3d.EventDispatcher
     {
         dom: HTMLElement;
+
+        get id()
+        {
+            return this.dom.id;
+        }
+
+        set id(id)
+        {
+            this.dom.id = id;
+        }
+
+        get className()
+        {
+            return this.dom.className;
+        }
+
+        set className(name)
+        {
+            this.dom.className = name;
+        }
+
+        get textContent()
+        {
+            return this.dom.textContent;
+        }
+
+        set textContent(value)
+        {
+            this.dom.textContent = value;
+        }
 
         get visible()
         {
             return this.dom.style.display == "none";
         }
+
         set visible(v: boolean)
         {
             if (v)
@@ -23,12 +54,15 @@ namespace UI
             }
         }
 
+        private listentypes: string[] = [];
+
         constructor(dom?: HTMLElement)
         {
+            super();
             this.dom = dom;
         }
 
-        add(...args: Element[])
+        addChild(...args: Element[])
         {
             for (var i = 0; i < args.length; i++)
             {
@@ -45,11 +79,11 @@ namespace UI
             return this;
         }
 
-        remove()
+        removeChild(...args: Element[])
         {
-            for (var i = 0; i < arguments.length; i++)
+            for (var i = 0; i < args.length; i++)
             {
-                var argument = arguments[i];
+                var argument = args[i];
                 if (argument instanceof Element)
                 {
                     this.dom.removeChild(argument.dom);
@@ -61,6 +95,67 @@ namespace UI
             return this;
         }
 
+        /**
+         * 监听一次事件后将会被移除
+		 * @param type						事件的类型。
+		 * @param listener					处理事件的侦听器函数。
+		 * @param thisObject                listener函数作用域
+         * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
+         */
+        once<K extends keyof HTMLElementEventMap>(type: K, listener: (event: feng3d.Event<HTMLElementEventMap[K]>) => void, thisObject?: any, priority?: number): void
+        {
+            this.on(type, listener, thisObject, priority, true)
+        }
+
+        /**
+         * 添加监听
+		 * @param type						事件的类型。
+		 * @param listener					处理事件的侦听器函数。
+         * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
+         */
+        on<K extends keyof HTMLElementEventMap>(type: K, listener: (event: feng3d.Event<HTMLElementEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any
+        {
+            super.on(type, listener, thisObject, priority, once);
+            if (this.listentypes.indexOf(type) == -1)
+            {
+                this.listentypes.push(type);
+                this.dom.addEventListener(type, this.onMouseKey);
+            }
+        }
+
+        /**
+         * 移除监听
+         * @param dispatcher 派发器
+		 * @param type						事件的类型。
+		 * @param listener					要删除的侦听器对象。
+         */
+        off<K extends keyof HTMLElementEventMap>(type?: K, listener?: (event: feng3d.Event<HTMLElementEventMap[K]>) => any, thisObject?: any): any
+        {
+            super.off(type, listener, thisObject);
+            if (!type)
+            {
+                this.listentypes.forEach(element =>
+                {
+                    this.dom.removeEventListener(element, this.onMouseKey);
+                });
+                this.listentypes.length = 0;
+            } else if (!this.has(<any>type))
+            {
+                this.dom.removeEventListener(type, this.onMouseKey);
+                this.listentypes.splice(this.listentypes.indexOf(type), 1);
+            }
+        }
+
+        dispatch<K extends keyof HTMLElementEventMap>(type: K, data?: HTMLElementEventMap[K], bubbles?: boolean): any
+        {
+            super.dispatch(type, data, bubbles);
+        }
+
+        has<K extends keyof HTMLElementEventMap>(type: K): boolean
+        {
+            return super.has(type);
+        }
+
         clear()
         {
             while (this.dom.children.length)
@@ -69,50 +164,31 @@ namespace UI
             }
         }
 
-        setId(id)
+        /**
+		 * 键盘按下事件
+		 */
+        private onMouseKey = (event) =>
         {
-            this.dom.id = id;
-            return this;
-        }
-
-        setClass(name)
-        {
-            this.dom.className = name;
-            return this;
-        }
-
-        setStyle(style, array)
-        {
-            for (var i = 0; i < array.length; i++)
-            {
-                this.dom.style[style] = array[i];
-            }
-            return this;
-        }
-
-        setTextContent(value)
-        {
-            this.dom.textContent = value;
-            return this;
+            this.dispatch(event.type, { data: event });
         }
     }
 
     // properties
 
-    var properties = ['position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-        'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-        'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex'];
+    // var properties = ['position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
+    //     'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+    //     'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex'];
 
-    properties.forEach(function (property)
-    {
-        var method = 'set' + property.substr(0, 1).toUpperCase() + property.substr(1, property.length);
+    // properties.forEach(function (property)
+    // {
+    //     var method = 'set' + property.substr(0, 1).toUpperCase() + property.substr(1, property.length);
 
-        UI.Element.prototype[method] = function ()
-        {
-            this.setStyle(property, arguments);
-            return this;
-        };
-    });
+    //     UI.Element.prototype[method] = function ()
+    //     {
+    //         this.setStyle(property, arguments);
+    //         return this;
+    //     };
+    // });
 
     // events
 
@@ -232,7 +308,7 @@ namespace UI
     export class Input extends Element
     {
         dom: HTMLInputElement;
-        constructor(text)
+        constructor(text = "")
         {
             super();
             var dom = document.createElement('input');
@@ -246,18 +322,27 @@ namespace UI
             }, false);
 
             this.dom = dom;
-            this.setValue(text);
+            this.value = text;
         }
 
-        getValue()
+        get enabled()
+        {
+            return !this.dom.disabled;
+        }
+
+        set enabled(v)
+        {
+            this.dom.disabled = !v;
+        }
+
+        get value()
         {
             return this.dom.value;
         }
 
-        setValue(value)
+        set value(value)
         {
             this.dom.value = value;
-            return this;
         }
     }
 
@@ -854,13 +939,13 @@ namespace UI
             this.container.dom.style.backgroundColor = '#ffffff';
             this.container.dom.style.boxShadow = '0px 5px 10px rgba(0,0,0,0.5)';
 
-            this.add(this.container);
+            this.addChild(this.container);
         }
 
         show(content)
         {
             this.container.clear();
-            this.container.add(content);
+            this.container.addChild(content);
             this.dom.style.display = 'flex';
             return this;
         };

@@ -16,8 +16,8 @@ class OVBaseDefault extends UI.Div implements feng3d.IObjectView
 
         this.label = new UI.Span();
         this.image = new UI.Image();
-        this.add(this.label);
-        this.add(this.image);
+        this.addChild(this.label);
+        this.addChild(this.image);
 
         this.updateView();
     }
@@ -65,58 +65,3 @@ class OVBaseDefault extends UI.Div implements feng3d.IObjectView
         }
     }
 }
-
-class B
-{
-    /**
-     * b.b
-     */
-    b = false;
-
-    bb = 1;
-}
-
-class ABase
-{
-    /**
-     * base
-     */
-    base = "";
-
-    /**
-     * b
-     */
-    b: B;
-
-    constructor(p: Partial1<ABase>)
-    {
-        if (p)
-        {
-            for (const key in p)
-            {
-                if (p.hasOwnProperty(key))
-                {
-                    this[key] = p[key];
-                }
-            }
-        }
-    }
-}
-
-type Partial1<T> = {
-    [P in keyof T]?: Partial1<T[P]>;
-};
-
-class A extends ABase
-{
-    /**
-     * a
-     */
-    a = 1;
-    constructor(p: Partial1<A>)
-    {
-        super(p);
-    }
-}
-
-new A({ a: 1, b: { b: false } });
