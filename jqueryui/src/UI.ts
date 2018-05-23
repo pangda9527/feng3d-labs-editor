@@ -770,6 +770,28 @@ namespace UI
         };
     }
 
+    export class Image extends Element
+    {
+        dom: HTMLImageElement;
+
+        constructor(source)
+        {
+            super();
+            var dom = new window["Image"]();
+            this.dom = dom;
+            this.dom.src = source;
+        }
+
+        getSource()
+        {
+            return this.dom.src;
+        }
+
+        setSource(v)
+        {
+            this.dom.src = v;
+        }
+    }
 
     // Modal
     export class Modal extends Element

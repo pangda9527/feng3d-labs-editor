@@ -3,10 +3,10 @@
  * @author feng 2016-3-11
  */
 @feng3d.OVComponent()
-class OVBaseDefault extends Element implements feng3d.IObjectView
+class OVBaseDefault extends UI.Div implements feng3d.IObjectView
 {
-    public label = document.createElement("label");
-    public image = document.createElement("image");
+    public label: UI.Span;
+    public image: UI.Image;
     //
     private _space: Object;
 
@@ -14,6 +14,9 @@ class OVBaseDefault extends Element implements feng3d.IObjectView
     {
         super();
 
+        this.label = new UI.Span();
+
+        
         var dom = document.createAttribute
 
         this.dom.innerHTML = `<div><span>Type</span><span>source texture</span></div>`;
