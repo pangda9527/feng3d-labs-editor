@@ -4218,7 +4218,8 @@ var feng3d;
                         feng3d.error(err);
                         return;
                     }
-                    editor.fs.getAllfilepathInFolder("", function (err, filepaths) {
+                    _this.files[_this.assetsPath] = new editor.AssetsFile(_this.assetsPath);
+                    editor.fs.getAllfilepathInFolder(_this.assetsPath, function (err, filepaths) {
                         feng3d.assert(!err);
                         filepaths.forEach(function (element) {
                             _this.files[element] = new editor.AssetsFile(element);
@@ -5281,7 +5282,6 @@ var feng3d;
                 this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
                 feng3d.watcher.watch(editor.editorAssets, "showFloder", this.updateShowFloder, this);
                 feng3d.watcher.watch(editor.editorData, "selectedObjects", this.selectedfilechanged, this);
-                feng3d.watcher.watchchain(this, "selectfile.name", this.selectfile_nameChanged, this);
             };
             AssetsView.prototype.$onRemoveFromStage = function () {
                 _super.prototype.$onRemoveFromStage.call(this);
@@ -5393,6 +5393,7 @@ var feng3d;
             };
             AssetsView.prototype.selectedfilechanged = function () {
                 var _this = this;
+                this.selectfile = null;
                 var selectedAssetsFile = editor.editorData.selectedAssetsFile;
                 var assetsFiles = this.filelistData.source;
                 assetsFiles.forEach(function (element) {
@@ -5400,8 +5401,6 @@ var feng3d;
                     if (element.selected)
                         _this.selectfile = element;
                 });
-            };
-            AssetsView.prototype.selectfile_nameChanged = function () {
                 if (this.selectfile)
                     this.filepathLabel.text = this.selectfile.name;
                 else

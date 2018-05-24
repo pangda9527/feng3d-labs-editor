@@ -47,7 +47,8 @@ namespace feng3d.editor
                     error(err);
                     return;
                 }
-                fs.getAllfilepathInFolder("", (err, filepaths) =>
+                this.files[this.assetsPath] = new AssetsFile(this.assetsPath);
+                fs.getAllfilepathInFolder(this.assetsPath, (err, filepaths) =>
                 {
                     assert(!err);
                     filepaths.forEach(element =>

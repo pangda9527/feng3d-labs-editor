@@ -88,7 +88,6 @@ namespace feng3d.editor
             feng3d.watcher.watch(editorAssets, "showFloder", this.updateShowFloder, this);
 
             watcher.watch(editorData, "selectedObjects", this.selectedfilechanged, this);
-            watcher.watchchain(this, "selectfile.name", this.selectfile_nameChanged, this);
         }
 
         $onRemoveFromStage()
@@ -240,6 +239,7 @@ namespace feng3d.editor
 
         private selectedfilechanged()
         {
+            this.selectfile = null;
             var selectedAssetsFile = editorData.selectedAssetsFile;
             var assetsFiles: AssetsFile[] = this.filelistData.source;
             assetsFiles.forEach(element =>
@@ -248,10 +248,6 @@ namespace feng3d.editor
                 if (element.selected)
                     this.selectfile = element;
             });
-        }
-
-        private selectfile_nameChanged()
-        {
             if (this.selectfile)
                 this.filepathLabel.text = this.selectfile.name;
             else

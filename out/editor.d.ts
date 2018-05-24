@@ -1356,7 +1356,6 @@ declare namespace feng3d.editor {
         private updateShowFloder(host?, property?, oldvalue?);
         private onfilter();
         private selectedfilechanged();
-        private selectfile_nameChanged();
         private onfilelistclick(e);
         private onfilelistrightclick(e);
         private onfloderpathTxtLink(evt);
