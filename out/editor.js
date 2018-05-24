@@ -4366,7 +4366,7 @@ var feng3d;
                             },
                             {
                                 label: "立方体贴图", click: function () {
-                                    assetsFile.addfile("new material" + ".texture.json", new feng3d.TextureCube());
+                                    assetsFile.addfile("new material" + ".texturecube.json", new feng3d.TextureCube());
                                 }
                             },
                             {
@@ -4815,18 +4815,7 @@ var feng3d;
              */
             AssetsFile.prototype.getArrayBuffer = function (callback) {
                 var content = this.cacheData;
-                if (content instanceof feng3d.Material
-                    || content instanceof feng3d.GameObject
-                    || content instanceof feng3d.AnimationClip
-                    || content instanceof feng3d.Geometry
-                    || content instanceof feng3d.Texture2D) {
-                    var obj = feng3d.serialization.serialize(content);
-                    var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                    feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
-                        callback(arrayBuffer);
-                    });
-                }
-                else if (editor.regExps.image.test(this.path)) {
+                if (content instanceof ArrayBuffer) {
                     callback(content);
                 }
                 else if (typeof content == "string") {
@@ -4835,7 +4824,11 @@ var feng3d;
                     });
                 }
                 else {
-                    callback(content);
+                    var obj = feng3d.serialization.serialize(content);
+                    var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                    feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
+                        callback(arrayBuffer);
+                    });
                 }
             };
             /**

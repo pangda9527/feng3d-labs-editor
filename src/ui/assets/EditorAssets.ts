@@ -225,7 +225,7 @@ namespace feng3d.editor
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    assetsFile.addfile("new material" + ".texture.json", new TextureCube());
+                                    assetsFile.addfile("new material" + ".texturecube.json", new TextureCube());
                                 }
                             },
                             {

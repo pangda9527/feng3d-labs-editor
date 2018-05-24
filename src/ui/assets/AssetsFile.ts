@@ -1,5 +1,7 @@
 namespace feng3d.editor
 {
+    export type AssetsDataType = ArrayBuffer | string | Material | GameObject | AnimationClip | Geometry | Texture2D | TextureCube;
+
     export class AssetsFile
     {
         /**
@@ -40,9 +42,9 @@ namespace feng3d.editor
         /**
          * 缓存下来的数据 避免从文件再次加载解析数据
          */
-        cacheData: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D;
+        cacheData: AssetsDataType;
 
-        constructor(path: string, data?: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D)
+        constructor(path: string, data?: AssetsDataType)
         {
             this.path = path;
             this.cacheData = data;
@@ -241,7 +243,7 @@ namespace feng3d.editor
          * @param content 文件内容
          * @param callback 完成回调
          */
-        addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry | Texture2D, override = false, callback?: (file: AssetsFile) => void)
+        addfile(filename: string, content: AssetsDataType, override = false, callback?: (file: AssetsFile) => void)
         {
             var filepath = this.path + filename;
             if (!override)
@@ -287,22 +289,9 @@ namespace feng3d.editor
         getArrayBuffer(callback: (arraybuffer: ArrayBuffer) => void)
         {
             var content = this.cacheData;
-            if (content instanceof Material
-                || content instanceof GameObject
-                || content instanceof AnimationClip
-                || content instanceof Geometry
-                || content instanceof Texture2D
-            )
+            if (content instanceof ArrayBuffer)
             {
-                var obj = serialization.serialize(content);
-                var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
-                {
-                    callback(arrayBuffer);
-                });
-            } else if (regExps.image.test(this.path))
-            {
-                callback(<ArrayBuffer>content);
+                callback(content);
             } else if (typeof content == "string")
             {
                 dataTransform.stringToArrayBuffer(content, (arrayBuffer) =>
@@ -311,7 +300,12 @@ namespace feng3d.editor
                 });
             } else
             {
-                callback(content);
+                var obj = serialization.serialize(content);
+                var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
+                {
+                    callback(arrayBuffer);
+                });
             }
         }
 

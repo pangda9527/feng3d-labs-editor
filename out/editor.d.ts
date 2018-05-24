@@ -1165,6 +1165,7 @@ declare namespace feng3d.editor {
     var codeeditoWin: Window;
 }
 declare namespace feng3d.editor {
+    type AssetsDataType = ArrayBuffer | string | Material | GameObject | AnimationClip | Geometry | Texture2D | TextureCube;
     class AssetsFile {
         /**
          * 路径
@@ -1197,8 +1198,8 @@ declare namespace feng3d.editor {
         /**
          * 缓存下来的数据 避免从文件再次加载解析数据
          */
-        cacheData: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D;
-        constructor(path: string, data?: string | ArrayBuffer | Uint8Array | Material | GameObject | AnimationClip | Geometry | Texture2D);
+        cacheData: AssetsDataType;
+        constructor(path: string, data?: AssetsDataType);
         pathChanged(): void;
         /**
          * 获取属性显示数据
@@ -1241,7 +1242,7 @@ declare namespace feng3d.editor {
          * @param content 文件内容
          * @param callback 完成回调
          */
-        addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry | Texture2D, override?: boolean, callback?: (file: AssetsFile) => void): void;
+        addfile(filename: string, content: AssetsDataType, override?: boolean, callback?: (file: AssetsFile) => void): void;
         /**
          * 保存数据到文件
          * @param callback 回调函数
