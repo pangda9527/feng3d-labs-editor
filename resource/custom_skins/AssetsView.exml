@@ -26,14 +26,18 @@
 				</e:Group>
 
 				<e:Group id="filelistgroup" width="100%" height="100%" y="20">
-					<e:Button label="Button" x="0" y="0" width="100%" height="100%"/>
+					<e:Scroller width="100%" x="0" height="100%">
+						<e:Group>
+							<e:List id="filelist" y="0" scaleX="1" scaleY="1" height="242" left="0" right="0">
+								<e:layout>
+								<e:TileLayout horizontalGap="0" verticalGap="0"/>
+								</e:layout>
+							</e:List>
+						</e:Group>
+					</e:Scroller>
 
 
-					<e:List id="filelist" top="0" bottom="0" y="0" scaleX="1" scaleY="1" left="0" right="0">
-						<e:layout>
-							<e:TileLayout horizontalGap="0" verticalGap="0" />
-						</e:layout>
-					</e:List>
+
 				</e:Group>
 				<e:Group width="100%" height="20" x="436" y="372">
 					<e:Rect width="100%" height="100%" scaleX="1" scaleY="1" fillAlpha="1" fillColor="0xdddddd"/>

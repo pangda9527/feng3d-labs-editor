@@ -79,7 +79,7 @@ namespace feng3d.editor
                 case "Mesh":
                     var meshRenderer = gameobject.addComponent(MeshRenderer);
                     meshRenderer.geometry = parseGeometry(object3d.geometry);
-                    skinnedMeshRenderer.material.renderParams.cullFace = CullFace.NONE;
+                    meshRenderer.material.renderParams.cullFace = CullFace.NONE;
                     break;
                 case "Group":
                     if (object3d.skeleton)

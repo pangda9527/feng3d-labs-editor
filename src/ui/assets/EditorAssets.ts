@@ -451,7 +451,7 @@ namespace feng3d.editor
                                     paths.pop();
                                     war3Model.root = paths.join("/") + "/";
                                     var gameobject = war3Model.getMesh();
-                                    gameobject.name = file.name;
+                                    gameobject.name = pathUtils.getName(file.name);
                                     this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                                 });
                             });
@@ -466,7 +466,7 @@ namespace feng3d.editor
                             {
                                 ObjLoader.parse(content, (gameobject: GameObject) =>
                                 {
-                                    gameobject.name = file.name;
+                                    gameobject.name = pathUtils.getName(file.name);
                                     this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                                 });
                             });
@@ -483,7 +483,7 @@ namespace feng3d.editor
                             {
                                 threejsLoader.load(data, (gameobject) =>
                                 {
-                                    gameobject.name = file.name;
+                                    gameobject.name = pathUtils.getName(file.name);
                                     this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                                     // engine.root.addChild(gameobject);
                                 });
@@ -501,7 +501,7 @@ namespace feng3d.editor
                             {
                                 MD5Loader.parseMD5Mesh(content, (gameobject) =>
                                 {
-                                    gameobject.name = file.name.split("/").pop().split(".").shift();
+                                    gameobject.name = pathUtils.getName(file.name);
                                     this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
                                     // engine.root.addChild(gameobject);
                                 });
@@ -518,7 +518,7 @@ namespace feng3d.editor
                             {
                                 MD5Loader.parseMD5Anim(content, (animationclip) =>
                                 {
-                                    animationclip.name = file.name.split("/").pop().split(".").shift();
+                                    animationclip.name = pathUtils.getName(file.name);
                                     this.saveObject(animationclip, animationclip.name + "." + AssetExtension.anim);
                                 });
                             });

@@ -4546,7 +4546,7 @@ var feng3d;
                                         paths.pop();
                                         war3Model.root = paths.join("/") + "/";
                                         var gameobject = war3Model.getMesh();
-                                        gameobject.name = file.name;
+                                        gameobject.name = feng3d.pathUtils.getName(file.name);
                                         _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                                     });
                                 });
@@ -4558,7 +4558,7 @@ var feng3d;
                             label: "解析", click: function () {
                                 editor.fs.readFileAsString(file.path, function (err, content) {
                                     feng3d.ObjLoader.parse(content, function (gameobject) {
-                                        gameobject.name = file.name;
+                                        gameobject.name = feng3d.pathUtils.getName(file.name);
                                         _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                                     });
                                 });
@@ -4570,7 +4570,7 @@ var feng3d;
                             label: "解析", click: function () {
                                 editor.fs.readFile(file.path, function (err, data) {
                                     editor.threejsLoader.load(data, function (gameobject) {
-                                        gameobject.name = file.name;
+                                        gameobject.name = feng3d.pathUtils.getName(file.name);
                                         _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                                         // engine.root.addChild(gameobject);
                                     });
@@ -4583,7 +4583,7 @@ var feng3d;
                             label: "解析", click: function () {
                                 editor.fs.readFileAsString(file.path, function (err, content) {
                                     feng3d.MD5Loader.parseMD5Mesh(content, function (gameobject) {
-                                        gameobject.name = file.name.split("/").pop().split(".").shift();
+                                        gameobject.name = feng3d.pathUtils.getName(file.name);
                                         _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                                         // engine.root.addChild(gameobject);
                                     });
@@ -4596,7 +4596,7 @@ var feng3d;
                             label: "解析", click: function () {
                                 editor.fs.readFileAsString(file.path, function (err, content) {
                                     feng3d.MD5Loader.parseMD5Anim(content, function (animationclip) {
-                                        animationclip.name = file.name.split("/").pop().split(".").shift();
+                                        animationclip.name = feng3d.pathUtils.getName(file.name);
                                         _this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
                                     });
                                 });
@@ -9916,7 +9916,7 @@ var feng3d;
                     case "Mesh":
                         var meshRenderer = gameobject.addComponent(feng3d.MeshRenderer);
                         meshRenderer.geometry = parseGeometry(object3d.geometry);
-                        skinnedMeshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
+                        meshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
                         break;
                     case "Group":
                         if (object3d.skeleton) {
