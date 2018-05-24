@@ -1152,7 +1152,13 @@ declare namespace feng3d.editor {
          * @param next 是否继续遍历children
          */
         filter(fn: (assetsFile: AssetsFile) => boolean): AssetsFile[];
-        inputFiles(files: File[] | FileList): void;
+        /**
+         *
+         * @param files 需要导入的文件列表
+         * @param callback 完成回调
+         * @param assetsFiles 生成资源文件列表（不用赋值，函数递归时使用）
+         */
+        inputFiles(files: File[], callback?: (files: AssetsFile[]) => void, assetsFiles?: AssetsFile[]): void;
         runProjectScript(callback?: () => void): void;
         /**
          * 解析菜单
@@ -1244,10 +1250,18 @@ declare namespace feng3d.editor {
          */
         addfile(filename: string, content: AssetsDataType, override?: boolean, callback?: (file: AssetsFile) => void): void;
         /**
+         * 新增文件从ArrayBuffer
+         * @param filename 新增文件名称
+         * @param arraybuffer 文件数据
+         * @param callback 完成回调
+         */
+        addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override?: boolean, callback?: (e: Error, file: AssetsFile) => void): void;
+        /**
          * 保存数据到文件
+         * @param create 如果文件不存在，是否新建文件
          * @param callback 回调函数
          */
-        save(callback?: (err: Error) => void): void;
+        save(create?: boolean, callback?: (err: Error) => void): void;
         /**
          * 获取ArrayBuffer数据
          * @param callback 回调函数

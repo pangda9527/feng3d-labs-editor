@@ -317,7 +317,12 @@ namespace feng3d.editor
                 e.stopPropagation();
                 e.preventDefault();
                 var dt = e.dataTransfer;
-                var files = dt.files;
+                var fileList = dt.files;
+                var files = [];
+                for (let i = 0; i < fileList.length; i++)
+                {
+                    files[i] = fileList[i];
+                }
                 if (displayobject.getTransformedBounds(displayobject.stage).contains(e.clientX, e.clientY))
                 {
                     editorAssets.inputFiles(files);

@@ -82,7 +82,7 @@ namespace feng3d.editor
             {
                 if (err) error(err);
 
-                if (pathUtils.isDirectory)
+                if (pathUtils.isDirectory(path))
                 {
                     Object.keys(this.files).forEach(element =>
                     {
@@ -96,10 +96,10 @@ namespace feng3d.editor
                     {
                         editorAssets.showFloder = pathUtils.getParentPath(path);
                     }
-                    editorui.assetsview.invalidateAssetstree();
                 }
                 delete this.files[path];
                 feng3dDispatcher.dispatch("assets.deletefile", { path: path });
+                editorui.assetsview.invalidateAssetstree();
                 callback && callback();
             });
         }
@@ -225,7 +225,7 @@ namespace feng3d.editor
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    assetsFile.addfile("new material" + ".texturecube.json", new TextureCube());
+                                    assetsFile.addfile("new texturecube" + ".texturecube.json", new TextureCube());
                                 }
                             },
                             {
@@ -240,9 +240,14 @@ namespace feng3d.editor
                     {
                         label: "导入资源", click: () =>
                         {
-                            fs.selectFile((file: FileList) =>
+                            fs.selectFile((fileList: FileList) =>
                             {
-                                this.inputFiles(file);
+                                var files = [];
+                                for (let i = 0; i < fileList.length; i++)
+                                {
+                                    files[i] = fileList[i];
+                                }
+                                this.inputFiles(files);
                             });
                         }
                     });
@@ -370,20 +375,36 @@ namespace feng3d.editor
             }
             return results;
         }
-        inputFiles(files: File[] | FileList)
+        /**
+         * 
+         * @param files 需要导入的文件列表
+         * @param callback 完成回调
+         * @param assetsFiles 生成资源文件列表（不用赋值，函数递归时使用）
+         */
+        inputFiles(files: File[], callback?: (files: AssetsFile[]) => void, assetsFiles: AssetsFile[] = [])
         {
-            for (let i = 0; i < files.length; i++)
+            if (files.length == 0)
             {
-                const file = files[i];
-                var reader = new FileReader();
-                reader.addEventListener('load', (event) =>
-                {
-                    var showFloder = this.getFile(this.showFloder);
-                    var result = event.target["result"];
-                    showFloder.addfile(file.name, result);
-                }, false);
-                reader.readAsArrayBuffer(file);
+                editorData.selectObject.apply(editorData, assetsFiles);
+                callback && callback(assetsFiles);
+                return;
             }
+            var file = files.shift();
+            var reader = new FileReader();
+            reader.addEventListener('load', (event) =>
+            {
+                var result: ArrayBuffer = event.target["result"];
+                var showFloder = this.getFile(this.showFloder);
+                showFloder.addfileFromArrayBuffer(file.name, result, false, (e, file) =>
+                {
+                    if (e)
+                        error(e);
+                    else
+                        assetsFiles.push(file);
+                    this.inputFiles(files, callback, assetsFiles);
+                });
+            }, false);
+            reader.readAsArrayBuffer(file);
         }
         runProjectScript(callback?: () => void)
         {

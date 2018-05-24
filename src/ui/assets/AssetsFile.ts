@@ -46,8 +46,8 @@ namespace feng3d.editor
 
         constructor(path: string, data?: AssetsDataType)
         {
-            this.path = path;
             this.cacheData = data;
+            this.path = path;
         }
 
         pathChanged()
@@ -252,9 +252,10 @@ namespace feng3d.editor
             }
 
             var assetsFile = new AssetsFile(filepath, content);
-            assetsFile.save(() =>
+            assetsFile.save(true, () =>
             {
                 editorAssets.files[filepath] = assetsFile;
+                editorData.selectObject(assetsFile);
 
                 editorui.assetsview.invalidateAssetstree();
 
@@ -265,11 +266,59 @@ namespace feng3d.editor
         }
 
         /**
+         * 新增文件从ArrayBuffer
+         * @param filename 新增文件名称
+         * @param arraybuffer 文件数据
+         * @param callback 完成回调
+         */
+        addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsFile) => void)
+        {
+            var filepath = this.path + filename;
+            if (!override)
+            {
+                filepath = this.getnewname(filepath);
+            }
+            fs.writeFile(filepath, arraybuffer, (e) =>
+            {
+                if (e)
+                {
+                    callback(e, null);
+                    return;
+                }
+                var assetsFile = new AssetsFile(filepath);
+                editorAssets.files[filepath] = assetsFile;
+                editorData.selectObject(assetsFile);
+
+                editorui.assetsview.invalidateAssetstree();
+
+                callback && callback(null, assetsFile);
+                if (regExps.image.test(assetsFile.path))
+                    feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
+
+            });
+        }
+
+        /**
          * 保存数据到文件
+         * @param create 如果文件不存在，是否新建文件
          * @param callback 回调函数
          */
-        save(callback?: (err: Error) => void)
+        save(create = false, callback?: (err: Error) => void)
         {
+            if (this.cacheData == undefined)
+            {
+                callback && callback(null);
+                return;
+            }
+            if (!create && !editorAssets.files[this.path])
+            {
+                var e = new Error(`需要保存的文件 ${this.path} 不存在`);
+                if (callback)
+                    callback(e);
+                else if (e)
+                    error(e);
+                return;
+            }
             this.getArrayBuffer((arraybuffer) =>
             {
                 fs.writeFile(this.path, arraybuffer, (e) =>
@@ -292,12 +341,22 @@ namespace feng3d.editor
             if (content instanceof ArrayBuffer)
             {
                 callback(content);
-            } else if (typeof content == "string")
+            }
+            else if (typeof content == "string")
             {
-                dataTransform.stringToArrayBuffer(content, (arrayBuffer) =>
+                if (regExps.image.test(this.path))
                 {
-                    callback(arrayBuffer);
-                });
+                    dataTransform.dataURLToArrayBuffer(content, (arrayBuffer) =>
+                    {
+                        callback(arrayBuffer);
+                    });
+                } else
+                {
+                    dataTransform.stringToArrayBuffer(content, (arrayBuffer) =>
+                    {
+                        callback(arrayBuffer);
+                    });
+                }
             } else
             {
                 var obj = serialization.serialize(content);

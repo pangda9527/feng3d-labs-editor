@@ -69,11 +69,15 @@ namespace feng3d.editor
 			{
 				if (this.viewData instanceof AssetsFile)
 				{
-					this.viewData.showInspectorData((showdata) =>
+					var viewData = this.viewData;
+					viewData.showInspectorData((showdata) =>
 					{
-						this.view = objectview.getObjectView(showdata);
-						this.view.percentWidth = 100;
-						this.group.addChild(this.view);
+						if (viewData == this.viewData)
+						{
+							this.view = objectview.getObjectView(showdata);
+							this.view.percentWidth = 100;
+							this.group.addChild(this.view);
+						}
 					});
 				} else
 				{
@@ -97,7 +101,7 @@ namespace feng3d.editor
 				{
 					if (element instanceof AssetsFile)
 					{
-						element.save();
+						element.save(false, () => { });
 					}
 				});
 				this.viewDataList.length = 0;

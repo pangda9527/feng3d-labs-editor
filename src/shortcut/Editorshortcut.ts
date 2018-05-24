@@ -94,6 +94,8 @@ namespace feng3d.editor
 
         if (!selectedObject)
             return;
+        //删除文件引用计数
+        var deletefileNum = 0;
         selectedObject.forEach(element =>
         {
             if (element instanceof GameObject)
@@ -101,11 +103,23 @@ namespace feng3d.editor
                 element.remove();
             } else if (element instanceof AssetsFile)
             {
-                editorAssets.deletefile(element.path);
+                deletefileNum++;
+                editorAssets.deletefile(element.path, () =>
+                {
+                    deletefileNum--;
+                    // 等待删除所有文件 后清空选中对象
+                    if (deletefileNum == 0)
+                    {
+                        editorData.selectedObjects = null;
+                    }
+                });
             }
         });
-        //
-        editorData.selectedObjects = null;
+        // 等待删除所有文件 后清空选中对象
+        if (deletefileNum == 0)
+        {
+            editorData.selectedObjects = null;
+        }
     }
 
     function onDragSceneStart()
