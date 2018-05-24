@@ -17,7 +17,7 @@ namespace feng3d.editor
         /**
          * 图标名称或者路径
          */
-        image: egret.Texture | string;
+        image: string;
 
         /**
          * 文件夹名称

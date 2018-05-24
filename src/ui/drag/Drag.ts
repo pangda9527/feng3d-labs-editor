@@ -79,7 +79,11 @@ namespace feng3d.editor
 		image?: string;
 
 		/**
-		 * 立方体贴图
+		 * 纹理
+		 */
+		texture2d?: TextureCube;
+		/**
+		 * 立方体纹理
 		 */
 		texturecube?: TextureCube;
 	}

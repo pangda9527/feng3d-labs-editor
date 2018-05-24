@@ -5028,6 +5028,20 @@ var feng3d;
                                         editor.drag.refreshAcceptables();
                                     });
                                     break;
+                                case feng3d.AssetExtension.texturecube:
+                                    var path = _this.data.path;
+                                    _this.data.getData(function (data) {
+                                        dragsource.texturecube = data;
+                                        editor.drag.refreshAcceptables();
+                                    });
+                                    break;
+                                case feng3d.AssetExtension.texture2d:
+                                    var path = _this.data.path;
+                                    _this.data.getData(function (data) {
+                                        dragsource.texture2d = data;
+                                        editor.drag.refreshAcceptables();
+                                    });
+                                    break;
                                 case feng3d.AssetExtension.geometry:
                                     var path = _this.data.path;
                                     _this.data.getData(function (data) {

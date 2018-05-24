@@ -266,7 +266,11 @@ declare namespace feng3d.editor {
          */
         image?: string;
         /**
-         * 立方体贴图
+         * 纹理
+         */
+        texture2d?: TextureCube;
+        /**
+         * 立方体纹理
          */
         texturecube?: TextureCube;
     }
@@ -1184,7 +1188,7 @@ declare namespace feng3d.editor {
         /**
          * 图标名称或者路径
          */
-        image: egret.Texture | string;
+        image: string;
         /**
          * 文件夹名称
          */
