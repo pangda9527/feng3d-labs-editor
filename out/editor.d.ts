@@ -816,7 +816,7 @@ declare namespace feng3d.editor {
     }
 }
 declare namespace feng3d.editor {
-    class BooleanAttrView extends OAVBase {
+    class OAVBoolean extends OAVBase {
         label: eui.Label;
         checkBox: eui.CheckBox;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
@@ -1242,7 +1242,16 @@ declare namespace feng3d.editor {
          * @param callback 完成回调
          */
         addfile(filename: string, content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry | Texture2D, override?: boolean, callback?: (file: AssetsFile) => void): void;
-        save(callback?: () => void): void;
+        /**
+         * 保存数据到文件
+         * @param callback 回调函数
+         */
+        save(callback?: (err: Error) => void): void;
+        /**
+         * 获取ArrayBuffer数据
+         * @param callback 回调函数
+         */
+        getArrayBuffer(callback: (arraybuffer: ArrayBuffer) => void): void;
         /**
          * 获取一个新的不重名子文件名称
          */

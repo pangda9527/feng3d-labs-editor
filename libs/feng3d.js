@@ -379,7 +379,7 @@ var feng3d;
          * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
          */
         EventProxy.prototype.once = function (type, listener, thisObject, priority) {
-            _super.prototype.once.call(this, type, listener, thisObject, priority);
+            this.on(type, listener, thisObject, priority, true);
         };
         /**
          * 添加监听

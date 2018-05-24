@@ -249,58 +249,70 @@ namespace feng3d.editor
                 filepath = this.getnewname(filepath);
             }
 
-            getcontent(content, (savedata) =>
+            var assetsFile = new AssetsFile(filepath, content);
+            assetsFile.save(() =>
             {
-                fs.writeFile(filepath, savedata, (e) =>
-                {
-                    var assetsFile = new AssetsFile(filepath, content);
-                    editorAssets.files[filepath] = assetsFile;
+                editorAssets.files[filepath] = assetsFile;
 
-                    editorui.assetsview.invalidateAssetstree();
+                editorui.assetsview.invalidateAssetstree();
 
-                    callback && callback(this);
-                    if (regExps.image.test(assetsFile.path))
-                        feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
-                });
+                callback && callback(this);
+                if (regExps.image.test(assetsFile.path))
+                    feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
             });
-
-            function getcontent(content: string | ArrayBuffer | Material | GameObject | AnimationClip | Geometry | Texture2D, callback: (savedata: ArrayBuffer) => void)
-            {
-                if (content instanceof Material
-                    || content instanceof GameObject
-                    || content instanceof AnimationClip
-                    || content instanceof Geometry
-                    || content instanceof Texture2D
-                )
-                {
-                    var obj = serialization.serialize(content);
-                    var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                    dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
-                    {
-                        callback(arrayBuffer);
-                    });
-                } else if (regExps.image.test(filename))
-                {
-                    dataTransform.arrayBufferToDataURL(<ArrayBuffer>content, (datarul) =>
-                    {
-                        callback(<ArrayBuffer>content);
-                    });
-                } else if (typeof content == "string")
-                {
-                    dataTransform.stringToArrayBuffer(content, (arrayBuffer) =>
-                    {
-                        callback(arrayBuffer);
-                    });
-                } else
-                {
-                    callback(content);
-                }
-            }
         }
 
-        save(callback?: () => void)
+        /**
+         * 保存数据到文件
+         * @param callback 回调函数
+         */
+        save(callback?: (err: Error) => void)
         {
+            this.getArrayBuffer((arraybuffer) =>
+            {
+                fs.writeFile(this.path, arraybuffer, (e) =>
+                {
+                    if (callback)
+                        callback(e);
+                    else if (e)
+                        error(e);
+                });
+            });
+        }
 
+        /**
+         * 获取ArrayBuffer数据
+         * @param callback 回调函数
+         */
+        getArrayBuffer(callback: (arraybuffer: ArrayBuffer) => void)
+        {
+            var content = this.cacheData;
+            if (content instanceof Material
+                || content instanceof GameObject
+                || content instanceof AnimationClip
+                || content instanceof Geometry
+                || content instanceof Texture2D
+            )
+            {
+                var obj = serialization.serialize(content);
+                var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
+                {
+                    callback(arrayBuffer);
+                });
+            } else if (regExps.image.test(this.path))
+            {
+                callback(<ArrayBuffer>content);
+            } else if (typeof content == "string")
+            {
+                dataTransform.stringToArrayBuffer(content, (arrayBuffer) =>
+                {
+                    callback(arrayBuffer);
+                });
+            } else
+            {
+                callback(content);
+            }
         }
 
         /**

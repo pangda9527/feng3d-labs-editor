@@ -3118,31 +3118,31 @@ var feng3d;
 (function (feng3d) {
     var editor;
     (function (editor) {
-        var BooleanAttrView = /** @class */ (function (_super) {
-            __extends(BooleanAttrView, _super);
-            function BooleanAttrView(attributeViewInfo) {
+        var OAVBoolean = /** @class */ (function (_super) {
+            __extends(OAVBoolean, _super);
+            function OAVBoolean(attributeViewInfo) {
                 var _this = _super.call(this, attributeViewInfo) || this;
                 _this.skinName = "BooleanAttrViewSkin";
                 return _this;
             }
-            BooleanAttrView.prototype.initView = function () {
+            OAVBoolean.prototype.initView = function () {
                 this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
             };
-            BooleanAttrView.prototype.dispose = function () {
+            OAVBoolean.prototype.dispose = function () {
                 this.checkBox.removeEventListener(egret.Event.CHANGE, this.onChange, this);
             };
-            BooleanAttrView.prototype.updateView = function () {
+            OAVBoolean.prototype.updateView = function () {
                 this.checkBox.selected = this.attributeValue;
             };
-            BooleanAttrView.prototype.onChange = function (event) {
+            OAVBoolean.prototype.onChange = function (event) {
                 this.attributeValue = this.checkBox.selected;
             };
-            BooleanAttrView = __decorate([
+            OAVBoolean = __decorate([
                 feng3d.OAVComponent()
-            ], BooleanAttrView);
-            return BooleanAttrView;
+            ], OAVBoolean);
+            return OAVBoolean;
         }(editor.OAVBase));
-        editor.BooleanAttrView = BooleanAttrView;
+        editor.OAVBoolean = OAVBoolean;
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -4026,10 +4026,12 @@ var feng3d;
                     this.viewDataList.push(this.viewData);
                 }
                 if (removeBack) {
+                    this.viewDataList.forEach(function (element) {
+                        if (element instanceof editor.AssetsFile) {
+                            element.save();
+                        }
+                    });
                     this.viewDataList.length = 0;
-                }
-                if (this.viewData instanceof editor.AssetsFile) {
-                    this.viewData.save();
                 }
                 //
                 this.viewData = data;
@@ -4778,44 +4780,58 @@ var feng3d;
                 if (!override) {
                     filepath = this.getnewname(filepath);
                 }
-                getcontent(content, function (savedata) {
-                    editor.fs.writeFile(filepath, savedata, function (e) {
-                        var assetsFile = new AssetsFile(filepath, content);
-                        editor.editorAssets.files[filepath] = assetsFile;
-                        editor.editorui.assetsview.invalidateAssetstree();
-                        callback && callback(_this);
-                        if (editor.regExps.image.test(assetsFile.path))
-                            feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
+                var assetsFile = new AssetsFile(filepath, content);
+                assetsFile.save(function () {
+                    editor.editorAssets.files[filepath] = assetsFile;
+                    editor.editorui.assetsview.invalidateAssetstree();
+                    callback && callback(_this);
+                    if (editor.regExps.image.test(assetsFile.path))
+                        feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
+                });
+            };
+            /**
+             * 保存数据到文件
+             * @param callback 回调函数
+             */
+            AssetsFile.prototype.save = function (callback) {
+                var _this = this;
+                this.getArrayBuffer(function (arraybuffer) {
+                    editor.fs.writeFile(_this.path, arraybuffer, function (e) {
+                        if (callback)
+                            callback(e);
+                        else if (e)
+                            feng3d.error(e);
                     });
                 });
-                function getcontent(content, callback) {
-                    if (content instanceof feng3d.Material
-                        || content instanceof feng3d.GameObject
-                        || content instanceof feng3d.AnimationClip
-                        || content instanceof feng3d.Geometry
-                        || content instanceof feng3d.Texture2D) {
-                        var obj = feng3d.serialization.serialize(content);
-                        var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                        feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
-                            callback(arrayBuffer);
-                        });
-                    }
-                    else if (editor.regExps.image.test(filename)) {
-                        feng3d.dataTransform.arrayBufferToDataURL(content, function (datarul) {
-                            callback(content);
-                        });
-                    }
-                    else if (typeof content == "string") {
-                        feng3d.dataTransform.stringToArrayBuffer(content, function (arrayBuffer) {
-                            callback(arrayBuffer);
-                        });
-                    }
-                    else {
-                        callback(content);
-                    }
-                }
             };
-            AssetsFile.prototype.save = function (callback) {
+            /**
+             * 获取ArrayBuffer数据
+             * @param callback 回调函数
+             */
+            AssetsFile.prototype.getArrayBuffer = function (callback) {
+                var content = this.cacheData;
+                if (content instanceof feng3d.Material
+                    || content instanceof feng3d.GameObject
+                    || content instanceof feng3d.AnimationClip
+                    || content instanceof feng3d.Geometry
+                    || content instanceof feng3d.Texture2D) {
+                    var obj = feng3d.serialization.serialize(content);
+                    var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                    feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
+                        callback(arrayBuffer);
+                    });
+                }
+                else if (editor.regExps.image.test(this.path)) {
+                    callback(content);
+                }
+                else if (typeof content == "string") {
+                    feng3d.dataTransform.stringToArrayBuffer(content, function (arrayBuffer) {
+                        callback(arrayBuffer);
+                    });
+                }
+                else {
+                    callback(content);
+                }
             };
             /**
              * 获取一个新的不重名子文件名称
@@ -10736,7 +10752,7 @@ var feng3d;
         feng3d.objectview.defaultObjectAttributeViewClass = "OAVDefault";
         feng3d.objectview.defaultObjectAttributeBlockView = "OBVDefault";
         //
-        feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "BooleanAttrView" });
+        feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "OAVBoolean" });
         feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
         feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
         feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });

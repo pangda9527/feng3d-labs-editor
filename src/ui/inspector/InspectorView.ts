@@ -93,11 +93,14 @@ namespace feng3d.editor
 			}
 			if (removeBack)
 			{
+				this.viewDataList.forEach(element =>
+				{
+					if (element instanceof AssetsFile)
+					{
+						element.save();
+					}
+				});
 				this.viewDataList.length = 0;
-			}
-			if (this.viewData instanceof AssetsFile)
-			{
-				this.viewData.save();
 			}
 			//
 			this.viewData = data;
