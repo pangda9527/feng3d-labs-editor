@@ -223,6 +223,12 @@ namespace feng3d.editor
                                 }
                             },
                             {
+                                label: "立方体贴图", click: () =>
+                                {
+                                    assetsFile.addfile("new material" + ".texture.json", new TextureCube());
+                                }
+                            },
+                            {
                                 label: "材质", click: () =>
                                 {
                                     assetsFile.addfile("new material" + ".material.json", materialFactory.create("standard"));

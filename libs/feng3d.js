@@ -18175,20 +18175,11 @@ var feng3d;
      */
     var TextureCube = /** @class */ (function (_super) {
         __extends(TextureCube, _super);
-        function TextureCube(images) {
-            var _this = _super.call(this) || this;
+        function TextureCube(raw) {
+            var _this = _super.call(this, raw) || this;
+            _this._pixels = [];
             _this._textureType = feng3d.TextureType.TEXTURE_CUBE_MAP;
             _this.noPixels = [feng3d.imageDatas.white, feng3d.imageDatas.white, feng3d.imageDatas.white, feng3d.imageDatas.white, feng3d.imageDatas.white, feng3d.imageDatas.white];
-            _this._pixels = [];
-            if (images) {
-                _this.positive_x_url = images[0];
-                _this.positive_y_url = images[1];
-                _this.positive_z_url = images[2];
-                _this.negative_x_url = images[3];
-                _this.negative_y_url = images[4];
-                _this.negative_z_url = images[5];
-                _this.urlChanged();
-            }
             return _this;
         }
         /**

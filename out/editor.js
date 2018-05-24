@@ -4365,6 +4365,11 @@ var feng3d;
                                 }
                             },
                             {
+                                label: "立方体贴图", click: function () {
+                                    assetsFile.addfile("new material" + ".texture.json", new feng3d.TextureCube());
+                                }
+                            },
+                            {
                                 label: "材质", click: function () {
                                     assetsFile.addfile("new material" + ".material.json", feng3d.materialFactory.create("standard"));
                                 }
