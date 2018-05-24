@@ -499,6 +499,7 @@ declare namespace feng3d.editor {
          * 销毁
          */
         destroy(): void;
+        private selectedchange();
     }
     interface TreeEventMap {
         added: TreeNode;
@@ -1886,12 +1887,20 @@ declare namespace feng3d.editor {
          */
         destroy(): void;
         private update();
-        private onSelectedGameObjectChanged();
     }
 }
 declare namespace feng3d.editor {
+    /**
+     * 层级树
+     */
+    var hierarchyTree: HierarchyTree;
+    /**
+     * 层级树
+     */
     class HierarchyTree extends Tree {
         rootnode: HierarchyNode;
+        private selectedGameObjects;
+        constructor();
         /**
          * 获取选中节点
          */
@@ -1904,8 +1913,8 @@ declare namespace feng3d.editor {
          * 获取节点
          */
         getNode(gameObject: GameObject): HierarchyNode;
+        private onSelectedGameObjectChanged();
     }
-    var hierarchyTree: HierarchyTree;
 }
 declare namespace feng3d.editor {
     class Hierarchy {

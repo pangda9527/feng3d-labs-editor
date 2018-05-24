@@ -17,6 +17,7 @@ namespace feng3d.editor
 		/**
 		 * 是否选中
 		 */
+		@watch("selectedchange")
 		selected = false;
         /** 
          * 父节点
@@ -42,6 +43,19 @@ namespace feng3d.editor
 		{
 			this.parent = null;
 			this.children = null;
+		}
+
+		private selectedchange()
+		{
+			if (this.selected)
+			{
+				var p = this.parent;
+				while (p)
+				{
+					p.isOpen = true;
+					p = p.parent;
+				}
+			}
 		}
 	}
 

@@ -208,12 +208,11 @@ namespace feng3d.editor
                 this.path = newpath;
                 editorAssets.files[this.path] = this;
 
-                if (this.isDirectory)
-                    editorui.assetsview.invalidateAssetstree();
                 if (editorAssets.showFloder == oldpath)
                 {
                     editorAssets.showFloder = newpath;
                 }
+                editorui.assetsview.invalidateAssetstree();
                 callback && callback(this);
             });
         }

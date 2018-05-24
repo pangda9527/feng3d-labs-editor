@@ -21,7 +21,6 @@ namespace feng3d.editor
         {
             super(obj);
 
-            watcher.watch(editorData, "selectedObjects", this.onSelectedGameObjectChanged, this);
             watcher.watch(this.gameobject, "name", this.update, this);
 
             this.update();
@@ -32,7 +31,6 @@ namespace feng3d.editor
          */
         destroy()
         {
-            watcher.unwatch(editorData, "selectedObjects", this.onSelectedGameObjectChanged, this);
             watcher.unwatch(this.gameobject, "name", this.update, this);
 
             this.gameobject = null;
@@ -42,29 +40,6 @@ namespace feng3d.editor
         private update()
         {
             this.label = this.gameobject.name;
-        }
-
-        private onSelectedGameObjectChanged()
-        {
-            var selectedGameObjects = editorData.selectedGameObjects;
-            var isselected = selectedGameObjects.indexOf(this.gameobject) != -1;
-            if (this.selected != isselected)
-            {
-                this.selected = isselected;
-                if (this.selected)
-                {
-                    //新增选中效果
-                    var wireframeComponent = this.gameobject.getComponent(WireframeComponent);
-                    if (!wireframeComponent)
-                        this.gameobject.addComponent(WireframeComponent);
-                } else
-                {
-                    //清除选中效果
-                    var wireframeComponent = this.gameobject.getComponent(WireframeComponent);
-                    if (wireframeComponent)
-                        this.gameobject.removeComponent(wireframeComponent);
-                }
-            }
         }
     }
 }

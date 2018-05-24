@@ -2,9 +2,26 @@ namespace feng3d.editor
 {
     var nodeMap = new Map<GameObject, HierarchyNode>();
 
+    /**
+     * 层级树
+     */
+    export var hierarchyTree: HierarchyTree;
+
+    /**
+     * 层级树
+     */
     export class HierarchyTree extends Tree
     {
         rootnode: HierarchyNode;
+
+        private selectedGameObjects: GameObject[] = [];
+
+        constructor()
+        {
+            super();
+
+            watcher.watch(editorData, "selectedObjects", this.onSelectedGameObjectChanged, this);
+        }
 
         /**
          * 获取选中节点
@@ -95,7 +112,28 @@ namespace feng3d.editor
             var node = nodeMap.get(gameObject);
             return node;
         }
+
+        private onSelectedGameObjectChanged()
+        {
+            this.selectedGameObjects.forEach(element =>
+            {
+                //清除选中效果
+                var wireframeComponent = element.getComponent(WireframeComponent);
+                if (wireframeComponent)
+                    element.removeComponent(wireframeComponent);
+                this.getNode(element).selected = false;
+            });
+            this.selectedGameObjects = editorData.selectedGameObjects;
+            this.selectedGameObjects.forEach(element =>
+            {
+                //新增选中效果
+                var wireframeComponent = element.getComponent(WireframeComponent);
+                if (!wireframeComponent)
+                    element.addComponent(WireframeComponent);
+                this.getNode(element).selected = true;
+            });
+        }
     }
 
-    export var hierarchyTree = new HierarchyTree();
+    hierarchyTree = new HierarchyTree();
 }

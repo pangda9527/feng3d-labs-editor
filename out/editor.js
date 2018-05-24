@@ -1900,6 +1900,18 @@ var feng3d;
                 this.parent = null;
                 this.children = null;
             };
+            TreeNode.prototype.selectedchange = function () {
+                if (this.selected) {
+                    var p = this.parent;
+                    while (p) {
+                        p.isOpen = true;
+                        p = p.parent;
+                    }
+                }
+            };
+            __decorate([
+                feng3d.watch("selectedchange")
+            ], TreeNode.prototype, "selected", void 0);
             return TreeNode;
         }());
         editor.TreeNode = TreeNode;
@@ -4757,11 +4769,10 @@ var feng3d;
                     delete editor.editorAssets.files[_this.path];
                     _this.path = newpath;
                     editor.editorAssets.files[_this.path] = _this;
-                    if (_this.isDirectory)
-                        editor.editorui.assetsview.invalidateAssetstree();
                     if (editor.editorAssets.showFloder == oldpath) {
                         editor.editorAssets.showFloder = newpath;
                     }
+                    editor.editorui.assetsview.invalidateAssetstree();
                     callback && callback(_this);
                 });
             };
@@ -7597,7 +7608,6 @@ var feng3d;
                  * 子节点列表
                  */
                 _this.children = [];
-                feng3d.watcher.watch(editor.editorData, "selectedObjects", _this.onSelectedGameObjectChanged, _this);
                 feng3d.watcher.watch(_this.gameobject, "name", _this.update, _this);
                 _this.update();
                 return _this;
@@ -7606,32 +7616,12 @@ var feng3d;
              * 销毁
              */
             HierarchyNode.prototype.destroy = function () {
-                feng3d.watcher.unwatch(editor.editorData, "selectedObjects", this.onSelectedGameObjectChanged, this);
                 feng3d.watcher.unwatch(this.gameobject, "name", this.update, this);
                 this.gameobject = null;
                 _super.prototype.destroy.call(this);
             };
             HierarchyNode.prototype.update = function () {
                 this.label = this.gameobject.name;
-            };
-            HierarchyNode.prototype.onSelectedGameObjectChanged = function () {
-                var selectedGameObjects = editor.editorData.selectedGameObjects;
-                var isselected = selectedGameObjects.indexOf(this.gameobject) != -1;
-                if (this.selected != isselected) {
-                    this.selected = isselected;
-                    if (this.selected) {
-                        //新增选中效果
-                        var wireframeComponent = this.gameobject.getComponent(feng3d.WireframeComponent);
-                        if (!wireframeComponent)
-                            this.gameobject.addComponent(feng3d.WireframeComponent);
-                    }
-                    else {
-                        //清除选中效果
-                        var wireframeComponent = this.gameobject.getComponent(feng3d.WireframeComponent);
-                        if (wireframeComponent)
-                            this.gameobject.removeComponent(wireframeComponent);
-                    }
-                }
             };
             return HierarchyNode;
         }(editor.TreeNode));
@@ -7643,10 +7633,16 @@ var feng3d;
     var editor;
     (function (editor) {
         var nodeMap = new Map();
+        /**
+         * 层级树
+         */
         var HierarchyTree = /** @class */ (function (_super) {
             __extends(HierarchyTree, _super);
             function HierarchyTree() {
-                return _super !== null && _super.apply(this, arguments) || this;
+                var _this = _super.call(this) || this;
+                _this.selectedGameObjects = [];
+                feng3d.watcher.watch(editor.editorData, "selectedObjects", _this.onSelectedGameObjectChanged, _this);
+                return _this;
             }
             /**
              * 获取选中节点
@@ -7716,6 +7712,24 @@ var feng3d;
             HierarchyTree.prototype.getNode = function (gameObject) {
                 var node = nodeMap.get(gameObject);
                 return node;
+            };
+            HierarchyTree.prototype.onSelectedGameObjectChanged = function () {
+                var _this = this;
+                this.selectedGameObjects.forEach(function (element) {
+                    //清除选中效果
+                    var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
+                    if (wireframeComponent)
+                        element.removeComponent(wireframeComponent);
+                    _this.getNode(element).selected = false;
+                });
+                this.selectedGameObjects = editor.editorData.selectedGameObjects;
+                this.selectedGameObjects.forEach(function (element) {
+                    //新增选中效果
+                    var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
+                    if (!wireframeComponent)
+                        element.addComponent(feng3d.WireframeComponent);
+                    _this.getNode(element).selected = true;
+                });
             };
             return HierarchyTree;
         }(editor.Tree));
