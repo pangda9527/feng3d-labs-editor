@@ -5035,13 +5035,6 @@ var feng3d;
                                         editor.drag.refreshAcceptables();
                                     });
                                     break;
-                                case feng3d.AssetExtension.texture2d:
-                                    var path = _this.data.path;
-                                    _this.data.getData(function (data) {
-                                        dragsource.texture2d = data;
-                                        editor.drag.refreshAcceptables();
-                                    });
-                                    break;
                                 case feng3d.AssetExtension.geometry:
                                     var path = _this.data.path;
                                     _this.data.getData(function (data) {
@@ -7816,10 +7809,28 @@ var feng3d;
                 return _this;
             }
             SceneRotateTool.prototype.init = function (gameObject) {
+                var _this = this;
                 _super.prototype.init.call(this, gameObject);
                 var thisObj = this;
-                var _a = initModel(), rotationToolModel = _a.rotationToolModel, arrowsX = _a.arrowsX, arrowsY = _a.arrowsY, arrowsZ = _a.arrowsZ, arrowsNX = _a.arrowsNX, arrowsNY = _a.arrowsNY, arrowsNZ = _a.arrowsNZ, planeX = _a.planeX, planeY = _a.planeY, planeZ = _a.planeZ, planeNX = _a.planeNX, planeNY = _a.planeNY, planeNZ = _a.planeNZ;
-                var _b = newEngine(), toolEngine = _b.toolEngine, canvas = _b.canvas;
+                feng3d.Loader.loadText(editor.editorData.getEditorAssetsPath("gameobjects/SceneRotateTool.gameobject.json"), function (content) {
+                    var rotationToolModel = feng3d.serialization.deserialize(JSON.parse(content));
+                    _this.onLoaded(rotationToolModel);
+                });
+            };
+            SceneRotateTool.prototype.onLoaded = function (rotationToolModel) {
+                var arrowsX = rotationToolModel.find("arrowsX");
+                var arrowsY = rotationToolModel.find("arrowsY");
+                var arrowsZ = rotationToolModel.find("arrowsZ");
+                var arrowsNX = rotationToolModel.find("arrowsNX");
+                var arrowsNY = rotationToolModel.find("arrowsNY");
+                var arrowsNZ = rotationToolModel.find("arrowsNZ");
+                var planeX = rotationToolModel.find("planeX");
+                var planeY = rotationToolModel.find("planeY");
+                var planeZ = rotationToolModel.find("planeZ");
+                var planeNX = rotationToolModel.find("planeNX");
+                var planeNY = rotationToolModel.find("planeNY");
+                var planeNZ = rotationToolModel.find("planeNZ");
+                var _a = newEngine(), toolEngine = _a.toolEngine, canvas = _a.canvas;
                 toolEngine.root.addChild(rotationToolModel);
                 rotationToolModel.transform.sx = 0.01;
                 rotationToolModel.transform.sy = 0.01;
@@ -7896,22 +7907,6 @@ var feng3d;
                         ]);
                     }
                 });
-                function initModel() {
-                    var rotationToolModel = feng3d.serialization.deserialize(rotateToolModelJson);
-                    var arrowsX = rotationToolModel.find("arrowsX");
-                    var arrowsY = rotationToolModel.find("arrowsY");
-                    var arrowsZ = rotationToolModel.find("arrowsZ");
-                    var arrowsNX = rotationToolModel.find("arrowsNX");
-                    var arrowsNY = rotationToolModel.find("arrowsNY");
-                    var arrowsNZ = rotationToolModel.find("arrowsNZ");
-                    var planeX = rotationToolModel.find("planeX");
-                    var planeY = rotationToolModel.find("planeY");
-                    var planeZ = rotationToolModel.find("planeZ");
-                    var planeNX = rotationToolModel.find("planeNX");
-                    var planeNY = rotationToolModel.find("planeNY");
-                    var planeNZ = rotationToolModel.find("planeNZ");
-                    return { rotationToolModel: rotationToolModel, arrowsX: arrowsX, arrowsY: arrowsY, arrowsZ: arrowsZ, arrowsNX: arrowsNX, arrowsNY: arrowsNY, arrowsNZ: arrowsNZ, planeX: planeX, planeY: planeY, planeZ: planeZ, planeNX: planeNX, planeNY: planeNY, planeNZ: planeNZ };
-                }
                 function newEngine() {
                     var canvas = document.getElementById("sceneRotateToolCanvas");
                     ;
@@ -7963,356 +7958,6 @@ var feng3d;
             return SceneRotateTool;
         }(feng3d.Component));
         editor.SceneRotateTool = SceneRotateTool;
-        /**
-         * 旋转工具模型，该模型由editor生成 RotationToolModel.gameobject
-         */
-        var rotateToolModelJson = {
-            "__class__": "feng3d.GameObject",
-            "name": "RotationToolModel",
-            "children": [
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "arrowsX",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "x": 19,
-                            "rz": 90
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.ConeGeometry",
-                                "bottomRadius": 7,
-                                "height": 21
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms",
-                                    "u_diffuse": {
-                                        "g": 0,
-                                        "b": 0
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "arrowsNX",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "x": -19,
-                            "rz": -90
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.ConeGeometry",
-                                "bottomRadius": 7,
-                                "height": 21
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "arrowsY",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "y": 19,
-                            "rz": 180
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.ConeGeometry",
-                                "bottomRadius": 7,
-                                "height": 21
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms",
-                                    "u_diffuse": {
-                                        "r": 0,
-                                        "b": 0
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "arrowsNY",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "y": -19
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.ConeGeometry",
-                                "bottomRadius": 7,
-                                "height": 21
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "arrowsZ",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "z": 19,
-                            "rx": -90
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.ConeGeometry",
-                                "bottomRadius": 7,
-                                "height": 21
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms",
-                                    "u_diffuse": {
-                                        "r": 0,
-                                        "g": 0
-                                    }
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "arrowsNZ",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "z": -19,
-                            "rx": 90
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.ConeGeometry",
-                                "bottomRadius": 7,
-                                "height": 21
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "planeX",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "x": 7,
-                            "rz": -90
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.PlaneGeometry",
-                                "width": 14,
-                                "height": 14
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "planeNX",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "x": -7,
-                            "rz": 90
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.PlaneGeometry",
-                                "width": 14,
-                                "height": 14
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "planeY",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "y": 7
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.PlaneGeometry",
-                                "width": 14,
-                                "height": 14
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "planeNY",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "y": -7,
-                            "rz": 180
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.PlaneGeometry",
-                                "width": 14,
-                                "height": 14
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "planeZ",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "z": 7,
-                            "rx": 90
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.PlaneGeometry",
-                                "width": 14,
-                                "height": 14
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "__class__": "feng3d.GameObject",
-                    "name": "planeNZ",
-                    "components": [
-                        null,
-                        {
-                            "__class__": "feng3d.Transform",
-                            "z": -7,
-                            "rx": -90
-                        },
-                        {
-                            "__class__": "feng3d.MeshRenderer",
-                            "geometry": {
-                                "__class__": "feng3d.PlaneGeometry",
-                                "width": 14,
-                                "height": 14
-                            },
-                            "material": {
-                                "__class__": "feng3d.Material",
-                                "shaderName": "standard",
-                                "uniforms": {
-                                    "__class__": "feng3d.StandardUniforms"
-                                }
-                            }
-                        }
-                    ]
-                }
-            ],
-            "components": [
-                null,
-                {
-                    "__class__": "feng3d.Transform"
-                },
-                null
-            ]
-        };
     })(editor = feng3d.editor || (feng3d.editor = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;

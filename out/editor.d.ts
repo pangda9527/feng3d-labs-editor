@@ -266,10 +266,6 @@ declare namespace feng3d.editor {
          */
         image?: string;
         /**
-         * 纹理
-         */
-        texture2d?: TextureCube;
-        /**
          * 立方体纹理
          */
         texturecube?: TextureCube;
@@ -1927,6 +1923,7 @@ declare namespace feng3d.editor {
         showInInspector: boolean;
         serializable: boolean;
         init(gameObject: GameObject): void;
+        private onLoaded(rotationToolModel);
     }
 }
 declare namespace feng3d.editor {

@@ -77,11 +77,6 @@ namespace feng3d.editor
 		 * 图片路径
 		 */
 		image?: string;
-
-		/**
-		 * 纹理
-		 */
-		texture2d?: TextureCube;
 		/**
 		 * 立方体纹理
 		 */

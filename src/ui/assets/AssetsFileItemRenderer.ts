@@ -93,14 +93,6 @@ namespace feng3d.editor
                                     drag.refreshAcceptables();
                                 });
                                 break;
-                            case AssetExtension.texture2d:
-                                var path = this.data.path;
-                                this.data.getData((data) =>
-                                {
-                                    dragsource.texture2d = data;
-                                    drag.refreshAcceptables();
-                                });
-                                break;
                             case AssetExtension.geometry:
                                 var path = this.data.path;
                                 this.data.getData((data) =>
