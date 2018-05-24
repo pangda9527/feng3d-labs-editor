@@ -453,49 +453,54 @@
 			"scale9grid": "12,3,6,9"
 		},
 		{
-			"name": "material_small_png",
+			"url": "assets/icons/material_small.png",
 			"type": "image",
-			"url": "assets/icons/material_small.png"
+			"name": "material_small_png"
 		},
 		{
-			"name": "gameobject_small_png",
+			"url": "assets/objectview/gameobject_small.png",
 			"type": "image",
-			"url": "assets/objectview/gameobject_small.png"
+			"name": "gameobject_small_png"
 		},
 		{
-			"name": "pick_png",
+			"url": "assets/Button/pick.png",
 			"type": "image",
-			"url": "assets/Button/pick.png"
+			"name": "pick_png"
 		},
 		{
-			"name": "shader_png",
+			"url": "assets/icons/shader.png",
 			"type": "image",
-			"url": "assets/icons/shader.png"
+			"name": "shader_png"
 		},
 		{
-			"name": "qrcode_jpg",
+			"url": "assets/Button/qrcode.jpg",
 			"type": "image",
-			"url": "assets/Button/qrcode.jpg"
+			"name": "qrcode_jpg"
 		},
 		{
-			"name": "img_bg_png",
+			"url": "assets/Button/img_bg.png",
 			"type": "image",
-			"url": "assets/Button/img_bg.png"
+			"name": "img_bg_png"
 		},
 		{
-			"name": "img_border_png",
+			"url": "assets/Button/img_border.png",
 			"type": "image",
-			"url": "assets/Button/img_border.png"
+			"name": "img_border_png"
 		},
 		{
-			"name": "script_png",
+			"url": "assets/icons/script.png",
 			"type": "image",
-			"url": "assets/icons/script.png"
+			"name": "script_png"
 		},
 		{
-			"name": "geometry_png",
+			"url": "assets/icons/geometry.png",
 			"type": "image",
-			"url": "assets/icons/geometry.png"
+			"name": "geometry_png"
+		},
+		{
+			"url": "gameobjects/SceneRotateTool.gameobject.json",
+			"type": "json",
+			"name": "SceneRotateTool.gameobject_json"
 		}
 	]
 }

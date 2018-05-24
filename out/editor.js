@@ -753,9 +753,9 @@ var feng3d;
         var stage;
         var registers = [];
         /**
-         * 接受拖拽数据对象列表
+         * 对象与触发接受拖拽的对象列表
          */
-        var accepters;
+        var accepters = new Map();
         /**
          * 被拖拽数据
          */
@@ -806,12 +806,12 @@ var feng3d;
                 element.displayObject.removeEventListener(egret.MouseEvent.MOUSE_OUT, onMouseOut, null);
             });
             acceptableitems = null;
-            accepters && accepters.forEach(function (accepter) {
-                accepter.alpha = 1.0;
-                var accepteritem = getitem(accepter);
+            accepters.getKeys().forEach(function (element) {
+                element.alpha = accepters.get(element).oldalpha;
+                var accepteritem = getitem(element);
                 accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
             });
-            accepters = null;
+            accepters.clear();
             dragitem = null;
         }
         function onMouseMove(event) {
@@ -833,19 +833,27 @@ var feng3d;
         }
         function onMouseOver(event) {
             var displayObject = event.currentTarget;
-            accepters = accepters || [];
-            if (accepters.indexOf(displayObject) == -1) {
-                accepters.push(displayObject);
+            var target = event.target;
+            if (!accepters.has(displayObject)) {
+                accepters.set(displayObject, { targets: [], oldalpha: displayObject.alpha });
                 displayObject.alpha = 0.5;
             }
+            var a = accepters.get(displayObject);
+            a.targets.push(target);
         }
         function onMouseOut(event) {
             var displayObject = event.currentTarget;
-            accepters = accepters || [];
-            var index = accepters.indexOf(displayObject);
-            if (index != -1) {
-                accepters.splice(index, 1);
-                displayObject.alpha = 1.0;
+            var target = event.target;
+            var a = accepters.get(displayObject);
+            if (a) {
+                var index = a.targets.indexOf(target);
+                if (index != -1) {
+                    a.targets.splice(index, 1);
+                }
+                if (a.targets.length == 0) {
+                    displayObject.alpha = 1.0;
+                    accepters.delete(displayObject);
+                }
             }
         }
     })(editor = feng3d.editor || (feng3d.editor = {}));

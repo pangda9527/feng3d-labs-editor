@@ -94,9 +94,9 @@ namespace feng3d.editor
 	var stage: egret.Stage;
 	var registers: DragItem[] = [];
 	/**
-	 * 接受拖拽数据对象列表
+	 * 对象与触发接受拖拽的对象列表
 	 */
-	var accepters: egret.DisplayObject[];
+	var accepters = new Map<egret.DisplayObject, { targets: egret.DisplayObject[], oldalpha }>();
 	/**
 	 * 被拖拽数据
 	 */
@@ -163,13 +163,14 @@ namespace feng3d.editor
 		});
 		acceptableitems = null;
 
-		accepters && accepters.forEach(accepter =>
+		accepters.getKeys().forEach(element =>
 		{
-			accepter.alpha = 1.0;
-			var accepteritem = getitem(accepter);
+			element.alpha = accepters.get(element).oldalpha;
+			var accepteritem = getitem(element);
 			accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
 		});
-		accepters = null;
+
+		accepters.clear();
 
 		dragitem = null;
 	}
@@ -202,23 +203,34 @@ namespace feng3d.editor
 	function onMouseOver(event: egret.Event)
 	{
 		var displayObject: egret.DisplayObject = event.currentTarget;
-		accepters = accepters || [];
-		if (accepters.indexOf(displayObject) == -1)
+		var target: egret.DisplayObject = event.target;
+
+		if (!accepters.has(displayObject))
 		{
-			accepters.push(displayObject);
+			accepters.set(displayObject, { targets: [], oldalpha: displayObject.alpha })
 			displayObject.alpha = 0.5;
 		}
+		var a = accepters.get(displayObject);
+		a.targets.push(target);
 	}
 
 	function onMouseOut(event: egret.Event)
 	{
 		var displayObject: egret.DisplayObject = event.currentTarget;
-		accepters = accepters || [];
-		var index = accepters.indexOf(displayObject);
-		if (index != -1)
+		var target: egret.DisplayObject = event.target;
+		var a = accepters.get(displayObject);
+		if (a)
 		{
-			accepters.splice(index, 1);
-			displayObject.alpha = 1.0;
+			var index = a.targets.indexOf(target);
+			if (index != -1)
+			{
+				a.targets.splice(index, 1);
+			}
+			if (a.targets.length == 0)
+			{
+				displayObject.alpha = 1.0;
+				accepters.delete(displayObject);
+			}
 		}
 	}
 }
