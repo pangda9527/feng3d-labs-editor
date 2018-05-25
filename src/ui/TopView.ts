@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
 	export class TopView extends eui.Component implements eui.UIComponent
 	{
@@ -48,7 +48,7 @@ namespace feng3d.editor
 			this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-			watcher.watch(mrsTool, "toolType", this.updateview, this);
+			feng3d.watcher.watch(mrsTool, "toolType", this.updateview, this);
 
 			this.updateview();
 		}
@@ -67,7 +67,7 @@ namespace feng3d.editor
 			this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-			watcher.unwatch(mrsTool, "toolType", this.updateview, this);
+			feng3d.watcher.unwatch(mrsTool, "toolType", this.updateview, this);
 
 			if (runwin) runwin.close();
 			runwin = null;
@@ -110,20 +110,20 @@ namespace feng3d.editor
 					{
 						if (err)
 						{
-							warn(err);
+							feng3d.warn(err);
 							return;
 						}
-						if (fs.type == FSType.indexedDB)
+						if (fs.type == feng3d.FSType.indexedDB)
 						{
 							if (runwin) runwin.close();
-							runwin = window.open(`run.html?fstype=${assets.type}&project=${editorcache.projectname}`);
+							runwin = window.open(`run.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}`);
 							return;
 						}
 						fs.getAbsolutePath("index.html", (err, path) =>
 						{
 							if (err)
 							{
-								warn(err);
+								feng3d.warn(err);
 								return;
 							}
 							if (runwin) runwin.close();

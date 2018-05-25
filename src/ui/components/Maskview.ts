@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export var maskview: Maskview;
 
@@ -25,7 +25,7 @@ namespace feng3d.editor
                 maskReck.addEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
                 displayObject.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromStage, null);
 
-                shortcut.activityState("inModal");
+                feng3d.shortcut.activityState("inModal");
             }
 
             function removeDisplayObject()
@@ -44,9 +44,9 @@ namespace feng3d.editor
                 {
                     maskReck.parent.removeChild(maskReck);
                 }
-                ticker.onceframe(() =>
+                feng3d.ticker.onceframe(() =>
                 {
-                    shortcut.deactivityState("inModal");
+                    feng3d.shortcut.deactivityState("inModal");
                 });
             }
         }

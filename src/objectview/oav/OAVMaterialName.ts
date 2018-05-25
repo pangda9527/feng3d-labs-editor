@@ -1,6 +1,6 @@
-namespace feng3d.editor
+namespace editor
 {
-    @OAVComponent()
+    @feng3d.OAVComponent()
     export class OAVMaterialName extends OAVBase
     {
         public tileIcon: eui.Image;
@@ -11,9 +11,9 @@ namespace feng3d.editor
         public group: eui.Group;
 
         //
-        space: Material;
+        space: feng3d.Material;
 
-        constructor(attributeViewInfo: AttributeViewInfo)
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
             this.skinName = "OVMaterial";
@@ -22,13 +22,13 @@ namespace feng3d.editor
         initView()
         {
             this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-            feng3dDispatcher.on("assets.shaderChanged", this.onShaderComboBoxChange, this);
+            feng3d.feng3dDispatcher.on("assets.shaderChanged", this.onShaderComboBoxChange, this);
         }
 
         dispose()
         {
             this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-            feng3dDispatcher.off("assets.shaderChanged", this.onShaderComboBoxChange, this);
+            feng3d.feng3dDispatcher.off("assets.shaderChanged", this.onShaderComboBoxChange, this);
         }
 
         updateView()
@@ -36,7 +36,7 @@ namespace feng3d.editor
             var material = this.space;
             this.nameLabel.text = material.shaderName;
 
-            var data = shaderlib.getShaderNames().sort().map((v) => { return { label: v, value: v } });
+            var data = feng3d.shaderlib.getShaderNames().sort().map((v) => { return { label: v, value: v } });
             var selected = data.reduce((prevalue, item) =>
             {
                 if (prevalue) return prevalue;

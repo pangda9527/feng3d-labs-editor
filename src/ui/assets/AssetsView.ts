@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export class AssetsView extends eui.Component implements eui.UIComponent
     {
@@ -49,26 +49,26 @@ namespace feng3d.editor
             {
                 if (dragSource.gameobject)
                 {
-                    var gameobject: GameObject = dragSource.gameobject;
-                    if (gameobject.getComponent(Scene3D) != null)
-                        editorAssets.saveObject(gameobject, gameobject.name + "." + AssetExtension.scene);
+                    var gameobject: feng3d.GameObject = dragSource.gameobject;
+                    if (gameobject.getComponent(feng3d.Scene3D) != null)
+                        editorAssets.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.scene);
                     else
-                        editorAssets.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
+                        editorAssets.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                 }
                 if (dragSource.animationclip)
                 {
                     var animationclip = dragSource.animationclip;
-                    editorAssets.saveObject(animationclip, animationclip.name + "." + AssetExtension.anim);
+                    editorAssets.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
                 }
                 if (dragSource.material)
                 {
                     var material = dragSource.material;
-                    editorAssets.saveObject(material, material.shaderName + "." + AssetExtension.material);
+                    editorAssets.saveObject(material, material.shaderName + "." + feng3d.AssetExtension.material);
                 }
                 if (dragSource.geometry)
                 {
                     var geometry = dragSource.geometry;
-                    editorAssets.saveObject(geometry, geometry.name + "." + AssetExtension.geometry);
+                    editorAssets.saveObject(geometry, geometry.name + "." + feng3d.AssetExtension.geometry);
                 }
             });
 
@@ -87,7 +87,7 @@ namespace feng3d.editor
 
             feng3d.watcher.watch(editorAssets, "showFloder", this.updateShowFloder, this);
 
-            watcher.watch(editorData, "selectedObjects", this.selectedfilechanged, this);
+            feng3d.watcher.watch(editorData, "selectedObjects", this.selectedfilechanged, this);
         }
 
         $onRemoveFromStage()
@@ -103,7 +103,7 @@ namespace feng3d.editor
 
             feng3d.watcher.unwatch(editorAssets, "showFloder", this.updateShowFloder, this);
 
-            watcher.unwatch(editorData, "selectedObjects", this.selectedfilechanged, this);
+            feng3d.watcher.unwatch(editorData, "selectedObjects", this.selectedfilechanged, this);
 
             //
             drag.unregister(this.filelistgroup);
@@ -137,7 +137,7 @@ namespace feng3d.editor
 
         private updateAssetsTree()
         {
-            var paths = Object.keys(editorAssets.files).filter((item) => pathUtils.isDirectory(item)).sort();
+            var paths = Object.keys(editorAssets.files).filter((item) => feng3d.pathUtils.isDirectory(item)).sort();
 
             var nodes: AssetsTreeNode[] = [];
             var closepath: string;
@@ -183,7 +183,7 @@ namespace feng3d.editor
             while (floders.length > 0)
             this.floderpathTxt.textFlow = textFlow;
 
-            var children = editorAssets.filter((item) => pathUtils.getParentPath(item.path) == editorAssets.showFloder);
+            var children = editorAssets.filter((item) => feng3d.pathUtils.getParentPath(item.path) == editorAssets.showFloder);
 
 
             try

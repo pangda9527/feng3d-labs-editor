@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export var mainMenu: MenuItem[] = [
         {
@@ -32,7 +32,7 @@ namespace feng3d.editor
         {
             label: "保存场景", click: () =>
             {
-                var gameobject: GameObject = hierarchyTree.rootnode.gameobject;
+                var gameobject = hierarchyTree.rootnode.gameobject;
                 editorAssets.saveObject(gameobject, gameobject.name + ".scene", true);
             }
         },
@@ -142,7 +142,7 @@ namespace feng3d.editor
         {
             label: "游戏对象", click: () =>
             {
-                addToHierarchy(gameObjectFactory.createGameObject());
+                addToHierarchy(feng3d.gameObjectFactory.createGameObject());
             }
         },
         { type: "separator" },
@@ -152,49 +152,49 @@ namespace feng3d.editor
                 {
                     label: "平面", click: () =>
                     {
-                        addToHierarchy(gameObjectFactory.createPlane());
+                        addToHierarchy(feng3d.gameObjectFactory.createPlane());
                     }
                 },
                 {
                     label: "立方体", click: () =>
                     {
-                        addToHierarchy(gameObjectFactory.createCube());
+                        addToHierarchy(feng3d.gameObjectFactory.createCube());
                     }
                 },
                 {
                     label: "球体", click: () =>
                     {
-                        addToHierarchy(gameObjectFactory.createSphere());
+                        addToHierarchy(feng3d.gameObjectFactory.createSphere());
                     }
                 },
                 {
                     label: "胶囊体", click: () =>
                     {
-                        addToHierarchy(gameObjectFactory.createCapsule());
+                        addToHierarchy(feng3d.gameObjectFactory.createCapsule());
                     }
                 },
                 {
                     label: "圆柱体", click: () =>
                     {
-                        addToHierarchy(gameObjectFactory.createCylinder());
+                        addToHierarchy(feng3d.gameObjectFactory.createCylinder());
                     }
                 },
                 {
                     label: "圆锥体", click: () =>
                     {
-                        addToHierarchy(gameObjectFactory.createCone());
+                        addToHierarchy(feng3d.gameObjectFactory.createCone());
                     }
                 },
                 {
                     label: "圆环", click: () =>
                     {
-                        addToHierarchy(gameObjectFactory.createTorus());
+                        addToHierarchy(feng3d.gameObjectFactory.createTorus());
                     }
                 },
                 {
                     label: "地形", click: () =>
                     {
-                        addToHierarchy(gameObjectFactory.createTerrain());
+                        addToHierarchy(feng3d.gameObjectFactory.createTerrain());
                     }
                 },
             ],
@@ -205,14 +205,14 @@ namespace feng3d.editor
                 {
                     label: "点光源", click: () =>
                     {
-                        addToHierarchy(gameObjectFactory.createPointLight());
+                        addToHierarchy(feng3d.gameObjectFactory.createPointLight());
                     }
                 },
                 {
                     label: "方向光源", click: () =>
                     {
-                        var gameobject = GameObject.create("DirectionalLight");
-                        gameobject.addComponent(DirectionalLight);
+                        var gameobject = feng3d.GameObject.create("DirectionalLight");
+                        gameobject.addComponent(feng3d.DirectionalLight);
                         addToHierarchy(gameobject);
                     }
                 },
@@ -221,18 +221,18 @@ namespace feng3d.editor
         {
             label: "粒子系统", click: () =>
             {
-                addToHierarchy(gameObjectFactory.createParticle());
+                addToHierarchy(feng3d.gameObjectFactory.createParticle());
             }
         },
         {
             label: "摄像机", click: () =>
             {
-                addToHierarchy(gameObjectFactory.createCamera());
+                addToHierarchy(feng3d.gameObjectFactory.createCamera());
             }
         },
     ];
 
-    function addToHierarchy(gameobject: GameObject)
+    function addToHierarchy(gameobject: feng3d.GameObject)
     {
         var selectedNode = hierarchyTree.getSelectedNode();
         if (selectedNode)
@@ -242,7 +242,7 @@ namespace feng3d.editor
         editorData.selectObject(gameobject);
     }
 
-    export var needcreateComponentGameObject: GameObject;
+    export var needcreateComponentGameObject: feng3d.GameObject;
 
     /**
      * 层级界面创建3D对象列表数据
@@ -251,37 +251,37 @@ namespace feng3d.editor
         //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
         {
             label: "SkyBox",
-            click: () => { needcreateComponentGameObject.addComponent(SkyBox); }
+            click: () => { needcreateComponentGameObject.addComponent(feng3d.SkyBox); }
         },
         {
             label: "Animator",
             submenu: [
-                { label: "ParticleSystem", click: () => { needcreateComponentGameObject.addComponent(ParticleSystem); } },
-                { label: "Animation", click: () => { needcreateComponentGameObject.addComponent(Animation); } },
+                { label: "ParticleSystem", click: () => { needcreateComponentGameObject.addComponent(feng3d.ParticleSystem); } },
+                { label: "Animation", click: () => { needcreateComponentGameObject.addComponent(feng3d.Animation); } },
             ]
         },
         {
             label: "Rendering",
             submenu: [
-                { label: "Camera", click: () => { needcreateComponentGameObject.addComponent(Camera); } },
-                { label: "PointLight", click: () => { needcreateComponentGameObject.addComponent(PointLight); } },
-                { label: "DirectionalLight", click: () => { needcreateComponentGameObject.addComponent(DirectionalLight); } },
-                { label: "OutLineComponent", click: () => { needcreateComponentGameObject.addComponent(OutLineComponent); } },
-                { label: "CartoonComponent", click: () => { needcreateComponentGameObject.addComponent(CartoonComponent); } },
+                { label: "Camera", click: () => { needcreateComponentGameObject.addComponent(feng3d.Camera); } },
+                { label: "PointLight", click: () => { needcreateComponentGameObject.addComponent(feng3d.PointLight); } },
+                { label: "DirectionalLight", click: () => { needcreateComponentGameObject.addComponent(feng3d.DirectionalLight); } },
+                { label: "OutLineComponent", click: () => { needcreateComponentGameObject.addComponent(feng3d.OutLineComponent); } },
+                { label: "CartoonComponent", click: () => { needcreateComponentGameObject.addComponent(feng3d.CartoonComponent); } },
                 // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
             ]
         },
         {
             label: "Controller",
             submenu: [
-                { label: "FPSController", click: () => { needcreateComponentGameObject.addComponent(FPSController); } },
+                { label: "FPSController", click: () => { needcreateComponentGameObject.addComponent(feng3d.FPSController); } },
             ]
         },
         {
             label: "Layout",
             submenu: [
-                { label: "HoldSizeComponent", click: () => { needcreateComponentGameObject.addComponent(HoldSizeComponent); } },
-                { label: "BillboardComponent", click: () => { needcreateComponentGameObject.addComponent(BillboardComponent); } },
+                { label: "HoldSizeComponent", click: () => { needcreateComponentGameObject.addComponent(feng3d.HoldSizeComponent); } },
+                { label: "BillboardComponent", click: () => { needcreateComponentGameObject.addComponent(feng3d.BillboardComponent); } },
             ]
         },
         {
@@ -293,7 +293,7 @@ namespace feng3d.editor
         {
             label: "Script",
             submenu: [
-                { label: "Script", click: () => { needcreateComponentGameObject.addComponent(ScriptComponent); } },
+                { label: "Script", click: () => { needcreateComponentGameObject.addComponent(feng3d.ScriptComponent); } },
             ]
         },
     ];
@@ -316,7 +316,7 @@ namespace feng3d.editor
     function downloadProject(projectname: string, callback?: () => void)
     {
         var path = "projects/" + projectname;
-        Loader.loadBinary(path, (content) =>
+        feng3d.Loader.loadBinary(path, (content) =>
         {
             fs.importProject(<any>content, () =>
             {

@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
 	export class HierarchyView extends eui.Component implements eui.UIComponent
 	{
@@ -58,7 +58,7 @@ namespace feng3d.editor
 
 		private invalidHierarchy()
 		{
-			ticker.onceframe(this.updateHierarchyTree, this);
+			feng3d.ticker.onceframe(this.updateHierarchyTree, this);
 		}
 
 		private updateHierarchyTree()
@@ -69,7 +69,7 @@ namespace feng3d.editor
 
 		private onListbackClick()
 		{
-			log("onListbackClick");
+			feng3d.log("onListbackClick");
 		}
 
 		private onListClick(e: egret.MouseEvent)
@@ -85,7 +85,7 @@ namespace feng3d.editor
 			if (e.target == this.list)
 			{
 				editorData.selectObject(null);
-				menu.popup(createObjectConfig, windowEventProxy.clientX, windowEventProxy.clientY);
+				menu.popup(createObjectConfig, feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			}
 		}
 	}

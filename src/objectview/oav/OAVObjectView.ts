@@ -1,6 +1,6 @@
-namespace feng3d.editor
+namespace editor
 {
-	@OAVComponent()
+	@feng3d.OAVComponent()
 	export class OAVObjectView extends OAVBase
 	{
 		group: eui.Group;
@@ -15,7 +15,7 @@ namespace feng3d.editor
 
 		initView()
 		{
-			this.view = objectview.getObjectView(this.attributeValue);
+			this.view = feng3d.objectview.getObjectView(this.attributeValue);
 			this.view.percentWidth = 100;
 			this.group.addChild(this.view);
 		}

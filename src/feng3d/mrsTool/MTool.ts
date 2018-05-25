@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     /**
      * 位移工具
@@ -10,15 +10,15 @@ namespace feng3d.editor
         /**
          * 用于判断是否改变了XYZ
          */
-        private changeXYZ: Vector3 = new Vector3();
-        private startPlanePos: Vector3;
-        private startPos: Vector3;
+        private changeXYZ = new feng3d.Vector3();
+        private startPlanePos: feng3d.Vector3;
+        private startPos: feng3d.Vector3;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
 
-            this.toolModel = GameObject.create().addComponent(MToolModel);
+            this.toolModel = feng3d.GameObject.create().addComponent(MToolModel);
         }
 
         protected onAddedToScene()
@@ -45,19 +45,19 @@ namespace feng3d.editor
             this.toolModel.oCube.gameObject.off("mousedown", this.onItemMouseDown, this);
         }
 
-        protected onItemMouseDown(event: Event<any>)
+        protected onItemMouseDown(event: feng3d.Event<any>)
         {
             if (!engine.mouseinview)
                 return;
-            if (shortcut.keyState.getKeyState("alt"))
+            if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
-            var po = globalMatrix3D.transformVector(new Vector3(0, 0, 0));
-            var px = globalMatrix3D.transformVector(new Vector3(1, 0, 0));
-            var py = globalMatrix3D.transformVector(new Vector3(0, 1, 0));
-            var pz = globalMatrix3D.transformVector(new Vector3(0, 0, 1));
+            var po = globalMatrix3D.transformVector(new feng3d.Vector3(0, 0, 0));
+            var px = globalMatrix3D.transformVector(new feng3d.Vector3(1, 0, 0));
+            var py = globalMatrix3D.transformVector(new feng3d.Vector3(0, 1, 0));
+            var pz = globalMatrix3D.transformVector(new feng3d.Vector3(0, 0, 1));
             //
             var ox = px.subTo(po);
             var oy = py.subTo(po);
@@ -65,8 +65,8 @@ namespace feng3d.editor
             //摄像机前方方向
             var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
-            this.movePlane3D = new Plane3D();
-            var selectedGameObject: GameObject = <any>event.currentTarget;
+            this.movePlane3D = new feng3d.Plane3D();
+            var selectedGameObject: feng3d.GameObject = <any>event.currentTarget;
             //
             switch (selectedGameObject)
             {
@@ -112,7 +112,7 @@ namespace feng3d.editor
             this.startPos = this.toolModel.transform.position;
             this.gameobjectControllerTarget.startTranslation();
             //
-            windowEventProxy.on("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         }
 
         private onMouseMove()
@@ -131,7 +131,7 @@ namespace feng3d.editor
         protected onMouseUp()
         {
             super.onMouseUp()
-            windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
 
             this.gameobjectControllerTarget.stopTranslation();
             this.startPos = null;

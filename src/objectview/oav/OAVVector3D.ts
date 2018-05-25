@@ -1,12 +1,12 @@
-namespace feng3d.editor
+namespace editor
 {
-	@OAVComponent()
+	@feng3d.OAVComponent()
 	export class OAVVector3D extends OAVBase
 	{
 		label: eui.Label;
-		vector3DView: feng3d.editor.Vector3DView;
+		vector3DView: editor.Vector3DView;
 
-		constructor(attributeViewInfo: AttributeViewInfo)
+		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 		{
 			super(attributeViewInfo);
 			this.skinName = "OAVVector3DSkin";

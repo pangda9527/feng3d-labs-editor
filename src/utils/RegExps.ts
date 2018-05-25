@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     /**
      * 常用正则表示式

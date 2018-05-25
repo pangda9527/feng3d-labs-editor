@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
 
     /**
@@ -20,21 +20,21 @@ namespace feng3d.editor
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
          */
-        selectedObjects: (GameObject | AssetsFile)[];
+        selectedObjects: (feng3d.GameObject | AssetsFile)[];
 
         /**
          * 位移旋转缩放工具对象
          */
-        mrsToolObject: GameObject;
+        mrsToolObject: feng3d.GameObject;
 
         /**
          * 选择对象
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectObject(...objs: (GameObject | AssetsFile)[])
+        selectObject(...objs: (feng3d.GameObject | AssetsFile)[])
         {
-            if (shortcut.keyState.getKeyState("ctrl") && this.selectedObjects)
+            if (feng3d.shortcut.keyState.getKeyState("ctrl") && this.selectedObjects)
             {
                 var oldobjs = this.selectedObjects.concat();
                 if (objs)
@@ -57,13 +57,13 @@ namespace feng3d.editor
          */
         get selectedGameObjects()
         {
-            var result: GameObject[] = [];
+            var result: feng3d.GameObject[] = [];
 
             if (this.selectedObjects)
             {
                 this.selectedObjects.forEach(element =>
                 {
-                    if (element instanceof GameObject)
+                    if (element instanceof feng3d.GameObject)
                         result.push(element);
                 });
             }
@@ -83,13 +83,13 @@ namespace feng3d.editor
          */
         get mrsTransforms()
         {
-            var transforms = <Transform[]>this.selectedGameObjects.reduce((result, item) =>
+            var transforms = <feng3d.Transform[]>this.selectedGameObjects.reduce((result, item) =>
             {
-                if (item.getComponent(Scene3D))
+                if (item.getComponent(feng3d.Scene3D))
                     return result;
                 if (item.getComponent(GroundGrid))
                     return result;
-                if (item.getComponent(SkinnedMeshRenderer))
+                if (item.getComponent(feng3d.SkinnedMeshRenderer))
                     return result;
                 result.push(item.transform);
                 return result;

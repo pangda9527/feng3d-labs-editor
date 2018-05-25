@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
 	export var drag: Drag;
 
@@ -45,10 +45,10 @@ namespace feng3d.editor
 	 */
 	export interface DragData
 	{
-		gameobject?: GameObject;
-		animationclip?: AnimationClip;
-		material?: Material;
-		geometry?: Geometry;
+		gameobject?: feng3d.GameObject;
+		animationclip?: feng3d.AnimationClip;
+		material?: feng3d.Material;
+		geometry?: feng3d.Geometry;
 		//
 		file_gameobject?: string;
 		/**
@@ -66,7 +66,7 @@ namespace feng3d.editor
 		/**
 		 * 立方体纹理
 		 */
-		texturecube?: TextureCube;
+		texturecube?: feng3d.TextureCube;
 	}
 
 	interface DragItem

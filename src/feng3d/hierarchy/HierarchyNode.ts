@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export class HierarchyNode extends TreeNode
     {
@@ -7,7 +7,7 @@ namespace feng3d.editor
         /**
          * 游戏对象
          */
-        gameobject: GameObject;
+        gameobject: feng3d.GameObject;
         /** 
          * 父节点
          */
@@ -21,7 +21,7 @@ namespace feng3d.editor
         {
             super(obj);
 
-            watcher.watch(this.gameobject, "name", this.update, this);
+            feng3d.watcher.watch(this.gameobject, "name", this.update, this);
 
             this.update();
         }
@@ -31,7 +31,7 @@ namespace feng3d.editor
          */
         destroy()
         {
-            watcher.unwatch(this.gameobject, "name", this.update, this);
+            feng3d.watcher.unwatch(this.gameobject, "name", this.update, this);
 
             this.gameobject = null;
             super.destroy();

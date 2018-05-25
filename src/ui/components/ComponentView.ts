@@ -1,12 +1,12 @@
-namespace feng3d.editor
+namespace editor
 {
 	export class ComponentView extends eui.Component
 	{
-		component: Component;
-		componentView: IObjectView;
+		component: feng3d.Component;
+		componentView: feng3d.IObjectView;
 
 		//
-		public accordion: feng3d.editor.Accordion;
+		public accordion: editor.Accordion;
 
 		//
 		public enabledCB: eui.CheckBox;
@@ -14,12 +14,12 @@ namespace feng3d.editor
 		public helpBtn: eui.Button;
 		public operationBtn: eui.Button;
 
-		scriptView: IObjectView;
+		scriptView: feng3d.IObjectView;
 
 		/**
 		 * 对象界面数据
 		 */
-		constructor(component: Component)
+		constructor(component: feng3d.Component)
 		{
 			super();
 			this.component = component;
@@ -40,9 +40,9 @@ namespace feng3d.editor
 
 		private onComplete()
 		{
-			var componentName = classUtils.getQualifiedClassName(this.component).split(".").pop();
+			var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
 			this.accordion.titleName = componentName;
-			this.componentView = objectview.getObjectView(this.component, false, ["enabled"]);
+			this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
 			this.accordion.addContent(this.componentView);
 
 			this.enabledCB = this.accordion["enabledCB"];
@@ -50,13 +50,13 @@ namespace feng3d.editor
 			this.helpBtn = this.accordion["helpBtn"];
 			this.operationBtn = this.accordion["operationBtn"];
 
-			if (this.component instanceof Transform)
+			if (this.component instanceof feng3d.Transform)
 			{
 				this.componentIcon.source = "Transform_png";
-			} else if (this.component instanceof MeshRenderer)
+			} else if (this.component instanceof feng3d.MeshRenderer)
 			{
 				this.componentIcon.source = "MeshRenderer_png";
-			} else if (this.component instanceof ScriptComponent)
+			} else if (this.component instanceof feng3d.ScriptComponent)
 			{
 				this.componentIcon.source = "ScriptComponent_png";
 			}
@@ -85,7 +85,7 @@ namespace feng3d.editor
 
 			this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 			this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-			feng3dDispatcher.on("assets.scriptChanged", this.onScriptChanged, this);
+			feng3d.feng3dDispatcher.on("assets.scriptChanged", this.onScriptChanged, this);
 		}
 
 		private onRemovedFromStage()
@@ -96,7 +96,7 @@ namespace feng3d.editor
 
 			this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 			this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-			feng3dDispatcher.off("assets.scriptChanged", this.onScriptChanged, this);
+			feng3d.feng3dDispatcher.off("assets.scriptChanged", this.onScriptChanged, this);
 		}
 
 		private updateEnableCB()
@@ -123,13 +123,13 @@ namespace feng3d.editor
 		private initScriptView()
 		{
 			// 初始化Script属性面板
-			if (this.component instanceof ScriptComponent)
+			if (this.component instanceof feng3d.ScriptComponent)
 			{
-				watcher.watch(this.component, "script", this.onScriptChanged, this);
+				feng3d.watcher.watch(this.component, "script", this.onScriptChanged, this);
 				var component = this.component;
 				if (component.scriptInstance)
 				{
-					this.scriptView = objectview.getObjectView(component.scriptInstance, false);
+					this.scriptView = feng3d.objectview.getObjectView(component.scriptInstance, false);
 					this.accordion.addContent(this.scriptView);
 				}
 			}
@@ -138,9 +138,9 @@ namespace feng3d.editor
 		private removeScriptView()
 		{
 			// 移除Script属性面板
-			if (this.component instanceof ScriptComponent)
+			if (this.component instanceof feng3d.ScriptComponent)
 			{
-				watcher.unwatch(this.component, "script", this.onScriptChanged, this);
+				feng3d.watcher.unwatch(this.component, "script", this.onScriptChanged, this);
 			}
 			if (this.scriptView)
 			{
@@ -153,7 +153,7 @@ namespace feng3d.editor
 		{
 			var menus: MenuItem[] = [];
 
-			if (!(this.component instanceof Transform))
+			if (!(this.component instanceof feng3d.Transform))
 			{
 				menus.push({
 					label: "移除组件",

@@ -1,10 +1,10 @@
-namespace feng3d.editor
+namespace editor
 {
     export var fs: EditorAssets1;
 
-    export class EditorAssets1 extends ReadWriteAssets
+    export class EditorAssets1 extends feng3d.ReadWriteAssets
     {
-        constructor(readWriteFS?: ReadWriteFS)
+        constructor(readWriteFS?: feng3d.ReadWriteFS)
         {
             super();
             if (readWriteFS)
@@ -19,9 +19,9 @@ namespace feng3d.editor
         hasProject(projectname: string, callback: (has: boolean) => void)
         {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof IndexedDBfs)
+            if (readWriteFS instanceof feng3d.IndexedDBfs)
             {
-                storage.hasObjectStore(readWriteFS.DBname, projectname, callback);
+                feng3d.storage.hasObjectStore(readWriteFS.DBname, projectname, callback);
             } else if (readWriteFS["getProjectList"] != null)
             {
                 readWriteFS["getProjectList"]((err: Error, projects: string[]) =>
@@ -43,9 +43,9 @@ namespace feng3d.editor
         getProjectList(callback: (err: Error, projects: string[]) => void)
         {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof IndexedDBfs)
+            if (readWriteFS instanceof feng3d.IndexedDBfs)
             {
-                storage.getObjectStoreNames(readWriteFS.DBname, callback)
+                feng3d.storage.getObjectStoreNames(readWriteFS.DBname, callback)
             } else if (readWriteFS["getProjectList"] != null)
             {
                 readWriteFS["getProjectList"](callback);
@@ -63,26 +63,26 @@ namespace feng3d.editor
         initproject(projectname: string, callback: () => void)
         {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof IndexedDBfs)
+            if (readWriteFS instanceof feng3d.IndexedDBfs)
             {
-                storage.createObjectStore(readWriteFS.DBname, projectname, (err) =>
+                feng3d.storage.createObjectStore(readWriteFS.DBname, projectname, (err) =>
                 {
                     if (err)
                     {
-                        warn(err);
+                        feng3d.warn(err);
                         return;
                     }
                     readWriteFS.projectname = projectname;
                     // todo 启动监听 ts代码变化自动编译
                     callback();
                 });
-            } else if (readWriteFS.type == FSType.native)
+            } else if (readWriteFS.type == feng3d.FSType.native)
             {
                 readWriteFS.projectname = projectname;
                 readWriteFS.mkdir("", (err) =>
                 {
                     if (err)
-                        error(err);
+                        feng3d.error(err);
                     callback();
                 });
 
@@ -149,7 +149,7 @@ namespace feng3d.editor
                 };
                 request.onerror = (ev) =>
                 {
-                    error(request.responseURL + "不存在，无法初始化项目！");
+                    feng3d.error(request.responseURL + "不存在，无法初始化项目！");
                 }
                 request.send();
             });
@@ -215,7 +215,7 @@ namespace feng3d.editor
             };
             request.onerror = (ev) =>
             {
-                error(request.responseURL + "不存在，无法初始化项目！");
+                feng3d.error(request.responseURL + "不存在，无法初始化项目！");
             }
             request.send();
         }
@@ -303,11 +303,11 @@ namespace feng3d.editor
 
     if (typeof require == "undefined")
     {
-        assets = fs = new EditorAssets1(indexedDBfs);
+        feng3d.assets = fs = new EditorAssets1(feng3d.indexedDBfs);
     } else
     {
         var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
-        assets = fs = new EditorAssets1(nativeFS);
+        feng3d.assets = fs = new EditorAssets1(nativeFS);
     }
 
     //

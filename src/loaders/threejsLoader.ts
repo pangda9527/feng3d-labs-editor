@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export var threejsLoader = {
         load: load,
@@ -8,7 +8,7 @@ namespace feng3d.editor
     function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => void)
     {
 
-        var skeletonComponent: SkeletonComponent;
+        var skeletonComponent: feng3d.SkeletonComponent;
         prepare(() =>
         {
             //
@@ -39,52 +39,52 @@ namespace feng3d.editor
             var gameobject = parse(scene);
             gameobject.transform.sx = -1;
             onParseComplete && onParseComplete(gameobject);
-            log("onLoad");
+            feng3d.log("onLoad");
         }
         function onProgress(event: ProgressEvent)
         {
-            log(event);
+            feng3d.log(event);
         }
         function onError(err)
         {
-            error(err);
+            feng3d.error(err);
         }
 
-        function parse(object3d, parent?: GameObject)
+        function parse(object3d, parent?: feng3d.GameObject)
         {
             if (object3d.type == "Bone")
                 return null;
 
-            var gameobject = GameObject.create(object3d.name);
-            gameobject.transform.position = new Vector3(object3d.position.x, object3d.position.y, object3d.position.z);
-            gameobject.transform.orientation = new Quaternion(object3d.quaternion.x, object3d.quaternion.y, object3d.quaternion.z, object3d.quaternion.w);
-            gameobject.transform.scale = new Vector3(object3d.scale.x, object3d.scale.y, object3d.scale.z);
+            var gameobject = feng3d.GameObject.create(object3d.name);
+            gameobject.transform.position = new feng3d.Vector3(object3d.position.x, object3d.position.y, object3d.position.z);
+            gameobject.transform.orientation = new feng3d.Quaternion(object3d.quaternion.x, object3d.quaternion.y, object3d.quaternion.z, object3d.quaternion.w);
+            gameobject.transform.scale = new feng3d.Vector3(object3d.scale.x, object3d.scale.y, object3d.scale.z);
             if (parent)
                 parent.addChild(gameobject);
 
             switch (object3d.type)
             {
                 case "PerspectiveCamera":
-                    gameobject.addComponent(Camera).lens = parsePerspectiveCamera(object3d);
+                    gameobject.addComponent(feng3d.Camera).lens = parsePerspectiveCamera(object3d);
                     break;
                 case "SkinnedMesh":
-                    var skinnedMeshRenderer = gameobject.addComponent(SkinnedMeshRenderer);
+                    var skinnedMeshRenderer = gameobject.addComponent(feng3d.SkinnedMeshRenderer);
                     skinnedMeshRenderer.geometry = parseGeometry(object3d.geometry);
-                    skinnedMeshRenderer.material.renderParams.cullFace = CullFace.NONE;
-                    assert(object3d.bindMode == "attached");
+                    skinnedMeshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
+                    feng3d.assert(object3d.bindMode == "attached");
                     skinnedMeshRenderer.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
                         skinnedMeshRenderer.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();
                     break;
                 case "Mesh":
-                    var meshRenderer = gameobject.addComponent(MeshRenderer);
+                    var meshRenderer = gameobject.addComponent(feng3d.MeshRenderer);
                     meshRenderer.geometry = parseGeometry(object3d.geometry);
-                    meshRenderer.material.renderParams.cullFace = CullFace.NONE;
+                    meshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
                     break;
                 case "Group":
                     if (object3d.skeleton)
                     {
-                        skeletonComponent = gameobject.addComponent(SkeletonComponent);
+                        skeletonComponent = gameobject.addComponent(feng3d.SkeletonComponent);
                         skeletonComponent.joints = parseSkeleton(object3d.skeleton);
                     }
                     break;
@@ -92,13 +92,13 @@ namespace feng3d.editor
                     //Bone 由SkeletonComponent自动生成，不用解析
                     break;
                 default:
-                    warn(`没有提供 ${object3d.type} 类型对象的解析`);
+                    feng3d.warn(`没有提供 ${object3d.type} 类型对象的解析`);
                     break;
             }
 
             if (object3d.animations && object3d.animations.length > 0)
             {
-                var animation = gameobject.addComponent(Animation);
+                var animation = gameobject.addComponent(feng3d.Animation);
                 for (var i = 0; i < object3d.animations.length; i++)
                 {
                     var animationClip = parseAnimations(object3d.animations[i]);
@@ -122,10 +122,10 @@ namespace feng3d.editor
     {
         var matrixTemp = new window["THREE"].Matrix4();
         var quaternionTemp = new window["THREE"].Quaternion();
-        var fmatrix3d = new Matrix4x4();
+        var fmatrix3d = new feng3d.Matrix4x4();
 
         //
-        var animationClip = new AnimationClip();
+        var animationClip = new feng3d.AnimationClip();
 
         animationClip.name = animationClipData.name;
         animationClip.length = animationClipData.duration * 1000;
@@ -143,13 +143,13 @@ namespace feng3d.editor
 
         function parsePropertyClip(keyframeTrack)
         {
-            var propertyClip = new PropertyClip();
+            var propertyClip = new feng3d.PropertyClip();
 
             var trackName: string = keyframeTrack.name;
             var result = /\.bones\[(\w+)\]\.(\w+)/.exec(trackName);
             propertyClip.path = <any>[
-                [PropertyClipPathItemType.GameObject, result[1]],
-                [PropertyClipPathItemType.Component, , "feng3d.Transform"],
+                [feng3d.PropertyClipPathItemType.GameObject, result[1]],
+                [feng3d.PropertyClipPathItemType.Component, , "feng3d.Transform"],
             ];
 
             switch (result[2])
@@ -164,7 +164,7 @@ namespace feng3d.editor
                     propertyClip.propertyName = "orientation";
                     break;
                 default:
-                    warn(`没有处理 propertyName ${result[2]}`);
+                    feng3d.warn(`没有处理 propertyName ${result[2]}`);
                     break;
             }
 
@@ -191,7 +191,7 @@ namespace feng3d.editor
                     }
                     break;
                 default:
-                    warn(`没有提供解析 ${keyframeTrack.ValueTypeName} 类型Track数据`);
+                    feng3d.warn(`没有提供解析 ${keyframeTrack.ValueTypeName} 类型Track数据`);
                     break;
             }
 
@@ -201,7 +201,7 @@ namespace feng3d.editor
 
     function parseSkeleton(skeleton)
     {
-        var joints: SkeletonJoint[] = [];
+        var joints: feng3d.SkeletonJoint[] = [];
         var skeNameDic = {};
 
         var len = skeleton.bones.length;
@@ -212,10 +212,10 @@ namespace feng3d.editor
         for (var i = 0; i < len; i++)
         {
             var bone = skeleton.bones[i];
-            var skeletonJoint = joints[i] = new SkeletonJoint();
+            var skeletonJoint = joints[i] = new feng3d.SkeletonJoint();
             //
             skeletonJoint.name = bone.name;
-            skeletonJoint.matrix3D = new Matrix4x4(bone.matrixWorld.elements);
+            skeletonJoint.matrix3D = new feng3d.Matrix4x4(bone.matrixWorld.elements);
 
             var parentId = skeNameDic[bone.parent.name];
             if (parentId === undefined)
@@ -227,9 +227,9 @@ namespace feng3d.editor
         return joints;
     }
 
-    function parseSkinnedSkeleton(skeleton: SkeletonComponent, skinSkeletonData)
+    function parseSkinnedSkeleton(skeleton: feng3d.SkeletonComponent, skinSkeletonData)
     {
-        var skinSkeleton = new SkinSkeletonTemp();
+        var skinSkeleton = new feng3d.SkinSkeletonTemp();
 
         var joints = skeleton.joints;
         var jointsMap = {};
@@ -251,10 +251,10 @@ namespace feng3d.editor
             if (jointsMapitem)
             {
                 skinSkeleton.joints[i] = jointsMapitem;
-                joints[jointsMapitem[0]].matrix3D = new Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
+                joints[jointsMapitem[0]].matrix3D = new feng3d.Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
             } else
             {
-                warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);
+                feng3d.warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);
             }
         }
 
@@ -265,7 +265,7 @@ namespace feng3d.editor
     {
         var attributes = geometry.attributes;
 
-        var geo = new CustomGeometry();
+        var geo = new feng3d.CustomGeometry();
 
         for (var key in attributes)
         {
@@ -291,7 +291,7 @@ namespace feng3d.editor
                         geo.setVAData("a_jointweight0", array, 4);
                         break;
                     default:
-                        warn("没有解析顶点数据", key);
+                        feng3d.warn("没有解析顶点数据", key);
                         break;
                 }
             }
@@ -306,7 +306,7 @@ namespace feng3d.editor
 
     function parsePerspectiveCamera(perspectiveCamera)
     {
-        var perspectiveLen = new PerspectiveLens();
+        var perspectiveLen = new feng3d.PerspectiveLens();
 
         perspectiveLen.near = perspectiveCamera.near;
         perspectiveLen.far = perspectiveCamera.far;
@@ -333,7 +333,7 @@ namespace feng3d.editor
                 return;
 
             preparing = true;
-            loadjs.load({
+            feng3d.loadjs.load({
                 paths: [
                     "threejs/three.js",
                     // <!-- FBX -->

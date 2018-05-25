@@ -1,7 +1,7 @@
-namespace feng3d.editor
+namespace editor
 {
-	@OVComponent()
-	export class OVTransform extends eui.Component implements IObjectView
+	@feng3d.OVComponent()
+	export class OVTransform extends eui.Component implements feng3d.IObjectView
 	{
 		//
 		public xTextInput: eui.TextInput;
@@ -14,10 +14,10 @@ namespace feng3d.editor
 		public syTextInput: eui.TextInput;
 		public szTextInput: eui.TextInput;
 		//
-		private _space: Transform;
-		private _objectViewInfo: ObjectViewInfo;
+		private _space: feng3d.Transform;
+		private _objectViewInfo: feng3d.ObjectViewInfo;
 
-		constructor(objectViewInfo: ObjectViewInfo)
+		constructor(objectViewInfo: feng3d.ObjectViewInfo)
 		{
 			super();
 			this._objectViewInfo = objectViewInfo;
@@ -92,7 +92,7 @@ namespace feng3d.editor
 		{
 			if (!this._textfocusintxt) return;
 
-			var transfrom: Transform = <any>this.space;
+			var transfrom: feng3d.Transform = <any>this.space;
 			var value = 0;
 			if (event.currentTarget.text != undefined)
 			{
@@ -160,7 +160,7 @@ namespace feng3d.editor
 		updateView(): void
 		{
 			if (this._textfocusintxt) return;
-			var transfrom: Transform = <any>this.space;
+			var transfrom: feng3d.Transform = <any>this.space;
 			if (!transfrom)
 				return;
 			this.xTextInput.text = "" + transfrom.x;

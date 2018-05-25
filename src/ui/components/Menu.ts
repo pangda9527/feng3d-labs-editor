@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     /**
      * 菜单
@@ -74,8 +74,8 @@ namespace feng3d.editor
 
             if (width !== undefined)
                 menuUI.width = width;
-            menuUI.x = mousex || windowEventProxy.clientX;
-            menuUI.y = mousey || windowEventProxy.clientY;
+            menuUI.x = mousex || feng3d.windowEventProxy.clientX;
+            menuUI.y = mousey || feng3d.windowEventProxy.clientY;
 
             if (menuUI.x + menuUI.width > editorui.popupLayer.stage.stageWidth)
                 menuUI.x -= menuUI.width;

@@ -13,7 +13,7 @@ namespace feng3d
     }
 }
 
-namespace feng3d.editor
+namespace editor
 {
 
     export var editorAssets: EditorAssets;
@@ -26,7 +26,7 @@ namespace feng3d.editor
         /**
          * 显示文件夹
          */
-        @watch("showFloderChanged")
+        @feng3d.watch("showFloderChanged")
         showFloder = "Assets/";
 
         /**
@@ -44,13 +44,13 @@ namespace feng3d.editor
                 if (err)
                 {
                     alert("初始化项目失败！");
-                    error(err);
+                    feng3d.error(err);
                     return;
                 }
                 this.files[this.assetsPath] = new AssetsFile(this.assetsPath);
                 fs.getAllfilepathInFolder(this.assetsPath, (err, filepaths) =>
                 {
-                    assert(!err);
+                    feng3d.assert(!err);
                     filepaths.forEach(element =>
                     {
                         this.files[element] = new AssetsFile(element);
@@ -81,30 +81,30 @@ namespace feng3d.editor
             }
             fs.delete(path, (err) =>
             {
-                if (err) error(err);
+                if (err) feng3d.error(err);
 
-                if (pathUtils.isDirectory(path))
+                if (feng3d.pathUtils.isDirectory(path))
                 {
                     Object.keys(this.files).forEach(element =>
                     {
                         if (element.indexOf(path) == 0)
                         {
                             delete this.files[element];
-                            feng3dDispatcher.dispatch("assets.deletefile", { path: element });
+                            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: element });
                         }
                     });
                     if (editorAssets.showFloder == path)
                     {
-                        editorAssets.showFloder = pathUtils.getParentPath(path);
+                        editorAssets.showFloder = feng3d.pathUtils.getParentPath(path);
                     }
                 }
                 delete this.files[path];
-                feng3dDispatcher.dispatch("assets.deletefile", { path: path });
+                feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: path });
                 editorui.assetsview.invalidateAssetstree();
                 callback && callback();
             });
         }
-        readScene(path: string, callback: (err: Error, scene: Scene3D) => void)
+        readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
             fs.readFileAsString(path, (err, data) =>
             {
@@ -114,8 +114,8 @@ namespace feng3d.editor
                     return;
                 }
                 var json = JSON.parse(data);
-                var sceneobject = serialization.deserialize(json);
-                var scene = sceneobject.getComponent(Scene3D);
+                var sceneobject = feng3d.serialization.deserialize(json);
+                var scene = sceneobject.getComponent(feng3d.Scene3D);
                 scene.initCollectComponents();
                 callback(null, scene);
             });
@@ -125,11 +125,11 @@ namespace feng3d.editor
          * @param path 场景路径
          * @param scene 保存的场景
          */
-        saveScene(path: string, scene: Scene3D, callback: (err: Error) => void = (err) => { })
+        saveScene(path: string, scene: feng3d.Scene3D, callback: (err: Error) => void = (err) => { })
         {
-            var obj = serialization.serialize(scene.gameObject);
+            var obj = feng3d.serialization.serialize(scene.gameObject);
             var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-            dataTransform.stringToUint8Array(str, (uint8Array) =>
+            feng3d.dataTransform.stringToUint8Array(str, (uint8Array) =>
             {
                 fs.writeFile(path, uint8Array, callback)
             });
@@ -220,19 +220,19 @@ namespace feng3d.editor
                             {
                                 label: "贴图", click: () =>
                                 {
-                                    assetsFile.addfile("new texture" + ".texture.json", new Texture2D());
+                                    assetsFile.addfile("new texture" + ".texture.json", new feng3d.Texture2D());
                                 }
                             },
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    assetsFile.addfile("new texturecube" + ".texturecube.json", new TextureCube());
+                                    assetsFile.addfile("new texturecube" + ".texturecube.json", new feng3d.TextureCube());
                                 }
                             },
                             {
                                 label: "材质", click: () =>
                                 {
-                                    assetsFile.addfile("new material" + ".material.json", materialFactory.create("standard"));
+                                    assetsFile.addfile("new material" + ".material.json", feng3d.materialFactory.create("standard"));
                                 }
                             },
                         ]
@@ -284,22 +284,22 @@ namespace feng3d.editor
             {
                 var menu: MenuItem;
                 // 使用编辑器打开
-                if (file.extension == AssetExtension.ts
-                    || file.extension == AssetExtension.js
-                    || file.extension == AssetExtension.txt
-                    || file.extension == AssetExtension.shader
-                    || file.extension == AssetExtension.json
-                    || file.extension == AssetExtension.material
-                    || file.extension == AssetExtension.gameobject
-                    || file.extension == AssetExtension.geometry
-                    || file.extension == AssetExtension.scene
-                    || file.extension == AssetExtension.script
+                if (file.extension == feng3d.AssetExtension.ts
+                    || file.extension == feng3d.AssetExtension.js
+                    || file.extension == feng3d.AssetExtension.txt
+                    || file.extension == feng3d.AssetExtension.shader
+                    || file.extension == feng3d.AssetExtension.json
+                    || file.extension == feng3d.AssetExtension.material
+                    || file.extension == feng3d.AssetExtension.gameobject
+                    || file.extension == feng3d.AssetExtension.geometry
+                    || file.extension == feng3d.AssetExtension.scene
+                    || file.extension == feng3d.AssetExtension.script
                 )
                 {
                     menu = {
                         label: "编辑", click: () =>
                         {
-                            var url = `codeeditor.html?fstype=${assets.type}&project=${editorcache.projectname}&path=${file.path}`;
+                            var url = `codeeditor.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}&path=${file.path}`;
                             url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                             // if (assets.type == FSType.native)
                             // {
@@ -355,7 +355,7 @@ namespace feng3d.editor
                 });
             }
         }
-        saveObject(object: GameObject | AnimationClip | Material | Geometry, filename: string, override = false, callback?: (file: AssetsFile) => void)
+        saveObject(object: feng3d.GameObject | feng3d.AnimationClip | feng3d.Material | feng3d.Geometry, filename: string, override = false, callback?: (file: AssetsFile) => void)
         {
             var showFloder = this.getFile(this.showFloder);
             showFloder.addfile(filename, object, override, callback);
@@ -399,7 +399,7 @@ namespace feng3d.editor
                 showFloder.addfileFromArrayBuffer(file.name, result, false, (e, file) =>
                 {
                     if (e)
-                        error(e);
+                        feng3d.error(e);
                     else
                         assetsFiles.push(file);
                     this.inputFiles(files, callback, assetsFiles);
@@ -423,7 +423,7 @@ namespace feng3d.editor
                         editorui.inspectorView.updateView();
                     } catch (error)
                     {
-                        warn(error);
+                        feng3d.warn(error);
                     }
                 }
                 this._preProjectJsContent = content;
@@ -446,14 +446,14 @@ namespace feng3d.editor
                         {
                             fs.readFileAsString(file.path, (err, content) =>
                             {
-                                war3.MdlParser.parse(content, (war3Model) =>
+                                feng3d.war3.MdlParser.parse(content, (war3Model) =>
                                 {
                                     var paths = file.path.split("/");
                                     paths.pop();
                                     war3Model.root = paths.join("/") + "/";
                                     var gameobject = war3Model.getMesh();
-                                    gameobject.name = pathUtils.getName(file.name);
-                                    this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
+                                    gameobject.name = feng3d.pathUtils.getName(file.name);
+                                    this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                                 });
                             });
                         }
@@ -465,10 +465,10 @@ namespace feng3d.editor
                         {
                             fs.readFileAsString(file.path, (err, content) =>
                             {
-                                ObjLoader.parse(content, (gameobject: GameObject) =>
+                                feng3d.ObjLoader.parse(content, (gameobject: feng3d.GameObject) =>
                                 {
-                                    gameobject.name = pathUtils.getName(file.name);
-                                    this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
+                                    gameobject.name = feng3d.pathUtils.getName(file.name);
+                                    this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                                 });
                             });
                         }
@@ -484,8 +484,8 @@ namespace feng3d.editor
                             {
                                 threejsLoader.load(data, (gameobject) =>
                                 {
-                                    gameobject.name = pathUtils.getName(file.name);
-                                    this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
+                                    gameobject.name = feng3d.pathUtils.getName(file.name);
+                                    this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                                     // engine.root.addChild(gameobject);
                                 });
                             });
@@ -497,13 +497,12 @@ namespace feng3d.editor
                     menuconfig.push({
                         label: "解析", click: () =>
                         {
-
                             fs.readFileAsString(file.path, (err, content) =>
                             {
-                                MD5Loader.parseMD5Mesh(content, (gameobject) =>
+                                feng3d.MD5Loader.parseMD5Mesh(content, (gameobject) =>
                                 {
-                                    gameobject.name = pathUtils.getName(file.name);
-                                    this.saveObject(gameobject, gameobject.name + "." + AssetExtension.gameobject);
+                                    gameobject.name = feng3d.pathUtils.getName(file.name);
+                                    this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                                     // engine.root.addChild(gameobject);
                                 });
 
@@ -517,10 +516,10 @@ namespace feng3d.editor
                         {
                             fs.readFileAsString(file.path, (err, content) =>
                             {
-                                MD5Loader.parseMD5Anim(content, (animationclip) =>
+                                feng3d.MD5Loader.parseMD5Anim(content, (animationclip) =>
                                 {
-                                    animationclip.name = pathUtils.getName(file.name);
-                                    this.saveObject(animationclip, animationclip.name + "." + AssetExtension.anim);
+                                    animationclip.name = feng3d.pathUtils.getName(file.name);
+                                    this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
                                 });
                             });
                         }
@@ -531,7 +530,7 @@ namespace feng3d.editor
 
         private showFloderChanged(property, oldValue, newValue)
         {
-            feng3dDispatcher.dispatch("assets.showFloderChanged", { oldpath: oldValue, newpath: newValue });
+            feng3d.feng3dDispatcher.dispatch("assets.showFloderChanged", { oldpath: oldValue, newpath: newValue });
         }
     }
 

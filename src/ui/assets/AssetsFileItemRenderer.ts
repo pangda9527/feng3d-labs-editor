@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export class AssetsFileItemRenderer extends eui.ItemRenderer
     {
@@ -59,17 +59,17 @@ namespace feng3d.editor
                         var extension = this.data.extension;
                         switch (extension)
                         {
-                            case AssetExtension.gameobject:
+                            case feng3d.AssetExtension.gameobject:
                                 dragsource.file_gameobject = this.data.path;
                                 break;
-                            case AssetExtension.script:
+                            case feng3d.AssetExtension.script:
                                 this.data.getScriptClassName((scriptClassName) =>
                                 {
                                     dragsource.file_script = scriptClassName;
                                     drag.refreshAcceptables();
                                 });
                                 break;
-                            case AssetExtension.anim:
+                            case feng3d.AssetExtension.anim:
                                 var path = this.data.path;
                                 this.data.getData((data) =>
                                 {
@@ -77,7 +77,7 @@ namespace feng3d.editor
                                     drag.refreshAcceptables();
                                 });
                                 break;
-                            case AssetExtension.material:
+                            case feng3d.AssetExtension.material:
                                 var path = this.data.path;
                                 this.data.getData((data) =>
                                 {
@@ -85,7 +85,7 @@ namespace feng3d.editor
                                     drag.refreshAcceptables();
                                 });
                                 break;
-                            case AssetExtension.texturecube:
+                            case feng3d.AssetExtension.texturecube:
                                 var path = this.data.path;
                                 this.data.getData((data) =>
                                 {
@@ -93,7 +93,7 @@ namespace feng3d.editor
                                     drag.refreshAcceptables();
                                 });
                                 break;
-                            case AssetExtension.geometry:
+                            case feng3d.AssetExtension.geometry:
                                 var path = this.data.path;
                                 this.data.getData((data) =>
                                 {
@@ -101,10 +101,10 @@ namespace feng3d.editor
                                     drag.refreshAcceptables();
                                 });
                                 break;
-                            case AssetExtension.png:
-                            case AssetExtension.jpg:
-                            case AssetExtension.jpeg:
-                            case AssetExtension.gif:
+                            case feng3d.AssetExtension.png:
+                            case feng3d.AssetExtension.jpg:
+                            case feng3d.AssetExtension.jpeg:
+                            case feng3d.AssetExtension.gif:
                                 dragsource.image = this.data.path;
                                 break;
                         }
@@ -122,11 +122,11 @@ namespace feng3d.editor
             if (this.data.isDirectory)
             {
                 editorAssets.showFloder = this.data.path;
-            } else if (this.data.extension == AssetExtension.scene)
+            } else if (this.data.extension == feng3d.AssetExtension.scene)
             {
-                this.data.getData((data: GameObject) =>
+                this.data.getData((data: feng3d.GameObject) =>
                 {
-                    var scene = data.getComponent(Scene3D);
+                    var scene = data.getComponent(feng3d.Scene3D);
                     scene.initCollectComponents();
                     engine.scene = scene;
                 });

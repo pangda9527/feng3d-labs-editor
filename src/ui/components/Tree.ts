@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
 	export class TreeNode
 	{
@@ -17,7 +17,7 @@ namespace feng3d.editor
 		/**
 		 * 是否选中
 		 */
-		@watch("selectedchange")
+		@feng3d.watch("selectedchange")
 		selected = false;
         /** 
          * 父节点
@@ -76,7 +76,7 @@ namespace feng3d.editor
 		off<K extends keyof TreeEventMap>(type?: K, listener?: (event: TreeEventMap[K]) => any, thisObject?: any);
 	}
 
-	export class Tree extends EventDispatcher
+	export class Tree extends feng3d.EventDispatcher
 	{
 		_rootnode: TreeNode;
 		get rootnode()
@@ -89,12 +89,12 @@ namespace feng3d.editor
 				return;
 			if (this._rootnode)
 			{
-				watcher.unwatch(this._rootnode, "isOpen", this.isopenchanged, this)
+				feng3d.watcher.unwatch(this._rootnode, "isOpen", this.isopenchanged, this)
 			}
 			this._rootnode = value;
 			if (this._rootnode)
 			{
-				watcher.watch(this._rootnode, "isOpen", this.isopenchanged, this)
+				feng3d.watcher.watch(this._rootnode, "isOpen", this.isopenchanged, this)
 			}
 		}
 
@@ -116,13 +116,13 @@ namespace feng3d.editor
 		addNode(node: TreeNode, parentnode?: TreeNode)
 		{
 			parentnode = parentnode || this.rootnode;
-			debuger && assert(!this.contain(parentnode, node), "无法添加到自身节点中!");
+			feng3d.debuger && feng3d.assert(!this.contain(parentnode, node), "无法添加到自身节点中!");
 
 			node.parent = parentnode;
 			parentnode.children.push(node);
 			this.updateChildrenDepth(node);
 
-			watcher.watch(node, "isOpen", this.isopenchanged, this)
+			feng3d.watcher.watch(node, "isOpen", this.isopenchanged, this)
 
 			this.dispatch("added", node);
 			this.dispatch("changed", node);
@@ -134,12 +134,12 @@ namespace feng3d.editor
 			if (!parentnode)
 				return;
 			var index = parentnode.children.indexOf(node);
-			debuger && assert(index != -1);
+			feng3d.debuger && feng3d.assert(index != -1);
 			parentnode.children.splice(index, 1);
 
 			node.parent = null;
 
-			watcher.unwatch(node, "isOpen", this.isopenchanged, this)
+			feng3d.watcher.unwatch(node, "isOpen", this.isopenchanged, this)
 
 			this.dispatch("removed", node);
 			this.dispatch("changed", node);

@@ -1,17 +1,17 @@
-namespace feng3d.editor
+namespace editor
 {
 	/**
 	 * 挑选（拾取）OAV界面
 	 * @author feng 2016-3-10
 	 */
-    @OAVComponent()
+    @feng3d.OAVComponent()
     export class OAVPick extends OAVBase
     {
         public label: eui.Label;
         public text: eui.Label;
         public pickBtn: eui.Button;
 
-        constructor(attributeViewInfo: AttributeViewInfo)
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
 
@@ -25,7 +25,7 @@ namespace feng3d.editor
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
-            watcher.watch(this.space, this.attributeName, this.updateView, this);
+            feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
 
             var param: { accepttype: keyof DragData; datatype: string; } = <any>this.attributeViewInfo.componentParam;
             drag.register(this,
@@ -46,7 +46,7 @@ namespace feng3d.editor
             this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
             drag.unregister(this);
-            watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+            feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
         }
 
         private ontxtClick()
@@ -79,7 +79,7 @@ namespace feng3d.editor
                 {
                     var materialfiles = editorAssets.filter((file) =>
                     {
-                        return file.extension == AssetExtension.script;
+                        return file.extension == feng3d.AssetExtension.script;
                     })
 
                     if (materialfiles.length > 0)
@@ -107,7 +107,7 @@ namespace feng3d.editor
                 {
                     var materialfiles = editorAssets.filter((file) =>
                     {
-                        return file.extension == AssetExtension.material;
+                        return file.extension == feng3d.AssetExtension.material;
                     });
 
                     if (materialfiles.length > 0)
@@ -149,7 +149,7 @@ namespace feng3d.editor
             } else
             {
                 var valuename = this.attributeValue["name"] || "";
-                this.text.text = valuename + " (" + classUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
+                this.text.text = valuename + " (" + feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
                 this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             }
         }
@@ -175,7 +175,7 @@ namespace feng3d.editor
         });
     }
 
-    function getMaterials(tsfiles: AssetsFile[], callback: (materials: Material[]) => void, materials: Material[] = [])
+    function getMaterials(tsfiles: AssetsFile[], callback: (materials: feng3d.Material[]) => void, materials: feng3d.Material[] = [])
     {
         if (tsfiles.length == 0)
         {

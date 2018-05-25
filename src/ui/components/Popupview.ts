@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     /**
      * 弹出一个objectview界面，点击其它区域关闭界面，并且调用关闭回调
@@ -13,7 +13,7 @@ namespace feng3d.editor
         popup<T>(object: T, closecallback?: (object: T) => void, param?: { width?: number, height?: number })
         {
             param = param || {};
-            var view: eui.Component = objectview.getObjectView(object);
+            var view: eui.Component = feng3d.objectview.getObjectView(object);
             var background = new eui.Rect(param.width || 300, param.height || 300, 0xf0f0f0);
             view.addChildAt(background, 0);
             maskview.mask(view);

@@ -27,7 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-namespace feng3d.editor
+namespace editor
 {
 
     export class MainUI extends eui.UILayer
@@ -123,7 +123,7 @@ namespace feng3d.editor
          */
         private onItemLoadError(event: RES.ResourceEvent): void
         {
-            warn("Url:" + event.resItem.url + " has failed to load");
+            feng3d.warn("Url:" + event.resItem.url + " has failed to load");
         }
         /**
          * 资源组加载出错
@@ -132,7 +132,7 @@ namespace feng3d.editor
         private onResourceLoadError(event: RES.ResourceEvent): void
         {
             //TODO
-            warn("Group:" + event.groupName + " has failed to load");
+            feng3d.warn("Group:" + event.groupName + " has failed to load");
             //忽略加载失败的项目
             //ignore loading failed projects
             this.onResourceLoadComplete(event);

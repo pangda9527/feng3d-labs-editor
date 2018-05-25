@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
 	export class Vector3DView extends eui.Component implements eui.UIComponent
 	{
@@ -18,7 +18,7 @@ namespace feng3d.editor
 			this._vm.copy(v);
 			this.updateView();
 		}
-		private _vm = new Vector3(1, 2, 3);
+		private _vm = new feng3d.Vector3(1, 2, 3);
 
 		constructor()
 		{

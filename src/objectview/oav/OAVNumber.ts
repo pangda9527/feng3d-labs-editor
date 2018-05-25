@@ -1,10 +1,10 @@
-namespace feng3d.editor
+namespace editor
 {
 	/**
 	 * 默认对象属性界面
 	 * @author feng 2016-3-10
 	 */
-	@OAVComponent()
+	@feng3d.OAVComponent()
 	export class OAVNumber extends OAVDefault
 	{
 		fractionDigits = 3;

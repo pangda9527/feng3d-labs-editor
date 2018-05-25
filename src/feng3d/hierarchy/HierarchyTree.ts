@@ -1,6 +1,6 @@
-namespace feng3d.editor
+namespace editor
 {
-    var nodeMap = new Map<GameObject, HierarchyNode>();
+    var nodeMap = new Map<feng3d.GameObject, HierarchyNode>();
 
     /**
      * 层级树
@@ -14,13 +14,13 @@ namespace feng3d.editor
     {
         rootnode: HierarchyNode;
 
-        private selectedGameObjects: GameObject[] = [];
+        private selectedGameObjects: feng3d.GameObject[] = [];
 
         constructor()
         {
             super();
 
-            watcher.watch(editorData, "selectedObjects", this.onSelectedGameObjectChanged, this);
+            feng3d.watcher.watch(editorData, "selectedObjects", this.onSelectedGameObjectChanged, this);
         }
 
         /**
@@ -37,7 +37,7 @@ namespace feng3d.editor
             return null;
         }
 
-        init(gameobject: GameObject)
+        init(gameobject: feng3d.GameObject)
         {
             if (this.rootnode)
                 this.rootnode.destroy();
@@ -55,7 +55,7 @@ namespace feng3d.editor
             });
         }
 
-        delete(gameobject: GameObject)
+        delete(gameobject: feng3d.GameObject)
         {
             var node = nodeMap.get(gameobject);
             if (node)
@@ -65,7 +65,7 @@ namespace feng3d.editor
             }
         }
 
-        add(gameobject: GameObject)
+        add(gameobject: feng3d.GameObject)
         {
             if (!gameobject.showinHierarchy)
                 return;
@@ -91,7 +91,7 @@ namespace feng3d.editor
             return node;
         }
 
-        remove(gameobject: GameObject)
+        remove(gameobject: feng3d.GameObject)
         {
             var node = nodeMap.get(gameobject);
             if (node)
@@ -107,7 +107,7 @@ namespace feng3d.editor
         /**
          * 获取节点
          */
-        getNode(gameObject: GameObject)
+        getNode(gameObject: feng3d.GameObject)
         {
             var node = nodeMap.get(gameObject);
             return node;
@@ -118,7 +118,7 @@ namespace feng3d.editor
             this.selectedGameObjects.forEach(element =>
             {
                 //清除选中效果
-                var wireframeComponent = element.getComponent(WireframeComponent);
+                var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
                 if (wireframeComponent)
                     element.removeComponent(wireframeComponent);
                 this.getNode(element).selected = false;
@@ -127,9 +127,9 @@ namespace feng3d.editor
             this.selectedGameObjects.forEach(element =>
             {
                 //新增选中效果
-                var wireframeComponent = element.getComponent(WireframeComponent);
+                var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
                 if (!wireframeComponent)
-                    element.addComponent(WireframeComponent);
+                    element.addComponent(feng3d.WireframeComponent);
                 this.getNode(element).selected = true;
             });
         }

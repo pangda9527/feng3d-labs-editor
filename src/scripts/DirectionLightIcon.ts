@@ -1,13 +1,13 @@
-namespace feng3d.editor
+namespace editor
 {
     export class DirectionLightIcon extends EditorScript
     {
-        private lightIcon: GameObject;
-        private lightLines: GameObject;
-        private textureMaterial: TextureMaterial;
-        private directionalLight: DirectionalLight;
+        private lightIcon: feng3d.GameObject;
+        private lightLines: feng3d.GameObject;
+        private textureMaterial: feng3d.TextureMaterial;
+        private directionalLight: feng3d.DirectionalLight;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
             this.initicon()
@@ -17,35 +17,35 @@ namespace feng3d.editor
         {
             var size = 1;
             var linesize = 10;
-            this.directionalLight = this.getComponent(DirectionalLight);
+            this.directionalLight = this.getComponent(feng3d.DirectionalLight);
 
-            var lightIcon = this.lightIcon = GameObject.create("Icon");
+            var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
             lightIcon.showinHierarchy = false;
-            var billboardComponent = lightIcon.addComponent(BillboardComponent);
+            var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editorCamera;
-            var meshRenderer = lightIcon.addComponent(MeshRenderer);
-            meshRenderer.geometry = new PlaneGeometry({ width: size, height: size, segmentsH: 1, segmentsW: 1, yUp: false });
-            var textureMaterial = this.textureMaterial = meshRenderer.material = materialFactory.create("texture");
-            var texture = new Texture2D();
+            var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
+            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: size, height: size, segmentsH: 1, segmentsW: 1, yUp: false });
+            var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture");
+            var texture = new feng3d.Texture2D();
             texture.url = editorData.getEditorAssetsPath("assets/3d/icons/sun.png");
-            texture.format = TextureFormat.RGBA;
+            texture.format = feng3d.TextureFormat.RGBA;
             texture.premulAlpha = true;
             textureMaterial.uniforms.s_texture = texture;
             textureMaterial.renderParams.enableBlend = true;
             this.gameObject.addChild(lightIcon);
 
             //
-            var lightLines = this.lightLines = GameObject.create("Lines");
+            var lightLines = this.lightLines = feng3d.GameObject.create("Lines");
             lightLines.mouseEnabled = false;
             lightLines.serializable = false;
             lightLines.showinHierarchy = false;
-            var holdSizeComponent = lightLines.addComponent(HoldSizeComponent);
+            var holdSizeComponent = lightLines.addComponent(feng3d.HoldSizeComponent);
             holdSizeComponent.camera = editorCamera;
             holdSizeComponent.holdSize = 1;
             var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
-            material.uniforms.u_segmentColor = new Color4(163 / 255, 162 / 255, 107 / 255);
+            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            material.uniforms.u_segmentColor = new feng3d.Color4(163 / 255, 162 / 255, 107 / 255);
             var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             var num = 10;
             for (var i = 0; i < num; i++)
@@ -53,7 +53,7 @@ namespace feng3d.editor
                 var angle = i * Math.PI * 2 / num;
                 var x = Math.sin(angle) * linesize;
                 var y = Math.cos(angle) * linesize;
-                segmentGeometry.segments.push({ start: new Vector3(x, y, 0), end: new Vector3(x, y, linesize * 5) });
+                segmentGeometry.segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x, y, linesize * 5) });
             }
             num = 36;
             for (var i = 0; i < num; i++)
@@ -64,7 +64,7 @@ namespace feng3d.editor
                 var angle1 = (i + 1) * Math.PI * 2 / num;
                 var x1 = Math.sin(angle1) * linesize;
                 var y1 = Math.cos(angle1) * linesize;
-                segmentGeometry.segments.push({ start: new Vector3(x, y, 0), end: new Vector3(x1, y1, 0) });
+                segmentGeometry.segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
             }
             this.gameObject.addChild(lightLines);
 

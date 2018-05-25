@@ -1,20 +1,20 @@
-namespace feng3d.editor
+namespace editor
 {
     export class MouseRayTestScript extends EditorScript
     {
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
 
-            windowEventProxy.on("click", this.onclick, this);
+            feng3d.windowEventProxy.on("click", this.onclick, this);
         }
 
         private onclick()
         {
-            var gameobject = GameObject.create("test");
-            var meshRenderer = gameobject.addComponent(MeshRenderer);
-            meshRenderer.material = materialFactory.create("standard");
-            meshRenderer.geometry = new SphereGeometry({ radius: 10 });
+            var gameobject = feng3d.GameObject.create("test");
+            var meshRenderer = gameobject.addComponent(feng3d.MeshRenderer);
+            meshRenderer.material = feng3d.materialFactory.create("standard");
+            meshRenderer.geometry = new feng3d.SphereGeometry({ radius: 10 });
             gameobject.mouseEnabled = false;
 
             var mouseRay3D = engine.camera.getMouseRay3D();
@@ -55,7 +55,7 @@ namespace feng3d.editor
          */
         dispose()
         {
-            windowEventProxy.off("click", this.onclick, this);
+            feng3d.windowEventProxy.off("click", this.onclick, this);
         }
     }
 }

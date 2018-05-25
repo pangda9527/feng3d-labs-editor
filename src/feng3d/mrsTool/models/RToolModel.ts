@@ -1,9 +1,9 @@
-namespace feng3d.editor
+namespace editor
 {
     /**
      * 旋转工具模型组件
      */
-    export class RToolModel extends Component
+    export class RToolModel extends feng3d.Component
     {
         xAxis: CoordinateRotationAxis;
         yAxis: CoordinateRotationAxis;
@@ -11,7 +11,7 @@ namespace feng3d.editor
         freeAxis: CoordinateRotationFreeAxis;
         cameraAxis: CoordinateRotationAxis;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
             this.gameObject.name = "GameObjectRotationModel";
@@ -20,59 +20,59 @@ namespace feng3d.editor
 
         private initModels()
         {
-            this.xAxis = GameObject.create("xAxis").addComponent(CoordinateRotationAxis);
+            this.xAxis = feng3d.GameObject.create("xAxis").addComponent(CoordinateRotationAxis);
             this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.update();
             this.xAxis.transform.ry = 90;
             this.gameObject.addChild(this.xAxis.gameObject);
 
-            this.yAxis = GameObject.create("yAxis").addComponent(CoordinateRotationAxis);
+            this.yAxis = feng3d.GameObject.create("yAxis").addComponent(CoordinateRotationAxis);
             this.yAxis.color.setTo(0, 1, 0);
             this.yAxis.update();
             this.yAxis.transform.rx = 90;
             this.gameObject.addChild(this.yAxis.gameObject);
 
-            this.zAxis = GameObject.create("zAxis").addComponent(CoordinateRotationAxis);
+            this.zAxis = feng3d.GameObject.create("zAxis").addComponent(CoordinateRotationAxis);
             this.zAxis.color.setTo(0, 0, 1);
             this.zAxis.update();
             this.gameObject.addChild(this.zAxis.gameObject);
 
-            this.cameraAxis = GameObject.create("cameraAxis").addComponent(CoordinateRotationAxis);
+            this.cameraAxis = feng3d.GameObject.create("cameraAxis").addComponent(CoordinateRotationAxis);
             this.cameraAxis.radius = 88;
             this.cameraAxis.color.setTo(1, 1, 1);
             this.cameraAxis.update();
             this.gameObject.addChild(this.cameraAxis.gameObject);
 
-            this.freeAxis = GameObject.create("freeAxis").addComponent(CoordinateRotationFreeAxis);
+            this.freeAxis = feng3d.GameObject.create("freeAxis").addComponent(CoordinateRotationFreeAxis);
             this.freeAxis.color.setTo(1, 1, 1);
             this.freeAxis.update();
             this.gameObject.addChild(this.freeAxis.gameObject);
         }
     }
 
-    export class CoordinateRotationAxis extends Component
+    export class CoordinateRotationAxis extends feng3d.Component
     {
         private isinit: boolean;
-        private segmentGeometry: SegmentGeometry;
-        private torusGeometry: TorusGeometry;
+        private segmentGeometry: feng3d.SegmentGeometry;
+        private torusGeometry: feng3d.TorusGeometry;
         private sector: SectorGameObject;
 
         radius = 80;
-        readonly color = new Color4(1, 0, 0, 0.99)
-        private backColor = new Color4(0.6, 0.6, 0.6, 0.99);
-        private selectedColor = new Color4(1, 1, 0, 0.99);
+        readonly color = new feng3d.Color4(1, 0, 0, 0.99)
+        private backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
+        private selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
 
         //
-        @watch("update")
+        @feng3d.watch("update")
         selected = false;
 
         /**
          * 过滤法线显示某一面线条
          */
-        @watch("update")
-        filterNormal: Vector3;
+        @feng3d.watch("update")
+        filterNormal: feng3d.Vector3;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
             this.initModels();
@@ -80,23 +80,23 @@ namespace feng3d.editor
 
         private initModels()
         {
-            var border = GameObject.create();
-            var meshRenderer = border.addComponent(MeshRenderer);
-            var material = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
-            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.99);
+            var border = feng3d.GameObject.create();
+            var meshRenderer = border.addComponent(feng3d.MeshRenderer);
+            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
-            this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
+            this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
-            this.sector = GameObject.create("sector").addComponent(SectorGameObject);
+            this.sector = feng3d.GameObject.create("sector").addComponent(SectorGameObject);
 
 
-            var mouseHit = GameObject.create("hit");
-            meshRenderer = mouseHit.addComponent(MeshRenderer);
-            this.torusGeometry = meshRenderer.geometry = new TorusGeometry({ radius: this.radius, tubeRadius: 2 });
-            meshRenderer.material = materialFactory.create("standard");
+            var mouseHit = feng3d.GameObject.create("hit");
+            meshRenderer = mouseHit.addComponent(feng3d.MeshRenderer);
+            this.torusGeometry = meshRenderer.geometry = new feng3d.TorusGeometry({ radius: this.radius, tubeRadius: 2 });
+            meshRenderer.material = feng3d.materialFactory.create("standard");
             mouseHit.transform.rx = 90;
             mouseHit.visible = false;
-            mouseHit.mouselayer = mouselayer.editor;
+            mouseHit.mouselayer = feng3d.mouselayer.editor;
             mouseHit.mouseEnabled = true;
             this.gameObject.addChild(mouseHit);
 
@@ -119,10 +119,10 @@ namespace feng3d.editor
             }
 
             this.segmentGeometry.segments = [];
-            var points: Vector3[] = [];
+            var points: feng3d.Vector3[] = [];
             for (var i = 0; i <= 360; i++)
             {
-                points[i] = new Vector3(Math.sin(i * FMath.DEG2RAD), Math.cos(i * FMath.DEG2RAD), 0);
+                points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
                 points[i].scale(this.radius);
                 if (i > 0)
                 {
@@ -142,13 +142,13 @@ namespace feng3d.editor
             }
         }
 
-        showSector(startPos: Vector3, endPos: Vector3)
+        showSector(startPos: feng3d.Vector3, endPos: feng3d.Vector3)
         {
             var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
             var localStartPos = inverseGlobalMatrix3D.transformVector(startPos);
             var localEndPos = inverseGlobalMatrix3D.transformVector(endPos);
-            var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * FMath.RAD2DEG;
-            var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * FMath.RAD2DEG;
+            var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * feng3d.FMath.RAD2DEG;
+            var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * feng3d.FMath.RAD2DEG;
 
             //
             var min = Math.min(startAngle, endAngle);
@@ -171,12 +171,12 @@ namespace feng3d.editor
     /**
      * 扇形对象
      */
-    export class SectorGameObject extends Component
+    export class SectorGameObject extends feng3d.Component
     {
         private isinit: boolean;
-        private segmentGeometry: SegmentGeometry;
-        private geometry: Geometry;
-        private borderColor = new Color4(0, 1, 1, 0.6);
+        private segmentGeometry: feng3d.SegmentGeometry;
+        private geometry: feng3d.Geometry;
+        private borderColor = new feng3d.Color4(0, 1, 1, 0.6);
 
         radius = 80;
 
@@ -186,23 +186,23 @@ namespace feng3d.editor
         /**
          * 构建3D对象
          */
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
             this.gameObject.name = "sector";
 
-            var meshRenderer = this.gameObject.addComponent(MeshRenderer);
-            this.geometry = meshRenderer.geometry = new CustomGeometry();
-            meshRenderer.material = materialFactory.create("color", { uniforms: { u_diffuseInput: new Color4(0.5, 0.5, 0.5, 0.2) } });
+            var meshRenderer = this.gameObject.addComponent(feng3d.MeshRenderer);
+            this.geometry = meshRenderer.geometry = new feng3d.CustomGeometry();
+            meshRenderer.material = feng3d.materialFactory.create("color", { uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
             meshRenderer.material.renderParams.enableBlend = true;
-            meshRenderer.material.renderParams.cullFace = CullFace.NONE;
+            meshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
 
-            var border = GameObject.create("border");
-            meshRenderer = border.addComponent(MeshRenderer);
-            var material = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
-            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.99);
+            var border = feng3d.GameObject.create("border");
+            meshRenderer = border.addComponent(feng3d.MeshRenderer);
+            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
-            this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
+            this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
 
             this.isinit = true;
@@ -225,8 +225,8 @@ namespace feng3d.editor
             vertexPositionData[2] = 0;
             for (var i = 0; i < length; i++)
             {
-                vertexPositionData[i * 3 + 3] = this.radius * Math.cos((i + this._start) * FMath.DEG2RAD);
-                vertexPositionData[i * 3 + 4] = this.radius * Math.sin((i + this._start) * FMath.DEG2RAD);
+                vertexPositionData[i * 3 + 3] = this.radius * Math.cos((i + this._start) * feng3d.FMath.DEG2RAD);
+                vertexPositionData[i * 3 + 4] = this.radius * Math.sin((i + this._start) * feng3d.FMath.DEG2RAD);
                 vertexPositionData[i * 3 + 5] = 0;
                 if (i > 0)
                 {
@@ -238,32 +238,32 @@ namespace feng3d.editor
             this.geometry.setVAData("a_position", vertexPositionData, 3);
             this.geometry.indices = indices;
             //绘制边界
-            var startPoint = new Vector3(this.radius * Math.cos((this._start - 0.1) * FMath.DEG2RAD), this.radius * Math.sin((this._start - 0.1) * FMath.DEG2RAD), 0);
-            var endPoint = new Vector3(this.radius * Math.cos((this._end + 0.1) * FMath.DEG2RAD), this.radius * Math.sin((this._end + 0.1) * FMath.DEG2RAD), 0);
+            var startPoint = new feng3d.Vector3(this.radius * Math.cos((this._start - 0.1) * feng3d.FMath.DEG2RAD), this.radius * Math.sin((this._start - 0.1) * feng3d.FMath.DEG2RAD), 0);
+            var endPoint = new feng3d.Vector3(this.radius * Math.cos((this._end + 0.1) * feng3d.FMath.DEG2RAD), this.radius * Math.sin((this._end + 0.1) * feng3d.FMath.DEG2RAD), 0);
             //
             this.segmentGeometry.segments = [
-                { start: new Vector3(), end: startPoint, startColor: this.borderColor, endColor: this.borderColor },
-                { start: new Vector3(), end: endPoint, startColor: this.borderColor, endColor: this.borderColor },
+                { start: new feng3d.Vector3(), end: startPoint, startColor: this.borderColor, endColor: this.borderColor },
+                { start: new feng3d.Vector3(), end: endPoint, startColor: this.borderColor, endColor: this.borderColor },
             ];
         }
     }
 
-    export class CoordinateRotationFreeAxis extends Component
+    export class CoordinateRotationFreeAxis extends feng3d.Component
     {
         private isinit: boolean;
-        private segmentGeometry: SegmentGeometry;
+        private segmentGeometry: feng3d.SegmentGeometry;
         private sector: SectorGameObject;
 
         private radius = 80;
-        color = new Color4(1, 0, 0, 0.99)
-        private backColor = new Color4(0.6, 0.6, 0.6, 0.99);
-        private selectedColor = new Color4(1, 1, 0, 0.99);
+        color = new feng3d.Color4(1, 0, 0, 0.99)
+        private backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
+        private selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
 
         //
-        @watch("update")
+        @feng3d.watch("update")
         selected = false;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
             this.initModels();
@@ -271,19 +271,19 @@ namespace feng3d.editor
 
         private initModels()
         {
-            var border = GameObject.create("border");
-            var meshRenderer = border.addComponent(MeshRenderer);
-            var material = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
-            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.99);
+            var border = feng3d.GameObject.create("border");
+            var meshRenderer = border.addComponent(feng3d.MeshRenderer);
+            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
-            this.segmentGeometry = meshRenderer.geometry = new SegmentGeometry();
+            this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
 
-            this.sector = GameObject.create("sector").addComponent(SectorGameObject);
+            this.sector = feng3d.GameObject.create("sector").addComponent(SectorGameObject);
             this.sector.update(0, 360);
             this.sector.gameObject.visible = false;
             this.sector.gameObject.mouseEnabled = true;
-            this.sector.gameObject.mouselayer = mouselayer.editor;
+            this.sector.gameObject.mouselayer = feng3d.mouselayer.editor;
             this.gameObject.addChild(this.sector.gameObject);
 
             this.isinit = true;
@@ -299,11 +299,11 @@ namespace feng3d.editor
 
             var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
 
-            var segments: Segment[] = [];
-            var points: Vector3[] = [];
+            var segments: feng3d.Segment[] = [];
+            var points: feng3d.Vector3[] = [];
             for (var i = 0; i <= 360; i++)
             {
-                points[i] = new Vector3(Math.sin(i * FMath.DEG2RAD), Math.cos(i * FMath.DEG2RAD), 0);
+                points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
                 points[i].scale(this.radius);
                 if (i > 0)
                 {

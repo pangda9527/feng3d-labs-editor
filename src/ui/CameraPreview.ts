@@ -1,11 +1,11 @@
-namespace feng3d.editor
+namespace editor
 {
     export class CameraPreview extends eui.Component implements eui.UIComponent
     {
         public group: eui.Group;
         //
         private canvas: HTMLElement;
-        private previewEngine: Engine;
+        private previewEngine: feng3d.Engine;
 
         get camera()
         {
@@ -15,7 +15,7 @@ namespace feng3d.editor
         {
             if (this._camera)
             {
-                ticker.offframe(this.onframe, this);
+                feng3d.ticker.offframe(this.onframe, this);
             }
             this._camera = value;
             this.previewEngine.camera = this._camera;
@@ -23,11 +23,11 @@ namespace feng3d.editor
             this.canvas.style.display = this._camera ? "inline" : "none";
             if (this._camera)
             {
-                ticker.onframe(this.onframe, this);
+                feng3d.ticker.onframe(this.onframe, this);
             }
         }
 
-        private _camera: Camera;
+        private _camera: feng3d.Camera;
 
         constructor()
         {
@@ -36,7 +36,7 @@ namespace feng3d.editor
             this.visible = false;
             //
             var canvas = this.canvas = <HTMLCanvasElement>document.getElementById("cameraPreviewCanvas");;
-            this.previewEngine = new Engine(canvas);
+            this.previewEngine = new feng3d.Engine(canvas);
             this.previewEngine.mouse3DManager.mouseInput.enable = false;
             this.previewEngine.stop();
         }
@@ -44,7 +44,7 @@ namespace feng3d.editor
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
-            watcher.watch(editorData, "selectedObjects", this.onDataChange, this);
+            feng3d.watcher.watch(editorData, "selectedObjects", this.onDataChange, this);
 
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
@@ -56,7 +56,7 @@ namespace feng3d.editor
         $onRemoveFromStage()
         {
             super.$onRemoveFromStage()
-            watcher.unwatch(editorData, "selectedObjects", this.onDataChange, this);
+            feng3d.watcher.unwatch(editorData, "selectedObjects", this.onDataChange, this);
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
             this.removeEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
         }
@@ -68,7 +68,7 @@ namespace feng3d.editor
 
             var lt = this.group.localToGlobal(0, 0);
             var rb = this.group.localToGlobal(this.group.width, this.group.height);
-            var bound1 = new Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+            var bound1 = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
 
             // var bound2 = this.getTransformedBounds(this.stage);
             var bound = bound1;
@@ -89,7 +89,7 @@ namespace feng3d.editor
             {
                 for (let i = 0; i < selectedGameObjects.length; i++)
                 {
-                    var camera = selectedGameObjects[i].getComponent(Camera);
+                    var camera = selectedGameObjects[i].getComponent(feng3d.Camera);
                     if (camera)
                     {
                         this.camera = camera;

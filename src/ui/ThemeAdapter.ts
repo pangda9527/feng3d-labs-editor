@@ -27,7 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-namespace feng3d.editor {
+namespace editor {
     export class ThemeAdapter implements eui.IThemeAdapter {
 
         /**

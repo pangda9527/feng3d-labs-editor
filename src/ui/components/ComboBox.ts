@@ -84,8 +84,8 @@ class ComboBox extends eui.Component implements eui.UIComponent
 		this.list.y = rect.bottom;
 		this.list.selectedIndex = this.dataProvider.indexOf(this.data);
 
-		feng3d.editor.editorui.popupLayer.addChild(this.list);
-		feng3d.editor.maskview.mask(this.list);
+		editor.editorui.popupLayer.addChild(this.list);
+		editor.maskview.mask(this.list);
 	}
 
 	private onlistChange()

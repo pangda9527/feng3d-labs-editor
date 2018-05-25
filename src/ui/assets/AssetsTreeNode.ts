@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export var assetsTree: AssetsTree;
 
@@ -8,7 +8,7 @@ namespace feng3d.editor
 
         constructor()
         {
-            feng3dDispatcher.on("assets.showFloderChanged", this.onShowFloderChanged, this);
+            feng3d.feng3dDispatcher.on("assets.showFloderChanged", this.onShowFloderChanged, this);
         }
 
         getNode(path: string)
@@ -20,7 +20,7 @@ namespace feng3d.editor
             return node;
         }
 
-        private onShowFloderChanged(event: Event<{ oldpath: string; newpath: string; }>)
+        private onShowFloderChanged(event: feng3d.Event<{ oldpath: string; newpath: string; }>)
         {
             var oldnode = this.getNode(event.data.oldpath);
             if (oldnode) oldnode.selected = false;
@@ -38,7 +38,7 @@ namespace feng3d.editor
         /**
          * 文件夹是否打开
          */
-        @watch("openChanged")
+        @feng3d.watch("openChanged")
         isOpen = true;
 
         get label()
@@ -48,7 +48,7 @@ namespace feng3d.editor
 
         get parent()
         {
-            var parentpath = pathUtils.getParentPath(this.path);
+            var parentpath = feng3d.pathUtils.getParentPath(this.path);
             return assetsTree.nodes[parentpath];
         }
 
@@ -63,7 +63,7 @@ namespace feng3d.editor
         {
             super();
             this.path = path;
-            this.depth = pathUtils.getDirDepth(path);
+            this.depth = feng3d.pathUtils.getDirDepth(path);
         }
 
         private openChanged()

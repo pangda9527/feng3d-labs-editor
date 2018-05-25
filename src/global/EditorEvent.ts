@@ -1,12 +1,12 @@
-namespace feng3d.editor
+namespace editor
 {
     export interface EditorEventMap
     {
         /**
          * 旋转场景摄像机
          */
-        editorCameraRotate: Vector3
+        editorCameraRotate: feng3d.Vector3
     }
 
-    export var editorDispatcher: IEventDispatcher<EditorEventMap> = new EventDispatcher();
+    export var editorDispatcher: feng3d.IEventDispatcher<EditorEventMap> = new feng3d.EventDispatcher();
 }

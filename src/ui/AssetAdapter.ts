@@ -27,7 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-namespace feng3d.editor {
+namespace editor {
     export class AssetAdapter implements eui.IAssetAdapter {
         /**
          * @language zh_CN

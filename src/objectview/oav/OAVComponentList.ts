@@ -1,17 +1,17 @@
-namespace feng3d.editor
+namespace editor
 {
-	@OAVComponent()
+	@feng3d.OAVComponent()
 	export class OAVComponentList extends OAVBase
 	{
 		private accordions: Accordion[] = [];
-		protected _space: GameObject;
+		protected _space: feng3d.GameObject;
 
 		//
 		group: eui.Group;
 		addComponentButton: eui.Button;
 
 
-		constructor(attributeViewInfo: AttributeViewInfo)
+		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 		{
 			super(attributeViewInfo);
 			this.skinName = "OAVComponentListSkin";
@@ -95,7 +95,7 @@ namespace feng3d.editor
 			this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
 		}
 
-		private addComponentView(component: Component)
+		private addComponentView(component: feng3d.Component)
 		{
 			var o: Object;
 			if (!component.showInInspector)
@@ -119,7 +119,7 @@ namespace feng3d.editor
 			}
 		}
 
-		private removedComponentView(component: Component)
+		private removedComponentView(component: feng3d.Component)
 		{
 			for (var i = this.group.numChildren - 1; i >= 0; i--)
 			{
@@ -131,12 +131,12 @@ namespace feng3d.editor
 			}
 		}
 
-		private onaddedcompont(event: Event<Component>)
+		private onaddedcompont(event: feng3d.Event<feng3d.Component>)
 		{
 			this.addComponentView(event.data);
 		}
 
-		private onremovedComponent(event: Event<Component>)
+		private onremovedComponent(event: feng3d.Event<feng3d.Component>)
 		{
 			this.removedComponentView(event.data);
 		}

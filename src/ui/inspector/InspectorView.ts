@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
 	/**
      * 属性面板（检查器）
@@ -40,13 +40,13 @@ namespace feng3d.editor
 			this.backButton.visible = this.viewDataList.length > 0;
 
 			this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-			watcher.watch(editorData, "selectedObjects", this.onDataChange, this);
+			feng3d.watcher.watch(editorData, "selectedObjects", this.onDataChange, this);
 		}
 
 		private onRemovedFromStage()
 		{
 			this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-			watcher.unwatch(editorData, "selectedObjects", this.onDataChange, this);
+			feng3d.watcher.unwatch(editorData, "selectedObjects", this.onDataChange, this);
 		}
 
 		private onDataChange()
@@ -74,14 +74,14 @@ namespace feng3d.editor
 					{
 						if (viewData == this.viewData)
 						{
-							this.view = objectview.getObjectView(showdata);
+							this.view = feng3d.objectview.getObjectView(showdata);
 							this.view.percentWidth = 100;
 							this.group.addChild(this.view);
 						}
 					});
 				} else
 				{
-					this.view = objectview.getObjectView(this.viewData);
+					this.view = feng3d.objectview.getObjectView(this.viewData);
 					this.view.percentWidth = 100;
 					this.group.addChild(this.view);
 				}

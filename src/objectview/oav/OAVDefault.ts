@@ -1,16 +1,16 @@
-namespace feng3d.editor
+namespace editor
 {
 	/**
 	 * 默认对象属性界面
 	 * @author feng 2016-3-10
 	 */
-	@OAVComponent()
+	@feng3d.OAVComponent()
 	export class OAVDefault extends OAVBase
 	{
 		public label: eui.Label;
 		public text: eui.TextInput;
 
-		constructor(attributeViewInfo: AttributeViewInfo)
+		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 		{
 			super(attributeViewInfo);
 
@@ -51,13 +51,13 @@ namespace feng3d.editor
 			this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
 			this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
 
-			watcher.watch(this.space, this.attributeName, this.updateView, this);
+			feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
 		}
 
 		dispose()
 		{
 			drag.unregister(this);
-			watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+			feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
 
 			this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
 			this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);

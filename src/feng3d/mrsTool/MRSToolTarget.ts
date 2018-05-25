@@ -1,14 +1,14 @@
-namespace feng3d.editor
+namespace editor
 {
     export class MRSToolTarget
     {
         //
-        private _controllerTargets: Transform[];
-        private _startScaleVec: Vector3[] = [];
-        private _showGameObject: Transform;
-        private _controllerToolTransfrom: Transform = GameObject.create("controllerToolTransfrom").transform;
-        private _controllerTool: Transform;
-        private _startTransformDic: Map<Transform, TransformData>;
+        private _controllerTargets: feng3d.Transform[];
+        private _startScaleVec: feng3d.Vector3[] = [];
+        private _showGameObject: feng3d.Transform;
+        private _controllerToolTransfrom: feng3d.Transform = feng3d.GameObject.create("controllerToolTransfrom").transform;
+        private _controllerTool: feng3d.Transform;
+        private _startTransformDic: Map<feng3d.Transform, TransformData>;
 
         //
         get showGameObject()
@@ -39,7 +39,7 @@ namespace feng3d.editor
             }
         }
 
-        set controllerTargets(value: Transform[])
+        set controllerTargets(value: feng3d.Transform[])
         {
             if (this._controllerTargets && this._controllerTargets.length > 0)
             {
@@ -55,11 +55,11 @@ namespace feng3d.editor
 
         constructor()
         {
-            watcher.watch(mrsTool, "isWoldCoordinate", this.updateControllerImage, this);
-            watcher.watch(mrsTool, "isBaryCenter", this.updateControllerImage, this);
+            feng3d.watcher.watch(mrsTool, "isWoldCoordinate", this.updateControllerImage, this);
+            feng3d.watcher.watch(mrsTool, "isBaryCenter", this.updateControllerImage, this);
         }
 
-        private onShowObjectTransformChanged(event: Event<any>)
+        private onShowObjectTransformChanged(event: feng3d.Event<any>)
         {
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
@@ -79,7 +79,7 @@ namespace feng3d.editor
                 return;
 
             var transform = this._controllerTargets[0];
-            var position = new Vector3();
+            var position = new feng3d.Vector3();
             if (mrsTool.isBaryCenter)
             {
                 position.copy(transform.scenePosition);
@@ -91,7 +91,7 @@ namespace feng3d.editor
                 }
                 position.scale(1 / this._controllerTargets.length);
             }
-            var rotation = new Vector3();
+            var rotation = new feng3d.Vector3();
             if (!mrsTool.isWoldCoordinate)
             {
                 rotation = this._showGameObject.rotation;
@@ -110,7 +110,7 @@ namespace feng3d.editor
          */
         startTranslation()
         {
-            this._startTransformDic = new Map<Transform, TransformData>();
+            this._startTransformDic = new Map<feng3d.Transform, TransformData>();
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
             for (var i = 0; i < objects.length; i++)
@@ -120,7 +120,7 @@ namespace feng3d.editor
             }
         }
 
-        translation(addPos: Vector3)
+        translation(addPos: feng3d.Vector3)
         {
             if (!this._controllerTargets)
                 return;
@@ -144,7 +144,7 @@ namespace feng3d.editor
 
         startRotate()
         {
-            this._startTransformDic = new Map<Transform, TransformData>();
+            this._startTransformDic = new Map<feng3d.Transform, TransformData>();
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
             for (var i = 0; i < objects.length; i++)
@@ -159,11 +159,11 @@ namespace feng3d.editor
          * @param angle 旋转角度
          * @param normal 旋转轴
          */
-        rotate1(angle: number, normal: Vector3)
+        rotate1(angle: number, normal: feng3d.Vector3)
         {
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
-            var localnormal: Vector3;
+            var localnormal: feng3d.Vector3;
             var gameobject = objects[0];
             if (!mrsTool.isWoldCoordinate && mrsTool.isBaryCenter)
             {
@@ -190,7 +190,7 @@ namespace feng3d.editor
                         var localPivotPoint = this._controllerToolTransfrom.position;
                         if (gameobject.parent)
                             localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
-                        gameobject.position = Matrix4x4.fromPosition(tempTransform.position).appendRotation(localnormal, angle, localPivotPoint).position;
+                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position).appendRotation(localnormal, angle, localPivotPoint).position;
                         gameobject.rotation = rotateRotation(tempTransform.rotation, localnormal, angle);
                     }
                 }
@@ -204,7 +204,7 @@ namespace feng3d.editor
          * @param angle2 第二方向旋转角度
          * @param normal2 第二方向旋转轴
          */
-        rotate2(angle1: number, normal1: Vector3, angle2: number, normal2: Vector3)
+        rotate2(angle1: number, normal1: feng3d.Vector3, angle2: number, normal2: feng3d.Vector3)
         {
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
@@ -246,8 +246,8 @@ namespace feng3d.editor
                         if (gameobject.parent)
                             localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
                         //
-                        tempPosition = Matrix4x4.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
-                        gameobject.position = Matrix4x4.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
+                        tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
+                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition).appendRotation(localnormal1, angle1, localPivotPoint).position;
 
                         tempRotation = rotateRotation(tempRotation, localnormal1, angle1);
                         gameobject.rotation = rotateRotation(tempRotation, localnormal2, angle2);
@@ -269,9 +269,9 @@ namespace feng3d.editor
             }
         }
 
-        doScale(scale: Vector3)
+        doScale(scale: feng3d.Vector3)
         {
-            debuger && assert(!!scale.length);
+            feng3d.debuger && feng3d.assert(!!scale.length);
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
                 var result = this._startScaleVec[i].multiplyTo(scale);
@@ -289,20 +289,20 @@ namespace feng3d.editor
 
     interface TransformData
     {
-        position: Vector3, rotation: Vector3, scale: Vector3
+        position: feng3d.Vector3, rotation: feng3d.Vector3, scale: feng3d.Vector3
     }
 
-    function getTransformData(transform: Transform)
+    function getTransformData(transform: feng3d.Transform)
     {
         return { position: transform.position.clone(), rotation: transform.rotation.clone(), scale: transform.scale.clone() };
     }
 
-    function rotateRotation(rotation: Vector3, axis: Vector3, angle)
+    function rotateRotation(rotation: feng3d.Vector3, axis: feng3d.Vector3, angle)
     {
-        var rotationmatrix3d = new Matrix4x4();
-        rotationmatrix3d.appendRotation(Vector3.X_AXIS, rotation.x);
-        rotationmatrix3d.appendRotation(Vector3.Y_AXIS, rotation.y);
-        rotationmatrix3d.appendRotation(Vector3.Z_AXIS, rotation.z);
+        var rotationmatrix3d = new feng3d.Matrix4x4();
+        rotationmatrix3d.appendRotation(feng3d.Vector3.X_AXIS, rotation.x);
+        rotationmatrix3d.appendRotation(feng3d.Vector3.Y_AXIS, rotation.y);
+        rotationmatrix3d.appendRotation(feng3d.Vector3.Z_AXIS, rotation.z);
         rotationmatrix3d.appendRotation(axis, angle);
         var newrotation = rotationmatrix3d.decompose()[1];
         newrotation.scale(180 / Math.PI);

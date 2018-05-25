@@ -1,6 +1,6 @@
-namespace feng3d.editor
+namespace editor
 {
-	@OAVComponent()
+	@feng3d.OAVComponent()
 	export class OAVBoolean extends OAVBase
 	{
 		label: eui.Label;

@@ -1,13 +1,13 @@
-namespace feng3d.editor
+namespace editor
 {
-    export type AssetsDataType = ArrayBuffer | string | Material | GameObject | AnimationClip | Geometry | Texture2D | TextureCube;
+    export type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube;
 
     export class AssetsFile
     {
         /**
          * 路径
          */
-        @watch("pathChanged")
+        @feng3d.watch("pathChanged")
         path: string;
         /**
          * 是否文件夹
@@ -32,7 +32,7 @@ namespace feng3d.editor
         /**
          * 扩展名
          */
-        extension: AssetExtension
+        extension: feng3d.AssetExtension
 
         /**
          * 是否选中
@@ -53,15 +53,15 @@ namespace feng3d.editor
         pathChanged()
         {
             // 更新名字
-            this.name = pathUtils.getNameWithExtension(this.path);
+            this.name = feng3d.pathUtils.getNameWithExtension(this.path);
             this.label = this.name.split(".").shift();
 
-            this.isDirectory = pathUtils.isDirectory(this.path);
+            this.isDirectory = feng3d.pathUtils.isDirectory(this.path);
 
             if (this.isDirectory)
-                this.extension = AssetExtension.folder;
+                this.extension = feng3d.AssetExtension.folder;
             else
-                this.extension = <AssetExtension>pathUtils.getExtension(this.path);
+                this.extension = <feng3d.AssetExtension>feng3d.pathUtils.getExtension(this.path);
 
             // 更新图标
             if (this.isDirectory)
@@ -125,7 +125,7 @@ namespace feng3d.editor
                 fs.readFileAsString(this.path, (err, content: string) =>
                 {
                     var json = JSON.parse(content);
-                    this.cacheData = serialization.deserialize(json);
+                    this.cacheData = feng3d.serialization.deserialize(json);
                     this.cacheData["path"] = this.path;
                     callback(this.cacheData);
                 });
@@ -135,7 +135,7 @@ namespace feng3d.editor
             {
                 fs.readFile(this.path, (err, data) =>
                 {
-                    dataTransform.arrayBufferToDataURL(data, (dataurl) =>
+                    feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                     {
                         this.cacheData = dataurl;
                         callback(this.cacheData);
@@ -158,7 +158,7 @@ namespace feng3d.editor
         rename(newname: string, callback?: (file: AssetsFile) => void)
         {
             var oldpath = this.path;
-            var newpath = pathUtils.getParentPath(this.path) + newname;
+            var newpath = feng3d.pathUtils.getParentPath(this.path) + newname;
             if (this.isDirectory)
                 newpath = newpath + "/";
             this.move(oldpath, newpath, callback);
@@ -192,7 +192,7 @@ namespace feng3d.editor
         {
             fs.move(oldpath, newpath, (err) =>
             {
-                assert(!err);
+                feng3d.assert(!err);
 
                 if (this.isDirectory)
                 {
@@ -229,7 +229,7 @@ namespace feng3d.editor
 
             fs.mkdir(folderpath, (e) =>
             {
-                assert(!e);
+                feng3d.assert(!e);
 
                 editorAssets.files[folderpath] = new AssetsFile(folderpath);
                 editorui.assetsview.invalidateAssetstree();
@@ -260,7 +260,7 @@ namespace feng3d.editor
 
                 callback && callback(this);
                 if (regExps.image.test(assetsFile.path))
-                    feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
+                    feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
             });
         }
 
@@ -292,7 +292,7 @@ namespace feng3d.editor
 
                 callback && callback(null, assetsFile);
                 if (regExps.image.test(assetsFile.path))
-                    feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
+                    feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
 
             });
         }
@@ -315,7 +315,7 @@ namespace feng3d.editor
                 if (callback)
                     callback(e);
                 else if (e)
-                    error(e);
+                    feng3d.error(e);
                 return;
             }
             this.getArrayBuffer((arraybuffer) =>
@@ -325,7 +325,7 @@ namespace feng3d.editor
                     if (callback)
                         callback(e);
                     else if (e)
-                        error(e);
+                        feng3d.error(e);
                 });
             });
         }
@@ -345,22 +345,22 @@ namespace feng3d.editor
             {
                 if (regExps.image.test(this.path))
                 {
-                    dataTransform.dataURLToArrayBuffer(content, (arrayBuffer) =>
+                    feng3d.dataTransform.dataURLToArrayBuffer(content, (arrayBuffer) =>
                     {
                         callback(arrayBuffer);
                     });
                 } else
                 {
-                    dataTransform.stringToArrayBuffer(content, (arrayBuffer) =>
+                    feng3d.dataTransform.stringToArrayBuffer(content, (arrayBuffer) =>
                     {
                         callback(arrayBuffer);
                     });
                 }
             } else
             {
-                var obj = serialization.serialize(content);
+                var obj = feng3d.serialization.serialize(content);
                 var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
+                feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
                 {
                     callback(arrayBuffer);
                 });
@@ -402,20 +402,20 @@ namespace feng3d.editor
          */
         getScriptClassName(callback: (scriptClassName: string) => void)
         {
-            if (this.extension != AssetExtension.script)
+            if (this.extension != feng3d.AssetExtension.script)
                 return "";
             this.cacheData = null;
             this.getData((code: string) =>
             {
                 // 获取脚本类名称
                 var result = regExps.scriptClass.exec(code);
-                assert(result != null, `在脚本 ${this.path} 中没有找到 脚本类定义`);
+                feng3d.assert(result != null, `在脚本 ${this.path} 中没有找到 脚本类定义`);
                 var script = result[2];
                 // 获取导出类命名空间
                 if (result[1])
                 {
                     result = regExps.namespace.exec(code);
-                    assert(result != null, `获取脚本 ${this.path} 命名空间失败`);
+                    feng3d.assert(result != null, `获取脚本 ${this.path} 命名空间失败`);
                     script = result[1] + "." + script;
                 }
                 callback(script);

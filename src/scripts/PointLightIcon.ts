@@ -1,20 +1,20 @@
-namespace feng3d.editor
+namespace editor
 {
     export class PointLightIcon extends EditorScript
     {
         showInInspector = false;
         serializable = false;
 
-        private lightIcon: GameObject;
-        private lightLines: GameObject;
-        private lightLines1: GameObject;
-        private lightpoints: GameObject;
-        private textureMaterial: TextureMaterial;
-        private pointLight: PointLight;
-        private segmentGeometry: SegmentGeometry;
-        private pointGeometry: PointGeometry;
+        private lightIcon: feng3d.GameObject;
+        private lightLines: feng3d.GameObject;
+        private lightLines1: feng3d.GameObject;
+        private lightpoints: feng3d.GameObject;
+        private textureMaterial: feng3d.TextureMaterial;
+        private pointLight: feng3d.PointLight;
+        private segmentGeometry: feng3d.SegmentGeometry;
+        private pointGeometry: feng3d.PointGeometry;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
             this.initicon()
@@ -23,21 +23,21 @@ namespace feng3d.editor
         initicon()
         {
             var size = 1;
-            this.pointLight = this.getComponent(PointLight);
+            this.pointLight = this.getComponent(feng3d.PointLight);
 
-            var lightIcon = this.lightIcon = GameObject.create("Icon");
+            var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
             lightIcon.showinHierarchy = false;
-            var billboardComponent = lightIcon.addComponent(BillboardComponent);
+            var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editorCamera;
-            var meshRenderer = lightIcon.addComponent(MeshRenderer);
-            meshRenderer.geometry = new PlaneGeometry({ width: size, height: size, segmentsW: 1, segmentsH: 1, yUp: false });
-            var textureMaterial = this.textureMaterial = meshRenderer.material = materialFactory.create("texture",
+            var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
+            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: size, height: size, segmentsW: 1, segmentsH: 1, yUp: false });
+            var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture",
                 {
                     uniforms: {
                         s_texture: {
                             url: editorData.getEditorAssetsPath("assets/3d/icons/light.png"),
-                            format: TextureFormat.RGBA,
+                            format: feng3d.TextureFormat.RGBA,
                             premulAlpha: true,
                         }
                     }
@@ -50,24 +50,24 @@ namespace feng3d.editor
             // });
 
             //
-            var lightLines = this.lightLines = GameObject.create("Lines");
+            var lightLines = this.lightLines = feng3d.GameObject.create("Lines");
             lightLines.mouseEnabled = false;
             lightLines.serializable = false;
             lightLines.showinHierarchy = false;
-            var lightLines1 = this.lightLines1 = GameObject.create("Lines1");
-            lightLines1.addComponent(BillboardComponent).camera = editorCamera;
+            var lightLines1 = this.lightLines1 = feng3d.GameObject.create("Lines1");
+            lightLines1.addComponent(feng3d.BillboardComponent).camera = editorCamera;
             lightLines1.mouseEnabled = false;
             lightLines1.serializable = false;
             lightLines1.showinHierarchy = false;
             var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
             var meshRenderer1 = lightLines1.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
+            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
-            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.5);
+            material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
-            var material = meshRenderer1.material = materialFactory.create("segment", { renderParams: { renderMode: RenderMode.LINES } });
+            var material = meshRenderer1.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
             // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
-            material.uniforms.u_segmentColor = new Color4(1, 1, 1, 0.5);
+            material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
             var segmentGeometry = this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             var segmentGeometry1 = meshRenderer1.geometry = new feng3d.SegmentGeometry();
@@ -81,28 +81,27 @@ namespace feng3d.editor
                 var x1 = Math.sin(angle1);
                 var y1 = Math.cos(angle1);
                 segmentGeometry.segments.push(
-                    { start: new Vector3(0, x, y), end: new Vector3(0, x1, y1) },
-                    { start: new Vector3(x, 0, y), end: new Vector3(x1, 0, y1) },
-                    { start: new Vector3(x, y, 0), end: new Vector3(x1, y1, 0) },
-                    { start: new Vector3(x, y, 0), end: new Vector3(x1, y1, 0) });
+                    { start: new feng3d.Vector3(0, x, y), end: new feng3d.Vector3(0, x1, y1) },
+                    { start: new feng3d.Vector3(x, 0, y), end: new feng3d.Vector3(x1, 0, y1) },
+                    { start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) },
+                    { start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
             }
             this.gameObject.addChild(lightLines);
             this.gameObject.addChild(lightLines1);
             //
-            var lightpoints = this.lightpoints = GameObject.create("points");
+            var lightpoints = this.lightpoints = feng3d.GameObject.create("points");
             lightpoints.mouseEnabled = false;
             lightpoints.serializable = false;
             lightpoints.showinHierarchy = false;
-            var meshRenderer = lightpoints.addComponent(MeshRenderer);
-            var pointGeometry = this.pointGeometry = meshRenderer.geometry = new PointGeometry();
+            var meshRenderer = lightpoints.addComponent(feng3d.MeshRenderer);
+            var pointGeometry = this.pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
             pointGeometry.points = [
-                { position: new Vector3(1, 0, 0), color: new Color4(1, 0, 0) },
-                { position: new Vector3(-1, 0, 0), color: new Color4(1, 0, 0) },
-                { position: new Vector3(0, 1, 0), color: new Color4(0, 1, 0) },
-                { position: new Vector3(0, -1, 0), color: new Color4(0, 1, 0) },
-                { position: new Vector3(0, 0, 1), color: new Color4(0, 0, 1) },
-                { position: new Vector3(0, 0, -1), color: new Color4(0, 0, 1) }];
-            var pointMaterial = meshRenderer.material = materialFactory.create("point", { renderParams: { renderMode: RenderMode.POINTS } });
+                { position: new feng3d.Vector3(1, 0, 0), color: new feng3d.Color4(1, 0, 0) },
+                { position: new feng3d.Vector3(-1, 0, 0), color: new feng3d.Color4(1, 0, 0) },
+                { position: new feng3d.Vector3(0, -1, 0), color: new feng3d.Color4(0, 1, 0) },
+                { position: new feng3d.Vector3(0, 0, 1), color: new feng3d.Color4(0, 0, 1) },
+                { position: new feng3d.Vector3(0, 0, -1), color: new feng3d.Color4(0, 0, 1) }];
+            var pointMaterial = meshRenderer.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
             pointMaterial.renderParams.enableBlend = true;
             pointMaterial.uniforms.u_PointSize = 5;
             // pointMaterial.color = new Color(163 / 255 * 1.2, 162 / 255 * 1.2, 107 / 255 * 1.2);
@@ -117,7 +116,7 @@ namespace feng3d.editor
             this.lightLines.transform.scale =
                 this.lightLines1.transform.scale =
                 this.lightpoints.transform.scale =
-                new Vector3(this.pointLight.range, this.pointLight.range, this.pointLight.range);
+                new feng3d.Vector3(this.pointLight.range, this.pointLight.range, this.pointLight.range);
 
             if (editorData.selectedGameObjects.indexOf(this.gameObject) != -1)
             {
@@ -128,8 +127,8 @@ namespace feng3d.editor
                 var alpha = 1;
                 var backalpha = 0.5;
                 var num = 36;
-                var point0: Vector3;
-                var point1: Vector3;
+                var point0: feng3d.Vector3;
+                var point1: feng3d.Vector3;
                 for (var i = 0; i < num; i++)
                 {
                     var angle = i * Math.PI * 2 / num;
@@ -139,67 +138,67 @@ namespace feng3d.editor
                     var x1 = Math.sin(angle1);
                     var y1 = Math.cos(angle1);
                     //
-                    point0 = new Vector3(0, x, y);
-                    point1 = new Vector3(0, x1, y1);
+                    point0 = new feng3d.Vector3(0, x, y);
+                    point1 = new feng3d.Vector3(0, x1, y1);
                     if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new Color4(1, 0, 0, alpha), endColor: new Color4(1, 0, 0, alpha) });
-                    point0 = new Vector3(x, 0, y);
-                    point1 = new Vector3(x1, 0, y1);
+                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(1, 0, 0, alpha), endColor: new feng3d.Color4(1, 0, 0, alpha) });
+                    point0 = new feng3d.Vector3(x, 0, y);
+                    point1 = new feng3d.Vector3(x1, 0, y1);
                     if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new Color4(0, 1, 0, alpha), endColor: new Color4(0, 1, 0, alpha) });
-                    point0 = new Vector3(x, y, 0);
-                    point1 = new Vector3(x1, y1, 0);
+                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 1, 0, alpha), endColor: new feng3d.Color4(0, 1, 0, alpha) });
+                    point0 = new feng3d.Vector3(x, y, 0);
+                    point1 = new feng3d.Vector3(x1, y1, 0);
                     if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new Color4(0, 0, 1, alpha), endColor: new Color4(0, 0, 1, alpha) });
+                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 0, 1, alpha), endColor: new feng3d.Color4(0, 0, 1, alpha) });
                 }
                 this.segmentGeometry.invalidateGeometry();
 
                 this.pointGeometry.points = [];
-                var point = new Vector3(1, 0, 0);
+                var point = new feng3d.Vector3(1, 0, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new Color4(1, 0, 0, alpha) });
-                point = new Vector3(-1, 0, 0);
+                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(1, 0, 0, alpha) });
+                point = new feng3d.Vector3(-1, 0, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new Color4(1, 0, 0, alpha) });
-                point = new Vector3(0, 1, 0);
+                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(1, 0, 0, alpha) });
+                point = new feng3d.Vector3(0, 1, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new Color4(0, 1, 0, alpha) });
-                point = new Vector3(0, -1, 0);
+                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 1, 0, alpha) });
+                point = new feng3d.Vector3(0, -1, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new Color4(0, 1, 0, alpha) });
-                point = new Vector3(0, 0, 1);
+                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 1, 0, alpha) });
+                point = new feng3d.Vector3(0, 0, 1);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new Color4(0, 0, 1, alpha) });
-                point = new Vector3(0, 0, -1);
+                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 0, 1, alpha) });
+                point = new feng3d.Vector3(0, 0, -1);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new Color4(0, 0, 1, alpha) });
+                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 0, 1, alpha) });
                 //
                 this.lightLines.visible = true;
                 this.lightLines1.visible = true;

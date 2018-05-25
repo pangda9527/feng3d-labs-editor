@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     //
     export var editorData: EditorData;
@@ -47,14 +47,14 @@ namespace feng3d.editor
 
             document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorcache.projectname;
 
-            feng3d.runEnvironment = RunEnvironment.editor;
+            feng3d.runEnvironment = feng3d.RunEnvironment.editor;
 
             this.initMainView()
 
             //初始化feng3d
             new Main3D();
 
-            shortcut.addShortCuts(shortcutConfig);
+            feng3d.shortcut.addShortCuts(shortcutConfig);
 
             editorshortcut.init();
 

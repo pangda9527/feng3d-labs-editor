@@ -1,24 +1,24 @@
-namespace feng3d.editor
+namespace editor
 {
-    export class SceneRotateTool extends Component
+    export class SceneRotateTool extends feng3d.Component
     {
         showInInspector = false;
         serializable = false;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
 
             var thisObj = this;
 
-            Loader.loadText(editorData.getEditorAssetsPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
+            feng3d.Loader.loadText(editorData.getEditorAssetsPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
             {
-                var rotationToolModel = serialization.deserialize(JSON.parse(content));
+                var rotationToolModel = feng3d.serialization.deserialize(JSON.parse(content));
                 this.onLoaded(rotationToolModel);
             });
         }
 
-        private onLoaded(rotationToolModel: GameObject)
+        private onLoaded(rotationToolModel: feng3d.GameObject)
         {
             var arrowsX = rotationToolModel.find("arrowsX");
             var arrowsY = rotationToolModel.find("arrowsY");
@@ -48,7 +48,7 @@ namespace feng3d.editor
             });
             var arrowsArr = [arrowsX, arrowsY, arrowsZ, arrowsNX, arrowsNY, arrowsNZ];
 
-            ticker.onframe(() =>
+            feng3d.ticker.onframe(() =>
             {
                 var rect = engine.canvas.getBoundingClientRect();
                 canvas.style.top = rect.top + "px";
@@ -58,11 +58,11 @@ namespace feng3d.editor
                 rotationToolModel.transform.rotation = rotation;
 
                 //隐藏角度
-                var visibleAngle = Math.cos(15 * FMath.DEG2RAD);
+                var visibleAngle = Math.cos(15 * feng3d.FMath.DEG2RAD);
                 //隐藏正面箭头
                 arrowsArr.forEach(element =>
                 {
-                    if (Math.abs(element.transform.localToWorldMatrix.up.dot(Vector3.Z_AXIS)) < visibleAngle)
+                    if (Math.abs(element.transform.localToWorldMatrix.up.dot(feng3d.Vector3.Z_AXIS)) < visibleAngle)
                         element.visible = true;
                     else
                         element.visible = false;
@@ -70,21 +70,21 @@ namespace feng3d.editor
 
                 //
                 var canvasRect = canvas.getBoundingClientRect();
-                var bound = new Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
-                if (bound.contains(windowEventProxy.clientX, windowEventProxy.clientY))
+                var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
+                if (bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
                 {
-                    shortcut.activityState("mouseInSceneRotateTool");
+                    feng3d.shortcut.activityState("mouseInSceneRotateTool");
                 } else
                 {
-                    shortcut.deactivityState("mouseInSceneRotateTool");
+                    feng3d.shortcut.deactivityState("mouseInSceneRotateTool");
                 }
             });
 
-            windowEventProxy.on("mouseup", (e) =>
+            feng3d.windowEventProxy.on("mouseup", (e) =>
             {
                 var canvasRect = canvas.getBoundingClientRect();
-                var bound = new Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
-                if (!bound.contains(windowEventProxy.clientX, windowEventProxy.clientY))
+                var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
+                if (!bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
                     return;
 
                 //右键点击菜单
@@ -138,22 +138,22 @@ namespace feng3d.editor
                 // can
                 canvas.width = 80;
                 canvas.height = 80;
-                var toolEngine = new Engine(canvas);
+                var toolEngine = new feng3d.Engine(canvas);
                 toolEngine.scene.background.a = 0.0;
-                toolEngine.root.addChild(gameObjectFactory.createPointLight());
+                toolEngine.root.addChild(feng3d.gameObjectFactory.createPointLight());
                 return { toolEngine, canvas };
             }
 
-            function onclick(e: Event<any>)
+            function onclick(e: feng3d.Event<any>)
             {
-                var front_view = new Vector3(0, 0, 0);//前视图
-                var back_view = new Vector3(0, 180, 0);//后视图
-                var right_view = new Vector3(0, -90, 0);//右视图
-                var left_view = new Vector3(0, 90, 0);//左视图
-                var top_view = new Vector3(-90, 0, 180);//顶视图
-                var bottom_view = new Vector3(-90, 180, 0);//底视图
+                var front_view = new feng3d.Vector3(0, 0, 0);//前视图
+                var back_view = new feng3d.Vector3(0, 180, 0);//后视图
+                var right_view = new feng3d.Vector3(0, -90, 0);//右视图
+                var left_view = new feng3d.Vector3(0, 90, 0);//左视图
+                var top_view = new feng3d.Vector3(-90, 0, 180);//顶视图
+                var bottom_view = new feng3d.Vector3(-90, 180, 0);//底视图
 
-                var rotation: Vector3;
+                var rotation: feng3d.Vector3;
                 switch (e.currentTarget)
                 {
                     case arrowsX:
@@ -177,7 +177,7 @@ namespace feng3d.editor
                 }
                 if (rotation)
                 {
-                    var cameraTargetMatrix3D = Matrix4x4.fromRotation(rotation);
+                    var cameraTargetMatrix3D = feng3d.Matrix4x4.fromRotation(rotation);
                     cameraTargetMatrix3D.invert();
                     var result = cameraTargetMatrix3D.decompose()[1];
                     result.scale(180 / Math.PI);

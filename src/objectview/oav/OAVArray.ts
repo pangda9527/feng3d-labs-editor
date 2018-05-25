@@ -1,6 +1,6 @@
-namespace feng3d.editor
+namespace editor
 {
-    @OAVComponent()
+    @feng3d.OAVComponent()
     export class OAVArray extends OAVBase
     {
         public group: eui.Group;
@@ -11,7 +11,7 @@ namespace feng3d.editor
 
         private attributeViews: eui.Component[];
 
-        constructor(attributeViewInfo: AttributeViewInfo)
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
             this.skinName = "OAVArray";
@@ -102,7 +102,7 @@ namespace feng3d.editor
                 for (var i = 0; i < attributeValue.length; i++)
                 {
                     if (attributeValue[i] == null && this.attributeViewInfo.componentParam)
-                        attributeValue[i] = lazy.getvalue((<any>this.attributeViewInfo.componentParam).defaultItem);
+                        attributeValue[i] = feng3d.lazy.getvalue((<any>this.attributeViewInfo.componentParam).defaultItem);
 
                     if (attributeViews[i] == null)
                     {
@@ -121,7 +121,7 @@ namespace feng3d.editor
     {
         constructor(arr: any[], index: number, componentParam: Object)
         {
-            var attributeViewInfo: AttributeViewInfo = <any>{
+            var attributeViewInfo: feng3d.AttributeViewInfo = <any>{
                 name: index,
                 writable: true,
                 componentParam: componentParam,

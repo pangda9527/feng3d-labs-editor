@@ -1,23 +1,23 @@
-namespace feng3d.editor
+namespace editor
 {
-    export class MRSToolBase extends Component
+    export class MRSToolBase extends feng3d.Component
     {
         private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis | CoordinateRotationFreeAxis;
         //
-        private _toolModel: Component;
+        private _toolModel: feng3d.Component;
 
         protected ismouseDown = false;
 
         //平移平面，该平面处于场景空间，用于计算位移量
-        protected movePlane3D: Plane3D;
-        protected startSceneTransform: Matrix4x4;
+        protected movePlane3D: feng3d.Plane3D;
+        protected startSceneTransform: feng3d.Matrix4x4;
 
         protected _gameobjectControllerTarget: MRSToolTarget;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
-            var holdSizeComponent = this.gameObject.addComponent(HoldSizeComponent);
+            var holdSizeComponent = this.gameObject.addComponent(feng3d.HoldSizeComponent);
             holdSizeComponent.holdSize = 1;
             holdSizeComponent.camera = editorCamera;
             //
@@ -29,20 +29,20 @@ namespace feng3d.editor
         {
             this._gameobjectControllerTarget.controllerTool = this.transform;
             //
-            windowEventProxy.on("mousedown", this.onMouseDown, this);
-            windowEventProxy.on("mouseup", this.onMouseUp, this);
+            feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
 
-            ticker.onframe(this.updateToolModel, this);
+            feng3d.ticker.onframe(this.updateToolModel, this);
         }
 
         protected onRemovedFromScene()
         {
             this._gameobjectControllerTarget.controllerTool = null;
             //
-            windowEventProxy.off("mousedown", this.onMouseDown, this);
-            windowEventProxy.off("mouseup", this.onMouseUp, this);
+            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
 
-            ticker.offframe(this.updateToolModel, this);
+            feng3d.ticker.offframe(this.updateToolModel, this);
         }
 
         protected get toolModel()
@@ -123,7 +123,7 @@ namespace feng3d.editor
         {
             var line3D = editorCamera.getMouseRay3D();
             //射线与平面交点
-            var crossPos = <Vector3>this.movePlane3D.intersectWithLine3D(line3D);
+            var crossPos = <feng3d.Vector3>this.movePlane3D.intersectWithLine3D(line3D);
             return crossPos;
         }
     }

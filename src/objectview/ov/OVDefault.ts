@@ -5,25 +5,25 @@ namespace feng3d
 	export interface IObjectAttributeView extends eui.Component { }
 }
 
-namespace feng3d.editor
+namespace editor
 {
 	/**
 	 * 默认使用块的对象界面
 	 * @author feng 2016-3-22
 	 */
-	@OVComponent()
-	export class OVDefault extends eui.Component implements IObjectView
+	@feng3d.OVComponent()
+	export class OVDefault extends eui.Component implements feng3d.IObjectView
 	{
 		private _space: Object;
-		private _objectViewInfo: ObjectViewInfo;
-		private blockViews: IObjectBlockView[];
+		private _objectViewInfo: feng3d.ObjectViewInfo;
+		private blockViews: feng3d.IObjectBlockView[];
 
 		group: eui.Group;
 
 		/**
 		 * 对象界面数据
 		 */
-		constructor(objectViewInfo: ObjectViewInfo)
+		constructor(objectViewInfo: feng3d.ObjectViewInfo)
 		{
 			super();
 
@@ -49,10 +49,10 @@ namespace feng3d.editor
 		initview()
 		{
 			this.blockViews = [];
-			var objectBlockInfos: BlockViewInfo[] = this._objectViewInfo.objectBlockInfos;
+			var objectBlockInfos = this._objectViewInfo.objectBlockInfos;
 			for (var i = 0; i < objectBlockInfos.length; i++)
 			{
-				var displayObject = <any>objectview.getBlockView(objectBlockInfos[i]);
+				var displayObject = feng3d.objectview.getBlockView(objectBlockInfos[i]);
 				displayObject.percentWidth = 100;
 				displayObject.objectView = this;
 				this.group.addChild(displayObject);

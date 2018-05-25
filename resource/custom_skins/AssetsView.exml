@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="AssetsView" width="800" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:editor="feng3d.editor.*"
+<e:Skin class="AssetsView" width="800" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:editor="editor.*"
         xmlns:w="http://ns.egret.com/wing">
 	<e:Rect width="100%" height="100%" scaleX="1" scaleY="1" fillColor="0xc2c2c2"  strokeColor="0x525252"/>
 	<e:Group width="100%" height="100%">

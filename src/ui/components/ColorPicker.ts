@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export class ColorPicker extends eui.Component implements eui.UIComponent
     {
@@ -16,7 +16,7 @@ namespace feng3d.editor
             if (this.picker)
                 this.picker.fillColor = this._value.toInt();
         }
-        private _value = new Color3();
+        private _value = new feng3d.Color3();
 
         constructor()
         {
@@ -54,7 +54,7 @@ namespace feng3d.editor
             c.onchange = () =>
             {
                 var v = (<any>c).value;//"#189a56"
-                this.value = new Color3().fromUnit(Number("0x" + v.substr(1)));
+                this.value = new feng3d.Color3().fromUnit(Number("0x" + v.substr(1)));
                 c.onchange = null;
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }

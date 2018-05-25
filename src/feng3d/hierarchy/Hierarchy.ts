@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export class Hierarchy
     {
@@ -21,28 +21,28 @@ namespace feng3d.editor
                 this._rootGameObject.on("removed", this.ongameobjectremoved, this);
             }
         }
-        private _rootGameObject: GameObject;
+        private _rootGameObject: feng3d.GameObject;
 
         constructor()
         {
         }
 
-        private ongameobjectadded(event: Event<GameObject>)
+        private ongameobjectadded(event: feng3d.Event<feng3d.GameObject>)
         {
             hierarchyTree.add(event.data);
         }
 
-        private ongameobjectremoved(event: Event<GameObject>)
+        private ongameobjectremoved(event: feng3d.Event<feng3d.GameObject>)
         {
             hierarchyTree.remove(event.data);
         }
 
-        addGameoObjectFromAsset(path: string, parent?: GameObject)
+        addGameoObjectFromAsset(path: string, parent?: feng3d.GameObject)
         {
             fs.readFileAsString(path, (err, content: string) =>
             {
                 var json = JSON.parse(content);
-                var gameobject = serialization.deserialize(json);
+                var gameobject = feng3d.serialization.deserialize(json);
                 gameobject.name = path.split("/").pop().split(".").shift();
                 if (parent)
                     parent.addChild(gameobject);

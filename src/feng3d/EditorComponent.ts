@@ -1,12 +1,12 @@
-namespace feng3d.editor
+namespace editor
 {
-    export class EditorComponent extends Component
+    export class EditorComponent extends feng3d.Component
     {
         serializable = false;
         showInInspector = false;
-        scene: Scene3D
+        scene: feng3d.Scene3D
 
-        init(gameobject: GameObject)
+        init(gameobject: feng3d.GameObject)
         {
             super.init(gameobject);
 
@@ -30,7 +30,7 @@ namespace feng3d.editor
         private onAddedToScene()
         {
             this.scene = this.gameObject.scene;
-            var lights = this.scene.getComponentsInChildren(Light);
+            var lights = this.scene.getComponentsInChildren(feng3d.Light);
             lights.forEach(element =>
             {
                 this.addLightIcon(element);
@@ -48,7 +48,7 @@ namespace feng3d.editor
             this.scene.off("addComponentToScene", this.onAddComponentToScene, this);
             this.scene.off("removeComponentFromScene", this.onRemoveComponentFromScene, this);
 
-            var lights = this.scene.getComponentsInChildren(Light);
+            var lights = this.scene.getComponentsInChildren(feng3d.Light);
             lights.forEach(element =>
             {
                 this.removeLightIcon(element);
@@ -56,33 +56,33 @@ namespace feng3d.editor
             this.scene = null;
         }
 
-        private onAddComponentToScene(event: Event<Component>)
+        private onAddComponentToScene(event: feng3d.Event<feng3d.Component>)
         {
             this.addLightIcon(event.data);
         }
 
-        private onRemoveComponentFromScene(event: Event<Component>)
+        private onRemoveComponentFromScene(event: feng3d.Event<feng3d.Component>)
         {
             this.removeLightIcon(event.data);
         }
 
-        private addLightIcon(light: Component)
+        private addLightIcon(light: feng3d.Component)
         {
-            if (light instanceof DirectionalLight)
+            if (light instanceof feng3d.DirectionalLight)
             {
                 light.gameObject.addComponent(DirectionLightIcon);
-            } else if (light instanceof PointLight)
+            } else if (light instanceof feng3d.PointLight)
             {
                 light.gameObject.addComponent(PointLightIcon);
             }
         }
 
-        private removeLightIcon(light: Component)
+        private removeLightIcon(light: feng3d.Component)
         {
-            if (light instanceof DirectionalLight)
+            if (light instanceof feng3d.DirectionalLight)
             {
                 light.gameObject.removeComponentsByType(DirectionLightIcon);
-            } else if (light instanceof PointLight)
+            } else if (light instanceof feng3d.PointLight)
             {
                 light.gameObject.removeComponentsByType(PointLightIcon);
             }

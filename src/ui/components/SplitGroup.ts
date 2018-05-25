@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     enum SplitGroupState
     {
@@ -63,7 +63,7 @@ namespace feng3d.editor
         preElementRect: egret.Rectangle;
         nextElementRect: egret.Rectangle;
         dragRect: egret.Rectangle;
-        dragingMousePoint: Vector2;
+        dragingMousePoint: feng3d.Vector2;
     }
 
     var egretDiv = <HTMLDivElement>document.getElementsByClassName("egret-player")[0];
@@ -189,8 +189,8 @@ namespace feng3d.editor
             {
                 var element = this.getElementAt(i);
                 var elementRect = element.getTransformedBounds(this.stage);
-                var elementRectRight = new Rectangle(elementRect.right - 3, elementRect.top, 6, elementRect.height);
-                var elementRectBotton = new Rectangle(elementRect.left, elementRect.bottom - 3, elementRect.width, 6);
+                var elementRectRight = new feng3d.Rectangle(elementRect.right - 3, elementRect.top, 6, elementRect.height);
+                var elementRectBotton = new feng3d.Rectangle(elementRect.left, elementRect.bottom - 3, elementRect.width, 6);
                 if (layouttype == 1 && elementRectRight.contains(stageX, stageY))
                 {
                     splitdragData.splitGroupState = SplitGroupState.onSplit;
@@ -218,7 +218,7 @@ namespace feng3d.editor
             if (splitdragData.splitGroupState == SplitGroupState.onSplit)
             {
                 splitdragData.splitGroupState = SplitGroupState.draging;
-                splitdragData.dragingMousePoint = new Vector2(e.layerX, e.layerY);
+                splitdragData.dragingMousePoint = new feng3d.Vector2(e.layerX, e.layerY);
                 //
                 var preElement = splitdragData.preElement;
                 var nextElement = splitdragData.nextElement;

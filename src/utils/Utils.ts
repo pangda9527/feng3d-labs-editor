@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export var utils: Utils;
     export class Utils

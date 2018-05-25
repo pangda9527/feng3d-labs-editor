@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     /**
      * 游戏对象控制器类型
@@ -48,9 +48,9 @@ namespace feng3d.editor
     /**
      * 设置永久可见
      */
-    function setAwaysVisible(component: Component)
+    function setAwaysVisible(component: feng3d.Component)
     {
-        var meshRenderers = component.getComponentsInChildren(MeshRenderer);
+        var meshRenderers = component.getComponentsInChildren(feng3d.MeshRenderer);
         meshRenderers.forEach(element =>
         {
             if (element.material)
@@ -64,7 +64,7 @@ namespace feng3d.editor
     /**
      * 位移旋转缩放工具
      */
-    export class MRSTool extends Component
+    export class MRSTool extends feng3d.Component
     {
         private mTool: MTool;
         private rTool: RTool;
@@ -73,13 +73,13 @@ namespace feng3d.editor
         private _currentTool: MRSToolBase;
 
         private controllerTarget: MRSToolTarget;
-        private mrsToolObject: GameObject;
+        private mrsToolObject: feng3d.GameObject;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
 
-            var mrsToolObject = GameObject.create("MRSTool");
+            var mrsToolObject = feng3d.GameObject.create("MRSTool");
             mrsToolObject.serializable = false;
             mrsToolObject.showinHierarchy = false;
 
@@ -87,9 +87,9 @@ namespace feng3d.editor
 
             this.controllerTarget = new MRSToolTarget();
 
-            this.mTool = GameObject.create("MTool").addComponent(MTool);
-            this.rTool = GameObject.create("RTool").addComponent(RTool);
-            this.sTool = GameObject.create("STool").addComponent(STool);
+            this.mTool = feng3d.GameObject.create("MTool").addComponent(MTool);
+            this.rTool = feng3d.GameObject.create("RTool").addComponent(RTool);
+            this.sTool = feng3d.GameObject.create("STool").addComponent(STool);
             setAwaysVisible(this.mTool);
             setAwaysVisible(this.rTool);
             setAwaysVisible(this.sTool);
@@ -100,8 +100,8 @@ namespace feng3d.editor
             //
             this.currentTool = this.mTool;
             //
-            watcher.watch(editorData, "selectedObjects", this.onSelectedGameObjectChange, this);
-            watcher.watch(mrsTool, "toolType", this.onToolTypeChange, this);
+            feng3d.watcher.watch(editorData, "selectedObjects", this.onSelectedGameObjectChange, this);
+            feng3d.watcher.watch(mrsTool, "toolType", this.onToolTypeChange, this);
         }
 
         dispose()
@@ -121,8 +121,8 @@ namespace feng3d.editor
             this.sTool.dispose();
             this.sTool = null;
             //
-            watcher.unwatch(editorData, "selectedObjects", this.onSelectedGameObjectChange, this);
-            watcher.unwatch(mrsTool, "toolType", this.onToolTypeChange, this);
+            feng3d.watcher.unwatch(editorData, "selectedObjects", this.onSelectedGameObjectChange, this);
+            feng3d.watcher.unwatch(mrsTool, "toolType", this.onToolTypeChange, this);
 
             super.dispose();
         }

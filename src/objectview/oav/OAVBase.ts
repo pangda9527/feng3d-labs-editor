@@ -1,22 +1,22 @@
-namespace feng3d.editor
+namespace editor
 {
     export class OAVBase extends eui.Component implements feng3d.IObjectAttributeView
     {
         protected _space: any;
         protected _attributeName: string;
         protected _attributeType: string;
-        protected attributeViewInfo: AttributeViewInfo;
+        protected attributeViewInfo: feng3d.AttributeViewInfo;
         //
         label: eui.Label;
-        
+
         /**
          * 对象属性界面
          */
-        objectView: IObjectView;
+        objectView: feng3d.IObjectView;
         /**
          * 对象属性块界面
          */
-        objectBlockView: IObjectBlockView;
+        objectBlockView: feng3d.IObjectBlockView;
 
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
@@ -106,7 +106,7 @@ namespace feng3d.editor
             if (this._space[this._attributeName] != value)
             {
                 this._space[this._attributeName] = value;
-                var objectViewEvent = <any>new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
+                var objectViewEvent = <any>new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
                 objectViewEvent.space = this._space;
                 objectViewEvent.attributeName = this._attributeName;
                 objectViewEvent.attributeValue = this.attributeValue;

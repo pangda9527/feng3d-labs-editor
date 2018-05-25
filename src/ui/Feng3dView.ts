@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
 	export class Feng3dView extends eui.Component implements eui.UIComponent
 	{
@@ -9,7 +9,7 @@ namespace feng3d.editor
 		{
 			super();
 			this.skinName = "Feng3dViewSkin";
-			Stats.init(document.getElementById("stats"));
+			feng3d.Stats.init(document.getElementById("stats"));
 		}
 
 		$onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -56,7 +56,7 @@ namespace feng3d.editor
 
 			var lt = this.localToGlobal(0, 0);
 			var rb = this.localToGlobal(this.width, this.height);
-			var bound1 = new Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+			var bound1 = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
 
 			// var bound2 = this.getTransformedBounds(this.stage);
 			var bound = bound1;
@@ -69,17 +69,17 @@ namespace feng3d.editor
 			style.height = bound.height + "px";
 			style.cursor = "hand";
 
-			Stats.instance.dom.style.left = bound.x + "px";
-			Stats.instance.dom.style.top = bound.y + "px";
+			feng3d.Stats.instance.dom.style.left = bound.x + "px";
+			feng3d.Stats.instance.dom.style.top = bound.y + "px";
 
 			var canvasRect = this.canvas.getBoundingClientRect();
-			var bound = new Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
-			if (bound.contains(windowEventProxy.clientX, windowEventProxy.clientY))
+			var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
+			if (bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
 			{
-				shortcut.activityState("mouseInView3D");
+				feng3d.shortcut.activityState("mouseInView3D");
 			} else
 			{
-				shortcut.deactivityState("mouseInView3D");
+				feng3d.shortcut.deactivityState("mouseInView3D");
 			}
 		}
 	}

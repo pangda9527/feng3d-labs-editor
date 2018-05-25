@@ -1,13 +1,13 @@
-namespace feng3d.editor
+namespace editor
 {
     /**
      * 编辑器脚本
      */
-    export class EditorScript extends ScriptComponent
+    export class EditorScript extends feng3d.ScriptComponent
     {
         showInInspector = false;
         serializable = false;
 
-        flag = ScriptFlag.editor;
+        flag = feng3d.ScriptFlag.editor;
     }
 }

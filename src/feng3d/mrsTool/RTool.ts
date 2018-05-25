@@ -1,16 +1,16 @@
-namespace feng3d.editor
+namespace editor
 {
     export class RTool extends MRSToolBase
     {
         protected toolModel: RToolModel;
-        private startPlanePos: Vector3;
-        private stepPlaneCross: Vector3;
-        private startMousePos: Vector2;
+        private startPlanePos: feng3d.Vector3;
+        private stepPlaneCross: feng3d.Vector3;
+        private startMousePos: feng3d.Vector2;
 
-        init(gameObject: GameObject)
+        init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
-            this.toolModel = GameObject.create().addComponent(RToolModel);
+            this.toolModel = feng3d.GameObject.create().addComponent(RToolModel);
         }
         protected onAddedToScene()
         {
@@ -35,11 +35,11 @@ namespace feng3d.editor
         }
 
 
-        protected onItemMouseDown(event: Event<any>)
+        protected onItemMouseDown(event: feng3d.Event<any>)
         {
             if (!engine.mouseinview)
                 return;
-            if (shortcut.keyState.getKeyState("alt"))
+            if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
@@ -52,8 +52,8 @@ namespace feng3d.editor
             var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.position;
-            this.movePlane3D = new Plane3D();
-            var selectedGameObject: GameObject = <any>event.currentTarget;
+            this.movePlane3D = new feng3d.Plane3D();
+            var selectedGameObject: feng3d.GameObject = <any>event.currentTarget;
             switch (selectedGameObject)
             {
                 case this.toolModel.xAxis.gameObject:
@@ -85,7 +85,7 @@ namespace feng3d.editor
             this.startSceneTransform = globalMatrix3D.clone();
             this.gameobjectControllerTarget.startRotate();
             //
-            windowEventProxy.on("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         }
 
         private onMouseMove()
@@ -104,7 +104,7 @@ namespace feng3d.editor
                     endDir.normalize();
                     //计算夹角
                     var cosValue = startDir.dot(endDir);
-                    var angle = Math.acos(cosValue) * FMath.RAD2DEG;
+                    var angle = Math.acos(cosValue) * feng3d.FMath.RAD2DEG;
                     //计算是否顺时针
                     var sign = this.movePlane3D.getNormal().cross(startDir).dot(endDir);
                     sign = sign > 0 ? 1 : -1;
@@ -136,7 +136,7 @@ namespace feng3d.editor
         protected onMouseUp()
         {
             super.onMouseUp();
-            windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
 
             if (this.selectedItem instanceof CoordinateRotationAxis)
             {
@@ -165,7 +165,7 @@ namespace feng3d.editor
             var temp = cameraSceneTransform.clone();
             temp.append(this.toolModel.transform.worldToLocalMatrix);
             var rotation = temp.decompose()[1];
-            rotation.scale(FMath.RAD2DEG);
+            rotation.scale(feng3d.FMath.RAD2DEG);
             this.toolModel.freeAxis.transform.rotation = rotation;
             this.toolModel.cameraAxis.transform.rotation = rotation;
         }

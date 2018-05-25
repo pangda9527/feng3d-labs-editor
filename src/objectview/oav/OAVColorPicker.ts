@@ -1,13 +1,13 @@
-namespace feng3d.editor
+namespace editor
 {
-    @OAVComponent()
+    @feng3d.OAVComponent()
     export class OAVColorPicker extends OAVBase
     {
         public label: eui.Label;
-        public colorPicker: feng3d.editor.ColorPicker;
+        public colorPicker: editor.ColorPicker;
         public input: eui.TextInput;
 
-        attributeValue: Color3 | Color4;
+        attributeValue: feng3d.Color3 | feng3d.Color4;
 
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
@@ -35,7 +35,7 @@ namespace feng3d.editor
         updateView()
         {
             var color = this.attributeValue;
-            if (color instanceof Color3)
+            if (color instanceof feng3d.Color3)
             {
                 this.colorPicker.value = color;
             } else
@@ -78,7 +78,7 @@ namespace feng3d.editor
                 color.fromUnit(Number("0x" + text.substr(1)));
                 this.attributeValue = color;
 
-                if (color instanceof Color3)
+                if (color instanceof feng3d.Color3)
                 {
                     this.colorPicker.value = color;
                 } else

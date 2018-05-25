@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     /**
      * Created by 黑暗之神KDS on 2017/2/17.
@@ -159,7 +159,7 @@ namespace feng3d.editor
             {
                 if (err)
                 {
-                    warn(err);
+                    feng3d.warn(err);
                     onError(this);
                 } else
                 {
@@ -180,7 +180,7 @@ namespace feng3d.editor
             {
                 if (err)
                 {
-                    warn(this);
+                    feng3d.warn(this);
                     onError(this);
                     return;
                 }
@@ -215,7 +215,7 @@ namespace feng3d.editor
         {
             if (typeof content == "string")
             {
-                dataTransform.stringToUint8Array(content, (uint8Array) =>
+                feng3d.dataTransform.stringToUint8Array(content, (uint8Array) =>
                 {
                     this.saveFile(uint8Array, onComplete, onError, thisPtr);
                 })
@@ -252,7 +252,7 @@ namespace feng3d.editor
             {
                 if (err)
                 {
-                    warn(err);
+                    feng3d.warn(err);
                     onError(this);
                     return;
                 }
@@ -276,7 +276,7 @@ namespace feng3d.editor
             {
                 if (err)
                 {
-                    warn(err);
+                    feng3d.warn(err);
                     onError(this);
                     return;
                 }
@@ -299,7 +299,7 @@ namespace feng3d.editor
             {
                 if (err)
                 {
-                    warn(err);
+                    feng3d.warn(err);
                     onError(this);
                     return;
                 }

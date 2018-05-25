@@ -1,18 +1,18 @@
-namespace feng3d.editor
+namespace editor
 {
 	/**
 	 * 默认基础对象界面
 	 * @author feng 2016-3-11
 	 */
-	@OVComponent()
-	export class OVBaseDefault extends eui.Component implements IObjectView
+	@feng3d.OVComponent()
+	export class OVBaseDefault extends eui.Component implements feng3d.IObjectView
 	{
 		public label: eui.Label;
 		public image: eui.Image;
 		//
 		private _space: Object;
 
-		constructor(objectViewInfo: ObjectViewInfo)
+		constructor(objectViewInfo: feng3d.ObjectViewInfo)
 		{
 			super();
 			this._space = objectViewInfo.owner;

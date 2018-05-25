@@ -1,10 +1,10 @@
-namespace feng3d.editor
+namespace editor
 {
 	/**
 	 * 挑选（拾取）OAV界面
 	 * @author feng 2016-3-10
 	 */
-    @OAVComponent()
+    @feng3d.OAVComponent()
     export class OAVTexture2D extends OAVBase
     {
         public image: eui.Image;
@@ -12,7 +12,7 @@ namespace feng3d.editor
         public pickBtn: eui.Button;
         public label: eui.Label;
 
-        constructor(attributeViewInfo: AttributeViewInfo)
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
 
@@ -26,7 +26,7 @@ namespace feng3d.editor
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
-            watcher.watch(this.space, this.attributeName, this.updateView, this);
+            feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
         }
 
         dispose()
@@ -34,7 +34,7 @@ namespace feng3d.editor
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
-            watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+            feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
         }
 
         private ontxtClick()
@@ -47,7 +47,7 @@ namespace feng3d.editor
                 prev.push({
                     label: item.name, click: () =>
                     {
-                        var text: Texture2D = this.attributeValue;
+                        var text: feng3d.Texture2D = this.attributeValue;
                         text.url = item.path;
                         this.updateView();
                     }
@@ -56,7 +56,7 @@ namespace feng3d.editor
             menus.unshift({
                 label: `空`, click: () =>
                 {
-                    var text: Texture2D = this.attributeValue;
+                    var text: feng3d.Texture2D = this.attributeValue;
                     text.url = "";
                     this.updateView();
                 }
@@ -69,7 +69,7 @@ namespace feng3d.editor
          */
         updateView(): void
         {
-            var text: Texture2D = this.attributeValue;
+            var text: feng3d.Texture2D = this.attributeValue;
 
             this.image.visible = false;
             this.img_border.visible = false;
@@ -78,7 +78,7 @@ namespace feng3d.editor
             {
                 fs.readFile(url, (err, data) =>
                 {
-                    dataTransform.arrayBufferToDataURL(data, (dataurl) =>
+                    feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                     {
                         this.image.source = dataurl;
                         this.image.visible = true;
@@ -90,7 +90,7 @@ namespace feng3d.editor
                 this.image.source = "";
             }
 
-            assets.readFileAsImage
+            feng3d.assets.readFileAsImage
         }
 
         private onDoubleClick()

@@ -1,4 +1,4 @@
-namespace feng3d.editor
+namespace editor
 {
     export class MenuItemRenderer extends eui.ItemRenderer
     {
