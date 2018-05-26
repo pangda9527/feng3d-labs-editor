@@ -107,6 +107,11 @@ namespace editor
                             case feng3d.AssetExtension.gif:
                                 dragsource.image = this.data.path;
                                 break;
+                            case feng3d.AssetExtension.mp3:
+                            case feng3d.AssetExtension.ogg:
+                            case feng3d.AssetExtension.wav:
+                                dragsource.audio = this.data.path;
+                                break;
                         }
                         dragsource.file = this.data.path;
                     }, []);

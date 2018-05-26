@@ -64,6 +64,10 @@ namespace editor
 		 */
 		image?: string;
 		/**
+		 * 声音路径
+		 */
+		audio?: string;
+		/**
 		 * 立方体纹理
 		 */
 		texturecube?: feng3d.TextureCube;

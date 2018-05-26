@@ -25,6 +25,10 @@ declare namespace editor {
          */
         image: RegExp;
         /**
+         * 声音
+         */
+        audio: RegExp;
+        /**
          * 命名空间
          */
         namespace: RegExp;
@@ -265,6 +269,10 @@ declare namespace editor {
          * 图片路径
          */
         image?: string;
+        /**
+         * 声音路径
+         */
+        audio?: string;
         /**
          * 立方体纹理
          */

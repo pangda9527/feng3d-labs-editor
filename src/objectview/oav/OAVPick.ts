@@ -69,7 +69,28 @@ namespace editor
                         }); return prev;
                     }, []);
                     menus.unshift({
-                        label: `空图片`, click: () =>
+                        label: `空`, click: () =>
+                        {
+                            this.attributeValue = "";
+                        }
+                    });
+                    menu.popup(menus);
+                } else if (param.accepttype == "audio")
+                {
+                    var menus: MenuItem[] = editorAssets.filter((file) =>
+                    {
+                        return regExps.audio.test(file.path);
+                    }).reduce((prev, item) =>
+                    {
+                        prev.push({
+                            label: item.name, click: () =>
+                            {
+                                this.attributeValue = item.path;
+                            }
+                        }); return prev;
+                    }, []);
+                    menus.unshift({
+                        label: `空`, click: () =>
                         {
                             this.attributeValue = "";
                         }

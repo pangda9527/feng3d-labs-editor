@@ -21,6 +21,11 @@ namespace editor
         image = /(\.jpg|\.png|\.jpeg|\.gif)\b/i;
 
         /**
+         * 声音
+         */
+        audio = /(\.ogg|\.mp3|\.wav)\b/i;
+
+        /**
          * 命名空间
          */
         namespace = /namespace\s+([\w$_\d\.]+)/;

@@ -49,6 +49,10 @@ var editor;
              */
             this.image = /(\.jpg|\.png|\.jpeg|\.gif)\b/i;
             /**
+             * 声音
+             */
+            this.audio = /(\.ogg|\.mp3|\.wav)\b/i;
+            /**
              * 命名空间
              */
             this.namespace = /namespace\s+([\w$_\d\.]+)/;
@@ -3659,7 +3663,25 @@ var editor;
                         return prev;
                     }, []);
                     menus.unshift({
-                        label: "\u7A7A\u56FE\u7247", click: function () {
+                        label: "\u7A7A", click: function () {
+                            _this.attributeValue = "";
+                        }
+                    });
+                    editor.menu.popup(menus);
+                }
+                else if (param.accepttype == "audio") {
+                    var menus = editor.editorAssets.filter(function (file) {
+                        return editor.regExps.audio.test(file.path);
+                    }).reduce(function (prev, item) {
+                        prev.push({
+                            label: item.name, click: function () {
+                                _this.attributeValue = item.path;
+                            }
+                        });
+                        return prev;
+                    }, []);
+                    menus.unshift({
+                        label: "\u7A7A", click: function () {
                             _this.attributeValue = "";
                         }
                     });
@@ -4898,6 +4920,11 @@ var editor;
                             case feng3d.AssetExtension.jpeg:
                             case feng3d.AssetExtension.gif:
                                 dragsource.image = _this.data.path;
+                                break;
+                            case feng3d.AssetExtension.mp3:
+                            case feng3d.AssetExtension.ogg:
+                            case feng3d.AssetExtension.wav:
+                                dragsource.audio = _this.data.path;
                                 break;
                         }
                         dragsource.file = _this.data.path;
