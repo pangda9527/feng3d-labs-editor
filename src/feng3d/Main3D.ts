@@ -146,6 +146,7 @@ namespace editor
         scene.ambientColor.setTo(0.4, 0.4, 0.4);
 
         var camera = feng3d.gameObjectFactory.createCamera("Main Camera");
+        camera.addComponent(feng3d.AudioListener);
         camera.transform.position = new feng3d.Vector3(0, 1, -10);
         scene.gameObject.addChild(camera);
 
