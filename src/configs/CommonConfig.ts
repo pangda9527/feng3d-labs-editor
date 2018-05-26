@@ -285,6 +285,13 @@ namespace editor
             ]
         },
         {
+            label: "Audio",
+            submenu: [
+                { label: "AudioListener", click: () => { needcreateComponentGameObject.addComponent(feng3d.AudioListener); } },
+                { label: "AudioSource", click: () => { needcreateComponentGameObject.addComponent(feng3d.AudioSource); } },
+            ]
+        },
+        {
             label: "Navigation",
             submenu: [
                 { label: "Navigation", click: () => { needcreateComponentGameObject.addComponent(Navigation); } },

@@ -143,11 +143,6 @@ namespace editor
                 });
                 return;
             }
-            fs.readFileAsString(this.path, (err, content) =>
-            {
-                this.cacheData = content;
-                callback(this.cacheData);
-            });
         }
 
         /**

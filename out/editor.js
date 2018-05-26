@@ -4585,10 +4585,6 @@ var editor;
                 });
                 return;
             }
-            editor.fs.readFileAsString(this.path, function (err, content) {
-                _this.cacheData = content;
-                callback(_this.cacheData);
-            });
         };
         /**
          * 重命名
@@ -10167,6 +10163,13 @@ var editor;
             submenu: [
                 { label: "HoldSizeComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.HoldSizeComponent); } },
                 { label: "BillboardComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.BillboardComponent); } },
+            ]
+        },
+        {
+            label: "Audio",
+            submenu: [
+                { label: "AudioListener", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.AudioListener); } },
+                { label: "AudioSource", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.AudioSource); } },
             ]
         },
         {
