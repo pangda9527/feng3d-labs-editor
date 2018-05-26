@@ -19,9 +19,8 @@ namespace editor
 
 		private onAddComponentButtonClick()
 		{
-			var globalPoint = this.addComponentButton.localToGlobal(0, 0);
 			needcreateComponentGameObject = this.space;
-			menu.popup(createComponentConfig, globalPoint.x, globalPoint.y, 180);
+			menu.popup(createComponentConfig);
 		}
 
 		get space()

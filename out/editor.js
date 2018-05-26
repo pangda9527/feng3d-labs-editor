@@ -3299,9 +3299,8 @@ var editor;
             return _this;
         }
         OAVComponentList.prototype.onAddComponentButtonClick = function () {
-            var globalPoint = this.addComponentButton.localToGlobal(0, 0);
             editor.needcreateComponentGameObject = this.space;
-            editor.menu.popup(editor.createComponentConfig, globalPoint.x, globalPoint.y, 180);
+            editor.menu.popup(editor.createComponentConfig);
         };
         Object.defineProperty(OAVComponentList.prototype, "space", {
             get: function () {
