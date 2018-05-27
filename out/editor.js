@@ -3294,7 +3294,6 @@ var editor;
         __extends(OAVComponentList, _super);
         function OAVComponentList(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
-            _this.accordions = [];
             _this.skinName = "OAVComponentListSkin";
             return _this;
         }
@@ -3336,7 +3335,6 @@ var editor;
         });
         OAVComponentList.prototype.initView = function () {
             var _this = this;
-            this.accordions.length = 0;
             this.group.layout.gap = -1;
             var components = this.attributeValue;
             for (var i = 0; i < components.length; i++) {
@@ -3548,9 +3546,19 @@ var editor;
             return _this;
         }
         OAVObjectView.prototype.initView = function () {
-            this.view = feng3d.objectview.getObjectView(this.attributeValue);
-            this.view.percentWidth = 100;
-            this.group.addChild(this.view);
+            var _this = this;
+            var arr = [];
+            if (this.attributeValue instanceof Array)
+                arr = this.attributeValue;
+            else
+                arr.push(this.attributeValue);
+            this.views = [];
+            arr.forEach(function (element) {
+                var view = feng3d.objectview.getObjectView(element);
+                view.percentWidth = 100;
+                _this.group.addChild(view);
+                _this.views.push(view);
+            });
         };
         OAVObjectView.prototype.updateView = function () {
         };
@@ -3558,8 +3566,11 @@ var editor;
          * 销毁
          */
         OAVObjectView.prototype.dispose = function () {
-            this.group.removeChild(this.view);
-            this.view = null;
+            var _this = this;
+            this.views.forEach(function (element) {
+                _this.group.removeChild(element);
+            });
+            this.views = null;
         };
         OAVObjectView = __decorate([
             feng3d.OAVComponent()

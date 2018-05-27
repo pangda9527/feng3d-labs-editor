@@ -3,13 +3,11 @@ namespace editor
 	@feng3d.OAVComponent()
 	export class OAVComponentList extends OAVBase
 	{
-		private accordions: Accordion[] = [];
 		protected _space: feng3d.GameObject;
 
 		//
 		group: eui.Group;
 		addComponentButton: eui.Button;
-
 
 		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 		{
@@ -56,7 +54,6 @@ namespace editor
 
 		initView(): void
 		{
-			this.accordions.length = 0;
 			(<eui.VerticalLayout>this.group.layout).gap = -1;
 
 			var components = <any>this.attributeValue;

@@ -5,7 +5,7 @@ namespace editor
 	{
 		group: eui.Group;
 		//
-		view: eui.Component;
+		views: feng3d.IObjectView[];
 
 		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 		{
@@ -15,9 +15,20 @@ namespace editor
 
 		initView()
 		{
-			this.view = feng3d.objectview.getObjectView(this.attributeValue);
-			this.view.percentWidth = 100;
-			this.group.addChild(this.view);
+			var arr = [];
+			if (this.attributeValue instanceof Array)
+				arr = this.attributeValue;
+			else
+				arr.push(this.attributeValue);
+
+			this.views = [];
+			arr.forEach(element =>
+			{
+				var view = feng3d.objectview.getObjectView(element);
+				view.percentWidth = 100;
+				this.group.addChild(view);
+				this.views.push(view);
+			});
 		}
 
 		updateView()
@@ -29,8 +40,11 @@ namespace editor
          */
 		dispose()
 		{
-			this.group.removeChild(this.view);
-			this.view = null;
+			this.views.forEach(element =>
+			{
+				this.group.removeChild(element);
+			});
+			this.views = null;
 		}
 	}
 }

@@ -897,7 +897,6 @@ declare namespace editor {
 }
 declare namespace editor {
     class OAVComponentList extends OAVBase {
-        private accordions;
         protected _space: feng3d.GameObject;
         group: eui.Group;
         addComponentButton: eui.Button;
@@ -965,7 +964,7 @@ declare namespace editor {
 declare namespace editor {
     class OAVObjectView extends OAVBase {
         group: eui.Group;
-        view: eui.Component;
+        views: feng3d.IObjectView[];
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
         updateView(): void;
