@@ -23,5 +23,14 @@ namespace editor
 		updateView()
 		{
 		}
+
+        /**
+         * 销毁
+         */
+		dispose()
+		{
+			this.group.removeChild(this.view);
+			this.view = null;
+		}
 	}
 }

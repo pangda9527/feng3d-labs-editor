@@ -3554,6 +3554,13 @@ var editor;
         };
         OAVObjectView.prototype.updateView = function () {
         };
+        /**
+         * 销毁
+         */
+        OAVObjectView.prototype.dispose = function () {
+            this.group.removeChild(this.view);
+            this.view = null;
+        };
         OAVObjectView = __decorate([
             feng3d.OAVComponent()
         ], OAVObjectView);

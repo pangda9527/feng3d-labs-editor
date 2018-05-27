@@ -969,6 +969,10 @@ declare namespace editor {
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
         updateView(): void;
+        /**
+         * 销毁
+         */
+        dispose(): void;
     }
 }
 declare namespace editor {
