@@ -5,6 +5,10 @@
         "sourceMap": true,
         "declaration": true,
         "experimentalDecorators": true,
+        "types": [
+            "jquery",
+            "jqueryui"
+        ],
         "outFile": "out/editor.js"
     },
     "files": [
