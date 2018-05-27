@@ -1,3 +1,6 @@
+declare function require(module: string): any;
+declare var __dirname: string;
+
 namespace editor
 {
     export var fs: EditorAssets1;

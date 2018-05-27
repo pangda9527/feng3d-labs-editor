@@ -5,14 +5,12 @@
     "sourceMap": true,
     // "declaration": true,
     "experimentalDecorators": true,
-    "types": [
-      "jquery",
-      "jqueryui"
-    ],
     "outFile": "out/app.js"
   },
   "files": [
     "../libs/feng3d.d.ts", //debug
+    "../libs/jquery.d.ts",
+    "../libs/jquery-ui.d.ts",
     //
     "src/components/UI.ts",
     "src/components/JQueryUI.ts",

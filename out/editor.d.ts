@@ -192,6 +192,8 @@ declare namespace editor {
         private updateStats(path, callback, onComplete?, onError?);
     }
 }
+declare function require(module: string): any;
+declare var __dirname: string;
 declare namespace editor {
     var fs: EditorAssets1;
     class EditorAssets1 extends feng3d.ReadWriteAssets {
