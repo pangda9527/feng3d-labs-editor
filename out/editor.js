@@ -2205,6 +2205,60 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var ParticleComponentView = /** @class */ (function (_super) {
+        __extends(ParticleComponentView, _super);
+        /**
+         * 对象界面数据
+         */
+        function ParticleComponentView(component) {
+            var _this = _super.call(this) || this;
+            _this.component = component;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "ParticleComponentView";
+            return _this;
+        }
+        /**
+         * 更新界面
+         */
+        ParticleComponentView.prototype.updateView = function () {
+            this.updateEnableCB();
+            if (this.componentView)
+                this.componentView.updateView();
+        };
+        ParticleComponentView.prototype.onComplete = function () {
+            var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
+            this.accordion.titleName = componentName;
+            this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
+            this.accordion.addContent(this.componentView);
+            this.enabledCB = this.accordion["enabledCB"];
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            if (this.stage)
+                this.onAddToStage();
+        };
+        ParticleComponentView.prototype.onAddToStage = function () {
+            this.updateView();
+            this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+            if (this.component instanceof feng3d.Behaviour)
+                feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+        };
+        ParticleComponentView.prototype.onRemovedFromStage = function () {
+            this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+            if (this.component instanceof feng3d.Behaviour)
+                feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+        };
+        ParticleComponentView.prototype.updateEnableCB = function () {
+            this.enabledCB.selected = this.component.enabled;
+        };
+        ParticleComponentView.prototype.onEnableCBChange = function () {
+            this.component.enabled = this.enabledCB.selected;
+        };
+        return ParticleComponentView;
+    }(eui.Component));
+    editor.ParticleComponentView = ParticleComponentView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var Menu = /** @class */ (function () {
         function Menu() {
         }
@@ -3298,8 +3352,7 @@ var editor;
             return _this;
         }
         OAVComponentList.prototype.onAddComponentButtonClick = function () {
-            editor.needcreateComponentGameObject = this.space;
-            editor.menu.popup(editor.createComponentConfig);
+            editor.menu.popup(editor.getCreateComponentMenu(this.space));
         };
         Object.defineProperty(OAVComponentList.prototype, "space", {
             get: function () {
@@ -3879,6 +3932,96 @@ var editor;
         return OAVTexture2D;
     }(editor.OAVBase));
     editor.OAVTexture2D = OAVTexture2D;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var OAVParticleComponentList = /** @class */ (function (_super) {
+        __extends(OAVParticleComponentList, _super);
+        function OAVParticleComponentList(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVParticleComponentList";
+            return _this;
+        }
+        OAVParticleComponentList.prototype.onAddComponentButtonClick = function () {
+            editor.menu.popup(editor.getCreateParticleComponentMenu(this.space));
+        };
+        Object.defineProperty(OAVParticleComponentList.prototype, "space", {
+            get: function () {
+                return this._space;
+            },
+            set: function (value) {
+                this._space = value;
+                this.dispose();
+                this.initView();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(OAVParticleComponentList.prototype, "attributeName", {
+            get: function () {
+                return this._attributeName;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(OAVParticleComponentList.prototype, "attributeValue", {
+            get: function () {
+                return this._space[this._attributeName];
+            },
+            set: function (value) {
+                if (this._space[this._attributeName] != value) {
+                    this._space[this._attributeName] = value;
+                }
+                this.updateView();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        OAVParticleComponentList.prototype.initView = function () {
+            this.group.layout.gap = -1;
+            var components = this.attributeValue;
+            for (var i = 0; i < components.length; i++) {
+                this.addComponentView(components[i]);
+            }
+            this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
+        };
+        OAVParticleComponentList.prototype.dispose = function () {
+            var components = this.attributeValue;
+            for (var i = 0; i < components.length; i++) {
+                this.removedComponentView(components[i]);
+            }
+            this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
+        };
+        OAVParticleComponentList.prototype.addComponentView = function (component) {
+            var o;
+            var displayObject = new editor.ParticleComponentView(component);
+            displayObject.percentWidth = 100;
+            this.group.addChild(displayObject);
+        };
+        /**
+         * 更新界面
+         */
+        OAVParticleComponentList.prototype.updateView = function () {
+            for (var i = 0, n = this.group.numChildren; i < n; i++) {
+                var child = this.group.getChildAt(i);
+                if (child instanceof editor.ParticleComponentView)
+                    child.updateView();
+            }
+        };
+        OAVParticleComponentList.prototype.removedComponentView = function (component) {
+            for (var i = this.group.numChildren - 1; i >= 0; i--) {
+                var displayObject = this.group.getChildAt(i);
+                if (displayObject instanceof editor.ParticleComponentView && displayObject.component == component) {
+                    this.group.removeChild(displayObject);
+                }
+            }
+        };
+        OAVParticleComponentList = __decorate([
+            feng3d.OAVComponent()
+        ], OAVParticleComponentList);
+        return OAVParticleComponentList;
+    }(editor.OAVBase));
+    editor.OAVParticleComponentList = OAVParticleComponentList;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -10172,64 +10315,78 @@ var editor;
         editor.editorData.selectObject(gameobject);
     }
     /**
-     * 层级界面创建3D对象列表数据
+     * 获取创建游戏对象组件菜单
+     * @param gameobject 游戏对象
      */
-    editor.createComponentConfig = [
-        //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
-        {
-            label: "SkyBox",
-            click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.SkyBox); }
-        },
-        {
-            label: "Animator",
-            submenu: [
-                { label: "ParticleSystem", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.ParticleSystem); } },
-                { label: "Animation", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Animation); } },
-            ]
-        },
-        {
-            label: "Rendering",
-            submenu: [
-                { label: "Camera", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.Camera); } },
-                { label: "PointLight", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.PointLight); } },
-                { label: "DirectionalLight", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.DirectionalLight); } },
-                { label: "OutLineComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.OutLineComponent); } },
-                { label: "CartoonComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.CartoonComponent); } },
-            ]
-        },
-        {
-            label: "Controller",
-            submenu: [
-                { label: "FPSController", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.FPSController); } },
-            ]
-        },
-        {
-            label: "Layout",
-            submenu: [
-                { label: "HoldSizeComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.HoldSizeComponent); } },
-                { label: "BillboardComponent", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.BillboardComponent); } },
-            ]
-        },
-        {
-            label: "Audio",
-            submenu: [
-                { label: "AudioListener", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.AudioListener); } },
-                { label: "AudioSource", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.AudioSource); } },
-            ]
-        },
-        {
-            label: "Navigation",
-            submenu: [
-                { label: "Navigation", click: function () { editor.needcreateComponentGameObject.addComponent(editor.Navigation); } },
-            ]
-        },
-        {
-            label: "Script",
-            submenu: [
-                { label: "Script", click: function () { editor.needcreateComponentGameObject.addComponent(feng3d.ScriptComponent); } },
-            ]
-        },
-    ];
+    function getCreateComponentMenu(gameobject) {
+        var menu = [
+            //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
+            {
+                label: "SkyBox",
+                click: function () { gameobject.addComponent(feng3d.SkyBox); }
+            },
+            {
+                label: "Animator",
+                submenu: [
+                    { label: "ParticleSystem", click: function () { gameobject.addComponent(feng3d.ParticleSystem); } },
+                    { label: "Animation", click: function () { gameobject.addComponent(feng3d.Animation); } },
+                ]
+            },
+            {
+                label: "Rendering",
+                submenu: [
+                    { label: "Camera", click: function () { gameobject.addComponent(feng3d.Camera); } },
+                    { label: "PointLight", click: function () { gameobject.addComponent(feng3d.PointLight); } },
+                    { label: "DirectionalLight", click: function () { gameobject.addComponent(feng3d.DirectionalLight); } },
+                    { label: "OutLineComponent", click: function () { gameobject.addComponent(feng3d.OutLineComponent); } },
+                    { label: "CartoonComponent", click: function () { gameobject.addComponent(feng3d.CartoonComponent); } },
+                ]
+            },
+            {
+                label: "Controller",
+                submenu: [
+                    { label: "FPSController", click: function () { gameobject.addComponent(feng3d.FPSController); } },
+                ]
+            },
+            {
+                label: "Layout",
+                submenu: [
+                    { label: "HoldSizeComponent", click: function () { gameobject.addComponent(feng3d.HoldSizeComponent); } },
+                    { label: "BillboardComponent", click: function () { gameobject.addComponent(feng3d.BillboardComponent); } },
+                ]
+            },
+            {
+                label: "Audio",
+                submenu: [
+                    { label: "AudioListener", click: function () { gameobject.addComponent(feng3d.AudioListener); } },
+                    { label: "AudioSource", click: function () { gameobject.addComponent(feng3d.AudioSource); } },
+                ]
+            },
+            {
+                label: "Navigation",
+                submenu: [
+                    { label: "Navigation", click: function () { gameobject.addComponent(editor.Navigation); } },
+                ]
+            },
+            {
+                label: "Script",
+                submenu: [
+                    { label: "Script", click: function () { gameobject.addComponent(feng3d.ScriptComponent); } },
+                ]
+            },
+        ];
+        return menu;
+    }
+    editor.getCreateComponentMenu = getCreateComponentMenu;
+    /**
+     * 获取创建粒子系统组件菜单
+     * @param particleSystem 粒子系统
+     */
+    function getCreateParticleComponentMenu(particleSystem) {
+        var menu = [];
+        return menu;
+    }
+    editor.getCreateParticleComponentMenu = getCreateParticleComponentMenu;
     /**
      * 下载项目
      * @param projectname

@@ -597,6 +597,28 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    class ParticleComponentView extends eui.Component {
+        component: feng3d.ParticleComponent;
+        componentView: feng3d.IObjectView;
+        accordion: editor.Accordion;
+        enabledCB: eui.CheckBox;
+        scriptView: feng3d.IObjectView;
+        /**
+         * 对象界面数据
+         */
+        constructor(component: feng3d.ParticleComponent);
+        /**
+         * 更新界面
+         */
+        updateView(): void;
+        private onComplete();
+        private onAddToStage();
+        private onRemovedFromStage();
+        private updateEnableCB();
+        private onEnableCBChange();
+    }
+}
+declare namespace editor {
     /**
      * 菜单
      */
@@ -1031,6 +1053,26 @@ declare namespace editor {
          */
         updateView(): void;
         private onDoubleClick();
+    }
+}
+declare namespace editor {
+    class OAVParticleComponentList extends OAVBase {
+        protected _space: feng3d.ParticleSystem;
+        group: eui.Group;
+        addComponentButton: eui.Button;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        private onAddComponentButtonClick();
+        space: feng3d.ParticleSystem;
+        readonly attributeName: string;
+        attributeValue: Object;
+        initView(): void;
+        dispose(): void;
+        private addComponentView(component);
+        /**
+         * 更新界面
+         */
+        updateView(): void;
+        private removedComponentView(component);
     }
 }
 declare namespace editor {
@@ -2324,11 +2366,16 @@ declare namespace editor {
      * 层级界面创建3D对象列表数据
      */
     var createObjectConfig: MenuItem[];
-    var needcreateComponentGameObject: feng3d.GameObject;
     /**
-     * 层级界面创建3D对象列表数据
+     * 获取创建游戏对象组件菜单
+     * @param gameobject 游戏对象
      */
-    var createComponentConfig: MenuItem[];
+    function getCreateComponentMenu(gameobject: feng3d.GameObject): MenuItem[];
+    /**
+     * 获取创建粒子系统组件菜单
+     * @param particleSystem 粒子系统
+     */
+    function getCreateParticleComponentMenu(particleSystem: feng3d.ParticleSystem): MenuItem[];
 }
 declare namespace editor {
 }

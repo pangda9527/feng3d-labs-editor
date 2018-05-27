@@ -46,6 +46,7 @@
         "src/ui/components/Tree.ts",
         "src/ui/components/Vector3DView.ts",
         "src/ui/components/ComponentView.ts",
+        "src/ui/components/ParticleComponentView.ts",
         "src/ui/components/Menu.ts",
         //
         "src/objectview/ov/OVBaseDefault.ts",
@@ -71,6 +72,7 @@
         "src/objectview/oav/OAVGameObjectName.ts",
         "src/objectview/oav/OAVPick.ts",
         "src/objectview/oav/OAVTexture2D.ts",
+        "src/objectview/oav/OAVParticleComponentList.ts",
         //
         "src/ui/inspector/InspectorView.ts",
         //

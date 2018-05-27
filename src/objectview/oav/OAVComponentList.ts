@@ -17,8 +17,7 @@ namespace editor
 
 		private onAddComponentButtonClick()
 		{
-			needcreateComponentGameObject = this.space;
-			menu.popup(createComponentConfig);
+			menu.popup(getCreateComponentMenu(this.space));
 		}
 
 		get space()

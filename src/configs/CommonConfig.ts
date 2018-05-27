@@ -242,68 +242,87 @@ namespace editor
         editorData.selectObject(gameobject);
     }
 
-    export var needcreateComponentGameObject: feng3d.GameObject;
+    /**
+     * 获取创建游戏对象组件菜单
+     * @param gameobject 游戏对象
+     */
+    export function getCreateComponentMenu(gameobject: feng3d.GameObject)
+    {
+        var menu: MenuItem[] = [
+            //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
+            {
+                label: "SkyBox",
+                click: () => { gameobject.addComponent(feng3d.SkyBox); }
+            },
+            {
+                label: "Animator",
+                submenu: [
+                    { label: "ParticleSystem", click: () => { gameobject.addComponent(feng3d.ParticleSystem); } },
+                    { label: "Animation", click: () => { gameobject.addComponent(feng3d.Animation); } },
+                ]
+            },
+            {
+                label: "Rendering",
+                submenu: [
+                    { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
+                    { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
+                    { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
+                    { label: "OutLineComponent", click: () => { gameobject.addComponent(feng3d.OutLineComponent); } },
+                    { label: "CartoonComponent", click: () => { gameobject.addComponent(feng3d.CartoonComponent); } },
+                    // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
+                ]
+            },
+            {
+                label: "Controller",
+                submenu: [
+                    { label: "FPSController", click: () => { gameobject.addComponent(feng3d.FPSController); } },
+                ]
+            },
+            {
+                label: "Layout",
+                submenu: [
+                    { label: "HoldSizeComponent", click: () => { gameobject.addComponent(feng3d.HoldSizeComponent); } },
+                    { label: "BillboardComponent", click: () => { gameobject.addComponent(feng3d.BillboardComponent); } },
+                ]
+            },
+            {
+                label: "Audio",
+                submenu: [
+                    { label: "AudioListener", click: () => { gameobject.addComponent(feng3d.AudioListener); } },
+                    { label: "AudioSource", click: () => { gameobject.addComponent(feng3d.AudioSource); } },
+                ]
+            },
+            {
+                label: "Navigation",
+                submenu: [
+                    { label: "Navigation", click: () => { gameobject.addComponent(Navigation); } },
+                ]
+            },
+            {
+                label: "Script",
+                submenu: [
+                    { label: "Script", click: () => { gameobject.addComponent(feng3d.ScriptComponent); } },
+                ]
+            },
+        ];
+        return menu;
+    }
 
     /**
-     * 层级界面创建3D对象列表数据
+     * 获取创建粒子系统组件菜单
+     * @param particleSystem 粒子系统
      */
-    export var createComponentConfig: MenuItem[] = [
-        //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
-        {
-            label: "SkyBox",
-            click: () => { needcreateComponentGameObject.addComponent(feng3d.SkyBox); }
-        },
-        {
-            label: "Animator",
-            submenu: [
-                { label: "ParticleSystem", click: () => { needcreateComponentGameObject.addComponent(feng3d.ParticleSystem); } },
-                { label: "Animation", click: () => { needcreateComponentGameObject.addComponent(feng3d.Animation); } },
-            ]
-        },
-        {
-            label: "Rendering",
-            submenu: [
-                { label: "Camera", click: () => { needcreateComponentGameObject.addComponent(feng3d.Camera); } },
-                { label: "PointLight", click: () => { needcreateComponentGameObject.addComponent(feng3d.PointLight); } },
-                { label: "DirectionalLight", click: () => { needcreateComponentGameObject.addComponent(feng3d.DirectionalLight); } },
-                { label: "OutLineComponent", click: () => { needcreateComponentGameObject.addComponent(feng3d.OutLineComponent); } },
-                { label: "CartoonComponent", click: () => { needcreateComponentGameObject.addComponent(feng3d.CartoonComponent); } },
-                // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
-            ]
-        },
-        {
-            label: "Controller",
-            submenu: [
-                { label: "FPSController", click: () => { needcreateComponentGameObject.addComponent(feng3d.FPSController); } },
-            ]
-        },
-        {
-            label: "Layout",
-            submenu: [
-                { label: "HoldSizeComponent", click: () => { needcreateComponentGameObject.addComponent(feng3d.HoldSizeComponent); } },
-                { label: "BillboardComponent", click: () => { needcreateComponentGameObject.addComponent(feng3d.BillboardComponent); } },
-            ]
-        },
-        {
-            label: "Audio",
-            submenu: [
-                { label: "AudioListener", click: () => { needcreateComponentGameObject.addComponent(feng3d.AudioListener); } },
-                { label: "AudioSource", click: () => { needcreateComponentGameObject.addComponent(feng3d.AudioSource); } },
-            ]
-        },
-        {
-            label: "Navigation",
-            submenu: [
-                { label: "Navigation", click: () => { needcreateComponentGameObject.addComponent(Navigation); } },
-            ]
-        },
-        {
-            label: "Script",
-            submenu: [
-                { label: "Script", click: () => { needcreateComponentGameObject.addComponent(feng3d.ScriptComponent); } },
-            ]
-        },
-    ];
+    export function getCreateParticleComponentMenu(particleSystem: feng3d.ParticleSystem)
+    {
+        var menu: MenuItem[] = [
+            //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
+            // {
+            //     label: "SkyBox",
+            //     click: () => { gameobject.addComponent(feng3d.SkyBox); }
+            // },
+        ];
+        return menu;
+    }
 
     /**
      * 下载项目
