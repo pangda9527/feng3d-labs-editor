@@ -9946,7 +9946,10 @@ var editor;
             propertyClip.propertyValues = [];
             var propertyValues = propertyClip.propertyValues;
             var times = keyframeTrack.times;
-            var values = Array.from(keyframeTrack.values, usenumberfixed ? function (v) { return Number(v.toFixed(6)); } : null);
+            var values = ds.utils.arrayFrom(keyframeTrack.values);
+            if (usenumberfixed) {
+                values = values.map(function (v) { return Number(v.toFixed(6)); });
+            }
             var len = times.length;
             switch (keyframeTrack.ValueTypeName) {
                 case "vector":
@@ -10019,7 +10022,10 @@ var editor;
         for (var key in attributes) {
             if (attributes.hasOwnProperty(key)) {
                 var element = attributes[key];
-                var array = Array.from(element.array, usenumberfixed ? function (v) { return Number(v.toFixed(6)); } : null);
+                var array = ds.utils.arrayFrom(element.array);
+                if (usenumberfixed) {
+                    array = array.map(function (v) { return Number(v.toFixed(6)); });
+                }
                 switch (key) {
                     case "position":
                         geo.positions = array;

@@ -171,7 +171,11 @@ namespace editor
             propertyClip.propertyValues = [];
             var propertyValues = propertyClip.propertyValues;
             var times: number[] = keyframeTrack.times;
-            var values = <number[]>Array.from(keyframeTrack.values, usenumberfixed ? (v: number) => { return Number(v.toFixed(6)); } : null)
+            var values: number[] = ds.utils.arrayFrom(keyframeTrack.values);
+            if (usenumberfixed)
+            {
+                values = values.map((v: number) => { return Number(v.toFixed(6)); });
+            }
 
             var len = times.length;
             switch (keyframeTrack.ValueTypeName)
@@ -272,7 +276,11 @@ namespace editor
             if (attributes.hasOwnProperty(key))
             {
                 var element = attributes[key];
-                var array = <number[]>Array.from(element.array, usenumberfixed ? (v: number) => { return Number(v.toFixed(6)); } : null)
+                var array: number[] = ds.utils.arrayFrom(element.array);
+                if (usenumberfixed)
+                {
+                    array = array.map((v: number) => { return Number(v.toFixed(6)); });
+                }
                 switch (key)
                 {
                     case "position":
