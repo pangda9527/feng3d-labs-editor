@@ -7,7 +7,7 @@ namespace editor
 	@feng3d.OAVComponent()
 	export class OAVDefault extends OAVBase
 	{
-		public label: eui.Label;
+		public labelLab: eui.Label;
 		public text: eui.TextInput;
 
 		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
@@ -45,7 +45,6 @@ namespace editor
 		initView()
 		{
 			this.text.percentWidth = 100;
-			this.label.text = this._attributeName;
 
 			this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
 			this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);

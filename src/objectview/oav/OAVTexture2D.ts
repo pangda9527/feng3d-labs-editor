@@ -10,7 +10,7 @@ namespace editor
         public image: eui.Image;
         public img_border: eui.Image;
         public pickBtn: eui.Button;
-        public label: eui.Label;
+        public labelLab: eui.Label;
 
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
@@ -21,8 +21,6 @@ namespace editor
 
         initView()
         {
-            this.label.text = this._attributeName;
-
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 

@@ -3,7 +3,7 @@ namespace editor
     @feng3d.OAVComponent()
     export class OAVEnum extends OAVBase
     {
-        public label: eui.Label;
+        public labelLab: eui.Label;
         public combobox: ComboBox;
 
         private list: { label: string, value: number }[];

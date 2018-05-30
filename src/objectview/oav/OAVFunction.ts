@@ -3,7 +3,7 @@ namespace editor
     @feng3d.OAVComponent()
     export class OAVFunction extends OAVBase
     {
-        public label: eui.Label;
+        public labelLab: eui.Label;
         public button: eui.Button;
 
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)

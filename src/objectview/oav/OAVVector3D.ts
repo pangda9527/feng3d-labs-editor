@@ -3,7 +3,7 @@ namespace editor
 	@feng3d.OAVComponent()
 	export class OAVVector3D extends OAVBase
 	{
-		label: eui.Label;
+		labelLab: eui.Label;
 		vector3DView: editor.Vector3DView;
 
 		constructor(attributeViewInfo: feng3d.AttributeViewInfo)

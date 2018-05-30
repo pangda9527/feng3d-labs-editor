@@ -133,7 +133,7 @@ namespace editor
         initView()
         {
             super.initView();
-            this.label.width = 60;
+            this.labelLab.width = 60;
         }
     }
 }

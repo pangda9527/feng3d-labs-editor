@@ -791,7 +791,7 @@ declare namespace editor {
         protected _attributeName: string;
         protected _attributeType: string;
         protected attributeViewInfo: feng3d.AttributeViewInfo;
-        label: eui.Label;
+        labelLab: eui.Label;
         /**
          * 对象属性界面
          */
@@ -802,6 +802,7 @@ declare namespace editor {
         objectBlockView: feng3d.IObjectBlockView;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         space: any;
+        private label;
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         /**
@@ -826,7 +827,7 @@ declare namespace editor {
      * @author feng 2016-3-10
      */
     class OAVDefault extends OAVBase {
-        label: eui.Label;
+        labelLab: eui.Label;
         text: eui.TextInput;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         dragparam: {
@@ -850,7 +851,6 @@ declare namespace editor {
 }
 declare namespace editor {
     class OAVBoolean extends OAVBase {
-        label: eui.Label;
         checkBox: eui.CheckBox;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
@@ -875,7 +875,7 @@ declare namespace editor {
 }
 declare namespace editor {
     class OAVVector3D extends OAVBase {
-        label: eui.Label;
+        labelLab: eui.Label;
         vector3DView: editor.Vector3DView;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
@@ -906,7 +906,7 @@ declare namespace editor {
 }
 declare namespace editor {
     class OAVEnum extends OAVBase {
-        label: eui.Label;
+        labelLab: eui.Label;
         combobox: ComboBox;
         private list;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
@@ -941,7 +941,7 @@ declare namespace editor {
 }
 declare namespace editor {
     class OAVFunction extends OAVBase {
-        label: eui.Label;
+        labelLab: eui.Label;
         button: eui.Button;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
@@ -952,7 +952,7 @@ declare namespace editor {
 }
 declare namespace editor {
     class OAVColorPicker extends OAVBase {
-        label: eui.Label;
+        labelLab: eui.Label;
         colorPicker: editor.ColorPicker;
         input: eui.TextInput;
         attributeValue: feng3d.Color3 | feng3d.Color4;
@@ -1020,7 +1020,7 @@ declare namespace editor {
      * @author feng 2016-3-10
      */
     class OAVPick extends OAVBase {
-        label: eui.Label;
+        labelLab: eui.Label;
         text: eui.Label;
         pickBtn: eui.Button;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
@@ -1043,7 +1043,7 @@ declare namespace editor {
         image: eui.Image;
         img_border: eui.Image;
         pickBtn: eui.Button;
-        label: eui.Label;
+        labelLab: eui.Label;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
         dispose(): void;

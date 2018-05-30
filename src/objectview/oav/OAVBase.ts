@@ -7,7 +7,7 @@ namespace editor
         protected _attributeType: string;
         protected attributeViewInfo: feng3d.AttributeViewInfo;
         //
-        label: eui.Label;
+        labelLab: eui.Label;
 
         /**
          * 对象属性界面
@@ -40,6 +40,9 @@ namespace editor
             this.updateView();
         }
 
+        // 占用，避免出现label命名的组件
+        private label = "";
+
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
@@ -49,18 +52,18 @@ namespace editor
             {
                 for (var key in componentParam)
                 {
-                    if (this.hasOwnProperty(key))
+                    if (componentParam.hasOwnProperty(key))
                     {
                         this[key] = componentParam[key];
                     }
                 }
             }
-            if (this.label)
+            if (this.labelLab)
             {
-                if (componentParam && componentParam.label)
-                    this.label.text = componentParam.label;
+                if (this.label)
+                    this.labelLab.text = this.label;
                 else
-                    this.label.text = this._attributeName;
+                    this.labelLab.text = this._attributeName;
             }
 
             this.initView();

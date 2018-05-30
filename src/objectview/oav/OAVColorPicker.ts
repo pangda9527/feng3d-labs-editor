@@ -3,7 +3,7 @@ namespace editor
     @feng3d.OAVComponent()
     export class OAVColorPicker extends OAVBase
     {
-        public label: eui.Label;
+        public labelLab: eui.Label;
         public colorPicker: editor.ColorPicker;
         public input: eui.TextInput;
 

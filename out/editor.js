@@ -2910,6 +2910,8 @@ var editor;
         __extends(OAVBase, _super);
         function OAVBase(attributeViewInfo) {
             var _this = _super.call(this) || this;
+            // 占用，避免出现label命名的组件
+            _this.label = "";
             _this._space = attributeViewInfo.owner;
             _this._attributeName = attributeViewInfo.name;
             _this._attributeType = attributeViewInfo.type;
@@ -2934,16 +2936,16 @@ var editor;
             var componentParam = this.attributeViewInfo.componentParam;
             if (componentParam) {
                 for (var key in componentParam) {
-                    if (this.hasOwnProperty(key)) {
+                    if (componentParam.hasOwnProperty(key)) {
                         this[key] = componentParam[key];
                     }
                 }
             }
-            if (this.label) {
-                if (componentParam && componentParam.label)
-                    this.label.text = componentParam.label;
+            if (this.labelLab) {
+                if (this.label)
+                    this.labelLab.text = this.label;
                 else
-                    this.label.text = this._attributeName;
+                    this.labelLab.text = this._attributeName;
             }
             this.initView();
             this.updateView();
@@ -3036,7 +3038,6 @@ var editor;
         });
         OAVDefault.prototype.initView = function () {
             this.text.percentWidth = 100;
-            this.label.text = this._attributeName;
             this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -3296,7 +3297,7 @@ var editor;
         }
         OAVArrayItem.prototype.initView = function () {
             _super.prototype.initView.call(this);
-            this.label.width = 60;
+            this.labelLab.width = 60;
         };
         return OAVArrayItem;
     }(editor.OAVDefault));
@@ -3710,7 +3711,6 @@ var editor;
         }
         OAVPick.prototype.initView = function () {
             var _this = this;
-            this.label.text = this._attributeName;
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
@@ -3877,7 +3877,6 @@ var editor;
             return _this;
         }
         OAVTexture2D.prototype.initView = function () {
-            this.label.text = this._attributeName;
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);

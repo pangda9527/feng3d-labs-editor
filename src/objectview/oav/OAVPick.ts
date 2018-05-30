@@ -7,7 +7,7 @@ namespace editor
     @feng3d.OAVComponent()
     export class OAVPick extends OAVBase
     {
-        public label: eui.Label;
+        public labelLab: eui.Label;
         public text: eui.Label;
         public pickBtn: eui.Button;
 
@@ -20,8 +20,6 @@ namespace editor
 
         initView()
         {
-            this.label.text = this._attributeName;
-
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
