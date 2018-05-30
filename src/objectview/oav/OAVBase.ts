@@ -65,6 +65,8 @@ namespace editor
                 else
                     this.labelLab.text = this._attributeName;
             }
+            if (componentParam)
+                toolTip.register(this.labelLab, componentParam.tooltip);
 
             this.initView();
             this.updateView();
@@ -72,6 +74,8 @@ namespace editor
 
         $onRemoveFromStage()
         {
+            toolTip.unregister(this.labelLab);
+
             super.$onRemoveFromStage()
             this.dispose();
         }

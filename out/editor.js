@@ -2493,6 +2493,123 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var ToolTip = /** @class */ (function () {
+        function ToolTip() {
+            /**
+             * 默认 提示界面
+             */
+            this.defaultTipview = function () { return editor.TipString; };
+            /**
+             * tip界面映射表，{key:数据类定义,value:界面类定义}，例如 {key:String,value:TipString}
+             */
+            this.tipviewmap = new Map();
+            this.tipmap = new Map();
+            this._ischeck = false;
+        }
+        ToolTip.prototype.register = function (displayObject, tip) {
+            if (!displayObject)
+                return;
+            this.tipmap.set(displayObject, tip);
+            this.ischeck = !!this.tipmap.size;
+        };
+        ToolTip.prototype.unregister = function (displayObject) {
+            if (!displayObject)
+                return;
+            this.tipmap.delete(displayObject);
+            this.ischeck = !!this.tipmap.size;
+        };
+        Object.defineProperty(ToolTip.prototype, "ischeck", {
+            get: function () {
+                return this._ischeck;
+            },
+            set: function (v) {
+                if (this._ischeck == v)
+                    return;
+                this._ischeck = v;
+                if (this._ischeck) {
+                    feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+                }
+                else {
+                    feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ToolTip.prototype.onMouseMove = function (event) {
+            var displayObjects = this.tipmap.getKeys().filter(function (item) {
+                if (!item.stage)
+                    return false;
+                return item.getTransformedBounds(item.stage).contains(event.clientX, event.clientY);
+            });
+            var displayObject = displayObjects[0];
+            if (displayObject) {
+                var tip = this.tipmap.get(displayObject);
+                var tipviewcls = this.tipviewmap.get(tip.constructor);
+                if (!tipviewcls)
+                    tipviewcls = this.defaultTipview();
+                if (this.tipView) {
+                    if (!(this.tipView instanceof tipviewcls)) {
+                        this.removeTipview();
+                    }
+                }
+                if (!this.tipView) {
+                    this.tipView = new tipviewcls();
+                }
+                editor.editorui.tooltipLayer.addChild(this.tipView);
+                this.tipView.value = tip;
+                this.tipView.x = event.clientX;
+                this.tipView.y = event.clientY - this.tipView.height;
+            }
+            else {
+                this.removeTipview();
+            }
+        };
+        ToolTip.prototype.removeTipview = function () {
+            if (this.tipView) {
+                this.tipView.parent.removeChild(this.tipView);
+                this.tipView = null;
+            }
+        };
+        return ToolTip;
+    }());
+    editor.ToolTip = ToolTip;
+    editor.toolTip = new ToolTip();
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * String 提示框
+     */
+    var TipString = /** @class */ (function (_super) {
+        __extends(TipString, _super);
+        function TipString() {
+            var _this = _super.call(this) || this;
+            _this.value = "";
+            _this.skinName = "TipString";
+            return _this;
+        }
+        TipString.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.txtLab.text = String(this.value);
+        };
+        TipString.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        TipString.prototype.valuechanged = function () {
+            if (this.txtLab) {
+                this.txtLab.text = String(this.value);
+            }
+        };
+        __decorate([
+            feng3d.watch("valuechanged")
+        ], TipString.prototype, "value", void 0);
+        return TipString;
+    }(eui.Component));
+    editor.TipString = TipString;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     /**
      * 默认基础对象界面
      * @author feng 2016-3-11
@@ -2947,10 +3064,13 @@ var editor;
                 else
                     this.labelLab.text = this._attributeName;
             }
+            if (componentParam)
+                editor.toolTip.register(this.labelLab, componentParam.tooltip);
             this.initView();
             this.updateView();
         };
         OAVBase.prototype.$onRemoveFromStage = function () {
+            editor.toolTip.unregister(this.labelLab);
             _super.prototype.$onRemoveFromStage.call(this);
             this.dispose();
         };
@@ -10521,6 +10641,11 @@ var editor;
                 maskLayer.touchEnabled = false;
                 _this.stage.addChild(maskLayer);
                 editor.editorui.maskLayer = maskLayer;
+                //
+                var tooltipLayer = new eui.UILayer();
+                tooltipLayer.touchEnabled = false;
+                _this.stage.addChild(tooltipLayer);
+                editor.editorui.tooltipLayer = tooltipLayer;
                 //
                 var popupLayer = new eui.UILayer();
                 popupLayer.touchEnabled = false;

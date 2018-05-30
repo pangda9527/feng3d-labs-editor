@@ -48,6 +48,9 @@
         "src/ui/components/ComponentView.ts",
         "src/ui/components/ParticleComponentView.ts",
         "src/ui/components/Menu.ts",
+        "src/ui/components/ToolTip.ts",
+        // tipviews
+        "src/ui/components/tipviews/TipString.ts",
         //
         "src/objectview/ov/OVBaseDefault.ts",
         "src/objectview/ov/OVDefault.ts",

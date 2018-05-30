@@ -658,6 +658,43 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    var toolTip: ToolTip;
+    interface ITipView extends egret.DisplayObject {
+        value: any;
+    }
+    class ToolTip {
+        /**
+         * 默认 提示界面
+         */
+        defaultTipview: () => typeof TipString;
+        /**
+         * tip界面映射表，{key:数据类定义,value:界面类定义}，例如 {key:String,value:TipString}
+         */
+        tipviewmap: Map<any, new () => ITipView>;
+        private tipmap;
+        private tipView;
+        register(displayObject: egret.DisplayObject, tip: any): void;
+        unregister(displayObject: egret.DisplayObject): void;
+        private ischeck;
+        private _ischeck;
+        private onMouseMove(event);
+        private removeTipview();
+    }
+}
+declare namespace editor {
+    /**
+     * String 提示框
+     */
+    class TipString extends eui.Component implements eui.UIComponent {
+        txtLab: eui.Label;
+        constructor();
+        value: string;
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        private valuechanged();
+    }
+}
+declare namespace editor {
     /**
      * 默认基础对象界面
      * @author feng 2016-3-11
@@ -1545,6 +1582,7 @@ declare namespace editor {
         stage: egret.Stage;
         assetsview: AssetsView;
         mainview: MainView;
+        tooltipLayer: eui.UILayer;
         maskLayer: eui.UILayer;
         popupLayer: eui.UILayer;
         /**

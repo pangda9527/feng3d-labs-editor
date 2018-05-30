@@ -5,6 +5,7 @@ namespace editor
         stage: egret.Stage;
         assetsview: AssetsView;
         mainview: MainView;
+        tooltipLayer: eui.UILayer;
         maskLayer: eui.UILayer;
         popupLayer: eui.UILayer;
 

@@ -25,6 +25,11 @@ namespace editor
                 this.stage.addChild(maskLayer);
                 editorui.maskLayer = maskLayer;
                 //
+                var tooltipLayer = new eui.UILayer();
+                tooltipLayer.touchEnabled = false;
+                this.stage.addChild(tooltipLayer);
+                editorui.tooltipLayer = tooltipLayer;
+                //
                 var popupLayer = new eui.UILayer();
                 popupLayer.touchEnabled = false;
                 this.stage.addChild(popupLayer);
