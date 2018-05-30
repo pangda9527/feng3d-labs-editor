@@ -44,18 +44,24 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
 
-            if (this.attributeViewInfo.componentParam)
+            var componentParam = this.attributeViewInfo.componentParam;
+            if (componentParam)
             {
-                for (var key in this.attributeViewInfo.componentParam)
+                for (var key in componentParam)
                 {
-                    if (this.attributeViewInfo.componentParam.hasOwnProperty(key))
+                    if (this.hasOwnProperty(key))
                     {
-                        this[key] = this.attributeViewInfo.componentParam[key];
+                        this[key] = componentParam[key];
                     }
                 }
             }
             if (this.label)
-                this.label.text = this._attributeName;
+            {
+                if (componentParam && componentParam.label)
+                    this.label.text = componentParam.label;
+                else
+                    this.label.text = this._attributeName;
+            }
 
             this.initView();
             this.updateView();

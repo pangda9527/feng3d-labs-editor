@@ -15,10 +15,15 @@ namespace editor
 		}
 		set vm(v)
 		{
-			this._vm.copy(v);
+			if (v)
+				this._vm = v;
+			else
+				this._vm = new feng3d.Vector3(1, 2, 3);
+
+			this.showw = v instanceof feng3d.Vector4;
 			this.updateView();
 		}
-		private _vm = new feng3d.Vector3(1, 2, 3);
+		private _vm: feng3d.Vector3 | feng3d.Vector4 = new feng3d.Vector3(1, 2, 3);
 
 		constructor()
 		{
@@ -100,7 +105,8 @@ namespace editor
 			this.xTextInput.text = "" + this.vm.x;
 			this.yTextInput.text = "" + this.vm.y;
 			this.zTextInput.text = "" + this.vm.z;
-			// this.wTextInput.text = "" + this.vm.w;
+			if (this.vm instanceof feng3d.Vector4)
+				this.wTextInput.text = "" + this.vm.w;
 		}
 
 		private onTextChange(event: egret.Event)
@@ -119,7 +125,8 @@ namespace editor
 					this.vm.z = Number(this.zTextInput.text);
 					break;
 				case this.wTextInput:
-					// this.vm.w = Number(this.wTextInput.text);
+					if (this.vm instanceof feng3d.Vector4)
+						this.wTextInput.text = "" + this.vm.w;
 					break;
 			}
 		}

@@ -548,7 +548,7 @@ declare namespace editor {
         zTextInput: eui.TextInput;
         wGroup: eui.Group;
         wTextInput: eui.TextInput;
-        vm: feng3d.Vector3;
+        vm: feng3d.Vector3 | feng3d.Vector4;
         private _vm;
         constructor();
         showw: any;

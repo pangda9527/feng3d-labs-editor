@@ -1987,7 +1987,11 @@ var editor;
                 return this._vm;
             },
             set: function (v) {
-                this._vm.copy(v);
+                if (v)
+                    this._vm = v;
+                else
+                    this._vm = new feng3d.Vector3(1, 2, 3);
+                this.showw = v instanceof feng3d.Vector4;
                 this.updateView();
             },
             enumerable: true,
@@ -2049,7 +2053,8 @@ var editor;
             this.xTextInput.text = "" + this.vm.x;
             this.yTextInput.text = "" + this.vm.y;
             this.zTextInput.text = "" + this.vm.z;
-            // this.wTextInput.text = "" + this.vm.w;
+            if (this.vm instanceof feng3d.Vector4)
+                this.wTextInput.text = "" + this.vm.w;
         };
         Vector3DView.prototype.onTextChange = function (event) {
             if (!this._textfocusintxt)
@@ -2065,7 +2070,8 @@ var editor;
                     this.vm.z = Number(this.zTextInput.text);
                     break;
                 case this.wTextInput:
-                    // this.vm.w = Number(this.wTextInput.text);
+                    if (this.vm instanceof feng3d.Vector4)
+                        this.wTextInput.text = "" + this.vm.w;
                     break;
             }
         };
@@ -2925,15 +2931,20 @@ var editor;
         });
         OAVBase.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            if (this.attributeViewInfo.componentParam) {
-                for (var key in this.attributeViewInfo.componentParam) {
-                    if (this.attributeViewInfo.componentParam.hasOwnProperty(key)) {
-                        this[key] = this.attributeViewInfo.componentParam[key];
+            var componentParam = this.attributeViewInfo.componentParam;
+            if (componentParam) {
+                for (var key in componentParam) {
+                    if (this.hasOwnProperty(key)) {
+                        this[key] = componentParam[key];
                     }
                 }
             }
-            if (this.label)
-                this.label.text = this._attributeName;
+            if (this.label) {
+                if (componentParam && componentParam.label)
+                    this.label.text = componentParam.label;
+                else
+                    this.label.text = this._attributeName;
+            }
             this.initView();
             this.updateView();
         };
