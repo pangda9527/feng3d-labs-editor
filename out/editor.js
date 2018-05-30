@@ -10282,6 +10282,11 @@ var editor;
                         addToHierarchy(feng3d.gameObjectFactory.createTerrain());
                     }
                 },
+                {
+                    label: "水", click: function () {
+                        addToHierarchy(feng3d.gameObjectFactory.createWater());
+                    }
+                },
             ],
         },
         {
