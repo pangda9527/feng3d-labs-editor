@@ -93,7 +93,7 @@ namespace editor
                             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: element });
                         }
                     });
-                    if (editorAssets.showFloder == path)
+                    if (editorAssets.showFloder == path && path != editorAssets.assetsPath)
                     {
                         editorAssets.showFloder = feng3d.pathUtils.getParentPath(path);
                     }

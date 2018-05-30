@@ -4310,7 +4310,7 @@ var editor;
                             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: element });
                         }
                     });
-                    if (editor.editorAssets.showFloder == path) {
+                    if (editor.editorAssets.showFloder == path && path != editor.editorAssets.assetsPath) {
                         editor.editorAssets.showFloder = feng3d.pathUtils.getParentPath(path);
                     }
                 }
