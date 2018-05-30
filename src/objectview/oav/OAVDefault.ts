@@ -64,12 +64,12 @@ namespace editor
 		}
 
 		private _textfocusintxt: boolean;
-		private ontxtfocusin()
+		protected ontxtfocusin()
 		{
 			this._textfocusintxt = true;
 		}
 
-		private ontxtfocusout()
+		protected ontxtfocusout()
 		{
 			this._textfocusintxt = false;
 		}

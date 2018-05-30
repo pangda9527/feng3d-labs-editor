@@ -876,8 +876,8 @@ declare namespace editor {
         initView(): void;
         dispose(): void;
         private _textfocusintxt;
-        private ontxtfocusin();
-        private ontxtfocusout();
+        protected ontxtfocusin(): void;
+        protected ontxtfocusout(): void;
         /**
          * 更新界面
          */
@@ -902,12 +902,33 @@ declare namespace editor {
      * @author feng 2016-3-10
      */
     class OAVNumber extends OAVDefault {
-        fractionDigits: number;
+        /**
+         * 步长，精度
+         */
+        step: number;
+        /**
+         * 键盘上下方向键步长
+         */
+        stepDownup: number;
+        /**
+         * 移动一个像素时增加的步长数量
+         */
+        stepScale: number;
         attributeValue: number;
+        initView(): void;
+        dispose(): void;
         /**
          * 更新界面
          */
         updateView(): void;
+        private mouseDownPosition;
+        private mouseDownValue;
+        private onMouseDown(e);
+        private onStageMouseMove(e);
+        private onStageMouseUp();
+        protected ontxtfocusin(): void;
+        protected ontxtfocusout(): void;
+        private onWindowKeyDown(event);
     }
 }
 declare namespace editor {

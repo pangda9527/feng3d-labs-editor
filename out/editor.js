@@ -3264,16 +3264,68 @@ var editor;
         __extends(OAVNumber, _super);
         function OAVNumber() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.fractionDigits = 3;
+            /**
+             * 步长，精度
+             */
+            _this.step = 0.001;
+            /**
+             * 键盘上下方向键步长
+             */
+            _this.stepDownup = 0.001;
+            /**
+             * 移动一个像素时增加的步长数量
+             */
+            _this.stepScale = 1;
+            _this.mouseDownPosition = new feng3d.Vector2();
+            _this.mouseDownValue = 0;
             return _this;
         }
+        OAVNumber.prototype.initView = function () {
+            _super.prototype.initView.call(this);
+            this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+        };
+        OAVNumber.prototype.dispose = function () {
+            this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            _super.prototype.dispose.call(this);
+        };
         /**
          * 更新界面
          */
         OAVNumber.prototype.updateView = function () {
-            var pow = Math.pow(10, 3);
-            var value = Math.round(this.attributeValue * pow) / pow;
-            this.text.text = String(value);
+            var fractionDigits = 0;
+            while (Math.pow(10, fractionDigits) * this.step < 1) {
+                fractionDigits++;
+            }
+            this.text.text = (Math.round(this.attributeValue / this.step) * this.step).toFixed(fractionDigits);
+        };
+        OAVNumber.prototype.onMouseDown = function (e) {
+            this.mouseDownPosition.init(e.stageX, e.stageY);
+            this.mouseDownValue = this.attributeValue;
+            editor.editorui.stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onStageMouseMove, this);
+            editor.editorui.stage.addEventListener(egret.MouseEvent.MOUSE_UP, this.onStageMouseUp, this);
+        };
+        OAVNumber.prototype.onStageMouseMove = function (e) {
+            this.attributeValue = this.mouseDownValue + ((e.stageX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - e.stageY)) * this.step * this.stepScale;
+        };
+        OAVNumber.prototype.onStageMouseUp = function () {
+            editor.editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onStageMouseMove, this);
+            editor.editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onStageMouseUp, this);
+        };
+        OAVNumber.prototype.ontxtfocusin = function () {
+            _super.prototype.ontxtfocusin.call(this);
+            feng3d.windowEventProxy.on("keydown", this.onWindowKeyDown, this);
+        };
+        OAVNumber.prototype.ontxtfocusout = function () {
+            _super.prototype.ontxtfocusout.call(this);
+            feng3d.windowEventProxy.off("keydown", this.onWindowKeyDown, this);
+        };
+        OAVNumber.prototype.onWindowKeyDown = function (event) {
+            if (event.key == "ArrowUp") {
+                this.attributeValue += this.step;
+            }
+            else if (event.key == "ArrowDown") {
+                this.attributeValue -= this.step;
+            }
         };
         OAVNumber = __decorate([
             feng3d.OAVComponent()
