@@ -41,12 +41,9 @@ namespace editor
 		 */
 		updateView(): void
 		{
-			var fractionDigits = 0;
-			while (Math.pow(10, fractionDigits) * this.step < 1)
-			{
-				fractionDigits++;
-			}
-			this.text.text = (Math.round(this.attributeValue / this.step) * this.step).toFixed(fractionDigits);
+			// 消除数字显示为类似 0.0000000001 的问题
+			var fractionDigits = 1; while (fractionDigits * this.step < 1) { fractionDigits *= 10; }
+			this.text.text = String(Math.round(fractionDigits * (Math.round(this.attributeValue / this.step) * this.step)) / fractionDigits);
 		}
 
 		private mouseDownPosition = new feng3d.Vector2();
