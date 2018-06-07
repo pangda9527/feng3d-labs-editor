@@ -317,6 +317,12 @@ namespace editor
                 ]
             },
             {
+                label: "Graphics",
+                submenu: [
+                    { label: "Water", click: () => { gameobject.addComponent(feng3d.Water); } },
+                ]
+            },
+            {
                 label: "Script",
                 submenu: [
                     { label: "Script", click: () => { gameobject.addComponent(feng3d.ScriptComponent); } },
