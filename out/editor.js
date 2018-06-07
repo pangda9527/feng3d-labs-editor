@@ -3064,7 +3064,7 @@ var editor;
                 else
                     this.labelLab.text = this._attributeName;
             }
-            if (componentParam)
+            if (componentParam && componentParam.tooltip)
                 editor.toolTip.register(this.labelLab, componentParam.tooltip);
             this.initView();
             this.updateView();

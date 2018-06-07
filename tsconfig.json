@@ -8,7 +8,7 @@
         "outFile": "out/editor.js"
     },
     "files": [
-        "../engine/out/feng3d.d.ts", //debug
+        "../feng3d/out/feng3d.d.ts", //debug
         //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",

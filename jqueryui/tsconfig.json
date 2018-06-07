@@ -8,7 +8,7 @@
     "outFile": "out/app.js"
   },
   "files": [
-    "../../engine/out/feng3d.d.ts", //debug
+    "../../feng3d/out/feng3d.d.ts", //debug
     "../libs/jquery.d.ts",
     "../libs/jquery-ui.d.ts",
     //
