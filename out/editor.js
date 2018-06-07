@@ -10396,6 +10396,11 @@ var editor;
                         openDownloadProject("customshader.feng3d.zip");
                     },
                 },
+                {
+                    label: "水", click: function () {
+                        openDownloadProject("water.feng3d.zip");
+                    },
+                },
             ],
         },
         {
@@ -10409,6 +10414,11 @@ var editor;
                 {
                     label: "自定义材质", click: function () {
                         downloadProject("customshader.feng3d.zip");
+                    },
+                },
+                {
+                    label: "水", click: function () {
+                        downloadProject("water.feng3d.zip");
                     },
                 },
             ],

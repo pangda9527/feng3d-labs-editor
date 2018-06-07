@@ -85,6 +85,12 @@ namespace editor
                         openDownloadProject("customshader.feng3d.zip");
                     },
                 },
+                {
+                    label: "水", click: () =>
+                    {
+                        openDownloadProject("water.feng3d.zip");
+                    },
+                },
             ],
         },
         {
@@ -100,6 +106,12 @@ namespace editor
                     label: "自定义材质", click: () =>
                     {
                         downloadProject("customshader.feng3d.zip");
+                    },
+                },
+                {
+                    label: "水", click: () =>
+                    {
+                        downloadProject("water.feng3d.zip");
                     },
                 },
             ],
