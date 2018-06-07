@@ -4256,6 +4256,9 @@ var editor;
                     var viewData = this.viewData;
                     viewData.showInspectorData(function (showdata) {
                         if (viewData == _this.viewData) {
+                            if (_this.view && _this.view.parent) {
+                                _this.view.parent.removeChild(_this.view);
+                            }
                             _this.view = feng3d.objectview.getObjectView(showdata);
                             _this.view.percentWidth = 100;
                             _this.group.addChild(_this.view);

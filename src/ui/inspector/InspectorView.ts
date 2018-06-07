@@ -74,6 +74,10 @@ namespace editor
 					{
 						if (viewData == this.viewData)
 						{
+							if (this.view && this.view.parent)
+							{
+								this.view.parent.removeChild(this.view);
+							}
 							this.view = feng3d.objectview.getObjectView(showdata);
 							this.view.percentWidth = 100;
 							this.group.addChild(this.view);
@@ -85,7 +89,6 @@ namespace editor
 					this.view.percentWidth = 100;
 					this.group.addChild(this.view);
 				}
-
 			}
 		}
 
