@@ -36,7 +36,7 @@ export class NativeFS implements feng3d.ReadWriteFS
      * @param path 路径
      * @param callback 读取完成回调 当err不为null时表示读取失败
      */
-    readFile(path: string, callback: (err, data: ArrayBuffer) => void)
+    readFile(path: string, callback: (err: Error, data: ArrayBuffer) => void)
     {
         if (path.charAt(path.length - 1) == "/")
         {
@@ -122,7 +122,7 @@ export class NativeFS implements feng3d.ReadWriteFS
      * @param path 文件路径
      * @param callback 回调函数
      */
-    deleteFile(path: string, callback: (err) => void): void
+    deleteFile(path: string, callback: (err: Error) => void): void
     {
         this.getAbsolutePath(path, (err, absolutePath) =>
         {
