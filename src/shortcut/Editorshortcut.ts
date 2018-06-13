@@ -198,7 +198,7 @@ namespace editor
         var selectedGameObject = editorData.firstSelectedGameObject;
         if (selectedGameObject)
         {
-            var worldBounds = selectedGameObject.getComponent(feng3d.BoundingComponent).worldBounds;
+            var worldBounds = selectedGameObject.getComponent(feng3d.Bounding).worldBounds;
             var size = 1;
             if (worldBounds)
                 size = worldBounds.getSize().length;
