@@ -78,7 +78,7 @@ namespace editor
             //
             var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
             engine = new EditorEngine(canvas, null, editorCamera);
-            engine.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
+            engine.scene.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
             //
             editorAssets.runProjectScript(() =>
             {
