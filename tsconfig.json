@@ -121,7 +121,6 @@
         "src/feng3d/EditorComponent.ts",
         "src/navigation/Navigation.ts",
         "src/navigation/ThreeBSP.ts",
-        "src/navigation/GeometryOperation.ts",
         "src/navigation/NavigationProcess.ts",
         //
         "src/global/EgretExtend.ts",

@@ -2310,8 +2310,6 @@ declare namespace feng3d {
         clipTo(node: ThreeBSPNode): this;
     }
 }
-declare namespace feng3d {
-}
 declare namespace navigation {
     class NavigationProcess {
         private data;
