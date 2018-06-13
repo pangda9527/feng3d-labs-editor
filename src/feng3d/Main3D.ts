@@ -57,7 +57,6 @@ namespace editor
             editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
             editorObject = feng3d.GameObject.create("editorObject");
-            editorObject.flag = feng3d.GameObjectFlag.editor;
             editorObject.serializable = false;
             editorObject.showinHierarchy = false;
             editorObject.addComponent(SceneRotateTool);
@@ -78,7 +77,6 @@ namespace editor
             //
             var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
             engine = new EditorEngine(canvas, null, editorCamera);
-            engine.scene.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
             //
             editorAssets.runProjectScript(() =>
             {

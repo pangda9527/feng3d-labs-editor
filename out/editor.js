@@ -8225,7 +8225,6 @@ var editor;
             editor.editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
             editorObject = feng3d.GameObject.create("editorObject");
-            editorObject.flag = feng3d.GameObjectFlag.editor;
             editorObject.serializable = false;
             editorObject.showinHierarchy = false;
             editorObject.addComponent(editor.SceneRotateTool);
@@ -8243,7 +8242,6 @@ var editor;
             //
             var canvas = document.getElementById("glcanvas");
             editor.engine = new EditorEngine(canvas, null, editor.editorCamera);
-            editor.engine.scene.renderObjectflag = feng3d.GameObjectFlag.feng3d | feng3d.GameObjectFlag.editor;
             //
             editor.editorAssets.runProjectScript(function () {
                 editor.editorAssets.readScene("default.scene.json", function (err, scene) {
