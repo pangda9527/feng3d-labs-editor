@@ -1,4 +1,4 @@
-/// <reference path="libs/feng3d.d.ts" />
+/// <reference path="../feng3d/out/feng3d.d.ts" />
 /// <reference path="out/editor.d.ts" />
 /// <reference path="libs/monaco-editor/monaco.d.ts" />
 
