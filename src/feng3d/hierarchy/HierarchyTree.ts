@@ -121,7 +121,13 @@ namespace editor
                 var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
                 if (wireframeComponent)
                     element.removeComponent(wireframeComponent);
-                this.getNode(element).selected = false;
+                var node = this.getNode(element);
+                if (!node)
+                {
+                    // 为什么为空，是否被允许？
+                    debugger;
+                }
+                node.selected = false;
             });
             this.selectedGameObjects = editorData.selectedGameObjects;
             this.selectedGameObjects.forEach(element =>

@@ -210,7 +210,7 @@ var monacoEditor;
                     monaco.languages.typescript.typescriptDefaults.addExtraLib(item.code, item.path);
             });
 
-            loadLibs(['libs/feng3d.d.ts'], () =>
+            loadLibs(['https://unpkg.com/feng3d/out/feng3d.d.ts'], () =>
             {
                 monacoEditor = monaco.editor.create(document.getElementById('container'), {
                     model: null,

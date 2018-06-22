@@ -5710,7 +5710,7 @@ var editor;
     editor.AssetsFileTemplates = AssetsFileTemplates;
     editor.assetsFileTemplates = new AssetsFileTemplates();
     var scriptTemplate = "\nclass NewScript extends feng3d.Script\n{\n\n    /** \n     * \u6D4B\u8BD5\u5C5E\u6027 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    t_attr = new feng3d.Color4();\n\n    /**\n     * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n     */\n    init()\n    {\n\n    }\n\n    /**\n     * \u66F4\u65B0\n     */\n    update()\n    {\n\n    }\n\n    /**\n     * \u9500\u6BC1\u65F6\u8C03\u7528\n     */\n    dispose()\n    {\n\n    }\n}";
-    var shaderTemplate = "\nclass NewShaderUniforms\n{\n    /** \n     * \u989C\u8272 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    u_color = new feng3d.Color4();\n}\n\nfeng3d.shaderConfig.shaders[\"NewShader\"] = {\n    cls: NewShaderUniforms,\n    vertex: `\n    \n    attribute vec3 a_position;\n    \n    uniform mat4 u_modelMatrix;\n    uniform mat4 u_viewProjection;\n    \n    void main(void) {\n    \n        vec4 globalPosition = u_modelMatrix * vec4(a_position, 1.0);\n        gl_Position = u_viewProjection * globalPosition;\n    }`,\n    fragment: `\n    \n    precision mediump float;\n    \n    uniform vec4 u_color;\n    \n    void main(void) {\n        \n        gl_FragColor = u_color;\n    }\n    `,\n};\n\ntype NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };\ninterface MaterialFactory\n{\n    create(shader: \"NewShader\", raw?: NewShaderMaterialRaw): NewShaderMaterial;\n}\n\ninterface MaterialRawMap\n{\n    NewShader: NewShaderMaterialRaw\n}\n\ninterface NewShaderMaterialRaw extends feng3d.MaterialBaseRaw\n{\n    shaderName?: \"NewShader\",\n    uniforms?: NewShaderUniformsRaw;\n}\n\ninterface NewShaderUniformsRaw\n{\n    __class__?: \"feng3d.NewShaderUniforms\",\n    u_time?: number,\n}";
+    var shaderTemplate = "\nclass NewShaderUniforms\n{\n    /** \n     * \u989C\u8272 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    u_color = new feng3d.Color4();\n}\n\nfeng3d.shaderConfig.shaders[\"NewShader\"] = {\n    cls: NewShaderUniforms,\n    vertex: `\n    \n    attribute vec3 a_position;\n    \n    uniform mat4 u_modelMatrix;\n    uniform mat4 u_viewProjection;\n    \n    void main(void) {\n    \n        vec4 globalPosition = u_modelMatrix * vec4(a_position, 1.0);\n        gl_Position = u_viewProjection * globalPosition;\n    }`,\n    fragment: `\n    \n    precision mediump float;\n    \n    uniform vec4 u_color;\n    \n    void main(void) {\n        \n        gl_FragColor = u_color;\n    }\n    `,\n};\n\ntype NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };\ninterface MaterialFactory\n{\n    create(shader: \"NewShader\", raw?: gPartial<NewShaderMaterial>): NewShaderMaterial;\n}\n\ninterface MaterialRawMap\n{\n    NewShader: gPartial<NewShaderMaterial>;\n}";
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -7885,7 +7885,12 @@ var editor;
                 var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
                 if (wireframeComponent)
                     element.removeComponent(wireframeComponent);
-                _this.getNode(element).selected = false;
+                var node = _this.getNode(element);
+                if (!node) {
+                    // 为什么为空，是否被允许？
+                    debugger;
+                }
+                node.selected = false;
             });
             this.selectedGameObjects = editor.editorData.selectedGameObjects;
             this.selectedGameObjects.forEach(function (element) {
