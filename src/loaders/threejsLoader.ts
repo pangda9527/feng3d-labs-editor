@@ -318,7 +318,7 @@ namespace editor
 
         perspectiveLen.near = perspectiveCamera.near;
         perspectiveLen.far = perspectiveCamera.far;
-        perspectiveLen.aspectRatio = perspectiveCamera.aspect;
+        perspectiveLen.aspect = perspectiveCamera.aspect;
         perspectiveLen.fov = perspectiveCamera.fov;
 
         return perspectiveLen;
