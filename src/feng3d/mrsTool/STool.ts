@@ -20,20 +20,20 @@ namespace editor
         {
             super.onAddedToScene();
 
-            this.toolModel.xCube.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yCube.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zCube.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.oCube.gameObject.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xCube.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yCube.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zCube.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.on("mousedown", this.onItemMouseDown, this);
         }
 
         protected onRemovedFromScene()
         {
             super.onRemovedFromScene();
 
-            this.toolModel.xCube.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yCube.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zCube.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.oCube.gameObject.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xCube.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yCube.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zCube.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
         }
 
         protected onItemMouseDown(event: feng3d.Event<any>)

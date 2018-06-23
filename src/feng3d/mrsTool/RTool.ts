@@ -16,22 +16,22 @@ namespace editor
         {
             super.onAddedToScene();
 
-            this.toolModel.xAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.freeAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.cameraAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.freeAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.cameraAxis.on("mousedown", this.onItemMouseDown, this);
         }
 
         protected onRemovedFromScene()
         {
             super.onRemovedFromScene();
 
-            this.toolModel.xAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.freeAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.cameraAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.freeAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.cameraAxis.off("mousedown", this.onItemMouseDown, this);
         }
 
 

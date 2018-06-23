@@ -18,10 +18,10 @@ namespace editor
         set showGameObject(value)
         {
             if (this._showGameObject)
-                this._showGameObject.gameObject.off("scenetransformChanged", this.onShowObjectTransformChanged, this);
+                this._showGameObject.off("scenetransformChanged", this.onShowObjectTransformChanged, this);
             this._showGameObject = value;
             if (this._showGameObject)
-                this._showGameObject.gameObject.on("scenetransformChanged", this.onShowObjectTransformChanged, this);
+                this._showGameObject.on("scenetransformChanged", this.onShowObjectTransformChanged, this);
         }
 
         get controllerTool()

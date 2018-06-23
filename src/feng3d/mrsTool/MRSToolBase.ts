@@ -21,8 +21,8 @@ namespace editor
             holdSizeComponent.holdSize = 1;
             holdSizeComponent.camera = editorCamera;
             //
-            this.gameObject.on("addedToScene", this.onAddedToScene, this);
-            this.gameObject.on("removedFromScene", this.onRemovedFromScene, this);
+            this.on("addedToScene", this.onAddedToScene, this);
+            this.on("removedFromScene", this.onRemovedFromScene, this);
         }
 
         protected onAddedToScene()

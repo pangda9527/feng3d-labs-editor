@@ -6280,10 +6280,10 @@ var editor;
             },
             set: function (value) {
                 if (this._showGameObject)
-                    this._showGameObject.gameObject.off("scenetransformChanged", this.onShowObjectTransformChanged, this);
+                    this._showGameObject.off("scenetransformChanged", this.onShowObjectTransformChanged, this);
                 this._showGameObject = value;
                 if (this._showGameObject)
-                    this._showGameObject.gameObject.on("scenetransformChanged", this.onShowObjectTransformChanged, this);
+                    this._showGameObject.on("scenetransformChanged", this.onShowObjectTransformChanged, this);
             },
             enumerable: true,
             configurable: true
@@ -7099,8 +7099,8 @@ var editor;
             holdSizeComponent.holdSize = 1;
             holdSizeComponent.camera = editor.editorCamera;
             //
-            this.gameObject.on("addedToScene", this.onAddedToScene, this);
-            this.gameObject.on("removedFromScene", this.onRemovedFromScene, this);
+            this.on("addedToScene", this.onAddedToScene, this);
+            this.on("removedFromScene", this.onRemovedFromScene, this);
         };
         MRSToolBase.prototype.onAddedToScene = function () {
             this._gameobjectControllerTarget.controllerTool = this.transform;
@@ -7212,23 +7212,23 @@ var editor;
         };
         MTool.prototype.onAddedToScene = function () {
             _super.prototype.onAddedToScene.call(this);
-            this.toolModel.xAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yzPlane.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.xzPlane.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.xyPlane.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.oCube.gameObject.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yzPlane.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xzPlane.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xyPlane.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.on("mousedown", this.onItemMouseDown, this);
         };
         MTool.prototype.onRemovedFromScene = function () {
             _super.prototype.onRemovedFromScene.call(this);
-            this.toolModel.xAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yzPlane.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.xzPlane.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.xyPlane.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.oCube.gameObject.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yzPlane.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xzPlane.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xyPlane.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
         };
         MTool.prototype.onItemMouseDown = function (event) {
             if (!editor.engine.mouseinview)
@@ -7346,19 +7346,19 @@ var editor;
         };
         RTool.prototype.onAddedToScene = function () {
             _super.prototype.onAddedToScene.call(this);
-            this.toolModel.xAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.freeAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.cameraAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.freeAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.cameraAxis.on("mousedown", this.onItemMouseDown, this);
         };
         RTool.prototype.onRemovedFromScene = function () {
             _super.prototype.onRemovedFromScene.call(this);
-            this.toolModel.xAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.freeAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.cameraAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.freeAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.cameraAxis.off("mousedown", this.onItemMouseDown, this);
         };
         RTool.prototype.onItemMouseDown = function (event) {
             if (!editor.engine.mouseinview)
@@ -7502,17 +7502,17 @@ var editor;
         };
         STool.prototype.onAddedToScene = function () {
             _super.prototype.onAddedToScene.call(this);
-            this.toolModel.xCube.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yCube.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zCube.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.oCube.gameObject.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xCube.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yCube.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zCube.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.on("mousedown", this.onItemMouseDown, this);
         };
         STool.prototype.onRemovedFromScene = function () {
             _super.prototype.onRemovedFromScene.call(this);
-            this.toolModel.xCube.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yCube.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zCube.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.oCube.gameObject.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xCube.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yCube.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zCube.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
         };
         STool.prototype.onItemMouseDown = function (event) {
             if (!editor.engine.mouseinview)
@@ -8330,15 +8330,15 @@ var editor;
         }
         EditorComponent.prototype.init = function (gameobject) {
             _super.prototype.init.call(this, gameobject);
-            this.gameObject.on("addedToScene", this.onAddedToScene, this);
-            this.gameObject.on("removedFromScene", this.onRemovedFromScene, this);
+            this.on("addedToScene", this.onAddedToScene, this);
+            this.on("removedFromScene", this.onRemovedFromScene, this);
         };
         /**
          * 销毁
          */
         EditorComponent.prototype.dispose = function () {
-            this.gameObject.off("addedToScene", this.onAddedToScene, this);
-            this.gameObject.off("removedFromScene", this.onRemovedFromScene, this);
+            this.off("addedToScene", this.onAddedToScene, this);
+            this.off("removedFromScene", this.onRemovedFromScene, this);
             this.onRemovedFromScene();
             _super.prototype.dispose.call(this);
         };

@@ -24,25 +24,25 @@ namespace editor
         protected onAddedToScene()
         {
             super.onAddedToScene();
-            this.toolModel.xAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zAxis.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yzPlane.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.xzPlane.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.xyPlane.gameObject.on("mousedown", this.onItemMouseDown, this);
-            this.toolModel.oCube.gameObject.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zAxis.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yzPlane.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xzPlane.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xyPlane.on("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.on("mousedown", this.onItemMouseDown, this);
         }
 
         protected onRemovedFromScene()
         {
             super.onRemovedFromScene();
-            this.toolModel.xAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.zAxis.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.yzPlane.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.xzPlane.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.xyPlane.gameObject.off("mousedown", this.onItemMouseDown, this);
-            this.toolModel.oCube.gameObject.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.zAxis.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.yzPlane.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xzPlane.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.xyPlane.off("mousedown", this.onItemMouseDown, this);
+            this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
         }
 
         protected onItemMouseDown(event: feng3d.Event<any>)

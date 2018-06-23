@@ -10,8 +10,8 @@ namespace editor
         {
             super.init(gameobject);
 
-            this.gameObject.on("addedToScene", this.onAddedToScene, this);
-            this.gameObject.on("removedFromScene", this.onRemovedFromScene, this);
+            this.on("addedToScene", this.onAddedToScene, this);
+            this.on("removedFromScene", this.onRemovedFromScene, this);
         }
 
         /**
@@ -19,8 +19,8 @@ namespace editor
          */
         dispose()
         {
-            this.gameObject.off("addedToScene", this.onAddedToScene, this);
-            this.gameObject.off("removedFromScene", this.onRemovedFromScene, this);
+            this.off("addedToScene", this.onAddedToScene, this);
+            this.off("removedFromScene", this.onRemovedFromScene, this);
 
             this.onRemovedFromScene();
 
