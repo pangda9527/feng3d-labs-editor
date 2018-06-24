@@ -8031,32 +8031,32 @@ var editor;
                     editor.menu.popup([
                         {
                             label: "左视图", click: function () {
-                                onclick({ type: "click", currentTarget: arrowsX, data: null });
+                                clickItem(arrowsX);
                             }
                         },
                         {
                             label: "右视图", click: function () {
-                                onclick({ type: "click", currentTarget: arrowsNX, data: null });
+                                clickItem(arrowsNX);
                             }
                         },
                         {
                             label: "顶视图", click: function () {
-                                onclick({ type: "click", currentTarget: arrowsY, data: null });
+                                clickItem(arrowsY);
                             }
                         },
                         {
                             label: "底视图", click: function () {
-                                onclick({ type: "click", currentTarget: arrowsNY, data: null });
+                                clickItem(arrowsNY);
                             }
                         },
                         {
                             label: "前视图", click: function () {
-                                onclick({ type: "click", currentTarget: arrowsZ, data: null });
+                                clickItem(arrowsZ);
                             }
                         },
                         {
                             label: "后视图", click: function () {
-                                onclick({ type: "click", currentTarget: arrowsNZ, data: null });
+                                clickItem(arrowsNZ);
                             }
                         },
                     ]);
@@ -8074,6 +8074,9 @@ var editor;
                 return { toolEngine: toolEngine, canvas: canvas };
             }
             function onclick(e) {
+                clickItem(e.currentTarget);
+            }
+            function clickItem(item) {
                 var front_view = new feng3d.Vector3(0, 0, 0); //前视图
                 var back_view = new feng3d.Vector3(0, 180, 0); //后视图
                 var right_view = new feng3d.Vector3(0, -90, 0); //右视图
@@ -8081,7 +8084,7 @@ var editor;
                 var top_view = new feng3d.Vector3(-90, 0, 180); //顶视图
                 var bottom_view = new feng3d.Vector3(-90, 180, 0); //底视图
                 var rotation;
-                switch (e.currentTarget) {
+                switch (item) {
                     case arrowsX:
                         rotation = left_view;
                         break;

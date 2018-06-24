@@ -22,7 +22,7 @@ interface OAVBaseMap extends HTMLElementEventMap
 interface OAVBase
 {
     once<K extends keyof OAVBaseMap>(type: K, listener: (event: feng3d.Event<OAVBaseMap[K]>) => void, thisObject?: any, priority?: number): void;
-    dispatch<K extends keyof OAVBaseMap>(type: K, data?: OAVBaseMap[K], bubbles?: boolean);
+    dispatch<K extends keyof OAVBaseMap>(type: K, data?: OAVBaseMap[K], bubbles?: boolean): feng3d.Event<OAVBaseMap[K]>;
     has<K extends keyof OAVBaseMap>(type: K): boolean;
     on<K extends keyof OAVBaseMap>(type: K, listener: (event: feng3d.Event<OAVBaseMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
     off<K extends keyof OAVBaseMap>(type?: K, listener?: (event: feng3d.Event<OAVBaseMap[K]>) => any, thisObject?: any);
@@ -108,7 +108,7 @@ class OAVBase extends ui.Div implements feng3d.IObjectAttributeView
      */
     updateView()
     {
-        
+
     }
 
     get attributeName(): string

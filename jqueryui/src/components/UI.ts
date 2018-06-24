@@ -17,7 +17,7 @@ namespace ui
     interface OAVBase
     {
         once<K extends keyof ElementMap>(type: K, listener: (event: feng3d.Event<ElementMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof ElementMap>(type: K, data?: ElementMap[K], bubbles?: boolean);
+        dispatch<K extends keyof ElementMap>(type: K, data?: ElementMap[K], bubbles?: boolean): feng3d.Event<ElementMap[K]>;
         has<K extends keyof ElementMap>(type: K): boolean;
         on<K extends keyof ElementMap>(type: K, listener: (event: feng3d.Event<ElementMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
         off<K extends keyof ElementMap>(type?: K, listener?: (event: feng3d.Event<ElementMap[K]>) => any, thisObject?: any);
