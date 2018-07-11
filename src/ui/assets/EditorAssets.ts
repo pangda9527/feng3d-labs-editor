@@ -220,7 +220,7 @@ namespace editor
                             {
                                 label: "贴图", click: () =>
                                 {
-                                    assetsFile.addfile("new texture" + ".texture.json", new feng3d.Texture2D());
+                                    assetsFile.addfile("new texture" + ".texture.json", new feng3d.UrlImageTexture2D());
                                 }
                             },
                             {

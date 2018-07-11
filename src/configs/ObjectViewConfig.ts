@@ -13,5 +13,5 @@ namespace editor
     feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
     feng3d.objectview.setDefaultTypeAttributeView("Color3", { component: "OAVColorPicker" });
     feng3d.objectview.setDefaultTypeAttributeView("Color4", { component: "OAVColorPicker" });
-    feng3d.objectview.setDefaultTypeAttributeView("Texture2D", { component: "OAVTexture2D" });
+    feng3d.objectview.setDefaultTypeAttributeView("UrlImageTexture2D", { component: "OAVTexture2D" });
 }

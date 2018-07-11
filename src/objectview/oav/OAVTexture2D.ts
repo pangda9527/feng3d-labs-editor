@@ -45,7 +45,7 @@ namespace editor
                 prev.push({
                     label: item.name, click: () =>
                     {
-                        var text: feng3d.Texture2D = this.attributeValue;
+                        var text: feng3d.UrlImageTexture2D = this.attributeValue;
                         text.url = item.path;
                         this.updateView();
                     }
@@ -54,7 +54,7 @@ namespace editor
             menus.unshift({
                 label: `空`, click: () =>
                 {
-                    var text: feng3d.Texture2D = this.attributeValue;
+                    var text: feng3d.UrlImageTexture2D = this.attributeValue;
                     text.url = "";
                     this.updateView();
                 }
@@ -67,7 +67,7 @@ namespace editor
          */
         updateView(): void
         {
-            var text: feng3d.Texture2D = this.attributeValue;
+            var text: feng3d.UrlImageTexture2D = this.attributeValue;
 
             this.image.visible = false;
             this.img_border.visible = false;

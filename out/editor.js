@@ -4605,7 +4605,7 @@ var editor;
                         { type: "separator" },
                         {
                             label: "贴图", click: function () {
-                                assetsFile.addfile("new texture" + ".texture.json", new feng3d.Texture2D());
+                                assetsFile.addfile("new texture" + ".texture.json", new feng3d.UrlImageTexture2D());
                             }
                         },
                         {
@@ -9759,7 +9759,7 @@ var editor;
             var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
             meshRenderer.geometry = new feng3d.PlaneGeometry({ width: size, height: size, segmentsH: 1, segmentsW: 1, yUp: false });
             var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture");
-            var texture = new feng3d.Texture2D();
+            var texture = new feng3d.UrlImageTexture2D();
             texture.url = editor.editorData.getEditorAssetsPath("assets/3d/icons/sun.png");
             texture.format = feng3d.TextureFormat.RGBA;
             texture.premulAlpha = true;
@@ -10691,7 +10691,7 @@ var editor;
     feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
     feng3d.objectview.setDefaultTypeAttributeView("Color3", { component: "OAVColorPicker" });
     feng3d.objectview.setDefaultTypeAttributeView("Color4", { component: "OAVColorPicker" });
-    feng3d.objectview.setDefaultTypeAttributeView("Texture2D", { component: "OAVTexture2D" });
+    feng3d.objectview.setDefaultTypeAttributeView("UrlImageTexture2D", { component: "OAVTexture2D" });
 })(editor || (editor = {}));
 /**
  * 快捷键配置
