@@ -53,27 +53,26 @@ namespace editor
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.position;
             this.movePlane3D = new feng3d.Plane3D();
-            var selectedGameObject: feng3d.GameObject = <any>event.currentTarget;
-            switch (selectedGameObject)
+            switch (event.currentTarget)
             {
-                case this.toolModel.xAxis.gameObject:
+                case this.toolModel.xAxis:
                     this.selectedItem = this.toolModel.xAxis;
                     this.movePlane3D.fromNormalAndPoint(xDir, pos);
                     break;
-                case this.toolModel.yAxis.gameObject:
+                case this.toolModel.yAxis:
                     this.selectedItem = this.toolModel.yAxis;
                     this.movePlane3D.fromNormalAndPoint(yDir, pos);
                     break;
-                case this.toolModel.zAxis.gameObject:
+                case this.toolModel.zAxis:
                     this.selectedItem = this.toolModel.zAxis;
                     this.selectedItem = this.toolModel.zAxis;
                     this.movePlane3D.fromNormalAndPoint(zDir, pos);
                     break;
-                case this.toolModel.freeAxis.gameObject:
+                case this.toolModel.freeAxis:
                     this.selectedItem = this.toolModel.freeAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir, pos);
                     break;
-                case this.toolModel.cameraAxis.gameObject:
+                case this.toolModel.cameraAxis:
                     this.selectedItem = this.toolModel.cameraAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir, pos);
                     break;

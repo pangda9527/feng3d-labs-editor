@@ -66,41 +66,40 @@ namespace editor
             var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new feng3d.Plane3D();
-            var selectedGameObject: feng3d.GameObject = <any>event.currentTarget;
             //
-            switch (selectedGameObject)
+            switch (event.currentTarget)
             {
-                case this.toolModel.xAxis.gameObject:
+                case this.toolModel.xAxis:
                     this.selectedItem = this.toolModel.xAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(ox).crossTo(ox), po);
                     this.changeXYZ.init(1, 0, 0);
                     break;
-                case this.toolModel.yAxis.gameObject:
+                case this.toolModel.yAxis:
                     this.selectedItem = this.toolModel.yAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oy).crossTo(oy), po);
                     this.changeXYZ.init(0, 1, 0);
                     break;
-                case this.toolModel.zAxis.gameObject:
+                case this.toolModel.zAxis:
                     this.selectedItem = this.toolModel.zAxis;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oz).crossTo(oz), po);
                     this.changeXYZ.init(0, 0, 1);
                     break;
-                case this.toolModel.yzPlane.gameObject:
+                case this.toolModel.yzPlane:
                     this.selectedItem = this.toolModel.yzPlane;
                     this.movePlane3D.fromPoints(po, py, pz);
                     this.changeXYZ.init(0, 1, 1);
                     break;
-                case this.toolModel.xzPlane.gameObject:
+                case this.toolModel.xzPlane:
                     this.selectedItem = this.toolModel.xzPlane;
                     this.movePlane3D.fromPoints(po, px, pz);
                     this.changeXYZ.init(1, 0, 1);
                     break;
-                case this.toolModel.xyPlane.gameObject:
+                case this.toolModel.xyPlane:
                     this.selectedItem = this.toolModel.xyPlane;
                     this.movePlane3D.fromPoints(po, px, py);
                     this.changeXYZ.init(1, 1, 0);
                     break;
-                case this.toolModel.oCube.gameObject:
+                case this.toolModel.oCube:
                     this.selectedItem = this.toolModel.oCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir, po);
                     this.changeXYZ.init(1, 1, 1);

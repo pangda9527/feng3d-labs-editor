@@ -57,25 +57,24 @@ namespace editor
             var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new feng3d.Plane3D();
-            var selectedGameObject: feng3d.GameObject = <any>event.currentTarget;
-            switch (selectedGameObject)
+            switch (event.currentTarget)
             {
-                case this.toolModel.xCube.gameObject:
+                case this.toolModel.xCube:
                     this.selectedItem = this.toolModel.xCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(ox).crossTo(ox), po);
                     this.changeXYZ.init(1, 0, 0);
                     break;
-                case this.toolModel.yCube.gameObject:
+                case this.toolModel.yCube:
                     this.selectedItem = this.toolModel.yCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oy).crossTo(oy), po);
                     this.changeXYZ.init(0, 1, 0);
                     break;
-                case this.toolModel.zCube.gameObject:
+                case this.toolModel.zCube:
                     this.selectedItem = this.toolModel.zCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oz).crossTo(oz), po);
                     this.changeXYZ.init(0, 0, 1);
                     break;
-                case this.toolModel.oCube.gameObject:
+                case this.toolModel.oCube:
                     this.selectedItem = this.toolModel.oCube;
                     this.startMousePos = engine.mousePos.clone();
                     this.changeXYZ.init(1, 1, 1);
