@@ -6593,13 +6593,14 @@ var editor;
             var meshRenderer = xLine.addComponent(feng3d.MeshRenderer);
             var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
             segmentGeometry.segments.push({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
-            this.segmentMaterial = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            this.segmentMaterial = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
             this.gameObject.addChild(xLine);
             //
             this.xArrow = feng3d.GameObject.create();
             meshRenderer = this.xArrow.addComponent(feng3d.MeshRenderer);
             meshRenderer.geometry = new feng3d.ConeGeometry({ bottomRadius: 5, height: 18 });
             this.material = meshRenderer.material = feng3d.materialFactory.create("color");
+            this.material.renderParams.enableBlend = true;
             this.xArrow.transform.y = this.length;
             this.xArrow.mouselayer = feng3d.mouselayer.editor;
             this.gameObject.addChild(this.xArrow);
@@ -6622,7 +6623,6 @@ var editor;
             this.segmentMaterial.uniforms.u_segmentColor = color;
             //
             this.material.uniforms.u_diffuseInput = color;
-            this.segmentMaterial.renderParams.enableBlend = this.material.renderParams.enableBlend = color.a < 1;
         };
         __decorate([
             feng3d.watch("update")
@@ -6648,6 +6648,7 @@ var editor;
             var meshRenderer = this.oCube.addComponent(feng3d.MeshRenderer);
             meshRenderer.geometry = new feng3d.CubeGeometry({ width: 8, height: 8, depth: 8 });
             this.colorMaterial = meshRenderer.material = feng3d.materialFactory.create("color");
+            this.colorMaterial.renderParams.enableBlend = true;
             this.oCube.mouseEnabled = true;
             this.oCube.mouselayer = feng3d.mouselayer.editor;
             this.gameObject.addChild(this.oCube);
@@ -6692,6 +6693,7 @@ var editor;
             meshRenderer.geometry = new feng3d.PlaneGeometry({ width: this._width, height: this._width });
             this.colorMaterial = meshRenderer.material = feng3d.materialFactory.create("color");
             this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
+            this.colorMaterial.renderParams.enableBlend = true;
             plane.mouselayer = feng3d.mouselayer.editor;
             plane.mouseEnabled = true;
             this.gameObject.addChild(plane);
@@ -7023,6 +7025,7 @@ var editor;
             this.zCube.transform.rx = 90;
             this.gameObject.addChild(this.zCube.gameObject);
             this.oCube = feng3d.GameObject.create("oCube").addComponent(editor.CoordinateCube);
+            this.oCube.gameObject.transform.scale = new feng3d.Vector3(1.2, 1.2, 1.2);
             this.gameObject.addChild(this.oCube.gameObject);
         };
         return SToolModel;

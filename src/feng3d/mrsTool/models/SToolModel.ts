@@ -37,6 +37,7 @@ namespace editor
             this.gameObject.addChild(this.zCube.gameObject);
 
             this.oCube = feng3d.GameObject.create("oCube").addComponent(CoordinateCube);
+            this.oCube.gameObject.transform.scale = new feng3d.Vector3(1.2, 1.2, 1.2);
             this.gameObject.addChild(this.oCube.gameObject);
         }
     }
