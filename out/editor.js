@@ -8312,7 +8312,7 @@ var editor;
         camera.transform.position = new feng3d.Vector3(0, 1, -10);
         scene.gameObject.addChild(camera);
         var directionalLight = feng3d.GameObject.create("DirectionalLight");
-        directionalLight.addComponent(feng3d.DirectionalLight);
+        directionalLight.addComponent(feng3d.DirectionalLight).shadowType = feng3d.ShadowType.Hard_Shadows;
         directionalLight.transform.rx = 50;
         directionalLight.transform.ry = -30;
         directionalLight.transform.y = 3;
