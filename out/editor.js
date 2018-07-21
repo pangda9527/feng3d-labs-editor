@@ -8177,7 +8177,6 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var editorObject;
     var EditorEngine = /** @class */ (function (_super) {
         __extends(EditorEngine, _super);
         function EditorEngine() {
@@ -8189,17 +8188,14 @@ var editor;
             },
             set: function (value) {
                 if (this._scene) {
-                    this._scene.iseditor = false;
-                    this._scene.gameObject.removeChild(editorObject);
                     this._scene.updateScriptFlag = feng3d.ScriptFlag.feng3d;
                 }
                 this._scene = value;
                 if (this._scene) {
-                    this._scene.iseditor = true;
-                    this._scene.gameObject.addChild(editorObject);
                     this._scene.updateScriptFlag = feng3d.ScriptFlag.editor;
                     editor.hierarchy.rootGameObject = this._scene.gameObject;
                 }
+                editor.editorComponent.scene = this._scene;
             },
             enumerable: true,
             configurable: true
@@ -8211,6 +8207,17 @@ var editor;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 绘制场景
+         */
+        EditorEngine.prototype.render = function () {
+            _super.prototype.render.call(this);
+            editor.editorScene.update();
+            feng3d.forwardRenderer.draw(this.gl, editor.editorScene, this.camera);
+            var selectedObject = this.mouse3DManager.pick(editor.editorScene, this.camera);
+            if (selectedObject)
+                this.selectedObject = selectedObject;
+        };
         return EditorEngine;
     }(feng3d.Engine));
     editor.EditorEngine = EditorEngine;
@@ -8232,18 +8239,17 @@ var editor;
             //
             editor.editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
-            editorObject = feng3d.GameObject.create("editorObject");
-            editorObject.serializable = false;
-            editorObject.showinHierarchy = false;
-            editorObject.addComponent(editor.SceneRotateTool);
+            editor.editorScene = feng3d.GameObject.create("scene").addComponent(feng3d.Scene3D);
+            //
+            editor.editorScene.gameObject.addComponent(editor.SceneRotateTool);
             //
             //初始化模块
-            editorObject.addComponent(editor.GroundGrid);
-            editorObject.addComponent(editor.MRSTool);
-            editorObject.addComponent(editor.EditorComponent);
+            editor.editorScene.gameObject.addComponent(editor.GroundGrid);
+            editor.editorScene.gameObject.addComponent(editor.MRSTool);
+            editor.editorComponent = editor.editorScene.gameObject.addComponent(editor.EditorComponent);
             feng3d.Loader.loadText(editor.editorData.getEditorAssetsPath("gameobjects/Trident.gameobject.json"), function (content) {
                 var trident = feng3d.serialization.deserialize(JSON.parse(content));
-                editorObject.addChild(trident);
+                editor.editorScene.gameObject.addChild(trident);
             });
             //
             editor.editorDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
@@ -8326,46 +8332,44 @@ var editor;
     var EditorComponent = /** @class */ (function (_super) {
         __extends(EditorComponent, _super);
         function EditorComponent() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.serializable = false;
-            _this.showInInspector = false;
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(EditorComponent.prototype, "scene", {
+            get: function () {
+                return this._scene;
+            },
+            set: function (v) {
+                var _this = this;
+                if (this._scene) {
+                    this.scene.off("addComponentToScene", this.onAddComponentToScene, this);
+                    this.scene.off("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+                    var lights = this.scene.getComponentsInChildren(feng3d.Light);
+                    lights.forEach(function (element) {
+                        _this.removeLightIcon(element);
+                    });
+                }
+                this._scene = v;
+                if (this._scene) {
+                    var lights = this.scene.getComponentsInChildren(feng3d.Light);
+                    lights.forEach(function (element) {
+                        _this.addLightIcon(element);
+                    });
+                    this.scene.on("addComponentToScene", this.onAddComponentToScene, this);
+                    this.scene.on("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         EditorComponent.prototype.init = function (gameobject) {
             _super.prototype.init.call(this, gameobject);
-            this.on("addedToScene", this.onAddedToScene, this);
-            this.on("removedFromScene", this.onRemovedFromScene, this);
         };
         /**
          * 销毁
          */
         EditorComponent.prototype.dispose = function () {
-            this.off("addedToScene", this.onAddedToScene, this);
-            this.off("removedFromScene", this.onRemovedFromScene, this);
-            this.onRemovedFromScene();
-            _super.prototype.dispose.call(this);
-        };
-        EditorComponent.prototype.onAddedToScene = function () {
-            var _this = this;
-            this.scene = this.gameObject.scene;
-            var lights = this.scene.getComponentsInChildren(feng3d.Light);
-            lights.forEach(function (element) {
-                _this.addLightIcon(element);
-            });
-            this.scene.on("addComponentToScene", this.onAddComponentToScene, this);
-            this.scene.on("removeComponentFromScene", this.onRemoveComponentFromScene, this);
-        };
-        EditorComponent.prototype.onRemovedFromScene = function () {
-            var _this = this;
-            if (!this.scene)
-                return;
-            this.scene.off("addComponentToScene", this.onAddComponentToScene, this);
-            this.scene.off("removeComponentFromScene", this.onRemoveComponentFromScene, this);
-            var lights = this.scene.getComponentsInChildren(feng3d.Light);
-            lights.forEach(function (element) {
-                _this.removeLightIcon(element);
-            });
             this.scene = null;
+            _super.prototype.dispose.call(this);
         };
         EditorComponent.prototype.onAddComponentToScene = function (event) {
             this.addLightIcon(event.data);

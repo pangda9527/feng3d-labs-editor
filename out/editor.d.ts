@@ -2061,10 +2061,16 @@ declare namespace editor {
 declare namespace editor {
     var engine: feng3d.Engine;
     var editorCamera: feng3d.Camera;
+    var editorScene: feng3d.Scene3D;
+    var editorComponent: EditorComponent;
     class EditorEngine extends feng3d.Engine {
         scene: feng3d.Scene3D;
         readonly camera: feng3d.Camera;
         private _scene;
+        /**
+         * 绘制场景
+         */
+        render(): void;
     }
     /**
     * 编辑器3D入口
@@ -2079,16 +2085,13 @@ declare namespace editor {
 }
 declare namespace editor {
     class EditorComponent extends feng3d.Component {
-        serializable: boolean;
-        showInInspector: boolean;
         scene: feng3d.Scene3D;
+        private _scene;
         init(gameobject: feng3d.GameObject): void;
         /**
          * 销毁
          */
         dispose(): void;
-        private onAddedToScene();
-        private onRemovedFromScene();
         private onAddComponentToScene(event);
         private onRemoveComponentFromScene(event);
         private addLightIcon(light);

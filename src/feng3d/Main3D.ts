@@ -2,7 +2,8 @@ namespace editor
 {
     export var engine: feng3d.Engine;
     export var editorCamera: feng3d.Camera;
-    var editorObject: feng3d.GameObject
+    export var editorScene: feng3d.Scene3D;
+    export var editorComponent: EditorComponent;
 
     export class EditorEngine extends feng3d.Engine
     {
@@ -14,24 +15,34 @@ namespace editor
         {
             if (this._scene)
             {
-                this._scene.iseditor = false;
-                this._scene.gameObject.removeChild(editorObject);
                 this._scene.updateScriptFlag = feng3d.ScriptFlag.feng3d;
             }
             this._scene = value;
             if (this._scene)
             {
-                this._scene.iseditor = true;
-                this._scene.gameObject.addChild(editorObject);
                 this._scene.updateScriptFlag = feng3d.ScriptFlag.editor;
                 hierarchy.rootGameObject = this._scene.gameObject;
             }
+            editorComponent.scene = this._scene;
         }
         get camera()
         {
             return editorCamera;
         }
         private _scene: feng3d.Scene3D;
+
+        /**
+         * 绘制场景
+         */
+        render()
+        {
+            super.render();
+
+            editorScene.update();
+            feng3d.forwardRenderer.draw(this.gl, editorScene, this.camera);
+            var selectedObject = this.mouse3DManager.pick(editorScene, this.camera);
+            if (selectedObject) this.selectedObject = selectedObject;
+        }
     }
 
     /**
@@ -56,20 +67,19 @@ namespace editor
             //
             editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
-            editorObject = feng3d.GameObject.create("editorObject");
-            editorObject.serializable = false;
-            editorObject.showinHierarchy = false;
-            editorObject.addComponent(SceneRotateTool);
+            editorScene = feng3d.GameObject.create("scene").addComponent(feng3d.Scene3D);
+            //
+            editorScene.gameObject.addComponent(SceneRotateTool);
             //
             //初始化模块
-            editorObject.addComponent(GroundGrid);
-            editorObject.addComponent(MRSTool);
-            editorObject.addComponent(EditorComponent);
+            editorScene.gameObject.addComponent(GroundGrid);
+            editorScene.gameObject.addComponent(MRSTool);
+            editorComponent = editorScene.gameObject.addComponent(EditorComponent);
 
             feng3d.Loader.loadText(editorData.getEditorAssetsPath("gameobjects/Trident.gameobject.json"), (content) =>
             {
                 var trident = feng3d.serialization.deserialize(JSON.parse(content));
-                editorObject.addChild(trident);
+                editorScene.gameObject.addChild(trident);
             });
 
             //

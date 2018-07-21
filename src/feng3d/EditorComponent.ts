@@ -2,16 +2,42 @@ namespace editor
 {
     export class EditorComponent extends feng3d.Component
     {
-        serializable = false;
-        showInInspector = false;
-        scene: feng3d.Scene3D
+        get scene()
+        {
+            return this._scene;
+        }
+        set scene(v)
+        {
+            if (this._scene)
+            {
+                this.scene.off("addComponentToScene", this.onAddComponentToScene, this);
+                this.scene.off("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+
+                var lights = this.scene.getComponentsInChildren(feng3d.Light);
+                lights.forEach(element =>
+                {
+                    this.removeLightIcon(element);
+                });
+            }
+            this._scene = v;
+            if (this._scene)
+            {
+                var lights = this.scene.getComponentsInChildren(feng3d.Light);
+                lights.forEach(element =>
+                {
+                    this.addLightIcon(element);
+                });
+
+                this.scene.on("addComponentToScene", this.onAddComponentToScene, this);
+                this.scene.on("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+            }
+        }
+
+        private _scene: feng3d.Scene3D
 
         init(gameobject: feng3d.GameObject)
         {
             super.init(gameobject);
-
-            this.on("addedToScene", this.onAddedToScene, this);
-            this.on("removedFromScene", this.onRemovedFromScene, this);
         }
 
         /**
@@ -19,41 +45,8 @@ namespace editor
          */
         dispose()
         {
-            this.off("addedToScene", this.onAddedToScene, this);
-            this.off("removedFromScene", this.onRemovedFromScene, this);
-
-            this.onRemovedFromScene();
-
-            super.dispose();
-        }
-
-        private onAddedToScene()
-        {
-            this.scene = this.gameObject.scene;
-            var lights = this.scene.getComponentsInChildren(feng3d.Light);
-            lights.forEach(element =>
-            {
-                this.addLightIcon(element);
-            });
-
-            this.scene.on("addComponentToScene", this.onAddComponentToScene, this);
-            this.scene.on("removeComponentFromScene", this.onRemoveComponentFromScene, this);
-        }
-
-        private onRemovedFromScene()
-        {
-            if (!this.scene)
-                return;
-
-            this.scene.off("addComponentToScene", this.onAddComponentToScene, this);
-            this.scene.off("removeComponentFromScene", this.onRemoveComponentFromScene, this);
-
-            var lights = this.scene.getComponentsInChildren(feng3d.Light);
-            lights.forEach(element =>
-            {
-                this.removeLightIcon(element);
-            });
             this.scene = null;
+            super.dispose();
         }
 
         private onAddComponentToScene(event: feng3d.Event<feng3d.Component>)
