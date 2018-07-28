@@ -2408,7 +2408,6 @@ declare namespace editor {
         private _light;
         private lightIcon;
         private lightLines;
-        private lightLines1;
         private lightpoints;
         private textureMaterial;
         private segmentGeometry;
@@ -2427,7 +2426,6 @@ declare namespace editor {
         private _light;
         private lightIcon;
         private lightLines;
-        private lightLines1;
         private lightpoints;
         private textureMaterial;
         private segmentGeometry;
