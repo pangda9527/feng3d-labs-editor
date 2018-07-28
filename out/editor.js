@@ -9790,6 +9790,7 @@ var editor;
         DirectionLightIcon.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
             this.initicon();
+            this.on("mousedown", this.onMousedown, this);
         };
         DirectionLightIcon.prototype.initicon = function () {
             var size = 1;
@@ -9858,6 +9859,13 @@ var editor;
         DirectionLightIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
         };
+        DirectionLightIcon.prototype.onMousedown = function () {
+            editor.editorData.selectObject(this.light.gameObject);
+            feng3d.shortcut.activityState("selectInvalid");
+            feng3d.ticker.once(100, function () {
+                feng3d.shortcut.deactivityState("selectInvalid");
+            });
+        };
         return DirectionLightIcon;
     }(editor.EditorScript));
     editor.DirectionLightIcon = DirectionLightIcon;
@@ -9889,6 +9897,7 @@ var editor;
         PointLightIcon.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
             this.initicon();
+            this.on("mousedown", this.onMousedown, this);
         };
         PointLightIcon.prototype.initicon = function () {
             var size = 1;
@@ -10081,6 +10090,14 @@ var editor;
         };
         PointLightIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
+        };
+        PointLightIcon.prototype.onMousedown = function () {
+            editor.editorData.selectObject(this.light.gameObject);
+            // 防止再次调用鼠标拾取
+            feng3d.shortcut.activityState("selectInvalid");
+            feng3d.ticker.once(100, function () {
+                feng3d.shortcut.deactivityState("selectInvalid");
+            });
         };
         return PointLightIcon;
     }(editor.EditorScript));
@@ -10785,7 +10802,7 @@ var shortcutConfig = [
     { key: "e", command: "gameobjectRotationTool", when: "!fpsViewing" },
     { key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
     { key: "del", command: "deleteSeletedGameObject", when: "" },
-    { key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming" },
+    { key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
 ];
 var editor;
 (function (editor) {

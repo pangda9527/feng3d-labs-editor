@@ -26,7 +26,7 @@ var shortcutConfig = [ //
 	{ key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
 
 	{ key: "del", command: "deleteSeletedGameObject", when: "" },
-	{ key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming" },
+	{ key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
 
 	// 可用命令
 	// - fpsViewStart						启动fps浏览场景
@@ -48,6 +48,7 @@ var shortcutConfig = [ //
 	// - dragSceneing						拖拽场景中
 	// - inModal							处于模式窗口时，比如menu.popup时，inMode处于激活状态
 	// - inTransforming						使用变换工具中
+	// - selectInvalid						选择失效
 
 	// 可用按键（按键均为小写）
 	// - a-z

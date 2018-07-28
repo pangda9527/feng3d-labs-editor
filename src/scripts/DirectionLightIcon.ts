@@ -29,7 +29,8 @@ namespace editor
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
-            this.initicon()
+            this.initicon();
+            this.on("mousedown", this.onMousedown, this);
         }
 
         initicon()
@@ -110,6 +111,16 @@ namespace editor
         private onScenetransformChanged()
         {
             this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
+        }
+
+        private onMousedown()
+        {
+            editorData.selectObject(this.light.gameObject);
+            feng3d.shortcut.activityState("selectInvalid");
+            feng3d.ticker.once(100, () =>
+            {
+                feng3d.shortcut.deactivityState("selectInvalid");
+            });
         }
     }
 }

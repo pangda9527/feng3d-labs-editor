@@ -2398,6 +2398,7 @@ declare namespace editor {
         update(): void;
         dispose(): void;
         private onScenetransformChanged();
+        private onMousedown();
     }
 }
 declare namespace editor {
@@ -2416,6 +2417,7 @@ declare namespace editor {
         update(): void;
         dispose(): void;
         private onScenetransformChanged();
+        private onMousedown();
     }
 }
 declare namespace editor {
