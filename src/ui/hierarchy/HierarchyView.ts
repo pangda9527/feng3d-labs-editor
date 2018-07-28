@@ -58,7 +58,7 @@ namespace editor
 
 		private invalidHierarchy()
 		{
-			feng3d.ticker.onceframe(this.updateHierarchyTree, this);
+			feng3d.ticker.nextframe(this.updateHierarchyTree, this);
 		}
 
 		private updateHierarchyTree()

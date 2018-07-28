@@ -44,7 +44,7 @@ namespace editor
                 {
                     maskReck.parent.removeChild(maskReck);
                 }
-                feng3d.ticker.onceframe(() =>
+                feng3d.ticker.nextframe(() =>
                 {
                     feng3d.shortcut.deactivityState("inModal");
                 });

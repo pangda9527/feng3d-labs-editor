@@ -1857,6 +1857,7 @@ declare namespace editor {
         init(gameObject: feng3d.GameObject): void;
         protected onAddedToScene(): void;
         protected onRemovedFromScene(): void;
+        protected onItemMouseDown(event: feng3d.Event<any>): void;
         protected toolModel: feng3d.Component;
         selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateRotationAxis | CoordinateRotationFreeAxis | CoordinateScaleCube;
         gameobjectControllerTarget: MRSToolTarget;

@@ -45,6 +45,11 @@ namespace editor
             feng3d.ticker.offframe(this.updateToolModel, this);
         }
 
+        protected onItemMouseDown(event: feng3d.Event<any>)
+        {
+            feng3d.shortcut.activityState("inTransforming");
+        }
+
         protected get toolModel()
         {
             return this._toolModel;
@@ -103,6 +108,11 @@ namespace editor
             this.ismouseDown = false;
             this.movePlane3D = null;
             this.startSceneTransform = null;
+
+            feng3d.ticker.nextframe(() =>
+            {
+                feng3d.shortcut.deactivityState("inTransforming");
+            });
         }
 
         /**

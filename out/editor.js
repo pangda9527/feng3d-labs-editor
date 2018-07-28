@@ -1475,7 +1475,7 @@ var editor;
                 if (maskReck.parent) {
                     maskReck.parent.removeChild(maskReck);
                 }
-                feng3d.ticker.onceframe(function () {
+                feng3d.ticker.nextframe(function () {
                     feng3d.shortcut.deactivityState("inModal");
                 });
             }
@@ -4409,7 +4409,7 @@ var editor;
             editor.hierarchyTree.off("openChanged", this.invalidHierarchy, this);
         };
         HierarchyView.prototype.invalidHierarchy = function () {
-            feng3d.ticker.onceframe(this.updateHierarchyTree, this);
+            feng3d.ticker.nextframe(this.updateHierarchyTree, this);
         };
         HierarchyView.prototype.updateHierarchyTree = function () {
             var nodes = editor.hierarchyTree.getShowNodes();
@@ -7119,6 +7119,9 @@ var editor;
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
             feng3d.ticker.offframe(this.updateToolModel, this);
         };
+        MRSToolBase.prototype.onItemMouseDown = function (event) {
+            feng3d.shortcut.activityState("inTransforming");
+        };
         Object.defineProperty(MRSToolBase.prototype, "toolModel", {
             get: function () {
                 return this._toolModel;
@@ -7171,6 +7174,9 @@ var editor;
             this.ismouseDown = false;
             this.movePlane3D = null;
             this.startSceneTransform = null;
+            feng3d.ticker.nextframe(function () {
+                feng3d.shortcut.deactivityState("inTransforming");
+            });
         };
         /**
          * 获取鼠标射线与移动平面的交点（模型空间）
@@ -7238,6 +7244,7 @@ var editor;
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
+            _super.prototype.onItemMouseDown.call(this, event);
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -7367,6 +7374,7 @@ var editor;
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
+            _super.prototype.onItemMouseDown.call(this, event);
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -7520,6 +7528,7 @@ var editor;
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
+            _super.prototype.onItemMouseDown.call(this, event);
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -10729,7 +10738,7 @@ var shortcutConfig = [
     { key: "e", command: "gameobjectRotationTool", when: "!fpsViewing" },
     { key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
     { key: "del", command: "deleteSeletedGameObject", when: "" },
-    { key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool" },
+    { key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming" },
 ];
 var editor;
 (function (editor) {

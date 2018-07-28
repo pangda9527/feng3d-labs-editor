@@ -34,13 +34,13 @@ namespace editor
             this.toolModel.cameraAxis.off("mousedown", this.onItemMouseDown, this);
         }
 
-
         protected onItemMouseDown(event: feng3d.Event<any>)
         {
             if (!engine.mouseinview)
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
+            super.onItemMouseDown(event);
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
