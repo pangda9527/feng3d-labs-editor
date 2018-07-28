@@ -234,6 +234,14 @@ namespace editor
                         addToHierarchy(gameobject);
                     }
                 },
+                {
+                    label: "聚光灯", click: () =>
+                    {
+                        var gameobject = feng3d.GameObject.create("SpotLight");
+                        gameobject.addComponent(feng3d.SpotLight);
+                        addToHierarchy(gameobject);
+                    }
+                },
             ],
         },
         {

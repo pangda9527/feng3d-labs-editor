@@ -10532,6 +10532,13 @@ var editor;
                         addToHierarchy(gameobject);
                     }
                 },
+                {
+                    label: "聚光灯", click: function () {
+                        var gameobject = feng3d.GameObject.create("SpotLight");
+                        gameobject.addComponent(feng3d.SpotLight);
+                        addToHierarchy(gameobject);
+                    }
+                },
             ],
         },
         {
