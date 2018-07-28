@@ -8249,6 +8249,7 @@ var editor;
             editor.editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
             editor.editorScene = feng3d.GameObject.create("scene").addComponent(feng3d.Scene3D);
+            editor.editorScene.updateScriptFlag = feng3d.ScriptFlag.all;
             //
             editor.editorScene.gameObject.addComponent(editor.SceneRotateTool);
             //
@@ -8341,7 +8342,10 @@ var editor;
     var EditorComponent = /** @class */ (function (_super) {
         __extends(EditorComponent, _super);
         function EditorComponent() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.directionLightIconMap = new Map();
+            _this.pointLightIconMap = new Map();
+            return _this;
         }
         Object.defineProperty(EditorComponent.prototype, "scene", {
             get: function () {
@@ -8388,18 +8392,30 @@ var editor;
         };
         EditorComponent.prototype.addLightIcon = function (light) {
             if (light instanceof feng3d.DirectionalLight) {
-                light.gameObject.addComponent(editor.DirectionLightIcon);
+                var directionLightIcon = feng3d.GameObject.create("DirectionLightIcon").addComponent(editor.DirectionLightIcon);
+                directionLightIcon.light = light;
+                this.gameObject.addChild(directionLightIcon.gameObject);
+                this.directionLightIconMap.set(light, directionLightIcon);
             }
             else if (light instanceof feng3d.PointLight) {
-                light.gameObject.addComponent(editor.PointLightIcon);
+                var pointLightIcon = feng3d.GameObject.create("PointLightIcon").addComponent(editor.PointLightIcon);
+                pointLightIcon.light = light;
+                this.gameObject.addChild(pointLightIcon.gameObject);
+                this.pointLightIconMap.set(light, pointLightIcon);
             }
         };
         EditorComponent.prototype.removeLightIcon = function (light) {
             if (light instanceof feng3d.DirectionalLight) {
-                light.gameObject.removeComponentsByType(editor.DirectionLightIcon);
+                var directionLightIcon = this.directionLightIconMap.get(light);
+                directionLightIcon.light = null;
+                directionLightIcon.gameObject.remove();
+                this.directionLightIconMap.delete(light);
             }
             else if (light instanceof feng3d.PointLight) {
-                light.gameObject.removeComponentsByType(editor.PointLightIcon);
+                var pointLightIcon = this.pointLightIconMap.get(light);
+                pointLightIcon.light = null;
+                pointLightIcon.gameObject.remove();
+                this.pointLightIconMap.delete(light);
             }
         };
         return EditorComponent;
@@ -9689,8 +9705,6 @@ var editor;
         __extends(EditorScript, _super);
         function EditorScript() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.showInInspector = false;
-            _this.serializable = false;
             _this.flag = feng3d.ScriptFlag.editor;
             return _this;
         }
@@ -9756,6 +9770,23 @@ var editor;
         function DirectionLightIcon() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(DirectionLightIcon.prototype, "light", {
+            get: function () {
+                return this._light;
+            },
+            set: function (v) {
+                if (this._light) {
+                    this._light.off("scenetransformChanged", this.onScenetransformChanged, this);
+                }
+                this._light = v;
+                if (this._light) {
+                    this.onScenetransformChanged();
+                    this._light.on("scenetransformChanged", this.onScenetransformChanged, this);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         DirectionLightIcon.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
             this.initicon();
@@ -9763,7 +9794,6 @@ var editor;
         DirectionLightIcon.prototype.initicon = function () {
             var size = 1;
             var linesize = 10;
-            this.directionalLight = this.getComponent(feng3d.DirectionalLight);
             var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
             lightIcon.showinHierarchy = false;
@@ -9812,19 +9842,21 @@ var editor;
             this.enabled = true;
         };
         DirectionLightIcon.prototype.update = function () {
-            this.textureMaterial.uniforms.u_color = this.directionalLight.color.toColor4();
-            this.lightLines.visible = editor.editorData.selectedGameObjects.indexOf(this.gameObject) != -1;
+            this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
+            this.lightLines.visible = editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
         };
         DirectionLightIcon.prototype.dispose = function () {
             this.enabled = false;
             this.textureMaterial = null;
-            this.directionalLight = null;
             //
             this.lightIcon.dispose();
             this.lightLines.dispose();
             this.lightIcon = null;
             this.lightLines = null;
             _super.prototype.dispose.call(this);
+        };
+        DirectionLightIcon.prototype.onScenetransformChanged = function () {
+            this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
         };
         return DirectionLightIcon;
     }(editor.EditorScript));
@@ -9835,18 +9867,31 @@ var editor;
     var PointLightIcon = /** @class */ (function (_super) {
         __extends(PointLightIcon, _super);
         function PointLightIcon() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.showInInspector = false;
-            _this.serializable = false;
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(PointLightIcon.prototype, "light", {
+            get: function () {
+                return this._light;
+            },
+            set: function (v) {
+                if (this._light) {
+                    this._light.off("scenetransformChanged", this.onScenetransformChanged, this);
+                }
+                this._light = v;
+                if (this._light) {
+                    this.onScenetransformChanged();
+                    this._light.on("scenetransformChanged", this.onScenetransformChanged, this);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         PointLightIcon.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
             this.initicon();
         };
         PointLightIcon.prototype.initicon = function () {
             var size = 1;
-            this.pointLight = this.getComponent(feng3d.PointLight);
             var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
             lightIcon.showinHierarchy = false;
@@ -9925,12 +9970,12 @@ var editor;
             this.enabled = true;
         };
         PointLightIcon.prototype.update = function () {
-            this.textureMaterial.uniforms.u_color = this.pointLight.color.toColor4();
+            this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
             this.lightLines.transform.scale =
                 this.lightLines1.transform.scale =
                     this.lightpoints.transform.scale =
-                        new feng3d.Vector3(this.pointLight.range, this.pointLight.range, this.pointLight.range);
-            if (editor.editorData.selectedGameObjects.indexOf(this.gameObject) != -1) {
+                        new feng3d.Vector3(this.light.range, this.light.range, this.light.range);
+            if (editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1) {
                 //
                 var camerapos = this.gameObject.transform.inverseTransformPoint(editor.editorCamera.gameObject.transform.scenePosition);
                 //
@@ -10022,7 +10067,6 @@ var editor;
         PointLightIcon.prototype.dispose = function () {
             this.enabled = false;
             this.textureMaterial = null;
-            this.pointLight = null;
             //
             this.lightIcon.dispose();
             this.lightLines.dispose();
@@ -10034,6 +10078,9 @@ var editor;
             this.lightpoints = null;
             this.segmentGeometry = null;
             _super.prototype.dispose.call(this);
+        };
+        PointLightIcon.prototype.onScenetransformChanged = function () {
+            this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
         };
         return PointLightIcon;
     }(editor.EditorScript));

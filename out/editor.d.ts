@@ -2097,6 +2097,8 @@ declare namespace editor {
         private onRemoveComponentFromScene(event);
         private addLightIcon(light);
         private removeLightIcon(light);
+        private directionLightIconMap;
+        private pointLightIconMap;
     }
 }
 declare namespace editor {
@@ -2370,8 +2372,6 @@ declare namespace editor {
      * 编辑器脚本
      */
     class EditorScript extends feng3d.ScriptComponent {
-        showInInspector: boolean;
-        serializable: boolean;
         flag: feng3d.ScriptFlag;
     }
 }
@@ -2388,32 +2388,34 @@ declare namespace editor {
 }
 declare namespace editor {
     class DirectionLightIcon extends EditorScript {
+        light: feng3d.DirectionalLight;
+        private _light;
         private lightIcon;
         private lightLines;
         private textureMaterial;
-        private directionalLight;
         init(gameObject: feng3d.GameObject): void;
         initicon(): void;
         update(): void;
         dispose(): void;
+        private onScenetransformChanged();
     }
 }
 declare namespace editor {
     class PointLightIcon extends EditorScript {
-        showInInspector: boolean;
-        serializable: boolean;
+        light: feng3d.PointLight;
+        private _light;
         private lightIcon;
         private lightLines;
         private lightLines1;
         private lightpoints;
         private textureMaterial;
-        private pointLight;
         private segmentGeometry;
         private pointGeometry;
         init(gameObject: feng3d.GameObject): void;
         initicon(): void;
         update(): void;
         dispose(): void;
+        private onScenetransformChanged();
     }
 }
 declare namespace editor {

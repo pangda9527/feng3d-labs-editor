@@ -2,15 +2,31 @@ namespace editor
 {
     export class PointLightIcon extends EditorScript
     {
-        showInInspector = false;
-        serializable = false;
+        get light()
+        {
+            return this._light;
+        }
+        set light(v)
+        {
+            if (this._light)
+            {
+                this._light.off("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+            this._light = v;
+            if (this._light)
+            {
+                this.onScenetransformChanged();
+                this._light.on("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+        }
+
+        private _light: feng3d.PointLight;
 
         private lightIcon: feng3d.GameObject;
         private lightLines: feng3d.GameObject;
         private lightLines1: feng3d.GameObject;
         private lightpoints: feng3d.GameObject;
         private textureMaterial: feng3d.TextureMaterial;
-        private pointLight: feng3d.PointLight;
         private segmentGeometry: feng3d.SegmentGeometry;
         private pointGeometry: feng3d.PointGeometry;
 
@@ -23,7 +39,6 @@ namespace editor
         initicon()
         {
             var size = 1;
-            this.pointLight = this.getComponent(feng3d.PointLight);
 
             var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
@@ -112,13 +127,13 @@ namespace editor
 
         update()
         {
-            this.textureMaterial.uniforms.u_color = this.pointLight.color.toColor4();
+            this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
             this.lightLines.transform.scale =
                 this.lightLines1.transform.scale =
                 this.lightpoints.transform.scale =
-                new feng3d.Vector3(this.pointLight.range, this.pointLight.range, this.pointLight.range);
+                new feng3d.Vector3(this.light.range, this.light.range, this.light.range);
 
-            if (editorData.selectedGameObjects.indexOf(this.gameObject) != -1)
+            if (editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1)
             {
                 //
                 var camerapos = this.gameObject.transform.inverseTransformPoint(editorCamera.gameObject.transform.scenePosition);
@@ -215,7 +230,6 @@ namespace editor
         {
             this.enabled = false;
             this.textureMaterial = null;
-            this.pointLight = null;
             //
             this.lightIcon.dispose();
             this.lightLines.dispose();
@@ -229,5 +243,9 @@ namespace editor
             super.dispose();
         }
 
+        private onScenetransformChanged()
+        {
+            this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
+        }
     }
 }

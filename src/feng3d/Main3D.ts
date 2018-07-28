@@ -68,6 +68,7 @@ namespace editor
             editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
             editorScene = feng3d.GameObject.create("scene").addComponent(feng3d.Scene3D);
+            editorScene.updateScriptFlag = feng3d.ScriptFlag.all;
             //
             editorScene.gameObject.addComponent(SceneRotateTool);
             //

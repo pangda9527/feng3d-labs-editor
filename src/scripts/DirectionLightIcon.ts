@@ -2,10 +2,29 @@ namespace editor
 {
     export class DirectionLightIcon extends EditorScript
     {
+        get light()
+        {
+            return this._light;
+        }
+        set light(v)
+        {
+            if (this._light)
+            {
+                this._light.off("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+            this._light = v;
+            if (this._light)
+            {
+                this.onScenetransformChanged();
+                this._light.on("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+        }
+
+        private _light: feng3d.DirectionalLight;
+
         private lightIcon: feng3d.GameObject;
         private lightLines: feng3d.GameObject;
         private textureMaterial: feng3d.TextureMaterial;
-        private directionalLight: feng3d.DirectionalLight;
 
         init(gameObject: feng3d.GameObject)
         {
@@ -17,7 +36,6 @@ namespace editor
         {
             var size = 1;
             var linesize = 10;
-            this.directionalLight = this.getComponent(feng3d.DirectionalLight);
 
             var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
@@ -73,15 +91,14 @@ namespace editor
 
         update()
         {
-            this.textureMaterial.uniforms.u_color = this.directionalLight.color.toColor4();
-            this.lightLines.visible = editorData.selectedGameObjects.indexOf(this.gameObject) != -1;
+            this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
+            this.lightLines.visible = editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
         }
 
         dispose()
         {
             this.enabled = false;
             this.textureMaterial = null;
-            this.directionalLight = null;
             //
             this.lightIcon.dispose();
             this.lightLines.dispose();
@@ -90,5 +107,9 @@ namespace editor
             super.dispose();
         }
 
+        private onScenetransformChanged()
+        {
+            this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
+        }
     }
 }

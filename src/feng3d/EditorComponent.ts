@@ -63,10 +63,16 @@ namespace editor
         {
             if (light instanceof feng3d.DirectionalLight)
             {
-                light.gameObject.addComponent(DirectionLightIcon);
+                var directionLightIcon = feng3d.GameObject.create("DirectionLightIcon").addComponent(DirectionLightIcon);
+                directionLightIcon.light = light;
+                this.gameObject.addChild(directionLightIcon.gameObject);
+                this.directionLightIconMap.set(light, directionLightIcon);
             } else if (light instanceof feng3d.PointLight)
             {
-                light.gameObject.addComponent(PointLightIcon);
+                var pointLightIcon = feng3d.GameObject.create("PointLightIcon").addComponent(PointLightIcon);
+                pointLightIcon.light = light;
+                this.gameObject.addChild(pointLightIcon.gameObject);
+                this.pointLightIconMap.set(light, pointLightIcon);
             }
         }
 
@@ -74,11 +80,21 @@ namespace editor
         {
             if (light instanceof feng3d.DirectionalLight)
             {
-                light.gameObject.removeComponentsByType(DirectionLightIcon);
+                var directionLightIcon = this.directionLightIconMap.get(light);
+                directionLightIcon.light = null;
+                directionLightIcon.gameObject.remove();
+                this.directionLightIconMap.delete(light);
             } else if (light instanceof feng3d.PointLight)
             {
-                light.gameObject.removeComponentsByType(PointLightIcon);
+                var pointLightIcon = this.pointLightIconMap.get(light);
+                pointLightIcon.light = null;
+                pointLightIcon.gameObject.remove();
+                this.pointLightIconMap.delete(light);
             }
         }
+
+        private directionLightIconMap = new Map<feng3d.DirectionalLight, DirectionLightIcon>();
+        private pointLightIconMap = new Map<feng3d.PointLight, PointLightIcon>();
+
     }
 }

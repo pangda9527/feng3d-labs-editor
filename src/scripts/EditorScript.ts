@@ -5,9 +5,6 @@ namespace editor
      */
     export class EditorScript extends feng3d.ScriptComponent
     {
-        showInInspector = false;
-        serializable = false;
-
         flag = feng3d.ScriptFlag.editor;
     }
 }
