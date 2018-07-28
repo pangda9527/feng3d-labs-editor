@@ -38,15 +38,13 @@ namespace editor
 
         initicon()
         {
-            var size = 1;
-
             var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
             lightIcon.showinHierarchy = false;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editorCamera;
             var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
-            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: size, height: size, segmentsW: 1, segmentsH: 1, yUp: false });
+            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
             var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture",
                 {
                     uniforms: {

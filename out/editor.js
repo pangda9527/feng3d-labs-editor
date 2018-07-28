@@ -9806,7 +9806,6 @@ var editor;
             this.on("mousedown", this.onMousedown, this);
         };
         DirectionLightIcon.prototype.initicon = function () {
-            var size = 1;
             var linesize = 10;
             var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
@@ -9814,7 +9813,7 @@ var editor;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editor.editorCamera;
             var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
-            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: size, height: size, segmentsH: 1, segmentsW: 1, yUp: false });
+            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false });
             var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture");
             var texture = new feng3d.UrlImageTexture2D();
             texture.url = editor.editorData.getEditorAssetsPath("assets/3d/icons/sun.png");
@@ -9913,14 +9912,13 @@ var editor;
             this.on("mousedown", this.onMousedown, this);
         };
         PointLightIcon.prototype.initicon = function () {
-            var size = 1;
             var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
             lightIcon.showinHierarchy = false;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editor.editorCamera;
             var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
-            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: size, height: size, segmentsW: 1, segmentsH: 1, yUp: false });
+            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
             var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture", {
                 uniforms: {
                     s_texture: {
@@ -9932,10 +9930,6 @@ var editor;
             });
             textureMaterial.renderParams.enableBlend = true;
             this.gameObject.addChild(lightIcon);
-            // this.lightIcon.on("click", () =>
-            // {
-            //     editor3DData.selectObject(this.gameObject);
-            // });
             //
             var lightLines = this.lightLines = feng3d.GameObject.create("Lines");
             lightLines.mouseEnabled = false;
@@ -9943,7 +9937,6 @@ var editor;
             lightLines.showinHierarchy = false;
             var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
             var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
-            // material.color = new Color(163 / 255, 162 / 255, 107 / 255);
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
@@ -9965,7 +9958,6 @@ var editor;
             var pointMaterial = meshRenderer.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
             pointMaterial.renderParams.enableBlend = true;
             pointMaterial.uniforms.u_PointSize = 5;
-            // pointMaterial.color = new Color(163 / 255 * 1.2, 162 / 255 * 1.2, 107 / 255 * 1.2);
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
         };
@@ -10119,14 +10111,13 @@ var editor;
             this.on("mousedown", this.onMousedown, this);
         };
         SpotLightIcon.prototype.initicon = function () {
-            var size = 1;
             var lightIcon = this.lightIcon = feng3d.GameObject.create("Icon");
             lightIcon.serializable = false;
             lightIcon.showinHierarchy = false;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editor.editorCamera;
             var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
-            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: size, height: size, segmentsW: 1, segmentsH: 1, yUp: false });
+            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
             var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture", {
                 uniforms: {
                     s_texture: {
