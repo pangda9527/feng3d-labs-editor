@@ -129,6 +129,7 @@
         "src/scripts/MouseRayTestScript.ts",
         "src/scripts/DirectionLightIcon.ts",
         "src/scripts/PointLightIcon.ts",
+        "src/scripts/SpotLightIcon.ts",
         //
         "src/loaders/threejsLoader.ts",
         //configs

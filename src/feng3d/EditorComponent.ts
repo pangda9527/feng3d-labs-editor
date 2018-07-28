@@ -73,6 +73,12 @@ namespace editor
                 pointLightIcon.light = light;
                 this.gameObject.addChild(pointLightIcon.gameObject);
                 this.pointLightIconMap.set(light, pointLightIcon);
+            } else if (light instanceof feng3d.SpotLight)
+            {
+                var spotLightIcon = feng3d.GameObject.create("SpotLightIcon").addComponent(SpotLightIcon);
+                spotLightIcon.light = light;
+                this.gameObject.addChild(spotLightIcon.gameObject);
+                this.spotLightIconMap.set(light, spotLightIcon);
             }
         }
 
@@ -90,11 +96,18 @@ namespace editor
                 pointLightIcon.light = null;
                 pointLightIcon.gameObject.remove();
                 this.pointLightIconMap.delete(light);
+            } else if (light instanceof feng3d.SpotLight)
+            {
+                var spotLightIcon = this.spotLightIconMap.get(light);
+                spotLightIcon.light = null;
+                spotLightIcon.gameObject.remove();
+                this.spotLightIconMap.delete(light);
             }
         }
 
         private directionLightIconMap = new Map<feng3d.DirectionalLight, DirectionLightIcon>();
         private pointLightIconMap = new Map<feng3d.PointLight, PointLightIcon>();
+        private spotLightIconMap = new Map<feng3d.SpotLight, SpotLightIcon>();
 
     }
 }
