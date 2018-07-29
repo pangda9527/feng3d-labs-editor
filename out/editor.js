@@ -10616,6 +10616,11 @@ var editor;
                         openDownloadProject("water.feng3d.zip");
                     },
                 },
+                {
+                    label: "灯光", click: function () {
+                        openDownloadProject("light.feng3d.zip");
+                    },
+                },
             ],
         },
         {
@@ -10634,6 +10639,11 @@ var editor;
                 {
                     label: "水", click: function () {
                         downloadProject("water.feng3d.zip");
+                    },
+                },
+                {
+                    label: "灯光", click: function () {
+                        downloadProject("light.feng3d.zip");
                     },
                 },
             ],

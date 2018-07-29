@@ -91,6 +91,12 @@ namespace editor
                         openDownloadProject("water.feng3d.zip");
                     },
                 },
+                {
+                    label: "灯光", click: () =>
+                    {
+                        openDownloadProject("light.feng3d.zip");
+                    },
+                },
             ],
         },
         {
@@ -112,6 +118,12 @@ namespace editor
                     label: "水", click: () =>
                     {
                         downloadProject("water.feng3d.zip");
+                    },
+                },
+                {
+                    label: "灯光", click: () =>
+                    {
+                        downloadProject("light.feng3d.zip");
                     },
                 },
             ],
