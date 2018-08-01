@@ -2140,6 +2140,9 @@ var editor;
             else if (this.component instanceof feng3d.DirectionalLight) {
                 this.componentIcon.source = "DirectionalLight_png";
             }
+            else if (this.component instanceof feng3d.FPSController) {
+                this.componentIcon.source = "FPSController_png";
+            }
             else if (this.component instanceof feng3d.AudioListener) {
                 this.componentIcon.source = "AudioListener_png";
             }
