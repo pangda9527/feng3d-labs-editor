@@ -9,7 +9,7 @@ namespace editor
      */
     export var revision: string = "2018.08.02";
 
-    feng3d.log(`Editot version ${revision}`)
+    feng3d.log(`Editor version ${revision}`)
 
     /**
      * 编辑器
