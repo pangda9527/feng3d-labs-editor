@@ -4,6 +4,14 @@ namespace editor
     export var editorData: EditorData;
 
     /**
+     * feng3d的版本号
+     * @author feng 2015-03-20
+     */
+    export var revision: string = "2018.08.02";
+
+    feng3d.log(`Feng3D version ${revision}`)
+
+    /**
      * 编辑器
      * @author feng 2016-10-29
      */
