@@ -77,7 +77,6 @@ namespace editor
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;
-            mouseHit.mouselayer = feng3d.mouselayer.editor;
             this.gameObject.addChild(mouseHit);
 
             this.isinit = true;

@@ -96,7 +96,6 @@ namespace editor
             meshRenderer.material = feng3d.materialFactory.create("standard");
             mouseHit.transform.rx = 90;
             mouseHit.visible = false;
-            mouseHit.mouselayer = feng3d.mouselayer.editor;
             mouseHit.mouseEnabled = true;
             this.gameObject.addChild(mouseHit);
 
@@ -283,7 +282,6 @@ namespace editor
             this.sector.update(0, 360);
             this.sector.gameObject.visible = false;
             this.sector.gameObject.mouseEnabled = true;
-            this.sector.gameObject.mouselayer = feng3d.mouselayer.editor;
             this.gameObject.addChild(this.sector.gameObject);
 
             this.isinit = true;

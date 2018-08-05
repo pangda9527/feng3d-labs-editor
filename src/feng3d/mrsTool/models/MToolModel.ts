@@ -96,7 +96,6 @@ namespace editor
             this.material = meshRenderer.material = feng3d.materialFactory.create("color");
             this.material.renderParams.enableBlend = true;
             this.xArrow.transform.y = this.length;
-            this.xArrow.mouselayer = feng3d.mouselayer.editor;
             this.gameObject.addChild(this.xArrow);
 
             var mouseHit = feng3d.GameObject.create("hitCoordinateAxis");
@@ -106,7 +105,6 @@ namespace editor
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;
-            mouseHit.mouselayer = feng3d.mouselayer.editor;
             this.gameObject.addChild(mouseHit);
 
             this.isinit = true;
@@ -145,7 +143,6 @@ namespace editor
             this.colorMaterial = meshRenderer.material = feng3d.materialFactory.create("color");
             this.colorMaterial.renderParams.enableBlend = true;
             this.oCube.mouseEnabled = true;
-            this.oCube.mouselayer = feng3d.mouselayer.editor;
             this.gameObject.addChild(this.oCube);
 
             this.isinit = true;
@@ -189,7 +186,6 @@ namespace editor
             this.colorMaterial = meshRenderer.material = feng3d.materialFactory.create("color");
             this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
             this.colorMaterial.renderParams.enableBlend = true;
-            plane.mouselayer = feng3d.mouselayer.editor;
             plane.mouseEnabled = true;
             this.gameObject.addChild(plane);
 
