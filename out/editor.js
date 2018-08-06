@@ -974,7 +974,7 @@ var editor;
     function onLookToSelectedGameObject() {
         var selectedGameObject = editor.editorData.firstSelectedGameObject;
         if (selectedGameObject) {
-            var worldBounds = selectedGameObject.getComponent(feng3d.Bounding).worldBounds;
+            var worldBounds = selectedGameObject.getComponent(feng3d.MeshRenderer).worldBounds;
             var size = 1;
             if (worldBounds)
                 size = worldBounds.getSize().length;
