@@ -9878,6 +9878,8 @@ var editor;
             this.enabled = true;
         };
         DirectionLightIcon.prototype.update = function () {
+            if (!this.light)
+                return;
             this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
             this.lightLines.visible = editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
         };
@@ -9985,6 +9987,8 @@ var editor;
             this.enabled = true;
         };
         PointLightIcon.prototype.update = function () {
+            if (!this.light)
+                return;
             this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
             this.lightLines.transform.scale =
                 this.lightpoints.transform.scale =
@@ -10184,6 +10188,8 @@ var editor;
             this.enabled = true;
         };
         SpotLightIcon.prototype.update = function () {
+            if (!this.light)
+                return;
             this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
             if (editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1) {
                 //

@@ -91,6 +91,8 @@ namespace editor
 
         update()
         {
+            if (!this.light) return;
+
             this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
             this.lightLines.visible = editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
         }

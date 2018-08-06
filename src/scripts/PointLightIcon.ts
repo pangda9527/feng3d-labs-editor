@@ -92,6 +92,8 @@ namespace editor
 
         update()
         {
+            if (!this.light) return;
+
             this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
             this.lightLines.transform.scale =
                 this.lightpoints.transform.scale =

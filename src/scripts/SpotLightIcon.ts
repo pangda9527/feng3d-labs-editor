@@ -92,6 +92,8 @@ namespace editor
 
         update()
         {
+            if (!this.light) return;
+
             this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
 
             if (editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1)
@@ -132,7 +134,7 @@ namespace editor
                 point = new feng3d.Vector3(radius, 0, distance);
                 this.segmentGeometry.segments.push({ start: new feng3d.Vector3(), end: point, startColor: new feng3d.Color4(1, 1, 0, 1), endColor: new feng3d.Color4(1, 1, 0, 1) });
                 this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(1, 1, 0, 1) });
-                
+
                 this.segmentGeometry.invalidateGeometry();
                 //
                 this.lightLines.visible = true;
