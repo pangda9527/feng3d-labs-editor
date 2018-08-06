@@ -50,8 +50,8 @@ namespace editor
      */
     function setAwaysVisible(component: feng3d.Component)
     {
-        var meshRenderers = component.getComponentsInChildren(feng3d.MeshRenderer);
-        meshRenderers.forEach(element =>
+        var models = component.getComponentsInChildren(feng3d.Model);
+        models.forEach(element =>
         {
             if (element.material)
             {

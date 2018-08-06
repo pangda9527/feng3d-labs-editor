@@ -62,18 +62,18 @@ namespace editor
         {
             super.init(gameObject);
             var xLine = feng3d.GameObject.create();
-            var meshRenderer = xLine.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var model = xLine.addComponent(feng3d.Model);
+            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
-            this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+            this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(xLine);
             this.coordinateCube = feng3d.GameObject.create("coordinateCube").addComponent(CoordinateCube);
             this.gameObject.addChild(this.coordinateCube.gameObject);
 
             var mouseHit = feng3d.GameObject.create("hit");
-            meshRenderer = mouseHit.addComponent(feng3d.MeshRenderer);
-            meshRenderer.geometry = new feng3d.CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length - 4 });
+            model = mouseHit.addComponent(feng3d.Model);
+            model.geometry = new feng3d.CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length - 4 });
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;

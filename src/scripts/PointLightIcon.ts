@@ -43,9 +43,9 @@ namespace editor
             lightIcon.showinHierarchy = false;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editorCamera;
-            var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
-            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
-            var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture",
+            var model = lightIcon.addComponent(feng3d.Model);
+            model.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
+            var textureMaterial = this.textureMaterial = model.material = feng3d.materialFactory.create("texture",
                 {
                     uniforms: {
                         s_texture: {
@@ -63,26 +63,26 @@ namespace editor
             lightLines.mouseEnabled = false;
             lightLines.serializable = false;
             lightLines.showinHierarchy = false;
-            var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var model = lightLines.addComponent(feng3d.Model);
+            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
-            this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+            this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(lightLines);
             //
             var lightpoints = this.lightpoints = feng3d.GameObject.create("points");
             lightpoints.mouseEnabled = false;
             lightpoints.serializable = false;
             lightpoints.showinHierarchy = false;
-            var meshRenderer = lightpoints.addComponent(feng3d.MeshRenderer);
-            var pointGeometry = this.pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
+            var model = lightpoints.addComponent(feng3d.Model);
+            var pointGeometry = this.pointGeometry = model.geometry = new feng3d.PointGeometry();
             pointGeometry.points = [
                 { position: new feng3d.Vector3(1, 0, 0), color: new feng3d.Color4(1, 0, 0) },
                 { position: new feng3d.Vector3(-1, 0, 0), color: new feng3d.Color4(1, 0, 0) },
                 { position: new feng3d.Vector3(0, -1, 0), color: new feng3d.Color4(0, 1, 0) },
                 { position: new feng3d.Vector3(0, 0, 1), color: new feng3d.Color4(0, 0, 1) },
                 { position: new feng3d.Vector3(0, 0, -1), color: new feng3d.Color4(0, 0, 1) }];
-            var pointMaterial = meshRenderer.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
+            var pointMaterial = model.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
             pointMaterial.renderParams.enableBlend = true;
             pointMaterial.uniforms.u_PointSize = 5;
             this.gameObject.addChild(lightpoints);

@@ -69,7 +69,7 @@ namespace editor
             }
             //
             var navobject = this._navobject = this._navobject || createNavObject();
-            navobject.getComponent(feng3d.MeshRenderer).geometry = getGeometry(geometrydata);
+            navobject.getComponent(feng3d.Model).geometry = getGeometry(geometrydata);
             var parentobject = this.gameObject.scene.gameObject.find("editorObject") || this.gameObject.scene.gameObject;
             parentobject.addChild(navobject);
 
@@ -94,7 +94,7 @@ namespace editor
             {
                 var navobject = feng3d.GameObject.create("navigation");
                 navobject.mouseEnabled = false;
-                navobject.addComponent(feng3d.MeshRenderer).set((space) =>
+                navobject.addComponent(feng3d.Model).set((space) =>
                 {
                     space.geometry = new feng3d.CustomGeometry();
                     space.material = feng3d.materialFactory.create("color", { uniforms: { u_diffuseInput: new feng3d.Color4(0, 1, 0, 0.5) } });
@@ -119,8 +119,8 @@ namespace editor
 
                 if (!gameobject.visible)
                     return geometrys;
-                var meshRenderer = gameobject.getComponent(feng3d.MeshRenderer);
-                var geometry = meshRenderer && meshRenderer.geometry;
+                var model = gameobject.getComponent(feng3d.Model);
+                var geometry = model && model.geometry;
                 if (geometry && gameobject.navigationArea != -1)
                 {
                     var matrix3d = gameobject.transform.localToWorldMatrix;

@@ -42,9 +42,9 @@ namespace editor
             lightIcon.showinHierarchy = false;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editorCamera;
-            var meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
-            meshRenderer.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false });
-            var textureMaterial = this.textureMaterial = meshRenderer.material = feng3d.materialFactory.create("texture");
+            var model = lightIcon.addComponent(feng3d.Model);
+            model.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false });
+            var textureMaterial = this.textureMaterial = model.material = feng3d.materialFactory.create("texture");
             var texture = new feng3d.UrlImageTexture2D();
             texture.url = editorData.getEditorAssetsPath("assets/3d/icons/sun.png");
             texture.format = feng3d.TextureFormat.RGBA;
@@ -61,10 +61,10 @@ namespace editor
             var holdSizeComponent = lightLines.addComponent(feng3d.HoldSizeComponent);
             holdSizeComponent.camera = editorCamera;
             holdSizeComponent.holdSize = 1;
-            var meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var model = lightLines.addComponent(feng3d.Model);
+            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(163 / 255, 162 / 255, 107 / 255);
-            var segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+            var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             var num = 10;
             for (var i = 0; i < num; i++)
             {

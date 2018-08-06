@@ -81,19 +81,19 @@ namespace editor
         private initModels()
         {
             var border = feng3d.GameObject.create();
-            var meshRenderer = border.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var model = border.addComponent(feng3d.Model);
+            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
-            this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+            this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
             this.sector = feng3d.GameObject.create("sector").addComponent(SectorGameObject);
 
 
             var mouseHit = feng3d.GameObject.create("hit");
-            meshRenderer = mouseHit.addComponent(feng3d.MeshRenderer);
-            this.torusGeometry = meshRenderer.geometry = new feng3d.TorusGeometry({ radius: this.radius, tubeRadius: 2 });
-            meshRenderer.material = feng3d.materialFactory.create("standard");
+            model = mouseHit.addComponent(feng3d.Model);
+            this.torusGeometry = model.geometry = new feng3d.TorusGeometry({ radius: this.radius, tubeRadius: 2 });
+            model.material = feng3d.materialFactory.create("standard");
             mouseHit.transform.rx = 90;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;
@@ -190,18 +190,18 @@ namespace editor
             super.init(gameObject);
             this.gameObject.name = "sector";
 
-            var meshRenderer = this.gameObject.addComponent(feng3d.MeshRenderer);
-            this.geometry = meshRenderer.geometry = new feng3d.CustomGeometry();
-            meshRenderer.material = feng3d.materialFactory.create("color", { uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
-            meshRenderer.material.renderParams.enableBlend = true;
-            meshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
+            var model = this.gameObject.addComponent(feng3d.Model);
+            this.geometry = model.geometry = new feng3d.CustomGeometry();
+            model.material = feng3d.materialFactory.create("color", { uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
+            model.material.renderParams.enableBlend = true;
+            model.material.renderParams.cullFace = feng3d.CullFace.NONE;
 
             var border = feng3d.GameObject.create("border");
-            meshRenderer = border.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            model = border.addComponent(feng3d.Model);
+            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
-            this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+            this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
 
             this.isinit = true;
@@ -271,11 +271,11 @@ namespace editor
         private initModels()
         {
             var border = feng3d.GameObject.create("border");
-            var meshRenderer = border.addComponent(feng3d.MeshRenderer);
-            var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var model = border.addComponent(feng3d.Model);
+            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
-            this.segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+            this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
 
             this.sector = feng3d.GameObject.create("sector").addComponent(SectorGameObject);

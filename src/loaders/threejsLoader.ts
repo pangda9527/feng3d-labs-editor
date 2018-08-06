@@ -68,18 +68,18 @@ namespace editor
                     gameobject.addComponent(feng3d.Camera).lens = parsePerspectiveCamera(object3d);
                     break;
                 case "SkinnedMesh":
-                    var skinnedMeshRenderer = gameobject.addComponent(feng3d.SkinnedMeshRenderer);
-                    skinnedMeshRenderer.geometry = parseGeometry(object3d.geometry);
-                    skinnedMeshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
+                    var skinnedModel = gameobject.addComponent(feng3d.SkinnedModel);
+                    skinnedModel.geometry = parseGeometry(object3d.geometry);
+                    skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
                     feng3d.assert(object3d.bindMode == "attached");
-                    skinnedMeshRenderer.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
+                    skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
-                        skinnedMeshRenderer.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();
+                        skinnedModel.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();
                     break;
                 case "Mesh":
-                    var meshRenderer = gameobject.addComponent(feng3d.MeshRenderer);
-                    meshRenderer.geometry = parseGeometry(object3d.geometry);
-                    meshRenderer.material.renderParams.cullFace = feng3d.CullFace.NONE;
+                    var model = gameobject.addComponent(feng3d.Model);
+                    model.geometry = parseGeometry(object3d.geometry);
+                    model.material.renderParams.cullFace = feng3d.CullFace.NONE;
                     break;
                 case "Group":
                     if (object3d.skeleton)

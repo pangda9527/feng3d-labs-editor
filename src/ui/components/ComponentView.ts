@@ -59,9 +59,9 @@ namespace editor
 			} else if (this.component instanceof feng3d.Terrain)
 			{
 				this.componentIcon.source = "Terrain_png";
-			} else if (this.component instanceof feng3d.MeshRenderer)
+			} else if (this.component instanceof feng3d.Model)
 			{
-				this.componentIcon.source = "MeshRenderer_png";
+				this.componentIcon.source = "Model_png";
 			} else if (this.component instanceof feng3d.ScriptComponent)
 			{
 				this.componentIcon.source = "ScriptComponent_png";

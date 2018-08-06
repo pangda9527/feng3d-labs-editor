@@ -650,10 +650,10 @@ function createSegment()
         debugSegment = feng3d.GameObject.create("segment");
         debugSegment.mouseEnabled = false;
         //初始化材质
-        var meshRenderer = debugSegment.addComponent(feng3d.MeshRenderer);
-        var material = meshRenderer.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+        var model = debugSegment.addComponent(feng3d.Model);
+        var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
         material.uniforms.u_segmentColor.setTo(1.0, 0, 0);
-        segmentGeometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+        segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
     }
     parentobject.addChild(debugSegment);
     //
@@ -661,9 +661,9 @@ function createSegment()
     {
         debugPoint = feng3d.GameObject.create("points");
         debugPoint.mouseEnabled = false;
-        var meshRenderer = debugPoint.addComponent(feng3d.MeshRenderer);
-        pointGeometry = meshRenderer.geometry = new feng3d.PointGeometry();
-        var materialp = meshRenderer.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
+        var model = debugPoint.addComponent(feng3d.Model);
+        pointGeometry = model.geometry = new feng3d.PointGeometry();
+        var materialp = model.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
         materialp.uniforms.u_PointSize = 5;
         materialp.uniforms.u_color.setTo(0, 0, 0);
     }

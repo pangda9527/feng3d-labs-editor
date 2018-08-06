@@ -89,7 +89,7 @@ namespace editor
                     return result;
                 if (item.getComponent(GroundGrid))
                     return result;
-                if (item.getComponent(feng3d.SkinnedMeshRenderer))
+                if (item.getComponent(feng3d.SkinnedModel))
                     return result;
                 result.push(item.transform);
                 return result;
