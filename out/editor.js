@@ -831,6 +831,9 @@ var editor;
                 editor.mrsTool.toolType = editor.MRSToolType.SCALE;
             });
             feng3d.shortcut.on("selectGameObject", function () {
+                // var mouseRay3D = editorCamera.getMouseRay3D();
+                // feng3d.raycaster.pick(mouseRay3D, editorScene.mouseCheckObjects);
+                // editorScene
                 var gameObject = editor.engine.mouse3DManager.selectedGameObject;
                 if (!gameObject || !gameObject.scene) {
                     editor.editorData.selectedObjects = null;

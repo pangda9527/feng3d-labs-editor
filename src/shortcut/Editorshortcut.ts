@@ -22,6 +22,11 @@ namespace editor
             });
             feng3d.shortcut.on("selectGameObject", () =>
             {
+                // var mouseRay3D = editorCamera.getMouseRay3D();
+                // feng3d.raycaster.pick(mouseRay3D, editorScene.mouseCheckObjects);
+
+                // editorScene
+
                 var gameObject = engine.mouse3DManager.selectedGameObject;
                 if (!gameObject || !gameObject.scene)
                 {
