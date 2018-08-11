@@ -974,10 +974,10 @@ var editor;
     function onLookToSelectedGameObject() {
         var selectedGameObject = editor.editorData.firstSelectedGameObject;
         if (selectedGameObject) {
-            var worldBounds = selectedGameObject.getComponent(feng3d.Model).worldBounds;
+            var model = selectedGameObject.getComponent(feng3d.Model);
             var size = 1;
-            if (worldBounds)
-                size = worldBounds.getSize().length;
+            if (model && model.worldBounds)
+                size = model.worldBounds.getSize().length;
             size = Math.max(size, 1);
             //
             var cameraGameObject = editor.editorCamera;
@@ -7913,23 +7913,14 @@ var editor;
         HierarchyTree.prototype.onSelectedGameObjectChanged = function () {
             var _this = this;
             this.selectedGameObjects.forEach(function (element) {
-                //清除选中效果
-                var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
-                if (wireframeComponent)
-                    element.removeComponent(wireframeComponent);
                 var node = _this.getNode(element);
-                if (!node) {
-                    // 为什么为空，是否被允许？
-                    debugger;
-                }
-                node.selected = false;
+                if (node)
+                    node.selected = false;
+                else
+                    debugger; // 为什么为空，是否被允许？
             });
             this.selectedGameObjects = editor.editorData.selectedGameObjects;
             this.selectedGameObjects.forEach(function (element) {
-                //新增选中效果
-                var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
-                if (!wireframeComponent)
-                    element.addComponent(feng3d.WireframeComponent);
                 _this.getNode(element).selected = true;
             });
         };
@@ -8212,7 +8203,9 @@ var editor;
     var EditorEngine = /** @class */ (function (_super) {
         __extends(EditorEngine, _super);
         function EditorEngine() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.wireframeColor = new feng3d.Color4(125 / 255, 176 / 255, 250 / 255);
+            return _this;
         }
         Object.defineProperty(EditorEngine.prototype, "scene", {
             get: function () {
@@ -8243,12 +8236,17 @@ var editor;
          * 绘制场景
          */
         EditorEngine.prototype.render = function () {
+            var _this = this;
             _super.prototype.render.call(this);
             editor.editorScene.update();
             feng3d.forwardRenderer.draw(this.gl, editor.editorScene, this.camera);
             var selectedObject = this.mouse3DManager.pick(editor.editorScene, this.camera);
             if (selectedObject)
                 this.selectedObject = selectedObject;
+            editor.editorData.selectedGameObjects.forEach(function (element) {
+                if (element.getComponent(feng3d.Model))
+                    feng3d.wireframeRenderer.drawGameObject(_this.gl, element, _this.scene, _this.camera, _this.wireframeColor);
+            });
         };
         return EditorEngine;
     }(feng3d.Engine));

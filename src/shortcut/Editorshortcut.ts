@@ -203,10 +203,11 @@ namespace editor
         var selectedGameObject = editorData.firstSelectedGameObject;
         if (selectedGameObject)
         {
-            var worldBounds = selectedGameObject.getComponent(feng3d.Model).worldBounds;
+            var model = selectedGameObject.getComponent(feng3d.Model);
+
             var size = 1;
-            if (worldBounds)
-                size = worldBounds.getSize().length;
+            if (model && model.worldBounds)
+                size = model.worldBounds.getSize().length;
             size = Math.max(size, 1);
             //
             var cameraGameObject = editorCamera;

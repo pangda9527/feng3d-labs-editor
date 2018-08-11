@@ -2068,6 +2068,7 @@ declare namespace editor {
         scene: feng3d.Scene3D;
         readonly camera: feng3d.Camera;
         private _scene;
+        wireframeColor: feng3d.Color4;
         /**
          * 绘制场景
          */

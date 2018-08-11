@@ -117,25 +117,15 @@ namespace editor
         {
             this.selectedGameObjects.forEach(element =>
             {
-                //清除选中效果
-                var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
-                if (wireframeComponent)
-                    element.removeComponent(wireframeComponent);
                 var node = this.getNode(element);
-                if (!node)
-                {
-                    // 为什么为空，是否被允许？
-                    debugger;
-                }
-                node.selected = false;
+                if (node)
+                    node.selected = false;
+                else
+                    debugger; // 为什么为空，是否被允许？
             });
             this.selectedGameObjects = editorData.selectedGameObjects;
             this.selectedGameObjects.forEach(element =>
             {
-                //新增选中效果
-                var wireframeComponent = element.getComponent(feng3d.WireframeComponent);
-                if (!wireframeComponent)
-                    element.addComponent(feng3d.WireframeComponent);
                 this.getNode(element).selected = true;
             });
         }

@@ -31,6 +31,8 @@ namespace editor
         }
         private _scene: feng3d.Scene3D;
 
+        wireframeColor = new feng3d.Color4(125 / 255, 176 / 255, 250 / 255);
+
         /**
          * 绘制场景
          */
@@ -42,6 +44,12 @@ namespace editor
             feng3d.forwardRenderer.draw(this.gl, editorScene, this.camera);
             var selectedObject = this.mouse3DManager.pick(editorScene, this.camera);
             if (selectedObject) this.selectedObject = selectedObject;
+
+            editorData.selectedGameObjects.forEach(element =>
+            {
+                if (element.getComponent(feng3d.Model))
+                    feng3d.wireframeRenderer.drawGameObject(this.gl, element, this.scene, this.camera, this.wireframeColor);
+            });
         }
     }
 
