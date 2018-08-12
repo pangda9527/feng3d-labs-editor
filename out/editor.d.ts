@@ -284,7 +284,30 @@ declare namespace editor {
 declare namespace editor {
     var editorshortcut: Editorshortcut;
     class Editorshortcut {
+        private preMousePoint;
+        private selectedObjectsHistory;
+        private dragSceneMousePoint;
+        private dragSceneCameraGlobalMatrix3D;
+        private rotateSceneCenter;
+        private rotateSceneCameraGlobalMatrix3D;
+        private rotateSceneMousePoint;
         init(): void;
+        private onGameobjectMoveTool();
+        private onGameobjectRotationTool();
+        private onGameobjectScaleTool();
+        private onSceneCameraForwardBackMouseMoveStart();
+        private onSceneCameraForwardBackMouseMove();
+        private onSelectGameObject();
+        onDeleteSeletedGameObject(): void;
+        onDragSceneStart(): void;
+        onDragScene(): void;
+        onFpsViewStart(): void;
+        onFpsViewStop(): void;
+        updateFpsView(): void;
+        onMouseRotateSceneStart(): void;
+        onMouseRotateScene(): void;
+        onLookToSelectedGameObject(): void;
+        onMouseWheelMoveSceneCamera(): void;
     }
     class SceneControlConfig {
         mouseWheelMoveStep: number;
