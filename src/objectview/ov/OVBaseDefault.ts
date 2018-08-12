@@ -2,7 +2,6 @@ namespace editor
 {
 	/**
 	 * 默认基础对象界面
-	 * @author feng 2016-3-11
 	 */
 	@feng3d.OVComponent()
 	export class OVBaseDefault extends eui.Component implements feng3d.IObjectView

@@ -1,6 +1,5 @@
 /**
  * 默认对象属性界面
- * @author feng 2016-3-10
  */
 @feng3d.OAVComponent()
 class OAVDefault extends OAVBase

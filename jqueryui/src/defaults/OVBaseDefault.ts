@@ -1,6 +1,5 @@
 /**
  * 默认基础对象界面
- * @author feng 2016-3-11
  */
 @feng3d.OVComponent()
 class OVBaseDefault extends ui.Div implements feng3d.IObjectView

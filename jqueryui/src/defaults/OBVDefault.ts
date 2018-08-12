@@ -1,6 +1,5 @@
 /**
  * 默认对象属性块界面
- * @author feng 2016-3-22
  */
 @feng3d.OBVComponent()
 class OBVDefault extends ui.Div implements feng3d.IObjectBlockView

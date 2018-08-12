@@ -2,7 +2,6 @@ namespace editor
 {
 	/**
 	 * 挑选（拾取）OAV界面
-	 * @author feng 2016-3-10
 	 */
     @feng3d.OAVComponent()
     export class OAVPick extends OAVBase

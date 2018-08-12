@@ -5,7 +5,6 @@ namespace editor
 
     /**
      * feng3d的版本号
-     * @author feng 2015-03-20
      */
     export var revision: string = "2018.08.02";
 
@@ -13,7 +12,6 @@ namespace editor
 
     /**
      * 编辑器
-     * @author feng 2016-10-29
      */
     export class Editor extends eui.UILayer
     {

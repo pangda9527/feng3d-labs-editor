@@ -697,7 +697,6 @@ declare namespace editor {
 declare namespace editor {
     /**
      * 默认基础对象界面
-     * @author feng 2016-3-11
      */
     class OVBaseDefault extends eui.Component implements feng3d.IObjectView {
         label: eui.Label;
@@ -725,7 +724,6 @@ declare namespace feng3d {
 declare namespace editor {
     /**
      * 默认使用块的对象界面
-     * @author feng 2016-3-22
      */
     class OVDefault extends eui.Component implements feng3d.IObjectView {
         private _space;
@@ -784,7 +782,6 @@ declare namespace editor {
 declare namespace editor {
     /**
      * 默认对象属性块界面
-     * @author feng 2016-3-22
      */
     class OBVDefault extends eui.Component implements feng3d.IObjectBlockView {
         private _space;
@@ -861,7 +858,6 @@ declare namespace editor {
 declare namespace editor {
     /**
      * 默认对象属性界面
-     * @author feng 2016-3-10
      */
     class OAVDefault extends OAVBase {
         labelLab: eui.Label;
@@ -899,7 +895,6 @@ declare namespace editor {
 declare namespace editor {
     /**
      * 默认对象属性界面
-     * @author feng 2016-3-10
      */
     class OAVNumber extends OAVDefault {
         /**
@@ -1075,7 +1070,6 @@ declare namespace editor {
 declare namespace editor {
     /**
      * 挑选（拾取）OAV界面
-     * @author feng 2016-3-10
      */
     class OAVPick extends OAVBase {
         labelLab: eui.Label;
@@ -1095,7 +1089,6 @@ declare namespace editor {
 declare namespace editor {
     /**
      * 挑选（拾取）OAV界面
-     * @author feng 2016-3-10
      */
     class OAVTexture2D extends OAVBase {
         image: eui.Image;
@@ -1136,7 +1129,6 @@ declare namespace editor {
 declare namespace editor {
     /**
      * 属性面板（检查器）
-     * @author feng     2017-03-20
      */
     class InspectorView extends eui.Component implements eui.UIComponent {
         backButton: eui.Button;
@@ -2052,7 +2044,6 @@ declare namespace editor {
 declare namespace editor {
     /**
      * 地面网格
-     * @author feng 2016-10-29
      */
     class GroundGrid extends feng3d.Component {
         private num;
@@ -2076,7 +2067,6 @@ declare namespace editor {
     }
     /**
     * 编辑器3D入口
-    * @author feng 2016-10-29
     */
     class Main3D {
         constructor();
@@ -2493,12 +2483,10 @@ declare namespace editor {
     var editorData: EditorData;
     /**
      * feng3d的版本号
-     * @author feng 2015-03-20
      */
     var revision: string;
     /**
      * 编辑器
-     * @author feng 2016-10-29
      */
     class Editor extends eui.UILayer {
         private mainView;

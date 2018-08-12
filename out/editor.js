@@ -2639,7 +2639,6 @@ var editor;
 (function (editor) {
     /**
      * 默认基础对象界面
-     * @author feng 2016-3-11
      */
     var OVBaseDefault = /** @class */ (function (_super) {
         __extends(OVBaseDefault, _super);
@@ -2700,7 +2699,6 @@ var editor;
 (function (editor) {
     /**
      * 默认使用块的对象界面
-     * @author feng 2016-3-22
      */
     var OVDefault = /** @class */ (function (_super) {
         __extends(OVDefault, _super);
@@ -2934,7 +2932,6 @@ var editor;
 (function (editor) {
     /**
      * 默认对象属性块界面
-     * @author feng 2016-3-22
      */
     var OBVDefault = /** @class */ (function (_super) {
         __extends(OBVDefault, _super);
@@ -3149,7 +3146,6 @@ var editor;
 (function (editor) {
     /**
      * 默认对象属性界面
-     * @author feng 2016-3-10
      */
     var OAVDefault = /** @class */ (function (_super) {
         __extends(OAVDefault, _super);
@@ -3285,7 +3281,6 @@ var editor;
 (function (editor) {
     /**
      * 默认对象属性界面
-     * @author feng 2016-3-10
      */
     var OAVNumber = /** @class */ (function (_super) {
         __extends(OAVNumber, _super);
@@ -3900,7 +3895,6 @@ var editor;
 (function (editor) {
     /**
      * 挑选（拾取）OAV界面
-     * @author feng 2016-3-10
      */
     var OAVPick = /** @class */ (function (_super) {
         __extends(OAVPick, _super);
@@ -4067,7 +4061,6 @@ var editor;
 (function (editor) {
     /**
      * 挑选（拾取）OAV界面
-     * @author feng 2016-3-10
      */
     var OAVTexture2D = /** @class */ (function (_super) {
         __extends(OAVTexture2D, _super);
@@ -4237,7 +4230,6 @@ var editor;
 (function (editor) {
     /**
      * 属性面板（检查器）
-     * @author feng     2017-03-20
      */
     var InspectorView = /** @class */ (function (_super) {
         __extends(InspectorView, _super);
@@ -8141,7 +8133,6 @@ var editor;
 (function (editor) {
     /**
      * 地面网格
-     * @author feng 2016-10-29
      */
     var GroundGrid = /** @class */ (function (_super) {
         __extends(GroundGrid, _super);
@@ -8250,7 +8241,6 @@ var editor;
     editor.EditorEngine = EditorEngine;
     /**
     * 编辑器3D入口
-    * @author feng 2016-10-29
     */
     var Main3D = /** @class */ (function () {
         function Main3D() {
@@ -10978,13 +10968,11 @@ var editor;
 (function (editor) {
     /**
      * feng3d的版本号
-     * @author feng 2015-03-20
      */
     editor.revision = "2018.08.02";
     feng3d.log("Editor version " + editor.revision);
     /**
      * 编辑器
-     * @author feng 2016-10-29
      */
     var Editor = /** @class */ (function (_super) {
         __extends(Editor, _super);

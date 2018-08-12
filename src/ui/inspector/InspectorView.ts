@@ -2,7 +2,6 @@ namespace editor
 {
 	/**
      * 属性面板（检查器）
-     * @author feng     2017-03-20
      */
 	export class InspectorView extends eui.Component implements eui.UIComponent
 	{

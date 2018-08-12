@@ -2,7 +2,6 @@ namespace editor
 {
     /**
      * 地面网格
-     * @author feng 2016-10-29
      */
     export class GroundGrid extends feng3d.Component
     {

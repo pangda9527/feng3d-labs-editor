@@ -2,7 +2,6 @@ namespace editor
 {
 	/**
 	 * 默认对象属性块界面
-	 * @author feng 2016-3-22
 	 */
 	@feng3d.OBVComponent()
 	export class OBVDefault extends eui.Component implements feng3d.IObjectBlockView

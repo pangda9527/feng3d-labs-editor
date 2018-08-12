@@ -55,7 +55,6 @@ namespace editor
 
     /**
     * 编辑器3D入口
-    * @author feng 2016-10-29
     */
     export class Main3D
     {
