@@ -67,7 +67,7 @@ namespace editor
 
             feng3d.shortcut.addShortCuts(shortcutConfig);
 
-            editorshortcut.init();
+            new Editorshortcut();
 
             this.once(egret.Event.ENTER_FRAME, function ()
             {

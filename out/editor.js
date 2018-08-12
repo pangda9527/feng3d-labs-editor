@@ -818,8 +818,6 @@ var editor;
     var Editorshortcut = /** @class */ (function () {
         function Editorshortcut() {
             this.selectedObjectsHistory = [];
-        }
-        Editorshortcut.prototype.init = function () {
             //监听命令
             feng3d.shortcut.on("deleteSeletedGameObject", this.onDeleteSeletedGameObject, this);
             //
@@ -838,7 +836,7 @@ var editor;
             feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
             feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
-        };
+        }
         Editorshortcut.prototype.onGameobjectMoveTool = function () {
             editor.mrsTool.toolType = editor.MRSToolType.MOVE;
         };
@@ -999,14 +997,13 @@ var editor;
                 }
                 size = Math.max(size, 1);
                 //
-                var cameraGameObject = editor.editorCamera;
                 editor.sceneControlConfig.lookDistance = size;
-                var lookPos = cameraGameObject.transform.localToWorldMatrix.forward;
+                var lookPos = editor.editorCamera.transform.localToWorldMatrix.forward;
                 lookPos.scale(-editor.sceneControlConfig.lookDistance);
                 lookPos.add(scenePosition);
                 var localLookPos = lookPos.clone();
-                if (cameraGameObject.transform.parent) {
-                    cameraGameObject.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
+                if (editor.editorCamera.transform.parent) {
+                    editor.editorCamera.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
                 }
                 egret.Tween.get(editor.editorCamera.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
             }
@@ -1019,7 +1016,6 @@ var editor;
         return Editorshortcut;
     }());
     editor.Editorshortcut = Editorshortcut;
-    editor.editorshortcut = new Editorshortcut();
     var SceneControlConfig = /** @class */ (function () {
         function SceneControlConfig() {
             this.mouseWheelMoveStep = 0.004;
@@ -11038,7 +11034,7 @@ var editor;
             //初始化feng3d
             new editor.Main3D();
             feng3d.shortcut.addShortCuts(shortcutConfig);
-            editor.editorshortcut.init();
+            new editor.Editorshortcut();
             this.once(egret.Event.ENTER_FRAME, function () {
                 //
                 egret.mouseEventEnvironment();
