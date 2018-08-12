@@ -991,16 +991,19 @@ var editor;
             var selectedGameObject = editor.editorData.firstSelectedGameObject;
             if (selectedGameObject) {
                 var model = selectedGameObject.getComponent(feng3d.Model);
+                var scenePosition = selectedGameObject.transform.scenePosition;
                 var size = 1;
-                if (model && model.worldBounds)
+                if (model && model.worldBounds) {
                     size = model.worldBounds.getSize().length;
+                    scenePosition = model.worldBounds.getCenter();
+                }
                 size = Math.max(size, 1);
                 //
                 var cameraGameObject = editor.editorCamera;
                 editor.sceneControlConfig.lookDistance = size;
                 var lookPos = cameraGameObject.transform.localToWorldMatrix.forward;
                 lookPos.scale(-editor.sceneControlConfig.lookDistance);
-                lookPos.add(selectedGameObject.transform.scenePosition);
+                lookPos.add(scenePosition);
                 var localLookPos = lookPos.clone();
                 if (cameraGameObject.transform.parent) {
                     cameraGameObject.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
