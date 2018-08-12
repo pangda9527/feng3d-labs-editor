@@ -22,24 +22,20 @@ namespace editor
             });
             feng3d.shortcut.on("selectGameObject", () =>
             {
-                // var mouseRay3D = editorCamera.getMouseRay3D();
-                // feng3d.raycaster.pick(mouseRay3D, editorScene.mouseCheckObjects);
+                var gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+                if (gameObjects.length > 0) return;
 
-                // editorScene
-
-                var gameObject = engine.mouse3DManager.selectedGameObject;
-                if (!gameObject || !gameObject.scene)
+                gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), engine.scene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+                if (gameObjects.length == 0)
                 {
                     editorData.selectedObjects = null;
                     return;
                 }
-                if (editorData.mrsToolObject == gameObject)
-                    return;
+
+                var gameObject = gameObjects[0];
                 var node = hierarchyTree.getNode(gameObject);
                 while (!node && gameObject.parent)
                 {
-                    if (editorData.mrsToolObject == gameObject)
-                        return;
                     gameObject = gameObject.parent;
                     node = hierarchyTree.getNode(gameObject);
                 }

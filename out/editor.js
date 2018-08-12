@@ -831,20 +831,17 @@ var editor;
                 editor.mrsTool.toolType = editor.MRSToolType.SCALE;
             });
             feng3d.shortcut.on("selectGameObject", function () {
-                // var mouseRay3D = editorCamera.getMouseRay3D();
-                // feng3d.raycaster.pick(mouseRay3D, editorScene.mouseCheckObjects);
-                // editorScene
-                var gameObject = editor.engine.mouse3DManager.selectedGameObject;
-                if (!gameObject || !gameObject.scene) {
+                var gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
+                if (gameObjects.length > 0)
+                    return;
+                gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.engine.scene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
+                if (gameObjects.length == 0) {
                     editor.editorData.selectedObjects = null;
                     return;
                 }
-                if (editor.editorData.mrsToolObject == gameObject)
-                    return;
+                var gameObject = gameObjects[0];
                 var node = editor.hierarchyTree.getNode(gameObject);
                 while (!node && gameObject.parent) {
-                    if (editor.editorData.mrsToolObject == gameObject)
-                        return;
                     gameObject = gameObject.parent;
                     node = editor.hierarchyTree.getNode(gameObject);
                 }
