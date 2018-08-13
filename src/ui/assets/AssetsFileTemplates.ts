@@ -80,7 +80,7 @@ feng3d.shaderConfig.shaders["NewShader"] = {
     uniform mat4 u_modelMatrix;
     uniform mat4 u_viewProjection;
     
-    void main(void) {
+    void main() {
     
         vec4 globalPosition = u_modelMatrix * vec4(a_position, 1.0);
         gl_Position = u_viewProjection * globalPosition;
@@ -91,7 +91,7 @@ feng3d.shaderConfig.shaders["NewShader"] = {
     
     uniform vec4 u_color;
     
-    void main(void) {
+    void main() {
         
         gl_FragColor = u_color;
     }
