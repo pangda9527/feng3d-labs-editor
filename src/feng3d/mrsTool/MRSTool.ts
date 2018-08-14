@@ -55,7 +55,6 @@ namespace editor
         {
             if (element.material)
             {
-                // element.material.depthMask = false;
                 element.material.renderParams.depthtest = false;
             }
         });
@@ -100,7 +99,7 @@ namespace editor
             //
             this.currentTool = this.mTool;
             //
-            feng3d.watcher.watch(editorData, "selectedObjects", this.onSelectedGameObjectChange, this);
+            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.onSelectedGameObjectChange, this);
             feng3d.watcher.watch(mrsTool, "toolType", this.onToolTypeChange, this);
         }
 
@@ -121,7 +120,7 @@ namespace editor
             this.sTool.dispose();
             this.sTool = null;
             //
-            feng3d.watcher.unwatch(editorData, "selectedObjects", this.onSelectedGameObjectChange, this);
+            feng3d.feng3dDispatcher.off("editor.onSelectedObjectsChanged", this.onSelectedGameObjectChange, this);
             feng3d.watcher.unwatch(mrsTool, "toolType", this.onToolTypeChange, this);
 
             super.dispose();

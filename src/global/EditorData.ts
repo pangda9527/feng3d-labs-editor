@@ -20,7 +20,19 @@ namespace editor
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
          */
-        selectedObjects: (feng3d.GameObject | AssetsFile)[];
+        get selectedObjects()
+        {
+            return this._selectedObjects;
+        }
+        private _selectedObjects: (feng3d.GameObject | AssetsFile)[] = [];
+
+        clearSelectedObjects()
+        {
+            this._selectedObjects.length = 0;
+            this._selectedGameObjectsInvalid = true;
+            this._selectedAssetsFileInvalid = true;
+            feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
+        }
 
         /**
          * 位移旋转缩放工具对象
@@ -34,22 +46,17 @@ namespace editor
          */
         selectObject(...objs: (feng3d.GameObject | AssetsFile)[])
         {
-            if (feng3d.shortcut.keyState.getKeyState("ctrl") && this.selectedObjects)
+            var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
+            if (!isAdd) this._selectedObjects.length = 0;
+            objs.forEach(v =>
             {
-                var oldobjs = this.selectedObjects.concat();
-                if (objs)
-                {
-                    objs.forEach(obj =>
-                    {
-                        if (oldobjs.indexOf(obj) != -1)
-                            oldobjs.splice(oldobjs.indexOf(obj), 1);
-                        else
-                            oldobjs.push(obj);
-                    });
-                }
-                objs = oldobjs;
-            }
-            this.selectedObjects = objs;
+                var index = this._selectedObjects.indexOf(v);
+                if (index == -1) this._selectedObjects.push(v);
+                else this._selectedObjects.splice(index, 1);
+            });
+            this._selectedGameObjectsInvalid = true;
+            this._selectedAssetsFileInvalid = true;
+            feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
         }
 
         /**
@@ -57,18 +64,20 @@ namespace editor
          */
         get selectedGameObjects()
         {
-            var result: feng3d.GameObject[] = [];
-
-            if (this.selectedObjects)
+            if (this._selectedGameObjectsInvalid)
             {
-                this.selectedObjects.forEach(element =>
+                this._selectedGameObjects.length = 0;
+                this._selectedObjects.forEach(v =>
                 {
-                    if (element instanceof feng3d.GameObject)
-                        result.push(element);
+                    if (v instanceof feng3d.GameObject) this._selectedGameObjects.push(v);
                 });
+
+                this._selectedGameObjectsInvalid = false;
             }
-            return result;
+            return this._selectedGameObjects;
         }
+        private _selectedGameObjects: feng3d.GameObject[] = [];
+        private _selectedGameObjectsInvalid = true;
 
         /**
          * 第一个选中游戏对象
@@ -85,12 +94,6 @@ namespace editor
         {
             var transforms = <feng3d.Transform[]>this.selectedGameObjects.reduce((result, item) =>
             {
-                if (item.getComponent(feng3d.Scene3D))
-                    return result;
-                if (item.getComponent(GroundGrid))
-                    return result;
-                if (item.getComponent(feng3d.SkinnedModel))
-                    return result;
                 result.push(item.transform);
                 return result;
             }, []);
@@ -102,18 +105,19 @@ namespace editor
          */
         get selectedAssetsFile()
         {
-            var result: AssetsFile[] = [];
-
-            if (this.selectedObjects)
+            if (this._selectedAssetsFileInvalid)
             {
-                this.selectedObjects.forEach(element =>
+                this._selectedAssetsFile.length = 0;
+                this._selectedObjects.forEach(v =>
                 {
-                    if (element instanceof AssetsFile)
-                        result.push(element);
+                    if (v instanceof AssetsFile) this._selectedAssetsFile.push(v);
                 });
+                this._selectedAssetsFileInvalid = false;
             }
-            return result;
+            return this._selectedObjects;
         }
+        private _selectedAssetsFileInvalid = true;
+        private _selectedAssetsFile: AssetsFile[] = [];
 
         /**
          * 获取编辑器资源绝对路径

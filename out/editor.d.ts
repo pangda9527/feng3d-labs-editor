@@ -1644,7 +1644,9 @@ declare namespace editor {
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
          */
-        selectedObjects: (feng3d.GameObject | AssetsFile)[];
+        readonly selectedObjects: (feng3d.GameObject | AssetsFile)[];
+        private _selectedObjects;
+        clearSelectedObjects(): void;
         /**
          * 位移旋转缩放工具对象
          */
@@ -1659,6 +1661,8 @@ declare namespace editor {
          * 选中游戏对象列表
          */
         readonly selectedGameObjects: feng3d.GameObject[];
+        private _selectedGameObjects;
+        private _selectedGameObjectsInvalid;
         /**
          * 第一个选中游戏对象
          */
@@ -1670,7 +1674,9 @@ declare namespace editor {
         /**
          * 选中游戏对象列表
          */
-        readonly selectedAssetsFile: AssetsFile[];
+        readonly selectedAssetsFile: (feng3d.GameObject | AssetsFile)[];
+        private _selectedAssetsFileInvalid;
+        private _selectedAssetsFile;
         /**
          * 获取编辑器资源绝对路径
          * @param url 编辑器资源相对路径
@@ -1717,6 +1723,8 @@ declare namespace editor {
         startScale(): void;
         doScale(scale: feng3d.Vector3): void;
         stopScale(): void;
+        private getTransformData(transform);
+        private rotateRotation(rotation, axis, angle);
     }
 }
 declare namespace editor {
@@ -2042,6 +2050,11 @@ declare namespace editor {
          */
         getNode(gameObject: feng3d.GameObject): HierarchyNode;
         private onSelectedGameObjectChanged();
+    }
+}
+declare namespace feng3d {
+    interface Feng3dEventMap {
+        "editor.onSelectedObjectsChanged": any;
     }
 }
 declare namespace editor {

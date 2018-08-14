@@ -20,7 +20,7 @@ namespace editor
         {
             super();
 
-            feng3d.watcher.watch(editorData, "selectedObjects", this.onSelectedGameObjectChanged, this);
+            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.onSelectedGameObjectChanged, this);
         }
 
         /**
@@ -132,4 +132,13 @@ namespace editor
     }
 
     hierarchyTree = new HierarchyTree();
+
+}
+
+namespace feng3d
+{
+    export interface Feng3dEventMap
+    {
+        "editor.onSelectedObjectsChanged"
+    }
 }

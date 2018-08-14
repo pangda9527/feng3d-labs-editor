@@ -39,13 +39,13 @@ namespace editor
 			this.backButton.visible = this.viewDataList.length > 0;
 
 			this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-			feng3d.watcher.watch(editorData, "selectedObjects", this.onDataChange, this);
+			feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.onDataChange, this);
 		}
 
 		private onRemovedFromStage()
 		{
 			this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-			feng3d.watcher.unwatch(editorData, "selectedObjects", this.onDataChange, this);
+			feng3d.feng3dDispatcher.off("editor.onSelectedObjectsChanged", this.onDataChange, this);
 		}
 
 		private onDataChange()

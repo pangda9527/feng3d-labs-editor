@@ -79,7 +79,7 @@ namespace editor
             gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), engine.scene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
             if (gameObjects.length == 0)
             {
-                editorData.selectedObjects = null;
+                editorData.clearSelectedObjects();
                 return;
             }
             //
@@ -117,7 +117,7 @@ namespace editor
             }
             else
             {
-                editorData.selectedObjects = null;
+                editorData.clearSelectedObjects();
             }
         }
 
@@ -143,7 +143,7 @@ namespace editor
                         // 等待删除所有文件 后清空选中对象
                         if (deletefileNum == 0)
                         {
-                            editorData.selectedObjects = null;
+                            editorData.clearSelectedObjects();
                         }
                     });
                 }
@@ -151,7 +151,7 @@ namespace editor
             // 等待删除所有文件 后清空选中对象
             if (deletefileNum == 0)
             {
-                editorData.selectedObjects = null;
+                editorData.clearSelectedObjects();
             }
         }
 
