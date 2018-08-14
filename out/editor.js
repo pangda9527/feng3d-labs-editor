@@ -964,7 +964,7 @@ var editor;
             this.rotateSceneCameraGlobalMatrix3D = editor.editorCamera.transform.localToWorldMatrix.clone();
             this.rotateSceneCenter = null;
             //获取第一个 游戏对象
-            var firstObject = editor.editorData.firstSelectedGameObject;
+            var firstObject = editor.editorData.transformGameObject;
             if (firstObject) {
                 this.rotateSceneCenter = firstObject.transform.scenePosition;
             }
@@ -986,7 +986,7 @@ var editor;
             editor.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
         };
         Editorshortcut.prototype.onLookToSelectedGameObject = function () {
-            var selectedGameObject = editor.editorData.firstSelectedGameObject;
+            var selectedGameObject = editor.editorData.transformGameObject;
             if (selectedGameObject) {
                 var model = selectedGameObject.getComponent(feng3d.Model);
                 var scenePosition = selectedGameObject.transform.scenePosition;
@@ -996,8 +996,13 @@ var editor;
                     scenePosition = model.worldBounds.getCenter();
                 }
                 size = Math.max(size, 1);
+                var lookDistance = size;
+                var lens = editor.editorCamera.lens;
+                if (lens instanceof feng3d.PerspectiveLens) {
+                    lookDistance = size / Math.tan(lens.fov * Math.PI / 360);
+                }
                 //
-                editor.sceneControlConfig.lookDistance = size;
+                editor.sceneControlConfig.lookDistance = lookDistance;
                 var lookPos = editor.editorCamera.transform.localToWorldMatrix.forward;
                 lookPos.scale(-editor.sceneControlConfig.lookDistance);
                 lookPos.add(scenePosition);
@@ -6207,6 +6212,7 @@ var editor;
             this._selectedObjects = [];
             this._selectedGameObjects = [];
             this._selectedGameObjectsInvalid = true;
+            this._transformGameObjectInvalid = true;
             this._selectedAssetsFileInvalid = true;
             this._selectedAssetsFile = [];
         }
@@ -6225,6 +6231,7 @@ var editor;
             this._selectedObjects.length = 0;
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetsFileInvalid = true;
+            this._transformGameObjectInvalid = true;
             feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
         };
         /**
@@ -6250,6 +6257,7 @@ var editor;
             });
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetsFileInvalid = true;
+            this._transformGameObjectInvalid = true;
             feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
         };
         Object.defineProperty(EditorData.prototype, "selectedGameObjects", {
@@ -6271,12 +6279,20 @@ var editor;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(EditorData.prototype, "firstSelectedGameObject", {
+        Object.defineProperty(EditorData.prototype, "transformGameObject", {
             /**
-             * 第一个选中游戏对象
+             * 变换对象
              */
             get: function () {
-                return this.selectedGameObjects[0];
+                if (this._transformGameObjectInvalid) {
+                    var length = this.selectedGameObjects.length;
+                    if (length > 0)
+                        this._transformGameObject = this.selectedGameObjects[length - 1];
+                    else
+                        this._transformGameObject = null;
+                    this._transformGameObjectInvalid = true;
+                }
+                return this._transformGameObject;
             },
             enumerable: true,
             configurable: true

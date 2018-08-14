@@ -31,6 +31,7 @@ namespace editor
             this._selectedObjects.length = 0;
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetsFileInvalid = true;
+            this._transformGameObjectInvalid = true;
             feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
         }
 
@@ -56,6 +57,7 @@ namespace editor
             });
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetsFileInvalid = true;
+            this._transformGameObjectInvalid = true;
             feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
         }
 
@@ -80,12 +82,23 @@ namespace editor
         private _selectedGameObjectsInvalid = true;
 
         /**
-         * 第一个选中游戏对象
+         * 变换对象
          */
-        get firstSelectedGameObject()
+        get transformGameObject()
         {
-            return this.selectedGameObjects[0];
+            if (this._transformGameObjectInvalid)
+            {
+                var length = this.selectedGameObjects.length;
+                if (length > 0)
+                    this._transformGameObject = this.selectedGameObjects[length - 1];
+                else
+                    this._transformGameObject = null;
+                this._transformGameObjectInvalid = true;
+            }
+            return this._transformGameObject;
         }
+        private _transformGameObject: feng3d.GameObject;
+        private _transformGameObjectInvalid = true;
 
         /**
          * 获取 受 MRSTool 控制的Transform列表

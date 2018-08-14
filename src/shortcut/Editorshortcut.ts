@@ -201,7 +201,7 @@ namespace editor
             this.rotateSceneCameraGlobalMatrix3D = editorCamera.transform.localToWorldMatrix.clone();
             this.rotateSceneCenter = null;
             //获取第一个 游戏对象
-            var firstObject = editorData.firstSelectedGameObject;
+            var firstObject = editorData.transformGameObject;
             if (firstObject)
             {
                 this.rotateSceneCenter = firstObject.transform.scenePosition;
@@ -228,7 +228,7 @@ namespace editor
 
         private onLookToSelectedGameObject()
         {
-            var selectedGameObject = editorData.firstSelectedGameObject;
+            var selectedGameObject = editorData.transformGameObject;
             if (selectedGameObject)
             {
                 var model = selectedGameObject.getComponent(feng3d.Model);
@@ -241,10 +241,16 @@ namespace editor
                     scenePosition = model.worldBounds.getCenter();
                 }
                 size = Math.max(size, 1);
+                var lookDistance = size;
+                var lens = editorCamera.lens;
+                if (lens instanceof feng3d.PerspectiveLens)
+                {
+                    lookDistance = size / Math.tan(lens.fov * Math.PI / 360);
+                }
                 //
-                sceneControlConfig.lookDistance = size;
+                sceneControlConfig.lookDistance = lookDistance;
                 var lookPos = editorCamera.transform.localToWorldMatrix.forward;
-                lookPos.scale(- sceneControlConfig.lookDistance);
+                lookPos.scale(-sceneControlConfig.lookDistance);
                 lookPos.add(scenePosition);
                 var localLookPos = lookPos.clone();
                 if (editorCamera.transform.parent)

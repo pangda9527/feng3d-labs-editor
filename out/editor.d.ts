@@ -1664,9 +1664,11 @@ declare namespace editor {
         private _selectedGameObjects;
         private _selectedGameObjectsInvalid;
         /**
-         * 第一个选中游戏对象
+         * 变换对象
          */
-        readonly firstSelectedGameObject: feng3d.GameObject;
+        readonly transformGameObject: feng3d.GameObject;
+        private _transformGameObject;
+        private _transformGameObjectInvalid;
         /**
          * 获取 受 MRSTool 控制的Transform列表
          */
