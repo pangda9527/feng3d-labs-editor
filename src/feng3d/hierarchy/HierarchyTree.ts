@@ -20,7 +20,7 @@ namespace editor
         {
             super();
 
-            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.onSelectedGameObjectChanged, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
         }
 
         /**
@@ -139,6 +139,9 @@ namespace feng3d
 {
     export interface Feng3dEventMap
     {
-        "editor.onSelectedObjectsChanged"
+        "editor.selectedObjectsChanged"
+        "editor.isBaryCenterChanged"
+        "editor.isWoldCoordinateChanged"
+        "editor.toolTypeChanged"
     }
 }

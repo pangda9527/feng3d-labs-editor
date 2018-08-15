@@ -44,7 +44,7 @@ namespace editor
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
-            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.onDataChange, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
 
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
@@ -56,7 +56,7 @@ namespace editor
         $onRemoveFromStage()
         {
             super.$onRemoveFromStage()
-            feng3d.feng3dDispatcher.off("editor.onSelectedObjectsChanged", this.onDataChange, this);
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onDataChange, this);
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
             this.removeEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
         }

@@ -20,32 +20,6 @@ namespace editor
     }
 
     /**
-     * 控制器数据
-     */
-    export class MRSToolData
-    {
-        /**
-         * 使用的控制工具类型
-         */
-        toolType = MRSToolType.MOVE;
-
-        /**
-         * 是否使用世界坐标
-         */
-        isWoldCoordinate = false;
-
-        /**
-         * 坐标原点是否在质心
-         */
-        isBaryCenter = true;
-    }
-
-    /**
-     * 控制器数据
-     */
-    export var mrsTool = new MRSToolData();
-
-    /**
      * 设置永久可见
      */
     function setAwaysVisible(component: feng3d.Component)
@@ -99,8 +73,8 @@ namespace editor
             //
             this.currentTool = this.mTool;
             //
-            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.onSelectedGameObjectChange, this);
-            feng3d.watcher.watch(mrsTool, "toolType", this.onToolTypeChange, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+            feng3d.feng3dDispatcher.on("editor.toolTypeChanged", this.onToolTypeChange, this);
         }
 
         dispose()
@@ -120,8 +94,8 @@ namespace editor
             this.sTool.dispose();
             this.sTool = null;
             //
-            feng3d.feng3dDispatcher.off("editor.onSelectedObjectsChanged", this.onSelectedGameObjectChange, this);
-            feng3d.watcher.unwatch(mrsTool, "toolType", this.onToolTypeChange, this);
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+            feng3d.feng3dDispatcher.off("editor.toolTypeChanged", this.onToolTypeChange, this);
 
             super.dispose();
         }
@@ -144,7 +118,7 @@ namespace editor
 
         private onToolTypeChange()
         {
-            switch (mrsTool.toolType)
+            switch (editorData.toolType)
             {
                 case MRSToolType.MOVE:
                     this.currentTool = this.mTool;

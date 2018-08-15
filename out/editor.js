@@ -838,13 +838,13 @@ var editor;
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
         }
         Editorshortcut.prototype.onGameobjectMoveTool = function () {
-            editor.mrsTool.toolType = editor.MRSToolType.MOVE;
+            editor.editorData.toolType = editor.MRSToolType.MOVE;
         };
         Editorshortcut.prototype.onGameobjectRotationTool = function () {
-            editor.mrsTool.toolType = editor.MRSToolType.ROTATION;
+            editor.editorData.toolType = editor.MRSToolType.ROTATION;
         };
         Editorshortcut.prototype.onGameobjectScaleTool = function () {
-            editor.mrsTool.toolType = editor.MRSToolType.SCALE;
+            editor.editorData.toolType = editor.MRSToolType.SCALE;
         };
         Editorshortcut.prototype.onSceneCameraForwardBackMouseMoveStart = function () {
             this.preMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -986,15 +986,10 @@ var editor;
             editor.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
         };
         Editorshortcut.prototype.onLookToSelectedGameObject = function () {
-            var selectedGameObject = editor.editorData.transformGameObject;
-            if (selectedGameObject) {
-                var model = selectedGameObject.getComponent(feng3d.Model);
-                var scenePosition = selectedGameObject.transform.scenePosition;
-                var size = 1;
-                if (model && model.worldBounds) {
-                    size = model.worldBounds.getSize().length;
-                    scenePosition = model.worldBounds.getCenter();
-                }
+            var transformBox = editor.editorData.transformBox;
+            if (transformBox) {
+                var scenePosition = transformBox.getCenter();
+                var size = transformBox.getSize().length;
                 size = Math.max(size, 1);
                 var lookDistance = size;
                 var lens = editor.editorCamera.lens;
@@ -1135,7 +1130,7 @@ var editor;
         });
         CameraPreview.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.onDataChange, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
             this.onResize();
@@ -1143,7 +1138,7 @@ var editor;
         };
         CameraPreview.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
-            feng3d.feng3dDispatcher.off("editor.onSelectedObjectsChanged", this.onDataChange, this);
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onDataChange, this);
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
             this.removeEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
         };
@@ -4278,11 +4273,11 @@ var editor;
         InspectorView.prototype.onAddedToStage = function () {
             this.backButton.visible = this.viewDataList.length > 0;
             this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.onDataChange, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
         };
         InspectorView.prototype.onRemovedFromStage = function () {
             this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-            feng3d.feng3dDispatcher.off("editor.onSelectedObjectsChanged", this.onDataChange, this);
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onDataChange, this);
         };
         InspectorView.prototype.onDataChange = function () {
             var selectedObject = editor.editorData.selectedObjects;
@@ -5553,7 +5548,7 @@ var editor;
             this.floderpathTxt.touchEnabled = true;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.watcher.watch(editor.editorAssets, "showFloder", this.updateShowFloder, this);
-            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         };
         AssetsView.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
@@ -5563,7 +5558,7 @@ var editor;
             this.excludeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.watcher.unwatch(editor.editorAssets, "showFloder", this.updateShowFloder, this);
-            feng3d.feng3dDispatcher.off("editor.onSelectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
             //
             editor.drag.unregister(this.filelistgroup);
             this.fileDrag.removeEventListener();
@@ -5786,7 +5781,7 @@ var editor;
             this.helpButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
             this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
             this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-            feng3d.watcher.watch(editor.mrsTool, "toolType", this.updateview, this);
+            feng3d.feng3dDispatcher.on("editor.toolTypeChanged", this.updateview, this);
             this.updateview();
         };
         TopView.prototype.onRemovedFromStage = function () {
@@ -5800,7 +5795,7 @@ var editor;
             this.helpButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
             this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
             this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-            feng3d.watcher.unwatch(editor.mrsTool, "toolType", this.updateview, this);
+            feng3d.feng3dDispatcher.off("editor.toolTypeChanged", this.updateview, this);
             if (editor.runwin)
                 editor.runwin.close();
             editor.runwin = null;
@@ -5817,19 +5812,19 @@ var editor;
                     editor.menu.popup(editor.mainMenu);
                     break;
                 case this.moveButton:
-                    editor.mrsTool.toolType = editor.MRSToolType.MOVE;
+                    editor.editorData.toolType = editor.MRSToolType.MOVE;
                     break;
                 case this.rotateButton:
-                    editor.mrsTool.toolType = editor.MRSToolType.ROTATION;
+                    editor.editorData.toolType = editor.MRSToolType.ROTATION;
                     break;
                 case this.scaleButton:
-                    editor.mrsTool.toolType = editor.MRSToolType.SCALE;
+                    editor.editorData.toolType = editor.MRSToolType.SCALE;
                     break;
                 case this.worldButton:
-                    editor.mrsTool.isWoldCoordinate = !editor.mrsTool.isWoldCoordinate;
+                    editor.editorData.isWoldCoordinate = !editor.editorData.isWoldCoordinate;
                     break;
                 case this.centerButton:
-                    editor.mrsTool.isBaryCenter = !editor.mrsTool.isBaryCenter;
+                    editor.editorData.isBaryCenter = !editor.editorData.isBaryCenter;
                     break;
                 case this.playBtn:
                     editor.editorAssets.saveScene("default.scene.json", editor.engine.scene, function (err) {
@@ -5862,11 +5857,11 @@ var editor;
             }
         };
         TopView.prototype.updateview = function () {
-            this.moveButton.selected = editor.mrsTool.toolType == editor.MRSToolType.MOVE;
-            this.rotateButton.selected = editor.mrsTool.toolType == editor.MRSToolType.ROTATION;
-            this.scaleButton.selected = editor.mrsTool.toolType == editor.MRSToolType.SCALE;
-            this.worldButton.selected = editor.mrsTool.isWoldCoordinate;
-            this.centerButton.selected = editor.mrsTool.isBaryCenter;
+            this.moveButton.selected = editor.editorData.toolType == editor.MRSToolType.MOVE;
+            this.rotateButton.selected = editor.editorData.toolType == editor.MRSToolType.ROTATION;
+            this.scaleButton.selected = editor.editorData.toolType == editor.MRSToolType.SCALE;
+            this.worldButton.selected = editor.editorData.isWoldCoordinate;
+            this.centerButton.selected = editor.editorData.isBaryCenter;
         };
         return TopView;
     }(eui.Component));
@@ -6210,9 +6205,13 @@ var editor;
     var EditorData = /** @class */ (function () {
         function EditorData() {
             this._selectedObjects = [];
+            this._toolType = editor.MRSToolType.MOVE;
             this._selectedGameObjects = [];
             this._selectedGameObjectsInvalid = true;
+            this._isBaryCenter = true;
+            this._isWoldCoordinate = false;
             this._transformGameObjectInvalid = true;
+            this._transformBoxInvalid = true;
             this._selectedAssetsFileInvalid = true;
             this._selectedAssetsFile = [];
         }
@@ -6232,7 +6231,8 @@ var editor;
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetsFileInvalid = true;
             this._transformGameObjectInvalid = true;
-            feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
+            this._transformBoxInvalid = true;
+            feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
         };
         /**
          * 选择对象
@@ -6258,8 +6258,25 @@ var editor;
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetsFileInvalid = true;
             this._transformGameObjectInvalid = true;
-            feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
+            this._transformBoxInvalid = true;
+            feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
         };
+        Object.defineProperty(EditorData.prototype, "toolType", {
+            /**
+             * 使用的控制工具类型
+             */
+            get: function () {
+                return this._toolType;
+            },
+            set: function (v) {
+                if (this._toolType == v)
+                    return;
+                this._toolType = v;
+                feng3d.feng3dDispatcher.dispatch("editor.toolTypeChanged");
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(EditorData.prototype, "selectedGameObjects", {
             /**
              * 选中游戏对象列表
@@ -6279,6 +6296,38 @@ var editor;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(EditorData.prototype, "isBaryCenter", {
+            /**
+             * 坐标原点是否在质心
+             */
+            get: function () {
+                return this._isBaryCenter;
+            },
+            set: function (v) {
+                if (this._isBaryCenter == v)
+                    return;
+                this._isBaryCenter = v;
+                feng3d.feng3dDispatcher.dispatch("editor.isBaryCenterChanged");
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EditorData.prototype, "isWoldCoordinate", {
+            /**
+             * 是否使用世界坐标
+             */
+            get: function () {
+                return this._isWoldCoordinate;
+            },
+            set: function (v) {
+                if (this._isWoldCoordinate == v)
+                    return;
+                this._isWoldCoordinate = v;
+                feng3d.feng3dDispatcher.dispatch("editor.isWoldCoordinateChanged");
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(EditorData.prototype, "transformGameObject", {
             /**
              * 变换对象
@@ -6290,9 +6339,39 @@ var editor;
                         this._transformGameObject = this.selectedGameObjects[length - 1];
                     else
                         this._transformGameObject = null;
-                    this._transformGameObjectInvalid = true;
+                    this._transformGameObjectInvalid = false;
                 }
                 return this._transformGameObject;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(EditorData.prototype, "transformBox", {
+            get: function () {
+                if (this._transformBoxInvalid) {
+                    var length = this.selectedGameObjects.length;
+                    if (length > 0) {
+                        this._transformBox = this.selectedGameObjects.reduce(function (pv, cv) {
+                            var model = cv.getComponent(feng3d.Model);
+                            var box = new feng3d.Box(cv.transform.scenePosition, cv.transform.scenePosition);
+                            if (model && model.worldBounds) {
+                                box.copy(model.worldBounds);
+                            }
+                            if (editor.editorData.isBaryCenter || pv == null) {
+                                pv = box;
+                            }
+                            else {
+                                pv.union(box);
+                            }
+                            return pv;
+                        }, null);
+                    }
+                    else {
+                        this._transformBox = null;
+                    }
+                    this._transformBoxInvalid = false;
+                }
+                return this._transformBox;
             },
             enumerable: true,
             configurable: true
@@ -6348,8 +6427,8 @@ var editor;
         function MRSToolTarget() {
             this._startScaleVec = [];
             this._controllerToolTransfrom = feng3d.GameObject.create("controllerToolTransfrom").transform;
-            feng3d.watcher.watch(editor.mrsTool, "isWoldCoordinate", this.updateControllerImage, this);
-            feng3d.watcher.watch(editor.mrsTool, "isBaryCenter", this.updateControllerImage, this);
+            feng3d.feng3dDispatcher.on("editor.isWoldCoordinateChanged", this.updateControllerImage, this);
+            feng3d.feng3dDispatcher.on("editor.isBaryCenterChanged", this.updateControllerImage, this);
         }
         Object.defineProperty(MRSToolTarget.prototype, "showGameObject", {
             //
@@ -6409,7 +6488,7 @@ var editor;
                 return;
             var transform = this._controllerTargets[this._controllerTargets.length - 1];
             var position = new feng3d.Vector3();
-            if (editor.mrsTool.isBaryCenter) {
+            if (editor.editorData.isBaryCenter) {
                 position.copy(transform.scenePosition);
             }
             else {
@@ -6419,7 +6498,7 @@ var editor;
                 position.scale(1 / this._controllerTargets.length);
             }
             var rotation = new feng3d.Vector3();
-            if (!editor.mrsTool.isWoldCoordinate) {
+            if (!editor.editorData.isWoldCoordinate) {
                 rotation = this._showGameObject.rotation;
             }
             this._controllerToolTransfrom.position = position;
@@ -6477,21 +6556,21 @@ var editor;
             objects.push(this._controllerTool);
             var localnormal;
             var gameobject = objects[0];
-            if (!editor.mrsTool.isWoldCoordinate && editor.mrsTool.isBaryCenter) {
+            if (!editor.editorData.isWoldCoordinate && editor.editorData.isBaryCenter) {
                 if (gameobject.parent)
                     localnormal = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal);
             }
             for (var i = 0; i < objects.length; i++) {
                 gameobject = objects[i];
                 var tempTransform = this._startTransformDic.get(gameobject);
-                if (!editor.mrsTool.isWoldCoordinate && editor.mrsTool.isBaryCenter) {
+                if (!editor.editorData.isWoldCoordinate && editor.editorData.isBaryCenter) {
                     gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                 }
                 else {
                     localnormal = normal.clone();
                     if (gameobject.parent)
                         localnormal = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal);
-                    if (editor.mrsTool.isBaryCenter) {
+                    if (editor.editorData.isBaryCenter) {
                         gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                     }
                     else {
@@ -6515,7 +6594,7 @@ var editor;
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
             var gameobject = objects[0];
-            if (!editor.mrsTool.isWoldCoordinate && editor.mrsTool.isBaryCenter) {
+            if (!editor.editorData.isWoldCoordinate && editor.editorData.isBaryCenter) {
                 if (gameobject.parent) {
                     normal1 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal1);
                     normal2 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal2);
@@ -6526,7 +6605,7 @@ var editor;
                 var tempsceneTransform = this._startTransformDic.get(gameobject);
                 var tempPosition = tempsceneTransform.position.clone();
                 var tempRotation = tempsceneTransform.rotation.clone();
-                if (!editor.mrsTool.isWoldCoordinate && editor.mrsTool.isBaryCenter) {
+                if (!editor.editorData.isWoldCoordinate && editor.editorData.isBaryCenter) {
                     tempRotation = this.rotateRotation(tempRotation, normal2, angle2);
                     gameobject.rotation = this.rotateRotation(tempRotation, normal1, angle1);
                 }
@@ -6537,7 +6616,7 @@ var editor;
                         localnormal1 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal1);
                         localnormal2 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal2);
                     }
-                    if (editor.mrsTool.isBaryCenter) {
+                    if (editor.editorData.isBaryCenter) {
                         tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
                         gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
                     }
@@ -7711,31 +7790,6 @@ var editor;
         MRSToolType[MRSToolType["SCALE"] = 2] = "SCALE";
     })(MRSToolType = editor.MRSToolType || (editor.MRSToolType = {}));
     /**
-     * 控制器数据
-     */
-    var MRSToolData = /** @class */ (function () {
-        function MRSToolData() {
-            /**
-             * 使用的控制工具类型
-             */
-            this.toolType = MRSToolType.MOVE;
-            /**
-             * 是否使用世界坐标
-             */
-            this.isWoldCoordinate = false;
-            /**
-             * 坐标原点是否在质心
-             */
-            this.isBaryCenter = true;
-        }
-        return MRSToolData;
-    }());
-    editor.MRSToolData = MRSToolData;
-    /**
-     * 控制器数据
-     */
-    editor.mrsTool = new MRSToolData();
-    /**
      * 设置永久可见
      */
     function setAwaysVisible(component) {
@@ -7773,8 +7827,8 @@ var editor;
             //
             this.currentTool = this.mTool;
             //
-            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.onSelectedGameObjectChange, this);
-            feng3d.watcher.watch(editor.mrsTool, "toolType", this.onToolTypeChange, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+            feng3d.feng3dDispatcher.on("editor.toolTypeChanged", this.onToolTypeChange, this);
         };
         MRSTool.prototype.dispose = function () {
             //
@@ -7792,8 +7846,8 @@ var editor;
             this.sTool.dispose();
             this.sTool = null;
             //
-            feng3d.feng3dDispatcher.off("editor.onSelectedObjectsChanged", this.onSelectedGameObjectChange, this);
-            feng3d.watcher.unwatch(editor.mrsTool, "toolType", this.onToolTypeChange, this);
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+            feng3d.feng3dDispatcher.off("editor.toolTypeChanged", this.onToolTypeChange, this);
             _super.prototype.dispose.call(this);
         };
         MRSTool.prototype.onSelectedGameObjectChange = function () {
@@ -7809,7 +7863,7 @@ var editor;
             }
         };
         MRSTool.prototype.onToolTypeChange = function () {
-            switch (editor.mrsTool.toolType) {
+            switch (editor.editorData.toolType) {
                 case MRSToolType.MOVE:
                     this.currentTool = this.mTool;
                     break;
@@ -7885,7 +7939,7 @@ var editor;
         function HierarchyTree() {
             var _this = _super.call(this) || this;
             _this.selectedGameObjects = [];
-            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", _this.onSelectedGameObjectChanged, _this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", _this.onSelectedGameObjectChanged, _this);
             return _this;
         }
         /**

@@ -87,7 +87,7 @@ namespace editor
 
             feng3d.watcher.watch(editorAssets, "showFloder", this.updateShowFloder, this);
 
-            feng3d.feng3dDispatcher.on("editor.onSelectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         }
 
         $onRemoveFromStage()
@@ -103,7 +103,7 @@ namespace editor
 
             feng3d.watcher.unwatch(editorAssets, "showFloder", this.updateShowFloder, this);
 
-            feng3d.feng3dDispatcher.off("editor.onSelectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
 
             //
             drag.unregister(this.filelistgroup);

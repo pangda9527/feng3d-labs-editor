@@ -48,7 +48,7 @@ namespace editor
 			this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-			feng3d.watcher.watch(mrsTool, "toolType", this.updateview, this);
+			feng3d.feng3dDispatcher.on("editor.toolTypeChanged", this.updateview, this);
 
 			this.updateview();
 		}
@@ -67,7 +67,7 @@ namespace editor
 			this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-			feng3d.watcher.unwatch(mrsTool, "toolType", this.updateview, this);
+			feng3d.feng3dDispatcher.off("editor.toolTypeChanged", this.updateview, this);
 
 			if (runwin) runwin.close();
 			runwin = null;
@@ -91,19 +91,19 @@ namespace editor
 					menu.popup(mainMenu);
 					break;
 				case this.moveButton:
-					mrsTool.toolType = MRSToolType.MOVE;
+					editorData.toolType = MRSToolType.MOVE;
 					break;
 				case this.rotateButton:
-					mrsTool.toolType = MRSToolType.ROTATION;
+					editorData.toolType = MRSToolType.ROTATION;
 					break;
 				case this.scaleButton:
-					mrsTool.toolType = MRSToolType.SCALE;
+					editorData.toolType = MRSToolType.SCALE;
 					break;
 				case this.worldButton:
-					mrsTool.isWoldCoordinate = !mrsTool.isWoldCoordinate;
+					editorData.isWoldCoordinate = !editorData.isWoldCoordinate;
 					break;
 				case this.centerButton:
-					mrsTool.isBaryCenter = !mrsTool.isBaryCenter;
+					editorData.isBaryCenter = !editorData.isBaryCenter;
 					break;
 				case this.playBtn:
 					editorAssets.saveScene("default.scene.json", engine.scene, (err) =>
@@ -142,11 +142,11 @@ namespace editor
 
 		private updateview()
 		{
-			this.moveButton.selected = mrsTool.toolType == MRSToolType.MOVE;
-			this.rotateButton.selected = mrsTool.toolType == MRSToolType.ROTATION;
-			this.scaleButton.selected = mrsTool.toolType == MRSToolType.SCALE;
-			this.worldButton.selected = mrsTool.isWoldCoordinate;
-			this.centerButton.selected = mrsTool.isBaryCenter;
+			this.moveButton.selected = editorData.toolType == MRSToolType.MOVE;
+			this.rotateButton.selected = editorData.toolType == MRSToolType.ROTATION;
+			this.scaleButton.selected = editorData.toolType == MRSToolType.SCALE;
+			this.worldButton.selected = editorData.isWoldCoordinate;
+			this.centerButton.selected = editorData.isBaryCenter;
 		}
 	}
 	// 运行窗口

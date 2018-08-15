@@ -34,17 +34,17 @@ namespace editor
 
         private onGameobjectMoveTool()
         {
-            mrsTool.toolType = MRSToolType.MOVE;
+            editorData.toolType = MRSToolType.MOVE;
         }
 
         private onGameobjectRotationTool()
         {
-            mrsTool.toolType = MRSToolType.ROTATION;
+            editorData.toolType = MRSToolType.ROTATION;
         }
 
         private onGameobjectScaleTool()
         {
-            mrsTool.toolType = MRSToolType.SCALE;
+            editorData.toolType = MRSToolType.SCALE;
         }
 
         private onSceneCameraForwardBackMouseMoveStart()
@@ -228,18 +228,11 @@ namespace editor
 
         private onLookToSelectedGameObject()
         {
-            var selectedGameObject = editorData.transformGameObject;
-            if (selectedGameObject)
+            var transformBox = editorData.transformBox;
+            if (transformBox)
             {
-                var model = selectedGameObject.getComponent(feng3d.Model);
-                var scenePosition = selectedGameObject.transform.scenePosition;
-
-                var size = 1;
-                if (model && model.worldBounds)
-                {
-                    size = model.worldBounds.getSize().length;
-                    scenePosition = model.worldBounds.getCenter();
-                }
+                var scenePosition = transformBox.getCenter();
+                var size = transformBox.getSize().length;
                 size = Math.max(size, 1);
                 var lookDistance = size;
                 var lens = editorCamera.lens;

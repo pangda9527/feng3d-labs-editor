@@ -32,7 +32,8 @@ namespace editor
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetsFileInvalid = true;
             this._transformGameObjectInvalid = true;
-            feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
+            this._transformBoxInvalid = true;
+            feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
         }
 
         /**
@@ -58,8 +59,25 @@ namespace editor
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetsFileInvalid = true;
             this._transformGameObjectInvalid = true;
-            feng3d.feng3dDispatcher.dispatch("editor.onSelectedObjectsChanged");
+            this._transformBoxInvalid = true;
+            feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
         }
+
+        /**
+         * 使用的控制工具类型
+         */
+        get toolType()
+        {
+            return this._toolType;
+        }
+        set toolType(v)
+        {
+            if (this._toolType == v) return;
+            this._toolType = v;
+            feng3d.feng3dDispatcher.dispatch("editor.toolTypeChanged");
+        }
+
+        private _toolType = MRSToolType.MOVE;
 
         /**
          * 选中游戏对象列表
@@ -82,6 +100,36 @@ namespace editor
         private _selectedGameObjectsInvalid = true;
 
         /**
+         * 坐标原点是否在质心
+         */
+        get isBaryCenter()
+        {
+            return this._isBaryCenter;
+        }
+        set isBaryCenter(v)
+        {
+            if (this._isBaryCenter == v) return;
+            this._isBaryCenter = v;
+            feng3d.feng3dDispatcher.dispatch("editor.isBaryCenterChanged");
+        }
+        private _isBaryCenter = true;
+
+        /**
+         * 是否使用世界坐标
+         */
+        get isWoldCoordinate()
+        {
+            return this._isWoldCoordinate;
+        }
+        set isWoldCoordinate(v)
+        {
+            if (this._isWoldCoordinate == v) return;
+            this._isWoldCoordinate = v;
+            feng3d.feng3dDispatcher.dispatch("editor.isWoldCoordinateChanged");
+        }
+        private _isWoldCoordinate = false;
+
+        /**
          * 变换对象
          */
         get transformGameObject()
@@ -93,12 +141,49 @@ namespace editor
                     this._transformGameObject = this.selectedGameObjects[length - 1];
                 else
                     this._transformGameObject = null;
-                this._transformGameObjectInvalid = true;
+                this._transformGameObjectInvalid = false;
             }
             return this._transformGameObject;
         }
         private _transformGameObject: feng3d.GameObject;
         private _transformGameObjectInvalid = true;
+
+        get transformBox()
+        {
+            if (this._transformBoxInvalid)
+            {
+                var length = this.selectedGameObjects.length;
+                if (length > 0)
+                {
+                    this._transformBox = this.selectedGameObjects.reduce((pv: feng3d.Box, cv) =>
+                    {
+                        var model = cv.getComponent(feng3d.Model);
+                        var box = new feng3d.Box(cv.transform.scenePosition, cv.transform.scenePosition);
+                        if (model && model.worldBounds)
+                        {
+                            box.copy(model.worldBounds);
+                        }
+                        if (editorData.isBaryCenter || pv == null)
+                        {
+                            pv = box;
+                        } else
+                        {
+                            pv.union(box);
+                        }
+                        return pv;
+                    }, null);
+                }
+                else
+                {
+                    this._transformBox = null;
+                }
+                this._transformBoxInvalid = false;
+            }
+            return this._transformBox;
+        }
+        private _transformBox: feng3d.Box;
+        private _transformBoxInvalid = true;
+
 
         /**
          * 获取 受 MRSTool 控制的Transform列表

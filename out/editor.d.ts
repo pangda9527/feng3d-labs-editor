@@ -1658,17 +1658,35 @@ declare namespace editor {
          */
         selectObject(...objs: (feng3d.GameObject | AssetsFile)[]): void;
         /**
+         * 使用的控制工具类型
+         */
+        toolType: MRSToolType;
+        private _toolType;
+        /**
          * 选中游戏对象列表
          */
         readonly selectedGameObjects: feng3d.GameObject[];
         private _selectedGameObjects;
         private _selectedGameObjectsInvalid;
         /**
+         * 坐标原点是否在质心
+         */
+        isBaryCenter: boolean;
+        private _isBaryCenter;
+        /**
+         * 是否使用世界坐标
+         */
+        isWoldCoordinate: boolean;
+        private _isWoldCoordinate;
+        /**
          * 变换对象
          */
         readonly transformGameObject: feng3d.GameObject;
         private _transformGameObject;
         private _transformGameObjectInvalid;
+        readonly transformBox: feng3d.Box;
+        private _transformBox;
+        private _transformBoxInvalid;
         /**
          * 获取 受 MRSTool 控制的Transform列表
          */
@@ -1967,27 +1985,6 @@ declare namespace editor {
         SCALE = 2,
     }
     /**
-     * 控制器数据
-     */
-    class MRSToolData {
-        /**
-         * 使用的控制工具类型
-         */
-        toolType: MRSToolType;
-        /**
-         * 是否使用世界坐标
-         */
-        isWoldCoordinate: boolean;
-        /**
-         * 坐标原点是否在质心
-         */
-        isBaryCenter: boolean;
-    }
-    /**
-     * 控制器数据
-     */
-    var mrsTool: MRSToolData;
-    /**
      * 位移旋转缩放工具
      */
     class MRSTool extends feng3d.Component {
@@ -2056,7 +2053,10 @@ declare namespace editor {
 }
 declare namespace feng3d {
     interface Feng3dEventMap {
-        "editor.onSelectedObjectsChanged": any;
+        "editor.selectedObjectsChanged": any;
+        "editor.isBaryCenterChanged": any;
+        "editor.isWoldCoordinateChanged": any;
+        "editor.toolTypeChanged": any;
     }
 }
 declare namespace editor {
