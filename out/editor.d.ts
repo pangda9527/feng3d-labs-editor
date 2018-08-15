@@ -1648,10 +1648,6 @@ declare namespace editor {
         private _selectedObjects;
         clearSelectedObjects(): void;
         /**
-         * 位移旋转缩放工具对象
-         */
-        mrsToolObject: feng3d.GameObject;
-        /**
          * 选择对象
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
@@ -1993,7 +1989,6 @@ declare namespace editor {
         private sTool;
         private _currentTool;
         private controllerTarget;
-        private mrsToolObject;
         init(gameObject: feng3d.GameObject): void;
         dispose(): void;
         private onSelectedGameObjectChange();

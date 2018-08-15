@@ -46,17 +46,10 @@ namespace editor
         private _currentTool: MRSToolBase;
 
         private controllerTarget: MRSToolTarget;
-        private mrsToolObject: feng3d.GameObject;
 
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
-
-            var mrsToolObject = feng3d.GameObject.create("MRSTool");
-            mrsToolObject.serializable = false;
-            mrsToolObject.showinHierarchy = false;
-
-            this.mrsToolObject = editorData.mrsToolObject = mrsToolObject;
 
             this.controllerTarget = new MRSToolTarget();
 
@@ -82,10 +75,6 @@ namespace editor
             //
             this.currentTool = null;
             //
-            this.mrsToolObject.dispose();
-            this.mrsToolObject = null;
-            editorData.mrsToolObject = null;
-            //
             this.controllerTarget = null;
             this.mTool.dispose();
             this.mTool = null;
@@ -107,12 +96,10 @@ namespace editor
             if (transforms.length > 0)
             {
                 this.controllerTarget.controllerTargets = transforms;
-                this.gameObject.addChild(this.mrsToolObject);
             }
             else
             {
                 this.controllerTarget.controllerTargets = null;
-                this.mrsToolObject.remove();
             }
         }
 
@@ -138,12 +125,12 @@ namespace editor
                 return;
             if (this._currentTool)
             {
-                this.mrsToolObject.removeChild(this._currentTool.gameObject)
+                this.gameObject.removeChild(this._currentTool.gameObject)
             }
             this._currentTool = value;
             if (this._currentTool)
             {
-                this.mrsToolObject.addChild(this._currentTool.gameObject);
+                this.gameObject.addChild(this._currentTool.gameObject);
             }
         }
     }
