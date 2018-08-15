@@ -11,8 +11,8 @@ namespace editor
 		//
 		private view: eui.Component;
 
-		viewData: any;
-		viewDataList = [];
+		private viewData: any;
+		private viewDataList = [];
 
 		constructor()
 		{
@@ -39,20 +39,20 @@ namespace editor
 			this.backButton.visible = this.viewDataList.length > 0;
 
 			this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-			feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
+			feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
 		}
 
 		private onRemovedFromStage()
 		{
 			this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-			feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onDataChange, this);
+			feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
 		}
 
-		private onDataChange()
+		private onSelectedObjectsChanged()
 		{
-			var selectedObject = editorData.selectedObjects;
-			if (selectedObject && selectedObject.length > 0)
-				this.showData(selectedObject[0], true)
+			var selectedObjects = editorData.selectedObjects;
+			if (selectedObjects && selectedObjects.length > 0)
+				this.showData(selectedObjects[0], true)
 			else
 				this.showData(null, true)
 		}

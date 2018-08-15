@@ -964,9 +964,9 @@ var editor;
             this.rotateSceneCameraGlobalMatrix3D = editor.editorCamera.transform.localToWorldMatrix.clone();
             this.rotateSceneCenter = null;
             //获取第一个 游戏对象
-            var firstObject = editor.editorData.transformGameObject;
-            if (firstObject) {
-                this.rotateSceneCenter = firstObject.transform.scenePosition;
+            var transformBox = editor.editorData.transformBox;
+            if (transformBox) {
+                this.rotateSceneCenter = transformBox.getCenter();
             }
             else {
                 this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
@@ -4273,16 +4273,16 @@ var editor;
         InspectorView.prototype.onAddedToStage = function () {
             this.backButton.visible = this.viewDataList.length > 0;
             this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
         };
         InspectorView.prototype.onRemovedFromStage = function () {
             this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onDataChange, this);
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
         };
-        InspectorView.prototype.onDataChange = function () {
-            var selectedObject = editor.editorData.selectedObjects;
-            if (selectedObject && selectedObject.length > 0)
-                this.showData(selectedObject[0], true);
+        InspectorView.prototype.onSelectedObjectsChanged = function () {
+            var selectedObjects = editor.editorData.selectedObjects;
+            if (selectedObjects && selectedObjects.length > 0)
+                this.showData(selectedObjects[0], true);
             else
                 this.showData(null, true);
         };
@@ -6200,12 +6200,30 @@ var editor;
 var editor;
 (function (editor) {
     /**
+     * 游戏对象控制器类型
+     */
+    var MRSToolType;
+    (function (MRSToolType) {
+        /**
+         * 移动
+         */
+        MRSToolType[MRSToolType["MOVE"] = 0] = "MOVE";
+        /**
+         * 旋转
+         */
+        MRSToolType[MRSToolType["ROTATION"] = 1] = "ROTATION";
+        /**
+         * 缩放
+         */
+        MRSToolType[MRSToolType["SCALE"] = 2] = "SCALE";
+    })(MRSToolType = editor.MRSToolType || (editor.MRSToolType = {}));
+    /**
      * 编辑器数据
      */
     var EditorData = /** @class */ (function () {
         function EditorData() {
             this._selectedObjects = [];
-            this._toolType = editor.MRSToolType.MOVE;
+            this._toolType = MRSToolType.MOVE;
             this._selectedGameObjects = [];
             this._selectedGameObjectsInvalid = true;
             this._isBaryCenter = true;
@@ -6348,23 +6366,24 @@ var editor;
         });
         Object.defineProperty(EditorData.prototype, "transformBox", {
             get: function () {
+                var _this = this;
                 if (this._transformBoxInvalid) {
                     var length = this.selectedGameObjects.length;
                     if (length > 0) {
-                        this._transformBox = this.selectedGameObjects.reduce(function (pv, cv) {
+                        this._transformBox = null;
+                        this.selectedGameObjects.forEach(function (cv) {
                             var model = cv.getComponent(feng3d.Model);
                             var box = new feng3d.Box(cv.transform.scenePosition, cv.transform.scenePosition);
                             if (model && model.worldBounds) {
                                 box.copy(model.worldBounds);
                             }
-                            if (editor.editorData.isBaryCenter || pv == null) {
-                                pv = box;
+                            if (editor.editorData.isBaryCenter || _this._transformBox == null) {
+                                _this._transformBox = box.clone();
                             }
                             else {
-                                pv.union(box);
+                                _this._transformBox.union(box);
                             }
-                            return pv;
-                        }, null);
+                        });
                     }
                     else {
                         this._transformBox = null;
@@ -7772,24 +7791,6 @@ var editor;
 var editor;
 (function (editor) {
     /**
-     * 游戏对象控制器类型
-     */
-    var MRSToolType;
-    (function (MRSToolType) {
-        /**
-         * 移动
-         */
-        MRSToolType[MRSToolType["MOVE"] = 0] = "MOVE";
-        /**
-         * 旋转
-         */
-        MRSToolType[MRSToolType["ROTATION"] = 1] = "ROTATION";
-        /**
-         * 缩放
-         */
-        MRSToolType[MRSToolType["SCALE"] = 2] = "SCALE";
-    })(MRSToolType = editor.MRSToolType || (editor.MRSToolType = {}));
-    /**
      * 设置永久可见
      */
     function setAwaysVisible(component) {
@@ -7854,13 +7855,13 @@ var editor;
         };
         MRSTool.prototype.onToolTypeChange = function () {
             switch (editor.editorData.toolType) {
-                case MRSToolType.MOVE:
+                case editor.MRSToolType.MOVE:
                     this.currentTool = this.mTool;
                     break;
-                case MRSToolType.ROTATION:
+                case editor.MRSToolType.ROTATION:
                     this.currentTool = this.rTool;
                     break;
-                case MRSToolType.SCALE:
+                case editor.MRSToolType.SCALE:
                     this.currentTool = this.sTool;
                     break;
             }

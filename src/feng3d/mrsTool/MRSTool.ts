@@ -1,25 +1,6 @@
 namespace editor
 {
     /**
-     * 游戏对象控制器类型
-     */
-    export enum MRSToolType
-    {
-        /**
-         * 移动
-         */
-        MOVE,
-        /**
-         * 旋转
-         */
-        ROTATION,
-        /**
-         * 缩放
-         */
-        SCALE,
-    }
-
-    /**
      * 设置永久可见
      */
     function setAwaysVisible(component: feng3d.Component)

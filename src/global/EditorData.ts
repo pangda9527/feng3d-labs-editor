@@ -7,6 +7,25 @@ namespace editor
     export var editorData: EditorData;
 
     /**
+     * 游戏对象控制器类型
+     */
+    export enum MRSToolType
+    {
+        /**
+         * 移动
+         */
+        MOVE,
+        /**
+         * 旋转
+         */
+        ROTATION,
+        /**
+         * 缩放
+         */
+        SCALE,
+    }
+
+    /**
      * 编辑器数据
      */
     export class EditorData
@@ -150,7 +169,8 @@ namespace editor
                 var length = this.selectedGameObjects.length;
                 if (length > 0)
                 {
-                    this._transformBox = this.selectedGameObjects.reduce((pv: feng3d.Box, cv) =>
+                    this._transformBox = null;
+                    this.selectedGameObjects.forEach(cv =>
                     {
                         var model = cv.getComponent(feng3d.Model);
                         var box = new feng3d.Box(cv.transform.scenePosition, cv.transform.scenePosition);
@@ -158,15 +178,14 @@ namespace editor
                         {
                             box.copy(model.worldBounds);
                         }
-                        if (editorData.isBaryCenter || pv == null)
+                        if (editorData.isBaryCenter || this._transformBox == null)
                         {
-                            pv = box;
+                            this._transformBox = box.clone();
                         } else
                         {
-                            pv.union(box);
+                            this._transformBox.union(box);
                         }
-                        return pv;
-                    }, null);
+                    });
                 }
                 else
                 {
@@ -178,7 +197,6 @@ namespace editor
         }
         private _transformBox: feng3d.Box;
         private _transformBoxInvalid = true;
-
 
         /**
          * 获取 受 MRSTool 控制的Transform列表

@@ -201,10 +201,10 @@ namespace editor
             this.rotateSceneCameraGlobalMatrix3D = editorCamera.transform.localToWorldMatrix.clone();
             this.rotateSceneCenter = null;
             //获取第一个 游戏对象
-            var firstObject = editorData.transformGameObject;
-            if (firstObject)
+            var transformBox = editorData.transformBox;
+            if (transformBox)
             {
-                this.rotateSceneCenter = firstObject.transform.scenePosition;
+                this.rotateSceneCenter = transformBox.getCenter();
             } else
             {
                 this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;

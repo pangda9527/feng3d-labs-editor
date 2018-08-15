@@ -1156,13 +1156,13 @@ declare namespace editor {
         backButton: eui.Button;
         group: eui.Group;
         private view;
-        viewData: any;
-        viewDataList: any[];
+        private viewData;
+        private viewDataList;
         constructor();
         private onComplete();
         private onAddedToStage();
         private onRemovedFromStage();
-        private onDataChange();
+        private onSelectedObjectsChanged();
         updateView(): void;
         showData(data: any, removeBack?: boolean): void;
         onBackButton(): void;
@@ -1633,6 +1633,23 @@ declare namespace editor {
      */
     var editorData: EditorData;
     /**
+     * 游戏对象控制器类型
+     */
+    enum MRSToolType {
+        /**
+         * 移动
+         */
+        MOVE = 0,
+        /**
+         * 旋转
+         */
+        ROTATION = 1,
+        /**
+         * 缩放
+         */
+        SCALE = 2,
+    }
+    /**
      * 编辑器数据
      */
     class EditorData {
@@ -1963,23 +1980,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    /**
-     * 游戏对象控制器类型
-     */
-    enum MRSToolType {
-        /**
-         * 移动
-         */
-        MOVE = 0,
-        /**
-         * 旋转
-         */
-        ROTATION = 1,
-        /**
-         * 缩放
-         */
-        SCALE = 2,
-    }
     /**
      * 位移旋转缩放工具
      */
