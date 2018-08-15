@@ -1989,6 +1989,7 @@ declare namespace editor {
         private sTool;
         private _currentTool;
         private controllerTarget;
+        private mrsToolObject;
         init(gameObject: feng3d.GameObject): void;
         dispose(): void;
         private onSelectedGameObjectChange();

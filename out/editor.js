@@ -7811,6 +7811,7 @@ var editor;
         }
         MRSTool.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
+            this.mrsToolObject = feng3d.GameObject.create("MRSTool");
             this.controllerTarget = new editor.MRSToolTarget();
             this.mTool = feng3d.GameObject.create("MTool").addComponent(editor.MTool);
             this.rTool = feng3d.GameObject.create("RTool").addComponent(editor.RTool);
@@ -7831,6 +7832,9 @@ var editor;
             //
             this.currentTool = null;
             //
+            this.mrsToolObject.dispose();
+            this.mrsToolObject = null;
+            //
             this.controllerTarget = null;
             this.mTool.dispose();
             this.mTool = null;
@@ -7848,9 +7852,11 @@ var editor;
             var transforms = editor.editorData.mrsTransforms;
             if (transforms.length > 0) {
                 this.controllerTarget.controllerTargets = transforms;
+                this.gameObject.addChild(this.mrsToolObject);
             }
             else {
                 this.controllerTarget.controllerTargets = null;
+                this.mrsToolObject.remove();
             }
         };
         MRSTool.prototype.onToolTypeChange = function () {
@@ -7871,11 +7877,11 @@ var editor;
                 if (this._currentTool == value)
                     return;
                 if (this._currentTool) {
-                    this.gameObject.removeChild(this._currentTool.gameObject);
+                    this._currentTool.gameObject.remove();
                 }
                 this._currentTool = value;
                 if (this._currentTool) {
-                    this.gameObject.addChild(this._currentTool.gameObject);
+                    this.mrsToolObject.addChild(this._currentTool.gameObject);
                 }
             },
             enumerable: true,
