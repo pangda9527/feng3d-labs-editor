@@ -145,7 +145,7 @@ namespace editor
 			this.moveButton.selected = editorData.toolType == MRSToolType.MOVE;
 			this.rotateButton.selected = editorData.toolType == MRSToolType.ROTATION;
 			this.scaleButton.selected = editorData.toolType == MRSToolType.SCALE;
-			this.worldButton.selected = editorData.isWoldCoordinate;
+			this.worldButton.selected = !editorData.isWoldCoordinate;
 			this.centerButton.selected = editorData.isBaryCenter;
 		}
 	}

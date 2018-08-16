@@ -5860,7 +5860,7 @@ var editor;
             this.moveButton.selected = editor.editorData.toolType == editor.MRSToolType.MOVE;
             this.rotateButton.selected = editor.editorData.toolType == editor.MRSToolType.ROTATION;
             this.scaleButton.selected = editor.editorData.toolType == editor.MRSToolType.SCALE;
-            this.worldButton.selected = editor.editorData.isWoldCoordinate;
+            this.worldButton.selected = !editor.editorData.isWoldCoordinate;
             this.centerButton.selected = editor.editorData.isBaryCenter;
         };
         return TopView;
@@ -6325,6 +6325,7 @@ var editor;
                 if (this._isBaryCenter == v)
                     return;
                 this._isBaryCenter = v;
+                this._transformBoxInvalid = true;
                 feng3d.feng3dDispatcher.dispatch("editor.isBaryCenterChanged");
             },
             enumerable: true,

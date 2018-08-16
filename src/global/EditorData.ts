@@ -124,6 +124,7 @@ namespace editor
         {
             if (this._isBaryCenter == v) return;
             this._isBaryCenter = v;
+            this._transformBoxInvalid = true;
             feng3d.feng3dDispatcher.dispatch("editor.isBaryCenterChanged");
         }
         private _isBaryCenter = true;
