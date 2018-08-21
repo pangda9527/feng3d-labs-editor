@@ -11090,7 +11090,7 @@ var editor;
     /**
      * feng3d的版本号
      */
-    editor.revision = "2018.08.02";
+    editor.revision = "2018.08.22";
     feng3d.log("editor version " + editor.revision);
     /**
      * 编辑器

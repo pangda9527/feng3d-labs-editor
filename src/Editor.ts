@@ -6,7 +6,7 @@ namespace editor
     /**
      * feng3d的版本号
      */
-    export var revision: string = "2018.08.02";
+    export var revision: string = "2018.08.22";
 
     feng3d.log(`editor version ${revision}`)
 
