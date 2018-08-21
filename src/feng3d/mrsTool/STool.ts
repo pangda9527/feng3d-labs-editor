@@ -1,3 +1,5 @@
+namespace feng3d { export interface ComponentMap { STool: editor.STool } }
+
 namespace editor
 {
     export class STool extends MRSToolBase

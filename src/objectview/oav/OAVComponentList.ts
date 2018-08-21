@@ -90,7 +90,7 @@ namespace editor
 			this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
 		}
 
-		private addComponentView(component: feng3d.Component)
+		private addComponentView(component: feng3d.Components)
 		{
 			var o: Object;
 			if (!component.showInInspector)
@@ -114,7 +114,7 @@ namespace editor
 			}
 		}
 
-		private removedComponentView(component: feng3d.Component)
+		private removedComponentView(component: feng3d.Components)
 		{
 			for (var i = this.group.numChildren - 1; i >= 0; i--)
 			{
@@ -126,12 +126,12 @@ namespace editor
 			}
 		}
 
-		private onaddedcompont(event: feng3d.Event<feng3d.Component>)
+		private onaddedcompont(event: feng3d.Event<feng3d.Components>)
 		{
 			this.addComponentView(event.data);
 		}
 
-		private onremovedComponent(event: feng3d.Event<feng3d.Component>)
+		private onremovedComponent(event: feng3d.Event<feng3d.Components>)
 		{
 			this.removedComponentView(event.data);
 		}

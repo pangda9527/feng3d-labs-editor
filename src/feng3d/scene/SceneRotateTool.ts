@@ -1,3 +1,5 @@
+namespace feng3d { export interface ComponentMap { SceneRotateTool: editor.SceneRotateTool } }
+
 namespace editor
 {
     export class SceneRotateTool extends feng3d.Component

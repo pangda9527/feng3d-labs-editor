@@ -1,3 +1,5 @@
+namespace feng3d { export interface ComponentMap { RTool: editor.RTool } }
+
 namespace editor
 {
     export class RTool extends MRSToolBase

@@ -589,7 +589,7 @@ declare namespace editor {
 }
 declare namespace editor {
     class ComponentView extends eui.Component {
-        component: feng3d.Component;
+        component: feng3d.Components;
         componentView: feng3d.IObjectView;
         accordion: editor.Accordion;
         enabledCB: eui.CheckBox;
@@ -600,7 +600,7 @@ declare namespace editor {
         /**
          * 对象界面数据
          */
-        constructor(component: feng3d.Component);
+        constructor(component: feng3d.Components);
         /**
          * 更新界面
          */
@@ -1760,6 +1760,11 @@ declare namespace editor {
         private rotateRotation;
     }
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        MToolModel: editor.MToolModel;
+    }
+}
 declare namespace editor {
     /**
      * 移动工具模型组件
@@ -1810,6 +1815,21 @@ declare namespace editor {
         selected: boolean;
         init(gameObject: feng3d.GameObject): void;
         update(): void;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        RToolModel: editor.RToolModel;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        SectorGameObject: editor.SectorGameObject;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        CoordinateRotationFreeAxis: editor.CoordinateRotationFreeAxis;
     }
 }
 declare namespace editor {
@@ -1876,6 +1896,11 @@ declare namespace editor {
         update(): void;
     }
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        SToolModel: editor.SToolModel;
+    }
+}
 declare namespace editor {
     /**
      * 缩放工具模型组件
@@ -1914,7 +1939,7 @@ declare namespace editor {
         protected onRemovedFromScene(): void;
         protected onItemMouseDown(event: feng3d.Event<any>): void;
         protected toolModel: feng3d.Component;
-        selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateRotationAxis | CoordinateRotationFreeAxis | CoordinateScaleCube;
+        selectedItem: CoordinateRotationFreeAxis | CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateRotationAxis | CoordinateScaleCube;
         gameobjectControllerTarget: MRSToolTarget;
         protected updateToolModel(): void;
         protected onMouseDown(): void;
@@ -1924,6 +1949,11 @@ declare namespace editor {
          */
         protected getLocalMousePlaneCross(): feng3d.Vector3;
         protected getMousePlaneCross(): feng3d.Vector3;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        MTool: editor.MTool;
     }
 }
 declare namespace editor {
@@ -1947,6 +1977,11 @@ declare namespace editor {
         protected updateToolModel(): void;
     }
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        RTool: editor.RTool;
+    }
+}
 declare namespace editor {
     class RTool extends MRSToolBase {
         protected toolModel: RToolModel;
@@ -1960,6 +1995,11 @@ declare namespace editor {
         private onMouseMove;
         protected onMouseUp(): void;
         protected updateToolModel(): void;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        STool: editor.STool;
     }
 }
 declare namespace editor {
@@ -1977,6 +2017,11 @@ declare namespace editor {
         protected onItemMouseDown(event: feng3d.Event<any>): void;
         private onMouseMove;
         protected onMouseUp(): void;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        MRSTool: editor.MRSTool;
     }
 }
 declare namespace editor {
@@ -2066,12 +2111,22 @@ declare namespace editor {
     }
     var hierarchy: Hierarchy;
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        SceneRotateTool: editor.SceneRotateTool;
+    }
+}
 declare namespace editor {
     class SceneRotateTool extends feng3d.Component {
         showInInspector: boolean;
         serializable: boolean;
         init(gameObject: feng3d.GameObject): void;
         private onLoaded;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        GroundGrid: editor.GroundGrid;
     }
 }
 declare namespace editor {
@@ -2108,6 +2163,11 @@ declare namespace editor {
     }
     function creatNewScene(): feng3d.Scene3D;
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        EditorComponent: editor.EditorComponent;
+    }
+}
 declare namespace editor {
     class EditorComponent extends feng3d.Component {
         scene: feng3d.Scene3D;
@@ -2124,6 +2184,11 @@ declare namespace editor {
         private directionLightIconMap;
         private pointLightIconMap;
         private spotLightIconMap;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        Navigation: editor.Navigation;
     }
 }
 declare namespace editor {

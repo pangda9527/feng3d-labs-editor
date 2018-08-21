@@ -1,3 +1,5 @@
+namespace feng3d { export interface ComponentMap { SToolModel: editor.SToolModel } }
+
 namespace editor
 {
     /**

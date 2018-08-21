@@ -1,3 +1,5 @@
+namespace feng3d { export interface ComponentMap { GroundGrid: editor.GroundGrid } }
+
 namespace editor
 {
     /**

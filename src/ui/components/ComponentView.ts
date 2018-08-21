@@ -2,7 +2,7 @@ namespace editor
 {
 	export class ComponentView extends eui.Component
 	{
-		component: feng3d.Component;
+		component: feng3d.Components;
 		componentView: feng3d.IObjectView;
 
 		//
@@ -19,7 +19,7 @@ namespace editor
 		/**
 		 * 对象界面数据
 		 */
-		constructor(component: feng3d.Component)
+		constructor(component: feng3d.Components)
 		{
 			super();
 			this.component = component;

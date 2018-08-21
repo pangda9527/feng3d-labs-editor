@@ -1,3 +1,8 @@
+namespace feng3d
+{
+    export interface ComponentMap { Navigation: editor.Navigation; }
+}
+
 namespace editor
 {
     /**
