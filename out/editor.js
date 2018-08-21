@@ -1,7 +1,10 @@
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -9208,10 +9211,12 @@ var navigation;
                     var rd = rs.getPointDistance(point.getPoint());
                     //
                     if (cd < agentRadius) {
-                        if (ld < agentRadius) {
+                        if (ld < agentRadius) //处理左夹角内点点
+                         {
                             point.setPoint(lp);
                         }
-                        else if (rd < agentRadius) {
+                        else if (rd < agentRadius) //处理右夹角内点点
+                         {
                             point.setPoint(rp);
                         }
                         else {
@@ -10974,7 +10979,13 @@ var editor;
      * @param particleSystem 粒子系统
      */
     function getCreateParticleComponentMenu(particleSystem) {
-        var menu = [];
+        var menu = [
+        //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
+        // {
+        //     label: "SkyBox",
+        //     click: () => { gameobject.addComponent(feng3d.SkyBox); }
+        // },
+        ];
         return menu;
     }
     editor.getCreateParticleComponentMenu = getCreateParticleComponentMenu;
