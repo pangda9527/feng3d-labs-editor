@@ -13,7 +13,7 @@ namespace editor
         {
             var gameobject = feng3d.GameObject.create("test");
             var model = gameobject.addComponent(feng3d.Model);
-            model.material = feng3d.materialFactory.create("standard");
+            model.material = new feng3d.StandardMaterial();
             model.geometry = new feng3d.SphereGeometry({ radius: 10 });
             gameobject.mouseEnabled = false;
 

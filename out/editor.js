@@ -4659,7 +4659,7 @@ var editor;
                         },
                         {
                             label: "材质", click: function () {
-                                assetsFile.addfile("new material" + ".material.json", feng3d.materialFactory.create("standard"));
+                                assetsFile.addfile("new material" + ".material.json", new feng3d.StandardMaterial());
                             }
                         },
                     ]
@@ -6773,13 +6773,13 @@ var editor;
             var model = xLine.addComponent(feng3d.Model);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             segmentGeometry.segments.push({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
-            this.segmentMaterial = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
+            this.segmentMaterial = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
             this.gameObject.addChild(xLine);
             //
             this.xArrow = feng3d.GameObject.create();
             model = this.xArrow.addComponent(feng3d.Model);
             model.geometry = new feng3d.ConeGeometry({ bottomRadius: 5, height: 18 });
-            this.material = model.material = feng3d.materialFactory.create("color");
+            this.material = model.material = new feng3d.ColorMaterial();
             this.material.renderParams.enableBlend = true;
             this.xArrow.transform.y = this.length;
             this.gameObject.addChild(this.xArrow);
@@ -6825,7 +6825,7 @@ var editor;
             this.oCube = feng3d.GameObject.create();
             var model = this.oCube.addComponent(feng3d.Model);
             model.geometry = new feng3d.CubeGeometry({ width: 8, height: 8, depth: 8 });
-            this.colorMaterial = model.material = feng3d.materialFactory.create("color");
+            this.colorMaterial = model.material = new feng3d.ColorMaterial();
             this.colorMaterial.renderParams.enableBlend = true;
             this.oCube.mouseEnabled = true;
             this.gameObject.addChild(this.oCube);
@@ -6868,7 +6868,7 @@ var editor;
             var model = plane.addComponent(feng3d.Model);
             plane.transform.x = plane.transform.z = this._width / 2;
             model.geometry = new feng3d.PlaneGeometry({ width: this._width, height: this._width });
-            this.colorMaterial = model.material = feng3d.materialFactory.create("color");
+            this.colorMaterial = model.material = new feng3d.ColorMaterial();
             this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
             this.colorMaterial.renderParams.enableBlend = true;
             plane.mouseEnabled = true;
@@ -6876,7 +6876,7 @@ var editor;
             var border = feng3d.GameObject.create("border");
             model = border.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.gameObject.addChild(border);
@@ -6965,7 +6965,7 @@ var editor;
         CoordinateRotationAxis.prototype.initModels = function () {
             var border = feng3d.GameObject.create();
             var model = border.addComponent(feng3d.Model);
-            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
@@ -6974,7 +6974,7 @@ var editor;
             var mouseHit = feng3d.GameObject.create("hit");
             model = mouseHit.addComponent(feng3d.Model);
             this.torusGeometry = model.geometry = new feng3d.TorusGeometry({ radius: this.radius, tubeRadius: 2 });
-            model.material = feng3d.materialFactory.create("standard");
+            model.material = new feng3d.StandardMaterial();
             mouseHit.transform.rx = 90;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;
@@ -7060,12 +7060,12 @@ var editor;
             this.gameObject.name = "sector";
             var model = this.gameObject.addComponent(feng3d.Model);
             this.geometry = model.geometry = new feng3d.CustomGeometry();
-            model.material = feng3d.materialFactory.create("color", { uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
+            model.material = new feng3d.ColorMaterial({ uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
             model.material.renderParams.enableBlend = true;
             model.material.renderParams.cullFace = feng3d.CullFace.NONE;
             var border = feng3d.GameObject.create("border");
             model = border.addComponent(feng3d.Model);
-            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
@@ -7131,7 +7131,7 @@ var editor;
         CoordinateRotationFreeAxis.prototype.initModels = function () {
             var border = feng3d.GameObject.create("border");
             var model = border.addComponent(feng3d.Model);
-            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
@@ -7222,7 +7222,7 @@ var editor;
             _super.prototype.init.call(this, gameObject);
             var xLine = feng3d.GameObject.create();
             var model = xLine.addComponent(feng3d.Model);
-            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
@@ -8264,7 +8264,7 @@ var editor;
             editor.editorCamera.transform.on("transformChanged", update, this);
             var model = groundGridObject.addComponent(feng3d.Model);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.renderParams.enableBlend = true;
             update();
             function update() {
@@ -8634,7 +8634,7 @@ var editor;
                 navobject.mouseEnabled = false;
                 navobject.addComponent(feng3d.Model).set(function (space) {
                     space.geometry = new feng3d.CustomGeometry();
-                    space.material = feng3d.materialFactory.create("color", { uniforms: { u_diffuseInput: new feng3d.Color4(0, 1, 0, 0.5) } });
+                    space.material = new feng3d.ColorMaterial({ uniforms: { u_diffuseInput: new feng3d.Color4(0, 1, 0, 0.5) } });
                 });
                 navobject.transform.y = 0.01;
                 return navobject;
@@ -9628,7 +9628,7 @@ function createSegment() {
         debugSegment.mouseEnabled = false;
         //初始化材质
         var model = debugSegment.addComponent(feng3d.Model);
-        var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+        var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
         material.uniforms.u_segmentColor.setTo(1.0, 0, 0);
         segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
     }
@@ -9639,7 +9639,7 @@ function createSegment() {
         debugPoint.mouseEnabled = false;
         var model = debugPoint.addComponent(feng3d.Model);
         pointGeometry = model.geometry = new feng3d.PointGeometry();
-        var materialp = model.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
+        var materialp = model.material = new feng3d.PointMaterial({ renderParams: { renderMode: feng3d.RenderMode.POINTS } });
         materialp.uniforms.u_PointSize = 5;
         materialp.uniforms.u_color.setTo(0, 0, 0);
     }
@@ -9862,7 +9862,7 @@ var editor;
         MouseRayTestScript.prototype.onclick = function () {
             var gameobject = feng3d.GameObject.create("test");
             var model = gameobject.addComponent(feng3d.Model);
-            model.material = feng3d.materialFactory.create("standard");
+            model.material = new feng3d.StandardMaterial();
             model.geometry = new feng3d.SphereGeometry({ radius: 10 });
             gameobject.mouseEnabled = false;
             var mouseRay3D = editor.engine.camera.getMouseRay3D();
@@ -9937,7 +9937,7 @@ var editor;
             billboardComponent.camera = editor.editorCamera;
             var model = lightIcon.addComponent(feng3d.Model);
             model.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false });
-            var textureMaterial = this.textureMaterial = model.material = feng3d.materialFactory.create("texture");
+            var textureMaterial = this.textureMaterial = model.material = new feng3d.TextureMaterial();
             var texture = new feng3d.UrlImageTexture2D();
             texture.url = editor.editorData.getEditorAssetsPath("assets/3d/icons/sun.png");
             texture.format = feng3d.TextureFormat.RGBA;
@@ -9954,7 +9954,7 @@ var editor;
             holdSizeComponent.camera = editor.editorCamera;
             holdSizeComponent.holdSize = 1;
             var model = lightLines.addComponent(feng3d.Model);
-            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(163 / 255, 162 / 255, 107 / 255);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             var num = 10;
@@ -10044,7 +10044,7 @@ var editor;
             billboardComponent.camera = editor.editorCamera;
             var model = lightIcon.addComponent(feng3d.Model);
             model.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
-            var textureMaterial = this.textureMaterial = model.material = feng3d.materialFactory.create("texture", {
+            var textureMaterial = this.textureMaterial = model.material = new feng3d.TextureMaterial({
                 uniforms: {
                     s_texture: {
                         url: editor.editorData.getEditorAssetsPath("assets/3d/icons/light.png"),
@@ -10061,7 +10061,7 @@ var editor;
             lightLines.serializable = false;
             lightLines.showinHierarchy = false;
             var model = lightLines.addComponent(feng3d.Model);
-            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
@@ -10080,7 +10080,7 @@ var editor;
                 { position: new feng3d.Vector3(0, 0, 1), color: new feng3d.Color4(0, 0, 1) },
                 { position: new feng3d.Vector3(0, 0, -1), color: new feng3d.Color4(0, 0, 1) }
             ];
-            var pointMaterial = model.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
+            var pointMaterial = model.material = new feng3d.PointMaterial({ renderParams: { renderMode: feng3d.RenderMode.POINTS } });
             pointMaterial.renderParams.enableBlend = true;
             pointMaterial.uniforms.u_PointSize = 5;
             this.gameObject.addChild(lightpoints);
@@ -10245,7 +10245,7 @@ var editor;
             billboardComponent.camera = editor.editorCamera;
             var model = lightIcon.addComponent(feng3d.Model);
             model.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
-            var textureMaterial = this.textureMaterial = model.material = feng3d.materialFactory.create("texture", {
+            var textureMaterial = this.textureMaterial = model.material = new feng3d.TextureMaterial({
                 uniforms: {
                     s_texture: {
                         url: editor.editorData.getEditorAssetsPath("assets/3d/icons/spot.png"),
@@ -10262,7 +10262,7 @@ var editor;
             lightLines.serializable = false;
             lightLines.showinHierarchy = false;
             var model = lightLines.addComponent(feng3d.Model);
-            var material = model.material = feng3d.materialFactory.create("segment", { renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
@@ -10281,7 +10281,7 @@ var editor;
                 { position: new feng3d.Vector3(0, 0, 1), color: new feng3d.Color4(0, 0, 1) },
                 { position: new feng3d.Vector3(0, 0, -1), color: new feng3d.Color4(0, 0, 1) }
             ];
-            var pointMaterial = model.material = feng3d.materialFactory.create("point", { renderParams: { renderMode: feng3d.RenderMode.POINTS } });
+            var pointMaterial = model.material = new feng3d.PointMaterial({ renderParams: { renderMode: feng3d.RenderMode.POINTS } });
             pointMaterial.renderParams.enableBlend = true;
             pointMaterial.uniforms.u_PointSize = 5;
             this.gameObject.addChild(lightpoints);

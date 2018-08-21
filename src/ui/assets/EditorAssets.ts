@@ -232,7 +232,7 @@ namespace editor
                             {
                                 label: "材质", click: () =>
                                 {
-                                    assetsFile.addfile("new material" + ".material.json", feng3d.materialFactory.create("standard"));
+                                    assetsFile.addfile("new material" + ".material.json", new feng3d.StandardMaterial());
                                 }
                             },
                         ]
