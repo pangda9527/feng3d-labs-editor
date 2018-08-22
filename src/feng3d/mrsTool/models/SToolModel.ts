@@ -23,24 +23,24 @@ namespace editor
 
         private initModels()
         {
-            this.xCube = new feng3d.GameObject({ name: "xCube" }).addComponent(CoordinateScaleCube);
+            this.xCube = new feng3d.GameObject().value({ name: "xCube" }).addComponent(CoordinateScaleCube);
             this.xCube.color.setTo(1, 0, 0, 1);
             this.xCube.update();
             this.xCube.transform.rz = -90;
             this.gameObject.addChild(this.xCube.gameObject);
 
-            this.yCube = new feng3d.GameObject({ name: "yCube" }).addComponent(CoordinateScaleCube);
+            this.yCube = new feng3d.GameObject().value({ name: "yCube" }).addComponent(CoordinateScaleCube);
             this.yCube.color.setTo(0, 1, 0, 1);
             this.yCube.update();
             this.gameObject.addChild(this.yCube.gameObject);
 
-            this.zCube = new feng3d.GameObject({ name: "zCube" }).addComponent(CoordinateScaleCube);
+            this.zCube = new feng3d.GameObject().value({ name: "zCube" }).addComponent(CoordinateScaleCube);
             this.zCube.color.setTo(0, 0, 1, 1);
             this.zCube.update();
             this.zCube.transform.rx = 90;
             this.gameObject.addChild(this.zCube.gameObject);
 
-            this.oCube = new feng3d.GameObject({ name: "oCube" }).addComponent(CoordinateCube);
+            this.oCube = new feng3d.GameObject().value({ name: "oCube" }).addComponent(CoordinateCube);
             this.oCube.gameObject.transform.scale = new feng3d.Vector3(1.2, 1.2, 1.2);
             this.gameObject.addChild(this.oCube.gameObject);
         }
@@ -72,10 +72,10 @@ namespace editor
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(xLine);
-            this.coordinateCube = new feng3d.GameObject({ name: "coordinateCube" }).addComponent(CoordinateCube);
+            this.coordinateCube = new feng3d.GameObject().value({ name: "coordinateCube" }).addComponent(CoordinateCube);
             this.gameObject.addChild(this.coordinateCube.gameObject);
 
-            var mouseHit = new feng3d.GameObject({ name: "hit" });
+            var mouseHit = new feng3d.GameObject().value({ name: "hit" });
             model = mouseHit.addComponent(feng3d.Model);
             model.geometry = new feng3d.CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length - 4 });
             mouseHit.transform.y = 4 + (this.length - 4) / 2;

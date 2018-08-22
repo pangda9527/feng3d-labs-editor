@@ -38,7 +38,7 @@ namespace editor
 
         initicon()
         {
-            var lightIcon = this.lightIcon = new feng3d.GameObject({ name: "Icon" });
+            var lightIcon = this.lightIcon = new feng3d.GameObject().value({ name: "Icon" });
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editorCamera;
             var model = lightIcon.addComponent(feng3d.Model);
@@ -56,7 +56,7 @@ namespace editor
             this.gameObject.addChild(lightIcon);
 
             //
-            var lightLines = this.lightLines = new feng3d.GameObject({ name: "Lines" });
+            var lightLines = this.lightLines = new feng3d.GameObject().value({ name: "Lines" });
             lightLines.mouseEnabled = false;
             lightLines.serializable = false;
             lightLines.showinHierarchy = false;
@@ -67,7 +67,7 @@ namespace editor
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this.lightpoints = new feng3d.GameObject({ name: "points" });
+            var lightpoints = this.lightpoints = new feng3d.GameObject().value({ name: "points" });
             lightpoints.mouseEnabled = false;
             lightpoints.serializable = false;
             lightpoints.showinHierarchy = false;

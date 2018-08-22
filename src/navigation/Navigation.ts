@@ -97,7 +97,7 @@ namespace editor
 
             function createNavObject()
             {
-                var navobject = new feng3d.GameObject({ name: "navigation" });
+                var navobject = new feng3d.GameObject().value({ name: "navigation" });
                 navobject.mouseEnabled = false;
                 navobject.addComponent(feng3d.Model).set((space) =>
                 {

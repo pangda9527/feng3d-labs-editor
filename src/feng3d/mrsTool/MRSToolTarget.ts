@@ -6,7 +6,7 @@ namespace editor
         private _controllerTargets: feng3d.Transform[];
         private _startScaleVec: feng3d.Vector3[] = [];
         private _showGameObject: feng3d.Transform;
-        private _controllerToolTransfrom: feng3d.Transform = new feng3d.GameObject({ name: "controllerToolTransfrom" }).transform;
+        private _controllerToolTransfrom: feng3d.Transform = new feng3d.GameObject().value({ name: "controllerToolTransfrom" }).transform;
         private _controllerTool: feng3d.Transform;
         private _startTransformDic: Map<feng3d.Transform, TransformData>;
 
