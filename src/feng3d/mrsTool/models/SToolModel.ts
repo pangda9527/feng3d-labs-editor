@@ -77,7 +77,7 @@ namespace editor
 
             var mouseHit = new feng3d.GameObject().value({ name: "hit" });
             model = mouseHit.addComponent(feng3d.Model);
-            model.geometry = new feng3d.CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length - 4 });
+            model.geometry = new feng3d.CylinderGeometry().value({ topRadius: 5, bottomRadius: 5, height: this.length - 4 });
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;

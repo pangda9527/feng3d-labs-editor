@@ -6778,14 +6778,14 @@ var editor;
             //
             this.xArrow = new feng3d.GameObject();
             model = this.xArrow.addComponent(feng3d.Model);
-            model.geometry = new feng3d.ConeGeometry({ bottomRadius: 5, height: 18 });
+            model.geometry = new feng3d.ConeGeometry().value({ bottomRadius: 5, height: 18 });
             this.material = model.material = new feng3d.ColorMaterial();
             this.material.renderParams.enableBlend = true;
             this.xArrow.transform.y = this.length;
             this.gameObject.addChild(this.xArrow);
             var mouseHit = new feng3d.GameObject().value({ name: "hitCoordinateAxis" });
             model = mouseHit.addComponent(feng3d.Model);
-            model.geometry = new feng3d.CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length });
+            model.geometry = new feng3d.CylinderGeometry().value({ topRadius: 5, bottomRadius: 5, height: this.length });
             //model.material = materialFactory.create("color");
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
@@ -6824,7 +6824,7 @@ var editor;
             //
             this.oCube = new feng3d.GameObject();
             var model = this.oCube.addComponent(feng3d.Model);
-            model.geometry = new feng3d.CubeGeometry({ width: 8, height: 8, depth: 8 });
+            model.geometry = new feng3d.CubeGeometry().value({ width: 8, height: 8, depth: 8 });
             this.colorMaterial = model.material = new feng3d.ColorMaterial();
             this.colorMaterial.renderParams.enableBlend = true;
             this.oCube.mouseEnabled = true;
@@ -6867,7 +6867,7 @@ var editor;
             var plane = new feng3d.GameObject().value({ name: "plane" });
             var model = plane.addComponent(feng3d.Model);
             plane.transform.x = plane.transform.z = this._width / 2;
-            model.geometry = new feng3d.PlaneGeometry({ width: this._width, height: this._width });
+            model.geometry = new feng3d.PlaneGeometry().value({ width: this._width, height: this._width });
             this.colorMaterial = model.material = new feng3d.ColorMaterial();
             this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
             this.colorMaterial.renderParams.enableBlend = true;
@@ -6973,7 +6973,7 @@ var editor;
             this.sector = new feng3d.GameObject().value({ name: "sector" }).addComponent(SectorGameObject);
             var mouseHit = new feng3d.GameObject().value({ name: "hit" });
             model = mouseHit.addComponent(feng3d.Model);
-            this.torusGeometry = model.geometry = new feng3d.TorusGeometry({ radius: this.radius, tubeRadius: 2 });
+            this.torusGeometry = model.geometry = new feng3d.TorusGeometry().value({ radius: this.radius, tubeRadius: 2 });
             model.material = new feng3d.StandardMaterial();
             mouseHit.transform.rx = 90;
             mouseHit.visible = false;
@@ -7231,7 +7231,7 @@ var editor;
             this.gameObject.addChild(this.coordinateCube.gameObject);
             var mouseHit = new feng3d.GameObject().value({ name: "hit" });
             model = mouseHit.addComponent(feng3d.Model);
-            model.geometry = new feng3d.CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length - 4 });
+            model.geometry = new feng3d.CylinderGeometry().value({ topRadius: 5, bottomRadius: 5, height: this.length - 4 });
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;
@@ -9863,7 +9863,7 @@ var editor;
             var gameobject = new feng3d.GameObject().value({ name: "test" });
             var model = gameobject.addComponent(feng3d.Model);
             model.material = new feng3d.StandardMaterial();
-            model.geometry = new feng3d.SphereGeometry({ radius: 10 });
+            model.geometry = new feng3d.SphereGeometry().value({ radius: 10 });
             gameobject.mouseEnabled = false;
             var mouseRay3D = editor.engine.camera.getMouseRay3D();
             this.gameObject.addChild(gameobject);
@@ -9936,7 +9936,7 @@ var editor;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editor.editorCamera;
             var model = lightIcon.addComponent(feng3d.Model);
-            model.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false });
+            model.geometry = new feng3d.PlaneGeometry().value({ width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false });
             var textureMaterial = this.textureMaterial = model.material = new feng3d.TextureMaterial();
             var texture = new feng3d.UrlImageTexture2D();
             texture.url = editor.editorData.getEditorAssetsPath("assets/3d/icons/sun.png");
@@ -10041,7 +10041,7 @@ var editor;
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
-                        __class__: "feng3d.Model", geometry: new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false }),
+                        __class__: "feng3d.Model", geometry: new feng3d.PlaneGeometry().value({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false }),
                         material: this.textureMaterial = new feng3d.TextureMaterial().value({
                             uniforms: {
                                 s_texture: {
@@ -10243,7 +10243,7 @@ var editor;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editor.editorCamera;
             var model = lightIcon.addComponent(feng3d.Model);
-            model.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
+            model.geometry = new feng3d.PlaneGeometry().value({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
             var textureMaterial = this.textureMaterial = model.material = new feng3d.TextureMaterial().value({
                 uniforms: {
                     s_texture: {

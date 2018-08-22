@@ -42,7 +42,7 @@ namespace editor
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
-                        __class__: "feng3d.Model", geometry: new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false }),
+                        __class__: "feng3d.Model", geometry: new feng3d.PlaneGeometry().value({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false }),
                         material: this.textureMaterial = new feng3d.TextureMaterial().value({
                             uniforms: {
                                 s_texture: {

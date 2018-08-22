@@ -96,7 +96,7 @@ namespace editor
             //
             this.xArrow = new feng3d.GameObject();
             model = this.xArrow.addComponent(feng3d.Model);
-            model.geometry = new feng3d.ConeGeometry({ bottomRadius: 5, height: 18 });
+            model.geometry = new feng3d.ConeGeometry().value({ bottomRadius: 5, height: 18 });
             this.material = model.material = new feng3d.ColorMaterial();
             this.material.renderParams.enableBlend = true;
             this.xArrow.transform.y = this.length;
@@ -104,7 +104,7 @@ namespace editor
 
             var mouseHit = new feng3d.GameObject().value({ name: "hitCoordinateAxis" });
             model = mouseHit.addComponent(feng3d.Model);
-            model.geometry = new feng3d.CylinderGeometry({ topRadius: 5, bottomRadius: 5, height: this.length });
+            model.geometry = new feng3d.CylinderGeometry().value({ topRadius: 5, bottomRadius: 5, height: this.length });
             //model.material = materialFactory.create("color");
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
@@ -143,7 +143,7 @@ namespace editor
             //
             this.oCube = new feng3d.GameObject();
             var model = this.oCube.addComponent(feng3d.Model)
-            model.geometry = new feng3d.CubeGeometry({ width: 8, height: 8, depth: 8 });
+            model.geometry = new feng3d.CubeGeometry().value({ width: 8, height: 8, depth: 8 });
             this.colorMaterial = model.material = new feng3d.ColorMaterial();
             this.colorMaterial.renderParams.enableBlend = true;
             this.oCube.mouseEnabled = true;
@@ -186,7 +186,7 @@ namespace editor
             var plane = new feng3d.GameObject().value({ name: "plane" });
             var model = plane.addComponent(feng3d.Model);
             plane.transform.x = plane.transform.z = this._width / 2;
-            model.geometry = new feng3d.PlaneGeometry({ width: this._width, height: this._width });
+            model.geometry = new feng3d.PlaneGeometry().value({ width: this._width, height: this._width });
             this.colorMaterial = model.material = new feng3d.ColorMaterial();
             this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
             this.colorMaterial.renderParams.enableBlend = true;

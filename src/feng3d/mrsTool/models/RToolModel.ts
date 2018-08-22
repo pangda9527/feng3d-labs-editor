@@ -97,7 +97,7 @@ namespace editor
 
             var mouseHit = new feng3d.GameObject().value({ name: "hit" });
             model = mouseHit.addComponent(feng3d.Model);
-            this.torusGeometry = model.geometry = new feng3d.TorusGeometry({ radius: this.radius, tubeRadius: 2 });
+            this.torusGeometry = model.geometry = new feng3d.TorusGeometry().value({ radius: this.radius, tubeRadius: 2 });
             model.material = new feng3d.StandardMaterial();
             mouseHit.transform.rx = 90;
             mouseHit.visible = false;

@@ -42,7 +42,7 @@ namespace editor
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editorCamera;
             var model = lightIcon.addComponent(feng3d.Model);
-            model.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
+            model.geometry = new feng3d.PlaneGeometry().value({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
             var textureMaterial = this.textureMaterial = model.material = new feng3d.TextureMaterial().value({
                 uniforms: {
                     s_texture: {
