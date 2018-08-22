@@ -241,7 +241,7 @@ namespace editor
                 {
                     label: "方向光源", click: () =>
                     {
-                        var gameobject = feng3d.GameObject.create("DirectionalLight");
+                        var gameobject = new feng3d.GameObject({ name: "DirectionalLight" });
                         gameobject.addComponent(feng3d.DirectionalLight);
                         addToHierarchy(gameobject);
                     }
@@ -249,7 +249,7 @@ namespace editor
                 {
                     label: "聚光灯", click: () =>
                     {
-                        var gameobject = feng3d.GameObject.create("SpotLight");
+                        var gameobject = new feng3d.GameObject({ name: "SpotLight" });
                         gameobject.addComponent(feng3d.SpotLight);
                         addToHierarchy(gameobject);
                     }

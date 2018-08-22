@@ -66,19 +66,19 @@ namespace editor
         {
             if (light instanceof feng3d.DirectionalLight)
             {
-                var directionLightIcon = feng3d.GameObject.create("DirectionLightIcon").addComponent(DirectionLightIcon);
+                var directionLightIcon = new feng3d.GameObject({ name: "DirectionLightIcon" }).addComponent(DirectionLightIcon);
                 directionLightIcon.light = light;
                 this.gameObject.addChild(directionLightIcon.gameObject);
                 this.directionLightIconMap.set(light, directionLightIcon);
             } else if (light instanceof feng3d.PointLight)
             {
-                var pointLightIcon = feng3d.GameObject.create("PointLightIcon").addComponent(PointLightIcon);
+                var pointLightIcon = new feng3d.GameObject({ name: "PointLightIcon" }).addComponent(PointLightIcon);
                 pointLightIcon.light = light;
                 this.gameObject.addChild(pointLightIcon.gameObject);
                 this.pointLightIconMap.set(light, pointLightIcon);
             } else if (light instanceof feng3d.SpotLight)
             {
-                var spotLightIcon = feng3d.GameObject.create("SpotLightIcon").addComponent(SpotLightIcon);
+                var spotLightIcon = new feng3d.GameObject({ name: "SpotLightIcon" }).addComponent(SpotLightIcon);
                 spotLightIcon.light = light;
                 this.gameObject.addChild(spotLightIcon.gameObject);
                 this.spotLightIconMap.set(light, spotLightIcon);

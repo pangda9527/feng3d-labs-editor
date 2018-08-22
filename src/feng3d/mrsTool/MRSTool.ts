@@ -36,13 +36,13 @@ namespace editor
         {
             super.init(gameObject);
 
-            this.mrsToolObject = feng3d.GameObject.create("MRSTool");
+            this.mrsToolObject = new feng3d.GameObject({ name: "MRSTool" });
 
             this.controllerTarget = new MRSToolTarget();
 
-            this.mTool = feng3d.GameObject.create("MTool").addComponent(MTool);
-            this.rTool = feng3d.GameObject.create("RTool").addComponent(RTool);
-            this.sTool = feng3d.GameObject.create("STool").addComponent(STool);
+            this.mTool = new feng3d.GameObject({ name: "MTool" }).addComponent(MTool);
+            this.rTool = new feng3d.GameObject({ name: "RTool" }).addComponent(RTool);
+            this.sTool = new feng3d.GameObject({ name: "STool" }).addComponent(STool);
             setAwaysVisible(this.mTool);
             setAwaysVisible(this.rTool);
             setAwaysVisible(this.sTool);

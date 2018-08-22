@@ -14,7 +14,7 @@ namespace editor
         {
             super.init(gameObject);
 
-            var groundGridObject = feng3d.GameObject.create("GroundGrid");
+            var groundGridObject = new feng3d.GameObject({ name: "GroundGrid" });
             groundGridObject.mouseEnabled = false;
             groundGridObject.transform.showInInspector = false;
 

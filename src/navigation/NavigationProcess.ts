@@ -647,7 +647,7 @@ function createSegment()
     var parentobject = editor.engine.root.find("editorObject") || editor.engine.root;
     if (!debugSegment)
     {
-        debugSegment = feng3d.GameObject.create("segment");
+        debugSegment = new feng3d.GameObject({ name: "segment" });
         debugSegment.mouseEnabled = false;
         //初始化材质
         var model = debugSegment.addComponent(feng3d.Model);
@@ -659,7 +659,7 @@ function createSegment()
     //
     if (!debugPoint)
     {
-        debugPoint = feng3d.GameObject.create("points");
+        debugPoint = new feng3d.GameObject({ name: "points" });
         debugPoint.mouseEnabled = false;
         var model = debugPoint.addComponent(feng3d.Model);
         pointGeometry = model.geometry = new feng3d.PointGeometry();

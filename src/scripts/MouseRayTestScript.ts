@@ -11,7 +11,7 @@ namespace editor
 
         private onclick()
         {
-            var gameobject = feng3d.GameObject.create("test");
+            var gameobject = new feng3d.GameObject({ name: "test" });
             var model = gameobject.addComponent(feng3d.Model);
             model.material = new feng3d.StandardMaterial();
             model.geometry = new feng3d.SphereGeometry({ radius: 10 });
