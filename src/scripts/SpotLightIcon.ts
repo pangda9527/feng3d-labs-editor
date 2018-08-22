@@ -39,13 +39,11 @@ namespace editor
         initicon()
         {
             var lightIcon = this.lightIcon = new feng3d.GameObject({ name: "Icon" });
-            lightIcon.serializable = false;
-            lightIcon.showinHierarchy = false;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editorCamera;
             var model = lightIcon.addComponent(feng3d.Model);
             model.geometry = new feng3d.PlaneGeometry({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false });
-            var textureMaterial = this.textureMaterial = model.material = new feng3d.TextureMaterial({
+            var textureMaterial = this.textureMaterial = model.material = new feng3d.TextureMaterial().value({
                 uniforms: {
                     s_texture: {
                         url: editorData.getEditorAssetsPath("assets/3d/icons/spot.png"),
