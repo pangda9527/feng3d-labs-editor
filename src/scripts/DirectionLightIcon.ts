@@ -62,7 +62,7 @@ namespace editor
             holdSizeComponent.camera = editorCamera;
             holdSizeComponent.holdSize = 1;
             var model = lightLines.addComponent(feng3d.Model);
-            var material = model.material = new feng3d.SegmentMaterial({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(163 / 255, 162 / 255, 107 / 255);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             var num = 10;

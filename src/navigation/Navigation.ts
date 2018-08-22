@@ -102,7 +102,7 @@ namespace editor
                 navobject.addComponent(feng3d.Model).set((space) =>
                 {
                     space.geometry = new feng3d.CustomGeometry();
-                    space.material = new feng3d.ColorMaterial({ uniforms: { u_diffuseInput: new feng3d.Color4(0, 1, 0, 0.5) } });
+                    space.material = new feng3d.ColorMaterial().value({ uniforms: { u_diffuseInput: new feng3d.Color4(0, 1, 0, 0.5) } });
                 });
                 navobject.transform.y = 0.01;
                 return navobject;
