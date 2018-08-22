@@ -99,11 +99,9 @@ namespace editor
             {
                 var navobject = new feng3d.GameObject().value({ name: "navigation" });
                 navobject.mouseEnabled = false;
-                navobject.addComponent(feng3d.Model).set((space) =>
-                {
-                    space.geometry = new feng3d.CustomGeometry();
-                    space.material = new feng3d.ColorMaterial().value({ uniforms: { u_diffuseInput: new feng3d.Color4(0, 1, 0, 0.5) } });
-                });
+                var model = navobject.addComponent(feng3d.Model);
+                model.geometry = new feng3d.CustomGeometry();
+                model.material = new feng3d.ColorMaterial().value({ uniforms: { u_diffuseInput: new feng3d.Color4(0, 1, 0, 0.5) } });
                 navobject.transform.y = 0.01;
                 return navobject;
             }
