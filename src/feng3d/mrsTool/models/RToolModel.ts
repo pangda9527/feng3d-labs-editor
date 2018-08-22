@@ -1,6 +1,7 @@
 namespace feng3d { export interface ComponentMap { RToolModel: editor.RToolModel } }
 namespace feng3d { export interface ComponentMap { SectorGameObject: editor.SectorGameObject } }
 namespace feng3d { export interface ComponentMap { CoordinateRotationFreeAxis: editor.CoordinateRotationFreeAxis } }
+namespace feng3d { export interface ComponentMap { CoordinateRotationAxis: editor.CoordinateRotationAxis } }
 
 namespace editor
 {

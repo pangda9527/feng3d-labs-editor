@@ -1765,6 +1765,16 @@ declare namespace feng3d {
         MToolModel: editor.MToolModel;
     }
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        CoordinateAxis: editor.CoordinateAxis;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        CoordinatePlane: editor.CoordinatePlane;
+    }
+}
 declare namespace editor {
     /**
      * 移动工具模型组件
@@ -1830,6 +1840,11 @@ declare namespace feng3d {
 declare namespace feng3d {
     interface ComponentMap {
         CoordinateRotationFreeAxis: editor.CoordinateRotationFreeAxis;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        CoordinateRotationAxis: editor.CoordinateRotationAxis;
     }
 }
 declare namespace editor {
@@ -1901,6 +1916,16 @@ declare namespace feng3d {
         SToolModel: editor.SToolModel;
     }
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        CoordinateCube: editor.CoordinateCube;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        CoordinateScaleCube: editor.CoordinateScaleCube;
+    }
+}
 declare namespace editor {
     /**
      * 缩放工具模型组件
@@ -1939,7 +1964,7 @@ declare namespace editor {
         protected onRemovedFromScene(): void;
         protected onItemMouseDown(event: feng3d.Event<any>): void;
         protected toolModel: feng3d.Component;
-        selectedItem: CoordinateRotationFreeAxis | CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateRotationAxis | CoordinateScaleCube;
+        selectedItem: CoordinateAxis | CoordinatePlane | CoordinateRotationFreeAxis | CoordinateRotationAxis | CoordinateCube | CoordinateScaleCube;
         gameobjectControllerTarget: MRSToolTarget;
         protected updateToolModel(): void;
         protected onMouseDown(): void;

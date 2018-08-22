@@ -1,4 +1,6 @@
 namespace feng3d { export interface ComponentMap { SToolModel: editor.SToolModel } }
+namespace feng3d { export interface ComponentMap { CoordinateCube: editor.CoordinateCube } }
+namespace feng3d { export interface ComponentMap { CoordinateScaleCube: editor.CoordinateScaleCube } }
 
 namespace editor
 {
