@@ -16,28 +16,22 @@ namespace editor
         {
             var linesize = 10;
 
-            var lightIcon = this.lightIcon = new feng3d.GameObject().value({ name: "Icon" });
-            var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
-            billboardComponent.camera = editorCamera;
-            var model = lightIcon.addComponent(feng3d.Model);
-            model.geometry = new feng3d.PlaneGeometry().value({ width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false });
-            var textureMaterial = this.textureMaterial = model.material = new feng3d.TextureMaterial();
-            var texture = new feng3d.UrlImageTexture2D();
-            texture.url = editorData.getEditorAssetsPath("assets/3d/icons/sun.png");
-            texture.format = feng3d.TextureFormat.RGBA;
-            texture.premulAlpha = true;
-            textureMaterial.uniforms.s_texture = texture;
-            textureMaterial.renderParams.enableBlend = true;
+            var lightIcon = this.lightIcon = new feng3d.GameObject().value({
+                name: "Icon", components: [{ __class__: "feng3d.BillboardComponent", camera: editorCamera },
+                {
+                    __class__: "feng3d.Model", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
+                    material: { __class__: "feng3d.TextureMaterial", uniforms: { s_texture: { __class__: "feng3d.UrlImageTexture2D", url: editorData.getEditorAssetsPath("assets/3d/icons/sun.png"), format: feng3d.TextureFormat.RGBA, premulAlpha: true, } }, renderParams: { enableBlend: true } },
+                },],
+            });
+            this.textureMaterial = <any>lightIcon.addComponent(feng3d.Model).material;
             this.gameObject.addChild(lightIcon);
 
             //
-            var lightLines = this.lightLines = new feng3d.GameObject().value({ name: "Lines" });
-            lightLines.mouseEnabled = false;
-            lightLines.hideFlags = feng3d.HideFlags.Hide;
-            var holdSizeComponent = lightLines.addComponent(feng3d.HoldSizeComponent);
-            holdSizeComponent.camera = editorCamera;
-            holdSizeComponent.holdSize = 1;
-            var model = lightLines.addComponent(feng3d.Model);
+            var lightLines = this.lightLines = new feng3d.GameObject().value({
+                name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
+                components: [{ __class__: "feng3d.HoldSizeComponent", camera: editorCamera, holdSize: 1 }],
+            });
+            var model = lightLines.addComponent(feng3d.Model).value({});
             var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(163 / 255, 162 / 255, 107 / 255);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();

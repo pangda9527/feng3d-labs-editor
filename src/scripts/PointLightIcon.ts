@@ -18,8 +18,9 @@ namespace editor
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
-                        __class__: "feng3d.Model", geometry: new feng3d.PlaneGeometry().value({ width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false }),
-                        material: this.textureMaterial = new feng3d.TextureMaterial().value({
+                        __class__: "feng3d.Model", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
+                        material: {
+                            __class__: "feng3d.TextureMaterial",
                             uniforms: {
                                 s_texture: {
                                     url: editorData.getEditorAssetsPath("assets/3d/icons/light.png"),
@@ -28,37 +29,49 @@ namespace editor
                                 },
                             },
                             renderParams: { enableBlend: true },
-                        }),
+                        },
                     },
                 ],
             });
+            this.textureMaterial = <any>lightIcon.getComponent(feng3d.Model).material;
             this.gameObject.addChild(lightIcon);
 
             //
-            var lightLines = this.lightLines = new feng3d.GameObject().value({ name: "Lines" });
-            lightLines.mouseEnabled = false;
-            lightLines.hideFlags = feng3d.HideFlags.Hide;
-            var model = lightLines.addComponent(feng3d.Model);
-            var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
-            material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
-            material.renderParams.enableBlend = true;
-            this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
+            var lightLines = this.lightLines = new feng3d.GameObject().value({
+                name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
+                components: [{
+                    __class__: "feng3d.Model", material: {
+                        __class__: "feng3d.SegmentMaterial",
+                        uniforms: {
+                            u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 },
+                        }, renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true, }
+                    },
+                    geometry: { __class__: "feng3d.SegmentGeometry" },
+                }]
+            });
+            this.segmentGeometry = <any>lightLines.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this.lightpoints = new feng3d.GameObject().value({ name: "points" });
-            lightpoints.mouseEnabled = false;
-            lightpoints.hideFlags = feng3d.HideFlags.Hide;
-            var model = lightpoints.addComponent(feng3d.Model);
-            var pointGeometry = this.pointGeometry = model.geometry = new feng3d.PointGeometry();
-            pointGeometry.points = [
-                { position: new feng3d.Vector3(1, 0, 0), color: new feng3d.Color4(1, 0, 0) },
-                { position: new feng3d.Vector3(-1, 0, 0), color: new feng3d.Color4(1, 0, 0) },
-                { position: new feng3d.Vector3(0, -1, 0), color: new feng3d.Color4(0, 1, 0) },
-                { position: new feng3d.Vector3(0, 0, 1), color: new feng3d.Color4(0, 0, 1) },
-                { position: new feng3d.Vector3(0, 0, -1), color: new feng3d.Color4(0, 0, 1) }];
-            var pointMaterial = model.material = new feng3d.PointMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.POINTS } });
-            pointMaterial.renderParams.enableBlend = true;
-            pointMaterial.uniforms.u_PointSize = 5;
+            var lightpoints = this.lightpoints = new feng3d.GameObject().value({
+                name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
+                components: [{
+                    __class__: "feng3d.Model",
+                    geometry: {
+                        __class__: "feng3d.PointGeometry",
+                        points: [
+                            { position: { __class__: "feng3d.Vector3", x: 1 }, color: { __class__: "feng3d.Color4", r: 1 } },
+                            { position: { __class__: "feng3d.Vector3", x: -1 }, color: { __class__: "feng3d.Color4", r: 1 } },
+                            { position: { __class__: "feng3d.Vector3", y: 1 }, color: { __class__: "feng3d.Color4", g: 1 } },
+                            { position: { __class__: "feng3d.Vector3", y: -1 }, color: { __class__: "feng3d.Color4", g: 1 } },
+                            { position: { __class__: "feng3d.Vector3", z: 1 }, color: { __class__: "feng3d.Color4", b: 1 } },
+                            { position: { __class__: "feng3d.Vector3", z: -1 }, color: { __class__: "feng3d.Color4", b: 1 } }],
+                    },
+                    material: {
+                        __class__: "feng3d.PointMaterial", uniforms: { u_PointSize: 5 }, renderParams: { renderMode: feng3d.RenderMode.POINTS, enableBlend: true, },
+                    },
+                }],
+            });
+            this.pointGeometry = <any>lightpoints.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightpoints);
 
             this.enabled = true;
@@ -78,7 +91,7 @@ namespace editor
                 //
                 var camerapos = this.gameObject.transform.inverseTransformPoint(editorCamera.gameObject.transform.scenePosition);
                 //
-                this.segmentGeometry.segments.length = 0;
+                var segments: feng3d.Segment[] = [];
                 var alpha = 1;
                 var backalpha = 0.5;
                 var num = 36;
@@ -99,23 +112,23 @@ namespace editor
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(1, 0, 0, alpha), endColor: new feng3d.Color4(1, 0, 0, alpha) });
+                    segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(1, 0, 0, alpha), endColor: new feng3d.Color4(1, 0, 0, alpha) });
                     point0 = new feng3d.Vector3(x, 0, y);
                     point1 = new feng3d.Vector3(x1, 0, y1);
                     if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 1, 0, alpha), endColor: new feng3d.Color4(0, 1, 0, alpha) });
+                    segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 1, 0, alpha), endColor: new feng3d.Color4(0, 1, 0, alpha) });
                     point0 = new feng3d.Vector3(x, y, 0);
                     point1 = new feng3d.Vector3(x1, y1, 0);
                     if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
                         alpha = backalpha;
                     else
                         alpha = 1.0;
-                    this.segmentGeometry.segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 0, 1, alpha), endColor: new feng3d.Color4(0, 0, 1, alpha) });
+                    segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 0, 1, alpha), endColor: new feng3d.Color4(0, 0, 1, alpha) });
                 }
-                this.segmentGeometry.invalidateGeometry();
+                this.segmentGeometry.segments = segments;
 
                 this.pointGeometry.points = [];
                 var point = new feng3d.Vector3(1, 0, 0);
