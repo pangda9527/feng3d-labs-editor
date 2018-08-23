@@ -2569,7 +2569,9 @@ declare namespace editor {
         private lightpoints;
         private segmentGeometry;
         private pointGeometry;
+        private lensChanged;
         private onCameraChanged;
+        private onLensChanged;
         private onScenetransformChanged;
         private onMousedown;
     }

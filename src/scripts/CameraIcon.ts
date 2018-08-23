@@ -72,47 +72,51 @@ namespace editor
 
             if (editorData.selectedGameObjects.indexOf(this.camera.gameObject) != -1)
             {
-                //
-                var points: feng3d.PointInfo[] = [];
-                var segments: feng3d.Segment[] = [];
-                var lens = this.camera.lens;
-                var near = lens.near;
-                var far = lens.far;
-                if (lens instanceof feng3d.PerspectiveLens)
+                if (this.lensChanged)
                 {
-                    var fov = lens.fov;
-                    var aspect = lens.aspect;
-                    var tan = Math.tan(fov * Math.PI / 360);
-
-                    var nearLeft = -tan * near * aspect;
-                    var nearRight = tan * near * aspect;
-                    var nearTop = tan * near;
-                    var nearBottom = -tan * near;
-                    var farLeft = -tan * far * aspect;
-                    var farRight = tan * far * aspect;
-                    var farTop = tan * far;
-                    var farBottom = -tan * far;
                     //
-                    points.push({ position: new feng3d.Vector3(0, farBottom, far) }, { position: new feng3d.Vector3(0, farTop, far) }, { position: new feng3d.Vector3(farLeft, 0, far) }, { position: new feng3d.Vector3(farRight, 0, far) });
-                    segments.push(
-                        { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(nearRight, nearBottom, near) },
-                        { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(nearLeft, nearTop, near) },
-                        { start: new feng3d.Vector3(nearLeft, nearTop, near), end: new feng3d.Vector3(nearRight, nearTop, near) },
-                        { start: new feng3d.Vector3(nearRight, nearBottom, near), end: new feng3d.Vector3(nearRight, nearTop, near) },
+                    var points: feng3d.PointInfo[] = [];
+                    var segments: feng3d.Segment[] = [];
+                    var lens = this.camera.lens;
+                    var near = lens.near;
+                    var far = lens.far;
+                    if (lens instanceof feng3d.PerspectiveLens)
+                    {
+                        var fov = lens.fov;
+                        var aspect = lens.aspect;
+                        var tan = Math.tan(fov * Math.PI / 360);
+
+                        var nearLeft = -tan * near * aspect;
+                        var nearRight = tan * near * aspect;
+                        var nearTop = tan * near;
+                        var nearBottom = -tan * near;
+                        var farLeft = -tan * far * aspect;
+                        var farRight = tan * far * aspect;
+                        var farTop = tan * far;
+                        var farBottom = -tan * far;
                         //
-                        { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(farLeft, farBottom, far) },
-                        { start: new feng3d.Vector3(nearLeft, nearTop, near), end: new feng3d.Vector3(farLeft, farTop, far) },
-                        { start: new feng3d.Vector3(nearRight, nearBottom, near), end: new feng3d.Vector3(farRight, farBottom, far) },
-                        { start: new feng3d.Vector3(nearRight, nearTop, near), end: new feng3d.Vector3(farRight, farTop, far) },
-                        //
-                        { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farRight, farBottom, far) },
-                        { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farLeft, farTop, far) },
-                        { start: new feng3d.Vector3(farLeft, farTop, far), end: new feng3d.Vector3(farRight, farTop, far) },
-                        { start: new feng3d.Vector3(farRight, farBottom, far), end: new feng3d.Vector3(farRight, farTop, far) },
-                    );
+                        points.push({ position: new feng3d.Vector3(0, farBottom, far) }, { position: new feng3d.Vector3(0, farTop, far) }, { position: new feng3d.Vector3(farLeft, 0, far) }, { position: new feng3d.Vector3(farRight, 0, far) });
+                        segments.push(
+                            { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(nearRight, nearBottom, near) },
+                            { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(nearLeft, nearTop, near) },
+                            { start: new feng3d.Vector3(nearLeft, nearTop, near), end: new feng3d.Vector3(nearRight, nearTop, near) },
+                            { start: new feng3d.Vector3(nearRight, nearBottom, near), end: new feng3d.Vector3(nearRight, nearTop, near) },
+                            //
+                            { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(farLeft, farBottom, far) },
+                            { start: new feng3d.Vector3(nearLeft, nearTop, near), end: new feng3d.Vector3(farLeft, farTop, far) },
+                            { start: new feng3d.Vector3(nearRight, nearBottom, near), end: new feng3d.Vector3(farRight, farBottom, far) },
+                            { start: new feng3d.Vector3(nearRight, nearTop, near), end: new feng3d.Vector3(farRight, farTop, far) },
+                            //
+                            { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farRight, farBottom, far) },
+                            { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farLeft, farTop, far) },
+                            { start: new feng3d.Vector3(farLeft, farTop, far), end: new feng3d.Vector3(farRight, farTop, far) },
+                            { start: new feng3d.Vector3(farRight, farBottom, far), end: new feng3d.Vector3(farRight, farTop, far) },
+                        );
+                    }
+                    this.pointGeometry.points = points;
+                    this.segmentGeometry.segments = segments;
+                    this.lensChanged = false;
                 }
-                this.pointGeometry.points = points;
-                this.segmentGeometry.segments = segments;
                 //
                 this.lightLines.visible = true;
                 this.lightpoints.visible = true;
@@ -143,18 +147,26 @@ namespace editor
         private lightpoints: feng3d.GameObject;
         private segmentGeometry: feng3d.SegmentGeometry;
         private pointGeometry: feng3d.PointGeometry;
+        private lensChanged = true;
 
         private onCameraChanged(property: string, oldValue: feng3d.Camera, value: feng3d.Camera)
         {
             if (oldValue)
             {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
+                value.off("lensChanged", this.onLensChanged, this);
             }
             if (value)
             {
                 this.onScenetransformChanged();
                 value.on("scenetransformChanged", this.onScenetransformChanged, this);
+                value.on("lensChanged", this.onLensChanged, this);
             }
+        }
+
+        private onLensChanged()
+        {
+            this.lensChanged = true;
         }
 
         private onScenetransformChanged()
