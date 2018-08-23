@@ -8510,41 +8510,32 @@ var editor;
         };
         EditorComponent.prototype.addLightIcon = function (light) {
             if (light instanceof feng3d.DirectionalLight) {
-                var directionLightIcon = new feng3d.GameObject().value({ name: "DirectionLightIcon" }).addComponent(editor.DirectionLightIcon);
-                directionLightIcon.light = light;
+                var directionLightIcon = new feng3d.GameObject().value({ name: "DirectionLightIcon", }).addComponent(editor.DirectionLightIcon).value({ light: light, });
                 this.gameObject.addChild(directionLightIcon.gameObject);
                 this.directionLightIconMap.set(light, directionLightIcon);
             }
             else if (light instanceof feng3d.PointLight) {
-                var pointLightIcon = new feng3d.GameObject().value({ name: "PointLightIcon" }).addComponent(editor.PointLightIcon);
-                pointLightIcon.light = light;
+                var pointLightIcon = new feng3d.GameObject().value({ name: "PointLightIcon" }).addComponent(editor.PointLightIcon).value({ light: light });
                 this.gameObject.addChild(pointLightIcon.gameObject);
                 this.pointLightIconMap.set(light, pointLightIcon);
             }
             else if (light instanceof feng3d.SpotLight) {
-                var spotLightIcon = new feng3d.GameObject().value({ name: "SpotLightIcon" }).addComponent(editor.SpotLightIcon);
-                spotLightIcon.light = light;
+                var spotLightIcon = new feng3d.GameObject().value({ name: "SpotLightIcon" }).addComponent(editor.SpotLightIcon).value({ light: light });
                 this.gameObject.addChild(spotLightIcon.gameObject);
                 this.spotLightIconMap.set(light, spotLightIcon);
             }
         };
         EditorComponent.prototype.removeLightIcon = function (light) {
             if (light instanceof feng3d.DirectionalLight) {
-                var directionLightIcon = this.directionLightIconMap.get(light);
-                directionLightIcon.light = null;
-                directionLightIcon.gameObject.remove();
+                this.directionLightIconMap.get(light).value({ light: null }).gameObject.remove();
                 this.directionLightIconMap.delete(light);
             }
             else if (light instanceof feng3d.PointLight) {
-                var pointLightIcon = this.pointLightIconMap.get(light);
-                pointLightIcon.light = null;
-                pointLightIcon.gameObject.remove();
+                this.pointLightIconMap.get(light).value({ light: null }).gameObject.remove();
                 this.pointLightIconMap.delete(light);
             }
             else if (light instanceof feng3d.SpotLight) {
-                var spotLightIcon = this.spotLightIconMap.get(light);
-                spotLightIcon.light = null;
-                spotLightIcon.gameObject.remove();
+                this.spotLightIconMap.get(light).value({ light: null }).gameObject.remove();
                 this.spotLightIconMap.delete(light);
             }
         };
@@ -9899,7 +9890,9 @@ var editor;
     var DirectionLightIcon = /** @class */ (function (_super) {
         __extends(DirectionLightIcon, _super);
         function DirectionLightIcon() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.__class__ = "editor.DirectionLightIcon";
+            return _this;
         }
         DirectionLightIcon.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
@@ -9912,26 +9905,19 @@ var editor;
                 name: "Icon", components: [{ __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
                         __class__: "feng3d.Model", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
-                        material: { __class__: "feng3d.TextureMaterial", uniforms: { s_texture: { __class__: "feng3d.UrlImageTexture2D", url: editor.editorData.getEditorAssetsPath("assets/3d/icons/sun.png"), format: feng3d.TextureFormat.RGBA, premulAlpha: true, } }, renderParams: { enableBlend: true } },
+                        material: { __class__: "feng3d.TextureMaterial", uniforms: { s_texture: { __class__: "feng3d.UrlImageTexture2D", url: editor.editorData.getEditorAssetsPath("assets/3d/icons/sun.png"), format: feng3d.TextureFormat.RGBA, premulAlpha: true, }, }, renderParams: { enableBlend: true } },
                     },],
             });
             this.textureMaterial = lightIcon.addComponent(feng3d.Model).material;
             this.gameObject.addChild(lightIcon);
             //
-            var lightLines = this.lightLines = new feng3d.GameObject().value({
-                name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
-                components: [{ __class__: "feng3d.HoldSizeComponent", camera: editor.editorCamera, holdSize: 1 }],
-            });
-            var model = lightLines.addComponent(feng3d.Model).value({});
-            var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
-            material.uniforms.u_segmentColor = new feng3d.Color4(163 / 255, 162 / 255, 107 / 255);
-            var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             var num = 10;
+            var segments = [];
             for (var i = 0; i < num; i++) {
                 var angle = i * Math.PI * 2 / num;
                 var x = Math.sin(angle) * linesize;
                 var y = Math.cos(angle) * linesize;
-                segmentGeometry.segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x, y, linesize * 5) });
+                segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x, y, linesize * 5) });
             }
             num = 36;
             for (var i = 0; i < num; i++) {
@@ -9941,8 +9927,17 @@ var editor;
                 var angle1 = (i + 1) * Math.PI * 2 / num;
                 var x1 = Math.sin(angle1) * linesize;
                 var y1 = Math.cos(angle1) * linesize;
-                segmentGeometry.segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
+                segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
             }
+            var lightLines = this.lightLines = new feng3d.GameObject().value({
+                name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
+                components: [{ __class__: "feng3d.HoldSizeComponent", camera: editor.editorCamera, holdSize: 1 },
+                    {
+                        __class__: "feng3d.Model",
+                        material: { __class__: "feng3d.SegmentMaterial", uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 163 / 255, g: 162 / 255, b: 107 / 255 } }, renderParams: { renderMode: feng3d.RenderMode.LINES } },
+                        geometry: { __class__: "feng3d.SegmentGeometry", segments: segments },
+                    },],
+            });
             this.gameObject.addChild(lightLines);
             this.enabled = true;
         };

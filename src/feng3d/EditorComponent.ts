@@ -66,20 +66,17 @@ namespace editor
         {
             if (light instanceof feng3d.DirectionalLight)
             {
-                var directionLightIcon = new feng3d.GameObject().value({ name: "DirectionLightIcon" }).addComponent(DirectionLightIcon);
-                directionLightIcon.light = light;
+                var directionLightIcon = new feng3d.GameObject().value({ name: "DirectionLightIcon", }).addComponent(DirectionLightIcon).value({ light: light, });
                 this.gameObject.addChild(directionLightIcon.gameObject);
                 this.directionLightIconMap.set(light, directionLightIcon);
             } else if (light instanceof feng3d.PointLight)
             {
-                var pointLightIcon = new feng3d.GameObject().value({ name: "PointLightIcon" }).addComponent(PointLightIcon);
-                pointLightIcon.light = light;
+                var pointLightIcon = new feng3d.GameObject().value({ name: "PointLightIcon" }).addComponent(PointLightIcon).value({ light: light });
                 this.gameObject.addChild(pointLightIcon.gameObject);
                 this.pointLightIconMap.set(light, pointLightIcon);
             } else if (light instanceof feng3d.SpotLight)
             {
-                var spotLightIcon = new feng3d.GameObject().value({ name: "SpotLightIcon" }).addComponent(SpotLightIcon);
-                spotLightIcon.light = light;
+                var spotLightIcon = new feng3d.GameObject().value({ name: "SpotLightIcon" }).addComponent(SpotLightIcon).value({ light: light });
                 this.gameObject.addChild(spotLightIcon.gameObject);
                 this.spotLightIconMap.set(light, spotLightIcon);
             }
@@ -89,21 +86,15 @@ namespace editor
         {
             if (light instanceof feng3d.DirectionalLight)
             {
-                var directionLightIcon = this.directionLightIconMap.get(light);
-                directionLightIcon.light = null;
-                directionLightIcon.gameObject.remove();
+                this.directionLightIconMap.get(light).value({ light: null }).gameObject.remove();
                 this.directionLightIconMap.delete(light);
             } else if (light instanceof feng3d.PointLight)
             {
-                var pointLightIcon = this.pointLightIconMap.get(light);
-                pointLightIcon.light = null;
-                pointLightIcon.gameObject.remove();
+                this.pointLightIconMap.get(light).value({ light: null }).gameObject.remove();
                 this.pointLightIconMap.delete(light);
             } else if (light instanceof feng3d.SpotLight)
             {
-                var spotLightIcon = this.spotLightIconMap.get(light);
-                spotLightIcon.light = null;
-                spotLightIcon.gameObject.remove();
+                this.spotLightIconMap.get(light).value({ light: null }).gameObject.remove();
                 this.spotLightIconMap.delete(light);
             }
         }

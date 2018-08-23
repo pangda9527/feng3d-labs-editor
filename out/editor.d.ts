@@ -2499,8 +2499,14 @@ declare namespace editor {
         dispose(): void;
     }
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        DirectionLightIcon: editor.DirectionLightIcon;
+    }
+}
 declare namespace editor {
     class DirectionLightIcon extends EditorScript {
+        __class__: "editor.DirectionLightIcon";
         light: feng3d.DirectionalLight;
         init(gameObject: feng3d.GameObject): void;
         initicon(): void;
