@@ -9901,23 +9901,6 @@ var editor;
         function DirectionLightIcon() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(DirectionLightIcon.prototype, "light", {
-            get: function () {
-                return this._light;
-            },
-            set: function (v) {
-                if (this._light) {
-                    this._light.off("scenetransformChanged", this.onScenetransformChanged, this);
-                }
-                this._light = v;
-                if (this._light) {
-                    this.onScenetransformChanged();
-                    this._light.on("scenetransformChanged", this.onScenetransformChanged, this);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
         DirectionLightIcon.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
             this.initicon();
@@ -9985,6 +9968,15 @@ var editor;
             this.lightLines = null;
             _super.prototype.dispose.call(this);
         };
+        DirectionLightIcon.prototype.onLightChanged = function (property, oldValue, value) {
+            if (oldValue) {
+                oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+            if (value) {
+                this.onScenetransformChanged();
+                value.on("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+        };
         DirectionLightIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
         };
@@ -9995,6 +9987,9 @@ var editor;
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
         };
+        __decorate([
+            feng3d.watch("onLightChanged")
+        ], DirectionLightIcon.prototype, "light", void 0);
         return DirectionLightIcon;
     }(editor.EditorScript));
     editor.DirectionLightIcon = DirectionLightIcon;
@@ -10201,23 +10196,6 @@ var editor;
         function SpotLightIcon() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(SpotLightIcon.prototype, "light", {
-            get: function () {
-                return this._light;
-            },
-            set: function (v) {
-                if (this._light) {
-                    this._light.off("scenetransformChanged", this.onScenetransformChanged, this);
-                }
-                this._light = v;
-                if (this._light) {
-                    this.onScenetransformChanged();
-                    this._light.on("scenetransformChanged", this.onScenetransformChanged, this);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
         SpotLightIcon.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
             this.initicon();
@@ -10331,6 +10309,15 @@ var editor;
             this.segmentGeometry = null;
             _super.prototype.dispose.call(this);
         };
+        SpotLightIcon.prototype.onLightChanged = function (property, oldValue, value) {
+            if (oldValue) {
+                oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+            if (value) {
+                this.onScenetransformChanged();
+                value.on("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+        };
         SpotLightIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
         };
@@ -10342,6 +10329,9 @@ var editor;
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
         };
+        __decorate([
+            feng3d.watch("onLightChanged")
+        ], SpotLightIcon.prototype, "light", void 0);
         return SpotLightIcon;
     }(editor.EditorScript));
     editor.SpotLightIcon = SpotLightIcon;

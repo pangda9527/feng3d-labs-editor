@@ -2,29 +2,8 @@ namespace editor
 {
     export class DirectionLightIcon extends EditorScript
     {
-        get light()
-        {
-            return this._light;
-        }
-        set light(v)
-        {
-            if (this._light)
-            {
-                this._light.off("scenetransformChanged", this.onScenetransformChanged, this);
-            }
-            this._light = v;
-            if (this._light)
-            {
-                this.onScenetransformChanged();
-                this._light.on("scenetransformChanged", this.onScenetransformChanged, this);
-            }
-        }
-
-        private _light: feng3d.DirectionalLight;
-
-        private lightIcon: feng3d.GameObject;
-        private lightLines: feng3d.GameObject;
-        private textureMaterial: feng3d.TextureMaterial;
+        @feng3d.watch("onLightChanged")
+        light: feng3d.DirectionalLight;
 
         init(gameObject: feng3d.GameObject)
         {
@@ -104,6 +83,23 @@ namespace editor
             this.lightIcon = null;
             this.lightLines = null;
             super.dispose();
+        }
+
+        private lightIcon: feng3d.GameObject;
+        private lightLines: feng3d.GameObject;
+        private textureMaterial: feng3d.TextureMaterial;
+
+        private onLightChanged(property: string, oldValue: feng3d.DirectionalLight, value: feng3d.DirectionalLight)
+        {
+            if (oldValue)
+            {
+                oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+            if (value)
+            {
+                this.onScenetransformChanged();
+                value.on("scenetransformChanged", this.onScenetransformChanged, this);
+            }
         }
 
         private onScenetransformChanged()

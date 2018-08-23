@@ -2502,14 +2502,14 @@ declare namespace editor {
 declare namespace editor {
     class DirectionLightIcon extends EditorScript {
         light: feng3d.DirectionalLight;
-        private _light;
-        private lightIcon;
-        private lightLines;
-        private textureMaterial;
         init(gameObject: feng3d.GameObject): void;
         initicon(): void;
         update(): void;
         dispose(): void;
+        private lightIcon;
+        private lightLines;
+        private textureMaterial;
+        private onLightChanged;
         private onScenetransformChanged;
         private onMousedown;
     }
@@ -2535,17 +2535,17 @@ declare namespace editor {
 declare namespace editor {
     class SpotLightIcon extends EditorScript {
         light: feng3d.SpotLight;
-        private _light;
+        init(gameObject: feng3d.GameObject): void;
+        initicon(): void;
+        update(): void;
+        dispose(): void;
         private lightIcon;
         private lightLines;
         private lightpoints;
         private textureMaterial;
         private segmentGeometry;
         private pointGeometry;
-        init(gameObject: feng3d.GameObject): void;
-        initicon(): void;
-        update(): void;
-        dispose(): void;
+        private onLightChanged;
         private onScenetransformChanged;
         private onMousedown;
     }
