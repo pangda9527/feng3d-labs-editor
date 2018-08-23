@@ -7976,7 +7976,7 @@ var editor;
         };
         HierarchyTree.prototype.add = function (gameobject) {
             var _this = this;
-            if (!(gameobject.hideFlags & feng3d.HideFlags.HideInHierarchy))
+            if (gameobject.hideFlags & feng3d.HideFlags.HideInHierarchy)
                 return;
             var node = nodeMap.get(gameobject);
             if (node) {
