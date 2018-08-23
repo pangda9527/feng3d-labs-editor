@@ -67,7 +67,7 @@ namespace editor
 
         add(gameobject: feng3d.GameObject)
         {
-            if (!gameobject.showinHierarchy)
+            if (!(gameobject.hideFlags & feng3d.HideFlags.HideInHierarchy))
                 return;
             var node = nodeMap.get(gameobject);
             if (node)

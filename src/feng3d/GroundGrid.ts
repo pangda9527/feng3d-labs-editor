@@ -16,7 +16,6 @@ namespace editor
 
             var groundGridObject = new feng3d.GameObject().value({ name: "GroundGrid" });
             groundGridObject.mouseEnabled = false;
-            groundGridObject.transform.showInInspector = false;
 
             gameObject.addChild(groundGridObject);
 

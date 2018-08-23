@@ -58,8 +58,7 @@ namespace editor
             //
             var lightLines = this.lightLines = new feng3d.GameObject().value({ name: "Lines" });
             lightLines.mouseEnabled = false;
-            lightLines.serializable = false;
-            lightLines.showinHierarchy = false;
+            lightLines.hideFlags = feng3d.HideFlags.Hide;
             var model = lightLines.addComponent(feng3d.Model);
             var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
@@ -69,8 +68,7 @@ namespace editor
             //
             var lightpoints = this.lightpoints = new feng3d.GameObject().value({ name: "points" });
             lightpoints.mouseEnabled = false;
-            lightpoints.serializable = false;
-            lightpoints.showinHierarchy = false;
+            lightpoints.hideFlags = feng3d.HideFlags.Hide;
             var model = lightpoints.addComponent(feng3d.Model);
             var pointGeometry = this.pointGeometry = model.geometry = new feng3d.PointGeometry();
             pointGeometry.points = [

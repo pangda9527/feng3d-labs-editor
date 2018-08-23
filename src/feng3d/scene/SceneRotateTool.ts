@@ -4,9 +4,6 @@ namespace editor
 {
     export class SceneRotateTool extends feng3d.Component
     {
-        showInInspector = false;
-        serializable = false;
-
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);

@@ -2,32 +2,8 @@ namespace editor
 {
     export class PointLightIcon extends EditorScript
     {
-        get light()
-        {
-            return this._light;
-        }
-        set light(v)
-        {
-            if (this._light)
-            {
-                this._light.off("scenetransformChanged", this.onScenetransformChanged, this);
-            }
-            this._light = v;
-            if (this._light)
-            {
-                this.onScenetransformChanged();
-                this._light.on("scenetransformChanged", this.onScenetransformChanged, this);
-            }
-        }
-
-        private _light: feng3d.PointLight;
-
-        private lightIcon: feng3d.GameObject;
-        private lightLines: feng3d.GameObject;
-        private lightpoints: feng3d.GameObject;
-        private textureMaterial: feng3d.TextureMaterial;
-        private segmentGeometry: feng3d.SegmentGeometry;
-        private pointGeometry: feng3d.PointGeometry;
+        @feng3d.watch("onLightChanged")
+        light: feng3d.PointLight;
 
         init(gameObject: feng3d.GameObject)
         {
@@ -61,8 +37,7 @@ namespace editor
             //
             var lightLines = this.lightLines = new feng3d.GameObject().value({ name: "Lines" });
             lightLines.mouseEnabled = false;
-            lightLines.serializable = false;
-            lightLines.showinHierarchy = false;
+            lightLines.hideFlags = feng3d.HideFlags.Hide;
             var model = lightLines.addComponent(feng3d.Model);
             var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
@@ -72,8 +47,7 @@ namespace editor
             //
             var lightpoints = this.lightpoints = new feng3d.GameObject().value({ name: "points" });
             lightpoints.mouseEnabled = false;
-            lightpoints.serializable = false;
-            lightpoints.showinHierarchy = false;
+            lightpoints.hideFlags = feng3d.HideFlags.Hide;
             var model = lightpoints.addComponent(feng3d.Model);
             var pointGeometry = this.pointGeometry = model.geometry = new feng3d.PointGeometry();
             pointGeometry.points = [
@@ -203,6 +177,27 @@ namespace editor
             this.lightpoints = null;
             this.segmentGeometry = null;
             super.dispose();
+        }
+
+        //
+        private lightIcon: feng3d.GameObject;
+        private lightLines: feng3d.GameObject;
+        private lightpoints: feng3d.GameObject;
+        private textureMaterial: feng3d.TextureMaterial;
+        private segmentGeometry: feng3d.SegmentGeometry;
+        private pointGeometry: feng3d.PointGeometry;
+
+        private onLightChanged(property: string, oldValue: feng3d.PointLight, value: feng3d.PointLight)
+        {
+            if (oldValue)
+            {
+                oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+            if (value)
+            {
+                this.onScenetransformChanged();
+                value.on("scenetransformChanged", this.onScenetransformChanged, this);
+            }
         }
 
         private onScenetransformChanged()

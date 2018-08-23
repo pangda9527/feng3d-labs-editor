@@ -3646,7 +3646,7 @@ var editor;
         };
         OAVComponentList.prototype.addComponentView = function (component) {
             var o;
-            if (!component.showInInspector)
+            if (component.hideFlags & feng3d.HideFlags.HideInHierarchy)
                 return;
             var displayObject = new editor.ComponentView(component);
             displayObject.percentWidth = 100;
@@ -7976,7 +7976,7 @@ var editor;
         };
         HierarchyTree.prototype.add = function (gameobject) {
             var _this = this;
-            if (!gameobject.showinHierarchy)
+            if (!(gameobject.hideFlags & feng3d.HideFlags.HideInHierarchy))
                 return;
             var node = nodeMap.get(gameobject);
             if (node) {
@@ -8083,10 +8083,7 @@ var editor;
     var SceneRotateTool = /** @class */ (function (_super) {
         __extends(SceneRotateTool, _super);
         function SceneRotateTool() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.showInInspector = false;
-            _this.serializable = false;
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         SceneRotateTool.prototype.init = function (gameObject) {
             var _this = this;
@@ -8258,7 +8255,6 @@ var editor;
             _super.prototype.init.call(this, gameObject);
             var groundGridObject = new feng3d.GameObject().value({ name: "GroundGrid" });
             groundGridObject.mouseEnabled = false;
-            groundGridObject.transform.showInInspector = false;
             gameObject.addChild(groundGridObject);
             var __this = this;
             editor.editorCamera.transform.on("transformChanged", update, this);
@@ -9930,8 +9926,6 @@ var editor;
         DirectionLightIcon.prototype.initicon = function () {
             var linesize = 10;
             var lightIcon = this.lightIcon = new feng3d.GameObject().value({ name: "Icon" });
-            lightIcon.serializable = false;
-            lightIcon.showinHierarchy = false;
             var billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
             billboardComponent.camera = editor.editorCamera;
             var model = lightIcon.addComponent(feng3d.Model);
@@ -9947,8 +9941,7 @@ var editor;
             //
             var lightLines = this.lightLines = new feng3d.GameObject().value({ name: "Lines" });
             lightLines.mouseEnabled = false;
-            lightLines.serializable = false;
-            lightLines.showinHierarchy = false;
+            lightLines.hideFlags = feng3d.HideFlags.Hide;
             var holdSizeComponent = lightLines.addComponent(feng3d.HoldSizeComponent);
             holdSizeComponent.camera = editor.editorCamera;
             holdSizeComponent.holdSize = 1;
@@ -10013,23 +10006,6 @@ var editor;
         function PointLightIcon() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(PointLightIcon.prototype, "light", {
-            get: function () {
-                return this._light;
-            },
-            set: function (v) {
-                if (this._light) {
-                    this._light.off("scenetransformChanged", this.onScenetransformChanged, this);
-                }
-                this._light = v;
-                if (this._light) {
-                    this.onScenetransformChanged();
-                    this._light.on("scenetransformChanged", this.onScenetransformChanged, this);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
         PointLightIcon.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
             this.initicon();
@@ -10058,8 +10034,7 @@ var editor;
             //
             var lightLines = this.lightLines = new feng3d.GameObject().value({ name: "Lines" });
             lightLines.mouseEnabled = false;
-            lightLines.serializable = false;
-            lightLines.showinHierarchy = false;
+            lightLines.hideFlags = feng3d.HideFlags.Hide;
             var model = lightLines.addComponent(feng3d.Model);
             var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
@@ -10069,8 +10044,7 @@ var editor;
             //
             var lightpoints = this.lightpoints = new feng3d.GameObject().value({ name: "points" });
             lightpoints.mouseEnabled = false;
-            lightpoints.serializable = false;
-            lightpoints.showinHierarchy = false;
+            lightpoints.hideFlags = feng3d.HideFlags.Hide;
             var model = lightpoints.addComponent(feng3d.Model);
             var pointGeometry = this.pointGeometry = model.geometry = new feng3d.PointGeometry();
             pointGeometry.points = [
@@ -10193,6 +10167,15 @@ var editor;
             this.segmentGeometry = null;
             _super.prototype.dispose.call(this);
         };
+        PointLightIcon.prototype.onLightChanged = function (property, oldValue, value) {
+            if (oldValue) {
+                oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+            if (value) {
+                this.onScenetransformChanged();
+                value.on("scenetransformChanged", this.onScenetransformChanged, this);
+            }
+        };
         PointLightIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
         };
@@ -10204,6 +10187,9 @@ var editor;
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
         };
+        __decorate([
+            feng3d.watch("onLightChanged")
+        ], PointLightIcon.prototype, "light", void 0);
         return PointLightIcon;
     }(editor.EditorScript));
     editor.PointLightIcon = PointLightIcon;
@@ -10257,8 +10243,7 @@ var editor;
             //
             var lightLines = this.lightLines = new feng3d.GameObject().value({ name: "Lines" });
             lightLines.mouseEnabled = false;
-            lightLines.serializable = false;
-            lightLines.showinHierarchy = false;
+            lightLines.hideFlags = feng3d.HideFlags.Hide;
             var model = lightLines.addComponent(feng3d.Model);
             var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
@@ -10268,8 +10253,7 @@ var editor;
             //
             var lightpoints = this.lightpoints = new feng3d.GameObject().value({ name: "points" });
             lightpoints.mouseEnabled = false;
-            lightpoints.serializable = false;
-            lightpoints.showinHierarchy = false;
+            lightpoints.hideFlags = feng3d.HideFlags.Hide;
             var model = lightpoints.addComponent(feng3d.Model);
             var pointGeometry = this.pointGeometry = model.geometry = new feng3d.PointGeometry();
             pointGeometry.points = [

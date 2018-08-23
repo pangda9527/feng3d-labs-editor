@@ -2143,8 +2143,6 @@ declare namespace feng3d {
 }
 declare namespace editor {
     class SceneRotateTool extends feng3d.Component {
-        showInInspector: boolean;
-        serializable: boolean;
         init(gameObject: feng3d.GameObject): void;
         private onLoaded;
     }
@@ -2519,17 +2517,17 @@ declare namespace editor {
 declare namespace editor {
     class PointLightIcon extends EditorScript {
         light: feng3d.PointLight;
-        private _light;
+        init(gameObject: feng3d.GameObject): void;
+        initicon(): void;
+        update(): void;
+        dispose(): void;
         private lightIcon;
         private lightLines;
         private lightpoints;
         private textureMaterial;
         private segmentGeometry;
         private pointGeometry;
-        init(gameObject: feng3d.GameObject): void;
-        initicon(): void;
-        update(): void;
-        dispose(): void;
+        private onLightChanged;
         private onScenetransformChanged;
         private onMousedown;
     }
