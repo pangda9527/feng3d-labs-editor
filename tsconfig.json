@@ -130,6 +130,7 @@
         "src/scripts/DirectionLightIcon.ts",
         "src/scripts/PointLightIcon.ts",
         "src/scripts/SpotLightIcon.ts",
+        "src/scripts/CameraIcon.ts",
         //
         "src/loaders/threejsLoader.ts",
         //configs

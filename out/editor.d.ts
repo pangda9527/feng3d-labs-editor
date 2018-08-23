@@ -2202,11 +2202,12 @@ declare namespace editor {
         dispose(): void;
         private onAddComponentToScene;
         private onRemoveComponentFromScene;
-        private addLightIcon;
-        private removeLightIcon;
+        private addComponent;
+        private removeComponent;
         private directionLightIconMap;
         private pointLightIconMap;
         private spotLightIconMap;
+        private cameraIconMap;
     }
 }
 declare namespace feng3d {
@@ -2552,6 +2553,23 @@ declare namespace editor {
         private segmentGeometry;
         private pointGeometry;
         private onLightChanged;
+        private onScenetransformChanged;
+        private onMousedown;
+    }
+}
+declare namespace editor {
+    class CameraIcon extends EditorScript {
+        camera: feng3d.Camera;
+        init(gameObject: feng3d.GameObject): void;
+        initicon(): void;
+        update(): void;
+        dispose(): void;
+        private lightIcon;
+        private lightLines;
+        private lightpoints;
+        private segmentGeometry;
+        private pointGeometry;
+        private onCameraChanged;
         private onScenetransformChanged;
         private onMousedown;
     }

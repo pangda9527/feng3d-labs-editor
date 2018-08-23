@@ -67,6 +67,7 @@ namespace editor
         {
             //
             editorCamera = new feng3d.GameObject().value({ name: "editorCamera" }).addComponent(feng3d.Camera);
+            editorCamera.lens.far = 5000;
             editorCamera.transform.x = 5;
             editorCamera.transform.y = 3;
             editorCamera.transform.z = 5;
