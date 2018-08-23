@@ -86,7 +86,7 @@ namespace editor
 
             feng3d.Loader.loadText(editorData.getEditorAssetsPath("gameobjects/Trident.gameobject.json"), (content) =>
             {
-                var trident = feng3d.serialization.deserialize(JSON.parse(content));
+                var trident: feng3d.GameObject = feng3d.serialization.deserialize(JSON.parse(content));
                 editorScene.gameObject.addChild(trident);
             });
 
