@@ -1638,6 +1638,13 @@ var editor;
             else
                 this.contentGroup.addChild(component);
         };
+        Accordion.prototype.removeContent = function (component) {
+            var index = this.components ? this.components.indexOf(component) : -1;
+            if (index != -1)
+                this.components.splice(index, 1);
+            else
+                component.parent && component.parent.removeChild(component);
+        };
         Accordion.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
@@ -2114,6 +2121,7 @@ var editor;
         function ComponentView(component) {
             var _this = _super.call(this) || this;
             _this.component = component;
+            component.on("refreshView", _this.onRefreshView, _this);
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "ComponentSkin";
             return _this;
@@ -2197,6 +2205,11 @@ var editor;
             this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
             this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
             feng3d.feng3dDispatcher.off("assets.scriptChanged", this.onScriptChanged, this);
+        };
+        ComponentView.prototype.onRefreshView = function () {
+            this.accordion.removeContent(this.componentView);
+            this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
+            this.accordion.addContent(this.componentView);
         };
         ComponentView.prototype.updateEnableCB = function () {
             if (this.component instanceof feng3d.Behaviour) {

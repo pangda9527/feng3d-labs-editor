@@ -24,6 +24,7 @@ namespace editor
 			super();
 			this.component = component;
 
+			component.on("refreshView", this.onRefreshView, this);
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "ComponentSkin";
 		}
@@ -124,6 +125,13 @@ namespace editor
 			this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 			this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
 			feng3d.feng3dDispatcher.off("assets.scriptChanged", this.onScriptChanged, this);
+		}
+
+		private onRefreshView()
+		{
+			this.accordion.removeContent(this.componentView);
+			this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
+			this.accordion.addContent(this.componentView);
 		}
 
 		private updateEnableCB()

@@ -28,6 +28,15 @@ namespace editor
 				this.contentGroup.addChild(component);
 		}
 
+		removeContent(component: eui.Component)
+		{
+			var index = this.components ? this.components.indexOf(component) : -1;
+			if (index != -1)
+				this.components.splice(index, 1);
+			else
+				component.parent && component.parent.removeChild(component);
+		}
+
 		protected onComplete()
 		{
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);

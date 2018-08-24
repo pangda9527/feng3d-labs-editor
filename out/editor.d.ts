@@ -448,6 +448,7 @@ declare namespace editor {
         private components;
         constructor();
         addContent(component: eui.Component): void;
+        removeContent(component: eui.Component): void;
         protected onComplete(): void;
         protected onAddedToStage(): void;
         protected onRemovedFromStage(): void;
@@ -609,6 +610,7 @@ declare namespace editor {
         private onDeleteButton;
         private onAddToStage;
         private onRemovedFromStage;
+        private onRefreshView;
         private updateEnableCB;
         private onEnableCBChange;
         private initScriptView;
