@@ -10437,9 +10437,9 @@ var editor;
                     var lens = this.camera.lens;
                     var near = lens.near;
                     var far = lens.far;
+                    var aspect = lens.aspect;
                     if (lens instanceof feng3d.PerspectiveLens) {
                         var fov = lens.fov;
-                        var aspect = lens.aspect;
                         var tan = Math.tan(fov * Math.PI / 360);
                         //
                         var nearLeft = -tan * near * aspect;
@@ -10453,14 +10453,16 @@ var editor;
                         //
                     }
                     else if (lens instanceof feng3d.OrthographicLens) {
-                        var nearLeft = lens.left;
-                        var nearRight = lens.right;
-                        var nearTop = lens.top;
-                        var nearBottom = lens.bottom;
-                        var farLeft = lens.left;
-                        var farRight = lens.right;
-                        var farTop = lens.top;
-                        var farBottom = lens.bottom;
+                        var size = lens.size;
+                        //
+                        var nearLeft = -size * aspect;
+                        var nearRight = size;
+                        var nearTop = size;
+                        var nearBottom = -size;
+                        var farLeft = -size;
+                        var farRight = size;
+                        var farTop = size;
+                        var farBottom = -size;
                     }
                     points.push({ position: new feng3d.Vector3(0, farBottom, far) }, { position: new feng3d.Vector3(0, farTop, far) }, { position: new feng3d.Vector3(farLeft, 0, far) }, { position: new feng3d.Vector3(farRight, 0, far) });
                     segments.push({ start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(nearRight, nearBottom, near) }, { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(nearLeft, nearTop, near) }, { start: new feng3d.Vector3(nearLeft, nearTop, near), end: new feng3d.Vector3(nearRight, nearTop, near) }, { start: new feng3d.Vector3(nearRight, nearBottom, near), end: new feng3d.Vector3(nearRight, nearTop, near) }, 
