@@ -9913,7 +9913,7 @@ var editor;
             var lightIcon = this.lightIcon = new feng3d.GameObject().value({
                 name: "Icon", components: [{ __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
-                        __class__: "feng3d.Model", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
+                        __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
                         material: { __class__: "feng3d.TextureMaterial", uniforms: { s_texture: { __class__: "feng3d.UrlImageTexture2D", url: editor.editorData.getEditorAssetsPath("assets/3d/icons/sun.png"), format: feng3d.TextureFormat.RGBA, premulAlpha: true, }, }, renderParams: { enableBlend: true } },
                     },],
             });
@@ -9942,7 +9942,7 @@ var editor;
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{ __class__: "feng3d.HoldSizeComponent", camera: editor.editorCamera, holdSize: 1 },
                     {
-                        __class__: "feng3d.Model",
+                        __class__: "feng3d.MeshModel",
                         material: { __class__: "feng3d.SegmentMaterial", uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 163 / 255, g: 162 / 255, b: 107 / 255 } }, renderParams: { renderMode: feng3d.RenderMode.LINES } },
                         geometry: { __class__: "feng3d.SegmentGeometry", segments: segments },
                     },],
@@ -10009,7 +10009,7 @@ var editor;
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
-                        __class__: "feng3d.Model", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
+                        __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
                         material: {
                             __class__: "feng3d.TextureMaterial",
                             uniforms: {
@@ -10030,7 +10030,7 @@ var editor;
             var lightLines = this.lightLines = new feng3d.GameObject().value({
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
-                        __class__: "feng3d.Model", material: {
+                        __class__: "feng3d.MeshModel", material: {
                             __class__: "feng3d.SegmentMaterial",
                             uniforms: {
                                 u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 },
@@ -10045,7 +10045,7 @@ var editor;
             var lightpoints = this.lightpoints = new feng3d.GameObject().value({
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
-                        __class__: "feng3d.Model",
+                        __class__: "feng3d.MeshModel",
                         geometry: {
                             __class__: "feng3d.PointGeometry",
                             points: [
@@ -10217,7 +10217,7 @@ var editor;
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
-                        __class__: "feng3d.Model", material: {
+                        __class__: "feng3d.MeshModel", material: {
                             __class__: "feng3d.TextureMaterial",
                             uniforms: {
                                 s_texture: {
@@ -10238,7 +10238,7 @@ var editor;
             var lightLines = this.lightLines = new feng3d.GameObject().value({
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
-                        __class__: "feng3d.Model", material: {
+                        __class__: "feng3d.MeshModel", material: {
                             __class__: "feng3d.SegmentMaterial",
                             uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 } },
                             renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.LINES },
@@ -10253,7 +10253,7 @@ var editor;
             var lightpoints = this.lightpoints = new feng3d.GameObject().value({
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
-                        __class__: "feng3d.Model",
+                        __class__: "feng3d.MeshModel",
                         material: { __class__: "feng3d.PointMaterial", uniforms: { u_PointSize: 5 }, renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.POINTS } },
                         geometry: { __class__: "feng3d.PointGeometry", },
                     },
@@ -10368,7 +10368,7 @@ var editor;
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
-                        __class__: "feng3d.Model", material: {
+                        __class__: "feng3d.MeshModel", material: {
                             __class__: "feng3d.TextureMaterial",
                             uniforms: {
                                 s_texture: {
@@ -10388,7 +10388,7 @@ var editor;
             var lightLines = this.lightLines = new feng3d.GameObject().value({
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
-                        __class__: "feng3d.Model", material: {
+                        __class__: "feng3d.MeshModel", material: {
                             __class__: "feng3d.SegmentMaterial",
                             uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 } },
                             renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.LINES },
@@ -10403,7 +10403,7 @@ var editor;
             var lightpoints = this.lightpoints = new feng3d.GameObject().value({
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
-                        __class__: "feng3d.Model",
+                        __class__: "feng3d.MeshModel",
                         material: { __class__: "feng3d.PointMaterial", uniforms: { u_PointSize: 5 }, renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.POINTS } },
                         geometry: { __class__: "feng3d.PointGeometry", },
                     },

@@ -18,7 +18,7 @@ namespace editor
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
-                        __class__: "feng3d.Model", material: {
+                        __class__: "feng3d.MeshModel", material: {
                             __class__: "feng3d.TextureMaterial",
                             uniforms: {
                                 s_texture: {
@@ -40,7 +40,7 @@ namespace editor
             var lightLines = this.lightLines = new feng3d.GameObject().value({
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
-                    __class__: "feng3d.Model", material: {
+                    __class__: "feng3d.MeshModel", material: {
                         __class__: "feng3d.SegmentMaterial",
                         uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 } },
                         renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.LINES },
@@ -55,7 +55,7 @@ namespace editor
             var lightpoints = this.lightpoints = new feng3d.GameObject().value({
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
-                        __class__: "feng3d.Model",
+                        __class__: "feng3d.MeshModel",
                         material: { __class__: "feng3d.PointMaterial", uniforms: { u_PointSize: 5 }, renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.POINTS } },
                         geometry: { __class__: "feng3d.PointGeometry", },
                     },
