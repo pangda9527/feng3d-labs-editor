@@ -4892,7 +4892,7 @@ var editor;
                     menuconfig.push({
                         label: "解析", click: function () {
                             editor.fs.readFileAsString(file.path, function (err, content) {
-                                feng3d.MD5Loader.parseMD5Mesh(content, function (gameobject) {
+                                feng3d.md5Loader.parseMD5Mesh(content, function (gameobject) {
                                     gameobject.name = feng3d.pathUtils.getName(file.name);
                                     _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                                     // engine.root.addChild(gameobject);
@@ -4905,7 +4905,7 @@ var editor;
                     menuconfig.push({
                         label: "解析", click: function () {
                             editor.fs.readFileAsString(file.path, function (err, content) {
-                                feng3d.MD5Loader.parseMD5Anim(content, function (animationclip) {
+                                feng3d.md5Loader.parseMD5Anim(content, function (animationclip) {
                                     animationclip.name = feng3d.pathUtils.getName(file.name);
                                     _this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
                                 });

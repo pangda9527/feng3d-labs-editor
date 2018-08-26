@@ -499,7 +499,7 @@ namespace editor
                         {
                             fs.readFileAsString(file.path, (err, content) =>
                             {
-                                feng3d.MD5Loader.parseMD5Mesh(content, (gameobject) =>
+                                feng3d.md5Loader.parseMD5Mesh(content, (gameobject) =>
                                 {
                                     gameobject.name = feng3d.pathUtils.getName(file.name);
                                     this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
@@ -516,7 +516,7 @@ namespace editor
                         {
                             fs.readFileAsString(file.path, (err, content) =>
                             {
-                                feng3d.MD5Loader.parseMD5Anim(content, (animationclip) =>
+                                feng3d.md5Loader.parseMD5Anim(content, (animationclip) =>
                                 {
                                     animationclip.name = feng3d.pathUtils.getName(file.name);
                                     this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
