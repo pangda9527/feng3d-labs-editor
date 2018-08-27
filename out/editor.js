@@ -4697,6 +4697,14 @@ var editor;
             // 解析菜单
             this.parserMenu(menuconfig, assetsFile);
             menuconfig.push({
+                label: "导出", click: function () {
+                    editor.fs.readFile(assetsFile.path, function (err, data) {
+                        feng3d.dataTransform.arrayBufferToBlob(data, function (blob) {
+                            saveAs(blob, assetsFile.name);
+                        });
+                    });
+                }
+            }, {
                 label: "删除", click: function () {
                     editor.editorAssets.deletefile(assetsFile.path);
                 }

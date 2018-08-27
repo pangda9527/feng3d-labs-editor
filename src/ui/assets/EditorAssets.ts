@@ -265,8 +265,18 @@ namespace editor
             // 解析菜单
             this.parserMenu(menuconfig, assetsFile);
 
-            menuconfig.push(
+            menuconfig.push({
+                label: "导出", click: () =>
                 {
+                    fs.readFile(assetsFile.path, (err, data) =>
+                    {
+                        feng3d.dataTransform.arrayBufferToBlob(data, (blob) =>
+                        {
+                            saveAs(blob, assetsFile.name);
+                        });
+                    });
+                }
+            }, {
                     label: "删除", click: () =>
                     {
                         editorAssets.deletefile(assetsFile.path);
