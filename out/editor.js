@@ -10506,7 +10506,7 @@ var editor;
         CameraIcon.prototype.onCameraChanged = function (property, oldValue, value) {
             if (oldValue) {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
-                value.off("lensChanged", this.onLensChanged, this);
+                oldValue.off("lensChanged", this.onLensChanged, this);
             }
             if (value) {
                 this.onScenetransformChanged();
