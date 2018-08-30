@@ -473,14 +473,20 @@ namespace editor
                     menuconfig.push({
                         label: "解析", click: () =>
                         {
-                            fs.readFileAsString(file.path, (err, content) =>
+                            feng3d.objLoader.load(file.path, (gameobject: feng3d.GameObject) =>
                             {
-                                feng3d.ObjLoader.parse(content, (gameobject: feng3d.GameObject) =>
-                                {
-                                    gameobject.name = feng3d.pathUtils.getName(file.name);
-                                    this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                                });
+                                gameobject.name = feng3d.pathUtils.getName(file.name);
+                                this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                             });
+
+                            // fs.readFileAsString(file.path, (err, content) =>
+                            // {
+                            //     feng3d.objLoader.parse(content, (gameobject: feng3d.GameObject) =>
+                            //     {
+                            //         gameobject.name = feng3d.pathUtils.getName(file.name);
+                            //         this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
+                            //     });
+                            // });
                         }
                     });
                     break;

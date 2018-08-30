@@ -10,7 +10,7 @@ namespace editor
 
             var thisObj = this;
 
-            feng3d.Loader.loadText(editorData.getEditorAssetsPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
+            feng3d.loader.loadText(editorData.getEditorAssetsPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
             {
                 var rotationToolModel = feng3d.serialization.deserialize(JSON.parse(content));
                 this.onLoaded(rotationToolModel);

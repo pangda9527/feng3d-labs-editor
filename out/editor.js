@@ -4874,12 +4874,18 @@ var editor;
                 case "obj":
                     menuconfig.push({
                         label: "解析", click: function () {
-                            editor.fs.readFileAsString(file.path, function (err, content) {
-                                feng3d.ObjLoader.parse(content, function (gameobject) {
-                                    gameobject.name = feng3d.pathUtils.getName(file.name);
-                                    _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                                });
+                            feng3d.objLoader.load(file.path, function (gameobject) {
+                                gameobject.name = feng3d.pathUtils.getName(file.name);
+                                _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                             });
+                            // fs.readFileAsString(file.path, (err, content) =>
+                            // {
+                            //     feng3d.objLoader.parse(content, (gameobject: feng3d.GameObject) =>
+                            //     {
+                            //         gameobject.name = feng3d.pathUtils.getName(file.name);
+                            //         this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
+                            //     });
+                            // });
                         }
                     });
                     break;
@@ -8110,7 +8116,7 @@ var editor;
             var _this = this;
             _super.prototype.init.call(this, gameObject);
             var thisObj = this;
-            feng3d.Loader.loadText(editor.editorData.getEditorAssetsPath("gameobjects/SceneRotateTool.gameobject.json"), function (content) {
+            feng3d.loader.loadText(editor.editorData.getEditorAssetsPath("gameobjects/SceneRotateTool.gameobject.json"), function (content) {
                 var rotationToolModel = feng3d.serialization.deserialize(JSON.parse(content));
                 _this.onLoaded(rotationToolModel);
             });
@@ -8396,7 +8402,7 @@ var editor;
             editor.editorScene.gameObject.addComponent(editor.GroundGrid);
             editor.editorScene.gameObject.addComponent(editor.MRSTool);
             editor.editorComponent = editor.editorScene.gameObject.addComponent(editor.EditorComponent);
-            feng3d.Loader.loadText(editor.editorData.getEditorAssetsPath("gameobjects/Trident.gameobject.json"), function (content) {
+            feng3d.loader.loadText(editor.editorData.getEditorAssetsPath("gameobjects/Trident.gameobject.json"), function (content) {
                 var trident = feng3d.serialization.deserialize(JSON.parse(content));
                 editor.editorScene.gameObject.addChild(trident);
             });
@@ -11175,7 +11181,7 @@ var editor;
      */
     function downloadProject(projectname, callback) {
         var path = "projects/" + projectname;
-        feng3d.Loader.loadBinary(path, function (content) {
+        feng3d.loader.loadBinary(path, function (content) {
             editor.fs.importProject(content, function () {
                 editor.editorAssets.initproject(function () {
                     editor.editorAssets.runProjectScript(function () {
