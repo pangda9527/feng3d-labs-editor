@@ -504,15 +504,11 @@ namespace editor
                     menuconfig.push({
                         label: "解析", click: () =>
                         {
-                            fs.readFileAsString(file.path, (err, content) =>
+                            feng3d.md5Loader.load(file.path, (gameobject) =>
                             {
-                                feng3d.md5Loader.parseMD5Mesh(content, (gameobject) =>
-                                {
-                                    gameobject.name = feng3d.pathUtils.getName(file.name);
-                                    this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                                    // engine.root.addChild(gameobject);
-                                });
-
+                                gameobject.name = feng3d.pathUtils.getName(file.name);
+                                this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
+                                // engine.root.addChild(gameobject);
                             });
                         }
                     });
@@ -521,13 +517,10 @@ namespace editor
                     menuconfig.push({
                         label: "解析", click: () =>
                         {
-                            fs.readFileAsString(file.path, (err, content) =>
+                            feng3d.md5Loader.loadAnim(file.path, (animationclip) =>
                             {
-                                feng3d.md5Loader.parseMD5Anim(content, (animationclip) =>
-                                {
-                                    animationclip.name = feng3d.pathUtils.getName(file.name);
-                                    this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
-                                });
+                                animationclip.name = feng3d.pathUtils.getName(file.name);
+                                this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
                             });
                         }
                     });

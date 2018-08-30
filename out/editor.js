@@ -4897,12 +4897,10 @@ var editor;
                 case "md5mesh":
                     menuconfig.push({
                         label: "解析", click: function () {
-                            editor.fs.readFileAsString(file.path, function (err, content) {
-                                feng3d.md5Loader.parseMD5Mesh(content, function (gameobject) {
-                                    gameobject.name = feng3d.pathUtils.getName(file.name);
-                                    _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                                    // engine.root.addChild(gameobject);
-                                });
+                            feng3d.md5Loader.load(file.path, function (gameobject) {
+                                gameobject.name = feng3d.pathUtils.getName(file.name);
+                                _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
+                                // engine.root.addChild(gameobject);
                             });
                         }
                     });
@@ -4910,11 +4908,9 @@ var editor;
                 case "md5anim":
                     menuconfig.push({
                         label: "解析", click: function () {
-                            editor.fs.readFileAsString(file.path, function (err, content) {
-                                feng3d.md5Loader.parseMD5Anim(content, function (animationclip) {
-                                    animationclip.name = feng3d.pathUtils.getName(file.name);
-                                    _this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
-                                });
+                            feng3d.md5Loader.loadAnim(file.path, function (animationclip) {
+                                animationclip.name = feng3d.pathUtils.getName(file.name);
+                                _this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
                             });
                         }
                     });
