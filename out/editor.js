@@ -4878,14 +4878,6 @@ var editor;
                                 gameobject.name = feng3d.pathUtils.getName(file.name);
                                 _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                             });
-                            // fs.readFileAsString(file.path, (err, content) =>
-                            // {
-                            //     feng3d.objLoader.parse(content, (gameobject: feng3d.GameObject) =>
-                            //     {
-                            //         gameobject.name = feng3d.pathUtils.getName(file.name);
-                            //         this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                            //     });
-                            // });
                         }
                     });
                     break;
