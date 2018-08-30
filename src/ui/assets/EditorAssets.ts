@@ -456,7 +456,7 @@ namespace editor
                         {
                             fs.readFileAsString(file.path, (err, content) =>
                             {
-                                feng3d.war3.MdlParser.parse(content, (war3Model) =>
+                                feng3d.war3.mdlParser.parse(content, (war3Model) =>
                                 {
                                     var paths = file.path.split("/");
                                     paths.pop();

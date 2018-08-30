@@ -4859,7 +4859,7 @@ var editor;
                     menuconfig.push({
                         label: "解析", click: function () {
                             editor.fs.readFileAsString(file.path, function (err, content) {
-                                feng3d.war3.MdlParser.parse(content, function (war3Model) {
+                                feng3d.war3.mdlParser.parse(content, function (war3Model) {
                                     var paths = file.path.split("/");
                                     paths.pop();
                                     war3Model.root = paths.join("/") + "/";
