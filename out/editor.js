@@ -9931,14 +9931,14 @@ var editor;
         };
         DirectionLightIcon.prototype.initicon = function () {
             var linesize = 10;
-            var lightIcon = this.lightIcon = new feng3d.GameObject().value({
+            var lightIcon = this._lightIcon = new feng3d.GameObject().value({
                 name: "Icon", components: [{ __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
                         __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
                         material: { __class__: "feng3d.TextureMaterial", uniforms: { s_texture: { __class__: "feng3d.UrlImageTexture2D", url: editor.editorData.getEditorAssetsPath("assets/3d/icons/sun.png"), format: feng3d.TextureFormat.RGBA, premulAlpha: true, }, }, renderParams: { enableBlend: true } },
                     },],
             });
-            this.textureMaterial = lightIcon.addComponent(feng3d.Model).material;
+            this._textureMaterial = lightIcon.addComponent(feng3d.Model).material;
             this.gameObject.addChild(lightIcon);
             //
             var num = 10;
@@ -9959,7 +9959,7 @@ var editor;
                 var y1 = Math.cos(angle1) * linesize;
                 segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
             }
-            var lightLines = this.lightLines = new feng3d.GameObject().value({
+            var lightLines = this._lightLines = new feng3d.GameObject().value({
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{ __class__: "feng3d.HoldSizeComponent", camera: editor.editorCamera, holdSize: 1 },
                     {
@@ -9974,17 +9974,17 @@ var editor;
         DirectionLightIcon.prototype.update = function () {
             if (!this.light)
                 return;
-            this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
-            this.lightLines.visible = editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
+            this._textureMaterial.uniforms.u_color = this.light.color.toColor4();
+            this._lightLines.visible = editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
         };
         DirectionLightIcon.prototype.dispose = function () {
             this.enabled = false;
-            this.textureMaterial = null;
+            this._textureMaterial = null;
             //
-            this.lightIcon.dispose();
-            this.lightLines.dispose();
-            this.lightIcon = null;
-            this.lightLines = null;
+            this._lightIcon.dispose();
+            this._lightLines.dispose();
+            this._lightIcon = null;
+            this._lightLines = null;
             _super.prototype.dispose.call(this);
         };
         DirectionLightIcon.prototype.onLightChanged = function (property, oldValue, value) {
@@ -10026,7 +10026,7 @@ var editor;
             this.on("mousedown", this.onMousedown, this);
         };
         PointLightIcon.prototype.initicon = function () {
-            var lightIcon = this.lightIcon = new feng3d.GameObject().value({
+            var lightIcon = this._lightIcon = new feng3d.GameObject().value({
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
@@ -10045,10 +10045,10 @@ var editor;
                     },
                 ],
             });
-            this.textureMaterial = lightIcon.getComponent(feng3d.Model).material;
+            this._textureMaterial = lightIcon.getComponent(feng3d.Model).material;
             this.gameObject.addChild(lightIcon);
             //
-            var lightLines = this.lightLines = new feng3d.GameObject().value({
+            var lightLines = this._lightLines = new feng3d.GameObject().value({
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                         __class__: "feng3d.MeshModel", material: {
@@ -10060,10 +10060,10 @@ var editor;
                         geometry: { __class__: "feng3d.SegmentGeometry" },
                     }]
             });
-            this.segmentGeometry = lightLines.getComponent(feng3d.Model).geometry;
+            this._segmentGeometry = lightLines.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this.lightpoints = new feng3d.GameObject().value({
+            var lightpoints = this._lightpoints = new feng3d.GameObject().value({
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                         __class__: "feng3d.MeshModel",
@@ -10083,16 +10083,16 @@ var editor;
                         },
                     }],
             });
-            this.pointGeometry = lightpoints.getComponent(feng3d.Model).geometry;
+            this._pointGeometry = lightpoints.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
         };
         PointLightIcon.prototype.update = function () {
             if (!this.light)
                 return;
-            this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
-            this.lightLines.transform.scale =
-                this.lightpoints.transform.scale =
+            this._textureMaterial.uniforms.u_color = this.light.color.toColor4();
+            this._lightLines.transform.scale =
+                this._lightpoints.transform.scale =
                     new feng3d.Vector3(this.light.range, this.light.range, this.light.range);
             if (editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1) {
                 //
@@ -10134,64 +10134,64 @@ var editor;
                         alpha = 1.0;
                     segments.push({ start: point0, end: point1, startColor: new feng3d.Color4(0, 0, 1, alpha), endColor: new feng3d.Color4(0, 0, 1, alpha) });
                 }
-                this.segmentGeometry.segments = segments;
-                this.pointGeometry.points = [];
+                this._segmentGeometry.segments = segments;
+                this._pointGeometry.points = [];
                 var point = new feng3d.Vector3(1, 0, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(1, 0, 0, alpha) });
+                this._pointGeometry.points.push({ position: point, color: new feng3d.Color4(1, 0, 0, alpha) });
                 point = new feng3d.Vector3(-1, 0, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(1, 0, 0, alpha) });
+                this._pointGeometry.points.push({ position: point, color: new feng3d.Color4(1, 0, 0, alpha) });
                 point = new feng3d.Vector3(0, 1, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 1, 0, alpha) });
+                this._pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 1, 0, alpha) });
                 point = new feng3d.Vector3(0, -1, 0);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 1, 0, alpha) });
+                this._pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 1, 0, alpha) });
                 point = new feng3d.Vector3(0, 0, 1);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 0, 1, alpha) });
+                this._pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 0, 1, alpha) });
                 point = new feng3d.Vector3(0, 0, -1);
                 if (point.dot(camerapos) < 0)
                     alpha = backalpha;
                 else
                     alpha = 1.0;
-                this.pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 0, 1, alpha) });
+                this._pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 0, 1, alpha) });
                 //
-                this.lightLines.visible = true;
-                this.lightpoints.visible = true;
+                this._lightLines.visible = true;
+                this._lightpoints.visible = true;
             }
             else {
-                this.lightLines.visible = false;
-                this.lightpoints.visible = false;
+                this._lightLines.visible = false;
+                this._lightpoints.visible = false;
             }
         };
         PointLightIcon.prototype.dispose = function () {
             this.enabled = false;
-            this.textureMaterial = null;
+            this._textureMaterial = null;
             //
-            this.lightIcon.dispose();
-            this.lightLines.dispose();
-            this.lightpoints.dispose();
-            this.lightIcon = null;
-            this.lightLines = null;
-            this.lightpoints = null;
-            this.segmentGeometry = null;
+            this._lightIcon.dispose();
+            this._lightLines.dispose();
+            this._lightpoints.dispose();
+            this._lightIcon = null;
+            this._lightLines = null;
+            this._lightpoints = null;
+            this._segmentGeometry = null;
             _super.prototype.dispose.call(this);
         };
         PointLightIcon.prototype.onLightChanged = function (property, oldValue, value) {
@@ -10234,7 +10234,7 @@ var editor;
             this.on("mousedown", this.onMousedown, this);
         };
         SpotLightIcon.prototype.initicon = function () {
-            var lightIcon = this.lightIcon = new feng3d.GameObject().value({
+            var lightIcon = this._lightIcon = new feng3d.GameObject().value({
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
@@ -10253,10 +10253,10 @@ var editor;
                     },
                 ]
             });
-            this.textureMaterial = lightIcon.getComponent(feng3d.Model).material;
+            this._textureMaterial = lightIcon.getComponent(feng3d.Model).material;
             this.gameObject.addChild(lightIcon);
             //
-            var lightLines = this.lightLines = new feng3d.GameObject().value({
+            var lightLines = this._lightLines = new feng3d.GameObject().value({
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                         __class__: "feng3d.MeshModel", material: {
@@ -10268,10 +10268,10 @@ var editor;
                     },
                 ],
             });
-            this.segmentGeometry = lightLines.getComponent(feng3d.Model).geometry;
+            this._segmentGeometry = lightLines.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this.lightpoints = new feng3d.GameObject().value({
+            var lightpoints = this._lightpoints = new feng3d.GameObject().value({
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
                         __class__: "feng3d.MeshModel",
@@ -10280,14 +10280,14 @@ var editor;
                     },
                 ]
             });
-            this.pointGeometry = lightpoints.getComponent(feng3d.Model).geometry;
+            this._pointGeometry = lightpoints.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
         };
         SpotLightIcon.prototype.update = function () {
             if (!this.light)
                 return;
-            this.textureMaterial.uniforms.u_color = this.light.color.toColor4();
+            this._textureMaterial.uniforms.u_color = this.light.color.toColor4();
             if (editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1) {
                 //
                 var points = [];
@@ -10319,28 +10319,28 @@ var editor;
                 points.push({ position: new feng3d.Vector3(0, radius, distance), color: new feng3d.Color4(1, 1, 0, 1) });
                 segments.push({ start: new feng3d.Vector3(), end: new feng3d.Vector3(radius, 0, distance), startColor: new feng3d.Color4(1, 1, 0, 1), endColor: new feng3d.Color4(1, 1, 0, 1) });
                 points.push({ position: new feng3d.Vector3(radius, 0, distance), color: new feng3d.Color4(1, 1, 0, 1) });
-                this.pointGeometry.points = points;
-                this.segmentGeometry.segments = segments;
+                this._pointGeometry.points = points;
+                this._segmentGeometry.segments = segments;
                 //
-                this.lightLines.visible = true;
-                this.lightpoints.visible = true;
+                this._lightLines.visible = true;
+                this._lightpoints.visible = true;
             }
             else {
-                this.lightLines.visible = false;
-                this.lightpoints.visible = false;
+                this._lightLines.visible = false;
+                this._lightpoints.visible = false;
             }
         };
         SpotLightIcon.prototype.dispose = function () {
             this.enabled = false;
-            this.textureMaterial = null;
+            this._textureMaterial = null;
             //
-            this.lightIcon.dispose();
-            this.lightLines.dispose();
-            this.lightpoints.dispose();
-            this.lightIcon = null;
-            this.lightLines = null;
-            this.lightpoints = null;
-            this.segmentGeometry = null;
+            this._lightIcon.dispose();
+            this._lightLines.dispose();
+            this._lightpoints.dispose();
+            this._lightIcon = null;
+            this._lightLines = null;
+            this._lightpoints = null;
+            this._segmentGeometry = null;
             _super.prototype.dispose.call(this);
         };
         SpotLightIcon.prototype.onLightChanged = function (property, oldValue, value) {
@@ -10376,7 +10376,7 @@ var editor;
         __extends(CameraIcon, _super);
         function CameraIcon() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.lensChanged = true;
+            _this._lensChanged = true;
             return _this;
         }
         CameraIcon.prototype.init = function (gameObject) {
@@ -10385,7 +10385,7 @@ var editor;
             this.on("mousedown", this.onMousedown, this);
         };
         CameraIcon.prototype.initicon = function () {
-            var lightIcon = this.lightIcon = new feng3d.GameObject().value({
+            var lightIcon = this._lightIcon = new feng3d.GameObject().value({
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
@@ -10406,7 +10406,7 @@ var editor;
             });
             this.gameObject.addChild(lightIcon);
             //
-            var lightLines = this.lightLines = new feng3d.GameObject().value({
+            var lightLines = this._lightLines = new feng3d.GameObject().value({
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                         __class__: "feng3d.MeshModel", material: {
@@ -10418,10 +10418,10 @@ var editor;
                     },
                 ],
             });
-            this.segmentGeometry = lightLines.getComponent(feng3d.Model).geometry;
+            this._segmentGeometry = lightLines.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this.lightpoints = new feng3d.GameObject().value({
+            var lightpoints = this._lightpoints = new feng3d.GameObject().value({
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
                         __class__: "feng3d.MeshModel",
@@ -10430,7 +10430,7 @@ var editor;
                     },
                 ]
             });
-            this.pointGeometry = lightpoints.getComponent(feng3d.Model).geometry;
+            this._pointGeometry = lightpoints.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
         };
@@ -10438,7 +10438,7 @@ var editor;
             if (!this.camera)
                 return;
             if (editor.editorData.selectedGameObjects.indexOf(this.camera.gameObject) != -1) {
-                if (this.lensChanged) {
+                if (this._lensChanged) {
                     //
                     var points = [];
                     var segments = [];
@@ -10478,29 +10478,29 @@ var editor;
                     { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(farLeft, farBottom, far) }, { start: new feng3d.Vector3(nearLeft, nearTop, near), end: new feng3d.Vector3(farLeft, farTop, far) }, { start: new feng3d.Vector3(nearRight, nearBottom, near), end: new feng3d.Vector3(farRight, farBottom, far) }, { start: new feng3d.Vector3(nearRight, nearTop, near), end: new feng3d.Vector3(farRight, farTop, far) }, 
                     //
                     { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farRight, farBottom, far) }, { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farLeft, farTop, far) }, { start: new feng3d.Vector3(farLeft, farTop, far), end: new feng3d.Vector3(farRight, farTop, far) }, { start: new feng3d.Vector3(farRight, farBottom, far), end: new feng3d.Vector3(farRight, farTop, far) });
-                    this.pointGeometry.points = points;
-                    this.segmentGeometry.segments = segments;
-                    this.lensChanged = false;
+                    this._pointGeometry.points = points;
+                    this._segmentGeometry.segments = segments;
+                    this._lensChanged = false;
                 }
                 //
-                this.lightLines.visible = true;
-                this.lightpoints.visible = true;
+                this._lightLines.visible = true;
+                this._lightpoints.visible = true;
             }
             else {
-                this.lightLines.visible = false;
-                this.lightpoints.visible = false;
+                this._lightLines.visible = false;
+                this._lightpoints.visible = false;
             }
         };
         CameraIcon.prototype.dispose = function () {
             this.enabled = false;
             //
-            this.lightIcon.dispose();
-            this.lightLines.dispose();
-            this.lightpoints.dispose();
-            this.lightIcon = null;
-            this.lightLines = null;
-            this.lightpoints = null;
-            this.segmentGeometry = null;
+            this._lightIcon.dispose();
+            this._lightLines.dispose();
+            this._lightpoints.dispose();
+            this._lightIcon = null;
+            this._lightLines = null;
+            this._lightpoints = null;
+            this._segmentGeometry = null;
             _super.prototype.dispose.call(this);
         };
         CameraIcon.prototype.onCameraChanged = function (property, oldValue, value) {
@@ -10515,7 +10515,7 @@ var editor;
             }
         };
         CameraIcon.prototype.onLensChanged = function () {
-            this.lensChanged = true;
+            this._lensChanged = true;
         };
         CameraIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.camera.transform.localToWorldMatrix;

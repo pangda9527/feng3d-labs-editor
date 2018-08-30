@@ -14,7 +14,7 @@ namespace editor
 
         initicon()
         {
-            var lightIcon = this.lightIcon = new feng3d.GameObject().value({
+            var lightIcon = this._lightIcon = new feng3d.GameObject().value({
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
@@ -36,7 +36,7 @@ namespace editor
             this.gameObject.addChild(lightIcon);
 
             //
-            var lightLines = this.lightLines = new feng3d.GameObject().value({
+            var lightLines = this._lightLines = new feng3d.GameObject().value({
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                     __class__: "feng3d.MeshModel", material: {
@@ -48,10 +48,10 @@ namespace editor
                 },
                 ],
             });
-            this.segmentGeometry = <any>lightLines.getComponent(feng3d.Model).geometry;
+            this._segmentGeometry = <any>lightLines.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this.lightpoints = new feng3d.GameObject().value({
+            var lightpoints = this._lightpoints = new feng3d.GameObject().value({
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
                         __class__: "feng3d.MeshModel",
@@ -60,7 +60,7 @@ namespace editor
                     },
                 ]
             });
-            this.pointGeometry = <any>lightpoints.getComponent(feng3d.Model).geometry;
+            this._pointGeometry = <any>lightpoints.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightpoints);
 
             this.enabled = true;
@@ -72,7 +72,7 @@ namespace editor
 
             if (editorData.selectedGameObjects.indexOf(this.camera.gameObject) != -1)
             {
-                if (this.lensChanged)
+                if (this._lensChanged)
                 {
                     //
                     var points: feng3d.PointInfo[] = [];
@@ -125,17 +125,17 @@ namespace editor
                         { start: new feng3d.Vector3(farLeft, farTop, far), end: new feng3d.Vector3(farRight, farTop, far) },
                         { start: new feng3d.Vector3(farRight, farBottom, far), end: new feng3d.Vector3(farRight, farTop, far) },
                     );
-                    this.pointGeometry.points = points;
-                    this.segmentGeometry.segments = segments;
-                    this.lensChanged = false;
+                    this._pointGeometry.points = points;
+                    this._segmentGeometry.segments = segments;
+                    this._lensChanged = false;
                 }
                 //
-                this.lightLines.visible = true;
-                this.lightpoints.visible = true;
+                this._lightLines.visible = true;
+                this._lightpoints.visible = true;
             } else
             {
-                this.lightLines.visible = false;
-                this.lightpoints.visible = false;
+                this._lightLines.visible = false;
+                this._lightpoints.visible = false;
             }
         }
 
@@ -143,23 +143,23 @@ namespace editor
         {
             this.enabled = false;
             //
-            this.lightIcon.dispose();
-            this.lightLines.dispose();
-            this.lightpoints.dispose();
-            this.lightIcon = null;
-            this.lightLines = null;
-            this.lightpoints = null;
-            this.segmentGeometry = null;
+            this._lightIcon.dispose();
+            this._lightLines.dispose();
+            this._lightpoints.dispose();
+            this._lightIcon = null;
+            this._lightLines = null;
+            this._lightpoints = null;
+            this._segmentGeometry = null;
             super.dispose();
         }
 
         //
-        private lightIcon: feng3d.GameObject;
-        private lightLines: feng3d.GameObject;
-        private lightpoints: feng3d.GameObject;
-        private segmentGeometry: feng3d.SegmentGeometry;
-        private pointGeometry: feng3d.PointGeometry;
-        private lensChanged = true;
+        private _lightIcon: feng3d.GameObject;
+        private _lightLines: feng3d.GameObject;
+        private _lightpoints: feng3d.GameObject;
+        private _segmentGeometry: feng3d.SegmentGeometry;
+        private _pointGeometry: feng3d.PointGeometry;
+        private _lensChanged = true;
 
         private onCameraChanged(property: string, oldValue: feng3d.Camera, value: feng3d.Camera)
         {
@@ -178,7 +178,7 @@ namespace editor
 
         private onLensChanged()
         {
-            this.lensChanged = true;
+            this._lensChanged = true;
         }
 
         private onScenetransformChanged()
