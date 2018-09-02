@@ -1239,6 +1239,7 @@ declare namespace editor {
         files: {
             [path: string]: AssetsFile;
         };
+        constructor();
         initproject(callback: () => void): void;
         /**
          * 获取文件
@@ -1297,6 +1298,7 @@ declare namespace editor {
          */
         private parserMenu;
         private showFloderChanged;
+        private onParsed;
     }
     var codeeditoWin: Window;
 }

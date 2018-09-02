@@ -36,6 +36,11 @@ namespace editor
 
         files: { [path: string]: AssetsFile } = {};
 
+        constructor()
+        {
+            feng3d.feng3dDispatcher.on("assets.parsed", this.onParsed, this);
+        }
+
         //function
         initproject(callback: () => void)
         {
@@ -467,11 +472,15 @@ namespace editor
                     menuconfig.push({
                         label: "解析", click: () =>
                         {
-                            feng3d.objLoader.load(file.path, (gameobject: feng3d.GameObject) =>
-                            {
-                                gameobject.name = feng3d.pathUtils.getName(file.name);
-                                this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                            });
+                            feng3d.objLoader.load(file.path);
+                        }
+                    });
+                    break;
+                case "mtl":
+                    menuconfig.push({
+                        label: "解析", click: () =>
+                        {
+                            feng3d.mtlLoader.load(file.path);
                         }
                     });
                     break;
@@ -524,6 +533,18 @@ namespace editor
         private showFloderChanged(property, oldValue, newValue)
         {
             feng3d.feng3dDispatcher.dispatch("assets.showFloderChanged", { oldpath: oldValue, newpath: newValue });
+        }
+
+        private onParsed(e: feng3d.Event<any>)
+        {
+            var data = e.data;
+            if (data instanceof feng3d.GameObject)
+            {
+                this.saveObject(data, data.name + "." + feng3d.AssetExtension.gameobject);
+            } else if (data instanceof feng3d.Material)
+            {
+                editorAssets.saveObject(data, data.name + "." + feng3d.AssetExtension.material);
+            }
         }
     }
 

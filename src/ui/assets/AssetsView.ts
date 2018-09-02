@@ -63,7 +63,7 @@ namespace editor
                 if (dragSource.material)
                 {
                     var material = dragSource.material;
-                    editorAssets.saveObject(material, material.shaderName + "." + feng3d.AssetExtension.material);
+                    editorAssets.saveObject(material, material.name + "." + feng3d.AssetExtension.material);
                 }
                 if (dragSource.geometry)
                 {

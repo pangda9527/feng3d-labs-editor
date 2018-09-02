@@ -4505,6 +4505,7 @@ var editor;
              */
             this._preProjectJsContent = null;
             this.files = {};
+            feng3d.feng3dDispatcher.on("assets.parsed", this.onParsed, this);
         }
         //function
         EditorAssets.prototype.initproject = function (callback) {
@@ -4870,10 +4871,14 @@ var editor;
                 case "obj":
                     menuconfig.push({
                         label: "解析", click: function () {
-                            feng3d.objLoader.load(file.path, function (gameobject) {
-                                gameobject.name = feng3d.pathUtils.getName(file.name);
-                                _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                            });
+                            feng3d.objLoader.load(file.path);
+                        }
+                    });
+                    break;
+                case "mtl":
+                    menuconfig.push({
+                        label: "解析", click: function () {
+                            feng3d.mtlLoader.load(file.path);
                         }
                     });
                     break;
@@ -4915,6 +4920,15 @@ var editor;
         };
         EditorAssets.prototype.showFloderChanged = function (property, oldValue, newValue) {
             feng3d.feng3dDispatcher.dispatch("assets.showFloderChanged", { oldpath: oldValue, newpath: newValue });
+        };
+        EditorAssets.prototype.onParsed = function (e) {
+            var data = e.data;
+            if (data instanceof feng3d.GameObject) {
+                this.saveObject(data, data.name + "." + feng3d.AssetExtension.gameobject);
+            }
+            else if (data instanceof feng3d.Material) {
+                editor.editorAssets.saveObject(data, data.name + "." + feng3d.AssetExtension.material);
+            }
         };
         __decorate([
             feng3d.watch("showFloderChanged")
@@ -5545,7 +5559,7 @@ var editor;
                 }
                 if (dragSource.material) {
                     var material = dragSource.material;
-                    editor.editorAssets.saveObject(material, material.shaderName + "." + feng3d.AssetExtension.material);
+                    editor.editorAssets.saveObject(material, material.name + "." + feng3d.AssetExtension.material);
                 }
                 if (dragSource.geometry) {
                     var geometry = dragSource.geometry;
