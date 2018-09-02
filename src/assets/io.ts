@@ -243,7 +243,7 @@ namespace editor
                     if (filepaths.length > 0)
                     {
                         var filepath = filepaths.shift();
-                        assets.readFile(filepath, (err, data: ArrayBuffer) =>
+                        assets.readFileAsArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                         {
                             //处理文件夹
                             data && zip.file(filepath, data);

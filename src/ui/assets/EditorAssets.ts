@@ -268,12 +268,9 @@ namespace editor
             menuconfig.push({
                 label: "导出", click: () =>
                 {
-                    assets.readFile(assetsFile.path, (err, data) =>
+                    assets.readFileAsBlob(assetsFile.path, (err, blob) =>
                     {
-                        feng3d.dataTransform.arrayBufferToBlob(data, (blob) =>
-                        {
-                            saveAs(blob, assetsFile.name);
-                        });
+                        saveAs(blob, assetsFile.name);
                     });
                 }
             }, {
@@ -483,8 +480,7 @@ namespace editor
                     menuconfig.push({
                         label: "解析", click: () =>
                         {
-
-                            assets.readFile(file.path, (err, data) =>
+                            assets.readFileAsArrayBuffer(file.path, (err, data) =>
                             {
                                 threejsLoader.load(data, (gameobject) =>
                                 {

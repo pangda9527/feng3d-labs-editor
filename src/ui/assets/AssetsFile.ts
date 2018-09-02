@@ -133,7 +133,7 @@ namespace editor
             }
             if (regExps.image.test(this.path))
             {
-                assets.readFile(this.path, (err, data) =>
+                assets.readFileAsArrayBuffer(this.path, (err, data) =>
                 {
                     feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                     {

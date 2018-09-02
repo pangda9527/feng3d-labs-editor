@@ -73,7 +73,7 @@ namespace editor
             var url = text.url;
             if (url)
             {
-                assets.readFile(url, (err, data) =>
+                assets.readFileAsArrayBuffer(url, (err, data) =>
                 {
                     feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                     {

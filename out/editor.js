@@ -593,7 +593,7 @@ var editor;
                 function readfiles() {
                     if (filepaths.length > 0) {
                         var filepath = filepaths.shift();
-                        editor.assets.readFile(filepath, function (err, data) {
+                        editor.assets.readFileAsArrayBuffer(filepath, function (err, data) {
                             //处理文件夹
                             data && zip.file(filepath, data);
                             readfiles();
@@ -4150,7 +4150,7 @@ var editor;
             this.img_border.visible = false;
             var url = text.url;
             if (url) {
-                editor.assets.readFile(url, function (err, data) {
+                editor.assets.readFileAsArrayBuffer(url, function (err, data) {
                     feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                         _this.image.source = dataurl;
                         _this.image.visible = true;
@@ -4698,10 +4698,8 @@ var editor;
             this.parserMenu(menuconfig, assetsFile);
             menuconfig.push({
                 label: "导出", click: function () {
-                    editor.assets.readFile(assetsFile.path, function (err, data) {
-                        feng3d.dataTransform.arrayBufferToBlob(data, function (blob) {
-                            saveAs(blob, assetsFile.name);
-                        });
+                    editor.assets.readFileAsBlob(assetsFile.path, function (err, blob) {
+                        saveAs(blob, assetsFile.name);
                     });
                 }
             }, {
@@ -4882,7 +4880,7 @@ var editor;
                 case "fbx":
                     menuconfig.push({
                         label: "解析", click: function () {
-                            editor.assets.readFile(file.path, function (err, data) {
+                            editor.assets.readFileAsArrayBuffer(file.path, function (err, data) {
                                 editor.threejsLoader.load(data, function (gameobject) {
                                     gameobject.name = feng3d.pathUtils.getName(file.name);
                                     _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
@@ -5002,7 +5000,7 @@ var editor;
                 return;
             }
             if (editor.regExps.image.test(this.path)) {
-                editor.assets.readFile(this.path, function (err, data) {
+                editor.assets.readFileAsArrayBuffer(this.path, function (err, data) {
                     feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                         _this.cacheData = dataurl;
                         callback(_this.cacheData);
