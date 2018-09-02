@@ -304,6 +304,10 @@ namespace editor
                     || file.extension == feng3d.AssetExtension.geometry
                     || file.extension == feng3d.AssetExtension.scene
                     || file.extension == feng3d.AssetExtension.script
+                    || file.extension == feng3d.AssetExtension.mtl
+                    || file.extension == feng3d.AssetExtension.obj
+                    || file.extension == feng3d.AssetExtension.md5mesh
+                    || file.extension == feng3d.AssetExtension.md5anim
                 )
                 {
                     menu = {
