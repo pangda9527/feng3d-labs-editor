@@ -122,7 +122,7 @@ namespace editor
             }
             if (regExps.json.test(this.path))
             {
-                fs.readFileAsString(this.path, (err, content: string) =>
+                assets.readFileAsString(this.path, (err, content: string) =>
                 {
                     var json = JSON.parse(content);
                     this.cacheData = feng3d.serialization.deserialize(json);
@@ -133,7 +133,7 @@ namespace editor
             }
             if (regExps.image.test(this.path))
             {
-                fs.readFile(this.path, (err, data) =>
+                assets.readFile(this.path, (err, data) =>
                 {
                     feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                     {
@@ -185,7 +185,7 @@ namespace editor
          */
         move(oldpath: string, newpath: string, callback?: (file: AssetsFile) => void)
         {
-            fs.move(oldpath, newpath, (err) =>
+            assets.move(oldpath, newpath, (err) =>
             {
                 feng3d.assert(!err);
 
@@ -222,7 +222,7 @@ namespace editor
             var folderpath = this.getnewname(this.path + newfoldername);
             folderpath = folderpath + "/";
 
-            fs.mkdir(folderpath, (e) =>
+            assets.mkdir(folderpath, (e) =>
             {
                 feng3d.assert(!e);
 
@@ -272,7 +272,7 @@ namespace editor
             {
                 filepath = this.getnewname(filepath);
             }
-            fs.writeFile(filepath, arraybuffer, (e) =>
+            assets.writeFile(filepath, arraybuffer, (e) =>
             {
                 if (e)
                 {
@@ -315,7 +315,7 @@ namespace editor
             }
             this.getArrayBuffer((arraybuffer) =>
             {
-                fs.writeFile(this.path, arraybuffer, (e) =>
+                assets.writeFile(this.path, arraybuffer, (e) =>
                 {
                     if (callback)
                         callback(e);

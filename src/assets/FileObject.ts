@@ -155,7 +155,7 @@ namespace editor
          */
         getDirectoryListing(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            fs.readdir(this._path, (err, files) =>
+            assets.readdir(this._path, (err, files) =>
             {
                 if (err)
                 {
@@ -176,7 +176,7 @@ namespace editor
          */
         createDirectory(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            fs.mkdir(this._path, (err) =>
+            assets.mkdir(this._path, (err) =>
             {
                 if (err)
                 {
@@ -222,7 +222,7 @@ namespace editor
                 return;
             }
 
-            fs.writeFile(this._path, content, (err) =>
+            assets.writeFile(this._path, content, (err) =>
             {
                 if (err)
                 {
@@ -248,7 +248,7 @@ namespace editor
         {
             var oldPath = this._path;
             var newPath = this.location ? (this.location + "/" + newName) : newName;
-            fs.rename(oldPath, newPath, (err) =>
+            assets.rename(oldPath, newPath, (err) =>
             {
                 if (err)
                 {
@@ -272,7 +272,7 @@ namespace editor
          */
         move(newPath: string, onComplete: Function, onError: Function, thisPtr: any): void
         {
-            fs.move(this._path, newPath, (err) =>
+            assets.move(this._path, newPath, (err) =>
             {
                 if (err)
                 {
@@ -295,7 +295,7 @@ namespace editor
          */
         delete(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            fs.delete(this._path, (err) =>
+            assets.delete(this._path, (err) =>
             {
                 if (err)
                 {
@@ -324,7 +324,7 @@ namespace editor
          */
         private updateStats(path: string, callback: () => void, onComplete?: Function, onError?: Function)
         {
-            fs.exists(path, (exists) =>
+            assets.exists(path, (exists) =>
             {
                 if (!exists)
                 {

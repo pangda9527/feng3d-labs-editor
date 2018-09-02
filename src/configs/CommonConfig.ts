@@ -39,9 +39,9 @@ namespace editor
         {
             label: "导入项目", click: () =>
             {
-                fs.selectFile((filelist) =>
+                assets.selectFile((filelist) =>
                 {
-                    fs.importProject(filelist.item(0), () =>
+                    assets.importProject(filelist.item(0), () =>
                     {
                         console.log("导入项目完成");
                         editorAssets.initproject(() =>
@@ -63,7 +63,7 @@ namespace editor
         {
             label: "导出项目", click: () =>
             {
-                fs.exportProject(function (err, content)
+                assets.exportProject(function (err, content)
                 {
                     // see FileSaver.js
                     saveAs(content, `${editorcache.projectname}.feng3d.zip`);
@@ -132,7 +132,7 @@ namespace editor
             label: "升级项目",
             click: () =>
             {
-                fs.upgradeProject(() =>
+                assets.upgradeProject(() =>
                 {
                     alert("升级完成！");
                 });
@@ -388,7 +388,7 @@ namespace editor
         var path = "projects/" + projectname;
         feng3d.loader.loadBinary(path, (content) =>
         {
-            fs.importProject(<any>content, () =>
+            assets.importProject(<any>content, () =>
             {
                 editorAssets.initproject(() =>
                 {
@@ -414,7 +414,7 @@ namespace editor
     {
         var projects: MenuItem[] = [];
 
-        fs.getProjectList((err, ps) =>
+        assets.getProjectList((err, ps) =>
         {
             ps.forEach(element =>
             {

@@ -99,16 +99,16 @@ namespace editor
         {
             editorcache.projectname = editorcache.projectname || "newproject";
 
-            fs.hasProject(editorcache.projectname, (has) =>
+            assets.hasProject(editorcache.projectname, (has) =>
             {
                 if (has)
                 {
-                    fs.initproject(editorcache.projectname, callback);
+                    assets.initproject(editorcache.projectname, callback);
                 } else
                 {
-                    fs.createproject(editorcache.projectname, () =>
+                    assets.createproject(editorcache.projectname, () =>
                     {
-                        fs.initproject(editorcache.projectname, callback);
+                        assets.initproject(editorcache.projectname, callback);
                     });
                 }
             });

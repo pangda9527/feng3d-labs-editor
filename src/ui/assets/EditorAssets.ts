@@ -39,7 +39,7 @@ namespace editor
         //function
         initproject(callback: () => void)
         {
-            fs.mkdir(this.assetsPath, (err) =>
+            assets.mkdir(this.assetsPath, (err) =>
             {
                 if (err)
                 {
@@ -48,7 +48,7 @@ namespace editor
                     return;
                 }
                 this.files[this.assetsPath] = new AssetsFile(this.assetsPath);
-                fs.getAllfilepathInFolder(this.assetsPath, (err, filepaths) =>
+                assets.getAllfilepathInFolder(this.assetsPath, (err, filepaths) =>
                 {
                     feng3d.assert(!err);
                     filepaths.forEach(element =>
@@ -79,7 +79,7 @@ namespace editor
                 alert("无法删除根目录");
                 return;
             }
-            fs.delete(path, (err) =>
+            assets.delete(path, (err) =>
             {
                 if (err) feng3d.error(err);
 
@@ -106,7 +106,7 @@ namespace editor
         }
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
-            fs.readFileAsString(path, (err, data) =>
+            assets.readFileAsString(path, (err, data) =>
             {
                 if (err)
                 {
@@ -131,7 +131,7 @@ namespace editor
             var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
             feng3d.dataTransform.stringToUint8Array(str, (uint8Array) =>
             {
-                fs.writeFile(path, uint8Array, callback)
+                assets.writeFile(path, uint8Array, callback)
             });
         }
         /**
@@ -150,7 +150,7 @@ namespace editor
             {
                 var filename = path.split("/").pop();
                 var dest = destdirpath + "/" + filename;
-                fs.move(path, dest, callback);
+                assets.move(path, dest, callback);
             }
         }
         getparentdir(path: string)
@@ -241,7 +241,7 @@ namespace editor
                     {
                         label: "导入资源", click: () =>
                         {
-                            fs.selectFile((fileList: FileList) =>
+                            assets.selectFile((fileList: FileList) =>
                             {
                                 var files = [];
                                 for (let i = 0; i < fileList.length; i++)
@@ -268,7 +268,7 @@ namespace editor
             menuconfig.push({
                 label: "导出", click: () =>
                 {
-                    fs.readFile(assetsFile.path, (err, data) =>
+                    assets.readFile(assetsFile.path, (err, data) =>
                     {
                         feng3d.dataTransform.arrayBufferToBlob(data, (blob) =>
                         {
@@ -360,7 +360,7 @@ namespace editor
             function searchnewpath()
             {
                 var path = newpath();
-                fs.exists(path, (exists) =>
+                assets.exists(path, (exists) =>
                 {
                     if (exists)
                         searchnewpath();
@@ -423,7 +423,7 @@ namespace editor
         }
         runProjectScript(callback?: () => void)
         {
-            fs.readFileAsString("project.js", (err, content) =>
+            assets.readFileAsString("project.js", (err, content) =>
             {
                 if (content != this._preProjectJsContent)
                 {
@@ -484,7 +484,7 @@ namespace editor
                         label: "解析", click: () =>
                         {
 
-                            fs.readFile(file.path, (err, data) =>
+                            assets.readFile(file.path, (err, data) =>
                             {
                                 threejsLoader.load(data, (gameobject) =>
                                 {

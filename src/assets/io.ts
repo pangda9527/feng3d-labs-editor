@@ -3,7 +3,7 @@ declare var __dirname: string;
 
 namespace editor
 {
-    export var fs: EditorAssets1;
+    export var assets: EditorAssets1;
 
     export class EditorAssets1 extends feng3d.ReadWriteAssets
     {
@@ -100,7 +100,7 @@ namespace editor
          */
         createproject(projectname: string, callback: () => void)
         {
-            fs.initproject(projectname, () =>
+            assets.initproject(projectname, () =>
             {
                 //
                 var zip = new JSZip();
@@ -126,12 +126,12 @@ namespace editor
                                 var file = zip.files[filepath];
                                 if (file.dir)
                                 {
-                                    fs.mkdir(filepath, readfiles);
+                                    assets.mkdir(filepath, readfiles);
                                 } else
                                 {
                                     file.async("arraybuffer").then((data) =>
                                     {
-                                        fs.writeFile(filepath, data, (err: Error) =>
+                                        assets.writeFile(filepath, data, (err: Error) =>
                                         {
                                             if (err)
                                                 console.log(err);
@@ -192,12 +192,12 @@ namespace editor
                             var file = zip.files[filepath];
                             if (file.dir)
                             {
-                                fs.mkdir(filepath, readfiles);
+                                assets.mkdir(filepath, readfiles);
                             } else
                             {
                                 file.async("arraybuffer").then((data) =>
                                 {
-                                    fs.writeFile(filepath, data, (err: Error) =>
+                                    assets.writeFile(filepath, data, (err: Error) =>
                                     {
                                         if (err)
                                             console.log(err);
@@ -235,7 +235,7 @@ namespace editor
         exportProject(callback: (err: Error, data: Blob) => void)
         {
             var zip = new JSZip();
-            fs.getAllfilepathInFolder("", (err, filepaths) =>
+            assets.getAllfilepathInFolder("", (err, filepaths) =>
             {
                 readfiles();
                 function readfiles()
@@ -243,7 +243,7 @@ namespace editor
                     if (filepaths.length > 0)
                     {
                         var filepath = filepaths.shift();
-                        fs.readFile(filepath, (err, data: ArrayBuffer) =>
+                        assets.readFile(filepath, (err, data: ArrayBuffer) =>
                         {
                             //处理文件夹
                             data && zip.file(filepath, data);
@@ -279,7 +279,7 @@ namespace editor
                         var filepath = filepaths.shift();
                         if (value.files[filepath].dir)
                         {
-                            fs.mkdir(filepath, (err) =>
+                            assets.mkdir(filepath, (err) =>
                             {
                                 writeFiles();
                             });
@@ -287,7 +287,7 @@ namespace editor
                         {
                             zip.file(filepath).async("arraybuffer").then((data) =>
                             {
-                                fs.writeFile(filepath, data, (err) =>
+                                assets.writeFile(filepath, data, (err) =>
                                 {
                                     writeFiles();
                                 });
@@ -306,11 +306,11 @@ namespace editor
 
     if (typeof require == "undefined")
     {
-        feng3d.assets = fs = new EditorAssets1(feng3d.indexedDBfs);
+        feng3d.assets = assets = new EditorAssets1(feng3d.indexedDBfs);
     } else
     {
         var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
-        feng3d.assets = fs = new EditorAssets1(nativeFS);
+        feng3d.assets = assets = new EditorAssets1(nativeFS);
     }
 
     //

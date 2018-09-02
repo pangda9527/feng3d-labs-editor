@@ -195,7 +195,7 @@ declare namespace editor {
 declare function require(module: string): any;
 declare var __dirname: string;
 declare namespace editor {
-    var fs: EditorAssets1;
+    var assets: EditorAssets1;
     class EditorAssets1 extends feng3d.ReadWriteAssets {
         constructor(readWriteFS?: feng3d.ReadWriteFS);
         /**
