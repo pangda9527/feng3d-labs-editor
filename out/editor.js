@@ -4862,15 +4862,9 @@ var editor;
                 case "mdl":
                     menuconfig.push({
                         label: "解析", click: function () {
-                            editor.fs.readFileAsString(file.path, function (err, content) {
-                                feng3d.war3.mdlParser.parse(content, function (war3Model) {
-                                    var paths = file.path.split("/");
-                                    paths.pop();
-                                    war3Model.root = paths.join("/") + "/";
-                                    var gameobject = war3Model.getMesh();
-                                    gameobject.name = feng3d.pathUtils.getName(file.name);
-                                    _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                                });
+                            feng3d.mdlLoader.load(file.path, function (gameobject) {
+                                gameobject.name = feng3d.pathUtils.getName(file.name);
+                                _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
                             });
                         }
                     });
