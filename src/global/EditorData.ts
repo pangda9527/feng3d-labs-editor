@@ -173,12 +173,7 @@ namespace editor
                     this._transformBox = null;
                     this.selectedGameObjects.forEach(cv =>
                     {
-                        var model = cv.getComponent(feng3d.Model);
-                        var box = new feng3d.Box(cv.transform.scenePosition, cv.transform.scenePosition);
-                        if (model && model.worldBounds)
-                        {
-                            box.copy(model.worldBounds);
-                        }
+                        var box = cv.worldBounds;
                         if (editorData.isBaryCenter || this._transformBox == null)
                         {
                             this._transformBox = box.clone();

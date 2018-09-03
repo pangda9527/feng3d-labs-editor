@@ -4728,7 +4728,8 @@ var editor;
                     || file.extension == feng3d.AssetExtension.mtl
                     || file.extension == feng3d.AssetExtension.obj
                     || file.extension == feng3d.AssetExtension.md5mesh
-                    || file.extension == feng3d.AssetExtension.md5anim) {
+                    || file.extension == feng3d.AssetExtension.md5anim
+                    || file.extension == feng3d.AssetExtension.mdl) {
                     menu = {
                         label: "编辑", click: function () {
                             var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + file.path;
@@ -4861,10 +4862,7 @@ var editor;
                 case "mdl":
                     menuconfig.push({
                         label: "解析", click: function () {
-                            feng3d.mdlLoader.load(file.path, function (gameobject) {
-                                gameobject.name = feng3d.pathUtils.getName(file.name);
-                                _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                            });
+                            feng3d.mdlLoader.load(file.path);
                         }
                     });
                     break;
@@ -6401,11 +6399,7 @@ var editor;
                     if (length > 0) {
                         this._transformBox = null;
                         this.selectedGameObjects.forEach(function (cv) {
-                            var model = cv.getComponent(feng3d.Model);
-                            var box = new feng3d.Box(cv.transform.scenePosition, cv.transform.scenePosition);
-                            if (model && model.worldBounds) {
-                                box.copy(model.worldBounds);
-                            }
+                            var box = cv.worldBounds;
                             if (editor.editorData.isBaryCenter || _this._transformBox == null) {
                                 _this._transformBox = box.clone();
                             }

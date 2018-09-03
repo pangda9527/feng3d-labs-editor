@@ -310,6 +310,7 @@ namespace editor
                     || file.extension == feng3d.AssetExtension.obj
                     || file.extension == feng3d.AssetExtension.md5mesh
                     || file.extension == feng3d.AssetExtension.md5anim
+                    || file.extension == feng3d.AssetExtension.mdl
                 )
                 {
                     menu = {
@@ -460,11 +461,7 @@ namespace editor
                     menuconfig.push({
                         label: "解析", click: () =>
                         {
-                            feng3d.mdlLoader.load(file.path, (gameobject) =>
-                            {
-                                gameobject.name = feng3d.pathUtils.getName(file.name);
-                                this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                            });
+                            feng3d.mdlLoader.load(file.path);
                         }
                     });
                     break;
