@@ -471,7 +471,7 @@ namespace editor
                 this.saveObject(data, data.name + "." + feng3d.AssetExtension.gameobject);
             } else if (data instanceof feng3d.Material)
             {
-                editorAssets.saveObject(data, data.name + "." + feng3d.AssetExtension.material);
+                this.saveObject(data, data.name + "." + feng3d.AssetExtension.material);
             } else if (data instanceof feng3d.AnimationClip)
             {
                 this.saveObject(data, data.name + "." + feng3d.AssetExtension.anim);
