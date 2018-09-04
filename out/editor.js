@@ -4692,9 +4692,39 @@ var editor;
             if (menuconfig.length > 0) {
                 menuconfig.push({ type: "separator" });
             }
-            var openMenu = getOpenCodeEditorMenu(assetsFile);
-            if (openMenu)
-                menuconfig.push(openMenu);
+            // 使用编辑器打开
+            if ([feng3d.AssetExtension.ts,
+                feng3d.AssetExtension.js,
+                feng3d.AssetExtension.txt,
+                feng3d.AssetExtension.shader,
+                feng3d.AssetExtension.json,
+                feng3d.AssetExtension.material,
+                feng3d.AssetExtension.gameobject,
+                feng3d.AssetExtension.geometry,
+                feng3d.AssetExtension.scene,
+                feng3d.AssetExtension.script,
+                feng3d.AssetExtension.mtl,
+                feng3d.AssetExtension.obj,
+                feng3d.AssetExtension.md5mesh,
+                feng3d.AssetExtension.md5anim,
+                feng3d.AssetExtension.mdl
+            ].indexOf(assetsFile.extension) != -1) {
+                menuconfig.push({
+                    label: "编辑", click: function () {
+                        var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + assetsFile.path;
+                        url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                        // if (assets.type == FSType.native)
+                        // {
+                        //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
+                        // } else
+                        // {
+                        if (editor.codeeditoWin)
+                            editor.codeeditoWin.close();
+                        editor.codeeditoWin = window.open(url);
+                        // }
+                    }
+                });
+            }
             // 解析菜单
             this.parserMenu(menuconfig, assetsFile);
             menuconfig.push({
@@ -4712,42 +4742,6 @@ var editor;
                 menuconfig.push(othermenus.rename);
             }
             editor.menu.popup(menuconfig);
-            function getOpenCodeEditorMenu(file) {
-                var menu;
-                // 使用编辑器打开
-                if (file.extension == feng3d.AssetExtension.ts
-                    || file.extension == feng3d.AssetExtension.js
-                    || file.extension == feng3d.AssetExtension.txt
-                    || file.extension == feng3d.AssetExtension.shader
-                    || file.extension == feng3d.AssetExtension.json
-                    || file.extension == feng3d.AssetExtension.material
-                    || file.extension == feng3d.AssetExtension.gameobject
-                    || file.extension == feng3d.AssetExtension.geometry
-                    || file.extension == feng3d.AssetExtension.scene
-                    || file.extension == feng3d.AssetExtension.script
-                    || file.extension == feng3d.AssetExtension.mtl
-                    || file.extension == feng3d.AssetExtension.obj
-                    || file.extension == feng3d.AssetExtension.md5mesh
-                    || file.extension == feng3d.AssetExtension.md5anim
-                    || file.extension == feng3d.AssetExtension.mdl) {
-                    menu = {
-                        label: "编辑", click: function () {
-                            var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + file.path;
-                            url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                            // if (assets.type == FSType.native)
-                            // {
-                            //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
-                            // } else
-                            // {
-                            if (editor.codeeditoWin)
-                                editor.codeeditoWin.close();
-                            editor.codeeditoWin = window.open(url);
-                            // }
-                        }
-                    };
-                }
-                return menu;
-            }
         };
         /**
          * 获取一个新路径
@@ -4856,63 +4850,25 @@ var editor;
          * @param assetsFile 文件
          */
         EditorAssets.prototype.parserMenu = function (menuconfig, file) {
-            var _this = this;
             var extensions = file.path.split(".").pop();
             switch (extensions) {
                 case "mdl":
-                    menuconfig.push({
-                        label: "解析", click: function () {
-                            feng3d.mdlLoader.load(file.path);
-                        }
-                    });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.mdlLoader.load(file.path); } });
                     break;
                 case "obj":
-                    menuconfig.push({
-                        label: "解析", click: function () {
-                            feng3d.objLoader.load(file.path);
-                        }
-                    });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.objLoader.load(file.path); } });
                     break;
                 case "mtl":
-                    menuconfig.push({
-                        label: "解析", click: function () {
-                            feng3d.mtlLoader.load(file.path);
-                        }
-                    });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.mtlLoader.load(file.path); } });
                     break;
                 case "fbx":
-                    menuconfig.push({
-                        label: "解析", click: function () {
-                            editor.assets.readFileAsArrayBuffer(file.path, function (err, data) {
-                                editor.threejsLoader.load(data, function (gameobject) {
-                                    gameobject.name = feng3d.pathUtils.getName(file.name);
-                                    _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                                    // engine.root.addChild(gameobject);
-                                });
-                            });
-                        }
-                    });
+                    menuconfig.push({ label: "解析", click: function () { return editor.threejsLoader.load(file.path); } });
                     break;
                 case "md5mesh":
-                    menuconfig.push({
-                        label: "解析", click: function () {
-                            feng3d.md5Loader.load(file.path, function (gameobject) {
-                                gameobject.name = feng3d.pathUtils.getName(file.name);
-                                _this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                                // engine.root.addChild(gameobject);
-                            });
-                        }
-                    });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.load(file.path); } });
                     break;
                 case "md5anim":
-                    menuconfig.push({
-                        label: "解析", click: function () {
-                            feng3d.md5Loader.loadAnim(file.path, function (animationclip) {
-                                animationclip.name = feng3d.pathUtils.getName(file.name);
-                                _this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
-                            });
-                        }
-                    });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.loadAnim(file.path); } });
                     break;
             }
         };
@@ -4926,6 +4882,9 @@ var editor;
             }
             else if (data instanceof feng3d.Material) {
                 editor.editorAssets.saveObject(data, data.name + "." + feng3d.AssetExtension.material);
+            }
+            else if (data instanceof feng3d.AnimationClip) {
+                this.saveObject(data, data.name + "." + feng3d.AssetExtension.anim);
             }
         };
         __decorate([
@@ -10535,9 +10494,21 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    editor.threejsLoader = {
-        load: load,
-    };
+    var ThreejsLoader = /** @class */ (function () {
+        function ThreejsLoader() {
+        }
+        ThreejsLoader.prototype.load = function (url, completed) {
+            editor.assets.readFileAsArrayBuffer(url, function (err, data) {
+                load(data, function (gameobject) {
+                    gameobject.name = feng3d.pathUtils.getName(url);
+                    feng3d.feng3dDispatcher.dispatch("assets.parsed", gameobject);
+                });
+            });
+        };
+        return ThreejsLoader;
+    }());
+    editor.ThreejsLoader = ThreejsLoader;
+    editor.threejsLoader = new ThreejsLoader();
     var usenumberfixed = true;
     function load(url, onParseComplete) {
         var skeletonComponent;

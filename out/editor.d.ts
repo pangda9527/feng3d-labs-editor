@@ -2581,10 +2581,10 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    var threejsLoader: {
-        load: typeof load;
-    };
-    function load(url: string | File | ArrayBuffer, onParseComplete?: (group: any) => void): void;
+    class ThreejsLoader {
+        load(url: string, completed?: (gameobject: feng3d.GameObject) => void): void;
+    }
+    var threejsLoader: ThreejsLoader;
 }
 declare namespace editor {
     var mainMenu: MenuItem[];

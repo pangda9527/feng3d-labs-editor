@@ -1,13 +1,26 @@
 namespace editor
 {
-    export var threejsLoader = {
-        load: load,
-    };
+    export class ThreejsLoader
+    {
+        load(url: string, completed?: (gameobject: feng3d.GameObject) => void)
+        {
+            assets.readFileAsArrayBuffer(url, (err, data) =>
+            {
+                load(data, (gameobject) =>
+                {
+                    gameobject.name = feng3d.pathUtils.getName(url);
+                    feng3d.feng3dDispatcher.dispatch("assets.parsed", gameobject);
+                });
+            });
+        }
+    }
+
+    export var threejsLoader = new ThreejsLoader();
+
     var usenumberfixed = true;
 
     function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => void)
     {
-
         var skeletonComponent: feng3d.SkeletonComponent;
         prepare(() =>
         {

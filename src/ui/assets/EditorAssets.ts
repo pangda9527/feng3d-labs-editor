@@ -263,9 +263,41 @@ namespace editor
                 menuconfig.push({ type: "separator" });
             }
 
-            var openMenu = getOpenCodeEditorMenu(assetsFile);
-            if (openMenu)
-                menuconfig.push(openMenu);
+            // 使用编辑器打开
+            if ([feng3d.AssetExtension.ts,
+            feng3d.AssetExtension.js,
+            feng3d.AssetExtension.txt,
+            feng3d.AssetExtension.shader,
+            feng3d.AssetExtension.json,
+            feng3d.AssetExtension.material,
+            feng3d.AssetExtension.gameobject,
+            feng3d.AssetExtension.geometry,
+            feng3d.AssetExtension.scene,
+            feng3d.AssetExtension.script,
+            feng3d.AssetExtension.mtl,
+            feng3d.AssetExtension.obj,
+            feng3d.AssetExtension.md5mesh,
+            feng3d.AssetExtension.md5anim,
+            feng3d.AssetExtension.mdl
+            ].indexOf(assetsFile.extension) != -1
+            )
+            {
+                menuconfig.push({
+                    label: "编辑", click: () =>
+                    {
+                        var url = `codeeditor.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}&path=${assetsFile.path}`;
+                        url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
+                        // if (assets.type == FSType.native)
+                        // {
+                        //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
+                        // } else
+                        // {
+                        if (codeeditoWin) codeeditoWin.close();
+                        codeeditoWin = window.open(url);
+                        // }
+                    }
+                });
+            }
 
             // 解析菜单
             this.parserMenu(menuconfig, assetsFile);
@@ -291,46 +323,6 @@ namespace editor
             }
 
             menu.popup(menuconfig);
-
-            function getOpenCodeEditorMenu(file: AssetsFile)
-            {
-                var menu: MenuItem;
-                // 使用编辑器打开
-                if (file.extension == feng3d.AssetExtension.ts
-                    || file.extension == feng3d.AssetExtension.js
-                    || file.extension == feng3d.AssetExtension.txt
-                    || file.extension == feng3d.AssetExtension.shader
-                    || file.extension == feng3d.AssetExtension.json
-                    || file.extension == feng3d.AssetExtension.material
-                    || file.extension == feng3d.AssetExtension.gameobject
-                    || file.extension == feng3d.AssetExtension.geometry
-                    || file.extension == feng3d.AssetExtension.scene
-                    || file.extension == feng3d.AssetExtension.script
-                    || file.extension == feng3d.AssetExtension.mtl
-                    || file.extension == feng3d.AssetExtension.obj
-                    || file.extension == feng3d.AssetExtension.md5mesh
-                    || file.extension == feng3d.AssetExtension.md5anim
-                    || file.extension == feng3d.AssetExtension.mdl
-                )
-                {
-                    menu = {
-                        label: "编辑", click: () =>
-                        {
-                            var url = `codeeditor.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}&path=${file.path}`;
-                            url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                            // if (assets.type == FSType.native)
-                            // {
-                            //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
-                            // } else
-                            // {
-                            if (codeeditoWin) codeeditoWin.close();
-                            codeeditoWin = window.open(url);
-                            // }
-                        }
-                    }
-                }
-                return menu;
-            }
         }
         /**
          * 获取一个新路径
@@ -457,73 +449,12 @@ namespace editor
             var extensions = file.path.split(".").pop();
             switch (extensions)
             {
-                case "mdl":
-                    menuconfig.push({
-                        label: "解析", click: () =>
-                        {
-                            feng3d.mdlLoader.load(file.path);
-                        }
-                    });
-                    break;
-                case "obj":
-                    menuconfig.push({
-                        label: "解析", click: () =>
-                        {
-                            feng3d.objLoader.load(file.path);
-                        }
-                    });
-                    break;
-                case "mtl":
-                    menuconfig.push({
-                        label: "解析", click: () =>
-                        {
-                            feng3d.mtlLoader.load(file.path);
-                        }
-                    });
-                    break;
-                case "fbx":
-
-                    menuconfig.push({
-                        label: "解析", click: () =>
-                        {
-                            assets.readFileAsArrayBuffer(file.path, (err, data) =>
-                            {
-                                threejsLoader.load(data, (gameobject) =>
-                                {
-                                    gameobject.name = feng3d.pathUtils.getName(file.name);
-                                    this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                                    // engine.root.addChild(gameobject);
-                                });
-                            });
-                        }
-                    });
-                    break;
-                case "md5mesh":
-
-                    menuconfig.push({
-                        label: "解析", click: () =>
-                        {
-                            feng3d.md5Loader.load(file.path, (gameobject) =>
-                            {
-                                gameobject.name = feng3d.pathUtils.getName(file.name);
-                                this.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
-                                // engine.root.addChild(gameobject);
-                            });
-                        }
-                    });
-                    break;
-                case "md5anim":
-                    menuconfig.push({
-                        label: "解析", click: () =>
-                        {
-                            feng3d.md5Loader.loadAnim(file.path, (animationclip) =>
-                            {
-                                animationclip.name = feng3d.pathUtils.getName(file.name);
-                                this.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
-                            });
-                        }
-                    });
-                    break;
+                case "mdl": menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(file.path) }); break;
+                case "obj": menuconfig.push({ label: "解析", click: () => feng3d.objLoader.load(file.path) }); break;
+                case "mtl": menuconfig.push({ label: "解析", click: () => feng3d.mtlLoader.load(file.path) }); break;
+                case "fbx": menuconfig.push({ label: "解析", click: () => threejsLoader.load(file.path) }); break;
+                case "md5mesh": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.load(file.path) }); break;
+                case "md5anim": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.loadAnim(file.path) }); break;
             }
         }
 
@@ -541,6 +472,9 @@ namespace editor
             } else if (data instanceof feng3d.Material)
             {
                 editorAssets.saveObject(data, data.name + "." + feng3d.AssetExtension.material);
+            } else if (data instanceof feng3d.AnimationClip)
+            {
+                this.saveObject(data, data.name + "." + feng3d.AssetExtension.anim);
             }
         }
     }
