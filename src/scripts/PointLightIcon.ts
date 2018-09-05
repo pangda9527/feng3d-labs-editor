@@ -81,7 +81,7 @@ namespace editor
         {
             if (!this.light) return;
 
-            this._textureMaterial.uniforms.u_color = this.light.color.toColor4();
+            (<feng3d.TextureUniforms>this._textureMaterial.uniforms).u_color = this.light.color.toColor4();
             this._lightLines.transform.scale =
                 this._lightpoints.transform.scale =
                 new feng3d.Vector3(this.light.range, this.light.range, this.light.range);
@@ -196,7 +196,7 @@ namespace editor
         private _lightIcon: feng3d.GameObject;
         private _lightLines: feng3d.GameObject;
         private _lightpoints: feng3d.GameObject;
-        private _textureMaterial: feng3d.TextureMaterial;
+        private _textureMaterial: feng3d.Material;
         private _segmentGeometry: feng3d.SegmentGeometry;
         private _pointGeometry: feng3d.PointGeometry;
 

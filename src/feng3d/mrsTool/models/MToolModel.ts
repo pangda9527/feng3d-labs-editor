@@ -70,8 +70,8 @@ namespace editor
     export class CoordinateAxis extends feng3d.Component
     {
         private isinit: boolean;
-        private segmentMaterial: feng3d.SegmentMaterial;
-        private material: feng3d.ColorMaterial;
+        private segmentMaterial: feng3d.Material;
+        private material: feng3d.Material;
 
         private xArrow: feng3d.GameObject;
 
@@ -91,13 +91,13 @@ namespace editor
             var model = xLine.addComponent(feng3d.Model);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             segmentGeometry.segments.push({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
-            this.segmentMaterial = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
+            this.segmentMaterial = model.material = new feng3d.Material().value({ shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
             this.gameObject.addChild(xLine);
             //
             this.xArrow = new feng3d.GameObject();
             model = this.xArrow.addComponent(feng3d.Model);
             model.geometry = new feng3d.ConeGeometry().value({ bottomRadius: 5, height: 18 });
-            this.material = model.material = new feng3d.ColorMaterial();
+            this.material = model.material = new feng3d.Material().value({ shaderName: "color" });
             this.material.renderParams.enableBlend = true;
             this.xArrow.transform.y = this.length;
             this.gameObject.addChild(this.xArrow);
@@ -119,16 +119,16 @@ namespace editor
         {
             if (!this.isinit) return;
             var color = this.selected ? this.selectedColor : this.color;
-            this.segmentMaterial.uniforms.u_segmentColor = color;
+            (<feng3d.SegmentUniforms>this.segmentMaterial.uniforms).u_segmentColor = color;
             //
-            this.material.uniforms.u_diffuseInput = color;
+            (<feng3d.ColorUniforms>this.material.uniforms).u_diffuseInput = color;
         }
     }
 
     export class CoordinateCube extends feng3d.Component
     {
         private isinit = false;
-        private colorMaterial: feng3d.ColorMaterial;
+        private colorMaterial: feng3d.Material;
         private oCube: feng3d.GameObject;
 
         color = new feng3d.Color4(1, 1, 1, 0.99);
@@ -144,7 +144,7 @@ namespace editor
             this.oCube = new feng3d.GameObject();
             var model = this.oCube.addComponent(feng3d.Model)
             model.geometry = new feng3d.CubeGeometry().value({ width: 8, height: 8, depth: 8 });
-            this.colorMaterial = model.material = new feng3d.ColorMaterial();
+            this.colorMaterial = model.material = new feng3d.Material().value({ shaderName: "color" });
             this.colorMaterial.renderParams.enableBlend = true;
             this.oCube.mouseEnabled = true;
             this.gameObject.addChild(this.oCube);
@@ -156,14 +156,14 @@ namespace editor
         update()
         {
             if (!this.isinit) return;
-            this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
+            (<feng3d.ColorUniforms>this.colorMaterial.uniforms).u_diffuseInput = this.selected ? this.selectedColor : this.color;
         }
     }
 
     export class CoordinatePlane extends feng3d.Component
     {
         private isinit: boolean;
-        private colorMaterial: feng3d.ColorMaterial;
+        private colorMaterial: feng3d.Material;
         private segmentGeometry: feng3d.SegmentGeometry;
 
         color = new feng3d.Color4(1, 0, 0, 0.2);
@@ -187,7 +187,7 @@ namespace editor
             var model = plane.addComponent(feng3d.Model);
             plane.transform.x = plane.transform.z = this._width / 2;
             model.geometry = new feng3d.PlaneGeometry().value({ width: this._width, height: this._width });
-            this.colorMaterial = model.material = new feng3d.ColorMaterial();
+            this.colorMaterial = model.material = new feng3d.Material().value({ shaderName: "color" });
             this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
             this.colorMaterial.renderParams.enableBlend = true;
             plane.mouseEnabled = true;
@@ -196,8 +196,10 @@ namespace editor
             var border = new feng3d.GameObject().value({ name: "border" });
             model = border.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
-            material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
+            var material = model.material = new feng3d.Material().value({
+                shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
+                uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
+            });
             material.renderParams.enableBlend = true;
             this.gameObject.addChild(border);
 
@@ -209,7 +211,7 @@ namespace editor
         {
             if (!this.isinit) return;
 
-            this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
+            (<feng3d.ColorUniforms>this.colorMaterial.uniforms).u_diffuseInput = this.selected ? this.selectedColor : this.color;
 
             var color = this.selected ? this.selectedborderColor : this.borderColor;
             this.segmentGeometry.segments = [{ start: new feng3d.Vector3(0, 0, 0), end: new feng3d.Vector3(this._width, 0, 0), startColor: color, endColor: color }];

@@ -67,8 +67,10 @@ namespace editor
             super.init(gameObject);
             var xLine = new feng3d.GameObject();
             var model = xLine.addComponent(feng3d.Model);
-            var material = model.material = new feng3d.SegmentMaterial().value({ renderParams: { renderMode: feng3d.RenderMode.LINES } });
-            material.uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.99);
+            var material = model.material = new feng3d.Material().value({
+                shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
+                uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
+            });
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(xLine);

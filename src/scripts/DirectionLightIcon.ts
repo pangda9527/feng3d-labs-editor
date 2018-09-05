@@ -72,7 +72,7 @@ namespace editor
         {
             if (!this.light) return;
 
-            this._textureMaterial.uniforms.u_color = this.light.color.toColor4();
+            (<feng3d.TextureUniforms>this._textureMaterial.uniforms).u_color = this.light.color.toColor4();
             this._lightLines.visible = editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
         }
 
@@ -90,7 +90,7 @@ namespace editor
 
         private _lightIcon: feng3d.GameObject;
         private _lightLines: feng3d.GameObject;
-        private _textureMaterial: feng3d.TextureMaterial;
+        private _textureMaterial: feng3d.Material;
 
         private onLightChanged(property: string, oldValue: feng3d.DirectionalLight, value: feng3d.DirectionalLight)
         {
