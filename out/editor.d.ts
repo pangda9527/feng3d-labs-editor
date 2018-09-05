@@ -1276,7 +1276,7 @@ declare namespace editor {
          * 获取一个新路径
          */
         getnewpath(path: string, callback: (newpath: string) => void): void;
-        saveObject(object: feng3d.GameObject | feng3d.AnimationClip | feng3d.Material | feng3d.Geometry, filename: string, override?: boolean, callback?: (file: AssetsFile) => void): void;
+        saveObject(object: feng3d.GameObject | feng3d.AnimationClip | feng3d.Material | feng3d.Geometry, filename: string, callback?: (file: AssetsFile) => void): void;
         /**
          * 过滤出文件列表
          * @param fn 过滤函数

@@ -4776,10 +4776,9 @@ var editor;
                 });
             }
         };
-        EditorAssets.prototype.saveObject = function (object, filename, override, callback) {
-            if (override === void 0) { override = false; }
+        EditorAssets.prototype.saveObject = function (object, filename, callback) {
             var showFloder = this.getFile(this.showFloder);
-            showFloder.addfile(filename, object, override, callback);
+            showFloder.addfile(filename, object, true, callback);
         };
         /**
          * 过滤出文件列表
@@ -10838,7 +10837,7 @@ var editor;
         {
             label: "保存场景", click: function () {
                 var gameobject = editor.hierarchyTree.rootnode.gameobject;
-                editor.editorAssets.saveObject(gameobject, gameobject.name + ".scene", true);
+                editor.editorAssets.saveObject(gameobject, gameobject.name + ".scene");
             }
         },
         {
