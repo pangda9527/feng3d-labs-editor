@@ -20,7 +20,8 @@ namespace editor
                     {
                         __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
                         material: {
-                            __class__: "feng3d.TextureMaterial",
+                            __class__: "feng3d.Material",
+                            shaderName: "texture",
                             uniforms: {
                                 s_texture: {
                                     url: editorData.getEditorAssetsPath("assets/3d/icons/light.png"),
@@ -41,7 +42,8 @@ namespace editor
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                     __class__: "feng3d.MeshModel", material: {
-                        __class__: "feng3d.SegmentMaterial",
+                        __class__: "feng3d.Material",
+                        shaderName: "segment",
                         uniforms: {
                             u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 },
                         }, renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true, }
@@ -67,7 +69,7 @@ namespace editor
                             { position: { __class__: "feng3d.Vector3", z: -1 }, color: { __class__: "feng3d.Color4", b: 1 } }],
                     },
                     material: {
-                        __class__: "feng3d.PointMaterial", uniforms: { u_PointSize: 5 }, renderParams: { renderMode: feng3d.RenderMode.POINTS, enableBlend: true, },
+                        __class__: "feng3d.Material", shaderName: "point", uniforms: { u_PointSize: 5 }, renderParams: { renderMode: feng3d.RenderMode.POINTS, enableBlend: true, },
                     },
                 }],
             });

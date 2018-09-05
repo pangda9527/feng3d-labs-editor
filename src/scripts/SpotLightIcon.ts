@@ -19,7 +19,8 @@ namespace editor
                     { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
                         __class__: "feng3d.MeshModel", material: {
-                            __class__: "feng3d.TextureMaterial",
+                            __class__: "feng3d.Material",
+                            shaderName: "texture",
                             uniforms: {
                                 s_texture: {
                                     url: editorData.getEditorAssetsPath("assets/3d/icons/spot.png"),
@@ -41,7 +42,7 @@ namespace editor
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                     __class__: "feng3d.MeshModel", material: {
-                        __class__: "feng3d.SegmentMaterial",
+                        __class__: "feng3d.Material", shaderName: "segment",
                         uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 } },
                         renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.LINES },
                     },
@@ -56,7 +57,7 @@ namespace editor
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
                         __class__: "feng3d.MeshModel",
-                        material: { __class__: "feng3d.PointMaterial", uniforms: { u_PointSize: 5 }, renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.POINTS } },
+                        material: { __class__: "feng3d.Material", shaderName: "point", uniforms: { u_PointSize: 5 }, renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.POINTS } },
                         geometry: { __class__: "feng3d.PointGeometry", },
                     },
                 ]
