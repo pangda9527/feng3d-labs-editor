@@ -33,7 +33,7 @@ namespace editor
             label: "保存场景", click: () =>
             {
                 var gameobject = hierarchyTree.rootnode.gameobject;
-                editorAssets.saveObject(gameobject, gameobject.name + ".scene");
+                editorAssets.saveObject(gameobject, gameobject.name + ".scene.json");
             }
         },
         {

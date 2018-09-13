@@ -10859,7 +10859,7 @@ var editor;
         {
             label: "保存场景", click: function () {
                 var gameobject = editor.hierarchyTree.rootnode.gameobject;
-                editor.editorAssets.saveObject(gameobject, gameobject.name + ".scene");
+                editor.editorAssets.saveObject(gameobject, gameobject.name + ".scene.json");
             }
         },
         {
