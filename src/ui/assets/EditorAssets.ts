@@ -411,24 +411,32 @@ namespace editor
             {
                 var result: ArrayBuffer = event.target["result"];
                 var showFloder = this.getFile(this.showFloder);
-                showFloder.addfileFromArrayBuffer(file.name, result, false, (e, assetsFile) =>
+                if (regExps.image.test(file.name))
                 {
-                    if (e)
+                    var imagePath = "Library/" + file.name;
+                    assets.writeFile(imagePath, result, err =>
                     {
-                        feng3d.error(e);
-                        this.inputFiles(files, callback, assetsFiles);
-                    }
-                    else
-                    {
-                        if (regExps.image.test(file.name))
-                        {
-                            var texture2dName = feng3d.pathUtils.getName(file.name) + "." + feng3d.AssetExtension.texture2d;
-                            assetsFile = showFloder.addfile(texture2dName, new feng3d.UrlImageTexture2D().value({ url: assetsFile.path }));
-                        }
+                        var texture2dName = feng3d.pathUtils.getName(file.name) + "." + feng3d.AssetExtension.texture2d;
+                        var assetsFile = showFloder.addfile(texture2dName, new feng3d.UrlImageTexture2D().value({ url: imagePath }));
                         assetsFiles.push(assetsFile);
                         this.inputFiles(files, callback, assetsFiles);
-                    }
-                });
+                    });
+                } else
+                {
+                    showFloder.addfileFromArrayBuffer(file.name, result, false, (e, assetsFile) =>
+                    {
+                        if (e)
+                        {
+                            feng3d.error(e);
+                            this.inputFiles(files, callback, assetsFiles);
+                        }
+                        else
+                        {
+                            assetsFiles.push(assetsFile);
+                            this.inputFiles(files, callback, assetsFiles);
+                        }
+                    });
+                }
             }, false);
             reader.readAsArrayBuffer(file);
         }

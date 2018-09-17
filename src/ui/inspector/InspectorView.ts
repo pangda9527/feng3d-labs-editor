@@ -93,6 +93,9 @@ namespace editor
 					});
 				}
 				this._dataChanged = false;
+			} else
+			{
+				callback && callback();
 			}
 		}
 

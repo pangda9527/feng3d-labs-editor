@@ -4325,6 +4325,9 @@ var editor;
                 }
                 this._dataChanged = false;
             }
+            else {
+                callback && callback();
+            }
         };
         InspectorView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
@@ -4829,20 +4832,27 @@ var editor;
             reader.addEventListener('load', function (event) {
                 var result = event.target["result"];
                 var showFloder = _this.getFile(_this.showFloder);
-                showFloder.addfileFromArrayBuffer(file.name, result, false, function (e, assetsFile) {
-                    if (e) {
-                        feng3d.error(e);
-                        _this.inputFiles(files, callback, assetsFiles);
-                    }
-                    else {
-                        if (editor.regExps.image.test(file.name)) {
-                            var texture2dName = feng3d.pathUtils.getName(file.name) + "." + feng3d.AssetExtension.texture2d;
-                            assetsFile = showFloder.addfile(texture2dName, new feng3d.UrlImageTexture2D().value({ url: assetsFile.path }));
-                        }
+                if (editor.regExps.image.test(file.name)) {
+                    var imagePath = "Library/" + file.name;
+                    editor.assets.writeFile(imagePath, result, function (err) {
+                        var texture2dName = feng3d.pathUtils.getName(file.name) + "." + feng3d.AssetExtension.texture2d;
+                        var assetsFile = showFloder.addfile(texture2dName, new feng3d.UrlImageTexture2D().value({ url: imagePath }));
                         assetsFiles.push(assetsFile);
                         _this.inputFiles(files, callback, assetsFiles);
-                    }
-                });
+                    });
+                }
+                else {
+                    showFloder.addfileFromArrayBuffer(file.name, result, false, function (e, assetsFile) {
+                        if (e) {
+                            feng3d.error(e);
+                            _this.inputFiles(files, callback, assetsFiles);
+                        }
+                        else {
+                            assetsFiles.push(assetsFile);
+                            _this.inputFiles(files, callback, assetsFiles);
+                        }
+                    });
+                }
             }, false);
             reader.readAsArrayBuffer(file);
         };
