@@ -265,10 +265,11 @@ namespace editor
 
                 editorui.assetsview.invalidateAssetstree();
 
-                callback && callback(this);
+                callback && callback(assetsFile);
                 if (regExps.image.test(assetsFile.path))
                     feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
             });
+            return assetsFile;
         }
 
         /**

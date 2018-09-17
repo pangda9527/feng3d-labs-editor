@@ -410,13 +410,23 @@ namespace editor
             {
                 var result: ArrayBuffer = event.target["result"];
                 var showFloder = this.getFile(this.showFloder);
-                showFloder.addfileFromArrayBuffer(file.name, result, false, (e, file) =>
+                showFloder.addfileFromArrayBuffer(file.name, result, false, (e, assetsFile) =>
                 {
                     if (e)
+                    {
                         feng3d.error(e);
+                        this.inputFiles(files, callback, assetsFiles);
+                    }
                     else
-                        assetsFiles.push(file);
-                    this.inputFiles(files, callback, assetsFiles);
+                    {
+                        if (regExps.image.test(file.name))
+                        {
+                            var texture2dName = feng3d.pathUtils.getName(file.name) + "." + feng3d.AssetExtension.texture2d;
+                            assetsFile = showFloder.addfile(texture2dName, new feng3d.UrlImageTexture2D().value({ url: assetsFile.path }));
+                        }
+                        assetsFiles.push(assetsFile);
+                        this.inputFiles(files, callback, assetsFiles);
+                    }
                 });
             }, false);
             reader.readAsArrayBuffer(file);

@@ -4820,12 +4820,19 @@ var editor;
             reader.addEventListener('load', function (event) {
                 var result = event.target["result"];
                 var showFloder = _this.getFile(_this.showFloder);
-                showFloder.addfileFromArrayBuffer(file.name, result, false, function (e, file) {
-                    if (e)
+                showFloder.addfileFromArrayBuffer(file.name, result, false, function (e, assetsFile) {
+                    if (e) {
                         feng3d.error(e);
-                    else
-                        assetsFiles.push(file);
-                    _this.inputFiles(files, callback, assetsFiles);
+                        _this.inputFiles(files, callback, assetsFiles);
+                    }
+                    else {
+                        if (editor.regExps.image.test(file.name)) {
+                            var texture2dName = feng3d.pathUtils.getName(file.name) + "." + feng3d.AssetExtension.texture2d;
+                            assetsFile = showFloder.addfile(texture2dName, new feng3d.UrlImageTexture2D().value({ url: assetsFile.path }));
+                        }
+                        assetsFiles.push(assetsFile);
+                        _this.inputFiles(files, callback, assetsFiles);
+                    }
                 });
             }, false);
             reader.readAsArrayBuffer(file);
@@ -5072,7 +5079,6 @@ var editor;
          * @param callback 完成回调
          */
         AssetsFile.prototype.addfile = function (filename, content, override, callback) {
-            var _this = this;
             if (override === void 0) { override = false; }
             var filepath = this.path + filename;
             if (!override) {
@@ -5083,10 +5089,11 @@ var editor;
                 editor.editorAssets.files[filepath] = assetsFile;
                 editor.editorData.selectObject(assetsFile);
                 editor.editorui.assetsview.invalidateAssetstree();
-                callback && callback(_this);
+                callback && callback(assetsFile);
                 if (editor.regExps.image.test(assetsFile.path))
                     feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
             });
+            return assetsFile;
         };
         /**
          * 新增文件从ArrayBuffer

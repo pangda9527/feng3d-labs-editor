@@ -1383,7 +1383,7 @@ declare namespace editor {
          * @param content 文件内容
          * @param callback 完成回调
          */
-        addfile(filename: string, content: AssetsDataType, override?: boolean, callback?: (file: AssetsFile) => void): void;
+        addfile(filename: string, content: AssetsDataType, override?: boolean, callback?: (file: AssetsFile) => void): AssetsFile;
         /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
