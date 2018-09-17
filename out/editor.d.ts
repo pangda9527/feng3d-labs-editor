@@ -1306,7 +1306,7 @@ declare namespace editor {
     var codeeditoWin: Window;
 }
 declare namespace editor {
-    type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube;
+    type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube | HTMLImageElement;
     class AssetsFile {
         /**
          * 路径

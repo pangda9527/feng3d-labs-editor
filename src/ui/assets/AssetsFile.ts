@@ -1,6 +1,6 @@
 namespace editor
 {
-    export type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube;
+    export type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube | HTMLImageElement;
 
     export class AssetsFile
     {
@@ -80,10 +80,17 @@ namespace editor
             }
             if (regExps.image.test(this.path))
             {
-                this.getData((data) =>
+                assets.readFileAsArrayBuffer(this.path, (err, data) =>
                 {
-                    this.image = data;
+                    feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
+                    {
+                        this.image = dataurl;
+                    });
                 });
+                // assets.readFileAsImage(this.path, (err, img) =>
+                // {
+                //     this.image = img;
+                // });
             }
         }
 
@@ -122,25 +129,17 @@ namespace editor
             }
             if (regExps.json.test(this.path))
             {
-                assets.readFileAsString(this.path, (err, content: string) =>
+                feng3d.Feng3dAssets.getAssetsByPath(this.path, assets =>
                 {
-                    var json = JSON.parse(content);
-                    this.cacheData = feng3d.serialization.deserialize(json);
-                    this.cacheData["path"] = this.path;
+                    this.cacheData = assets;
                     callback(this.cacheData);
                 });
                 return;
             }
             if (regExps.image.test(this.path))
             {
-                assets.readFileAsArrayBuffer(this.path, (err, data) =>
-                {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
-                    {
-                        this.cacheData = dataurl;
-                        callback(this.cacheData);
-                    });
-                });
+                this.cacheData = new feng3d.UrlImageTexture2D().value({ url: this.path });
+                callback(this.cacheData);
                 return;
             }
         }

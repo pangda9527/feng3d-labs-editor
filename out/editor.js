@@ -4917,9 +4917,15 @@ var editor;
                 }
             }
             if (editor.regExps.image.test(this.path)) {
-                this.getData(function (data) {
-                    _this.image = data;
+                editor.assets.readFileAsArrayBuffer(this.path, function (err, data) {
+                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
+                        _this.image = dataurl;
+                    });
                 });
+                // assets.readFileAsImage(this.path, (err, img) =>
+                // {
+                //     this.image = img;
+                // });
             }
         };
         /**
@@ -4950,21 +4956,15 @@ var editor;
                 return;
             }
             if (editor.regExps.json.test(this.path)) {
-                editor.assets.readFileAsString(this.path, function (err, content) {
-                    var json = JSON.parse(content);
-                    _this.cacheData = feng3d.serialization.deserialize(json);
-                    _this.cacheData["path"] = _this.path;
+                feng3d.Feng3dAssets.getAssetsByPath(this.path, function (assets) {
+                    _this.cacheData = assets;
                     callback(_this.cacheData);
                 });
                 return;
             }
             if (editor.regExps.image.test(this.path)) {
-                editor.assets.readFileAsArrayBuffer(this.path, function (err, data) {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
-                        _this.cacheData = dataurl;
-                        callback(_this.cacheData);
-                    });
-                });
+                this.cacheData = new feng3d.UrlImageTexture2D().value({ url: this.path });
+                callback(this.cacheData);
                 return;
             }
         };
