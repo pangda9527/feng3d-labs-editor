@@ -4258,6 +4258,7 @@ var editor;
         function InspectorView() {
             var _this = _super.call(this) || this;
             _this.viewDataList = [];
+            _this.dataChanged = false;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "InspectorViewSkin";
             return _this;
@@ -4300,30 +4301,36 @@ var editor;
                             if (_this.view && _this.view.parent) {
                                 _this.view.parent.removeChild(_this.view);
                             }
-                            _this.view = feng3d.objectview.getObjectView(showdata);
-                            _this.view.percentWidth = 100;
-                            _this.group.addChild(_this.view);
+                            _this.updateShowData(showdata);
                         }
                     });
                 }
                 else {
-                    this.view = feng3d.objectview.getObjectView(this.viewData);
-                    this.view.percentWidth = 100;
-                    this.group.addChild(this.view);
+                    this.updateShowData(this.viewData);
                 }
             }
+        };
+        InspectorView.prototype.updateShowData = function (showdata) {
+            if (this.view)
+                this.view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+            this.view = feng3d.objectview.getObjectView(showdata);
+            this.view.percentWidth = 100;
+            this.group.addChild(this.view);
+            this.view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+        };
+        InspectorView.prototype.onValueChanged = function () {
+            this.dataChanged = true;
         };
         InspectorView.prototype.showData = function (data, removeBack) {
             if (removeBack === void 0) { removeBack = false; }
             if (this.viewData) {
+                if (this.dataChanged && this.viewData instanceof editor.AssetsFile) {
+                    this.viewData.save(false, function () { });
+                }
                 this.viewDataList.push(this.viewData);
+                this.dataChanged = false;
             }
             if (removeBack) {
-                this.viewDataList.forEach(function (element) {
-                    if (element instanceof editor.AssetsFile) {
-                        element.save(false, function () { });
-                    }
-                });
                 this.viewDataList.length = 0;
             }
             //

@@ -1166,6 +1166,9 @@ declare namespace editor {
         private onRemovedFromStage;
         private onSelectedObjectsChanged;
         updateView(): void;
+        private updateShowData;
+        private dataChanged;
+        private onValueChanged;
         showData(data: any, removeBack?: boolean): void;
         onBackButton(): void;
     }

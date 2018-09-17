@@ -77,35 +77,45 @@ namespace editor
 							{
 								this.view.parent.removeChild(this.view);
 							}
-							this.view = feng3d.objectview.getObjectView(showdata);
-							this.view.percentWidth = 100;
-							this.group.addChild(this.view);
+							this.updateShowData(showdata);
 						}
 					});
 				} else
 				{
-					this.view = feng3d.objectview.getObjectView(this.viewData);
-					this.view.percentWidth = 100;
-					this.group.addChild(this.view);
+					this.updateShowData(this.viewData);
 				}
 			}
+		}
+
+		private updateShowData(showdata: Object)
+		{
+			if (this.view)
+				this.view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+			this.view = feng3d.objectview.getObjectView(showdata);
+			this.view.percentWidth = 100;
+			this.group.addChild(this.view);
+			this.view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+		}
+
+		private dataChanged = false;
+		private onValueChanged()
+		{
+			this.dataChanged = true;
 		}
 
 		showData(data: any, removeBack = false)
 		{
 			if (this.viewData)
 			{
+				if (this.dataChanged && this.viewData instanceof AssetsFile)
+				{
+					this.viewData.save(false, () => { });
+				}
 				this.viewDataList.push(this.viewData);
+				this.dataChanged = false;
 			}
 			if (removeBack)
 			{
-				this.viewDataList.forEach(element =>
-				{
-					if (element instanceof AssetsFile)
-					{
-						element.save(false, () => { });
-					}
-				});
 				this.viewDataList.length = 0;
 			}
 			//
