@@ -3317,46 +3317,6 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var OAVImage = /** @class */ (function (_super) {
-        __extends(OAVImage, _super);
-        function OAVImage(attributeViewInfo) {
-            var _this = _super.call(this, attributeViewInfo) || this;
-            _this.skinName = "OAVImage";
-            return _this;
-        }
-        OAVImage.prototype.initView = function () {
-            var _this = this;
-            var imagePath = this.attributeValue;
-            if (imagePath) {
-                editor.assets.readFileAsArrayBuffer(imagePath, function (err, data) {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
-                        _this.image.source = dataurl;
-                    });
-                });
-            }
-            else {
-                this.image.source = null;
-            }
-            this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-        };
-        OAVImage.prototype.dispose = function () {
-        };
-        OAVImage.prototype.updateView = function () {
-        };
-        OAVImage.prototype.onResize = function () {
-            this.image.width = this.width;
-            this.image.height = this.width;
-            this.height = this.width;
-        };
-        OAVImage = __decorate([
-            feng3d.OAVComponent()
-        ], OAVImage);
-        return OAVImage;
-    }(editor.OAVBase));
-    editor.OAVImage = OAVImage;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
     /**
      * 默认对象属性界面
      */
@@ -3626,6 +3586,164 @@ var editor;
         return OAVEnum;
     }(editor.OAVBase));
     editor.OAVEnum = OAVEnum;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var OAVImage = /** @class */ (function (_super) {
+        __extends(OAVImage, _super);
+        function OAVImage(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVImage";
+            return _this;
+        }
+        OAVImage.prototype.initView = function () {
+            var _this = this;
+            var imagePath = this.attributeValue;
+            if (imagePath) {
+                editor.assets.readFileAsArrayBuffer(imagePath, function (err, data) {
+                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
+                        _this.image.source = dataurl;
+                    });
+                });
+            }
+            else {
+                this.image.source = null;
+            }
+            this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+        };
+        OAVImage.prototype.dispose = function () {
+        };
+        OAVImage.prototype.updateView = function () {
+        };
+        OAVImage.prototype.onResize = function () {
+            this.image.width = this.width;
+            this.image.height = this.width;
+            this.height = this.width;
+        };
+        OAVImage = __decorate([
+            feng3d.OAVComponent()
+        ], OAVImage);
+        return OAVImage;
+    }(editor.OAVBase));
+    editor.OAVImage = OAVImage;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var OAVCubeMap = /** @class */ (function (_super) {
+        __extends(OAVCubeMap, _super);
+        function OAVCubeMap(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVCubeMap";
+            return _this;
+        }
+        OAVCubeMap.prototype.initView = function () {
+            this.images = [this.px, this.py, this.pz, this.nx, this.ny, this.nz];
+            this.btns = [this.pxBtn, this.pyBtn, this.pzBtn, this.nxBtn, this.nyBtn, this.nzBtn];
+            // var param: { accepttype: keyof DragData; datatype?: string; } = { accepttype: "image" };
+            for (var i = 0; i < propertys.length; i++) {
+                this.updateImage(i);
+                // drag.register(image,
+                // 	(dragsource) => { },
+                // 	[param.accepttype],
+                // 	(dragSource) =>
+                // 	{
+                // 		this.attributeValue = dragSource[param.accepttype];
+                // 	});
+                this.btns[i].addEventListener(egret.MouseEvent.CLICK, this.onImageClick, this);
+            }
+            this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+        };
+        OAVCubeMap.prototype.updateImage = function (i) {
+            var textureCube = this.space;
+            var imagePath = textureCube[propertys[i]];
+            var image = this.images[i];
+            if (imagePath) {
+                editor.assets.readFileAsArrayBuffer(imagePath, function (err, data) {
+                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
+                        image.source = dataurl;
+                    });
+                });
+            }
+            else {
+                image.source = null;
+            }
+        };
+        OAVCubeMap.prototype.onImageClick = function (e) {
+            var _this = this;
+            var index = this.btns.indexOf(e.currentTarget);
+            if (index != -1) {
+                var textureCube = this.space;
+                var texturefiles = editor.editorAssets.filter(function (file) {
+                    return file.extension == feng3d.AssetExtension.texture2d;
+                });
+                var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
+                texturefiles.forEach(function (v) {
+                    v.getData(function (d) {
+                        menus.push({
+                            label: d.name,
+                            click: function () {
+                                textureCube[propertys[index]] = d.url;
+                                _this.updateImage(index);
+                                //
+                                var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+                                objectViewEvent.space = _this._space;
+                                objectViewEvent.attributeName = propertys[index];
+                                objectViewEvent.attributeValue = d.url;
+                                _this.dispatchEvent(objectViewEvent);
+                            }
+                        });
+                    });
+                });
+                editor.menu.popup(menus);
+            }
+        };
+        OAVCubeMap.prototype.dispose = function () {
+        };
+        OAVCubeMap.prototype.updateView = function () {
+        };
+        OAVCubeMap.prototype.onResize = function () {
+            var w4 = Math.round(this.width / 4);
+            this.px.width = this.py.width = this.pz.width = this.nx.width = this.ny.width = this.nz.width = w4;
+            this.px.height = this.py.height = this.pz.height = this.nx.height = this.ny.height = this.nz.height = w4;
+            //
+            this.pxGroup.width = this.pyGroup.width = this.pzGroup.width = this.nxGroup.width = this.nyGroup.width = this.nzGroup.width = w4;
+            this.pxGroup.height = this.pyGroup.height = this.pzGroup.height = this.nxGroup.height = this.nyGroup.height = this.nzGroup.height = w4;
+            //
+            this.px.x = w4 * 2;
+            this.px.y = w4;
+            this.pxGroup.x = w4 * 2;
+            this.pxGroup.y = w4;
+            //
+            this.py.x = w4;
+            this.pyGroup.x = w4;
+            //
+            this.pz.x = w4;
+            this.pz.y = w4;
+            this.pzGroup.x = w4;
+            this.pzGroup.y = w4;
+            //
+            this.nx.y = w4;
+            this.nxGroup.y = w4;
+            //
+            this.ny.x = w4;
+            this.ny.y = w4 * 2;
+            this.nyGroup.x = w4;
+            this.nyGroup.y = w4 * 2;
+            //
+            this.nz.x = w4 * 3;
+            this.nz.y = w4;
+            this.nzGroup.x = w4 * 3;
+            this.nzGroup.y = w4;
+            //
+            this.height = w4 * 3;
+        };
+        OAVCubeMap = __decorate([
+            feng3d.OAVComponent()
+        ], OAVCubeMap);
+        return OAVCubeMap;
+    }(editor.OAVBase));
+    editor.OAVCubeMap = OAVCubeMap;
+    var propertys = ["positive_x_url", "positive_y_url", "positive_z_url", "negative_x_url", "negative_y_url", "negative_z_url"];
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -3981,7 +4099,7 @@ var editor;
         OAVPick.prototype.initView = function () {
             var _this = this;
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
             var param = this._attributeViewInfo.componentParam;
             editor.drag.register(this, function (dragsource) {
@@ -3993,11 +4111,11 @@ var editor;
         };
         OAVPick.prototype.dispose = function () {
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+            this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
             editor.drag.unregister(this);
             feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
         };
-        OAVPick.prototype.ontxtClick = function () {
+        OAVPick.prototype.onPickBtnClick = function () {
             var _this = this;
             var param = this._attributeViewInfo.componentParam;
             if (param.accepttype) {
@@ -4752,6 +4870,7 @@ var editor;
                 feng3d.AssetExtension.shader,
                 feng3d.AssetExtension.json,
                 feng3d.AssetExtension.texture2d,
+                feng3d.AssetExtension.texturecube,
                 feng3d.AssetExtension.material,
                 feng3d.AssetExtension.gameobject,
                 feng3d.AssetExtension.geometry,

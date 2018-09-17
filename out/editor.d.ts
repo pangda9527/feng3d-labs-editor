@@ -917,16 +917,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class OAVImage extends OAVBase {
-        image: eui.Image;
-        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
-        initView(): void;
-        dispose(): void;
-        updateView(): void;
-        onResize(): void;
-    }
-}
-declare namespace editor {
     /**
      * 默认对象属性界面
      */
@@ -1002,6 +992,47 @@ declare namespace editor {
         dispose(): void;
         updateView(): void;
         private onComboxChange;
+    }
+}
+declare namespace editor {
+    class OAVImage extends OAVBase {
+        image: eui.Image;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
+        dispose(): void;
+        updateView(): void;
+        onResize(): void;
+    }
+}
+declare namespace editor {
+    class OAVCubeMap extends OAVBase {
+        px: eui.Image;
+        py: eui.Image;
+        pz: eui.Image;
+        nx: eui.Image;
+        ny: eui.Image;
+        nz: eui.Image;
+        pxGroup: eui.Group;
+        pxBtn: eui.Button;
+        pyGroup: eui.Group;
+        pyBtn: eui.Button;
+        pzGroup: eui.Group;
+        pzBtn: eui.Button;
+        nxGroup: eui.Group;
+        nxBtn: eui.Button;
+        nyGroup: eui.Group;
+        nyBtn: eui.Button;
+        nzGroup: eui.Group;
+        nzBtn: eui.Button;
+        private images;
+        private btns;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
+        private updateImage;
+        private onImageClick;
+        dispose(): void;
+        updateView(): void;
+        onResize(): void;
     }
 }
 declare namespace editor {
@@ -1112,7 +1143,7 @@ declare namespace editor {
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
         dispose(): void;
-        private ontxtClick;
+        private onPickBtnClick;
         /**
          * 更新界面
          */

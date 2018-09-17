@@ -20,7 +20,7 @@ namespace editor
         initView()
         {
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
 
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
 
@@ -40,13 +40,13 @@ namespace editor
         dispose()
         {
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+            this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
 
             drag.unregister(this);
             feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
         }
 
-        private ontxtClick()
+        private onPickBtnClick()
         {
             var param: { accepttype: keyof DragData; datatype: string; } = <any>this._attributeViewInfo.componentParam;
             if (param.accepttype)
