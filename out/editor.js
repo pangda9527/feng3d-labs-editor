@@ -3965,48 +3965,38 @@ var editor;
             var param = this.attributeViewInfo.componentParam;
             if (param.accepttype) {
                 if (param.accepttype == "image") {
-                    var menus = editor.editorAssets.filter(function (file) {
+                    var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
+                    editor.editorAssets.filter(function (file) {
                         return editor.regExps.image.test(file.path);
-                    }).reduce(function (prev, item) {
-                        prev.push({
+                    }).forEach(function (item) {
+                        menus.push({
                             label: item.name, click: function () {
                                 _this.attributeValue = item.path;
                             }
                         });
-                        return prev;
-                    }, []);
-                    menus.unshift({
-                        label: "\u7A7A", click: function () {
-                            _this.attributeValue = "";
-                        }
                     });
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "audio") {
-                    var menus = editor.editorAssets.filter(function (file) {
+                    var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
+                    editor.editorAssets.filter(function (file) {
                         return editor.regExps.audio.test(file.path);
-                    }).reduce(function (prev, item) {
-                        prev.push({
+                    }).forEach(function (item) {
+                        menus.push({
                             label: item.name, click: function () {
                                 _this.attributeValue = item.path;
                             }
                         });
-                        return prev;
                     }, []);
-                    menus.unshift({
-                        label: "\u7A7A", click: function () {
-                            _this.attributeValue = "";
-                        }
-                    });
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "file_script") {
                     var materialfiles = editor.editorAssets.filter(function (file) {
                         return file.extension == feng3d.AssetExtension.script;
                     });
+                    var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
                     if (materialfiles.length > 0) {
                         getScriptClassNames(materialfiles, function (scriptClassNames) {
-                            var menus = [];
                             scriptClassNames.forEach(function (element) {
                                 menus.push({
                                     label: element,
@@ -4015,20 +4005,17 @@ var editor;
                                     }
                                 });
                             });
-                            editor.menu.popup(menus);
                         });
                     }
-                    else {
-                        editor.menu.popup([{ label: "\u6CA1\u6709 " + param.accepttype + " \u8D44\u6E90" }]);
-                    }
+                    editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "material") {
                     var materialfiles = editor.editorAssets.filter(function (file) {
                         return file.extension == feng3d.AssetExtension.material;
                     });
+                    var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
                     if (materialfiles.length > 0) {
                         getMaterials(materialfiles, function (materials) {
-                            var menus = [];
                             materials.forEach(function (element) {
                                 menus.push({
                                     label: element.name,
@@ -4037,12 +4024,9 @@ var editor;
                                     }
                                 });
                             });
-                            editor.menu.popup(menus);
                         });
                     }
-                    else {
-                        editor.menu.popup([{ label: "\u6CA1\u6709 " + param.accepttype + " \u8D44\u6E90" }]);
-                    }
+                    editor.menu.popup(menus);
                 }
             }
         };

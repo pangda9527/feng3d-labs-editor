@@ -53,45 +53,35 @@ namespace editor
             {
                 if (param.accepttype == "image")
                 {
-                    var menus: MenuItem[] = editorAssets.filter((file) =>
+                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
+                    editorAssets.filter((file) =>
                     {
                         return regExps.image.test(file.path);
-                    }).reduce((prev, item) =>
+                    }).forEach(item =>
                     {
-                        prev.push({
+                        menus.push({
                             label: item.name, click: () =>
                             {
                                 this.attributeValue = item.path;
                             }
-                        }); return prev;
-                    }, []);
-                    menus.unshift({
-                        label: `空`, click: () =>
-                        {
-                            this.attributeValue = "";
-                        }
+                        });
                     });
                     menu.popup(menus);
                 } else if (param.accepttype == "audio")
                 {
-                    var menus: MenuItem[] = editorAssets.filter((file) =>
+                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
+                    editorAssets.filter((file) =>
                     {
                         return regExps.audio.test(file.path);
-                    }).reduce((prev, item) =>
+                    }).forEach(item =>
                     {
-                        prev.push({
+                        menus.push({
                             label: item.name, click: () =>
                             {
                                 this.attributeValue = item.path;
                             }
-                        }); return prev;
+                        });
                     }, []);
-                    menus.unshift({
-                        label: `空`, click: () =>
-                        {
-                            this.attributeValue = "";
-                        }
-                    });
                     menu.popup(menus);
                 } else if (param.accepttype == "file_script")
                 {
@@ -100,11 +90,11 @@ namespace editor
                         return file.extension == feng3d.AssetExtension.script;
                     })
 
+                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
                     if (materialfiles.length > 0)
                     {
                         getScriptClassNames(materialfiles, (scriptClassNames) =>
                         {
-                            var menus: MenuItem[] = [];
                             scriptClassNames.forEach(element =>
                             {
                                 menus.push({
@@ -115,12 +105,9 @@ namespace editor
                                     }
                                 });
                             });
-                            menu.popup(menus);
                         });
-                    } else
-                    {
-                        menu.popup([{ label: `没有 ${param.accepttype} 资源` }]);
                     }
+                    menu.popup(menus);
                 } else if (param.accepttype == "material")
                 {
                     var materialfiles = editorAssets.filter((file) =>
@@ -128,11 +115,12 @@ namespace editor
                         return file.extension == feng3d.AssetExtension.material;
                     });
 
+                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
+
                     if (materialfiles.length > 0)
                     {
                         getMaterials(materialfiles, (materials) =>
                         {
-                            var menus: MenuItem[] = [];
                             materials.forEach(element =>
                             {
                                 menus.push({
@@ -143,12 +131,9 @@ namespace editor
                                     }
                                 });
                             });
-                            menu.popup(menus);
                         });
-                    } else
-                    {
-                        menu.popup([{ label: `没有 ${param.accepttype} 资源` }]);
                     }
+                    menu.popup(menus);
                 }
             }
         }
