@@ -106,28 +106,31 @@ namespace editor
 					editorData.isBaryCenter = !editorData.isBaryCenter;
 					break;
 				case this.playBtn:
-					editorAssets.saveScene("default.scene.json", engine.scene, (err) =>
+					editorui.inspectorView.saveShowData(() =>
 					{
-						if (err)
-						{
-							feng3d.warn(err);
-							return;
-						}
-						if (assets.type == feng3d.FSType.indexedDB)
-						{
-							if (runwin) runwin.close();
-							runwin = window.open(`run.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}`);
-							return;
-						}
-						assets.getAbsolutePath("index.html", (err, path) =>
+						editorAssets.saveScene("default.scene.json", engine.scene, (err) =>
 						{
 							if (err)
 							{
 								feng3d.warn(err);
 								return;
 							}
-							if (runwin) runwin.close();
-							runwin = window.open(path);
+							if (assets.type == feng3d.FSType.indexedDB)
+							{
+								if (runwin) runwin.close();
+								runwin = window.open(`run.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}`);
+								return;
+							}
+							assets.getAbsolutePath("index.html", (err, path) =>
+							{
+								if (err)
+								{
+									feng3d.warn(err);
+									return;
+								}
+								if (runwin) runwin.close();
+								runwin = window.open(path);
+							});
 						});
 					});
 					break;

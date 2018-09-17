@@ -270,6 +270,7 @@ namespace editor
             feng3d.AssetExtension.txt,
             feng3d.AssetExtension.shader,
             feng3d.AssetExtension.json,
+            feng3d.AssetExtension.texture2d,
             feng3d.AssetExtension.material,
             feng3d.AssetExtension.gameobject,
             feng3d.AssetExtension.geometry,

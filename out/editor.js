@@ -4264,20 +4264,8 @@ var editor;
             var _this = this;
             if (removeBack === void 0) { removeBack = false; }
             if (this._viewData) {
-                if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets) {
-                    if (this._viewData.path) {
-                        var obj = feng3d.serialization.serialize(this._viewData);
-                        var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                        feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
-                            editor.assets.writeFile(_this._viewData.path, arrayBuffer, function (e) {
-                                if (e)
-                                    feng3d.error(e);
-                            });
-                        });
-                    }
-                }
+                this.saveShowData();
                 this._viewDataList.push(this._viewData);
-                this._dataChanged = false;
             }
             if (removeBack) {
                 this._viewDataList.length = 0;
@@ -4316,6 +4304,26 @@ var editor;
                 else {
                     this.updateShowData(this._viewData);
                 }
+            }
+        };
+        /**
+         * 保存显示数据
+         */
+        InspectorView.prototype.saveShowData = function (callback) {
+            var _this = this;
+            if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets) {
+                if (this._viewData.path) {
+                    var obj = feng3d.serialization.serialize(this._viewData);
+                    var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                    feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
+                        editor.assets.writeFile(_this._viewData.path, arrayBuffer, function (e) {
+                            if (e)
+                                feng3d.error(e);
+                            callback && callback();
+                        });
+                    });
+                }
+                this._dataChanged = false;
             }
         };
         InspectorView.prototype.onComplete = function () {
@@ -4705,6 +4713,7 @@ var editor;
                 feng3d.AssetExtension.txt,
                 feng3d.AssetExtension.shader,
                 feng3d.AssetExtension.json,
+                feng3d.AssetExtension.texture2d,
                 feng3d.AssetExtension.material,
                 feng3d.AssetExtension.gameobject,
                 feng3d.AssetExtension.geometry,
@@ -5834,25 +5843,27 @@ var editor;
                     editor.editorData.isBaryCenter = !editor.editorData.isBaryCenter;
                     break;
                 case this.playBtn:
-                    editor.editorAssets.saveScene("default.scene.json", editor.engine.scene, function (err) {
-                        if (err) {
-                            feng3d.warn(err);
-                            return;
-                        }
-                        if (editor.assets.type == feng3d.FSType.indexedDB) {
-                            if (editor.runwin)
-                                editor.runwin.close();
-                            editor.runwin = window.open("run.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname);
-                            return;
-                        }
-                        editor.assets.getAbsolutePath("index.html", function (err, path) {
+                    editor.editorui.inspectorView.saveShowData(function () {
+                        editor.editorAssets.saveScene("default.scene.json", editor.engine.scene, function (err) {
                             if (err) {
                                 feng3d.warn(err);
                                 return;
                             }
-                            if (editor.runwin)
-                                editor.runwin.close();
-                            editor.runwin = window.open(path);
+                            if (editor.assets.type == feng3d.FSType.indexedDB) {
+                                if (editor.runwin)
+                                    editor.runwin.close();
+                                editor.runwin = window.open("run.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname);
+                                return;
+                            }
+                            editor.assets.getAbsolutePath("index.html", function (err, path) {
+                                if (err) {
+                                    feng3d.warn(err);
+                                    return;
+                                }
+                                if (editor.runwin)
+                                    editor.runwin.close();
+                                editor.runwin = window.open(path);
+                            });
                         });
                     });
                     break;

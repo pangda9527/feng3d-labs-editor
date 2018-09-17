@@ -19,23 +19,8 @@ namespace editor
 		{
 			if (this._viewData)
 			{
-				if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets)
-				{
-					if (this._viewData.path)
-					{
-						var obj = feng3d.serialization.serialize(this._viewData);
-						var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-						feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
-						{
-							assets.writeFile(this._viewData.path, arrayBuffer, (e) =>
-							{
-								if (e) feng3d.error(e);
-							});
-						});
-					}
-				}
+				this.saveShowData();
 				this._viewDataList.push(this._viewData);
-				this._dataChanged = false;
 			}
 			if (removeBack)
 			{
@@ -87,11 +72,36 @@ namespace editor
 			}
 		}
 
+		/**
+		 * 保存显示数据
+		 */
+		saveShowData(callback?: () => void)
+		{
+			if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets)
+			{
+				if (this._viewData.path)
+				{
+					var obj = feng3d.serialization.serialize(this._viewData);
+					var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+					feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
+					{
+						assets.writeFile(this._viewData.path, arrayBuffer, (e) =>
+						{
+							if (e) feng3d.error(e);
+							callback && callback();
+						});
+					});
+				}
+				this._dataChanged = false;
+			}
+		}
+
 		//
 		private _view: eui.Component;
 		private _viewData: any;
 		private _viewDataList = [];
 		private _dataChanged = false;
+
 		private onComplete(): void
 		{
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);

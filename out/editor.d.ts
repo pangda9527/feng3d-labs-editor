@@ -1160,6 +1160,10 @@ declare namespace editor {
         constructor();
         showData(data: any, removeBack?: boolean): void;
         updateView(): void;
+        /**
+         * 保存显示数据
+         */
+        saveShowData(callback?: () => void): void;
         private _view;
         private _viewData;
         private _viewDataList;
