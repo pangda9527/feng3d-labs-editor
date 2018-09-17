@@ -24,7 +24,7 @@ namespace editor
 
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
 
-            var param: { accepttype: keyof DragData; datatype: string; } = <any>this.attributeViewInfo.componentParam;
+            var param: { accepttype: keyof DragData; datatype: string; } = <any>this._attributeViewInfo.componentParam;
             drag.register(this,
                 (dragsource) =>
                 {
@@ -48,7 +48,7 @@ namespace editor
 
         private ontxtClick()
         {
-            var param: { accepttype: keyof DragData; datatype: string; } = <any>this.attributeViewInfo.componentParam;
+            var param: { accepttype: keyof DragData; datatype: string; } = <any>this._attributeViewInfo.componentParam;
             if (param.accepttype)
             {
                 if (param.accepttype == "image")

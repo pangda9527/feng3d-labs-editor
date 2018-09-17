@@ -5,7 +5,7 @@ namespace editor
         protected _space: any;
         protected _attributeName: string;
         protected _attributeType: string;
-        protected attributeViewInfo: feng3d.AttributeViewInfo;
+        protected _attributeViewInfo: feng3d.AttributeViewInfo;
         //
         labelLab: eui.Label;
 
@@ -24,7 +24,7 @@ namespace editor
             this._space = attributeViewInfo.owner;
             this._attributeName = attributeViewInfo.name;
             this._attributeType = attributeViewInfo.type;
-            this.attributeViewInfo = attributeViewInfo;
+            this._attributeViewInfo = attributeViewInfo;
         }
 
         get space(): any
@@ -47,7 +47,7 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
 
-            var componentParam = this.attributeViewInfo.componentParam;
+            var componentParam = this._attributeViewInfo.componentParam;
             if (componentParam)
             {
                 for (var key in componentParam)

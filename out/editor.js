@@ -3094,7 +3094,7 @@ var editor;
             _this._space = attributeViewInfo.owner;
             _this._attributeName = attributeViewInfo.name;
             _this._attributeType = attributeViewInfo.type;
-            _this.attributeViewInfo = attributeViewInfo;
+            _this._attributeViewInfo = attributeViewInfo;
             return _this;
         }
         Object.defineProperty(OAVBase.prototype, "space", {
@@ -3112,7 +3112,7 @@ var editor;
         });
         OAVBase.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            var componentParam = this.attributeViewInfo.componentParam;
+            var componentParam = this._attributeViewInfo.componentParam;
             if (componentParam) {
                 for (var key in componentParam) {
                     if (componentParam.hasOwnProperty(key)) {
@@ -3241,7 +3241,7 @@ var editor;
          * 更新界面
          */
         OAVDefault.prototype.updateView = function () {
-            this.text.enabled = this.attributeViewInfo.writable;
+            this.text.enabled = this._attributeViewInfo.writable;
             var value = this.attributeValue;
             if (this.attributeValue === undefined) {
                 this.text.text = String(this.attributeValue);
@@ -3314,6 +3314,46 @@ var editor;
         return OAVBoolean;
     }(editor.OAVBase));
     editor.OAVBoolean = OAVBoolean;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var OAVImage = /** @class */ (function (_super) {
+        __extends(OAVImage, _super);
+        function OAVImage(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVImage";
+            return _this;
+        }
+        OAVImage.prototype.initView = function () {
+            var _this = this;
+            var imagePath = this.attributeValue;
+            if (imagePath) {
+                editor.assets.readFileAsArrayBuffer(imagePath, function (err, data) {
+                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
+                        _this.image.source = dataurl;
+                    });
+                });
+            }
+            else {
+                this.image.source = null;
+            }
+            this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+        };
+        OAVImage.prototype.dispose = function () {
+        };
+        OAVImage.prototype.updateView = function () {
+        };
+        OAVImage.prototype.onResize = function () {
+            this.image.width = this.width;
+            this.image.height = this.width;
+            this.height = this.width;
+        };
+        OAVImage = __decorate([
+            feng3d.OAVComponent()
+        ], OAVImage);
+        return OAVImage;
+    }(editor.OAVBase));
+    editor.OAVImage = OAVImage;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -3464,7 +3504,7 @@ var editor;
             var attributeValue = this.attributeValue;
             this.sizeTxt.text = this.attributeValue.length.toString();
             for (var i = 0; i < attributeValue.length; i++) {
-                var displayObject = new OAVArrayItem(attributeValue, i, this.attributeViewInfo.componentParam);
+                var displayObject = new OAVArrayItem(attributeValue, i, this._attributeViewInfo.componentParam);
                 displayObject.percentWidth = 100;
                 this.contentGroup.addChild(displayObject);
                 this.attributeViews[i] = displayObject;
@@ -3498,10 +3538,10 @@ var editor;
                     }
                 }
                 for (var i = 0; i < attributeValue.length; i++) {
-                    if (attributeValue[i] == null && this.attributeViewInfo.componentParam)
-                        attributeValue[i] = feng3d.lazy.getvalue(this.attributeViewInfo.componentParam.defaultItem);
+                    if (attributeValue[i] == null && this._attributeViewInfo.componentParam)
+                        attributeValue[i] = feng3d.lazy.getvalue(this._attributeViewInfo.componentParam.defaultItem);
                     if (attributeViews[i] == null) {
-                        var displayObject = new OAVArrayItem(attributeValue, i, this.attributeViewInfo.componentParam);
+                        var displayObject = new OAVArrayItem(attributeValue, i, this._attributeViewInfo.componentParam);
                         attributeViews[i] = displayObject;
                         displayObject.percentWidth = 100;
                     }
@@ -3943,7 +3983,7 @@ var editor;
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
-            var param = this.attributeViewInfo.componentParam;
+            var param = this._attributeViewInfo.componentParam;
             editor.drag.register(this, function (dragsource) {
                 if (param.datatype)
                     dragsource[param.datatype] = _this.attributeValue;
@@ -3959,7 +3999,7 @@ var editor;
         };
         OAVPick.prototype.ontxtClick = function () {
             var _this = this;
-            var param = this.attributeViewInfo.componentParam;
+            var param = this._attributeViewInfo.componentParam;
             if (param.accepttype) {
                 if (param.accepttype == "image") {
                     var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
@@ -4679,11 +4719,6 @@ var editor;
                             }
                         },
                         { type: "separator" },
-                        {
-                            label: "贴图", click: function () {
-                                assetsFile.addfile("new texture" + ".texture.json", new feng3d.UrlImageTexture2D());
-                            }
-                        },
                         {
                             label: "立方体贴图", click: function () {
                                 assetsFile.addfile("new texturecube" + ".texturecube.json", new feng3d.TextureCube());

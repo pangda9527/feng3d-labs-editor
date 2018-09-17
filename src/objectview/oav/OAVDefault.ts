@@ -78,7 +78,7 @@ namespace editor
 		 */
 		updateView(): void
 		{
-			this.text.enabled = this.attributeViewInfo.writable;
+			this.text.enabled = this._attributeViewInfo.writable;
 			var value = this.attributeValue;
 			if (this.attributeValue === undefined)
 			{

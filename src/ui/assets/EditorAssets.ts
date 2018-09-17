@@ -224,12 +224,6 @@ namespace editor
                             },
                             { type: "separator" },
                             {
-                                label: "贴图", click: () =>
-                                {
-                                    assetsFile.addfile("new texture" + ".texture.json", new feng3d.UrlImageTexture2D());
-                                }
-                            },
-                            {
                                 label: "立方体贴图", click: () =>
                                 {
                                     assetsFile.addfile("new texturecube" + ".texturecube.json", new feng3d.TextureCube());

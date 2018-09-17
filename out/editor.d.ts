@@ -848,7 +848,7 @@ declare namespace editor {
         protected _space: any;
         protected _attributeName: string;
         protected _attributeType: string;
-        protected attributeViewInfo: feng3d.AttributeViewInfo;
+        protected _attributeViewInfo: feng3d.AttributeViewInfo;
         labelLab: eui.Label;
         /**
          * 对象属性界面
@@ -914,6 +914,16 @@ declare namespace editor {
         dispose(): void;
         updateView(): void;
         protected onChange(event: egret.Event): void;
+    }
+}
+declare namespace editor {
+    class OAVImage extends OAVBase {
+        image: eui.Image;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
+        dispose(): void;
+        updateView(): void;
+        onResize(): void;
     }
 }
 declare namespace editor {

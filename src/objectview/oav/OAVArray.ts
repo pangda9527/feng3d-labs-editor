@@ -54,7 +54,7 @@ namespace editor
             this.sizeTxt.text = this.attributeValue.length.toString();
             for (var i = 0; i < attributeValue.length; i++)
             {
-                var displayObject = new OAVArrayItem(attributeValue, i, this.attributeViewInfo.componentParam);
+                var displayObject = new OAVArrayItem(attributeValue, i, this._attributeViewInfo.componentParam);
                 displayObject.percentWidth = 100;
                 this.contentGroup.addChild(displayObject);
                 this.attributeViews[i] = <any>displayObject;
@@ -101,12 +101,12 @@ namespace editor
 
                 for (var i = 0; i < attributeValue.length; i++)
                 {
-                    if (attributeValue[i] == null && this.attributeViewInfo.componentParam)
-                        attributeValue[i] = feng3d.lazy.getvalue((<any>this.attributeViewInfo.componentParam).defaultItem);
+                    if (attributeValue[i] == null && this._attributeViewInfo.componentParam)
+                        attributeValue[i] = feng3d.lazy.getvalue((<any>this._attributeViewInfo.componentParam).defaultItem);
 
                     if (attributeViews[i] == null)
                     {
-                        var displayObject = new OAVArrayItem(attributeValue, i, this.attributeViewInfo.componentParam);
+                        var displayObject = new OAVArrayItem(attributeValue, i, this._attributeViewInfo.componentParam);
                         attributeViews[i] = displayObject;
 
                         displayObject.percentWidth = 100;
