@@ -3755,14 +3755,12 @@ var editor;
             this.input.text = color.toHexString();
         };
         OAVColorPicker.prototype.onChange = function (event) {
-            var color = this.attributeValue;
-            var pickerValue = this.colorPicker.value;
-            color.r = pickerValue.r;
-            color.g = pickerValue.g;
-            color.b = pickerValue.b;
             //
-            this.attributeValue = color;
-            this.input.text = color.toHexString();
+            if (this.attributeValue instanceof feng3d.Color3)
+                this.attributeValue = this.colorPicker.value;
+            else
+                this.attributeValue = this.colorPicker.value.toColor4();
+            this.input.text = this.attributeValue.toHexString();
         };
         OAVColorPicker.prototype.ontxtfocusin = function () {
             this._textfocusintxt = true;
@@ -4257,12 +4255,51 @@ var editor;
         __extends(InspectorView, _super);
         function InspectorView() {
             var _this = _super.call(this) || this;
-            _this.viewDataList = [];
-            _this.dataChanged = false;
+            _this._viewDataList = [];
+            _this._dataChanged = false;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "InspectorViewSkin";
             return _this;
         }
+        InspectorView.prototype.showData = function (data, removeBack) {
+            if (removeBack === void 0) { removeBack = false; }
+            if (this._viewData) {
+                if (this._dataChanged && this._viewData instanceof editor.AssetsFile) {
+                    this._viewData.save(false, function () { });
+                }
+                this._viewDataList.push(this._viewData);
+                this._dataChanged = false;
+            }
+            if (removeBack) {
+                this._viewDataList.length = 0;
+            }
+            //
+            this._viewData = data;
+            this.updateView();
+        };
+        InspectorView.prototype.updateView = function () {
+            var _this = this;
+            this.backButton.visible = this._viewDataList.length > 0;
+            if (this._view && this._view.parent) {
+                this._view.parent.removeChild(this._view);
+            }
+            if (this._viewData) {
+                if (this._viewData instanceof editor.AssetsFile) {
+                    var viewData = this._viewData;
+                    viewData.showInspectorData(function (showdata) {
+                        if (viewData == _this._viewData) {
+                            if (_this._view && _this._view.parent) {
+                                _this._view.parent.removeChild(_this._view);
+                            }
+                            _this.updateShowData(showdata);
+                        }
+                    });
+                }
+                else {
+                    this.updateShowData(this._viewData);
+                }
+            }
+        };
         InspectorView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
@@ -4272,7 +4309,7 @@ var editor;
             }
         };
         InspectorView.prototype.onAddedToStage = function () {
-            this.backButton.visible = this.viewDataList.length > 0;
+            this.backButton.visible = this._viewDataList.length > 0;
             this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
         };
@@ -4287,58 +4324,19 @@ var editor;
             else
                 this.showData(null, true);
         };
-        InspectorView.prototype.updateView = function () {
-            var _this = this;
-            this.backButton.visible = this.viewDataList.length > 0;
-            if (this.view && this.view.parent) {
-                this.view.parent.removeChild(this.view);
-            }
-            if (this.viewData) {
-                if (this.viewData instanceof editor.AssetsFile) {
-                    var viewData = this.viewData;
-                    viewData.showInspectorData(function (showdata) {
-                        if (viewData == _this.viewData) {
-                            if (_this.view && _this.view.parent) {
-                                _this.view.parent.removeChild(_this.view);
-                            }
-                            _this.updateShowData(showdata);
-                        }
-                    });
-                }
-                else {
-                    this.updateShowData(this.viewData);
-                }
-            }
-        };
         InspectorView.prototype.updateShowData = function (showdata) {
-            if (this.view)
-                this.view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
-            this.view = feng3d.objectview.getObjectView(showdata);
-            this.view.percentWidth = 100;
-            this.group.addChild(this.view);
-            this.view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+            if (this._view)
+                this._view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+            this._view = feng3d.objectview.getObjectView(showdata);
+            this._view.percentWidth = 100;
+            this.group.addChild(this._view);
+            this._view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
         };
         InspectorView.prototype.onValueChanged = function () {
-            this.dataChanged = true;
-        };
-        InspectorView.prototype.showData = function (data, removeBack) {
-            if (removeBack === void 0) { removeBack = false; }
-            if (this.viewData) {
-                if (this.dataChanged && this.viewData instanceof editor.AssetsFile) {
-                    this.viewData.save(false, function () { });
-                }
-                this.viewDataList.push(this.viewData);
-                this.dataChanged = false;
-            }
-            if (removeBack) {
-                this.viewDataList.length = 0;
-            }
-            //
-            this.viewData = data;
-            this.updateView();
+            this._dataChanged = true;
         };
         InspectorView.prototype.onBackButton = function () {
-            this.viewData = this.viewDataList.pop();
+            this._viewData = this._viewDataList.pop();
             this.updateView();
         };
         return InspectorView;

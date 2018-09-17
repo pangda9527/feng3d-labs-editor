@@ -8,12 +8,6 @@ namespace editor
 		backButton: eui.Button;
 		group: eui.Group;
 
-		//
-		private view: eui.Component;
-
-		private viewData: any;
-		private viewDataList = [];
-
 		constructor()
 		{
 			super();
@@ -21,6 +15,61 @@ namespace editor
 			this.skinName = "InspectorViewSkin";
 		}
 
+		showData(data: any, removeBack = false)
+		{
+			if (this._viewData)
+			{
+				if (this._dataChanged && this._viewData instanceof AssetsFile)
+				{
+					this._viewData.save(false, () => { });
+				}
+				this._viewDataList.push(this._viewData);
+				this._dataChanged = false;
+			}
+			if (removeBack)
+			{
+				this._viewDataList.length = 0;
+			}
+			//
+			this._viewData = data;
+			this.updateView();
+		}
+
+		updateView()
+		{
+			this.backButton.visible = this._viewDataList.length > 0;
+			if (this._view && this._view.parent)
+			{
+				this._view.parent.removeChild(this._view);
+			}
+			if (this._viewData)
+			{
+				if (this._viewData instanceof AssetsFile)
+				{
+					var viewData = this._viewData;
+					viewData.showInspectorData((showdata) =>
+					{
+						if (viewData == this._viewData)
+						{
+							if (this._view && this._view.parent)
+							{
+								this._view.parent.removeChild(this._view);
+							}
+							this.updateShowData(showdata);
+						}
+					});
+				} else
+				{
+					this.updateShowData(this._viewData);
+				}
+			}
+		}
+
+		//
+		private _view: eui.Component;
+		private _viewData: any;
+		private _viewDataList = [];
+		private _dataChanged = false;
 		private onComplete(): void
 		{
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
@@ -36,7 +85,7 @@ namespace editor
 
 		private onAddedToStage()
 		{
-			this.backButton.visible = this.viewDataList.length > 0;
+			this.backButton.visible = this._viewDataList.length > 0;
 
 			this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
 			feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
@@ -57,75 +106,24 @@ namespace editor
 				this.showData(null, true)
 		}
 
-		updateView()
-		{
-			this.backButton.visible = this.viewDataList.length > 0;
-			if (this.view && this.view.parent)
-			{
-				this.view.parent.removeChild(this.view);
-			}
-			if (this.viewData)
-			{
-				if (this.viewData instanceof AssetsFile)
-				{
-					var viewData = this.viewData;
-					viewData.showInspectorData((showdata) =>
-					{
-						if (viewData == this.viewData)
-						{
-							if (this.view && this.view.parent)
-							{
-								this.view.parent.removeChild(this.view);
-							}
-							this.updateShowData(showdata);
-						}
-					});
-				} else
-				{
-					this.updateShowData(this.viewData);
-				}
-			}
-		}
-
 		private updateShowData(showdata: Object)
 		{
-			if (this.view)
-				this.view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
-			this.view = feng3d.objectview.getObjectView(showdata);
-			this.view.percentWidth = 100;
-			this.group.addChild(this.view);
-			this.view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+			if (this._view)
+				this._view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+			this._view = feng3d.objectview.getObjectView(showdata);
+			this._view.percentWidth = 100;
+			this.group.addChild(this._view);
+			this._view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
 		}
 
-		private dataChanged = false;
 		private onValueChanged()
 		{
-			this.dataChanged = true;
+			this._dataChanged = true;
 		}
 
-		showData(data: any, removeBack = false)
+		private onBackButton()
 		{
-			if (this.viewData)
-			{
-				if (this.dataChanged && this.viewData instanceof AssetsFile)
-				{
-					this.viewData.save(false, () => { });
-				}
-				this.viewDataList.push(this.viewData);
-				this.dataChanged = false;
-			}
-			if (removeBack)
-			{
-				this.viewDataList.length = 0;
-			}
-			//
-			this.viewData = data;
-			this.updateView();
-		}
-
-		onBackButton()
-		{
-			this.viewData = this.viewDataList.pop();
+			this._viewData = this._viewDataList.pop();
 			this.updateView();
 		}
 	}

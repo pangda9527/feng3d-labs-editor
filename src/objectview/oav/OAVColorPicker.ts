@@ -47,14 +47,12 @@ namespace editor
 
         protected onChange(event: egret.Event)
         {
-            var color = this.attributeValue;
-            var pickerValue = this.colorPicker.value;
-            color.r = pickerValue.r;
-            color.g = pickerValue.g;
-            color.b = pickerValue.b;
             //
-            this.attributeValue = color;
-            this.input.text = color.toHexString();
+            if (this.attributeValue instanceof feng3d.Color3)
+                this.attributeValue = this.colorPicker.value;
+            else
+                this.attributeValue = this.colorPicker.value.toColor4();
+            this.input.text = this.attributeValue.toHexString();
         }
 
         private _textfocusintxt: boolean;

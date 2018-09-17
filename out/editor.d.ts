@@ -1157,20 +1157,20 @@ declare namespace editor {
     class InspectorView extends eui.Component implements eui.UIComponent {
         backButton: eui.Button;
         group: eui.Group;
-        private view;
-        private viewData;
-        private viewDataList;
         constructor();
+        showData(data: any, removeBack?: boolean): void;
+        updateView(): void;
+        private _view;
+        private _viewData;
+        private _viewDataList;
+        private _dataChanged;
         private onComplete;
         private onAddedToStage;
         private onRemovedFromStage;
         private onSelectedObjectsChanged;
-        updateView(): void;
         private updateShowData;
-        private dataChanged;
         private onValueChanged;
-        showData(data: any, removeBack?: boolean): void;
-        onBackButton(): void;
+        private onBackButton;
     }
 }
 declare namespace editor {
