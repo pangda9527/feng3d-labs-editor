@@ -3772,14 +3772,13 @@ var editor;
         OAVColorPicker.prototype.onTextChange = function () {
             if (this._textfocusintxt) {
                 var text = this.input.text;
-                var color = this.attributeValue;
-                color.fromUnit(Number("0x" + text.substr(1)));
-                this.attributeValue = color;
-                if (color instanceof feng3d.Color3) {
-                    this.colorPicker.value = color;
+                if (this.attributeValue instanceof feng3d.Color3) {
+                    this.colorPicker.value = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
+                    this.attributeValue = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
                 }
                 else {
-                    this.colorPicker.value = color.toColor3();
+                    this.colorPicker.value = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
+                    this.attributeValue = new feng3d.Color4().fromUnit(Number("0x" + text.substr(1)));
                 }
             }
         };
@@ -4102,21 +4101,21 @@ var editor;
         OAVTexture2D.prototype.ontxtClick = function () {
             var _this = this;
             var menus = editor.editorAssets.filter(function (file) {
-                return editor.regExps.image.test(file.path);
+                return file.extension == feng3d.AssetExtension.texture2d;
             }).reduce(function (prev, item) {
                 prev.push({
                     label: item.name, click: function () {
-                        var text = _this.attributeValue;
-                        text.url = item.path;
-                        _this.updateView();
+                        item.getData(function (texture2d) {
+                            _this.attributeValue = texture2d;
+                            _this.updateView();
+                        });
                     }
                 });
                 return prev;
             }, []);
             menus.unshift({
                 label: "\u7A7A", click: function () {
-                    var text = _this.attributeValue;
-                    text.url = "";
+                    _this.attributeValue = new feng3d.UrlImageTexture2D();
                     _this.updateView();
                 }
             });
@@ -4262,10 +4261,20 @@ var editor;
             return _this;
         }
         InspectorView.prototype.showData = function (data, removeBack) {
+            var _this = this;
             if (removeBack === void 0) { removeBack = false; }
             if (this._viewData) {
-                if (this._dataChanged && this._viewData instanceof editor.AssetsFile) {
-                    this._viewData.save(false, function () { });
+                if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets) {
+                    if (this._viewData.path) {
+                        var obj = feng3d.serialization.serialize(this._viewData);
+                        var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+                        feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
+                            editor.assets.writeFile(_this._viewData.path, arrayBuffer, function (e) {
+                                if (e)
+                                    feng3d.error(e);
+                            });
+                        });
+                    }
                 }
                 this._viewDataList.push(this._viewData);
                 this._dataChanged = false;
@@ -4274,8 +4283,17 @@ var editor;
                 this._viewDataList.length = 0;
             }
             //
-            this._viewData = data;
-            this.updateView();
+            this._viewData = null;
+            if (data instanceof editor.AssetsFile) {
+                data.showInspectorData(function (showdata) {
+                    _this._viewData = showdata;
+                    _this.updateView();
+                });
+            }
+            else {
+                this._viewData = data;
+                this.updateView();
+            }
         };
         InspectorView.prototype.updateView = function () {
             var _this = this;
@@ -4489,11 +4507,11 @@ var editor;
              * 显示文件夹
              */
             this.showFloder = "Assets/";
+            this.files = {};
             /**
              * 上次执行的项目脚本
              */
             this._preProjectJsContent = null;
-            this.files = {};
             feng3d.feng3dDispatcher.on("assets.parsed", this.onParsed, this);
         }
         //function
@@ -4915,6 +4933,15 @@ var editor;
                 else {
                     this.image = "file_png";
                 }
+            }
+            if (this.extension == feng3d.AssetExtension.texture2d) {
+                this.getData(function (texture2d) {
+                    editor.assets.readFileAsArrayBuffer(texture2d.url, function (err, data) {
+                        feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
+                            _this.image = dataurl;
+                        });
+                    });
+                });
             }
             if (editor.regExps.image.test(this.path)) {
                 editor.assets.readFileAsArrayBuffer(this.path, function (err, data) {

@@ -29,11 +29,6 @@ namespace editor
         @feng3d.watch("showFloderChanged")
         showFloder = "Assets/";
 
-        /**
-         * 上次执行的项目脚本
-         */
-        private _preProjectJsContent = null
-
         files: { [path: string]: AssetsFile } = {};
 
         constructor()
@@ -73,6 +68,7 @@ namespace editor
         {
             return this.files[path];
         }
+
         /**
          * 删除文件
          * @param path 文件路径
@@ -109,6 +105,7 @@ namespace editor
                 callback && callback();
             });
         }
+
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
             assets.readFileAsString(path, (err, data) =>
@@ -125,6 +122,7 @@ namespace editor
                 callback(null, scene);
             });
         }
+
         /**
          * 保存场景到文件
          * @param path 场景路径
@@ -139,6 +137,7 @@ namespace editor
                 assets.writeFile(path, uint8Array, callback)
             });
         }
+
         /**
         * 移动文件
         * @param path 移动的文件路径
@@ -158,6 +157,7 @@ namespace editor
                 assets.move(path, dest, callback);
             }
         }
+
         getparentdir(path: string)
         {
             var paths = path.split("/");
@@ -165,6 +165,7 @@ namespace editor
             var parentdir = paths.join("/");
             return parentdir;
         }
+
         /**
          * 弹出文件菜单
          */
@@ -324,6 +325,7 @@ namespace editor
 
             menu.popup(menuconfig);
         }
+
         /**
          * 获取一个新路径
          */
@@ -364,11 +366,13 @@ namespace editor
                 });
             }
         }
+
         saveObject(object: feng3d.GameObject | feng3d.AnimationClip | feng3d.Material | feng3d.Geometry, filename: string, callback?: (file: AssetsFile) => void)
         {
             var showFloder = this.getFile(this.showFloder);
             showFloder.addfile(filename, object, true, callback);
         }
+
         /**
          * 过滤出文件列表
          * @param fn 过滤函数
@@ -385,6 +389,7 @@ namespace editor
             }
             return results;
         }
+
         /**
          * 
          * @param files 需要导入的文件列表
@@ -416,6 +421,7 @@ namespace editor
             }, false);
             reader.readAsArrayBuffer(file);
         }
+
         runProjectScript(callback?: () => void)
         {
             assets.readFileAsString("project.js", (err, content) =>
@@ -439,6 +445,12 @@ namespace editor
                 callback && callback();
             });
         }
+
+        /**
+         * 上次执行的项目脚本
+         */
+        private _preProjectJsContent = null
+
         /**
          * 解析菜单
          * @param menuconfig 菜单

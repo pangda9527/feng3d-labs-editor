@@ -19,9 +19,20 @@ namespace editor
 		{
 			if (this._viewData)
 			{
-				if (this._dataChanged && this._viewData instanceof AssetsFile)
+				if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets)
 				{
-					this._viewData.save(false, () => { });
+					if (this._viewData.path)
+					{
+						var obj = feng3d.serialization.serialize(this._viewData);
+						var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+						feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
+						{
+							assets.writeFile(this._viewData.path, arrayBuffer, (e) =>
+							{
+								if (e) feng3d.error(e);
+							});
+						});
+					}
 				}
 				this._viewDataList.push(this._viewData);
 				this._dataChanged = false;
@@ -31,8 +42,19 @@ namespace editor
 				this._viewDataList.length = 0;
 			}
 			//
-			this._viewData = data;
-			this.updateView();
+			this._viewData = null;
+			if (data instanceof AssetsFile)
+			{
+				data.showInspectorData((showdata) =>
+				{
+					this._viewData = showdata;
+					this.updateView();
+				});
+			} else
+			{
+				this._viewData = data;
+				this.updateView();
+			}
 		}
 
 		updateView()

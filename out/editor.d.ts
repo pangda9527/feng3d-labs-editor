@@ -1235,10 +1235,6 @@ declare namespace editor {
          * 显示文件夹
          */
         showFloder: string;
-        /**
-         * 上次执行的项目脚本
-         */
-        private _preProjectJsContent;
         files: {
             [path: string]: AssetsFile;
         };
@@ -1294,6 +1290,10 @@ declare namespace editor {
          */
         inputFiles(files: File[], callback?: (files: AssetsFile[]) => void, assetsFiles?: AssetsFile[]): void;
         runProjectScript(callback?: () => void): void;
+        /**
+         * 上次执行的项目脚本
+         */
+        private _preProjectJsContent;
         /**
          * 解析菜单
          * @param menuconfig 菜单

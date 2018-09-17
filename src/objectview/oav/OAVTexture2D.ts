@@ -38,23 +38,24 @@ namespace editor
         {
             var menus: MenuItem[] = editorAssets.filter((file) =>
             {
-                return regExps.image.test(file.path);
+                return file.extension == feng3d.AssetExtension.texture2d;
             }).reduce((prev, item) =>
             {
                 prev.push({
                     label: item.name, click: () =>
                     {
-                        var text: feng3d.UrlImageTexture2D = this.attributeValue;
-                        text.url = item.path;
-                        this.updateView();
+                        item.getData((texture2d: feng3d.UrlImageTexture2D) =>
+                        {
+                            this.attributeValue = texture2d;
+                            this.updateView();
+                        });
                     }
                 }); return prev;
             }, []);
             menus.unshift({
                 label: `空`, click: () =>
                 {
-                    var text: feng3d.UrlImageTexture2D = this.attributeValue;
-                    text.url = "";
+                    this.attributeValue = new feng3d.UrlImageTexture2D();
                     this.updateView();
                 }
             });

@@ -72,16 +72,14 @@ namespace editor
             if (this._textfocusintxt)
             {
                 var text = this.input.text;
-                var color = this.attributeValue;
-                color.fromUnit(Number("0x" + text.substr(1)));
-                this.attributeValue = color;
-
-                if (color instanceof feng3d.Color3)
+                if (this.attributeValue instanceof feng3d.Color3)
                 {
-                    this.colorPicker.value = color;
+                    this.colorPicker.value = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
+                    this.attributeValue = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
                 } else
                 {
-                    this.colorPicker.value = color.toColor3();
+                    this.colorPicker.value = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
+                    this.attributeValue = new feng3d.Color4().fromUnit(Number("0x" + text.substr(1)));
                 }
             }
         }

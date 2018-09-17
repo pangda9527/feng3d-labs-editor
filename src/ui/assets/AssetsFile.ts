@@ -78,6 +78,19 @@ namespace editor
                     this.image = "file_png";
                 }
             }
+            if (this.extension == feng3d.AssetExtension.texture2d)
+            {
+                this.getData((texture2d: feng3d.UrlImageTexture2D) =>
+                {
+                    assets.readFileAsArrayBuffer(texture2d.url, (err, data) =>
+                    {
+                        feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
+                        {
+                            this.image = dataurl;
+                        });
+                    });
+                });
+            }
             if (regExps.image.test(this.path))
             {
                 assets.readFileAsArrayBuffer(this.path, (err, data) =>
