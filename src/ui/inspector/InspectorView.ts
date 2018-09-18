@@ -85,7 +85,7 @@ namespace editor
 					var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
 					feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
 					{
-						assets.writeFile(this._viewData.path, arrayBuffer, (e) =>
+						assets.writeArrayBuffer(this._viewData.path, arrayBuffer, (e) =>
 						{
 							if (e) feng3d.error(e);
 							callback && callback();

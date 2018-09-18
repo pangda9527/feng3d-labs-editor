@@ -74,7 +74,7 @@ namespace editor
             var url = text.url;
             if (url)
             {
-                assets.readFileAsArrayBuffer(url, (err, data) =>
+                assets.readArrayBuffer(url, (err, data) =>
                 {
                     feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                     {
@@ -87,8 +87,6 @@ namespace editor
             {
                 this.image.source = "";
             }
-
-            feng3d.assets.readFileAsImage
         }
 
         private onDoubleClick()

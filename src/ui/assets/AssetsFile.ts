@@ -82,7 +82,7 @@ namespace editor
             {
                 this.getData((texture2d: feng3d.UrlImageTexture2D) =>
                 {
-                    assets.readFileAsArrayBuffer(texture2d.url, (err, data) =>
+                    assets.readArrayBuffer(texture2d.url, (err, data) =>
                     {
                         feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                         {
@@ -93,17 +93,13 @@ namespace editor
             }
             if (regExps.image.test(this.path))
             {
-                assets.readFileAsArrayBuffer(this.path, (err, data) =>
+                assets.readArrayBuffer(this.path, (err, data) =>
                 {
                     feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
                     {
                         this.image = dataurl;
                     });
                 });
-                // assets.readFileAsImage(this.path, (err, img) =>
-                // {
-                //     this.image = img;
-                // });
             }
         }
 
@@ -285,7 +281,7 @@ namespace editor
             {
                 filepath = this.getnewname(filepath);
             }
-            assets.writeFile(filepath, arraybuffer, (e) =>
+            assets.writeArrayBuffer(filepath, arraybuffer, (e) =>
             {
                 if (e)
                 {
@@ -328,7 +324,7 @@ namespace editor
             }
             this.getArrayBuffer((arraybuffer) =>
             {
-                assets.writeFile(this.path, arraybuffer, (e) =>
+                assets.writeArrayBuffer(this.path, arraybuffer, (e) =>
                 {
                     if (callback)
                         callback(e);

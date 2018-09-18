@@ -294,7 +294,7 @@ var editor;
                 });
                 return;
             }
-            editor.assets.writeFile(this._path, content, function (err) {
+            editor.assets.writeArrayBuffer(this._path, content, function (err) {
                 if (err) {
                     onError(_this);
                 }
@@ -504,7 +504,7 @@ var editor;
                                 }
                                 else {
                                     file.async("arraybuffer").then(function (data) {
-                                        editor.assets.writeFile(filepath, data, function (err) {
+                                        editor.assets.writeArrayBuffer(filepath, data, function (err) {
                                             if (err)
                                                 console.log(err);
                                             readfiles();
@@ -557,7 +557,7 @@ var editor;
                             }
                             else {
                                 file.async("arraybuffer").then(function (data) {
-                                    editor.assets.writeFile(filepath, data, function (err) {
+                                    editor.assets.writeArrayBuffer(filepath, data, function (err) {
                                         if (err)
                                             console.log(err);
                                         readfiles();
@@ -593,7 +593,7 @@ var editor;
                 function readfiles() {
                     if (filepaths.length > 0) {
                         var filepath = filepaths.shift();
-                        editor.assets.readFileAsArrayBuffer(filepath, function (err, data) {
+                        editor.assets.readArrayBuffer(filepath, function (err, data) {
                             //处理文件夹
                             data && zip.file(filepath, data);
                             readfiles();
@@ -626,7 +626,7 @@ var editor;
                         }
                         else {
                             zip.file(filepath).async("arraybuffer").then(function (data) {
-                                editor.assets.writeFile(filepath, data, function (err) {
+                                editor.assets.writeArrayBuffer(filepath, data, function (err) {
                                     writeFiles();
                                 });
                             }, function (reason) {
@@ -3600,7 +3600,7 @@ var editor;
             var _this = this;
             var imagePath = this.attributeValue;
             if (imagePath) {
-                editor.assets.readFileAsArrayBuffer(imagePath, function (err, data) {
+                editor.assets.readArrayBuffer(imagePath, function (err, data) {
                     feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                         _this.image.source = dataurl;
                     });
@@ -3658,7 +3658,7 @@ var editor;
             var imagePath = textureCube[propertys[i]];
             var image = this.images[i];
             if (imagePath) {
-                editor.assets.readFileAsArrayBuffer(imagePath, function (err, data) {
+                editor.assets.readArrayBuffer(imagePath, function (err, data) {
                     feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                         image.source = dataurl;
                     });
@@ -4289,7 +4289,7 @@ var editor;
             this.img_border.visible = false;
             var url = text.url;
             if (url) {
-                editor.assets.readFileAsArrayBuffer(url, function (err, data) {
+                editor.assets.readArrayBuffer(url, function (err, data) {
                     feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                         _this.image.source = dataurl;
                         _this.image.visible = true;
@@ -4300,7 +4300,6 @@ var editor;
             else {
                 this.image.source = "";
             }
-            feng3d.assets.readFileAsImage;
         };
         OAVTexture2D.prototype.onDoubleClick = function () {
             if (this.attributeValue && typeof this.attributeValue == "object")
@@ -4474,7 +4473,7 @@ var editor;
                     var obj = feng3d.serialization.serialize(this._viewData);
                     var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
                     feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
-                        editor.assets.writeFile(_this._viewData.path, arrayBuffer, function (e) {
+                        editor.assets.writeArrayBuffer(_this._viewData.path, arrayBuffer, function (e) {
                             if (e)
                                 feng3d.error(e);
                             callback && callback();
@@ -4678,6 +4677,10 @@ var editor;
             this.showFloder = "Assets/";
             this.files = {};
             /**
+             * 项目资源id树形结构
+             */
+            this.projectAssetsMap = {};
+            /**
              * 上次执行的项目脚本
              */
             this._preProjectJsContent = null;
@@ -4701,6 +4704,22 @@ var editor;
                     callback();
                 });
             });
+            //
+            editor.assets.readObject("project.json", function (err, data) {
+                if (data) {
+                    _this.projectAssetsMap = data;
+                }
+                else {
+                    _this.saveProject();
+                }
+            });
+        };
+        /**
+         * 保存项目
+         * @param callback 完成回调
+         */
+        EditorAssets.prototype.saveProject = function (callback) {
+            editor.assets.saveObject("project.json", this.projectAssetsMap, callback);
         };
         /**
          * 获取文件
@@ -4741,7 +4760,7 @@ var editor;
             });
         };
         EditorAssets.prototype.readScene = function (path, callback) {
-            editor.assets.readFileAsString(path, function (err, data) {
+            editor.assets.readString(path, function (err, data) {
                 if (err) {
                     callback(err, null);
                     return;
@@ -4763,7 +4782,7 @@ var editor;
             var obj = feng3d.serialization.serialize(scene.gameObject);
             var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
             feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
-                editor.assets.writeFile(path, arrayBuffer, callback);
+                editor.assets.writeArrayBuffer(path, arrayBuffer, callback);
             });
         };
         /**
@@ -4839,7 +4858,11 @@ var editor;
                         },
                         {
                             label: "材质", click: function () {
-                                assetsFile.addfile("new material" + ".material.json", new feng3d.Material());
+                                // assetsFile.addfile("new material" + ".material.json", new feng3d.Material());
+                                var material = new feng3d.Material().value({ name: "New Material" });
+                                editor.assets.saveObject("Library/" + material.assetsId + "/material.json", material, function (err) {
+                                    alert("\u65B0\u589E\u6750\u8D28\uFF01");
+                                });
                             }
                         },
                     ]
@@ -4897,7 +4920,7 @@ var editor;
             this.parserMenu(menuconfig, assetsFile);
             menuconfig.push({
                 label: "导出", click: function () {
-                    editor.assets.readFileAsBlob(assetsFile.path, function (err, blob) {
+                    editor.assets.readBlob(assetsFile.path, function (err, blob) {
                         saveAs(blob, assetsFile.name);
                     });
                 }
@@ -4983,7 +5006,7 @@ var editor;
                 var showFloder = _this.getFile(_this.showFloder);
                 if (editor.regExps.image.test(file.name)) {
                     var imagePath = "Library/" + file.name;
-                    editor.assets.writeFile(imagePath, result, function (err) {
+                    editor.assets.writeArrayBuffer(imagePath, result, function (err) {
                         var texture2dName = feng3d.pathUtils.getName(file.name) + "." + feng3d.AssetExtension.texture2d;
                         var assetsFile = showFloder.addfile(texture2dName, new feng3d.UrlImageTexture2D().value({ url: imagePath }));
                         assetsFiles.push(assetsFile);
@@ -5007,7 +5030,7 @@ var editor;
         };
         EditorAssets.prototype.runProjectScript = function (callback) {
             var _this = this;
-            editor.assets.readFileAsString("project.js", function (err, content) {
+            editor.assets.readString("project.js", function (err, content) {
                 if (content != _this._preProjectJsContent) {
                     //
                     var windowEval = eval.bind(window);
@@ -5111,7 +5134,7 @@ var editor;
             }
             if (this.extension == feng3d.AssetExtension.texture2d) {
                 this.getData(function (texture2d) {
-                    editor.assets.readFileAsArrayBuffer(texture2d.url, function (err, data) {
+                    editor.assets.readArrayBuffer(texture2d.url, function (err, data) {
                         feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                             _this.image = dataurl;
                         });
@@ -5119,15 +5142,11 @@ var editor;
                 });
             }
             if (editor.regExps.image.test(this.path)) {
-                editor.assets.readFileAsArrayBuffer(this.path, function (err, data) {
+                editor.assets.readArrayBuffer(this.path, function (err, data) {
                     feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                         _this.image = dataurl;
                     });
                 });
-                // assets.readFileAsImage(this.path, (err, img) =>
-                // {
-                //     this.image = img;
-                // });
             }
         };
         /**
@@ -5275,7 +5294,7 @@ var editor;
             if (!override) {
                 filepath = this.getnewname(filepath);
             }
-            editor.assets.writeFile(filepath, arraybuffer, function (e) {
+            editor.assets.writeArrayBuffer(filepath, arraybuffer, function (e) {
                 if (e) {
                     callback(e, null);
                     return;
@@ -5310,7 +5329,7 @@ var editor;
                 return;
             }
             this.getArrayBuffer(function (arraybuffer) {
-                editor.assets.writeFile(_this.path, arraybuffer, function (e) {
+                editor.assets.writeArrayBuffer(_this.path, arraybuffer, function (e) {
                     if (callback)
                         callback(e);
                     else if (e)
@@ -8242,7 +8261,7 @@ var editor;
             editor.hierarchyTree.remove(event.data);
         };
         Hierarchy.prototype.addGameoObjectFromAsset = function (path, parent) {
-            editor.assets.readFileAsString(path, function (err, content) {
+            editor.assets.readString(path, function (err, content) {
                 var json = JSON.parse(content);
                 var gameobject = feng3d.serialization.deserialize(json);
                 gameobject.name = path.split("/").pop().split(".").shift();
@@ -10712,7 +10731,7 @@ var editor;
         function ThreejsLoader() {
         }
         ThreejsLoader.prototype.load = function (url, completed) {
-            editor.assets.readFileAsArrayBuffer(url, function (err, data) {
+            editor.assets.readArrayBuffer(url, function (err, data) {
                 load(data, function (gameobject) {
                     gameobject.name = feng3d.pathUtils.getName(url);
                     feng3d.feng3dDispatcher.dispatch("assets.parsed", gameobject);

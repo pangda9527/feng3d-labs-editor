@@ -131,7 +131,7 @@ namespace editor
                                 {
                                     file.async("arraybuffer").then((data) =>
                                     {
-                                        assets.writeFile(filepath, data, (err: Error) =>
+                                        assets.writeArrayBuffer(filepath, data, (err: Error) =>
                                         {
                                             if (err)
                                                 console.log(err);
@@ -197,7 +197,7 @@ namespace editor
                             {
                                 file.async("arraybuffer").then((data) =>
                                 {
-                                    assets.writeFile(filepath, data, (err: Error) =>
+                                    assets.writeArrayBuffer(filepath, data, (err: Error) =>
                                     {
                                         if (err)
                                             console.log(err);
@@ -243,7 +243,7 @@ namespace editor
                     if (filepaths.length > 0)
                     {
                         var filepath = filepaths.shift();
-                        assets.readFileAsArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        assets.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                         {
                             //处理文件夹
                             data && zip.file(filepath, data);
@@ -287,7 +287,7 @@ namespace editor
                         {
                             zip.file(filepath).async("arraybuffer").then((data) =>
                             {
-                                assets.writeFile(filepath, data, (err) =>
+                                assets.writeArrayBuffer(filepath, data, (err) =>
                                 {
                                     writeFiles();
                                 });

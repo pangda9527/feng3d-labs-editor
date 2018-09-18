@@ -222,7 +222,7 @@ namespace editor
                 return;
             }
 
-            assets.writeFile(this._path, content, (err) =>
+            assets.writeArrayBuffer(this._path, content, (err) =>
             {
                 if (err)
                 {

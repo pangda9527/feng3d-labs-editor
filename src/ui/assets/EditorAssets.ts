@@ -31,6 +31,11 @@ namespace editor
 
         files: { [path: string]: AssetsFile } = {};
 
+        /**
+         * 项目资源id树形结构
+         */
+        projectAssetsMap = {};
+
         constructor()
         {
             feng3d.feng3dDispatcher.on("assets.parsed", this.onParsed, this);
@@ -58,6 +63,27 @@ namespace editor
                     callback();
                 });
             });
+
+            //
+            assets.readObject("project.json", (err, data) =>
+            {
+                if (data)
+                {
+                    this.projectAssetsMap = data;
+                } else
+                {
+                    this.saveProject();
+                }
+            });
+        }
+
+        /**
+         * 保存项目
+         * @param callback 完成回调
+         */
+        saveProject(callback?: (err: Error) => void)
+        {
+            assets.saveObject("project.json", this.projectAssetsMap, callback);
         }
 
         /**
@@ -108,7 +134,7 @@ namespace editor
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
-            assets.readFileAsString(path, (err, data) =>
+            assets.readString(path, (err, data) =>
             {
                 if (err)
                 {
@@ -134,7 +160,7 @@ namespace editor
             var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
             feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
             {
-                assets.writeFile(path, arrayBuffer, callback);
+                assets.writeArrayBuffer(path, arrayBuffer, callback);
             });
         }
 
@@ -226,7 +252,13 @@ namespace editor
                             {
                                 label: "材质", click: () =>
                                 {
-                                    assetsFile.addfile("new material" + ".material.json", new feng3d.Material());
+                                    // assetsFile.addfile("new material" + ".material.json", new feng3d.Material());
+
+                                    var material = new feng3d.Material().value({ name: "New Material" });
+                                    assets.saveObject("Library/" + material.assetsId + "/material.json", material, (err) =>
+                                    {
+                                        alert(`新增材质！`);
+                                    });
                                 }
                             },
                         ]
@@ -296,7 +328,7 @@ namespace editor
             menuconfig.push({
                 label: "导出", click: () =>
                 {
-                    assets.readFileAsBlob(assetsFile.path, (err, blob) =>
+                    assets.readBlob(assetsFile.path, (err, blob) =>
                     {
                         saveAs(blob, assetsFile.name);
                     });
@@ -403,7 +435,7 @@ namespace editor
                 if (regExps.image.test(file.name))
                 {
                     var imagePath = "Library/" + file.name;
-                    assets.writeFile(imagePath, result, err =>
+                    assets.writeArrayBuffer(imagePath, result, err =>
                     {
                         var texture2dName = feng3d.pathUtils.getName(file.name) + "." + feng3d.AssetExtension.texture2d;
                         var assetsFile = showFloder.addfile(texture2dName, new feng3d.UrlImageTexture2D().value({ url: imagePath }));
@@ -432,7 +464,7 @@ namespace editor
 
         runProjectScript(callback?: () => void)
         {
-            assets.readFileAsString("project.js", (err, content) =>
+            assets.readString("project.js", (err, content) =>
             {
                 if (content != this._preProjectJsContent)
                 {

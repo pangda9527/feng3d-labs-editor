@@ -1283,8 +1283,17 @@ declare namespace editor {
         files: {
             [path: string]: AssetsFile;
         };
+        /**
+         * 项目资源id树形结构
+         */
+        projectAssetsMap: {};
         constructor();
         initproject(callback: () => void): void;
+        /**
+         * 保存项目
+         * @param callback 完成回调
+         */
+        saveProject(callback?: (err: Error) => void): void;
         /**
          * 获取文件
          * @param path 文件路径

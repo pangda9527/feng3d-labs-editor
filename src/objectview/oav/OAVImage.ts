@@ -16,7 +16,7 @@ namespace editor
 			var imagePath = this.attributeValue;
 			if (imagePath)
 			{
-				assets.readFileAsArrayBuffer(imagePath, (err, data) =>
+				assets.readArrayBuffer(imagePath, (err, data) =>
 				{
 					feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
 					{
