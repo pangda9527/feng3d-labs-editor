@@ -1,6 +1,6 @@
 namespace editor
 {
-	export class TreeNode
+	export class TreeNode extends feng3d.EventDispatcher
 	{
 		/**
 		 * 标签
@@ -9,7 +9,17 @@ namespace editor
 		/**
          * 目录深度
          */
-		depth = 0;
+		get depth()
+		{
+			var d = 0;
+			var p = this.parent;
+			while (p)
+			{
+				d++;
+				p = p.parent;
+			}
+			return d;
+		}
 		/**
 		 * 是否打开
 		 */
@@ -30,6 +40,7 @@ namespace editor
 
 		constructor(obj?: gPartial<TreeNode>)
 		{
+			super();
 			if (obj)
 			{
 				Object.assign(this, obj);
@@ -120,7 +131,6 @@ namespace editor
 
 			node.parent = parentnode;
 			parentnode.children.push(node);
-			this.updateChildrenDepth(node);
 
 			feng3d.watcher.watch(node, "isOpen", this.isopenchanged, this)
 
@@ -156,15 +166,6 @@ namespace editor
 				}
 				node.children.length = 0;
 			}
-		}
-
-		updateChildrenDepth(node: TreeNode)
-		{
-			node.depth = ~~node.parent.depth + 1;
-			treeMap(node, (node) =>
-			{
-				node.depth = ~~node.parent.depth + 1;
-			});
 		}
 
 		getShowNodes(node?: TreeNode)

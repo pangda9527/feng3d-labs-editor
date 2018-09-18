@@ -502,7 +502,7 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class TreeNode {
+    class TreeNode extends feng3d.EventDispatcher {
         /**
          * 标签
          */
@@ -510,7 +510,7 @@ declare namespace editor {
         /**
          * 目录深度
          */
-        depth: number;
+        readonly depth: number;
         /**
          * 是否打开
          */
@@ -557,7 +557,6 @@ declare namespace editor {
         addNode(node: TreeNode, parentnode?: TreeNode): void;
         removeNode(node: TreeNode): void;
         destroy(node: TreeNode): void;
-        updateChildrenDepth(node: TreeNode): void;
         getShowNodes(node?: TreeNode): TreeNode[];
         private isopenchanged;
     }
@@ -1358,8 +1357,69 @@ declare namespace editor {
     var codeeditoWin: Window;
 }
 declare namespace editor {
+    class Folder extends feng3d.Feng3dAssets {
+    }
+}
+declare namespace editor {
+    class AssetsFileItemRenderer extends eui.ItemRenderer {
+        icon: eui.Image;
+        renameInput: RenameTextInput;
+        data: AssetsFile;
+        constructor();
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        dataChanged(): void;
+        private ondoubleclick;
+        private onclick;
+        private onrightclick;
+    }
+}
+declare namespace editor {
+    var assetsTree: AssetsTree;
+    class AssetsTree {
+        nodes: {
+            [path: string]: AssetsTreeNode;
+        };
+        constructor();
+        getNode(path: string): AssetsTreeNode;
+        private onShowFloderChanged;
+    }
+    class AssetsTreeNode extends TreeNode {
+        path: string;
+        /**
+         * 文件夹是否打开
+         */
+        isOpen: boolean;
+        children: AssetsTreeNode[];
+        constructor();
+        private openChanged;
+    }
+}
+declare namespace editor {
     type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube | HTMLImageElement;
-    class AssetsFile {
+    interface AssetsFileEventMap {
+        added: TreeNode;
+        removed: TreeNode;
+        changed: TreeNode;
+        openChanged: TreeNode;
+        /**
+         * 加载完成
+         */
+        loaded: any;
+        /**
+         * 所有字对象加载完成
+         */
+        childrenLoaded: any;
+    }
+    interface AssetsFile {
+        once<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof AssetsFileEventMap>(type: K, data?: AssetsFileEventMap[K], bubbles?: boolean): feng3d.Event<AssetsFileEventMap[K]>;
+        has<K extends keyof AssetsFileEventMap>(type: K): boolean;
+        on<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
+        off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any): any;
+    }
+    var loadingNum: number;
+    class AssetsFile extends AssetsTreeNode {
         id: string;
         /**
          * 路径
@@ -1395,9 +1455,14 @@ declare namespace editor {
         cacheData: AssetsDataType;
         children: AssetsFile[];
         parent: AssetsFile;
+        feng3dAssets: feng3d.Feng3dAssets;
         constructor(id?: string);
+        private idChanged;
+        private init;
         addChild(file: AssetsFile): void;
         removeChild(file: AssetsFile): void;
+        getFolderList(): any[];
+        loadAll(callback: () => void): void;
         private pathChanged;
         /**
          * 获取属性显示数据
@@ -1471,53 +1536,11 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class Folder extends feng3d.Feng3dAssets {
-    }
-}
-declare namespace editor {
-    class AssetsFileItemRenderer extends eui.ItemRenderer {
-        icon: eui.Image;
-        renameInput: RenameTextInput;
-        data: AssetsFile;
-        constructor();
-        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
-        $onRemoveFromStage(): void;
-        dataChanged(): void;
-        private ondoubleclick;
-        private onclick;
-        private onrightclick;
-    }
-}
-declare namespace editor {
-    var assetsTree: AssetsTree;
-    class AssetsTree {
-        nodes: {
-            [path: string]: AssetsTreeNode;
-        };
-        constructor();
-        getNode(path: string): AssetsTreeNode;
-        private onShowFloderChanged;
-    }
-    class AssetsTreeNode extends TreeNode {
-        path: string;
-        /**
-         * 文件夹是否打开
-         */
-        isOpen: boolean;
-        readonly label: string;
-        readonly parent: AssetsTreeNode;
-        readonly assetsFile: AssetsFile;
-        children: AssetsTreeNode[];
-        constructor(path: string);
-        private openChanged;
-    }
-}
-declare namespace editor {
     class AssetsTreeItemRenderer extends TreeItemRenderer {
         contentGroup: eui.Group;
         disclosureButton: eui.ToggleButton;
         renameInput: RenameTextInput;
-        data: AssetsTreeNode;
+        data: AssetsFile;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -2191,6 +2214,7 @@ declare namespace feng3d {
         "editor.isBaryCenterChanged": any;
         "editor.isWoldCoordinateChanged": any;
         "editor.toolTypeChanged": any;
+        "editor.allLoaded": any;
     }
 }
 declare namespace editor {

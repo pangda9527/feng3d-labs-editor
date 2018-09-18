@@ -143,5 +143,6 @@ namespace feng3d
         "editor.isBaryCenterChanged"
         "editor.isWoldCoordinateChanged"
         "editor.toolTypeChanged"
+        "editor.allLoaded"
     }
 }

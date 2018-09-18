@@ -14,7 +14,7 @@ namespace editor
         getNode(path: string)
         {
             var node = this.nodes[path];
-            if (!node) node = this.nodes[path] = new AssetsTreeNode(path);
+            if (!node) node = this.nodes[path] = new AssetsTreeNode();
             if (path == editorAssets.showFloder)
                 node.selected = true;
             return node;
@@ -41,29 +41,11 @@ namespace editor
         @feng3d.watch("openChanged")
         isOpen = true;
 
-        get label()
-        {
-            return this.assetsFile.label;
-        }
-
-        get parent()
-        {
-            var parentpath = feng3d.pathUtils.getParentPath(this.path);
-            return assetsTree.nodes[parentpath];
-        }
-
-        get assetsFile()
-        {
-            return editorAssets.getFile(this.path);
-        }
-
         children: AssetsTreeNode[] = [];
 
-        constructor(path: string)
+        constructor()
         {
             super();
-            this.path = path;
-            this.depth = feng3d.pathUtils.getDirDepth(path);
         }
 
         private openChanged()

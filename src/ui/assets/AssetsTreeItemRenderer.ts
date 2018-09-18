@@ -6,7 +6,7 @@ namespace editor
         public disclosureButton: eui.ToggleButton;
         public renameInput: RenameTextInput;
 
-        data: AssetsTreeNode;
+        data: AssetsFile;
 
         constructor()
         {
@@ -66,16 +66,16 @@ namespace editor
                         {
                             this.renameInput.edit(() =>
                             {
-                                var newName = this.data.assetsFile.name.replace(this.data.label, this.renameInput.text);
-                                this.data.assetsFile.rename(newName);
+                                var newName = this.data.name.replace(this.data.label, this.renameInput.text);
+                                this.data.rename(newName);
                             });
                         }
                     }
                 }
-                editorAssets.popupmenu(this.data.assetsFile, othermenus);
+                editorAssets.popupmenu(this.data, othermenus);
             } else
             {
-                editorAssets.popupmenu(this.data.assetsFile);
+                editorAssets.popupmenu(this.data);
             }
         }
     }

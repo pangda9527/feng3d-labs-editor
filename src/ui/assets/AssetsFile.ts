@@ -2,9 +2,39 @@ namespace editor
 {
     export type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube | HTMLImageElement;
 
-    export class AssetsFile
+    export interface AssetsFileEventMap
+    {
+        added: TreeNode;
+        removed: TreeNode;
+        changed: TreeNode;
+        openChanged: TreeNode;
+
+        /**
+         * 加载完成
+         */
+        loaded
+
+        /**
+         * 所有字对象加载完成
+         */
+        childrenLoaded
+    }
+
+    export interface AssetsFile
+    {
+        once<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof AssetsFileEventMap>(type: K, data?: AssetsFileEventMap[K], bubbles?: boolean): feng3d.Event<AssetsFileEventMap[K]>;
+        has<K extends keyof AssetsFileEventMap>(type: K): boolean;
+        on<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
+        off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any);
+    }
+
+    export var loadingNum = 0;
+
+    export class AssetsFile extends AssetsTreeNode
     {
         @feng3d.serialize
+        @feng3d.watch("idChanged")
         id = "";
 
         /**
@@ -53,9 +83,48 @@ namespace editor
 
         parent: AssetsFile;
 
-        constructor(id = "")
+        feng3dAssets: feng3d.Feng3dAssets;
+
+        constructor(id: string = "")
         {
+            super();
             this.id = id;
+        }
+
+        private idChanged()
+        {
+            if (this.id == "") return;
+
+            loadingNum++;
+            assets.readAssets(this.id, (err, assets) =>
+            {
+                if (err) feng3d.error(err.message);
+
+                this.feng3dAssets = assets;
+                this.init();
+                loadingNum--;
+                if (loadingNum == 0)
+                {
+                    feng3d.feng3dDispatcher.dispatch("editor.allLoaded");
+                }
+                this.dispatch("loaded");
+            });
+        }
+
+        private init()
+        {
+            this.isDirectory = this.feng3dAssets instanceof Folder;
+            this.label = this.name = this.feng3dAssets.name;
+
+            // 更新图标
+            if (this.isDirectory)
+            {
+                this.image = "folder_png";
+            }
+            else
+            {
+                this.image = "file_png";
+            }
         }
 
         addChild(file: AssetsFile)
@@ -73,14 +142,28 @@ namespace editor
             editorAssets.saveProject();
         }
 
+        getFolderList()
+        {
+            var folders = [];
+            if (this.isDirectory)
+            {
+                folders.push(this);
+            }
+            this.children.forEach(v =>
+            {
+                var cfolders = v.getFolderList();
+                folders = folders.concat(cfolders);
+            })
+            return folders;
+        }
+
+        loadAll(callback: () => void)
+        {
+
+        }
+
         private pathChanged()
         {
-            // 更新名字
-            this.name = feng3d.pathUtils.getNameWithExtension(this.path);
-            this.label = this.name.split(".").shift();
-
-            this.isDirectory = feng3d.pathUtils.isDirectory(this.path);
-
             if (this.isDirectory)
                 this.extension = feng3d.AssetExtension.folder;
             else

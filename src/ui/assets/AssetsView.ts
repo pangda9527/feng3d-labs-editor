@@ -137,31 +137,8 @@ namespace editor
 
         private updateAssetsTree()
         {
-            var paths = Object.keys(editorAssets.files).filter((item) => feng3d.pathUtils.isDirectory(item)).sort();
-
-            var nodes: AssetsTreeNode[] = [];
-            var closepath: string;
-            for (let i = 0, n = paths.length; i < n; i++)
-            {
-                const element = paths[i];
-                var node = assetsTree.getNode(element);
-                node.children.length = 0;
-                var nodeparent = node.parent;
-                if (nodeparent)
-                    nodeparent.children.push(node);
-                // node.selected = element == editorAssets.showFloder;
-
-                if (closepath)
-                {
-                    if (element.substr(0, closepath.length) == closepath)
-                        continue;
-                    closepath = null;
-                }
-                if (!node.isOpen)
-                    closepath = element;
-                nodes.push(node);
-            }
-            this.listData.replaceAll(nodes);
+            var folders = editorAssets.rootFile.getFolderList();
+            this.listData.replaceAll(folders);
         }
 
         private updateShowFloder(host?: any, property?: string, oldvalue?: any)

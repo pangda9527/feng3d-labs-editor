@@ -47,17 +47,22 @@ namespace editor
         initproject(callback: () => void)
         {
             //
-            assets.readObject("project.json", (err, data) =>
+            assets.readObject("project.json", (err, data: AssetsFile) =>
             {
                 if (data)
                 {
                     this.rootFile = <any>data;
                 } else
                 {
-                    this.rootFile = new AssetsFile()
+                    var folder = new Folder().value({ name: "Assets" });
+                    assets.saveAssets(folder)
+                    this.rootFile = new AssetsFile(folder.assetsId)
                     this.saveProject();
                 }
-                callback();
+                feng3d.feng3dDispatcher.once("editor.allLoaded", () =>
+                {
+                    callback();
+                });
             });
         }
 
