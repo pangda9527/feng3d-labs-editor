@@ -52,7 +52,7 @@ namespace editor
         }
         private onclick()
         {
-            editorAssets.showFloder = this.data.path;
+            editorAssets.showFloder = this.data;
         }
 
         private onrightclick(e)

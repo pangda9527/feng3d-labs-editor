@@ -26,9 +26,9 @@ namespace editor
          * 显示文件夹
          */
         @feng3d.watch("showFloderChanged")
-        showFloder = "Assets/";
+        showFloder: AssetsFile;
 
-        files: { [path: string]: AssetsFile } = {};
+        files: { [id: string]: AssetsFile } = {};
 
         /**
          * 项目资源id树形结构
@@ -61,6 +61,7 @@ namespace editor
                 }
                 feng3d.feng3dDispatcher.once("editor.allLoaded", () =>
                 {
+                    this.showFloder = this.rootFile;
                     callback();
                 });
             });
@@ -109,10 +110,6 @@ namespace editor
                             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: element });
                         }
                     });
-                    if (editorAssets.showFloder == path && path != editorAssets.assetsPath)
-                    {
-                        editorAssets.showFloder = feng3d.pathUtils.getParentPath(path);
-                    }
                 }
                 delete this.files[path];
                 feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: path });
@@ -367,7 +364,7 @@ namespace editor
 
         saveObject(object: feng3d.GameObject | feng3d.AnimationClip | feng3d.Material | feng3d.Geometry, filename: string, callback?: (file: AssetsFile) => void)
         {
-            var showFloder = this.getFile(this.showFloder);
+            var showFloder = this.showFloder;
             showFloder.addfile(filename, object, true, callback);
         }
 
@@ -407,7 +404,7 @@ namespace editor
             reader.addEventListener('load', (event) =>
             {
                 var result: ArrayBuffer = event.target["result"];
-                var showFloder = this.getFile(this.showFloder);
+                var showFloder = this.showFloder;
                 if (regExps.image.test(file.name))
                 {
                     var imagePath = "Library/" + file.name;

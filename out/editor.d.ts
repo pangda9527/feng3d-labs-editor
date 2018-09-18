@@ -1278,9 +1278,9 @@ declare namespace editor {
         /**
          * 显示文件夹
          */
-        showFloder: string;
+        showFloder: AssetsFile;
         files: {
-            [path: string]: AssetsFile;
+            [id: string]: AssetsFile;
         };
         /**
          * 项目资源id树形结构
@@ -1375,15 +1375,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    var assetsTree: AssetsTree;
-    class AssetsTree {
-        nodes: {
-            [path: string]: AssetsTreeNode;
-        };
-        constructor();
-        getNode(path: string): AssetsTreeNode;
-        private onShowFloderChanged;
-    }
     class AssetsTreeNode extends TreeNode {
         path: string;
         /**

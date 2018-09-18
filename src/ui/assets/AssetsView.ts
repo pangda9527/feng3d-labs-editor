@@ -143,25 +143,20 @@ namespace editor
 
         private updateShowFloder(host?: any, property?: string, oldvalue?: any)
         {
-            var floders = editorAssets.showFloder.split("/");
-            // 除去尾部 ""
-            floders.pop();
+            var floder = editorAssets.showFloder;
 
             var textFlow = new Array<egret.ITextElement>();
             do
             {
-                var path = floders.join("/") + "/";
                 if (textFlow.length > 0)
                     textFlow.unshift({ text: " > " });
-                textFlow.unshift({ text: floders.pop(), style: { "href": `event:${path}` } });
-                if (path == editorAssets.assetsPath)
-                    break;
+                textFlow.unshift({ text: floder.name, style: { "href": `event:${floder.id}` } });
+                floder = floder.parent;
             }
-            while (floders.length > 0)
+            while (floder)
             this.floderpathTxt.textFlow = textFlow;
 
-            var children = editorAssets.filter((item) => feng3d.pathUtils.getParentPath(item.path) == editorAssets.showFloder);
-
+            var children = editorAssets.showFloder.children;
 
             try
             {
@@ -241,16 +236,12 @@ namespace editor
 
         private onfilelistrightclick(e: egret.MouseEvent)
         {
-            var assetsFile = editorAssets.getFile(editorAssets.showFloder);
-            if (assetsFile)
-            {
-                editorAssets.popupmenu(assetsFile);
-            }
+            editorAssets.popupmenu(editorAssets.showFloder);
         }
 
         private onfloderpathTxtLink(evt: egret.TextEvent)
         {
-            editorAssets.showFloder = evt.text;
+            editorAssets.showFloder = editorAssets.files[evt.text];
         }
     }
 

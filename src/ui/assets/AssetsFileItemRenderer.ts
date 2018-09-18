@@ -126,7 +126,7 @@ namespace editor
         {
             if (this.data.isDirectory)
             {
-                editorAssets.showFloder = this.data.path;
+                editorAssets.showFloder = this.data;
             } else if (this.data.extension == feng3d.AssetExtension.scene)
             {
                 this.data.getData((data: feng3d.GameObject) =>

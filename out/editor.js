@@ -4679,10 +4679,6 @@ var editor;
         function EditorAssets() {
             //attribute
             this.assetsPath = "Assets/";
-            /**
-             * 显示文件夹
-             */
-            this.showFloder = "Assets/";
             this.files = {};
             /**
              * 上次执行的项目脚本
@@ -4708,6 +4704,7 @@ var editor;
                     _this.saveProject();
                 }
                 feng3d.feng3dDispatcher.once("editor.allLoaded", function () {
+                    _this.showFloder = _this.rootFile;
                     callback();
                 });
             });
@@ -4747,9 +4744,6 @@ var editor;
                             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: element });
                         }
                     });
-                    if (editor.editorAssets.showFloder == path && path != editor.editorAssets.assetsPath) {
-                        editor.editorAssets.showFloder = feng3d.pathUtils.getParentPath(path);
-                    }
                 }
                 delete _this.files[path];
                 feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: path });
@@ -4952,7 +4946,7 @@ var editor;
             }
         };
         EditorAssets.prototype.saveObject = function (object, filename, callback) {
-            var showFloder = this.getFile(this.showFloder);
+            var showFloder = this.showFloder;
             showFloder.addfile(filename, object, true, callback);
         };
         /**
@@ -4987,7 +4981,7 @@ var editor;
             var reader = new FileReader();
             reader.addEventListener('load', function (event) {
                 var result = event.target["result"];
-                var showFloder = _this.getFile(_this.showFloder);
+                var showFloder = _this.showFloder;
                 if (editor.regExps.image.test(file.name)) {
                     var imagePath = "Library/" + file.name;
                     editor.assets.writeArrayBuffer(imagePath, result, function (err) {
@@ -5193,7 +5187,7 @@ var editor;
         };
         AssetsFileItemRenderer.prototype.ondoubleclick = function () {
             if (this.data.isDirectory) {
-                editor.editorAssets.showFloder = this.data.path;
+                editor.editorAssets.showFloder = this.data;
             }
             else if (this.data.extension == feng3d.AssetExtension.scene) {
                 this.data.getData(function (data) {
@@ -5228,31 +5222,6 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var AssetsTree = /** @class */ (function () {
-        function AssetsTree() {
-            this.nodes = {};
-            feng3d.feng3dDispatcher.on("assets.showFloderChanged", this.onShowFloderChanged, this);
-        }
-        AssetsTree.prototype.getNode = function (path) {
-            var node = this.nodes[path];
-            if (!node)
-                node = this.nodes[path] = new AssetsTreeNode();
-            if (path == editor.editorAssets.showFloder)
-                node.selected = true;
-            return node;
-        };
-        AssetsTree.prototype.onShowFloderChanged = function (event) {
-            var oldnode = this.getNode(event.data.oldpath);
-            if (oldnode)
-                oldnode.selected = false;
-            var node = this.getNode(event.data.newpath);
-            if (node)
-                node.selected = true;
-        };
-        return AssetsTree;
-    }());
-    editor.AssetsTree = AssetsTree;
-    editor.assetsTree = new AssetsTree();
     var AssetsTreeNode = /** @class */ (function (_super) {
         __extends(AssetsTreeNode, _super);
         function AssetsTreeNode() {
@@ -5295,6 +5264,7 @@ var editor;
             var _this = this;
             if (this.id == "")
                 return;
+            editor.editorAssets.files[this.id] = this;
             editor.loadingNum++;
             editor.assets.readAssets(this.id, function (err, assets) {
                 if (err)
@@ -5469,9 +5439,6 @@ var editor;
                 delete editor.editorAssets.files[_this.path];
                 _this.path = newpath;
                 editor.editorAssets.files[_this.path] = _this;
-                if (editor.editorAssets.showFloder == oldpath) {
-                    editor.editorAssets.showFloder = newpath;
-                }
                 editor.editorui.assetsview.invalidateAssetstree();
                 callback && callback(_this);
             });
@@ -5699,7 +5666,7 @@ var editor;
             }
         };
         AssetsTreeItemRenderer.prototype.onclick = function () {
-            editor.editorAssets.showFloder = this.data.path;
+            editor.editorAssets.showFloder = this.data;
         };
         AssetsTreeItemRenderer.prototype.onrightclick = function (e) {
             var _this = this;
@@ -5819,20 +5786,16 @@ var editor;
         };
         AssetsView.prototype.updateShowFloder = function (host, property, oldvalue) {
             var _this = this;
-            var floders = editor.editorAssets.showFloder.split("/");
-            // 除去尾部 ""
-            floders.pop();
+            var floder = editor.editorAssets.showFloder;
             var textFlow = new Array();
             do {
-                var path = floders.join("/") + "/";
                 if (textFlow.length > 0)
                     textFlow.unshift({ text: " > " });
-                textFlow.unshift({ text: floders.pop(), style: { "href": "event:" + path } });
-                if (path == editor.editorAssets.assetsPath)
-                    break;
-            } while (floders.length > 0);
+                textFlow.unshift({ text: floder.name, style: { "href": "event:" + floder.id } });
+                floder = floder.parent;
+            } while (floder);
             this.floderpathTxt.textFlow = textFlow;
-            var children = editor.editorAssets.filter(function (item) { return feng3d.pathUtils.getParentPath(item.path) == editor.editorAssets.showFloder; });
+            var children = editor.editorAssets.showFloder.children;
             try {
                 var excludeReg = new RegExp(this.excludeTxt.text);
             }
@@ -5893,13 +5856,10 @@ var editor;
             }
         };
         AssetsView.prototype.onfilelistrightclick = function (e) {
-            var assetsFile = editor.editorAssets.getFile(editor.editorAssets.showFloder);
-            if (assetsFile) {
-                editor.editorAssets.popupmenu(assetsFile);
-            }
+            editor.editorAssets.popupmenu(editor.editorAssets.showFloder);
         };
         AssetsView.prototype.onfloderpathTxtLink = function (evt) {
-            editor.editorAssets.showFloder = evt.text;
+            editor.editorAssets.showFloder = editor.editorAssets.files[evt.text];
         };
         return AssetsView;
     }(eui.Component));

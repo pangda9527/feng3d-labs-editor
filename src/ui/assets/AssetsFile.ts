@@ -95,6 +95,8 @@ namespace editor
         {
             if (this.id == "") return;
 
+            editorAssets.files[this.id] = this;
+
             loadingNum++;
             assets.readAssets(this.id, (err, assets) =>
             {
@@ -317,10 +319,6 @@ namespace editor
                 this.path = newpath;
                 editorAssets.files[this.path] = this;
 
-                if (editorAssets.showFloder == oldpath)
-                {
-                    editorAssets.showFloder = newpath;
-                }
                 editorui.assetsview.invalidateAssetstree();
                 callback && callback(this);
             });
