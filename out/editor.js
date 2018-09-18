@@ -4762,8 +4762,8 @@ var editor;
             if (callback === void 0) { callback = function (err) { }; }
             var obj = feng3d.serialization.serialize(scene.gameObject);
             var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-            feng3d.dataTransform.stringToUint8Array(str, function (uint8Array) {
-                editor.assets.writeFile(path, uint8Array, callback);
+            feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
+                editor.assets.writeFile(path, arrayBuffer, callback);
             });
         };
         /**
@@ -4814,11 +4814,6 @@ var editor;
                             label: "着色器", click: function () {
                                 var shadername = "NewShader";
                                 assetsFile.addfile(shadername + ".shader.ts", editor.assetsFileTemplates.getNewShader(shadername));
-                            }
-                        },
-                        {
-                            label: "ts", click: function () {
-                                assetsFile.addfile("new file.ts", "");
                             }
                         },
                         {

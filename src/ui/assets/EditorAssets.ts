@@ -132,9 +132,9 @@ namespace editor
         {
             var obj = feng3d.serialization.serialize(scene.gameObject);
             var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-            feng3d.dataTransform.stringToUint8Array(str, (uint8Array) =>
+            feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
             {
-                assets.writeFile(path, uint8Array, callback)
+                assets.writeFile(path, arrayBuffer, callback);
             });
         }
 
@@ -196,12 +196,6 @@ namespace editor
                                 {
                                     var shadername = "NewShader"
                                     assetsFile.addfile(`${shadername}.shader.ts`, assetsFileTemplates.getNewShader(shadername));
-                                }
-                            },
-                            {
-                                label: "ts", click: () =>
-                                {
-                                    assetsFile.addfile("new file.ts", "");
                                 }
                             },
                             {
