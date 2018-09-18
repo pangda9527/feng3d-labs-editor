@@ -110,7 +110,7 @@ namespace editor
 
             window.addEventListener("beforeunload", () =>
             {
-                editorAssets.saveScene("default.scene.json", engine.scene);
+                assets.saveObject("default.scene.json", engine.scene.gameObject);
             });
         }
 

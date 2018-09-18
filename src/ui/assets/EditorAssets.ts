@@ -118,33 +118,16 @@ namespace editor
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
-            assets.readString(path, (err, data) =>
+            assets.readObject(path, (err, object: feng3d.GameObject) =>
             {
                 if (err)
                 {
                     callback(err, null);
                     return;
                 }
-                var json = JSON.parse(data);
-                var sceneobject = feng3d.serialization.deserialize(json);
-                var scene = sceneobject.getComponent(feng3d.Scene3D);
+                var scene = object.getComponent(feng3d.Scene3D);
                 scene.initCollectComponents();
                 callback(null, scene);
-            });
-        }
-
-        /**
-         * 保存场景到文件
-         * @param path 场景路径
-         * @param scene 保存的场景
-         */
-        saveScene(path: string, scene: feng3d.Scene3D, callback: (err: Error) => void = (err) => { })
-        {
-            var obj = feng3d.serialization.serialize(scene.gameObject);
-            var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-            feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
-            {
-                assets.writeArrayBuffer(path, arrayBuffer, callback);
             });
         }
 

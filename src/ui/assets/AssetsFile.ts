@@ -12,6 +12,7 @@ namespace editor
          */
         @feng3d.watch("pathChanged")
         path: string;
+
         /**
          * 是否文件夹
          */

@@ -1310,12 +1310,6 @@ declare namespace editor {
         deletefile(path: string, callback?: () => void, includeRoot?: boolean): void;
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void): void;
         /**
-         * 保存场景到文件
-         * @param path 场景路径
-         * @param scene 保存的场景
-         */
-        saveScene(path: string, scene: feng3d.Scene3D, callback?: (err: Error) => void): void;
-        /**
         * 移动文件
         * @param path 移动的文件路径
         * @param destdirpath   目标文件夹

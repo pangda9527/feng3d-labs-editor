@@ -4746,29 +4746,14 @@ var editor;
             });
         };
         EditorAssets.prototype.readScene = function (path, callback) {
-            editor.assets.readString(path, function (err, data) {
+            editor.assets.readObject(path, function (err, object) {
                 if (err) {
                     callback(err, null);
                     return;
                 }
-                var json = JSON.parse(data);
-                var sceneobject = feng3d.serialization.deserialize(json);
-                var scene = sceneobject.getComponent(feng3d.Scene3D);
+                var scene = object.getComponent(feng3d.Scene3D);
                 scene.initCollectComponents();
                 callback(null, scene);
-            });
-        };
-        /**
-         * 保存场景到文件
-         * @param path 场景路径
-         * @param scene 保存的场景
-         */
-        EditorAssets.prototype.saveScene = function (path, scene, callback) {
-            if (callback === void 0) { callback = function (err) { }; }
-            var obj = feng3d.serialization.serialize(scene.gameObject);
-            var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-            feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
-                editor.assets.writeArrayBuffer(path, arrayBuffer, callback);
             });
         };
         /**
@@ -6046,7 +6031,7 @@ var editor;
                     break;
                 case this.playBtn:
                     editor.editorui.inspectorView.saveShowData(function () {
-                        editor.editorAssets.saveScene("default.scene.json", editor.engine.scene, function (err) {
+                        editor.assets.saveObject("default.scene.json", editor.engine.scene.gameObject, function (err) {
                             if (err) {
                                 feng3d.warn(err);
                                 return;
@@ -8617,7 +8602,7 @@ var editor;
                 });
             });
             window.addEventListener("beforeunload", function () {
-                editor.editorAssets.saveScene("default.scene.json", editor.engine.scene);
+                editor.assets.saveObject("default.scene.json", editor.engine.scene.gameObject);
             });
         };
         Main3D.prototype.onEditorCameraRotate = function (e) {

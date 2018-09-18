@@ -108,7 +108,7 @@ namespace editor
 				case this.playBtn:
 					editorui.inspectorView.saveShowData(() =>
 					{
-						editorAssets.saveScene("default.scene.json", engine.scene, (err) =>
+						assets.saveObject("default.scene.json", engine.scene.gameObject, (err) =>
 						{
 							if (err)
 							{
