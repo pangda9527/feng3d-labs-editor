@@ -15,7 +15,6 @@ namespace feng3d
 
 namespace editor
 {
-
     export var editorAssets: EditorAssets;
 
     export class EditorAssets
@@ -34,46 +33,31 @@ namespace editor
         /**
          * 项目资源id树形结构
          */
-        projectAssetsMap = {};
+        rootFile: AssetsFile;
 
         constructor()
         {
             feng3d.feng3dDispatcher.on("assets.parsed", this.onParsed, this);
         }
 
-        //function
+        /**
+         * 初始化项目
+         * @param callback 
+         */
         initproject(callback: () => void)
         {
-            assets.mkdir(this.assetsPath, (err) =>
-            {
-                if (err)
-                {
-                    alert("初始化项目失败！");
-                    feng3d.error(err);
-                    return;
-                }
-                this.files[this.assetsPath] = new AssetsFile(this.assetsPath);
-                assets.getAllfilepathInFolder(this.assetsPath, (err, filepaths) =>
-                {
-                    feng3d.assert(!err);
-                    filepaths.forEach(element =>
-                    {
-                        this.files[element] = new AssetsFile(element);
-                    });
-                    callback();
-                });
-            });
-
             //
             assets.readObject("project.json", (err, data) =>
             {
                 if (data)
                 {
-                    this.projectAssetsMap = data;
+                    this.rootFile = <any>data;
                 } else
                 {
+                    this.rootFile = new AssetsFile()
                     this.saveProject();
                 }
+                callback();
             });
         }
 
@@ -83,7 +67,7 @@ namespace editor
          */
         saveProject(callback?: (err: Error) => void)
         {
-            assets.saveObject("project.json", this.projectAssetsMap, callback);
+            assets.saveObject("project.json", this.rootFile, callback);
         }
 
         /**
@@ -207,6 +191,11 @@ namespace editor
                             {
                                 label: "文件夹", click: () =>
                                 {
+                                    var folder = new Folder().value({ name: "New Folder" });
+
+
+                                    this.rootFile
+
                                     assetsFile.addfolder("New Folder");
                                 }
                             },
@@ -254,11 +243,10 @@ namespace editor
                                 {
                                     // assetsFile.addfile("new material" + ".material.json", new feng3d.Material());
 
+
                                     var material = new feng3d.Material().value({ name: "New Material" });
-                                    assets.saveObject("Library/" + material.assetsId + "/material.json", material, (err) =>
-                                    {
-                                        alert(`新增材质！`);
-                                    });
+                                    assets.saveAssets(material);
+                                    editorAssets.rootFile.addChild(new AssetsFile(material.assetsId));
                                 }
                             },
                         ]

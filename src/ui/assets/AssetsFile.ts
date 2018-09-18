@@ -4,6 +4,9 @@ namespace editor
 
     export class AssetsFile
     {
+        @feng3d.serialize
+        id = "";
+
         /**
          * 路径
          */
@@ -44,13 +47,32 @@ namespace editor
          */
         cacheData: AssetsDataType;
 
-        constructor(path: string, data?: AssetsDataType)
+        @feng3d.serialize
+        children: AssetsFile[] = [];
+
+        parent: AssetsFile;
+
+        constructor(id = "")
         {
-            this.cacheData = data;
-            this.path = path;
+            this.id = id;
         }
 
-        pathChanged()
+        addChild(file: AssetsFile)
+        {
+            if (this.children.indexOf(file) == -1) this.children.push(file);
+            file.parent = this;
+            editorAssets.saveProject();
+        }
+
+        removeChild(file: AssetsFile)
+        {
+            var index = this.children.indexOf(file);
+            if (index != -1) this.children.splice(index, 1);
+            file.parent = null;
+            editorAssets.saveProject();
+        }
+
+        private pathChanged()
         {
             // 更新名字
             this.name = feng3d.pathUtils.getNameWithExtension(this.path);
@@ -234,7 +256,10 @@ namespace editor
             {
                 feng3d.assert(!e);
 
-                editorAssets.files[folderpath] = new AssetsFile(folderpath);
+                var assetsFile = new AssetsFile();
+                assetsFile.path = folderpath;
+                editorAssets.files[folderpath] = assetsFile;
+
                 editorui.assetsview.invalidateAssetstree();
             });
         }
@@ -253,7 +278,9 @@ namespace editor
                 filepath = this.getnewname(filepath);
             }
 
-            var assetsFile = new AssetsFile(filepath, content);
+            var assetsFile = new AssetsFile();
+            assetsFile.path = filepath;
+            assetsFile.cacheData = content;
             assetsFile.save(true, () =>
             {
                 editorAssets.files[filepath] = assetsFile;
@@ -288,7 +315,8 @@ namespace editor
                     callback(e, null);
                     return;
                 }
-                var assetsFile = new AssetsFile(filepath);
+                var assetsFile = new AssetsFile();
+                assetsFile.path = filepath;
                 editorAssets.files[filepath] = assetsFile;
                 editorData.selectObject(assetsFile);
 

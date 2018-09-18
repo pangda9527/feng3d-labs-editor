@@ -1286,8 +1286,12 @@ declare namespace editor {
         /**
          * 项目资源id树形结构
          */
-        projectAssetsMap: {};
+        rootFile: AssetsFile;
         constructor();
+        /**
+         * 初始化项目
+         * @param callback
+         */
         initproject(callback: () => void): void;
         /**
          * 保存项目
@@ -1362,6 +1366,7 @@ declare namespace editor {
 declare namespace editor {
     type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube | HTMLImageElement;
     class AssetsFile {
+        id: string;
         /**
          * 路径
          */
@@ -1394,8 +1399,12 @@ declare namespace editor {
          * 缓存下来的数据 避免从文件再次加载解析数据
          */
         cacheData: AssetsDataType;
-        constructor(path: string, data?: AssetsDataType);
-        pathChanged(): void;
+        children: AssetsFile[];
+        parent: AssetsFile;
+        constructor(id?: string);
+        addChild(file: AssetsFile): void;
+        removeChild(file: AssetsFile): void;
+        private pathChanged;
         /**
          * 获取属性显示数据
          * @param callback 获取属性面板显示数据回调
@@ -1465,6 +1474,10 @@ declare namespace editor {
          * @param callback 回调函数
          */
         getScriptClassName(callback: (scriptClassName: string) => void): string;
+    }
+}
+declare namespace editor {
+    class Folder extends feng3d.Feng3dAssets {
     }
 }
 declare namespace editor {

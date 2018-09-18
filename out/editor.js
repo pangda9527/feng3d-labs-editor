@@ -4677,41 +4677,27 @@ var editor;
             this.showFloder = "Assets/";
             this.files = {};
             /**
-             * 项目资源id树形结构
-             */
-            this.projectAssetsMap = {};
-            /**
              * 上次执行的项目脚本
              */
             this._preProjectJsContent = null;
             feng3d.feng3dDispatcher.on("assets.parsed", this.onParsed, this);
         }
-        //function
+        /**
+         * 初始化项目
+         * @param callback
+         */
         EditorAssets.prototype.initproject = function (callback) {
             var _this = this;
-            editor.assets.mkdir(this.assetsPath, function (err) {
-                if (err) {
-                    alert("初始化项目失败！");
-                    feng3d.error(err);
-                    return;
-                }
-                _this.files[_this.assetsPath] = new editor.AssetsFile(_this.assetsPath);
-                editor.assets.getAllfilepathInFolder(_this.assetsPath, function (err, filepaths) {
-                    feng3d.assert(!err);
-                    filepaths.forEach(function (element) {
-                        _this.files[element] = new editor.AssetsFile(element);
-                    });
-                    callback();
-                });
-            });
             //
             editor.assets.readObject("project.json", function (err, data) {
                 if (data) {
-                    _this.projectAssetsMap = data;
+                    _this.rootFile = data;
                 }
                 else {
+                    _this.rootFile = new editor.AssetsFile();
                     _this.saveProject();
                 }
+                callback();
             });
         };
         /**
@@ -4719,7 +4705,7 @@ var editor;
          * @param callback 完成回调
          */
         EditorAssets.prototype.saveProject = function (callback) {
-            editor.assets.saveObject("project.json", this.projectAssetsMap, callback);
+            editor.assets.saveObject("project.json", this.rootFile, callback);
         };
         /**
          * 获取文件
@@ -4820,6 +4806,8 @@ var editor;
                     submenu: [
                         {
                             label: "文件夹", click: function () {
+                                var folder = new editor.Folder().value({ name: "New Folder" });
+                                _this.rootFile;
                                 assetsFile.addfolder("New Folder");
                             }
                         },
@@ -4860,9 +4848,8 @@ var editor;
                             label: "材质", click: function () {
                                 // assetsFile.addfile("new material" + ".material.json", new feng3d.Material());
                                 var material = new feng3d.Material().value({ name: "New Material" });
-                                editor.assets.saveObject("Library/" + material.assetsId + "/material.json", material, function (err) {
-                                    alert("\u65B0\u589E\u6750\u8D28\uFF01");
-                                });
+                                editor.assets.saveAssets(material);
+                                editor.editorAssets.rootFile.addChild(new editor.AssetsFile(material.assetsId));
                             }
                         },
                     ]
@@ -5102,14 +5089,29 @@ var editor;
 var editor;
 (function (editor) {
     var AssetsFile = /** @class */ (function () {
-        function AssetsFile(path, data) {
+        function AssetsFile(id) {
+            if (id === void 0) { id = ""; }
+            this.id = "";
             /**
              * 是否选中
              */
             this.selected = false;
-            this.cacheData = data;
-            this.path = path;
+            this.children = [];
+            this.id = id;
         }
+        AssetsFile.prototype.addChild = function (file) {
+            if (this.children.indexOf(file) == -1)
+                this.children.push(file);
+            file.parent = this;
+            editor.editorAssets.saveProject();
+        };
+        AssetsFile.prototype.removeChild = function (file) {
+            var index = this.children.indexOf(file);
+            if (index != -1)
+                this.children.splice(index, 1);
+            file.parent = null;
+            editor.editorAssets.saveProject();
+        };
         AssetsFile.prototype.pathChanged = function () {
             var _this = this;
             // 更新名字
@@ -5255,7 +5257,9 @@ var editor;
             folderpath = folderpath + "/";
             editor.assets.mkdir(folderpath, function (e) {
                 feng3d.assert(!e);
-                editor.editorAssets.files[folderpath] = new AssetsFile(folderpath);
+                var assetsFile = new AssetsFile();
+                assetsFile.path = folderpath;
+                editor.editorAssets.files[folderpath] = assetsFile;
                 editor.editorui.assetsview.invalidateAssetstree();
             });
         };
@@ -5271,7 +5275,9 @@ var editor;
             if (!override) {
                 filepath = this.getnewname(filepath);
             }
-            var assetsFile = new AssetsFile(filepath, content);
+            var assetsFile = new AssetsFile();
+            assetsFile.path = filepath;
+            assetsFile.cacheData = content;
             assetsFile.save(true, function () {
                 editor.editorAssets.files[filepath] = assetsFile;
                 editor.editorData.selectObject(assetsFile);
@@ -5299,7 +5305,8 @@ var editor;
                     callback(e, null);
                     return;
                 }
-                var assetsFile = new AssetsFile(filepath);
+                var assetsFile = new AssetsFile();
+                assetsFile.path = filepath;
                 editor.editorAssets.files[filepath] = assetsFile;
                 editor.editorData.selectObject(assetsFile);
                 editor.editorui.assetsview.invalidateAssetstree();
@@ -5413,11 +5420,28 @@ var editor;
             });
         };
         __decorate([
+            feng3d.serialize
+        ], AssetsFile.prototype, "id", void 0);
+        __decorate([
             feng3d.watch("pathChanged")
         ], AssetsFile.prototype, "path", void 0);
+        __decorate([
+            feng3d.serialize
+        ], AssetsFile.prototype, "children", void 0);
         return AssetsFile;
     }());
     editor.AssetsFile = AssetsFile;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var Folder = /** @class */ (function (_super) {
+        __extends(Folder, _super);
+        function Folder() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return Folder;
+    }(feng3d.Feng3dAssets));
+    editor.Folder = Folder;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -9848,7 +9872,7 @@ var egret;
     (function () {
         document.body.oncontextmenu = function () { return false; };
         //给反射添加查找的空间
-        feng3d.classUtils.addClassNameSpace("feng3d.editor");
+        feng3d.classUtils.addClassNameSpace("editor");
         feng3d.classUtils.addClassNameSpace("egret");
     })();
     //-----------------------------------------------------------
