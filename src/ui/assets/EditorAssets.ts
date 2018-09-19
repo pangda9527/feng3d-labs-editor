@@ -104,7 +104,7 @@ namespace editor
                 alert("无法删除根目录");
                 return;
             }
-            assetsFile.remove();
+            assetsFile.delete();
             editorui.assetsview.invalidateAssetstree();
             callback && callback();
         }

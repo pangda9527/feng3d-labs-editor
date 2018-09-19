@@ -34,11 +34,10 @@ namespace editor
 			this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 			this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-			hierarchyTree.on("added", this.invalidHierarchy, this);
-			hierarchyTree.on("removed", this.invalidHierarchy, this);
-			hierarchyTree.on("openChanged", this.invalidHierarchy, this);
+			feng3d.watcher.watch(hierarchyTree, "rootnode", this.onRootNodeChanged, this);
+			this.onRootNode(hierarchyTree.rootnode);
 
-			this.updateHierarchyTree();
+			this.invalidHierarchy();
 		}
 
 		private onRemovedFromStage()
@@ -46,9 +45,34 @@ namespace editor
 			this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 			this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-			hierarchyTree.off("added", this.invalidHierarchy, this);
-			hierarchyTree.off("removed", this.invalidHierarchy, this);
-			hierarchyTree.off("openChanged", this.invalidHierarchy, this);
+			feng3d.watcher.unwatch(hierarchyTree, "rootnode", this.onRootNodeChanged, this);
+			this.offRootNode(hierarchyTree.rootnode);
+		}
+
+		private onRootNodeChanged(host?: any, property?: string, oldvalue?: HierarchyNode)
+		{
+			this.offRootNode(oldvalue);
+			this.onRootNode(hierarchyTree.rootnode);
+		}
+
+		private onRootNode(node: HierarchyNode)
+		{
+			if (node)
+			{
+				node.on("added", this.invalidHierarchy, this);
+				node.on("removed", this.invalidHierarchy, this);
+				node.on("openChanged", this.invalidHierarchy, this);
+			}
+		}
+
+		private offRootNode(node: HierarchyNode)
+		{
+			if (node)
+			{
+				node.off("added", this.invalidHierarchy, this);
+				node.off("removed", this.invalidHierarchy, this);
+				node.off("openChanged", this.invalidHierarchy, this);
+			}
 		}
 
 		private invalidHierarchy()
@@ -60,11 +84,6 @@ namespace editor
 		{
 			var nodes = hierarchyTree.getShowNodes();
 			this.listData.replaceAll(nodes);
-		}
-
-		private onListbackClick()
-		{
-			feng3d.log("onListbackClick");
 		}
 
 		private onListClick(e: egret.MouseEvent)

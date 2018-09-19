@@ -147,22 +147,26 @@ namespace editor
             editorui.assetsview.invalidateAssetstree();
         }
 
-        removeChild(file: AssetsFile)
+        remove()
         {
-            var index = this.children.indexOf(file);
-            if (index != -1) this.children.splice(index, 1);
-            file.parent = null;
+            if (this.parent)
+            {
+                var index = this.parent.children.indexOf(this);
+                if (index != -1) this.parent.children.splice(index, 1);
+            }
+            this.parent = null;
             editorAssets.saveProject();
             editorui.assetsview.invalidateAssetstree();
         }
 
-        remove()
+        /**
+         * 删除
+         */
+        delete()
         {
-            if (this.parent) this.parent.removeChild(this);
+            this.remove();
             assets.deleteAssets(this.id);
             delete editorAssets.files[this.id];
-            editorAssets.saveProject();
-            editorui.assetsview.invalidateAssetstree();
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
         }
 

@@ -134,7 +134,7 @@ namespace editor
         invalidateAssetstree()
         {
             this._assetstreeInvalid = true;
-            this.once(egret.Event.ENTER_FRAME, this.update, this);
+            feng3d.ticker.nextframe(this.update, this);
         }
 
         private updateAssetsTree()

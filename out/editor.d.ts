@@ -505,7 +505,6 @@ declare namespace editor {
     interface TreeNodeMap {
         added: TreeNode;
         removed: TreeNode;
-        changed: TreeNode;
         openChanged: TreeNode;
     }
     interface TreeNode {
@@ -545,6 +544,12 @@ declare namespace editor {
          * 销毁
          */
         destroy(): void;
+        /**
+         * 判断是否包含节点
+         */
+        contain(node: TreeNode): boolean;
+        addNode(node: TreeNode): void;
+        removeNode(): void;
         private openChanged;
     }
     interface TreeEventMap {
@@ -561,19 +566,9 @@ declare namespace editor {
         off<K extends keyof TreeEventMap>(type?: K, listener?: (event: feng3d.Event<TreeEventMap[K]>) => any, thisObject?: any): any;
     }
     class Tree extends feng3d.EventDispatcher {
-        _rootnode: TreeNode;
         rootnode: TreeNode;
-        /**
-         * 判断是否包含节点
-         */
-        contain(node: TreeNode, rootnode?: TreeNode): boolean;
-        addNode(node: TreeNode, parentnode?: TreeNode): void;
-        removeNode(node: TreeNode): void;
-        destroy(node: TreeNode): void;
         getShowNodes(node?: TreeNode): TreeNode[];
-        private isopenchanged;
     }
-    function treeMap<T extends TreeNode>(treeNode: T, callback: (node: T, parent: T) => void): void;
 }
 declare namespace editor {
     class Vector3DView extends eui.Component implements eui.UIComponent {
@@ -1256,9 +1251,11 @@ declare namespace editor {
         private onComplete;
         private onAddedToStage;
         private onRemovedFromStage;
+        private onRootNodeChanged;
+        private onRootNode;
+        private offRootNode;
         private invalidHierarchy;
         private updateHierarchyTree;
-        private onListbackClick;
         private onListClick;
         private onListRightClick;
     }
@@ -1442,8 +1439,11 @@ declare namespace editor {
         private init;
         addAssets(feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
         addChild(file: AssetsFile): void;
-        removeChild(file: AssetsFile): void;
         remove(): void;
+        /**
+         * 删除
+         */
+        delete(): void;
         getFolderList(includeClose?: boolean): any[];
         private pathChanged;
         /**

@@ -1894,8 +1894,40 @@ var editor;
          * 销毁
          */
         TreeNode.prototype.destroy = function () {
+            if (this.children) {
+                this.children.concat().forEach(function (element) {
+                    element.destroy();
+                });
+            }
+            this.removeNode();
             this.parent = null;
             this.children = null;
+        };
+        /**
+         * 判断是否包含节点
+         */
+        TreeNode.prototype.contain = function (node) {
+            while (node) {
+                if (node == this)
+                    return true;
+                node = node.parent;
+            }
+            return false;
+        };
+        TreeNode.prototype.addNode = function (node) {
+            feng3d.debuger && feng3d.assert(!node.contain(this), "无法添加到自身节点中!");
+            node.parent = this;
+            this.children.push(node);
+            this.dispatch("added", node, true);
+        };
+        TreeNode.prototype.removeNode = function () {
+            if (this.parent) {
+                var index = this.parent.children.indexOf(this);
+                feng3d.debuger && feng3d.assert(index != -1);
+                this.parent.children.splice(index, 1);
+            }
+            this.dispatch("removed", this, true);
+            this.parent = null;
         };
         TreeNode.prototype.openChanged = function () {
             this.dispatch("openChanged", null, true);
@@ -1911,66 +1943,6 @@ var editor;
         function Tree() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(Tree.prototype, "rootnode", {
-            get: function () {
-                return this._rootnode;
-            },
-            set: function (value) {
-                if (this._rootnode == value)
-                    return;
-                if (this._rootnode) {
-                    feng3d.watcher.unwatch(this._rootnode, "isOpen", this.isopenchanged, this);
-                }
-                this._rootnode = value;
-                if (this._rootnode) {
-                    feng3d.watcher.watch(this._rootnode, "isOpen", this.isopenchanged, this);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /**
-         * 判断是否包含节点
-         */
-        Tree.prototype.contain = function (node, rootnode) {
-            rootnode = rootnode || this.rootnode;
-            var result = false;
-            treeMap(rootnode, function (item) {
-                if (item == node)
-                    result = true;
-            });
-            return result;
-        };
-        Tree.prototype.addNode = function (node, parentnode) {
-            parentnode = parentnode || this.rootnode;
-            feng3d.debuger && feng3d.assert(!this.contain(parentnode, node), "无法添加到自身节点中!");
-            node.parent = parentnode;
-            parentnode.children.push(node);
-            feng3d.watcher.watch(node, "isOpen", this.isopenchanged, this);
-            this.dispatch("added", node);
-            this.dispatch("changed", node);
-        };
-        Tree.prototype.removeNode = function (node) {
-            var parentnode = node.parent;
-            if (!parentnode)
-                return;
-            var index = parentnode.children.indexOf(node);
-            feng3d.debuger && feng3d.assert(index != -1);
-            parentnode.children.splice(index, 1);
-            node.parent = null;
-            feng3d.watcher.unwatch(node, "isOpen", this.isopenchanged, this);
-            this.dispatch("removed", node);
-            this.dispatch("changed", node);
-        };
-        Tree.prototype.destroy = function (node) {
-            this.removeNode(node);
-            if (node.children) {
-                for (var i = node.children.length - 1; i >= 0; i--) {
-                    this.destroy(node.children[i]);
-                }
-                node.children.length = 0;
-            }
-        };
         Tree.prototype.getShowNodes = function (node) {
             var _this = this;
             node = node || this.rootnode;
@@ -1984,21 +1956,9 @@ var editor;
             }
             return nodes;
         };
-        Tree.prototype.isopenchanged = function (host, property, oldvalue) {
-            this.dispatch("openChanged", host);
-        };
         return Tree;
     }(feng3d.EventDispatcher));
     editor.Tree = Tree;
-    function treeMap(treeNode, callback) {
-        if (treeNode.children) {
-            treeNode.children.forEach(function (element) {
-                callback(element, treeNode);
-                treeMap(element, callback);
-            });
-        }
-    }
-    editor.treeMap = treeMap;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -4626,17 +4586,33 @@ var editor;
         HierarchyView.prototype.onAddedToStage = function () {
             this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
             this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
-            editor.hierarchyTree.on("added", this.invalidHierarchy, this);
-            editor.hierarchyTree.on("removed", this.invalidHierarchy, this);
-            editor.hierarchyTree.on("openChanged", this.invalidHierarchy, this);
-            this.updateHierarchyTree();
+            feng3d.watcher.watch(editor.hierarchyTree, "rootnode", this.onRootNodeChanged, this);
+            this.onRootNode(editor.hierarchyTree.rootnode);
+            this.invalidHierarchy();
         };
         HierarchyView.prototype.onRemovedFromStage = function () {
             this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
             this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
-            editor.hierarchyTree.off("added", this.invalidHierarchy, this);
-            editor.hierarchyTree.off("removed", this.invalidHierarchy, this);
-            editor.hierarchyTree.off("openChanged", this.invalidHierarchy, this);
+            feng3d.watcher.unwatch(editor.hierarchyTree, "rootnode", this.onRootNodeChanged, this);
+            this.offRootNode(editor.hierarchyTree.rootnode);
+        };
+        HierarchyView.prototype.onRootNodeChanged = function (host, property, oldvalue) {
+            this.offRootNode(oldvalue);
+            this.onRootNode(editor.hierarchyTree.rootnode);
+        };
+        HierarchyView.prototype.onRootNode = function (node) {
+            if (node) {
+                node.on("added", this.invalidHierarchy, this);
+                node.on("removed", this.invalidHierarchy, this);
+                node.on("openChanged", this.invalidHierarchy, this);
+            }
+        };
+        HierarchyView.prototype.offRootNode = function (node) {
+            if (node) {
+                node.off("added", this.invalidHierarchy, this);
+                node.off("removed", this.invalidHierarchy, this);
+                node.off("openChanged", this.invalidHierarchy, this);
+            }
         };
         HierarchyView.prototype.invalidHierarchy = function () {
             feng3d.ticker.nextframe(this.updateHierarchyTree, this);
@@ -4644,9 +4620,6 @@ var editor;
         HierarchyView.prototype.updateHierarchyTree = function () {
             var nodes = editor.hierarchyTree.getShowNodes();
             this.listData.replaceAll(nodes);
-        };
-        HierarchyView.prototype.onListbackClick = function () {
-            feng3d.log("onListbackClick");
         };
         HierarchyView.prototype.onListClick = function (e) {
             if (e.target == this.list) {
@@ -4729,7 +4702,7 @@ var editor;
                 alert("无法删除根目录");
                 return;
             }
-            assetsFile.remove();
+            assetsFile.delete();
             editor.editorui.assetsview.invalidateAssetstree();
             callback && callback();
         };
@@ -5261,21 +5234,23 @@ var editor;
             editor.editorAssets.saveProject();
             editor.editorui.assetsview.invalidateAssetstree();
         };
-        AssetsFile.prototype.removeChild = function (file) {
-            var index = this.children.indexOf(file);
-            if (index != -1)
-                this.children.splice(index, 1);
-            file.parent = null;
+        AssetsFile.prototype.remove = function () {
+            if (this.parent) {
+                var index = this.parent.children.indexOf(this);
+                if (index != -1)
+                    this.parent.children.splice(index, 1);
+            }
+            this.parent = null;
             editor.editorAssets.saveProject();
             editor.editorui.assetsview.invalidateAssetstree();
         };
-        AssetsFile.prototype.remove = function () {
-            if (this.parent)
-                this.parent.removeChild(this);
+        /**
+         * 删除
+         */
+        AssetsFile.prototype.delete = function () {
+            this.remove();
             editor.assets.deleteAssets(this.id);
             delete editor.editorAssets.files[this.id];
-            editor.editorAssets.saveProject();
-            editor.editorui.assetsview.invalidateAssetstree();
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
         };
         AssetsFile.prototype.getFolderList = function (includeClose) {
@@ -5735,7 +5710,7 @@ var editor;
         };
         AssetsView.prototype.invalidateAssetstree = function () {
             this._assetstreeInvalid = true;
-            this.once(egret.Event.ENTER_FRAME, this.update, this);
+            feng3d.ticker.nextframe(this.update, this);
         };
         AssetsView.prototype.updateAssetsTree = function () {
             var folders = editor.editorAssets.rootFile.getFolderList();
@@ -8139,7 +8114,7 @@ var editor;
         HierarchyTree.prototype.delete = function (gameobject) {
             var node = nodeMap.get(gameobject);
             if (node) {
-                this.destroy(node);
+                node.destroy();
                 nodeMap.delete(gameobject);
             }
         };
@@ -8149,7 +8124,7 @@ var editor;
                 return;
             var node = nodeMap.get(gameobject);
             if (node) {
-                this.removeNode(node);
+                node.removeNode();
             }
             var parentnode = nodeMap.get(gameobject.parent);
             if (parentnode) {
@@ -8157,7 +8132,7 @@ var editor;
                     node = new editor.HierarchyNode({ gameobject: gameobject });
                     nodeMap.set(gameobject, node);
                 }
-                this.addNode(node, parentnode);
+                parentnode.addNode(node);
             }
             gameobject.children.forEach(function (element) {
                 _this.add(element);
@@ -8168,7 +8143,7 @@ var editor;
             var _this = this;
             var node = nodeMap.get(gameobject);
             if (node) {
-                this.removeNode(node);
+                node.removeNode();
             }
             gameobject.children.forEach(function (element) {
                 _this.remove(element);

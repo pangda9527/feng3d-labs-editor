@@ -60,7 +60,7 @@ namespace editor
             var node = nodeMap.get(gameobject);
             if (node)
             {
-                this.destroy(node);
+                node.destroy();
                 nodeMap.delete(gameobject);
             }
         }
@@ -72,7 +72,7 @@ namespace editor
             var node = nodeMap.get(gameobject);
             if (node)
             {
-                this.removeNode(node);
+                node.removeNode();
             }
             var parentnode = nodeMap.get(gameobject.parent);
             if (parentnode)
@@ -82,7 +82,7 @@ namespace editor
                     node = new HierarchyNode({ gameobject: gameobject });
                     nodeMap.set(gameobject, node);
                 }
-                this.addNode(node, parentnode);
+                parentnode.addNode(node);
             }
             gameobject.children.forEach(element =>
             {
@@ -96,7 +96,7 @@ namespace editor
             var node = nodeMap.get(gameobject);
             if (node)
             {
-                this.removeNode(node);
+                node.removeNode();
             }
             gameobject.children.forEach(element =>
             {

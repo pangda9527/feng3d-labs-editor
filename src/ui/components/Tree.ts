@@ -4,7 +4,6 @@ namespace editor
 	{
 		added: TreeNode;
 		removed: TreeNode;
-		changed: TreeNode;
 		openChanged: TreeNode;
 	}
 
@@ -70,8 +69,53 @@ namespace editor
          */
 		destroy()
 		{
+			if (this.children)
+			{
+				this.children.concat().forEach(element =>
+				{
+					element.destroy();
+				});
+			}
+			this.removeNode();
+
 			this.parent = null;
 			this.children = null;
+		}
+
+		/**
+         * 判断是否包含节点
+         */
+		contain(node: TreeNode)
+		{
+			while (node)
+			{
+				if (node == this) return true;
+				node = node.parent;
+			}
+			return false;
+		}
+
+		addNode(node: TreeNode)
+		{
+			feng3d.debuger && feng3d.assert(!node.contain(this), "无法添加到自身节点中!");
+
+			node.parent = this;
+			this.children.push(node);
+
+			this.dispatch("added", node, true);
+		}
+
+		removeNode()
+		{
+			if (this.parent)
+			{
+				var index = this.parent.children.indexOf(this);
+				feng3d.debuger && feng3d.assert(index != -1);
+				this.parent.children.splice(index, 1);
+			}
+
+			this.dispatch("removed", this, true);
+			this.parent = null;
 		}
 
 		private openChanged()
@@ -99,84 +143,7 @@ namespace editor
 
 	export class Tree extends feng3d.EventDispatcher
 	{
-		_rootnode: TreeNode;
-		get rootnode()
-		{
-			return this._rootnode;
-		}
-		set rootnode(value)
-		{
-			if (this._rootnode == value)
-				return;
-			if (this._rootnode)
-			{
-				feng3d.watcher.unwatch(this._rootnode, "isOpen", this.isopenchanged, this)
-			}
-			this._rootnode = value;
-			if (this._rootnode)
-			{
-				feng3d.watcher.watch(this._rootnode, "isOpen", this.isopenchanged, this)
-			}
-		}
-
-        /**
-         * 判断是否包含节点
-         */
-		contain(node: TreeNode, rootnode?: TreeNode)
-		{
-			rootnode = rootnode || this.rootnode;
-			var result = false;
-			treeMap(rootnode, (item) =>
-			{
-				if (item == node)
-					result = true;
-			});
-			return result;
-		}
-
-		addNode(node: TreeNode, parentnode?: TreeNode)
-		{
-			parentnode = parentnode || this.rootnode;
-			feng3d.debuger && feng3d.assert(!this.contain(parentnode, node), "无法添加到自身节点中!");
-
-			node.parent = parentnode;
-			parentnode.children.push(node);
-
-			feng3d.watcher.watch(node, "isOpen", this.isopenchanged, this)
-
-			this.dispatch("added", node);
-			this.dispatch("changed", node);
-		}
-
-		removeNode(node: TreeNode)
-		{
-			var parentnode = node.parent;
-			if (!parentnode)
-				return;
-			var index = parentnode.children.indexOf(node);
-			feng3d.debuger && feng3d.assert(index != -1);
-			parentnode.children.splice(index, 1);
-
-			node.parent = null;
-
-			feng3d.watcher.unwatch(node, "isOpen", this.isopenchanged, this)
-
-			this.dispatch("removed", node);
-			this.dispatch("changed", node);
-		}
-
-		destroy(node: TreeNode)
-		{
-			this.removeNode(node);
-			if (node.children)
-			{
-				for (var i = node.children.length - 1; i >= 0; i--)
-				{
-					this.destroy(node.children[i]);
-				}
-				node.children.length = 0;
-			}
-		}
+		rootnode: TreeNode;
 
 		getShowNodes(node?: TreeNode)
 		{
@@ -191,23 +158,6 @@ namespace editor
 				});
 			}
 			return nodes;
-		}
-
-		private isopenchanged(host: any, property: string, oldvalue: any)
-		{
-			this.dispatch("openChanged", host);
-		}
-	}
-
-	export function treeMap<T extends TreeNode>(treeNode: T, callback: (node: T, parent: T) => void)
-	{
-		if (treeNode.children)
-		{
-			treeNode.children.forEach(element =>
-			{
-				callback(<T>element, treeNode);
-				treeMap(element, callback);
-			});
 		}
 	}
 }
