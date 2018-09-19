@@ -8127,7 +8127,8 @@ var editor;
             this.add(event.data);
         };
         Hierarchy.prototype.ongameobjectremoved = function (event) {
-            this.remove(event.data);
+            var node = nodeMap.get(event.data);
+            this.remove(node);
         };
         Hierarchy.prototype.init = function (gameobject) {
             var _this = this;
@@ -8163,15 +8164,14 @@ var editor;
             });
             return node;
         };
-        Hierarchy.prototype.remove = function (gameobject) {
+        Hierarchy.prototype.remove = function (node) {
             var _this = this;
-            var node = nodeMap.get(gameobject);
-            if (node) {
-                node.removeNode();
-            }
-            gameobject.children.forEach(function (element) {
+            if (!node)
+                return;
+            node.children.forEach(function (element) {
                 _this.remove(element);
             });
+            node.removeNode();
         };
         Hierarchy.prototype.addGameoObjectFromAsset = function (path, parent) {
             var _this = this;

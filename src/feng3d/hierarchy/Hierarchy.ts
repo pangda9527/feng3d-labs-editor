@@ -86,7 +86,8 @@ namespace editor
 
         private ongameobjectremoved(event: feng3d.Event<feng3d.GameObject>)
         {
-            this.remove(event.data);
+            var node = nodeMap.get(event.data);
+            this.remove(node);
         }
 
         private init(gameobject: feng3d.GameObject)
@@ -133,17 +134,14 @@ namespace editor
             return node;
         }
 
-        private remove(gameobject: feng3d.GameObject)
+        private remove(node: HierarchyNode)
         {
-            var node = nodeMap.get(gameobject);
-            if (node)
-            {
-                node.removeNode();
-            }
-            gameobject.children.forEach(element =>
+            if (!node) return;
+            node.children.forEach(element =>
             {
                 this.remove(element);
             });
+            node.removeNode();
         }
 
         addGameoObjectFromAsset(path: string, parent?: feng3d.GameObject)
