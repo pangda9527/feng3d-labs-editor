@@ -32,7 +32,7 @@ namespace editor
         {
             label: "保存场景", click: () =>
             {
-                var gameobject = hierarchyTree.rootnode.gameobject;
+                var gameobject = hierarchy.rootnode.gameobject;
                 editorAssets.saveObject(gameobject, gameobject.name + ".scene.json");
             }
         },
@@ -272,11 +272,11 @@ namespace editor
 
     function addToHierarchy(gameobject: feng3d.GameObject)
     {
-        var selectedNode = hierarchyTree.getSelectedNode();
+        var selectedNode = hierarchy.getSelectedNode();
         if (selectedNode)
             selectedNode.gameobject.addChild(gameobject);
         else
-            hierarchyTree.rootnode.gameobject.addChild(gameobject);
+            hierarchy.rootnode.gameobject.addChild(gameobject);
         editorData.selectObject(gameobject);
     }
 

@@ -85,11 +85,11 @@ namespace editor
             //
             gameObjects = gameObjects.reduce((pv: feng3d.GameObject[], gameObject) =>
             {
-                var node = hierarchyTree.getNode(gameObject);
+                var node = hierarchy.getNode(gameObject);
                 while (!node && gameObject.parent)
                 {
                     gameObject = gameObject.parent;
-                    node = hierarchyTree.getNode(gameObject);
+                    node = hierarchy.getNode(gameObject);
                 }
                 if (gameObject != gameObject.scene.gameObject)
                 {

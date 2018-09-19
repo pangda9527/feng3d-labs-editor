@@ -26,13 +26,13 @@ namespace editor
 			{
 				if (dragdata.file_gameobject)
 				{
-					hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, hierarchyTree.rootnode.gameobject);
+					hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, hierarchy.rootnode.gameobject);
 				}
 				if (dragdata.file_script)
 				{
 					var gameobject = engine.mouse3DManager.selectedGameObject;
 					if (!gameobject || !gameobject.scene)
-						gameobject = hierarchyTree.rootnode.gameobject;
+						gameobject = hierarchy.rootnode.gameobject;
 					gameobject.addScript(dragdata.file_script);
 				}
 			});

@@ -875,10 +875,10 @@ var editor;
             }
             //
             gameObjects = gameObjects.reduce(function (pv, gameObject) {
-                var node = editor.hierarchyTree.getNode(gameObject);
+                var node = editor.hierarchy.getNode(gameObject);
                 while (!node && gameObject.parent) {
                     gameObject = gameObject.parent;
-                    node = editor.hierarchyTree.getNode(gameObject);
+                    node = editor.hierarchy.getNode(gameObject);
                 }
                 if (gameObject != gameObject.scene.gameObject) {
                     pv.push(gameObject);
@@ -1049,12 +1049,12 @@ var editor;
             this.onResize();
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 if (dragdata.file_gameobject) {
-                    editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, editor.hierarchyTree.rootnode.gameobject);
+                    editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, editor.hierarchy.rootnode.gameobject);
                 }
                 if (dragdata.file_script) {
                     var gameobject = editor.engine.mouse3DManager.selectedGameObject;
                     if (!gameobject || !gameobject.scene)
-                        gameobject = editor.hierarchyTree.rootnode.gameobject;
+                        gameobject = editor.hierarchy.rootnode.gameobject;
                     gameobject.addScript(dragdata.file_script);
                 }
             });
@@ -4574,19 +4574,19 @@ var editor;
         HierarchyView.prototype.onAddedToStage = function () {
             this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
             this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
-            feng3d.watcher.watch(editor.hierarchyTree, "rootnode", this.onRootNodeChanged, this);
-            this.onRootNode(editor.hierarchyTree.rootnode);
+            feng3d.watcher.watch(editor.hierarchy, "rootnode", this.onRootNodeChanged, this);
+            this.onRootNode(editor.hierarchy.rootnode);
             this.invalidHierarchy();
         };
         HierarchyView.prototype.onRemovedFromStage = function () {
             this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
             this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
-            feng3d.watcher.unwatch(editor.hierarchyTree, "rootnode", this.onRootNodeChanged, this);
-            this.offRootNode(editor.hierarchyTree.rootnode);
+            feng3d.watcher.unwatch(editor.hierarchy, "rootnode", this.onRootNodeChanged, this);
+            this.offRootNode(editor.hierarchy.rootnode);
         };
         HierarchyView.prototype.onRootNodeChanged = function (host, property, oldvalue) {
             this.offRootNode(oldvalue);
-            this.onRootNode(editor.hierarchyTree.rootnode);
+            this.onRootNode(editor.hierarchy.rootnode);
         };
         HierarchyView.prototype.onRootNode = function (node) {
             if (node) {
@@ -4606,7 +4606,7 @@ var editor;
             feng3d.ticker.nextframe(this.updateHierarchyTree, this);
         };
         HierarchyView.prototype.updateHierarchyTree = function () {
-            var nodes = editor.hierarchyTree.rootnode.getShowNodes();
+            var nodes = editor.hierarchy.rootnode.getShowNodes();
             this.listData.replaceAll(nodes);
         };
         HierarchyView.prototype.onListClick = function (e) {
@@ -5928,7 +5928,7 @@ var editor;
             editor.runwin = null;
         };
         TopView.prototype.onMainMenu = function (item) {
-            editor.editorDispatcher.dispatch(item.command);
+            feng3d.feng3dDispatcher.dispatch(item.command);
         };
         TopView.prototype.onHelpButtonClick = function () {
             window.open("http://feng3d.com");
@@ -8063,27 +8063,73 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var nodeMap = new Map();
-    /**
-     * 层级树
-     */
-    var HierarchyTree = /** @class */ (function () {
-        function HierarchyTree() {
+    var Hierarchy = /** @class */ (function () {
+        function Hierarchy() {
             this.selectedGameObjects = [];
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
         }
+        Object.defineProperty(Hierarchy.prototype, "rootGameObject", {
+            get: function () {
+                return this._rootGameObject;
+            },
+            set: function (value) {
+                if (this._rootGameObject) {
+                    this._rootGameObject.off("added", this.ongameobjectadded, this);
+                    this._rootGameObject.off("removed", this.ongameobjectremoved, this);
+                }
+                this._rootGameObject = value;
+                if (this._rootGameObject) {
+                    this.init(this._rootGameObject);
+                    this._rootGameObject.on("added", this.ongameobjectadded, this);
+                    this._rootGameObject.on("removed", this.ongameobjectremoved, this);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 获取选中节点
          */
-        HierarchyTree.prototype.getSelectedNode = function () {
-            for (var i = 0; i < editor.editorData.selectedGameObjects.length; i++) {
-                var node = this.getNode(editor.editorData.selectedGameObjects[i]);
-                if (node)
-                    return node;
-            }
-            return null;
+        Hierarchy.prototype.getSelectedNode = function () {
+            var _this = this;
+            var node = editor.editorData.selectedGameObjects.reduce(function (pv, cv) { pv = pv || _this.getNode(cv); return pv; }, null);
+            return node;
         };
-        HierarchyTree.prototype.init = function (gameobject) {
+        /**
+         * 获取节点
+         */
+        Hierarchy.prototype.getNode = function (gameObject) {
+            var node = nodeMap.get(gameObject);
+            return node;
+        };
+        Hierarchy.prototype.delete = function (gameobject) {
+            var node = nodeMap.get(gameobject);
+            if (node) {
+                node.destroy();
+                nodeMap.delete(gameobject);
+            }
+        };
+        Hierarchy.prototype.onSelectedGameObjectChanged = function () {
+            var _this = this;
+            this.selectedGameObjects.forEach(function (element) {
+                var node = _this.getNode(element);
+                if (node)
+                    node.selected = false;
+                else
+                    debugger; // 为什么为空，是否被允许？
+            });
+            this.selectedGameObjects = editor.editorData.selectedGameObjects;
+            this.selectedGameObjects.forEach(function (element) {
+                _this.getNode(element).selected = true;
+            });
+        };
+        Hierarchy.prototype.ongameobjectadded = function (event) {
+            this.add(event.data);
+        };
+        Hierarchy.prototype.ongameobjectremoved = function (event) {
+            this.remove(event.data);
+        };
+        Hierarchy.prototype.init = function (gameobject) {
             var _this = this;
             if (this.rootnode)
                 this.rootnode.destroy();
@@ -8096,14 +8142,7 @@ var editor;
                 _this.add(element);
             });
         };
-        HierarchyTree.prototype.delete = function (gameobject) {
-            var node = nodeMap.get(gameobject);
-            if (node) {
-                node.destroy();
-                nodeMap.delete(gameobject);
-            }
-        };
-        HierarchyTree.prototype.add = function (gameobject) {
+        Hierarchy.prototype.add = function (gameobject) {
             var _this = this;
             if (gameobject.hideFlags & feng3d.HideFlags.HideInHierarchy)
                 return;
@@ -8124,7 +8163,7 @@ var editor;
             });
             return node;
         };
-        HierarchyTree.prototype.remove = function (gameobject) {
+        Hierarchy.prototype.remove = function (gameobject) {
             var _this = this;
             var node = nodeMap.get(gameobject);
             if (node) {
@@ -8134,63 +8173,8 @@ var editor;
                 _this.remove(element);
             });
         };
-        /**
-         * 获取节点
-         */
-        HierarchyTree.prototype.getNode = function (gameObject) {
-            var node = nodeMap.get(gameObject);
-            return node;
-        };
-        HierarchyTree.prototype.onSelectedGameObjectChanged = function () {
-            var _this = this;
-            this.selectedGameObjects.forEach(function (element) {
-                var node = _this.getNode(element);
-                if (node)
-                    node.selected = false;
-                else
-                    debugger; // 为什么为空，是否被允许？
-            });
-            this.selectedGameObjects = editor.editorData.selectedGameObjects;
-            this.selectedGameObjects.forEach(function (element) {
-                _this.getNode(element).selected = true;
-            });
-        };
-        return HierarchyTree;
-    }());
-    editor.HierarchyTree = HierarchyTree;
-    editor.hierarchyTree = new HierarchyTree();
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    var Hierarchy = /** @class */ (function () {
-        function Hierarchy() {
-        }
-        Object.defineProperty(Hierarchy.prototype, "rootGameObject", {
-            get: function () {
-                return this._rootGameObject;
-            },
-            set: function (value) {
-                if (this._rootGameObject) {
-                    this._rootGameObject.off("added", this.ongameobjectadded, this);
-                    this._rootGameObject.off("removed", this.ongameobjectremoved, this);
-                }
-                this._rootGameObject = value;
-                if (this._rootGameObject) {
-                    editor.hierarchyTree.init(this._rootGameObject);
-                    this._rootGameObject.on("added", this.ongameobjectadded, this);
-                    this._rootGameObject.on("removed", this.ongameobjectremoved, this);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Hierarchy.prototype.ongameobjectadded = function (event) {
-            editor.hierarchyTree.add(event.data);
-        };
-        Hierarchy.prototype.ongameobjectremoved = function (event) {
-            editor.hierarchyTree.remove(event.data);
-        };
         Hierarchy.prototype.addGameoObjectFromAsset = function (path, parent) {
+            var _this = this;
             editor.assets.readString(path, function (err, content) {
                 var json = JSON.parse(content);
                 var gameobject = feng3d.serialization.deserialize(json);
@@ -8198,13 +8182,14 @@ var editor;
                 if (parent)
                     parent.addChild(gameobject);
                 else
-                    editor.hierarchyTree.rootnode.gameobject.addChild(gameobject);
+                    _this.rootnode.gameobject.addChild(gameobject);
                 editor.editorData.selectObject(gameobject);
             });
         };
         return Hierarchy;
     }());
     editor.Hierarchy = Hierarchy;
+    var nodeMap = new Map();
     editor.hierarchy = new Hierarchy();
 })(editor || (editor = {}));
 var editor;
@@ -8360,7 +8345,7 @@ var editor;
                     cameraTargetMatrix3D.invert();
                     var result = cameraTargetMatrix3D.decompose()[1];
                     result.scale(180 / Math.PI);
-                    editor.editorDispatcher.dispatch("editorCameraRotate", result);
+                    feng3d.feng3dDispatcher.dispatch("editorCameraRotate", result);
                 }
             }
         };
@@ -8509,7 +8494,7 @@ var editor;
                 editor.editorScene.gameObject.addChild(trident);
             });
             //
-            editor.editorDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
+            feng3d.feng3dDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             //
             var canvas = document.getElementById("glcanvas");
             editor.engine = new EditorEngine(canvas, null, editor.editorCamera);
@@ -11000,7 +10985,7 @@ var editor;
         },
         {
             label: "保存场景", click: function () {
-                var gameobject = editor.hierarchyTree.rootnode.gameobject;
+                var gameobject = editor.hierarchy.rootnode.gameobject;
                 editor.editorAssets.saveObject(gameobject, gameobject.name + ".scene.json");
             }
         },
@@ -11200,11 +11185,11 @@ var editor;
         },
     ];
     function addToHierarchy(gameobject) {
-        var selectedNode = editor.hierarchyTree.getSelectedNode();
+        var selectedNode = editor.hierarchy.getSelectedNode();
         if (selectedNode)
             selectedNode.gameobject.addChild(gameobject);
         else
-            editor.hierarchyTree.rootnode.gameobject.addChild(gameobject);
+            editor.hierarchy.rootnode.gameobject.addChild(gameobject);
         editor.editorData.selectObject(gameobject);
     }
     /**
@@ -11384,10 +11369,6 @@ var shortcutConfig = [
     { key: "del", command: "deleteSeletedGameObject", when: "" },
     { key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
 ];
-var editor;
-(function (editor) {
-    editor.editorDispatcher = new feng3d.EventDispatcher();
-})(editor || (editor = {}));
 var editor;
 (function (editor) {
     /**

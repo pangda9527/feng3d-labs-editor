@@ -75,7 +75,7 @@ namespace editor
 
 		private onMainMenu(item: { label: string; command: string; })
 		{
-			editorDispatcher.dispatch(<any>item.command);
+			feng3d.feng3dDispatcher.dispatch(<any>item.command);
 		}
 
 		private onHelpButtonClick()

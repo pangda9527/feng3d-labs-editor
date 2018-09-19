@@ -2160,51 +2160,30 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    /**
-     * 层级树
-     */
-    var hierarchyTree: HierarchyTree;
-    /**
-     * 层级树
-     */
-    class HierarchyTree {
+    var hierarchy: Hierarchy;
+    class Hierarchy {
         rootnode: HierarchyNode;
+        rootGameObject: feng3d.GameObject;
+        private _rootGameObject;
         private selectedGameObjects;
         constructor();
         /**
          * 获取选中节点
          */
         getSelectedNode(): HierarchyNode;
-        init(gameobject: feng3d.GameObject): void;
-        delete(gameobject: feng3d.GameObject): void;
-        add(gameobject: feng3d.GameObject): HierarchyNode;
-        remove(gameobject: feng3d.GameObject): void;
         /**
          * 获取节点
          */
         getNode(gameObject: feng3d.GameObject): HierarchyNode;
+        delete(gameobject: feng3d.GameObject): void;
         private onSelectedGameObjectChanged;
-    }
-}
-declare namespace feng3d {
-    interface Feng3dEventMap {
-        "editor.selectedObjectsChanged": any;
-        "editor.isBaryCenterChanged": any;
-        "editor.isWoldCoordinateChanged": any;
-        "editor.toolTypeChanged": any;
-        "editor.allLoaded": any;
-    }
-}
-declare namespace editor {
-    class Hierarchy {
-        rootGameObject: feng3d.GameObject;
-        private _rootGameObject;
-        constructor();
         private ongameobjectadded;
         private ongameobjectremoved;
+        private init;
+        private add;
+        private remove;
         addGameoObjectFromAsset(path: string, parent?: feng3d.GameObject): void;
     }
-    var hierarchy: Hierarchy;
 }
 declare namespace feng3d {
     interface ComponentMap {
@@ -2690,14 +2669,18 @@ declare var shortcutConfig: ({
     when: string;
     command?: undefined;
 })[];
-declare namespace editor {
-    interface EditorEventMap {
+declare namespace feng3d {
+    interface Feng3dEventMap {
+        "editor.selectedObjectsChanged": any;
+        "editor.isBaryCenterChanged": any;
+        "editor.isWoldCoordinateChanged": any;
+        "editor.toolTypeChanged": any;
+        "editor.allLoaded": any;
         /**
          * 旋转场景摄像机
          */
         editorCameraRotate: feng3d.Vector3;
     }
-    var editorDispatcher: feng3d.IEventDispatcher<EditorEventMap>;
 }
 declare namespace editor {
     var editorData: EditorData;

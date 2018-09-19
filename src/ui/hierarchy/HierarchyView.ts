@@ -34,8 +34,8 @@ namespace editor
 			this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 			this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-			feng3d.watcher.watch(hierarchyTree, "rootnode", this.onRootNodeChanged, this);
-			this.onRootNode(hierarchyTree.rootnode);
+			feng3d.watcher.watch(hierarchy, "rootnode", this.onRootNodeChanged, this);
+			this.onRootNode(hierarchy.rootnode);
 
 			this.invalidHierarchy();
 		}
@@ -45,14 +45,14 @@ namespace editor
 			this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 			this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-			feng3d.watcher.unwatch(hierarchyTree, "rootnode", this.onRootNodeChanged, this);
-			this.offRootNode(hierarchyTree.rootnode);
+			feng3d.watcher.unwatch(hierarchy, "rootnode", this.onRootNodeChanged, this);
+			this.offRootNode(hierarchy.rootnode);
 		}
 
 		private onRootNodeChanged(host?: any, property?: string, oldvalue?: HierarchyNode)
 		{
 			this.offRootNode(oldvalue);
-			this.onRootNode(hierarchyTree.rootnode);
+			this.onRootNode(hierarchy.rootnode);
 		}
 
 		private onRootNode(node: HierarchyNode)
@@ -82,7 +82,7 @@ namespace editor
 
 		private updateHierarchyTree()
 		{
-			var nodes = hierarchyTree.rootnode.getShowNodes();
+			var nodes = hierarchy.rootnode.getShowNodes();
 			this.listData.replaceAll(nodes);
 		}
 

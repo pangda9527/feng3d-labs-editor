@@ -92,7 +92,7 @@ namespace editor
             });
 
             //
-            editorDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
+            feng3d.feng3dDispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             //
             var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
             engine = new EditorEngine(canvas, null, editorCamera);

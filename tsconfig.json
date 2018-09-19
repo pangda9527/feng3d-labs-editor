@@ -117,7 +117,6 @@
         "src/feng3d/mrsTool/MRSTool.ts",
         //
         "src/feng3d/hierarchy/HierarchyNode.ts",
-        "src/feng3d/hierarchy/HierarchyTree.ts",
         "src/feng3d/hierarchy/Hierarchy.ts",
         "src/feng3d/scene/SceneRotateTool.ts",
         "src/feng3d/GroundGrid.ts",
