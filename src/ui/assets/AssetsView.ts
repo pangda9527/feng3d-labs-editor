@@ -116,6 +116,8 @@ namespace editor
             editorAssets.initproject(() =>
             {
                 this.invalidateAssetstree();
+
+                editorAssets.rootFile.on("openChanged", this.invalidateAssetstree, this);
             });
         }
 
@@ -231,7 +233,7 @@ namespace editor
         {
             if (e.target == this.filelist)
             {
-                editorData.selectObject(null)
+                editorData.clearSelectedObjects()
             }
         }
 

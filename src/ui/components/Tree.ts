@@ -1,5 +1,22 @@
 namespace editor
 {
+	export interface TreeNodeMap
+	{
+		added: TreeNode;
+		removed: TreeNode;
+		changed: TreeNode;
+		openChanged: TreeNode;
+	}
+
+	export interface TreeNode
+	{
+		once<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => void, thisObject?: any, priority?: number): void;
+		dispatch<K extends keyof TreeNodeMap>(type: K, data?: TreeNodeMap[K], bubbles?: boolean): feng3d.Event<TreeNodeMap[K]>;
+		has<K extends keyof TreeNodeMap>(type: K): boolean;
+		on<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
+		off<K extends keyof TreeNodeMap>(type?: K, listener?: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any);
+	}
+
 	export class TreeNode extends feng3d.EventDispatcher
 	{
 		/**
@@ -23,11 +40,12 @@ namespace editor
 		/**
 		 * 是否打开
 		 */
+		@feng3d.watch("openChanged")
 		isOpen = true;
+
 		/**
 		 * 是否选中
 		 */
-		@feng3d.watch("selectedchange")
 		selected = false;
         /** 
          * 父节点
@@ -56,17 +74,9 @@ namespace editor
 			this.children = null;
 		}
 
-		private selectedchange()
+		private openChanged()
 		{
-			if (this.selected)
-			{
-				var p = this.parent;
-				while (p)
-				{
-					p.isOpen = true;
-					p = p.parent;
-				}
-			}
+			this.dispatch("openChanged", null, true);
 		}
 	}
 

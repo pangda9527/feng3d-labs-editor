@@ -502,6 +502,19 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    interface TreeNodeMap {
+        added: TreeNode;
+        removed: TreeNode;
+        changed: TreeNode;
+        openChanged: TreeNode;
+    }
+    interface TreeNode {
+        once<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof TreeNodeMap>(type: K, data?: TreeNodeMap[K], bubbles?: boolean): feng3d.Event<TreeNodeMap[K]>;
+        has<K extends keyof TreeNodeMap>(type: K): boolean;
+        on<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
+        off<K extends keyof TreeNodeMap>(type?: K, listener?: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any): any;
+    }
     class TreeNode extends feng3d.EventDispatcher {
         /**
          * 标签
@@ -532,7 +545,7 @@ declare namespace editor {
          * 销毁
          */
         destroy(): void;
-        private selectedchange;
+        private openChanged;
     }
     interface TreeEventMap {
         added: TreeNode;
@@ -1371,24 +1384,8 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class AssetsTreeNode extends TreeNode {
-        path: string;
-        /**
-         * 文件夹是否打开
-         */
-        isOpen: boolean;
-        children: AssetsTreeNode[];
-        constructor();
-        private openChanged;
-    }
-}
-declare namespace editor {
     type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube | HTMLImageElement;
-    interface AssetsFileEventMap {
-        added: TreeNode;
-        removed: TreeNode;
-        changed: TreeNode;
-        openChanged: TreeNode;
+    interface AssetsFileEventMap extends TreeNodeMap {
         /**
          * 加载完成
          */
@@ -1406,7 +1403,7 @@ declare namespace editor {
         off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any): any;
     }
     var loadingNum: number;
-    class AssetsFile extends AssetsTreeNode {
+    class AssetsFile extends TreeNode {
         id: string;
         /**
          * 路径
@@ -1444,13 +1441,17 @@ declare namespace editor {
         parent: AssetsFile;
         feng3dAssets: feng3d.Feng3dAssets;
         constructor(id?: string);
+        /**
+         * 更新父对象
+         */
+        updateParent(): void;
         private idChanged;
         private init;
         addAssets(feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
         addChild(file: AssetsFile): void;
         removeChild(file: AssetsFile): void;
         remove(): void;
-        getFolderList(): any[];
+        getFolderList(includeClose?: boolean): any[];
         private pathChanged;
         /**
          * 获取属性显示数据

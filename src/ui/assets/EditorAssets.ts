@@ -59,6 +59,7 @@ namespace editor
                     this.rootFile = new AssetsFile(folder.assetsId)
                     this.saveProject();
                 }
+                this.rootFile.updateParent();
                 this.showFloder = this.rootFile;
                 if (loadingNum == 0)
                 {
@@ -344,8 +345,7 @@ namespace editor
 
         saveObject(object: feng3d.GameObject | feng3d.AnimationClip | feng3d.Material | feng3d.Geometry, filename: string, callback?: (file: AssetsFile) => void)
         {
-            var showFloder = this.showFloder;
-            showFloder.addfile(filename, object, true, callback);
+            this.showFloder.addfile(filename, object, true, callback);
         }
 
         /**

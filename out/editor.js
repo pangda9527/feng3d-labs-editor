@@ -1901,18 +1901,12 @@ var editor;
             this.parent = null;
             this.children = null;
         };
-        TreeNode.prototype.selectedchange = function () {
-            if (this.selected) {
-                var p = this.parent;
-                while (p) {
-                    p.isOpen = true;
-                    p = p.parent;
-                }
-            }
+        TreeNode.prototype.openChanged = function () {
+            this.dispatch("openChanged", null, true);
         };
         __decorate([
-            feng3d.watch("selectedchange")
-        ], TreeNode.prototype, "selected", void 0);
+            feng3d.watch("openChanged")
+        ], TreeNode.prototype, "isOpen", void 0);
         return TreeNode;
     }(feng3d.EventDispatcher));
     editor.TreeNode = TreeNode;
@@ -4703,6 +4697,7 @@ var editor;
                     _this.rootFile = new editor.AssetsFile(folder.assetsId);
                     _this.saveProject();
                 }
+                _this.rootFile.updateParent();
                 _this.showFloder = _this.rootFile;
                 if (editor.loadingNum == 0) {
                     callback();
@@ -4932,8 +4927,7 @@ var editor;
             }
         };
         EditorAssets.prototype.saveObject = function (object, filename, callback) {
-            var showFloder = this.showFloder;
-            showFloder.addfile(filename, object, true, callback);
+            this.showFloder.addfile(filename, object, true, callback);
         };
         /**
          * 过滤出文件列表
@@ -5201,29 +5195,6 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var AssetsTreeNode = /** @class */ (function (_super) {
-        __extends(AssetsTreeNode, _super);
-        function AssetsTreeNode() {
-            var _this = _super.call(this) || this;
-            /**
-             * 文件夹是否打开
-             */
-            _this.isOpen = true;
-            _this.children = [];
-            return _this;
-        }
-        AssetsTreeNode.prototype.openChanged = function () {
-            editor.editorui.assetsview.invalidateAssetstree();
-        };
-        __decorate([
-            feng3d.watch("openChanged")
-        ], AssetsTreeNode.prototype, "isOpen", void 0);
-        return AssetsTreeNode;
-    }(editor.TreeNode));
-    editor.AssetsTreeNode = AssetsTreeNode;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
     editor.loadingNum = 0;
     var AssetsFile = /** @class */ (function (_super) {
         __extends(AssetsFile, _super);
@@ -5239,6 +5210,16 @@ var editor;
             _this.id = id;
             return _this;
         }
+        /**
+         * 更新父对象
+         */
+        AssetsFile.prototype.updateParent = function () {
+            var _this = this;
+            this.children.forEach(function (element) {
+                element.parent = _this;
+                element.updateParent();
+            });
+        };
         AssetsFile.prototype.idChanged = function () {
             var _this = this;
             if (this.id == "")
@@ -5298,15 +5279,18 @@ var editor;
             editor.editorui.assetsview.invalidateAssetstree();
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
         };
-        AssetsFile.prototype.getFolderList = function () {
+        AssetsFile.prototype.getFolderList = function (includeClose) {
+            if (includeClose === void 0) { includeClose = false; }
             var folders = [];
             if (this.isDirectory) {
                 folders.push(this);
             }
-            this.children.forEach(function (v) {
-                var cfolders = v.getFolderList();
-                folders = folders.concat(cfolders);
-            });
+            if (this.isOpen || includeClose) {
+                this.children.forEach(function (v) {
+                    var cfolders = v.getFolderList();
+                    folders = folders.concat(cfolders);
+                });
+            }
             return folders;
         };
         AssetsFile.prototype.pathChanged = function () {
@@ -5593,7 +5577,7 @@ var editor;
             feng3d.serialize
         ], AssetsFile.prototype, "children", void 0);
         return AssetsFile;
-    }(editor.AssetsTreeNode));
+    }(editor.TreeNode));
     editor.AssetsFile = AssetsFile;
 })(editor || (editor = {}));
 var editor;
@@ -5734,6 +5718,7 @@ var editor;
             var _this = this;
             editor.editorAssets.initproject(function () {
                 _this.invalidateAssetstree();
+                editor.editorAssets.rootFile.on("openChanged", _this.invalidateAssetstree, _this);
             });
         };
         AssetsView.prototype.update = function () {
@@ -5821,7 +5806,7 @@ var editor;
         };
         AssetsView.prototype.onfilelistclick = function (e) {
             if (e.target == this.filelist) {
-                editor.editorData.selectObject(null);
+                editor.editorData.clearSelectedObjects();
             }
         };
         AssetsView.prototype.onfilelistrightclick = function (e) {

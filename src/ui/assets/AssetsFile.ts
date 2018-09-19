@@ -2,13 +2,8 @@ namespace editor
 {
     export type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube | HTMLImageElement;
 
-    export interface AssetsFileEventMap
+    export interface AssetsFileEventMap extends TreeNodeMap
     {
-        added: TreeNode;
-        removed: TreeNode;
-        changed: TreeNode;
-        openChanged: TreeNode;
-
         /**
          * 加载完成
          */
@@ -31,7 +26,7 @@ namespace editor
 
     export var loadingNum = 0;
 
-    export class AssetsFile extends AssetsTreeNode
+    export class AssetsFile extends TreeNode
     {
         @feng3d.serialize
         @feng3d.watch("idChanged")
@@ -89,6 +84,18 @@ namespace editor
         {
             super();
             this.id = id;
+        }
+
+        /**
+         * 更新父对象
+         */
+        updateParent()
+        {
+            this.children.forEach(element =>
+            {
+                element.parent = this;
+                element.updateParent();
+            });
         }
 
         private idChanged()
@@ -164,18 +171,21 @@ namespace editor
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
         }
 
-        getFolderList()
+        getFolderList(includeClose = false)
         {
             var folders = [];
             if (this.isDirectory)
             {
                 folders.push(this);
             }
-            this.children.forEach(v =>
+            if (this.isOpen || includeClose)
             {
-                var cfolders = v.getFolderList();
-                folders = folders.concat(cfolders);
-            })
+                this.children.forEach(v =>
+                {
+                    var cfolders = v.getFolderList();
+                    folders = folders.concat(cfolders);
+                });
+            }
             return folders;
         }
 
