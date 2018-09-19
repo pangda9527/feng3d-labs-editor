@@ -19,6 +19,9 @@ namespace editor
             super.$onAddToStage(stage, nestLevel);
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+
+            feng3d.watcher.watch(editorAssets, "showFloder", this.showFloderChanged, this);
+            this.showFloderChanged();
         }
 
         $onRemoveFromStage()
@@ -26,6 +29,8 @@ namespace editor
             super.$onRemoveFromStage();
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+
+            feng3d.watcher.unwatch(editorAssets, "showFloder", this.showFloderChanged, this);
         }
 
         dataChanged()
@@ -36,7 +41,6 @@ namespace editor
             {
                 this.renameInput.text = this.data.label;
 
-                var accepttypes = [];
                 drag.register(this, (dragsource) =>
                 {
                     dragsource.file = this.data.path;
@@ -49,7 +53,14 @@ namespace editor
             {
                 drag.unregister(this);
             }
+            this.showFloderChanged();
         }
+
+        private showFloderChanged()
+        {
+            this.selected = this.data ? editorAssets.showFloder == this.data : false;
+        }
+
         private onclick()
         {
             editorAssets.showFloder = this.data;

@@ -1252,10 +1252,6 @@ declare namespace editor {
         addButton: eui.Button;
         list: eui.List;
         private listData;
-        /**
-         * 选中节点
-         */
-        private selectedNode;
         constructor();
         private onComplete;
         private onAddedToStage;
@@ -1381,6 +1377,7 @@ declare namespace editor {
         private ondoubleclick;
         private onclick;
         private onrightclick;
+        private selectedfilechanged;
     }
 }
 declare namespace editor {
@@ -1429,10 +1426,6 @@ declare namespace editor {
          * 扩展名
          */
         extension: feng3d.AssetExtension;
-        /**
-         * 是否选中
-         */
-        selected: boolean;
         /**
          * 缓存下来的数据 避免从文件再次加载解析数据
          */
@@ -1528,6 +1521,7 @@ declare namespace editor {
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         dataChanged(): void;
+        private showFloderChanged;
         private onclick;
         private onrightclick;
     }

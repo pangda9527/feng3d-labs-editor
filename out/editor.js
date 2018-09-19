@@ -1750,10 +1750,6 @@ var editor;
         };
         TreeItemRenderer.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
-            eui.Watcher.watch(this, ["data", "depth"], this.updateView, this);
-            eui.Watcher.watch(this, ["data", "isOpen"], this.updateView, this);
-            eui.Watcher.watch(this, ["data", "hasChildren"], this.updateView, this);
-            eui.Watcher.watch(this, ["indentation"], this.updateView, this);
             while (this.watchers.length > 0) {
                 this.watchers.pop().unwatch();
             }
@@ -5075,12 +5071,15 @@ var editor;
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+            this.selectedfilechanged();
         };
         AssetsFileItemRenderer.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         };
         AssetsFileItemRenderer.prototype.dataChanged = function () {
             var _this = this;
@@ -5088,7 +5087,6 @@ var editor;
             if (this.data) {
                 this.renameInput.text = this.data.label;
                 this.renameInput.textAlign = egret.HorizontalAlign.CENTER;
-                var accepttypes = [];
                 if (this.data.isDirectory) {
                     editor.drag.register(this, function (dragsource) {
                         dragsource.file = _this.data.path;
@@ -5157,6 +5155,7 @@ var editor;
             else {
                 editor.drag.unregister(this);
             }
+            this.selectedfilechanged();
         };
         AssetsFileItemRenderer.prototype.ondoubleclick = function () {
             if (this.data.isDirectory) {
@@ -5189,6 +5188,10 @@ var editor;
             };
             editor.editorAssets.popupmenu(this.data, othermenus);
         };
+        AssetsFileItemRenderer.prototype.selectedfilechanged = function () {
+            var selectedAssetsFile = editor.editorData.selectedAssetsFile;
+            this.selected = this.data ? selectedAssetsFile.indexOf(this.data) != -1 : false;
+        };
         return AssetsFileItemRenderer;
     }(eui.ItemRenderer));
     editor.AssetsFileItemRenderer = AssetsFileItemRenderer;
@@ -5202,10 +5205,6 @@ var editor;
             if (id === void 0) { id = ""; }
             var _this = _super.call(this) || this;
             _this.id = "";
-            /**
-             * 是否选中
-             */
-            _this.selected = false;
             _this.children = [];
             _this.id = id;
             return _this;
@@ -5593,18 +5592,20 @@ var editor;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            feng3d.watcher.watch(editor.editorAssets, "showFloder", this.showFloderChanged, this);
+            this.showFloderChanged();
         };
         AssetsTreeItemRenderer.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            feng3d.watcher.unwatch(editor.editorAssets, "showFloder", this.showFloderChanged, this);
         };
         AssetsTreeItemRenderer.prototype.dataChanged = function () {
             var _this = this;
             _super.prototype.dataChanged.call(this);
             if (this.data) {
                 this.renameInput.text = this.data.label;
-                var accepttypes = [];
                 editor.drag.register(this, function (dragsource) {
                     dragsource.file = _this.data.path;
                 }, ["file"], function (dragdata) {
@@ -5615,6 +5616,10 @@ var editor;
             else {
                 editor.drag.unregister(this);
             }
+            this.showFloderChanged();
+        };
+        AssetsTreeItemRenderer.prototype.showFloderChanged = function () {
+            this.selected = this.data ? editor.editorAssets.showFloder == this.data : false;
         };
         AssetsTreeItemRenderer.prototype.onclick = function () {
             editor.editorAssets.showFloder = this.data;
@@ -5795,8 +5800,7 @@ var editor;
             var selectedAssetsFile = editor.editorData.selectedAssetsFile;
             var assetsFiles = this.filelistData.source;
             assetsFiles.forEach(function (element) {
-                element.selected = selectedAssetsFile.indexOf(element) != -1;
-                if (element.selected)
+                if (selectedAssetsFile.indexOf(element) != -1)
                     _this.selectfile = element;
             });
             if (this.selectfile)

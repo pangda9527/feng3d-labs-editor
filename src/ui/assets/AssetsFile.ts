@@ -64,11 +64,6 @@ namespace editor
         extension: feng3d.AssetExtension
 
         /**
-         * 是否选中
-         */
-        selected = false;
-
-        /**
          * 缓存下来的数据 避免从文件再次加载解析数据
          */
         cacheData: AssetsDataType;

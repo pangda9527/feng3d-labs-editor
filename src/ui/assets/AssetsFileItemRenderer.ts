@@ -21,6 +21,9 @@ namespace editor
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+            this.selectedfilechanged();
         }
 
         $onRemoveFromStage()
@@ -29,6 +32,8 @@ namespace editor
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+
+            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         }
 
         dataChanged()
@@ -40,7 +45,6 @@ namespace editor
                 this.renameInput.text = this.data.label;
                 this.renameInput.textAlign = egret.HorizontalAlign.CENTER;
 
-                var accepttypes = [];
                 if (this.data.isDirectory)
                 {
                     drag.register(this, (dragsource) =>
@@ -120,6 +124,7 @@ namespace editor
             {
                 drag.unregister(this);
             }
+            this.selectedfilechanged();
         }
 
         private ondoubleclick()
@@ -161,6 +166,12 @@ namespace editor
                 }
             }
             editorAssets.popupmenu(this.data, othermenus);
+        }
+
+        private selectedfilechanged()
+        {
+            var selectedAssetsFile = editorData.selectedAssetsFile;
+            this.selected = this.data ? selectedAssetsFile.indexOf(this.data) != -1 : false;
         }
     }
 }

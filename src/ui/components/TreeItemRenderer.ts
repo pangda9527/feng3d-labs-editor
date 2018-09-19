@@ -32,17 +32,13 @@ namespace editor
                 eui.Watcher.watch(this, ["data", "hasChildren"], this.updateView, this),
                 eui.Watcher.watch(this, ["indentation"], this.updateView, this)
             );
+
             this.updateView();
         }
 
         $onRemoveFromStage()
         {
             super.$onRemoveFromStage();
-
-            eui.Watcher.watch(this, ["data", "depth"], this.updateView, this);
-            eui.Watcher.watch(this, ["data", "isOpen"], this.updateView, this);
-            eui.Watcher.watch(this, ["data", "hasChildren"], this.updateView, this);
-            eui.Watcher.watch(this, ["indentation"], this.updateView, this);
 
             while (this.watchers.length > 0)
             {

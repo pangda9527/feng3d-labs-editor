@@ -7,11 +7,6 @@ namespace editor
 
 		private listData: eui.ArrayCollection;
 
-		/**
-		 * 选中节点
-		 */
-		private selectedNode: HierarchyNode;
-
 		constructor()
 		{
 			super();

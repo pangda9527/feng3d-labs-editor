@@ -219,8 +219,7 @@ namespace editor
             var assetsFiles: AssetsFile[] = this.filelistData.source;
             assetsFiles.forEach(element =>
             {
-                element.selected = selectedAssetsFile.indexOf(element) != -1;
-                if (element.selected)
+                if (selectedAssetsFile.indexOf(element) != -1)
                     this.selectfile = element;
             });
             if (this.selectfile)
