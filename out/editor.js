@@ -4698,7 +4698,7 @@ var editor;
                     _this.rootFile = data;
                 }
                 else {
-                    var folder = new editor.Folder().value({ name: "Assets" });
+                    var folder = new editor.Feng3dFolder().value({ name: "Assets" });
                     editor.assets.saveAssets(folder);
                     _this.rootFile = new editor.AssetsFile(folder.assetsId);
                     _this.saveProject();
@@ -4788,7 +4788,7 @@ var editor;
                     submenu: [
                         {
                             label: "文件夹", click: function () {
-                                assetsFile.addAssets(new editor.Folder().value({ name: "New Folder" }));
+                                assetsFile.addAssets(new editor.Feng3dFolder().value({ name: "New Folder" }));
                             }
                         },
                         {
@@ -5069,17 +5069,6 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var Folder = /** @class */ (function (_super) {
-        __extends(Folder, _super);
-        function Folder() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return Folder;
-    }(feng3d.Feng3dAssets));
-    editor.Folder = Folder;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
     var AssetsFileItemRenderer = /** @class */ (function (_super) {
         __extends(AssetsFileItemRenderer, _super);
         function AssetsFileItemRenderer() {
@@ -5269,7 +5258,7 @@ var editor;
             });
         };
         AssetsFile.prototype.init = function () {
-            this.isDirectory = this.feng3dAssets instanceof editor.Folder;
+            this.isDirectory = this.feng3dAssets instanceof editor.Feng3dFolder;
             this.label = this.name = this.feng3dAssets.name;
             // 更新图标
             if (this.isDirectory) {
@@ -5319,8 +5308,6 @@ var editor;
                 folders = folders.concat(cfolders);
             });
             return folders;
-        };
-        AssetsFile.prototype.loadAll = function (callback) {
         };
         AssetsFile.prototype.pathChanged = function () {
             var _this = this;
@@ -5482,24 +5469,13 @@ var editor;
          * @param callback 完成回调
          */
         AssetsFile.prototype.addfileFromArrayBuffer = function (filename, arraybuffer, override, callback) {
+            var _this = this;
             if (override === void 0) { override = false; }
-            var filepath = this.path + filename;
-            if (!override) {
-                filepath = this.getnewname(filepath);
-            }
-            editor.assets.writeArrayBuffer(filepath, arraybuffer, function (e) {
-                if (e) {
-                    callback(e, null);
-                    return;
-                }
-                var assetsFile = new AssetsFile();
-                assetsFile.path = filepath;
-                editor.editorAssets.files[filepath] = assetsFile;
-                editor.editorData.selectObject(assetsFile);
-                editor.editorui.assetsview.invalidateAssetstree();
-                callback && callback(null, assetsFile);
-                if (editor.regExps.image.test(assetsFile.path))
-                    feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
+            var feng3dFile = new editor.Feng3dFile().value({ name: filename, filename: filename, arraybuffer: arraybuffer });
+            editor.assets.saveAssets(feng3dFile);
+            editor.assets.writeArrayBuffer(feng3dFile.filePath, arraybuffer, function (err) {
+                var assetsFile = _this.addAssets(feng3dFile);
+                callback(err, assetsFile);
             });
         };
         /**
@@ -5919,6 +5895,38 @@ var editor;
     editor.assetsFileTemplates = new AssetsFileTemplates();
     var scriptTemplate = "\nclass NewScript extends feng3d.Script\n{\n\n    /** \n     * \u6D4B\u8BD5\u5C5E\u6027 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    t_attr = new feng3d.Color4();\n\n    /**\n     * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n     */\n    init()\n    {\n\n    }\n\n    /**\n     * \u66F4\u65B0\n     */\n    update()\n    {\n\n    }\n\n    /**\n     * \u9500\u6BC1\u65F6\u8C03\u7528\n     */\n    dispose()\n    {\n\n    }\n}";
     var shaderTemplate = "\nclass NewShaderUniforms\n{\n    /** \n     * \u989C\u8272 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    u_color = new feng3d.Color4();\n}\n\nfeng3d.shaderConfig.shaders[\"NewShader\"] = {\n    cls: NewShaderUniforms,\n    vertex: `\n    \n    attribute vec3 a_position;\n    \n    uniform mat4 u_modelMatrix;\n    uniform mat4 u_viewProjection;\n    \n    void main() {\n    \n        vec4 globalPosition = u_modelMatrix * vec4(a_position, 1.0);\n        gl_Position = u_viewProjection * globalPosition;\n    }`,\n    fragment: `\n    \n    precision mediump float;\n    \n    uniform vec4 u_color;\n    \n    void main() {\n        \n        gl_FragColor = u_color;\n    }\n    `,\n};\n\ntype NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };\ninterface MaterialFactory\n{\n    create(shader: \"NewShader\", raw?: gPartial<NewShaderMaterial>): NewShaderMaterial;\n}\n\ninterface MaterialRawMap\n{\n    NewShader: gPartial<NewShaderMaterial>;\n}";
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var Feng3dFile = /** @class */ (function (_super) {
+        __extends(Feng3dFile, _super);
+        function Feng3dFile() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(Feng3dFile.prototype, "filePath", {
+            get: function () {
+                return "Library/" + this.assetsId + "/file/" + this.filename;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        __decorate([
+            feng3d.serialize
+        ], Feng3dFile.prototype, "filename", void 0);
+        return Feng3dFile;
+    }(feng3d.Feng3dAssets));
+    editor.Feng3dFile = Feng3dFile;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var Feng3dFolder = /** @class */ (function (_super) {
+        __extends(Feng3dFolder, _super);
+        function Feng3dFolder() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return Feng3dFolder;
+    }(feng3d.Feng3dAssets));
+    editor.Feng3dFolder = Feng3dFolder;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

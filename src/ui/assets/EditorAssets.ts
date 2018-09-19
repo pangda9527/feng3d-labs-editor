@@ -54,7 +54,7 @@ namespace editor
                     this.rootFile = <any>data;
                 } else
                 {
-                    var folder = new Folder().value({ name: "Assets" });
+                    var folder = new Feng3dFolder().value({ name: "Assets" });
                     assets.saveAssets(folder)
                     this.rootFile = new AssetsFile(folder.assetsId)
                     this.saveProject();
@@ -166,7 +166,7 @@ namespace editor
                             {
                                 label: "文件夹", click: () =>
                                 {
-                                    assetsFile.addAssets(new Folder().value({ name: "New Folder" }));
+                                    assetsFile.addAssets(new Feng3dFolder().value({ name: "New Folder" }));
                                 }
                             },
                             {

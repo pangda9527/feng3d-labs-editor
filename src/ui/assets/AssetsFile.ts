@@ -115,7 +115,7 @@ namespace editor
 
         private init()
         {
-            this.isDirectory = this.feng3dAssets instanceof Folder;
+            this.isDirectory = this.feng3dAssets instanceof Feng3dFolder;
             this.label = this.name = this.feng3dAssets.name;
 
             // 更新图标
@@ -177,11 +177,6 @@ namespace editor
                 folders = folders.concat(cfolders);
             })
             return folders;
-        }
-
-        loadAll(callback: () => void)
-        {
-
         }
 
         private pathChanged()
@@ -383,29 +378,12 @@ namespace editor
          */
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsFile) => void)
         {
-            var filepath = this.path + filename;
-            if (!override)
+            var feng3dFile = new Feng3dFile().value({ name: filename, filename: filename, arraybuffer: arraybuffer });
+            assets.saveAssets(feng3dFile);
+            assets.writeArrayBuffer(feng3dFile.filePath, arraybuffer, err =>
             {
-                filepath = this.getnewname(filepath);
-            }
-            assets.writeArrayBuffer(filepath, arraybuffer, (e) =>
-            {
-                if (e)
-                {
-                    callback(e, null);
-                    return;
-                }
-                var assetsFile = new AssetsFile();
-                assetsFile.path = filepath;
-                editorAssets.files[filepath] = assetsFile;
-                editorData.selectObject(assetsFile);
-
-                editorui.assetsview.invalidateAssetstree();
-
-                callback && callback(null, assetsFile);
-                if (regExps.image.test(assetsFile.path))
-                    feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
-
+                var assetsFile = this.addAssets(feng3dFile);
+                callback(err, assetsFile);
             });
         }
 

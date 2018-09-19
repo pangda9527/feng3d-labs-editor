@@ -1357,10 +1357,6 @@ declare namespace editor {
     var codeeditoWin: Window;
 }
 declare namespace editor {
-    class Folder extends feng3d.Feng3dAssets {
-    }
-}
-declare namespace editor {
     class AssetsFileItemRenderer extends eui.ItemRenderer {
         icon: eui.Image;
         renameInput: RenameTextInput;
@@ -1455,7 +1451,6 @@ declare namespace editor {
         removeChild(file: AssetsFile): void;
         remove(): void;
         getFolderList(): any[];
-        loadAll(callback: () => void): void;
         private pathChanged;
         /**
          * 获取属性显示数据
@@ -1579,6 +1574,23 @@ declare namespace editor {
          * @param shadername shader名称
          */
         getNewShader(shadername: string): string;
+    }
+}
+declare namespace editor {
+    class Feng3dFile extends feng3d.Feng3dAssets {
+        /**
+         * 文件名称
+         */
+        filename: string;
+        /**
+         * 文件数据
+         */
+        arraybuffer: ArrayBuffer;
+        readonly filePath: string;
+    }
+}
+declare namespace editor {
+    class Feng3dFolder extends feng3d.Feng3dAssets {
     }
 }
 declare namespace editor {
