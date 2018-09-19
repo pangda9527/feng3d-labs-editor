@@ -550,24 +550,8 @@ declare namespace editor {
         contain(node: TreeNode): boolean;
         addNode(node: TreeNode): void;
         removeNode(): void;
+        getShowNodes(): TreeNode[];
         private openChanged;
-    }
-    interface TreeEventMap {
-        added: TreeNode;
-        removed: TreeNode;
-        changed: TreeNode;
-        openChanged: TreeNode;
-    }
-    interface Tree {
-        once<K extends keyof TreeEventMap>(type: K, listener: (event: feng3d.Event<TreeEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof TreeEventMap>(type: K, data?: TreeEventMap[K], bubbles?: boolean): feng3d.Event<TreeEventMap[K]>;
-        has<K extends keyof TreeEventMap>(type: K): boolean;
-        on<K extends keyof TreeEventMap>(type: K, listener: (event: feng3d.Event<TreeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
-        off<K extends keyof TreeEventMap>(type?: K, listener?: (event: feng3d.Event<TreeEventMap[K]>) => any, thisObject?: any): any;
-    }
-    class Tree extends feng3d.EventDispatcher {
-        rootnode: TreeNode;
-        getShowNodes(node?: TreeNode): TreeNode[];
     }
 }
 declare namespace editor {
@@ -2183,7 +2167,7 @@ declare namespace editor {
     /**
      * 层级树
      */
-    class HierarchyTree extends Tree {
+    class HierarchyTree {
         rootnode: HierarchyNode;
         private selectedGameObjects;
         constructor();

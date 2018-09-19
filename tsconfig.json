@@ -43,7 +43,7 @@
         "src/ui/components/ColorPicker.ts",
         "src/ui/components/TreeItemRenderer.ts",
         "src/ui/components/MenuItemRenderer.ts",
-        "src/ui/components/Tree.ts",
+        "src/ui/components/TreeNode.ts",
         "src/ui/components/Vector3DView.ts",
         "src/ui/components/ComponentView.ts",
         "src/ui/components/ParticleComponentView.ts",

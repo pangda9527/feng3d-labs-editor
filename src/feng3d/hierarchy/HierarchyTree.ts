@@ -10,7 +10,7 @@ namespace editor
     /**
      * 层级树
      */
-    export class HierarchyTree extends Tree
+    export class HierarchyTree
     {
         rootnode: HierarchyNode;
 
@@ -18,8 +18,6 @@ namespace editor
 
         constructor()
         {
-            super();
-
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
         }
 

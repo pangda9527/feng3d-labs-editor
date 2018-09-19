@@ -1929,6 +1929,15 @@ var editor;
             this.dispatch("removed", this, true);
             this.parent = null;
         };
+        TreeNode.prototype.getShowNodes = function () {
+            var nodes = [this];
+            if (this.isOpen) {
+                this.children.forEach(function (element) {
+                    nodes = nodes.concat(element.getShowNodes());
+                });
+            }
+            return nodes;
+        };
         TreeNode.prototype.openChanged = function () {
             this.dispatch("openChanged", null, true);
         };
@@ -1938,27 +1947,6 @@ var editor;
         return TreeNode;
     }(feng3d.EventDispatcher));
     editor.TreeNode = TreeNode;
-    var Tree = /** @class */ (function (_super) {
-        __extends(Tree, _super);
-        function Tree() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Tree.prototype.getShowNodes = function (node) {
-            var _this = this;
-            node = node || this.rootnode;
-            if (!node)
-                return [];
-            var nodes = [node];
-            if (node.isOpen) {
-                node.children.forEach(function (element) {
-                    nodes = nodes.concat(_this.getShowNodes(element));
-                });
-            }
-            return nodes;
-        };
-        return Tree;
-    }(feng3d.EventDispatcher));
-    editor.Tree = Tree;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -4618,7 +4606,7 @@ var editor;
             feng3d.ticker.nextframe(this.updateHierarchyTree, this);
         };
         HierarchyView.prototype.updateHierarchyTree = function () {
-            var nodes = editor.hierarchyTree.getShowNodes();
+            var nodes = editor.hierarchyTree.rootnode.getShowNodes();
             this.listData.replaceAll(nodes);
         };
         HierarchyView.prototype.onListClick = function (e) {
@@ -8079,13 +8067,10 @@ var editor;
     /**
      * 层级树
      */
-    var HierarchyTree = /** @class */ (function (_super) {
-        __extends(HierarchyTree, _super);
+    var HierarchyTree = /** @class */ (function () {
         function HierarchyTree() {
-            var _this = _super.call(this) || this;
-            _this.selectedGameObjects = [];
-            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", _this.onSelectedGameObjectChanged, _this);
-            return _this;
+            this.selectedGameObjects = [];
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
         }
         /**
          * 获取选中节点
@@ -8171,7 +8156,7 @@ var editor;
             });
         };
         return HierarchyTree;
-    }(editor.Tree));
+    }());
     editor.HierarchyTree = HierarchyTree;
     editor.hierarchyTree = new HierarchyTree();
 })(editor || (editor = {}));

@@ -82,7 +82,7 @@ namespace editor
 
 		private updateHierarchyTree()
 		{
-			var nodes = hierarchyTree.getShowNodes();
+			var nodes = hierarchyTree.rootnode.getShowNodes();
 			this.listData.replaceAll(nodes);
 		}
 

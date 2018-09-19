@@ -118,46 +118,22 @@ namespace editor
 			this.parent = null;
 		}
 
-		private openChanged()
+		getShowNodes()
 		{
-			this.dispatch("openChanged", null, true);
-		}
-	}
-
-	export interface TreeEventMap
-	{
-		added: TreeNode;
-		removed: TreeNode;
-		changed: TreeNode;
-		openChanged: TreeNode;
-	}
-
-	export interface Tree
-	{
-		once<K extends keyof TreeEventMap>(type: K, listener: (event: feng3d.Event<TreeEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-		dispatch<K extends keyof TreeEventMap>(type: K, data?: TreeEventMap[K], bubbles?: boolean): feng3d.Event<TreeEventMap[K]>;
-		has<K extends keyof TreeEventMap>(type: K): boolean;
-		on<K extends keyof TreeEventMap>(type: K, listener: (event: feng3d.Event<TreeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
-		off<K extends keyof TreeEventMap>(type?: K, listener?: (event: feng3d.Event<TreeEventMap[K]>) => any, thisObject?: any);
-	}
-
-	export class Tree extends feng3d.EventDispatcher
-	{
-		rootnode: TreeNode;
-
-		getShowNodes(node?: TreeNode)
-		{
-			node = node || this.rootnode;
-			if (!node) return [];
-			var nodes: TreeNode[] = [node];
-			if (node.isOpen)
+			var nodes: TreeNode[] = [this];
+			if (this.isOpen)
 			{
-				node.children.forEach(element =>
+				this.children.forEach(element =>
 				{
-					nodes = nodes.concat(this.getShowNodes(element));
+					nodes = nodes.concat(element.getShowNodes());
 				});
 			}
 			return nodes;
+		}
+
+		private openChanged()
+		{
+			this.dispatch("openChanged", null, true);
 		}
 	}
 }
