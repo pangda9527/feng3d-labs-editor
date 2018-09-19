@@ -144,6 +144,7 @@ namespace editor
         private updateShowFloder(host?: any, property?: string, oldvalue?: any)
         {
             var floder = editorAssets.showFloder;
+            if (!floder) return;
 
             var textFlow = new Array<egret.ITextElement>();
             do

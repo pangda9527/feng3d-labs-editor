@@ -1304,9 +1304,9 @@ declare namespace editor {
         getFile(path: string): AssetsFile;
         /**
          * 删除文件
-         * @param path 文件路径
+         * @param assetsFile 文件路径
          */
-        deletefile(path: string, callback?: () => void, includeRoot?: boolean): void;
+        deletefile(assetsFile: AssetsFile, callback?: () => void, includeRoot?: boolean): void;
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void): void;
         /**
         * 移动文件
@@ -1452,6 +1452,7 @@ declare namespace editor {
         private init;
         addChild(file: AssetsFile): void;
         removeChild(file: AssetsFile): void;
+        remove(): void;
         getFolderList(): any[];
         loadAll(callback: () => void): void;
         private pathChanged;

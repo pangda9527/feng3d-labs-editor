@@ -87,35 +87,18 @@ namespace editor
 
         /**
          * 删除文件
-         * @param path 文件路径
+         * @param assetsFile 文件路径
          */
-        deletefile(path: string, callback?: () => void, includeRoot = false)
+        deletefile(assetsFile: AssetsFile, callback?: () => void, includeRoot = false)
         {
-            if (path == this.assetsPath && !includeRoot)
+            if (assetsFile == this.rootFile && !includeRoot)
             {
                 alert("无法删除根目录");
                 return;
             }
-            assets.delete(path, (err) =>
-            {
-                if (err) feng3d.error(err);
-
-                if (feng3d.pathUtils.isDirectory(path))
-                {
-                    Object.keys(this.files).forEach(element =>
-                    {
-                        if (element.indexOf(path) == 0)
-                        {
-                            delete this.files[element];
-                            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: element });
-                        }
-                    });
-                }
-                delete this.files[path];
-                feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: path });
-                editorui.assetsview.invalidateAssetstree();
-                callback && callback();
-            });
+            assetsFile.remove();
+            editorui.assetsview.invalidateAssetstree();
+            callback && callback();
         }
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
@@ -309,7 +292,7 @@ namespace editor
             }, {
                     label: "删除", click: () =>
                     {
-                        editorAssets.deletefile(assetsFile.path);
+                        editorAssets.deletefile(assetsFile);
                     }
                 });
 
@@ -469,17 +452,19 @@ namespace editor
          * @param menuconfig 菜单
          * @param assetsFile 文件
          */
-        private parserMenu(menuconfig: MenuItem[], file: AssetsFile)
+        private parserMenu(menuconfig: MenuItem[], assetsFile: AssetsFile)
         {
-            var extensions = file.path.split(".").pop();
+            if (!assetsFile.path) return;
+
+            var extensions = assetsFile.path.split(".").pop();
             switch (extensions)
             {
-                case "mdl": menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(file.path) }); break;
-                case "obj": menuconfig.push({ label: "解析", click: () => feng3d.objLoader.load(file.path) }); break;
-                case "mtl": menuconfig.push({ label: "解析", click: () => feng3d.mtlLoader.load(file.path) }); break;
-                case "fbx": menuconfig.push({ label: "解析", click: () => threejsLoader.load(file.path) }); break;
-                case "md5mesh": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.load(file.path) }); break;
-                case "md5anim": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.loadAnim(file.path) }); break;
+                case "mdl": menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(assetsFile.path) }); break;
+                case "obj": menuconfig.push({ label: "解析", click: () => feng3d.objLoader.load(assetsFile.path) }); break;
+                case "mtl": menuconfig.push({ label: "解析", click: () => feng3d.mtlLoader.load(assetsFile.path) }); break;
+                case "fbx": menuconfig.push({ label: "解析", click: () => threejsLoader.load(assetsFile.path) }); break;
+                case "md5mesh": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.load(assetsFile.path) }); break;
+                case "md5anim": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.loadAnim(assetsFile.path) }); break;
             }
         }
 

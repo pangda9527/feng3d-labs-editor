@@ -144,6 +144,15 @@ namespace editor
             editorAssets.saveProject();
         }
 
+        remove()
+        {
+            if (this.parent) this.parent.removeChild(this);
+            assets.deleteAssets(this.id);
+            delete editorAssets.files[this.id];
+            editorAssets.saveProject();
+            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
+        }
+
         getFolderList()
         {
             var folders = [];

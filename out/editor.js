@@ -918,7 +918,7 @@ var editor;
                 }
                 else if (element instanceof editor.AssetsFile) {
                     deletefileNum++;
-                    editor.editorAssets.deletefile(element.path, function () {
+                    editor.editorAssets.deletefile(element, function () {
                         deletefileNum--;
                         // 等待删除所有文件 后清空选中对象
                         if (deletefileNum == 0) {
@@ -4725,31 +4725,17 @@ var editor;
         };
         /**
          * 删除文件
-         * @param path 文件路径
+         * @param assetsFile 文件路径
          */
-        EditorAssets.prototype.deletefile = function (path, callback, includeRoot) {
-            var _this = this;
+        EditorAssets.prototype.deletefile = function (assetsFile, callback, includeRoot) {
             if (includeRoot === void 0) { includeRoot = false; }
-            if (path == this.assetsPath && !includeRoot) {
+            if (assetsFile == this.rootFile && !includeRoot) {
                 alert("无法删除根目录");
                 return;
             }
-            editor.assets.delete(path, function (err) {
-                if (err)
-                    feng3d.error(err);
-                if (feng3d.pathUtils.isDirectory(path)) {
-                    Object.keys(_this.files).forEach(function (element) {
-                        if (element.indexOf(path) == 0) {
-                            delete _this.files[element];
-                            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: element });
-                        }
-                    });
-                }
-                delete _this.files[path];
-                feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: path });
-                editor.editorui.assetsview.invalidateAssetstree();
-                callback && callback();
-            });
+            assetsFile.remove();
+            editor.editorui.assetsview.invalidateAssetstree();
+            callback && callback();
         };
         EditorAssets.prototype.readScene = function (path, callback) {
             editor.assets.readObject(path, function (err, object) {
@@ -4904,7 +4890,7 @@ var editor;
                 }
             }, {
                 label: "删除", click: function () {
-                    editor.editorAssets.deletefile(assetsFile.path);
+                    editor.editorAssets.deletefile(assetsFile);
                 }
             });
             if (othermenus && othermenus.rename) {
@@ -5031,26 +5017,28 @@ var editor;
          * @param menuconfig 菜单
          * @param assetsFile 文件
          */
-        EditorAssets.prototype.parserMenu = function (menuconfig, file) {
-            var extensions = file.path.split(".").pop();
+        EditorAssets.prototype.parserMenu = function (menuconfig, assetsFile) {
+            if (!assetsFile.path)
+                return;
+            var extensions = assetsFile.path.split(".").pop();
             switch (extensions) {
                 case "mdl":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.mdlLoader.load(file.path); } });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.mdlLoader.load(assetsFile.path); } });
                     break;
                 case "obj":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.objLoader.load(file.path); } });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.objLoader.load(assetsFile.path); } });
                     break;
                 case "mtl":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.mtlLoader.load(file.path); } });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.mtlLoader.load(assetsFile.path); } });
                     break;
                 case "fbx":
-                    menuconfig.push({ label: "解析", click: function () { return editor.threejsLoader.load(file.path); } });
+                    menuconfig.push({ label: "解析", click: function () { return editor.threejsLoader.load(assetsFile.path); } });
                     break;
                 case "md5mesh":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.load(file.path); } });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.load(assetsFile.path); } });
                     break;
                 case "md5anim":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.loadAnim(file.path); } });
+                    menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.loadAnim(assetsFile.path); } });
                     break;
             }
         };
@@ -5301,6 +5289,14 @@ var editor;
                 this.children.splice(index, 1);
             file.parent = null;
             editor.editorAssets.saveProject();
+        };
+        AssetsFile.prototype.remove = function () {
+            if (this.parent)
+                this.parent.removeChild(this);
+            editor.assets.deleteAssets(this.id);
+            delete editor.editorAssets.files[this.id];
+            editor.editorAssets.saveProject();
+            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
         };
         AssetsFile.prototype.getFolderList = function () {
             var folders = [];
@@ -5787,6 +5783,8 @@ var editor;
         AssetsView.prototype.updateShowFloder = function (host, property, oldvalue) {
             var _this = this;
             var floder = editor.editorAssets.showFloder;
+            if (!floder)
+                return;
             var textFlow = new Array();
             do {
                 if (textFlow.length > 0)
@@ -11141,7 +11139,7 @@ var editor;
         {
             label: "清空项目",
             click: function () {
-                editor.editorAssets.deletefile(editor.editorAssets.assetsPath, function () {
+                editor.editorAssets.deletefile(editor.editorAssets.rootFile, function () {
                     editor.editorAssets.initproject(function () {
                         editor.editorAssets.runProjectScript(function () {
                             editor.engine.scene = editor.creatNewScene();
@@ -11347,7 +11345,7 @@ var editor;
      * @param projectname
      */
     function openDownloadProject(projectname, callback) {
-        editor.editorAssets.deletefile(editor.editorAssets.assetsPath, function () {
+        editor.editorAssets.deletefile(editor.editorAssets.rootFile, function () {
             downloadProject(projectname, callback);
         }, true);
     }

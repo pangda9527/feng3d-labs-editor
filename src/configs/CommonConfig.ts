@@ -142,7 +142,7 @@ namespace editor
             label: "清空项目",
             click: () =>
             {
-                editorAssets.deletefile(editorAssets.assetsPath, () =>
+                editorAssets.deletefile(editorAssets.rootFile, () =>
                 {
                     editorAssets.initproject(() =>
                     {
@@ -374,7 +374,7 @@ namespace editor
      */
     function openDownloadProject(projectname: string, callback?: () => void)
     {
-        editorAssets.deletefile(editorAssets.assetsPath, () =>
+        editorAssets.deletefile(editorAssets.rootFile, () =>
         {
             downloadProject(projectname, callback);
         }, true);

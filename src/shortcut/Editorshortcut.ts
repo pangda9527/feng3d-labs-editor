@@ -137,7 +137,7 @@ namespace editor
                 } else if (element instanceof AssetsFile)
                 {
                     deletefileNum++;
-                    editorAssets.deletefile(element.path, () =>
+                    editorAssets.deletefile(element, () =>
                     {
                         deletefileNum--;
                         // 等待删除所有文件 后清空选中对象
