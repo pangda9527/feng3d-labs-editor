@@ -129,11 +129,20 @@ namespace editor
             }
         }
 
+        addAssets(feng3dAssets: feng3d.Feng3dAssets)
+        {
+            assets.saveAssets(feng3dAssets);
+            var assetsFile = new AssetsFile(feng3dAssets.assetsId);
+            this.addChild(assetsFile);
+            return assetsFile;
+        }
+
         addChild(file: AssetsFile)
         {
             if (this.children.indexOf(file) == -1) this.children.push(file);
             file.parent = this;
             editorAssets.saveProject();
+            editorui.assetsview.invalidateAssetstree();
         }
 
         removeChild(file: AssetsFile)
@@ -142,6 +151,7 @@ namespace editor
             if (index != -1) this.children.splice(index, 1);
             file.parent = null;
             editorAssets.saveProject();
+            editorui.assetsview.invalidateAssetstree();
         }
 
         remove()
@@ -150,6 +160,7 @@ namespace editor
             assets.deleteAssets(this.id);
             delete editorAssets.files[this.id];
             editorAssets.saveProject();
+            editorui.assetsview.invalidateAssetstree();
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
         }
 
@@ -330,28 +341,6 @@ namespace editor
 
                 editorui.assetsview.invalidateAssetstree();
                 callback && callback(this);
-            });
-        }
-
-        /**
-         * 新增子文件夹
-         * @param newfoldername 新增文件夹名称
-         * @param callback      完成回调
-         */
-        addfolder(newfoldername: string, callback?: (file: AssetsFile) => void)
-        {
-            var folderpath = this.getnewname(this.path + newfoldername);
-            folderpath = folderpath + "/";
-
-            assets.mkdir(folderpath, (e) =>
-            {
-                feng3d.assert(!e);
-
-                var assetsFile = new AssetsFile();
-                assetsFile.path = folderpath;
-                editorAssets.files[folderpath] = assetsFile;
-
-                editorui.assetsview.invalidateAssetstree();
             });
         }
 

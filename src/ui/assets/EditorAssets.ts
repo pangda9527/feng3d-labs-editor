@@ -59,11 +59,18 @@ namespace editor
                     this.rootFile = new AssetsFile(folder.assetsId)
                     this.saveProject();
                 }
-                feng3d.feng3dDispatcher.once("editor.allLoaded", () =>
+                this.showFloder = this.rootFile;
+                if (loadingNum == 0)
                 {
-                    this.showFloder = this.rootFile;
                     callback();
-                });
+                }
+                else
+                {
+                    feng3d.feng3dDispatcher.once("editor.allLoaded", () =>
+                    {
+                        callback();
+                    });
+                }
             });
         }
 
@@ -159,12 +166,7 @@ namespace editor
                             {
                                 label: "文件夹", click: () =>
                                 {
-                                    var folder = new Folder().value({ name: "New Folder" });
-
-
-                                    this.rootFile
-
-                                    assetsFile.addfolder("New Folder");
+                                    assetsFile.addAssets(new Folder().value({ name: "New Folder" }));
                                 }
                             },
                             {
@@ -203,18 +205,13 @@ namespace editor
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    assetsFile.addfile("new texturecube" + ".texturecube.json", new feng3d.TextureCube());
+                                    assetsFile.addAssets(new feng3d.TextureCube().value({ name: "New TextureCube" }));
                                 }
                             },
                             {
                                 label: "材质", click: () =>
                                 {
-                                    // assetsFile.addfile("new material" + ".material.json", new feng3d.Material());
-
-
-                                    var material = new feng3d.Material().value({ name: "New Material" });
-                                    assets.saveAssets(material);
-                                    editorAssets.rootFile.addChild(new AssetsFile(material.assetsId));
+                                    assetsFile.addAssets(new feng3d.Material().value({ name: "New Material" }));
                                 }
                             },
                         ]
@@ -390,11 +387,13 @@ namespace editor
                 var showFloder = this.showFloder;
                 if (regExps.image.test(file.name))
                 {
-                    var imagePath = "Library/" + file.name;
+                    var urlImageTexture2D = new feng3d.UrlImageTexture2D().value({ name: file.name })
+                    assets.saveAssets(urlImageTexture2D);
+                    var imagePath = `Library/${urlImageTexture2D.assetsId}/file/` + file.name;
                     assets.writeArrayBuffer(imagePath, result, err =>
                     {
-                        var texture2dName = feng3d.pathUtils.getName(file.name) + "." + feng3d.AssetExtension.texture2d;
-                        var assetsFile = showFloder.addfile(texture2dName, new feng3d.UrlImageTexture2D().value({ url: imagePath }));
+                        urlImageTexture2D.url = imagePath;
+                        var assetsFile = showFloder.addAssets(urlImageTexture2D);
                         assetsFiles.push(assetsFile);
                         this.inputFiles(files, callback, assetsFiles);
                     });

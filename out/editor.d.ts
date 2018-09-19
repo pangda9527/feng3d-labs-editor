@@ -1450,6 +1450,7 @@ declare namespace editor {
         constructor(id?: string);
         private idChanged;
         private init;
+        addAssets(feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
         addChild(file: AssetsFile): void;
         removeChild(file: AssetsFile): void;
         remove(): void;
@@ -1485,12 +1486,6 @@ declare namespace editor {
          * @param callback 回调函数
          */
         move(oldpath: string, newpath: string, callback?: (file: AssetsFile) => void): void;
-        /**
-         * 新增子文件夹
-         * @param newfoldername 新增文件夹名称
-         * @param callback      完成回调
-         */
-        addfolder(newfoldername: string, callback?: (file: AssetsFile) => void): void;
         /**
          * 新增文件
          * @param filename 新增文件名称
