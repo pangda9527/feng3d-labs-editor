@@ -30,11 +30,8 @@ namespace editor
 			this._viewData = null;
 			if (data instanceof AssetsFile)
 			{
-				data.showInspectorData((showdata) =>
-				{
-					this._viewData = showdata;
-					this.updateView();
-				});
+				this._viewData = data.feng3dAssets;
+				this.updateView();
 			} else
 			{
 				this._viewData = data;
@@ -53,18 +50,7 @@ namespace editor
 			{
 				if (this._viewData instanceof AssetsFile)
 				{
-					var viewData = this._viewData;
-					viewData.showInspectorData((showdata) =>
-					{
-						if (viewData == this._viewData)
-						{
-							if (this._view && this._view.parent)
-							{
-								this._view.parent.removeChild(this._view);
-							}
-							this.updateShowData(showdata);
-						}
-					});
+					this.updateShowData(this._viewData.feng3dAssets);
 				} else
 				{
 					this.updateShowData(this._viewData);

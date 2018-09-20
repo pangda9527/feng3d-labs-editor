@@ -4334,7 +4334,6 @@ var editor;
             return _this;
         }
         InspectorView.prototype.showData = function (data, removeBack) {
-            var _this = this;
             if (removeBack === void 0) { removeBack = false; }
             if (this._viewData) {
                 this.saveShowData();
@@ -4346,10 +4345,8 @@ var editor;
             //
             this._viewData = null;
             if (data instanceof editor.AssetsFile) {
-                data.showInspectorData(function (showdata) {
-                    _this._viewData = showdata;
-                    _this.updateView();
-                });
+                this._viewData = data.feng3dAssets;
+                this.updateView();
             }
             else {
                 this._viewData = data;
@@ -4357,22 +4354,13 @@ var editor;
             }
         };
         InspectorView.prototype.updateView = function () {
-            var _this = this;
             this.backButton.visible = this._viewDataList.length > 0;
             if (this._view && this._view.parent) {
                 this._view.parent.removeChild(this._view);
             }
             if (this._viewData) {
                 if (this._viewData instanceof editor.AssetsFile) {
-                    var viewData = this._viewData;
-                    viewData.showInspectorData(function (showdata) {
-                        if (viewData == _this._viewData) {
-                            if (_this._view && _this._view.parent) {
-                                _this._view.parent.removeChild(_this._view);
-                            }
-                            _this.updateShowData(showdata);
-                        }
-                    });
+                    this.updateShowData(this._viewData.feng3dAssets);
                 }
                 else {
                     this.updateShowData(this._viewData);
@@ -5077,20 +5065,8 @@ var editor;
             editor.editorData.selectObject(this.data);
         };
         AssetsFileItemRenderer.prototype.onrightclick = function (e) {
-            var _this = this;
             e.stopPropagation();
-            var othermenus = {
-                rename: {
-                    label: "重命名",
-                    click: function () {
-                        _this.renameInput.edit(function () {
-                            var newName = _this.data.name.replace(_this.data.label, _this.renameInput.text);
-                            _this.data.rename(newName);
-                        });
-                    }
-                }
-            };
-            editor.editorAssets.popupmenu(this.data, othermenus);
+            editor.editorAssets.popupmenu(this.data);
         };
         AssetsFileItemRenderer.prototype.selectedfilechanged = function () {
             var selectedAssetsFile = editor.editorData.selectedAssetsFile;
@@ -5157,13 +5133,6 @@ var editor;
                     _this.image = dataurl;
                 });
             }
-            if (editor.regExps.image.test(this.path)) {
-                editor.assets.readArrayBuffer(this.path, function (err, data) {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
-                        _this.image = dataurl;
-                    });
-                });
-            }
         };
         AssetsFile.prototype.addAssets = function (feng3dAssets) {
             editor.assets.saveAssets(feng3dAssets);
@@ -5193,26 +5162,6 @@ var editor;
                 });
             }
             return folders;
-        };
-        /**
-         * 获取属性显示数据
-         * @param callback 获取属性面板显示数据回调
-         */
-        AssetsFile.prototype.showInspectorData = function (callback) {
-            callback(this.feng3dAssets);
-            return;
-        };
-        /**
-         * 重命名
-         * @param newname 新文件名称
-         * @param callback 重命名完成回调
-         */
-        AssetsFile.prototype.rename = function (newname, callback) {
-            var oldpath = this.path;
-            var newpath = feng3d.pathUtils.getParentPath(this.path) + newname;
-            if (this.isDirectory)
-                newpath = newpath + "/";
-            this.move(oldpath, newpath, callback);
         };
         /**
          * 移动文件（夹）到指定文件夹
@@ -5405,20 +5354,8 @@ var editor;
             editor.editorAssets.showFloder = this.data;
         };
         AssetsTreeItemRenderer.prototype.onrightclick = function (e) {
-            var _this = this;
             if (this.data.parent != null) {
-                var othermenus = {
-                    rename: {
-                        label: "重命名",
-                        click: function () {
-                            _this.renameInput.edit(function () {
-                                var newName = _this.data.name.replace(_this.data.label, _this.renameInput.text);
-                                _this.data.rename(newName);
-                            });
-                        }
-                    }
-                };
-                editor.editorAssets.popupmenu(this.data, othermenus);
+                editor.editorAssets.popupmenu(this.data);
             }
             else {
                 editor.editorAssets.popupmenu(this.data);

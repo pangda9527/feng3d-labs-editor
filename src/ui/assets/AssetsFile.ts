@@ -123,16 +123,6 @@ namespace editor
                     this.image = dataurl;
                 });
             }
-            if (regExps.image.test(this.path))
-            {
-                assets.readArrayBuffer(this.path, (err, data) =>
-                {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
-                    {
-                        this.image = dataurl;
-                    });
-                });
-            }
         }
 
         addAssets(feng3dAssets: feng3d.Feng3dAssets)
@@ -170,30 +160,6 @@ namespace editor
                 });
             }
             return folders;
-        }
-
-        /**
-         * 获取属性显示数据
-         * @param callback 获取属性面板显示数据回调
-         */
-        showInspectorData(callback: (showdata: Object) => void)
-        {
-            callback(this.feng3dAssets)
-            return;
-        }
-
-        /**
-         * 重命名
-         * @param newname 新文件名称
-         * @param callback 重命名完成回调
-         */
-        rename(newname: string, callback?: (file: AssetsFile) => void)
-        {
-            var oldpath = this.path;
-            var newpath = feng3d.pathUtils.getParentPath(this.path) + newname;
-            if (this.isDirectory)
-                newpath = newpath + "/";
-            this.move(oldpath, newpath, callback);
         }
 
         /**

@@ -127,21 +127,7 @@ namespace editor
         private onrightclick(e: egret.Event)
         {
             e.stopPropagation();
-
-            var othermenus = {
-                rename: {
-                    label: "重命名",
-                    click: () =>
-                    {
-                        this.renameInput.edit(() =>
-                        {
-                            var newName = this.data.name.replace(this.data.label, this.renameInput.text);
-                            this.data.rename(newName);
-                        });
-                    }
-                }
-            }
-            editorAssets.popupmenu(this.data, othermenus);
+            editorAssets.popupmenu(this.data);
         }
 
         private selectedfilechanged()

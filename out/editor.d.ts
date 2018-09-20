@@ -1399,17 +1399,6 @@ declare namespace editor {
         delete(): void;
         getFolderList(includeClose?: boolean): any[];
         /**
-         * 获取属性显示数据
-         * @param callback 获取属性面板显示数据回调
-         */
-        showInspectorData(callback: (showdata: Object) => void): void;
-        /**
-         * 重命名
-         * @param newname 新文件名称
-         * @param callback 重命名完成回调
-         */
-        rename(newname: string, callback?: (file: AssetsFile) => void): void;
-        /**
          * 移动文件（夹）到指定文件夹
          * @param destdirpath 目标文件夹路径
          * @param callback 移动文件完成回调
