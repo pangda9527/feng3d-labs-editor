@@ -42,6 +42,7 @@ namespace editor
 
         // 占用，避免出现label命名的组件
         private label = "";
+        protected editable = true;
 
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {

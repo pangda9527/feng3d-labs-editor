@@ -1,18 +1,3 @@
-namespace feng3d
-{
-    export interface Feng3dEventMap
-    {
-        /**
-         * 资源显示文件夹发生变化
-         */
-        "assets.showFloderChanged": { oldpath: string, newpath: string };
-        /**
-         * 删除文件
-         */
-        "assets.deletefile": { path: string };
-    }
-}
-
 namespace editor
 {
     export var editorAssets: EditorAssets;
@@ -343,9 +328,10 @@ namespace editor
             }
         }
 
-        saveObject(object: feng3d.Feng3dAssets, filename: string, callback?: (file: AssetsFile) => void)
+        saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsFile) => void)
         {
-            this.showFloder.addfile(filename, object, true, callback);
+            var assetsFile = this.showFloder.addAssets(object);
+            callback && callback(assetsFile);
         }
 
         /**
@@ -477,13 +463,13 @@ namespace editor
             var data = e.data;
             if (data instanceof feng3d.GameObject)
             {
-                this.saveObject(data, data.name + "." + feng3d.AssetExtension.gameobject);
+                this.saveObject(data);
             } else if (data instanceof feng3d.Material)
             {
-                this.saveObject(data, data.name + "." + feng3d.AssetExtension.material);
+                this.saveObject(data);
             } else if (data instanceof feng3d.AnimationClip)
             {
-                this.saveObject(data, data.name + "." + feng3d.AssetExtension.anim);
+                this.saveObject(data);
             }
         }
     }

@@ -79,19 +79,7 @@ namespace editor
 		{
 			if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets)
 			{
-				if (this._viewData.path)
-				{
-					var obj = feng3d.serialization.serialize(this._viewData);
-					var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-					feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
-					{
-						assets.writeArrayBuffer(this._viewData.path, arrayBuffer, (e) =>
-						{
-							if (e) feng3d.error(e);
-							callback && callback();
-						});
-					});
-				}
+				assets.saveAssets(this._viewData, callback);
 				this._dataChanged = false;
 			} else
 			{

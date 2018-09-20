@@ -51,24 +51,24 @@ namespace editor
                 {
                     var gameobject: feng3d.GameObject = dragSource.gameobject;
                     if (gameobject.getComponent(feng3d.Scene3D) != null)
-                        editorAssets.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.scene);
+                        editorAssets.saveObject(gameobject);
                     else
-                        editorAssets.saveObject(gameobject, gameobject.name + "." + feng3d.AssetExtension.gameobject);
+                        editorAssets.saveObject(gameobject);
                 }
                 if (dragSource.animationclip)
                 {
                     var animationclip = dragSource.animationclip;
-                    editorAssets.saveObject(animationclip, animationclip.name + "." + feng3d.AssetExtension.anim);
+                    editorAssets.saveObject(animationclip);
                 }
                 if (dragSource.material)
                 {
                     var material = dragSource.material;
-                    editorAssets.saveObject(material, material.name + "." + feng3d.AssetExtension.material);
+                    editorAssets.saveObject(material);
                 }
                 if (dragSource.geometry)
                 {
                     var geometry = dragSource.geometry;
-                    editorAssets.saveObject(geometry, geometry.name + "." + feng3d.AssetExtension.geometry);
+                    editorAssets.saveObject(geometry);
                 }
             });
 

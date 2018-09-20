@@ -9,6 +9,15 @@ namespace feng3d
         "editor.allLoaded"
 
         /**
+         * 资源显示文件夹发生变化
+         */
+        "assets.showFloderChanged": { oldpath: string, newpath: string };
+        /**
+         * 删除文件
+         */
+        "assets.deletefile": { path: string };
+
+        /**
          * 旋转场景摄像机
          */
         editorCameraRotate: feng3d.Vector3

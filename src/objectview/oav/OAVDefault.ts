@@ -34,13 +34,6 @@ namespace editor
 			}
 		}
 
-		private _textEnabled: undefined | boolean = undefined;
-		set textEnabled(v: boolean)
-		{
-			this.text.enabled = v;
-			this._textEnabled = v;
-		}
-
 		initView()
 		{
 			this.text.percentWidth = 100;
@@ -93,8 +86,7 @@ namespace editor
 				this.text.text = valuename + " (" + this.attributeValue.constructor.name + ")";
 				this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
 			}
-			if (this._textEnabled !== undefined)
-				this.text.enabled = this._textEnabled;
+			this.text.enabled = this.editable;
 		}
 
 		private onDoubleClick()

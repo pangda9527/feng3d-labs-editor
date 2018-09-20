@@ -110,29 +110,18 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "material")
                 {
-                    var materialfiles = editorAssets.filter((file) =>
-                    {
-                        return file.extension == feng3d.AssetExtension.material;
-                    });
-
+                    var materials = feng3d.Feng3dAssets.getAssetsByType(feng3d.Material);
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
-
-                    if (materialfiles.length > 0)
+                    materials.forEach(element =>
                     {
-                        getMaterials(materialfiles, (materials) =>
-                        {
-                            materials.forEach(element =>
+                        menus.push({
+                            label: element.name,
+                            click: () =>
                             {
-                                menus.push({
-                                    label: element.name,
-                                    click: () =>
-                                    {
-                                        this.attributeValue = element;
-                                    }
-                                });
-                            });
+                                this.attributeValue = element;
+                            }
                         });
-                    }
+                    });
                     menu.popup(menus);
                 }
             }

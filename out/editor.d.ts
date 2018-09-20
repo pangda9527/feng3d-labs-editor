@@ -852,6 +852,7 @@ declare namespace editor {
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         space: any;
         private label;
+        protected editable: boolean;
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         /**
@@ -882,8 +883,6 @@ declare namespace editor {
             accepttype: keyof DragData;
             datatype: string;
         };
-        private _textEnabled;
-        textEnabled: boolean;
         initView(): void;
         dispose(): void;
         private _textfocusintxt;
@@ -1244,23 +1243,6 @@ declare namespace editor {
         private onListRightClick;
     }
 }
-declare namespace feng3d {
-    interface Feng3dEventMap {
-        /**
-         * 资源显示文件夹发生变化
-         */
-        "assets.showFloderChanged": {
-            oldpath: string;
-            newpath: string;
-        };
-        /**
-         * 删除文件
-         */
-        "assets.deletefile": {
-            path: string;
-        };
-    }
-}
 declare namespace editor {
     var editorAssets: EditorAssets;
     class EditorAssets {
@@ -1316,7 +1298,7 @@ declare namespace editor {
          * 获取一个新路径
          */
         getnewpath(path: string, callback: (newpath: string) => void): void;
-        saveObject(object: feng3d.Feng3dAssets, filename: string, callback?: (file: AssetsFile) => void): void;
+        saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsFile) => void): void;
         /**
          * 过滤出文件列表
          * @param fn 过滤函数
@@ -1453,13 +1435,6 @@ declare namespace editor {
          */
         move(oldpath: string, newpath: string, callback?: (file: AssetsFile) => void): void;
         /**
-         * 新增文件
-         * @param filename 新增文件名称
-         * @param content 文件内容
-         * @param callback 完成回调
-         */
-        addfile(filename: string, content: feng3d.Feng3dAssets, override?: boolean, callback?: (file: AssetsFile) => void): AssetsFile;
-        /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
          * @param arraybuffer 文件数据
@@ -1558,7 +1533,12 @@ declare namespace editor {
          * 文件数据
          */
         arraybuffer: ArrayBuffer;
-        readonly filePath: string;
+        /**
+         * 文件路径
+         */
+        filePath: string;
+        protected fileNameChanged(): void;
+        protected assetsIdChanged(): void;
     }
 }
 declare namespace editor {
@@ -2694,6 +2674,19 @@ declare namespace feng3d {
         "editor.isWoldCoordinateChanged": any;
         "editor.toolTypeChanged": any;
         "editor.allLoaded": any;
+        /**
+         * 资源显示文件夹发生变化
+         */
+        "assets.showFloderChanged": {
+            oldpath: string;
+            newpath: string;
+        };
+        /**
+         * 删除文件
+         */
+        "assets.deletefile": {
+            path: string;
+        };
         /**
          * 旋转场景摄像机
          */

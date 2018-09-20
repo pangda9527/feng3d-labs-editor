@@ -6,6 +6,7 @@ namespace editor
          * 文件名称
          */
         @feng3d.serialize
+        @feng3d.watch("fileNameChanged")
         filename: string;
 
         /**
@@ -13,9 +14,19 @@ namespace editor
          */
         arraybuffer: ArrayBuffer;
 
-        get filePath()
+        /**
+         * 文件路径
+         */
+        filePath: string;
+
+        protected fileNameChanged()
         {
-            return `Library/${this.assetsId}/file/` + this.filename;
+            this.filePath = `Library/${this.assetsId}/file/` + this.filename;
+        }
+
+        protected assetsIdChanged()
+        {
+            this.filePath = `Library/${this.assetsId}/file/` + this.filename;
         }
     }
 }

@@ -292,37 +292,6 @@ namespace editor
         }
 
         /**
-         * 新增文件
-         * @param filename 新增文件名称
-         * @param content 文件内容
-         * @param callback 完成回调
-         */
-        addfile(filename: string, content: feng3d.Feng3dAssets, override = false, callback?: (file: AssetsFile) => void)
-        {
-            var filepath = this.path + filename;
-            if (!override)
-            {
-                filepath = this.getnewname(filepath);
-            }
-
-            var assetsFile = new AssetsFile();
-            assetsFile.path = filepath;
-            assetsFile.feng3dAssets = content;
-            assetsFile.save(true, () =>
-            {
-                editorAssets.files[filepath] = assetsFile;
-                editorData.selectObject(assetsFile);
-
-                editorui.assetsview.invalidateAssetstree();
-
-                callback && callback(assetsFile);
-                if (regExps.image.test(assetsFile.path))
-                    feng3d.feng3dDispatcher.dispatch("assets.imageAssetsChanged", { url: assetsFile.path });
-            });
-            return assetsFile;
-        }
-
-        /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
          * @param arraybuffer 文件数据

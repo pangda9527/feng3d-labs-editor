@@ -18,11 +18,6 @@ class OAVDefault extends OAVBase
 		this.addChild(this.text);
 	}
 
-	set textEnabled(v: boolean)
-	{
-		this.text.enabled = v;
-	}
-
 	initView()
 	{
 		// this.text.percentWidth = 100;
