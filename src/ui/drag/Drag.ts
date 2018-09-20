@@ -54,7 +54,7 @@ namespace editor
 		/**
 		 * 脚本路径
 		 */
-		file_script?: string;
+		file_script?: ScriptFile;
 		/**
 		 * 文件路径
 		 */

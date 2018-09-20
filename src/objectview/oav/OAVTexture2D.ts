@@ -36,28 +36,23 @@ namespace editor
 
         private ontxtClick()
         {
-            var menus: MenuItem[] = editorAssets.filter((file) =>
-            {
-                return file.extension == feng3d.AssetExtension.texture2d;
-            }).reduce((prev, item) =>
-            {
-                prev.push({
-                    label: item.name, click: () =>
-                    {
-                        item.getData((texture2d: feng3d.UrlImageTexture2D) =>
-                        {
-                            this.attributeValue = texture2d;
-                            this.updateView();
-                        });
-                    }
-                }); return prev;
-            }, []);
-            menus.unshift({
-                label: `空`, click: () =>
+            var menus: MenuItem[] = [{
+                label: `None`, click: () =>
                 {
                     this.attributeValue = new feng3d.UrlImageTexture2D();
                     this.updateView();
                 }
+            }];
+            var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.Texture2D);
+            texture2ds.forEach(texture2d =>
+            {
+                menus.push({
+                    label: texture2d.name, click: () =>
+                    {
+                        this.attributeValue = texture2d;
+                        this.updateView();
+                    }
+                });
             });
             menu.popup(menus);
         }

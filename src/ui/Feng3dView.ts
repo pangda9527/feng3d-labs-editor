@@ -33,7 +33,11 @@ namespace editor
 					var gameobject = engine.mouse3DManager.selectedGameObject;
 					if (!gameobject || !gameobject.scene)
 						gameobject = hierarchy.rootnode.gameobject;
-					gameobject.addScript(dragdata.file_script);
+
+					dragdata.file_script.getScriptClassName(scriptClassName =>
+					{
+						gameobject.addScript(scriptClassName);
+					});
 				}
 			});
 		}

@@ -85,34 +85,43 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "file_script")
                 {
-                    var materialfiles = editorAssets.filter((file) =>
-                    {
-                        return file.extension == feng3d.AssetExtension.script;
-                    })
+                    var scriptFiles = feng3d.Feng3dAssets.getAssetsByType(ScriptFile);
 
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
-                    if (materialfiles.length > 0)
+                    scriptFiles.forEach(element =>
                     {
-                        getScriptClassNames(materialfiles, (scriptClassNames) =>
-                        {
-                            scriptClassNames.forEach(element =>
+                        menus.push({
+                            label: element.name,
+                            click: () =>
                             {
-                                menus.push({
-                                    label: element,
-                                    click: () =>
-                                    {
-                                        this.attributeValue = element;
-                                    }
+                                element.getScriptClassName(scriptClassName =>
+                                {
+                                    this.attributeValue = scriptClassName;
                                 });
-                            });
+                            }
                         });
-                    }
+                    });
                     menu.popup(menus);
                 } else if (param.accepttype == "material")
                 {
                     var materials = feng3d.Feng3dAssets.getAssetsByType(feng3d.Material);
-                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
+                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = undefined; } }];
                     materials.forEach(element =>
+                    {
+                        menus.push({
+                            label: element.name,
+                            click: () =>
+                            {
+                                this.attributeValue = element;
+                            }
+                        });
+                    });
+                    menu.popup(menus);
+                } else if (param.accepttype == "geometry")
+                {
+                    var geometrys = feng3d.Feng3dAssets.getAssetsByType(feng3d.Geometry);
+                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = undefined; } }];
+                    geometrys.forEach(element =>
                     {
                         menus.push({
                             label: element.name,
@@ -151,33 +160,5 @@ namespace editor
             if (this.attributeValue && typeof this.attributeValue == "object")
                 editorui.inspectorView.showData(this.attributeValue);
         }
-    }
-
-    function getScriptClassNames(tsfiles: AssetsFile[], callback: (scriptClassNames: string[]) => void, scriptClassNames: string[] = [])
-    {
-        if (tsfiles.length == 0)
-        {
-            callback(scriptClassNames);
-            return;
-        }
-        tsfiles.shift().getScriptClassName((scriptClassName) =>
-        {
-            scriptClassNames.push(scriptClassName);
-            getScriptClassNames(tsfiles, callback, scriptClassNames);
-        });
-    }
-
-    function getMaterials(tsfiles: AssetsFile[], callback: (materials: feng3d.Material[]) => void, materials: feng3d.Material[] = [])
-    {
-        if (tsfiles.length == 0)
-        {
-            callback(materials);
-            return;
-        }
-        tsfiles.shift().getData((material) =>
-        {
-            materials.push(material);
-            getMaterials(tsfiles, callback, materials);
-        });
     }
 }

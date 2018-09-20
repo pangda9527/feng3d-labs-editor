@@ -241,7 +241,7 @@ namespace editor
             feng3d.AssetExtension.md5mesh,
             feng3d.AssetExtension.md5anim,
             feng3d.AssetExtension.mdl
-            ].indexOf(assetsFile.extension) != -1
+            ].indexOf(assetsFile.feng3dAssets.assetType) != -1
             )
             {
                 menuconfig.push({

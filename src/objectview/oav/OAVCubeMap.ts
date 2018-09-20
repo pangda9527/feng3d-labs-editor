@@ -80,35 +80,36 @@ namespace editor
 			if (index != -1)
 			{
 				var textureCube: feng3d.TextureCube = this.space;
-
-				var texturefiles = editorAssets.filter((file) =>
-				{
-					return file.extension == feng3d.AssetExtension.texture2d;
-				});
-
-				var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
-				texturefiles.forEach(v =>
-				{
-					v.getData((d: feng3d.UrlImageTexture2D) =>
+				var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.UrlImageTexture2D);
+				var menus: MenuItem[] = [{
+					label: `None`, click: () =>
 					{
-						menus.push({
-							label: d.name,
-							click: () =>
-							{
-								textureCube[propertys[index]] = d.url;
-								this.updateImage(index);
-								//
-								var objectViewEvent = <any>new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
-								objectViewEvent.space = this._space;
-								objectViewEvent.attributeName = propertys[index];
-								objectViewEvent.attributeValue = d.url;
-								this.dispatchEvent(objectViewEvent);
-							}
-						});
+						textureCube[propertys[index]] = "";
+						this.updateImage(index);
+						this.dispatchValueChange(index);
+					}
+				}];
+				texture2ds.forEach(d =>
+				{
+					menus.push({
+						label: d.name, click: () =>
+						{
+							textureCube[propertys[index]] = d.url;
+							this.updateImage(index);
+							this.dispatchValueChange(index);
+						}
 					});
 				});
 				menu.popup(menus);
 			}
+		}
+
+		private dispatchValueChange(index: number)
+		{
+			var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+			objectViewEvent.space = this._space;
+			objectViewEvent.attributeName = propertys[index];
+			this.dispatchEvent(objectViewEvent);
 		}
 
 		dispose()

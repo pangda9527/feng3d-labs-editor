@@ -262,7 +262,7 @@ declare namespace editor {
         /**
          * 脚本路径
          */
-        file_script?: string;
+        file_script?: ScriptFile;
         /**
          * 文件路径
          */
@@ -829,9 +829,6 @@ declare namespace feng3d {
         static VALUE_CHANGE: string;
         space: any;
         attributeName: string;
-        attributeValue: any;
-        constructor(type: string, bubbles?: boolean, cancelable?: boolean);
-        toString(): string;
     }
 }
 declare namespace editor {
@@ -1020,6 +1017,7 @@ declare namespace editor {
         initView(): void;
         private updateImage;
         private onImageClick;
+        private dispatchValueChange;
         dispose(): void;
         updateView(): void;
         onResize(): void;
@@ -1384,10 +1382,6 @@ declare namespace editor {
          * 显示标签
          */
         label: string;
-        /**
-         * 扩展名
-         */
-        extension: feng3d.AssetExtension;
         children: AssetsFile[];
         parent: AssetsFile;
         feng3dAssets: feng3d.Feng3dAssets;
@@ -1404,17 +1398,11 @@ declare namespace editor {
          */
         delete(): void;
         getFolderList(includeClose?: boolean): any[];
-        private pathChanged;
         /**
          * 获取属性显示数据
          * @param callback 获取属性面板显示数据回调
          */
         showInspectorData(callback: (showdata: Object) => void): void;
-        /**
-         * 获取文件数据
-         * @param callback 获取文件数据回调
-         */
-        getData(callback: (data: any) => void): void;
         /**
          * 重命名
          * @param newname 新文件名称
@@ -1456,11 +1444,6 @@ declare namespace editor {
          * 获取一个新的不重名子文件名称
          */
         private getnewname;
-        /**
-         * 获取脚本类名称
-         * @param callback 回调函数
-         */
-        getScriptClassName(callback: (scriptClassName: string) => void): string;
     }
 }
 declare namespace editor {
@@ -1543,30 +1526,41 @@ declare namespace editor {
 }
 declare namespace editor {
     class Feng3dFolder extends feng3d.Feng3dAssets {
+        assetType: feng3d.AssetExtension;
     }
 }
 declare namespace editor {
     class ScriptFile extends Feng3dFile {
+        type: feng3d.AssetExtension;
         scriptContent: string;
+        /**
+         * 获取脚本类名称
+         * @param callback 回调函数
+         */
+        getScriptClassName(callback: (scriptClassName: string) => void): void;
     }
 }
 declare namespace editor {
     class ShaderFile extends Feng3dFile {
+        assetType: feng3d.AssetExtension;
         shaderContent: string;
     }
 }
 declare namespace editor {
     class JSFile extends Feng3dFile {
+        assetType: feng3d.AssetExtension;
         jsContent: string;
     }
 }
 declare namespace editor {
     class JsonFile extends Feng3dFile {
+        assetType: feng3d.AssetExtension;
         jsonContent: string;
     }
 }
 declare namespace editor {
     class TextFile extends Feng3dFile {
+        assetType: feng3d.AssetExtension;
         textContent: string;
     }
 }

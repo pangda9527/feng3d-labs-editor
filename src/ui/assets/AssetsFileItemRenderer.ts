@@ -60,50 +60,26 @@ namespace editor
                 {
                     drag.register(this, (dragsource) =>
                     {
-                        var extension = this.data.extension;
+                        var extension = this.data.feng3dAssets.assetType;
                         switch (extension)
                         {
                             case feng3d.AssetExtension.gameobject:
                                 dragsource.file_gameobject = this.data.path;
                                 break;
                             case feng3d.AssetExtension.script:
-                                this.data.getScriptClassName((scriptClassName) =>
-                                {
-                                    dragsource.file_script = scriptClassName;
-                                    drag.refreshAcceptables();
-                                });
+                                dragsource.file_script = <any>this.data.feng3dAssets;
                                 break;
                             case feng3d.AssetExtension.anim:
-                                var path = this.data.path;
-                                this.data.getData((data) =>
-                                {
-                                    dragsource.animationclip = data;
-                                    drag.refreshAcceptables();
-                                });
+                                dragsource.animationclip = <any>this.data.feng3dAssets;
                                 break;
                             case feng3d.AssetExtension.material:
-                                var path = this.data.path;
-                                this.data.getData((data) =>
-                                {
-                                    dragsource.material = data;
-                                    drag.refreshAcceptables();
-                                });
+                                dragsource.material = <any>this.data.feng3dAssets;
                                 break;
                             case feng3d.AssetExtension.texturecube:
-                                var path = this.data.path;
-                                this.data.getData((data) =>
-                                {
-                                    dragsource.texturecube = data;
-                                    drag.refreshAcceptables();
-                                });
+                                dragsource.texturecube = <any>this.data.feng3dAssets;
                                 break;
                             case feng3d.AssetExtension.geometry:
-                                var path = this.data.path;
-                                this.data.getData((data) =>
-                                {
-                                    dragsource.geometry = data;
-                                    drag.refreshAcceptables();
-                                });
+                                dragsource.geometry = <any>this.data.feng3dAssets;
                                 break;
                             case feng3d.AssetExtension.png:
                             case feng3d.AssetExtension.jpg:
@@ -132,14 +108,14 @@ namespace editor
             if (this.data.isDirectory)
             {
                 editorAssets.showFloder = this.data;
-            } else if (this.data.extension == feng3d.AssetExtension.scene)
+            } else if (this.data.feng3dAssets instanceof feng3d.GameObject)
             {
-                this.data.getData((data: feng3d.GameObject) =>
+                var scene = this.data.feng3dAssets.getComponent(feng3d.Scene3D);
+                if (scene)
                 {
-                    var scene = data.getComponent(feng3d.Scene3D);
                     scene.initCollectComponents();
                     engine.scene = scene;
-                });
+                }
             }
         }
 

@@ -33,7 +33,6 @@ namespace editor
         /**
          * 路径
          */
-        @feng3d.watch("pathChanged")
         path: string;
 
         /**
@@ -55,11 +54,6 @@ namespace editor
          * 显示标签
          */
         label: string;
-
-        /**
-         * 扩展名
-         */
-        extension: feng3d.AssetExtension
 
         @feng3d.serialize
         children: AssetsFile[] = [];
@@ -122,6 +116,23 @@ namespace editor
             {
                 this.image = "file_png";
             }
+            if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D)
+            {
+                assets.readDataURL(this.feng3dAssets.url, (err, dataurl) =>
+                {
+                    this.image = dataurl;
+                });
+            }
+            if (regExps.image.test(this.path))
+            {
+                assets.readArrayBuffer(this.path, (err, data) =>
+                {
+                    feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
+                    {
+                        this.image = dataurl;
+                    });
+                });
+            }
         }
 
         addAssets(feng3dAssets: feng3d.Feng3dAssets)
@@ -161,53 +172,6 @@ namespace editor
             return folders;
         }
 
-        private pathChanged()
-        {
-            if (this.isDirectory)
-                this.extension = feng3d.AssetExtension.folder;
-            else
-                this.extension = <feng3d.AssetExtension>feng3d.pathUtils.getExtension(this.path);
-
-            // 更新图标
-            if (this.isDirectory)
-            {
-                this.image = "folder_png";
-            }
-            else
-            {
-                if (RES.getRes(this.extension.split(".").shift() + "_png"))
-                {
-                    this.image = this.extension.split(".").shift() + "_png";
-                } else
-                {
-                    this.image = "file_png";
-                }
-            }
-            if (this.extension == feng3d.AssetExtension.texture2d)
-            {
-                this.getData((texture2d: feng3d.UrlImageTexture2D) =>
-                {
-                    assets.readArrayBuffer(texture2d.url, (err, data) =>
-                    {
-                        feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
-                        {
-                            this.image = dataurl;
-                        });
-                    });
-                });
-            }
-            if (regExps.image.test(this.path))
-            {
-                assets.readArrayBuffer(this.path, (err, data) =>
-                {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
-                    {
-                        this.image = dataurl;
-                    });
-                });
-            }
-        }
-
         /**
          * 获取属性显示数据
          * @param callback 获取属性面板显示数据回调
@@ -215,16 +179,6 @@ namespace editor
         showInspectorData(callback: (showdata: Object) => void)
         {
             callback(this.feng3dAssets)
-            return;
-        }
-
-        /**
-         * 获取文件数据
-         * @param callback 获取文件数据回调
-         */
-        getData(callback: (data: any) => void)
-        {
-            callback(this.feng3dAssets);
             return;
         }
 
@@ -400,31 +354,6 @@ namespace editor
                 index++;
             } while (!(editorAssets.getFile(path) == null && editorAssets.getFile(path + "/") == null));
             return path;
-        }
-
-        /**
-         * 获取脚本类名称
-         * @param callback 回调函数
-         */
-        getScriptClassName(callback: (scriptClassName: string) => void)
-        {
-            if (this.extension != feng3d.AssetExtension.script)
-                return "";
-            this.getData((code: string) =>
-            {
-                // 获取脚本类名称
-                var result = regExps.scriptClass.exec(code);
-                feng3d.assert(result != null, `在脚本 ${this.path} 中没有找到 脚本类定义`);
-                var script = result[2];
-                // 获取导出类命名空间
-                if (result[1])
-                {
-                    result = regExps.namespace.exec(code);
-                    feng3d.assert(result != null, `获取脚本 ${this.path} 命名空间失败`);
-                    script = result[1] + "." + script;
-                }
-                callback(script);
-            });
         }
     }
 }
