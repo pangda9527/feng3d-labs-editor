@@ -128,7 +128,6 @@ namespace editor
             if (!selectedObject)
                 return;
             //删除文件引用计数
-            var deletefileNum = 0;
             selectedObject.forEach(element =>
             {
                 if (element instanceof feng3d.GameObject)
@@ -136,23 +135,10 @@ namespace editor
                     element.remove();
                 } else if (element instanceof AssetsFile)
                 {
-                    deletefileNum++;
-                    editorAssets.deletefile(element, () =>
-                    {
-                        deletefileNum--;
-                        // 等待删除所有文件 后清空选中对象
-                        if (deletefileNum == 0)
-                        {
-                            editorData.clearSelectedObjects();
-                        }
-                    });
+                    element.delete();
                 }
             });
-            // 等待删除所有文件 后清空选中对象
-            if (deletefileNum == 0)
-            {
-                editorData.clearSelectedObjects();
-            }
+            editorData.clearSelectedObjects();
         }
 
         private onDragSceneStart()

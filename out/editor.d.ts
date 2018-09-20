@@ -258,23 +258,23 @@ declare namespace editor {
         animationclip?: feng3d.AnimationClip;
         material?: feng3d.Material;
         geometry?: feng3d.Geometry;
-        file_gameobject?: string;
+        file_gameobject?: feng3d.GameObject;
         /**
          * 脚本路径
          */
         file_script?: ScriptFile;
         /**
-         * 文件路径
+         * 文件
          */
-        file?: string;
-        /**
-         * 图片路径
-         */
-        image?: string;
+        assetsFile?: AssetsFile;
         /**
          * 声音路径
          */
-        audio?: string;
+        audio?: AudioFile;
+        /**
+         * 纹理
+         */
+        texture2d?: feng3d.Texture2D;
         /**
          * 立方体纹理
          */
@@ -1272,20 +1272,7 @@ declare namespace editor {
          * @param path 文件路径
          */
         getFile(path: string): AssetsFile;
-        /**
-         * 删除文件
-         * @param assetsFile 文件路径
-         */
-        deletefile(assetsFile: AssetsFile, callback?: () => void, includeRoot?: boolean): void;
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void): void;
-        /**
-        * 移动文件
-        * @param path 移动的文件路径
-        * @param destdirpath   目标文件夹
-        * @param callback      完成回调
-        */
-        movefile(path: string, destdirpath: string, callback?: () => void): void;
-        getparentdir(path: string): string;
         /**
          * 弹出文件菜单
          */
@@ -1347,10 +1334,6 @@ declare namespace editor {
          * 加载完成
          */
         loaded: any;
-        /**
-         * 所有字对象加载完成
-         */
-        childrenLoaded: any;
     }
     interface AssetsFile {
         once<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => void, thisObject?: any, priority?: number): void;
@@ -1362,10 +1345,6 @@ declare namespace editor {
     var loadingNum: number;
     class AssetsFile extends TreeNode {
         id: string;
-        /**
-         * 路径
-         */
-        path: string;
         /**
          * 是否文件夹
          */
@@ -1399,40 +1378,12 @@ declare namespace editor {
         delete(): void;
         getFolderList(includeClose?: boolean): any[];
         /**
-         * 移动文件（夹）到指定文件夹
-         * @param destdirpath 目标文件夹路径
-         * @param callback 移动文件完成回调
-         */
-        moveToDir(destdirpath: string, callback?: (file: AssetsFile) => void): void;
-        /**
-         * 移动文件（夹）
-         * @param oldpath 老路径
-         * @param newpath 新路径
-         * @param callback 回调函数
-         */
-        move(oldpath: string, newpath: string, callback?: (file: AssetsFile) => void): void;
-        /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
          * @param arraybuffer 文件数据
          * @param callback 完成回调
          */
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override?: boolean, callback?: (e: Error, file: AssetsFile) => void): void;
-        /**
-         * 保存数据到文件
-         * @param create 如果文件不存在，是否新建文件
-         * @param callback 回调函数
-         */
-        save(create?: boolean, callback?: (err: Error) => void): void;
-        /**
-         * 获取ArrayBuffer数据
-         * @param callback 回调函数
-         */
-        getArrayBuffer(callback: (arraybuffer: ArrayBuffer) => void): void;
-        /**
-         * 获取一个新的不重名子文件名称
-         */
-        private getnewname;
     }
 }
 declare namespace editor {
@@ -1551,6 +1502,11 @@ declare namespace editor {
     class TextFile extends Feng3dFile {
         assetType: feng3d.AssetExtension;
         textContent: string;
+    }
+}
+declare namespace editor {
+    class AudioFile extends Feng3dFile {
+        assetType: feng3d.AssetExtension;
     }
 }
 declare namespace editor {
@@ -2155,7 +2111,7 @@ declare namespace editor {
          */
         getNode(gameObject: feng3d.GameObject): HierarchyNode;
         delete(gameobject: feng3d.GameObject): void;
-        addGameoObjectFromAsset(path: string, parent?: feng3d.GameObject): void;
+        addGameoObjectFromAsset(gameobject: feng3d.GameObject, parent?: feng3d.GameObject): void;
         private _selectedGameObjects;
         private rootGameObjectChanged;
         private onSelectedGameObjectChanged;

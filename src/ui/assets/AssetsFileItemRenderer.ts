@@ -49,11 +49,10 @@ namespace editor
                 {
                     drag.register(this, (dragsource) =>
                     {
-                        dragsource.file = this.data.path;
-                    }, ["file"], (dragdata) =>
+                        dragsource.assetsFile = this.data;
+                    }, ["assetsFile"], (dragdata) =>
                         {
-                            var movefile = editorAssets.getFile(dragdata.file);
-                            movefile.moveToDir(this.data.path);
+                            this.data.addChild(dragdata.assetsFile);
                         });
                 }
                 else
@@ -64,7 +63,7 @@ namespace editor
                         switch (extension)
                         {
                             case feng3d.AssetExtension.gameobject:
-                                dragsource.file_gameobject = this.data.path;
+                                dragsource.file_gameobject = <any>this.data.feng3dAssets;
                                 break;
                             case feng3d.AssetExtension.script:
                                 dragsource.file_script = <any>this.data.feng3dAssets;
@@ -81,19 +80,14 @@ namespace editor
                             case feng3d.AssetExtension.geometry:
                                 dragsource.geometry = <any>this.data.feng3dAssets;
                                 break;
-                            case feng3d.AssetExtension.png:
-                            case feng3d.AssetExtension.jpg:
-                            case feng3d.AssetExtension.jpeg:
-                            case feng3d.AssetExtension.gif:
-                                dragsource.image = this.data.path;
+                            case feng3d.AssetExtension.texture2d:
+                                dragsource.texture2d = <any>this.data.feng3dAssets;
                                 break;
-                            case feng3d.AssetExtension.mp3:
-                            case feng3d.AssetExtension.ogg:
-                            case feng3d.AssetExtension.wav:
-                                dragsource.audio = this.data.path;
+                            case feng3d.AssetExtension.audio:
+                                dragsource.audio = <any>this.data.feng3dAssets;
                                 break;
                         }
-                        dragsource.file = this.data.path;
+                        dragsource.assetsFile = this.data;
                     }, []);
                 }
             } else

@@ -49,11 +49,8 @@ namespace editor
             {
                 if (dragSource.gameobject)
                 {
-                    var gameobject: feng3d.GameObject = dragSource.gameobject;
-                    if (gameobject.getComponent(feng3d.Scene3D) != null)
-                        editorAssets.saveObject(gameobject);
-                    else
-                        editorAssets.saveObject(gameobject);
+                    var gameobject = dragSource.gameobject;
+                    editorAssets.saveObject(gameobject);
                 }
                 if (dragSource.animationclip)
                 {
@@ -182,12 +179,12 @@ namespace editor
             {
                 if (this.includeTxt.text)
                 {
-                    if (!includeReg.test(value.path))
+                    if (!includeReg.test(value.name))
                         return false;
                 }
                 if (this.excludeTxt.text)
                 {
-                    if (excludeReg.test(value.path))
+                    if (excludeReg.test(value.name))
                         return false;
                 }
                 return true;
@@ -199,7 +196,7 @@ namespace editor
                     return -1;
                 if (a.isDirectory < b.isDirectory)
                     return 1;
-                if (a.path < b.path)
+                if (a.name < b.name)
                     return -1;
                 return 1;
             });

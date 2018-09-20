@@ -97,6 +97,8 @@ namespace editor
 
 		addChild(node: TreeNode)
 		{
+			node.remove();
+
 			feng3d.assert(!node.contain(this), "无法添加到自身节点中!");
 
 			if (this.children.indexOf(node) == -1) this.children.push(node);
@@ -111,10 +113,9 @@ namespace editor
 			{
 				var index = this.parent.children.indexOf(this);
 				if (index != -1) this.parent.children.splice(index, 1);
+				this.dispatch("removed", this, true);
+				this.parent = null;
 			}
-
-			this.dispatch("removed", this, true);
-			this.parent = null;
 		}
 
 		getShowNodes()

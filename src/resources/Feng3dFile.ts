@@ -26,6 +26,7 @@ namespace editor
 
         protected assetsIdChanged()
         {
+            super.assetsIdChanged();
             this.filePath = `Library/${this.assetsId}/file/` + this.filename;
         }
     }

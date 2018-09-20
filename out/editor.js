@@ -911,26 +911,15 @@ var editor;
             if (!selectedObject)
                 return;
             //删除文件引用计数
-            var deletefileNum = 0;
             selectedObject.forEach(function (element) {
                 if (element instanceof feng3d.GameObject) {
                     element.remove();
                 }
                 else if (element instanceof editor.AssetsFile) {
-                    deletefileNum++;
-                    editor.editorAssets.deletefile(element, function () {
-                        deletefileNum--;
-                        // 等待删除所有文件 后清空选中对象
-                        if (deletefileNum == 0) {
-                            editor.editorData.clearSelectedObjects();
-                        }
-                    });
+                    element.delete();
                 }
             });
-            // 等待删除所有文件 后清空选中对象
-            if (deletefileNum == 0) {
-                editor.editorData.clearSelectedObjects();
-            }
+            editor.editorData.clearSelectedObjects();
         };
         Editorshortcut.prototype.onDragSceneStart = function () {
             this.dragSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -1917,6 +1906,7 @@ var editor;
             return false;
         };
         TreeNode.prototype.addChild = function (node) {
+            node.remove();
             feng3d.assert(!node.contain(this), "无法添加到自身节点中!");
             if (this.children.indexOf(node) == -1)
                 this.children.push(node);
@@ -1928,9 +1918,9 @@ var editor;
                 var index = this.parent.children.indexOf(this);
                 if (index != -1)
                     this.parent.children.splice(index, 1);
+                this.dispatch("removed", this, true);
+                this.parent = null;
             }
-            this.dispatch("removed", this, true);
-            this.parent = null;
         };
         TreeNode.prototype.getShowNodes = function () {
             var nodes = [this];
@@ -4058,14 +4048,13 @@ var editor;
             var _this = this;
             var param = this._attributeViewInfo.componentParam;
             if (param.accepttype) {
-                if (param.accepttype == "image") {
+                if (param.accepttype == "texture2d") {
                     var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
-                    editor.editorAssets.filter(function (file) {
-                        return editor.regExps.image.test(file.path);
-                    }).forEach(function (item) {
+                    var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.UrlImageTexture2D);
+                    texture2ds.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
-                                _this.attributeValue = item.path;
+                                _this.attributeValue = item.url;
                             }
                         });
                     });
@@ -4073,12 +4062,11 @@ var editor;
                 }
                 else if (param.accepttype == "audio") {
                     var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
-                    editor.editorAssets.filter(function (file) {
-                        return editor.regExps.audio.test(file.path);
-                    }).forEach(function (item) {
+                    var audioFiles = feng3d.Feng3dAssets.getAssetsByType(editor.AudioFile);
+                    audioFiles.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
-                                _this.attributeValue = item.path;
+                                _this.attributeValue = item.filePath;
                             }
                         });
                     }, []);
@@ -4631,20 +4619,6 @@ var editor;
         EditorAssets.prototype.getFile = function (path) {
             return this.files[path];
         };
-        /**
-         * 删除文件
-         * @param assetsFile 文件路径
-         */
-        EditorAssets.prototype.deletefile = function (assetsFile, callback, includeRoot) {
-            if (includeRoot === void 0) { includeRoot = false; }
-            if (assetsFile == this.rootFile && !includeRoot) {
-                alert("无法删除根目录");
-                return;
-            }
-            assetsFile.delete();
-            editor.editorui.assetsview.invalidateAssetstree();
-            callback && callback();
-        };
         EditorAssets.prototype.readScene = function (path, callback) {
             editor.assets.readObject(path, function (err, object) {
                 if (err) {
@@ -4655,29 +4629,6 @@ var editor;
                 scene.initCollectComponents();
                 callback(null, scene);
             });
-        };
-        /**
-        * 移动文件
-        * @param path 移动的文件路径
-        * @param destdirpath   目标文件夹
-        * @param callback      完成回调
-        */
-        EditorAssets.prototype.movefile = function (path, destdirpath, callback) {
-            var assetsfile = this.getFile(path);
-            if (assetsfile) {
-                assetsfile.moveToDir(destdirpath, callback);
-            }
-            else {
-                var filename = path.split("/").pop();
-                var dest = destdirpath + "/" + filename;
-                editor.assets.move(path, dest, callback);
-            }
-        };
-        EditorAssets.prototype.getparentdir = function (path) {
-            var paths = path.split("/");
-            paths.pop();
-            var parentdir = paths.join("/");
-            return parentdir;
         };
         /**
          * 弹出文件菜单
@@ -4767,7 +4718,7 @@ var editor;
             ].indexOf(assetsFile.feng3dAssets.assetType) != -1) {
                 menuconfig.push({
                     label: "编辑", click: function () {
-                        var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + assetsFile.path;
+                        var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + assetsFile.id;
                         url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                         // if (assets.type == FSType.native)
                         // {
@@ -4785,13 +4736,13 @@ var editor;
             this.parserMenu(menuconfig, assetsFile);
             menuconfig.push({
                 label: "导出", click: function () {
-                    editor.assets.readBlob(assetsFile.path, function (err, blob) {
+                    editor.assets.readBlob(assetsFile.feng3dAssets.path, function (err, blob) {
                         saveAs(blob, assetsFile.name);
                     });
                 }
             }, {
                 label: "删除", click: function () {
-                    editor.editorAssets.deletefile(assetsFile);
+                    assetsFile.delete();
                 }
             });
             if (othermenus && othermenus.rename) {
@@ -4921,28 +4872,29 @@ var editor;
          * @param assetsFile 文件
          */
         EditorAssets.prototype.parserMenu = function (menuconfig, assetsFile) {
-            if (!assetsFile.path)
-                return;
-            var extensions = assetsFile.path.split(".").pop();
-            switch (extensions) {
-                case "mdl":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.mdlLoader.load(assetsFile.path); } });
-                    break;
-                case "obj":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.objLoader.load(assetsFile.path); } });
-                    break;
-                case "mtl":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.mtlLoader.load(assetsFile.path); } });
-                    break;
-                case "fbx":
-                    menuconfig.push({ label: "解析", click: function () { return editor.threejsLoader.load(assetsFile.path); } });
-                    break;
-                case "md5mesh":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.load(assetsFile.path); } });
-                    break;
-                case "md5anim":
-                    menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.loadAnim(assetsFile.path); } });
-                    break;
+            if (assetsFile.feng3dAssets instanceof editor.Feng3dFile) {
+                var extensions = assetsFile.feng3dAssets.filename.split(".").pop();
+                var filePath = assetsFile.feng3dAssets.filePath;
+                switch (extensions) {
+                    case "mdl":
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.mdlLoader.load(filePath); } });
+                        break;
+                    case "obj":
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.objLoader.load(filePath); } });
+                        break;
+                    case "mtl":
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.mtlLoader.load(filePath); } });
+                        break;
+                    case "fbx":
+                        menuconfig.push({ label: "解析", click: function () { return editor.threejsLoader.load(filePath); } });
+                        break;
+                    case "md5mesh":
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.load(filePath); } });
+                        break;
+                    case "md5anim":
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.loadAnim(filePath); } });
+                        break;
+                }
             }
         };
         EditorAssets.prototype.showFloderChanged = function (property, oldValue, newValue) {
@@ -5000,10 +4952,9 @@ var editor;
                 this.renameInput.textAlign = egret.HorizontalAlign.CENTER;
                 if (this.data.isDirectory) {
                     editor.drag.register(this, function (dragsource) {
-                        dragsource.file = _this.data.path;
-                    }, ["file"], function (dragdata) {
-                        var movefile = editor.editorAssets.getFile(dragdata.file);
-                        movefile.moveToDir(_this.data.path);
+                        dragsource.assetsFile = _this.data;
+                    }, ["assetsFile"], function (dragdata) {
+                        _this.data.addChild(dragdata.assetsFile);
                     });
                 }
                 else {
@@ -5011,7 +4962,7 @@ var editor;
                         var extension = _this.data.feng3dAssets.assetType;
                         switch (extension) {
                             case feng3d.AssetExtension.gameobject:
-                                dragsource.file_gameobject = _this.data.path;
+                                dragsource.file_gameobject = _this.data.feng3dAssets;
                                 break;
                             case feng3d.AssetExtension.script:
                                 dragsource.file_script = _this.data.feng3dAssets;
@@ -5028,19 +4979,14 @@ var editor;
                             case feng3d.AssetExtension.geometry:
                                 dragsource.geometry = _this.data.feng3dAssets;
                                 break;
-                            case feng3d.AssetExtension.png:
-                            case feng3d.AssetExtension.jpg:
-                            case feng3d.AssetExtension.jpeg:
-                            case feng3d.AssetExtension.gif:
-                                dragsource.image = _this.data.path;
+                            case feng3d.AssetExtension.texture2d:
+                                dragsource.texture2d = _this.data.feng3dAssets;
                                 break;
-                            case feng3d.AssetExtension.mp3:
-                            case feng3d.AssetExtension.ogg:
-                            case feng3d.AssetExtension.wav:
-                                dragsource.audio = _this.data.path;
+                            case feng3d.AssetExtension.audio:
+                                dragsource.audio = _this.data.feng3dAssets;
                                 break;
                         }
-                        dragsource.file = _this.data.path;
+                        dragsource.assetsFile = _this.data;
                     }, []);
                 }
             }
@@ -5111,10 +5057,10 @@ var editor;
                 _this.feng3dAssets = assets;
                 _this.init();
                 editor.loadingNum--;
+                _this.dispatch("loaded");
                 if (editor.loadingNum == 0) {
                     feng3d.feng3dDispatcher.dispatch("editor.allLoaded");
                 }
-                _this.dispatch("loaded");
             });
         };
         AssetsFile.prototype.init = function () {
@@ -5164,47 +5110,6 @@ var editor;
             return folders;
         };
         /**
-         * 移动文件（夹）到指定文件夹
-         * @param destdirpath 目标文件夹路径
-         * @param callback 移动文件完成回调
-         */
-        AssetsFile.prototype.moveToDir = function (destdirpath, callback) {
-            //禁止向子文件夹移动
-            if (destdirpath.indexOf(this.path) != -1)
-                return;
-            var oldpath = this.path;
-            var newpath = destdirpath + this.name;
-            if (this.isDirectory)
-                newpath += "/";
-            var destDir = editor.editorAssets.getFile(destdirpath);
-            this.move(oldpath, newpath, callback);
-        };
-        /**
-         * 移动文件（夹）
-         * @param oldpath 老路径
-         * @param newpath 新路径
-         * @param callback 回调函数
-         */
-        AssetsFile.prototype.move = function (oldpath, newpath, callback) {
-            var _this = this;
-            editor.assets.move(oldpath, newpath, function (err) {
-                feng3d.assert(!err);
-                if (_this.isDirectory) {
-                    var movefiles = editor.editorAssets.filter(function (item) { return item.path.substr(0, oldpath.length) == oldpath; });
-                    movefiles.forEach(function (element) {
-                        delete editor.editorAssets.files[element.path];
-                        element.path = newpath + element.path.substr(oldpath.length);
-                        editor.editorAssets.files[element.path] = element;
-                    });
-                }
-                delete editor.editorAssets.files[_this.path];
-                _this.path = newpath;
-                editor.editorAssets.files[_this.path] = _this;
-                editor.editorui.assetsview.invalidateAssetstree();
-                callback && callback(_this);
-            });
-        };
-        /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
          * @param arraybuffer 文件数据
@@ -5219,83 +5124,6 @@ var editor;
                 var assetsFile = _this.addAssets(feng3dFile);
                 callback(err, assetsFile);
             });
-        };
-        /**
-         * 保存数据到文件
-         * @param create 如果文件不存在，是否新建文件
-         * @param callback 回调函数
-         */
-        AssetsFile.prototype.save = function (create, callback) {
-            var _this = this;
-            if (create === void 0) { create = false; }
-            if (!create && !editor.editorAssets.files[this.path]) {
-                var e = new Error("\u9700\u8981\u4FDD\u5B58\u7684\u6587\u4EF6 " + this.path + " \u4E0D\u5B58\u5728");
-                if (callback)
-                    callback(e);
-                else if (e)
-                    feng3d.error(e);
-                return;
-            }
-            this.getArrayBuffer(function (arraybuffer) {
-                editor.assets.writeArrayBuffer(_this.path, arraybuffer, function (e) {
-                    if (callback)
-                        callback(e);
-                    else if (e)
-                        feng3d.error(e);
-                });
-            });
-        };
-        /**
-         * 获取ArrayBuffer数据
-         * @param callback 回调函数
-         */
-        AssetsFile.prototype.getArrayBuffer = function (callback) {
-            var content = this.feng3dAssets;
-            if (content instanceof ArrayBuffer) {
-                callback(content);
-            }
-            else if (typeof content == "string") {
-                if (editor.regExps.image.test(this.path)) {
-                    feng3d.dataTransform.dataURLToArrayBuffer(content, function (arrayBuffer) {
-                        callback(arrayBuffer);
-                    });
-                }
-                else {
-                    feng3d.dataTransform.stringToArrayBuffer(content, function (arrayBuffer) {
-                        callback(arrayBuffer);
-                    });
-                }
-            }
-            else {
-                var obj = feng3d.serialization.serialize(content);
-                var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                feng3d.dataTransform.stringToArrayBuffer(str, function (arrayBuffer) {
-                    callback(arrayBuffer);
-                });
-            }
-        };
-        /**
-         * 获取一个新的不重名子文件名称
-         */
-        AssetsFile.prototype.getnewname = function (path) {
-            if (editor.editorAssets.getFile(path) == null && editor.editorAssets.getFile(path + "/") == null)
-                return path;
-            var basepath = "";
-            var ext = "";
-            if (path.indexOf(".") == -1) {
-                basepath = path;
-                ext = "";
-            }
-            else {
-                basepath = path.substring(0, path.indexOf("."));
-                ext = path.substring(path.indexOf("."));
-            }
-            var index = 1;
-            do {
-                var path = basepath + " " + index + ext;
-                index++;
-            } while (!(editor.editorAssets.getFile(path) == null && editor.editorAssets.getFile(path + "/") == null));
-            return path;
         };
         __decorate([
             feng3d.serialize,
@@ -5336,10 +5164,9 @@ var editor;
             if (this.data) {
                 this.renameInput.text = this.data.label;
                 editor.drag.register(this, function (dragsource) {
-                    dragsource.file = _this.data.path;
-                }, ["file"], function (dragdata) {
-                    var movefile = editor.editorAssets.getFile(dragdata.file);
-                    movefile.moveToDir(_this.data.path);
+                    dragsource.assetsFile = _this.data;
+                }, ["assetsFile"], function (dragdata) {
+                    _this.data.addChild(dragdata.assetsFile);
                 });
             }
             else {
@@ -5393,10 +5220,7 @@ var editor;
             editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject", "animationclip", "material", "geometry"], function (dragSource) {
                 if (dragSource.gameobject) {
                     var gameobject = dragSource.gameobject;
-                    if (gameobject.getComponent(feng3d.Scene3D) != null)
-                        editor.editorAssets.saveObject(gameobject);
-                    else
-                        editor.editorAssets.saveObject(gameobject);
+                    editor.editorAssets.saveObject(gameobject);
                 }
                 if (dragSource.animationclip) {
                     var animationclip = dragSource.animationclip;
@@ -5488,11 +5312,11 @@ var editor;
             }
             var fileinfos = children.filter(function (value) {
                 if (_this.includeTxt.text) {
-                    if (!includeReg.test(value.path))
+                    if (!includeReg.test(value.name))
                         return false;
                 }
                 if (_this.excludeTxt.text) {
-                    if (excludeReg.test(value.path))
+                    if (excludeReg.test(value.name))
                         return false;
                 }
                 return true;
@@ -5503,7 +5327,7 @@ var editor;
                     return -1;
                 if (a.isDirectory < b.isDirectory)
                     return 1;
-                if (a.path < b.path)
+                if (a.name < b.name)
                     return -1;
                 return 1;
             });
@@ -5615,6 +5439,7 @@ var editor;
             this.filePath = "Library/" + this.assetsId + "/file/" + this.filename;
         };
         Feng3dFile.prototype.assetsIdChanged = function () {
+            _super.prototype.assetsIdChanged.call(this);
             this.filePath = "Library/" + this.assetsId + "/file/" + this.filename;
         };
         __decorate([
@@ -5720,6 +5545,19 @@ var editor;
         return TextFile;
     }(editor.Feng3dFile));
     editor.TextFile = TextFile;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var AudioFile = /** @class */ (function (_super) {
+        __extends(AudioFile, _super);
+        function AudioFile() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.assetType = feng3d.AssetExtension.audio;
+            return _this;
+        }
+        return AudioFile;
+    }(editor.Feng3dFile));
+    editor.AudioFile = AudioFile;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -7931,18 +7769,13 @@ var editor;
                 nodeMap.delete(gameobject);
             }
         };
-        Hierarchy.prototype.addGameoObjectFromAsset = function (path, parent) {
-            var _this = this;
-            editor.assets.readString(path, function (err, content) {
-                var json = JSON.parse(content);
-                var gameobject = feng3d.serialization.deserialize(json);
-                gameobject.name = path.split("/").pop().split(".").shift();
-                if (parent)
-                    parent.addChild(gameobject);
-                else
-                    _this.rootnode.gameobject.addChild(gameobject);
-                editor.editorData.selectObject(gameobject);
-            });
+        Hierarchy.prototype.addGameoObjectFromAsset = function (gameobject, parent) {
+            gameobject = feng3d.serialization.clone(gameobject);
+            if (parent)
+                parent.addChild(gameobject);
+            else
+                this.rootnode.gameobject.addChild(gameobject);
+            editor.editorData.selectObject(gameobject);
         };
         Hierarchy.prototype.rootGameObjectChanged = function (property, oldValue, newValue) {
             if (oldValue) {
@@ -10912,15 +10745,14 @@ var editor;
         {
             label: "清空项目",
             click: function () {
-                editor.editorAssets.deletefile(editor.editorAssets.rootFile, function () {
-                    editor.editorAssets.initproject(function () {
-                        editor.editorAssets.runProjectScript(function () {
-                            editor.engine.scene = editor.creatNewScene();
-                            editor.editorui.assetsview.invalidateAssetstree();
-                            console.log("清空项目完成!");
-                        });
+                editor.editorAssets.rootFile.remove();
+                editor.editorAssets.initproject(function () {
+                    editor.editorAssets.runProjectScript(function () {
+                        editor.engine.scene = editor.creatNewScene();
+                        editor.editorui.assetsview.invalidateAssetstree();
+                        console.log("清空项目完成!");
                     });
-                }, true);
+                });
             },
         }
     ];
@@ -11118,9 +10950,8 @@ var editor;
      * @param projectname
      */
     function openDownloadProject(projectname, callback) {
-        editor.editorAssets.deletefile(editor.editorAssets.rootFile, function () {
-            downloadProject(projectname, callback);
-        }, true);
+        editor.editorAssets.rootFile.delete();
+        downloadProject(projectname, callback);
     }
     /**
      * 下载项目

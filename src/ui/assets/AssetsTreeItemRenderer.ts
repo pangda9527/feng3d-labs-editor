@@ -43,11 +43,10 @@ namespace editor
 
                 drag.register(this, (dragsource) =>
                 {
-                    dragsource.file = this.data.path;
-                }, ["file"], (dragdata) =>
+                    dragsource.assetsFile = this.data;
+                }, ["assetsFile"], (dragdata) =>
                     {
-                        var movefile = editorAssets.getFile(dragdata.file);
-                        movefile.moveToDir(this.data.path);
+                        this.data.addChild(dragdata.assetsFile);
                     });
             } else
             {

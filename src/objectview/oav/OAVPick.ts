@@ -51,18 +51,16 @@ namespace editor
             var param: { accepttype: keyof DragData; datatype: string; } = <any>this._attributeViewInfo.componentParam;
             if (param.accepttype)
             {
-                if (param.accepttype == "image")
+                if (param.accepttype == "texture2d")
                 {
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
-                    editorAssets.filter((file) =>
-                    {
-                        return regExps.image.test(file.path);
-                    }).forEach(item =>
+                    var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.UrlImageTexture2D);
+                    texture2ds.forEach(item =>
                     {
                         menus.push({
                             label: item.name, click: () =>
                             {
-                                this.attributeValue = item.path;
+                                this.attributeValue = item.url;
                             }
                         });
                     });
@@ -70,15 +68,13 @@ namespace editor
                 } else if (param.accepttype == "audio")
                 {
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
-                    editorAssets.filter((file) =>
-                    {
-                        return regExps.audio.test(file.path);
-                    }).forEach(item =>
+                    var audioFiles = feng3d.Feng3dAssets.getAssetsByType(AudioFile);
+                    audioFiles.forEach(item =>
                     {
                         menus.push({
                             label: item.name, click: () =>
                             {
-                                this.attributeValue = item.path;
+                                this.attributeValue = item.filePath;
                             }
                         });
                     }, []);

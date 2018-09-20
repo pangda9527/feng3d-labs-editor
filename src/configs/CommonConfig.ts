@@ -142,18 +142,16 @@ namespace editor
             label: "清空项目",
             click: () =>
             {
-                editorAssets.deletefile(editorAssets.rootFile, () =>
+                editorAssets.rootFile.remove();
+                editorAssets.initproject(() =>
                 {
-                    editorAssets.initproject(() =>
+                    editorAssets.runProjectScript(() =>
                     {
-                        editorAssets.runProjectScript(() =>
-                        {
-                            engine.scene = creatNewScene()
-                            editorui.assetsview.invalidateAssetstree();
-                            console.log("清空项目完成!");
-                        });
+                        engine.scene = creatNewScene()
+                        editorui.assetsview.invalidateAssetstree();
+                        console.log("清空项目完成!");
                     });
-                }, true);
+                });
             },
         }
     ];
@@ -374,11 +372,10 @@ namespace editor
      */
     function openDownloadProject(projectname: string, callback?: () => void)
     {
-        editorAssets.deletefile(editorAssets.rootFile, () =>
-        {
-            downloadProject(projectname, callback);
-        }, true);
+        editorAssets.rootFile.delete();
+        downloadProject(projectname, callback);
     }
+
     /**
      * 下载项目
      * @param projectname 

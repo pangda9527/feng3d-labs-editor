@@ -6,11 +6,6 @@ namespace editor
          * 加载完成
          */
         loaded
-
-        /**
-         * 所有字对象加载完成
-         */
-        childrenLoaded
     }
 
     export interface AssetsFile
@@ -29,11 +24,6 @@ namespace editor
         @feng3d.serialize
         @feng3d.watch("idChanged")
         id = "";
-
-        /**
-         * 路径
-         */
-        path: string;
 
         /**
          * 是否文件夹
@@ -94,11 +84,11 @@ namespace editor
                 this.feng3dAssets = assets;
                 this.init();
                 loadingNum--;
+                this.dispatch("loaded");
                 if (loadingNum == 0)
                 {
                     feng3d.feng3dDispatcher.dispatch("editor.allLoaded");
                 }
-                this.dispatch("loaded");
             });
         }
 
@@ -163,55 +153,6 @@ namespace editor
         }
 
         /**
-         * 移动文件（夹）到指定文件夹
-         * @param destdirpath 目标文件夹路径
-         * @param callback 移动文件完成回调
-         */
-        moveToDir(destdirpath: string, callback?: (file: AssetsFile) => void)
-        {
-            //禁止向子文件夹移动
-            if (destdirpath.indexOf(this.path) != -1)
-                return;
-            var oldpath = this.path;
-            var newpath = destdirpath + this.name;
-            if (this.isDirectory)
-                newpath += "/";
-            var destDir = editorAssets.getFile(destdirpath);
-            this.move(oldpath, newpath, callback);
-        }
-
-        /**
-         * 移动文件（夹）
-         * @param oldpath 老路径
-         * @param newpath 新路径
-         * @param callback 回调函数
-         */
-        move(oldpath: string, newpath: string, callback?: (file: AssetsFile) => void)
-        {
-            assets.move(oldpath, newpath, (err) =>
-            {
-                feng3d.assert(!err);
-
-                if (this.isDirectory)
-                {
-                    var movefiles = editorAssets.filter((item) => item.path.substr(0, oldpath.length) == oldpath);
-                    movefiles.forEach(element =>
-                    {
-                        delete editorAssets.files[element.path];
-                        element.path = newpath + element.path.substr(oldpath.length);
-                        editorAssets.files[element.path] = element;
-                    });
-                }
-                delete editorAssets.files[this.path];
-                this.path = newpath;
-                editorAssets.files[this.path] = this;
-
-                editorui.assetsview.invalidateAssetstree();
-                callback && callback(this);
-            });
-        }
-
-        /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
          * @param arraybuffer 文件数据
@@ -226,100 +167,6 @@ namespace editor
                 var assetsFile = this.addAssets(feng3dFile);
                 callback(err, assetsFile);
             });
-        }
-
-        /**
-         * 保存数据到文件
-         * @param create 如果文件不存在，是否新建文件
-         * @param callback 回调函数
-         */
-        save(create = false, callback?: (err: Error) => void)
-        {
-            if (!create && !editorAssets.files[this.path])
-            {
-                var e = new Error(`需要保存的文件 ${this.path} 不存在`);
-                if (callback)
-                    callback(e);
-                else if (e)
-                    feng3d.error(e);
-                return;
-            }
-            this.getArrayBuffer((arraybuffer) =>
-            {
-                assets.writeArrayBuffer(this.path, arraybuffer, (e) =>
-                {
-                    if (callback)
-                        callback(e);
-                    else if (e)
-                        feng3d.error(e);
-                });
-            });
-        }
-
-        /**
-         * 获取ArrayBuffer数据
-         * @param callback 回调函数
-         */
-        getArrayBuffer(callback: (arraybuffer: ArrayBuffer) => void)
-        {
-            var content = this.feng3dAssets;
-            if (content instanceof ArrayBuffer)
-            {
-                callback(content);
-            }
-            else if (typeof content == "string")
-            {
-                if (regExps.image.test(this.path))
-                {
-                    feng3d.dataTransform.dataURLToArrayBuffer(content, (arrayBuffer) =>
-                    {
-                        callback(arrayBuffer);
-                    });
-                } else
-                {
-                    feng3d.dataTransform.stringToArrayBuffer(content, (arrayBuffer) =>
-                    {
-                        callback(arrayBuffer);
-                    });
-                }
-            } else
-            {
-                var obj = feng3d.serialization.serialize(content);
-                var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
-                feng3d.dataTransform.stringToArrayBuffer(str, (arrayBuffer) =>
-                {
-                    callback(arrayBuffer);
-                });
-            }
-        }
-
-        /**
-         * 获取一个新的不重名子文件名称
-         */
-        private getnewname(path: string)
-        {
-            if (editorAssets.getFile(path) == null && editorAssets.getFile(path + "/") == null)
-                return path;
-
-            var basepath = "";
-            var ext = "";
-            if (path.indexOf(".") == -1)
-            {
-                basepath = path;
-                ext = "";
-            } else
-            {
-                basepath = path.substring(0, path.indexOf("."));
-                ext = path.substring(path.indexOf("."));
-            }
-
-            var index = 1;
-            do
-            {
-                var path = basepath + " " + index + ext;
-                index++;
-            } while (!(editorAssets.getFile(path) == null && editorAssets.getFile(path + "/") == null));
-            return path;
         }
     }
 }

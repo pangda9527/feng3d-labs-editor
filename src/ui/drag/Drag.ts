@@ -50,23 +50,23 @@ namespace editor
 		material?: feng3d.Material;
 		geometry?: feng3d.Geometry;
 		//
-		file_gameobject?: string;
+		file_gameobject?: feng3d.GameObject;
 		/**
 		 * 脚本路径
 		 */
 		file_script?: ScriptFile;
 		/**
-		 * 文件路径
+		 * 文件
 		 */
-		file?: string;
-		/**
-		 * 图片路径
-		 */
-		image?: string;
+		assetsFile?: AssetsFile;
 		/**
 		 * 声音路径
 		 */
-		audio?: string;
+		audio?: AudioFile;
+		/**
+		 * 纹理
+		 */
+		texture2d?: feng3d.Texture2D;
 		/**
 		 * 立方体纹理
 		 */

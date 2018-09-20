@@ -42,19 +42,15 @@ namespace editor
             }
         }
 
-        addGameoObjectFromAsset(path: string, parent?: feng3d.GameObject)
+        addGameoObjectFromAsset(gameobject: feng3d.GameObject, parent?: feng3d.GameObject)
         {
-            assets.readString(path, (err, content: string) =>
-            {
-                var json = JSON.parse(content);
-                var gameobject = feng3d.serialization.deserialize(json);
-                gameobject.name = path.split("/").pop().split(".").shift();
-                if (parent)
-                    parent.addChild(gameobject);
-                else
-                    this.rootnode.gameobject.addChild(gameobject);
-                editorData.selectObject(gameobject);
-            });
+            gameobject = feng3d.serialization.clone(gameobject);
+            
+            if (parent)
+                parent.addChild(gameobject);
+            else
+                this.rootnode.gameobject.addChild(gameobject);
+            editorData.selectObject(gameobject);
         }
 
         private _selectedGameObjects: feng3d.GameObject[] = [];

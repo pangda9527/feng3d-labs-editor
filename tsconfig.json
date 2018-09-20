@@ -98,6 +98,7 @@
         "src/resources/JSFile.ts",
         "src/resources/JsonFile.ts",
         "src/resources/TextFile.ts",
+        "src/resources/AudioFile.ts",
         //
         "src/ui/TopView.ts",
         "src/ui/MainView.ts",

@@ -80,22 +80,6 @@ namespace editor
             return this.files[path];
         }
 
-        /**
-         * 删除文件
-         * @param assetsFile 文件路径
-         */
-        deletefile(assetsFile: AssetsFile, callback?: () => void, includeRoot = false)
-        {
-            if (assetsFile == this.rootFile && !includeRoot)
-            {
-                alert("无法删除根目录");
-                return;
-            }
-            assetsFile.delete();
-            editorui.assetsview.invalidateAssetstree();
-            callback && callback();
-        }
-
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
             assets.readObject(path, (err, object: feng3d.GameObject) =>
@@ -109,34 +93,6 @@ namespace editor
                 scene.initCollectComponents();
                 callback(null, scene);
             });
-        }
-
-        /**
-        * 移动文件
-        * @param path 移动的文件路径
-        * @param destdirpath   目标文件夹
-        * @param callback      完成回调
-        */
-        movefile(path: string, destdirpath: string, callback?: () => void)
-        {
-            var assetsfile = this.getFile(path);
-            if (assetsfile)
-            {
-                assetsfile.moveToDir(destdirpath, callback);
-            } else
-            {
-                var filename = path.split("/").pop();
-                var dest = destdirpath + "/" + filename;
-                assets.move(path, dest, callback);
-            }
-        }
-
-        getparentdir(path: string)
-        {
-            var paths = path.split("/");
-            paths.pop();
-            var parentdir = paths.join("/");
-            return parentdir;
         }
 
         /**
@@ -247,7 +203,7 @@ namespace editor
                 menuconfig.push({
                     label: "编辑", click: () =>
                     {
-                        var url = `codeeditor.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}&path=${assetsFile.path}`;
+                        var url = `codeeditor.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}&path=${assetsFile.id}`;
                         url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                         // if (assets.type == FSType.native)
                         // {
@@ -267,7 +223,7 @@ namespace editor
             menuconfig.push({
                 label: "导出", click: () =>
                 {
-                    assets.readBlob(assetsFile.path, (err, blob) =>
+                    assets.readBlob(assetsFile.feng3dAssets.path, (err, blob) =>
                     {
                         saveAs(blob, assetsFile.name);
                     });
@@ -275,7 +231,7 @@ namespace editor
             }, {
                     label: "删除", click: () =>
                     {
-                        editorAssets.deletefile(assetsFile);
+                        assetsFile.delete();
                     }
                 });
 
@@ -439,18 +395,21 @@ namespace editor
          */
         private parserMenu(menuconfig: MenuItem[], assetsFile: AssetsFile)
         {
-            if (!assetsFile.path) return;
-
-            var extensions = assetsFile.path.split(".").pop();
-            switch (extensions)
+            if (assetsFile.feng3dAssets instanceof Feng3dFile)
             {
-                case "mdl": menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(assetsFile.path) }); break;
-                case "obj": menuconfig.push({ label: "解析", click: () => feng3d.objLoader.load(assetsFile.path) }); break;
-                case "mtl": menuconfig.push({ label: "解析", click: () => feng3d.mtlLoader.load(assetsFile.path) }); break;
-                case "fbx": menuconfig.push({ label: "解析", click: () => threejsLoader.load(assetsFile.path) }); break;
-                case "md5mesh": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.load(assetsFile.path) }); break;
-                case "md5anim": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.loadAnim(assetsFile.path) }); break;
+                var extensions = assetsFile.feng3dAssets.filename.split(".").pop();
+                var filePath = assetsFile.feng3dAssets.filePath;
+                switch (extensions)
+                {
+                    case "mdl": menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(filePath) }); break;
+                    case "obj": menuconfig.push({ label: "解析", click: () => feng3d.objLoader.load(filePath) }); break;
+                    case "mtl": menuconfig.push({ label: "解析", click: () => feng3d.mtlLoader.load(filePath) }); break;
+                    case "fbx": menuconfig.push({ label: "解析", click: () => threejsLoader.load(filePath) }); break;
+                    case "md5mesh": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.load(filePath) }); break;
+                    case "md5anim": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.loadAnim(filePath) }); break;
+                }
             }
+
         }
 
         private showFloderChanged(property, oldValue, newValue)
