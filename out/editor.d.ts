@@ -2164,8 +2164,6 @@ declare namespace editor {
     class Hierarchy {
         rootnode: HierarchyNode;
         rootGameObject: feng3d.GameObject;
-        private _rootGameObject;
-        private selectedGameObjects;
         constructor();
         /**
          * 获取选中节点
@@ -2176,13 +2174,15 @@ declare namespace editor {
          */
         getNode(gameObject: feng3d.GameObject): HierarchyNode;
         delete(gameobject: feng3d.GameObject): void;
+        addGameoObjectFromAsset(path: string, parent?: feng3d.GameObject): void;
+        private _selectedGameObjects;
+        private rootGameObjectChanged;
         private onSelectedGameObjectChanged;
         private ongameobjectadded;
         private ongameobjectremoved;
         private init;
         private add;
         private remove;
-        addGameoObjectFromAsset(path: string, parent?: feng3d.GameObject): void;
     }
 }
 declare namespace feng3d {

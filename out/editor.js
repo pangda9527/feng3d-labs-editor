@@ -8065,28 +8065,9 @@ var editor;
 (function (editor) {
     var Hierarchy = /** @class */ (function () {
         function Hierarchy() {
-            this.selectedGameObjects = [];
+            this._selectedGameObjects = [];
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
         }
-        Object.defineProperty(Hierarchy.prototype, "rootGameObject", {
-            get: function () {
-                return this._rootGameObject;
-            },
-            set: function (value) {
-                if (this._rootGameObject) {
-                    this._rootGameObject.off("added", this.ongameobjectadded, this);
-                    this._rootGameObject.off("removed", this.ongameobjectremoved, this);
-                }
-                this._rootGameObject = value;
-                if (this._rootGameObject) {
-                    this.init(this._rootGameObject);
-                    this._rootGameObject.on("added", this.ongameobjectadded, this);
-                    this._rootGameObject.on("removed", this.ongameobjectremoved, this);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
         /**
          * 获取选中节点
          */
@@ -8109,17 +8090,41 @@ var editor;
                 nodeMap.delete(gameobject);
             }
         };
+        Hierarchy.prototype.addGameoObjectFromAsset = function (path, parent) {
+            var _this = this;
+            editor.assets.readString(path, function (err, content) {
+                var json = JSON.parse(content);
+                var gameobject = feng3d.serialization.deserialize(json);
+                gameobject.name = path.split("/").pop().split(".").shift();
+                if (parent)
+                    parent.addChild(gameobject);
+                else
+                    _this.rootnode.gameobject.addChild(gameobject);
+                editor.editorData.selectObject(gameobject);
+            });
+        };
+        Hierarchy.prototype.rootGameObjectChanged = function (property, oldValue, newValue) {
+            if (oldValue) {
+                oldValue.off("added", this.ongameobjectadded, this);
+                oldValue.off("removed", this.ongameobjectremoved, this);
+            }
+            if (newValue) {
+                this.init(newValue);
+                newValue.on("added", this.ongameobjectadded, this);
+                newValue.on("removed", this.ongameobjectremoved, this);
+            }
+        };
         Hierarchy.prototype.onSelectedGameObjectChanged = function () {
             var _this = this;
-            this.selectedGameObjects.forEach(function (element) {
+            this._selectedGameObjects.forEach(function (element) {
                 var node = _this.getNode(element);
                 if (node)
                     node.selected = false;
                 else
                     debugger; // 为什么为空，是否被允许？
             });
-            this.selectedGameObjects = editor.editorData.selectedGameObjects;
-            this.selectedGameObjects.forEach(function (element) {
+            this._selectedGameObjects = editor.editorData.selectedGameObjects;
+            this._selectedGameObjects.forEach(function (element) {
                 _this.getNode(element).selected = true;
             });
         };
@@ -8173,19 +8178,9 @@ var editor;
             });
             node.removeNode();
         };
-        Hierarchy.prototype.addGameoObjectFromAsset = function (path, parent) {
-            var _this = this;
-            editor.assets.readString(path, function (err, content) {
-                var json = JSON.parse(content);
-                var gameobject = feng3d.serialization.deserialize(json);
-                gameobject.name = path.split("/").pop().split(".").shift();
-                if (parent)
-                    parent.addChild(gameobject);
-                else
-                    _this.rootnode.gameobject.addChild(gameobject);
-                editor.editorData.selectObject(gameobject);
-            });
-        };
+        __decorate([
+            feng3d.watch("rootGameObjectChanged")
+        ], Hierarchy.prototype, "rootGameObject", void 0);
         return Hierarchy;
     }());
     editor.Hierarchy = Hierarchy;

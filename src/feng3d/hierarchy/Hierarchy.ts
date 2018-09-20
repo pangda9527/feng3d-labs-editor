@@ -6,28 +6,8 @@ namespace editor
     {
         rootnode: HierarchyNode;
 
-        get rootGameObject()
-        {
-            return this._rootGameObject;
-        }
-        set rootGameObject(value)
-        {
-            if (this._rootGameObject)
-            {
-                this._rootGameObject.off("added", this.ongameobjectadded, this);
-                this._rootGameObject.off("removed", this.ongameobjectremoved, this);
-            }
-            this._rootGameObject = value;
-            if (this._rootGameObject)
-            {
-                this.init(this._rootGameObject);
-                this._rootGameObject.on("added", this.ongameobjectadded, this);
-                this._rootGameObject.on("removed", this.ongameobjectremoved, this);
-            }
-        }
-        private _rootGameObject: feng3d.GameObject;
-
-        private selectedGameObjects: feng3d.GameObject[] = [];
+        @feng3d.watch("rootGameObjectChanged")
+        rootGameObject: feng3d.GameObject;
 
         constructor()
         {
@@ -62,9 +42,41 @@ namespace editor
             }
         }
 
+        addGameoObjectFromAsset(path: string, parent?: feng3d.GameObject)
+        {
+            assets.readString(path, (err, content: string) =>
+            {
+                var json = JSON.parse(content);
+                var gameobject = feng3d.serialization.deserialize(json);
+                gameobject.name = path.split("/").pop().split(".").shift();
+                if (parent)
+                    parent.addChild(gameobject);
+                else
+                    this.rootnode.gameobject.addChild(gameobject);
+                editorData.selectObject(gameobject);
+            });
+        }
+
+        private _selectedGameObjects: feng3d.GameObject[] = [];
+
+        private rootGameObjectChanged(property, oldValue, newValue)
+        {
+            if (oldValue)
+            {
+                oldValue.off("added", this.ongameobjectadded, this);
+                oldValue.off("removed", this.ongameobjectremoved, this);
+            }
+            if (newValue)
+            {
+                this.init(newValue);
+                newValue.on("added", this.ongameobjectadded, this);
+                newValue.on("removed", this.ongameobjectremoved, this);
+            }
+        }
+
         private onSelectedGameObjectChanged()
         {
-            this.selectedGameObjects.forEach(element =>
+            this._selectedGameObjects.forEach(element =>
             {
                 var node = this.getNode(element);
                 if (node)
@@ -72,8 +84,8 @@ namespace editor
                 else
                     debugger; // 为什么为空，是否被允许？
             });
-            this.selectedGameObjects = editorData.selectedGameObjects;
-            this.selectedGameObjects.forEach(element =>
+            this._selectedGameObjects = editorData.selectedGameObjects;
+            this._selectedGameObjects.forEach(element =>
             {
                 this.getNode(element).selected = true;
             });
@@ -142,21 +154,6 @@ namespace editor
                 this.remove(element);
             });
             node.removeNode();
-        }
-
-        addGameoObjectFromAsset(path: string, parent?: feng3d.GameObject)
-        {
-            assets.readString(path, (err, content: string) =>
-            {
-                var json = JSON.parse(content);
-                var gameobject = feng3d.serialization.deserialize(json);
-                gameobject.name = path.split("/").pop().split(".").shift();
-                if (parent)
-                    parent.addChild(gameobject);
-                else
-                    this.rootnode.gameobject.addChild(gameobject);
-                editorData.selectObject(gameobject);
-            });
         }
     }
     var nodeMap = new Map<feng3d.GameObject, HierarchyNode>();
