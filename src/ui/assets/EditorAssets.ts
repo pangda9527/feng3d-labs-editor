@@ -4,9 +4,6 @@ namespace editor
 
     export class EditorAssets
     {
-        //attribute
-        assetsPath = "Assets/";
-
         /**
          * 显示文件夹
          */
@@ -73,11 +70,11 @@ namespace editor
 
         /**
          * 获取文件
-         * @param path 文件路径
+         * @param assetsId 文件路径
          */
-        getFile(path: string): AssetsFile
+        getFile(assetsId: string): AssetsFile
         {
-            return this.files[path];
+            return this.files[assetsId];
         }
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
@@ -98,7 +95,7 @@ namespace editor
         /**
          * 弹出文件菜单
          */
-        popupmenu(assetsFile: AssetsFile, othermenus?: { rename?: MenuItem })
+        popupmenu(assetsFile: AssetsFile)
         {
             var menuconfig: MenuItem[] = [];
             if (assetsFile.isDirectory)
@@ -223,10 +220,7 @@ namespace editor
             menuconfig.push({
                 label: "导出", click: () =>
                 {
-                    assets.readBlob(assetsFile.feng3dAssets.path, (err, blob) =>
-                    {
-                        saveAs(blob, assetsFile.name);
-                    });
+                    assetsFile.export();
                 }
             }, {
                     label: "删除", click: () =>
@@ -235,76 +229,13 @@ namespace editor
                     }
                 });
 
-            if (othermenus && othermenus.rename)
-            {
-                menuconfig.push(othermenus.rename);
-            }
-
             menu.popup(menuconfig);
-        }
-
-        /**
-         * 获取一个新路径
-         */
-        getnewpath(path: string, callback: (newpath: string) => void)
-        {
-            var index = 0;
-            var basepath = "";
-            var ext = "";
-            if (path.indexOf(".") == -1)
-            {
-                basepath = path;
-                ext = "";
-            } else
-            {
-                basepath = path.substring(0, path.indexOf("."));
-                ext = path.substring(path.indexOf("."));
-            }
-            searchnewpath();
-
-            function newpath()
-            {
-                var path = index == 0 ?
-                    (basepath + ext) :
-                    (basepath + " " + index + ext);
-                index++;
-                return path;
-            }
-
-            function searchnewpath()
-            {
-                var path = newpath();
-                assets.exists(path, (exists) =>
-                {
-                    if (exists)
-                        searchnewpath();
-                    else
-                        callback(path);
-                });
-            }
         }
 
         saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsFile) => void)
         {
             var assetsFile = this.showFloder.addAssets(object);
             callback && callback(assetsFile);
-        }
-
-        /**
-         * 过滤出文件列表
-         * @param fn 过滤函数
-         * @param next 是否继续遍历children
-         */
-        filter(fn: (assetsFile: AssetsFile) => boolean)
-        {
-            var results: AssetsFile[] = [];
-            for (const path in this.files)
-            {
-                const element = this.files[path];
-                if (fn(element))
-                    results.push(element);
-            }
-            return results;
         }
 
         /**
@@ -420,13 +351,7 @@ namespace editor
         private onParsed(e: feng3d.Event<any>)
         {
             var data = e.data;
-            if (data instanceof feng3d.GameObject)
-            {
-                this.saveObject(data);
-            } else if (data instanceof feng3d.Material)
-            {
-                this.saveObject(data);
-            } else if (data instanceof feng3d.AnimationClip)
+            if (data instanceof feng3d.Feng3dAssets)
             {
                 this.saveObject(data);
             }

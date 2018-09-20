@@ -4565,8 +4565,6 @@ var editor;
 (function (editor) {
     var EditorAssets = /** @class */ (function () {
         function EditorAssets() {
-            //attribute
-            this.assetsPath = "Assets/";
             this.files = {};
             /**
              * 上次执行的项目脚本
@@ -4614,10 +4612,10 @@ var editor;
         };
         /**
          * 获取文件
-         * @param path 文件路径
+         * @param assetsId 文件路径
          */
-        EditorAssets.prototype.getFile = function (path) {
-            return this.files[path];
+        EditorAssets.prototype.getFile = function (assetsId) {
+            return this.files[assetsId];
         };
         EditorAssets.prototype.readScene = function (path, callback) {
             editor.assets.readObject(path, function (err, object) {
@@ -4633,7 +4631,7 @@ var editor;
         /**
          * 弹出文件菜单
          */
-        EditorAssets.prototype.popupmenu = function (assetsFile, othermenus) {
+        EditorAssets.prototype.popupmenu = function (assetsFile) {
             var _this = this;
             var menuconfig = [];
             if (assetsFile.isDirectory) {
@@ -4736,70 +4734,18 @@ var editor;
             this.parserMenu(menuconfig, assetsFile);
             menuconfig.push({
                 label: "导出", click: function () {
-                    editor.assets.readBlob(assetsFile.feng3dAssets.path, function (err, blob) {
-                        saveAs(blob, assetsFile.name);
-                    });
+                    assetsFile.export();
                 }
             }, {
                 label: "删除", click: function () {
                     assetsFile.delete();
                 }
             });
-            if (othermenus && othermenus.rename) {
-                menuconfig.push(othermenus.rename);
-            }
             editor.menu.popup(menuconfig);
-        };
-        /**
-         * 获取一个新路径
-         */
-        EditorAssets.prototype.getnewpath = function (path, callback) {
-            var index = 0;
-            var basepath = "";
-            var ext = "";
-            if (path.indexOf(".") == -1) {
-                basepath = path;
-                ext = "";
-            }
-            else {
-                basepath = path.substring(0, path.indexOf("."));
-                ext = path.substring(path.indexOf("."));
-            }
-            searchnewpath();
-            function newpath() {
-                var path = index == 0 ?
-                    (basepath + ext) :
-                    (basepath + " " + index + ext);
-                index++;
-                return path;
-            }
-            function searchnewpath() {
-                var path = newpath();
-                editor.assets.exists(path, function (exists) {
-                    if (exists)
-                        searchnewpath();
-                    else
-                        callback(path);
-                });
-            }
         };
         EditorAssets.prototype.saveObject = function (object, callback) {
             var assetsFile = this.showFloder.addAssets(object);
             callback && callback(assetsFile);
-        };
-        /**
-         * 过滤出文件列表
-         * @param fn 过滤函数
-         * @param next 是否继续遍历children
-         */
-        EditorAssets.prototype.filter = function (fn) {
-            var results = [];
-            for (var path in this.files) {
-                var element = this.files[path];
-                if (fn(element))
-                    results.push(element);
-            }
-            return results;
         };
         /**
          *
@@ -4902,13 +4848,7 @@ var editor;
         };
         EditorAssets.prototype.onParsed = function (e) {
             var data = e.data;
-            if (data instanceof feng3d.GameObject) {
-                this.saveObject(data);
-            }
-            else if (data instanceof feng3d.Material) {
-                this.saveObject(data);
-            }
-            else if (data instanceof feng3d.AnimationClip) {
+            if (data instanceof feng3d.Feng3dAssets) {
                 this.saveObject(data);
             }
         };
@@ -5066,7 +5006,7 @@ var editor;
         AssetsFile.prototype.init = function () {
             var _this = this;
             this.isDirectory = this.feng3dAssets instanceof editor.Feng3dFolder;
-            this.label = this.name = this.feng3dAssets.name;
+            this.label = this.feng3dAssets.name;
             // 更新图标
             if (this.isDirectory) {
                 this.image = "folder_png";
@@ -5123,6 +5063,33 @@ var editor;
             editor.assets.writeArrayBuffer(feng3dFile.filePath, arraybuffer, function (err) {
                 var assetsFile = _this.addAssets(feng3dFile);
                 callback(err, assetsFile);
+            });
+        };
+        /**
+         * 导出
+         */
+        AssetsFile.prototype.export = function () {
+            var zip = new JSZip();
+            var path = this.feng3dAssets.path;
+            path = path.substring(0, path.lastIndexOf("/") + 1);
+            var filename = this.label;
+            editor.assets.getAllfilepathInFolder(path, function (err, filepaths) {
+                readfiles();
+                function readfiles() {
+                    if (filepaths.length > 0) {
+                        var filepath = filepaths.shift();
+                        editor.assets.readArrayBuffer(filepath, function (err, data) {
+                            //处理文件夹
+                            data && zip.file(filepath, data);
+                            readfiles();
+                        });
+                    }
+                    else {
+                        zip.generateAsync({ type: "blob" }).then(function (content) {
+                            saveAs(content, filename + ".zip");
+                        });
+                    }
+                }
             });
         };
         __decorate([
@@ -5293,7 +5260,7 @@ var editor;
             do {
                 if (textFlow.length > 0)
                     textFlow.unshift({ text: " > " });
-                textFlow.unshift({ text: floder.name, style: { "href": "event:" + floder.id } });
+                textFlow.unshift({ text: floder.label, style: { "href": "event:" + floder.id } });
                 floder = floder.parent;
             } while (floder);
             this.floderpathTxt.textFlow = textFlow;
@@ -5312,11 +5279,11 @@ var editor;
             }
             var fileinfos = children.filter(function (value) {
                 if (_this.includeTxt.text) {
-                    if (!includeReg.test(value.name))
+                    if (!includeReg.test(value.label))
                         return false;
                 }
                 if (_this.excludeTxt.text) {
-                    if (excludeReg.test(value.name))
+                    if (excludeReg.test(value.label))
                         return false;
                 }
                 return true;
@@ -5327,7 +5294,7 @@ var editor;
                     return -1;
                 if (a.isDirectory < b.isDirectory)
                     return 1;
-                if (a.name < b.name)
+                if (a.label < b.label)
                     return -1;
                 return 1;
             });
@@ -5347,7 +5314,7 @@ var editor;
                     _this.selectfile = element;
             });
             if (this.selectfile)
-                this.filepathLabel.text = this.selectfile.name;
+                this.filepathLabel.text = this.selectfile.label;
             else
                 this.filepathLabel.text = "";
         };

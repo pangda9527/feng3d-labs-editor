@@ -152,7 +152,7 @@ namespace editor
             {
                 if (textFlow.length > 0)
                     textFlow.unshift({ text: " > " });
-                textFlow.unshift({ text: floder.name, style: { "href": `event:${floder.id}` } });
+                textFlow.unshift({ text: floder.label, style: { "href": `event:${floder.id}` } });
                 floder = floder.parent;
             }
             while (floder)
@@ -179,12 +179,12 @@ namespace editor
             {
                 if (this.includeTxt.text)
                 {
-                    if (!includeReg.test(value.name))
+                    if (!includeReg.test(value.label))
                         return false;
                 }
                 if (this.excludeTxt.text)
                 {
-                    if (excludeReg.test(value.name))
+                    if (excludeReg.test(value.label))
                         return false;
                 }
                 return true;
@@ -196,7 +196,7 @@ namespace editor
                     return -1;
                 if (a.isDirectory < b.isDirectory)
                     return 1;
-                if (a.name < b.name)
+                if (a.label < b.label)
                     return -1;
                 return 1;
             });
@@ -222,7 +222,7 @@ namespace editor
                     this.selectfile = element;
             });
             if (this.selectfile)
-                this.filepathLabel.text = this.selectfile.name;
+                this.filepathLabel.text = this.selectfile.label;
             else
                 this.filepathLabel.text = "";
         }

@@ -36,11 +36,6 @@ namespace editor
         image: string;
 
         /**
-         * 文件夹名称
-         */
-        name: string;
-
-        /**
          * 显示标签
          */
         label: string;
@@ -95,7 +90,7 @@ namespace editor
         private init()
         {
             this.isDirectory = this.feng3dAssets instanceof Feng3dFolder;
-            this.label = this.name = this.feng3dAssets.name;
+            this.label = this.feng3dAssets.name;
 
             // 更新图标
             if (this.isDirectory)
@@ -166,6 +161,40 @@ namespace editor
             {
                 var assetsFile = this.addAssets(feng3dFile);
                 callback(err, assetsFile);
+            });
+        }
+
+        /**
+         * 导出
+         */
+        export()
+        {
+            var zip = new JSZip();
+            var path = this.feng3dAssets.path;
+            path = path.substring(0, path.lastIndexOf("/") + 1);
+            var filename = this.label;
+            assets.getAllfilepathInFolder(path, (err, filepaths) =>
+            {
+                readfiles();
+                function readfiles()
+                {
+                    if (filepaths.length > 0)
+                    {
+                        var filepath = filepaths.shift();
+                        assets.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        {
+                            //处理文件夹
+                            data && zip.file(filepath, data);
+                            readfiles();
+                        });
+                    } else
+                    {
+                        zip.generateAsync({ type: "blob" }).then(function (content)
+                        {
+                            saveAs(content, `${filename}.zip`);
+                        });
+                    }
+                }
             });
         }
     }

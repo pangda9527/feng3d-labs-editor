@@ -1244,7 +1244,6 @@ declare namespace editor {
 declare namespace editor {
     var editorAssets: EditorAssets;
     class EditorAssets {
-        assetsPath: string;
         /**
          * 显示文件夹
          */
@@ -1269,27 +1268,15 @@ declare namespace editor {
         saveProject(callback?: (err: Error) => void): void;
         /**
          * 获取文件
-         * @param path 文件路径
+         * @param assetsId 文件路径
          */
-        getFile(path: string): AssetsFile;
+        getFile(assetsId: string): AssetsFile;
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void): void;
         /**
          * 弹出文件菜单
          */
-        popupmenu(assetsFile: AssetsFile, othermenus?: {
-            rename?: MenuItem;
-        }): void;
-        /**
-         * 获取一个新路径
-         */
-        getnewpath(path: string, callback: (newpath: string) => void): void;
+        popupmenu(assetsFile: AssetsFile): void;
         saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsFile) => void): void;
-        /**
-         * 过滤出文件列表
-         * @param fn 过滤函数
-         * @param next 是否继续遍历children
-         */
-        filter(fn: (assetsFile: AssetsFile) => boolean): AssetsFile[];
         /**
          *
          * @param files 需要导入的文件列表
@@ -1354,10 +1341,6 @@ declare namespace editor {
          */
         image: string;
         /**
-         * 文件夹名称
-         */
-        name: string;
-        /**
          * 显示标签
          */
         label: string;
@@ -1384,6 +1367,10 @@ declare namespace editor {
          * @param callback 完成回调
          */
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override?: boolean, callback?: (e: Error, file: AssetsFile) => void): void;
+        /**
+         * 导出
+         */
+        export(): void;
     }
 }
 declare namespace editor {
