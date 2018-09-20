@@ -76,7 +76,7 @@ namespace editor
 					element.destroy();
 				});
 			}
-			this.removeNode();
+			this.remove();
 
 			this.parent = null;
 			this.children = null;
@@ -95,23 +95,22 @@ namespace editor
 			return false;
 		}
 
-		addNode(node: TreeNode)
+		addChild(node: TreeNode)
 		{
-			feng3d.debuger && feng3d.assert(!node.contain(this), "无法添加到自身节点中!");
+			feng3d.assert(!node.contain(this), "无法添加到自身节点中!");
 
+			if (this.children.indexOf(node) == -1) this.children.push(node);
 			node.parent = this;
-			this.children.push(node);
 
 			this.dispatch("added", node, true);
 		}
 
-		removeNode()
+		remove()
 		{
 			if (this.parent)
 			{
 				var index = this.parent.children.indexOf(this);
-				feng3d.debuger && feng3d.assert(index != -1);
-				this.parent.children.splice(index, 1);
+				if (index != -1) this.parent.children.splice(index, 1);
 			}
 
 			this.dispatch("removed", this, true);

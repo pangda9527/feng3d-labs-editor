@@ -548,8 +548,8 @@ declare namespace editor {
          * 判断是否包含节点
          */
         contain(node: TreeNode): boolean;
-        addNode(node: TreeNode): void;
-        removeNode(): void;
+        addChild(node: TreeNode): void;
+        remove(): void;
         getShowNodes(): TreeNode[];
         private openChanged;
     }
@@ -1316,7 +1316,7 @@ declare namespace editor {
          * 获取一个新路径
          */
         getnewpath(path: string, callback: (newpath: string) => void): void;
-        saveObject(object: feng3d.GameObject | feng3d.AnimationClip | feng3d.Material | feng3d.Geometry, filename: string, callback?: (file: AssetsFile) => void): void;
+        saveObject(object: feng3d.Feng3dAssets, filename: string, callback?: (file: AssetsFile) => void): void;
         /**
          * 过滤出文件列表
          * @param fn 过滤函数
@@ -1362,7 +1362,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube | HTMLImageElement;
     interface AssetsFileEventMap extends TreeNodeMap {
         /**
          * 加载完成
@@ -1407,10 +1406,6 @@ declare namespace editor {
          * 扩展名
          */
         extension: feng3d.AssetExtension;
-        /**
-         * 缓存下来的数据 避免从文件再次加载解析数据
-         */
-        cacheData: AssetsDataType;
         children: AssetsFile[];
         parent: AssetsFile;
         feng3dAssets: feng3d.Feng3dAssets;
@@ -1422,8 +1417,6 @@ declare namespace editor {
         private idChanged;
         private init;
         addAssets(feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
-        addChild(file: AssetsFile): void;
-        remove(): void;
         /**
          * 删除
          */
@@ -1465,7 +1458,7 @@ declare namespace editor {
          * @param content 文件内容
          * @param callback 完成回调
          */
-        addfile(filename: string, content: AssetsDataType, override?: boolean, callback?: (file: AssetsFile) => void): AssetsFile;
+        addfile(filename: string, content: feng3d.Feng3dAssets, override?: boolean, callback?: (file: AssetsFile) => void): AssetsFile;
         /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
@@ -1570,6 +1563,31 @@ declare namespace editor {
 }
 declare namespace editor {
     class Feng3dFolder extends feng3d.Feng3dAssets {
+    }
+}
+declare namespace editor {
+    class ScriptFile extends Feng3dFile {
+        scriptContent: string;
+    }
+}
+declare namespace editor {
+    class ShaderFile extends Feng3dFile {
+        shaderContent: string;
+    }
+}
+declare namespace editor {
+    class JSFile extends Feng3dFile {
+        jsContent: string;
+    }
+}
+declare namespace editor {
+    class JsonFile extends Feng3dFile {
+        jsonContent: string;
+    }
+}
+declare namespace editor {
+    class TextFile extends Feng3dFile {
+        textContent: string;
     }
 }
 declare namespace editor {

@@ -61,6 +61,8 @@ namespace editor
                 }
                 this.rootFile.updateParent();
                 this.showFloder = this.rootFile;
+                this.rootFile.on("added", () => { this.saveProject() });
+                this.rootFile.on("removed", () => { this.saveProject() });
                 if (loadingNum == 0)
                 {
                     callback();
@@ -173,33 +175,31 @@ namespace editor
                             {
                                 label: "脚本", click: () =>
                                 {
-                                    var scriptName = "NewScript";
-                                    assetsFile.addfile(`${scriptName}.script.ts`, assetsFileTemplates.getNewScript(scriptName));
+                                    assetsFile.addAssets(new ScriptFile().value({ name: "NewScript", scriptContent: assetsFileTemplates.getNewScript("NewScript") }));
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
-                                    var shadername = "NewShader"
-                                    assetsFile.addfile(`${shadername}.shader.ts`, assetsFileTemplates.getNewShader(shadername));
+                                    assetsFile.addAssets(new ShaderFile().value({ name: "NewShader", shaderContent: assetsFileTemplates.getNewShader("NewShader") }));
                                 }
                             },
                             {
                                 label: "js", click: () =>
                                 {
-                                    assetsFile.addfile("new file.js", "");
+                                    assetsFile.addAssets(new JSFile().value({ name: "New Js", jsContent: "" }));
                                 }
                             },
                             {
                                 label: "Json", click: () =>
                                 {
-                                    assetsFile.addfile("new json.json", "{}");
+                                    assetsFile.addAssets(new JsonFile().value({ name: "New Json", jsonContent: "{}" }));
                                 }
                             },
                             {
                                 label: "文本", click: () =>
                                 {
-                                    assetsFile.addfile("new text.txt", "");
+                                    assetsFile.addAssets(new TextFile().value({ name: "New Text", textContent: "" }));
                                 }
                             },
                             { type: "separator" },
@@ -343,7 +343,7 @@ namespace editor
             }
         }
 
-        saveObject(object: feng3d.GameObject | feng3d.AnimationClip | feng3d.Material | feng3d.Geometry, filename: string, callback?: (file: AssetsFile) => void)
+        saveObject(object: feng3d.Feng3dAssets, filename: string, callback?: (file: AssetsFile) => void)
         {
             this.showFloder.addfile(filename, object, true, callback);
         }

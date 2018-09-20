@@ -93,6 +93,11 @@
         //
         "src/resources/Feng3dFile.ts",
         "src/resources/Feng3dFolder.ts",
+        "src/resources/ScriptFile.ts",
+        "src/resources/ShaderFile.ts",
+        "src/resources/JSFile.ts",
+        "src/resources/JsonFile.ts",
+        "src/resources/TextFile.ts",
         //
         "src/ui/TopView.ts",
         "src/ui/MainView.ts",

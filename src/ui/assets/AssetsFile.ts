@@ -1,7 +1,5 @@
 namespace editor
 {
-    export type AssetsDataType = ArrayBuffer | string | feng3d.Material | feng3d.GameObject | feng3d.AnimationClip | feng3d.Geometry | feng3d.Texture2D | feng3d.TextureCube | HTMLImageElement;
-
     export interface AssetsFileEventMap extends TreeNodeMap
     {
         /**
@@ -62,11 +60,6 @@ namespace editor
          * 扩展名
          */
         extension: feng3d.AssetExtension
-
-        /**
-         * 缓存下来的数据 避免从文件再次加载解析数据
-         */
-        cacheData: AssetsDataType;
 
         @feng3d.serialize
         children: AssetsFile[] = [];
@@ -137,26 +130,6 @@ namespace editor
             var assetsFile = new AssetsFile(feng3dAssets.assetsId);
             this.addChild(assetsFile);
             return assetsFile;
-        }
-
-        addChild(file: AssetsFile)
-        {
-            if (this.children.indexOf(file) == -1) this.children.push(file);
-            file.parent = this;
-            editorAssets.saveProject();
-            editorui.assetsview.invalidateAssetstree();
-        }
-
-        remove()
-        {
-            if (this.parent)
-            {
-                var index = this.parent.children.indexOf(this);
-                if (index != -1) this.parent.children.splice(index, 1);
-            }
-            this.parent = null;
-            editorAssets.saveProject();
-            editorui.assetsview.invalidateAssetstree();
         }
 
         /**
@@ -241,15 +214,8 @@ namespace editor
          */
         showInspectorData(callback: (showdata: Object) => void)
         {
-            if (this.cacheData)
-            {
-                callback(this.cacheData);
-                return;
-            }
-            this.getData((data) =>
-            {
-                callback(data);
-            });
+            callback(this.feng3dAssets)
+            return;
         }
 
         /**
@@ -258,31 +224,8 @@ namespace editor
          */
         getData(callback: (data: any) => void)
         {
-            if (this.cacheData)
-            {
-                callback(this.cacheData);
-                return;
-            }
-            if (this.isDirectory)
-            {
-                callback({ isDirectory: true });
-                return;
-            }
-            if (regExps.json.test(this.path))
-            {
-                feng3d.Feng3dAssets.getAssetsByPath(this.path, assets =>
-                {
-                    this.cacheData = assets;
-                    callback(this.cacheData);
-                });
-                return;
-            }
-            if (regExps.image.test(this.path))
-            {
-                this.cacheData = new feng3d.UrlImageTexture2D().value({ url: this.path });
-                callback(this.cacheData);
-                return;
-            }
+            callback(this.feng3dAssets);
+            return;
         }
 
         /**
@@ -354,7 +297,7 @@ namespace editor
          * @param content 文件内容
          * @param callback 完成回调
          */
-        addfile(filename: string, content: AssetsDataType, override = false, callback?: (file: AssetsFile) => void)
+        addfile(filename: string, content: feng3d.Feng3dAssets, override = false, callback?: (file: AssetsFile) => void)
         {
             var filepath = this.path + filename;
             if (!override)
@@ -364,7 +307,7 @@ namespace editor
 
             var assetsFile = new AssetsFile();
             assetsFile.path = filepath;
-            assetsFile.cacheData = content;
+            assetsFile.feng3dAssets = content;
             assetsFile.save(true, () =>
             {
                 editorAssets.files[filepath] = assetsFile;
@@ -403,11 +346,6 @@ namespace editor
          */
         save(create = false, callback?: (err: Error) => void)
         {
-            if (this.cacheData == undefined)
-            {
-                callback && callback(null);
-                return;
-            }
             if (!create && !editorAssets.files[this.path])
             {
                 var e = new Error(`需要保存的文件 ${this.path} 不存在`);
@@ -435,7 +373,7 @@ namespace editor
          */
         getArrayBuffer(callback: (arraybuffer: ArrayBuffer) => void)
         {
-            var content = this.cacheData;
+            var content = this.feng3dAssets;
             if (content instanceof ArrayBuffer)
             {
                 callback(content);
@@ -503,7 +441,6 @@ namespace editor
         {
             if (this.extension != feng3d.AssetExtension.script)
                 return "";
-            this.cacheData = null;
             this.getData((code: string) =>
             {
                 // 获取脚本类名称

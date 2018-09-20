@@ -127,7 +127,7 @@ namespace editor
             var node = nodeMap.get(gameobject);
             if (node)
             {
-                node.removeNode();
+                node.remove();
             }
             var parentnode = nodeMap.get(gameobject.parent);
             if (parentnode)
@@ -137,7 +137,7 @@ namespace editor
                     node = new HierarchyNode({ gameobject: gameobject });
                     nodeMap.set(gameobject, node);
                 }
-                parentnode.addNode(node);
+                parentnode.addChild(node);
             }
             gameobject.children.forEach(element =>
             {
@@ -153,7 +153,7 @@ namespace editor
             {
                 this.remove(element);
             });
-            node.removeNode();
+            node.remove();
         }
     }
     var nodeMap = new Map<feng3d.GameObject, HierarchyNode>();

@@ -118,6 +118,8 @@ namespace editor
                 this.invalidateAssetstree();
 
                 editorAssets.rootFile.on("openChanged", this.invalidateAssetstree, this);
+                editorAssets.rootFile.on("added", this.invalidateAssetstree, this);
+                editorAssets.rootFile.on("removed", this.invalidateAssetstree, this);
             });
         }
 
