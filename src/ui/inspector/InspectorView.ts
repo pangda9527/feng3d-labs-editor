@@ -65,7 +65,7 @@ namespace editor
 		{
 			if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets)
 			{
-				assets.saveAssets(this._viewData, callback);
+				assets.writeAssets(this._viewData, callback);
 				this._dataChanged = false;
 			} else
 			{

@@ -37,7 +37,7 @@ namespace editor
                 } else
                 {
                     var folder = new Feng3dFolder().value({ name: "Assets" });
-                    assets.saveAssets(folder)
+                    assets.writeAssets(folder)
                     this.rootFile = new AssetsFile(folder.assetsId)
                     this.saveProject();
                 }
@@ -65,7 +65,7 @@ namespace editor
          */
         saveProject(callback?: (err: Error) => void)
         {
-            assets.saveObject("project.json", this.rootFile, callback);
+            assets.writeObject("project.json", this.rootFile, callback);
         }
 
         /**
@@ -113,31 +113,31 @@ namespace editor
                             {
                                 label: "脚本", click: () =>
                                 {
-                                    assetsFile.addAssets(new ScriptFile().value({ name: "NewScript", scriptContent: assetsFileTemplates.getNewScript("NewScript") }));
+                                    assetsFile.addAssets(new ScriptFile().value({ name: "NewScript", filename: "script.ts", scriptContent: assetsFileTemplates.getNewScript("NewScript") }));
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
-                                    assetsFile.addAssets(new ShaderFile().value({ name: "NewShader", shaderContent: assetsFileTemplates.getNewShader("NewShader") }));
+                                    assetsFile.addAssets(new ShaderFile().value({ name: "NewShader", filename: "shader.ts", shaderContent: assetsFileTemplates.getNewShader("NewShader") }));
                                 }
                             },
                             {
                                 label: "js", click: () =>
                                 {
-                                    assetsFile.addAssets(new JSFile().value({ name: "New Js", jsContent: "" }));
+                                    assetsFile.addAssets(new JSFile().value({ name: "New Js", filename: "js.js", jsContent: "" }));
                                 }
                             },
                             {
                                 label: "Json", click: () =>
                                 {
-                                    assetsFile.addAssets(new JsonFile().value({ name: "New Json", jsonContent: "{}" }));
+                                    assetsFile.addAssets(new JsonFile().value({ name: "New Json", filename: "json.json", jsonContent: "{}" }));
                                 }
                             },
                             {
                                 label: "文本", click: () =>
                                 {
-                                    assetsFile.addAssets(new TextFile().value({ name: "New Text", textContent: "" }));
+                                    assetsFile.addAssets(new TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" }));
                                 }
                             },
                             { type: "separator" },
@@ -200,7 +200,7 @@ namespace editor
                 menuconfig.push({
                     label: "编辑", click: () =>
                     {
-                        var url = `codeeditor.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}&path=${assetsFile.id}`;
+                        var url = `codeeditor.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}&id=${assetsFile.id}`;
                         url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                         // if (assets.type == FSType.native)
                         // {
@@ -266,7 +266,7 @@ namespace editor
                 if (regExps.image.test(file.name))
                 {
                     var urlImageTexture2D = new feng3d.UrlImageTexture2D().value({ name: file.name })
-                    assets.saveAssets(urlImageTexture2D);
+                    assets.writeAssets(urlImageTexture2D);
                     var imagePath = `Library/${urlImageTexture2D.assetsId}/file/` + file.name;
                     assets.writeArrayBuffer(imagePath, result, err =>
                     {

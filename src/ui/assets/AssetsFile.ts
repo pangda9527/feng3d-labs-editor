@@ -72,11 +72,11 @@ namespace editor
             editorAssets.files[this.id] = this;
 
             loadingNum++;
-            assets.readAssets(this.id, (err, assets) =>
+            assets.readAssets(this.id, (err, feng3dAssets) =>
             {
                 if (err) feng3d.error(err.message);
 
-                this.feng3dAssets = assets;
+                this.feng3dAssets = feng3dAssets;
                 this.init();
                 loadingNum--;
                 this.dispatch("loaded");
@@ -113,7 +113,7 @@ namespace editor
 
         addAssets(feng3dAssets: feng3d.Feng3dAssets)
         {
-            assets.saveAssets(feng3dAssets);
+            assets.writeAssets(feng3dAssets);
             var assetsFile = new AssetsFile(feng3dAssets.assetsId);
             this.addChild(assetsFile);
             return assetsFile;
@@ -157,7 +157,7 @@ namespace editor
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsFile) => void)
         {
             var feng3dFile = new Feng3dFile().value({ name: filename, filename: filename, arraybuffer: arraybuffer });
-            assets.saveAssets(feng3dFile);
+            assets.writeAssets(feng3dFile);
             assets.writeArrayBuffer(feng3dFile.filePath, arraybuffer, err =>
             {
                 var assetsFile = this.addAssets(feng3dFile);

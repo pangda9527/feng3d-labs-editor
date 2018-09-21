@@ -1444,6 +1444,13 @@ declare namespace editor {
          * 文件路径
          */
         filePath: string;
+        /**
+         * 保存资源
+         * @param readWriteAssets
+         * @param callback  完成回调
+         */
+        save(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): any;
+        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
         protected fileNameChanged(): void;
         protected assetsIdChanged(): void;
     }
@@ -1457,6 +1464,7 @@ declare namespace editor {
     class ScriptFile extends Feng3dFile {
         type: feng3d.AssetExtension;
         scriptContent: string;
+        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
         /**
          * 获取脚本类名称
          * @param callback 回调函数
@@ -1468,24 +1476,28 @@ declare namespace editor {
     class ShaderFile extends Feng3dFile {
         assetType: feng3d.AssetExtension;
         shaderContent: string;
+        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
     }
 }
 declare namespace editor {
     class JSFile extends Feng3dFile {
         assetType: feng3d.AssetExtension;
         jsContent: string;
+        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
     }
 }
 declare namespace editor {
     class JsonFile extends Feng3dFile {
         assetType: feng3d.AssetExtension;
         jsonContent: string;
+        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
     }
 }
 declare namespace editor {
     class TextFile extends Feng3dFile {
         assetType: feng3d.AssetExtension;
         textContent: string;
+        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
     }
 }
 declare namespace editor {

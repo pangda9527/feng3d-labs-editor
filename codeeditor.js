@@ -14,10 +14,10 @@ var monacoEditor;
     var DBname = "feng3d-editor";
     var fstype = GetQueryString("fstype");
     var project = decodeURI(GetQueryString("project"));
-    var path = decodeURI(GetQueryString("path"));
+    var id = decodeURI(GetQueryString("id"));
 
-    // var assetsfs:feng3d.ReadWriteAssets;
-    var assetsfs;
+    var assetsfs:feng3d.ReadWriteAssets;
+    // var assetsfs;
     if (fstype == "indexedDB")
     {
         window.feng3d = window.opener.feng3d;
@@ -64,9 +64,9 @@ var monacoEditor;
     var tslist = [];
     var tslibs = [];
 
-    var extension = path.split(".").pop();
+    var extension = id.split(".").pop();
 
-    document.head.getElementsByTagName("title")[0].innerText = path;
+    document.head.getElementsByTagName("title")[0].innerText = id;
 
     // 加载所有ts文件
     function loadallts(callback)
@@ -86,7 +86,7 @@ var monacoEditor;
                 if (tspaths.length > 0)
                 {
                     var path = tspaths.pop();
-                    assetsfs.readFileAsString(path, (err, str) =>
+                    assetsfs.readString(path, (err, str) =>
                     {
                         if (err)
                             console.warn(err);
@@ -110,7 +110,7 @@ var monacoEditor;
     function init()
     {
         // 获取文件内容
-        assetsfs.readFileAsString(path, (err, code) =>
+        assetsfs.readString(id, (err, code) =>
         {
             initEditor(extension, function ()
             {
@@ -131,14 +131,14 @@ var monacoEditor;
                     code = monacoEditor.getValue();
                     feng3d.dataTransform.stringToArrayBuffer(code, (arrayBuffer) =>
                     {
-                        assetsfs.writeFile(path, arrayBuffer, (err) =>
+                        assetsfs.writeFile(id, arrayBuffer, (err) =>
                         {
                             if (err)
                                 console.warn(err);
                             logLabel.textContent = "自动保存完成！";
                             if (extension == "ts" || extension == "shader")
                             {
-                                tslist.filter((v) => v.path == path)[0].code = code;
+                                tslist.filter((v) => v.path == id)[0].code = code;
                                 if (watch.checked)
                                 {
                                     autoCompile();
@@ -206,7 +206,7 @@ var monacoEditor;
 
             tslist.forEach(item =>
             {
-                if (item.path != path)
+                if (item.path != id)
                     monaco.languages.typescript.typescriptDefaults.addExtraLib(item.code, item.path);
             });
 

@@ -4364,7 +4364,7 @@ var editor;
          */
         InspectorView.prototype.saveShowData = function (callback) {
             if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets) {
-                editor.assets.saveAssets(this._viewData, callback);
+                editor.assets.writeAssets(this._viewData, callback);
                 this._dataChanged = false;
             }
             else {
@@ -4580,7 +4580,7 @@ var editor;
                 }
                 else {
                     var folder = new editor.Feng3dFolder().value({ name: "Assets" });
-                    editor.assets.saveAssets(folder);
+                    editor.assets.writeAssets(folder);
                     _this.rootFile = new editor.AssetsFile(folder.assetsId);
                     _this.saveProject();
                 }
@@ -4603,7 +4603,7 @@ var editor;
          * @param callback 完成回调
          */
         EditorAssets.prototype.saveProject = function (callback) {
-            editor.assets.saveObject("project.json", this.rootFile, callback);
+            editor.assets.writeObject("project.json", this.rootFile, callback);
         };
         /**
          * 获取文件
@@ -4640,27 +4640,27 @@ var editor;
                         },
                         {
                             label: "脚本", click: function () {
-                                assetsFile.addAssets(new editor.ScriptFile().value({ name: "NewScript", scriptContent: editor.assetsFileTemplates.getNewScript("NewScript") }));
+                                assetsFile.addAssets(new editor.ScriptFile().value({ name: "NewScript", filename: "script.ts", scriptContent: editor.assetsFileTemplates.getNewScript("NewScript") }));
                             }
                         },
                         {
                             label: "着色器", click: function () {
-                                assetsFile.addAssets(new editor.ShaderFile().value({ name: "NewShader", shaderContent: editor.assetsFileTemplates.getNewShader("NewShader") }));
+                                assetsFile.addAssets(new editor.ShaderFile().value({ name: "NewShader", filename: "shader.ts", shaderContent: editor.assetsFileTemplates.getNewShader("NewShader") }));
                             }
                         },
                         {
                             label: "js", click: function () {
-                                assetsFile.addAssets(new editor.JSFile().value({ name: "New Js", jsContent: "" }));
+                                assetsFile.addAssets(new editor.JSFile().value({ name: "New Js", filename: "js.js", jsContent: "" }));
                             }
                         },
                         {
                             label: "Json", click: function () {
-                                assetsFile.addAssets(new editor.JsonFile().value({ name: "New Json", jsonContent: "{}" }));
+                                assetsFile.addAssets(new editor.JsonFile().value({ name: "New Json", filename: "json.json", jsonContent: "{}" }));
                             }
                         },
                         {
                             label: "文本", click: function () {
-                                assetsFile.addAssets(new editor.TextFile().value({ name: "New Text", textContent: "" }));
+                                assetsFile.addAssets(new editor.TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" }));
                             }
                         },
                         { type: "separator" },
@@ -4711,7 +4711,7 @@ var editor;
             ].indexOf(assetsFile.feng3dAssets.assetType) != -1) {
                 menuconfig.push({
                     label: "编辑", click: function () {
-                        var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&path=" + assetsFile.id;
+                        var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&id=" + assetsFile.id;
                         url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
                         // if (assets.type == FSType.native)
                         // {
@@ -4768,7 +4768,7 @@ var editor;
                 var showFloder = _this.showFloder;
                 if (editor.regExps.image.test(file.name)) {
                     var urlImageTexture2D = new feng3d.UrlImageTexture2D().value({ name: file.name });
-                    editor.assets.saveAssets(urlImageTexture2D);
+                    editor.assets.writeAssets(urlImageTexture2D);
                     var imagePath = "Library/" + urlImageTexture2D.assetsId + "/file/" + file.name;
                     editor.assets.writeArrayBuffer(imagePath, result, function (err) {
                         urlImageTexture2D.url = imagePath;
@@ -4989,10 +4989,10 @@ var editor;
                 return;
             editor.editorAssets.files[this.id] = this;
             editor.loadingNum++;
-            editor.assets.readAssets(this.id, function (err, assets) {
+            editor.assets.readAssets(this.id, function (err, feng3dAssets) {
                 if (err)
                     feng3d.error(err.message);
-                _this.feng3dAssets = assets;
+                _this.feng3dAssets = feng3dAssets;
                 _this.init();
                 editor.loadingNum--;
                 _this.dispatch("loaded");
@@ -5020,7 +5020,7 @@ var editor;
             }
         };
         AssetsFile.prototype.addAssets = function (feng3dAssets) {
-            editor.assets.saveAssets(feng3dAssets);
+            editor.assets.writeAssets(feng3dAssets);
             var assetsFile = new AssetsFile(feng3dAssets.assetsId);
             this.addChild(assetsFile);
             return assetsFile;
@@ -5058,7 +5058,7 @@ var editor;
             var _this = this;
             if (override === void 0) { override = false; }
             var feng3dFile = new editor.Feng3dFile().value({ name: filename, filename: filename, arraybuffer: arraybuffer });
-            editor.assets.saveAssets(feng3dFile);
+            editor.assets.writeAssets(feng3dFile);
             editor.assets.writeArrayBuffer(feng3dFile.filePath, arraybuffer, function (err) {
                 var assetsFile = _this.addAssets(feng3dFile);
                 callback(err, assetsFile);
@@ -5400,6 +5400,24 @@ var editor;
         function Feng3dFile() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        /**
+         * 保存资源
+         * @param readWriteAssets
+         * @param callback  完成回调
+         */
+        Feng3dFile.prototype.save = function (readWriteAssets, callback) {
+            var _this = this;
+            _super.prototype.save.call(this, readWriteAssets, function (err) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+                _this.saveFile(readWriteAssets, callback);
+            });
+        };
+        Feng3dFile.prototype.saveFile = function (readWriteAssets, callback) {
+            readWriteAssets.writeArrayBuffer(this.filePath, this.arraybuffer, callback);
+        };
         Feng3dFile.prototype.fileNameChanged = function () {
             this.filePath = "Library/" + this.assetsId + "/file/" + this.filename;
         };
@@ -5437,6 +5455,9 @@ var editor;
             _this.type = feng3d.AssetExtension.script;
             return _this;
         }
+        ScriptFile.prototype.saveFile = function (readWriteAssets, callback) {
+            readWriteAssets.writeString(this.filePath, this.scriptContent, callback);
+        };
         /**
          * 获取脚本类名称
          * @param callback 回调函数
@@ -5468,6 +5489,9 @@ var editor;
             _this.assetType = feng3d.AssetExtension.shader;
             return _this;
         }
+        ShaderFile.prototype.saveFile = function (readWriteAssets, callback) {
+            readWriteAssets.writeString(this.filePath, this.shaderContent, callback);
+        };
         return ShaderFile;
     }(editor.Feng3dFile));
     editor.ShaderFile = ShaderFile;
@@ -5481,6 +5505,9 @@ var editor;
             _this.assetType = feng3d.AssetExtension.js;
             return _this;
         }
+        JSFile.prototype.saveFile = function (readWriteAssets, callback) {
+            readWriteAssets.writeString(this.filePath, this.jsContent, callback);
+        };
         return JSFile;
     }(editor.Feng3dFile));
     editor.JSFile = JSFile;
@@ -5494,6 +5521,9 @@ var editor;
             _this.assetType = feng3d.AssetExtension.json;
             return _this;
         }
+        JsonFile.prototype.saveFile = function (readWriteAssets, callback) {
+            readWriteAssets.writeString(this.filePath, this.jsonContent, callback);
+        };
         return JsonFile;
     }(editor.Feng3dFile));
     editor.JsonFile = JsonFile;
@@ -5507,6 +5537,9 @@ var editor;
             _this.assetType = feng3d.AssetExtension.txt;
             return _this;
         }
+        TextFile.prototype.saveFile = function (readWriteAssets, callback) {
+            readWriteAssets.writeString(this.filePath, this.textContent, callback);
+        };
         return TextFile;
     }(editor.Feng3dFile));
     editor.TextFile = TextFile;
@@ -5599,7 +5632,7 @@ var editor;
                     break;
                 case this.playBtn:
                     editor.editorui.inspectorView.saveShowData(function () {
-                        editor.assets.saveObject("default.scene.json", editor.engine.scene.gameObject, function (err) {
+                        editor.assets.writeObject("default.scene.json", editor.engine.scene.gameObject, function (err) {
                             if (err) {
                                 feng3d.warn(err);
                                 return;
@@ -8142,7 +8175,7 @@ var editor;
                 });
             });
             window.addEventListener("beforeunload", function () {
-                editor.assets.saveObject("default.scene.json", editor.engine.scene.gameObject);
+                editor.assets.writeObject("default.scene.json", editor.engine.scene.gameObject);
             });
         };
         Main3D.prototype.onEditorCameraRotate = function (e) {
