@@ -1797,8 +1797,12 @@ var editor;
         MenuItemRenderer.prototype.updateView = function () {
             if (!this.data)
                 return;
+            this.touchEnabled = true;
+            this.touchChildren = true;
             if (this.data.type == 'separator') {
                 this.skin.currentState = "separator";
+                this.touchEnabled = false;
+                this.touchChildren = false;
             }
             else if (this.data.submenu) {
                 this.skin.currentState = "sub";
@@ -4458,11 +4462,6 @@ var editor;
         };
         HierarchyTreeItemRenderer.prototype.dataChanged = function () {
             _super.prototype.dataChanged.call(this);
-            if (this.data) {
-                this.renameInput.text = this.data.label;
-            }
-            else {
-            }
         };
         HierarchyTreeItemRenderer.prototype.onrightclick = function (e) {
             var _this = this;
@@ -4472,12 +4471,6 @@ var editor;
                 menuconfig.push({
                     label: "删除", click: function () {
                         _this.data.gameobject.parent.removeChild(_this.data.gameobject);
-                    }
-                }, {
-                    label: "重命名", click: function () {
-                        _this.renameInput.edit(function () {
-                            _this.data.gameobject.name = _this.renameInput.text;
-                        });
                     }
                 });
             }
@@ -4732,15 +4725,20 @@ var editor;
             }
             // 解析菜单
             this.parserMenu(menuconfig, assetsFile);
-            menuconfig.push({
-                label: "导出", click: function () {
-                    assetsFile.export();
-                }
-            }, {
-                label: "删除", click: function () {
-                    assetsFile.delete();
-                }
-            });
+            if (!assetsFile.isDirectory) {
+                menuconfig.push({
+                    label: "导出", click: function () {
+                        assetsFile.export();
+                    }
+                });
+            }
+            if (assetsFile != this.rootFile) {
+                menuconfig.push({
+                    label: "删除", click: function () {
+                        assetsFile.delete();
+                    }
+                });
+            }
             editor.menu.popup(menuconfig);
         };
         EditorAssets.prototype.saveObject = function (object, callback) {
@@ -4888,8 +4886,6 @@ var editor;
             var _this = this;
             _super.prototype.dataChanged.call(this);
             if (this.data) {
-                this.renameInput.text = this.data.label;
-                this.renameInput.textAlign = egret.HorizontalAlign.CENTER;
                 if (this.data.isDirectory) {
                     editor.drag.register(this, function (dragsource) {
                         dragsource.assetsFile = _this.data;
@@ -5007,6 +5003,7 @@ var editor;
             var _this = this;
             this.isDirectory = this.feng3dAssets instanceof editor.Feng3dFolder;
             this.label = this.feng3dAssets.name;
+            feng3d.watcher.watch(this.feng3dAssets, "name", function () { _this.label = _this.feng3dAssets.name; });
             // 更新图标
             if (this.isDirectory) {
                 this.image = "folder_png";
@@ -5129,7 +5126,6 @@ var editor;
             var _this = this;
             _super.prototype.dataChanged.call(this);
             if (this.data) {
-                this.renameInput.text = this.data.label;
                 editor.drag.register(this, function (dragsource) {
                     dragsource.assetsFile = _this.data;
                 }, ["assetsFile"], function (dragdata) {

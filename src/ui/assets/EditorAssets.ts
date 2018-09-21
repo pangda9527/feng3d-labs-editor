@@ -216,19 +216,24 @@ namespace editor
 
             // 解析菜单
             this.parserMenu(menuconfig, assetsFile);
-
-            menuconfig.push({
-                label: "导出", click: () =>
-                {
-                    assetsFile.export();
-                }
-            }, {
+            if (!assetsFile.isDirectory)
+            {
+                menuconfig.push({
+                    label: "导出", click: () =>
+                    {
+                        assetsFile.export();
+                    }
+                });
+            }
+            if (assetsFile != this.rootFile)
+            {
+                menuconfig.push({
                     label: "删除", click: () =>
                     {
                         assetsFile.delete();
                     }
                 });
-
+            }
             menu.popup(menuconfig);
         }
 

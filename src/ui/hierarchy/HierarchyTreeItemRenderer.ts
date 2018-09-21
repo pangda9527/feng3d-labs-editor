@@ -2,8 +2,6 @@ namespace editor
 {
     export class HierarchyTreeItemRenderer extends TreeItemRenderer
     {
-        public renameInput: RenameTextInput;
-
         /**
          * 上一个选中项
          */
@@ -73,13 +71,6 @@ namespace editor
         dataChanged()
         {
             super.dataChanged();
-
-            if (this.data)
-            {
-                this.renameInput.text = this.data.label;
-            } else
-            {
-            }
         }
 
         private onrightclick(e)
@@ -93,15 +84,6 @@ namespace editor
                         label: "删除", click: () =>
                         {
                             this.data.gameobject.parent.removeChild(this.data.gameobject);
-                        }
-                    },
-                    {
-                        label: "重命名", click: () =>
-                        {
-                            this.renameInput.edit(() =>
-                            {
-                                this.data.gameobject.name = this.renameInput.text;
-                            });
                         }
                     }
                 );

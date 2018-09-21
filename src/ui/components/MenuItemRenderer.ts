@@ -55,9 +55,13 @@ namespace editor
         {
             if (!this.data)
                 return;
+            this.touchEnabled = true;
+            this.touchChildren = true;
             if (this.data.type == 'separator')
             {
                 this.skin.currentState = "separator";
+                this.touchEnabled = false;
+                this.touchChildren = false;
             }
             else if (this.data.submenu)
             {

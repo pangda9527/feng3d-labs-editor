@@ -1208,7 +1208,6 @@ declare namespace editor {
 }
 declare namespace editor {
     class HierarchyTreeItemRenderer extends TreeItemRenderer {
-        renameInput: RenameTextInput;
         /**
          * 上一个选中项
          */
@@ -1303,7 +1302,6 @@ declare namespace editor {
 declare namespace editor {
     class AssetsFileItemRenderer extends eui.ItemRenderer {
         icon: eui.Image;
-        renameInput: RenameTextInput;
         data: AssetsFile;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
@@ -1377,7 +1375,6 @@ declare namespace editor {
     class AssetsTreeItemRenderer extends TreeItemRenderer {
         contentGroup: eui.Group;
         disclosureButton: eui.ToggleButton;
-        renameInput: RenameTextInput;
         data: AssetsFile;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;

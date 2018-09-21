@@ -91,6 +91,7 @@ namespace editor
         {
             this.isDirectory = this.feng3dAssets instanceof Feng3dFolder;
             this.label = this.feng3dAssets.name;
+            feng3d.watcher.watch(this.feng3dAssets, "name", () => { this.label = this.feng3dAssets.name; });
 
             // 更新图标
             if (this.isDirectory)

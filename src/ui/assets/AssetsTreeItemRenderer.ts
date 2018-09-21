@@ -4,7 +4,6 @@ namespace editor
     {
         public contentGroup: eui.Group;
         public disclosureButton: eui.ToggleButton;
-        public renameInput: RenameTextInput;
 
         data: AssetsFile;
 
@@ -39,8 +38,6 @@ namespace editor
 
             if (this.data)
             {
-                this.renameInput.text = this.data.label;
-
                 drag.register(this, (dragsource) =>
                 {
                     dragsource.assetsFile = this.data;

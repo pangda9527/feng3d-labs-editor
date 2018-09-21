@@ -4,8 +4,6 @@ namespace editor
     {
         public icon: eui.Image;
 
-        public renameInput: RenameTextInput;
-
         data: AssetsFile;
 
         constructor()
@@ -42,9 +40,6 @@ namespace editor
 
             if (this.data)
             {
-                this.renameInput.text = this.data.label;
-                this.renameInput.textAlign = egret.HorizontalAlign.CENTER;
-
                 if (this.data.isDirectory)
                 {
                     drag.register(this, (dragsource) =>
