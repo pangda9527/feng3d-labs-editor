@@ -44,6 +44,7 @@ namespace editor
             });
             //
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+            this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
         }
 
@@ -53,6 +54,7 @@ namespace editor
 
             super.$onRemoveFromStage();
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+            this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
         }
 
@@ -68,9 +70,9 @@ namespace editor
             editorData.selectObject(this.data.gameobject);
         }
 
-        dataChanged()
+        private onDoubleClick()
         {
-            super.dataChanged();
+            feng3d.shortcut.dispatch("lookToSelectedGameObject");
         }
 
         private onrightclick(e)

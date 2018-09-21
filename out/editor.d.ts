@@ -1218,7 +1218,7 @@ declare namespace editor {
         $onRemoveFromStage(): void;
         private setdargSource;
         private onclick;
-        dataChanged(): void;
+        private onDoubleClick;
         private onrightclick;
     }
 }

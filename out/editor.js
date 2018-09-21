@@ -4445,12 +4445,14 @@ var editor;
             });
             //
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+            this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
         };
         HierarchyTreeItemRenderer.prototype.$onRemoveFromStage = function () {
             editor.drag.unregister(this);
             _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+            this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
         };
         HierarchyTreeItemRenderer.prototype.setdargSource = function (dragSource) {
@@ -4460,8 +4462,8 @@ var editor;
             HierarchyTreeItemRenderer.preSelectedItem = this;
             editor.editorData.selectObject(this.data.gameobject);
         };
-        HierarchyTreeItemRenderer.prototype.dataChanged = function () {
-            _super.prototype.dataChanged.call(this);
+        HierarchyTreeItemRenderer.prototype.onDoubleClick = function () {
+            feng3d.shortcut.dispatch("lookToSelectedGameObject");
         };
         HierarchyTreeItemRenderer.prototype.onrightclick = function (e) {
             var _this = this;
