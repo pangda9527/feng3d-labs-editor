@@ -21,7 +21,6 @@
         "libs/FileSaver.d.ts",
         //
         "src/utils/Utils.ts",
-        "src/utils/RegExps.ts",
         //
         "src/assets/FileObject.ts",
         "src/assets/io.ts",
@@ -90,15 +89,6 @@
         "src/ui/assets/AssetsTreeItemRenderer.ts",
         "src/ui/assets/AssetsView.ts",
         "src/ui/assets/AssetsFileTemplates.ts",
-        //
-        "src/resources/Feng3dFile.ts",
-        "src/resources/Feng3dFolder.ts",
-        "src/resources/ScriptFile.ts",
-        "src/resources/ShaderFile.ts",
-        "src/resources/JSFile.ts",
-        "src/resources/JsonFile.ts",
-        "src/resources/TextFile.ts",
-        "src/resources/AudioFile.ts",
         //
         "src/ui/TopView.ts",
         "src/ui/MainView.ts",

@@ -9,41 +9,6 @@ declare namespace editor {
 }
 declare namespace editor {
     /**
-     * 常用正则表示式
-     */
-    var regExps: RegExps;
-    /**
-     * 常用正则表示式
-     */
-    class RegExps {
-        /**
-         * json文件
-         */
-        json: RegExp;
-        /**
-         * 图片
-         */
-        image: RegExp;
-        /**
-         * 声音
-         */
-        audio: RegExp;
-        /**
-         * 命名空间
-         */
-        namespace: RegExp;
-        /**
-         * 导出类
-         */
-        exportClass: RegExp;
-        /**
-         * 脚本中的类
-         */
-        scriptClass: RegExp;
-    }
-}
-declare namespace editor {
-    /**
      * Created by 黑暗之神KDS on 2017/2/17.
      */
     /**
@@ -262,7 +227,7 @@ declare namespace editor {
         /**
          * 脚本路径
          */
-        file_script?: ScriptFile;
+        file_script?: feng3d.ScriptFile;
         /**
          * 文件
          */
@@ -270,7 +235,7 @@ declare namespace editor {
         /**
          * 声音路径
          */
-        audio?: AudioFile;
+        audio?: feng3d.AudioFile;
         /**
          * 纹理
          */
@@ -1428,81 +1393,6 @@ declare namespace editor {
          * @param shadername shader名称
          */
         getNewShader(shadername: string): string;
-    }
-}
-declare namespace editor {
-    class Feng3dFile extends feng3d.Feng3dAssets {
-        /**
-         * 文件名称
-         */
-        filename: string;
-        /**
-         * 文件数据
-         */
-        arraybuffer: ArrayBuffer;
-        /**
-         * 文件路径
-         */
-        filePath: string;
-        /**
-         * 保存资源
-         * @param readWriteAssets
-         * @param callback  完成回调
-         */
-        save(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): any;
-        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
-        protected fileNameChanged(): void;
-        protected assetsIdChanged(): void;
-    }
-}
-declare namespace editor {
-    class Feng3dFolder extends feng3d.Feng3dAssets {
-        assetType: feng3d.AssetExtension;
-    }
-}
-declare namespace editor {
-    class ScriptFile extends Feng3dFile {
-        type: feng3d.AssetExtension;
-        scriptContent: string;
-        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
-        /**
-         * 获取脚本类名称
-         * @param callback 回调函数
-         */
-        getScriptClassName(callback: (scriptClassName: string) => void): void;
-    }
-}
-declare namespace editor {
-    class ShaderFile extends Feng3dFile {
-        assetType: feng3d.AssetExtension;
-        shaderContent: string;
-        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
-    }
-}
-declare namespace editor {
-    class JSFile extends Feng3dFile {
-        assetType: feng3d.AssetExtension;
-        jsContent: string;
-        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
-    }
-}
-declare namespace editor {
-    class JsonFile extends Feng3dFile {
-        assetType: feng3d.AssetExtension;
-        jsonContent: string;
-        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
-    }
-}
-declare namespace editor {
-    class TextFile extends Feng3dFile {
-        assetType: feng3d.AssetExtension;
-        textContent: string;
-        protected saveFile(readWriteAssets: feng3d.ReadWriteAssets, callback?: (err: Error) => void): void;
-    }
-}
-declare namespace editor {
-    class AudioFile extends Feng3dFile {
-        assetType: feng3d.AssetExtension;
     }
 }
 declare namespace editor {

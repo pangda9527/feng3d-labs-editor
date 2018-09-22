@@ -68,7 +68,7 @@ namespace editor
                 } else if (param.accepttype == "audio")
                 {
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
-                    var audioFiles = feng3d.Feng3dAssets.getAssetsByType(AudioFile);
+                    var audioFiles = feng3d.Feng3dAssets.getAssetsByType(feng3d.AudioFile);
                     audioFiles.forEach(item =>
                     {
                         menus.push({
@@ -81,7 +81,7 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "file_script")
                 {
-                    var scriptFiles = feng3d.Feng3dAssets.getAssetsByType(ScriptFile);
+                    var scriptFiles = feng3d.Feng3dAssets.getAssetsByType(feng3d.ScriptFile);
 
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
                     scriptFiles.forEach(element =>

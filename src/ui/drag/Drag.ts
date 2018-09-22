@@ -54,7 +54,7 @@ namespace editor
 		/**
 		 * 脚本路径
 		 */
-		file_script?: ScriptFile;
+		file_script?: feng3d.ScriptFile;
 		/**
 		 * 文件
 		 */
@@ -62,7 +62,7 @@ namespace editor
 		/**
 		 * 声音路径
 		 */
-		audio?: AudioFile;
+		audio?: feng3d.AudioFile;
 		/**
 		 * 纹理
 		 */

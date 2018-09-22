@@ -36,7 +36,7 @@ namespace editor
                     this.rootFile = <any>data;
                 } else
                 {
-                    var folder = new Feng3dFolder().value({ name: "Assets" });
+                    var folder = new feng3d.Feng3dFolder().value({ name: "Assets" });
                     assets.writeAssets(folder)
                     this.rootFile = new AssetsFile(folder.assetsId)
                     this.saveProject();
@@ -107,37 +107,37 @@ namespace editor
                             {
                                 label: "文件夹", click: () =>
                                 {
-                                    assetsFile.addAssets(new Feng3dFolder().value({ name: "New Folder" }));
+                                    assetsFile.addAssets(new feng3d.Feng3dFolder().value({ name: "New Folder" }));
                                 }
                             },
                             {
                                 label: "脚本", click: () =>
                                 {
-                                    assetsFile.addAssets(new ScriptFile().value({ name: "NewScript", filename: "script.ts", scriptContent: assetsFileTemplates.getNewScript("NewScript") }));
+                                    assetsFile.addAssets(new feng3d.ScriptFile().value({ name: "NewScript", filename: "script.ts", scriptContent: assetsFileTemplates.getNewScript("NewScript") }));
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
-                                    assetsFile.addAssets(new ShaderFile().value({ name: "NewShader", filename: "shader.ts", shaderContent: assetsFileTemplates.getNewShader("NewShader") }));
+                                    assetsFile.addAssets(new feng3d.ShaderFile().value({ name: "NewShader", filename: "shader.ts", shaderContent: assetsFileTemplates.getNewShader("NewShader") }));
                                 }
                             },
                             {
                                 label: "js", click: () =>
                                 {
-                                    assetsFile.addAssets(new JSFile().value({ name: "New Js", filename: "js.js", jsContent: "" }));
+                                    assetsFile.addAssets(new feng3d.JSFile().value({ name: "New Js", filename: "js.js", jsContent: "" }));
                                 }
                             },
                             {
                                 label: "Json", click: () =>
                                 {
-                                    assetsFile.addAssets(new JsonFile().value({ name: "New Json", filename: "json.json", jsonContent: "{}" }));
+                                    assetsFile.addAssets(new feng3d.JsonFile().value({ name: "New Json", filename: "json.json", jsonContent: "{}" }));
                                 }
                             },
                             {
                                 label: "文本", click: () =>
                                 {
-                                    assetsFile.addAssets(new TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" }));
+                                    assetsFile.addAssets(new feng3d.TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" }));
                                 }
                             },
                             { type: "separator" },
@@ -263,7 +263,7 @@ namespace editor
             {
                 var result: ArrayBuffer = event.target["result"];
                 var showFloder = this.showFloder;
-                if (regExps.image.test(file.name))
+                if (feng3d.regExps.image.test(file.name))
                 {
                     var urlImageTexture2D = new feng3d.UrlImageTexture2D().value({ name: file.name })
                     assets.writeAssets(urlImageTexture2D);
@@ -331,7 +331,7 @@ namespace editor
          */
         private parserMenu(menuconfig: MenuItem[], assetsFile: AssetsFile)
         {
-            if (assetsFile.feng3dAssets instanceof Feng3dFile)
+            if (assetsFile.feng3dAssets instanceof feng3d.Feng3dFile)
             {
                 var extensions = assetsFile.feng3dAssets.filename.split(".").pop();
                 var filePath = assetsFile.feng3dAssets.filePath;

@@ -39,43 +39,6 @@ var editor;
 var editor;
 (function (editor) {
     /**
-     * 常用正则表示式
-     */
-    var RegExps = /** @class */ (function () {
-        function RegExps() {
-            /**
-             * json文件
-             */
-            this.json = /(\.json)\b/i;
-            /**
-             * 图片
-             */
-            this.image = /(\.jpg|\.png|\.jpeg|\.gif)\b/i;
-            /**
-             * 声音
-             */
-            this.audio = /(\.ogg|\.mp3|\.wav)\b/i;
-            /**
-             * 命名空间
-             */
-            this.namespace = /namespace\s+([\w$_\d\.]+)/;
-            /**
-             * 导出类
-             */
-            this.exportClass = /export\s+(abstract\s+)?class\s+([\w$_\d]+)(\s+extends\s+([\w$_\d]+))?/;
-            /**
-             * 脚本中的类
-             */
-            this.scriptClass = /(export\s+)?class\s+([\w$_\d]+)\s+extends\s+(([\w$_\d\.]+))/;
-        }
-        return RegExps;
-    }());
-    editor.RegExps = RegExps;
-    editor.regExps = new RegExps();
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    /**
      * Created by 黑暗之神KDS on 2017/2/17.
      */
     /**
@@ -4066,7 +4029,7 @@ var editor;
                 }
                 else if (param.accepttype == "audio") {
                     var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
-                    var audioFiles = feng3d.Feng3dAssets.getAssetsByType(editor.AudioFile);
+                    var audioFiles = feng3d.Feng3dAssets.getAssetsByType(feng3d.AudioFile);
                     audioFiles.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
@@ -4077,7 +4040,7 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "file_script") {
-                    var scriptFiles = feng3d.Feng3dAssets.getAssetsByType(editor.ScriptFile);
+                    var scriptFiles = feng3d.Feng3dAssets.getAssetsByType(feng3d.ScriptFile);
                     var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
                     scriptFiles.forEach(function (element) {
                         menus.push({
@@ -4579,7 +4542,7 @@ var editor;
                     _this.rootFile = data;
                 }
                 else {
-                    var folder = new editor.Feng3dFolder().value({ name: "Assets" });
+                    var folder = new feng3d.Feng3dFolder().value({ name: "Assets" });
                     editor.assets.writeAssets(folder);
                     _this.rootFile = new editor.AssetsFile(folder.assetsId);
                     _this.saveProject();
@@ -4635,32 +4598,32 @@ var editor;
                     submenu: [
                         {
                             label: "文件夹", click: function () {
-                                assetsFile.addAssets(new editor.Feng3dFolder().value({ name: "New Folder" }));
+                                assetsFile.addAssets(new feng3d.Feng3dFolder().value({ name: "New Folder" }));
                             }
                         },
                         {
                             label: "脚本", click: function () {
-                                assetsFile.addAssets(new editor.ScriptFile().value({ name: "NewScript", filename: "script.ts", scriptContent: editor.assetsFileTemplates.getNewScript("NewScript") }));
+                                assetsFile.addAssets(new feng3d.ScriptFile().value({ name: "NewScript", filename: "script.ts", scriptContent: editor.assetsFileTemplates.getNewScript("NewScript") }));
                             }
                         },
                         {
                             label: "着色器", click: function () {
-                                assetsFile.addAssets(new editor.ShaderFile().value({ name: "NewShader", filename: "shader.ts", shaderContent: editor.assetsFileTemplates.getNewShader("NewShader") }));
+                                assetsFile.addAssets(new feng3d.ShaderFile().value({ name: "NewShader", filename: "shader.ts", shaderContent: editor.assetsFileTemplates.getNewShader("NewShader") }));
                             }
                         },
                         {
                             label: "js", click: function () {
-                                assetsFile.addAssets(new editor.JSFile().value({ name: "New Js", filename: "js.js", jsContent: "" }));
+                                assetsFile.addAssets(new feng3d.JSFile().value({ name: "New Js", filename: "js.js", jsContent: "" }));
                             }
                         },
                         {
                             label: "Json", click: function () {
-                                assetsFile.addAssets(new editor.JsonFile().value({ name: "New Json", filename: "json.json", jsonContent: "{}" }));
+                                assetsFile.addAssets(new feng3d.JsonFile().value({ name: "New Json", filename: "json.json", jsonContent: "{}" }));
                             }
                         },
                         {
                             label: "文本", click: function () {
-                                assetsFile.addAssets(new editor.TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" }));
+                                assetsFile.addAssets(new feng3d.TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" }));
                             }
                         },
                         { type: "separator" },
@@ -4766,7 +4729,7 @@ var editor;
             reader.addEventListener('load', function (event) {
                 var result = event.target["result"];
                 var showFloder = _this.showFloder;
-                if (editor.regExps.image.test(file.name)) {
+                if (feng3d.regExps.image.test(file.name)) {
                     var urlImageTexture2D = new feng3d.UrlImageTexture2D().value({ name: file.name });
                     editor.assets.writeAssets(urlImageTexture2D);
                     var imagePath = "Library/" + urlImageTexture2D.assetsId + "/file/" + file.name;
@@ -4818,7 +4781,7 @@ var editor;
          * @param assetsFile 文件
          */
         EditorAssets.prototype.parserMenu = function (menuconfig, assetsFile) {
-            if (assetsFile.feng3dAssets instanceof editor.Feng3dFile) {
+            if (assetsFile.feng3dAssets instanceof feng3d.Feng3dFile) {
                 var extensions = assetsFile.feng3dAssets.filename.split(".").pop();
                 var filePath = assetsFile.feng3dAssets.filePath;
                 switch (extensions) {
@@ -5003,7 +4966,7 @@ var editor;
         };
         AssetsFile.prototype.init = function () {
             var _this = this;
-            this.isDirectory = this.feng3dAssets instanceof editor.Feng3dFolder;
+            this.isDirectory = this.feng3dAssets instanceof feng3d.Feng3dFolder;
             this.label = this.feng3dAssets.name;
             feng3d.watcher.watch(this.feng3dAssets, "name", function () { _this.label = _this.feng3dAssets.name; });
             // 更新图标
@@ -5057,7 +5020,7 @@ var editor;
         AssetsFile.prototype.addfileFromArrayBuffer = function (filename, arraybuffer, override, callback) {
             var _this = this;
             if (override === void 0) { override = false; }
-            var feng3dFile = new editor.Feng3dFile().value({ name: filename, filename: filename, arraybuffer: arraybuffer });
+            var feng3dFile = new feng3d.Feng3dFile().value({ name: filename, filename: filename, arraybuffer: arraybuffer });
             editor.assets.writeAssets(feng3dFile);
             editor.assets.writeArrayBuffer(feng3dFile.filePath, arraybuffer, function (err) {
                 var assetsFile = _this.addAssets(feng3dFile);
@@ -5392,170 +5355,6 @@ var editor;
     editor.assetsFileTemplates = new AssetsFileTemplates();
     var scriptTemplate = "\nclass NewScript extends feng3d.Script\n{\n\n    /** \n     * \u6D4B\u8BD5\u5C5E\u6027 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    t_attr = new feng3d.Color4();\n\n    /**\n     * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n     */\n    init()\n    {\n\n    }\n\n    /**\n     * \u66F4\u65B0\n     */\n    update()\n    {\n\n    }\n\n    /**\n     * \u9500\u6BC1\u65F6\u8C03\u7528\n     */\n    dispose()\n    {\n\n    }\n}";
     var shaderTemplate = "\nclass NewShaderUniforms\n{\n    /** \n     * \u989C\u8272 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    u_color = new feng3d.Color4();\n}\n\nfeng3d.shaderConfig.shaders[\"NewShader\"] = {\n    cls: NewShaderUniforms,\n    vertex: `\n    \n    attribute vec3 a_position;\n    \n    uniform mat4 u_modelMatrix;\n    uniform mat4 u_viewProjection;\n    \n    void main() {\n    \n        vec4 globalPosition = u_modelMatrix * vec4(a_position, 1.0);\n        gl_Position = u_viewProjection * globalPosition;\n    }`,\n    fragment: `\n    \n    precision mediump float;\n    \n    uniform vec4 u_color;\n    \n    void main() {\n        \n        gl_FragColor = u_color;\n    }\n    `,\n};\n\ntype NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };\ninterface MaterialFactory\n{\n    create(shader: \"NewShader\", raw?: gPartial<NewShaderMaterial>): NewShaderMaterial;\n}\n\ninterface MaterialRawMap\n{\n    NewShader: gPartial<NewShaderMaterial>;\n}";
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    var Feng3dFile = /** @class */ (function (_super) {
-        __extends(Feng3dFile, _super);
-        function Feng3dFile() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        /**
-         * 保存资源
-         * @param readWriteAssets
-         * @param callback  完成回调
-         */
-        Feng3dFile.prototype.save = function (readWriteAssets, callback) {
-            var _this = this;
-            _super.prototype.save.call(this, readWriteAssets, function (err) {
-                if (err) {
-                    callback(err);
-                    return;
-                }
-                _this.saveFile(readWriteAssets, callback);
-            });
-        };
-        Feng3dFile.prototype.saveFile = function (readWriteAssets, callback) {
-            readWriteAssets.writeArrayBuffer(this.filePath, this.arraybuffer, callback);
-        };
-        Feng3dFile.prototype.fileNameChanged = function () {
-            this.filePath = "Library/" + this.assetsId + "/file/" + this.filename;
-        };
-        Feng3dFile.prototype.assetsIdChanged = function () {
-            _super.prototype.assetsIdChanged.call(this);
-            this.filePath = "Library/" + this.assetsId + "/file/" + this.filename;
-        };
-        __decorate([
-            feng3d.serialize,
-            feng3d.watch("fileNameChanged")
-        ], Feng3dFile.prototype, "filename", void 0);
-        return Feng3dFile;
-    }(feng3d.Feng3dAssets));
-    editor.Feng3dFile = Feng3dFile;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    var Feng3dFolder = /** @class */ (function (_super) {
-        __extends(Feng3dFolder, _super);
-        function Feng3dFolder() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.assetType = feng3d.AssetExtension.folder;
-            return _this;
-        }
-        return Feng3dFolder;
-    }(feng3d.Feng3dAssets));
-    editor.Feng3dFolder = Feng3dFolder;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    var ScriptFile = /** @class */ (function (_super) {
-        __extends(ScriptFile, _super);
-        function ScriptFile() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.type = feng3d.AssetExtension.script;
-            return _this;
-        }
-        ScriptFile.prototype.saveFile = function (readWriteAssets, callback) {
-            readWriteAssets.writeString(this.filePath, this.scriptContent, callback);
-        };
-        /**
-         * 获取脚本类名称
-         * @param callback 回调函数
-         */
-        ScriptFile.prototype.getScriptClassName = function (callback) {
-            var code = this.scriptContent;
-            // 获取脚本类名称
-            var result = editor.regExps.scriptClass.exec(code);
-            feng3d.assert(result != null, "\u5728\u811A\u672C " + this.filePath + " \u4E2D\u6CA1\u6709\u627E\u5230 \u811A\u672C\u7C7B\u5B9A\u4E49");
-            var script = result[2];
-            // 获取导出类命名空间
-            if (result[1]) {
-                result = editor.regExps.namespace.exec(code);
-                feng3d.assert(result != null, "\u83B7\u53D6\u811A\u672C " + this.filePath + " \u547D\u540D\u7A7A\u95F4\u5931\u8D25");
-                script = result[1] + "." + script;
-            }
-            callback(script);
-        };
-        return ScriptFile;
-    }(editor.Feng3dFile));
-    editor.ScriptFile = ScriptFile;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    var ShaderFile = /** @class */ (function (_super) {
-        __extends(ShaderFile, _super);
-        function ShaderFile() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.assetType = feng3d.AssetExtension.shader;
-            return _this;
-        }
-        ShaderFile.prototype.saveFile = function (readWriteAssets, callback) {
-            readWriteAssets.writeString(this.filePath, this.shaderContent, callback);
-        };
-        return ShaderFile;
-    }(editor.Feng3dFile));
-    editor.ShaderFile = ShaderFile;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    var JSFile = /** @class */ (function (_super) {
-        __extends(JSFile, _super);
-        function JSFile() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.assetType = feng3d.AssetExtension.js;
-            return _this;
-        }
-        JSFile.prototype.saveFile = function (readWriteAssets, callback) {
-            readWriteAssets.writeString(this.filePath, this.jsContent, callback);
-        };
-        return JSFile;
-    }(editor.Feng3dFile));
-    editor.JSFile = JSFile;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    var JsonFile = /** @class */ (function (_super) {
-        __extends(JsonFile, _super);
-        function JsonFile() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.assetType = feng3d.AssetExtension.json;
-            return _this;
-        }
-        JsonFile.prototype.saveFile = function (readWriteAssets, callback) {
-            readWriteAssets.writeString(this.filePath, this.jsonContent, callback);
-        };
-        return JsonFile;
-    }(editor.Feng3dFile));
-    editor.JsonFile = JsonFile;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    var TextFile = /** @class */ (function (_super) {
-        __extends(TextFile, _super);
-        function TextFile() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.assetType = feng3d.AssetExtension.txt;
-            return _this;
-        }
-        TextFile.prototype.saveFile = function (readWriteAssets, callback) {
-            readWriteAssets.writeString(this.filePath, this.textContent, callback);
-        };
-        return TextFile;
-    }(editor.Feng3dFile));
-    editor.TextFile = TextFile;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    var AudioFile = /** @class */ (function (_super) {
-        __extends(AudioFile, _super);
-        function AudioFile() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.assetType = feng3d.AssetExtension.audio;
-            return _this;
-        }
-        return AudioFile;
-    }(editor.Feng3dFile));
-    editor.AudioFile = AudioFile;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
