@@ -16,8 +16,8 @@ var monacoEditor;
     var project = decodeURI(GetQueryString("project"));
     var id = decodeURI(GetQueryString("id"));
 
-    // var assetsfs: feng3d.ReadWriteAssets;
-    var assetsfs;
+    // var assetsfs;
+    var assetsfs: feng3d.ReadWriteAssets;
     if (fstype == "indexedDB")
     {
         window.feng3d = window.opener.feng3d;
@@ -64,13 +64,6 @@ var monacoEditor;
     var tslist = [];
     var tslibs = [];
 
-    assetsfs.readAssets(id, (err, assets) =>
-    {
-        assets;
-    });
-
-    var extension = id.split(".").pop();
-
     document.head.getElementsByTagName("title")[0].innerText = id;
 
     // 加载所有ts文件
@@ -110,38 +103,52 @@ var monacoEditor;
 
     loadallts(init);
 
-    var modelMap = { ts: "typescript", shader: "typescript", js: "javascript", json: "json", text: "text" };
+    function getModel(assets)
+    {
+        if (assets instanceof feng3d.JsonFile)
+            return "json";
+        if (assets instanceof feng3d.JSFile)
+            return "javascript";
+        if (assets instanceof feng3d.ScriptFile)
+            return "typescript";
+        if (assets instanceof feng3d.ShaderFile)
+            return "typescript";
+        if (assets instanceof feng3d.StringFile)
+            return "text";
+        return "text";
+    }
 
     function init()
     {
         // 获取文件内容
-        assetsfs.readString(id, (err, code) =>
+        assetsfs.readAssets(id, (err, assets) =>
         {
-            initEditor(extension, function ()
+            initEditor(() =>
             {
+                var model = getModel(assets);
                 var oldModel = monacoEditor.getModel();
-                var newModel = monaco.editor.createModel(code, modelMap[extension] || modelMap.text);
+                var newModel = monaco.editor.createModel(assets.textContent, model);
                 monacoEditor.setModel(newModel);
                 if (oldModel) oldModel.dispose();
 
                 // monacoEditor.setValue(code);
-                if (extension == "ts" || extension == "shader")
+                if (model == "typescript")
                 {
                     logLabel.textContent = "初次编译中。。。。";
                     triggerCompile();
                 }
-                monacoEditor.onDidChangeModelContent(function ()
+                monacoEditor.onDidChangeModelContent(() =>
                 {
                     logLabel.textContent = "";
-                    code = monacoEditor.getValue();
-                    assetsfs.writeString(id, code, (err) =>
+                    assets.textContent = monacoEditor.getValue();
+                    assetsfs.writeAssets(id, assets, (err) =>
                     {
                         if (err)
                             console.warn(err);
                         logLabel.textContent = "自动保存完成！";
                         if (extension == "ts" || extension == "shader")
                         {
-                            tslist.filter((v) => v.path == id)[0].code = code;
+                            tslist.filter((v) => v.path == id)[0].code = assets.textContent;
                             if (watch.checked)
                             {
                                 autoCompile();
@@ -153,7 +160,7 @@ var monacoEditor;
         });
     }
 
-    function initEditor(extension, callback)
+    function initEditor(callback)
     {
         if (fstype == feng3d.FSType.native)
         {
