@@ -16,8 +16,8 @@ var monacoEditor;
     var project = decodeURI(GetQueryString("project"));
     var id = decodeURI(GetQueryString("id"));
 
-    var assetsfs:feng3d.ReadWriteAssets;
-    // var assetsfs;
+    // var assetsfs: feng3d.ReadWriteAssets;
+    var assetsfs;
     if (fstype == "indexedDB")
     {
         window.feng3d = window.opener.feng3d;
@@ -63,6 +63,11 @@ var monacoEditor;
     // ts 列表
     var tslist = [];
     var tslibs = [];
+
+    assetsfs.readAssets(id, (err, assets) =>
+    {
+        assets;
+    });
 
     var extension = id.split(".").pop();
 
@@ -129,23 +134,20 @@ var monacoEditor;
                 {
                     logLabel.textContent = "";
                     code = monacoEditor.getValue();
-                    feng3d.dataTransform.stringToArrayBuffer(code, (arrayBuffer) =>
+                    assetsfs.writeString(id, code, (err) =>
                     {
-                        assetsfs.writeFile(id, arrayBuffer, (err) =>
+                        if (err)
+                            console.warn(err);
+                        logLabel.textContent = "自动保存完成！";
+                        if (extension == "ts" || extension == "shader")
                         {
-                            if (err)
-                                console.warn(err);
-                            logLabel.textContent = "自动保存完成！";
-                            if (extension == "ts" || extension == "shader")
+                            tslist.filter((v) => v.path == id)[0].code = code;
+                            if (watch.checked)
                             {
-                                tslist.filter((v) => v.path == id)[0].code = code;
-                                if (watch.checked)
-                                {
-                                    autoCompile();
-                                }
+                                autoCompile();
                             }
-                        });
-                    })
+                        }
+                    });
                 });
             });
         });
@@ -256,20 +258,17 @@ var monacoEditor;
             }, "");
 
             outputStr += `\n//# sourceURL=project.js`;
-            feng3d.dataTransform.stringToArrayBuffer(outputStr, (arrayBuffer) =>
+            assetsfs.writeString("project.js", outputStr, (err) =>
             {
                 logLabel.textContent = "编译完成！";
-                assetsfs.writeFile("project.js", arrayBuffer, (err) =>
+                if (editor)
                 {
-                    if (feng3d.editor)
+                    editor.editorAssets.runProjectScript(() =>
                     {
-                        feng3d.editor.editorAssets.runProjectScript(() =>
-                        {
-                            feng3d.globalEvent.dispatch("shaderChanged");
-                            feng3d.globalEvent.dispatch("scriptChanged");
-                        });
-                    }
-                });
+                        feng3d.globalEvent.dispatch("shaderChanged");
+                        feng3d.globalEvent.dispatch("scriptChanged");
+                    });
+                }
             });
         }
         catch (e)

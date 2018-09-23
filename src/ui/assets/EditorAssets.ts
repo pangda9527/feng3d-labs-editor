@@ -113,25 +113,25 @@ namespace editor
                             {
                                 label: "脚本", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.ScriptFile().value({ name: "NewScript", filename: "script.ts", scriptContent: assetsFileTemplates.getNewScript("NewScript") }));
+                                    assetsFile.addAssets(new feng3d.ScriptFile().value({ name: "NewScript", filename: "script.ts", textContent: assetsFileTemplates.getNewScript("NewScript") }));
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.ShaderFile().value({ name: "NewShader", filename: "shader.ts", shaderContent: assetsFileTemplates.getNewShader("NewShader") }));
+                                    assetsFile.addAssets(new feng3d.ShaderFile().value({ name: "NewShader", filename: "shader.ts", textContent: assetsFileTemplates.getNewShader("NewShader") }));
                                 }
                             },
                             {
                                 label: "js", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.JSFile().value({ name: "New Js", filename: "js.js", jsContent: "" }));
+                                    assetsFile.addAssets(new feng3d.JSFile().value({ name: "New Js", filename: "js.js", textContent: "" }));
                                 }
                             },
                             {
                                 label: "Json", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.JsonFile().value({ name: "New Json", filename: "json.json", jsonContent: "{}" }));
+                                    assetsFile.addAssets(new feng3d.JsonFile().value({ name: "New Json", filename: "json.json", textContent: "{}" }));
                                 }
                             },
                             {
@@ -177,25 +177,7 @@ namespace editor
             }
 
             // 使用编辑器打开
-            if ([feng3d.AssetExtension.ts,
-            feng3d.AssetExtension.js,
-            feng3d.AssetExtension.txt,
-            feng3d.AssetExtension.shader,
-            feng3d.AssetExtension.json,
-            feng3d.AssetExtension.texture2d,
-            feng3d.AssetExtension.texturecube,
-            feng3d.AssetExtension.material,
-            feng3d.AssetExtension.gameobject,
-            feng3d.AssetExtension.geometry,
-            feng3d.AssetExtension.scene,
-            feng3d.AssetExtension.script,
-            feng3d.AssetExtension.mtl,
-            feng3d.AssetExtension.obj,
-            feng3d.AssetExtension.md5mesh,
-            feng3d.AssetExtension.md5anim,
-            feng3d.AssetExtension.mdl
-            ].indexOf(assetsFile.feng3dAssets.assetType) != -1
-            )
+            if (assetsFile.feng3dAssets instanceof feng3d.StringFile)
             {
                 menuconfig.push({
                     label: "编辑", click: () =>

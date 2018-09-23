@@ -156,7 +156,7 @@ namespace editor
          */
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsFile) => void)
         {
-            var feng3dFile = new feng3d.Feng3dFile().value({ name: filename, filename: filename, arraybuffer: arraybuffer });
+            var feng3dFile = new feng3d.ArrayBufferFile().value({ name: filename, filename: filename, arraybuffer: arraybuffer });
             assets.writeAssets(feng3dFile);
             assets.writeArrayBuffer(feng3dFile.filePath, arraybuffer, err =>
             {
