@@ -16,8 +16,8 @@ var monacoEditor;
     var project = decodeURI(GetQueryString("project"));
     var id = decodeURI(GetQueryString("id"));
 
-    // var assetsfs;
-    var assetsfs: feng3d.ReadWriteAssets;
+    var assetsfs;
+    // var assetsfs: feng3d.ReadWriteAssets;
     if (fstype == "indexedDB")
     {
         window.feng3d = window.opener.feng3d;
@@ -69,27 +69,29 @@ var monacoEditor;
     // 加载所有ts文件
     function loadallts(callback)
     {
-        assetsfs.getAllPaths((err, keys) =>
+        assetsfs.readdir("Library/", (err, ids) =>
         {
-            var tspaths = keys.filter((v) =>
-            {
-                var ext = v.split(".").pop();
-                return ext == "ts" || ext == "shader";
-            });
+            ids = ids.map(v => v.substring(0, v.length - 1));
+
             loadts();
 
             function loadts()
             {
                 logLabel.textContent = "加载脚本中。。。。";
-                if (tspaths.length > 0)
+                if (ids.length > 0)
                 {
-                    var path = tspaths.pop();
-                    assetsfs.readString(path, (err, str) =>
+                    var id = ids.pop();
+                    assetsfs.readAssets(id, (err, assets) =>
                     {
                         if (err)
                             console.warn(err);
                         else
-                            tslist.push({ path: path, code: str });
+                        {
+                            if (assets instanceof feng3d.ScriptFile)
+                            {
+                                tslist.push(assets);
+                            }
+                        }
                         loadts();
                     });
                 } else
@@ -146,9 +148,9 @@ var monacoEditor;
                         if (err)
                             console.warn(err);
                         logLabel.textContent = "自动保存完成！";
-                        if (extension == "ts" || extension == "shader")
+                        if (assets instanceof feng3d.ScriptFile)
                         {
-                            tslist.filter((v) => v.path == id)[0].code = assets.textContent;
+                            tslist.filter((v) => v.assetsId == id)[0].code = assets.textContent;
                             if (watch.checked)
                             {
                                 autoCompile();
@@ -215,8 +217,8 @@ var monacoEditor;
 
             tslist.forEach(item =>
             {
-                if (item.path != id)
-                    monaco.languages.typescript.typescriptDefaults.addExtraLib(item.code, item.path);
+                if (item.assetsId != id)
+                    monaco.languages.typescript.typescriptDefaults.addExtraLib(item.textContent, item.assetsId);
             });
 
             loadLibs(['https://unpkg.com/feng3d/out/feng3d.d.ts'], () =>
@@ -297,9 +299,7 @@ var monacoEditor;
 
         tslist.forEach((item) =>
         {
-            var path = item.path;
-            path = path.replace(".shader", ".shader.ts")
-            tsSourceMap[path] = ts.createSourceFile(path, item.code, options.target || ts.ScriptTarget.ES5);
+            tsSourceMap[item.assetsId] = ts.createSourceFile(item.assetsId, item.textContent, options.target || ts.ScriptTarget.ES5);
         })
 
         // Output
@@ -393,9 +393,9 @@ var monacoEditor;
 
         filelist = tsfiles.map((v) =>
         {
-            var result = v.code.match(scriptClassReg);
+            var result = v.textContent.match(scriptClassReg);
             //目前只处理了ts文件中单个导出对象
-            var item = { path: v.path, code: v.code, class: [], extends: [] }
+            var item = { path: v.assetsId, code: v.textContent, class: [], extends: [], assets: v }
             if (result)
             {
                 item.class.push(result[3]);
@@ -445,7 +445,7 @@ var monacoEditor;
             const element = filelist[i];
             if (element)
             {
-                tsfiles.push({ path: element.path, code: element.code });
+                tsfiles.push(element.assets);
             }
         }
     }
