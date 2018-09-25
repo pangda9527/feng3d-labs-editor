@@ -49,27 +49,12 @@ namespace editor
             this.filepathLabel.text = "";
 
             //
-            drag.register(this.filelistgroup, (dragsource) => { }, ["gameobject", "animationclip", "material", "geometry"], (dragSource) =>
+            drag.register(this.filelistgroup, (dragsource) => { }, ["gameobject"], (dragSource) =>
             {
                 if (dragSource.gameobject)
                 {
                     var gameobject = dragSource.gameobject;
                     editorAssets.saveObject(gameobject);
-                }
-                if (dragSource.animationclip)
-                {
-                    var animationclip = dragSource.animationclip;
-                    editorAssets.saveObject(animationclip);
-                }
-                if (dragSource.material)
-                {
-                    var material = dragSource.material;
-                    editorAssets.saveObject(material);
-                }
-                if (dragSource.geometry)
-                {
-                    var geometry = dragSource.geometry;
-                    editorAssets.saveObject(geometry);
                 }
             });
 

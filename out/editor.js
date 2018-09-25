@@ -5154,22 +5154,10 @@ var editor;
             this.excludeTxt.text = "";
             this.filepathLabel.text = "";
             //
-            editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject", "animationclip", "material", "geometry"], function (dragSource) {
+            editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject"], function (dragSource) {
                 if (dragSource.gameobject) {
                     var gameobject = dragSource.gameobject;
                     editor.editorAssets.saveObject(gameobject);
-                }
-                if (dragSource.animationclip) {
-                    var animationclip = dragSource.animationclip;
-                    editor.editorAssets.saveObject(animationclip);
-                }
-                if (dragSource.material) {
-                    var material = dragSource.material;
-                    editor.editorAssets.saveObject(material);
-                }
-                if (dragSource.geometry) {
-                    var geometry = dragSource.geometry;
-                    editor.editorAssets.saveObject(geometry);
                 }
             });
             this.initlist();
