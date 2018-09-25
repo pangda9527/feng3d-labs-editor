@@ -4459,6 +4459,7 @@ var editor;
         }
         HierarchyView.prototype.onComplete = function () {
             this.list.itemRenderer = editor.HierarchyTreeItemRenderer;
+            this.hierachyScroller.viewport = this.list;
             this.listData = this.list.dataProvider = new eui.ArrayCollection();
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
@@ -9402,6 +9403,9 @@ var egret;
         eui.Scroller.prototype.$onRemoveFromStage = function () {
             oldOnRemoveFromStage.call(this);
             feng3d.windowEventProxy.off("mousewheel", onMouseWheel, this);
+        };
+        // 阻止拖拽滚动面板
+        eui.Scroller.prototype["onTouchBeginCapture"] = function () {
         };
         function onMouseWheel(event) {
             var scroller = this;

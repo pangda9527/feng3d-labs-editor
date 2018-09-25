@@ -256,6 +256,12 @@ namespace egret
             feng3d.windowEventProxy.off("mousewheel", onMouseWheel, this);
         }
 
+        // 阻止拖拽滚动面板
+        eui.Scroller.prototype["onTouchBeginCapture"] = function ()
+        {
+
+        }
+
         function onMouseWheel(event: WheelEvent)
         {
             var scroller: eui.Scroller = this;

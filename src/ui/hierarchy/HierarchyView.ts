@@ -2,7 +2,7 @@ namespace editor
 {
 	export class HierarchyView extends eui.Component implements eui.UIComponent
 	{
-		public addButton: eui.Button;
+		public hierachyScroller: eui.Scroller;
 		public list: eui.List;
 
 		private listData: eui.ArrayCollection;
@@ -17,6 +17,8 @@ namespace editor
 		private onComplete(): void
 		{
 			this.list.itemRenderer = HierarchyTreeItemRenderer;
+
+			this.hierachyScroller.viewport = this.list;
 
 			this.listData = this.list.dataProvider = new eui.ArrayCollection();
 

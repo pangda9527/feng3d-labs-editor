@@ -1189,7 +1189,7 @@ declare namespace editor {
 }
 declare namespace editor {
     class HierarchyView extends eui.Component implements eui.UIComponent {
-        addButton: eui.Button;
+        hierachyScroller: eui.Scroller;
         list: eui.List;
         private listData;
         constructor();
