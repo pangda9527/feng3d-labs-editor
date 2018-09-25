@@ -2,11 +2,14 @@ namespace editor
 {
     export class AssetsView extends eui.Component implements eui.UIComponent
     {
-        public treelist: eui.List;
+        public assetsTreeScroller: eui.Scroller;
+        public assetsTreeList: eui.List;
+
         public floderpathTxt: eui.Label;
         public includeTxt: eui.TextInput;
         public excludeTxt: eui.TextInput;
         public filelistgroup: eui.Group;
+        public floderScroller: eui.Scroller;
         public filelist: eui.List;
         public filepathLabel: eui.Label;
         //
@@ -28,10 +31,13 @@ namespace editor
 
         private onComplete(): void
         {
-            this.treelist.itemRenderer = AssetsTreeItemRenderer;
+            this.assetsTreeList.itemRenderer = AssetsTreeItemRenderer;
             this.filelist.itemRenderer = AssetsFileItemRenderer;
 
-            this.listData = this.treelist.dataProvider = new eui.ArrayCollection();
+            this.floderScroller.viewport = this.filelist;
+            this.assetsTreeScroller.viewport = this.assetsTreeList;
+
+            this.listData = this.assetsTreeList.dataProvider = new eui.ArrayCollection();
             this.filelistData = this.filelist.dataProvider = new eui.ArrayCollection();
         }
 

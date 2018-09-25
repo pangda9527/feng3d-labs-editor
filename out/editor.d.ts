@@ -1353,11 +1353,13 @@ declare namespace editor {
 }
 declare namespace editor {
     class AssetsView extends eui.Component implements eui.UIComponent {
-        treelist: eui.List;
+        assetsTreeScroller: eui.Scroller;
+        assetsTreeList: eui.List;
         floderpathTxt: eui.Label;
         includeTxt: eui.TextInput;
         excludeTxt: eui.TextInput;
         filelistgroup: eui.Group;
+        floderScroller: eui.Scroller;
         filelist: eui.List;
         filepathLabel: eui.Label;
         private _assetstreeInvalid;

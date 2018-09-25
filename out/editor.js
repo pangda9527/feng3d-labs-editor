@@ -5141,9 +5141,11 @@ var editor;
             return _this;
         }
         AssetsView.prototype.onComplete = function () {
-            this.treelist.itemRenderer = editor.AssetsTreeItemRenderer;
+            this.assetsTreeList.itemRenderer = editor.AssetsTreeItemRenderer;
             this.filelist.itemRenderer = editor.AssetsFileItemRenderer;
-            this.listData = this.treelist.dataProvider = new eui.ArrayCollection();
+            this.floderScroller.viewport = this.filelist;
+            this.assetsTreeScroller.viewport = this.assetsTreeList;
+            this.listData = this.assetsTreeList.dataProvider = new eui.ArrayCollection();
             this.filelistData = this.filelist.dataProvider = new eui.ArrayCollection();
         };
         AssetsView.prototype.$onAddToStage = function (stage, nestLevel) {
