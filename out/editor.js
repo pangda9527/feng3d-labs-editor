@@ -4598,43 +4598,43 @@ var editor;
                     submenu: [
                         {
                             label: "文件夹", click: function () {
-                                assetsFile.addAssets(new feng3d.Feng3dFolder().value({ name: "New Folder" }));
+                                editor.editorData.selectObject(assetsFile.addAssets(new feng3d.Feng3dFolder().value({ name: "New Folder" })));
                             }
                         },
                         {
                             label: "脚本", click: function () {
-                                assetsFile.addAssets(new feng3d.ScriptFile().value({ name: "NewScript", filename: "script.ts", textContent: editor.assetsFileTemplates.getNewScript("NewScript") }));
+                                editor.editorData.selectObject(assetsFile.addAssets(new feng3d.ScriptFile().value({ name: "NewScript", filename: "script.ts", textContent: editor.assetsFileTemplates.getNewScript("NewScript") })));
                             }
                         },
                         {
                             label: "着色器", click: function () {
-                                assetsFile.addAssets(new feng3d.ShaderFile().value({ name: "NewShader", filename: "shader.ts", textContent: editor.assetsFileTemplates.getNewShader("NewShader") }));
+                                editor.editorData.selectObject(assetsFile.addAssets(new feng3d.ShaderFile().value({ name: "NewShader", filename: "shader.ts", textContent: editor.assetsFileTemplates.getNewShader("NewShader") })));
                             }
                         },
                         {
                             label: "js", click: function () {
-                                assetsFile.addAssets(new feng3d.JSFile().value({ name: "New Js", filename: "js.js", textContent: "" }));
+                                editor.editorData.selectObject(assetsFile.addAssets(new feng3d.JSFile().value({ name: "New Js", filename: "js.js", textContent: "" })));
                             }
                         },
                         {
                             label: "Json", click: function () {
-                                assetsFile.addAssets(new feng3d.JsonFile().value({ name: "New Json", filename: "json.json", textContent: "{}" }));
+                                editor.editorData.selectObject(assetsFile.addAssets(new feng3d.JsonFile().value({ name: "New Json", filename: "json.json", textContent: "{}" })));
                             }
                         },
                         {
                             label: "文本", click: function () {
-                                assetsFile.addAssets(new feng3d.TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" }));
+                                editor.editorData.selectObject(assetsFile.addAssets(new feng3d.TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" })));
                             }
                         },
                         { type: "separator" },
                         {
                             label: "立方体贴图", click: function () {
-                                assetsFile.addAssets(new feng3d.TextureCube().value({ name: "New TextureCube" }));
+                                editor.editorData.selectObject(assetsFile.addAssets(new feng3d.TextureCube().value({ name: "New TextureCube" })));
                             }
                         },
                         {
                             label: "材质", click: function () {
-                                assetsFile.addAssets(new feng3d.Material().value({ name: "New Material" }));
+                                editor.editorData.selectObject(assetsFile.addAssets(new feng3d.Material().value({ name: "New Material" })));
                             }
                         },
                     ]
@@ -4680,7 +4680,7 @@ var editor;
                     }
                 });
             }
-            if (assetsFile != this.rootFile) {
+            if (assetsFile != this.rootFile && assetsFile != this.showFloder) {
                 menuconfig.push({
                     label: "删除", click: function () {
                         assetsFile.delete();
@@ -4897,20 +4897,20 @@ var editor;
             var isShift = feng3d.shortcut.keyState.getKeyState("shift");
             if (isShift) {
                 var source = this.parent.dataProvider.source;
-                var selectedAssetsFile = editor.editorData.selectedAssetsFile;
                 var index = source.indexOf(this.data);
                 var min = index, max = index;
-                selectedAssetsFile.forEach(function (v) {
-                    index = source.indexOf(v);
+                if (editor.editorData.selectedAssetsFile.indexOf(preAssetsFile) != -1) {
+                    index = source.indexOf(preAssetsFile);
                     if (index < min)
                         min = index;
                     if (index > max)
                         max = index;
-                });
+                }
                 editor.editorData.selectObject.apply(editor.editorData, source.slice(min, max + 1));
             }
             else {
                 editor.editorData.selectObject(this.data);
+                preAssetsFile = this.data;
             }
         };
         AssetsFileItemRenderer.prototype.onrightclick = function (e) {
@@ -4927,6 +4927,7 @@ var editor;
         return AssetsFileItemRenderer;
     }(eui.ItemRenderer));
     editor.AssetsFileItemRenderer = AssetsFileItemRenderer;
+    var preAssetsFile;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

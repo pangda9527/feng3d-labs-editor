@@ -107,50 +107,50 @@ namespace editor
                             {
                                 label: "文件夹", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.Feng3dFolder().value({ name: "New Folder" }));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.Feng3dFolder().value({ name: "New Folder" })));
                                 }
                             },
                             {
                                 label: "脚本", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.ScriptFile().value({ name: "NewScript", filename: "script.ts", textContent: assetsFileTemplates.getNewScript("NewScript") }));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.ScriptFile().value({ name: "NewScript", filename: "script.ts", textContent: assetsFileTemplates.getNewScript("NewScript") })));
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.ShaderFile().value({ name: "NewShader", filename: "shader.ts", textContent: assetsFileTemplates.getNewShader("NewShader") }));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.ShaderFile().value({ name: "NewShader", filename: "shader.ts", textContent: assetsFileTemplates.getNewShader("NewShader") })));
                                 }
                             },
                             {
                                 label: "js", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.JSFile().value({ name: "New Js", filename: "js.js", textContent: "" }));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.JSFile().value({ name: "New Js", filename: "js.js", textContent: "" })));
                                 }
                             },
                             {
                                 label: "Json", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.JsonFile().value({ name: "New Json", filename: "json.json", textContent: "{}" }));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.JsonFile().value({ name: "New Json", filename: "json.json", textContent: "{}" })));
                                 }
                             },
                             {
                                 label: "文本", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" }));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" })));
                                 }
                             },
                             { type: "separator" },
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.TextureCube().value({ name: "New TextureCube" }));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.TextureCube().value({ name: "New TextureCube" })));
                                 }
                             },
                             {
                                 label: "材质", click: () =>
                                 {
-                                    assetsFile.addAssets(new feng3d.Material().value({ name: "New Material" }));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.Material().value({ name: "New Material" })));
                                 }
                             },
                         ]
@@ -207,7 +207,7 @@ namespace editor
                     }
                 });
             }
-            if (assetsFile != this.rootFile)
+            if (assetsFile != this.rootFile && assetsFile != this.showFloder)
             {
                 menuconfig.push({
                     label: "删除", click: () =>

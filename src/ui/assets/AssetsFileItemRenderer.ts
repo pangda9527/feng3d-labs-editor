@@ -116,19 +116,19 @@ namespace editor
             if (isShift)
             {
                 var source = (<eui.ArrayCollection>(<eui.List>this.parent).dataProvider).source;
-                var selectedAssetsFile = editorData.selectedAssetsFile;
                 var index = source.indexOf(this.data);
                 var min = index, max = index;
-                selectedAssetsFile.forEach(v =>
+                if (editorData.selectedAssetsFile.indexOf(preAssetsFile) != -1)
                 {
-                    index = source.indexOf(v);
+                    index = source.indexOf(preAssetsFile);
                     if (index < min) min = index;
                     if (index > max) max = index;
-                });
+                }
                 editorData.selectObject.apply(editorData, source.slice(min, max + 1));
             } else
             {
                 editorData.selectObject(this.data);
+                preAssetsFile = this.data;
             }
         }
 
@@ -148,4 +148,5 @@ namespace editor
             }
         }
     }
+    var preAssetsFile: AssetsFile;
 }
