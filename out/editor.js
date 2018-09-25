@@ -4812,6 +4812,7 @@ var editor;
         __extends(AssetsFileItemRenderer, _super);
         function AssetsFileItemRenderer() {
             var _this = _super.call(this) || this;
+            _this.itemSelected = false;
             _this.skinName = "AssetsFileItemRenderer";
             return _this;
         }
@@ -4892,7 +4893,25 @@ var editor;
             }
         };
         AssetsFileItemRenderer.prototype.onclick = function () {
-            editor.editorData.selectObject(this.data);
+            // 处理按下shift键时
+            var isShift = feng3d.shortcut.keyState.getKeyState("shift");
+            if (isShift) {
+                var source = this.parent.dataProvider.source;
+                var selectedAssetsFile = editor.editorData.selectedAssetsFile;
+                var index = source.indexOf(this.data);
+                var min = index, max = index;
+                selectedAssetsFile.forEach(function (v) {
+                    index = source.indexOf(v);
+                    if (index < min)
+                        min = index;
+                    if (index > max)
+                        max = index;
+                });
+                editor.editorData.selectObject.apply(editor.editorData, source.slice(min, max + 1));
+            }
+            else {
+                editor.editorData.selectObject(this.data);
+            }
         };
         AssetsFileItemRenderer.prototype.onrightclick = function (e) {
             e.stopPropagation();
@@ -4900,7 +4919,10 @@ var editor;
         };
         AssetsFileItemRenderer.prototype.selectedfilechanged = function () {
             var selectedAssetsFile = editor.editorData.selectedAssetsFile;
-            this.selected = this.data ? selectedAssetsFile.indexOf(this.data) != -1 : false;
+            var selected = this.data ? selectedAssetsFile.indexOf(this.data) != -1 : false;
+            if (this.itemSelected != selected) {
+                this.itemSelected = selected;
+            }
         };
         return AssetsFileItemRenderer;
     }(eui.ItemRenderer));
@@ -5249,16 +5271,9 @@ var editor;
             this.updateShowFloder();
         };
         AssetsView.prototype.selectedfilechanged = function () {
-            var _this = this;
-            this.selectfile = null;
             var selectedAssetsFile = editor.editorData.selectedAssetsFile;
-            var assetsFiles = this.filelistData.source;
-            assetsFiles.forEach(function (element) {
-                if (selectedAssetsFile.indexOf(element) != -1)
-                    _this.selectfile = element;
-            });
-            if (this.selectfile)
-                this.filepathLabel.text = this.selectfile.label;
+            if (selectedAssetsFile.length > 0)
+                this.filepathLabel.text = selectedAssetsFile.map(function (v) { return v.label; }).join(",");
             else
                 this.filepathLabel.text = "";
         };
@@ -6008,7 +6023,7 @@ var editor;
                     });
                     this._selectedAssetsFileInvalid = false;
                 }
-                return this._selectedObjects;
+                return this._selectedAssetsFile;
             },
             enumerable: true,
             configurable: true

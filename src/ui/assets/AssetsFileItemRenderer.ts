@@ -5,6 +5,7 @@ namespace editor
         public icon: eui.Image;
 
         data: AssetsFile;
+        itemSelected = false;
 
         constructor()
         {
@@ -110,7 +111,25 @@ namespace editor
 
         private onclick()
         {
-            editorData.selectObject(this.data);
+            // 处理按下shift键时
+            var isShift = feng3d.shortcut.keyState.getKeyState("shift");
+            if (isShift)
+            {
+                var source = (<eui.ArrayCollection>(<eui.List>this.parent).dataProvider).source;
+                var selectedAssetsFile = editorData.selectedAssetsFile;
+                var index = source.indexOf(this.data);
+                var min = index, max = index;
+                selectedAssetsFile.forEach(v =>
+                {
+                    index = source.indexOf(v);
+                    if (index < min) min = index;
+                    if (index > max) max = index;
+                });
+                editorData.selectObject.apply(editorData, source.slice(min, max + 1));
+            } else
+            {
+                editorData.selectObject(this.data);
+            }
         }
 
         private onrightclick(e: egret.Event)
@@ -122,7 +141,11 @@ namespace editor
         private selectedfilechanged()
         {
             var selectedAssetsFile = editorData.selectedAssetsFile;
-            this.selected = this.data ? selectedAssetsFile.indexOf(this.data) != -1 : false;
+            var selected = this.data ? selectedAssetsFile.indexOf(this.data) != -1 : false;
+            if (this.itemSelected != selected)
+            {
+                this.itemSelected = selected;
+            }
         }
     }
 }

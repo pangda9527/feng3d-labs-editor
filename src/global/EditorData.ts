@@ -221,7 +221,7 @@ namespace editor
                 });
                 this._selectedAssetsFileInvalid = false;
             }
-            return this._selectedObjects;
+            return this._selectedAssetsFile;
         }
         private _selectedAssetsFileInvalid = true;
         private _selectedAssetsFile: AssetsFile[] = [];

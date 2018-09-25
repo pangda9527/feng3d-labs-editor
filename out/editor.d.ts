@@ -1268,6 +1268,7 @@ declare namespace editor {
     class AssetsFileItemRenderer extends eui.ItemRenderer {
         icon: eui.Image;
         data: AssetsFile;
+        itemSelected: boolean;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -1363,7 +1364,6 @@ declare namespace editor {
         private listData;
         private filelistData;
         private fileDrag;
-        private selectfile;
         constructor();
         private onComplete;
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
@@ -1599,7 +1599,7 @@ declare namespace editor {
         /**
          * 选中游戏对象列表
          */
-        readonly selectedAssetsFile: (feng3d.GameObject | AssetsFile)[];
+        readonly selectedAssetsFile: AssetsFile[];
         private _selectedAssetsFileInvalid;
         private _selectedAssetsFile;
         /**

@@ -15,8 +15,6 @@ namespace editor
         private filelistData: eui.ArrayCollection;
 
         private fileDrag: FileDrag;
-        //
-        private selectfile: AssetsFile;
 
         constructor()
         {
@@ -213,16 +211,9 @@ namespace editor
 
         private selectedfilechanged()
         {
-            this.selectfile = null;
             var selectedAssetsFile = editorData.selectedAssetsFile;
-            var assetsFiles: AssetsFile[] = this.filelistData.source;
-            assetsFiles.forEach(element =>
-            {
-                if (selectedAssetsFile.indexOf(element) != -1)
-                    this.selectfile = element;
-            });
-            if (this.selectfile)
-                this.filepathLabel.text = this.selectfile.label;
+            if (selectedAssetsFile.length > 0)
+                this.filepathLabel.text = selectedAssetsFile.map(v => v.label).join(",");
             else
                 this.filepathLabel.text = "";
         }

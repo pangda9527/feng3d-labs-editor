@@ -143,7 +143,7 @@ var monacoEditor;
                 {
                     logLabel.textContent = "";
                     assets.textContent = monacoEditor.getValue();
-                    assetsfs.writeAssets(id, assets, (err) =>
+                    assetsfs.writeAssets(assets, (err) =>
                     {
                         if (err)
                             console.warn(err);
