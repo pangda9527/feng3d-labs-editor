@@ -40,7 +40,7 @@ namespace editor
 		 * 是否打开
 		 */
 		@feng3d.watch("openChanged")
-		isOpen = true;
+		isOpen = false;
 
 		/**
 		 * 是否选中
@@ -129,6 +129,16 @@ namespace editor
 				});
 			}
 			return nodes;
+		}
+
+		openParents()
+		{
+			var p = this.parent;
+			while (p)
+			{
+				p.isOpen = true;
+				p = p.parent;
+			}
 		}
 
 		private openChanged()

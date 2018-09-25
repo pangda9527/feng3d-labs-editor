@@ -45,7 +45,7 @@ namespace editor
         addGameoObjectFromAsset(gameobject: feng3d.GameObject, parent?: feng3d.GameObject)
         {
             gameobject = feng3d.serialization.clone(gameobject);
-            
+
             if (parent)
                 parent.addChild(gameobject);
             else
@@ -83,7 +83,9 @@ namespace editor
             this._selectedGameObjects = editorData.selectedGameObjects;
             this._selectedGameObjects.forEach(element =>
             {
-                this.getNode(element).selected = true;
+                var node = this.getNode(element);
+                node.selected = true;
+                node.openParents();
             });
         }
 

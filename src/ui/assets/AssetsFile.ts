@@ -149,6 +149,22 @@ namespace editor
         }
 
         /**
+         * 获取新子对象名称
+         * @param basename 基础名称
+         */
+        getNewChildName(basename: string)
+        {
+            var labels = this.children.map(v => v.label);
+            var name = basename;
+            var i = 1;
+            while (labels.indexOf(name) != -1)
+            {
+                name = basename + " " + i++;
+            }
+            return name;
+        }
+
+        /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
          * @param arraybuffer 文件数据

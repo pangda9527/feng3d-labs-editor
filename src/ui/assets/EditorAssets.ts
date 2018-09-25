@@ -45,6 +45,7 @@ namespace editor
                 this.showFloder = this.rootFile;
                 this.rootFile.on("added", () => { this.saveProject() });
                 this.rootFile.on("removed", () => { this.saveProject() });
+                this.rootFile.isOpen = true;
                 if (loadingNum == 0)
                 {
                     callback();
@@ -107,50 +108,55 @@ namespace editor
                             {
                                 label: "文件夹", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(new feng3d.Feng3dFolder().value({ name: "New Folder" })));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.Feng3dFolder().value({ name: assetsFile.getNewChildName("New Folder") })));
                                 }
                             },
                             {
                                 label: "脚本", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(new feng3d.ScriptFile().value({ name: "NewScript", filename: "script.ts", textContent: assetsFileTemplates.getNewScript("NewScript") })));
+                                    var name = assetsFile.getNewChildName("NewScript");
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.ScriptFile().value({ name: name, filename: "script.ts", textContent: assetsFileTemplates.getNewScript(name) })));
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(new feng3d.ShaderFile().value({ name: "NewShader", filename: "shader.ts", textContent: assetsFileTemplates.getNewShader("NewShader") })));
+                                    var name = assetsFile.getNewChildName("NewShader");
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.ShaderFile().value({ name: name, filename: "shader.ts", textContent: assetsFileTemplates.getNewShader(name) })));
                                 }
                             },
                             {
                                 label: "js", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(new feng3d.JSFile().value({ name: "New Js", filename: "js.js", textContent: "" })));
+                                    var name = assetsFile.getNewChildName("New Js");
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.JSFile().value({ name: name, filename: "js.js", textContent: "" })));
                                 }
                             },
                             {
                                 label: "Json", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(new feng3d.JsonFile().value({ name: "New Json", filename: "json.json", textContent: "{}" })));
+                                    var name = assetsFile.getNewChildName("New Json");
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.JsonFile().value({ name: name, filename: "json.json", textContent: "{}" })));
                                 }
                             },
                             {
                                 label: "文本", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(new feng3d.TextFile().value({ name: "New Text", filename: "text.txt", textContent: "" })));
+                                    var name = assetsFile.getNewChildName("New Text");
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.TextFile().value({ name: name, filename: "text.txt", textContent: "" })));
                                 }
                             },
                             { type: "separator" },
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(new feng3d.TextureCube().value({ name: "New TextureCube" })));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.TextureCube().value({ name: assetsFile.getNewChildName("New TextureCube") })));
                                 }
                             },
                             {
                                 label: "材质", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(new feng3d.Material().value({ name: "New Material" })));
+                                    editorData.selectObject(assetsFile.addAssets(new feng3d.Material().value({ name: assetsFile.getNewChildName("New Material") })));
                                 }
                             },
                         ]
@@ -327,11 +333,11 @@ namespace editor
                     case "md5anim": menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.loadAnim(filePath) }); break;
                 }
             }
-
         }
 
         private showFloderChanged(property, oldValue, newValue)
         {
+            this.showFloder.openParents();
             feng3d.feng3dDispatcher.dispatch("assets.showFloderChanged", { oldpath: oldValue, newpath: newValue });
         }
 

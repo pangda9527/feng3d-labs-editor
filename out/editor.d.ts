@@ -516,6 +516,7 @@ declare namespace editor {
         addChild(node: TreeNode): void;
         remove(): void;
         getShowNodes(): TreeNode[];
+        openParents(): void;
         private openChanged;
     }
 }
@@ -1324,6 +1325,11 @@ declare namespace editor {
          */
         delete(): void;
         getFolderList(includeClose?: boolean): any[];
+        /**
+         * 获取新子对象名称
+         * @param basename 基础名称
+         */
+        getNewChildName(basename: string): string;
         /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
