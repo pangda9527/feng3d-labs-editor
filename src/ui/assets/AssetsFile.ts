@@ -124,6 +124,10 @@ namespace editor
          */
         delete()
         {
+            this.children.forEach(element =>
+            {
+                element.delete();
+            });
             this.remove();
             assets.deleteAssets(this.id);
             delete editorAssets.files[this.id];

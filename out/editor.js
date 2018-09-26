@@ -4100,8 +4100,7 @@ var editor;
                 this.text.text = String(this.attributeValue);
             }
             else {
-                var valuename = this.attributeValue["name"] || "";
-                this.text.text = valuename + " (" + feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop() + ")";
+                this.text.text = this.attributeValue["name"] || "";
                 this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             }
         };
@@ -5014,6 +5013,9 @@ var editor;
          * 删除
          */
         AssetsFile.prototype.delete = function () {
+            this.children.forEach(function (element) {
+                element.delete();
+            });
             this.remove();
             editor.assets.deleteAssets(this.id);
             delete editor.editorAssets.files[this.id];
