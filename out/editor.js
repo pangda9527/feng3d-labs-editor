@@ -2685,6 +2685,8 @@ var editor;
             }
         };
         OVDefault.prototype.dispose = function () {
+            if (!this.blockViews)
+                return;
             for (var i = 0; i < this.blockViews.length; i++) {
                 var displayObject = this.blockViews[i];
                 displayObject.objectView = null;
@@ -2999,7 +3001,6 @@ var editor;
             var _this = _super.call(this) || this;
             // 占用，避免出现label命名的组件
             _this.label = "";
-            _this.editable = true;
             _this._space = attributeViewInfo.owner;
             _this._attributeName = attributeViewInfo.name;
             _this._attributeType = attributeViewInfo.type;
@@ -3035,8 +3036,8 @@ var editor;
                 else
                     this.labelLab.text = this._attributeName;
             }
-            if (componentParam && componentParam.tooltip)
-                editor.toolTip.register(this.labelLab, componentParam.tooltip);
+            if (this._attributeViewInfo.tooltip)
+                editor.toolTip.register(this.labelLab, this._attributeViewInfo.tooltip);
             this.initView();
             this.updateView();
         };
@@ -3122,11 +3123,13 @@ var editor;
             this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
+            if (this._attributeViewInfo.writable)
+                feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
         };
         OAVDefault.prototype.dispose = function () {
             editor.drag.unregister(this);
-            feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+            if (this._attributeViewInfo.writable)
+                feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
             this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.text.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -3154,8 +3157,8 @@ var editor;
                 var valuename = this.attributeValue["name"] || "";
                 this.text.text = valuename + " (" + this.attributeValue.constructor.name + ")";
                 this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+                this.text.enabled = false;
             }
-            this.text.enabled = this.editable;
         };
         OAVDefault.prototype.onDoubleClick = function () {
             editor.editorui.inspectorView.showData(this.attributeValue);

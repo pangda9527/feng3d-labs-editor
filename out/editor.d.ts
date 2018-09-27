@@ -815,7 +815,6 @@ declare namespace editor {
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         space: any;
         private label;
-        protected editable: boolean;
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         /**

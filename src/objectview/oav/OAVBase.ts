@@ -42,7 +42,6 @@ namespace editor
 
         // 占用，避免出现label命名的组件
         private label = "";
-        protected editable = true;
 
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
@@ -66,8 +65,8 @@ namespace editor
                 else
                     this.labelLab.text = this._attributeName;
             }
-            if (componentParam && componentParam.tooltip)
-                toolTip.register(this.labelLab, componentParam.tooltip);
+            if (this._attributeViewInfo.tooltip)
+                toolTip.register(this.labelLab, this._attributeViewInfo.tooltip);
 
             this.initView();
             this.updateView();

@@ -61,6 +61,7 @@ namespace editor
 
 		dispose()
 		{
+			if (!this.blockViews) return;
 			for (var i = 0; i < this.blockViews.length; i++)
 			{
 				var displayObject = this.blockViews[i];
