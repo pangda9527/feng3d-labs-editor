@@ -241,7 +241,7 @@ namespace editor
         {
             if (files.length == 0)
             {
-                editorData.selectObject.apply(editorData, assetsFiles);
+                editorData.selectMiltiObject(assetsFiles);
                 callback && callback(assetsFiles);
                 return;
             }

@@ -26,9 +26,13 @@ var shortcutConfig = [ //
 	{ key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
 
 	{ key: "del", command: "deleteSeletedGameObject", when: "" },
-	{ key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
-	{ key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
-	{ key: "mousemove", command: "areaSelect", when: "areaSelecting" },
+
+	{ key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal+mouseInView3D" },
+	{ key: "mousemove", stateCommand: "!selecting", when: "selecting" },
+	{ key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "mouseInView3D+selecting" },
+
+	{ key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D" },
+	{ key: "mousemove", command: "areaSelect", when: "areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
 	{ key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
 
 	// 可用命令

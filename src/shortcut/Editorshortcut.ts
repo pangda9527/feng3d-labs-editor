@@ -50,11 +50,16 @@ namespace editor
             var rb = editorui.feng3dView.localToGlobal(editorui.feng3dView.width, editorui.feng3dView.height);
             var rectangle = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
             //
-            areaSelectEndPosition.x = Math.min(Math.max(areaSelectEndPosition.x, rectangle.left), rectangle.right);
-            areaSelectEndPosition.y = Math.min(Math.max(areaSelectEndPosition.y, rectangle.top), rectangle.bottom);
+            areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
             //
             areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
-
+            //
+            var gs = engine.getObjectsInGlobalArea(this.areaSelectStartPosition, areaSelectEndPosition);
+            var gs0 = gs.filter(g =>
+            {
+                return !!hierarchy.getNode(g);
+            });
+            editorData.selectMiltiObject(gs0);
         }
 
         private onAreaSelectEnd()

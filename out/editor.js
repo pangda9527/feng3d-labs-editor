@@ -816,10 +816,15 @@ var editor;
             var rb = editor.editorui.feng3dView.localToGlobal(editor.editorui.feng3dView.width, editor.editorui.feng3dView.height);
             var rectangle = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
             //
-            areaSelectEndPosition.x = Math.min(Math.max(areaSelectEndPosition.x, rectangle.left), rectangle.right);
-            areaSelectEndPosition.y = Math.min(Math.max(areaSelectEndPosition.y, rectangle.top), rectangle.bottom);
+            areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
             //
             editor.areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
+            //
+            var gs = editor.engine.getObjectsInGlobalArea(this.areaSelectStartPosition, areaSelectEndPosition);
+            var gs0 = gs.filter(function (g) {
+                return !!editor.hierarchy.getNode(g);
+            });
+            editor.editorData.selectMiltiObject(gs0);
         };
         Editorshortcut.prototype.onAreaSelectEnd = function () {
             editor.areaSelectRect.hide();
@@ -4815,7 +4820,7 @@ var editor;
             var _this = this;
             if (assetsFiles === void 0) { assetsFiles = []; }
             if (files.length == 0) {
-                editor.editorData.selectObject.apply(editor.editorData, assetsFiles);
+                editor.editorData.selectMiltiObject(assetsFiles);
                 callback && callback(assetsFiles);
                 return;
             }
@@ -5019,7 +5024,7 @@ var editor;
                     if (index > max)
                         max = index;
                 }
-                editor.editorData.selectObject.apply(editor.editorData, source.slice(min, max + 1));
+                editor.editorData.selectMiltiObject(source.slice(min, max + 1));
             }
             else {
                 editor.editorData.selectObject(this.data);
@@ -5980,12 +5985,30 @@ var editor;
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        EditorData.prototype.selectObject = function () {
+        EditorData.prototype.selectObject = function (object) {
+            var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
+            if (!isAdd)
+                this._selectedObjects.length = 0;
+            //
+            var index = this._selectedObjects.indexOf(object);
+            if (index == -1)
+                this._selectedObjects.push(object);
+            else
+                this._selectedObjects.splice(index, 1);
+            //
+            this._selectedGameObjectsInvalid = true;
+            this._selectedAssetsFileInvalid = true;
+            this._transformGameObjectInvalid = true;
+            this._transformBoxInvalid = true;
+            feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
+        };
+        /**
+         * 选择对象
+         * 该方法会处理 按ctrl键附加选中对象操作
+         * @param objs 选中的对象
+         */
+        EditorData.prototype.selectMiltiObject = function (objs) {
             var _this = this;
-            var objs = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                objs[_i] = arguments[_i];
-            }
             var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
             if (!isAdd)
                 this._selectedObjects.length = 0;
@@ -10910,9 +10933,11 @@ var shortcutConfig = [
     { key: "e", command: "gameobjectRotationTool", when: "!fpsViewing" },
     { key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
     { key: "del", command: "deleteSeletedGameObject", when: "" },
-    { key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
-    { key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
-    { key: "mousemove", command: "areaSelect", when: "areaSelecting" },
+    { key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal+mouseInView3D" },
+    { key: "mousemove", stateCommand: "!selecting", when: "selecting" },
+    { key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "mouseInView3D+selecting" },
+    { key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D" },
+    { key: "mousemove", command: "areaSelect", when: "areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
     { key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
 ];
 var editor;

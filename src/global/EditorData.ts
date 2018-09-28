@@ -60,7 +60,28 @@ namespace editor
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectObject(...objs: (feng3d.GameObject | AssetsFile)[])
+        selectObject(object: (feng3d.GameObject | AssetsFile))
+        {
+            var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
+            if (!isAdd) this._selectedObjects.length = 0;
+            //
+            var index = this._selectedObjects.indexOf(object);
+            if (index == -1) this._selectedObjects.push(object);
+            else this._selectedObjects.splice(index, 1);
+            //
+            this._selectedGameObjectsInvalid = true;
+            this._selectedAssetsFileInvalid = true;
+            this._transformGameObjectInvalid = true;
+            this._transformBoxInvalid = true;
+            feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
+        }
+
+        /**
+         * 选择对象
+         * 该方法会处理 按ctrl键附加选中对象操作
+         * @param objs 选中的对象
+         */
+        selectMiltiObject(objs: (feng3d.GameObject | AssetsFile)[])
         {
             var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
             if (!isAdd) this._selectedObjects.length = 0;
@@ -76,6 +97,8 @@ namespace editor
             this._transformBoxInvalid = true;
             feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
         }
+
+
 
         /**
          * 使用的控制工具类型

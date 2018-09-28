@@ -1609,7 +1609,13 @@ declare namespace editor {
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectObject(...objs: (feng3d.GameObject | AssetsFile)[]): void;
+        selectObject(object: (feng3d.GameObject | AssetsFile)): void;
+        /**
+         * 选择对象
+         * 该方法会处理 按ctrl键附加选中对象操作
+         * @param objs 选中的对象
+         */
+        selectMiltiObject(objs: (feng3d.GameObject | AssetsFile)[]): void;
         /**
          * 使用的控制工具类型
          */
