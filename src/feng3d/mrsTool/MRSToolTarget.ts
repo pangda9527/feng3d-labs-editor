@@ -7,11 +7,11 @@ namespace editor
         //
         private _controllerTargets: feng3d.Transform[];
         private _startScaleVec: feng3d.Vector3[] = [];
-        private _controllerToolTransfrom: feng3d.Transform = new feng3d.GameObject().value({ name: "controllerToolTransfrom" }).transform;
         private _controllerTool: feng3d.Transform;
         private _startTransformDic: Map<feng3d.Transform, TransformData>;
 
-        showGameObject: feng3d.Transform;
+        private _position = new feng3d.Vector3();
+        private _rotation = new feng3d.Vector3();
 
         get controllerTool()
         {
@@ -23,23 +23,15 @@ namespace editor
             this._controllerTool = value;
             if (this._controllerTool)
             {
-                this._controllerTool.position = this._controllerToolTransfrom.position;
-                this._controllerTool.rotation = this._controllerToolTransfrom.rotation;
+                this._controllerTool.position = this._position;
+                this._controllerTool.rotation = this._rotation;
             }
         }
 
         set controllerTargets(value: feng3d.Transform[])
         {
-            if (this._controllerTargets && this._controllerTargets.length > 0)
-            {
-                this.showGameObject = null;
-            }
             this._controllerTargets = value;
-            if (this._controllerTargets && this._controllerTargets.length > 0)
-            {
-                this.showGameObject = this._controllerTargets[0];
-                this.updateControllerImage();
-            }
+            this.updateControllerImage();
         }
 
         constructor()
@@ -89,10 +81,10 @@ namespace editor
             var rotation = new feng3d.Vector3();
             if (!editorData.isWoldCoordinate)
             {
-                rotation = this.showGameObject.rotation;
+                rotation = this._controllerTargets[0].rotation;
             }
-            this._controllerToolTransfrom.position = position;
-            this._controllerToolTransfrom.rotation = rotation;
+            this._position = position;
+            this._rotation = rotation;
             if (this._controllerTool)
             {
                 this._controllerTool.position = position;
@@ -182,7 +174,7 @@ namespace editor
                         gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                     } else
                     {
-                        var localPivotPoint = this._controllerToolTransfrom.position;
+                        var localPivotPoint = this._position;
                         if (gameobject.parent)
                             localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
                         gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position).appendRotation(localnormal, angle, localPivotPoint).position;
@@ -237,7 +229,7 @@ namespace editor
                         gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
                     } else
                     {
-                        var localPivotPoint = this._controllerToolTransfrom.position;
+                        var localPivotPoint = this._position;
                         if (gameobject.parent)
                             localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
                         //

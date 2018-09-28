@@ -1613,10 +1613,10 @@ declare namespace editor {
     class MRSToolTarget {
         private _controllerTargets;
         private _startScaleVec;
-        private _controllerToolTransfrom;
         private _controllerTool;
         private _startTransformDic;
-        showGameObject: feng3d.Transform;
+        private _position;
+        private _rotation;
         controllerTool: feng3d.Transform;
         controllerTargets: feng3d.Transform[];
         constructor();
