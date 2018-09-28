@@ -79,6 +79,7 @@
         "src/objectview/oav/OAVParticleComponentList.ts",
         //
         "src/ui/inspector/InspectorView.ts",
+        "src/ui/inspector/InspectorMultiObject.ts",
         //
         "src/ui/hierarchy/HierarchyTreeItemRenderer.ts",
         "src/ui/hierarchy/HierarchyView.ts",

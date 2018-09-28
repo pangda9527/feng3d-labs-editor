@@ -4361,11 +4361,8 @@ var editor;
             feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
         };
         InspectorView.prototype.onSelectedObjectsChanged = function () {
-            var selectedObjects = editor.editorData.selectedObjects;
-            if (selectedObjects && selectedObjects.length > 0)
-                this.showData(selectedObjects[0], true);
-            else
-                this.showData(null, true);
+            var data = editor.inspectorMultiObject.convertInspectorObject(editor.editorData.selectedObjects);
+            this.showData(data, true);
         };
         InspectorView.prototype.updateShowData = function (showdata) {
             if (this._view)
@@ -4386,6 +4383,28 @@ var editor;
         return InspectorView;
     }(eui.Component));
     editor.InspectorView = InspectorView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * 检查器多对象
+     *
+     * 处理多个对象在检查器中显示问题
+     */
+    var InspectorMultiObject = /** @class */ (function () {
+        function InspectorMultiObject() {
+        }
+        InspectorMultiObject.prototype.convertInspectorObject = function (selectedObjects) {
+            var selectedObjects = editor.editorData.selectedObjects;
+            if (selectedObjects && selectedObjects.length > 0)
+                return selectedObjects[0];
+            else
+                return null;
+        };
+        return InspectorMultiObject;
+    }());
+    editor.InspectorMultiObject = InspectorMultiObject;
+    editor.inspectorMultiObject = new InspectorMultiObject();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

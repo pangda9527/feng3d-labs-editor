@@ -108,11 +108,8 @@ namespace editor
 
 		private onSelectedObjectsChanged()
 		{
-			var selectedObjects = editorData.selectedObjects;
-			if (selectedObjects && selectedObjects.length > 0)
-				this.showData(selectedObjects[0], true)
-			else
-				this.showData(null, true)
+			var data = inspectorMultiObject.convertInspectorObject(editorData.selectedObjects);
+			this.showData(data, true);
 		}
 
 		private updateShowData(showdata: Object)

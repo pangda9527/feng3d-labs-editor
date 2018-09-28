@@ -1172,6 +1172,17 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    var inspectorMultiObject: InspectorMultiObject;
+    /**
+     * 检查器多对象
+     *
+     * 处理多个对象在检查器中显示问题
+     */
+    class InspectorMultiObject {
+        convertInspectorObject(selectedObjects: (feng3d.GameObject | AssetsFile)[]): any;
+    }
+}
+declare namespace editor {
     class HierarchyTreeItemRenderer extends TreeItemRenderer {
         data: HierarchyNode;
         constructor();
