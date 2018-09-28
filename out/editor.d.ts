@@ -256,6 +256,10 @@ declare namespace editor {
         private rotateSceneCameraGlobalMatrix3D;
         private rotateSceneMousePoint;
         constructor();
+        private areaSelectStartPosition;
+        private onAreaSelectStart;
+        private onAreaSelect;
+        private onAreaSelectEnd;
         private onGameobjectMoveTool;
         private onGameobjectRotationTool;
         private onGameobjectScaleTool;
@@ -660,6 +664,32 @@ declare namespace editor {
         private _ischeck;
         private onMouseMove;
         private removeTipview;
+    }
+}
+declare namespace editor {
+    var areaSelectRect: AreaSelectRect;
+    /**
+     * 区域选择框
+     */
+    class AreaSelectRect extends eui.Rect {
+        fillAlpha: number;
+        fillColor: number;
+        /**
+         * 显示
+         * @param start 起始位置
+         * @param end 结束位置
+         */
+        show(start: {
+            x: number;
+            y: number;
+        }, end: {
+            x: number;
+            y: number;
+        }): void;
+        /**
+         * 隐藏
+         */
+        hide(): void;
     }
 }
 declare namespace editor {
@@ -1530,6 +1560,10 @@ declare namespace editor {
          * 属性面板
          */
         inspectorView: InspectorView;
+        /**
+         * 3D视图
+         */
+        feng3dView: Feng3dView;
     }
     var editorui: EditorUI;
 }

@@ -18,7 +18,7 @@ var shortcutConfig = [ //
 	{ key: "mousemove", command: "dragScene", when: "dragSceneing" },
 	{ key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
 	{ key: "mousewheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
-	{ key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "" },
+	{ key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "mouseInView3D" },
 
 	{ key: "f", command: "lookToSelectedGameObject", when: "" },
 	{ key: "w", command: "gameobjectMoveTool", when: "!fpsViewing" },
@@ -27,6 +27,9 @@ var shortcutConfig = [ //
 
 	{ key: "del", command: "deleteSeletedGameObject", when: "" },
 	{ key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
+	{ key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
+	{ key: "mousemove", command: "areaSelect", when: "areaSelecting" },
+	{ key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
 
 	// 可用命令
 	// - fpsViewStart						启动fps浏览场景
@@ -34,12 +37,16 @@ var shortcutConfig = [ //
 	// - lookToSelectedGameObject			看向选中目标
 	// - gameobjectMoveTool					启动3D对象移动工具
 	// - gameobjectRotationTool				启动3D对象旋转工具
-	// - gameobjectScaleTool					启动3D对象缩放工具
+	// - gameobjectScaleTool				启动3D对象缩放工具
 	// - mouseRotateSceneStart				启动场景旋转
 	// - mouseRotateScene					旋转场景
 	// - dragSceneStart						启动拖拽场景
 	// - dragScene							拖拽场景
 	// - mouseWheelMoveSceneCamera			鼠标滚轮前后移动摄像机
+	// - deleteSeletedGameObject			删除对象
+	// - areaSelectStart					启动区域选择
+	// - areaSelect							区域选择
+	// - areaSelectEnd						结束区域选择
 
 	// 可用状态
 	// - mouseInView3D						鼠标在3D视图中
@@ -49,6 +56,7 @@ var shortcutConfig = [ //
 	// - inModal							处于模式窗口时，比如menu.popup时，inMode处于激活状态
 	// - inTransforming						使用变换工具中
 	// - selectInvalid						选择失效
+	// - areaSelecting						区域选择中
 
 	// 可用按键（按键均为小写）
 	// - a-z

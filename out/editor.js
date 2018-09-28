@@ -802,7 +802,28 @@ var editor;
             feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
             feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
+            //
+            feng3d.shortcut.on("areaSelectStart", this.onAreaSelectStart, this);
+            feng3d.shortcut.on("areaSelect", this.onAreaSelect, this);
+            feng3d.shortcut.on("areaSelectEnd", this.onAreaSelectEnd, this);
         }
+        Editorshortcut.prototype.onAreaSelectStart = function () {
+            this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        };
+        Editorshortcut.prototype.onAreaSelect = function () {
+            var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var lt = editor.editorui.feng3dView.localToGlobal(0, 0);
+            var rb = editor.editorui.feng3dView.localToGlobal(editor.editorui.feng3dView.width, editor.editorui.feng3dView.height);
+            var rectangle = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+            //
+            areaSelectEndPosition.x = Math.min(Math.max(areaSelectEndPosition.x, rectangle.left), rectangle.right);
+            areaSelectEndPosition.y = Math.min(Math.max(areaSelectEndPosition.y, rectangle.top), rectangle.bottom);
+            //
+            editor.areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
+        };
+        Editorshortcut.prototype.onAreaSelectEnd = function () {
+            editor.areaSelectRect.hide();
+        };
         Editorshortcut.prototype.onGameobjectMoveTool = function () {
             editor.editorData.toolType = editor.MRSToolType.MOVE;
         };
@@ -991,6 +1012,7 @@ var editor;
             var _this = _super.call(this) || this;
             _this.skinName = "Feng3dViewSkin";
             feng3d.Stats.init(document.getElementById("stats"));
+            editor.editorui.feng3dView = _this;
             return _this;
         }
         Feng3dView.prototype.$onAddToStage = function (stage, nestLevel) {
@@ -2553,6 +2575,46 @@ var editor;
     }());
     editor.ToolTip = ToolTip;
     editor.toolTip = new ToolTip();
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * 区域选择框
+     */
+    var AreaSelectRect = /** @class */ (function (_super) {
+        __extends(AreaSelectRect, _super);
+        function AreaSelectRect() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.fillAlpha = 0.5;
+            _this.fillColor = 0x8888ff;
+            return _this;
+        }
+        /**
+         * 显示
+         * @param start 起始位置
+         * @param end 结束位置
+         */
+        AreaSelectRect.prototype.show = function (start, end) {
+            var minX = Math.min(start.x, end.x);
+            var maxX = Math.max(start.x, end.x);
+            var minY = Math.min(start.y, end.y);
+            var maxY = Math.max(start.y, end.y);
+            this.x = minX;
+            this.y = minY;
+            this.width = maxX - minX;
+            this.height = maxY - minY;
+            editor.editorui.popupLayer.addChild(this);
+        };
+        /**
+         * 隐藏
+         */
+        AreaSelectRect.prototype.hide = function () {
+            this.parent && this.parent.removeChild(this);
+        };
+        return AreaSelectRect;
+    }(eui.Rect));
+    editor.AreaSelectRect = AreaSelectRect;
+    editor.areaSelectRect = new AreaSelectRect();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -10842,13 +10904,16 @@ var shortcutConfig = [
     { key: "mousemove", command: "dragScene", when: "dragSceneing" },
     { key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
     { key: "mousewheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
-    { key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "" },
+    { key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "mouseInView3D" },
     { key: "f", command: "lookToSelectedGameObject", when: "" },
     { key: "w", command: "gameobjectMoveTool", when: "!fpsViewing" },
     { key: "e", command: "gameobjectRotationTool", when: "!fpsViewing" },
     { key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
     { key: "del", command: "deleteSeletedGameObject", when: "" },
     { key: "click+!alt", command: "selectGameObject", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
+    { key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
+    { key: "mousemove", command: "areaSelect", when: "areaSelecting" },
+    { key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
 ];
 var editor;
 (function (editor) {

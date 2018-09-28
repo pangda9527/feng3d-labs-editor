@@ -13,6 +13,11 @@ namespace editor
          * 属性面板
          */
         inspectorView: InspectorView;
+
+        /**
+         * 3D视图
+         */
+        feng3dView: Feng3dView;
     }
 
     export var editorui: EditorUI = <any>{};

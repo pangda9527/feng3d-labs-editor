@@ -10,6 +10,7 @@ namespace editor
 			super();
 			this.skinName = "Feng3dViewSkin";
 			feng3d.Stats.init(document.getElementById("stats"));
+			editorui.feng3dView = this;
 		}
 
 		$onAddToStage(stage: egret.Stage, nestLevel: number)
