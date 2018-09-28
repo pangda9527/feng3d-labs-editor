@@ -4432,7 +4432,6 @@ var editor;
             dragSource.gameobject = this.data.gameobject;
         };
         HierarchyTreeItemRenderer.prototype.onclick = function () {
-            HierarchyTreeItemRenderer.preSelectedItem = this;
             editor.editorData.selectObject(this.data.gameobject);
         };
         HierarchyTreeItemRenderer.prototype.onDoubleClick = function () {
@@ -6738,6 +6737,8 @@ var editor;
                     indices[(i - 1) * 3 + 2] = i + 1;
                 }
             }
+            if (indices.length == 0)
+                indices = [0, 0, 0];
             this.geometry.setVAData("a_position", vertexPositionData, 3);
             this.geometry.indices = indices;
             //绘制边界
@@ -7613,7 +7614,7 @@ var editor;
                 else
                     debugger; // 为什么为空，是否被允许？
             });
-            this._selectedGameObjects = editor.editorData.selectedGameObjects;
+            this._selectedGameObjects = editor.editorData.selectedGameObjects.concat();
             this._selectedGameObjects.forEach(function (element) {
                 var node = _this.getNode(element);
                 node.selected = true;

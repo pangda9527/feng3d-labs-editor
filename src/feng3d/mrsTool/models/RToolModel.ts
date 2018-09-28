@@ -243,6 +243,7 @@ namespace editor
                     indices[(i - 1) * 3 + 2] = i + 1;
                 }
             }
+            if (indices.length == 0) indices = [0, 0, 0];
             this.geometry.setVAData("a_position", vertexPositionData, 3);
             this.geometry.indices = indices;
             //绘制边界

@@ -80,7 +80,7 @@ namespace editor
                 else
                     debugger; // 为什么为空，是否被允许？
             });
-            this._selectedGameObjects = editorData.selectedGameObjects;
+            this._selectedGameObjects = editorData.selectedGameObjects.concat();
             this._selectedGameObjects.forEach(element =>
             {
                 var node = this.getNode(element);

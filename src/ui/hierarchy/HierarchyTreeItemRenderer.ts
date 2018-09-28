@@ -2,11 +2,6 @@ namespace editor
 {
     export class HierarchyTreeItemRenderer extends TreeItemRenderer
     {
-        /**
-         * 上一个选中项
-         */
-        static preSelectedItem: HierarchyTreeItemRenderer;
-
         data: HierarchyNode;
 
         constructor()
@@ -65,8 +60,6 @@ namespace editor
 
         private onclick()
         {
-            HierarchyTreeItemRenderer.preSelectedItem = this;
-
             editorData.selectObject(this.data.gameobject);
         }
 

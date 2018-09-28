@@ -1173,10 +1173,6 @@ declare namespace editor {
 }
 declare namespace editor {
     class HierarchyTreeItemRenderer extends TreeItemRenderer {
-        /**
-         * 上一个选中项
-         */
-        static preSelectedItem: HierarchyTreeItemRenderer;
         data: HierarchyNode;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
