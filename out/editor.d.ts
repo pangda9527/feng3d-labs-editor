@@ -1617,6 +1617,7 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    var mrsToolTarget: MRSToolTarget;
     class MRSToolTarget {
         private _controllerTargets;
         private _startScaleVec;
@@ -1628,6 +1629,7 @@ declare namespace editor {
         controllerTool: feng3d.Transform;
         controllerTargets: feng3d.Transform[];
         constructor();
+        private onSelectedGameObjectChange;
         private onShowObjectTransformChanged;
         private updateControllerImage;
         /**
@@ -1857,14 +1859,12 @@ declare namespace editor {
         protected ismouseDown: boolean;
         protected movePlane3D: feng3d.Plane3D;
         protected startSceneTransform: feng3d.Matrix4x4;
-        protected _gameobjectControllerTarget: MRSToolTarget;
         init(gameObject: feng3d.GameObject): void;
         protected onAddedToScene(): void;
         protected onRemovedFromScene(): void;
         protected onItemMouseDown(event: feng3d.Event<any>): void;
         protected toolModel: feng3d.Component;
         selectedItem: CoordinateAxis | CoordinatePlane | CoordinateRotationFreeAxis | CoordinateRotationAxis | CoordinateCube | CoordinateScaleCube;
-        gameobjectControllerTarget: MRSToolTarget;
         protected updateToolModel(): void;
         protected onMouseDown(): void;
         protected onMouseUp(): void;
@@ -1957,7 +1957,6 @@ declare namespace editor {
         private rTool;
         private sTool;
         private _currentTool;
-        private controllerTarget;
         private mrsToolObject;
         init(gameObject: feng3d.GameObject): void;
         dispose(): void;

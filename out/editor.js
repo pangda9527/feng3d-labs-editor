@@ -6073,6 +6073,8 @@ var editor;
             this._controllerToolTransfrom = new feng3d.GameObject().value({ name: "controllerToolTransfrom" }).transform;
             feng3d.feng3dDispatcher.on("editor.isWoldCoordinateChanged", this.updateControllerImage, this);
             feng3d.feng3dDispatcher.on("editor.isBaryCenterChanged", this.updateControllerImage, this);
+            //
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
         }
         Object.defineProperty(MRSToolTarget.prototype, "showGameObject", {
             //
@@ -6117,6 +6119,16 @@ var editor;
             enumerable: true,
             configurable: true
         });
+        MRSToolTarget.prototype.onSelectedGameObjectChange = function () {
+            //筛选出 工具控制的对象
+            var transforms = editor.editorData.mrsTransforms;
+            if (transforms.length > 0) {
+                this.controllerTargets = transforms;
+            }
+            else {
+                this.controllerTargets = null;
+            }
+        };
         MRSToolTarget.prototype.onShowObjectTransformChanged = function (event) {
             for (var i = 0; i < this._controllerTargets.length; i++) {
                 if (this._controllerTargets[i] != this._showGameObject) {
@@ -6326,6 +6338,7 @@ var editor;
         return MRSToolTarget;
     }());
     editor.MRSToolTarget = MRSToolTarget;
+    editor.mrsToolTarget = new MRSToolTarget();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -6910,14 +6923,14 @@ var editor;
             this.on("removedFromScene", this.onRemovedFromScene, this);
         };
         MRSToolBase.prototype.onAddedToScene = function () {
-            this._gameobjectControllerTarget.controllerTool = this.transform;
+            editor.mrsToolTarget.controllerTool = this.transform;
             //
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
             feng3d.ticker.onframe(this.updateToolModel, this);
         };
         MRSToolBase.prototype.onRemovedFromScene = function () {
-            this._gameobjectControllerTarget.controllerTool = null;
+            editor.mrsToolTarget.controllerTool = null;
             //
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
@@ -6954,16 +6967,6 @@ var editor;
                 this._selectedItem = value;
                 if (this._selectedItem)
                     this._selectedItem.selected = true;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(MRSToolBase.prototype, "gameobjectControllerTarget", {
-            get: function () {
-                return this._gameobjectControllerTarget;
-            },
-            set: function (value) {
-                this._gameobjectControllerTarget = value;
             },
             enumerable: true,
             configurable: true
@@ -7106,7 +7109,7 @@ var editor;
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
             this.startPos = this.toolModel.transform.position;
-            this.gameobjectControllerTarget.startTranslation();
+            editor.mrsToolTarget.startTranslation();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
@@ -7119,12 +7122,12 @@ var editor;
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
             var sceneAddpos = sceneTransform.position.subTo(this.startSceneTransform.position);
-            this.gameobjectControllerTarget.translation(sceneAddpos);
+            editor.mrsToolTarget.translation(sceneAddpos);
         };
         MTool.prototype.onMouseUp = function () {
             _super.prototype.onMouseUp.call(this);
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-            this.gameobjectControllerTarget.stopTranslation();
+            editor.mrsToolTarget.stopTranslation();
             this.startPos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
@@ -7219,7 +7222,7 @@ var editor;
             //
             this.startMousePos = editor.engine.mousePos.clone();
             this.startSceneTransform = globalMatrix3D.clone();
-            this.gameobjectControllerTarget.startRotate();
+            editor.mrsToolTarget.startRotate();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
@@ -7243,9 +7246,9 @@ var editor;
                     sign = sign > 0 ? 1 : -1;
                     angle = angle * sign;
                     //
-                    this.gameobjectControllerTarget.rotate1(angle, this.movePlane3D.getNormal());
+                    editor.mrsToolTarget.rotate1(angle, this.movePlane3D.getNormal());
                     this.stepPlaneCross.copy(planeCross);
-                    this.gameobjectControllerTarget.startRotate();
+                    editor.mrsToolTarget.startRotate();
                     //绘制扇形区域
                     if (this.selectedItem instanceof editor.CoordinateRotationAxis) {
                         this.selectedItem.showSector(this.startPlanePos, planeCross);
@@ -7257,10 +7260,10 @@ var editor;
                     var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
-                    this.gameobjectControllerTarget.rotate2(-offset.y, right, -offset.x, up);
+                    editor.mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
                     //
                     this.startMousePos = endPoint;
-                    this.gameobjectControllerTarget.startRotate();
+                    editor.mrsToolTarget.startRotate();
                     break;
             }
         };
@@ -7270,7 +7273,7 @@ var editor;
             if (this.selectedItem instanceof editor.CoordinateRotationAxis) {
                 this.selectedItem.hideSector();
             }
-            this.gameobjectControllerTarget.stopRote();
+            editor.mrsToolTarget.stopRote();
             this.startMousePos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
@@ -7372,7 +7375,7 @@ var editor;
             }
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
-            this.gameobjectControllerTarget.startScale();
+            editor.mrsToolTarget.startScale();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
@@ -7402,7 +7405,7 @@ var editor;
                 addScale.y += 1;
                 addScale.z += 1;
             }
-            this.gameobjectControllerTarget.doScale(addScale);
+            editor.mrsToolTarget.doScale(addScale);
             //
             this.toolModel.xCube.scaleValue = addScale.x;
             this.toolModel.yCube.scaleValue = addScale.y;
@@ -7411,7 +7414,7 @@ var editor;
         STool.prototype.onMouseUp = function () {
             _super.prototype.onMouseUp.call(this);
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-            this.gameobjectControllerTarget.stopScale();
+            editor.mrsToolTarget.stopScale();
             this.startPlanePos = null;
             this.startSceneTransform = null;
             //
@@ -7447,16 +7450,12 @@ var editor;
         MRSTool.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
             this.mrsToolObject = new feng3d.GameObject().value({ name: "MRSTool" });
-            this.controllerTarget = new editor.MRSToolTarget();
             this.mTool = new feng3d.GameObject().value({ name: "MTool" }).addComponent(editor.MTool);
             this.rTool = new feng3d.GameObject().value({ name: "RTool" }).addComponent(editor.RTool);
             this.sTool = new feng3d.GameObject().value({ name: "STool" }).addComponent(editor.STool);
             setAwaysVisible(this.mTool);
             setAwaysVisible(this.rTool);
             setAwaysVisible(this.sTool);
-            this.mTool.gameobjectControllerTarget = this.controllerTarget;
-            this.rTool.gameobjectControllerTarget = this.controllerTarget;
-            this.sTool.gameobjectControllerTarget = this.controllerTarget;
             //
             this.currentTool = this.mTool;
             //
@@ -7470,7 +7469,6 @@ var editor;
             this.mrsToolObject.dispose();
             this.mrsToolObject = null;
             //
-            this.controllerTarget = null;
             this.mTool.dispose();
             this.mTool = null;
             this.rTool.dispose();
@@ -7486,11 +7484,9 @@ var editor;
             //筛选出 工具控制的对象
             var transforms = editor.editorData.mrsTransforms;
             if (transforms.length > 0) {
-                this.controllerTarget.controllerTargets = transforms;
                 this.gameObject.addChild(this.mrsToolObject);
             }
             else {
-                this.controllerTarget.controllerTargets = null;
                 this.mrsToolObject.remove();
             }
         };

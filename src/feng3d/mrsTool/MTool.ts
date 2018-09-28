@@ -112,7 +112,7 @@ namespace editor
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
             this.startPos = this.toolModel.transform.position;
-            this.gameobjectControllerTarget.startTranslation();
+            mrsToolTarget.startTranslation();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         }
@@ -127,7 +127,7 @@ namespace editor
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
             var sceneAddpos = sceneTransform.position.subTo(this.startSceneTransform.position);
-            this.gameobjectControllerTarget.translation(sceneAddpos);
+            mrsToolTarget.translation(sceneAddpos);
         }
 
         protected onMouseUp()
@@ -135,7 +135,7 @@ namespace editor
             super.onMouseUp()
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
 
-            this.gameobjectControllerTarget.stopTranslation();
+            mrsToolTarget.stopTranslation();
             this.startPos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;

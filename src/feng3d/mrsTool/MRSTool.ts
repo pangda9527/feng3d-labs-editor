@@ -29,7 +29,6 @@ namespace editor
 
         private _currentTool: MRSToolBase;
 
-        private controllerTarget: MRSToolTarget;
         private mrsToolObject: feng3d.GameObject;
 
         init(gameObject: feng3d.GameObject)
@@ -38,18 +37,12 @@ namespace editor
 
             this.mrsToolObject = new feng3d.GameObject().value({ name: "MRSTool" });
 
-            this.controllerTarget = new MRSToolTarget();
-
             this.mTool = new feng3d.GameObject().value({ name: "MTool" }).addComponent(MTool);
             this.rTool = new feng3d.GameObject().value({ name: "RTool" }).addComponent(RTool);
             this.sTool = new feng3d.GameObject().value({ name: "STool" }).addComponent(STool);
             setAwaysVisible(this.mTool);
             setAwaysVisible(this.rTool);
             setAwaysVisible(this.sTool);
-
-            this.mTool.gameobjectControllerTarget = this.controllerTarget;
-            this.rTool.gameobjectControllerTarget = this.controllerTarget;
-            this.sTool.gameobjectControllerTarget = this.controllerTarget;
             //
             this.currentTool = this.mTool;
             //
@@ -65,7 +58,6 @@ namespace editor
             this.mrsToolObject.dispose();
             this.mrsToolObject = null;
             //
-            this.controllerTarget = null;
             this.mTool.dispose();
             this.mTool = null;
             this.rTool.dispose();
@@ -85,12 +77,10 @@ namespace editor
             var transforms = editorData.mrsTransforms;
             if (transforms.length > 0)
             {
-                this.controllerTarget.controllerTargets = transforms;
                 this.gameObject.addChild(this.mrsToolObject);
             }
             else
             {
-                this.controllerTarget.controllerTargets = null;
                 this.mrsToolObject.remove();
             }
         }

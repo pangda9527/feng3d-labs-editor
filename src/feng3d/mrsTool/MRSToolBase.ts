@@ -12,8 +12,6 @@ namespace editor
         protected movePlane3D: feng3d.Plane3D;
         protected startSceneTransform: feng3d.Matrix4x4;
 
-        protected _gameobjectControllerTarget: MRSToolTarget;
-
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
@@ -27,7 +25,7 @@ namespace editor
 
         protected onAddedToScene()
         {
-            this._gameobjectControllerTarget.controllerTool = this.transform;
+            mrsToolTarget.controllerTool = this.transform;
             //
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
@@ -37,7 +35,7 @@ namespace editor
 
         protected onRemovedFromScene()
         {
-            this._gameobjectControllerTarget.controllerTool = null;
+            mrsToolTarget.controllerTool = null;
             //
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
@@ -80,16 +78,6 @@ namespace editor
             this._selectedItem = value;
             if (this._selectedItem)
                 this._selectedItem.selected = true;
-        }
-
-        get gameobjectControllerTarget(): MRSToolTarget
-        {
-            return this._gameobjectControllerTarget;
-        }
-
-        set gameobjectControllerTarget(value)
-        {
-            this._gameobjectControllerTarget = value;
         }
 
         protected updateToolModel()

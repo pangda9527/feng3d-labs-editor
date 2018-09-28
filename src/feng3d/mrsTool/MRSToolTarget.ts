@@ -1,5 +1,7 @@
 namespace editor
 {
+    export var mrsToolTarget: MRSToolTarget;
+
     export class MRSToolTarget
     {
         //
@@ -57,6 +59,22 @@ namespace editor
         {
             feng3d.feng3dDispatcher.on("editor.isWoldCoordinateChanged", this.updateControllerImage, this);
             feng3d.feng3dDispatcher.on("editor.isBaryCenterChanged", this.updateControllerImage, this);
+            //
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+        }
+
+        private onSelectedGameObjectChange()
+        {
+            //筛选出 工具控制的对象
+            var transforms = editorData.mrsTransforms;
+            if (transforms.length > 0)
+            {
+                this.controllerTargets = transforms;
+            }
+            else
+            {
+                this.controllerTargets = null;
+            }
         }
 
         private onShowObjectTransformChanged(event: feng3d.Event<any>)
@@ -325,4 +343,5 @@ namespace editor
         position: feng3d.Vector3, rotation: feng3d.Vector3, scale: feng3d.Vector3
     }
 
+    mrsToolTarget = new MRSToolTarget();
 }

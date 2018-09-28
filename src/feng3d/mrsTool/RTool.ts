@@ -84,7 +84,7 @@ namespace editor
             //
             this.startMousePos = engine.mousePos.clone();
             this.startSceneTransform = globalMatrix3D.clone();
-            this.gameobjectControllerTarget.startRotate();
+            mrsToolTarget.startRotate();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         }
@@ -111,9 +111,9 @@ namespace editor
                     sign = sign > 0 ? 1 : -1;
                     angle = angle * sign;
                     //
-                    this.gameobjectControllerTarget.rotate1(angle, this.movePlane3D.getNormal());
+                    mrsToolTarget.rotate1(angle, this.movePlane3D.getNormal());
                     this.stepPlaneCross.copy(planeCross);
-                    this.gameobjectControllerTarget.startRotate();
+                    mrsToolTarget.startRotate();
                     //绘制扇形区域
                     if (this.selectedItem instanceof CoordinateRotationAxis)
                     {
@@ -126,10 +126,10 @@ namespace editor
                     var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
-                    this.gameobjectControllerTarget.rotate2(-offset.y, right, -offset.x, up);
+                    mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
                     //
                     this.startMousePos = endPoint;
-                    this.gameobjectControllerTarget.startRotate();
+                    mrsToolTarget.startRotate();
                     break;
             }
         }
@@ -144,7 +144,7 @@ namespace editor
                 this.selectedItem.hideSector();
             }
 
-            this.gameobjectControllerTarget.stopRote();
+            mrsToolTarget.stopRote();
             this.startMousePos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
