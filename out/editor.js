@@ -4373,7 +4373,7 @@ var editor;
             this.group.scrollV = 0;
             this._view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
         };
-        InspectorView.prototype.onValueChanged = function () {
+        InspectorView.prototype.onValueChanged = function (e) {
             this._dataChanged = true;
         };
         InspectorView.prototype.onBackButton = function () {
@@ -4394,12 +4394,27 @@ var editor;
     var InspectorMultiObject = /** @class */ (function () {
         function InspectorMultiObject() {
         }
-        InspectorMultiObject.prototype.convertInspectorObject = function (selectedObjects) {
-            var selectedObjects = editor.editorData.selectedObjects;
-            if (selectedObjects && selectedObjects.length > 0)
-                return selectedObjects[0];
-            else
-                return null;
+        InspectorMultiObject.prototype.convertInspectorObject = function (objects) {
+            if (objects.length == 0)
+                return 0;
+            if (objects.length == 1)
+                return objects[0];
+            var data = {};
+            objects.forEach(function (element) {
+                if (element instanceof editor.AssetsFile) {
+                    element = element.feng3dAssets;
+                }
+                var type = feng3d.classUtils.getQualifiedClassName(element);
+                var list = data[type] = data[type] || [];
+                list.push(element);
+            });
+            var l = [];
+            for (var type in data) {
+                var element = data[type];
+                l.push(element.length + " " + type);
+            }
+            l.unshift(objects.length + " Objects\n");
+            return l.join("\n\t");
         };
         return InspectorMultiObject;
     }());

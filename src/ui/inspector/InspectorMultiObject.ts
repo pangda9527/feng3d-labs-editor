@@ -9,15 +9,33 @@ namespace editor
      */
     export class InspectorMultiObject
     {
-        convertInspectorObject(selectedObjects: (feng3d.GameObject | AssetsFile)[]): any
+        convertInspectorObject(objects: any[]): any
         {
-            var selectedObjects = editorData.selectedObjects;
-            if (selectedObjects && selectedObjects.length > 0)
-                return selectedObjects[0];
-            else
-                return null;
-        }
+            if (objects.length == 0) return 0;
+            if (objects.length == 1) return objects[0];
 
+            var data: { [type: string]: any[] } = {};
+            objects.forEach(element =>
+            {
+                if (element instanceof AssetsFile)
+                {
+                    element = element.feng3dAssets;
+                }
+                var type = feng3d.classUtils.getQualifiedClassName(element);
+                var list = data[type] = data[type] || [];
+                list.push(element);
+            });
+
+            var l = [];
+            for (const type in data)
+            {
+                var element = data[type];
+                l.push(`${element.length} ${type}`);
+            }
+
+            l.unshift(`${objects.length} Objects\n`);
+            return l.join("\n\t");
+        }
     }
 
     inspectorMultiObject = new InspectorMultiObject();

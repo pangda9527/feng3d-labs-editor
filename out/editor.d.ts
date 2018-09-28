@@ -1179,7 +1179,7 @@ declare namespace editor {
      * 处理多个对象在检查器中显示问题
      */
     class InspectorMultiObject {
-        convertInspectorObject(selectedObjects: (feng3d.GameObject | AssetsFile)[]): any;
+        convertInspectorObject(objects: any[]): any;
     }
 }
 declare namespace editor {

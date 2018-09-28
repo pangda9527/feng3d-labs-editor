@@ -123,7 +123,7 @@ namespace editor
 			this._view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
 		}
 
-		private onValueChanged()
+		private onValueChanged(e: feng3d.ObjectViewEvent)
 		{
 			this._dataChanged = true;
 		}
