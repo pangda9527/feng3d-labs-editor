@@ -74,8 +74,7 @@ namespace editor
         private onSelectedGameObjectChange()
         {
             //筛选出 工具控制的对象
-            var transforms = editorData.mrsTransforms;
-            if (transforms.length > 0)
+            if (editorData.selectedGameObjects.length > 0)
             {
                 this.gameObject.addChild(this.mrsToolObject);
             }

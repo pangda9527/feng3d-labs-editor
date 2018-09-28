@@ -6019,20 +6019,6 @@ var editor;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(EditorData.prototype, "mrsTransforms", {
-            /**
-             * 获取 受 MRSTool 控制的Transform列表
-             */
-            get: function () {
-                var transforms = this.selectedGameObjects.reduce(function (result, item) {
-                    result.push(item.transform);
-                    return result;
-                }, []);
-                return transforms;
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(EditorData.prototype, "selectedAssetsFile", {
             /**
              * 选中游戏对象列表
@@ -6075,21 +6061,6 @@ var editor;
             //
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
         }
-        Object.defineProperty(MRSToolTarget.prototype, "showGameObject", {
-            //
-            get: function () {
-                return this._showGameObject;
-            },
-            set: function (value) {
-                if (this._showGameObject)
-                    this._showGameObject.off("scenetransformChanged", this.onShowObjectTransformChanged, this);
-                this._showGameObject = value;
-                if (this._showGameObject)
-                    this._showGameObject.on("scenetransformChanged", this.onShowObjectTransformChanged, this);
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(MRSToolTarget.prototype, "controllerTool", {
             get: function () {
                 return this._controllerTool;
@@ -6120,23 +6091,16 @@ var editor;
         });
         MRSToolTarget.prototype.onSelectedGameObjectChange = function () {
             //筛选出 工具控制的对象
-            var transforms = editor.editorData.mrsTransforms;
+            var transforms = editor.editorData.selectedGameObjects.reduce(function (result, item) {
+                result.push(item.transform);
+                return result;
+            }, []);
             if (transforms.length > 0) {
                 this.controllerTargets = transforms;
             }
             else {
                 this.controllerTargets = null;
             }
-        };
-        MRSToolTarget.prototype.onShowObjectTransformChanged = function (event) {
-            for (var i = 0; i < this._controllerTargets.length; i++) {
-                if (this._controllerTargets[i] != this._showGameObject) {
-                    this._controllerTargets[i].position = this._showGameObject.position;
-                    this._controllerTargets[i].rotation = this._showGameObject.rotation;
-                    this._controllerTargets[i].scale = this._showGameObject.scale;
-                }
-            }
-            this.updateControllerImage();
         };
         MRSToolTarget.prototype.updateControllerImage = function () {
             if (!this._controllerTargets || this._controllerTargets.length == 0)
@@ -6154,7 +6118,7 @@ var editor;
             }
             var rotation = new feng3d.Vector3();
             if (!editor.editorData.isWoldCoordinate) {
-                rotation = this._showGameObject.rotation;
+                rotation = this.showGameObject.rotation;
             }
             this._controllerToolTransfrom.position = position;
             this._controllerToolTransfrom.rotation = rotation;
@@ -7483,8 +7447,7 @@ var editor;
         };
         MRSTool.prototype.onSelectedGameObjectChange = function () {
             //筛选出 工具控制的对象
-            var transforms = editor.editorData.mrsTransforms;
-            if (transforms.length > 0) {
+            if (editor.editorData.selectedGameObjects.length > 0) {
                 this.gameObject.addChild(this.mrsToolObject);
             }
             else {

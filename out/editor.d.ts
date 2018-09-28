@@ -1596,10 +1596,6 @@ declare namespace editor {
         private _transformBox;
         private _transformBoxInvalid;
         /**
-         * 获取 受 MRSTool 控制的Transform列表
-         */
-        readonly mrsTransforms: feng3d.Transform[];
-        /**
          * 选中游戏对象列表
          */
         readonly selectedAssetsFile: AssetsFile[];
@@ -1617,7 +1613,6 @@ declare namespace editor {
     class MRSToolTarget {
         private _controllerTargets;
         private _startScaleVec;
-        private _showGameObject;
         private _controllerToolTransfrom;
         private _controllerTool;
         private _startTransformDic;
@@ -1626,7 +1621,6 @@ declare namespace editor {
         controllerTargets: feng3d.Transform[];
         constructor();
         private onSelectedGameObjectChange;
-        private onShowObjectTransformChanged;
         private updateControllerImage;
         /**
          * 开始移动

@@ -7,24 +7,11 @@ namespace editor
         //
         private _controllerTargets: feng3d.Transform[];
         private _startScaleVec: feng3d.Vector3[] = [];
-        private _showGameObject: feng3d.Transform;
         private _controllerToolTransfrom: feng3d.Transform = new feng3d.GameObject().value({ name: "controllerToolTransfrom" }).transform;
         private _controllerTool: feng3d.Transform;
         private _startTransformDic: Map<feng3d.Transform, TransformData>;
 
-        //
-        get showGameObject()
-        {
-            return this._showGameObject;
-        }
-        set showGameObject(value)
-        {
-            if (this._showGameObject)
-                this._showGameObject.off("scenetransformChanged", this.onShowObjectTransformChanged, this);
-            this._showGameObject = value;
-            if (this._showGameObject)
-                this._showGameObject.on("scenetransformChanged", this.onShowObjectTransformChanged, this);
-        }
+        showGameObject: feng3d.Transform;
 
         get controllerTool()
         {
@@ -66,7 +53,11 @@ namespace editor
         private onSelectedGameObjectChange()
         {
             //筛选出 工具控制的对象
-            var transforms = editorData.mrsTransforms;
+            var transforms = <feng3d.Transform[]>editorData.selectedGameObjects.reduce((result, item) =>
+            {
+                result.push(item.transform);
+                return result;
+            }, []);
             if (transforms.length > 0)
             {
                 this.controllerTargets = transforms;
@@ -75,20 +66,6 @@ namespace editor
             {
                 this.controllerTargets = null;
             }
-        }
-
-        private onShowObjectTransformChanged(event: feng3d.Event<any>)
-        {
-            for (var i = 0; i < this._controllerTargets.length; i++)
-            {
-                if (this._controllerTargets[i] != this._showGameObject)
-                {
-                    this._controllerTargets[i].position = this._showGameObject.position;
-                    this._controllerTargets[i].rotation = this._showGameObject.rotation;
-                    this._controllerTargets[i].scale = this._showGameObject.scale;
-                }
-            }
-            this.updateControllerImage();
         }
 
         private updateControllerImage()
@@ -112,7 +89,7 @@ namespace editor
             var rotation = new feng3d.Vector3();
             if (!editorData.isWoldCoordinate)
             {
-                rotation = this._showGameObject.rotation;
+                rotation = this.showGameObject.rotation;
             }
             this._controllerToolTransfrom.position = position;
             this._controllerToolTransfrom.rotation = rotation;

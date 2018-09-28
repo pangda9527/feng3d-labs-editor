@@ -195,19 +195,6 @@ namespace editor
         private _transformBoxInvalid = true;
 
         /**
-         * 获取 受 MRSTool 控制的Transform列表
-         */
-        get mrsTransforms()
-        {
-            var transforms = <feng3d.Transform[]>this.selectedGameObjects.reduce((result, item) =>
-            {
-                result.push(item.transform);
-                return result;
-            }, []);
-            return transforms;
-        }
-
-        /**
          * 选中游戏对象列表
          */
         get selectedAssetsFile()
