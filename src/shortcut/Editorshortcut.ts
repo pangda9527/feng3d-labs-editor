@@ -59,7 +59,7 @@ namespace editor
             {
                 return !!hierarchy.getNode(g);
             });
-            editorData.selectMiltiObject(gs0);
+            editorData.selectMultiObject(gs0);
         }
 
         private onAreaSelectEnd()

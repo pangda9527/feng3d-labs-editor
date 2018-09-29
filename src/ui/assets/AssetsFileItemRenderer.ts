@@ -124,7 +124,7 @@ namespace editor
                     if (index < min) min = index;
                     if (index > max) max = index;
                 }
-                editorData.selectMiltiObject(source.slice(min, max + 1));
+                editorData.selectMultiObject(source.slice(min, max + 1));
             } else
             {
                 editorData.selectObject(this.data);

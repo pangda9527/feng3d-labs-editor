@@ -67,6 +67,7 @@ namespace editor
             this.filelist.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
+            this.filelist.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
 
             this.floderpathTxt.touchEnabled = true;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
@@ -84,6 +85,8 @@ namespace editor
             this.filelist.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
+
+            this.filelist.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
 
             this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
@@ -225,6 +228,44 @@ namespace editor
         private onfloderpathTxtLink(evt: egret.TextEvent)
         {
             editorAssets.showFloder = editorAssets.files[evt.text];
+        }
+
+        private areaSelectStartPosition: feng3d.Vector2;
+        private onMouseDown()
+        {
+            this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+        }
+
+        private onMouseMove()
+        {
+            var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var p = this.filelist.localToGlobal(0, 0);
+            var rectangle = new feng3d.Rectangle(p.x, p.y, this.filelist.width, this.filelist.height);
+            //
+            areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
+            //
+            areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
+            //
+            var min = this.areaSelectStartPosition.clone().min(areaSelectEndPosition);
+            var max = this.areaSelectStartPosition.clone().max(areaSelectEndPosition);
+            var areaRect = new feng3d.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
+            //
+            var datas = this.filelist.$indexToRenderer.filter(v =>
+            {
+                var p = v.localToGlobal(0, 0);
+                var rectangle = new feng3d.Rectangle(p.x, p.y, v.width, v.height);
+                return areaRect.intersects(rectangle);
+            }).map(v => v.data);
+            editorData.selectMultiObject(datas);
+        }
+
+        private onMouseUp()
+        {
+            areaSelectRect.hide();
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         }
     }
 

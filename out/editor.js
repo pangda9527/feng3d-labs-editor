@@ -824,7 +824,7 @@ var editor;
             var gs0 = gs.filter(function (g) {
                 return !!editor.hierarchy.getNode(g);
             });
-            editor.editorData.selectMiltiObject(gs0);
+            editor.editorData.selectMultiObject(gs0);
         };
         Editorshortcut.prototype.onAreaSelectEnd = function () {
             editor.areaSelectRect.hide();
@@ -4820,7 +4820,7 @@ var editor;
             var _this = this;
             if (assetsFiles === void 0) { assetsFiles = []; }
             if (files.length == 0) {
-                editor.editorData.selectMiltiObject(assetsFiles);
+                editor.editorData.selectMultiObject(assetsFiles);
                 callback && callback(assetsFiles);
                 return;
             }
@@ -5024,7 +5024,7 @@ var editor;
                     if (index > max)
                         max = index;
                 }
-                editor.editorData.selectMiltiObject(source.slice(min, max + 1));
+                editor.editorData.selectMultiObject(source.slice(min, max + 1));
             }
             else {
                 editor.editorData.selectObject(this.data);
@@ -5300,6 +5300,7 @@ var editor;
             this.filelist.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
+            this.filelist.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             this.floderpathTxt.touchEnabled = true;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.watcher.watch(editor.editorAssets, "showFloder", this.updateShowFloder, this);
@@ -5311,6 +5312,7 @@ var editor;
             this.filelist.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
+            this.filelist.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.watcher.unwatch(editor.editorAssets, "showFloder", this.updateShowFloder, this);
             feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
@@ -5412,6 +5414,36 @@ var editor;
         };
         AssetsView.prototype.onfloderpathTxtLink = function (evt) {
             editor.editorAssets.showFloder = editor.editorAssets.files[evt.text];
+        };
+        AssetsView.prototype.onMouseDown = function () {
+            this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+        };
+        AssetsView.prototype.onMouseMove = function () {
+            var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var p = this.filelist.localToGlobal(0, 0);
+            var rectangle = new feng3d.Rectangle(p.x, p.y, this.filelist.width, this.filelist.height);
+            //
+            areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
+            //
+            editor.areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
+            //
+            var min = this.areaSelectStartPosition.clone().min(areaSelectEndPosition);
+            var max = this.areaSelectStartPosition.clone().max(areaSelectEndPosition);
+            var areaRect = new feng3d.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
+            //
+            var datas = this.filelist.$indexToRenderer.filter(function (v) {
+                var p = v.localToGlobal(0, 0);
+                var rectangle = new feng3d.Rectangle(p.x, p.y, v.width, v.height);
+                return areaRect.intersects(rectangle);
+            }).map(function (v) { return v.data; });
+            editor.editorData.selectMultiObject(datas);
+        };
+        AssetsView.prototype.onMouseUp = function () {
+            editor.areaSelectRect.hide();
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         };
         return AssetsView;
     }(eui.Component));
@@ -6007,7 +6039,7 @@ var editor;
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        EditorData.prototype.selectMiltiObject = function (objs) {
+        EditorData.prototype.selectMultiObject = function (objs) {
             var _this = this;
             var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
             if (!isAdd)

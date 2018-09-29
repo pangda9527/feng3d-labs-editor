@@ -1422,6 +1422,10 @@ declare namespace editor {
         private onfilelistclick;
         private onfilelistrightclick;
         private onfloderpathTxtLink;
+        private areaSelectStartPosition;
+        private onMouseDown;
+        private onMouseMove;
+        private onMouseUp;
     }
 }
 declare namespace editor {
@@ -1615,7 +1619,7 @@ declare namespace editor {
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectMiltiObject(objs: (feng3d.GameObject | AssetsFile)[]): void;
+        selectMultiObject(objs: (feng3d.GameObject | AssetsFile)[]): void;
         /**
          * 使用的控制工具类型
          */
