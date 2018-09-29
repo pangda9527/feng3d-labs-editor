@@ -9,6 +9,8 @@ namespace editor
     {
         engine: feng3d.Engine;
 
+        scene: feng3d.Scene3D;
+
         gameObject: feng3d.GameObject;
 
         model: feng3d.Model;
@@ -25,24 +27,25 @@ namespace editor
             var engine = this.engine = new feng3d.Engine();
             engine.canvas.style.visibility = "hidden";
             engine.setSize(64, 64);
-            engine.scene.background.fromUnit(0xff525252);
-            engine.scene.ambientColor.setTo(0.4, 0.4, 0.4);
             //
-            this.camera = engine.camera;
-            engine.camera.lens = new feng3d.PerspectiveLens(45);
-            engine.camera.transform.position = new feng3d.Vector3(1.0, 0.8, -2.0);
-            engine.camera.transform.lookAt(new feng3d.Vector3());
+            var scene = this.scene = engine.scene;
+            scene.background.fromUnit(0xff525252);
+            scene.ambientColor.setTo(0.4, 0.4, 0.4);
+            //
+            var camera = this.camera = engine.camera;
+            camera.lens = new feng3d.PerspectiveLens(45);
+            camera.transform.position = new feng3d.Vector3(1.0, 0.8, -2.0);
+            camera.transform.lookAt(new feng3d.Vector3());
             //
             var light = new feng3d.GameObject().value({
                 name: "DirectionalLight",
                 components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "feng3d.DirectionalLight" },]
             });
-            engine.scene.gameObject.addChild(light);
+            scene.gameObject.addChild(light);
             engine.stop();
 
-            var gameObject = this.gameObject = new feng3d.GameObject();
+            this.gameObject = new feng3d.GameObject();
             this.model = this.gameObject.addComponent(feng3d.Model);
-            engine.scene.gameObject.addChild(gameObject);
         }
 
         /**
@@ -54,12 +57,7 @@ namespace editor
             this.model.geometry = this.defaultGeometry;
             this.model.material = material;
 
-            //
-            this.updateCameraPosition();
-
-            //
-            this.engine.render();
-            var dataUrl = this.engine.canvas.toDataURL();
+            var dataUrl = this.drawGameObject(this.gameObject);
             return dataUrl;
         }
 
@@ -72,19 +70,27 @@ namespace editor
             this.model.geometry = geometry;
             this.model.material = this.defaultMaterial;
 
-            //
-            this.updateCameraPosition();
-
-            //
-            this.engine.render();
-            var dataUrl = this.engine.canvas.toDataURL();
+            var dataUrl = this.drawGameObject(this.gameObject);
             return dataUrl;
         }
 
-        private updateCameraPosition()
+        drawGameObject(gameObject: feng3d.GameObject)
         {
             //
-            var bounds = this.gameObject.worldBounds;
+            this.updateCameraPosition(gameObject);
+
+            //
+            this.scene.gameObject.addChild(gameObject);
+            this.engine.render();
+            var dataUrl = this.engine.canvas.toDataURL();
+            this.scene.gameObject.removeChild(gameObject);
+            return dataUrl;
+        }
+
+        private updateCameraPosition(gameObject: feng3d.GameObject)
+        {
+            //
+            var bounds = gameObject.worldBounds;
             var scenePosition = bounds.getCenter();
             var size = bounds.getSize().length;
             size = Math.max(size, 1);

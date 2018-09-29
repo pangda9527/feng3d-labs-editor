@@ -2151,6 +2151,7 @@ declare namespace editor {
      */
     class Feng3dScreenShot {
         engine: feng3d.Engine;
+        scene: feng3d.Scene3D;
         gameObject: feng3d.GameObject;
         model: feng3d.Model;
         camera: feng3d.Camera;
@@ -2167,6 +2168,7 @@ declare namespace editor {
          * @param geometry 材质
          */
         drawGeometry(geometry: feng3d.Geometrys): string;
+        drawGameObject(gameObject: feng3d.GameObject): string;
         private updateCameraPosition;
     }
 }

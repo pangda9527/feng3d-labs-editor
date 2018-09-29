@@ -5138,6 +5138,9 @@ var editor;
             else if (this.feng3dAssets instanceof feng3d.Geometry) {
                 this.image = editor.feng3dScreenShot.drawGeometry(this.feng3dAssets);
             }
+            else if (this.feng3dAssets instanceof feng3d.GameObject) {
+                this.image = editor.feng3dScreenShot.drawGameObject(this.feng3dAssets);
+            }
         };
         AssetsFile.prototype.addAssets = function (feng3dAssets) {
             editor.assets.writeAssets(feng3dAssets);
@@ -8311,23 +8314,24 @@ var editor;
             var engine = this.engine = new feng3d.Engine();
             engine.canvas.style.visibility = "hidden";
             engine.setSize(64, 64);
-            engine.scene.background.fromUnit(0xff525252);
-            engine.scene.ambientColor.setTo(0.4, 0.4, 0.4);
             //
-            this.camera = engine.camera;
-            engine.camera.lens = new feng3d.PerspectiveLens(45);
-            engine.camera.transform.position = new feng3d.Vector3(1.0, 0.8, -2.0);
-            engine.camera.transform.lookAt(new feng3d.Vector3());
+            var scene = this.scene = engine.scene;
+            scene.background.fromUnit(0xff525252);
+            scene.ambientColor.setTo(0.4, 0.4, 0.4);
+            //
+            var camera = this.camera = engine.camera;
+            camera.lens = new feng3d.PerspectiveLens(45);
+            camera.transform.position = new feng3d.Vector3(1.0, 0.8, -2.0);
+            camera.transform.lookAt(new feng3d.Vector3());
             //
             var light = new feng3d.GameObject().value({
                 name: "DirectionalLight",
                 components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "feng3d.DirectionalLight" },]
             });
-            engine.scene.gameObject.addChild(light);
+            scene.gameObject.addChild(light);
             engine.stop();
-            var gameObject = this.gameObject = new feng3d.GameObject();
+            this.gameObject = new feng3d.GameObject();
             this.model = this.gameObject.addComponent(feng3d.Model);
-            engine.scene.gameObject.addChild(gameObject);
         }
         /**
          * 绘制材质
@@ -8336,11 +8340,7 @@ var editor;
         Feng3dScreenShot.prototype.drawMaterial = function (material) {
             this.model.geometry = this.defaultGeometry;
             this.model.material = material;
-            //
-            this.updateCameraPosition();
-            //
-            this.engine.render();
-            var dataUrl = this.engine.canvas.toDataURL();
+            var dataUrl = this.drawGameObject(this.gameObject);
             return dataUrl;
         };
         /**
@@ -8350,16 +8350,22 @@ var editor;
         Feng3dScreenShot.prototype.drawGeometry = function (geometry) {
             this.model.geometry = geometry;
             this.model.material = this.defaultMaterial;
-            //
-            this.updateCameraPosition();
-            //
-            this.engine.render();
-            var dataUrl = this.engine.canvas.toDataURL();
+            var dataUrl = this.drawGameObject(this.gameObject);
             return dataUrl;
         };
-        Feng3dScreenShot.prototype.updateCameraPosition = function () {
+        Feng3dScreenShot.prototype.drawGameObject = function (gameObject) {
             //
-            var bounds = this.gameObject.worldBounds;
+            this.updateCameraPosition(gameObject);
+            //
+            this.scene.gameObject.addChild(gameObject);
+            this.engine.render();
+            var dataUrl = this.engine.canvas.toDataURL();
+            this.scene.gameObject.removeChild(gameObject);
+            return dataUrl;
+        };
+        Feng3dScreenShot.prototype.updateCameraPosition = function (gameObject) {
+            //
+            var bounds = gameObject.worldBounds;
             var scenePosition = bounds.getCenter();
             var size = bounds.getSize().length;
             size = Math.max(size, 1);
