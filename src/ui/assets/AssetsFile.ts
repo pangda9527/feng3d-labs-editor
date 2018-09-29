@@ -108,6 +108,22 @@ namespace editor
                 {
                     this.image = dataurl;
                 });
+            } else 
+            {
+                // 等待可能未加载完成的贴图，此处可以优化为监听 材质所需的资源全部加载完成。
+                feng3d.ticker.once(1000, () =>
+                {
+                    this.updateImage();
+                });
+            }
+        }
+
+        updateImage()
+        {
+            if (this.feng3dAssets instanceof feng3d.Material)
+            {
+                var mat = this.feng3dAssets;
+                this.image = feng3dScreenShot.drawMaterial(mat);
             }
         }
 

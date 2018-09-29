@@ -27,16 +27,8 @@ namespace editor
 				this._viewDataList.length = 0;
 			}
 			//
-			this._viewData = null;
-			if (data instanceof AssetsFile)
-			{
-				this._viewData = data.feng3dAssets;
-				this.updateView();
-			} else
-			{
-				this._viewData = data;
-				this.updateView();
-			}
+			this._viewData = data;
+			this.updateView();
 		}
 
 		updateView()
@@ -63,9 +55,9 @@ namespace editor
 		 */
 		saveShowData(callback?: () => void)
 		{
-			if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets)
+			if (this._dataChanged && this._viewData instanceof AssetsFile)
 			{
-				assets.writeAssets(this._viewData, callback);
+				assets.writeAssets(this._viewData.feng3dAssets, callback);
 				this._dataChanged = false;
 			} else
 			{
@@ -126,6 +118,10 @@ namespace editor
 		private onValueChanged(e: feng3d.ObjectViewEvent)
 		{
 			this._dataChanged = true;
+			if (this._viewData instanceof AssetsFile)
+			{
+				this._viewData.updateImage();
+			}
 		}
 
 		private onBackButton()

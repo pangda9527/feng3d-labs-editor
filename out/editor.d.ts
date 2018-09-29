@@ -1355,6 +1355,7 @@ declare namespace editor {
         updateParent(): void;
         private idChanged;
         private init;
+        updateImage(): void;
         addAssets(feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
         /**
          * 删除
@@ -2131,6 +2132,19 @@ declare namespace editor {
         private pointLightIconMap;
         private spotLightIconMap;
         private cameraIconMap;
+    }
+}
+declare namespace editor {
+    var feng3dScreenShot: Feng3dScreenShot;
+    /**
+     * feng3d缩略图工具
+     */
+    class Feng3dScreenShot {
+        engine: feng3d.Engine;
+        gameObject: feng3d.GameObject;
+        model: feng3d.Model;
+        constructor();
+        drawMaterial(material: feng3d.Material, geometry?: feng3d.CubeGeometry): string;
     }
 }
 declare namespace feng3d {

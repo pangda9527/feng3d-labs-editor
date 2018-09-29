@@ -239,17 +239,13 @@ namespace editor
                 {
                     label: "方向光源", click: () =>
                     {
-                        var gameobject = new feng3d.GameObject().value({ name: "DirectionalLight" });
-                        gameobject.addComponent(feng3d.DirectionalLight);
-                        addToHierarchy(gameobject);
+                        addToHierarchy(feng3d.gameObjectFactory.createDirectionalLight());
                     }
                 },
                 {
                     label: "聚光灯", click: () =>
                     {
-                        var gameobject = new feng3d.GameObject().value({ name: "SpotLight" });
-                        gameobject.addComponent(feng3d.SpotLight);
-                        addToHierarchy(gameobject);
+                        addToHierarchy(feng3d.gameObjectFactory.createSpotLight());
                     }
                 },
             ],

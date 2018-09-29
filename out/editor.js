@@ -4374,15 +4374,8 @@ var editor;
                 this._viewDataList.length = 0;
             }
             //
-            this._viewData = null;
-            if (data instanceof editor.AssetsFile) {
-                this._viewData = data.feng3dAssets;
-                this.updateView();
-            }
-            else {
-                this._viewData = data;
-                this.updateView();
-            }
+            this._viewData = data;
+            this.updateView();
         };
         InspectorView.prototype.updateView = function () {
             this.backButton.visible = this._viewDataList.length > 0;
@@ -4402,8 +4395,8 @@ var editor;
          * 保存显示数据
          */
         InspectorView.prototype.saveShowData = function (callback) {
-            if (this._dataChanged && this._viewData instanceof feng3d.Feng3dAssets) {
-                editor.assets.writeAssets(this._viewData, callback);
+            if (this._dataChanged && this._viewData instanceof editor.AssetsFile) {
+                editor.assets.writeAssets(this._viewData.feng3dAssets, callback);
                 this._dataChanged = false;
             }
             else {
@@ -4442,6 +4435,9 @@ var editor;
         };
         InspectorView.prototype.onValueChanged = function (e) {
             this._dataChanged = true;
+            if (this._viewData instanceof editor.AssetsFile) {
+                this._viewData.updateImage();
+            }
         };
         InspectorView.prototype.onBackButton = function () {
             this._viewData = this._viewDataList.pop();
@@ -5104,6 +5100,18 @@ var editor;
                 editor.assets.readDataURL(this.feng3dAssets.url, function (err, dataurl) {
                     _this.image = dataurl;
                 });
+            }
+            else {
+                // 等待可能未加载完成的贴图，此处可以优化为监听 材质所需的资源全部加载完成。
+                feng3d.ticker.once(1000, function () {
+                    _this.updateImage();
+                });
+            }
+        };
+        AssetsFile.prototype.updateImage = function () {
+            if (this.feng3dAssets instanceof feng3d.Material) {
+                var mat = this.feng3dAssets;
+                this.image = editor.feng3dScreenShot.drawMaterial(mat);
             }
         };
         AssetsFile.prototype.addAssets = function (feng3dAssets) {
@@ -8266,6 +8274,47 @@ var editor;
 var editor;
 (function (editor) {
     /**
+     * feng3d缩略图工具
+     */
+    var Feng3dScreenShot = /** @class */ (function () {
+        function Feng3dScreenShot() {
+            //
+            var engine = this.engine = new feng3d.Engine();
+            engine.canvas.style.visibility = "hidden";
+            engine.setSize(100, 100);
+            engine.scene.background.fromUnit(0xff525252);
+            engine.scene.ambientColor.setTo(0.4, 0.4, 0.4);
+            //
+            engine.camera.lens = new feng3d.PerspectiveLens(45);
+            engine.camera.transform.position = new feng3d.Vector3(1.0, 0.8, -2.0);
+            engine.camera.transform.lookAt(new feng3d.Vector3());
+            //
+            var light = new feng3d.GameObject().value({
+                name: "DirectionalLight",
+                components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "feng3d.DirectionalLight" },]
+            });
+            engine.scene.gameObject.addChild(light);
+            engine.stop();
+            var gameObject = this.gameObject = new feng3d.GameObject();
+            this.model = this.gameObject.addComponent(feng3d.Model);
+            engine.scene.gameObject.addChild(gameObject);
+        }
+        Feng3dScreenShot.prototype.drawMaterial = function (material, geometry) {
+            if (geometry === void 0) { geometry = feng3d.Geometry.cube; }
+            this.model.geometry = geometry;
+            this.model.material = material;
+            this.engine.render();
+            var dataUrl = this.engine.canvas.toDataURL();
+            return dataUrl;
+        };
+        return Feng3dScreenShot;
+    }());
+    editor.Feng3dScreenShot = Feng3dScreenShot;
+    editor.feng3dScreenShot = new Feng3dScreenShot();
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
      * 导航组件，提供生成导航网格功能
      */
     var Navigation = /** @class */ (function (_super) {
@@ -10758,16 +10807,12 @@ var editor;
                 },
                 {
                     label: "方向光源", click: function () {
-                        var gameobject = new feng3d.GameObject().value({ name: "DirectionalLight" });
-                        gameobject.addComponent(feng3d.DirectionalLight);
-                        addToHierarchy(gameobject);
+                        addToHierarchy(feng3d.gameObjectFactory.createDirectionalLight());
                     }
                 },
                 {
                     label: "聚光灯", click: function () {
-                        var gameobject = new feng3d.GameObject().value({ name: "SpotLight" });
-                        gameobject.addComponent(feng3d.SpotLight);
-                        addToHierarchy(gameobject);
+                        addToHierarchy(feng3d.gameObjectFactory.createSpotLight());
                     }
                 },
             ],

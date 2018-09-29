@@ -120,6 +120,8 @@
         "src/feng3d/GroundGrid.ts",
         "src/feng3d/Main3D.ts",
         "src/feng3d/EditorComponent.ts",
+        "src/feng3d/Feng3dScreenShot.ts",
+        //
         "src/navigation/Navigation.ts",
         "src/navigation/ThreeBSP.ts",
         "src/navigation/NavigationProcess.ts",
