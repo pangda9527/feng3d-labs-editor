@@ -933,6 +933,16 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    /**
+     * 默认对象属性界面
+     */
+    class OAVMultiText extends OAVBase {
+        multiText: eui.Label;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
+    }
+}
+declare namespace editor {
     class OAVVector3D extends OAVBase {
         labelLab: eui.Label;
         vector3DView: editor.Vector3DView;
@@ -2143,8 +2153,21 @@ declare namespace editor {
         engine: feng3d.Engine;
         gameObject: feng3d.GameObject;
         model: feng3d.Model;
+        camera: feng3d.Camera;
+        defaultGeometry: feng3d.CubeGeometry;
+        defaultMaterial: feng3d.Material;
         constructor();
-        drawMaterial(material: feng3d.Material, geometry?: feng3d.CubeGeometry): string;
+        /**
+         * 绘制材质
+         * @param material 材质
+         */
+        drawMaterial(material: feng3d.Material): string;
+        /**
+         * 绘制材质
+         * @param geometry 材质
+         */
+        drawGeometry(geometry: feng3d.Geometrys): string;
+        private updateCameraPosition;
     }
 }
 declare namespace feng3d {

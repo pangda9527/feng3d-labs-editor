@@ -49,6 +49,7 @@
         "resource/custom_skins/BooleanAttrView.exml",
         "resource/custom_skins/OAVArray.exml",
         "resource/custom_skins/OAVDefault.exml",
+        "resource/custom_skins/OAVMultiText.exml",
         "resource/custom_skins/OBVDefault.exml",
         "resource/custom_skins/OVBaseDefault.exml",
         "resource/custom_skins/OVDefault.exml",

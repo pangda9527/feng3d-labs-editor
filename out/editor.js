@@ -980,11 +980,11 @@ var editor;
                 //
                 editor.sceneControlConfig.lookDistance = lookDistance;
                 var lookPos = editor.editorCamera.transform.localToWorldMatrix.forward;
-                lookPos.scale(-editor.sceneControlConfig.lookDistance);
+                lookPos.scale(-lookDistance);
                 lookPos.add(scenePosition);
                 var localLookPos = lookPos.clone();
                 if (editor.editorCamera.transform.parent) {
-                    editor.editorCamera.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
+                    localLookPos = editor.editorCamera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
                 }
                 egret.Tween.get(editor.editorCamera.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
             }
@@ -3366,6 +3366,28 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    /**
+     * 默认对象属性界面
+     */
+    var OAVMultiText = /** @class */ (function (_super) {
+        __extends(OAVMultiText, _super);
+        function OAVMultiText(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVMultiText";
+            return _this;
+        }
+        OAVMultiText.prototype.initView = function () {
+            this.multiText.text = this.attributeValue;
+        };
+        OAVMultiText = __decorate([
+            feng3d.OAVComponent()
+        ], OAVMultiText);
+        return OAVMultiText;
+    }(editor.OAVBase));
+    editor.OAVMultiText = OAVMultiText;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var OAVVector3D = /** @class */ (function (_super) {
         __extends(OAVVector3D, _super);
         function OAVVector3D(attributeViewInfo) {
@@ -5113,6 +5135,9 @@ var editor;
                 var mat = this.feng3dAssets;
                 this.image = editor.feng3dScreenShot.drawMaterial(mat);
             }
+            else if (this.feng3dAssets instanceof feng3d.Geometry) {
+                this.image = editor.feng3dScreenShot.drawGeometry(this.feng3dAssets);
+            }
         };
         AssetsFile.prototype.addAssets = function (feng3dAssets) {
             editor.assets.writeAssets(feng3dAssets);
@@ -5423,7 +5448,9 @@ var editor;
         AssetsView.prototype.onfloderpathTxtLink = function (evt) {
             editor.editorAssets.showFloder = editor.editorAssets.files[evt.text];
         };
-        AssetsView.prototype.onMouseDown = function () {
+        AssetsView.prototype.onMouseDown = function (e) {
+            if (e.target != this.filelist)
+                return;
             this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
@@ -8278,13 +8305,16 @@ var editor;
      */
     var Feng3dScreenShot = /** @class */ (function () {
         function Feng3dScreenShot() {
+            this.defaultGeometry = feng3d.Geometry.cube;
+            this.defaultMaterial = feng3d.Material.default;
             //
             var engine = this.engine = new feng3d.Engine();
             engine.canvas.style.visibility = "hidden";
-            engine.setSize(100, 100);
+            engine.setSize(64, 64);
             engine.scene.background.fromUnit(0xff525252);
             engine.scene.ambientColor.setTo(0.4, 0.4, 0.4);
             //
+            this.camera = engine.camera;
             engine.camera.lens = new feng3d.PerspectiveLens(45);
             engine.camera.transform.position = new feng3d.Vector3(1.0, 0.8, -2.0);
             engine.camera.transform.lookAt(new feng3d.Vector3());
@@ -8299,13 +8329,54 @@ var editor;
             this.model = this.gameObject.addComponent(feng3d.Model);
             engine.scene.gameObject.addChild(gameObject);
         }
-        Feng3dScreenShot.prototype.drawMaterial = function (material, geometry) {
-            if (geometry === void 0) { geometry = feng3d.Geometry.cube; }
-            this.model.geometry = geometry;
+        /**
+         * 绘制材质
+         * @param material 材质
+         */
+        Feng3dScreenShot.prototype.drawMaterial = function (material) {
+            this.model.geometry = this.defaultGeometry;
             this.model.material = material;
+            //
+            this.updateCameraPosition();
+            //
             this.engine.render();
             var dataUrl = this.engine.canvas.toDataURL();
             return dataUrl;
+        };
+        /**
+         * 绘制材质
+         * @param geometry 材质
+         */
+        Feng3dScreenShot.prototype.drawGeometry = function (geometry) {
+            this.model.geometry = geometry;
+            this.model.material = this.defaultMaterial;
+            //
+            this.updateCameraPosition();
+            //
+            this.engine.render();
+            var dataUrl = this.engine.canvas.toDataURL();
+            return dataUrl;
+        };
+        Feng3dScreenShot.prototype.updateCameraPosition = function () {
+            //
+            var bounds = this.gameObject.worldBounds;
+            var scenePosition = bounds.getCenter();
+            var size = bounds.getSize().length;
+            size = Math.max(size, 1);
+            var lookDistance = size;
+            var lens = this.camera.lens;
+            if (lens instanceof feng3d.PerspectiveLens) {
+                lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
+            }
+            //
+            var lookPos = this.camera.transform.localToWorldMatrix.forward;
+            lookPos.scale(-lookDistance);
+            lookPos.add(scenePosition);
+            var localLookPos = lookPos.clone();
+            if (this.camera.transform.parent) {
+                localLookPos = this.camera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
+            }
+            this.camera.transform.position = localLookPos;
         };
         return Feng3dScreenShot;
     }());

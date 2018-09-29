@@ -264,12 +264,12 @@ namespace editor
                 //
                 sceneControlConfig.lookDistance = lookDistance;
                 var lookPos = editorCamera.transform.localToWorldMatrix.forward;
-                lookPos.scale(-sceneControlConfig.lookDistance);
+                lookPos.scale(-lookDistance);
                 lookPos.add(scenePosition);
                 var localLookPos = lookPos.clone();
                 if (editorCamera.transform.parent)
                 {
-                    editorCamera.transform.parent.worldToLocalMatrix.transformVector(lookPos, localLookPos);
+                    localLookPos = editorCamera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
                 }
                 egret.Tween.get(editorCamera.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
             }

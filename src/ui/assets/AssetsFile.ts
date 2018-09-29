@@ -124,6 +124,9 @@ namespace editor
             {
                 var mat = this.feng3dAssets;
                 this.image = feng3dScreenShot.drawMaterial(mat);
+            } else if (this.feng3dAssets instanceof feng3d.Geometry)
+            {
+                this.image = feng3dScreenShot.drawGeometry(<any>this.feng3dAssets);
             }
         }
 

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="OAVMultiText" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+	<e:Label id="multiText" text="" size="12" textColor="0x000000" verticalAlign="middle" multiline="true" textAlign="left" left="0" top="5" bottom="5" right="5"/>
+
+</e:Skin>
