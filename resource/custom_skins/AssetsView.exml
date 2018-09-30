@@ -33,7 +33,7 @@
 						<e:Group>
 							<e:List id="filelist" scaleX="1" scaleY="1" width="100%">
 								<e:layout>
-								<e:TileLayout horizontalGap="0" verticalGap="0"/>
+								<e:TileLayout horizontalGap="2" verticalGap="2"/>
 								</e:layout>
 							</e:List>
 							<e:layout>
