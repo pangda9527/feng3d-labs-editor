@@ -102,25 +102,29 @@ namespace editor
             {
                 this.image = "file_png";
             }
+            // 等待可能未加载完成的贴图，此处可以优化为监听 材质所需的资源全部加载完成。
+            feng3d.ticker.once(1000, () =>
+            {
+                this.updateImage();
+            });
+        }
+
+        updateImage()
+        {
             if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D)
             {
                 assets.readDataURL(this.feng3dAssets.url, (err, dataurl) =>
                 {
                     this.image = dataurl;
                 });
-            } else 
+            } else if (this.feng3dAssets instanceof feng3d.TextureCube)
             {
-                // 等待可能未加载完成的贴图，此处可以优化为监听 材质所需的资源全部加载完成。
-                feng3d.ticker.once(1000, () =>
+                var textureCube = this.feng3dAssets;
+                this.feng3dAssets.onLoadCompleted(() =>
                 {
-                    this.updateImage();
+                    this.image = feng3dScreenShot.drawTextureCube(textureCube);
                 });
-            }
-        }
-
-        updateImage()
-        {
-            if (this.feng3dAssets instanceof feng3d.Material)
+            } else if (this.feng3dAssets instanceof feng3d.Material)
             {
                 var mat = this.feng3dAssets;
                 this.image = feng3dScreenShot.drawMaterial(mat);

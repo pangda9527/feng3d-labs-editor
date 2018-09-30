@@ -2159,6 +2159,11 @@ declare namespace editor {
         defaultMaterial: feng3d.Material;
         constructor();
         /**
+         * 绘制立方体贴图
+         * @param textureCube 立方体贴图
+         */
+        drawTextureCube(textureCube: feng3d.TextureCube): string;
+        /**
          * 绘制材质
          * @param material 材质
          */
@@ -2168,6 +2173,10 @@ declare namespace editor {
          * @param geometry 材质
          */
         drawGeometry(geometry: feng3d.Geometrys): string;
+        /**
+         * 绘制游戏对象
+         * @param gameObject 游戏对象
+         */
         drawGameObject(gameObject: feng3d.GameObject): string;
         private updateCameraPosition;
     }

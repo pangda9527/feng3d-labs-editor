@@ -3702,29 +3702,19 @@ var editor;
             this.pxGroup.width = this.pyGroup.width = this.pzGroup.width = this.nxGroup.width = this.nyGroup.width = this.nzGroup.width = w4;
             this.pxGroup.height = this.pyGroup.height = this.pzGroup.height = this.nxGroup.height = this.nyGroup.height = this.nzGroup.height = w4;
             //
-            this.px.x = w4 * 2;
-            this.px.y = w4;
             this.pxGroup.x = w4 * 2;
             this.pxGroup.y = w4;
             //
-            this.py.x = w4;
             this.pyGroup.x = w4;
             //
-            this.pz.x = w4;
-            this.pz.y = w4;
             this.pzGroup.x = w4;
             this.pzGroup.y = w4;
             //
-            this.nx.y = w4;
             this.nxGroup.y = w4;
             //
-            this.ny.x = w4;
-            this.ny.y = w4 * 2;
             this.nyGroup.x = w4;
             this.nyGroup.y = w4 * 2;
             //
-            this.nz.x = w4 * 3;
-            this.nz.y = w4;
             this.nzGroup.x = w4 * 3;
             this.nzGroup.y = w4;
             //
@@ -5118,20 +5108,25 @@ var editor;
             else {
                 this.image = "file_png";
             }
+            // 等待可能未加载完成的贴图，此处可以优化为监听 材质所需的资源全部加载完成。
+            feng3d.ticker.once(1000, function () {
+                _this.updateImage();
+            });
+        };
+        AssetsFile.prototype.updateImage = function () {
+            var _this = this;
             if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D) {
                 editor.assets.readDataURL(this.feng3dAssets.url, function (err, dataurl) {
                     _this.image = dataurl;
                 });
             }
-            else {
-                // 等待可能未加载完成的贴图，此处可以优化为监听 材质所需的资源全部加载完成。
-                feng3d.ticker.once(1000, function () {
-                    _this.updateImage();
+            else if (this.feng3dAssets instanceof feng3d.TextureCube) {
+                var textureCube = this.feng3dAssets;
+                this.feng3dAssets.onLoadCompleted(function () {
+                    _this.image = editor.feng3dScreenShot.drawTextureCube(textureCube);
                 });
             }
-        };
-        AssetsFile.prototype.updateImage = function () {
-            if (this.feng3dAssets instanceof feng3d.Material) {
+            else if (this.feng3dAssets instanceof feng3d.Material) {
                 var mat = this.feng3dAssets;
                 this.image = editor.feng3dScreenShot.drawMaterial(mat);
             }
@@ -8310,7 +8305,7 @@ var editor;
         function Feng3dScreenShot() {
             this.defaultGeometry = feng3d.Geometry.cube;
             this.defaultMaterial = feng3d.Material.default;
-            //
+            // 初始化3d
             var engine = this.engine = new feng3d.Engine();
             engine.canvas.style.visibility = "hidden";
             engine.setSize(64, 64);
@@ -8334,6 +8329,68 @@ var editor;
             this.model = this.gameObject.addComponent(feng3d.Model);
         }
         /**
+         * 绘制立方体贴图
+         * @param textureCube 立方体贴图
+         */
+        Feng3dScreenShot.prototype.drawTextureCube = function (textureCube) {
+            var pixels = textureCube["_pixels"];
+            var canvas2D = document.createElement("canvas");
+            var width = 64;
+            canvas2D.width = width;
+            canvas2D.height = width;
+            var context2D = canvas2D.getContext("2d");
+            context2D.fillStyle = "black";
+            // context2D.fillRect(10, 10, 100, 100);
+            feng3d.imageUtil.createImageData;
+            var w4 = Math.round(width / 4);
+            var Yoffset = w4 / 2;
+            //
+            var X = w4 * 2;
+            var Y = w4;
+            if (pixels[0])
+                context2D.drawImage(pixels[0], X, Y + Yoffset, w4, w4);
+            else
+                context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = w4;
+            Y = 0;
+            if (pixels[1])
+                context2D.drawImage(pixels[1], X, Y + Yoffset, w4, w4);
+            else
+                context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = w4;
+            Y = w4;
+            if (pixels[2])
+                context2D.drawImage(pixels[2], X, Y + Yoffset, w4, w4);
+            else
+                context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = 0;
+            Y = w4;
+            if (pixels[3])
+                context2D.drawImage(pixels[3], X, Y + Yoffset, w4, w4);
+            else
+                context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = w4;
+            Y = w4 * 2;
+            if (pixels[4])
+                context2D.drawImage(pixels[4], X, Y + Yoffset, w4, w4);
+            else
+                context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = w4 * 3;
+            Y = w4;
+            if (pixels[5])
+                context2D.drawImage(pixels[5], X, Y + Yoffset, w4, w4);
+            else
+                context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            var dataUrl = canvas2D.toDataURL();
+            return dataUrl;
+        };
+        /**
          * 绘制材质
          * @param material 材质
          */
@@ -8353,6 +8410,10 @@ var editor;
             var dataUrl = this.drawGameObject(this.gameObject);
             return dataUrl;
         };
+        /**
+         * 绘制游戏对象
+         * @param gameObject 游戏对象
+         */
         Feng3dScreenShot.prototype.drawGameObject = function (gameObject) {
             //
             this.updateCameraPosition(gameObject);

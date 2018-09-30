@@ -23,7 +23,7 @@ namespace editor
 
         constructor()
         {
-            //
+            // 初始化3d
             var engine = this.engine = new feng3d.Engine();
             engine.canvas.style.visibility = "hidden";
             engine.setSize(64, 64);
@@ -46,6 +46,65 @@ namespace editor
 
             this.gameObject = new feng3d.GameObject();
             this.model = this.gameObject.addComponent(feng3d.Model);
+        }
+
+        /**
+         * 绘制立方体贴图
+         * @param textureCube 立方体贴图
+         */
+        drawTextureCube(textureCube: feng3d.TextureCube)
+        {
+            var pixels = textureCube["_pixels"];
+
+            var canvas2D = document.createElement("canvas");
+            var width = 64;
+            canvas2D.width = width;
+            canvas2D.height = width;
+            var context2D = canvas2D.getContext("2d");
+
+            context2D.fillStyle = "black";
+            // context2D.fillRect(10, 10, 100, 100);
+
+            feng3d.imageUtil.createImageData
+
+            var w4 = Math.round(width / 4);
+            var Yoffset = w4 / 2;
+            //
+            var X = w4 * 2;
+            var Y = w4;
+            if (pixels[0])
+                context2D.drawImage(pixels[0], X, Y + Yoffset, w4, w4);
+            else
+                context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = w4;
+            Y = 0;
+            if (pixels[1]) context2D.drawImage(pixels[1], X, Y + Yoffset, w4, w4);
+            else context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = w4;
+            Y = w4;
+            if (pixels[2]) context2D.drawImage(pixels[2], X, Y + Yoffset, w4, w4);
+            else context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = 0;
+            Y = w4;
+            if (pixels[3]) context2D.drawImage(pixels[3], X, Y + Yoffset, w4, w4);
+            else context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = w4;
+            Y = w4 * 2;
+            if (pixels[4]) context2D.drawImage(pixels[4], X, Y + Yoffset, w4, w4);
+            else context2D.fillRect(X, Y + Yoffset, w4, w4);
+            //
+            X = w4 * 3;
+            Y = w4;
+            if (pixels[5]) context2D.drawImage(pixels[5], X, Y + Yoffset, w4, w4);
+            else context2D.fillRect(X, Y + Yoffset, w4, w4);
+
+            //
+            var dataUrl = canvas2D.toDataURL();
+            return dataUrl;
         }
 
         /**
@@ -74,6 +133,10 @@ namespace editor
             return dataUrl;
         }
 
+        /**
+         * 绘制游戏对象
+         * @param gameObject 游戏对象
+         */
         drawGameObject(gameObject: feng3d.GameObject)
         {
             //

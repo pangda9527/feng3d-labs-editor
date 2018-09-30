@@ -129,29 +129,19 @@ namespace editor
 			this.pxGroup.width = this.pyGroup.width = this.pzGroup.width = this.nxGroup.width = this.nyGroup.width = this.nzGroup.width = w4;
 			this.pxGroup.height = this.pyGroup.height = this.pzGroup.height = this.nxGroup.height = this.nyGroup.height = this.nzGroup.height = w4;
 			//
-			this.px.x = w4 * 2;
-			this.px.y = w4;
 			this.pxGroup.x = w4 * 2;
 			this.pxGroup.y = w4;
 			//
-			this.py.x = w4;
 			this.pyGroup.x = w4;
 			//
-			this.pz.x = w4;
-			this.pz.y = w4;
 			this.pzGroup.x = w4;
 			this.pzGroup.y = w4;
 			//
-			this.nx.y = w4;
 			this.nxGroup.y = w4;
 			//
-			this.ny.x = w4;
-			this.ny.y = w4 * 2;
 			this.nyGroup.x = w4;
 			this.nyGroup.y = w4 * 2;
 			//
-			this.nz.x = w4 * 3;
-			this.nz.y = w4;
 			this.nzGroup.x = w4 * 3;
 			this.nzGroup.y = w4;
 			//
