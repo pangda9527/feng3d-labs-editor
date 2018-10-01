@@ -2160,6 +2160,11 @@ declare namespace editor {
         constructor();
         /**
          * 绘制立方体贴图
+         * @param texture 贴图
+         */
+        drawTexture(texture: feng3d.UrlImageTexture2D): string;
+        /**
+         * 绘制立方体贴图
          * @param textureCube 立方体贴图
          */
         drawTextureCube(textureCube: feng3d.TextureCube): string;

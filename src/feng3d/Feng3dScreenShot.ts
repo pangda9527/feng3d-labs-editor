@@ -50,6 +50,32 @@ namespace editor
 
         /**
          * 绘制立方体贴图
+         * @param texture 贴图
+         */
+        drawTexture(texture: feng3d.UrlImageTexture2D)
+        {
+            var image = texture["image"];
+
+            var canvas2D = document.createElement("canvas");
+            var width = 64;
+            canvas2D.width = width;
+            canvas2D.height = width;
+            var context2D = canvas2D.getContext("2d");
+
+            context2D.fillStyle = "black";
+
+            if (image)
+                context2D.drawImage(image, 0, 0, width, width);
+            else
+                context2D.fillRect(0, 0, width, width);
+
+            //
+            var dataUrl = canvas2D.toDataURL();
+            return dataUrl;
+        }
+
+        /**
+         * 绘制立方体贴图
          * @param textureCube 立方体贴图
          */
         drawTextureCube(textureCube: feng3d.TextureCube)

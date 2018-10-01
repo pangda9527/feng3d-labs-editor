@@ -53,14 +53,29 @@ namespace editor
             {
                 if (param.accepttype == "texture2d")
                 {
-                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
+                    var menus: MenuItem[] = [];
                     var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.UrlImageTexture2D);
                     texture2ds.forEach(item =>
                     {
                         menus.push({
                             label: item.name, click: () =>
                             {
-                                this.attributeValue = item.url;
+                                this.attributeValue = item;
+                            }
+                        });
+                    });
+                    menu.popup(menus);
+                }
+                else if (param.accepttype == "texturecube")
+                {
+                    var menus: MenuItem[] = [];
+                    var textureCubes = feng3d.Feng3dAssets.getAssetsByType(feng3d.TextureCube);
+                    textureCubes.forEach(item =>
+                    {
+                        menus.push({
+                            label: item.name, click: () =>
+                            {
+                                this.attributeValue = item;
                             }
                         });
                     });
@@ -101,7 +116,7 @@ namespace editor
                 } else if (param.accepttype == "material")
                 {
                     var materials = feng3d.Feng3dAssets.getAssetsByType(feng3d.Material);
-                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = undefined; } }];
+                    var menus: MenuItem[] = [];
                     materials.forEach(element =>
                     {
                         menus.push({
@@ -116,7 +131,7 @@ namespace editor
                 } else if (param.accepttype == "geometry")
                 {
                     var geometrys = feng3d.Feng3dAssets.getAssetsByType(feng3d.Geometry);
-                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = undefined; } }];
+                    var menus: MenuItem[] = [];
                     geometrys.forEach(element =>
                     {
                         menus.push({

@@ -259,7 +259,7 @@ namespace editor
                 var lens = editorCamera.lens;
                 if (lens instanceof feng3d.PerspectiveLens)
                 {
-                    lookDistance = size / Math.tan(lens.fov * Math.PI / 360);
+                    lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
                 }
                 //
                 sceneControlConfig.lookDistance = lookDistance;

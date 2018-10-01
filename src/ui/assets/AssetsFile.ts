@@ -113,9 +113,10 @@ namespace editor
         {
             if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D)
             {
-                assets.readDataURL(this.feng3dAssets.url, (err, dataurl) =>
+                var texture = this.feng3dAssets;
+                this.feng3dAssets.onLoadCompleted(() =>
                 {
-                    this.image = dataurl;
+                    this.image = feng3dScreenShot.drawTexture(texture);
                 });
             } else if (this.feng3dAssets instanceof feng3d.TextureCube)
             {

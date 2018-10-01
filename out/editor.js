@@ -975,7 +975,7 @@ var editor;
                 var lookDistance = size;
                 var lens = editor.editorCamera.lens;
                 if (lens instanceof feng3d.PerspectiveLens) {
-                    lookDistance = size / Math.tan(lens.fov * Math.PI / 360);
+                    lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
                 }
                 //
                 editor.sceneControlConfig.lookDistance = lookDistance;
@@ -4105,12 +4105,24 @@ var editor;
             var param = this._attributeViewInfo.componentParam;
             if (param.accepttype) {
                 if (param.accepttype == "texture2d") {
-                    var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
+                    var menus = [];
                     var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.UrlImageTexture2D);
                     texture2ds.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
-                                _this.attributeValue = item.url;
+                                _this.attributeValue = item;
+                            }
+                        });
+                    });
+                    editor.menu.popup(menus);
+                }
+                else if (param.accepttype == "texturecube") {
+                    var menus = [];
+                    var textureCubes = feng3d.Feng3dAssets.getAssetsByType(feng3d.TextureCube);
+                    textureCubes.forEach(function (item) {
+                        menus.push({
+                            label: item.name, click: function () {
+                                _this.attributeValue = item;
                             }
                         });
                     });
@@ -4145,7 +4157,7 @@ var editor;
                 }
                 else if (param.accepttype == "material") {
                     var materials = feng3d.Feng3dAssets.getAssetsByType(feng3d.Material);
-                    var menus = [{ label: "None", click: function () { _this.attributeValue = undefined; } }];
+                    var menus = [];
                     materials.forEach(function (element) {
                         menus.push({
                             label: element.name,
@@ -4158,7 +4170,7 @@ var editor;
                 }
                 else if (param.accepttype == "geometry") {
                     var geometrys = feng3d.Feng3dAssets.getAssetsByType(feng3d.Geometry);
-                    var menus = [{ label: "None", click: function () { _this.attributeValue = undefined; } }];
+                    var menus = [];
                     geometrys.forEach(function (element) {
                         menus.push({
                             label: element.name,
@@ -5116,8 +5128,9 @@ var editor;
         AssetsFile.prototype.updateImage = function () {
             var _this = this;
             if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D) {
-                editor.assets.readDataURL(this.feng3dAssets.url, function (err, dataurl) {
-                    _this.image = dataurl;
+                var texture = this.feng3dAssets;
+                this.feng3dAssets.onLoadCompleted(function () {
+                    _this.image = editor.feng3dScreenShot.drawTexture(texture);
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.TextureCube) {
@@ -7936,6 +7949,7 @@ var editor;
                 canvas.height = 80;
                 var toolEngine = new feng3d.Engine(canvas);
                 toolEngine.scene.background.a = 0.0;
+                toolEngine.scene.ambientColor.setTo(0.2, 0.2, 0.2);
                 toolEngine.root.addChild(feng3d.gameObjectFactory.createPointLight());
                 return { toolEngine: toolEngine, canvas: canvas };
             }
@@ -8328,6 +8342,26 @@ var editor;
             this.gameObject = new feng3d.GameObject();
             this.model = this.gameObject.addComponent(feng3d.Model);
         }
+        /**
+         * 绘制立方体贴图
+         * @param texture 贴图
+         */
+        Feng3dScreenShot.prototype.drawTexture = function (texture) {
+            var image = texture["image"];
+            var canvas2D = document.createElement("canvas");
+            var width = 64;
+            canvas2D.width = width;
+            canvas2D.height = width;
+            var context2D = canvas2D.getContext("2d");
+            context2D.fillStyle = "black";
+            if (image)
+                context2D.drawImage(image, 0, 0, width, width);
+            else
+                context2D.fillRect(0, 0, width, width);
+            //
+            var dataUrl = canvas2D.toDataURL();
+            return dataUrl;
+        };
         /**
          * 绘制立方体贴图
          * @param textureCube 立方体贴图
