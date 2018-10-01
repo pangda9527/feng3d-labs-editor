@@ -23,6 +23,7 @@ namespace editor
                             shaderName: "texture",
                             uniforms: {
                                 s_texture: {
+                                    __class__: "feng3d.UrlImageTexture2D",
                                     url: editorData.getEditorAssetsPath("assets/3d/icons/camera.png"),
                                     format: feng3d.TextureFormat.RGBA,
                                     premulAlpha: true,

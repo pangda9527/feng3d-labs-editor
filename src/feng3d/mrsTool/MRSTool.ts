@@ -11,7 +11,7 @@ namespace editor
         var models = component.getComponentsInChildren(feng3d.Model);
         models.forEach(element =>
         {
-            if (element.material)
+            if (element.material && !element.material.assetsId)
             {
                 element.material.renderParams.depthtest = false;
             }

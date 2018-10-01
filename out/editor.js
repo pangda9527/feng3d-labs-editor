@@ -7593,7 +7593,7 @@ var editor;
     function setAwaysVisible(component) {
         var models = component.getComponentsInChildren(feng3d.Model);
         models.forEach(function (element) {
-            if (element.material) {
+            if (element.material && !element.material.assetsId) {
                 element.material.renderParams.depthtest = false;
             }
         });
@@ -10320,6 +10320,7 @@ var editor;
                             shaderName: "texture",
                             uniforms: {
                                 s_texture: {
+                                    __class__: "feng3d.UrlImageTexture2D",
                                     url: editor.editorData.getEditorAssetsPath("assets/3d/icons/camera.png"),
                                     format: feng3d.TextureFormat.RGBA,
                                     premulAlpha: true,
