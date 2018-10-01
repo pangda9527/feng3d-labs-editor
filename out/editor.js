@@ -4233,12 +4233,7 @@ var editor;
         };
         OAVTexture2D.prototype.ontxtClick = function () {
             var _this = this;
-            var menus = [{
-                    label: "None", click: function () {
-                        _this.attributeValue = new feng3d.UrlImageTexture2D();
-                        _this.updateView();
-                    }
-                }];
+            var menus = [];
             var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.Texture2D);
             texture2ds.forEach(function (texture2d) {
                 menus.push({
@@ -4255,18 +4250,25 @@ var editor;
          */
         OAVTexture2D.prototype.updateView = function () {
             var _this = this;
-            var text = this.attributeValue;
+            var texture = this.attributeValue;
+            var image = texture["_activePixels"];
             this.image.visible = false;
             this.img_border.visible = false;
-            var url = text.url;
-            if (url) {
-                editor.assets.readArrayBuffer(url, function (err, data) {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
+            if (image) {
+                if (image instanceof HTMLImageElement) {
+                    feng3d.dataTransform.imageToDataURL(image, function (dataurl) {
                         _this.image.source = dataurl;
                         _this.image.visible = true;
                         _this.img_border.visible = true;
                     });
-                });
+                }
+                else if (image instanceof ImageData) {
+                    feng3d.dataTransform.imageDataToDataURL(image, function (dataurl) {
+                        _this.image.source = dataurl;
+                        _this.image.visible = true;
+                        _this.img_border.visible = true;
+                    });
+                }
             }
             else {
                 this.image.source = "";

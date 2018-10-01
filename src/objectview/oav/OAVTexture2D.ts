@@ -36,13 +36,7 @@ namespace editor
 
         private ontxtClick()
         {
-            var menus: MenuItem[] = [{
-                label: `None`, click: () =>
-                {
-                    this.attributeValue = new feng3d.UrlImageTexture2D();
-                    this.updateView();
-                }
-            }];
+            var menus: MenuItem[] = [];
             var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.Texture2D);
             texture2ds.forEach(texture2d =>
             {
@@ -62,22 +56,30 @@ namespace editor
          */
         updateView(): void
         {
-            var text: feng3d.UrlImageTexture2D = this.attributeValue;
+            var texture: feng3d.UrlImageTexture2D = this.attributeValue;
+            var image = texture["_activePixels"]
 
             this.image.visible = false;
             this.img_border.visible = false;
-            var url = text.url;
-            if (url)
+            if (image)
             {
-                assets.readArrayBuffer(url, (err, data) =>
+                if (image instanceof HTMLImageElement)
                 {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
+                    feng3d.dataTransform.imageToDataURL(image, dataurl =>
                     {
                         this.image.source = dataurl;
                         this.image.visible = true;
                         this.img_border.visible = true;
                     });
-                });
+                } else if (image instanceof ImageData)
+                {
+                    feng3d.dataTransform.imageDataToDataURL(image, dataurl =>
+                    {
+                        this.image.source = dataurl;
+                        this.image.visible = true;
+                        this.img_border.visible = true;
+                    });
+                }
             } else
             {
                 this.image.source = "";
