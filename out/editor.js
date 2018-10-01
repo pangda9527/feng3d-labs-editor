@@ -4255,8 +4255,8 @@ var editor;
             this.image.visible = false;
             this.img_border.visible = false;
             if (image) {
-                if (image instanceof HTMLImageElement) {
-                    feng3d.dataTransform.imageToDataURL(image, function (dataurl) {
+                if (texture.url) {
+                    editor.assets.readDataURL(texture.url, function (err, dataurl) {
                         _this.image.source = dataurl;
                         _this.image.visible = true;
                         _this.img_border.visible = true;

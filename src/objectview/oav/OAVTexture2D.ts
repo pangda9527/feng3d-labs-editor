@@ -63,9 +63,9 @@ namespace editor
             this.img_border.visible = false;
             if (image)
             {
-                if (image instanceof HTMLImageElement)
+                if (texture.url)
                 {
-                    feng3d.dataTransform.imageToDataURL(image, dataurl =>
+                    assets.readDataURL(texture.url, (err, dataurl) =>
                     {
                         this.image.source = dataurl;
                         this.image.visible = true;
