@@ -4812,6 +4812,11 @@ var editor;
             }
             // 解析菜单
             this.parserMenu(menuconfig, assetsFile);
+            menuconfig.push({
+                label: "更新缩略图", click: function () {
+                    assetsFile.updateImage();
+                }
+            });
             if (!assetsFile.isDirectory) {
                 menuconfig.push({
                     label: "导出", click: function () {
@@ -5351,7 +5356,6 @@ var editor;
             this.filelist.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             this.floderpathTxt.touchEnabled = true;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
-            feng3d.watcher.watch(editor.editorAssets, "showFloder", this.updateShowFloder, this);
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         };
         AssetsView.prototype.$onRemoveFromStage = function () {
@@ -5375,6 +5379,7 @@ var editor;
                 editor.editorAssets.rootFile.on("openChanged", _this.invalidateAssetstree, _this);
                 editor.editorAssets.rootFile.on("added", _this.invalidateAssetstree, _this);
                 editor.editorAssets.rootFile.on("removed", _this.invalidateAssetstree, _this);
+                feng3d.watcher.watch(editor.editorAssets, "showFloder", _this.updateShowFloder, _this);
             });
         };
         AssetsView.prototype.update = function () {
@@ -8322,7 +8327,7 @@ var editor;
      */
     var Feng3dScreenShot = /** @class */ (function () {
         function Feng3dScreenShot() {
-            this.defaultGeometry = feng3d.Geometry.cube;
+            this.defaultGeometry = feng3d.Geometry.sphere;
             this.defaultMaterial = feng3d.Material.default;
             // 初始化3d
             var engine = this.engine = new feng3d.Engine();
@@ -8335,8 +8340,6 @@ var editor;
             //
             var camera = this.camera = engine.camera;
             camera.lens = new feng3d.PerspectiveLens(45);
-            camera.transform.position = new feng3d.Vector3(1.0, 0.8, -2.0);
-            camera.transform.lookAt(new feng3d.Vector3());
             //
             var light = new feng3d.GameObject().value({
                 name: "DirectionalLight",
@@ -8439,7 +8442,8 @@ var editor;
                         material: material,
                     }]
             });
-            var dataUrl = this.drawGameObject(gameObject);
+            this.camera.transform.rotation = new feng3d.Vector3(20, -90, 0);
+            var dataUrl = this._drawGameObject(gameObject);
             return dataUrl;
         };
         /**
@@ -8452,9 +8456,12 @@ var editor;
                         __class__: "feng3d.MeshModel",
                         geometry: geometry,
                         material: this.defaultMaterial,
+                    }, {
+                        __class__: "feng3d.WireframeComponent",
                     }]
             });
-            var dataUrl = this.drawGameObject(gameObject);
+            this.camera.transform.rotation = new feng3d.Vector3(-20, 120, 0);
+            var dataUrl = this._drawGameObject(gameObject);
             return dataUrl;
         };
         /**
@@ -8462,6 +8469,11 @@ var editor;
          * @param gameObject 游戏对象
          */
         Feng3dScreenShot.prototype.drawGameObject = function (gameObject) {
+            this.camera.transform.rotation = new feng3d.Vector3(20, -120, 0);
+            var dataUrl = this._drawGameObject(gameObject);
+            return dataUrl;
+        };
+        Feng3dScreenShot.prototype._drawGameObject = function (gameObject) {
             //
             this.updateCameraPosition(gameObject);
             //

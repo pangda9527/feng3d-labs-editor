@@ -13,7 +13,7 @@ namespace editor
 
         camera: feng3d.Camera;
 
-        defaultGeometry = feng3d.Geometry.cube;
+        defaultGeometry = feng3d.Geometry.sphere;
 
         defaultMaterial = feng3d.Material.default;
 
@@ -30,8 +30,6 @@ namespace editor
             //
             var camera = this.camera = engine.camera;
             camera.lens = new feng3d.PerspectiveLens(45);
-            camera.transform.position = new feng3d.Vector3(1.0, 0.8, -2.0);
-            camera.transform.lookAt(new feng3d.Vector3());
             //
             var light = new feng3d.GameObject().value({
                 name: "DirectionalLight",
@@ -139,7 +137,9 @@ namespace editor
                     material: material,
                 }]
             });
-            var dataUrl = this.drawGameObject(gameObject);
+
+            this.camera.transform.rotation = new feng3d.Vector3(20, -90, 0);
+            var dataUrl = this._drawGameObject(gameObject);
             return dataUrl;
         }
 
@@ -154,10 +154,14 @@ namespace editor
                     __class__: "feng3d.MeshModel",
                     geometry: geometry,
                     material: this.defaultMaterial,
+                }, {
+                    __class__: "feng3d.WireframeComponent",
+                    // color: new feng3d.Color4(0, 0, 0, 1),
                 }]
             });
 
-            var dataUrl = this.drawGameObject(gameObject);
+            this.camera.transform.rotation = new feng3d.Vector3(-20, 120, 0);
+            var dataUrl = this._drawGameObject(gameObject);
             return dataUrl;
         }
 
@@ -166,6 +170,13 @@ namespace editor
          * @param gameObject 游戏对象
          */
         drawGameObject(gameObject: feng3d.GameObject)
+        {
+            this.camera.transform.rotation = new feng3d.Vector3(20, -120, 0);
+            var dataUrl = this._drawGameObject(gameObject);
+            return dataUrl;
+        }
+
+        private _drawGameObject(gameObject: feng3d.GameObject)
         {
             //
             this.updateCameraPosition(gameObject);

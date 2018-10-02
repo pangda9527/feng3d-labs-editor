@@ -2153,7 +2153,7 @@ declare namespace editor {
         engine: feng3d.Engine;
         scene: feng3d.Scene3D;
         camera: feng3d.Camera;
-        defaultGeometry: feng3d.CubeGeometry;
+        defaultGeometry: feng3d.SphereGeometry;
         defaultMaterial: feng3d.Material;
         constructor();
         /**
@@ -2181,6 +2181,7 @@ declare namespace editor {
          * @param gameObject 游戏对象
          */
         drawGameObject(gameObject: feng3d.GameObject): string;
+        private _drawGameObject;
         private updateCameraPosition;
     }
 }
