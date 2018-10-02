@@ -4779,6 +4779,51 @@ var editor;
                                 editor.editorData.selectObject(assetsFile.addAssets(new feng3d.Material().value({ name: assetsFile.getNewChildName("New Material") })));
                             }
                         },
+                        {
+                            label: "几何体",
+                            submenu: [
+                                {
+                                    label: "平面", click: function () {
+                                        editor.editorData.selectObject(assetsFile.addAssets(new feng3d.PlaneGeometry().value({ name: assetsFile.getNewChildName("New PlaneGeometry") })));
+                                    }
+                                },
+                                {
+                                    label: "立方体", click: function () {
+                                        editor.editorData.selectObject(assetsFile.addAssets(new feng3d.CubeGeometry().value({ name: assetsFile.getNewChildName("New CubeGeometry") })));
+                                    }
+                                },
+                                {
+                                    label: "球体", click: function () {
+                                        editor.editorData.selectObject(assetsFile.addAssets(new feng3d.SphereGeometry().value({ name: assetsFile.getNewChildName("New SphereGeometry") })));
+                                    }
+                                },
+                                {
+                                    label: "胶囊体", click: function () {
+                                        editor.editorData.selectObject(assetsFile.addAssets(new feng3d.CapsuleGeometry().value({ name: assetsFile.getNewChildName("New CapsuleGeometry") })));
+                                    }
+                                },
+                                {
+                                    label: "圆柱体", click: function () {
+                                        editor.editorData.selectObject(assetsFile.addAssets(new feng3d.CylinderGeometry().value({ name: assetsFile.getNewChildName("New CylinderGeometry") })));
+                                    }
+                                },
+                                {
+                                    label: "圆锥体", click: function () {
+                                        editor.editorData.selectObject(assetsFile.addAssets(new feng3d.ConeGeometry().value({ name: assetsFile.getNewChildName("New ConeGeometry") })));
+                                    }
+                                },
+                                {
+                                    label: "圆环", click: function () {
+                                        editor.editorData.selectObject(assetsFile.addAssets(new feng3d.TorusGeometry().value({ name: assetsFile.getNewChildName("New TorusGeometry") })));
+                                    }
+                                },
+                                {
+                                    label: "地形", click: function () {
+                                        editor.editorData.selectObject(assetsFile.addAssets(new feng3d.TerrainGeometry().value({ name: assetsFile.getNewChildName("New TerrainGeometry") })));
+                                    }
+                                },
+                            ],
+                        },
                     ]
                 }, { type: "separator" }, {
                     label: "导入资源", click: function () {
