@@ -8343,8 +8343,6 @@ var editor;
             });
             scene.gameObject.addChild(light);
             engine.stop();
-            this.gameObject = new feng3d.GameObject();
-            this.model = this.gameObject.addComponent(feng3d.Model);
         }
         /**
          * 绘制立方体贴图
@@ -8433,9 +8431,14 @@ var editor;
          * @param material 材质
          */
         Feng3dScreenShot.prototype.drawMaterial = function (material) {
-            this.model.geometry = this.defaultGeometry;
-            this.model.material = material;
-            var dataUrl = this.drawGameObject(this.gameObject);
+            var gameObject = new feng3d.GameObject().value({
+                components: [{
+                        __class__: "feng3d.MeshModel",
+                        geometry: this.defaultGeometry,
+                        material: material,
+                    }]
+            });
+            var dataUrl = this.drawGameObject(gameObject);
             return dataUrl;
         };
         /**
@@ -8443,9 +8446,14 @@ var editor;
          * @param geometry 材质
          */
         Feng3dScreenShot.prototype.drawGeometry = function (geometry) {
-            this.model.geometry = geometry;
-            this.model.material = this.defaultMaterial;
-            var dataUrl = this.drawGameObject(this.gameObject);
+            var gameObject = new feng3d.GameObject().value({
+                components: [{
+                        __class__: "feng3d.MeshModel",
+                        geometry: geometry,
+                        material: this.defaultMaterial,
+                    }]
+            });
+            var dataUrl = this.drawGameObject(gameObject);
             return dataUrl;
         };
         /**

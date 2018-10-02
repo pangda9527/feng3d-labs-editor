@@ -2152,8 +2152,6 @@ declare namespace editor {
     class Feng3dScreenShot {
         engine: feng3d.Engine;
         scene: feng3d.Scene3D;
-        gameObject: feng3d.GameObject;
-        model: feng3d.Model;
         camera: feng3d.Camera;
         defaultGeometry: feng3d.CubeGeometry;
         defaultMaterial: feng3d.Material;

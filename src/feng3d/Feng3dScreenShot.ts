@@ -11,10 +11,6 @@ namespace editor
 
         scene: feng3d.Scene3D;
 
-        gameObject: feng3d.GameObject;
-
-        model: feng3d.Model;
-
         camera: feng3d.Camera;
 
         defaultGeometry = feng3d.Geometry.cube;
@@ -43,9 +39,6 @@ namespace editor
             });
             scene.gameObject.addChild(light);
             engine.stop();
-
-            this.gameObject = new feng3d.GameObject();
-            this.model = this.gameObject.addComponent(feng3d.Model);
         }
 
         /**
@@ -139,10 +132,14 @@ namespace editor
          */
         drawMaterial(material: feng3d.Material)
         {
-            this.model.geometry = this.defaultGeometry;
-            this.model.material = material;
-
-            var dataUrl = this.drawGameObject(this.gameObject);
+            var gameObject = new feng3d.GameObject().value({
+                components: [{
+                    __class__: "feng3d.MeshModel",
+                    geometry: this.defaultGeometry,
+                    material: material,
+                }]
+            });
+            var dataUrl = this.drawGameObject(gameObject);
             return dataUrl;
         }
 
@@ -152,10 +149,15 @@ namespace editor
          */
         drawGeometry(geometry: feng3d.Geometrys)
         {
-            this.model.geometry = geometry;
-            this.model.material = this.defaultMaterial;
+            var gameObject = new feng3d.GameObject().value({
+                components: [{
+                    __class__: "feng3d.MeshModel",
+                    geometry: geometry,
+                    material: this.defaultMaterial,
+                }]
+            });
 
-            var dataUrl = this.drawGameObject(this.gameObject);
+            var dataUrl = this.drawGameObject(gameObject);
             return dataUrl;
         }
 
