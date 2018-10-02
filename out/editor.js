@@ -5122,34 +5122,36 @@ var editor;
             else {
                 this.image = "file_png";
             }
-            // 等待可能未加载完成的贴图，此处可以优化为监听 材质所需的资源全部加载完成。
-            feng3d.ticker.once(1000, function () {
-                _this.updateImage();
-            });
+            this.updateImage();
         };
         AssetsFile.prototype.updateImage = function () {
             var _this = this;
             if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D) {
                 var texture = this.feng3dAssets;
-                this.feng3dAssets.onLoadCompleted(function () {
+                texture.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawTexture(texture);
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.TextureCube) {
                 var textureCube = this.feng3dAssets;
-                this.feng3dAssets.onLoadCompleted(function () {
+                textureCube.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawTextureCube(textureCube);
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.Material) {
                 var mat = this.feng3dAssets;
-                this.image = editor.feng3dScreenShot.drawMaterial(mat);
+                mat.onLoadCompleted(function () {
+                    _this.image = editor.feng3dScreenShot.drawMaterial(mat);
+                });
             }
             else if (this.feng3dAssets instanceof feng3d.Geometry) {
                 this.image = editor.feng3dScreenShot.drawGeometry(this.feng3dAssets);
             }
             else if (this.feng3dAssets instanceof feng3d.GameObject) {
-                this.image = editor.feng3dScreenShot.drawGameObject(this.feng3dAssets);
+                var gameObject = this.feng3dAssets;
+                gameObject.onLoadCompleted(function () {
+                    _this.image = editor.feng3dScreenShot.drawGameObject(gameObject);
+                });
             }
         };
         AssetsFile.prototype.addAssets = function (feng3dAssets) {
