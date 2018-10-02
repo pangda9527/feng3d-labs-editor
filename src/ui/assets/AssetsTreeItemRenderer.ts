@@ -40,10 +40,13 @@ namespace editor
             {
                 drag.register(this, (dragsource) =>
                 {
-                    dragsource.assetsFile = this.data;
-                }, ["assetsFile"], (dragdata) =>
+                    dragsource.assetsFiles = [this.data];
+                }, ["assetsFiles"], (dragdata) =>
                     {
-                        this.data.addChild(dragdata.assetsFile);
+                        dragdata.assetsFiles.forEach(v =>
+                        {
+                            this.data.addChild(v);
+                        });
                     });
             } else
             {

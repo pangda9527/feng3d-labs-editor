@@ -4980,9 +4980,16 @@ var editor;
             if (this.data) {
                 if (this.data.isDirectory) {
                     editor.drag.register(this, function (dragsource) {
-                        dragsource.assetsFile = _this.data;
-                    }, ["assetsFile"], function (dragdata) {
-                        _this.data.addChild(dragdata.assetsFile);
+                        if (editor.editorData.selectedAssetsFile.indexOf(_this.data) != -1) {
+                            dragsource.assetsFiles = editor.editorData.selectedAssetsFile.concat();
+                        }
+                        else {
+                            dragsource.assetsFiles = [_this.data];
+                        }
+                    }, ["assetsFiles"], function (dragdata) {
+                        dragdata.assetsFiles.forEach(function (v) {
+                            _this.data.addChild(v);
+                        });
                     });
                 }
                 else {
@@ -5014,7 +5021,12 @@ var editor;
                                 dragsource.audio = _this.data.feng3dAssets;
                                 break;
                         }
-                        dragsource.assetsFile = _this.data;
+                        if (editor.editorData.selectedAssetsFile.indexOf(_this.data) != -1) {
+                            dragsource.assetsFiles = editor.editorData.selectedAssetsFile.concat();
+                        }
+                        else {
+                            dragsource.assetsFiles = [_this.data];
+                        }
                     }, []);
                 }
             }
@@ -5283,9 +5295,11 @@ var editor;
             _super.prototype.dataChanged.call(this);
             if (this.data) {
                 editor.drag.register(this, function (dragsource) {
-                    dragsource.assetsFile = _this.data;
-                }, ["assetsFile"], function (dragdata) {
-                    _this.data.addChild(dragdata.assetsFile);
+                    dragsource.assetsFiles = [_this.data];
+                }, ["assetsFiles"], function (dragdata) {
+                    dragdata.assetsFiles.forEach(function (v) {
+                        _this.data.addChild(v);
+                    });
                 });
             }
             else {

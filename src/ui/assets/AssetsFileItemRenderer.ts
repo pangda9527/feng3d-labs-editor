@@ -45,10 +45,19 @@ namespace editor
                 {
                     drag.register(this, (dragsource) =>
                     {
-                        dragsource.assetsFile = this.data;
-                    }, ["assetsFile"], (dragdata) =>
+                        if (editorData.selectedAssetsFile.indexOf(this.data) != -1)
                         {
-                            this.data.addChild(dragdata.assetsFile);
+                            dragsource.assetsFiles = editorData.selectedAssetsFile.concat();
+                        } else
+                        {
+                            dragsource.assetsFiles = [this.data];
+                        }
+                    }, ["assetsFiles"], (dragdata) =>
+                        {
+                            dragdata.assetsFiles.forEach(v =>
+                            {
+                                this.data.addChild(v);
+                            });
                         });
                 }
                 else
@@ -83,7 +92,16 @@ namespace editor
                                 dragsource.audio = <any>this.data.feng3dAssets;
                                 break;
                         }
-                        dragsource.assetsFile = this.data;
+                        if (editorData.selectedAssetsFile.indexOf(this.data) != -1)
+                        {
+                            dragsource.assetsFiles = editorData.selectedAssetsFile.concat();
+                        } else
+                        {
+                            dragsource.assetsFiles = [this.data];
+                        }
+
+
+
                     }, []);
                 }
             } else
