@@ -204,12 +204,6 @@ namespace editor
 
             // 解析菜单
             this.parserMenu(menuconfig, assetsFile);
-            menuconfig.push({
-                label: "更新缩略图", click: () =>
-                {
-                    assetsFile.updateImage();
-                }
-            });
             if (!assetsFile.isDirectory)
             {
                 menuconfig.push({

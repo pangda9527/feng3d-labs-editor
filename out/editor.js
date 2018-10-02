@@ -4404,12 +4404,14 @@ var editor;
             this.updateView();
         };
         InspectorView.prototype.updateView = function () {
+            this.typeLab.text = "Inspector";
             this.backButton.visible = this._viewDataList.length > 0;
             if (this._view && this._view.parent) {
                 this._view.parent.removeChild(this._view);
             }
             if (this._viewData) {
                 if (this._viewData instanceof editor.AssetsFile) {
+                    this._viewData.updateImage();
                     this.updateShowData(this._viewData.feng3dAssets);
                 }
                 else {
@@ -4451,6 +4453,7 @@ var editor;
             this.showData(data, true);
         };
         InspectorView.prototype.updateShowData = function (showdata) {
+            this.typeLab.text = "Inspector - " + showdata.constructor["name"];
             if (this._view)
                 this._view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
             this._view = feng3d.objectview.getObjectView(showdata);
@@ -4812,11 +4815,6 @@ var editor;
             }
             // 解析菜单
             this.parserMenu(menuconfig, assetsFile);
-            menuconfig.push({
-                label: "更新缩略图", click: function () {
-                    assetsFile.updateImage();
-                }
-            });
             if (!assetsFile.isDirectory) {
                 menuconfig.push({
                     label: "导出", click: function () {

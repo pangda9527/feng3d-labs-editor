@@ -1189,6 +1189,7 @@ declare namespace editor {
      * 属性面板（检查器）
      */
     class InspectorView extends eui.Component implements eui.UIComponent {
+        typeLab: eui.Label;
         backButton: eui.Button;
         group: eui.Group;
         constructor();

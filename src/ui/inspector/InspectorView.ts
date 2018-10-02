@@ -5,8 +5,9 @@ namespace editor
      */
 	export class InspectorView extends eui.Component implements eui.UIComponent
 	{
-		backButton: eui.Button;
-		group: eui.Group;
+		public typeLab:eui.Label;
+		public backButton:eui.Button;
+		public group:eui.Group;
 
 		constructor()
 		{
@@ -33,6 +34,7 @@ namespace editor
 
 		updateView()
 		{
+			this.typeLab.text = `Inspector`;
 			this.backButton.visible = this._viewDataList.length > 0;
 			if (this._view && this._view.parent)
 			{
@@ -42,6 +44,7 @@ namespace editor
 			{
 				if (this._viewData instanceof AssetsFile)
 				{
+					this._viewData.updateImage();
 					this.updateShowData(this._viewData.feng3dAssets);
 				} else
 				{
@@ -106,6 +109,7 @@ namespace editor
 
 		private updateShowData(showdata: Object)
 		{
+			this.typeLab.text = `Inspector - ${showdata.constructor["name"]}`;
 			if (this._view)
 				this._view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
 			this._view = feng3d.objectview.getObjectView(showdata);
