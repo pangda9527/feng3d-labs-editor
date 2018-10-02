@@ -5440,6 +5440,7 @@ var editor;
                 return 1;
             });
             this.filelistData.replaceAll(nodes);
+            this.filelist.scrollV = 0;
             this.selectedfilechanged();
         };
         AssetsView.prototype.onfilter = function () {

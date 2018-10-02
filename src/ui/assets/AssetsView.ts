@@ -194,7 +194,7 @@ namespace editor
             });
 
             this.filelistData.replaceAll(nodes);
-
+            this.filelist.scrollV = 0;
             this.selectedfilechanged();
         }
 
