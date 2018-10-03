@@ -672,8 +672,12 @@ declare namespace editor {
      *
      */
     class ColorPickerView extends eui.Component {
-        rect0: eui.Rect;
-        rect1: eui.Rect;
+        group0: eui.Group;
+        image0: eui.Image;
+        pos0: eui.Group;
+        group1: eui.Group;
+        image1: eui.Image;
+        pos1: eui.Group;
         txtR: eui.TextInput;
         txtG: eui.TextInput;
         txtB: eui.TextInput;
