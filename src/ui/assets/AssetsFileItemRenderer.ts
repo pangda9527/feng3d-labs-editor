@@ -68,7 +68,7 @@ namespace editor
                         switch (extension)
                         {
                             case feng3d.AssetExtension.gameobject:
-                                dragsource.file_gameobject = <any>this.data.feng3dAssets;
+                                dragsource.file_gameobject = feng3d.serialization.clone(<feng3d.GameObject>this.data.feng3dAssets);
                                 break;
                             case feng3d.AssetExtension.script:
                                 dragsource.file_script = <any>this.data.feng3dAssets;
@@ -85,7 +85,7 @@ namespace editor
                             case feng3d.AssetExtension.geometry:
                                 dragsource.geometry = <any>this.data.feng3dAssets;
                                 break;
-                            case feng3d.AssetExtension.texture2d:
+                            case feng3d.AssetExtension.texture:
                                 dragsource.texture2d = <any>this.data.feng3dAssets;
                                 break;
                             case feng3d.AssetExtension.audio:

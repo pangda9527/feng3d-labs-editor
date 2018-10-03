@@ -5042,7 +5042,7 @@ var editor;
                         var extension = _this.data.feng3dAssets.assetType;
                         switch (extension) {
                             case feng3d.AssetExtension.gameobject:
-                                dragsource.file_gameobject = _this.data.feng3dAssets;
+                                dragsource.file_gameobject = feng3d.serialization.clone(_this.data.feng3dAssets);
                                 break;
                             case feng3d.AssetExtension.script:
                                 dragsource.file_script = _this.data.feng3dAssets;
@@ -5059,7 +5059,7 @@ var editor;
                             case feng3d.AssetExtension.geometry:
                                 dragsource.geometry = _this.data.feng3dAssets;
                                 break;
-                            case feng3d.AssetExtension.texture2d:
+                            case feng3d.AssetExtension.texture:
                                 dragsource.texture2d = _this.data.feng3dAssets;
                                 break;
                             case feng3d.AssetExtension.audio:
@@ -5399,7 +5399,7 @@ var editor;
             //
             editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject"], function (dragSource) {
                 if (dragSource.gameobject) {
-                    var gameobject = dragSource.gameobject;
+                    var gameobject = feng3d.serialization.clone(dragSource.gameobject);
                     editor.editorAssets.saveObject(gameobject);
                 }
             });

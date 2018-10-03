@@ -53,7 +53,7 @@ namespace editor
             {
                 if (dragSource.gameobject)
                 {
-                    var gameobject = dragSource.gameobject;
+                    var gameobject = feng3d.serialization.clone(dragSource.gameobject);
                     editorAssets.saveObject(gameobject);
                 }
             });
@@ -107,7 +107,7 @@ namespace editor
                 editorAssets.rootFile.on("openChanged", this.invalidateAssetstree, this);
                 editorAssets.rootFile.on("added", this.invalidateAssetstree, this);
                 editorAssets.rootFile.on("removed", this.invalidateAssetstree, this);
-                
+
                 feng3d.watcher.watch(editorAssets, "showFloder", this.updateShowFloder, this);
             });
         }
