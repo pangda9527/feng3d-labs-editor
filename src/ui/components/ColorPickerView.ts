@@ -55,6 +55,9 @@ namespace editor
             this.txtColor.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtColor.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtColor.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            //
+            this.group0.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            this.group1.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         }
 
         $onRemoveFromStage()
@@ -72,8 +75,56 @@ namespace editor
             this.txtColor.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtColor.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtColor.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-
+            //
+            this.group0.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            this.group1.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            //
             super.$onRemoveFromStage()
+        }
+
+        private _mouseDownGroup: eui.Group;
+        private onMouseDown(e: egret.Event)
+        {
+            this._mouseDownGroup = e.currentTarget;
+
+            this.onMouseMove();
+
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+        }
+
+        private onMouseMove()
+        {
+            var image = this.image0;
+            if (this._mouseDownGroup == this.group0) image = this.image0;
+            else image = this.image1;
+
+            var p = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var start = image.localToGlobal(0, 0);
+            var end = image.localToGlobal(image.width, image.height);
+
+            var rw = feng3d.FMath.clamp((p.x - start.x) / (end.x - start.x), 0, 1);
+            var rh = feng3d.FMath.clamp((p.y - start.y) / (end.y - start.y), 0, 1);
+
+            if (this.group0 == this._mouseDownGroup)
+            {
+                this.rw = rw;
+                this.rh = rh;
+                var color = feng3d.imageUtil.getColorPickerRectAtPosition(this.basecolor.toInt(), rw, rh);
+                this.color = color;
+            } else if (this.group1 == this._mouseDownGroup)
+            {
+                this.ratio = rh;
+                var basecolor = this.basecolor = feng3d.imageUtil.getMixColorAtRatio(rh, colors);
+                var color = feng3d.imageUtil.getColorPickerRectAtPosition(basecolor.toInt(), this.rw, this.rh);
+                this.color = color;
+            }
+        }
+
+        private onMouseUp()
+        {
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         }
 
         private _textfocusintxt: eui.TextInput;
@@ -85,6 +136,7 @@ namespace editor
         protected ontxtfocusout(e: egret.Event)
         {
             this._textfocusintxt = null;
+            this.updateView();
         }
 
         private onTextChange(e: egret.Event)
@@ -117,6 +169,9 @@ namespace editor
         }
 
         private basecolor: feng3d.Color3;
+        private rw: number;
+        private rh: number;
+        private ratio: number;
         private updateView()
         {
             if (this._textfocusintxt != this.txtR) this.txtR.text = Math.round(this.color.r * 255).toString();
@@ -124,23 +179,29 @@ namespace editor
             if (this._textfocusintxt != this.txtB) this.txtB.text = Math.round(this.color.b * 255).toString();
             if (this._textfocusintxt != this.txtColor) this.txtColor.text = this.color.toHexString().substr(1);
 
-            //
-            var result = feng3d.imageUtil.getColorPickerRectPosition(this.color.toInt());
-            var ratio = feng3d.imageUtil.getMixColorRatio(result.color.toInt(), colors);
-            this.basecolor = result.color;
-
-            //
-            var imagedata = feng3d.imageUtil.createColorPickerRect(this.basecolor.toInt(), this.group0.width, this.group0.height);
-            feng3d.dataTransform.imageDataToDataURL(imagedata, dataurl =>
+            if (this._mouseDownGroup == null)
             {
-                this.image0.source = dataurl;
-            });
+                //
+                var result = feng3d.imageUtil.getColorPickerRectPosition(this.color.toInt());
+                this.basecolor = result.color;
+                this.rw = result.ratioW;
+                this.rh = result.ratioH;
+                this.ratio = feng3d.imageUtil.getMixColorRatio(this.basecolor.toInt(), colors);
+            }
+            if (this._mouseDownGroup != this.group0)
+            {
+                //
+                var imagedata = feng3d.imageUtil.createColorPickerRect(this.basecolor.toInt(), this.group0.width - 16, this.group0.height - 16);
+                feng3d.dataTransform.imageDataToDataURL(imagedata, dataurl =>
+                {
+                    this.image0.source = dataurl;
+                });
+            }
 
+            this.pos1.y = this.ratio * (this.group1.height - this.pos1.height);
             //
-            this.pos0.x = result.ratioW * (this.group0.width - this.pos0.width);
-            this.pos0.y = result.ratioH * (this.group0.height - this.pos0.height);
-
-            this.pos1.y = ratio * (this.group0.height - this.pos0.height);
+            this.pos0.x = this.rw * (this.group0.width - this.pos0.width);
+            this.pos0.y = this.rh * (this.group0.height - this.pos0.height);
         }
     }
 }

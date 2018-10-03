@@ -686,12 +686,19 @@ declare namespace editor {
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
+        private _mouseDownGroup;
+        private onMouseDown;
+        private onMouseMove;
+        private onMouseUp;
         private _textfocusintxt;
         protected ontxtfocusin(e: egret.Event): void;
         protected ontxtfocusout(e: egret.Event): void;
         private onTextChange;
         private onColorChanged;
         private basecolor;
+        private rw;
+        private rh;
+        private ratio;
         private updateView;
     }
 }
