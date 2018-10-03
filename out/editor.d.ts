@@ -667,6 +667,25 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    /**
+     * editor.editorui.maskLayer.addChild(new editor.ColorPickerView())
+     *
+     */
+    class ColorPickerView extends eui.Component {
+        rect0: eui.Rect;
+        rect1: eui.Rect;
+        txtR: eui.TextInput;
+        txtG: eui.TextInput;
+        txtB: eui.TextInput;
+        txtColor: eui.TextInput;
+        color: feng3d.Color3;
+        constructor();
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        private updateView;
+    }
+}
+declare namespace editor {
     var areaSelectRect: AreaSelectRect;
     /**
      * 区域选择框

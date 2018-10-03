@@ -48,6 +48,7 @@
         "src/ui/components/ParticleComponentView.ts",
         "src/ui/components/Menu.ts",
         "src/ui/components/ToolTip.ts",
+        "src/ui/components/ColorPickerView.ts",
         "src/ui/components/AreaSelectRect.ts",
         // tipviews
         "src/ui/components/tipviews/TipString.ts",

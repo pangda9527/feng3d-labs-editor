@@ -2584,6 +2584,38 @@ var editor;
 var editor;
 (function (editor) {
     /**
+     * editor.editorui.maskLayer.addChild(new editor.ColorPickerView())
+     *
+     */
+    var ColorPickerView = /** @class */ (function (_super) {
+        __extends(ColorPickerView, _super);
+        function ColorPickerView() {
+            var _this = _super.call(this) || this;
+            //
+            _this.color = new feng3d.Color3(1, 0, 0);
+            _this.skinName = "ColorPickerView";
+            return _this;
+        }
+        ColorPickerView.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.updateView();
+        };
+        ColorPickerView.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        ColorPickerView.prototype.updateView = function () {
+            this.txtR.text = Math.round(this.color.r * 255).toString();
+            this.txtG.text = Math.round(this.color.g * 255).toString();
+            this.txtB.text = Math.round(this.color.b * 255).toString();
+            this.txtColor.text = this.color.toHexString().substr(1);
+        };
+        return ColorPickerView;
+    }(eui.Component));
+    editor.ColorPickerView = ColorPickerView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
      * 区域选择框
      */
     var AreaSelectRect = /** @class */ (function (_super) {

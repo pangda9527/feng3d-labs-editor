@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="ColorPickerView" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+	<e:Rect width="100%" height="100%" fillColor="0xc1c1c1"/>
+	<e:Group>
+		<e:Rect id="rect0" width="150" height="150" scaleX="1" scaleY="1"/>
+		<e:Rect id="rect1" width="15" height="150" scaleX="1" scaleY="1"/>
+		<e:Group height="150">
+			<e:Group height="20" y="0" scaleX="1" scaleY="1">
+				<e:Label text="R" size="12" width="20" y="0" x="0" textColor="0x000000" verticalAlign="middle" multiline="false"/>
+				<e:TextInput id="txtR" scaleX="1" scaleY="1"/>
+				<e:layout>
+				<e:HorizontalLayout verticalAlign="middle" paddingLeft="0"/>
+				</e:layout>
+			</e:Group>
+			<e:Group height="20" y="10" scaleX="1" scaleY="1" x="10">
+				<e:Label text="G" size="12" width="20" y="0" x="0" textColor="0x000000" verticalAlign="middle" multiline="false"/>
+				<e:TextInput id="txtG" scaleX="1" scaleY="1" x="10" y="10"/>
+				<e:layout>
+				<e:HorizontalLayout verticalAlign="middle" paddingLeft="0"/>
+				</e:layout>
+			</e:Group>
+			<e:Group height="20" y="10" scaleX="1" scaleY="1">
+				<e:Label text="B" size="12" width="20" y="0" x="0" textColor="0x000000" verticalAlign="middle" multiline="false"/>
+				<e:TextInput id="txtB" scaleX="1" scaleY="1" x="20" y="20"/>
+				<e:layout>
+				<e:HorizontalLayout verticalAlign="middle" paddingLeft="0"/>
+				</e:layout>
+			</e:Group>
+			<e:Group height="20" y="20" scaleX="1" scaleY="1" x="10">
+				<e:Label text="#" size="12" width="20" y="0" x="0" textColor="0x000000" verticalAlign="middle" multiline="false"/>
+				<e:TextInput id="txtColor" scaleX="1" scaleY="1" x="20" y="20"/>
+				<e:layout>
+				<e:HorizontalLayout verticalAlign="middle" paddingLeft="0"/>
+				</e:layout>
+			</e:Group>
+			<e:layout>
+				<e:VerticalLayout/>
+			</e:layout>
+		</e:Group>
+		<e:layout>
+			<e:HorizontalLayout paddingLeft="5" paddingRight="5" paddingBottom="5" paddingTop="5"/>
+		</e:layout>
+	</e:Group>
+</e:Skin>

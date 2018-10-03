@@ -44,6 +44,7 @@
         "resource/eui_skins/VSliderSkin.exml",
         "resource/eui_skins/RenameTextInput.exml",
         "resource/eui_skins/ComboBox.exml",
+        "resource/custom_skins/ColorPickerView.exml",
         "resource/custom_skins/TipString.exml",
         "resource/custom_skins/OAVEnum.exml",
         "resource/custom_skins/BooleanAttrView.exml",
