@@ -367,10 +367,8 @@ declare namespace editor {
      * 弹出一个objectview界面，点击其它区域关闭界面，并且调用关闭回调
      */
     class Popupview {
-        popup<T>(object: T, closecallback?: (object: T) => void, param?: {
-            width?: number;
-            height?: number;
-        }): void;
+        popupObject<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number): void;
+        popupView(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number): void;
     }
 }
 /**
@@ -434,6 +432,7 @@ declare namespace editor {
         private onAddedToStage;
         private onRemovedFromStage;
         private onClick;
+        private onPickerViewChanged;
     }
 }
 declare namespace editor {

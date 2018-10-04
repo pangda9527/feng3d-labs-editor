@@ -1500,20 +1500,36 @@ var editor;
     var Popupview = /** @class */ (function () {
         function Popupview() {
         }
-        Popupview.prototype.popup = function (object, closecallback, param) {
-            param = param || {};
+        Popupview.prototype.popupObject = function (object, closecallback, x, y, width, height) {
             var view = feng3d.objectview.getObjectView(object);
-            var background = new eui.Rect(param.width || 300, param.height || 300, 0xf0f0f0);
+            var background = new eui.Rect(width || 300, height || 300, 0xf0f0f0);
             view.addChildAt(background, 0);
-            editor.maskview.mask(view);
-            view.x = (editor.editorui.stage.stageWidth - view.width) / 2;
-            view.y = (editor.editorui.stage.stageHeight - view.height) / 2;
-            editor.editorui.popupLayer.addChild(view);
-            view.addEventListener(egret.Event.REMOVED_FROM_STAGE, removefromstage, null);
-            function removefromstage() {
-                view.removeEventListener(egret.Event.REMOVED_FROM_STAGE, removefromstage, null);
+            //
+            this.popupView(view, function () {
                 closecallback && closecallback(object);
+            }, x, y, width, height);
+        };
+        Popupview.prototype.popupView = function (view, closecallback, x, y, width, height) {
+            editor.editorui.popupLayer.addChild(view);
+            if (width !== undefined)
+                view.width = width;
+            if (height !== undefined)
+                view.height = height;
+            var x0 = (editor.editorui.stage.stageWidth - view.width) / 2;
+            var y0 = (editor.editorui.stage.stageHeight - view.height) / 2;
+            if (x !== undefined) {
+                x0 = x;
             }
+            if (y !== undefined) {
+                y0 = y;
+            }
+            x0 = feng3d.FMath.clamp(x0, 0, editor.editorui.popupLayer.stage.stageWidth - view.width);
+            y0 = feng3d.FMath.clamp(y0, 0, editor.editorui.popupLayer.stage.stageHeight - view.height);
+            view.x = x0;
+            view.y = y0;
+            editor.maskview.mask(view, function () {
+                closecallback && closecallback();
+            });
         };
         return Popupview;
     }());
@@ -1694,19 +1710,26 @@ var editor;
         };
         ColorPicker.prototype.onClick = function () {
             var _this = this;
-            var c = document.getElementById("color");
-            c.value = this.value.toHexString();
-            c.click();
-            c.onchange = function () {
-                var v = c.value; //"#189a56"
-                _this.value = new feng3d.Color3().fromUnit(Number("0x" + v.substr(1)));
-                c.onchange = null;
-                _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-            };
+            if (!colorPickerView)
+                colorPickerView = new editor.ColorPickerView();
+            colorPickerView.color = this.value;
+            var pos = this.localToGlobal(0, 0);
+            // pos.x = pos.x - colorPickerView.width;
+            pos.x = pos.x - 318;
+            colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+            //
+            editor.popupview.popupView(colorPickerView, function () {
+                colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+            }, pos.x, pos.y);
+        };
+        ColorPicker.prototype.onPickerViewChanged = function () {
+            this.value = colorPickerView.color;
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
         return ColorPicker;
     }(eui.Component));
     editor.ColorPicker = ColorPicker;
+    var colorPickerView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -2352,149 +2375,6 @@ var editor;
         return MenuUI;
     }(eui.List));
     editor.MenuUI = MenuUI;
-    // let template = [{
-    //     label: 'Edit',
-    //     submenu: [{
-    //         label: 'Undo',
-    //         accelerator: 'CmdOrCtrl+Z',
-    //         role: 'undo'
-    //     }, {
-    //         label: 'Redo',
-    //         accelerator: 'Shift+CmdOrCtrl+Z',
-    //         role: 'redo'
-    //     }, {
-    //         type: 'separator'
-    //     }, {
-    //         label: 'Cut',
-    //         accelerator: 'CmdOrCtrl+X',
-    //         role: 'cut'
-    //     }, {
-    //         label: 'Copy',
-    //         accelerator: 'CmdOrCtrl+C',
-    //         role: 'copy'
-    //     }, {
-    //         label: 'Paste',
-    //         accelerator: 'CmdOrCtrl+V',
-    //         role: 'paste'
-    //     }, {
-    //         label: 'Select All',
-    //         accelerator: 'CmdOrCtrl+A',
-    //         role: 'selectall'
-    //     }]
-    // }, {
-    //     label: 'View',
-    //     submenu: [{
-    //         label: 'Reload',
-    //         accelerator: 'CmdOrCtrl+R',
-    //         click: function (item, focusedWindow)
-    //         {
-    //             if (focusedWindow)
-    //             {
-    //                 // on reload, start fresh and close any old
-    //                 // open secondary windows
-    //                 if (focusedWindow.id === 1)
-    //                 {
-    //                     BrowserWindow.getAllWindows().forEach(function (win)
-    //                     {
-    //                         if (win.id > 1)
-    //                         {
-    //                             win.close()
-    //                         }
-    //                     })
-    //                 }
-    //                 focusedWindow.reload()
-    //             }
-    //         }
-    //     }, {
-    //         label: 'Toggle Full Screen',
-    //         accelerator: (function ()
-    //         {
-    //             if (process.platform === 'darwin')
-    //             {
-    //                 return 'Ctrl+Command+F'
-    //             } else
-    //             {
-    //                 return 'F11'
-    //             }
-    //         })(),
-    //         click: function (item, focusedWindow)
-    //         {
-    //             if (focusedWindow)
-    //             {
-    //                 focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
-    //             }
-    //         }
-    //     }, {
-    //         label: 'Toggle Developer Tools',
-    //         accelerator: (function ()
-    //         {
-    //             if (process.platform === 'darwin')
-    //             {
-    //                 return 'Alt+Command+I'
-    //             } else
-    //             {
-    //                 return 'Ctrl+Shift+I'
-    //             }
-    //         })(),
-    //         click: function (item, focusedWindow)
-    //         {
-    //             if (focusedWindow)
-    //             {
-    //                 focusedWindow.toggleDevTools()
-    //             }
-    //         }
-    //     }, {
-    //         type: 'separator'
-    //     }, {
-    //         label: 'App Menu Demo',
-    //         click: function (item, focusedWindow)
-    //         {
-    //             if (focusedWindow)
-    //             {
-    //                 const options = {
-    //                     type: 'info',
-    //                     title: 'Application Menu Demo',
-    //                     buttons: ['Ok'],
-    //                     message: 'This demo is for the Menu section, showing how to create a clickable menu item in the application menu.'
-    //                 }
-    //                 electron.dialog.showMessageBox(focusedWindow, options, function () { })
-    //             }
-    //         }
-    //     }]
-    // }, {
-    //     label: 'Window',
-    //     role: 'window',
-    //     submenu: [{
-    //         label: 'Minimize',
-    //         accelerator: 'CmdOrCtrl+M',
-    //         role: 'minimize'
-    //     }, {
-    //         label: 'Close',
-    //         accelerator: 'CmdOrCtrl+W',
-    //         role: 'close'
-    //     }, {
-    //         type: 'separator'
-    //     }, {
-    //         label: 'Reopen Window',
-    //         accelerator: 'CmdOrCtrl+Shift+T',
-    //         enabled: false,
-    //         key: 'reopenMenuItem',
-    //         click: function ()
-    //         {
-    //             app.emit('activate')
-    //         }
-    //     }]
-    // }, {
-    //     label: 'Help',
-    //     role: 'help',
-    //     submenu: [{
-    //         label: 'Learn More',
-    //         click: function ()
-    //         {
-    //             electron.shell.openExternal('http://electron.atom.io')
-    //         }
-    //     }]
-    // }]
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -2705,9 +2585,12 @@ var editor;
                 this.color = color;
             }
         };
-        ColorPickerView.prototype.onColorChanged = function () {
+        ColorPickerView.prototype.onColorChanged = function (property, oldValue, newValue) {
             if (this.stage)
                 this.updateView();
+            if (oldValue && newValue && !oldValue.equals(newValue)) {
+                this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+            }
         };
         ColorPickerView.prototype.updateView = function () {
             var _this = this;
@@ -4065,7 +3948,7 @@ var editor;
         OAVColorPicker.prototype.onChange = function (event) {
             //
             if (this.attributeValue instanceof feng3d.Color3)
-                this.attributeValue = this.colorPicker.value;
+                this.attributeValue = this.colorPicker.value.clone();
             else
                 this.attributeValue = this.colorPicker.value.toColor4();
             this.input.text = this.attributeValue.toHexString();
@@ -11032,7 +10915,7 @@ var editor;
     editor.mainMenu = [
         {
             label: "新建项目", click: function () {
-                editor.popupview.popup({ newprojectname: "newproject" }, function (data) {
+                editor.popupview.popupObject({ newprojectname: "newproject" }, function (data) {
                     if (data.newprojectname && data.newprojectname.length > 0) {
                         editor.editorcache.projectname = data.newprojectname;
                         window.location.reload();
@@ -11044,7 +10927,7 @@ var editor;
             label: "打开项目",
             submenu: getProjectsMenu(),
             click: function () {
-                editor.popupview.popup({ newprojectname: "newproject" }, function (data) {
+                editor.popupview.popupObject({ newprojectname: "newproject" }, function (data) {
                     if (data.newprojectname && data.newprojectname.length > 0) {
                         editor.editorcache.projectname = data.newprojectname;
                         window.location.reload();

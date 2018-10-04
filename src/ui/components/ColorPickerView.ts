@@ -18,7 +18,6 @@ namespace editor
         public txtB: eui.TextInput;
         public txtColor: eui.TextInput;
 
-
         //
         @feng3d.watch("onColorChanged")
         color = new feng3d.Color3(0.2, 0.5, 0);
@@ -163,9 +162,14 @@ namespace editor
             }
         }
 
-        private onColorChanged()
+        private onColorChanged(property, oldValue: feng3d.Color3, newValue: feng3d.Color3)
         {
             if (this.stage) this.updateView();
+
+            if (oldValue && newValue && !oldValue.equals(newValue))
+            {
+                this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+            }
         }
 
         private basecolor: feng3d.Color3;

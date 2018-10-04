@@ -4,7 +4,7 @@ namespace editor
         {
             label: "新建项目", click: () =>
             {
-                popupview.popup({ newprojectname: "newproject" }, (data) =>
+                popupview.popupObject({ newprojectname: "newproject" }, (data) =>
                 {
                     if (data.newprojectname && data.newprojectname.length > 0)
                     {
@@ -19,7 +19,7 @@ namespace editor
             submenu: getProjectsMenu(),
             click: () =>
             {
-                popupview.popup({ newprojectname: "newproject" }, (data) =>
+                popupview.popupObject({ newprojectname: "newproject" }, (data) =>
                 {
                     if (data.newprojectname && data.newprojectname.length > 0)
                     {

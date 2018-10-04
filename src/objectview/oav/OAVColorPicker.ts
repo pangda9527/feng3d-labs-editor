@@ -49,7 +49,7 @@ namespace editor
         {
             //
             if (this.attributeValue instanceof feng3d.Color3)
-                this.attributeValue = this.colorPicker.value;
+                this.attributeValue = this.colorPicker.value.clone();
             else
                 this.attributeValue = this.colorPicker.value.toColor4();
             this.input.text = this.attributeValue.toHexString();

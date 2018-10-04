@@ -10,24 +10,51 @@ namespace editor
      */
     export class Popupview
     {
-        popup<T>(object: T, closecallback?: (object: T) => void, param?: { width?: number, height?: number })
+
+        popupObject<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number)
         {
-            param = param || {};
             var view: eui.Component = feng3d.objectview.getObjectView(object);
-            var background = new eui.Rect(param.width || 300, param.height || 300, 0xf0f0f0);
+            var background = new eui.Rect(width || 300, height || 300, 0xf0f0f0);
             view.addChildAt(background, 0);
-            maskview.mask(view);
-            view.x = (editorui.stage.stageWidth - view.width) / 2;
-            view.y = (editorui.stage.stageHeight - view.height) / 2;
+
+            //
+            this.popupView(view, () =>
+            {
+                closecallback && closecallback(object);
+            }, x, y, width, height);
+        }
+
+        popupView(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number)
+        {
             editorui.popupLayer.addChild(view);
 
-            view.addEventListener(egret.Event.REMOVED_FROM_STAGE, removefromstage, null);
+            if (width !== undefined)
+                view.width = width;
 
-            function removefromstage()
+            if (height !== undefined)
+                view.height = height;
+
+            var x0 = (editorui.stage.stageWidth - view.width) / 2;
+            var y0 = (editorui.stage.stageHeight - view.height) / 2;
+            if (x !== undefined)
             {
-                view.removeEventListener(egret.Event.REMOVED_FROM_STAGE, removefromstage, null);
-                closecallback && closecallback(object);
+                x0 = x;
             }
+            if (y !== undefined)
+            {
+                y0 = y;
+            }
+
+            x0 = feng3d.FMath.clamp(x0, 0, editorui.popupLayer.stage.stageWidth - view.width);
+            y0 = feng3d.FMath.clamp(y0, 0, editorui.popupLayer.stage.stageHeight - view.height);
+
+            view.x = x0;
+            view.y = y0;
+
+            maskview.mask(view, () =>
+            {
+                closecallback && closecallback();
+            });
         }
     };
 

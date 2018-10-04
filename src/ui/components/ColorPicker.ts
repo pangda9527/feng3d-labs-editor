@@ -48,16 +48,24 @@ namespace editor
 
         private onClick()
         {
-            var c = document.getElementById("color");
-            (<any>c).value = this.value.toHexString();
-            c.click();
-            c.onchange = () =>
+            if (!colorPickerView) colorPickerView = new editor.ColorPickerView();
+            colorPickerView.color = this.value;
+            var pos = this.localToGlobal(0, 0);
+            // pos.x = pos.x - colorPickerView.width;
+            pos.x = pos.x - 318;
+            colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+            //
+            popupview.popupView(colorPickerView, () =>
             {
-                var v = (<any>c).value;//"#189a56"
-                this.value = new feng3d.Color3().fromUnit(Number("0x" + v.substr(1)));
-                c.onchange = null;
-                this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-            }
+                colorPickerView.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+            }, pos.x, pos.y);
+        }
+
+        private onPickerViewChanged()
+        {
+            this.value = colorPickerView.color;
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
     }
+    var colorPickerView: ColorPickerView;
 }
