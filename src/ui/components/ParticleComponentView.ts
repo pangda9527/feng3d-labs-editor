@@ -11,8 +11,6 @@ namespace editor
 		//
 		public enabledCB: eui.CheckBox;
 
-		scriptView: feng3d.IObjectView;
-
 		/**
 		 * 对象界面数据
 		 */
@@ -56,15 +54,13 @@ namespace editor
 			this.updateView();
 
 			this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-			if (this.component instanceof feng3d.Behaviour)
-				feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+			feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
 		}
 
 		private onRemovedFromStage()
 		{
 			this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-			if (this.component instanceof feng3d.Behaviour)
-				feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+			feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
 		}
 
 		private updateEnableCB()

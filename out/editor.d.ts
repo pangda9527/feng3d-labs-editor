@@ -586,7 +586,6 @@ declare namespace editor {
         componentView: feng3d.IObjectView;
         accordion: editor.Accordion;
         enabledCB: eui.CheckBox;
-        scriptView: feng3d.IObjectView;
         /**
          * 对象界面数据
          */

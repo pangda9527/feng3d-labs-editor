@@ -2273,13 +2273,11 @@ var editor;
         ParticleComponentView.prototype.onAddToStage = function () {
             this.updateView();
             this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-            if (this.component instanceof feng3d.Behaviour)
-                feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+            feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
         };
         ParticleComponentView.prototype.onRemovedFromStage = function () {
             this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-            if (this.component instanceof feng3d.Behaviour)
-                feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+            feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
         };
         ParticleComponentView.prototype.updateEnableCB = function () {
             this.enabledCB.selected = this.component.enabled;
