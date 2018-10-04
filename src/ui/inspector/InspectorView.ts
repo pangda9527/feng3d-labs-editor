@@ -5,9 +5,9 @@ namespace editor
      */
 	export class InspectorView extends eui.Component implements eui.UIComponent
 	{
-		public typeLab:eui.Label;
-		public backButton:eui.Button;
-		public group:eui.Group;
+		public typeLab: eui.Label;
+		public backButton: eui.Button;
+		public group: eui.Group;
 
 		constructor()
 		{
@@ -58,9 +58,21 @@ namespace editor
 		 */
 		saveShowData(callback?: () => void)
 		{
-			if (this._dataChanged && this._viewData instanceof AssetsFile)
+			if (this._dataChanged)
 			{
-				assets.writeAssets(this._viewData.feng3dAssets, callback);
+				if (this._viewData instanceof feng3d.Feng3dAssets)
+				{
+					if (this._viewData.assetsId)
+					{
+						var assetsFile = editorAssets.files[this._viewData.assetsId];
+						assetsFile && assets.writeAssets(assetsFile.feng3dAssets, callback);
+					}
+				} else if (this._viewData instanceof AssetsFile)
+				{
+					this._viewData.updateImage();
+					assets.writeAssets(this._viewData.feng3dAssets, callback);
+				}
+
 				this._dataChanged = false;
 			} else
 			{
@@ -122,7 +134,14 @@ namespace editor
 		private onValueChanged(e: feng3d.ObjectViewEvent)
 		{
 			this._dataChanged = true;
-			if (this._viewData instanceof AssetsFile)
+			if (this._viewData instanceof feng3d.Feng3dAssets)
+			{
+				if (this._viewData.assetsId)
+				{
+					var assetsFile = editorAssets.files[this._viewData.assetsId];
+					assetsFile && assetsFile.updateImage();
+				}
+			} else if (this._viewData instanceof AssetsFile)
 			{
 				this._viewData.updateImage();
 			}

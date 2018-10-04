@@ -4471,8 +4471,17 @@ var editor;
          * 保存显示数据
          */
         InspectorView.prototype.saveShowData = function (callback) {
-            if (this._dataChanged && this._viewData instanceof editor.AssetsFile) {
-                editor.assets.writeAssets(this._viewData.feng3dAssets, callback);
+            if (this._dataChanged) {
+                if (this._viewData instanceof feng3d.Feng3dAssets) {
+                    if (this._viewData.assetsId) {
+                        var assetsFile = editor.editorAssets.files[this._viewData.assetsId];
+                        assetsFile && editor.assets.writeAssets(assetsFile.feng3dAssets, callback);
+                    }
+                }
+                else if (this._viewData instanceof editor.AssetsFile) {
+                    this._viewData.updateImage();
+                    editor.assets.writeAssets(this._viewData.feng3dAssets, callback);
+                }
                 this._dataChanged = false;
             }
             else {
@@ -4512,7 +4521,13 @@ var editor;
         };
         InspectorView.prototype.onValueChanged = function (e) {
             this._dataChanged = true;
-            if (this._viewData instanceof editor.AssetsFile) {
+            if (this._viewData instanceof feng3d.Feng3dAssets) {
+                if (this._viewData.assetsId) {
+                    var assetsFile = editor.editorAssets.files[this._viewData.assetsId];
+                    assetsFile && assetsFile.updateImage();
+                }
+            }
+            else if (this._viewData instanceof editor.AssetsFile) {
                 this._viewData.updateImage();
             }
         };
