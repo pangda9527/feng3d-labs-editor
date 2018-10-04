@@ -4448,10 +4448,31 @@ var editor;
             }
             this.onResize();
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+            //
+            feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
         };
         OAVFeng3dPreView.prototype.dispose = function () {
             feng3dview.engine.canvas.style.visibility = "hidden";
             feng3dview.engine.stop();
+            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+        };
+        OAVFeng3dPreView.prototype.onMouseDown = function () {
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+            this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        };
+        OAVFeng3dPreView.prototype.onMouseMove = function () {
+            var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var X_AXIS = feng3dview.camera.transform.rightVector;
+            var Y_AXIS = feng3dview.camera.transform.upVector;
+            feng3dview.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
+            feng3dview.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
+            this.preMousePos = mousePos;
+            feng3dview.updateCameraPosition();
+        };
+        OAVFeng3dPreView.prototype.onMouseUp = function () {
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         };
         OAVFeng3dPreView.prototype.updateView = function () {
         };
@@ -8647,8 +8668,6 @@ var editor;
             return dataUrl;
         };
         Feng3dScreenShot.prototype._drawGameObject = function (gameObject) {
-            //
-            this.updateCameraPosition(gameObject);
             if (this.currentObject) {
                 this.scene.gameObject.removeChild(this.currentObject);
                 this.currentObject = null;
@@ -8656,13 +8675,15 @@ var editor;
             //
             this.scene.gameObject.addChild(gameObject);
             this.currentObject = gameObject;
+            //
+            this.updateCameraPosition();
             this.engine.render();
             var dataUrl = this.engine.canvas.toDataURL();
             return dataUrl;
         };
-        Feng3dScreenShot.prototype.updateCameraPosition = function (gameObject) {
+        Feng3dScreenShot.prototype.updateCameraPosition = function () {
             //
-            var bounds = gameObject.worldBounds;
+            var bounds = this.currentObject.worldBounds;
             var scenePosition = bounds.getCenter();
             var size = bounds.getSize().length;
             size = Math.max(size, 1);

@@ -27,12 +27,41 @@ namespace editor
             }
             this.onResize();
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+
+            //
+            feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
         }
 
         dispose()
         {
             feng3dview.engine.canvas.style.visibility = "hidden";
             feng3dview.engine.stop();
+            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+        }
+
+        private preMousePos: feng3d.Vector2;
+        private onMouseDown()
+        {
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+            this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        }
+        private onMouseMove()
+        {
+            var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+
+            var X_AXIS = feng3dview.camera.transform.rightVector;
+            var Y_AXIS = feng3dview.camera.transform.upVector;
+            feng3dview.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
+            feng3dview.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
+
+            this.preMousePos = mousePos;
+            feng3dview.updateCameraPosition();
+        }
+        private onMouseUp()
+        {
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         }
 
         updateView()

@@ -1224,6 +1224,10 @@ declare namespace editor {
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
         dispose(): void;
+        private preMousePos;
+        private onMouseDown;
+        private onMouseMove;
+        private onMouseUp;
         updateView(): void;
         onResize(): void;
     }
@@ -2228,7 +2232,7 @@ declare namespace editor {
         drawGameObject(gameObject: feng3d.GameObject): string;
         private _drawGameObject;
         private currentObject;
-        private updateCameraPosition;
+        updateCameraPosition(): void;
     }
 }
 declare namespace feng3d {

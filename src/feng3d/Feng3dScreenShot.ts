@@ -178,9 +178,6 @@ namespace editor
 
         private _drawGameObject(gameObject: feng3d.GameObject)
         {
-            //
-            this.updateCameraPosition(gameObject);
-
             if (this.currentObject)
             {
                 this.scene.gameObject.removeChild(this.currentObject);
@@ -189,6 +186,10 @@ namespace editor
             //
             this.scene.gameObject.addChild(gameObject);
             this.currentObject = gameObject;
+
+            //
+            this.updateCameraPosition();
+
             this.engine.render();
             var dataUrl = this.engine.canvas.toDataURL();
             return dataUrl;
@@ -196,10 +197,10 @@ namespace editor
 
         private currentObject: feng3d.GameObject;
 
-        private updateCameraPosition(gameObject: feng3d.GameObject)
+        updateCameraPosition()
         {
             //
-            var bounds = gameObject.worldBounds;
+            var bounds = this.currentObject.worldBounds;
             var scenePosition = bounds.getCenter();
             var size = bounds.getSize().length;
             size = Math.max(size, 1);
