@@ -80,6 +80,7 @@
         "src/objectview/oav/OAVPick.ts",
         "src/objectview/oav/OAVTexture2D.ts",
         "src/objectview/oav/OAVParticleComponentList.ts",
+        "src/objectview/oav/OAVFeng3dPreView.ts",
         //
         "src/ui/inspector/InspectorView.ts",
         "src/ui/inspector/InspectorMultiObject.ts",

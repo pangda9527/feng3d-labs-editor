@@ -1220,6 +1220,15 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    class OAVFeng3dPreView extends OAVBase {
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
+        dispose(): void;
+        updateView(): void;
+        onResize(): void;
+    }
+}
+declare namespace editor {
     /**
      * 属性面板（检查器）
      */
@@ -2218,6 +2227,7 @@ declare namespace editor {
          */
         drawGameObject(gameObject: feng3d.GameObject): string;
         private _drawGameObject;
+        private currentObject;
         private updateCameraPosition;
     }
 }

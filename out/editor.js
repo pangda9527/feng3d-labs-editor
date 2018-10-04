@@ -4425,6 +4425,58 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var OAVFeng3dPreView = /** @class */ (function (_super) {
+        __extends(OAVFeng3dPreView, _super);
+        function OAVFeng3dPreView(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVFeng3dPreView";
+            return _this;
+        }
+        OAVFeng3dPreView.prototype.initView = function () {
+            feng3dview = feng3dview || new editor.Feng3dScreenShot();
+            feng3dview.engine.start();
+            feng3dview.engine.canvas.style.visibility = null;
+            if (this.space instanceof feng3d.GameObject) {
+                feng3dview.drawGameObject(this.space);
+            }
+            else if (this.space instanceof feng3d.Geometry) {
+                feng3dview.drawGeometry(this.space);
+            }
+            else if (this.space instanceof feng3d.Material) {
+                feng3dview.drawMaterial(this.space);
+            }
+            this.onResize();
+            this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+        };
+        OAVFeng3dPreView.prototype.dispose = function () {
+            feng3dview.engine.canvas.style.visibility = "hidden";
+            feng3dview.engine.stop();
+        };
+        OAVFeng3dPreView.prototype.updateView = function () {
+        };
+        OAVFeng3dPreView.prototype.onResize = function () {
+            this.height = this.width;
+            feng3dview.engine.setSize(this.width, this.height);
+            var lt = this.localToGlobal(0, 0);
+            //
+            var style = feng3dview.engine.canvas.style;
+            style.position = "absolute";
+            style.left = lt.x + "px";
+            style.top = lt.y + "px";
+            style.width = this.width + "px";
+            style.height = this.height + "px";
+            style.cursor = "hand";
+        };
+        OAVFeng3dPreView = __decorate([
+            feng3d.OAVComponent()
+        ], OAVFeng3dPreView);
+        return OAVFeng3dPreView;
+    }(editor.OAVBase));
+    editor.OAVFeng3dPreView = OAVFeng3dPreView;
+    var feng3dview;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     /**
      * 属性面板（检查器）
      */
@@ -8596,11 +8648,15 @@ var editor;
         Feng3dScreenShot.prototype._drawGameObject = function (gameObject) {
             //
             this.updateCameraPosition(gameObject);
+            if (this.currentObject) {
+                this.scene.gameObject.removeChild(this.currentObject);
+                this.currentObject = null;
+            }
             //
             this.scene.gameObject.addChild(gameObject);
+            this.currentObject = gameObject;
             this.engine.render();
             var dataUrl = this.engine.canvas.toDataURL();
-            this.scene.gameObject.removeChild(gameObject);
             return dataUrl;
         };
         Feng3dScreenShot.prototype.updateCameraPosition = function (gameObject) {

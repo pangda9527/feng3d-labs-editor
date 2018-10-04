@@ -181,13 +181,20 @@ namespace editor
             //
             this.updateCameraPosition(gameObject);
 
+            if (this.currentObject)
+            {
+                this.scene.gameObject.removeChild(this.currentObject);
+                this.currentObject = null;
+            }
             //
             this.scene.gameObject.addChild(gameObject);
+            this.currentObject = gameObject;
             this.engine.render();
             var dataUrl = this.engine.canvas.toDataURL();
-            this.scene.gameObject.removeChild(gameObject);
             return dataUrl;
         }
+
+        private currentObject: feng3d.GameObject;
 
         private updateCameraPosition(gameObject: feng3d.GameObject)
         {

@@ -66,6 +66,7 @@
         "resource/custom_skins/OAVTexture2D.exml",
         "resource/custom_skins/OAVPick.exml",
         "resource/custom_skins/OAVParticleComponentList.exml",
+        "resource/custom_skins/OAVFeng3dPreView.exml",
         "resource/custom_skins/ColorPicker.exml",
         "resource/custom_skins/TreeDisclosureButtonSkin.exml",
         "resource/custom_skins/TreeItemRendererSkin.exml",
