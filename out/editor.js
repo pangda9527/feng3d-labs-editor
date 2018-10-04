@@ -2555,6 +2555,7 @@ var editor;
             }
         };
         ColorPickerView.prototype.onMouseUp = function () {
+            this._mouseDownGroup = null;
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         };
