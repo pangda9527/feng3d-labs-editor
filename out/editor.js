@@ -4457,9 +4457,12 @@ var editor;
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
         };
         OAVFeng3dPreView.prototype.onMouseDown = function () {
-            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
             this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var s = this.localToGlobal(0, 0);
+            if (new feng3d.Rectangle(s.x, s.y, this.width, this.height).containsPoint(this.preMousePos)) {
+                feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+                feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+            }
         };
         OAVFeng3dPreView.prototype.onMouseMove = function () {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
