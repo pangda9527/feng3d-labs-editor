@@ -1142,6 +1142,25 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    class OAVAccordionObjectView extends OAVBase {
+        componentView: feng3d.IObjectView;
+        accordion: editor.Accordion;
+        enabledCB: eui.CheckBox;
+        /**
+         * 对象界面数据
+         */
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        /**
+         * 更新界面
+         */
+        updateView(): void;
+        initView(): void;
+        dispose(): void;
+        private updateEnableCB;
+        private onEnableCBChange;
+    }
+}
+declare namespace editor {
     class OAVGameObjectName extends OAVBase {
         nameInput: eui.TextInput;
         visibleCB: eui.CheckBox;

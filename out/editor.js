@@ -4066,6 +4066,53 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var OAVAccordionObjectView = /** @class */ (function (_super) {
+        __extends(OAVAccordionObjectView, _super);
+        /**
+         * 对象界面数据
+         */
+        function OAVAccordionObjectView(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "ParticleComponentView";
+            return _this;
+        }
+        /**
+         * 更新界面
+         */
+        OAVAccordionObjectView.prototype.updateView = function () {
+            this.updateEnableCB();
+            if (this.componentView)
+                this.componentView.updateView();
+        };
+        OAVAccordionObjectView.prototype.initView = function () {
+            var componentName = feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop();
+            this.accordion.titleName = componentName;
+            this.componentView = feng3d.objectview.getObjectView(this.attributeValue, false, ["enabled"]);
+            this.accordion.addContent(this.componentView);
+            this.enabledCB = this.accordion["enabledCB"];
+            this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+            feng3d.watcher.watch(this.attributeValue, "enabled", this.updateEnableCB, this);
+            this.updateView();
+        };
+        OAVAccordionObjectView.prototype.dispose = function () {
+            this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+            feng3d.watcher.unwatch(this.attributeValue, "enabled", this.updateEnableCB, this);
+        };
+        OAVAccordionObjectView.prototype.updateEnableCB = function () {
+            this.enabledCB.selected = this.attributeValue.enabled;
+        };
+        OAVAccordionObjectView.prototype.onEnableCBChange = function () {
+            this.attributeValue.enabled = this.enabledCB.selected;
+        };
+        OAVAccordionObjectView = __decorate([
+            feng3d.OAVComponent()
+        ], OAVAccordionObjectView);
+        return OAVAccordionObjectView;
+    }(editor.OAVBase));
+    editor.OAVAccordionObjectView = OAVAccordionObjectView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var OAVGameObjectName = /** @class */ (function (_super) {
         __extends(OAVGameObjectName, _super);
         function OAVGameObjectName(attributeViewInfo) {
