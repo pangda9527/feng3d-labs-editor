@@ -76,17 +76,17 @@ namespace editor
 		{
 			this.text.enabled = this._attributeViewInfo.writable;
 			var value = this.attributeValue;
-			if (this.attributeValue === undefined)
+			if (value === undefined)
 			{
-				this.text.text = String(this.attributeValue);
-			} else if (!(this.attributeValue instanceof Object))
+				this.text.text = String(value);
+			} else if (!(value instanceof Object))
 			{
-				this.text.text = String(this.attributeValue);
+				this.text.text = String(value);
 			} else
 			{
 				this.text.enabled = false;
-				var valuename = this.attributeValue["name"] || "";
-				this.text.text = valuename + " (" + this.attributeValue.constructor.name + ")";
+				var valuename = value["name"] || "";
+				this.text.text = valuename + " (" + value.constructor.name + ")";
 				this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
 				this.text.enabled = false;
 			}
