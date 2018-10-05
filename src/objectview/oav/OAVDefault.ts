@@ -42,7 +42,7 @@ namespace editor
 			this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
 			this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
 
-			if (this._attributeViewInfo.writable)
+			if (this._attributeViewInfo.editable)
 				feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
 		}
 
@@ -50,7 +50,7 @@ namespace editor
 		{
 			drag.unregister(this);
 
-			if (this._attributeViewInfo.writable)
+			if (this._attributeViewInfo.editable)
 				feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
 
 			this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
@@ -74,7 +74,7 @@ namespace editor
 		 */
 		updateView(): void
 		{
-			this.text.enabled = this._attributeViewInfo.writable;
+			this.text.enabled = this._attributeViewInfo.editable;
 			var value = this.attributeValue;
 			if (value === undefined)
 			{

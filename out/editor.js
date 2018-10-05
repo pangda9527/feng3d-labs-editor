@@ -2190,7 +2190,7 @@ var editor;
         ComponentView.prototype.onComplete = function () {
             var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
             this.accordion.titleName = componentName;
-            this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
+            this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
             this.accordion.addContent(this.componentView);
             this.enabledCB = this.accordion["enabledCB"];
             this.componentIcon = this.accordion["componentIcon"];
@@ -2261,7 +2261,7 @@ var editor;
         };
         ComponentView.prototype.onRefreshView = function () {
             this.accordion.removeContent(this.componentView);
-            this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
+            this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
             this.accordion.addContent(this.componentView);
         };
         ComponentView.prototype.updateEnableCB = function () {
@@ -2284,7 +2284,7 @@ var editor;
                 feng3d.watcher.watch(this.component, "script", this.onScriptChanged, this);
                 var component = this.component;
                 if (component.scriptInstance) {
-                    this.scriptView = feng3d.objectview.getObjectView(component.scriptInstance, false);
+                    this.scriptView = feng3d.objectview.getObjectView(component.scriptInstance, { autocreate: false });
                     this.accordion.addContent(this.scriptView);
                 }
             }
@@ -2352,7 +2352,7 @@ var editor;
         ParticleComponentView.prototype.onComplete = function () {
             var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
             this.accordion.titleName = componentName;
-            this.componentView = feng3d.objectview.getObjectView(this.component, false, ["enabled"]);
+            this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
             this.accordion.addContent(this.componentView);
             this.enabledCB = this.accordion["enabledCB"];
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
@@ -3326,12 +3326,12 @@ var editor;
             this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            if (this._attributeViewInfo.writable)
+            if (this._attributeViewInfo.editable)
                 feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
         };
         OAVDefault.prototype.dispose = function () {
             editor.drag.unregister(this);
-            if (this._attributeViewInfo.writable)
+            if (this._attributeViewInfo.editable)
                 feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
             this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
@@ -3347,7 +3347,7 @@ var editor;
          * 更新界面
          */
         OAVDefault.prototype.updateView = function () {
-            this.text.enabled = this._attributeViewInfo.writable;
+            this.text.enabled = this._attributeViewInfo.editable;
             var value = this.attributeValue;
             if (value === undefined) {
                 this.text.text = String(value);
@@ -3647,10 +3647,11 @@ var editor;
         function OAVArrayItem(arr, index, componentParam) {
             var _this = this;
             var attributeViewInfo = {
-                name: index,
-                writable: true,
+                name: index + "",
+                editable: true,
                 componentParam: componentParam,
                 owner: arr,
+                type: "number",
             };
             _this = _super.call(this, attributeViewInfo) || this;
             return _this;
@@ -4166,7 +4167,7 @@ var editor;
         OAVAccordionObjectView.prototype.initView = function () {
             var componentName = feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop();
             this.accordion.titleName = componentName;
-            this.componentView = feng3d.objectview.getObjectView(this.attributeValue, false, ["enabled"]);
+            this.componentView = feng3d.objectview.getObjectView(this.attributeValue, { autocreate: false, excludeAttrs: ["enabled"] });
             this.accordion.addContent(this.componentView);
             this.enabledCB = this.accordion["enabledCB"];
             this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);

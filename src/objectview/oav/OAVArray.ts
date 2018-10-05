@@ -121,11 +121,12 @@ namespace editor
     {
         constructor(arr: any[], index: number, componentParam: Object)
         {
-            var attributeViewInfo: feng3d.AttributeViewInfo = <any>{
-                name: index,
-                writable: true,
+            var attributeViewInfo: feng3d.AttributeViewInfo = {
+                name: index + "",
+                editable: true,
                 componentParam: componentParam,
                 owner: arr,
+                type: "number",
             };
             super(attributeViewInfo);
         }

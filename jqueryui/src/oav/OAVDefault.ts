@@ -57,7 +57,6 @@ class OAVDefault extends OAVBase
 	 */
 	updateView(): void
 	{
-		// this.text.enabled = this.attributeViewInfo.writable;
 		var value = this.attributeValue;
 		if (this.attributeValue === undefined)
 		{

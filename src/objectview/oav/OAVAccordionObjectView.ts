@@ -34,7 +34,7 @@ namespace editor
         {
             var componentName = feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop();
             this.accordion.titleName = componentName;
-            this.componentView = feng3d.objectview.getObjectView(this.attributeValue, false, ["enabled"]);
+            this.componentView = feng3d.objectview.getObjectView(this.attributeValue, { autocreate: false, excludeAttrs: ["enabled"] });
             this.accordion.addContent(this.componentView);
 
             this.enabledCB = this.accordion["enabledCB"];
