@@ -2886,6 +2886,10 @@ var editor;
                 this.group.addChild(displayObject);
                 this.blockViews.push(displayObject);
             }
+            if (!this._objectViewInfo.editable)
+                this.alpha = 0.8;
+            else
+                this.alpha = 1;
         };
         OVDefault.prototype.dispose = function () {
             if (!this.blockViews)
@@ -3356,7 +3360,6 @@ var editor;
                 this.text.text = String(value);
             }
             else {
-                this.text.enabled = false;
                 var valuename = value["name"] || "";
                 this.text.text = valuename + " (" + value.constructor.name + ")";
                 this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
@@ -3402,7 +3405,9 @@ var editor;
             return _this;
         }
         OAVBoolean.prototype.initView = function () {
-            this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            if (this._attributeViewInfo.editable)
+                this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            this.checkBox.enabled = this._attributeViewInfo.editable;
         };
         OAVBoolean.prototype.dispose = function () {
             this.checkBox.removeEventListener(egret.Event.CHANGE, this.onChange, this);
@@ -3447,7 +3452,8 @@ var editor;
         }
         OAVNumber.prototype.initView = function () {
             _super.prototype.initView.call(this);
-            this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            if (this._attributeViewInfo.editable)
+                this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         };
         OAVNumber.prototype.dispose = function () {
             this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
@@ -3457,6 +3463,7 @@ var editor;
          * 更新界面
          */
         OAVNumber.prototype.updateView = function () {
+            this.text.enabled = this._attributeViewInfo.editable;
             // 消除数字显示为类似 0.0000000001 的问题
             var fractionDigits = 1;
             while (fractionDigits * this.step < 1) {
@@ -3687,7 +3694,10 @@ var editor;
             configurable: true
         });
         OAVEnum.prototype.initView = function () {
-            this.combobox.addEventListener(egret.Event.CHANGE, this.onComboxChange, this);
+            if (this._attributeViewInfo.editable) {
+                this.combobox.addEventListener(egret.Event.CHANGE, this.onComboxChange, this);
+            }
+            this.combobox.touchEnabled = this.combobox.touchChildren = this._attributeViewInfo.editable;
         };
         OAVEnum.prototype.dispose = function () {
             this.combobox.removeEventListener(egret.Event.CHANGE, this.onComboxChange, this);
@@ -4003,10 +4013,13 @@ var editor;
             return _this;
         }
         OAVColorPicker.prototype.initView = function () {
-            this.colorPicker.addEventListener(egret.Event.CHANGE, this.onChange, this);
-            this.input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            this.input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-            this.input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            if (this._attributeViewInfo.editable) {
+                this.colorPicker.addEventListener(egret.Event.CHANGE, this.onChange, this);
+                this.input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                this.input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+                this.input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            }
+            this.colorPicker.touchEnabled = this.colorPicker.touchChildren = this.input.enabled = this._attributeViewInfo.editable;
         };
         OAVColorPicker.prototype.dispose = function () {
             this.colorPicker.removeEventListener(egret.Event.CHANGE, this.onChange, this);
@@ -4071,6 +4084,7 @@ var editor;
         OAVMaterialName.prototype.initView = function () {
             this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
             feng3d.feng3dDispatcher.on("assets.shaderChanged", this.onShaderComboBoxChange, this);
+            this.shaderComboBox.touchChildren = this.shaderComboBox.touchEnabled = this._attributeViewInfo.editable;
         };
         OAVMaterialName.prototype.dispose = function () {
             this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
@@ -4119,7 +4133,10 @@ var editor;
                 arr.push(this.attributeValue);
             this.views = [];
             arr.forEach(function (element) {
-                var view = feng3d.objectview.getObjectView(element);
+                var editable = _this._attributeViewInfo.editable;
+                if (element instanceof feng3d.Feng3dObject)
+                    editable = editable && !Boolean(element.hideFlags & feng3d.HideFlags.NotEditable);
+                var view = feng3d.objectview.getObjectView(element, { editable: editable });
                 view.percentWidth = 100;
                 _this.group.addChild(view);
                 _this.views.push(view);
@@ -4258,15 +4275,17 @@ var editor;
         OAVPick.prototype.initView = function () {
             var _this = this;
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
+            if (this._attributeViewInfo.editable) {
+                this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
+                var param = this._attributeViewInfo.componentParam;
+                editor.drag.register(this, function (dragsource) {
+                    if (param.datatype)
+                        dragsource[param.datatype] = _this.attributeValue;
+                }, [param.accepttype], function (dragSource) {
+                    _this.attributeValue = dragSource[param.accepttype];
+                });
+            }
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
-            var param = this._attributeViewInfo.componentParam;
-            editor.drag.register(this, function (dragsource) {
-                if (param.datatype)
-                    dragsource[param.datatype] = _this.attributeValue;
-            }, [param.accepttype], function (dragSource) {
-                _this.attributeValue = dragSource[param.accepttype];
-            });
         };
         OAVPick.prototype.dispose = function () {
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
@@ -4397,7 +4416,8 @@ var editor;
         }
         OAVTexture2D.prototype.initView = function () {
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+            if (this._attributeViewInfo.editable)
+                this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
         };
         OAVTexture2D.prototype.dispose = function () {
@@ -4423,30 +4443,8 @@ var editor;
          * 更新界面
          */
         OAVTexture2D.prototype.updateView = function () {
-            var _this = this;
             var texture = this.attributeValue;
-            var image = texture["_activePixels"];
-            this.image.visible = false;
-            this.img_border.visible = false;
-            if (image) {
-                if (texture.url) {
-                    editor.assets.readDataURL(texture.url, function (err, dataurl) {
-                        _this.image.source = dataurl;
-                        _this.image.visible = true;
-                        _this.img_border.visible = true;
-                    });
-                }
-                else if (image instanceof ImageData) {
-                    feng3d.dataTransform.imageDataToDataURL(image, function (dataurl) {
-                        _this.image.source = dataurl;
-                        _this.image.visible = true;
-                        _this.img_border.visible = true;
-                    });
-                }
-            }
-            else {
-                this.image.source = "";
-            }
+            this.image.source = editor.feng3dScreenShot.drawTexture(texture);
         };
         OAVTexture2D.prototype.onDoubleClick = function () {
             if (this.attributeValue && typeof this.attributeValue == "object")
@@ -4704,7 +4702,10 @@ var editor;
             this.typeLab.text = "Inspector - " + showdata.constructor["name"];
             if (this._view)
                 this._view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
-            this._view = feng3d.objectview.getObjectView(showdata);
+            var editable = true;
+            if (showdata instanceof feng3d.Feng3dObject)
+                editable = !Boolean(showdata.hideFlags & feng3d.HideFlags.NotEditable);
+            this._view = feng3d.objectview.getObjectView(showdata, { editable: editable });
             this._view.percentWidth = 100;
             this.group.addChild(this._view);
             this.group.scrollV = 0;
@@ -8662,7 +8663,7 @@ var editor;
             engine.stop();
         }
         /**
-         * 绘制立方体贴图
+         * 绘制贴图
          * @param texture 贴图
          */
         Feng3dScreenShot.prototype.drawTexture = function (texture, width, height) {

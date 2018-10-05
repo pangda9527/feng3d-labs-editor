@@ -26,7 +26,8 @@ namespace editor
 		initView()
 		{
 			super.initView();
-			this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+			if (this._attributeViewInfo.editable)
+				this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
 		}
 
 		dispose()
@@ -40,6 +41,7 @@ namespace editor
 		 */
 		updateView(): void
 		{
+			this.text.enabled = this._attributeViewInfo.editable;
 			// 消除数字显示为类似 0.0000000001 的问题
 			var fractionDigits = 1; while (fractionDigits * this.step < 1) { fractionDigits *= 10; }
 			this.text.text = String(Math.round(fractionDigits * (Math.round(this.attributeValue / this.step) * this.step)) / fractionDigits);

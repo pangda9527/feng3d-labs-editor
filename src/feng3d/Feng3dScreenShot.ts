@@ -40,7 +40,7 @@ namespace editor
         }
 
         /**
-         * 绘制立方体贴图
+         * 绘制贴图
          * @param texture 贴图
          */
         drawTexture(texture: feng3d.UrlImageTexture2D, width?: number, height?: number)

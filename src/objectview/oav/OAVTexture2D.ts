@@ -7,7 +7,6 @@ namespace editor
     export class OAVTexture2D extends OAVBase
     {
         public image: eui.Image;
-        public img_border: eui.Image;
         public pickBtn: eui.Button;
         public labelLab: eui.Label;
 
@@ -21,7 +20,9 @@ namespace editor
         initView()
         {
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+
+            if (this._attributeViewInfo.editable)
+                this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
         }
@@ -57,33 +58,7 @@ namespace editor
         updateView(): void
         {
             var texture: feng3d.UrlImageTexture2D = this.attributeValue;
-            var image = texture["_activePixels"]
-
-            this.image.visible = false;
-            this.img_border.visible = false;
-            if (image)
-            {
-                if (texture.url)
-                {
-                    assets.readDataURL(texture.url, (err, dataurl) =>
-                    {
-                        this.image.source = dataurl;
-                        this.image.visible = true;
-                        this.img_border.visible = true;
-                    });
-                } else if (image instanceof ImageData)
-                {
-                    feng3d.dataTransform.imageDataToDataURL(image, dataurl =>
-                    {
-                        this.image.source = dataurl;
-                        this.image.visible = true;
-                        this.img_border.visible = true;
-                    });
-                }
-            } else
-            {
-                this.image.source = "";
-            }
+            this.image.source = feng3dScreenShot.drawTexture(texture);
         }
 
         private onDoubleClick()

@@ -13,7 +13,9 @@ namespace editor
 
 		initView()
 		{
-			this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
+			if (this._attributeViewInfo.editable)
+				this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
+			this.checkBox.enabled = this._attributeViewInfo.editable;
 		}
 
 		dispose()

@@ -20,21 +20,25 @@ namespace editor
         initView()
         {
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
+
+            if (this._attributeViewInfo.editable)
+            {
+                this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
+
+                var param: { accepttype: keyof DragData; datatype: string; } = <any>this._attributeViewInfo.componentParam;
+                drag.register(this,
+                    (dragsource) =>
+                    {
+                        if (param.datatype) dragsource[param.datatype] = this.attributeValue;
+                    },
+                    [param.accepttype],
+                    (dragSource) =>
+                    {
+                        this.attributeValue = dragSource[param.accepttype];
+                    });
+            }
 
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
-
-            var param: { accepttype: keyof DragData; datatype: string; } = <any>this._attributeViewInfo.componentParam;
-            drag.register(this,
-                (dragsource) =>
-                {
-                    if (param.datatype) dragsource[param.datatype] = this.attributeValue;
-                },
-                [param.accepttype],
-                (dragSource) =>
-                {
-                    this.attributeValue = dragSource[param.accepttype];
-                });
         }
 
         dispose()

@@ -29,7 +29,11 @@ namespace editor
 
         initView()
         {
-            this.combobox.addEventListener(egret.Event.CHANGE, this.onComboxChange, this);
+            if (this._attributeViewInfo.editable)
+            {
+                this.combobox.addEventListener(egret.Event.CHANGE, this.onComboxChange, this);
+            }
+            this.combobox.touchEnabled = this.combobox.touchChildren = this._attributeViewInfo.editable;
         }
 
         dispose()

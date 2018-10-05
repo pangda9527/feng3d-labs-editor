@@ -84,7 +84,6 @@ namespace editor
 				this.text.text = String(value);
 			} else
 			{
-				this.text.enabled = false;
 				var valuename = value["name"] || "";
 				this.text.text = valuename + " (" + value.constructor.name + ")";
 				this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);

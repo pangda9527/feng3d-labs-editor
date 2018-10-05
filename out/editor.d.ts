@@ -1230,7 +1230,6 @@ declare namespace editor {
      */
     class OAVTexture2D extends OAVBase {
         image: eui.Image;
-        img_border: eui.Image;
         pickBtn: eui.Button;
         labelLab: eui.Label;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
@@ -2252,7 +2251,7 @@ declare namespace editor {
         defaultMaterial: feng3d.Material;
         constructor();
         /**
-         * 绘制立方体贴图
+         * 绘制贴图
          * @param texture 贴图
          */
         drawTexture(texture: feng3d.UrlImageTexture2D, width?: number, height?: number): string;

@@ -24,7 +24,9 @@ namespace editor
 			this.views = [];
 			arr.forEach(element =>
 			{
-				var view = feng3d.objectview.getObjectView(element);
+				var editable = this._attributeViewInfo.editable;
+				if (element instanceof feng3d.Feng3dObject) editable = editable && !Boolean(element.hideFlags & feng3d.HideFlags.NotEditable);
+				var view = feng3d.objectview.getObjectView(element, { editable: editable });
 				view.percentWidth = 100;
 				this.group.addChild(view);
 				this.views.push(view);

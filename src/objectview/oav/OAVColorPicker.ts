@@ -18,10 +18,14 @@ namespace editor
 
         initView()
         {
-            this.colorPicker.addEventListener(egret.Event.CHANGE, this.onChange, this);
-            this.input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            this.input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-            this.input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            if (this._attributeViewInfo.editable)
+            {
+                this.colorPicker.addEventListener(egret.Event.CHANGE, this.onChange, this);
+                this.input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                this.input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+                this.input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            }
+            this.colorPicker.touchEnabled = this.colorPicker.touchChildren = this.input.enabled = this._attributeViewInfo.editable;
         }
 
         dispose()
