@@ -209,6 +209,7 @@ namespace egret
             var y = location.y;
 
             var target: egret.DisplayObject = touch["findTarget"](x, y);
+            egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MOUSE_MOVE, true, true, x, y);
             if (target == overDisplayObject)
                 return;
             var preOverDisplayObject = overDisplayObject;

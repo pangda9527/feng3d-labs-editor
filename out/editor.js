@@ -1024,7 +1024,8 @@ var editor;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.canvas = document.getElementById("glcanvas");
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.backRect.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            this.backRect.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+            this.backRect.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             this.onResize();
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 if (dragdata.file_gameobject) {
@@ -1044,40 +1045,22 @@ var editor;
             _super.prototype.$onRemoveFromStage.call(this);
             this.canvas = null;
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.backRect.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+            this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             editor.drag.unregister(this);
         };
-        Feng3dView.prototype.onMouseDown = function () {
-            this.checkMouseInView3D();
-            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+        Feng3dView.prototype.onMouseOver = function () {
+            feng3d.shortcut.activityState("mouseInView3D");
         };
-        Feng3dView.prototype.onMouseMove = function () {
-            this.checkMouseInView3D();
-        };
-        Feng3dView.prototype.onMouseUp = function () {
+        Feng3dView.prototype.onMouseOut = function () {
             feng3d.shortcut.deactivityState("mouseInView3D");
-            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
-        };
-        Feng3dView.prototype.checkMouseInView3D = function () {
-            var canvasRect = this.canvas.getBoundingClientRect();
-            var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
-            if (bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY)) {
-                feng3d.shortcut.activityState("mouseInView3D");
-            }
-            else {
-                feng3d.shortcut.deactivityState("mouseInView3D");
-            }
         };
         Feng3dView.prototype.onResize = function () {
             if (!this.stage)
                 return;
             var lt = this.localToGlobal(0, 0);
             var rb = this.localToGlobal(this.width, this.height);
-            var bound1 = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
-            // var bound2 = this.getTransformedBounds(this.stage);
-            var bound = bound1;
+            var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
             var style = this.canvas.style;
             style.position = "absolute";
             style.left = bound.x + "px";
@@ -10059,6 +10042,7 @@ var egret;
             var x = location.x;
             var y = location.y;
             var target = touch["findTarget"](x, y);
+            egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_MOVE, true, true, x, y);
             if (target == overDisplayObject)
                 return;
             var preOverDisplayObject = overDisplayObject;

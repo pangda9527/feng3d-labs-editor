@@ -291,10 +291,8 @@ declare namespace editor {
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
-        private onMouseDown;
-        private onMouseMove;
-        private onMouseUp;
-        private checkMouseInView3D;
+        private onMouseOver;
+        private onMouseOut;
         private onResize;
     }
 }
