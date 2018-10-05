@@ -321,15 +321,18 @@ declare namespace editor {
         pauseBtn: eui.Button;
         stopBtn: eui.Button;
         private saveParent;
-        private particleSystem;
+        private particleSystems;
         private playbackSpeed;
         private playbackTime;
         private particles;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
+        private onClick;
         private onEnterFrame;
         private initView;
+        private updateView;
+        private readonly isParticlePlaying;
         private onDataChange;
     }
 }

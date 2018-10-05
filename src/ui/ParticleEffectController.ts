@@ -9,7 +9,7 @@ namespace editor
         public stopBtn: eui.Button;
         //
         private saveParent: egret.DisplayObjectContainer;
-        private particleSystem: feng3d.ParticleSystem;
+        private particleSystems: feng3d.ParticleSystem[] = [];
         //
         private playbackSpeed: number;
         private playbackTime: number;
@@ -25,23 +25,45 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
             this.initView();
+            this.updateView();
             this.addEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
+            this.pauseBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.stopBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
         }
 
         $onRemoveFromStage(): void
         {
             super.$onRemoveFromStage();
             this.removeEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
+            this.pauseBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.stopBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+        }
+
+        private onClick(e: egret.Event)
+        {
+            switch (e.currentTarget)
+            {
+                case this.stopBtn:
+                    this.particleSystems.forEach(v => v.stop());
+                    break;
+                case this.pauseBtn:
+                    if (this.isParticlePlaying)
+                        this.particleSystems.forEach(v => v.pause());
+                    else
+                        this.particleSystems.forEach(v => v.continue());
+                    break;
+            }
+            this.updateView();
         }
 
         private onEnterFrame()
         {
-            var v = this.particleSystem;
+            var v = this.particleSystems;
             if (v)
             {
-                this.playbackSpeed = v.main.simulationSpeed;
-                this.playbackTime = v.time;
-                this.particles = v.main.maxParticles;
+                this.playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
+                this.playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
+                this.particles = this.particleSystems.reduce((pv, cv) => { pv += cv.main.maxParticles; return pv; }, 0);
             }
         }
 
@@ -56,24 +78,25 @@ namespace editor
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
         }
 
+        private updateView()
+        {
+            if (!this.particleSystems) return;
+            this.pauseBtn.label = this.isParticlePlaying ? "Pause" : "Continue";
+        }
+
+        private get isParticlePlaying()
+        {
+            return this.particleSystems.reduce((pv, cv) => { return pv || cv.isPlaying; }, false)
+        }
+
         private onDataChange()
         {
-            var selectedGameObjects = editorData.selectedGameObjects;
-            if (selectedGameObjects.length > 0)
-            {
-                for (let i = 0; i < selectedGameObjects.length; i++)
-                {
-                    var particleSystem = selectedGameObjects[i].getComponent(feng3d.ParticleSystem);
-                    if (particleSystem)
-                    {
-                        this.particleSystem = particleSystem;
-                        this.saveParent.addChild(this);
-                        return;
-                    }
-                }
-            }
-            this.particleSystem = null;
-            this.parent && this.parent.removeChild(this);
+            var particleSystems = editorData.selectedGameObjects.reduce((pv: feng3d.ParticleSystem[], cv) => { var ps = cv.getComponent(feng3d.ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
+            this.particleSystems.forEach(v => v.pause());
+            this.particleSystems = particleSystems;
+            this.particleSystems.forEach(v => v.continue());
+            if (this.particleSystems.length > 0) this.saveParent.addChild(this);
+            else this.parent && this.parent.removeChild(this);
         }
     }
 }

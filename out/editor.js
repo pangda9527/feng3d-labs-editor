@@ -1179,24 +1179,44 @@ var editor;
         __extends(ParticleEffectController, _super);
         function ParticleEffectController() {
             var _this = _super.call(this) || this;
+            _this.particleSystems = [];
             _this.skinName = "ParticleEffectController";
             return _this;
         }
         ParticleEffectController.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.initView();
+            this.updateView();
             this.addEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
+            this.pauseBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.stopBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
         };
         ParticleEffectController.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
+            this.pauseBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.stopBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+        };
+        ParticleEffectController.prototype.onClick = function (e) {
+            switch (e.currentTarget) {
+                case this.stopBtn:
+                    this.particleSystems.forEach(function (v) { return v.stop(); });
+                    break;
+                case this.pauseBtn:
+                    if (this.isParticlePlaying)
+                        this.particleSystems.forEach(function (v) { return v.pause(); });
+                    else
+                        this.particleSystems.forEach(function (v) { return v.continue(); });
+                    break;
+            }
+            this.updateView();
         };
         ParticleEffectController.prototype.onEnterFrame = function () {
-            var v = this.particleSystem;
+            var v = this.particleSystems;
             if (v) {
-                this.playbackSpeed = v.main.simulationSpeed;
-                this.playbackTime = v.time;
-                this.particles = v.main.maxParticles;
+                this.playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
+                this.playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
+                this.particles = this.particleSystems.reduce(function (pv, cv) { pv += cv.main.maxParticles; return pv; }, 0);
             }
         };
         ParticleEffectController.prototype.initView = function () {
@@ -1209,20 +1229,27 @@ var editor;
             });
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
         };
+        ParticleEffectController.prototype.updateView = function () {
+            if (!this.particleSystems)
+                return;
+            this.pauseBtn.label = this.isParticlePlaying ? "Pause" : "Continue";
+        };
+        Object.defineProperty(ParticleEffectController.prototype, "isParticlePlaying", {
+            get: function () {
+                return this.particleSystems.reduce(function (pv, cv) { return pv || cv.isPlaying; }, false);
+            },
+            enumerable: true,
+            configurable: true
+        });
         ParticleEffectController.prototype.onDataChange = function () {
-            var selectedGameObjects = editor.editorData.selectedGameObjects;
-            if (selectedGameObjects.length > 0) {
-                for (var i = 0; i < selectedGameObjects.length; i++) {
-                    var particleSystem = selectedGameObjects[i].getComponent(feng3d.ParticleSystem);
-                    if (particleSystem) {
-                        this.particleSystem = particleSystem;
-                        this.saveParent.addChild(this);
-                        return;
-                    }
-                }
-            }
-            this.particleSystem = null;
-            this.parent && this.parent.removeChild(this);
+            var particleSystems = editor.editorData.selectedGameObjects.reduce(function (pv, cv) { var ps = cv.getComponent(feng3d.ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
+            this.particleSystems.forEach(function (v) { return v.pause(); });
+            this.particleSystems = particleSystems;
+            this.particleSystems.forEach(function (v) { return v.continue(); });
+            if (this.particleSystems.length > 0)
+                this.saveParent.addChild(this);
+            else
+                this.parent && this.parent.removeChild(this);
         };
         return ParticleEffectController;
     }(eui.Component));
