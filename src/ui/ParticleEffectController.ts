@@ -5,8 +5,15 @@ namespace editor
      */
     export class ParticleEffectController extends eui.Component
     {
+        public pauseBtn: eui.Button;
+        public stopBtn: eui.Button;
+        //
         private saveParent: egret.DisplayObjectContainer;
         private particleSystem: feng3d.ParticleSystem;
+        //
+        private playbackSpeed: number;
+        private playbackTime: number;
+        private particles: number;
 
         constructor()
         {
@@ -18,6 +25,24 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
             this.initView();
+            this.addEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
+        }
+
+        $onRemoveFromStage(): void
+        {
+            super.$onRemoveFromStage();
+            this.removeEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
+        }
+
+        private onEnterFrame()
+        {
+            var v = this.particleSystem;
+            if (v)
+            {
+                this.playbackSpeed = v.main.simulationSpeed;
+                this.playbackTime = v.time;
+                this.particles = v.main.maxParticles;
+            }
         }
 
         private initView()

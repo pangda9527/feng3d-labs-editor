@@ -319,10 +319,17 @@ declare namespace editor {
      * 粒子特效控制器
      */
     class ParticleEffectController extends eui.Component {
+        pauseBtn: eui.Button;
+        stopBtn: eui.Button;
         private saveParent;
         private particleSystem;
+        private playbackSpeed;
+        private playbackTime;
+        private particles;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        private onEnterFrame;
         private initView;
         private onDataChange;
     }

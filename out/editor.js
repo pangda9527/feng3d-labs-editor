@@ -1197,6 +1197,19 @@ var editor;
         ParticleEffectController.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.initView();
+            this.addEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
+        };
+        ParticleEffectController.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
+            this.removeEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
+        };
+        ParticleEffectController.prototype.onEnterFrame = function () {
+            var v = this.particleSystem;
+            if (v) {
+                this.playbackSpeed = v.main.simulationSpeed;
+                this.playbackTime = v.time;
+                this.particles = v.main.maxParticles;
+            }
         };
         ParticleEffectController.prototype.initView = function () {
             var _this = this;
