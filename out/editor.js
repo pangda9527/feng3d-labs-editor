@@ -1024,7 +1024,7 @@ var editor;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.canvas = document.getElementById("glcanvas");
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
+            this.backRect.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             this.onResize();
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 if (dragdata.file_gameobject) {
@@ -1044,8 +1044,31 @@ var editor;
             _super.prototype.$onRemoveFromStage.call(this);
             this.canvas = null;
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.removeEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
+            this.backRect.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             editor.drag.unregister(this);
+        };
+        Feng3dView.prototype.onMouseDown = function () {
+            this.checkMouseInView3D();
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+        };
+        Feng3dView.prototype.onMouseMove = function () {
+            this.checkMouseInView3D();
+        };
+        Feng3dView.prototype.onMouseUp = function () {
+            feng3d.shortcut.deactivityState("mouseInView3D");
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
+        };
+        Feng3dView.prototype.checkMouseInView3D = function () {
+            var canvasRect = this.canvas.getBoundingClientRect();
+            var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
+            if (bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY)) {
+                feng3d.shortcut.activityState("mouseInView3D");
+            }
+            else {
+                feng3d.shortcut.deactivityState("mouseInView3D");
+            }
         };
         Feng3dView.prototype.onResize = function () {
             if (!this.stage)
@@ -1064,14 +1087,6 @@ var editor;
             style.cursor = "hand";
             feng3d.Stats.instance.dom.style.left = bound.x + "px";
             feng3d.Stats.instance.dom.style.top = bound.y + "px";
-            var canvasRect = this.canvas.getBoundingClientRect();
-            var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
-            if (bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY)) {
-                feng3d.shortcut.activityState("mouseInView3D");
-            }
-            else {
-                feng3d.shortcut.deactivityState("mouseInView3D");
-            }
         };
         return Feng3dView;
     }(eui.Component));
@@ -1113,26 +1128,27 @@ var editor;
         });
         CameraPreview.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.initView();
+        };
+        CameraPreview.prototype.initView = function () {
+            var _this = this;
+            if (this.saveParent)
+                return;
+            this.saveParent = this.parent;
+            feng3d.ticker.nextframe(function () {
+                _this.parent.removeChild(_this);
+            });
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
             this.onResize();
-            this.onDataChange();
-        };
-        CameraPreview.prototype.$onRemoveFromStage = function () {
-            _super.prototype.$onRemoveFromStage.call(this);
-            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onDataChange, this);
-            this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.removeEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
         };
         CameraPreview.prototype.onResize = function () {
             if (!this.stage)
                 return;
             var lt = this.group.localToGlobal(0, 0);
             var rb = this.group.localToGlobal(this.group.width, this.group.height);
-            var bound1 = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
-            // var bound2 = this.getTransformedBounds(this.stage);
-            var bound = bound1;
+            var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
             var style = this.canvas.style;
             style.position = "absolute";
             style.left = bound.x + "px";
@@ -1148,11 +1164,13 @@ var editor;
                     var camera = selectedGameObjects[i].getComponent(feng3d.Camera);
                     if (camera) {
                         this.camera = camera;
+                        this.saveParent.addChild(this);
                         return;
                     }
                 }
             }
             this.camera = null;
+            this.parent && this.parent.removeChild(this);
         };
         CameraPreview.prototype.onframe = function () {
             if (this.previewEngine.scene != editor.engine.scene) {
@@ -1176,6 +1194,35 @@ var editor;
             _this.skinName = "ParticleEffectController";
             return _this;
         }
+        ParticleEffectController.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.initView();
+        };
+        ParticleEffectController.prototype.initView = function () {
+            var _this = this;
+            if (this.saveParent)
+                return;
+            this.saveParent = this.parent;
+            feng3d.ticker.nextframe(function () {
+                _this.parent.removeChild(_this);
+            });
+            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
+        };
+        ParticleEffectController.prototype.onDataChange = function () {
+            var selectedGameObjects = editor.editorData.selectedGameObjects;
+            if (selectedGameObjects.length > 0) {
+                for (var i = 0; i < selectedGameObjects.length; i++) {
+                    var particleSystem = selectedGameObjects[i].getComponent(feng3d.ParticleSystem);
+                    if (particleSystem) {
+                        this.particleSystem = particleSystem;
+                        this.saveParent.addChild(this);
+                        return;
+                    }
+                }
+            }
+            this.particleSystem = null;
+            this.parent && this.parent.removeChild(this);
+        };
         return ParticleEffectController;
     }(eui.Component));
     editor.ParticleEffectController = ParticleEffectController;

@@ -4,6 +4,7 @@ namespace editor
     {
         public group: eui.Group;
         //
+        private saveParent: egret.DisplayObjectContainer;
         private canvas: HTMLElement;
         private previewEngine: feng3d.Engine;
 
@@ -43,21 +44,23 @@ namespace editor
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
+            this.initView();
+        }
+
+        private initView()
+        {
+            if (this.saveParent) return;
+            this.saveParent = this.parent;
+            feng3d.ticker.nextframe(() =>
+            {
+                this.parent.removeChild(this);
+            });
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
 
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
 
             this.onResize();
-            this.onDataChange();
-        }
-
-        $onRemoveFromStage()
-        {
-            super.$onRemoveFromStage()
-            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.onDataChange, this);
-            this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.removeEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
         }
 
         private onResize()
@@ -67,10 +70,7 @@ namespace editor
 
             var lt = this.group.localToGlobal(0, 0);
             var rb = this.group.localToGlobal(this.group.width, this.group.height);
-            var bound1 = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
-
-            // var bound2 = this.getTransformedBounds(this.stage);
-            var bound = bound1;
+            var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
 
             var style = this.canvas.style;
             style.position = "absolute";
@@ -92,11 +92,13 @@ namespace editor
                     if (camera)
                     {
                         this.camera = camera;
+                        this.saveParent.addChild(this);
                         return;
                     }
                 }
             }
             this.camera = null;
+            this.parent && this.parent.removeChild(this);
         }
 
         private onframe()

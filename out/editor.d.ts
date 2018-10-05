@@ -286,24 +286,29 @@ declare namespace editor {
 }
 declare namespace editor {
     class Feng3dView extends eui.Component implements eui.UIComponent {
-        fullbutton: eui.Button;
+        backRect: eui.Rect;
         private canvas;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
+        private onMouseDown;
+        private onMouseMove;
+        private onMouseUp;
+        private checkMouseInView3D;
         private onResize;
     }
 }
 declare namespace editor {
     class CameraPreview extends eui.Component {
         group: eui.Group;
+        private saveParent;
         private canvas;
         private previewEngine;
         camera: feng3d.Camera;
         private _camera;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
-        $onRemoveFromStage(): void;
+        private initView;
         private onResize;
         private onDataChange;
         private onframe;
@@ -314,7 +319,12 @@ declare namespace editor {
      * 粒子特效控制器
      */
     class ParticleEffectController extends eui.Component {
+        private saveParent;
+        private particleSystem;
         constructor();
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        private initView;
+        private onDataChange;
     }
 }
 declare var defaultTextFiled: egret.TextField;
