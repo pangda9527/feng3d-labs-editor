@@ -291,8 +291,9 @@ declare namespace editor {
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
-        private onMouseOver;
-        private onMouseOut;
+        private inMouseMove;
+        private onMouseMove;
+        private onGlobalMouseMove;
         private onResize;
     }
 }
@@ -1260,12 +1261,14 @@ declare namespace editor {
 }
 declare namespace editor {
     class OAVFeng3dPreView extends OAVBase {
+        image: eui.Image;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
         dispose(): void;
         private preMousePos;
         private onMouseDown;
         private onMouseMove;
+        private onDrawObject;
         private onMouseUp;
         updateView(): void;
         onResize(): void;
@@ -2258,17 +2261,21 @@ declare namespace editor {
          * 绘制材质
          * @param material 材质
          */
-        drawMaterial(material: feng3d.Material): string;
+        drawMaterial(material: feng3d.Material, cameraRotation?: feng3d.Vector3): this;
         /**
          * 绘制材质
          * @param geometry 材质
          */
-        drawGeometry(geometry: feng3d.Geometrys): string;
+        drawGeometry(geometry: feng3d.Geometrys, cameraRotation?: feng3d.Vector3): this;
         /**
          * 绘制游戏对象
          * @param gameObject 游戏对象
          */
-        drawGameObject(gameObject: feng3d.GameObject): string;
+        drawGameObject(gameObject: feng3d.GameObject, cameraRotation?: feng3d.Vector3): this;
+        /**
+         * 转换为DataURL
+         */
+        toDataURL(): string;
         private _drawGameObject;
         private currentObject;
         updateCameraPosition(): void;

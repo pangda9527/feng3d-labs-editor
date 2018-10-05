@@ -128,7 +128,7 @@ namespace editor
          * 绘制材质
          * @param material 材质
          */
-        drawMaterial(material: feng3d.Material)
+        drawMaterial(material: feng3d.Material, cameraRotation = new feng3d.Vector3(20, -90, 0))
         {
             var gameObject = new feng3d.GameObject().value({
                 components: [{
@@ -138,16 +138,16 @@ namespace editor
                 }]
             });
 
-            this.camera.transform.rotation = new feng3d.Vector3(20, -90, 0);
-            var dataUrl = this._drawGameObject(gameObject);
-            return dataUrl;
+            cameraRotation && (this.camera.transform.rotation = cameraRotation);
+            this._drawGameObject(gameObject);
+            return this;
         }
 
         /**
          * 绘制材质
          * @param geometry 材质
          */
-        drawGeometry(geometry: feng3d.Geometrys)
+        drawGeometry(geometry: feng3d.Geometrys, cameraRotation = new feng3d.Vector3(-20, 120, 0))
         {
             var gameObject = new feng3d.GameObject().value({
                 components: [{
@@ -160,19 +160,29 @@ namespace editor
                 }]
             });
 
-            this.camera.transform.rotation = new feng3d.Vector3(-20, 120, 0);
-            var dataUrl = this._drawGameObject(gameObject);
-            return dataUrl;
+            cameraRotation && (this.camera.transform.rotation = cameraRotation);
+            this._drawGameObject(gameObject);
+            return this;
         }
 
         /**
          * 绘制游戏对象
          * @param gameObject 游戏对象
          */
-        drawGameObject(gameObject: feng3d.GameObject)
+        drawGameObject(gameObject: feng3d.GameObject, cameraRotation = new feng3d.Vector3(20, -120, 0))
         {
-            this.camera.transform.rotation = new feng3d.Vector3(20, -120, 0);
-            var dataUrl = this._drawGameObject(gameObject);
+            cameraRotation && (this.camera.transform.rotation = cameraRotation);
+            this._drawGameObject(gameObject);
+            return this;
+        }
+
+        /**
+         * 转换为DataURL
+         */
+        toDataURL()
+        {
+            this.engine.render();
+            var dataUrl = this.engine.canvas.toDataURL();
             return dataUrl;
         }
 
@@ -189,10 +199,6 @@ namespace editor
 
             //
             this.updateCameraPosition();
-
-            this.engine.render();
-            var dataUrl = this.engine.canvas.toDataURL();
-            return dataUrl;
         }
 
         private currentObject: feng3d.GameObject;

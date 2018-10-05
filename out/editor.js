@@ -1024,8 +1024,8 @@ var editor;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.canvas = document.getElementById("glcanvas");
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.backRect.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
-            this.backRect.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+            this.backRect.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mousemove", this.onGlobalMouseMove, this);
             this.onResize();
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 if (dragdata.file_gameobject) {
@@ -1045,14 +1045,19 @@ var editor;
             _super.prototype.$onRemoveFromStage.call(this);
             this.canvas = null;
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
-            this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+            this.backRect.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mousemove", this.onGlobalMouseMove, this);
             editor.drag.unregister(this);
         };
-        Feng3dView.prototype.onMouseOver = function () {
+        Feng3dView.prototype.onMouseMove = function () {
             feng3d.shortcut.activityState("mouseInView3D");
+            this.inMouseMove = true;
         };
-        Feng3dView.prototype.onMouseOut = function () {
+        Feng3dView.prototype.onGlobalMouseMove = function () {
+            if (this.inMouseMove) {
+                this.inMouseMove = false;
+                return;
+            }
             feng3d.shortcut.deactivityState("mouseInView3D");
         };
         Feng3dView.prototype.onResize = function () {
@@ -4532,27 +4537,24 @@ var editor;
             return _this;
         }
         OAVFeng3dPreView.prototype.initView = function () {
-            feng3dview = feng3dview || new editor.Feng3dScreenShot();
-            feng3dview.engine.start();
-            feng3dview.engine.canvas.style.visibility = null;
             if (this.space instanceof feng3d.GameObject) {
-                feng3dview.drawGameObject(this.space);
+                editor.feng3dScreenShot.drawGameObject(this.space);
             }
             else if (this.space instanceof feng3d.Geometry) {
-                feng3dview.drawGeometry(this.space);
+                editor.feng3dScreenShot.drawGeometry(this.space);
             }
             else if (this.space instanceof feng3d.Material) {
-                feng3dview.drawMaterial(this.space);
+                editor.feng3dScreenShot.drawMaterial(this.space);
             }
             this.onResize();
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             //
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+            feng3d.ticker.on(100, this.onDrawObject, this);
         };
         OAVFeng3dPreView.prototype.dispose = function () {
-            feng3dview.engine.canvas.style.visibility = "hidden";
-            feng3dview.engine.stop();
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            feng3d.ticker.off(100, this.onDrawObject, this);
         };
         OAVFeng3dPreView.prototype.onMouseDown = function () {
             this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -4564,12 +4566,15 @@ var editor;
         };
         OAVFeng3dPreView.prototype.onMouseMove = function () {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var X_AXIS = feng3dview.camera.transform.rightVector;
-            var Y_AXIS = feng3dview.camera.transform.upVector;
-            feng3dview.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
-            feng3dview.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
+            var X_AXIS = editor.feng3dScreenShot.camera.transform.rightVector;
+            var Y_AXIS = editor.feng3dScreenShot.camera.transform.upVector;
+            editor.feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
+            editor.feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
             this.preMousePos = mousePos;
-            feng3dview.updateCameraPosition();
+            editor.feng3dScreenShot.updateCameraPosition();
+        };
+        OAVFeng3dPreView.prototype.onDrawObject = function () {
+            this.image.source = editor.feng3dScreenShot.toDataURL();
         };
         OAVFeng3dPreView.prototype.onMouseUp = function () {
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
@@ -4579,16 +4584,8 @@ var editor;
         };
         OAVFeng3dPreView.prototype.onResize = function () {
             this.height = this.width;
-            feng3dview.engine.setSize(this.width, this.height);
-            var lt = this.localToGlobal(0, 0);
-            //
-            var style = feng3dview.engine.canvas.style;
-            style.position = "absolute";
-            style.left = lt.x + "px";
-            style.top = lt.y + "px";
-            style.width = this.width + "px";
-            style.height = this.height + "px";
-            style.cursor = "hand";
+            this.image.width = this.image.height = this.width;
+            editor.feng3dScreenShot.engine.setSize(this.width, this.height);
         };
         OAVFeng3dPreView = __decorate([
             feng3d.OAVComponent()
@@ -4596,7 +4593,6 @@ var editor;
         return OAVFeng3dPreView;
     }(editor.OAVBase));
     editor.OAVFeng3dPreView = OAVFeng3dPreView;
-    var feng3dview;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -5439,16 +5435,16 @@ var editor;
             else if (this.feng3dAssets instanceof feng3d.Material) {
                 var mat = this.feng3dAssets;
                 mat.onLoadCompleted(function () {
-                    _this.image = editor.feng3dScreenShot.drawMaterial(mat);
+                    _this.image = editor.feng3dScreenShot.drawMaterial(mat).toDataURL();
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.Geometry) {
-                this.image = editor.feng3dScreenShot.drawGeometry(this.feng3dAssets);
+                this.image = editor.feng3dScreenShot.drawGeometry(this.feng3dAssets).toDataURL();
             }
             else if (this.feng3dAssets instanceof feng3d.GameObject) {
                 var gameObject = this.feng3dAssets;
                 gameObject.onLoadCompleted(function () {
-                    _this.image = editor.feng3dScreenShot.drawGameObject(gameObject);
+                    _this.image = editor.feng3dScreenShot.drawGameObject(gameObject).toDataURL();
                 });
             }
         };
@@ -8729,7 +8725,8 @@ var editor;
          * 绘制材质
          * @param material 材质
          */
-        Feng3dScreenShot.prototype.drawMaterial = function (material) {
+        Feng3dScreenShot.prototype.drawMaterial = function (material, cameraRotation) {
+            if (cameraRotation === void 0) { cameraRotation = new feng3d.Vector3(20, -90, 0); }
             var gameObject = new feng3d.GameObject().value({
                 components: [{
                         __class__: "feng3d.MeshModel",
@@ -8737,15 +8734,16 @@ var editor;
                         material: material,
                     }]
             });
-            this.camera.transform.rotation = new feng3d.Vector3(20, -90, 0);
-            var dataUrl = this._drawGameObject(gameObject);
-            return dataUrl;
+            cameraRotation && (this.camera.transform.rotation = cameraRotation);
+            this._drawGameObject(gameObject);
+            return this;
         };
         /**
          * 绘制材质
          * @param geometry 材质
          */
-        Feng3dScreenShot.prototype.drawGeometry = function (geometry) {
+        Feng3dScreenShot.prototype.drawGeometry = function (geometry, cameraRotation) {
+            if (cameraRotation === void 0) { cameraRotation = new feng3d.Vector3(-20, 120, 0); }
             var gameObject = new feng3d.GameObject().value({
                 components: [{
                         __class__: "feng3d.MeshModel",
@@ -8755,17 +8753,26 @@ var editor;
                         __class__: "feng3d.WireframeComponent",
                     }]
             });
-            this.camera.transform.rotation = new feng3d.Vector3(-20, 120, 0);
-            var dataUrl = this._drawGameObject(gameObject);
-            return dataUrl;
+            cameraRotation && (this.camera.transform.rotation = cameraRotation);
+            this._drawGameObject(gameObject);
+            return this;
         };
         /**
          * 绘制游戏对象
          * @param gameObject 游戏对象
          */
-        Feng3dScreenShot.prototype.drawGameObject = function (gameObject) {
-            this.camera.transform.rotation = new feng3d.Vector3(20, -120, 0);
-            var dataUrl = this._drawGameObject(gameObject);
+        Feng3dScreenShot.prototype.drawGameObject = function (gameObject, cameraRotation) {
+            if (cameraRotation === void 0) { cameraRotation = new feng3d.Vector3(20, -120, 0); }
+            cameraRotation && (this.camera.transform.rotation = cameraRotation);
+            this._drawGameObject(gameObject);
+            return this;
+        };
+        /**
+         * 转换为DataURL
+         */
+        Feng3dScreenShot.prototype.toDataURL = function () {
+            this.engine.render();
+            var dataUrl = this.engine.canvas.toDataURL();
             return dataUrl;
         };
         Feng3dScreenShot.prototype._drawGameObject = function (gameObject) {
@@ -8778,9 +8785,6 @@ var editor;
             this.currentObject = gameObject;
             //
             this.updateCameraPosition();
-            this.engine.render();
-            var dataUrl = this.engine.canvas.toDataURL();
-            return dataUrl;
         };
         Feng3dScreenShot.prototype.updateCameraPosition = function () {
             //

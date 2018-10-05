@@ -126,17 +126,17 @@ namespace editor
                 var mat = this.feng3dAssets;
                 mat.onLoadCompleted(() =>
                 {
-                    this.image = feng3dScreenShot.drawMaterial(mat);
+                    this.image = feng3dScreenShot.drawMaterial(mat).toDataURL();
                 });
             } else if (this.feng3dAssets instanceof feng3d.Geometry)
             {
-                this.image = feng3dScreenShot.drawGeometry(<any>this.feng3dAssets);
+                this.image = feng3dScreenShot.drawGeometry(<any>this.feng3dAssets).toDataURL();
             } else if (this.feng3dAssets instanceof feng3d.GameObject)
             {
                 var gameObject = this.feng3dAssets;
                 gameObject.onLoadCompleted(() =>
                 {
-                    this.image = feng3dScreenShot.drawGameObject(gameObject);
+                    this.image = feng3dScreenShot.drawGameObject(gameObject).toDataURL();
                 });
             }
         }

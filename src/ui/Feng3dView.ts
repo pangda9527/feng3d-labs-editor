@@ -20,8 +20,8 @@ namespace editor
 			this.canvas = document.getElementById("glcanvas");
 			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
 
-			this.backRect.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
-			this.backRect.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+			this.backRect.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+			feng3d.windowEventProxy.on("mousemove", this.onGlobalMouseMove, this);
 
 			this.onResize();
 
@@ -52,19 +52,26 @@ namespace editor
 			this.canvas = null;
 			this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
 
-			this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
-			this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+			this.backRect.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+			feng3d.windowEventProxy.off("mousemove", this.onGlobalMouseMove, this);
 
 			drag.unregister(this);
 		}
 
-		private onMouseOver()
+		private inMouseMove: boolean;
+		private onMouseMove()
 		{
 			feng3d.shortcut.activityState("mouseInView3D");
+			this.inMouseMove = true;
 		}
 
-		private onMouseOut()
+		private onGlobalMouseMove()
 		{
+			if (this.inMouseMove)
+			{
+				this.inMouseMove = false;
+				return;
+			}
 			feng3d.shortcut.deactivityState("mouseInView3D");
 		}
 

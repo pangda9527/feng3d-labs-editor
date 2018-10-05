@@ -3,6 +3,8 @@ namespace editor
     @feng3d.OAVComponent()
     export class OAVFeng3dPreView extends OAVBase
     {
+        public image: eui.Image;
+
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
@@ -11,32 +13,28 @@ namespace editor
 
         initView()
         {
-            feng3dview = feng3dview || new Feng3dScreenShot();
-            feng3dview.engine.start();
-            feng3dview.engine.canvas.style.visibility = null;
-
             if (this.space instanceof feng3d.GameObject)
             {
-                feng3dview.drawGameObject(this.space);
+                feng3dScreenShot.drawGameObject(this.space);
             } else if (this.space instanceof feng3d.Geometry)
             {
-                feng3dview.drawGeometry(<any>this.space);
+                feng3dScreenShot.drawGeometry(<any>this.space);
             } else if (this.space instanceof feng3d.Material)
             {
-                feng3dview.drawMaterial(this.space);
+                feng3dScreenShot.drawMaterial(this.space);
             }
             this.onResize();
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-
             //
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+
+            feng3d.ticker.on(100, this.onDrawObject, this);
         }
 
         dispose()
         {
-            feng3dview.engine.canvas.style.visibility = "hidden";
-            feng3dview.engine.stop();
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            feng3d.ticker.off(100, this.onDrawObject, this);
         }
 
         private preMousePos: feng3d.Vector2;
@@ -50,18 +48,25 @@ namespace editor
                 feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
             }
         }
+
         private onMouseMove()
         {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 
-            var X_AXIS = feng3dview.camera.transform.rightVector;
-            var Y_AXIS = feng3dview.camera.transform.upVector;
-            feng3dview.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
-            feng3dview.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
+            var X_AXIS = feng3dScreenShot.camera.transform.rightVector;
+            var Y_AXIS = feng3dScreenShot.camera.transform.upVector;
+            feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
+            feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
 
             this.preMousePos = mousePos;
-            feng3dview.updateCameraPosition();
+            feng3dScreenShot.updateCameraPosition();
         }
+
+        private onDrawObject()
+        {
+            this.image.source = feng3dScreenShot.toDataURL();
+        }
+
         private onMouseUp()
         {
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
@@ -75,20 +80,8 @@ namespace editor
         onResize()
         {
             this.height = this.width;
-            feng3dview.engine.setSize(this.width, this.height);
-
-            var lt = this.localToGlobal(0, 0);
-
-            //
-            var style = feng3dview.engine.canvas.style;
-            style.position = "absolute";
-            style.left = lt.x + "px";
-            style.top = lt.y + "px";
-            style.width = this.width + "px";
-            style.height = this.height + "px";
-            style.cursor = "hand";
+            this.image.width = this.image.height = this.width;
+            feng3dScreenShot.engine.setSize(this.width, this.height);
         }
     }
-
-    var feng3dview: Feng3dScreenShot;
 }
