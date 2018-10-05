@@ -347,22 +347,6 @@ namespace editor
     }
 
     /**
-     * 获取创建粒子系统组件菜单
-     * @param particleSystem 粒子系统
-     */
-    export function getCreateParticleComponentMenu(particleSystem: feng3d.ParticleSystem)
-    {
-        var menu: MenuItem[] = [
-            //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
-            // {
-            //     label: "SkyBox",
-            //     click: () => { gameobject.addComponent(feng3d.SkyBox); }
-            // },
-        ];
-        return menu;
-    }
-
-    /**
      * 下载项目
      * @param projectname 
      */

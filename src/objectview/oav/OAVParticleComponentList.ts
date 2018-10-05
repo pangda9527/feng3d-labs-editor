@@ -7,17 +7,11 @@ namespace editor
 
         //
         group: eui.Group;
-        addComponentButton: eui.Button;
 
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
             this.skinName = "OAVParticleComponentList";
-        }
-
-        private onAddComponentButtonClick()
-        {
-            menu.popup(getCreateParticleComponentMenu(this.space));
         }
 
         get space()
@@ -60,8 +54,6 @@ namespace editor
             {
                 this.addComponentView(components[i]);
             }
-
-            this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
         }
 
         dispose()
@@ -71,16 +63,6 @@ namespace editor
             {
                 this.removedComponentView(components[i]);
             }
-
-            this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
-        }
-
-        private addComponentView(component: feng3d.ParticleComponent)
-        {
-            var o: Object;
-            var displayObject = new ParticleComponentView(component);
-            displayObject.percentWidth = 100;
-            this.group.addChild(displayObject);
         }
 
 		/**
@@ -94,6 +76,14 @@ namespace editor
                 if (child instanceof ParticleComponentView)
                     child.updateView();
             }
+        }
+
+        private addComponentView(component: feng3d.ParticleComponent)
+        {
+            var o: Object;
+            var displayObject = new ParticleComponentView(component);
+            displayObject.percentWidth = 100;
+            this.group.addChild(displayObject);
         }
 
         private removedComponentView(component: feng3d.ParticleComponent)

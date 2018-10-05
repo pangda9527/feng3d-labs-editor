@@ -1221,19 +1221,17 @@ declare namespace editor {
     class OAVParticleComponentList extends OAVBase {
         protected _space: feng3d.ParticleSystem;
         group: eui.Group;
-        addComponentButton: eui.Button;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
-        private onAddComponentButtonClick;
         space: feng3d.ParticleSystem;
         readonly attributeName: string;
         attributeValue: Object;
         initView(): void;
         dispose(): void;
-        private addComponentView;
         /**
          * 更新界面
          */
         updateView(): void;
+        private addComponentView;
         private removedComponentView;
     }
 }
@@ -2636,11 +2634,6 @@ declare namespace editor {
      * @param gameobject 游戏对象
      */
     function getCreateComponentMenu(gameobject: feng3d.GameObject): MenuItem[];
-    /**
-     * 获取创建粒子系统组件菜单
-     * @param particleSystem 粒子系统
-     */
-    function getCreateParticleComponentMenu(particleSystem: feng3d.ParticleSystem): MenuItem[];
 }
 declare namespace editor {
 }

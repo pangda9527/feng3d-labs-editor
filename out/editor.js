@@ -4388,9 +4388,6 @@ var editor;
             _this.skinName = "OAVParticleComponentList";
             return _this;
         }
-        OAVParticleComponentList.prototype.onAddComponentButtonClick = function () {
-            editor.menu.popup(editor.getCreateParticleComponentMenu(this.space));
-        };
         Object.defineProperty(OAVParticleComponentList.prototype, "space", {
             get: function () {
                 return this._space;
@@ -4429,20 +4426,12 @@ var editor;
             for (var i = 0; i < components.length; i++) {
                 this.addComponentView(components[i]);
             }
-            this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
         };
         OAVParticleComponentList.prototype.dispose = function () {
             var components = this.attributeValue;
             for (var i = 0; i < components.length; i++) {
                 this.removedComponentView(components[i]);
             }
-            this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
-        };
-        OAVParticleComponentList.prototype.addComponentView = function (component) {
-            var o;
-            var displayObject = new editor.ParticleComponentView(component);
-            displayObject.percentWidth = 100;
-            this.group.addChild(displayObject);
         };
         /**
          * 更新界面
@@ -4453,6 +4442,12 @@ var editor;
                 if (child instanceof editor.ParticleComponentView)
                     child.updateView();
             }
+        };
+        OAVParticleComponentList.prototype.addComponentView = function (component) {
+            var o;
+            var displayObject = new editor.ParticleComponentView(component);
+            displayObject.percentWidth = 100;
+            this.group.addChild(displayObject);
         };
         OAVParticleComponentList.prototype.removedComponentView = function (component) {
             for (var i = this.group.numChildren - 1; i >= 0; i--) {
@@ -11350,21 +11345,6 @@ var editor;
         return menu;
     }
     editor.getCreateComponentMenu = getCreateComponentMenu;
-    /**
-     * 获取创建粒子系统组件菜单
-     * @param particleSystem 粒子系统
-     */
-    function getCreateParticleComponentMenu(particleSystem) {
-        var menu = [
-        //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
-        // {
-        //     label: "SkyBox",
-        //     click: () => { gameobject.addComponent(feng3d.SkyBox); }
-        // },
-        ];
-        return menu;
-    }
-    editor.getCreateParticleComponentMenu = getCreateParticleComponentMenu;
     /**
      * 下载项目
      * @param projectname
