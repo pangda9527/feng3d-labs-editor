@@ -23,6 +23,7 @@ namespace editor
             {
                 feng3dScreenShot.drawMaterial(this.space);
             }
+            this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
             this.onResize();
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             //
@@ -57,13 +58,16 @@ namespace editor
             var Y_AXIS = feng3dScreenShot.camera.transform.upVector;
             feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
             feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
+            this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
 
             this.preMousePos = mousePos;
-            feng3dScreenShot.updateCameraPosition();
         }
 
+        private cameraRotation: feng3d.Vector3;
         private onDrawObject()
         {
+            this.cameraRotation && (feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
+            feng3dScreenShot.updateCameraPosition();
             this.image.source = feng3dScreenShot.toDataURL();
         }
 

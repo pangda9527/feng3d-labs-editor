@@ -4545,6 +4545,7 @@ var editor;
             else if (this.space instanceof feng3d.Material) {
                 editor.feng3dScreenShot.drawMaterial(this.space);
             }
+            this.cameraRotation = editor.feng3dScreenShot.camera.transform.rotation.clone();
             this.onResize();
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             //
@@ -4569,10 +4570,12 @@ var editor;
             var Y_AXIS = editor.feng3dScreenShot.camera.transform.upVector;
             editor.feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
             editor.feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
+            this.cameraRotation = editor.feng3dScreenShot.camera.transform.rotation.clone();
             this.preMousePos = mousePos;
-            editor.feng3dScreenShot.updateCameraPosition();
         };
         OAVFeng3dPreView.prototype.onDrawObject = function () {
+            this.cameraRotation && (editor.feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
+            editor.feng3dScreenShot.updateCameraPosition();
             this.image.source = editor.feng3dScreenShot.toDataURL();
         };
         OAVFeng3dPreView.prototype.onMouseUp = function () {

@@ -1268,6 +1268,7 @@ declare namespace editor {
         private preMousePos;
         private onMouseDown;
         private onMouseMove;
+        private cameraRotation;
         private onDrawObject;
         private onMouseUp;
         updateView(): void;
