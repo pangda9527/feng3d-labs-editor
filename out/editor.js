@@ -1084,7 +1084,6 @@ var editor;
         function CameraPreview() {
             var _this = _super.call(this) || this;
             _this.skinName = "CameraPreview";
-            _this.visible = false;
             //
             var canvas = _this.canvas = document.getElementById("cameraPreviewCanvas");
             ;
@@ -1164,6 +1163,22 @@ var editor;
         return CameraPreview;
     }(eui.Component));
     editor.CameraPreview = CameraPreview;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * 粒子特效控制器
+     */
+    var ParticleEffectController = /** @class */ (function (_super) {
+        __extends(ParticleEffectController, _super);
+        function ParticleEffectController() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "ParticleEffectController";
+            return _this;
+        }
+        return ParticleEffectController;
+    }(eui.Component));
+    editor.ParticleEffectController = ParticleEffectController;
 })(editor || (editor = {}));
 var defaultTextFiled;
 function lostFocus(display) {

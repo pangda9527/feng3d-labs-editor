@@ -1,6 +1,6 @@
 namespace editor
 {
-    export class CameraPreview extends eui.Component implements eui.UIComponent
+    export class CameraPreview extends eui.Component
     {
         public group: eui.Group;
         //
@@ -33,7 +33,6 @@ namespace editor
         {
             super();
             this.skinName = "CameraPreview";
-            this.visible = false;
             //
             var canvas = this.canvas = <HTMLCanvasElement>document.getElementById("cameraPreviewCanvas");;
             this.previewEngine = new feng3d.Engine(canvas);

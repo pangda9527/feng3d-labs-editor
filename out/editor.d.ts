@@ -295,7 +295,7 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class CameraPreview extends eui.Component implements eui.UIComponent {
+    class CameraPreview extends eui.Component {
         group: eui.Group;
         private canvas;
         private previewEngine;
@@ -307,6 +307,14 @@ declare namespace editor {
         private onResize;
         private onDataChange;
         private onframe;
+    }
+}
+declare namespace editor {
+    /**
+     * 粒子特效控制器
+     */
+    class ParticleEffectController extends eui.Component {
+        constructor();
     }
 }
 declare var defaultTextFiled: egret.TextField;
