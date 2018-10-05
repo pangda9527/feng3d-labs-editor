@@ -2251,11 +2251,6 @@ declare namespace editor {
         defaultMaterial: feng3d.Material;
         constructor();
         /**
-         * 绘制贴图
-         * @param texture 贴图
-         */
-        drawTexture(texture: feng3d.UrlImageTexture2D, width?: number, height?: number): string;
-        /**
          * 绘制立方体贴图
          * @param textureCube 立方体贴图
          */

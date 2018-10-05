@@ -45,7 +45,7 @@ namespace editor
                     label: texture2d.name, click: () =>
                     {
                         this.attributeValue = texture2d;
-                        this.updateView();
+                        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                     }
                 });
             });
@@ -58,7 +58,7 @@ namespace editor
         updateView(): void
         {
             var texture: feng3d.UrlImageTexture2D = this.attributeValue;
-            this.image.source = feng3dScreenShot.drawTexture(texture);
+            this.image.source = texture.dataURL;
         }
 
         private onDoubleClick()

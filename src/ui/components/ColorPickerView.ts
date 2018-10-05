@@ -35,10 +35,7 @@ namespace editor
             var w = this.group1.width - 4;
             var h = this.group1.height - 4;
             var imagedata1 = feng3d.imageUtil.createColorPickerStripe(w, h, colors, null, false);
-            feng3d.dataTransform.imageDataToDataURL(imagedata1, dataurl =>
-            {
-                this.image1.source = dataurl;
-            });
+            this.image1.source = feng3d.dataTransform.imageDataToDataURL(imagedata1);
             this.updateView();
 
             //
@@ -197,10 +194,7 @@ namespace editor
             {
                 //
                 var imagedata = feng3d.imageUtil.createColorPickerRect(this.basecolor.toInt(), this.group0.width - 16, this.group0.height - 16);
-                feng3d.dataTransform.imageDataToDataURL(imagedata, dataurl =>
-                {
-                    this.image0.source = dataurl;
-                });
+                this.image0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
             }
 
             this.pos1.y = this.ratio * (this.group1.height - this.pos1.height);

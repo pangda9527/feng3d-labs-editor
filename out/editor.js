@@ -2566,14 +2566,11 @@ var editor;
             return _this;
         }
         ColorPickerView.prototype.$onAddToStage = function (stage, nestLevel) {
-            var _this = this;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             var w = this.group1.width - 4;
             var h = this.group1.height - 4;
             var imagedata1 = feng3d.imageUtil.createColorPickerStripe(w, h, colors, null, false);
-            feng3d.dataTransform.imageDataToDataURL(imagedata1, function (dataurl) {
-                _this.image1.source = dataurl;
-            });
+            this.image1.source = feng3d.dataTransform.imageDataToDataURL(imagedata1);
             this.updateView();
             //
             this.txtR.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
@@ -2681,7 +2678,6 @@ var editor;
             }
         };
         ColorPickerView.prototype.updateView = function () {
-            var _this = this;
             if (this._textfocusintxt != this.txtR)
                 this.txtR.text = Math.round(this.color.r * 255).toString();
             if (this._textfocusintxt != this.txtG)
@@ -2701,9 +2697,7 @@ var editor;
             if (this._mouseDownGroup != this.group0) {
                 //
                 var imagedata = feng3d.imageUtil.createColorPickerRect(this.basecolor.toInt(), this.group0.width - 16, this.group0.height - 16);
-                feng3d.dataTransform.imageDataToDataURL(imagedata, function (dataurl) {
-                    _this.image0.source = dataurl;
-                });
+                this.image0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
             }
             this.pos1.y = this.ratio * (this.group1.height - this.pos1.height);
             //
@@ -3735,7 +3729,7 @@ var editor;
         }
         OAVImage.prototype.initView = function () {
             var texture = this.space;
-            this.image.source = editor.feng3dScreenShot.drawTexture(texture);
+            this.image.source = texture.dataURL;
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
         };
         OAVImage.prototype.dispose = function () {
@@ -4435,7 +4429,7 @@ var editor;
                 menus.push({
                     label: texture2d.name, click: function () {
                         _this.attributeValue = texture2d;
-                        _this.updateView();
+                        _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     }
                 });
             });
@@ -4446,7 +4440,7 @@ var editor;
          */
         OAVTexture2D.prototype.updateView = function () {
             var texture = this.attributeValue;
-            this.image.source = editor.feng3dScreenShot.drawTexture(texture);
+            this.image.source = texture.dataURL;
         };
         OAVTexture2D.prototype.onDoubleClick = function () {
             if (this.attributeValue && typeof this.attributeValue == "object")
@@ -5447,7 +5441,7 @@ var editor;
             if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D) {
                 var texture = this.feng3dAssets;
                 texture.onLoadCompleted(function () {
-                    _this.image = editor.feng3dScreenShot.drawTexture(texture, 64, 64);
+                    _this.image = texture.dataURL;
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.TextureCube) {
@@ -8665,29 +8659,30 @@ var editor;
             scene.gameObject.addChild(light);
             engine.stop();
         }
-        /**
-         * 绘制贴图
-         * @param texture 贴图
-         */
-        Feng3dScreenShot.prototype.drawTexture = function (texture, width, height) {
-            var image = texture.activePixels;
-            var w = width || (image && image.width) || 64;
-            var h = height || (image && image.height) || 64;
-            var canvas2D = document.createElement("canvas");
-            canvas2D.width = w;
-            canvas2D.height = h;
-            var context2D = canvas2D.getContext("2d");
-            context2D.fillStyle = "black";
-            if (image instanceof HTMLImageElement)
-                context2D.drawImage(image, 0, 0, w, h);
-            else if (image instanceof ImageData)
-                context2D.putImageData(image, 0, 0);
-            else
-                context2D.fillRect(0, 0, w, h);
-            //
-            var dataUrl = canvas2D.toDataURL();
-            return dataUrl;
-        };
+        // /**
+        //  * 绘制贴图
+        //  * @param texture 贴图
+        //  */
+        // drawTexture(texture: feng3d.UrlImageTexture2D, width?: number, height?: number)
+        // {
+        //     var image: ImageData | HTMLImageElement = <any>texture.activePixels;
+        //     var w = width || (image && image.width) || 64;
+        //     var h = height || (image && image.height) || 64;
+        //     var canvas2D = document.createElement("canvas");
+        //     canvas2D.width = w;
+        //     canvas2D.height = h;
+        //     var context2D = canvas2D.getContext("2d");
+        //     context2D.fillStyle = "black";
+        //     if (image instanceof HTMLImageElement)
+        //         context2D.drawImage(image, 0, 0, w, h);
+        //     else if (image instanceof ImageData)
+        //         context2D.putImageData(image, 0, 0);
+        //     else
+        //         context2D.fillRect(0, 0, w, h);
+        //     //
+        //     var dataUrl = canvas2D.toDataURL();
+        //     return dataUrl;
+        // }
         /**
          * 绘制立方体贴图
          * @param textureCube 立方体贴图

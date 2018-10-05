@@ -39,35 +39,35 @@ namespace editor
             engine.stop();
         }
 
-        /**
-         * 绘制贴图
-         * @param texture 贴图
-         */
-        drawTexture(texture: feng3d.UrlImageTexture2D, width?: number, height?: number)
-        {
-            var image: ImageData | HTMLImageElement = <any>texture.activePixels;
+        // /**
+        //  * 绘制贴图
+        //  * @param texture 贴图
+        //  */
+        // drawTexture(texture: feng3d.UrlImageTexture2D, width?: number, height?: number)
+        // {
+        //     var image: ImageData | HTMLImageElement = <any>texture.activePixels;
 
-            var w = width || (image && image.width) || 64;
-            var h = height || (image && image.height) || 64;
+        //     var w = width || (image && image.width) || 64;
+        //     var h = height || (image && image.height) || 64;
 
-            var canvas2D = document.createElement("canvas");
-            canvas2D.width = w;
-            canvas2D.height = h;
-            var context2D = canvas2D.getContext("2d");
+        //     var canvas2D = document.createElement("canvas");
+        //     canvas2D.width = w;
+        //     canvas2D.height = h;
+        //     var context2D = canvas2D.getContext("2d");
 
-            context2D.fillStyle = "black";
+        //     context2D.fillStyle = "black";
 
-            if (image instanceof HTMLImageElement)
-                context2D.drawImage(image, 0, 0, w, h);
-            else if (image instanceof ImageData)
-                context2D.putImageData(image, 0, 0);
-            else
-                context2D.fillRect(0, 0, w, h);
+        //     if (image instanceof HTMLImageElement)
+        //         context2D.drawImage(image, 0, 0, w, h);
+        //     else if (image instanceof ImageData)
+        //         context2D.putImageData(image, 0, 0);
+        //     else
+        //         context2D.fillRect(0, 0, w, h);
 
-            //
-            var dataUrl = canvas2D.toDataURL();
-            return dataUrl;
-        }
+        //     //
+        //     var dataUrl = canvas2D.toDataURL();
+        //     return dataUrl;
+        // }
 
         /**
          * 绘制立方体贴图

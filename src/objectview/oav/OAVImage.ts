@@ -15,7 +15,7 @@ namespace editor
 		initView()
 		{
 			var texture: feng3d.UrlImageTexture2D = this.space;
-			this.image.source = feng3dScreenShot.drawTexture(texture);
+			this.image.source = texture.dataURL;
 
 			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
 		}
