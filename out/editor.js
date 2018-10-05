@@ -8421,7 +8421,7 @@ var editor;
             if (selectedObject)
                 this.selectedObject = selectedObject;
             editor.editorData.selectedGameObjects.forEach(function (element) {
-                if (element.getComponent(feng3d.Model))
+                if (element.getComponent(feng3d.Model) && !element.getComponent(feng3d.ParticleSystem))
                     feng3d.wireframeRenderer.drawGameObject(_this.gl, element, _this.scene, _this.camera, _this.wireframeColor);
             });
         };
