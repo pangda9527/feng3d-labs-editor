@@ -2276,9 +2276,11 @@ declare namespace editor {
          * 转换为DataURL
          */
         toDataURL(): string;
-        private _drawGameObject;
-        private currentObject;
         updateCameraPosition(): void;
+        private currentObject;
+        private materialObject;
+        private geometryObject;
+        private _drawGameObject;
     }
 }
 declare namespace feng3d {

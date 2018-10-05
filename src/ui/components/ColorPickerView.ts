@@ -165,7 +165,7 @@ namespace editor
 
         private onColorChanged(property, oldValue: feng3d.Color3, newValue: feng3d.Color3)
         {
-            if (this.stage) this.updateView();
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
 
             if (oldValue && newValue && !oldValue.equals(newValue))
             {

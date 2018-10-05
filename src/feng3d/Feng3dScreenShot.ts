@@ -130,16 +130,13 @@ namespace editor
          */
         drawMaterial(material: feng3d.Material, cameraRotation = new feng3d.Vector3(20, -90, 0))
         {
-            var gameObject = new feng3d.GameObject().value({
-                components: [{
-                    __class__: "feng3d.MeshModel",
-                    geometry: this.defaultGeometry,
-                    material: material,
-                }]
-            });
+            var mode = this.materialObject.getComponent(feng3d.Model);
+            mode.geometry = this.defaultGeometry;
+            mode.material = material;
 
+            //
             cameraRotation && (this.camera.transform.rotation = cameraRotation);
-            this._drawGameObject(gameObject);
+            this._drawGameObject(this.materialObject);
             return this;
         }
 
@@ -149,19 +146,12 @@ namespace editor
          */
         drawGeometry(geometry: feng3d.Geometrys, cameraRotation = new feng3d.Vector3(-20, 120, 0))
         {
-            var gameObject = new feng3d.GameObject().value({
-                components: [{
-                    __class__: "feng3d.MeshModel",
-                    geometry: geometry,
-                    material: this.defaultMaterial,
-                }, {
-                    __class__: "feng3d.WireframeComponent",
-                    // color: new feng3d.Color4(0, 0, 0, 1),
-                }]
-            });
+            var model = this.geometryObject.getComponent(feng3d.Model);
+            model.geometry = geometry;
+            model.material = this.defaultMaterial;
 
             cameraRotation && (this.camera.transform.rotation = cameraRotation);
-            this._drawGameObject(gameObject);
+            this._drawGameObject(this.geometryObject);
             return this;
         }
 
@@ -185,23 +175,6 @@ namespace editor
             var dataUrl = this.engine.canvas.toDataURL();
             return dataUrl;
         }
-
-        private _drawGameObject(gameObject: feng3d.GameObject)
-        {
-            if (this.currentObject)
-            {
-                this.scene.gameObject.removeChild(this.currentObject);
-                this.currentObject = null;
-            }
-            //
-            this.scene.gameObject.addChild(gameObject);
-            this.currentObject = gameObject;
-
-            //
-            this.updateCameraPosition();
-        }
-
-        private currentObject: feng3d.GameObject;
 
         updateCameraPosition()
         {
@@ -227,6 +200,26 @@ namespace editor
             }
             this.camera.transform.position = localLookPos;
         }
+
+        private currentObject: feng3d.GameObject;
+        private materialObject = new feng3d.GameObject().value({ components: [{ __class__: "feng3d.MeshModel" }] });
+        private geometryObject = new feng3d.GameObject().value({ components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
+
+        private _drawGameObject(gameObject: feng3d.GameObject)
+        {
+            if (this.currentObject)
+            {
+                this.scene.gameObject.removeChild(this.currentObject);
+                this.currentObject = null;
+            }
+            //
+            this.scene.gameObject.addChild(gameObject);
+            this.currentObject = gameObject;
+
+            //
+            this.updateCameraPosition();
+        }
+
     }
 
     feng3dScreenShot = new Feng3dScreenShot();

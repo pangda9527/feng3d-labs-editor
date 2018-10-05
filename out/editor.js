@@ -2648,8 +2648,7 @@ var editor;
             }
         };
         ColorPickerView.prototype.onColorChanged = function (property, oldValue, newValue) {
-            if (this.stage)
-                this.updateView();
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             if (oldValue && newValue && !oldValue.equals(newValue)) {
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }
@@ -8620,6 +8619,8 @@ var editor;
         function Feng3dScreenShot() {
             this.defaultGeometry = feng3d.Geometry.sphere;
             this.defaultMaterial = feng3d.Material.default;
+            this.materialObject = new feng3d.GameObject().value({ components: [{ __class__: "feng3d.MeshModel" }] });
+            this.geometryObject = new feng3d.GameObject().value({ components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
             // 初始化3d
             var engine = this.engine = new feng3d.Engine();
             engine.canvas.style.visibility = "hidden";
@@ -8727,15 +8728,12 @@ var editor;
          */
         Feng3dScreenShot.prototype.drawMaterial = function (material, cameraRotation) {
             if (cameraRotation === void 0) { cameraRotation = new feng3d.Vector3(20, -90, 0); }
-            var gameObject = new feng3d.GameObject().value({
-                components: [{
-                        __class__: "feng3d.MeshModel",
-                        geometry: this.defaultGeometry,
-                        material: material,
-                    }]
-            });
+            var mode = this.materialObject.getComponent(feng3d.Model);
+            mode.geometry = this.defaultGeometry;
+            mode.material = material;
+            //
             cameraRotation && (this.camera.transform.rotation = cameraRotation);
-            this._drawGameObject(gameObject);
+            this._drawGameObject(this.materialObject);
             return this;
         };
         /**
@@ -8744,17 +8742,11 @@ var editor;
          */
         Feng3dScreenShot.prototype.drawGeometry = function (geometry, cameraRotation) {
             if (cameraRotation === void 0) { cameraRotation = new feng3d.Vector3(-20, 120, 0); }
-            var gameObject = new feng3d.GameObject().value({
-                components: [{
-                        __class__: "feng3d.MeshModel",
-                        geometry: geometry,
-                        material: this.defaultMaterial,
-                    }, {
-                        __class__: "feng3d.WireframeComponent",
-                    }]
-            });
+            var model = this.geometryObject.getComponent(feng3d.Model);
+            model.geometry = geometry;
+            model.material = this.defaultMaterial;
             cameraRotation && (this.camera.transform.rotation = cameraRotation);
-            this._drawGameObject(gameObject);
+            this._drawGameObject(this.geometryObject);
             return this;
         };
         /**
@@ -8774,17 +8766,6 @@ var editor;
             this.engine.render();
             var dataUrl = this.engine.canvas.toDataURL();
             return dataUrl;
-        };
-        Feng3dScreenShot.prototype._drawGameObject = function (gameObject) {
-            if (this.currentObject) {
-                this.scene.gameObject.removeChild(this.currentObject);
-                this.currentObject = null;
-            }
-            //
-            this.scene.gameObject.addChild(gameObject);
-            this.currentObject = gameObject;
-            //
-            this.updateCameraPosition();
         };
         Feng3dScreenShot.prototype.updateCameraPosition = function () {
             //
@@ -8806,6 +8787,17 @@ var editor;
                 localLookPos = this.camera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
             }
             this.camera.transform.position = localLookPos;
+        };
+        Feng3dScreenShot.prototype._drawGameObject = function (gameObject) {
+            if (this.currentObject) {
+                this.scene.gameObject.removeChild(this.currentObject);
+                this.currentObject = null;
+            }
+            //
+            this.scene.gameObject.addChild(gameObject);
+            this.currentObject = gameObject;
+            //
+            this.updateCameraPosition();
         };
         return Feng3dScreenShot;
     }());
