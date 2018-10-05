@@ -25,6 +25,8 @@ namespace editor
             this._attributeName = attributeViewInfo.name;
             this._attributeType = attributeViewInfo.type;
             this._attributeViewInfo = attributeViewInfo;
+
+            if (!this._attributeViewInfo.editable) this.alpha = 0.8;
         }
 
         get space(): any

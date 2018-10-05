@@ -9,6 +9,7 @@ namespace editor
         {
             super(attributeViewInfo);
             this.skinName = "OAVFeng3dPreView";
+            this.alpha = 1;
         }
 
         initView()

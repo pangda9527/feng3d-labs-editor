@@ -30,6 +30,7 @@ namespace editor
 		{
 			super(attributeViewInfo);
 			this.skinName = "OAVCubeMap";
+			this.alpha = 1;
 		}
 
 		initView()
@@ -49,6 +50,8 @@ namespace editor
 				// 		this.attributeValue = dragSource[param.accepttype];
 				// 	});
 				this.btns[i].addEventListener(egret.MouseEvent.CLICK, this.onImageClick, this);
+				this.btns[i].enabled = this._attributeViewInfo.editable;
+				// this.btns[i].touchChildren = this.btns[i].touchEnabled = this._attributeViewInfo.editable;
 			}
 
 			this.addEventListener(egret.Event.RESIZE, this.onResize, this);

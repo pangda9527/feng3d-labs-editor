@@ -57,8 +57,6 @@ namespace editor
 				this.group.addChild(displayObject);
 				this.blockViews.push(displayObject);
 			}
-			if (!this._objectViewInfo.editable) this.alpha = 0.8;
-			else this.alpha = 1;
 		}
 
 		dispose()

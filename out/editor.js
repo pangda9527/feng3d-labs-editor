@@ -2886,10 +2886,6 @@ var editor;
                 this.group.addChild(displayObject);
                 this.blockViews.push(displayObject);
             }
-            if (!this._objectViewInfo.editable)
-                this.alpha = 0.8;
-            else
-                this.alpha = 1;
         };
         OVDefault.prototype.dispose = function () {
             if (!this.blockViews)
@@ -3212,6 +3208,8 @@ var editor;
             _this._attributeName = attributeViewInfo.name;
             _this._attributeType = attributeViewInfo.type;
             _this._attributeViewInfo = attributeViewInfo;
+            if (!_this._attributeViewInfo.editable)
+                _this.alpha = 0.8;
             return _this;
         }
         Object.defineProperty(OAVBase.prototype, "space", {
@@ -3732,6 +3730,7 @@ var editor;
         function OAVImage(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
             _this.skinName = "OAVImage";
+            _this.alpha = 1;
             return _this;
         }
         OAVImage.prototype.initView = function () {
@@ -3762,6 +3761,7 @@ var editor;
         function OAVCubeMap(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
             _this.skinName = "OAVCubeMap";
+            _this.alpha = 1;
             return _this;
         }
         OAVCubeMap.prototype.initView = function () {
@@ -3778,6 +3778,8 @@ var editor;
                 // 		this.attributeValue = dragSource[param.accepttype];
                 // 	});
                 this.btns[i].addEventListener(egret.MouseEvent.CLICK, this.onImageClick, this);
+                this.btns[i].enabled = this._attributeViewInfo.editable;
+                // this.btns[i].touchChildren = this.btns[i].touchEnabled = this._attributeViewInfo.editable;
             }
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
         };
@@ -4549,6 +4551,7 @@ var editor;
         function OAVFeng3dPreView(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
             _this.skinName = "OAVFeng3dPreView";
+            _this.alpha = 1;
             return _this;
         }
         OAVFeng3dPreView.prototype.initView = function () {

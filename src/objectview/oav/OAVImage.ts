@@ -9,6 +9,7 @@ namespace editor
 		{
 			super(attributeViewInfo);
 			this.skinName = "OAVImage";
+			this.alpha = 1;
 		}
 
 		initView()
