@@ -3697,18 +3697,8 @@ var editor;
             return _this;
         }
         OAVImage.prototype.initView = function () {
-            var _this = this;
-            var imagePath = this.attributeValue;
-            if (imagePath) {
-                editor.assets.readArrayBuffer(imagePath, function (err, data) {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
-                        _this.image.source = dataurl;
-                    });
-                });
-            }
-            else {
-                this.image.source = null;
-            }
+            var texture = this.space;
+            this.image.source = editor.feng3dScreenShot.drawTexture(texture);
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
         };
         OAVImage.prototype.dispose = function () {
@@ -5425,7 +5415,7 @@ var editor;
             if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D) {
                 var texture = this.feng3dAssets;
                 texture.onLoadCompleted(function () {
-                    _this.image = editor.feng3dScreenShot.drawTexture(texture);
+                    _this.image = editor.feng3dScreenShot.drawTexture(texture, 64, 64);
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.TextureCube) {
@@ -8647,18 +8637,21 @@ var editor;
          * 绘制立方体贴图
          * @param texture 贴图
          */
-        Feng3dScreenShot.prototype.drawTexture = function (texture) {
-            var image = texture["image"];
+        Feng3dScreenShot.prototype.drawTexture = function (texture, width, height) {
+            var image = texture.activePixels;
+            var w = width || (image && image.width) || 64;
+            var h = height || (image && image.height) || 64;
             var canvas2D = document.createElement("canvas");
-            var width = 64;
-            canvas2D.width = width;
-            canvas2D.height = width;
+            canvas2D.width = w;
+            canvas2D.height = h;
             var context2D = canvas2D.getContext("2d");
             context2D.fillStyle = "black";
-            if (image)
-                context2D.drawImage(image, 0, 0, width, width);
+            if (image instanceof HTMLImageElement)
+                context2D.drawImage(image, 0, 0, w, h);
+            else if (image instanceof ImageData)
+                context2D.putImageData(image, 0, 0);
             else
-                context2D.fillRect(0, 0, width, width);
+                context2D.fillRect(0, 0, w, h);
             //
             var dataUrl = canvas2D.toDataURL();
             return dataUrl;

@@ -13,21 +13,10 @@ namespace editor
 
 		initView()
 		{
-			var imagePath = this.attributeValue;
-			if (imagePath)
-			{
-				assets.readArrayBuffer(imagePath, (err, data) =>
-				{
-					feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
-					{
-						this.image.source = dataurl;
-					});
-				});
-			} else
-			{
-				this.image.source = null;
-			}
-			this.addEventListener(egret.Event.RESIZE,this.onResize,this);
+			var texture: feng3d.UrlImageTexture2D = this.space;
+			this.image.source = feng3dScreenShot.drawTexture(texture);
+
+			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
 		}
 
 		dispose()
@@ -37,7 +26,7 @@ namespace editor
 		updateView()
 		{
 		}
-		
+
 		onResize()
 		{
 			this.image.width = this.width;

@@ -112,7 +112,7 @@ namespace editor
                 var texture = this.feng3dAssets;
                 texture.onLoadCompleted(() =>
                 {
-                    this.image = feng3dScreenShot.drawTexture(texture);
+                    this.image = feng3dScreenShot.drawTexture(texture, 64, 64);
                 });
             } else if (this.feng3dAssets instanceof feng3d.TextureCube)
             {
