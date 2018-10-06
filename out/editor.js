@@ -11497,54 +11497,53 @@ var shortcutConfig = [
 // 解决monaco-editor在electron下运行问题
 // https://github.com/Microsoft/monaco-editor-samples/blob/master/electron-amd/electron-index.html
 var ts;
+amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
+amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function () {
+    // 设置ts编译选项
+    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+        allowNonTsExtensions: true,
+        module: monaco.languages.typescript.ModuleKind.AMD,
+        noResolve: true,
+        suppressOutputPathCheck: true,
+        skipLibCheck: true,
+        skipDefaultLibCheck: true,
+        target: monaco.languages.typescript.ScriptTarget.ES5,
+        noImplicitAny: false,
+        strictNullChecks: false,
+        noImplicitThis: false,
+        noImplicitReturns: false,
+        experimentalDecorators: true,
+        noUnusedLocals: false,
+        noUnusedParameters: false,
+    });
+});
 var editor;
 (function (editor) {
     var ScriptCompiler = /** @class */ (function () {
         function ScriptCompiler() {
-        }
-        ScriptCompiler.prototype.compile = function () {
             // ts 列表
-            var tslist = [];
-            var tslibs = [];
-            function initEditor(callback) {
-                amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-                amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], init);
-                function init() {
-                    // 设置ts编译选项
-                    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-                        allowNonTsExtensions: true,
-                        module: monaco.languages.typescript.ModuleKind.AMD,
-                        noResolve: true,
-                        suppressOutputPathCheck: true,
-                        skipLibCheck: true,
-                        skipDefaultLibCheck: true,
-                        target: monaco.languages.typescript.ScriptTarget.ES5,
-                        noImplicitAny: false,
-                        strictNullChecks: false,
-                        noImplicitThis: false,
-                        noImplicitReturns: false,
-                        experimentalDecorators: true,
-                        noUnusedLocals: false,
-                        noUnusedParameters: false,
-                    });
-                    loadLibs(['https://unpkg.com/feng3d/out/feng3d.d.ts'], function () {
-                        callback();
-                    });
-                }
-            }
-            function loadLibs(libpaths, callback) {
-                if (libpaths == null || libpaths.length == 0) {
-                    callback();
-                    return;
-                }
-                var libpath = libpaths.shift();
-                xhr(libpath).then(function (response) {
-                    var libcode = response.responseText;
-                    monaco.languages.typescript.typescriptDefaults.addExtraLib(libcode, libpath.split("/").pop());
-                    tslibs.push({ path: libpath, code: libcode });
-                    loadLibs(libpaths, callback);
+            this.tslist = [];
+        }
+        ScriptCompiler.prototype.loadLibs = function (callback) {
+            var _this = this;
+            this.tslibs = [];
+            feng3d.loadjs.load({
+                paths: ["../feng3d/out/feng3d.d.ts"], onitemload: function (url, content) {
+                    monaco.languages.typescript.typescriptDefaults.addExtraLib(content, url.split("/").pop());
+                    _this.tslibs.push({ path: url, code: content });
+                },
+                success: callback,
+            });
+        };
+        ScriptCompiler.prototype.compile = function () {
+            var _this = this;
+            if (!this.tslibs) {
+                this.loadLibs(function () {
+                    _this.compile();
                 });
+                return;
             }
+            this.tslibs;
             // ------------ Compilation logic
             function triggerCompile() {
                 try {
@@ -11566,12 +11565,12 @@ var editor;
             }
             function transpileModule(options) {
                 var tsSourceMap = {};
-                tslibs.forEach(function (item) {
+                this.tslibs.forEach(function (item) {
                     tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
                 });
-                tssort(tslist);
+                tssort(this.tslist);
                 // tslist.sort((a, b) => a.path > b.path);
-                tslist.forEach(function (item) {
+                this.tslist.forEach(function (item) {
                     tsSourceMap[item.assetsId + ".ts"] = ts.createSourceFile(item.assetsId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
                 });
                 // Output
@@ -11603,35 +11602,6 @@ var editor;
                 return outputs;
             }
             // ------------ Execution logic
-            function xhr(url) {
-                var req = null;
-                return new monaco.Promise(function (c, e, p) {
-                    req = new XMLHttpRequest();
-                    req.onreadystatechange = function () {
-                        if (req._canceled) {
-                            return;
-                        }
-                        if (req.readyState === 4) {
-                            if ((req.status >= 200 && req.status < 300) || req.status === 1223) {
-                                c(req);
-                            }
-                            else {
-                                e(req);
-                            }
-                            req.onreadystatechange = function () { };
-                        }
-                        else {
-                            p(req);
-                        }
-                    };
-                    req.open("GET", url, true);
-                    req.responseType = "";
-                    req.send(null);
-                }, function () {
-                    req._canceled = true;
-                    req.abort();
-                });
-            }
             /**
              * 脚本中的类
              */
@@ -11684,7 +11654,7 @@ var editor;
         return ScriptCompiler;
     }());
     editor.ScriptCompiler = ScriptCompiler;
-    editor.codeCompiler = new ScriptCompiler();
+    codeCompiler = new ScriptCompiler();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

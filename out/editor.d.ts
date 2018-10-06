@@ -2707,8 +2707,11 @@ declare namespace feng3d {
 declare var ts: any;
 declare var amdRequire: any;
 declare namespace editor {
-    var codeCompiler: ScriptCompiler;
+    var scriptCompiler: ScriptCompiler;
     class ScriptCompiler {
+        private tslibs;
+        private tslist;
+        private loadLibs;
         compile(): void;
     }
 }
