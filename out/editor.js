@@ -5069,17 +5069,10 @@ var editor;
             if (assetsFile.feng3dAssets instanceof feng3d.StringFile) {
                 menuconfig.push({
                     label: "编辑", click: function () {
-                        var url = "codeeditor.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname + "&id=" + assetsFile.id;
-                        url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                        // if (assets.type == FSType.native)
-                        // {
-                        //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
-                        // } else
-                        // {
-                        if (editor.codeeditoWin)
-                            editor.codeeditoWin.close();
-                        editor.codeeditoWin = window.open(url);
-                        // }
+                        var url = "codeeditor.html";
+                        if (!editor.codeeditoWin)
+                            editor.codeeditoWin = window.open(url);
+                        editor.scriptCompiler.edit(assetsFile.feng3dAssets);
                     }
                 });
             }
@@ -11503,6 +11496,10 @@ var editor;
             // ts 列表
             this.tslist = [];
         }
+        ScriptCompiler.prototype.edit = function (script) {
+            this._script = script;
+            this.codeEditor && this.codeEditor(script);
+        };
         ScriptCompiler.prototype.compile = function (callback) {
             var _this = this;
             if (!this.tslibs) {
@@ -11511,7 +11508,7 @@ var editor;
                 });
                 return;
             }
-            this.updateScripts();
+            this.tslist = this.getScripts();
             this.tssort(this.tslist);
             try {
                 var output = this.transpileModule();
@@ -11529,6 +11526,10 @@ var editor;
         };
         ScriptCompiler.prototype.loadLibs = function (callback) {
             var _this = this;
+            if (this.tslibs) {
+                callback();
+                return;
+            }
             this.tslibs = [];
             feng3d.loadjs.load({
                 paths: ["../feng3d/out/feng3d.d.ts"], onitemload: function (url, content) {
@@ -11538,15 +11539,16 @@ var editor;
                 success: callback,
             });
         };
-        ScriptCompiler.prototype.updateScripts = function () {
+        ScriptCompiler.prototype.getScripts = function () {
             var files = editor.editorAssets.files;
-            this.tslist = [];
+            var tslist = [];
             for (var key in files) {
                 var file = files[key].feng3dAssets;
                 if (file instanceof feng3d.ScriptFile) {
-                    this.tslist.push(file);
+                    tslist.push(file);
                 }
             }
+            return tslist;
         };
         ScriptCompiler.prototype.transpileModule = function () {
             var options = {

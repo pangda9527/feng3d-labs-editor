@@ -241,16 +241,9 @@ namespace editor
                 menuconfig.push({
                     label: "编辑", click: () =>
                     {
-                        var url = `codeeditor.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}&id=${assetsFile.id}`;
-                        url = document.URL.substring(0, document.URL.lastIndexOf("/")) + "/" + url;
-                        // if (assets.type == FSType.native)
-                        // {
-                        //     alert(`请使用本地编辑器编辑代码，推荐 vscode`);
-                        // } else
-                        // {
-                        if (codeeditoWin) codeeditoWin.close();
-                        codeeditoWin = window.open(url);
-                        // }
+                        var url = `codeeditor.html`;
+                        if (!codeeditoWin) codeeditoWin = window.open(url);
+                        scriptCompiler.edit(<feng3d.StringFile>assetsFile.feng3dAssets);
                     }
                 });
             }

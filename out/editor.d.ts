@@ -2709,9 +2709,12 @@ declare namespace editor {
     class ScriptCompiler {
         private tslibs;
         private tslist;
+        private codeEditor;
+        private _script;
+        edit(script: feng3d.StringFile): void;
         compile(callback?: (result: string) => void): any;
         private loadLibs;
-        private updateScripts;
+        private getScripts;
         private transpileModule;
         /**
          * ts 文件排序

@@ -14,6 +14,15 @@ namespace editor
         // ts 列表
         private tslist: feng3d.ScriptFile[] = [];
 
+        private codeEditor: (script: feng3d.StringFile) => void;
+        private _script: feng3d.StringFile;
+
+        edit(script: feng3d.StringFile)
+        {
+            this._script = script;
+            this.codeEditor && this.codeEditor(script);
+        }
+
         compile(callback?: (result: string) => void)
         {
             if (!this.tslibs)
@@ -25,7 +34,7 @@ namespace editor
                 return;
             }
 
-            this.updateScripts();
+            this.tslist = this.getScripts();
 
             this.tssort(this.tslist);
 
@@ -52,6 +61,11 @@ namespace editor
 
         private loadLibs(callback: () => void)
         {
+            if (this.tslibs) 
+            {
+                callback();
+                return;
+            }
             this.tslibs = [];
             feng3d.loadjs.load({
                 paths: ["../feng3d/out/feng3d.d.ts"], onitemload: (url, content) =>
@@ -63,18 +77,19 @@ namespace editor
             });
         }
 
-        private updateScripts()
+        private getScripts()
         {
             var files = editorAssets.files
-            this.tslist = [];
+            var tslist: feng3d.ScriptFile[] = [];
             for (const key in files)
             {
                 var file = files[key].feng3dAssets;
                 if (file instanceof feng3d.ScriptFile)
                 {
-                    this.tslist.push(file);
+                    tslist.push(file);
                 }
             }
+            return tslist;
         }
 
         private transpileModule()
