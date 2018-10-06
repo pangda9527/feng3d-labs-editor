@@ -31,7 +31,7 @@ namespace editor
                 }
                 if (dragdata.file_script)
                 {
-                    this.data.gameobject.addScript(dragdata.file_script.classDefinition);
+                    this.data.gameobject.addScript(dragdata.file_script.scriptName);
                 }
             });
             //

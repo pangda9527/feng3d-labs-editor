@@ -67,7 +67,7 @@ namespace editor
 			{
 				if (dragdata.file_script)
 				{
-					this.space.addScript(dragdata.file_script.classDefinition);
+					this.space.addScript(dragdata.file_script.scriptName);
 				}
 			});
 

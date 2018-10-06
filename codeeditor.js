@@ -301,7 +301,7 @@ window.editor = window.opener.editor;
 
         tslist.forEach((item) =>
         {
-            tsSourceMap[item.assetsId] = ts.createSourceFile(item.assetsId, item.textContent, options.target || ts.ScriptTarget.ES5);
+            tsSourceMap[item.assetsId + ".ts"] = ts.createSourceFile(item.assetsId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
         })
 
         // Output

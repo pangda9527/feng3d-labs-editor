@@ -20,8 +20,6 @@
         "libs/jszip.d.ts",
         "libs/FileSaver.d.ts",
         //
-        "src/utils/Utils.ts",
-        //
         "src/assets/FileObject.ts",
         "src/assets/io.ts",
         //

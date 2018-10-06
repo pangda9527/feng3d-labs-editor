@@ -106,10 +106,10 @@ namespace editor
                     scriptFiles.forEach(element =>
                     {
                         menus.push({
-                            label: element.name,
+                            label: element.scriptName,
                             click: () =>
                             {
-                                this.attributeValue = new element.classDefinition();
+                                this.attributeValue = element.scriptName;
                             }
                         });
                     });

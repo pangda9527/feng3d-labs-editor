@@ -1016,7 +1016,7 @@ var editor;
                     var gameobject = editor.engine.mouse3DManager.selectedGameObject;
                     if (!gameobject || !gameobject.scene)
                         gameobject = editor.hierarchy.rootnode.gameobject;
-                    gameobject.addScript(dragdata.file_script.classDefinition);
+                    gameobject.addScript(dragdata.file_script.scriptName);
                 }
             });
         };
@@ -2260,7 +2260,7 @@ var editor;
         ComponentView.prototype.initScriptView = function () {
             // 初始化Script属性面板
             if (this.component instanceof feng3d.ScriptComponent) {
-                feng3d.watcher.watch(this.component, "scriptInstance", this.onScriptChanged, this);
+                feng3d.watcher.watch(this.component, "scriptName", this.onScriptChanged, this);
                 var component = this.component;
                 if (component.scriptInstance) {
                     this.scriptView = feng3d.objectview.getObjectView(component.scriptInstance, { autocreate: false });
@@ -2271,7 +2271,7 @@ var editor;
         ComponentView.prototype.removeScriptView = function () {
             // 移除Script属性面板
             if (this.component instanceof feng3d.ScriptComponent) {
-                feng3d.watcher.unwatch(this.component, "scriptInstance", this.onScriptChanged, this);
+                feng3d.watcher.unwatch(this.component, "scriptName", this.onScriptChanged, this);
             }
             if (this.scriptView) {
                 if (this.scriptView.parent)
@@ -3895,7 +3895,7 @@ var editor;
             this.space.on("removedComponent", this.onremovedComponent, this);
             editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
                 if (dragdata.file_script) {
-                    _this.space.addScript(dragdata.file_script.classDefinition);
+                    _this.space.addScript(dragdata.file_script.scriptName);
                 }
             });
             this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
@@ -4311,9 +4311,9 @@ var editor;
                     var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
                     scriptFiles.forEach(function (element) {
                         menus.push({
-                            label: element.name,
+                            label: element.scriptName,
                             click: function () {
-                                _this.attributeValue = new element.classDefinition();
+                                _this.attributeValue = element.scriptName;
                             }
                         });
                     });
@@ -4764,7 +4764,7 @@ var editor;
                     editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, _this.data.gameobject);
                 }
                 if (dragdata.file_script) {
-                    _this.data.gameobject.addScript(dragdata.file_script.classDefinition);
+                    _this.data.gameobject.addScript(dragdata.file_script.scriptName);
                 }
             });
             //
