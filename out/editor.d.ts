@@ -2705,7 +2705,8 @@ declare namespace feng3d {
     }
 }
 declare var ts: any;
-declare var amdRequire: any;
+declare var nodeRequire: any;
+declare var script: HTMLScriptElement;
 declare namespace editor {
     var scriptCompiler: ScriptCompiler;
     class ScriptCompiler {

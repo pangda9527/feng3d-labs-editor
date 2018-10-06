@@ -11497,26 +11497,38 @@ var shortcutConfig = [
 // 解决monaco-editor在electron下运行问题
 // https://github.com/Microsoft/monaco-editor-samples/blob/master/electron-amd/electron-index.html
 var ts;
-amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function () {
-    // 设置ts编译选项
-    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-        allowNonTsExtensions: true,
-        module: monaco.languages.typescript.ModuleKind.AMD,
-        noResolve: true,
-        suppressOutputPathCheck: true,
-        skipLibCheck: true,
-        skipDefaultLibCheck: true,
-        target: monaco.languages.typescript.ScriptTarget.ES5,
-        noImplicitAny: false,
-        strictNullChecks: false,
-        noImplicitThis: false,
-        noImplicitReturns: false,
-        experimentalDecorators: true,
-        noUnusedLocals: false,
-        noUnusedParameters: false,
+// Monaco uses a custom amd loader that overrides node's require.
+// Keep a reference to node's require so we can restore it after executing the amd loader file.
+var nodeRequire = window["require"];
+var script = document.createElement("script");
+script.src = "libs/monaco-editor/min/vs/loader.js";
+script.onload = function () {
+    // Save Monaco's amd require and restore Node's require
+    var amdRequire = window["require"];
+    window["require"] = nodeRequire;
+    //
+    amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
+    amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function () {
+        // 设置ts编译选项
+        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+            allowNonTsExtensions: true,
+            module: monaco.languages.typescript.ModuleKind.AMD,
+            noResolve: true,
+            suppressOutputPathCheck: true,
+            skipLibCheck: true,
+            skipDefaultLibCheck: true,
+            target: monaco.languages.typescript.ScriptTarget.ES5,
+            noImplicitAny: false,
+            strictNullChecks: false,
+            noImplicitThis: false,
+            noImplicitReturns: false,
+            experimentalDecorators: true,
+            noUnusedLocals: false,
+            noUnusedParameters: false,
+        });
     });
-});
+};
+document.body.appendChild(script);
 var editor;
 (function (editor) {
     var ScriptCompiler = /** @class */ (function () {
