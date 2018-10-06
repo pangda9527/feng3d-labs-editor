@@ -66,6 +66,20 @@
 	 data-show-paint-rect="false" data-multi-fingered="2" data-show-fps="false" data-show-log="false" data-show-fps-style="x:0,y:0,size:12,textColor:0xffffff,bgAlpha:0.9">
 	</div>
 	<div id="output" style="position: absolute;display: none;top: 10px; right: 10px;"></div>
+
+	<!-- monaco-editor -->
+	<script>
+		// Monaco uses a custom amd loader that overrides node's require.
+		// Keep a reference to node's require so we can restore it after executing the amd loader file.
+		var nodeRequire = window.require;
+	</script>
+	<script src="libs/monaco-editor/min/vs/loader.js"></script>
+	<script>
+		// Save Monaco's amd require and restore Node's require
+		var amdRequire = window.require;
+		window.require = nodeRequire;
+	</script>
+	<!-- monaco-editor -->
 </body>
 
 </html>

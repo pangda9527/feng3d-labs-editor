@@ -1,3 +1,4 @@
+/// <reference path="../libs/monaco-editor/monaco.d.ts" />
 declare namespace editor {
     /**
      * Created by 黑暗之神KDS on 2017/2/17.
@@ -2701,6 +2702,14 @@ declare namespace feng3d {
          * 旋转场景摄像机
          */
         editorCameraRotate: feng3d.Vector3;
+    }
+}
+declare var ts: any;
+declare var amdRequire: any;
+declare namespace editor {
+    var codeCompiler: ScriptCompiler;
+    class ScriptCompiler {
+        compile(): void;
     }
 }
 declare namespace editor {

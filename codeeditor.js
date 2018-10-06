@@ -10,10 +10,13 @@
 var ts;
 var monacoEditor;
 
-window.feng3d = window.opener.feng3d;
-window.editor = window.opener.editor;
+if (window.opener)
+{
+    window.feng3d = window.opener.feng3d;
+    window.editor = window.opener.editor;
+}
 
-(function ()
+setTimeout(() =>
 {
     var DBname = "feng3d-editor";
     var fstype = GetQueryString("fstype");
@@ -451,4 +454,4 @@ window.editor = window.opener.editor;
             }
         }
     }
-})();
+}, 5000);
