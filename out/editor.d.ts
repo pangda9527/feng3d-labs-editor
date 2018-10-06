@@ -2704,9 +2704,6 @@ declare namespace feng3d {
         editorCameraRotate: feng3d.Vector3;
     }
 }
-declare var ts: any;
-declare var nodeRequire: any;
-declare var script: HTMLScriptElement;
 declare namespace editor {
     var scriptCompiler: ScriptCompiler;
     class ScriptCompiler {
@@ -2722,6 +2719,9 @@ declare namespace editor {
         private tssort;
     }
 }
+declare var ts: any;
+declare var nodeRequire: any;
+declare var script: HTMLScriptElement;
 declare namespace editor {
     var editorData: EditorData;
     /**
