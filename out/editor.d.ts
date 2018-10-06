@@ -2709,7 +2709,7 @@ declare namespace editor {
     class ScriptCompiler {
         private tslibs;
         private tslist;
-        compile(): any;
+        compile(callback?: (result: string) => void): any;
         private loadLibs;
         private updateScripts;
         private transpileModule;

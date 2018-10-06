@@ -11503,11 +11503,11 @@ var editor;
             // ts 列表
             this.tslist = [];
         }
-        ScriptCompiler.prototype.compile = function () {
+        ScriptCompiler.prototype.compile = function (callback) {
             var _this = this;
             if (!this.tslibs) {
                 this.loadLibs(function () {
-                    _this.compile();
+                    _this.compile(callback);
                 });
                 return;
             }
@@ -11519,12 +11519,13 @@ var editor;
                     return prev + item.text;
                 }, "");
                 outputStr += "\n//# sourceURL=project.js";
+                callback && callback(outputStr);
                 return outputStr;
             }
             catch (e) {
                 console.log("Error from compilation: " + e + "  " + (e.stack || ""));
             }
-            return "";
+            callback && callback("");
         };
         ScriptCompiler.prototype.loadLibs = function (callback) {
             var _this = this;
@@ -11553,18 +11554,22 @@ var editor;
                 target: ts.ScriptTarget.ES5,
                 noLib: true,
                 noResolve: true,
-                suppressOutputPathCheck: true
+                suppressOutputPathCheck: true,
+                outFile: "project.js",
             };
             var tsSourceMap = {};
+            var fileNames = [];
             this.tslibs.forEach(function (item) {
+                fileNames.push(item.path);
                 tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
             this.tslist.forEach(function (item) {
+                fileNames.push(item.assetsId + ".ts");
                 tsSourceMap[item.assetsId + ".ts"] = ts.createSourceFile(item.assetsId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
             });
             // Output
             var outputs = [];
-            var program = ts.createProgram(Object.keys(tsSourceMap), options, {
+            var program = ts.createProgram(fileNames, options, {
                 getSourceFile: function (fileName) {
                     return tsSourceMap[fileName];
                 },

@@ -16,6 +16,11 @@ if (window.opener)
     window.editor = window.opener.editor;
 }
 
+window.onresize = function ()
+{
+    monacoEditor.layout();
+};
+
 setTimeout(() =>
 {
     var DBname = "feng3d-editor";

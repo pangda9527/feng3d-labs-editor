@@ -14,13 +14,13 @@ namespace editor
         // ts 列表
         private tslist: feng3d.ScriptFile[] = [];
 
-        compile()
+        compile(callback?: (result: string) => void)
         {
             if (!this.tslibs)
             {
                 this.loadLibs(() =>
                 {
-                    this.compile();
+                    this.compile(callback);
                 });
                 return;
             }
@@ -38,13 +38,16 @@ namespace editor
                 }, "");
 
                 outputStr += `\n//# sourceURL=project.js`;
+
+                callback && callback(outputStr);
+
                 return outputStr;
             }
             catch (e)
             {
                 console.log("Error from compilation: " + e + "  " + (e.stack || ""));
             }
-            return "";
+            callback && callback("");
         }
 
         private loadLibs(callback: () => void)
@@ -81,23 +84,27 @@ namespace editor
                 target: ts.ScriptTarget.ES5,
                 noLib: true,
                 noResolve: true,
-                suppressOutputPathCheck: true
+                suppressOutputPathCheck: true,
+                outFile: "project.js",
             };
 
             var tsSourceMap = {};
+            var fileNames: string[] = [];
             this.tslibs.forEach(item =>
             {
+                fileNames.push(item.path);
                 tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
 
             this.tslist.forEach((item) =>
             {
+                fileNames.push(item.assetsId + ".ts");
                 tsSourceMap[item.assetsId + ".ts"] = ts.createSourceFile(item.assetsId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
             })
 
             // Output
             var outputs = [];
-            var program = ts.createProgram(Object.keys(tsSourceMap), options, {
+            var program = ts.createProgram(fileNames, options, {
                 getSourceFile: function (fileName)
                 {
                     return tsSourceMap[fileName];
