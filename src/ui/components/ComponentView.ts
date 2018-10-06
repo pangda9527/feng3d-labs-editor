@@ -160,7 +160,7 @@ namespace editor
 			// 初始化Script属性面板
 			if (this.component instanceof feng3d.ScriptComponent)
 			{
-				feng3d.watcher.watch(this.component, "script", this.onScriptChanged, this);
+				feng3d.watcher.watch(this.component, "scriptInstance", this.onScriptChanged, this);
 				var component = this.component;
 				if (component.scriptInstance)
 				{
@@ -175,7 +175,7 @@ namespace editor
 			// 移除Script属性面板
 			if (this.component instanceof feng3d.ScriptComponent)
 			{
-				feng3d.watcher.unwatch(this.component, "script", this.onScriptChanged, this);
+				feng3d.watcher.unwatch(this.component, "scriptInstance", this.onScriptChanged, this);
 			}
 			if (this.scriptView)
 			{

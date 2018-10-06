@@ -58,8 +58,6 @@ namespace editor
 
             document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorcache.projectname;
 
-            feng3d.runEnvironment = feng3d.RunEnvironment.editor;
-
             this.initMainView()
 
             //初始化feng3d

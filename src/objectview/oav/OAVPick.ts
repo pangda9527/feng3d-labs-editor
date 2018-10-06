@@ -102,17 +102,14 @@ namespace editor
                 {
                     var scriptFiles = feng3d.Feng3dAssets.getAssetsByType(feng3d.ScriptFile);
 
-                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
+                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
                     scriptFiles.forEach(element =>
                     {
                         menus.push({
                             label: element.name,
                             click: () =>
                             {
-                                element.getScriptClassName(scriptClassName =>
-                                {
-                                    this.attributeValue = scriptClassName;
-                                });
+                                this.attributeValue = new element.classDefinition();
                             }
                         });
                     });

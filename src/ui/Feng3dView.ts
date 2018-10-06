@@ -37,10 +37,7 @@ namespace editor
 					if (!gameobject || !gameobject.scene)
 						gameobject = hierarchy.rootnode.gameobject;
 
-					dragdata.file_script.getScriptClassName(scriptClassName =>
-					{
-						gameobject.addScript(scriptClassName);
-					});
+					gameobject.addScript(dragdata.file_script.classDefinition);
 				}
 			});
 		}

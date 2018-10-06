@@ -1035,9 +1035,7 @@ var editor;
                     var gameobject = editor.engine.mouse3DManager.selectedGameObject;
                     if (!gameobject || !gameobject.scene)
                         gameobject = editor.hierarchy.rootnode.gameobject;
-                    dragdata.file_script.getScriptClassName(function (scriptClassName) {
-                        gameobject.addScript(scriptClassName);
-                    });
+                    gameobject.addScript(dragdata.file_script.classDefinition);
                 }
             });
         };
@@ -2281,7 +2279,7 @@ var editor;
         ComponentView.prototype.initScriptView = function () {
             // 初始化Script属性面板
             if (this.component instanceof feng3d.ScriptComponent) {
-                feng3d.watcher.watch(this.component, "script", this.onScriptChanged, this);
+                feng3d.watcher.watch(this.component, "scriptInstance", this.onScriptChanged, this);
                 var component = this.component;
                 if (component.scriptInstance) {
                     this.scriptView = feng3d.objectview.getObjectView(component.scriptInstance, { autocreate: false });
@@ -2292,7 +2290,7 @@ var editor;
         ComponentView.prototype.removeScriptView = function () {
             // 移除Script属性面板
             if (this.component instanceof feng3d.ScriptComponent) {
-                feng3d.watcher.unwatch(this.component, "script", this.onScriptChanged, this);
+                feng3d.watcher.unwatch(this.component, "scriptInstance", this.onScriptChanged, this);
             }
             if (this.scriptView) {
                 if (this.scriptView.parent)
@@ -3916,9 +3914,7 @@ var editor;
             this.space.on("removedComponent", this.onremovedComponent, this);
             editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
                 if (dragdata.file_script) {
-                    dragdata.file_script.getScriptClassName(function (scriptClassName) {
-                        _this.space.addScript(scriptClassName);
-                    });
+                    _this.space.addScript(dragdata.file_script.classDefinition);
                 }
             });
             this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
@@ -4331,14 +4327,12 @@ var editor;
                 }
                 else if (param.accepttype == "file_script") {
                     var scriptFiles = feng3d.Feng3dAssets.getAssetsByType(feng3d.ScriptFile);
-                    var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
+                    var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
                     scriptFiles.forEach(function (element) {
                         menus.push({
                             label: element.name,
                             click: function () {
-                                element.getScriptClassName(function (scriptClassName) {
-                                    _this.attributeValue = scriptClassName;
-                                });
+                                _this.attributeValue = new element.classDefinition();
                             }
                         });
                     });
@@ -4789,9 +4783,7 @@ var editor;
                     editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, _this.data.gameobject);
                 }
                 if (dragdata.file_script) {
-                    dragdata.file_script.getScriptClassName(function (scriptClassName) {
-                        _this.data.gameobject.addScript(scriptClassName);
-                    });
+                    _this.data.gameobject.addScript(dragdata.file_script.classDefinition);
                 }
             });
             //
@@ -11562,7 +11554,6 @@ var editor;
         }
         Editor.prototype.init = function () {
             document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editor.editorcache.projectname;
-            feng3d.runEnvironment = feng3d.RunEnvironment.editor;
             this.initMainView();
             //初始化feng3d
             new editor.Main3D();
