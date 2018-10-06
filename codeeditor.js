@@ -9,6 +9,10 @@
 
 var ts;
 var monacoEditor;
+
+window.feng3d = window.opener.feng3d;
+window.editor = window.opener.editor;
+
 (function ()
 {
     var DBname = "feng3d-editor";
@@ -16,11 +20,9 @@ var monacoEditor;
     var project = decodeURI(GetQueryString("project"));
     var id = decodeURI(GetQueryString("id"));
 
-    var assetsfs;
-    // var assetsfs: feng3d.ReadWriteAssets;
+    var assetsfs = new feng3d.ReadWriteAssets(feng3d.indexedDBfs);
     if (fstype == "indexedDB")
     {
-        window.feng3d = window.opener.feng3d;
         feng3d.indexedDBfs.DBname = DBname;
         feng3d.indexedDBfs.projectname = project;
         assetsfs = feng3d.assets.fs = new feng3d.ReadWriteAssets(feng3d.indexedDBfs);
@@ -270,12 +272,12 @@ var monacoEditor;
             assetsfs.writeString("project.js", outputStr, (err) =>
             {
                 logLabel.textContent = "编译完成！";
-                if (editor)
+                if (typeof editor != "undefined")
                 {
                     editor.editorAssets.runProjectScript(() =>
                     {
-                        feng3d.globalEvent.dispatch("shaderChanged");
-                        feng3d.globalEvent.dispatch("scriptChanged");
+                        feng3d.feng3dDispatcher.dispatch("assets.shaderChanged");
+                        feng3d.feng3dDispatcher.dispatch("assets.scriptChanged");
                     });
                 }
             });

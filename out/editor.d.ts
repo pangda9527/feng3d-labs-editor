@@ -1,13 +1,4 @@
 declare namespace editor {
-    var utils: Utils;
-    class Utils {
-        /**
-         * 获取所有类
-         */
-        getAllClasss(root: Window, rootpath: "", depth?: number): void;
-    }
-}
-declare namespace editor {
     /**
      * Created by 黑暗之神KDS on 2017/2/17.
      */

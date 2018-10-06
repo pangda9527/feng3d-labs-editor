@@ -19,25 +19,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var editor;
 (function (editor) {
-    var Utils = /** @class */ (function () {
-        function Utils() {
-        }
-        /**
-         * 获取所有类
-         */
-        Utils.prototype.getAllClasss = function (root, rootpath, depth) {
-            if (root === void 0) { root = window; }
-            if (depth === void 0) { depth = 5; }
-            Object.keys(root).forEach(function (key) {
-            });
-        };
-        return Utils;
-    }());
-    editor.Utils = Utils;
-    editor.utils = new Utils();
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
     /**
      * Created by 黑暗之神KDS on 2017/2/17.
      */
