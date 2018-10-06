@@ -40,7 +40,40 @@ namespace editor
     {
         private tslibs: { path: string, code: string }[];
         // ts 列表
-        private tslist = [];
+        private tslist: feng3d.ScriptFile[] = [];
+
+        compile()
+        {
+            if (!this.tslibs)
+            {
+                this.loadLibs(() =>
+                {
+                    this.compile();
+                });
+                return;
+            }
+
+            this.updateScripts();
+
+            this.tssort(this.tslist);
+
+            try
+            {
+                var output = this.transpileModule();
+                var outputStr = output.reduce((prev, item) =>
+                {
+                    return prev + item.text;
+                }, "");
+
+                outputStr += `\n//# sourceURL=project.js`;
+                return outputStr;
+            }
+            catch (e)
+            {
+                console.log("Error from compilation: " + e + "  " + (e.stack || ""));
+            }
+            return "";
+        }
 
         private loadLibs(callback: () => void)
         {
@@ -55,159 +88,100 @@ namespace editor
             });
         }
 
-        compile()
+        private updateScripts()
         {
-            if (!this.tslibs)
+            var files = editorAssets.files
+            this.tslist = [];
+            for (const key in files)
             {
-                this.loadLibs(() =>
+                var file = files[key].feng3dAssets;
+                if (file instanceof feng3d.ScriptFile)
                 {
-                    this.compile();
-                });
-                return;
-            }
-
-            this.tslibs;
-
-
-            // ------------ Compilation logic
-            function triggerCompile()
-            {
-                try
-                {
-                    var output = transpileModule({
-                        // module: ts.ModuleKind.AMD,
-                        target: ts.ScriptTarget.ES5,
-                        noLib: true,
-                        noResolve: true,
-                        suppressOutputPathCheck: true
-                    });
-                    var outputStr = output.reduce((prev, item) =>
-                    {
-                        return prev + item.text;
-                    }, "");
-
-                    outputStr += `\n//# sourceURL=project.js`;
-                }
-                catch (e)
-                {
-                    console.log("Error from compilation: " + e + "  " + (e.stack || ""));
+                    this.tslist.push(file);
                 }
             }
-            function transpileModule(options)
+        }
+
+        private transpileModule()
+        {
+            var options = {
+                // module: ts.ModuleKind.AMD,
+                target: ts.ScriptTarget.ES5,
+                noLib: true,
+                noResolve: true,
+                suppressOutputPathCheck: true
+            };
+
+            var tsSourceMap = {};
+            this.tslibs.forEach(item =>
             {
-                var tsSourceMap = {};
-                this.tslibs.forEach(item =>
-                {
-                    tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
-                });
-                tssort(this.tslist);
+                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
+            });
 
-                // tslist.sort((a, b) => a.path > b.path);
-
-                this.tslist.forEach((item) =>
-                {
-                    tsSourceMap[item.assetsId + ".ts"] = ts.createSourceFile(item.assetsId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
-                })
-
-                // Output
-                var outputs = [];
-                var program = ts.createProgram(Object.keys(tsSourceMap), options, {
-                    getSourceFile: function (fileName)
-                    {
-                        return tsSourceMap[fileName];
-                    },
-                    writeFile: function (_name, text)
-                    {
-                        outputs.push({ name: _name, text: text });
-                    },
-                    getDefaultLibFileName: function () { return "lib.d.ts"; },
-                    useCaseSensitiveFileNames: function () { return false; },
-                    getCanonicalFileName: function (fileName) { return fileName; },
-                    getCurrentDirectory: function () { return ""; },
-                    getNewLine: function () { return "\r\n"; },
-                    fileExists: function (fileName)
-                    {
-                        return !!tsSourceMap[fileName];
-                    },
-                    readFile: function () { return ""; },
-                    directoryExists: function () { return true; },
-                    getDirectories: function () { return []; }
-                });
-                // Emit
-                program.emit();
-                if (outputs === undefined)
-                {
-                    throw new Error("Output generation failed");
-                }
-                return outputs;
-            }
-            // ------------ Execution logic
-            /**
-             * 脚本中的类
-             */
-            var scriptClassReg = /(export\s+)?(abstract\s+)?class\s+([\w$_\d]+)(\s+extends\s+([\w$_\d\.]+))?/;
-
-            /**
-             * ts 文件排序
-             */
-            function tssort(tsfiles)
+            this.tslist.forEach((item) =>
             {
-                var filelist = [{ path: "", class: [""], extends: [""] }];
+                tsSourceMap[item.assetsId + ".ts"] = ts.createSourceFile(item.assetsId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
+            })
 
-                filelist = tsfiles.map((v) =>
+            // Output
+            var outputs = [];
+            var program = ts.createProgram(Object.keys(tsSourceMap), options, {
+                getSourceFile: function (fileName)
                 {
-                    var result = v.textContent.match(scriptClassReg);
-                    //目前只处理了ts文件中单个导出对象
-                    var item = { path: v.assetsId, code: v.textContent, class: [], extends: [], assets: v }
-                    if (result)
-                    {
-                        item.class.push(result[3]);
-                        if (result[5])
-                            item.extends.push(result[5].split(".").pop());
-                    }
-                    return item;
-                });
+                    return tsSourceMap[fileName];
+                },
+                writeFile: function (_name, text)
+                {
+                    outputs.push({ name: _name, text: text });
+                },
+                getDefaultLibFileName: function () { return "lib.d.ts"; },
+                useCaseSensitiveFileNames: function () { return false; },
+                getCanonicalFileName: function (fileName) { return fileName; },
+                getCurrentDirectory: function () { return ""; },
+                getNewLine: function () { return "\r\n"; },
+                fileExists: function (fileName)
+                {
+                    return !!tsSourceMap[fileName];
+                },
+                readFile: function () { return ""; },
+                directoryExists: function () { return true; },
+                getDirectories: function () { return []; }
+            });
+            // Emit
+            program.emit();
+            return outputs;
+        }
 
-                //按继承排序
-                for (let i = 0; i < filelist.length; i++)
+        /**
+         * ts 文件排序
+         */
+        private tssort(filelist: feng3d.ScriptFile[])
+        {
+            //按继承排序
+            for (let i = 0; i < filelist.length; i++)
+            {
+                var item = filelist[i];
+                var newpos = i;
+                if (item.parentScriptName)
                 {
-                    var item = filelist[i];
-                    var newpos = i;
-                    if (item.extends.length > 0)
+                    for (let j = i + 1; j < filelist.length; j++)
                     {
-                        for (let j = 0; j < item.extends.length; j++)
+                        var itemk = filelist[j];
+                        if (itemk.scriptName == item.parentScriptName && newpos < j)
                         {
-                            var extendsclass = item.extends[j];
-                            for (let k = i + 1; k < filelist.length; k++)
-                            {
-                                var itemk = filelist[k];
-                                if (itemk.class.indexOf(extendsclass) != -1 && newpos < k)
-                                {
-                                    newpos = k;
-                                }
-                            }
+                            newpos = j;
                         }
                     }
-                    if (newpos > i)
-                    {
-                        filelist[i] = null;
-                        filelist.splice(newpos + 1, 0, item);
-                    }
                 }
-
-                tsfiles.length = 0;
-                for (let i = 0; i < filelist.length; i++)
+                if (newpos > i)
                 {
-                    const element = filelist[i];
-                    if (element)
-                    {
-                        // tsfiles.push(element.assets);
-                    }
+                    filelist[i] = null;
+                    filelist.splice(newpos + 1, 0, item);
                 }
             }
         }
 
     }
-    codeCompiler = new ScriptCompiler();
+    scriptCompiler = new ScriptCompiler();
 
 }

@@ -2711,8 +2711,14 @@ declare namespace editor {
     class ScriptCompiler {
         private tslibs;
         private tslist;
+        compile(): any;
         private loadLibs;
-        compile(): void;
+        private updateScripts;
+        private transpileModule;
+        /**
+         * ts 文件排序
+         */
+        private tssort;
     }
 }
 declare namespace editor {

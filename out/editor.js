@@ -11524,6 +11524,29 @@ var editor;
             // ts 列表
             this.tslist = [];
         }
+        ScriptCompiler.prototype.compile = function () {
+            var _this = this;
+            if (!this.tslibs) {
+                this.loadLibs(function () {
+                    _this.compile();
+                });
+                return;
+            }
+            this.updateScripts();
+            this.tssort(this.tslist);
+            try {
+                var output = this.transpileModule();
+                var outputStr = output.reduce(function (prev, item) {
+                    return prev + item.text;
+                }, "");
+                outputStr += "\n//# sourceURL=project.js";
+                return outputStr;
+            }
+            catch (e) {
+                console.log("Error from compilation: " + e + "  " + (e.stack || ""));
+            }
+            return "";
+        };
         ScriptCompiler.prototype.loadLibs = function (callback) {
             var _this = this;
             this.tslibs = [];
@@ -11535,126 +11558,82 @@ var editor;
                 success: callback,
             });
         };
-        ScriptCompiler.prototype.compile = function () {
-            var _this = this;
-            if (!this.tslibs) {
-                this.loadLibs(function () {
-                    _this.compile();
-                });
-                return;
-            }
-            this.tslibs;
-            // ------------ Compilation logic
-            function triggerCompile() {
-                try {
-                    var output = transpileModule({
-                        // module: ts.ModuleKind.AMD,
-                        target: ts.ScriptTarget.ES5,
-                        noLib: true,
-                        noResolve: true,
-                        suppressOutputPathCheck: true
-                    });
-                    var outputStr = output.reduce(function (prev, item) {
-                        return prev + item.text;
-                    }, "");
-                    outputStr += "\n//# sourceURL=project.js";
-                }
-                catch (e) {
-                    console.log("Error from compilation: " + e + "  " + (e.stack || ""));
+        ScriptCompiler.prototype.updateScripts = function () {
+            var files = editor.editorAssets.files;
+            this.tslist = [];
+            for (var key in files) {
+                var file = files[key].feng3dAssets;
+                if (file instanceof feng3d.ScriptFile) {
+                    this.tslist.push(file);
                 }
             }
-            function transpileModule(options) {
-                var tsSourceMap = {};
-                this.tslibs.forEach(function (item) {
-                    tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
-                });
-                tssort(this.tslist);
-                // tslist.sort((a, b) => a.path > b.path);
-                this.tslist.forEach(function (item) {
-                    tsSourceMap[item.assetsId + ".ts"] = ts.createSourceFile(item.assetsId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
-                });
-                // Output
-                var outputs = [];
-                var program = ts.createProgram(Object.keys(tsSourceMap), options, {
-                    getSourceFile: function (fileName) {
-                        return tsSourceMap[fileName];
-                    },
-                    writeFile: function (_name, text) {
-                        outputs.push({ name: _name, text: text });
-                    },
-                    getDefaultLibFileName: function () { return "lib.d.ts"; },
-                    useCaseSensitiveFileNames: function () { return false; },
-                    getCanonicalFileName: function (fileName) { return fileName; },
-                    getCurrentDirectory: function () { return ""; },
-                    getNewLine: function () { return "\r\n"; },
-                    fileExists: function (fileName) {
-                        return !!tsSourceMap[fileName];
-                    },
-                    readFile: function () { return ""; },
-                    directoryExists: function () { return true; },
-                    getDirectories: function () { return []; }
-                });
-                // Emit
-                program.emit();
-                if (outputs === undefined) {
-                    throw new Error("Output generation failed");
-                }
-                return outputs;
-            }
-            // ------------ Execution logic
-            /**
-             * 脚本中的类
-             */
-            var scriptClassReg = /(export\s+)?(abstract\s+)?class\s+([\w$_\d]+)(\s+extends\s+([\w$_\d\.]+))?/;
-            /**
-             * ts 文件排序
-             */
-            function tssort(tsfiles) {
-                var filelist = [{ path: "", class: [""], extends: [""] }];
-                filelist = tsfiles.map(function (v) {
-                    var result = v.textContent.match(scriptClassReg);
-                    //目前只处理了ts文件中单个导出对象
-                    var item = { path: v.assetsId, code: v.textContent, class: [], extends: [], assets: v };
-                    if (result) {
-                        item.class.push(result[3]);
-                        if (result[5])
-                            item.extends.push(result[5].split(".").pop());
-                    }
-                    return item;
-                });
-                //按继承排序
-                for (var i = 0; i < filelist.length; i++) {
-                    var item = filelist[i];
-                    var newpos = i;
-                    if (item.extends.length > 0) {
-                        for (var j = 0; j < item.extends.length; j++) {
-                            var extendsclass = item.extends[j];
-                            for (var k = i + 1; k < filelist.length; k++) {
-                                var itemk = filelist[k];
-                                if (itemk.class.indexOf(extendsclass) != -1 && newpos < k) {
-                                    newpos = k;
-                                }
-                            }
+        };
+        ScriptCompiler.prototype.transpileModule = function () {
+            var options = {
+                // module: ts.ModuleKind.AMD,
+                target: ts.ScriptTarget.ES5,
+                noLib: true,
+                noResolve: true,
+                suppressOutputPathCheck: true
+            };
+            var tsSourceMap = {};
+            this.tslibs.forEach(function (item) {
+                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
+            });
+            this.tslist.forEach(function (item) {
+                tsSourceMap[item.assetsId + ".ts"] = ts.createSourceFile(item.assetsId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
+            });
+            // Output
+            var outputs = [];
+            var program = ts.createProgram(Object.keys(tsSourceMap), options, {
+                getSourceFile: function (fileName) {
+                    return tsSourceMap[fileName];
+                },
+                writeFile: function (_name, text) {
+                    outputs.push({ name: _name, text: text });
+                },
+                getDefaultLibFileName: function () { return "lib.d.ts"; },
+                useCaseSensitiveFileNames: function () { return false; },
+                getCanonicalFileName: function (fileName) { return fileName; },
+                getCurrentDirectory: function () { return ""; },
+                getNewLine: function () { return "\r\n"; },
+                fileExists: function (fileName) {
+                    return !!tsSourceMap[fileName];
+                },
+                readFile: function () { return ""; },
+                directoryExists: function () { return true; },
+                getDirectories: function () { return []; }
+            });
+            // Emit
+            program.emit();
+            return outputs;
+        };
+        /**
+         * ts 文件排序
+         */
+        ScriptCompiler.prototype.tssort = function (filelist) {
+            //按继承排序
+            for (var i = 0; i < filelist.length; i++) {
+                var item = filelist[i];
+                var newpos = i;
+                if (item.parentScriptName) {
+                    for (var j = i + 1; j < filelist.length; j++) {
+                        var itemk = filelist[j];
+                        if (itemk.scriptName == item.parentScriptName && newpos < j) {
+                            newpos = j;
                         }
                     }
-                    if (newpos > i) {
-                        filelist[i] = null;
-                        filelist.splice(newpos + 1, 0, item);
-                    }
                 }
-                tsfiles.length = 0;
-                for (var i = 0; i < filelist.length; i++) {
-                    var element = filelist[i];
-                    if (element) {
-                        // tsfiles.push(element.assets);
-                    }
+                if (newpos > i) {
+                    filelist[i] = null;
+                    filelist.splice(newpos + 1, 0, item);
                 }
             }
         };
         return ScriptCompiler;
     }());
     editor.ScriptCompiler = ScriptCompiler;
-    codeCompiler = new ScriptCompiler();
+    editor.scriptCompiler = new ScriptCompiler();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
