@@ -5,6 +5,6 @@ namespace editor
      */
     export class EditorScript extends feng3d.ScriptComponent
     {
-        flag = feng3d.ScriptFlag.editor;
+        flag = feng3d.RunEnvironment.editor;
     }
 }

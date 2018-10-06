@@ -8387,11 +8387,11 @@ var editor;
             },
             set: function (value) {
                 if (this._scene) {
-                    this._scene.updateScriptFlag = feng3d.ScriptFlag.feng3d;
+                    this._scene.runEnvironment = feng3d.RunEnvironment.feng3d;
                 }
                 this._scene = value;
                 if (this._scene) {
-                    this._scene.updateScriptFlag = feng3d.ScriptFlag.editor;
+                    this._scene.runEnvironment = feng3d.RunEnvironment.editor;
                     editor.hierarchy.rootGameObject = this._scene.gameObject;
                 }
                 editor.editorComponent.scene = this._scene;
@@ -8444,7 +8444,7 @@ var editor;
             editor.editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
             editor.editorScene = new feng3d.GameObject().value({ name: "scene" }).addComponent(feng3d.Scene3D);
-            editor.editorScene.updateScriptFlag = feng3d.ScriptFlag.all;
+            editor.editorScene.runEnvironment = feng3d.RunEnvironment.all;
             //
             editor.editorScene.gameObject.addComponent(editor.SceneRotateTool);
             //
@@ -10118,7 +10118,7 @@ var editor;
         __extends(EditorScript, _super);
         function EditorScript() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.flag = feng3d.ScriptFlag.editor;
+            _this.flag = feng3d.RunEnvironment.editor;
             return _this;
         }
         return EditorScript;

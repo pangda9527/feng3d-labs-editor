@@ -15,12 +15,12 @@ namespace editor
         {
             if (this._scene)
             {
-                this._scene.updateScriptFlag = feng3d.ScriptFlag.feng3d;
+                this._scene.runEnvironment = feng3d.RunEnvironment.feng3d;
             }
             this._scene = value;
             if (this._scene)
             {
-                this._scene.updateScriptFlag = feng3d.ScriptFlag.editor;
+                this._scene.runEnvironment = feng3d.RunEnvironment.editor;
                 hierarchy.rootGameObject = this._scene.gameObject;
             }
             editorComponent.scene = this._scene;
@@ -76,7 +76,7 @@ namespace editor
             editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
             editorScene = new feng3d.GameObject().value({ name: "scene" }).addComponent(feng3d.Scene3D);
-            editorScene.updateScriptFlag = feng3d.ScriptFlag.all;
+            editorScene.runEnvironment = feng3d.RunEnvironment.all;
             //
             editorScene.gameObject.addComponent(SceneRotateTool);
             //
