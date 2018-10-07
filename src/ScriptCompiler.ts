@@ -10,11 +10,22 @@ namespace editor
 
     export class ScriptCompiler
     {
-        private tslibs: { path: string, code: string }[];
+        tslibs: { path: string, code: string }[];
         // ts 列表
         private tslist: feng3d.ScriptFile[] = [];
 
-        private _script: feng3d.StringFile;
+        _script: feng3d.StringFile;
+
+        constructor()
+        {
+            this.tslibs = [];
+            feng3d.loadjs.load({
+                paths: ["../feng3d/out/feng3d.d.ts"], onitemload: (url, content) =>
+                {
+                    this.tslibs.push({ path: url, code: content });
+                },
+            });
+        }
 
         edit(script: feng3d.StringFile)
         {
@@ -25,18 +36,7 @@ namespace editor
 
         compile(callback?: (result: string) => void)
         {
-            if (!this.tslibs)
-            {
-                this.loadLibs(() =>
-                {
-                    this.compile(callback);
-                });
-                return;
-            }
-
             this.tslist = this.getScripts();
-
-            this.tssort(this.tslist);
 
             try
             {
@@ -59,24 +59,7 @@ namespace editor
             callback && callback("");
         }
 
-        private loadLibs(callback: () => void)
-        {
-            if (this.tslibs)
-            {
-                callback();
-                return;
-            }
-            this.tslibs = [];
-            feng3d.loadjs.load({
-                paths: ["../feng3d/out/feng3d.d.ts"], onitemload: (url, content) =>
-                {
-                    this.tslibs.push({ path: url, code: content });
-                },
-                success: callback,
-            });
-        }
-
-        private getScripts()
+        getScripts()
         {
             var files = editorAssets.files
             var tslist: feng3d.ScriptFile[] = [];
@@ -88,6 +71,9 @@ namespace editor
                     tslist.push(file);
                 }
             }
+
+            this.tssort(tslist);
+
             return tslist;
         }
 

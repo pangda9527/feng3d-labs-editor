@@ -10,8 +10,6 @@
 window.feng3d = window.opener.feng3d;
 window.editor = window.opener.editor;
 
-
-var ts;
 var monacoEditor
 
 //
@@ -105,8 +103,18 @@ function codeEditor(file)
     if (oldModel) oldModel.dispose();
 
     // monacoEditor.setValue(code);
-    if (model == "typescript")
+    if (file instanceof feng3d.ScriptFile)
     {
+        var tslibs = editor.scriptCompiler.tslibs;
+        var tslist = editor.scriptCompiler.getScripts();
+        tslibs.forEach(v =>
+        {
+            monaco.languages.typescript.typescriptDefaults.addExtraLib(v.code, v.path);
+        });
+        tslist.forEach(v =>
+        {
+            if (v != file) monaco.languages.typescript.typescriptDefaults.addExtraLib(v.textContent, v.assetsId + ".ts");
+        });
         logLabel.textContent = "初次编译中。。。。";
         triggerCompile();
     }
@@ -116,8 +124,7 @@ function codeEditor(file)
         file.textContent = monacoEditor.getValue();
         editor.assets.writeAssets(file, (err) =>
         {
-            if (err)
-                console.warn(err);
+            if (err) console.warn(err);
             logLabel.textContent = "自动保存完成！";
             if (file instanceof feng3d.ScriptFile)
             {

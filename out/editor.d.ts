@@ -2706,13 +2706,16 @@ declare namespace feng3d {
 declare namespace editor {
     var scriptCompiler: ScriptCompiler;
     class ScriptCompiler {
-        private tslibs;
+        tslibs: {
+            path: string;
+            code: string;
+        }[];
         private tslist;
-        private _script;
+        _script: feng3d.StringFile;
+        constructor();
         edit(script: feng3d.StringFile): void;
         compile(callback?: (result: string) => void): any;
-        private loadLibs;
-        private getScripts;
+        getScripts(): feng3d.ScriptFile[];
         private transpileModule;
         /**
          * ts 文件排序

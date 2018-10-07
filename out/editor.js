@@ -11490,8 +11490,15 @@ var editor;
 (function (editor) {
     var ScriptCompiler = /** @class */ (function () {
         function ScriptCompiler() {
+            var _this = this;
             // ts 列表
             this.tslist = [];
+            this.tslibs = [];
+            feng3d.loadjs.load({
+                paths: ["../feng3d/out/feng3d.d.ts"], onitemload: function (url, content) {
+                    _this.tslibs.push({ path: url, code: content });
+                },
+            });
         }
         ScriptCompiler.prototype.edit = function (script) {
             this._script = script;
@@ -11500,15 +11507,7 @@ var editor;
             codeeditoWin = window.open("codeeditor.html");
         };
         ScriptCompiler.prototype.compile = function (callback) {
-            var _this = this;
-            if (!this.tslibs) {
-                this.loadLibs(function () {
-                    _this.compile(callback);
-                });
-                return;
-            }
             this.tslist = this.getScripts();
-            this.tssort(this.tslist);
             try {
                 var output = this.transpileModule();
                 var outputStr = output.reduce(function (prev, item) {
@@ -11523,20 +11522,6 @@ var editor;
             }
             callback && callback("");
         };
-        ScriptCompiler.prototype.loadLibs = function (callback) {
-            var _this = this;
-            if (this.tslibs) {
-                callback();
-                return;
-            }
-            this.tslibs = [];
-            feng3d.loadjs.load({
-                paths: ["../feng3d/out/feng3d.d.ts"], onitemload: function (url, content) {
-                    _this.tslibs.push({ path: url, code: content });
-                },
-                success: callback,
-            });
-        };
         ScriptCompiler.prototype.getScripts = function () {
             var files = editor.editorAssets.files;
             var tslist = [];
@@ -11546,6 +11531,7 @@ var editor;
                     tslist.push(file);
                 }
             }
+            this.tssort(tslist);
             return tslist;
         };
         ScriptCompiler.prototype.transpileModule = function () {
