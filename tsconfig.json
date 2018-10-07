@@ -52,6 +52,8 @@
         // tipviews
         "src/ui/components/tipviews/TipString.ts",
         //
+        "src/ui/components/binders/TextInputBinder.ts",
+        //
         "src/objectview/ov/OVBaseDefault.ts",
         "src/objectview/ov/OVDefault.ts",
         "src/objectview/ov/OVTransform.ts",

@@ -759,6 +759,21 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    interface UIBinder {
+        init(v: Partial<this>): this;
+        dispose(): void;
+    }
+    class TextInputBinder implements UIBinder {
+        space: any;
+        attribute: string;
+        textInput: eui.TextInput;
+        init(v: Partial<this>): this;
+        dispose(): void;
+        private updateView;
+        private onTextChange;
+    }
+}
+declare namespace editor {
     /**
      * 默认基础对象界面
      */
@@ -988,11 +1003,10 @@ declare namespace editor {
 declare namespace editor {
     class OAVString extends OAVBase {
         txtInput: eui.TextInput;
+        private binders;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
         dispose(): void;
-        updateView(): void;
-        private onTextChange;
     }
 }
 declare namespace editor {

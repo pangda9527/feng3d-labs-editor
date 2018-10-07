@@ -2764,6 +2764,31 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var TextInputBinder = /** @class */ (function () {
+        function TextInputBinder() {
+        }
+        TextInputBinder.prototype.init = function (v) {
+            feng3d.serialization.setValue(this, v);
+            feng3d.watcher.watch(this.space, this.attribute, this.updateView, this);
+            this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            return this;
+        };
+        TextInputBinder.prototype.dispose = function () {
+            feng3d.watcher.unwatch(this.space, this.attribute, this.updateView, this);
+            this.textInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+        };
+        TextInputBinder.prototype.updateView = function () {
+            this.textInput.text = this.space[this.attribute];
+        };
+        TextInputBinder.prototype.onTextChange = function () {
+            this.space[this.attribute] = this.textInput.text;
+        };
+        return TextInputBinder;
+    }());
+    editor.TextInputBinder = TextInputBinder;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     /**
      * 默认基础对象界面
      */
@@ -3484,23 +3509,17 @@ var editor;
         __extends(OAVString, _super);
         function OAVString(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
+            _this.binders = [];
             _this.skinName = "OAVString";
             return _this;
         }
         OAVString.prototype.initView = function () {
+            this.binders.push(new editor.TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput }));
             this.txtInput.enabled = this._attributeViewInfo.editable;
-            feng3d.watcher.watch(this.space, this._attributeName, this.updateView, this);
-            this.txtInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
         };
         OAVString.prototype.dispose = function () {
-            feng3d.watcher.unwatch(this.space, this._attributeName, this.updateView, this);
-            this.txtInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-        };
-        OAVString.prototype.updateView = function () {
-            this.txtInput.text = this.attributeValue;
-        };
-        OAVString.prototype.onTextChange = function () {
-            this.attributeValue = this.txtInput.text;
+            this.binders.forEach(function (v) { return v.dispose(); });
+            this.binders.length = 0;
         };
         OAVString = __decorate([
             feng3d.OAVComponent()
