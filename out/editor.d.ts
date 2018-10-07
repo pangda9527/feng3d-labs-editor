@@ -770,15 +770,64 @@ declare namespace editor {
     }
     class TextInputBinder implements UIBinder {
         space: any;
+        /**
+         * 绑定属性名称
+         */
         attribute: string;
         textInput: eui.TextInput;
+        /**
+         * 是否可编辑
+         */
+        editable: boolean;
+        /**
+         * 绑定属性值转换为文本
+         */
+        toText: (v: any) => any;
+        /**
+         * 文本转换为绑定属性值
+         */
+        toValue: (v: any) => any;
+        attributeValue: any;
         init(v: Partial<this>): this;
         dispose(): void;
-        private updateView;
+        protected initView(): void;
+        protected updateView(): void;
         private onTextChange;
         private _textfocusintxt;
         protected ontxtfocusin(): void;
         protected ontxtfocusout(): void;
+    }
+}
+declare namespace editor {
+    class NumberTextInputBinder extends TextInputBinder {
+        /**
+         * 步长，精度
+         */
+        step: number;
+        /**
+         * 键盘上下方向键步长
+         */
+        stepDownup: number;
+        /**
+         * 移动一个像素时增加的步长数量
+         */
+        stepScale: number;
+        /**
+         * 控制器
+         */
+        controller: egret.DisplayObject;
+        toText: (v: any) => string;
+        toValue: (v: any) => number;
+        initView(): void;
+        dispose(): void;
+        private mouseDownPosition;
+        private mouseDownValue;
+        private onMouseDown;
+        private onStageMouseMove;
+        private onStageMouseUp;
+        protected ontxtfocusin(): void;
+        protected ontxtfocusout(): void;
+        private onWindowKeyDown;
     }
 }
 declare namespace editor {
@@ -978,34 +1027,11 @@ declare namespace editor {
     /**
      * 默认对象属性界面
      */
-    class OAVNumber extends OAVDefault {
-        /**
-         * 步长，精度
-         */
-        step: number;
-        /**
-         * 键盘上下方向键步长
-         */
-        stepDownup: number;
-        /**
-         * 移动一个像素时增加的步长数量
-         */
-        stepScale: number;
-        attributeValue: number;
+    class OAVNumber extends OAVBase {
+        labelLab: eui.Label;
+        text: eui.TextInput;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
-        dispose(): void;
-        /**
-         * 更新界面
-         */
-        updateView(): void;
-        private mouseDownPosition;
-        private mouseDownValue;
-        private onMouseDown;
-        private onStageMouseMove;
-        private onStageMouseUp;
-        protected ontxtfocusin(): void;
-        protected ontxtfocusout(): void;
-        private onWindowKeyDown;
     }
 }
 declare namespace editor {

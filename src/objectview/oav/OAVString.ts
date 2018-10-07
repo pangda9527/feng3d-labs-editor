@@ -14,10 +14,8 @@ namespace editor
         initView()
         {
             this.addBinder(
-                new TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput })
+                new TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput, editable: this._attributeViewInfo.editable, })
             );
-
-            this.txtInput.enabled = this._attributeViewInfo.editable;
         }
     }
 }

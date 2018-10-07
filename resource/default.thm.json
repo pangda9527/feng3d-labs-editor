@@ -53,6 +53,7 @@
         "resource/custom_skins/OAVArray.exml",
         "resource/custom_skins/OAVDefault.exml",
         "resource/custom_skins/OAVString.exml",
+        "resource/custom_skins/OAVNumber.exml",
         "resource/custom_skins/OAVMultiText.exml",
         "resource/custom_skins/OBVDefault.exml",
         "resource/custom_skins/OVBaseDefault.exml",

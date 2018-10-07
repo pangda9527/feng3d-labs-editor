@@ -2788,15 +2788,41 @@ var editor;
 (function (editor) {
     var TextInputBinder = /** @class */ (function () {
         function TextInputBinder() {
+            /**
+             * 是否可编辑
+             */
+            this.editable = true;
+            /**
+             * 绑定属性值转换为文本
+             */
+            this.toText = function (v) { return v; };
+            /**
+             * 文本转换为绑定属性值
+             */
+            this.toValue = function (v) { return v; };
         }
+        Object.defineProperty(TextInputBinder.prototype, "attributeValue", {
+            get: function () {
+                return this.space[this.attribute];
+            },
+            set: function (value) {
+                if (this.space[this.attribute] != value) {
+                    this.space[this.attribute] = value;
+                    var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+                    objectViewEvent.space = this.space;
+                    objectViewEvent.attributeName = this.attribute;
+                    objectViewEvent.attributeValue = this.attributeValue;
+                    this.textInput.dispatchEvent(objectViewEvent);
+                }
+                this.updateView();
+            },
+            enumerable: true,
+            configurable: true
+        });
         TextInputBinder.prototype.init = function (v) {
             feng3d.serialization.setValue(this, v);
             //
-            feng3d.watcher.watch(this.space, this.attribute, this.updateView, this);
-            this.textInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            this.textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-            this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            //
+            this.initView();
             this.updateView();
             //
             return this;
@@ -2808,13 +2834,23 @@ var editor;
             this.textInput.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.textInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
         };
+        TextInputBinder.prototype.initView = function () {
+            //
+            feng3d.watcher.watch(this.space, this.attribute, this.updateView, this);
+            if (this.editable) {
+                this.textInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+                this.textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+                this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            }
+            this.textInput.enabled = this.editable;
+        };
         TextInputBinder.prototype.updateView = function () {
             if (!this._textfocusintxt) {
-                this.textInput.text = this.space[this.attribute];
+                this.textInput.text = this.toText.call(this, this.attributeValue);
             }
         };
         TextInputBinder.prototype.onTextChange = function () {
-            this.space[this.attribute] = this.textInput.text;
+            this.attributeValue = this.toValue.call(this, this.textInput.text);
         };
         TextInputBinder.prototype.ontxtfocusin = function () {
             this._textfocusintxt = true;
@@ -2826,6 +2862,93 @@ var editor;
         return TextInputBinder;
     }());
     editor.TextInputBinder = TextInputBinder;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var NumberTextInputBinder = /** @class */ (function (_super) {
+        __extends(NumberTextInputBinder, _super);
+        function NumberTextInputBinder() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            /**
+             * 步长，精度
+             */
+            _this.step = 0.001;
+            /**
+             * 键盘上下方向键步长
+             */
+            _this.stepDownup = 0.001;
+            /**
+             * 移动一个像素时增加的步长数量
+             */
+            _this.stepScale = 1;
+            _this.toText = function (v) {
+                // 消除数字显示为类似 0.0000000001 的问题
+                var fractionDigits = 1;
+                while (fractionDigits * this.step < 1) {
+                    fractionDigits *= 10;
+                }
+                var text = String(Math.round(fractionDigits * (Math.round(v / this.step) * this.step)) / fractionDigits);
+                return text;
+            };
+            _this.toValue = function (v) {
+                return Number(v) || 0;
+            };
+            _this.mouseDownPosition = new feng3d.Vector2();
+            _this.mouseDownValue = 0;
+            return _this;
+        }
+        NumberTextInputBinder.prototype.initView = function () {
+            _super.prototype.initView.call(this);
+            if (this.editable) {
+                feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+            }
+        };
+        NumberTextInputBinder.prototype.dispose = function () {
+            _super.prototype.dispose.call(this);
+            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+        };
+        NumberTextInputBinder.prototype.onMouseDown = function () {
+            if (!this.controller)
+                return;
+            var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var p = this.controller.localToGlobal(0, 0);
+            if (!new feng3d.Rectangle(p.x, p.y, this.controller.width, this.controller.height).containsPoint(mousePos))
+                return;
+            //
+            this.mouseDownPosition = mousePos;
+            this.mouseDownValue = this.attributeValue;
+            //
+            feng3d.windowEventProxy.on("mousemove", this.onStageMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onStageMouseUp, this);
+        };
+        NumberTextInputBinder.prototype.onStageMouseMove = function () {
+            this.attributeValue = this.mouseDownValue + ((feng3d.windowEventProxy.clientX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - feng3d.windowEventProxy.clientY)) * this.step * this.stepScale;
+        };
+        NumberTextInputBinder.prototype.onStageMouseUp = function () {
+            feng3d.windowEventProxy.off("mousemove", this.onStageMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onStageMouseUp, this);
+        };
+        NumberTextInputBinder.prototype.ontxtfocusin = function () {
+            _super.prototype.ontxtfocusin.call(this);
+            feng3d.windowEventProxy.on("keydown", this.onWindowKeyDown, this);
+        };
+        NumberTextInputBinder.prototype.ontxtfocusout = function () {
+            _super.prototype.ontxtfocusout.call(this);
+            feng3d.windowEventProxy.off("keydown", this.onWindowKeyDown, this);
+        };
+        NumberTextInputBinder.prototype.onWindowKeyDown = function (event) {
+            if (event.key == "ArrowUp") {
+                this.attributeValue += this.step;
+                this.textInput.text = this.toText.call(this, this.attributeValue);
+            }
+            else if (event.key == "ArrowDown") {
+                this.attributeValue -= this.step;
+                this.textInput.text = this.toText.call(this, this.attributeValue);
+            }
+        };
+        return NumberTextInputBinder;
+    }(editor.TextInputBinder));
+    editor.NumberTextInputBinder = NumberTextInputBinder;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -3468,79 +3591,23 @@ var editor;
      */
     var OAVNumber = /** @class */ (function (_super) {
         __extends(OAVNumber, _super);
-        function OAVNumber() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            /**
-             * 步长，精度
-             */
-            _this.step = 0.001;
-            /**
-             * 键盘上下方向键步长
-             */
-            _this.stepDownup = 0.001;
-            /**
-             * 移动一个像素时增加的步长数量
-             */
-            _this.stepScale = 1;
-            _this.mouseDownPosition = new feng3d.Vector2();
-            _this.mouseDownValue = 0;
+        function OAVNumber(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVNumber";
             return _this;
         }
         OAVNumber.prototype.initView = function () {
             _super.prototype.initView.call(this);
-            if (this._attributeViewInfo.editable)
-                this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-        };
-        OAVNumber.prototype.dispose = function () {
-            this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-            _super.prototype.dispose.call(this);
-        };
-        /**
-         * 更新界面
-         */
-        OAVNumber.prototype.updateView = function () {
-            this.text.enabled = this._attributeViewInfo.editable;
-            // 消除数字显示为类似 0.0000000001 的问题
-            var fractionDigits = 1;
-            while (fractionDigits * this.step < 1) {
-                fractionDigits *= 10;
-            }
-            this.text.text = String(Math.round(fractionDigits * (Math.round(this.attributeValue / this.step) * this.step)) / fractionDigits);
-        };
-        OAVNumber.prototype.onMouseDown = function (e) {
-            this.mouseDownPosition.init(e.stageX, e.stageY);
-            this.mouseDownValue = this.attributeValue;
-            editor.editorui.stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onStageMouseMove, this);
-            editor.editorui.stage.addEventListener(egret.MouseEvent.MOUSE_UP, this.onStageMouseUp, this);
-        };
-        OAVNumber.prototype.onStageMouseMove = function (e) {
-            this.attributeValue = this.mouseDownValue + ((e.stageX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - e.stageY)) * this.step * this.stepScale;
-        };
-        OAVNumber.prototype.onStageMouseUp = function () {
-            editor.editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onStageMouseMove, this);
-            editor.editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onStageMouseUp, this);
-        };
-        OAVNumber.prototype.ontxtfocusin = function () {
-            _super.prototype.ontxtfocusin.call(this);
-            feng3d.windowEventProxy.on("keydown", this.onWindowKeyDown, this);
-        };
-        OAVNumber.prototype.ontxtfocusout = function () {
-            _super.prototype.ontxtfocusout.call(this);
-            feng3d.windowEventProxy.off("keydown", this.onWindowKeyDown, this);
-        };
-        OAVNumber.prototype.onWindowKeyDown = function (event) {
-            if (event.key == "ArrowUp") {
-                this.attributeValue += this.step;
-            }
-            else if (event.key == "ArrowDown") {
-                this.attributeValue -= this.step;
-            }
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.space, attribute: this._attributeName, textInput: this.text, editable: this._attributeViewInfo.editable,
+                controller: this.labelLab,
+            }));
         };
         OAVNumber = __decorate([
             feng3d.OAVComponent()
         ], OAVNumber);
         return OAVNumber;
-    }(editor.OAVDefault));
+    }(editor.OAVBase));
     editor.OAVNumber = OAVNumber;
 })(editor || (editor = {}));
 var editor;
@@ -3553,8 +3620,7 @@ var editor;
             return _this;
         }
         OAVString.prototype.initView = function () {
-            this.addBinder(new editor.TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput }));
-            this.txtInput.enabled = this._attributeViewInfo.editable;
+            this.addBinder(new editor.TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput, editable: this._attributeViewInfo.editable, }));
         };
         OAVString = __decorate([
             feng3d.OAVComponent()
@@ -9995,28 +10061,6 @@ var egret;
         egret.InputController.prototype["blurHandler"] = function (event) {
             oldblurHandler.call(this, event);
             feng3d.shortcut.enable = !this._isFocus;
-        };
-    })();
-    (function () {
-        // 扩展 TextInput , 焦点在文本中时，延缓外部通过text属性赋值到失去焦点时生效
-        var descriptor = Object.getOwnPropertyDescriptor(eui.TextInput.prototype, "text");
-        var oldTextSet = descriptor.set;
-        descriptor.set = function (value) {
-            if (this["isFocus"]) {
-                this["__temp_value__"] = value;
-            }
-            else {
-                oldTextSet.call(this, value);
-            }
-        };
-        Object.defineProperty(eui.TextInput.prototype, "text", descriptor);
-        var oldFocusOutHandler = eui.TextInput.prototype["focusOutHandler"];
-        eui.TextInput.prototype["focusOutHandler"] = function (event) {
-            oldFocusOutHandler.call(this, event);
-            if (this["__temp_value__"] != undefined) {
-                this["text"] = this["__temp_value__"];
-                delete this["__temp_value__"];
-            }
         };
     })();
     egret.MouseEvent = egret.TouchEvent;
