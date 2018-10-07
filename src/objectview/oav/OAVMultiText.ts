@@ -6,7 +6,7 @@ namespace editor
     @feng3d.OAVComponent()
     export class OAVMultiText extends OAVBase
     {
-        public multiText: eui.Label;
+        public txtLab: eui.Label;
 
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
@@ -16,7 +16,17 @@ namespace editor
 
         initView()
         {
-            this.multiText.text = this.attributeValue;
+            feng3d.watcher.watch(this.space, this._attributeName, this.updateView, this);
+        }
+
+        dispose()
+        {
+            feng3d.watcher.unwatch(this.space, this._attributeName, this.updateView, this);
+        }
+
+        updateView()
+        {
+            this.txtLab.text = this.attributeValue;
         }
     }
 }

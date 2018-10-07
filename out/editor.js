@@ -3480,6 +3480,37 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var OAVString = /** @class */ (function (_super) {
+        __extends(OAVString, _super);
+        function OAVString(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVString";
+            return _this;
+        }
+        OAVString.prototype.initView = function () {
+            this.txtInput.enabled = this._attributeViewInfo.editable;
+            feng3d.watcher.watch(this.space, this._attributeName, this.updateView, this);
+            this.txtInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+        };
+        OAVString.prototype.dispose = function () {
+            feng3d.watcher.unwatch(this.space, this._attributeName, this.updateView, this);
+            this.txtInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+        };
+        OAVString.prototype.updateView = function () {
+            this.txtInput.text = this.attributeValue;
+        };
+        OAVString.prototype.onTextChange = function () {
+            this.attributeValue = this.txtInput.text;
+        };
+        OAVString = __decorate([
+            feng3d.OAVComponent()
+        ], OAVString);
+        return OAVString;
+    }(editor.OAVBase));
+    editor.OAVString = OAVString;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     /**
      * 默认对象属性界面
      */
@@ -3491,7 +3522,13 @@ var editor;
             return _this;
         }
         OAVMultiText.prototype.initView = function () {
-            this.multiText.text = this.attributeValue;
+            feng3d.watcher.watch(this.space, this._attributeName, this.updateView, this);
+        };
+        OAVMultiText.prototype.dispose = function () {
+            feng3d.watcher.unwatch(this.space, this._attributeName, this.updateView, this);
+        };
+        OAVMultiText.prototype.updateView = function () {
+            this.txtLab.text = this.attributeValue;
         };
         OAVMultiText = __decorate([
             feng3d.OAVComponent()
@@ -11442,6 +11479,7 @@ var editor;
     feng3d.objectview.defaultObjectAttributeBlockView = "OBVDefault";
     //
     feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "OAVBoolean" });
+    feng3d.objectview.setDefaultTypeAttributeView("String", { component: "OAVString" });
     feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
     feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
     feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });

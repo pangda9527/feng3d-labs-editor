@@ -7,6 +7,7 @@ namespace editor
     feng3d.objectview.defaultObjectAttributeBlockView = "OBVDefault";
     //
     feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "OAVBoolean" });
+    feng3d.objectview.setDefaultTypeAttributeView("String", { component: "OAVString" });
     feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
     feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
     feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });

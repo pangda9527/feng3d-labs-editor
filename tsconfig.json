@@ -64,6 +64,7 @@
         "src/objectview/oav/OAVDefault.ts",
         "src/objectview/oav/OAVBoolean.ts",
         "src/objectview/oav/OAVNumber.ts",
+        "src/objectview/oav/OAVString.ts",
         "src/objectview/oav/OAVMultiText.ts",
         "src/objectview/oav/OAVVector3D.ts",
         "src/objectview/oav/OAVArray.ts",
