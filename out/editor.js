@@ -634,8 +634,8 @@ var editor;
     editor.EditorCache = EditorCache;
     editor.editorcache = new EditorCache();
     window.addEventListener("beforeunload", function () {
-        if (editor.codeeditoWin)
-            editor.codeeditoWin.close();
+        if (codeeditoWin)
+            codeeditoWin.close();
         if (editor.runwin)
             editor.runwin.close();
         editor.editorcache.save();
@@ -5069,9 +5069,6 @@ var editor;
             if (assetsFile.feng3dAssets instanceof feng3d.StringFile) {
                 menuconfig.push({
                     label: "编辑", click: function () {
-                        var url = "codeeditor.html";
-                        if (!editor.codeeditoWin)
-                            editor.codeeditoWin = window.open(url);
                         editor.scriptCompiler.edit(assetsFile.feng3dAssets);
                     }
                 });
@@ -5473,7 +5470,7 @@ var editor;
             var name = basename;
             var i = 1;
             while (labels.indexOf(name) != -1) {
-                name = basename + " " + i++;
+                name = basename + i++;
             }
             return name;
         };
@@ -11498,7 +11495,9 @@ var editor;
         }
         ScriptCompiler.prototype.edit = function (script) {
             this._script = script;
-            this.codeEditor && this.codeEditor(script);
+            if (codeeditoWin)
+                codeeditoWin.close();
+            codeeditoWin = window.open("codeeditor.html");
         };
         ScriptCompiler.prototype.compile = function (callback) {
             var _this = this;
@@ -11533,7 +11532,6 @@ var editor;
             this.tslibs = [];
             feng3d.loadjs.load({
                 paths: ["../feng3d/out/feng3d.d.ts"], onitemload: function (url, content) {
-                    monaco.languages.typescript.typescriptDefaults.addExtraLib(content, url.split("/").pop());
                     _this.tslibs.push({ path: url, code: content });
                 },
                 success: callback,
@@ -11621,6 +11619,7 @@ var editor;
     editor.ScriptCompiler = ScriptCompiler;
     editor.scriptCompiler = new ScriptCompiler();
 })(editor || (editor = {}));
+var codeeditoWin;
 var ts;
 // Monaco uses a custom amd loader that overrides node's require.
 // Keep a reference to node's require so we can restore it after executing the amd loader file.
@@ -11633,24 +11632,7 @@ script.onload = function () {
     window["require"] = nodeRequire;
     //
     amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-    amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function () {
-        // 设置ts编译选项
-        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-            allowNonTsExtensions: true,
-            module: monaco.languages.typescript.ModuleKind.AMD,
-            noResolve: true,
-            suppressOutputPathCheck: true,
-            skipLibCheck: true,
-            skipDefaultLibCheck: true,
-            target: monaco.languages.typescript.ScriptTarget.ES5,
-            noImplicitAny: false,
-            strictNullChecks: false,
-            noImplicitThis: false,
-            noImplicitReturns: false,
-            experimentalDecorators: true,
-            noUnusedLocals: false,
-            noUnusedParameters: false,
-        });
+    amdRequire(['vs/language/typescript/lib/typescriptServices'], function () {
     });
 };
 document.body.appendChild(script);

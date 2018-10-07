@@ -193,7 +193,7 @@ namespace editor
             var i = 1;
             while (labels.indexOf(name) != -1)
             {
-                name = basename + " " + i++;
+                name = basename + i++;
             }
             return name;
         }

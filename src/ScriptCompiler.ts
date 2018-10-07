@@ -14,13 +14,13 @@ namespace editor
         // ts 列表
         private tslist: feng3d.ScriptFile[] = [];
 
-        private codeEditor: (script: feng3d.StringFile) => void;
         private _script: feng3d.StringFile;
 
         edit(script: feng3d.StringFile)
         {
             this._script = script;
-            this.codeEditor && this.codeEditor(script);
+            if (codeeditoWin) codeeditoWin.close();
+            codeeditoWin = window.open(`codeeditor.html`);
         }
 
         compile(callback?: (result: string) => void)
@@ -61,7 +61,7 @@ namespace editor
 
         private loadLibs(callback: () => void)
         {
-            if (this.tslibs) 
+            if (this.tslibs)
             {
                 callback();
                 return;
@@ -70,7 +70,6 @@ namespace editor
             feng3d.loadjs.load({
                 paths: ["../feng3d/out/feng3d.d.ts"], onitemload: (url, content) =>
                 {
-                    monaco.languages.typescript.typescriptDefaults.addExtraLib(content, url.split("/").pop());
                     this.tslibs.push({ path: url, code: content });
                 },
                 success: callback,
@@ -180,6 +179,8 @@ namespace editor
 
 }
 
+var codeeditoWin: Window;
+
 var ts;
 
 // Monaco uses a custom amd loader that overrides node's require.
@@ -196,25 +197,9 @@ script.onload = () =>
 
     //
     amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-    amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], () =>
+    amdRequire(['vs/language/typescript/lib/typescriptServices'], () =>
     {
-        // 设置ts编译选项
-        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-            allowNonTsExtensions: true,
-            module: monaco.languages.typescript.ModuleKind.AMD,
-            noResolve: true,
-            suppressOutputPathCheck: true,
-            skipLibCheck: true,
-            skipDefaultLibCheck: true,
-            target: monaco.languages.typescript.ScriptTarget.ES5,
-            noImplicitAny: false,
-            strictNullChecks: false,
-            noImplicitThis: false,
-            noImplicitReturns: false,
-            experimentalDecorators: true,
-            noUnusedLocals: false,
-            noUnusedParameters: false,
-        });
+
     });
 }
 document.body.appendChild(script);

@@ -1395,7 +1395,6 @@ declare namespace editor {
         private showFloderChanged;
         private onParsed;
     }
-    var codeeditoWin: Window;
 }
 declare namespace editor {
     class AssetsFileItemRenderer extends eui.ItemRenderer {
@@ -2709,7 +2708,6 @@ declare namespace editor {
     class ScriptCompiler {
         private tslibs;
         private tslist;
-        private codeEditor;
         private _script;
         edit(script: feng3d.StringFile): void;
         compile(callback?: (result: string) => void): any;
@@ -2722,6 +2720,7 @@ declare namespace editor {
         private tssort;
     }
 }
+declare var codeeditoWin: Window;
 declare var ts: any;
 declare var nodeRequire: any;
 declare var script: HTMLScriptElement;

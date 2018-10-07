@@ -42,15 +42,8 @@ amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServi
         formatOnType: true,
     });
 
-    editor.scriptCompiler.loadLibs(() =>
-    {
-
-    });
-
-    editor.scriptCompiler.codeEditor(editor.scriptCompiler._script);
+    codeEditor(editor.scriptCompiler._script);
 });
-
-var assets = editor.assets;
 
 window.onresize = function ()
 {
@@ -86,28 +79,28 @@ function autoCompile()
     }, 1000);
 }
 
-function getModel(assets)
+function getModel(file)
 {
-    if (assets instanceof feng3d.JsonFile)
+    if (file instanceof feng3d.JsonFile)
         return "json";
-    if (assets instanceof feng3d.JSFile)
+    if (file instanceof feng3d.JSFile)
         return "javascript";
-    if (assets instanceof feng3d.ScriptFile)
+    if (file instanceof feng3d.ScriptFile)
         return "typescript";
-    if (assets instanceof feng3d.ShaderFile)
+    if (file instanceof feng3d.ShaderFile)
         return "typescript";
-    if (assets instanceof feng3d.StringFile)
+    if (file instanceof feng3d.StringFile)
         return "text";
     return "text";
 }
 
-editor.scriptCompiler.codeEditor = (script) =>
+function codeEditor(file)
 {
-    if (!(script instanceof feng3d.StringFile)) return;
+    if (!(file instanceof feng3d.StringFile)) return;
 
-    var model = getModel(script);
+    var model = getModel(file);
     var oldModel = monacoEditor.getModel();
-    var newModel = monaco.editor.createModel(script.textContent, model);
+    var newModel = monaco.editor.createModel(file.textContent, model);
     monacoEditor.setModel(newModel);
     if (oldModel) oldModel.dispose();
 
@@ -120,13 +113,13 @@ editor.scriptCompiler.codeEditor = (script) =>
     monacoEditor.onDidChangeModelContent(() =>
     {
         logLabel.textContent = "";
-        script.textContent = monacoEditor.getValue();
-        assets.writeAssets(script, (err) =>
+        file.textContent = monacoEditor.getValue();
+        editor.assets.writeAssets(file, (err) =>
         {
             if (err)
                 console.warn(err);
             logLabel.textContent = "自动保存完成！";
-            if (script instanceof feng3d.ScriptFile)
+            if (file instanceof feng3d.ScriptFile)
             {
                 if (watchCB.checked)
                 {

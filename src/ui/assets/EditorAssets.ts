@@ -241,8 +241,6 @@ namespace editor
                 menuconfig.push({
                     label: "编辑", click: () =>
                     {
-                        var url = `codeeditor.html`;
-                        if (!codeeditoWin) codeeditoWin = window.open(url);
                         scriptCompiler.edit(<feng3d.StringFile>assetsFile.feng3dAssets);
                     }
                 });
@@ -398,5 +396,4 @@ namespace editor
     }
 
     editorAssets = new EditorAssets();
-    export var codeeditoWin: Window;
 }
