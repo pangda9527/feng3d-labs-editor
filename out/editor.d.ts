@@ -1157,8 +1157,8 @@ declare namespace editor {
          */
         updateView(): void;
         private removedComponentView;
-        private onaddedcompont;
-        private onremovedComponent;
+        private onAddCompont;
+        private onRemoveComponent;
     }
 }
 declare namespace editor {
@@ -2277,8 +2277,10 @@ declare namespace editor {
          * 销毁
          */
         dispose(): void;
-        private onAddComponentToScene;
-        private onRemoveComponentFromScene;
+        private onAddChild;
+        private onRemoveChild;
+        private onAddComponent;
+        private onRemoveComponent;
         private addComponent;
         private removeComponent;
         private directionLightIconMap;

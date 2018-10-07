@@ -60,8 +60,8 @@ namespace editor
 			{
 				this.addComponentView(components[i]);
 			}
-			this.space.on("addedComponent", this.onaddedcompont, this);
-			this.space.on("removedComponent", this.onremovedComponent, this);
+			this.space.on("addComponent", this.onAddCompont, this);
+			this.space.on("removeComponent", this.onRemoveComponent, this);
 
 			drag.register(this.addComponentButton, null, ["file_script"], (dragdata) =>
 			{
@@ -82,8 +82,8 @@ namespace editor
 				this.removedComponentView(components[i]);
 			}
 
-			this.space.off("addedComponent", this.onaddedcompont, this);
-			this.space.off("removedComponent", this.onremovedComponent, this);
+			this.space.off("addComponent", this.onAddCompont, this);
+			this.space.off("removeComponent", this.onRemoveComponent, this);
 
 			drag.unregister(this.addComponentButton);
 
@@ -126,14 +126,16 @@ namespace editor
 			}
 		}
 
-		private onaddedcompont(event: feng3d.Event<feng3d.Components>)
+		private onAddCompont(event: feng3d.Event<feng3d.Component>)
 		{
-			this.addComponentView(event.data);
+			if (event.data.gameObject == this.space)
+				this.addComponentView(event.data);
 		}
 
-		private onremovedComponent(event: feng3d.Event<feng3d.Components>)
+		private onRemoveComponent(event: feng3d.Event<feng3d.Component>)
 		{
-			this.removedComponentView(event.data);
+			if (event.data.gameObject == this.space)
+				this.removedComponentView(event.data);
 		}
 	}
 }

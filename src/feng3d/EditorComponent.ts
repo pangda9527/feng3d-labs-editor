@@ -13,8 +13,8 @@ namespace editor
         {
             if (this._scene)
             {
-                this.scene.off("addComponentToScene", this.onAddComponentToScene, this);
-                this.scene.off("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+                this.scene.off("addComponent", this.onAddComponent, this);
+                this.scene.off("removeComponent", this.onRemoveComponent, this);
 
                 this.scene.getComponentsInChildren(feng3d.Component).forEach(element =>
                 {
@@ -29,8 +29,10 @@ namespace editor
                     this.addComponent(element);
                 });
 
-                this.scene.on("addComponentToScene", this.onAddComponentToScene, this);
-                this.scene.on("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+                this.scene.on("addComponent", this.onAddComponent, this);
+                this.scene.on("removeComponent", this.onRemoveComponent, this);
+                this.scene.on("addChild", this.onAddChild, this);
+                this.scene.on("removeChild", this.onRemoveChild, this);
             }
         }
 
@@ -50,12 +52,30 @@ namespace editor
             super.dispose();
         }
 
-        private onAddComponentToScene(event: feng3d.Event<feng3d.Component>)
+        private onAddChild(event: feng3d.Event<feng3d.GameObject>)
+        {
+            var components = event.data.getComponentsInChildren();
+            components.forEach(v =>
+            {
+                this.addComponent(v);
+            });
+        }
+
+        private onRemoveChild(event: feng3d.Event<feng3d.GameObject>)
+        {
+            var components = event.data.getComponentsInChildren();
+            components.forEach(v =>
+            {
+                this.removeComponent(v);
+            });
+        }
+
+        private onAddComponent(event: feng3d.Event<feng3d.Component>)
         {
             this.addComponent(event.data);
         }
 
-        private onRemoveComponentFromScene(event: feng3d.Event<feng3d.Component>)
+        private onRemoveComponent(event: feng3d.Event<feng3d.Component>)
         {
             this.removeComponent(event.data);
         }

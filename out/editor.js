@@ -4048,8 +4048,8 @@ var editor;
             for (var i = 0; i < components.length; i++) {
                 this.addComponentView(components[i]);
             }
-            this.space.on("addedComponent", this.onaddedcompont, this);
-            this.space.on("removedComponent", this.onremovedComponent, this);
+            this.space.on("addComponent", this.onAddCompont, this);
+            this.space.on("removeComponent", this.onRemoveComponent, this);
             editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
                 if (dragdata.file_script) {
                     _this.space.addScript(dragdata.file_script.scriptName);
@@ -4062,8 +4062,8 @@ var editor;
             for (var i = 0; i < components.length; i++) {
                 this.removedComponentView(components[i]);
             }
-            this.space.off("addedComponent", this.onaddedcompont, this);
-            this.space.off("removedComponent", this.onremovedComponent, this);
+            this.space.off("addComponent", this.onAddCompont, this);
+            this.space.off("removeComponent", this.onRemoveComponent, this);
             editor.drag.unregister(this.addComponentButton);
             this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
         };
@@ -4093,11 +4093,13 @@ var editor;
                 }
             }
         };
-        OAVComponentList.prototype.onaddedcompont = function (event) {
-            this.addComponentView(event.data);
+        OAVComponentList.prototype.onAddCompont = function (event) {
+            if (event.data.gameObject == this.space)
+                this.addComponentView(event.data);
         };
-        OAVComponentList.prototype.onremovedComponent = function (event) {
-            this.removedComponentView(event.data);
+        OAVComponentList.prototype.onRemoveComponent = function (event) {
+            if (event.data.gameObject == this.space)
+                this.removedComponentView(event.data);
         };
         OAVComponentList = __decorate([
             feng3d.OAVComponent()
@@ -8188,13 +8190,13 @@ var editor;
         };
         Hierarchy.prototype.rootGameObjectChanged = function (property, oldValue, newValue) {
             if (oldValue) {
-                oldValue.off("added", this.ongameobjectadded, this);
-                oldValue.off("removed", this.ongameobjectremoved, this);
+                oldValue.off("addChild", this.ongameobjectadded, this);
+                oldValue.off("removeChild", this.ongameobjectremoved, this);
             }
             if (newValue) {
                 this.init(newValue);
-                newValue.on("added", this.ongameobjectadded, this);
-                newValue.on("removed", this.ongameobjectremoved, this);
+                newValue.on("addChild", this.ongameobjectadded, this);
+                newValue.on("removeChild", this.ongameobjectremoved, this);
             }
         };
         Hierarchy.prototype.onSelectedGameObjectChanged = function () {
@@ -8669,8 +8671,8 @@ var editor;
             set: function (v) {
                 var _this = this;
                 if (this._scene) {
-                    this.scene.off("addComponentToScene", this.onAddComponentToScene, this);
-                    this.scene.off("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+                    this.scene.off("addComponent", this.onAddComponent, this);
+                    this.scene.off("removeComponent", this.onRemoveComponent, this);
                     this.scene.getComponentsInChildren(feng3d.Component).forEach(function (element) {
                         _this.removeComponent(element);
                     });
@@ -8680,8 +8682,10 @@ var editor;
                     this.scene.getComponentsInChildren(feng3d.Component).forEach(function (element) {
                         _this.addComponent(element);
                     });
-                    this.scene.on("addComponentToScene", this.onAddComponentToScene, this);
-                    this.scene.on("removeComponentFromScene", this.onRemoveComponentFromScene, this);
+                    this.scene.on("addComponent", this.onAddComponent, this);
+                    this.scene.on("removeComponent", this.onRemoveComponent, this);
+                    this.scene.on("addChild", this.onAddChild, this);
+                    this.scene.on("removeChild", this.onRemoveChild, this);
                 }
             },
             enumerable: true,
@@ -8697,10 +8701,24 @@ var editor;
             this.scene = null;
             _super.prototype.dispose.call(this);
         };
-        EditorComponent.prototype.onAddComponentToScene = function (event) {
+        EditorComponent.prototype.onAddChild = function (event) {
+            var _this = this;
+            var components = event.data.getComponentsInChildren();
+            components.forEach(function (v) {
+                _this.addComponent(v);
+            });
+        };
+        EditorComponent.prototype.onRemoveChild = function (event) {
+            var _this = this;
+            var components = event.data.getComponentsInChildren();
+            components.forEach(function (v) {
+                _this.removeComponent(v);
+            });
+        };
+        EditorComponent.prototype.onAddComponent = function (event) {
             this.addComponent(event.data);
         };
-        EditorComponent.prototype.onRemoveComponentFromScene = function (event) {
+        EditorComponent.prototype.onRemoveComponent = function (event) {
             this.removeComponent(event.data);
         };
         EditorComponent.prototype.addComponent = function (component) {
@@ -10397,6 +10415,7 @@ var editor;
                             shaderName: "texture",
                             uniforms: {
                                 s_texture: {
+                                    __class__: "feng3d.UrlImageTexture2D",
                                     url: editor.editorData.getEditorAssetsPath("assets/3d/icons/light.png"),
                                     format: feng3d.TextureFormat.RGBA,
                                     premulAlpha: true,
@@ -10606,6 +10625,7 @@ var editor;
                             shaderName: "texture",
                             uniforms: {
                                 s_texture: {
+                                    __class__: "feng3d.UrlImageTexture2D",
                                     url: editor.editorData.getEditorAssetsPath("assets/3d/icons/spot.png"),
                                     format: feng3d.TextureFormat.RGBA,
                                     premulAlpha: true,

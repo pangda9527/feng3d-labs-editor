@@ -55,18 +55,18 @@ namespace editor
 
         private _selectedGameObjects: feng3d.GameObject[] = [];
 
-        private rootGameObjectChanged(property, oldValue, newValue)
+        private rootGameObjectChanged(property, oldValue: feng3d.GameObject, newValue: feng3d.GameObject)
         {
             if (oldValue)
             {
-                oldValue.off("added", this.ongameobjectadded, this);
-                oldValue.off("removed", this.ongameobjectremoved, this);
+                oldValue.off("addChild", this.ongameobjectadded, this);
+                oldValue.off("removeChild", this.ongameobjectremoved, this);
             }
             if (newValue)
             {
                 this.init(newValue);
-                newValue.on("added", this.ongameobjectadded, this);
-                newValue.on("removed", this.ongameobjectremoved, this);
+                newValue.on("addChild", this.ongameobjectadded, this);
+                newValue.on("removeChild", this.ongameobjectremoved, this);
             }
         }
 
