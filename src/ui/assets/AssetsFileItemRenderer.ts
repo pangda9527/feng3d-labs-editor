@@ -121,7 +121,6 @@ namespace editor
                 var scene = this.data.feng3dAssets.getComponent(feng3d.Scene3D);
                 if (scene)
                 {
-                    scene.initCollectComponents();
                     engine.scene = scene;
                 }
             }

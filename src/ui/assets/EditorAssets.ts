@@ -88,7 +88,6 @@ namespace editor
                     return;
                 }
                 var scene = object.getComponent(feng3d.Scene3D);
-                scene.initCollectComponents();
                 callback(null, scene);
             });
         }

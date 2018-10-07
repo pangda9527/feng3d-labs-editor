@@ -5101,7 +5101,6 @@ var editor;
                     return;
                 }
                 var scene = object.getComponent(feng3d.Scene3D);
-                scene.initCollectComponents();
                 callback(null, scene);
             });
         };
@@ -5459,7 +5458,6 @@ var editor;
             else if (this.data.feng3dAssets instanceof feng3d.GameObject) {
                 var scene = this.data.feng3dAssets.getComponent(feng3d.Scene3D);
                 if (scene) {
-                    scene.initCollectComponents();
                     editor.engine.scene = scene;
                 }
             }
