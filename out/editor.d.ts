@@ -758,6 +758,11 @@ declare namespace editor {
         private valuechanged;
     }
 }
+declare namespace eui {
+    interface Component {
+        addBinder(...binders: editor.UIBinder[]): void;
+    }
+}
 declare namespace editor {
     interface UIBinder {
         init(v: Partial<this>): this;
@@ -1003,10 +1008,8 @@ declare namespace editor {
 declare namespace editor {
     class OAVString extends OAVBase {
         txtInput: eui.TextInput;
-        private binders;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
-        dispose(): void;
     }
 }
 declare namespace editor {

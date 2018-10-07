@@ -5,8 +5,6 @@ namespace editor
     {
         public txtInput: eui.TextInput;
 
-        private binders: UIBinder[] = [];
-
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
             super(attributeViewInfo);
@@ -15,17 +13,11 @@ namespace editor
 
         initView()
         {
-            this.binders.push(
+            this.addBinder(
                 new TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput })
             );
 
             this.txtInput.enabled = this._attributeViewInfo.editable;
-        }
-
-        dispose()
-        {
-            this.binders.forEach(v => v.dispose());
-            this.binders.length = 0;
         }
     }
 }

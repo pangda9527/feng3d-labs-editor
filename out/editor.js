@@ -2762,6 +2762,28 @@ var editor;
     }(eui.Component));
     editor.TipString = TipString;
 })(editor || (editor = {}));
+var eui;
+(function (eui) {
+    eui.Component.prototype["addBinder"] = function () {
+        var _this = this;
+        var binders = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            binders[_i] = arguments[_i];
+        }
+        this._binders = this._binders || [];
+        binders.forEach(function (v) {
+            _this._binders.push(v);
+        });
+    };
+    var old$onRemoveFromStage = eui.Component.prototype.$onRemoveFromStage;
+    eui.Component.prototype["$onRemoveFromStage"] = function () {
+        if (this._binders) {
+            this._binders.forEach(function (v) { return v.dispose(); });
+            this._binders.length = 0;
+        }
+        old$onRemoveFromStage.call(this);
+    };
+})(eui || (eui = {}));
 var editor;
 (function (editor) {
     var TextInputBinder = /** @class */ (function () {
@@ -2771,6 +2793,7 @@ var editor;
             feng3d.serialization.setValue(this, v);
             feng3d.watcher.watch(this.space, this.attribute, this.updateView, this);
             this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            this.updateView();
             return this;
         };
         TextInputBinder.prototype.dispose = function () {
@@ -3509,17 +3532,12 @@ var editor;
         __extends(OAVString, _super);
         function OAVString(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
-            _this.binders = [];
             _this.skinName = "OAVString";
             return _this;
         }
         OAVString.prototype.initView = function () {
-            this.binders.push(new editor.TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput }));
+            this.addBinder(new editor.TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput }));
             this.txtInput.enabled = this._attributeViewInfo.editable;
-        };
-        OAVString.prototype.dispose = function () {
-            this.binders.forEach(function (v) { return v.dispose(); });
-            this.binders.length = 0;
         };
         OAVString = __decorate([
             feng3d.OAVComponent()
