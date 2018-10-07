@@ -2791,20 +2791,37 @@ var editor;
         }
         TextInputBinder.prototype.init = function (v) {
             feng3d.serialization.setValue(this, v);
+            //
             feng3d.watcher.watch(this.space, this.attribute, this.updateView, this);
+            this.textInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+            this.textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            //
             this.updateView();
+            //
             return this;
         };
         TextInputBinder.prototype.dispose = function () {
             feng3d.watcher.unwatch(this.space, this.attribute, this.updateView, this);
+            //
+            this.textInput.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+            this.textInput.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.textInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
         };
         TextInputBinder.prototype.updateView = function () {
-            this.textInput.text = this.space[this.attribute];
+            if (!this._textfocusintxt) {
+                this.textInput.text = this.space[this.attribute];
+            }
         };
         TextInputBinder.prototype.onTextChange = function () {
             this.space[this.attribute] = this.textInput.text;
+        };
+        TextInputBinder.prototype.ontxtfocusin = function () {
+            this._textfocusintxt = true;
+        };
+        TextInputBinder.prototype.ontxtfocusout = function () {
+            this._textfocusintxt = false;
+            this.updateView();
         };
         return TextInputBinder;
     }());

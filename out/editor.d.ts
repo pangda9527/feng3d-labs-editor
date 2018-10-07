@@ -776,6 +776,9 @@ declare namespace editor {
         dispose(): void;
         private updateView;
         private onTextChange;
+        private _textfocusintxt;
+        protected ontxtfocusin(): void;
+        protected ontxtfocusout(): void;
     }
 }
 declare namespace editor {
