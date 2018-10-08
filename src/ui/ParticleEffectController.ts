@@ -92,9 +92,17 @@ namespace editor
         private onDataChange()
         {
             var particleSystems = editorData.selectedGameObjects.reduce((pv: feng3d.ParticleSystem[], cv) => { var ps = cv.getComponent(feng3d.ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
-            this.particleSystems.forEach(v => v.pause());
+            this.particleSystems.forEach(v =>
+            {
+                v.pause()
+                v.off("particleCompleted", this.updateView, this);
+            });
             this.particleSystems = particleSystems;
-            this.particleSystems.forEach(v => v.continue());
+            this.particleSystems.forEach(v =>
+            {
+                v.continue()
+                v.on("particleCompleted", this.updateView, this);
+            });
             if (this.particleSystems.length > 0) this.saveParent.addChild(this);
             else this.parent && this.parent.removeChild(this);
         }

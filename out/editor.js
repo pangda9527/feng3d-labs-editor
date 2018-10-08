@@ -1221,10 +1221,17 @@ var editor;
             configurable: true
         });
         ParticleEffectController.prototype.onDataChange = function () {
+            var _this = this;
             var particleSystems = editor.editorData.selectedGameObjects.reduce(function (pv, cv) { var ps = cv.getComponent(feng3d.ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
-            this.particleSystems.forEach(function (v) { return v.pause(); });
+            this.particleSystems.forEach(function (v) {
+                v.pause();
+                v.off("particleCompleted", _this.updateView, _this);
+            });
             this.particleSystems = particleSystems;
-            this.particleSystems.forEach(function (v) { return v.continue(); });
+            this.particleSystems.forEach(function (v) {
+                v.continue();
+                v.on("particleCompleted", _this.updateView, _this);
+            });
             if (this.particleSystems.length > 0)
                 this.saveParent.addChild(this);
             else
