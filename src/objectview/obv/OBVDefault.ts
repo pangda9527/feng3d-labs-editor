@@ -84,7 +84,7 @@ namespace editor
 				displayObject.objectBlockView = null;
 				this.contentGroup.removeChild(displayObject);
 			}
-			this.attributeViews = null;
+			this.attributeViews.length = 0;
 		}
 
 		get space(): Object

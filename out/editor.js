@@ -3300,7 +3300,7 @@ var editor;
                 displayObject.objectBlockView = null;
                 this.contentGroup.removeChild(displayObject);
             }
-            this.attributeViews = null;
+            this.attributeViews.length = 0;
         };
         Object.defineProperty(OBVDefault.prototype, "space", {
             get: function () {
