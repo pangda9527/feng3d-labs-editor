@@ -78,7 +78,7 @@ namespace editor
             }
         }
 
-        private addComponentView(component: feng3d.ParticleComponent)
+        private addComponentView(component: feng3d.ParticleModule)
         {
             var o: Object;
             var displayObject = new ParticleComponentView(component);
@@ -86,7 +86,7 @@ namespace editor
             this.group.addChild(displayObject);
         }
 
-        private removedComponentView(component: feng3d.ParticleComponent)
+        private removedComponentView(component: feng3d.ParticleModule)
         {
             for (var i = this.group.numChildren - 1; i >= 0; i--)
             {
