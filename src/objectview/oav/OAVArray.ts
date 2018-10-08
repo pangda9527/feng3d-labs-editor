@@ -90,7 +90,6 @@ namespace editor
             var attributeViews = this.attributeViews;
             if (size != attributeValue.length)
             {
-                attributeValue.length = size;
                 for (var i = 0; i < attributeViews.length; i++)
                 {
                     if (attributeViews[i].parent)
@@ -99,7 +98,8 @@ namespace editor
                     }
                 }
 
-                for (var i = 0; i < attributeValue.length; i++)
+                attributeValue.length = size;
+                for (var i = 0; i < size; i++)
                 {
                     if (attributeValue[i] == null && this._attributeViewInfo.componentParam)
                         attributeValue[i] = feng3d.lazy.getvalue((<any>this._attributeViewInfo.componentParam).defaultItem);

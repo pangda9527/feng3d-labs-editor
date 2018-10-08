@@ -2827,7 +2827,7 @@ var editor;
             configurable: true
         });
         TextInputBinder.prototype.init = function (v) {
-            feng3d.serialization.setValue(this, v);
+            Object.assign(this, v);
             //
             this.initView();
             this.updateView();
@@ -3760,13 +3760,13 @@ var editor;
             var attributeValue = this.attributeValue;
             var attributeViews = this.attributeViews;
             if (size != attributeValue.length) {
-                attributeValue.length = size;
                 for (var i = 0; i < attributeViews.length; i++) {
                     if (attributeViews[i].parent) {
                         attributeViews[i].parent.removeChild(attributeViews[i]);
                     }
                 }
-                for (var i = 0; i < attributeValue.length; i++) {
+                attributeValue.length = size;
+                for (var i = 0; i < size; i++) {
                     if (attributeValue[i] == null && this._attributeViewInfo.componentParam)
                         attributeValue[i] = feng3d.lazy.getvalue(this._attributeViewInfo.componentParam.defaultItem);
                     if (attributeViews[i] == null) {

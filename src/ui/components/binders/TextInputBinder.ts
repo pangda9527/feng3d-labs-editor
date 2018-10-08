@@ -81,7 +81,7 @@ namespace editor
 
         init(v: Partial<this>)
         {
-            feng3d.serialization.setValue(this, <any>v);
+            Object.assign(this, v);
 
             //
             this.initView();
