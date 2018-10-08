@@ -63,7 +63,7 @@ namespace editor
             {
                 this.playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
                 this.playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
-                this.particles = this.particleSystems.reduce((pv, cv) => { pv += cv.main.maxParticles; return pv; }, 0);
+                this.particles = this.particleSystems.reduce((pv, cv) => { pv += cv.numActiveParticles; return pv; }, 0);
             }
         }
 
