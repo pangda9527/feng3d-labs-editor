@@ -4279,6 +4279,9 @@ var editor;
                 view.percentWidth = 100;
                 _this.group.addChild(view);
                 _this.views.push(view);
+                if (element instanceof feng3d.EventDispatcher) {
+                    element.on("refreshView", _this.onRefreshView, _this);
+                }
             });
         };
         OAVObjectView.prototype.updateView = function () {
@@ -4290,8 +4293,15 @@ var editor;
             var _this = this;
             this.views.forEach(function (element) {
                 _this.group.removeChild(element);
+                if (element.space instanceof feng3d.EventDispatcher) {
+                    element.space.on("refreshView", _this.onRefreshView, _this);
+                }
             });
             this.views = null;
+        };
+        OAVObjectView.prototype.onRefreshView = function (event) {
+            this.dispose();
+            this.initView();
         };
         OAVObjectView = __decorate([
             feng3d.OAVComponent()

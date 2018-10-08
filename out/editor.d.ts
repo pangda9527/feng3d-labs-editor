@@ -1216,6 +1216,7 @@ declare namespace editor {
          * 销毁
          */
         dispose(): void;
+        private onRefreshView;
     }
 }
 declare namespace editor {

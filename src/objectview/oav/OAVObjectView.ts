@@ -30,6 +30,10 @@ namespace editor
 				view.percentWidth = 100;
 				this.group.addChild(view);
 				this.views.push(view);
+				if (element instanceof feng3d.EventDispatcher)
+				{
+					element.on("refreshView", this.onRefreshView, this);
+				}
 			});
 		}
 
@@ -45,8 +49,18 @@ namespace editor
 			this.views.forEach(element =>
 			{
 				this.group.removeChild(element);
+				if (element.space instanceof feng3d.EventDispatcher)
+				{
+					element.space.on("refreshView", this.onRefreshView, this);
+				}
 			});
 			this.views = null;
+		}
+
+		private onRefreshView(event: feng3d.Event<any>)
+		{
+			this.dispose();
+			this.initView();
 		}
 	}
 }
