@@ -4297,7 +4297,7 @@ var editor;
                     element.space.on("refreshView", _this.onRefreshView, _this);
                 }
             });
-            this.views = null;
+            this.views.length = 0;
         };
         OAVObjectView.prototype.onRefreshView = function (event) {
             this.dispose();

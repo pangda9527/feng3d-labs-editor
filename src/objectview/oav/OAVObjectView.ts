@@ -54,7 +54,7 @@ namespace editor
 					element.space.on("refreshView", this.onRefreshView, this);
 				}
 			});
-			this.views = null;
+			this.views.length = 0;
 		}
 
 		private onRefreshView(event: feng3d.Event<any>)
