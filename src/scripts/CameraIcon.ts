@@ -26,10 +26,10 @@ namespace editor
                                     __class__: "feng3d.UrlImageTexture2D",
                                     url: editorData.getEditorAssetsPath("assets/3d/icons/camera.png"),
                                     format: feng3d.TextureFormat.RGBA,
-                                    premulAlpha: true,
+                                    // premulAlpha: true,
                                 }
                             },
-                            renderParams: { enableBlend: true },
+                            renderParams: { enableBlend: true, depthMask: false },
                         },
                         geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
                     },
