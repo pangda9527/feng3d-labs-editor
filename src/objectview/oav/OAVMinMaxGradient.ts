@@ -15,11 +15,22 @@ namespace editor
 
         initView()
         {
+            if (this._attributeViewInfo.editable)
+            {
+                this.minMaxGradientView.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
 
+            this.minMaxGradientView.minMaxGradient = this.attributeValue;
+
+            this.minMaxGradientView.touchEnabled = this.minMaxGradientView.touchChildren = this._attributeViewInfo.editable;
         }
 
         dispose()
         {
+            if (this._attributeViewInfo.editable)
+            {
+                this.minMaxGradientView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
         }
 
         updateView()
@@ -27,5 +38,9 @@ namespace editor
 
         }
 
+        private onChange()
+        {
+
+        }
     }
 }

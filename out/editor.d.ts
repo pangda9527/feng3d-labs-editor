@@ -1370,6 +1370,7 @@ declare namespace editor {
         initView(): void;
         dispose(): void;
         updateView(): void;
+        private onChange;
     }
 }
 declare namespace editor {
