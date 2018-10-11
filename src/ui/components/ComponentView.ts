@@ -200,7 +200,7 @@ namespace editor
 				});
 			}
 
-			menu.popup(menus, this.stage.stageWidth - 150);
+			menu.popup(menus, { mousex: this.stage.stageWidth - 150 });
 		}
 
 		private onHelpBtnClick()

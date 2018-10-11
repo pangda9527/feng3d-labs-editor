@@ -1910,7 +1910,7 @@ var editor;
                 var rect = this.getTransformedBounds(this.stage);
                 if (rect.right + 300 > this.stage.stageWidth)
                     rect.x -= rect.width + 150;
-                this.menuUI.subMenuUI = editor.MenuUI.create(this.data.submenu, rect.right, rect.top);
+                this.menuUI.subMenuUI = editor.MenuUI.create(this.data.submenu, { mousex: rect.right, mousey: rect.top });
                 this.menuUI.subMenuUI.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
             }
             else {
@@ -2297,7 +2297,7 @@ var editor;
                     }
                 });
             }
-            editor.menu.popup(menus, this.stage.stageWidth - 150);
+            editor.menu.popup(menus, { mousex: this.stage.stageWidth - 150 });
         };
         ComponentView.prototype.onHelpBtnClick = function () {
             window.open("http://feng3d.gitee.io/#/script");
@@ -2370,20 +2370,17 @@ var editor;
     var Menu = /** @class */ (function () {
         function Menu() {
         }
-        Menu.prototype.popup = function (menu, mousex, mousey, width) {
-            if (width === void 0) { width = 150; }
-            var menuUI = MenuUI.create(menu, mousex, mousey, width);
+        Menu.prototype.popup = function (menu, parm) {
+            var menuUI = MenuUI.create(menu, parm);
             editor.maskview.mask(menuUI);
         };
-        Menu.prototype.popupEnum = function (enumDefinition, currentValue, selectCallBack, mousex, mousey, width) {
-            if (width === void 0) { width = 150; }
-            var list = [];
-            var menu;
+        Menu.prototype.popupEnum = function (enumDefinition, currentValue, selectCallBack, parm) {
+            var menu = [];
             for (var key in enumDefinition) {
                 if (enumDefinition.hasOwnProperty(key)) {
                     if (isNaN(Number(key))) {
                         menu.push({
-                            label: key,
+                            label: (currentValue == enumDefinition[key] ? "√ " : "   ") + key,
                             click: (function (v) {
                                 return function () { return selectCallBack(v); };
                             })(enumDefinition[key])
@@ -2391,7 +2388,7 @@ var editor;
                     }
                 }
             }
-            this.popup(menu);
+            this.popup(menu, parm);
         };
         return Menu;
     }());
@@ -2428,17 +2425,17 @@ var editor;
             enumerable: true,
             configurable: true
         });
-        MenuUI.create = function (menu, mousex, mousey, width) {
-            if (width === void 0) { width = 150; }
+        MenuUI.create = function (menu, parm) {
             var menuUI = new MenuUI();
             var dataProvider = new eui.ArrayCollection();
             dataProvider.replaceAll(menu);
             menuUI.dataProvider = dataProvider;
             editor.editorui.popupLayer.addChild(menuUI);
-            if (width !== undefined)
-                menuUI.width = width;
-            menuUI.x = mousex || feng3d.windowEventProxy.clientX;
-            menuUI.y = mousey || feng3d.windowEventProxy.clientY;
+            parm = Object.assign({ width: 150 }, parm);
+            if (parm.width !== undefined)
+                menuUI.width = parm.width;
+            menuUI.x = parm.mousex || feng3d.windowEventProxy.clientX;
+            menuUI.y = parm.mousey || feng3d.windowEventProxy.clientY;
             if (menuUI.x + menuUI.width > editor.editorui.popupLayer.stage.stageWidth)
                 menuUI.x -= menuUI.width;
             if (menuUI.y + menuUI.height > editor.editorui.popupLayer.stage.stageHeight)
@@ -2788,7 +2785,7 @@ var editor;
             var _this = this;
             editor.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
                 _this.minMaxGradient.mode = v;
-            });
+            }, { width: 210 });
         };
         __decorate([
             feng3d.watch("_onMinMaxGradientChanged")
@@ -5109,7 +5106,7 @@ var editor;
         HierarchyView.prototype.onListRightClick = function (e) {
             if (e.target == this.list) {
                 editor.editorData.selectObject(null);
-                editor.menu.popup(editor.createObjectConfig, feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+                editor.menu.popup(editor.createObjectConfig, { mousex: feng3d.windowEventProxy.clientX, mousey: feng3d.windowEventProxy.clientY });
             }
         };
         return HierarchyView;

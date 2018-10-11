@@ -49,7 +49,7 @@ namespace editor
             menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, (v) =>
             {
                 this.minMaxGradient.mode = v;
-            });
+            }, { width: 210 });
         }
 
     }

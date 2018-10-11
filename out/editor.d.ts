@@ -643,8 +643,16 @@ declare namespace editor {
         submenu?: MenuItem[];
     };
     class Menu {
-        popup(menu: MenuItem[], mousex?: number, mousey?: number, width?: number): void;
-        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void, mousex?: number, mousey?: number, width?: number): void;
+        popup(menu: MenuItem[], parm?: {
+            mousex?: number;
+            mousey?: number;
+            width?: number;
+        }): void;
+        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void, parm?: {
+            mousex?: number;
+            mousey?: number;
+            width?: number;
+        }): void;
     }
     class MenuUI extends eui.List {
         subMenuUI: MenuUI;
@@ -652,7 +660,11 @@ declare namespace editor {
         private parentMenuUI;
         readonly topMenu: MenuUI;
         constructor();
-        static create(menu: MenuItem[], mousex?: number, mousey?: number, width?: number): MenuUI;
+        static create(menu: MenuItem[], parm?: {
+            mousex?: number;
+            mousey?: number;
+            width?: number;
+        }): MenuUI;
         private onComplete;
         private onAddedToStage;
         private onRemovedFromStage;

@@ -23,16 +23,15 @@ namespace editor
 
     export class Menu
     {
-        popup(menu: MenuItem[], mousex?: number, mousey?: number, width = 150)
+        popup(menu: MenuItem[], parm?: { mousex?: number, mousey?: number, width?: number })
         {
-            var menuUI = MenuUI.create(menu, mousex, mousey, width);
+            var menuUI = MenuUI.create(menu, parm);
             maskview.mask(menuUI);
         }
 
-        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v) => void, mousex?: number, mousey?: number, width = 150)
+        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v) => void, parm?: { mousex?: number, mousey?: number, width?: number })
         {
-            var list = [];
-            var menu: MenuItem[]
+            var menu: MenuItem[] = [];
             for (const key in enumDefinition)
             {
                 if (enumDefinition.hasOwnProperty(key))
@@ -40,7 +39,7 @@ namespace editor
                     if (isNaN(Number(key)))
                     {
                         menu.push({
-                            label: key,
+                            label: (currentValue == enumDefinition[key] ? "√ " : "   ") + key,
                             click: ((v) =>
                             {
                                 return () => selectCallBack(v);
@@ -50,7 +49,7 @@ namespace editor
                 }
             }
 
-            this.popup(menu)
+            this.popup(menu, parm)
         }
     };
 
@@ -87,7 +86,7 @@ namespace editor
             this.onComplete();
         }
 
-        static create(menu: MenuItem[], mousex?: number, mousey?: number, width = 150)
+        static create(menu: MenuItem[], parm?: { mousex?: number, mousey?: number, width?: number })
         {
             var menuUI = new MenuUI();
             var dataProvider = new eui.ArrayCollection();
@@ -96,10 +95,12 @@ namespace editor
             menuUI.dataProvider = dataProvider;
             editorui.popupLayer.addChild(menuUI);
 
-            if (width !== undefined)
-                menuUI.width = width;
-            menuUI.x = mousex || feng3d.windowEventProxy.clientX;
-            menuUI.y = mousey || feng3d.windowEventProxy.clientY;
+            parm = Object.assign({ width: 150 }, parm);
+
+            if (parm.width !== undefined)
+                menuUI.width = parm.width;
+            menuUI.x = parm.mousex || feng3d.windowEventProxy.clientX;
+            menuUI.y = parm.mousey || feng3d.windowEventProxy.clientY;
 
             if (menuUI.x + menuUI.width > editorui.popupLayer.stage.stageWidth)
                 menuUI.x -= menuUI.width;
