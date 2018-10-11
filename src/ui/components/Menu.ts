@@ -28,6 +28,30 @@ namespace editor
             var menuUI = MenuUI.create(menu, mousex, mousey, width);
             maskview.mask(menuUI);
         }
+
+        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v) => void, mousex?: number, mousey?: number, width = 150)
+        {
+            var list = [];
+            var menu: MenuItem[]
+            for (const key in enumDefinition)
+            {
+                if (enumDefinition.hasOwnProperty(key))
+                {
+                    if (isNaN(Number(key)))
+                    {
+                        menu.push({
+                            label: key,
+                            click: ((v) =>
+                            {
+                                return () => selectCallBack(v);
+                            })(enumDefinition[key])
+                        });
+                    }
+                }
+            }
+
+            this.popup(menu)
+        }
     };
 
     menu = new Menu();

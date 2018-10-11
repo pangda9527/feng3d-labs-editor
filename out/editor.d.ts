@@ -644,6 +644,7 @@ declare namespace editor {
     };
     class Menu {
         popup(menu: MenuItem[], mousex?: number, mousey?: number, width?: number): void;
+        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void, mousex?: number, mousey?: number, width?: number): void;
     }
     class MenuUI extends eui.List {
         subMenuUI: MenuUI;
@@ -743,6 +744,24 @@ declare namespace editor {
          * 隐藏
          */
         hide(): void;
+    }
+}
+declare namespace editor {
+    /**
+     * 最大最小颜色渐变界面
+     *
+     * editor.editorui.maskLayer.addChild(new editor.MinMaxGradientView())
+     */
+    class MinMaxGradientView extends eui.Component {
+        minMaxGradient: feng3d.MinMaxGradient;
+        colorRect: eui.Rect;
+        alphaRect: eui.Rect;
+        modeBtn: eui.Button;
+        constructor();
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        private _onMinMaxGradientChanged;
+        private onModeBtnClick;
     }
 }
 declare namespace editor {

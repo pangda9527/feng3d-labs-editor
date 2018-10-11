@@ -2375,6 +2375,24 @@ var editor;
             var menuUI = MenuUI.create(menu, mousex, mousey, width);
             editor.maskview.mask(menuUI);
         };
+        Menu.prototype.popupEnum = function (enumDefinition, currentValue, selectCallBack, mousex, mousey, width) {
+            if (width === void 0) { width = 150; }
+            var list = [];
+            var menu;
+            for (var key in enumDefinition) {
+                if (enumDefinition.hasOwnProperty(key)) {
+                    if (isNaN(Number(key))) {
+                        menu.push({
+                            label: key,
+                            click: (function (v) {
+                                return function () { return selectCallBack(v); };
+                            })(enumDefinition[key])
+                        });
+                    }
+                }
+            }
+            this.popup(menu);
+        };
         return Menu;
     }());
     editor.Menu = Menu;
@@ -2736,6 +2754,48 @@ var editor;
     }(eui.Rect));
     editor.AreaSelectRect = AreaSelectRect;
     editor.areaSelectRect = new AreaSelectRect();
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * 最大最小颜色渐变界面
+     *
+     * editor.editorui.maskLayer.addChild(new editor.MinMaxGradientView())
+     */
+    var MinMaxGradientView = /** @class */ (function (_super) {
+        __extends(MinMaxGradientView, _super);
+        function MinMaxGradientView() {
+            var _this = _super.call(this) || this;
+            //
+            _this.minMaxGradient = new feng3d.MinMaxGradient();
+            _this.skinName = "MinMaxGradientView";
+            _this.x = 100;
+            _this.y = 100;
+            _this.width = 100;
+            return _this;
+        }
+        MinMaxGradientView.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onModeBtnClick, this);
+        };
+        MinMaxGradientView.prototype.$onRemoveFromStage = function () {
+            this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onModeBtnClick, this);
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        MinMaxGradientView.prototype._onMinMaxGradientChanged = function () {
+        };
+        MinMaxGradientView.prototype.onModeBtnClick = function (e) {
+            var _this = this;
+            editor.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
+                _this.minMaxGradient.mode = v;
+            });
+        };
+        __decorate([
+            feng3d.watch("_onMinMaxGradientChanged")
+        ], MinMaxGradientView.prototype, "minMaxGradient", void 0);
+        return MinMaxGradientView;
+    }(eui.Component));
+    editor.MinMaxGradientView = MinMaxGradientView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

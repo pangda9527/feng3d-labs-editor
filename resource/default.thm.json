@@ -48,6 +48,7 @@
         "resource/custom_skins/ColorPickerView.exml",
         "resource/custom_skins/TipString.exml",
         "resource/custom_skins/ParticleEffectController.exml",
+        "resource/custom_skins/MinMaxGradientView.exml",
         "resource/custom_skins/OAVEnum.exml",
         "resource/custom_skins/BooleanAttrView.exml",
         "resource/custom_skins/OAVArray.exml",
