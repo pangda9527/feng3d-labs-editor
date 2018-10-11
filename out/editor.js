@@ -1786,26 +1786,25 @@ var editor;
         };
         ColorPicker.prototype.onClick = function () {
             var _this = this;
-            if (!colorPickerView)
-                colorPickerView = new editor.ColorPickerView();
-            colorPickerView.color = this.value;
+            if (!editor.colorPickerView)
+                editor.colorPickerView = new editor.ColorPickerView();
+            editor.colorPickerView.color = this.value;
             var pos = this.localToGlobal(0, 0);
             // pos.x = pos.x - colorPickerView.width;
             pos.x = pos.x - 318;
-            colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+            editor.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
             //
-            editor.popupview.popupView(colorPickerView, function () {
-                colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+            editor.popupview.popupView(editor.colorPickerView, function () {
+                editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
             }, pos.x, pos.y);
         };
         ColorPicker.prototype.onPickerViewChanged = function () {
-            this.value = colorPickerView.color;
+            this.value = editor.colorPickerView.color;
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
         return ColorPicker;
     }(eui.Component));
     editor.ColorPicker = ColorPicker;
-    var colorPickerView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -2773,19 +2772,51 @@ var editor;
         }
         MinMaxGradientView.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onModeBtnClick, this);
+            this.colorRect.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.updateView();
         };
         MinMaxGradientView.prototype.$onRemoveFromStage = function () {
-            this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onModeBtnClick, this);
+            this.colorRect.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
-        MinMaxGradientView.prototype._onMinMaxGradientChanged = function () {
+        MinMaxGradientView.prototype.updateView = function () {
+            var color = this.minMaxGradient.minMaxGradient.color;
+            this.colorRect.fillColor = color.toColor3().toInt();
+            this.alphaRect.percentWidth = color.a * 100;
         };
-        MinMaxGradientView.prototype.onModeBtnClick = function (e) {
+        MinMaxGradientView.prototype._onMinMaxGradientChanged = function () {
+            if (this.stage)
+                this.updateView();
+        };
+        MinMaxGradientView.prototype.onClick = function (e) {
             var _this = this;
-            editor.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
-                _this.minMaxGradient.mode = v;
-            }, { width: 210 });
+            switch (e.currentTarget) {
+                case this.colorRect:
+                    if (!editor.colorPickerView)
+                        editor.colorPickerView = new editor.ColorPickerView();
+                    editor.colorPickerView.color = this.minMaxGradient.getValue(0).toColor3();
+                    var pos = this.localToGlobal(0, 0);
+                    // pos.x = pos.x - colorPickerView.width;
+                    pos.x = pos.x - 318;
+                    editor.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                    //
+                    editor.popupview.popupView(editor.colorPickerView, function () {
+                        editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                    }, pos.x, pos.y);
+                    break;
+                case this.modeBtn:
+                    editor.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
+                        _this.minMaxGradient.mode = v;
+                    }, { width: 210 });
+                    break;
+            }
+        };
+        MinMaxGradientView.prototype.onPickerViewChanged = function () {
+            this.minMaxGradient.minMaxGradient.color = editor.colorPickerView.color.toColor4();
+            this.updateView();
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
         __decorate([
             feng3d.watch("_onMinMaxGradientChanged")

@@ -453,6 +453,7 @@ declare namespace editor {
         private onClick;
         private onPickerViewChanged;
     }
+    var colorPickerView: ColorPickerView;
 }
 declare namespace editor {
     class TreeItemRenderer extends eui.ItemRenderer {
@@ -772,8 +773,10 @@ declare namespace editor {
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
+        updateView(): void;
         private _onMinMaxGradientChanged;
-        private onModeBtnClick;
+        private onClick;
+        private onPickerViewChanged;
     }
 }
 declare namespace editor {
