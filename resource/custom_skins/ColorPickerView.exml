@@ -44,6 +44,13 @@
 				<e:HorizontalLayout verticalAlign="middle" paddingLeft="0"/>
 				</e:layout>
 			</e:Group>
+			<e:Group id="groupA" height="20" y="20" scaleX="1" scaleY="1" x="10">
+				<e:Label text="B" size="12" width="20" y="0" x="0" textColor="0x000000" verticalAlign="middle" multiline="false"/>
+				<e:TextInput id="txtA" scaleX="1" scaleY="1" x="20" y="20"/>
+				<e:layout>
+				<e:HorizontalLayout verticalAlign="middle" paddingLeft="0"/>
+				</e:layout>
+			</e:Group>
 			<e:Group height="20" y="20" scaleX="1" scaleY="1" x="10">
 				<e:Label text="#" size="12" width="20" y="0" x="0" textColor="0x000000" verticalAlign="middle" multiline="false"/>
 				<e:TextInput id="txtColor" scaleX="1" scaleY="1" x="20" y="20"/>

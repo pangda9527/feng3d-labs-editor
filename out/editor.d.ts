@@ -444,7 +444,7 @@ declare namespace editor {
 declare namespace editor {
     class ColorPicker extends eui.Component implements eui.UIComponent {
         picker: eui.Rect;
-        value: feng3d.Color3;
+        value: feng3d.Color3 | feng3d.Color4;
         private _value;
         constructor();
         private onComplete;
@@ -712,8 +712,10 @@ declare namespace editor {
         txtR: eui.TextInput;
         txtG: eui.TextInput;
         txtB: eui.TextInput;
+        groupA: eui.Group;
+        txtA: eui.TextInput;
         txtColor: eui.TextInput;
-        color: feng3d.Color3;
+        color: feng3d.Color3 | feng3d.Color4;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -731,6 +733,7 @@ declare namespace editor {
         private rh;
         private ratio;
         private updateView;
+        private _groupAParent;
     }
 }
 declare namespace editor {
@@ -762,8 +765,6 @@ declare namespace editor {
 declare namespace editor {
     /**
      * 最大最小颜色渐变界面
-     *
-     * editor.editorui.maskLayer.addChild(new editor.MinMaxGradientView())
      */
     class MinMaxGradientView extends eui.Component {
         minMaxGradient: feng3d.MinMaxGradient;

@@ -1759,14 +1759,18 @@ var editor;
         }
         Object.defineProperty(ColorPicker.prototype, "value", {
             get: function () {
-                if (this.picker)
-                    this._value.fromUnit(this.picker.fillColor);
                 return this._value;
             },
             set: function (v) {
-                this._value.fromUnit(v.toInt());
-                if (this.picker)
-                    this.picker.fillColor = this._value.toInt();
+                this._value = v;
+                if (this.picker) {
+                    if (this._value instanceof feng3d.Color3) {
+                        this.picker.fillColor = this._value.toInt();
+                    }
+                    else {
+                        this.picker.fillColor = this._value.toColor3().toInt();
+                    }
+                }
             },
             enumerable: true,
             configurable: true
@@ -2561,7 +2565,7 @@ var editor;
         function ColorPickerView() {
             var _this = _super.call(this) || this;
             //
-            _this.color = new feng3d.Color3(0.2, 0.5, 0);
+            _this.color = new feng3d.Color4(0.2, 0.5, 0);
             _this.skinName = "ColorPickerView";
             return _this;
         }
@@ -2582,6 +2586,9 @@ var editor;
             this.txtB.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtB.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtB.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            this.txtA.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+            this.txtA.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            this.txtA.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
             this.txtColor.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtColor.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtColor.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -2600,6 +2607,9 @@ var editor;
             this.txtB.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtB.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtB.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            this.txtA.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+            this.txtA.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            this.txtA.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
             this.txtColor.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtColor.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtColor.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -2630,13 +2640,17 @@ var editor;
                 this.rw = rw;
                 this.rh = rh;
                 var color = feng3d.imageUtil.getColorPickerRectAtPosition(this.basecolor.toInt(), rw, rh);
-                this.color = color;
             }
             else if (this.group1 == this._mouseDownGroup) {
                 this.ratio = rh;
                 var basecolor = this.basecolor = feng3d.imageUtil.getMixColorAtRatio(rh, colors);
                 var color = feng3d.imageUtil.getColorPickerRectAtPosition(basecolor.toInt(), this.rw, this.rh);
+            }
+            if (this.color instanceof feng3d.Color3) {
                 this.color = color;
+            }
+            else {
+                this.color = new feng3d.Color4(color.r, color.g, color.b, this.color.a);
             }
         };
         ColorPickerView.prototype.onMouseUp = function () {
@@ -2664,6 +2678,9 @@ var editor;
                     case this.txtB:
                         color.b = (Number(this.txtB.text) || 0) / 255;
                         break;
+                    case this.txtA:
+                        color.a = (Number(this.txtA.text) || 0) / 255;
+                        break;
                     case this.txtColor:
                         color.fromUnit(Number("0x" + this.txtColor.text) || 0);
                         break;
@@ -2684,6 +2701,8 @@ var editor;
                 this.txtG.text = Math.round(this.color.g * 255).toString();
             if (this._textfocusintxt != this.txtB)
                 this.txtB.text = Math.round(this.color.b * 255).toString();
+            if (this._textfocusintxt != this.txtA)
+                this.txtA.text = Math.round(this.color.a * 255).toString();
             if (this._textfocusintxt != this.txtColor)
                 this.txtColor.text = this.color.toHexString().substr(1);
             if (this._mouseDownGroup == null) {
@@ -2703,6 +2722,16 @@ var editor;
             //
             this.pos0.x = this.rw * (this.group0.width - this.pos0.width);
             this.pos0.y = this.rh * (this.group0.height - this.pos0.height);
+            //
+            if (this.color instanceof feng3d.Color3) {
+                this._groupAParent = this._groupAParent || this.groupA.parent;
+                this.groupA.parent && this.groupA.parent.removeChild(this.groupA);
+            }
+            else {
+                if (this.groupA.parent == null && this._groupAParent) {
+                    this._groupAParent.addChildAt(this.groupA, 3);
+                }
+            }
         };
         __decorate([
             feng3d.watch("onColorChanged")
@@ -2755,8 +2784,6 @@ var editor;
 (function (editor) {
     /**
      * 最大最小颜色渐变界面
-     *
-     * editor.editorui.maskLayer.addChild(new editor.MinMaxGradientView())
      */
     var MinMaxGradientView = /** @class */ (function (_super) {
         __extends(MinMaxGradientView, _super);
@@ -2782,7 +2809,7 @@ var editor;
             _super.prototype.$onRemoveFromStage.call(this);
         };
         MinMaxGradientView.prototype.updateView = function () {
-            var color = this.minMaxGradient.minMaxGradient.color;
+            var color = this.minMaxGradient.getValue(0);
             this.colorRect.fillColor = color.toColor3().toInt();
             this.alphaRect.percentWidth = color.a * 100;
         };
@@ -2796,7 +2823,7 @@ var editor;
                 case this.colorRect:
                     if (!editor.colorPickerView)
                         editor.colorPickerView = new editor.ColorPickerView();
-                    editor.colorPickerView.color = this.minMaxGradient.getValue(0).toColor3();
+                    editor.colorPickerView.color = this.minMaxGradient.getValue(0);
                     var pos = this.localToGlobal(0, 0);
                     // pos.x = pos.x - colorPickerView.width;
                     pos.x = pos.x - 318;
@@ -2814,7 +2841,7 @@ var editor;
             }
         };
         MinMaxGradientView.prototype.onPickerViewChanged = function () {
-            this.minMaxGradient.minMaxGradient.color = editor.colorPickerView.color.toColor4();
+            this.minMaxGradient.minMaxGradient.color = editor.colorPickerView.color;
             this.updateView();
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
@@ -3542,7 +3569,7 @@ var editor;
                     objectViewEvent.attributeValue = this.attributeValue;
                     this.dispatchEvent(objectViewEvent);
                 }
-                this.updateView();
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             },
             enumerable: true,
             configurable: true
@@ -4256,20 +4283,12 @@ var editor;
         };
         OAVColorPicker.prototype.updateView = function () {
             var color = this.attributeValue;
-            if (color instanceof feng3d.Color3) {
-                this.colorPicker.value = color;
-            }
-            else {
-                this.colorPicker.value = color.toColor3();
-            }
+            this.colorPicker.value = color;
             this.input.text = color.toHexString();
         };
         OAVColorPicker.prototype.onChange = function (event) {
             //
-            if (this.attributeValue instanceof feng3d.Color3)
-                this.attributeValue = this.colorPicker.value.clone();
-            else
-                this.attributeValue = this.colorPicker.value.toColor4();
+            this.attributeValue = this.colorPicker.value.clone();
             this.input.text = this.attributeValue.toHexString();
         };
         OAVColorPicker.prototype.ontxtfocusin = function () {
@@ -4287,7 +4306,7 @@ var editor;
                     this.attributeValue = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
                 }
                 else {
-                    this.colorPicker.value = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
+                    this.colorPicker.value = new feng3d.Color4().fromUnit(Number("0x" + text.substr(1)));
                     this.attributeValue = new feng3d.Color4().fromUnit(Number("0x" + text.substr(1)));
                 }
             }

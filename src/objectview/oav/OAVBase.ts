@@ -127,7 +127,7 @@ namespace editor
                 objectViewEvent.attributeValue = this.attributeValue;
                 this.dispatchEvent(objectViewEvent);
             }
-            this.updateView();
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
     }
 }

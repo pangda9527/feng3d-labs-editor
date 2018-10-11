@@ -2,8 +2,6 @@ namespace editor
 {
     /**
      * 最大最小颜色渐变界面
-     * 
-     * editor.editorui.maskLayer.addChild(new editor.MinMaxGradientView())
      */
     export class MinMaxGradientView extends eui.Component
     {
@@ -44,7 +42,7 @@ namespace editor
 
         updateView()
         {
-            var color = (<feng3d.MinMaxGradientColor>this.minMaxGradient.minMaxGradient).color;
+            var color = this.minMaxGradient.getValue(0);
             this.colorRect.fillColor = color.toColor3().toInt();
             this.alphaRect.percentWidth = color.a * 100;
         }
@@ -60,7 +58,7 @@ namespace editor
             {
                 case this.colorRect:
                     if (!colorPickerView) colorPickerView = new editor.ColorPickerView();
-                    colorPickerView.color = this.minMaxGradient.getValue(0).toColor3();
+                    colorPickerView.color = this.minMaxGradient.getValue(0);
                     var pos = this.localToGlobal(0, 0);
                     // pos.x = pos.x - colorPickerView.width;
                     pos.x = pos.x - 318;
@@ -82,7 +80,7 @@ namespace editor
 
         private onPickerViewChanged()
         {
-            (<feng3d.MinMaxGradientColor>this.minMaxGradient.minMaxGradient).color = colorPickerView.color.toColor4();
+            (<feng3d.MinMaxGradientColor>this.minMaxGradient.minMaxGradient).color = <feng3d.Color4>colorPickerView.color;
 
             this.updateView();
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));

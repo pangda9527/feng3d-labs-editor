@@ -6,17 +6,23 @@ namespace editor
 
         get value()
         {
-            if (this.picker)
-                this._value.fromUnit(this.picker.fillColor);
             return this._value;
         }
         set value(v)
         {
-            this._value.fromUnit(v.toInt());
+            this._value = v;
             if (this.picker)
-                this.picker.fillColor = this._value.toInt();
+            {
+                if (this._value instanceof feng3d.Color3)
+                {
+                    this.picker.fillColor = this._value.toInt();
+                } else 
+                {
+                    this.picker.fillColor = this._value.toColor3().toInt();
+                }
+            }
         }
-        private _value = new feng3d.Color3();
+        private _value: feng3d.Color3 | feng3d.Color4 = new feng3d.Color3();
 
         constructor()
         {

@@ -39,23 +39,14 @@ namespace editor
         updateView()
         {
             var color = this.attributeValue;
-            if (color instanceof feng3d.Color3)
-            {
-                this.colorPicker.value = color;
-            } else
-            {
-                this.colorPicker.value = color.toColor3();
-            }
+            this.colorPicker.value = color;
             this.input.text = color.toHexString();
         }
 
         protected onChange(event: egret.Event)
         {
             //
-            if (this.attributeValue instanceof feng3d.Color3)
-                this.attributeValue = this.colorPicker.value.clone();
-            else
-                this.attributeValue = this.colorPicker.value.toColor4();
+            this.attributeValue = this.colorPicker.value.clone();
             this.input.text = this.attributeValue.toHexString();
         }
 
@@ -82,7 +73,7 @@ namespace editor
                     this.attributeValue = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
                 } else
                 {
-                    this.colorPicker.value = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
+                    this.colorPicker.value = new feng3d.Color4().fromUnit(Number("0x" + text.substr(1)));
                     this.attributeValue = new feng3d.Color4().fromUnit(Number("0x" + text.substr(1)));
                 }
             }

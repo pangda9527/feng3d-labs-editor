@@ -16,11 +16,13 @@ namespace editor
         public txtR: eui.TextInput;
         public txtG: eui.TextInput;
         public txtB: eui.TextInput;
+        public groupA: eui.Group;
+        public txtA: eui.TextInput;
         public txtColor: eui.TextInput;
 
         //
         @feng3d.watch("onColorChanged")
-        color = new feng3d.Color3(0.2, 0.5, 0);
+        color: feng3d.Color3 | feng3d.Color4 = new feng3d.Color4(0.2, 0.5, 0);
 
         public constructor()
         {
@@ -48,6 +50,9 @@ namespace editor
             this.txtB.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtB.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtB.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            this.txtA.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+            this.txtA.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            this.txtA.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
             this.txtColor.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtColor.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtColor.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -68,6 +73,9 @@ namespace editor
             this.txtB.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtB.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtB.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+            this.txtA.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+            this.txtA.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            this.txtA.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
             this.txtColor.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtColor.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.txtColor.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -107,13 +115,19 @@ namespace editor
                 this.rw = rw;
                 this.rh = rh;
                 var color = feng3d.imageUtil.getColorPickerRectAtPosition(this.basecolor.toInt(), rw, rh);
-                this.color = color;
             } else if (this.group1 == this._mouseDownGroup)
             {
                 this.ratio = rh;
                 var basecolor = this.basecolor = feng3d.imageUtil.getMixColorAtRatio(rh, colors);
                 var color = feng3d.imageUtil.getColorPickerRectAtPosition(basecolor.toInt(), this.rw, this.rh);
+            }
+            if (this.color instanceof feng3d.Color3)
+            {
                 this.color = color;
+            }
+            else
+            {
+                this.color = new feng3d.Color4(color.r, color.g, color.b, this.color.a);
             }
         }
 
@@ -152,6 +166,9 @@ namespace editor
                     case this.txtB:
                         color.b = (Number(this.txtB.text) || 0) / 255;
                         break;
+                    case this.txtA:
+                        (<feng3d.Color4>color).a = (Number(this.txtA.text) || 0) / 255;
+                        break;
                     case this.txtColor:
                         color.fromUnit(Number("0x" + this.txtColor.text) || 0);
                         break;
@@ -160,7 +177,7 @@ namespace editor
             }
         }
 
-        private onColorChanged(property, oldValue: feng3d.Color3, newValue: feng3d.Color3)
+        private onColorChanged(property, oldValue: feng3d.Color4 | feng3d.Color4, newValue: feng3d.Color4 | feng3d.Color4)
         {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
 
@@ -179,6 +196,7 @@ namespace editor
             if (this._textfocusintxt != this.txtR) this.txtR.text = Math.round(this.color.r * 255).toString();
             if (this._textfocusintxt != this.txtG) this.txtG.text = Math.round(this.color.g * 255).toString();
             if (this._textfocusintxt != this.txtB) this.txtB.text = Math.round(this.color.b * 255).toString();
+            if (this._textfocusintxt != this.txtA) this.txtA.text = Math.round((<feng3d.Color4>this.color).a * 255).toString();
             if (this._textfocusintxt != this.txtColor) this.txtColor.text = this.color.toHexString().substr(1);
 
             if (this._mouseDownGroup == null)
@@ -201,6 +219,21 @@ namespace editor
             //
             this.pos0.x = this.rw * (this.group0.width - this.pos0.width);
             this.pos0.y = this.rh * (this.group0.height - this.pos0.height);
+
+            //
+            if (this.color instanceof feng3d.Color3)
+            {
+                this._groupAParent = this._groupAParent || this.groupA.parent;
+                this.groupA.parent && this.groupA.parent.removeChild(this.groupA);
+            } else
+            {
+                if (this.groupA.parent == null && this._groupAParent)
+                {
+                    this._groupAParent.addChildAt(this.groupA, 3);
+                }
+            }
         }
+
+        private _groupAParent: egret.DisplayObjectContainer;
     }
 }
