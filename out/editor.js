@@ -4850,6 +4850,28 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var OAVMinMaxGradient = /** @class */ (function (_super) {
+        __extends(OAVMinMaxGradient, _super);
+        function OAVMinMaxGradient(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVMinMaxGradient";
+            return _this;
+        }
+        OAVMinMaxGradient.prototype.initView = function () {
+        };
+        OAVMinMaxGradient.prototype.dispose = function () {
+        };
+        OAVMinMaxGradient.prototype.updateView = function () {
+        };
+        OAVMinMaxGradient = __decorate([
+            feng3d.OAVComponent()
+        ], OAVMinMaxGradient);
+        return OAVMinMaxGradient;
+    }(editor.OAVBase));
+    editor.OAVMinMaxGradient = OAVMinMaxGradient;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     /**
      * 属性面板（检查器）
      */
@@ -11707,6 +11729,7 @@ var editor;
     feng3d.objectview.setDefaultTypeAttributeView("Color3", { component: "OAVColorPicker" });
     feng3d.objectview.setDefaultTypeAttributeView("Color4", { component: "OAVColorPicker" });
     feng3d.objectview.setDefaultTypeAttributeView("UrlImageTexture2D", { component: "OAVTexture2D" });
+    feng3d.objectview.setDefaultTypeAttributeView("MinMaxGradient", { component: "OAVMinMaxGradient" });
 })(editor || (editor = {}));
 /**
  * 快捷键配置

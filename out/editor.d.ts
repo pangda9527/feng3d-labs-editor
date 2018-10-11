@@ -1363,6 +1363,16 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    class OAVMinMaxGradient extends OAVBase {
+        labelLab: eui.Label;
+        minMaxGradientView: editor.MinMaxGradientView;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
+        dispose(): void;
+        updateView(): void;
+    }
+}
+declare namespace editor {
     /**
      * 属性面板（检查器）
      */
