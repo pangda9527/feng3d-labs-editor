@@ -2799,19 +2799,27 @@ var editor;
         }
         MinMaxGradientView.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            this.colorRect.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup.addEventListener(egret.Event.RESIZE, this.onReSize, this);
             this.updateView();
         };
         MinMaxGradientView.prototype.$onRemoveFromStage = function () {
-            this.colorRect.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup.removeEventListener(egret.Event.RESIZE, this.onReSize, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
         MinMaxGradientView.prototype.updateView = function () {
             var color = this.minMaxGradient.getValue(0);
-            this.colorRect.fillColor = color.toColor3().toInt();
-            this.alphaRect.percentWidth = color.a * 100;
+            //
+            if (this.colorGroup.width > 0 && this.colorGroup.height > 0) {
+                var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup.width, this.colorGroup.height);
+                this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+            }
+        };
+        MinMaxGradientView.prototype.onReSize = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         };
         MinMaxGradientView.prototype._onMinMaxGradientChanged = function () {
             if (this.stage)
@@ -2820,7 +2828,7 @@ var editor;
         MinMaxGradientView.prototype.onClick = function (e) {
             var _this = this;
             switch (e.currentTarget) {
-                case this.colorRect:
+                case this.colorGroup:
                     if (!editor.colorPickerView)
                         editor.colorPickerView = new editor.ColorPickerView();
                     editor.colorPickerView.color = this.minMaxGradient.getValue(0);

@@ -9,9 +9,9 @@ namespace editor
         @feng3d.watch("_onMinMaxGradientChanged")
         minMaxGradient = new feng3d.MinMaxGradient();
 
-        public colorRect: eui.Rect;
-        public alphaRect: eui.Rect;
-        public modeBtn: eui.Button;
+        public colorGroup:eui.Group;
+        public colorImage:eui.Image;
+        public modeBtn:eui.Button;
 
         public constructor()
         {
@@ -26,16 +26,18 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
 
-            this.colorRect.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup.addEventListener(egret.Event.RESIZE, this.onReSize, this);
 
             this.updateView();
         }
 
         $onRemoveFromStage()
         {
-            this.colorRect.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup.removeEventListener(egret.Event.RESIZE, this.onReSize, this);
 
             super.$onRemoveFromStage()
         }
@@ -43,8 +45,18 @@ namespace editor
         updateView()
         {
             var color = this.minMaxGradient.getValue(0);
-            this.colorRect.fillColor = color.toColor3().toInt();
-            this.alphaRect.percentWidth = color.a * 100;
+
+            //
+            if (this.colorGroup.width > 0 && this.colorGroup.height > 0)
+            {
+                var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup.width, this.colorGroup.height);
+                this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+            }
+        }
+
+        private onReSize()
+        {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
 
         private _onMinMaxGradientChanged()
@@ -56,7 +68,7 @@ namespace editor
         {
             switch (e.currentTarget)
             {
-                case this.colorRect:
+                case this.colorGroup:
                     if (!colorPickerView) colorPickerView = new editor.ColorPickerView();
                     colorPickerView.color = this.minMaxGradient.getValue(0);
                     var pos = this.localToGlobal(0, 0);
