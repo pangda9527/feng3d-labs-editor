@@ -92,21 +92,37 @@ namespace editor
                 this._selectedAlphaKey = alphaKeys[this._selectIndex];
                 this.colorGroup.parent && this.colorGroup.parent.removeChild(this.colorGroup);
                 this.alphaGroup.parent || this._parentGroup.addChild(this.alphaGroup);
+                //
+                if (this._alphaNumberSliderTextInputBinder)
+                {
+                    this._alphaNumberSliderTextInputBinder.off("valueChanged", this._onLocationChanged, this);
+                    this._alphaNumberSliderTextInputBinder.dispose();
+                }
+                this._alphaNumberSliderTextInputBinder = new NumberSliderTextInputBinder().init({
+                    space: this._selectedAlphaKey, attribute: "alpha",
+                    slider: this.alphaSlide,
+                    textInput: this.alphaInput, controller: this.alphaLabel, minValue: 0, maxValue: 1,
+                });
+                this._alphaNumberSliderTextInputBinder.on("valueChanged", this._onAlphaChanged, this);
             } else
             {
                 this._selectedColorKey = colorKeys[this._selectIndex];
                 this.alphaGroup.parent && this.alphaGroup.parent.removeChild(this.alphaGroup);
                 this.colorGroup.parent || this.colorGroup.addChild(this.colorGroup);
             }
-            this.colorGroup
             //
-            this._loactionNumberTextInputBinder && this._loactionNumberTextInputBinder.dispose();
+            if (this._loactionNumberTextInputBinder)
+            {
+                this._loactionNumberTextInputBinder.off("valueChanged", this._onLocationChanged, this);
+                this._loactionNumberTextInputBinder.dispose();
+            }
             this._loactionNumberTextInputBinder = new NumberTextInputBinder().init({
                 space: this._selectedAlphaKey || this._selectedColorKey, attribute: "time",
                 textInput: this.locationInput, controller: this.locationLabel, minValue: 0, maxValue: 1,
             });
-
+            this._loactionNumberTextInputBinder.on("valueChanged", this._onLocationChanged, this);
         }
+
         private _alphaSprite: egret.Sprite;
         private _colorSprite: egret.Sprite;
         private _selectAlpha = true;
@@ -115,6 +131,7 @@ namespace editor
         private _selectedAlphaKey: { alpha: number, time: number };
         private _selectedColorKey: { color: feng3d.Color3, time: number };
         private _loactionNumberTextInputBinder: NumberTextInputBinder;
+        private _alphaNumberSliderTextInputBinder: NumberSliderTextInputBinder;
 
         private _drawAlphaGraphics(graphics: egret.Graphics, time: number, alpha: number, width: number, height: number, selected: boolean)
         {
@@ -140,6 +157,15 @@ namespace editor
             graphics.lineTo(time * width + 5, 10);
             graphics.lineTo(time * width, 0);
             graphics.endFill();
+        }
+
+        private _onAlphaChanged()
+        {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        }
+        private _onLocationChanged()
+        {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
 
         private _onReSize()

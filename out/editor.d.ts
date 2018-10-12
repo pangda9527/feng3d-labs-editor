@@ -811,8 +811,11 @@ declare namespace editor {
         private _selectedAlphaKey;
         private _selectedColorKey;
         private _loactionNumberTextInputBinder;
+        private _alphaNumberSliderTextInputBinder;
         private _drawAlphaGraphics;
         private _drawColorGraphics;
+        private _onAlphaChanged;
+        private _onLocationChanged;
         private _onReSize;
         private _onModeCBChange;
         private _onGradientChanged;
@@ -921,6 +924,15 @@ declare namespace editor {
         protected ontxtfocusin(): void;
         protected ontxtfocusout(): void;
         private onWindowKeyDown;
+    }
+}
+declare namespace editor {
+    class NumberSliderTextInputBinder extends NumberTextInputBinder {
+        slider: eui.HSlider;
+        initView(): void;
+        dispose(): void;
+        protected updateView(): void;
+        private _onSliderChanged;
     }
 }
 declare namespace editor {

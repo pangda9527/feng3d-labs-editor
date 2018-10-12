@@ -3034,19 +3034,33 @@ var editor;
                 this._selectedAlphaKey = alphaKeys[this._selectIndex];
                 this.colorGroup.parent && this.colorGroup.parent.removeChild(this.colorGroup);
                 this.alphaGroup.parent || this._parentGroup.addChild(this.alphaGroup);
+                //
+                if (this._alphaNumberSliderTextInputBinder) {
+                    this._alphaNumberSliderTextInputBinder.off("valueChanged", this._onLocationChanged, this);
+                    this._alphaNumberSliderTextInputBinder.dispose();
+                }
+                this._alphaNumberSliderTextInputBinder = new editor.NumberSliderTextInputBinder().init({
+                    space: this._selectedAlphaKey, attribute: "alpha",
+                    slider: this.alphaSlide,
+                    textInput: this.alphaInput, controller: this.alphaLabel, minValue: 0, maxValue: 1,
+                });
+                this._alphaNumberSliderTextInputBinder.on("valueChanged", this._onAlphaChanged, this);
             }
             else {
                 this._selectedColorKey = colorKeys[this._selectIndex];
                 this.alphaGroup.parent && this.alphaGroup.parent.removeChild(this.alphaGroup);
                 this.colorGroup.parent || this.colorGroup.addChild(this.colorGroup);
             }
-            this.colorGroup;
             //
-            this._loactionNumberTextInputBinder && this._loactionNumberTextInputBinder.dispose();
+            if (this._loactionNumberTextInputBinder) {
+                this._loactionNumberTextInputBinder.off("valueChanged", this._onLocationChanged, this);
+                this._loactionNumberTextInputBinder.dispose();
+            }
             this._loactionNumberTextInputBinder = new editor.NumberTextInputBinder().init({
                 space: this._selectedAlphaKey || this._selectedColorKey, attribute: "time",
                 textInput: this.locationInput, controller: this.locationLabel, minValue: 0, maxValue: 1,
             });
+            this._loactionNumberTextInputBinder.on("valueChanged", this._onLocationChanged, this);
         };
         GradientEditor.prototype._drawAlphaGraphics = function (graphics, time, alpha, width, height, selected) {
             graphics.beginFill(0xffffff, alpha);
@@ -3069,6 +3083,12 @@ var editor;
             graphics.lineTo(time * width + 5, 10);
             graphics.lineTo(time * width, 0);
             graphics.endFill();
+        };
+        GradientEditor.prototype._onAlphaChanged = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        };
+        GradientEditor.prototype._onLocationChanged = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         };
         GradientEditor.prototype._onReSize = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -3319,6 +3339,38 @@ var editor;
         return NumberTextInputBinder;
     }(editor.TextInputBinder));
     editor.NumberTextInputBinder = NumberTextInputBinder;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var NumberSliderTextInputBinder = /** @class */ (function (_super) {
+        __extends(NumberSliderTextInputBinder, _super);
+        function NumberSliderTextInputBinder() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        NumberSliderTextInputBinder.prototype.initView = function () {
+            _super.prototype.initView.call(this);
+            if (this.editable) {
+                this.slider.addEventListener(egret.Event.CHANGE, this._onSliderChanged, this);
+            }
+            this.slider.enabled = this.slider.touchEnabled = this.slider.touchChildren = this.editable;
+        };
+        NumberSliderTextInputBinder.prototype.dispose = function () {
+            _super.prototype.dispose.call(this);
+            this.slider.removeEventListener(egret.Event.CHANGE, this._onSliderChanged, this);
+        };
+        NumberSliderTextInputBinder.prototype.updateView = function () {
+            _super.prototype.updateView.call(this);
+            this.slider.minimum = isNaN(this.minValue) ? Number.MIN_VALUE : this.minValue;
+            this.slider.maximum = isNaN(this.maxValue) ? Number.MAX_VALUE : this.maxValue;
+            this.slider.snapInterval = this.step;
+            this.slider.value = this.space[this.attribute];
+        };
+        NumberSliderTextInputBinder.prototype._onSliderChanged = function () {
+            this.space[this.attribute] = this.slider.value;
+        };
+        return NumberSliderTextInputBinder;
+    }(editor.NumberTextInputBinder));
+    editor.NumberSliderTextInputBinder = NumberSliderTextInputBinder;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
