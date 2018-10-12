@@ -788,6 +788,7 @@ declare namespace editor {
     class GradientEditor extends eui.Component {
         gradient: feng3d.Gradient;
         modeCB: ComboBox;
+        controllerGroup: eui.Group;
         alphaLineGroup: eui.Group;
         colorImage: eui.Image;
         colorLineGroup: eui.Group;
@@ -805,13 +806,10 @@ declare namespace editor {
         updateView(): void;
         private _alphaSprite;
         private _colorSprite;
-        private _selectAlpha;
-        private _selectIndex;
         private _parentGroup;
-        private _selectedAlphaKey;
-        private _selectedColorKey;
         private _loactionNumberTextInputBinder;
         private _alphaNumberSliderTextInputBinder;
+        private _selectedValue;
         private _drawAlphaGraphics;
         private _drawColorGraphics;
         private _onAlphaChanged;
@@ -820,7 +818,9 @@ declare namespace editor {
         private _onModeCBChange;
         private _onColorPickerChange;
         private _onGradientChanged;
-        private _onClick;
+        private _onMouseDown;
+        private _onAlphaColorMouseMove;
+        private _onAlphaColorMouseUp;
     }
     var gradientEditor: GradientEditor;
 }

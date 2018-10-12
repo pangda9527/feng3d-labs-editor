@@ -2974,23 +2974,21 @@ var editor;
         function GradientEditor() {
             var _this = _super.call(this) || this;
             _this.gradient = new feng3d.Gradient();
-            _this._selectAlpha = false;
-            _this._selectIndex = 0;
             _this.skinName = "GradientEditor";
             return _this;
         }
         GradientEditor.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.updateView();
-            this.alphaLineGroup.addEventListener(egret.MouseEvent.CLICK, this._onClick, this);
-            this.colorLineGroup.addEventListener(egret.MouseEvent.CLICK, this._onClick, this);
+            this.alphaLineGroup.addEventListener(egret.MouseEvent.MOUSE_DOWN, this._onMouseDown, this);
+            this.colorLineGroup.addEventListener(egret.MouseEvent.MOUSE_DOWN, this._onMouseDown, this);
             this.colorPicker.addEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
             this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         };
         GradientEditor.prototype.$onRemoveFromStage = function () {
-            this.alphaLineGroup.removeEventListener(egret.MouseEvent.CLICK, this._onClick, this);
-            this.colorLineGroup.removeEventListener(egret.MouseEvent.CLICK, this._onClick, this);
+            this.alphaLineGroup.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this._onMouseDown, this);
+            this.colorLineGroup.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this._onMouseDown, this);
             this.colorPicker.removeEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
             this.modeCB.removeEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
@@ -3026,50 +3024,51 @@ var editor;
             var alphaKeys = this.gradient.alphaKeys;
             for (var i = 0, n = alphaKeys.length; i < n; i++) {
                 var element = alphaKeys[i];
-                this._drawAlphaGraphics(this._alphaSprite.graphics, element.time, element.alpha, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectAlpha && i == this._selectIndex);
+                this._drawAlphaGraphics(this._alphaSprite.graphics, element.time, element.alpha, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectedValue == alphaKeys[i]);
             }
             if (this.gradient.colorKeys.length == 0)
                 this.gradient.colorKeys = this.gradient.getRealColorKeys();
             var colorKeys = this.gradient.colorKeys;
             for (var i = 0, n = colorKeys.length; i < n; i++) {
                 var element = colorKeys[i];
-                this._drawColorGraphics(this._colorSprite.graphics, element.time, element.color, this.alphaLineGroup.width, this.alphaLineGroup.height, !this._selectAlpha && i == this._selectIndex);
+                this._drawColorGraphics(this._colorSprite.graphics, element.time, element.color, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectedValue == colorKeys[i]);
             }
             //
             this._parentGroup = this._parentGroup || this.colorGroup.parent;
-            if (this._selectAlpha) {
-                this._selectedAlphaKey = alphaKeys[this._selectIndex];
-                this.colorGroup.parent && this.colorGroup.parent.removeChild(this.colorGroup);
-                this.alphaGroup.parent || this._parentGroup.addChildAt(this.alphaGroup, 0);
-                //
-                if (this._alphaNumberSliderTextInputBinder) {
-                    this._alphaNumberSliderTextInputBinder.off("valueChanged", this._onLocationChanged, this);
-                    this._alphaNumberSliderTextInputBinder.dispose();
-                }
-                this._alphaNumberSliderTextInputBinder = new editor.NumberSliderTextInputBinder().init({
-                    space: this._selectedAlphaKey, attribute: "alpha",
-                    slider: this.alphaSlide,
-                    textInput: this.alphaInput, controller: this.alphaLabel, minValue: 0, maxValue: 1,
-                });
-                this._alphaNumberSliderTextInputBinder.on("valueChanged", this._onAlphaChanged, this);
-            }
-            else {
-                this._selectedColorKey = colorKeys[this._selectIndex];
-                this.alphaGroup.parent && this.alphaGroup.parent.removeChild(this.alphaGroup);
-                this.colorGroup.parent || this._parentGroup.addChildAt(this.colorGroup, 0);
-                //
-                this.colorPicker.value = this._selectedColorKey.color;
+            //
+            if (this._alphaNumberSliderTextInputBinder) {
+                this._alphaNumberSliderTextInputBinder.off("valueChanged", this._onLocationChanged, this);
+                this._alphaNumberSliderTextInputBinder.dispose();
             }
             //
             if (this._loactionNumberTextInputBinder) {
                 this._loactionNumberTextInputBinder.off("valueChanged", this._onLocationChanged, this);
                 this._loactionNumberTextInputBinder.dispose();
             }
-            this._loactionNumberTextInputBinder = new editor.NumberTextInputBinder().init({
-                space: this._selectedAlphaKey || this._selectedColorKey, attribute: "time",
-                textInput: this.locationInput, controller: this.locationLabel, minValue: 0, maxValue: 1,
-            });
-            this._loactionNumberTextInputBinder.on("valueChanged", this._onLocationChanged, this);
+            this.controllerGroup.visible = !!this._selectedValue;
+            if (this._selectedValue) {
+                if (this._selectedValue.color) {
+                    this.alphaGroup.parent && this.alphaGroup.parent.removeChild(this.alphaGroup);
+                    this.colorGroup.parent || this._parentGroup.addChildAt(this.colorGroup, 0);
+                    //
+                    this.colorPicker.value = this._selectedValue.color;
+                }
+                else {
+                    this.colorGroup.parent && this.colorGroup.parent.removeChild(this.colorGroup);
+                    this.alphaGroup.parent || this._parentGroup.addChildAt(this.alphaGroup, 0);
+                    this._alphaNumberSliderTextInputBinder = new editor.NumberSliderTextInputBinder().init({
+                        space: this._selectedValue, attribute: "alpha",
+                        slider: this.alphaSlide,
+                        textInput: this.alphaInput, controller: this.alphaLabel, minValue: 0, maxValue: 1,
+                    });
+                    this._alphaNumberSliderTextInputBinder.on("valueChanged", this._onAlphaChanged, this);
+                }
+                this._loactionNumberTextInputBinder = new editor.NumberTextInputBinder().init({
+                    space: this._selectedValue, attribute: "time",
+                    textInput: this.locationInput, controller: this.locationLabel, minValue: 0, maxValue: 1,
+                });
+                this._loactionNumberTextInputBinder.on("valueChanged", this._onLocationChanged, this);
+            }
         };
         GradientEditor.prototype._drawAlphaGraphics = function (graphics, time, alpha, width, height, selected) {
             graphics.beginFill(0xffffff, alpha);
@@ -3108,15 +3107,15 @@ var editor;
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
         GradientEditor.prototype._onColorPickerChange = function () {
-            if (this._selectedColorKey) {
-                this._selectedColorKey.color = new feng3d.Color3(this.colorPicker.value.r, this.colorPicker.value.g, this.colorPicker.value.b);
+            if (this._selectedValue && this._selectedValue.color) {
+                this._selectedValue.color = new feng3d.Color3(this.colorPicker.value.r, this.colorPicker.value.g, this.colorPicker.value.b);
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
-            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         };
         GradientEditor.prototype._onGradientChanged = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         };
-        GradientEditor.prototype._onClick = function (e) {
+        GradientEditor.prototype._onMouseDown = function (e) {
             var sp = e.currentTarget.localToGlobal(0, 0);
             var localPosX = feng3d.windowEventProxy.clientX - sp.x;
             switch (e.currentTarget) {
@@ -3131,8 +3130,11 @@ var editor;
                         }
                     }
                     if (onClickIndex != -1) {
-                        this._selectAlpha = true;
-                        this._selectIndex = onClickIndex;
+                        this._selectedValue = alphaKeys[onClickIndex];
+                        //
+                        this.updateView();
+                        feng3d.windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
+                        feng3d.windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
                     }
                     break;
                 case this.colorLineGroup:
@@ -3146,12 +3148,34 @@ var editor;
                         }
                     }
                     if (onClickIndex != -1) {
-                        this._selectAlpha = false;
-                        this._selectIndex = onClickIndex;
+                        this._selectedValue = colorKeys[onClickIndex];
+                        //
+                        this.updateView();
+                        feng3d.windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
+                        feng3d.windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
                     }
                     break;
             }
-            this.updateView();
+        };
+        GradientEditor.prototype._onAlphaColorMouseMove = function () {
+            if (!this._selectedValue)
+                return;
+            if (this._selectedValue.color) {
+                var sp = this.colorLineGroup.localToGlobal(0, 0);
+                var localPosX = feng3d.windowEventProxy.clientX - sp.x;
+                this._selectedValue.time = localPosX / this.colorLineGroup.width;
+                this.updateView();
+            }
+            else {
+                var sp = this.alphaLineGroup.localToGlobal(0, 0);
+                var localPosX = feng3d.windowEventProxy.clientX - sp.x;
+                this._selectedValue.time = localPosX / this.alphaLineGroup.width;
+                this.updateView();
+            }
+        };
+        GradientEditor.prototype._onAlphaColorMouseUp = function () {
+            feng3d.windowEventProxy.off("mousemove", this._onAlphaColorMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this._onAlphaColorMouseUp, this);
         };
         __decorate([
             feng3d.watch("_onGradientChanged")
