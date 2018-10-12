@@ -3113,13 +3113,20 @@ var editor;
             }
         };
         GradientEditor.prototype._onGradientChanged = function () {
+            if (this.gradient.colorKeys.length == 0)
+                this.gradient.colorKeys = this.gradient.getRealColorKeys();
+            this._selectedValue = this.gradient.colorKeys[0];
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         };
         GradientEditor.prototype._onMouseDown = function (e) {
             var sp = e.currentTarget.localToGlobal(0, 0);
             var localPosX = feng3d.windowEventProxy.clientX - sp.x;
+            var time = localPosX / e.currentTarget.width;
+            var newAlphaKey = { time: time, alpha: this.gradient.getAlpha(time) };
+            var newColorKey = { time: time, color: this.gradient.getColor(time) };
             switch (e.currentTarget) {
                 case this.alphaLineGroup:
+                    this._selectedValue = null;
                     var onClickIndex = -1;
                     var alphaKeys = this.gradient.alphaKeys;
                     for (var i = 0, n = alphaKeys.length; i < n; i++) {
@@ -3131,10 +3138,10 @@ var editor;
                     }
                     if (onClickIndex != -1) {
                         this._selectedValue = alphaKeys[onClickIndex];
-                        //
-                        this.updateView();
-                        feng3d.windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
-                        feng3d.windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
+                    }
+                    else if (alphaKeys.length < 8) {
+                        this._selectedValue = newAlphaKey;
+                        alphaKeys.push(newAlphaKey);
                     }
                     break;
                 case this.colorLineGroup:
@@ -3149,12 +3156,18 @@ var editor;
                     }
                     if (onClickIndex != -1) {
                         this._selectedValue = colorKeys[onClickIndex];
-                        //
-                        this.updateView();
-                        feng3d.windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
-                        feng3d.windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
+                    }
+                    else if (colorKeys.length < 8) {
+                        this._selectedValue = newColorKey;
+                        colorKeys.push(newColorKey);
                     }
                     break;
+            }
+            if (this._selectedValue) {
+                //
+                this.updateView();
+                feng3d.windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
+                feng3d.windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
             }
         };
         GradientEditor.prototype._onAlphaColorMouseMove = function () {
