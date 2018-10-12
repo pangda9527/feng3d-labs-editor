@@ -2981,11 +2981,15 @@ var editor;
         GradientEditor.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.updateView();
+            this.alphaLineGroup.addEventListener(egret.MouseEvent.CLICK, this._onClick, this);
+            this.colorLineGroup.addEventListener(egret.MouseEvent.CLICK, this._onClick, this);
             this.colorPicker.addEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
             this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         };
         GradientEditor.prototype.$onRemoveFromStage = function () {
+            this.alphaLineGroup.removeEventListener(egret.MouseEvent.CLICK, this._onClick, this);
+            this.colorLineGroup.removeEventListener(egret.MouseEvent.CLICK, this._onClick, this);
             this.colorPicker.removeEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
             this.modeCB.removeEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
@@ -3035,7 +3039,7 @@ var editor;
             if (this._selectAlpha) {
                 this._selectedAlphaKey = alphaKeys[this._selectIndex];
                 this.colorGroup.parent && this.colorGroup.parent.removeChild(this.colorGroup);
-                this.alphaGroup.parent || this._parentGroup.addChild(this.alphaGroup);
+                this.alphaGroup.parent || this._parentGroup.addChildAt(this.alphaGroup, 0);
                 //
                 if (this._alphaNumberSliderTextInputBinder) {
                     this._alphaNumberSliderTextInputBinder.off("valueChanged", this._onLocationChanged, this);
@@ -3051,7 +3055,7 @@ var editor;
             else {
                 this._selectedColorKey = colorKeys[this._selectIndex];
                 this.alphaGroup.parent && this.alphaGroup.parent.removeChild(this.alphaGroup);
-                this.colorGroup.parent || this.colorGroup.addChild(this.colorGroup);
+                this.colorGroup.parent || this._parentGroup.addChildAt(this.colorGroup, 0);
                 //
                 this.colorPicker.value = this._selectedColorKey.color;
             }
@@ -3110,6 +3114,43 @@ var editor;
         };
         GradientEditor.prototype._onGradientChanged = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        };
+        GradientEditor.prototype._onClick = function (e) {
+            var sp = e.currentTarget.localToGlobal(0, 0);
+            var localPosX = feng3d.windowEventProxy.clientX - sp.x;
+            switch (e.currentTarget) {
+                case this.alphaLineGroup:
+                    var onClickIndex = -1;
+                    var alphaKeys = this.gradient.alphaKeys;
+                    for (var i = 0, n = alphaKeys.length; i < n; i++) {
+                        var element = alphaKeys[i];
+                        if (Math.abs(element.time * this.alphaLineGroup.width - localPosX) < 8) {
+                            onClickIndex = i;
+                            break;
+                        }
+                    }
+                    if (onClickIndex != -1) {
+                        this._selectAlpha = true;
+                        this._selectIndex = onClickIndex;
+                    }
+                    break;
+                case this.colorLineGroup:
+                    var onClickIndex = -1;
+                    var colorKeys = this.gradient.colorKeys;
+                    for (var i = 0, n = colorKeys.length; i < n; i++) {
+                        var element = colorKeys[i];
+                        if (Math.abs(element.time * this.alphaLineGroup.width - localPosX) < 8) {
+                            onClickIndex = i;
+                            break;
+                        }
+                    }
+                    if (onClickIndex != -1) {
+                        this._selectAlpha = false;
+                        this._selectIndex = onClickIndex;
+                    }
+                    break;
+            }
+            this.updateView();
         };
         __decorate([
             feng3d.watch("_onGradientChanged")

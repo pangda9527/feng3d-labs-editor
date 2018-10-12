@@ -820,6 +820,7 @@ declare namespace editor {
         private _onModeCBChange;
         private _onColorPickerChange;
         private _onGradientChanged;
+        private _onClick;
     }
     var gradientEditor: GradientEditor;
 }
