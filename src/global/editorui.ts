@@ -6,7 +6,6 @@ namespace editor
         assetsview: AssetsView;
         mainview: MainView;
         tooltipLayer: eui.UILayer;
-        maskLayer: eui.UILayer;
         popupLayer: eui.UILayer;
 
         /**

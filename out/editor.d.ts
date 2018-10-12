@@ -1831,7 +1831,6 @@ declare namespace editor {
         assetsview: AssetsView;
         mainview: MainView;
         tooltipLayer: eui.UILayer;
-        maskLayer: eui.UILayer;
         popupLayer: eui.UILayer;
         /**
          * 属性面板

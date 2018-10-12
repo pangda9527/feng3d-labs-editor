@@ -20,7 +20,8 @@ namespace editor
             {
                 maskReck.width = displayObject.stage.stageWidth;
                 maskReck.height = displayObject.stage.stageHeight;
-                editorui.popupLayer.addChildAt(maskReck, 0);
+                var index = displayObject.parent.getChildIndex(displayObject);
+                editorui.popupLayer.addChildAt(maskReck, index);
                 //
                 maskReck.addEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
                 displayObject.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromStage, null);

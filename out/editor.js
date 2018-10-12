@@ -1540,7 +1540,8 @@ var editor;
             function onAddedToStage() {
                 maskReck.width = displayObject.stage.stageWidth;
                 maskReck.height = displayObject.stage.stageHeight;
-                editor.editorui.popupLayer.addChildAt(maskReck, 0);
+                var index = displayObject.parent.getChildIndex(displayObject);
+                editor.editorui.popupLayer.addChildAt(maskReck, index);
                 //
                 maskReck.addEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
                 displayObject.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromStage, null);
@@ -12299,11 +12300,6 @@ var editor;
             var _this = _super.call(this) || this;
             var mainui = new editor.MainUI(function () {
                 editor.editorui.stage = _this.stage;
-                //
-                var maskLayer = new eui.UILayer();
-                maskLayer.touchEnabled = false;
-                _this.stage.addChild(maskLayer);
-                editor.editorui.maskLayer = maskLayer;
                 //
                 var tooltipLayer = new eui.UILayer();
                 tooltipLayer.touchEnabled = false;
