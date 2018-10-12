@@ -2973,7 +2973,7 @@ var editor;
         function GradientEditor() {
             var _this = _super.call(this) || this;
             _this.gradient = new feng3d.Gradient();
-            _this._selectAlpha = true;
+            _this._selectAlpha = false;
             _this._selectIndex = 0;
             _this.skinName = "GradientEditor";
             return _this;
@@ -2981,12 +2981,14 @@ var editor;
         GradientEditor.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.updateView();
+            this.colorPicker.addEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
             this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         };
         GradientEditor.prototype.$onRemoveFromStage = function () {
-            this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
-            this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
+            this.colorPicker.removeEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
+            this.modeCB.removeEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
+            this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
         GradientEditor.prototype.updateView = function () {
@@ -3050,6 +3052,8 @@ var editor;
                 this._selectedColorKey = colorKeys[this._selectIndex];
                 this.alphaGroup.parent && this.alphaGroup.parent.removeChild(this.alphaGroup);
                 this.colorGroup.parent || this.colorGroup.addChild(this.colorGroup);
+                //
+                this.colorPicker.value = this._selectedColorKey.color;
             }
             //
             if (this._loactionNumberTextInputBinder) {
@@ -3097,6 +3101,12 @@ var editor;
             this.gradient.mode = this.modeCB.data.value;
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+        };
+        GradientEditor.prototype._onColorPickerChange = function () {
+            if (this._selectedColorKey) {
+                this._selectedColorKey.color = new feng3d.Color3(this.colorPicker.value.r, this.colorPicker.value.g, this.colorPicker.value.b);
+            }
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         };
         GradientEditor.prototype._onGradientChanged = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);

@@ -792,7 +792,7 @@ declare namespace editor {
         colorImage: eui.Image;
         colorLineGroup: eui.Group;
         colorGroup: eui.Group;
-        colorRect: eui.Rect;
+        colorPicker: editor.ColorPicker;
         alphaGroup: eui.Group;
         alphaLabel: eui.Label;
         alphaSlide: eui.HSlider;
@@ -818,6 +818,7 @@ declare namespace editor {
         private _onLocationChanged;
         private _onReSize;
         private _onModeCBChange;
+        private _onColorPickerChange;
         private _onGradientChanged;
     }
     var gradientEditor: GradientEditor;

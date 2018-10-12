@@ -10,13 +10,14 @@ namespace editor
         public colorImage: eui.Image;
         public colorLineGroup: eui.Group;
         public colorGroup: eui.Group;
-        public colorRect: eui.Rect;
+        public colorPicker: editor.ColorPicker;
         public alphaGroup: eui.Group;
         public alphaLabel: eui.Label;
         public alphaSlide: eui.HSlider;
         public alphaInput: eui.TextInput;
         public locationLabel: eui.Label;
         public locationInput: eui.TextInput;
+
 
         public constructor()
         {
@@ -30,14 +31,16 @@ namespace editor
 
             this.updateView();
 
+            this.colorPicker.addEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
             this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         }
 
         $onRemoveFromStage()
         {
-            this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
-            this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
+            this.colorPicker.removeEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
+            this.modeCB.removeEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
+            this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
 
             super.$onRemoveFromStage()
         }
@@ -109,6 +112,8 @@ namespace editor
                 this._selectedColorKey = colorKeys[this._selectIndex];
                 this.alphaGroup.parent && this.alphaGroup.parent.removeChild(this.alphaGroup);
                 this.colorGroup.parent || this.colorGroup.addChild(this.colorGroup);
+                //
+                this.colorPicker.value = this._selectedColorKey.color;
             }
             //
             if (this._loactionNumberTextInputBinder)
@@ -125,7 +130,7 @@ namespace editor
 
         private _alphaSprite: egret.Sprite;
         private _colorSprite: egret.Sprite;
-        private _selectAlpha = true;
+        private _selectAlpha = false;
         private _selectIndex = 0;
         private _parentGroup: egret.DisplayObjectContainer;
         private _selectedAlphaKey: { alpha: number, time: number };
@@ -178,6 +183,15 @@ namespace editor
             this.gradient.mode = this.modeCB.data.value;
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+        }
+
+        private _onColorPickerChange()
+        {
+            if (this._selectedColorKey)
+            {
+                this._selectedColorKey.color = new feng3d.Color3(this.colorPicker.value.r, this.colorPicker.value.g, this.colorPicker.value.b);
+            }
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
 
         private _onGradientChanged()
