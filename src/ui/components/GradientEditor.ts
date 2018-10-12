@@ -174,10 +174,12 @@ namespace editor
         private _onAlphaChanged()
         {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
         private _onLocationChanged()
         {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
 
         private _onReSize()
@@ -198,6 +200,7 @@ namespace editor
             {
                 this._selectedValue.color = new feng3d.Color3(this.colorPicker.value.r, this.colorPicker.value.g, this.colorPicker.value.b);
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }
         }
 
@@ -328,6 +331,7 @@ namespace editor
                 this._selectedValue.time = localPosX / this.alphaLineGroup.width;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
 
         private _onAlphaColorMouseUp()
