@@ -2557,8 +2557,6 @@ var editor;
 (function (editor) {
     var colors = [0xff0000, 0xffff00, 0x00ff00, 0x00ffff, 0x0000ff, 0xff00ff, 0xff0000];
     /**
-     * editor.editorui.maskLayer.addChild(new editor.ColorPickerView())
-     *
      */
     var ColorPickerView = /** @class */ (function (_super) {
         __extends(ColorPickerView, _super);
@@ -2792,9 +2790,6 @@ var editor;
             //
             _this.minMaxGradient = new feng3d.MinMaxGradient();
             _this.skinName = "MinMaxGradientView";
-            _this.x = 100;
-            _this.y = 100;
-            _this.width = 100;
             return _this;
         }
         MinMaxGradientView.prototype.$onAddToStage = function (stage, nestLevel) {
@@ -2890,6 +2885,19 @@ var editor;
                             _this.activeColorGroup = null;
                         }, pos.x, pos.y);
                     }
+                    else {
+                        if (!editor.gradientEditor)
+                            editor.gradientEditor = new editor.GradientEditor();
+                        // colorPickerView.color = this.value;
+                        var pos = this.localToGlobal(0, 0);
+                        // pos.x = pos.x - colorPickerView.width;
+                        pos.x = pos.x - 318;
+                        editor.gradientEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                        //
+                        editor.popupview.popupView(editor.gradientEditor, function () {
+                            editor.gradientEditor.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                        }, pos.x, pos.y);
+                    }
                     break;
                 case this.colorGroup1:
                     if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
@@ -2937,6 +2945,25 @@ var editor;
         return MinMaxGradientView;
     }(eui.Component));
     editor.MinMaxGradientView = MinMaxGradientView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var GradientEditor = /** @class */ (function (_super) {
+        __extends(GradientEditor, _super);
+        function GradientEditor() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "GradientEditor";
+            return _this;
+        }
+        GradientEditor.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+        };
+        GradientEditor.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        return GradientEditor;
+    }(eui.Component));
+    editor.GradientEditor = GradientEditor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

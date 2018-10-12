@@ -453,7 +453,6 @@ declare namespace editor {
         private onClick;
         private onPickerViewChanged;
     }
-    var colorPickerView: ColorPickerView;
 }
 declare namespace editor {
     class TreeItemRenderer extends eui.ItemRenderer {
@@ -699,8 +698,6 @@ declare namespace editor {
 }
 declare namespace editor {
     /**
-     * editor.editorui.maskLayer.addChild(new editor.ColorPickerView())
-     *
      */
     class ColorPickerView extends eui.Component {
         group0: eui.Group;
@@ -735,6 +732,7 @@ declare namespace editor {
         private updateView;
         private _groupAParent;
     }
+    var colorPickerView: ColorPickerView;
 }
 declare namespace editor {
     var areaSelectRect: AreaSelectRect;
@@ -785,6 +783,14 @@ declare namespace editor {
         private onClick;
         private onPickerViewChanged;
     }
+}
+declare namespace editor {
+    class GradientEditor extends eui.Component {
+        constructor();
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+    }
+    var gradientEditor: GradientEditor;
 }
 declare namespace editor {
     /**

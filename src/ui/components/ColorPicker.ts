@@ -73,5 +73,4 @@ namespace editor
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
     }
-    export var colorPickerView: ColorPickerView;
 }

@@ -22,9 +22,6 @@ namespace editor
         {
             super();
             this.skinName = "MinMaxGradientView";
-            this.x = 100;
-            this.y = 100;
-            this.width = 100;
         }
 
         $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -139,6 +136,19 @@ namespace editor
                         {
                             colorPickerView.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                             this.activeColorGroup = null;
+                        }, pos.x, pos.y);
+                    } else
+                    {
+                        if (!gradientEditor) gradientEditor = new editor.GradientEditor();
+                        // colorPickerView.color = this.value;
+                        var pos = this.localToGlobal(0, 0);
+                        // pos.x = pos.x - colorPickerView.width;
+                        pos.x = pos.x - 318;
+                        gradientEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                        //
+                        popupview.popupView(gradientEditor, () =>
+                        {
+                            gradientEditor.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                         }, pos.x, pos.y);
                     }
                     break;
