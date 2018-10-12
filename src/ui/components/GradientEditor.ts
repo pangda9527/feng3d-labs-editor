@@ -209,8 +209,11 @@ namespace editor
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
 
+        private _onMouseDownLineGroup: egret.DisplayObject;
+        private _removedTemp: boolean;
         private _onMouseDown(e: egret.MouseEvent)
         {
+            this._onMouseDownLineGroup = e.currentTarget;
             var sp = (<egret.DisplayObject>e.currentTarget).localToGlobal(0, 0);
             var localPosX = feng3d.windowEventProxy.clientX - sp.x;
             var time = localPosX / (<egret.DisplayObject>e.currentTarget).width;
@@ -269,6 +272,7 @@ namespace editor
                 this.updateView();
                 feng3d.windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
                 feng3d.windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
+                this._removedTemp = false;
             }
         }
 
@@ -276,6 +280,41 @@ namespace editor
         {
             if (!this._selectedValue) return;
 
+            var sp = this._onMouseDownLineGroup.localToGlobal(0, 0);
+            var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var rect = new feng3d.Rectangle(sp.x, sp.y, this._onMouseDownLineGroup.width, this._onMouseDownLineGroup.height);
+            rect.inflate(8, 8);
+            if (rect.containsPoint(mousePos))
+            {
+                if (this._removedTemp)
+                {
+                    if (this._selectedValue.color)
+                    {
+                        var index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
+                        if (index == -1) this.gradient.colorKeys.push(<any>this._selectedValue);
+                    } else
+                    {
+                        var index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
+                        if (index == -1) this.gradient.alphaKeys.push(<any>this._selectedValue);
+                    }
+                    this._removedTemp = false;
+                }
+            } else
+            {
+                if (!this._removedTemp)
+                {
+                    if (this._selectedValue.color)
+                    {
+                        var index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
+                        if (index != -1) this.gradient.colorKeys.splice(index, 1);
+                    } else
+                    {
+                        var index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
+                        if (index != -1) this.gradient.alphaKeys.splice(index, 1);
+                    }
+                    this._removedTemp = true;
+                }
+            }
             if (this._selectedValue.color)
             {
                 var sp = this.colorLineGroup.localToGlobal(0, 0);
@@ -293,8 +332,14 @@ namespace editor
 
         private _onAlphaColorMouseUp()
         {
+            if (this._removedTemp)
+            {
+                this._selectedValue = null;
+            }
+            this._onMouseDownLineGroup = null;
             feng3d.windowEventProxy.off("mousemove", this._onAlphaColorMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this._onAlphaColorMouseUp, this);
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
     }
     export var gradientEditor: GradientEditor;

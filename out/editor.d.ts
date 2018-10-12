@@ -818,6 +818,8 @@ declare namespace editor {
         private _onModeCBChange;
         private _onColorPickerChange;
         private _onGradientChanged;
+        private _onMouseDownLineGroup;
+        private _removedTemp;
         private _onMouseDown;
         private _onAlphaColorMouseMove;
         private _onAlphaColorMouseUp;

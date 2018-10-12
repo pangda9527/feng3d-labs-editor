@@ -3119,6 +3119,7 @@ var editor;
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         };
         GradientEditor.prototype._onMouseDown = function (e) {
+            this._onMouseDownLineGroup = e.currentTarget;
             var sp = e.currentTarget.localToGlobal(0, 0);
             var localPosX = feng3d.windowEventProxy.clientX - sp.x;
             var time = localPosX / e.currentTarget.width;
@@ -3168,11 +3169,46 @@ var editor;
                 this.updateView();
                 feng3d.windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
                 feng3d.windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
+                this._removedTemp = false;
             }
         };
         GradientEditor.prototype._onAlphaColorMouseMove = function () {
             if (!this._selectedValue)
                 return;
+            var sp = this._onMouseDownLineGroup.localToGlobal(0, 0);
+            var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var rect = new feng3d.Rectangle(sp.x, sp.y, this._onMouseDownLineGroup.width, this._onMouseDownLineGroup.height);
+            rect.inflate(8, 8);
+            if (rect.containsPoint(mousePos)) {
+                if (this._removedTemp) {
+                    if (this._selectedValue.color) {
+                        var index = this.gradient.colorKeys.indexOf(this._selectedValue);
+                        if (index == -1)
+                            this.gradient.colorKeys.push(this._selectedValue);
+                    }
+                    else {
+                        var index = this.gradient.alphaKeys.indexOf(this._selectedValue);
+                        if (index == -1)
+                            this.gradient.alphaKeys.push(this._selectedValue);
+                    }
+                    this._removedTemp = false;
+                }
+            }
+            else {
+                if (!this._removedTemp) {
+                    if (this._selectedValue.color) {
+                        var index = this.gradient.colorKeys.indexOf(this._selectedValue);
+                        if (index != -1)
+                            this.gradient.colorKeys.splice(index, 1);
+                    }
+                    else {
+                        var index = this.gradient.alphaKeys.indexOf(this._selectedValue);
+                        if (index != -1)
+                            this.gradient.alphaKeys.splice(index, 1);
+                    }
+                    this._removedTemp = true;
+                }
+            }
             if (this._selectedValue.color) {
                 var sp = this.colorLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
@@ -3187,8 +3223,13 @@ var editor;
             }
         };
         GradientEditor.prototype._onAlphaColorMouseUp = function () {
+            if (this._removedTemp) {
+                this._selectedValue = null;
+            }
+            this._onMouseDownLineGroup = null;
             feng3d.windowEventProxy.off("mousemove", this._onAlphaColorMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this._onAlphaColorMouseUp, this);
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         };
         __decorate([
             feng3d.watch("_onGradientChanged")
