@@ -768,8 +768,11 @@ declare namespace editor {
      */
     class MinMaxGradientView extends eui.Component {
         minMaxGradient: feng3d.MinMaxGradient;
-        colorGroup: eui.Group;
-        colorImage: eui.Image;
+        colorGroup0: eui.Group;
+        colorImage0: eui.Image;
+        secondGroup: eui.Group;
+        colorGroup1: eui.Group;
+        colorImage1: eui.Image;
         modeBtn: eui.Button;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
@@ -777,6 +780,7 @@ declare namespace editor {
         updateView(): void;
         private onReSize;
         private _onMinMaxGradientChanged;
+        private activeColorGroup;
         private onClick;
         private onPickerViewChanged;
     }

@@ -2799,32 +2799,52 @@ var editor;
         }
         MinMaxGradientView.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            this.colorGroup.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup0.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup0.addEventListener(egret.Event.RESIZE, this.onReSize, this);
+            this.colorGroup1.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup1.addEventListener(egret.Event.RESIZE, this.onReSize, this);
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-            this.colorGroup.addEventListener(egret.Event.RESIZE, this.onReSize, this);
             this.updateView();
         };
         MinMaxGradientView.prototype.$onRemoveFromStage = function () {
-            this.colorGroup.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup0.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup0.removeEventListener(egret.Event.RESIZE, this.onReSize, this);
+            this.colorGroup1.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup1.removeEventListener(egret.Event.RESIZE, this.onReSize, this);
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-            this.colorGroup.removeEventListener(egret.Event.RESIZE, this.onReSize, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
         MinMaxGradientView.prototype.updateView = function () {
-            var color = this.minMaxGradient.getValue(0);
             //
-            if (this.colorGroup.width > 0 && this.colorGroup.height > 0) {
-                if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient) {
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient, this.colorGroup.width, this.colorGroup.height);
-                    this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+            if (this.colorGroup0.width > 0 && this.colorGroup0.height > 0) {
+                if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color) {
+                    var color = this.minMaxGradient.getValue(0);
+                    var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup0.width, this.colorGroup0.height);
+                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
+                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient) {
+                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient, this.colorGroup0.width, this.colorGroup0.height);
+                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
+                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
+                    var randomBetweenTwoColors = this.minMaxGradient.minMaxGradient;
+                    var imagedata = feng3d.imageUtil.createColorRect(randomBetweenTwoColors.colorMin, this.colorGroup0.width, this.colorGroup0.height);
+                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    var imagedata = feng3d.imageUtil.createColorRect(randomBetweenTwoColors.colorMax, this.colorGroup1.width, this.colorGroup1.height);
+                    this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
+                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients) {
+                    var randomBetweenTwoGradients = this.minMaxGradient.minMaxGradient;
+                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(randomBetweenTwoGradients.gradientMin, this.colorGroup0.width, this.colorGroup0.height);
+                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(randomBetweenTwoGradients.gradientMax, this.colorGroup1.width, this.colorGroup1.height);
+                    this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomColor) {
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient.gradient, this.colorGroup.width, this.colorGroup.height);
-                    this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
-                }
-                else {
-                    var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup.width, this.colorGroup.height);
-                    this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient.gradient, this.colorGroup0.width, this.colorGroup0.height);
+                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
                 }
             }
         };
@@ -2838,18 +2858,39 @@ var editor;
         MinMaxGradientView.prototype.onClick = function (e) {
             var _this = this;
             switch (e.currentTarget) {
-                case this.colorGroup:
-                    if (!editor.colorPickerView)
-                        editor.colorPickerView = new editor.ColorPickerView();
-                    editor.colorPickerView.color = this.minMaxGradient.getValue(0);
-                    var pos = this.localToGlobal(0, 0);
-                    // pos.x = pos.x - colorPickerView.width;
-                    pos.x = pos.x - 318;
-                    editor.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                    //
-                    editor.popupview.popupView(editor.colorPickerView, function () {
-                        editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
-                    }, pos.x, pos.y);
+                case this.colorGroup0:
+                    if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color || this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
+                        if (!editor.colorPickerView)
+                            editor.colorPickerView = new editor.ColorPickerView();
+                        editor.colorPickerView.color = this.minMaxGradient.getValue(0);
+                        var pos = this.localToGlobal(0, 0);
+                        // pos.x = pos.x - colorPickerView.width;
+                        pos.x = pos.x - 318;
+                        editor.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                        this.activeColorGroup = this.colorGroup0;
+                        //
+                        editor.popupview.popupView(editor.colorPickerView, function () {
+                            editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                            _this.activeColorGroup = null;
+                        }, pos.x, pos.y);
+                    }
+                    break;
+                case this.colorGroup1:
+                    if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
+                        if (!editor.colorPickerView)
+                            editor.colorPickerView = new editor.ColorPickerView();
+                        editor.colorPickerView.color = this.minMaxGradient.getValue(0);
+                        var pos = this.localToGlobal(0, 0);
+                        // pos.x = pos.x - colorPickerView.width;
+                        pos.x = pos.x - 318;
+                        editor.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                        this.activeColorGroup = this.colorGroup1;
+                        //
+                        editor.popupview.popupView(editor.colorPickerView, function () {
+                            editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                            _this.activeColorGroup = null;
+                        }, pos.x, pos.y);
+                    }
                     break;
                 case this.modeBtn:
                     editor.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
@@ -2860,7 +2901,17 @@ var editor;
             }
         };
         MinMaxGradientView.prototype.onPickerViewChanged = function () {
-            this.minMaxGradient.minMaxGradient.color = editor.colorPickerView.color;
+            if (this.activeColorGroup == this.colorGroup0) {
+                if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color) {
+                    this.minMaxGradient.minMaxGradient.color = editor.colorPickerView.color;
+                }
+                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
+                    this.minMaxGradient.minMaxGradient.colorMin = editor.colorPickerView.color;
+                }
+            }
+            else {
+                this.minMaxGradient.minMaxGradient.colorMax = editor.colorPickerView.color;
+            }
             this.updateView();
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
