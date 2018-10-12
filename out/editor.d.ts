@@ -803,6 +803,12 @@ declare namespace editor {
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         updateView(): void;
+        private _alphaSprite;
+        private _colorSprite;
+        private _selectAlpha;
+        private _selectIndex;
+        private _drawAlphaGraphics;
+        private _drawColorGraphics;
         private _onReSize;
         private _onModeCBChange;
         private _onGradientChanged;

@@ -2973,6 +2973,8 @@ var editor;
         function GradientEditor() {
             var _this = _super.call(this) || this;
             _this.gradient = new feng3d.Gradient();
+            _this._selectAlpha = true;
+            _this._selectIndex = 0;
             _this.skinName = "GradientEditor";
             return _this;
         }
@@ -3002,7 +3004,51 @@ var editor;
                 var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.gradient, this.colorImage.width, this.colorImage.height);
                 this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
             }
+            if (!this._alphaSprite) {
+                this.alphaLineGroup.addChild(this._alphaSprite = new egret.Sprite());
+            }
+            this._alphaSprite.graphics.clear();
+            if (!this._colorSprite) {
+                this.colorLineGroup.addChild(this._colorSprite = new egret.Sprite());
+            }
+            this._colorSprite.graphics.clear();
             //
+            if (this.gradient.alphaKeys.length == 0)
+                this.gradient.alphaKeys = this.gradient.getRealAlphaKeys();
+            var alphaKeys = this.gradient.alphaKeys;
+            for (var i = 0, n = alphaKeys.length; i < n; i++) {
+                var element = alphaKeys[i];
+                this._drawAlphaGraphics(this._alphaSprite.graphics, element.time, element.alpha, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectAlpha && i == this._selectIndex);
+            }
+            if (this.gradient.colorKeys.length == 0)
+                this.gradient.colorKeys = this.gradient.getRealColorKeys();
+            var colorKeys = this.gradient.colorKeys;
+            for (var i = 0, n = colorKeys.length; i < n; i++) {
+                var element = colorKeys[i];
+                this._drawColorGraphics(this._colorSprite.graphics, element.time, element.color, this.alphaLineGroup.width, this.alphaLineGroup.height, !this._selectAlpha && i == this._selectIndex);
+            }
+        };
+        GradientEditor.prototype._drawAlphaGraphics = function (graphics, time, alpha, width, height, selected) {
+            graphics.beginFill(0xffffff, alpha);
+            graphics.lineStyle(1, selected ? 0x0091ff : 0x606060);
+            graphics.moveTo(time * width, height);
+            graphics.lineTo(time * width - 5, height - 10);
+            graphics.lineTo(time * width - 5, height - 15);
+            graphics.lineTo(time * width + 5, height - 15);
+            graphics.lineTo(time * width + 5, height - 10);
+            graphics.lineTo(time * width, height);
+            graphics.endFill();
+        };
+        GradientEditor.prototype._drawColorGraphics = function (graphics, time, color, width, height, selected) {
+            graphics.beginFill(color.toInt(), 1);
+            graphics.lineStyle(1, selected ? 0x0091ff : 0x606060);
+            graphics.moveTo(time * width, 0);
+            graphics.lineTo(time * width - 5, 10);
+            graphics.lineTo(time * width - 5, 15);
+            graphics.lineTo(time * width + 5, 15);
+            graphics.lineTo(time * width + 5, 10);
+            graphics.lineTo(time * width, 0);
+            graphics.endFill();
         };
         GradientEditor.prototype._onReSize = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
