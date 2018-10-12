@@ -2799,6 +2799,7 @@ var editor;
         }
         MinMaxGradientView.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.secondGroupParent = this.secondGroupParent || this.secondGroup.parent;
             this.colorGroup0.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.colorGroup0.addEventListener(egret.Event.RESIZE, this.onReSize, this);
             this.colorGroup1.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
@@ -2821,10 +2822,16 @@ var editor;
                     var color = this.minMaxGradient.getValue(0);
                     var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup0.width, this.colorGroup0.height);
                     this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (this.secondGroup.parent)
+                        this.secondGroup.parent.removeChild(this.secondGroup);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient) {
                     var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient, this.colorGroup0.width, this.colorGroup0.height);
                     this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (this.secondGroup.parent)
+                        this.secondGroup.parent.removeChild(this.secondGroup);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
                     var randomBetweenTwoColors = this.minMaxGradient.minMaxGradient;
@@ -2833,6 +2840,9 @@ var editor;
                     //
                     var imagedata = feng3d.imageUtil.createColorRect(randomBetweenTwoColors.colorMax, this.colorGroup1.width, this.colorGroup1.height);
                     this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (!this.secondGroup.parent)
+                        this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients) {
                     var randomBetweenTwoGradients = this.minMaxGradient.minMaxGradient;
@@ -2841,10 +2851,16 @@ var editor;
                     //
                     var imagedata = feng3d.imageUtil.createMinMaxGradientRect(randomBetweenTwoGradients.gradientMax, this.colorGroup1.width, this.colorGroup1.height);
                     this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (!this.secondGroup.parent)
+                        this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomColor) {
                     var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient.gradient, this.colorGroup0.width, this.colorGroup0.height);
                     this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (this.secondGroup.parent)
+                        this.secondGroup.parent.removeChild(this.secondGroup);
                 }
             }
         };

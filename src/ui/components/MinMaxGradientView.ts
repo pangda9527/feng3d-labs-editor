@@ -16,6 +16,8 @@ namespace editor
         public colorImage1: eui.Image;
         public modeBtn: eui.Button;
 
+        private secondGroupParent: egret.DisplayObjectContainer;
+
         public constructor()
         {
             super();
@@ -28,6 +30,8 @@ namespace editor
         $onAddToStage(stage: egret.Stage, nestLevel: number)
         {
             super.$onAddToStage(stage, nestLevel);
+
+            this.secondGroupParent = this.secondGroupParent || this.secondGroup.parent;
 
             this.colorGroup0.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.colorGroup0.addEventListener(egret.Event.RESIZE, this.onReSize, this);
@@ -53,7 +57,6 @@ namespace editor
 
         updateView()
         {
-
             //
             if (this.colorGroup0.width > 0 && this.colorGroup0.height > 0)
             {
@@ -62,11 +65,15 @@ namespace editor
                     var color = this.minMaxGradient.getValue(0);
                     var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup0.width, this.colorGroup0.height);
                     this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient)
                 {
                     var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient, this.colorGroup0.width, this.colorGroup0.height);
                     this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                 {
@@ -76,6 +83,8 @@ namespace editor
                     //
                     var imagedata = feng3d.imageUtil.createColorRect(randomBetweenTwoColors.colorMax, this.colorGroup1.width, this.colorGroup1.height);
                     this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients)
                 {
@@ -85,11 +94,15 @@ namespace editor
                     //
                     var imagedata = feng3d.imageUtil.createMinMaxGradientRect(randomBetweenTwoGradients.gradientMax, this.colorGroup1.width, this.colorGroup1.height);
                     this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomColor)
                 {
                     var imagedata = feng3d.imageUtil.createMinMaxGradientRect((<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient, this.colorGroup0.width, this.colorGroup0.height);
                     this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    //
+                    if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
                 }
 
             }

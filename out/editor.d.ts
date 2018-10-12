@@ -774,6 +774,7 @@ declare namespace editor {
         colorGroup1: eui.Group;
         colorImage1: eui.Image;
         modeBtn: eui.Button;
+        private secondGroupParent;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
