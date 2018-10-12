@@ -9,9 +9,9 @@ namespace editor
         @feng3d.watch("_onMinMaxGradientChanged")
         minMaxGradient = new feng3d.MinMaxGradient();
 
-        public colorGroup:eui.Group;
-        public colorImage:eui.Image;
-        public modeBtn:eui.Button;
+        public colorGroup: eui.Group;
+        public colorImage: eui.Image;
+        public modeBtn: eui.Button;
 
         public constructor()
         {
@@ -49,9 +49,22 @@ namespace editor
             //
             if (this.colorGroup.width > 0 && this.colorGroup.height > 0)
             {
-                var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup.width, this.colorGroup.height);
-                this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient)
+                {
+                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient, this.colorGroup.width, this.colorGroup.height);
+                    this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                } else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomColor)
+                {
+                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect((<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient, this.colorGroup.width, this.colorGroup.height);
+                    this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
+                else
+                {
+                    var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup.width, this.colorGroup.height);
+                    this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
             }
+
         }
 
         private onReSize()
@@ -85,6 +98,7 @@ namespace editor
                     menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, (v) =>
                     {
                         this.minMaxGradient.mode = v;
+                        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                     }, { width: 210 });
                     break;
             }

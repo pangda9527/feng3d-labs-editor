@@ -2814,8 +2814,18 @@ var editor;
             var color = this.minMaxGradient.getValue(0);
             //
             if (this.colorGroup.width > 0 && this.colorGroup.height > 0) {
-                var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup.width, this.colorGroup.height);
-                this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient) {
+                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient, this.colorGroup.width, this.colorGroup.height);
+                    this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
+                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomColor) {
+                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient.gradient, this.colorGroup.width, this.colorGroup.height);
+                    this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
+                else {
+                    var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup.width, this.colorGroup.height);
+                    this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
             }
         };
         MinMaxGradientView.prototype.onReSize = function () {
@@ -2844,6 +2854,7 @@ var editor;
                 case this.modeBtn:
                     editor.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
                         _this.minMaxGradient.mode = v;
+                        _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     }, { width: 210 });
                     break;
             }
