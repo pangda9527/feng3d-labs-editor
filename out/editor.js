@@ -2894,6 +2894,7 @@ var editor;
                             editor.gradientEditor.gradient = this.minMaxGradient.minMaxGradient.gradient;
                             break;
                     }
+                    break;
                 case this.colorGroup1:
                     this.activeColorGroup = this.colorGroup1;
                     switch (this.minMaxGradient.mode) {
@@ -2918,7 +2919,6 @@ var editor;
                 var pos = this.localToGlobal(0, 0);
                 pos.x = pos.x - 318;
                 view.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                this.activeColorGroup = this.colorGroup0;
                 //
                 editor.popupview.popupView(view, function () {
                     view.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);

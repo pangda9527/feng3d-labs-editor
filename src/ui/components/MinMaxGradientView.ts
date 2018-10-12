@@ -147,6 +147,7 @@ namespace editor
                             gradientEditor.gradient = (<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient;
                             break;
                     }
+                    break;
                 case this.colorGroup1:
                     this.activeColorGroup = this.colorGroup1;
                     switch (this.minMaxGradient.mode)
@@ -174,7 +175,6 @@ namespace editor
                 var pos = this.localToGlobal(0, 0);
                 pos.x = pos.x - 318;
                 view.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                this.activeColorGroup = this.colorGroup0;
                 //
                 popupview.popupView(view, () =>
                 {
