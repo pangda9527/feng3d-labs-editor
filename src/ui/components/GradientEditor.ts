@@ -320,13 +320,13 @@ namespace editor
                 var sp = this.colorLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.colorLineGroup.width;
-                this.updateView();
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             } else
             {
                 var sp = this.alphaLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.alphaLineGroup.width;
-                this.updateView();
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
         }
 
