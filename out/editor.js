@@ -2980,6 +2980,7 @@ var editor;
         }
         GradientEditor.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.updateView();
             this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         };
@@ -3027,6 +3028,25 @@ var editor;
                 var element = colorKeys[i];
                 this._drawColorGraphics(this._colorSprite.graphics, element.time, element.color, this.alphaLineGroup.width, this.alphaLineGroup.height, !this._selectAlpha && i == this._selectIndex);
             }
+            //
+            this._parentGroup = this._parentGroup || this.colorGroup.parent;
+            if (this._selectAlpha) {
+                this._selectedAlphaKey = alphaKeys[this._selectIndex];
+                this.colorGroup.parent && this.colorGroup.parent.removeChild(this.colorGroup);
+                this.alphaGroup.parent || this._parentGroup.addChild(this.alphaGroup);
+            }
+            else {
+                this._selectedColorKey = colorKeys[this._selectIndex];
+                this.alphaGroup.parent && this.alphaGroup.parent.removeChild(this.alphaGroup);
+                this.colorGroup.parent || this.colorGroup.addChild(this.colorGroup);
+            }
+            this.colorGroup;
+            //
+            this._loactionNumberTextInputBinder && this._loactionNumberTextInputBinder.dispose();
+            this._loactionNumberTextInputBinder = new editor.NumberTextInputBinder().init({
+                space: this._selectedAlphaKey || this._selectedColorKey, attribute: "time",
+                textInput: this.locationInput, controller: this.locationLabel, minValue: 0, maxValue: 1,
+            });
         };
         GradientEditor.prototype._drawAlphaGraphics = function (graphics, time, alpha, width, height, selected) {
             graphics.beginFill(0xffffff, alpha);
@@ -3124,39 +3144,24 @@ var eui;
 })(eui || (eui = {}));
 var editor;
 (function (editor) {
-    var TextInputBinder = /** @class */ (function () {
+    var TextInputBinder = /** @class */ (function (_super) {
+        __extends(TextInputBinder, _super);
         function TextInputBinder() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 是否可编辑
              */
-            this.editable = true;
+            _this.editable = true;
             /**
              * 绑定属性值转换为文本
              */
-            this.toText = function (v) { return v; };
+            _this.toText = function (v) { return v; };
             /**
              * 文本转换为绑定属性值
              */
-            this.toValue = function (v) { return v; };
+            _this.toValue = function (v) { return v; };
+            return _this;
         }
-        Object.defineProperty(TextInputBinder.prototype, "attributeValue", {
-            get: function () {
-                return this.space[this.attribute];
-            },
-            set: function (value) {
-                if (this.space[this.attribute] != value) {
-                    this.space[this.attribute] = value;
-                    var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
-                    objectViewEvent.space = this.space;
-                    objectViewEvent.attributeName = this.attribute;
-                    objectViewEvent.attributeValue = this.attributeValue;
-                    this.textInput.dispatchEvent(objectViewEvent);
-                }
-                this.updateView();
-            },
-            enumerable: true,
-            configurable: true
-        });
         TextInputBinder.prototype.init = function (v) {
             Object.assign(this, v);
             //
@@ -3166,7 +3171,7 @@ var editor;
             return this;
         };
         TextInputBinder.prototype.dispose = function () {
-            feng3d.watcher.unwatch(this.space, this.attribute, this.updateView, this);
+            feng3d.watcher.unwatch(this.space, this.attribute, this.onValueChanged, this);
             //
             this.textInput.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.textInput.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
@@ -3174,7 +3179,7 @@ var editor;
         };
         TextInputBinder.prototype.initView = function () {
             //
-            feng3d.watcher.watch(this.space, this.attribute, this.updateView, this);
+            feng3d.watcher.watch(this.space, this.attribute, this.onValueChanged, this);
             if (this.editable) {
                 this.textInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
@@ -3182,13 +3187,22 @@ var editor;
             }
             this.textInput.enabled = this.editable;
         };
+        TextInputBinder.prototype.onValueChanged = function () {
+            var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+            objectViewEvent.space = this.space;
+            objectViewEvent.attributeName = this.attribute;
+            objectViewEvent.attributeValue = this.space[this.attribute];
+            this.textInput.dispatchEvent(objectViewEvent);
+            this.dispatch("valueChanged");
+            this.updateView();
+        };
         TextInputBinder.prototype.updateView = function () {
             if (!this._textfocusintxt) {
-                this.textInput.text = this.toText.call(this, this.attributeValue);
+                this.textInput.text = this.toText.call(this, this.space[this.attribute]);
             }
         };
         TextInputBinder.prototype.onTextChange = function () {
-            this.attributeValue = this.toValue.call(this, this.textInput.text);
+            this.space[this.attribute] = this.toValue.call(this, this.textInput.text);
         };
         TextInputBinder.prototype.ontxtfocusin = function () {
             this._textfocusintxt = true;
@@ -3198,7 +3212,7 @@ var editor;
             this.updateView();
         };
         return TextInputBinder;
-    }());
+    }(feng3d.EventDispatcher));
     editor.TextInputBinder = TextInputBinder;
 })(editor || (editor = {}));
 var editor;
@@ -3219,6 +3233,14 @@ var editor;
              * 移动一个像素时增加的步长数量
              */
             _this.stepScale = 1;
+            /**
+             * 最小值
+             */
+            _this.minValue = NaN;
+            /**
+             * 最小值
+             */
+            _this.maxValue = NaN;
             _this.toText = function (v) {
                 // 消除数字显示为类似 0.0000000001 的问题
                 var fractionDigits = 1;
@@ -3229,7 +3251,8 @@ var editor;
                 return text;
             };
             _this.toValue = function (v) {
-                return Number(v) || 0;
+                var n = Number(v) || 0;
+                return n;
             };
             _this.mouseDownPosition = new feng3d.Vector2();
             _this.mouseDownValue = 0;
@@ -3245,6 +3268,17 @@ var editor;
             _super.prototype.dispose.call(this);
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
         };
+        NumberTextInputBinder.prototype.onValueChanged = function () {
+            var value = this.space[this.attribute];
+            if (!isNaN(this.minValue)) {
+                value = Math.max(this.minValue, value);
+            }
+            if (!isNaN(this.maxValue)) {
+                value = Math.min(this.maxValue, value);
+            }
+            this.space[this.attribute] = value;
+            _super.prototype.onValueChanged.call(this);
+        };
         NumberTextInputBinder.prototype.onMouseDown = function () {
             if (!this.controller)
                 return;
@@ -3254,13 +3288,13 @@ var editor;
                 return;
             //
             this.mouseDownPosition = mousePos;
-            this.mouseDownValue = this.attributeValue;
+            this.mouseDownValue = this.space[this.attribute];
             //
             feng3d.windowEventProxy.on("mousemove", this.onStageMouseMove, this);
             feng3d.windowEventProxy.on("mouseup", this.onStageMouseUp, this);
         };
         NumberTextInputBinder.prototype.onStageMouseMove = function () {
-            this.attributeValue = this.mouseDownValue + ((feng3d.windowEventProxy.clientX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - feng3d.windowEventProxy.clientY)) * this.step * this.stepScale;
+            this.space[this.attribute] = this.mouseDownValue + ((feng3d.windowEventProxy.clientX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - feng3d.windowEventProxy.clientY)) * this.step * this.stepScale;
         };
         NumberTextInputBinder.prototype.onStageMouseUp = function () {
             feng3d.windowEventProxy.off("mousemove", this.onStageMouseMove, this);
@@ -3276,12 +3310,10 @@ var editor;
         };
         NumberTextInputBinder.prototype.onWindowKeyDown = function (event) {
             if (event.key == "ArrowUp") {
-                this.attributeValue += this.step;
-                this.textInput.text = this.toText.call(this, this.attributeValue);
+                this.space[this.attribute] += this.step;
             }
             else if (event.key == "ArrowDown") {
-                this.attributeValue -= this.step;
-                this.textInput.text = this.toText.call(this, this.attributeValue);
+                this.space[this.attribute] -= this.step;
             }
         };
         return NumberTextInputBinder;

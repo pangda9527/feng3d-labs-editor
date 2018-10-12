@@ -807,6 +807,10 @@ declare namespace editor {
         private _colorSprite;
         private _selectAlpha;
         private _selectIndex;
+        private _parentGroup;
+        private _selectedAlphaKey;
+        private _selectedColorKey;
+        private _loactionNumberTextInputBinder;
         private _drawAlphaGraphics;
         private _drawColorGraphics;
         private _onReSize;
@@ -838,7 +842,17 @@ declare namespace editor {
         init(v: Partial<this>): this;
         dispose(): void;
     }
-    class TextInputBinder implements UIBinder {
+    interface TextInputBinderEventMap {
+        valueChanged: any;
+    }
+    interface TextInputBinder {
+        once<K extends keyof TextInputBinderEventMap>(type: K, listener: (event: feng3d.Event<TextInputBinderEventMap[K]>) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof TextInputBinderEventMap>(type: K, data?: TextInputBinderEventMap[K], bubbles?: boolean): feng3d.Event<TextInputBinderEventMap[K]>;
+        has<K extends keyof TextInputBinderEventMap>(type: K): boolean;
+        on<K extends keyof TextInputBinderEventMap>(type: K, listener: (event: feng3d.Event<TextInputBinderEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
+        off<K extends keyof TextInputBinderEventMap>(type?: K, listener?: (event: feng3d.Event<TextInputBinderEventMap[K]>) => any, thisObject?: any): any;
+    }
+    class TextInputBinder extends feng3d.EventDispatcher implements UIBinder {
         space: any;
         /**
          * 绑定属性名称
@@ -857,12 +871,12 @@ declare namespace editor {
          * 文本转换为绑定属性值
          */
         toValue: (v: any) => any;
-        attributeValue: any;
         init(v: Partial<this>): this;
         dispose(): void;
         protected initView(): void;
+        protected onValueChanged(): void;
         protected updateView(): void;
-        private onTextChange;
+        protected onTextChange(): void;
         private _textfocusintxt;
         protected ontxtfocusin(): void;
         protected ontxtfocusout(): void;
@@ -886,10 +900,19 @@ declare namespace editor {
          * 控制器
          */
         controller: egret.DisplayObject;
+        /**
+         * 最小值
+         */
+        minValue: number;
+        /**
+         * 最小值
+         */
+        maxValue: number;
         toText: (v: any) => string;
         toValue: (v: any) => number;
         initView(): void;
         dispose(): void;
+        protected onValueChanged(): void;
         private mouseDownPosition;
         private mouseDownValue;
         private onMouseDown;

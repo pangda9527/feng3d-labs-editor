@@ -22,6 +22,16 @@ namespace editor
          */
         controller: egret.DisplayObject;
 
+        /**
+         * 最小值
+         */
+        minValue = NaN;
+
+        /**
+         * 最小值
+         */
+        maxValue = NaN;
+
         toText = function (v)
         {
             // 消除数字显示为类似 0.0000000001 的问题
@@ -32,7 +42,8 @@ namespace editor
 
         toValue = function (v)
         {
-            return Number(v) || 0;
+            var n = Number(v) || 0;
+            return n;
         }
 
         initView()
@@ -50,6 +61,21 @@ namespace editor
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
         }
 
+        protected onValueChanged()
+        {
+            var value = this.space[this.attribute];
+            if (!isNaN(this.minValue))
+            {
+                value = Math.max(this.minValue, value);
+            }
+            if (!isNaN(this.maxValue))
+            {
+                value = Math.min(this.maxValue, value);
+            }
+            this.space[this.attribute] = value
+            super.onValueChanged();
+        }
+
         private mouseDownPosition = new feng3d.Vector2();
         private mouseDownValue = 0;
 
@@ -62,7 +88,7 @@ namespace editor
 
             //
             this.mouseDownPosition = mousePos;
-            this.mouseDownValue = this.attributeValue;
+            this.mouseDownValue = this.space[this.attribute];
 
             //
             feng3d.windowEventProxy.on("mousemove", this.onStageMouseMove, this);
@@ -71,7 +97,7 @@ namespace editor
 
         private onStageMouseMove()
         {
-            this.attributeValue = this.mouseDownValue + ((feng3d.windowEventProxy.clientX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - feng3d.windowEventProxy.clientY)) * this.step * this.stepScale;
+            this.space[this.attribute] = this.mouseDownValue + ((feng3d.windowEventProxy.clientX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - feng3d.windowEventProxy.clientY)) * this.step * this.stepScale;
         }
 
         private onStageMouseUp()
@@ -96,12 +122,10 @@ namespace editor
         {
             if (event.key == "ArrowUp")
             {
-                this.attributeValue += this.step;
-                this.textInput.text = this.toText.call(this, this.attributeValue);
+                this.space[this.attribute] += this.step;
             } else if (event.key == "ArrowDown")
             {
-                this.attributeValue -= this.step;
-                this.textInput.text = this.toText.call(this, this.attributeValue);
+                this.space[this.attribute] -= this.step;
             }
         }
     }

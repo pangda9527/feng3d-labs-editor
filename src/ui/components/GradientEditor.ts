@@ -28,6 +28,8 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
 
+            this.updateView();
+
             this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         }
@@ -83,11 +85,36 @@ namespace editor
                 const element = colorKeys[i];
                 this._drawColorGraphics(this._colorSprite.graphics, element.time, element.color, this.alphaLineGroup.width, this.alphaLineGroup.height, !this._selectAlpha && i == this._selectIndex);
             }
+            //
+            this._parentGroup = this._parentGroup || this.colorGroup.parent;
+            if (this._selectAlpha)
+            {
+                this._selectedAlphaKey = alphaKeys[this._selectIndex];
+                this.colorGroup.parent && this.colorGroup.parent.removeChild(this.colorGroup);
+                this.alphaGroup.parent || this._parentGroup.addChild(this.alphaGroup);
+            } else
+            {
+                this._selectedColorKey = colorKeys[this._selectIndex];
+                this.alphaGroup.parent && this.alphaGroup.parent.removeChild(this.alphaGroup);
+                this.colorGroup.parent || this.colorGroup.addChild(this.colorGroup);
+            }
+            this.colorGroup
+            //
+            this._loactionNumberTextInputBinder && this._loactionNumberTextInputBinder.dispose();
+            this._loactionNumberTextInputBinder = new NumberTextInputBinder().init({
+                space: this._selectedAlphaKey || this._selectedColorKey, attribute: "time",
+                textInput: this.locationInput, controller: this.locationLabel, minValue: 0, maxValue: 1,
+            });
+
         }
         private _alphaSprite: egret.Sprite;
         private _colorSprite: egret.Sprite;
         private _selectAlpha = true;
         private _selectIndex = 0;
+        private _parentGroup: egret.DisplayObjectContainer;
+        private _selectedAlphaKey: { alpha: number, time: number };
+        private _selectedColorKey: { color: feng3d.Color3, time: number };
+        private _loactionNumberTextInputBinder: NumberTextInputBinder;
 
         private _drawAlphaGraphics(graphics: egret.Graphics, time: number, alpha: number, width: number, height: number, selected: boolean)
         {
