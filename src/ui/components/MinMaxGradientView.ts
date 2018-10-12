@@ -119,55 +119,46 @@ namespace editor
         private activeColorGroup: any;
         private onClick(e: egret.MouseEvent)
         {
+            var view: eui.Component = null;
             switch (e.currentTarget)
             {
                 case this.colorGroup0:
-                    if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color || this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                    this.activeColorGroup = this.colorGroup0;
+                    switch (this.minMaxGradient.mode)
                     {
-                        if (!colorPickerView) colorPickerView = new editor.ColorPickerView();
-                        colorPickerView.color = this.minMaxGradient.getValue(0);
-                        var pos = this.localToGlobal(0, 0);
-                        // pos.x = pos.x - colorPickerView.width;
-                        pos.x = pos.x - 318;
-                        colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                        this.activeColorGroup = this.colorGroup0;
-                        //
-                        popupview.popupView(colorPickerView, () =>
-                        {
-                            colorPickerView.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                            this.activeColorGroup = null;
-                        }, pos.x, pos.y);
-                    } else
-                    {
-                        if (!gradientEditor) gradientEditor = new editor.GradientEditor();
-                        // colorPickerView.color = this.value;
-                        var pos = this.localToGlobal(0, 0);
-                        // pos.x = pos.x - colorPickerView.width;
-                        pos.x = pos.x - 318;
-                        gradientEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                        //
-                        popupview.popupView(gradientEditor, () =>
-                        {
-                            gradientEditor.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                        }, pos.x, pos.y);
+                        case feng3d.MinMaxGradientMode.Color:
+                            view = colorPickerView = colorPickerView || new editor.ColorPickerView();
+                            colorPickerView.color = (<feng3d.MinMaxGradientColor>this.minMaxGradient.minMaxGradient).color;
+                            break;
+                        case feng3d.MinMaxGradientMode.Gradient:
+                            view = gradientEditor = gradientEditor || new editor.GradientEditor();
+                            gradientEditor.gradient = (<feng3d.Gradient>this.minMaxGradient.minMaxGradient);
+                            break;
+                        case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                            view = colorPickerView = colorPickerView || new editor.ColorPickerView();
+                            colorPickerView.color = (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMin;
+                            break;
+                        case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                            view = gradientEditor = gradientEditor || new editor.GradientEditor();
+                            gradientEditor.gradient = (<feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient).gradientMin;
+                            break;
+                        case feng3d.MinMaxGradientMode.RandomColor:
+                            view = gradientEditor = gradientEditor || new editor.GradientEditor();
+                            gradientEditor.gradient = (<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient;
+                            break;
                     }
-                    break;
                 case this.colorGroup1:
-                    if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                    this.activeColorGroup = this.colorGroup1;
+                    switch (this.minMaxGradient.mode)
                     {
-                        if (!colorPickerView) colorPickerView = new editor.ColorPickerView();
-                        colorPickerView.color = this.minMaxGradient.getValue(0);
-                        var pos = this.localToGlobal(0, 0);
-                        // pos.x = pos.x - colorPickerView.width;
-                        pos.x = pos.x - 318;
-                        colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                        this.activeColorGroup = this.colorGroup1;
-                        //
-                        popupview.popupView(colorPickerView, () =>
-                        {
-                            colorPickerView.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                            this.activeColorGroup = null;
-                        }, pos.x, pos.y);
+                        case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                            view = colorPickerView = colorPickerView || new editor.ColorPickerView();
+                            colorPickerView.color = (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMax;
+                            break;
+                        case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                            view = gradientEditor = gradientEditor || new editor.GradientEditor();
+                            gradientEditor.gradient = (<feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient).gradientMax;
+                            break;
                     }
                     break;
                 case this.modeBtn:
@@ -178,25 +169,58 @@ namespace editor
                     }, { width: 210 });
                     break;
             }
+            if (view)
+            {
+                var pos = this.localToGlobal(0, 0);
+                pos.x = pos.x - 318;
+                view.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                this.activeColorGroup = this.colorGroup0;
+                //
+                popupview.popupView(view, () =>
+                {
+                    view.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                    this.activeColorGroup = null;
+                }, pos.x, pos.y);
+            }
         }
 
         private onPickerViewChanged()
         {
             if (this.activeColorGroup == this.colorGroup0)
             {
-                if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color)
+                switch (this.minMaxGradient.mode)
                 {
-                    (<feng3d.MinMaxGradientColor>this.minMaxGradient.minMaxGradient).color = <feng3d.Color4>colorPickerView.color;
-                } else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
-                {
-                    (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMin = <feng3d.Color4>colorPickerView.color;
+                    case feng3d.MinMaxGradientMode.Color:
+                        (<feng3d.MinMaxGradientColor>this.minMaxGradient.minMaxGradient).color = (<feng3d.Color4>colorPickerView.color).clone();
+                        break;
+                    case feng3d.MinMaxGradientMode.Gradient:
+                        this.minMaxGradient.minMaxGradient = gradientEditor.gradient;
+                        break;
+                    case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                        (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMin = (<feng3d.Color4>colorPickerView.color).clone();
+                        break;
+                    case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                        (<feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient).gradientMin = gradientEditor.gradient;
+                        break;
+                    case feng3d.MinMaxGradientMode.RandomColor:
+                        (<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient = gradientEditor.gradient;
+                        break;
                 }
-            } else
+            } else if (this.activeColorGroup == this.colorGroup1)
             {
-                (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMax = <feng3d.Color4>colorPickerView.color;
+                switch (this.minMaxGradient.mode)
+                {
+                    case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                        (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMax = (<feng3d.Color4>colorPickerView.color).clone();
+                        break;
+                    case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                        (<feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient).gradientMax = gradientEditor.gradient;
+                        break;
+                }
             }
 
-            this.updateView();
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
 

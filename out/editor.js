@@ -2868,52 +2868,43 @@ var editor;
         };
         MinMaxGradientView.prototype.onClick = function (e) {
             var _this = this;
+            var view = null;
             switch (e.currentTarget) {
                 case this.colorGroup0:
-                    if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color || this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
-                        if (!editor.colorPickerView)
-                            editor.colorPickerView = new editor.ColorPickerView();
-                        editor.colorPickerView.color = this.minMaxGradient.getValue(0);
-                        var pos = this.localToGlobal(0, 0);
-                        // pos.x = pos.x - colorPickerView.width;
-                        pos.x = pos.x - 318;
-                        editor.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                        this.activeColorGroup = this.colorGroup0;
-                        //
-                        editor.popupview.popupView(editor.colorPickerView, function () {
-                            editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
-                            _this.activeColorGroup = null;
-                        }, pos.x, pos.y);
+                    this.activeColorGroup = this.colorGroup0;
+                    switch (this.minMaxGradient.mode) {
+                        case feng3d.MinMaxGradientMode.Color:
+                            view = editor.colorPickerView = editor.colorPickerView || new editor.ColorPickerView();
+                            editor.colorPickerView.color = this.minMaxGradient.minMaxGradient.color;
+                            break;
+                        case feng3d.MinMaxGradientMode.Gradient:
+                            view = editor.gradientEditor = editor.gradientEditor || new editor.GradientEditor();
+                            editor.gradientEditor.gradient = this.minMaxGradient.minMaxGradient;
+                            break;
+                        case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                            view = editor.colorPickerView = editor.colorPickerView || new editor.ColorPickerView();
+                            editor.colorPickerView.color = this.minMaxGradient.minMaxGradient.colorMin;
+                            break;
+                        case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                            view = editor.gradientEditor = editor.gradientEditor || new editor.GradientEditor();
+                            editor.gradientEditor.gradient = this.minMaxGradient.minMaxGradient.gradientMin;
+                            break;
+                        case feng3d.MinMaxGradientMode.RandomColor:
+                            view = editor.gradientEditor = editor.gradientEditor || new editor.GradientEditor();
+                            editor.gradientEditor.gradient = this.minMaxGradient.minMaxGradient.gradient;
+                            break;
                     }
-                    else {
-                        if (!editor.gradientEditor)
-                            editor.gradientEditor = new editor.GradientEditor();
-                        // colorPickerView.color = this.value;
-                        var pos = this.localToGlobal(0, 0);
-                        // pos.x = pos.x - colorPickerView.width;
-                        pos.x = pos.x - 318;
-                        editor.gradientEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                        //
-                        editor.popupview.popupView(editor.gradientEditor, function () {
-                            editor.gradientEditor.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
-                        }, pos.x, pos.y);
-                    }
-                    break;
                 case this.colorGroup1:
-                    if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
-                        if (!editor.colorPickerView)
-                            editor.colorPickerView = new editor.ColorPickerView();
-                        editor.colorPickerView.color = this.minMaxGradient.getValue(0);
-                        var pos = this.localToGlobal(0, 0);
-                        // pos.x = pos.x - colorPickerView.width;
-                        pos.x = pos.x - 318;
-                        editor.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                        this.activeColorGroup = this.colorGroup1;
-                        //
-                        editor.popupview.popupView(editor.colorPickerView, function () {
-                            editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
-                            _this.activeColorGroup = null;
-                        }, pos.x, pos.y);
+                    this.activeColorGroup = this.colorGroup1;
+                    switch (this.minMaxGradient.mode) {
+                        case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                            view = editor.colorPickerView = editor.colorPickerView || new editor.ColorPickerView();
+                            editor.colorPickerView.color = this.minMaxGradient.minMaxGradient.colorMax;
+                            break;
+                        case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                            view = editor.gradientEditor = editor.gradientEditor || new editor.GradientEditor();
+                            editor.gradientEditor.gradient = this.minMaxGradient.minMaxGradient.gradientMax;
+                            break;
                     }
                     break;
                 case this.modeBtn:
@@ -2923,20 +2914,49 @@ var editor;
                     }, { width: 210 });
                     break;
             }
+            if (view) {
+                var pos = this.localToGlobal(0, 0);
+                pos.x = pos.x - 318;
+                view.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                this.activeColorGroup = this.colorGroup0;
+                //
+                editor.popupview.popupView(view, function () {
+                    view.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                    _this.activeColorGroup = null;
+                }, pos.x, pos.y);
+            }
         };
         MinMaxGradientView.prototype.onPickerViewChanged = function () {
             if (this.activeColorGroup == this.colorGroup0) {
-                if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color) {
-                    this.minMaxGradient.minMaxGradient.color = editor.colorPickerView.color;
-                }
-                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
-                    this.minMaxGradient.minMaxGradient.colorMin = editor.colorPickerView.color;
+                switch (this.minMaxGradient.mode) {
+                    case feng3d.MinMaxGradientMode.Color:
+                        this.minMaxGradient.minMaxGradient.color = editor.colorPickerView.color.clone();
+                        break;
+                    case feng3d.MinMaxGradientMode.Gradient:
+                        this.minMaxGradient.minMaxGradient = editor.gradientEditor.gradient;
+                        break;
+                    case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                        this.minMaxGradient.minMaxGradient.colorMin = editor.colorPickerView.color.clone();
+                        break;
+                    case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                        this.minMaxGradient.minMaxGradient.gradientMin = editor.gradientEditor.gradient;
+                        break;
+                    case feng3d.MinMaxGradientMode.RandomColor:
+                        this.minMaxGradient.minMaxGradient.gradient = editor.gradientEditor.gradient;
+                        break;
                 }
             }
-            else {
-                this.minMaxGradient.minMaxGradient.colorMax = editor.colorPickerView.color;
+            else if (this.activeColorGroup == this.colorGroup1) {
+                switch (this.minMaxGradient.mode) {
+                    case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                        this.minMaxGradient.minMaxGradient.colorMax = editor.colorPickerView.color.clone();
+                        break;
+                    case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                        this.minMaxGradient.minMaxGradient.gradientMax = editor.gradientEditor.gradient;
+                        break;
+                }
             }
-            this.updateView();
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
         __decorate([
@@ -2952,15 +2972,52 @@ var editor;
         __extends(GradientEditor, _super);
         function GradientEditor() {
             var _this = _super.call(this) || this;
+            _this.gradient = new feng3d.Gradient();
             _this.skinName = "GradientEditor";
             return _this;
         }
         GradientEditor.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
+            this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         };
         GradientEditor.prototype.$onRemoveFromStage = function () {
+            this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
+            this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
+        GradientEditor.prototype.updateView = function () {
+            var _this = this;
+            if (!this.stage)
+                return;
+            var list = [];
+            for (var key in feng3d.GradientMode) {
+                if (isNaN(Number(key)))
+                    list.push({ label: key, value: feng3d.GradientMode[key] });
+            }
+            this.modeCB.dataProvider = list;
+            this.modeCB.data = list.filter(function (v) { return v.value == _this.gradient.mode; })[0];
+            //
+            if (this.colorImage.width > 0 && this.colorImage.height > 0) {
+                var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.gradient, this.colorImage.width, this.colorImage.height);
+                this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+            }
+            //
+        };
+        GradientEditor.prototype._onReSize = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        };
+        GradientEditor.prototype._onModeCBChange = function () {
+            this.gradient.mode = this.modeCB.data.value;
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+        };
+        GradientEditor.prototype._onGradientChanged = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        };
+        __decorate([
+            feng3d.watch("_onGradientChanged")
+        ], GradientEditor.prototype, "gradient", void 0);
         return GradientEditor;
     }(eui.Component));
     editor.GradientEditor = GradientEditor;

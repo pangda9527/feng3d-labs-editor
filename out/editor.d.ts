@@ -786,9 +786,26 @@ declare namespace editor {
 }
 declare namespace editor {
     class GradientEditor extends eui.Component {
+        gradient: feng3d.Gradient;
+        modeCB: ComboBox;
+        alphaLineGroup: eui.Group;
+        colorImage: eui.Image;
+        colorLineGroup: eui.Group;
+        colorGroup: eui.Group;
+        colorRect: eui.Rect;
+        alphaGroup: eui.Group;
+        alphaLabel: eui.Label;
+        alphaSlide: eui.HSlider;
+        alphaInput: eui.TextInput;
+        locationLabel: eui.Label;
+        locationInput: eui.TextInput;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
+        updateView(): void;
+        private _onReSize;
+        private _onModeCBChange;
+        private _onGradientChanged;
     }
     var gradientEditor: GradientEditor;
 }
