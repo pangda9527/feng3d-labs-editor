@@ -3140,6 +3140,7 @@ var editor;
                     else if (alphaKeys.length < 8) {
                         this._selectedValue = newAlphaKey;
                         alphaKeys.push(newAlphaKey);
+                        this.gradient.updateAlphaKeys();
                     }
                     break;
                 case this.colorLineGroup:
@@ -3158,6 +3159,7 @@ var editor;
                     else if (colorKeys.length < 8) {
                         this._selectedValue = newColorKey;
                         colorKeys.push(newColorKey);
+                        this.gradient.updateColorKeys();
                     }
                     break;
             }
@@ -3182,11 +3184,13 @@ var editor;
                         var index = this.gradient.colorKeys.indexOf(this._selectedValue);
                         if (index == -1)
                             this.gradient.colorKeys.push(this._selectedValue);
+                        this.gradient.updateColorKeys();
                     }
                     else {
                         var index = this.gradient.alphaKeys.indexOf(this._selectedValue);
                         if (index == -1)
                             this.gradient.alphaKeys.push(this._selectedValue);
+                        this.gradient.updateAlphaKeys();
                     }
                     this._removedTemp = false;
                 }
@@ -3197,11 +3201,13 @@ var editor;
                         var index = this.gradient.colorKeys.indexOf(this._selectedValue);
                         if (index != -1)
                             this.gradient.colorKeys.splice(index, 1);
+                        this.gradient.updateColorKeys();
                     }
                     else {
                         var index = this.gradient.alphaKeys.indexOf(this._selectedValue);
                         if (index != -1)
                             this.gradient.alphaKeys.splice(index, 1);
+                        this.gradient.updateAlphaKeys();
                     }
                     this._removedTemp = true;
                 }
