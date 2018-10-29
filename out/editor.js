@@ -3019,15 +3019,11 @@ var editor;
             }
             this._colorSprite.graphics.clear();
             //
-            if (this.gradient.alphaKeys.length == 0)
-                this.gradient.alphaKeys = this.gradient.getRealAlphaKeys();
             var alphaKeys = this.gradient.alphaKeys;
             for (var i = 0, n = alphaKeys.length; i < n; i++) {
                 var element = alphaKeys[i];
                 this._drawAlphaGraphics(this._alphaSprite.graphics, element.time, element.alpha, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectedValue == alphaKeys[i]);
             }
-            if (this.gradient.colorKeys.length == 0)
-                this.gradient.colorKeys = this.gradient.getRealColorKeys();
             var colorKeys = this.gradient.colorKeys;
             for (var i = 0, n = colorKeys.length; i < n; i++) {
                 var element = colorKeys[i];
@@ -3116,8 +3112,6 @@ var editor;
             }
         };
         GradientEditor.prototype._onGradientChanged = function () {
-            if (this.gradient.colorKeys.length == 0)
-                this.gradient.colorKeys = this.gradient.getRealColorKeys();
             this._selectedValue = this.gradient.colorKeys[0];
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         };
