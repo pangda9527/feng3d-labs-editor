@@ -68,7 +68,7 @@ namespace editor
             if (object3d.type == "Bone")
                 return null;
 
-            var gameobject = new feng3d.GameObject().value({ name: object3d.name });
+            var gameobject = Object.setValue(new feng3d.GameObject(), { name: object3d.name });
             gameobject.transform.position = new feng3d.Vector3(object3d.position.x, object3d.position.y, object3d.position.z);
             gameobject.transform.orientation = new feng3d.Quaternion(object3d.quaternion.x, object3d.quaternion.y, object3d.quaternion.z, object3d.quaternion.w);
             gameobject.transform.scale = new feng3d.Vector3(object3d.scale.x, object3d.scale.y, object3d.scale.z);

@@ -11,10 +11,10 @@ namespace editor
 
         private onclick()
         {
-            var gameobject = new feng3d.GameObject().value({ name: "test" });
+            var gameobject = Object.setValue(new feng3d.GameObject(), { name: "test" });
             var model = gameobject.addComponent(feng3d.Model);
             model.material = new feng3d.Material();
-            model.geometry = new feng3d.SphereGeometry().value({ radius: 10 });
+            model.geometry = Object.setValue(new feng3d.SphereGeometry(), { radius: 10 });
             gameobject.mouseEnabled = false;
 
             var mouseRay3D = engine.camera.getMouseRay3D();

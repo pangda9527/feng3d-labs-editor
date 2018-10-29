@@ -84,22 +84,22 @@ namespace editor
         {
             if (component instanceof feng3d.DirectionalLight)
             {
-                var directionLightIcon = new feng3d.GameObject().value({ name: "DirectionLightIcon", }).addComponent(DirectionLightIcon).value({ light: component, });
+                var directionLightIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "DirectionLightIcon", }).addComponent(DirectionLightIcon), { light: component, });
                 this.gameObject.addChild(directionLightIcon.gameObject);
                 this.directionLightIconMap.set(component, directionLightIcon);
             } else if (component instanceof feng3d.PointLight)
             {
-                var pointLightIcon = new feng3d.GameObject().value({ name: "PointLightIcon" }).addComponent(PointLightIcon).value({ light: component });
+                var pointLightIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "PointLightIcon" }).addComponent(PointLightIcon), { light: component });
                 this.gameObject.addChild(pointLightIcon.gameObject);
                 this.pointLightIconMap.set(component, pointLightIcon);
             } else if (component instanceof feng3d.SpotLight)
             {
-                var spotLightIcon = new feng3d.GameObject().value({ name: "SpotLightIcon" }).addComponent(SpotLightIcon).value({ light: component });
+                var spotLightIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "SpotLightIcon" }).addComponent(SpotLightIcon), { light: component });
                 this.gameObject.addChild(spotLightIcon.gameObject);
                 this.spotLightIconMap.set(component, spotLightIcon);
             } else if (component instanceof feng3d.Camera)
             {
-                var cameraIcon = new feng3d.GameObject().value({ name: "CameraIcon" }).addComponent(CameraIcon).value({ camera: component });
+                var cameraIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "CameraIcon" }).addComponent(CameraIcon), { camera: component });
                 this.gameObject.addChild(cameraIcon.gameObject);
                 this.cameraIconMap.set(component, cameraIcon);
             }
@@ -109,19 +109,19 @@ namespace editor
         {
             if (component instanceof feng3d.DirectionalLight)
             {
-                this.directionLightIconMap.get(component).value({ light: null }).gameObject.remove();
+                Object.setValue(this.directionLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.directionLightIconMap.delete(component);
             } else if (component instanceof feng3d.PointLight)
             {
-                this.pointLightIconMap.get(component).value({ light: null }).gameObject.remove();
+                Object.setValue(this.pointLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.pointLightIconMap.delete(component);
             } else if (component instanceof feng3d.SpotLight)
             {
-                this.spotLightIconMap.get(component).value({ light: null }).gameObject.remove();
+                Object.setValue(this.spotLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.spotLightIconMap.delete(component);
             } else if (component instanceof feng3d.Camera)
             {
-                this.cameraIconMap.get(component).value({ camera: null }).gameObject.remove();
+                Object.setValue(this.cameraIconMap.get(component), { camera: null }).gameObject.remove();
                 this.cameraIconMap.delete(component);
             }
         }

@@ -2381,7 +2381,7 @@ declare namespace editor {
         private init;
         private onEditorCameraRotate;
     }
-    function creatNewScene(): feng3d.Scene3D;
+    function creatNewScene(): any;
 }
 declare namespace feng3d {
     interface ComponentMap {

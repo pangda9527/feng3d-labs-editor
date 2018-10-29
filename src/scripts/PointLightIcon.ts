@@ -14,7 +14,7 @@ namespace editor
 
         initicon()
         {
-            var lightIcon = this._lightIcon = new feng3d.GameObject().value({
+            var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
                 name: "Icon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
@@ -39,7 +39,7 @@ namespace editor
             this.gameObject.addChild(lightIcon);
 
             //
-            var lightLines = this._lightLines = new feng3d.GameObject().value({
+            var lightLines = this._lightLines = Object.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                     __class__: "feng3d.MeshModel", material: {
@@ -55,7 +55,7 @@ namespace editor
             this._segmentGeometry = <any>lightLines.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this._lightpoints = new feng3d.GameObject().value({
+            var lightpoints = this._lightpoints = Object.setValue(new feng3d.GameObject(), {
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                     __class__: "feng3d.MeshModel",

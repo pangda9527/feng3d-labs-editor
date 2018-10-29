@@ -28,41 +28,41 @@ namespace editor
 
         private initModels()
         {
-            this.xAxis = new feng3d.GameObject().value({ name: "xAxis" }).addComponent(CoordinateAxis);
+            this.xAxis = Object.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent(CoordinateAxis);
             this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.transform.rz = -90;
             this.gameObject.addChild(this.xAxis.gameObject);
 
-            this.yAxis = new feng3d.GameObject().value({ name: "yAxis" }).addComponent(CoordinateAxis);
+            this.yAxis = Object.setValue(new feng3d.GameObject(), { name: "yAxis" }).addComponent(CoordinateAxis);
             this.yAxis.color.setTo(0, 1, 0, 1);
             this.gameObject.addChild(this.yAxis.gameObject);
 
-            this.zAxis = new feng3d.GameObject().value({ name: "zAxis" }).addComponent(CoordinateAxis);
+            this.zAxis = Object.setValue(new feng3d.GameObject(), { name: "zAxis" }).addComponent(CoordinateAxis);
             this.zAxis.color.setTo(0, 0, 1, 1);
             this.zAxis.transform.rx = 90;
             this.gameObject.addChild(this.zAxis.gameObject);
 
-            this.yzPlane = new feng3d.GameObject().value({ name: "yzPlane" }).addComponent(CoordinatePlane);
+            this.yzPlane = Object.setValue(new feng3d.GameObject(), { name: "yzPlane" }).addComponent(CoordinatePlane);
             this.yzPlane.color.setTo(1, 0, 0, 0.2);
             this.yzPlane.selectedColor.setTo(1, 0, 0, 0.5);
             this.yzPlane.borderColor.setTo(1, 0, 0, 1);
             this.yzPlane.transform.rz = 90;
             this.gameObject.addChild(this.yzPlane.gameObject);
 
-            this.xzPlane = new feng3d.GameObject().value({ name: "xzPlane" }).addComponent(CoordinatePlane);
+            this.xzPlane = Object.setValue(new feng3d.GameObject(), { name: "xzPlane" }).addComponent(CoordinatePlane);
             this.xzPlane.color.setTo(0, 1, 0, 0.2);
             this.xzPlane.selectedColor.setTo(0, 1, 0, 0.5);
             this.xzPlane.borderColor.setTo(0, 1, 0, 1);
             this.gameObject.addChild(this.xzPlane.gameObject);
 
-            this.xyPlane = new feng3d.GameObject().value({ name: "xyPlane" }).addComponent(CoordinatePlane);
+            this.xyPlane = Object.setValue(new feng3d.GameObject(), { name: "xyPlane" }).addComponent(CoordinatePlane);
             this.xyPlane.color.setTo(0, 0, 1, 0.2);
             this.xyPlane.selectedColor.setTo(0, 0, 1, 0.5);
             this.xyPlane.borderColor.setTo(0, 0, 1, 1);
             this.xyPlane.transform.rx = -90;
             this.gameObject.addChild(this.xyPlane.gameObject);
 
-            this.oCube = new feng3d.GameObject().value({ name: "oCube" }).addComponent(CoordinateCube);
+            this.oCube = Object.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
             this.gameObject.addChild(this.oCube.gameObject);
         }
     }
@@ -91,20 +91,20 @@ namespace editor
             var model = xLine.addComponent(feng3d.Model);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             segmentGeometry.segments.push({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
-            this.segmentMaterial = model.material = new feng3d.Material().value({ shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
+            this.segmentMaterial = model.material = Object.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
             this.gameObject.addChild(xLine);
             //
             this.xArrow = new feng3d.GameObject();
             model = this.xArrow.addComponent(feng3d.Model);
-            model.geometry = new feng3d.ConeGeometry().value({ bottomRadius: 5, height: 18 });
-            this.material = model.material = new feng3d.Material().value({ shaderName: "color" });
+            model.geometry = Object.setValue(new feng3d.ConeGeometry(), { bottomRadius: 5, height: 18 });
+            this.material = model.material = Object.setValue(new feng3d.Material(), { shaderName: "color" });
             this.material.renderParams.enableBlend = true;
             this.xArrow.transform.y = this.length;
             this.gameObject.addChild(this.xArrow);
 
-            var mouseHit = new feng3d.GameObject().value({ name: "hitCoordinateAxis" });
+            var mouseHit = Object.setValue(new feng3d.GameObject(), { name: "hitCoordinateAxis" });
             model = mouseHit.addComponent(feng3d.Model);
-            model.geometry = new feng3d.CylinderGeometry().value({ topRadius: 5, bottomRadius: 5, height: this.length });
+            model.geometry = Object.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length });
             //model.material = materialFactory.create("color");
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
@@ -143,8 +143,8 @@ namespace editor
             //
             this.oCube = new feng3d.GameObject();
             var model = this.oCube.addComponent(feng3d.Model)
-            model.geometry = new feng3d.CubeGeometry().value({ width: 8, height: 8, depth: 8 });
-            this.colorMaterial = model.material = new feng3d.Material().value({ shaderName: "color" });
+            model.geometry = Object.setValue(new feng3d.CubeGeometry(), { width: 8, height: 8, depth: 8 });
+            this.colorMaterial = model.material = Object.setValue(new feng3d.Material(), { shaderName: "color" });
             this.colorMaterial.renderParams.enableBlend = true;
             this.oCube.mouseEnabled = true;
             this.gameObject.addChild(this.oCube);
@@ -183,20 +183,20 @@ namespace editor
         {
             super.init(gameObject);
 
-            var plane = new feng3d.GameObject().value({ name: "plane" });
+            var plane = Object.setValue(new feng3d.GameObject(), { name: "plane" });
             var model = plane.addComponent(feng3d.Model);
             plane.transform.x = plane.transform.z = this._width / 2;
-            model.geometry = new feng3d.PlaneGeometry().value({ width: this._width, height: this._width });
-            this.colorMaterial = model.material = new feng3d.Material().value({ shaderName: "color" });
+            model.geometry = Object.setValue(new feng3d.PlaneGeometry(), { width: this._width, height: this._width });
+            this.colorMaterial = model.material = Object.setValue(new feng3d.Material(), { shaderName: "color" });
             this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
             this.colorMaterial.renderParams.enableBlend = true;
             plane.mouseEnabled = true;
             this.gameObject.addChild(plane);
 
-            var border = new feng3d.GameObject().value({ name: "border" });
+            var border = Object.setValue(new feng3d.GameObject(), { name: "border" });
             model = border.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            var material = model.material = new feng3d.Material().value({
+            var material = model.material = Object.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
             });

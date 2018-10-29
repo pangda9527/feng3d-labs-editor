@@ -66,7 +66,7 @@ namespace editor
         private init()
         {
             //
-            editorCamera = new feng3d.GameObject().value({ name: "editorCamera" }).addComponent(feng3d.Camera);
+            editorCamera = Object.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
             editorCamera.lens.far = 5000;
             editorCamera.transform.x = 5;
             editorCamera.transform.y = 3;
@@ -75,7 +75,7 @@ namespace editor
             //
             editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
-            editorScene = new feng3d.GameObject().value({ name: "scene" }).addComponent(feng3d.Scene3D);
+            editorScene = Object.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
             editorScene.runEnvironment = feng3d.RunEnvironment.all;
             //
             editorScene.gameObject.addComponent(SceneRotateTool);
@@ -158,7 +158,7 @@ namespace editor
 
     export function creatNewScene()
     {
-        var scene = new feng3d.GameObject().value({ name: "Untitled" }).addComponent(feng3d.Scene3D)
+        var scene = Object.setValue(new feng3d.GameObject(), { name: "Untitled" }).addComponent(feng3d.Scene3D)
         scene.background.setTo(0.408, 0.38, 0.357);
         scene.ambientColor.setTo(0.4, 0.4, 0.4);
 
@@ -167,7 +167,7 @@ namespace editor
         camera.transform.position = new feng3d.Vector3(0, 1, -10);
         scene.gameObject.addChild(camera);
 
-        var directionalLight = new feng3d.GameObject().value({ name: "DirectionalLight" });
+        var directionalLight = Object.setValue(new feng3d.GameObject(), { name: "DirectionalLight" });
         directionalLight.addComponent(feng3d.DirectionalLight).shadowType = feng3d.ShadowType.Hard_Shadows;
         directionalLight.transform.rx = 50;
         directionalLight.transform.ry = -30;

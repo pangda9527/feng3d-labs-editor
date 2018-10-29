@@ -6237,7 +6237,7 @@ var editor;
         AssetsFile.prototype.addfileFromArrayBuffer = function (filename, arraybuffer, override, callback) {
             var _this = this;
             if (override === void 0) { override = false; }
-            var feng3dFile = new feng3d.ArrayBufferFile().value({ name: filename, filename: filename, arraybuffer: arraybuffer });
+            var feng3dFile = Object.setValue(new feng3d.ArrayBufferFile(), { name: filename, filename: filename, arraybuffer: arraybuffer });
             editor.assets.writeAssets(feng3dFile);
             editor.assets.writeArrayBuffer(feng3dFile.filePath, arraybuffer, function (err) {
                 var assetsFile = _this.addAssets(feng3dFile);
@@ -9320,41 +9320,41 @@ var editor;
         };
         EditorComponent.prototype.addComponent = function (component) {
             if (component instanceof feng3d.DirectionalLight) {
-                var directionLightIcon = new feng3d.GameObject().value({ name: "DirectionLightIcon", }).addComponent(editor.DirectionLightIcon).value({ light: component, });
+                var directionLightIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "DirectionLightIcon", }).addComponent(editor.DirectionLightIcon), { light: component, });
                 this.gameObject.addChild(directionLightIcon.gameObject);
                 this.directionLightIconMap.set(component, directionLightIcon);
             }
             else if (component instanceof feng3d.PointLight) {
-                var pointLightIcon = new feng3d.GameObject().value({ name: "PointLightIcon" }).addComponent(editor.PointLightIcon).value({ light: component });
+                var pointLightIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "PointLightIcon" }).addComponent(editor.PointLightIcon), { light: component });
                 this.gameObject.addChild(pointLightIcon.gameObject);
                 this.pointLightIconMap.set(component, pointLightIcon);
             }
             else if (component instanceof feng3d.SpotLight) {
-                var spotLightIcon = new feng3d.GameObject().value({ name: "SpotLightIcon" }).addComponent(editor.SpotLightIcon).value({ light: component });
+                var spotLightIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "SpotLightIcon" }).addComponent(editor.SpotLightIcon), { light: component });
                 this.gameObject.addChild(spotLightIcon.gameObject);
                 this.spotLightIconMap.set(component, spotLightIcon);
             }
             else if (component instanceof feng3d.Camera) {
-                var cameraIcon = new feng3d.GameObject().value({ name: "CameraIcon" }).addComponent(editor.CameraIcon).value({ camera: component });
+                var cameraIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "CameraIcon" }).addComponent(editor.CameraIcon), { camera: component });
                 this.gameObject.addChild(cameraIcon.gameObject);
                 this.cameraIconMap.set(component, cameraIcon);
             }
         };
         EditorComponent.prototype.removeComponent = function (component) {
             if (component instanceof feng3d.DirectionalLight) {
-                this.directionLightIconMap.get(component).value({ light: null }).gameObject.remove();
+                Object.setValue(this.directionLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.directionLightIconMap.delete(component);
             }
             else if (component instanceof feng3d.PointLight) {
-                this.pointLightIconMap.get(component).value({ light: null }).gameObject.remove();
+                Object.setValue(this.pointLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.pointLightIconMap.delete(component);
             }
             else if (component instanceof feng3d.SpotLight) {
-                this.spotLightIconMap.get(component).value({ light: null }).gameObject.remove();
+                Object.setValue(this.spotLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.spotLightIconMap.delete(component);
             }
             else if (component instanceof feng3d.Camera) {
-                this.cameraIconMap.get(component).value({ camera: null }).gameObject.remove();
+                Object.setValue(this.cameraIconMap.get(component), { camera: null }).gameObject.remove();
                 this.cameraIconMap.delete(component);
             }
         };
@@ -9371,8 +9371,8 @@ var editor;
         function Feng3dScreenShot() {
             this.defaultGeometry = feng3d.Geometry.sphere;
             this.defaultMaterial = feng3d.Material.default;
-            this.materialObject = new feng3d.GameObject().value({ components: [{ __class__: "feng3d.MeshModel" }] });
-            this.geometryObject = new feng3d.GameObject().value({ components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
+            this.materialObject = Object.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
+            this.geometryObject = Object.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
             // 初始化3d
             var engine = this.engine = new feng3d.Engine();
             engine.canvas.style.visibility = "hidden";
@@ -9385,7 +9385,7 @@ var editor;
             var camera = this.camera = engine.camera;
             camera.lens = new feng3d.PerspectiveLens(45);
             //
-            var light = new feng3d.GameObject().value({
+            var light = Object.setValue(new feng3d.GameObject(), {
                 name: "DirectionalLight",
                 components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "feng3d.DirectionalLight" },]
             });
