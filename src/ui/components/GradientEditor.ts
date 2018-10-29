@@ -242,7 +242,7 @@ namespace editor
                     {
                         this._selectedValue = newAlphaKey;
                         alphaKeys.push(newAlphaKey);
-                        this.gradient.updateAlphaKeys();
+                        alphaKeys.sort((a, b) => a.time - b.time);
                     }
                     break
                 case this.colorLineGroup:
@@ -264,7 +264,7 @@ namespace editor
                     {
                         this._selectedValue = newColorKey;
                         colorKeys.push(newColorKey);
-                        this.gradient.updateColorKeys();
+                        colorKeys.sort((a, b) => a.time - b.time);
                     }
                     break
             }
@@ -294,12 +294,12 @@ namespace editor
                     {
                         var index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
                         if (index == -1) this.gradient.colorKeys.push(<any>this._selectedValue);
-                        this.gradient.updateColorKeys();
+                        this.gradient.colorKeys.sort((a, b) => a.time - b.time);;
                     } else
                     {
                         var index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
                         if (index == -1) this.gradient.alphaKeys.push(<any>this._selectedValue);
-                        this.gradient.updateAlphaKeys();
+                        this.gradient.alphaKeys.sort((a, b) => a.time - b.time);;
                     }
                     this._removedTemp = false;
                 }
@@ -311,12 +311,12 @@ namespace editor
                     {
                         var index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
                         if (index != -1) this.gradient.colorKeys.splice(index, 1);
-                        this.gradient.updateColorKeys();
+                        this.gradient.colorKeys.sort((a, b) => a.time - b.time);;
                     } else
                     {
                         var index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
                         if (index != -1) this.gradient.alphaKeys.splice(index, 1);
-                        this.gradient.updateAlphaKeys();
+                        this.gradient.alphaKeys.sort((a, b) => a.time - b.time);;
                     }
                     this._removedTemp = true;
                 }
@@ -326,12 +326,14 @@ namespace editor
                 var sp = this.colorLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.colorLineGroup.width;
+                this.gradient.colorKeys.sort((a, b) => a.time - b.time);;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             } else
             {
                 var sp = this.alphaLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.alphaLineGroup.width;
+                this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));

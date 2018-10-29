@@ -3140,7 +3140,7 @@ var editor;
                     else if (alphaKeys.length < 8) {
                         this._selectedValue = newAlphaKey;
                         alphaKeys.push(newAlphaKey);
-                        this.gradient.updateAlphaKeys();
+                        alphaKeys.sort(function (a, b) { return a.time - b.time; });
                     }
                     break;
                 case this.colorLineGroup:
@@ -3159,7 +3159,7 @@ var editor;
                     else if (colorKeys.length < 8) {
                         this._selectedValue = newColorKey;
                         colorKeys.push(newColorKey);
-                        this.gradient.updateColorKeys();
+                        colorKeys.sort(function (a, b) { return a.time - b.time; });
                     }
                     break;
             }
@@ -3184,13 +3184,15 @@ var editor;
                         var index = this.gradient.colorKeys.indexOf(this._selectedValue);
                         if (index == -1)
                             this.gradient.colorKeys.push(this._selectedValue);
-                        this.gradient.updateColorKeys();
+                        this.gradient.colorKeys.sort(function (a, b) { return a.time - b.time; });
+                        ;
                     }
                     else {
                         var index = this.gradient.alphaKeys.indexOf(this._selectedValue);
                         if (index == -1)
                             this.gradient.alphaKeys.push(this._selectedValue);
-                        this.gradient.updateAlphaKeys();
+                        this.gradient.alphaKeys.sort(function (a, b) { return a.time - b.time; });
+                        ;
                     }
                     this._removedTemp = false;
                 }
@@ -3201,13 +3203,15 @@ var editor;
                         var index = this.gradient.colorKeys.indexOf(this._selectedValue);
                         if (index != -1)
                             this.gradient.colorKeys.splice(index, 1);
-                        this.gradient.updateColorKeys();
+                        this.gradient.colorKeys.sort(function (a, b) { return a.time - b.time; });
+                        ;
                     }
                     else {
                         var index = this.gradient.alphaKeys.indexOf(this._selectedValue);
                         if (index != -1)
                             this.gradient.alphaKeys.splice(index, 1);
-                        this.gradient.updateAlphaKeys();
+                        this.gradient.alphaKeys.sort(function (a, b) { return a.time - b.time; });
+                        ;
                     }
                     this._removedTemp = true;
                 }
@@ -3216,12 +3220,15 @@ var editor;
                 var sp = this.colorLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.colorLineGroup.width;
+                this.gradient.colorKeys.sort(function (a, b) { return a.time - b.time; });
+                ;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
             else {
                 var sp = this.alphaLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.alphaLineGroup.width;
+                this.gradient.alphaKeys.sort(function (a, b) { return a.time - b.time; });
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
