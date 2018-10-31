@@ -2832,6 +2832,11 @@ var editor;
                     var imagedata = feng3d.imageUtil.createAnimationCurveRect(animationCurve, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
                     this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
                 }
+                else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
+                    var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
+                    var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
+                    this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
             }
         };
         MinMaxCurveView.prototype.onReSize = function () {
