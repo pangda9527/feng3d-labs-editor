@@ -42,7 +42,41 @@ namespace editor
 
         updateView()
         {
+            this.constantGroup.visible = false;
+            this.curveGroup.visible = false;
+            this.randomBetweenTwoConstantsGroup.visible = false;
+            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant)
+            {
+                this.constantGroup.visible = true;
 
+                var minMaxCurveConstant = <feng3d.MinMaxCurveConstant>this.minMaxCurve.minMaxCurve;
+                this.addBinder(new NumberTextInputBinder().init({
+                    space: minMaxCurveConstant, attribute: "value", textInput: this.constantTextInput, editable: true,
+                    controller: null,
+                }));
+            } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants)
+            {
+                this.randomBetweenTwoConstantsGroup.visible = true;
+
+                var minMaxCurveRandomBetweenTwoConstants = <feng3d.MinMaxCurveRandomBetweenTwoConstants>this.minMaxCurve.minMaxCurve;
+                this.addBinder(new NumberTextInputBinder().init({
+                    space: minMaxCurveRandomBetweenTwoConstants, attribute: "minValue", textInput: this.minValueTextInput, editable: true,
+                    controller: null,
+                }));
+                this.addBinder(new NumberTextInputBinder().init({
+                    space: minMaxCurveRandomBetweenTwoConstants, attribute: "maxValue", textInput: this.maxValueTextInput, editable: true,
+                    controller: null,
+                }));
+            } else
+            {
+                this.curveGroup.visible = true;
+                if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
+                {
+                    var animationCurve = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
+                    var imagedata = feng3d.imageUtil.createAnimationCurveRect(animationCurve, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
+                    this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                }
+            }
         }
 
         private onReSize()
@@ -52,7 +86,7 @@ namespace editor
 
         private _onMinMaxCurveChanged()
         {
-            if (this.stage) this.updateView();
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
 
         private onClick(e: egret.MouseEvent)
