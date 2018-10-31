@@ -26,6 +26,7 @@
         "editor.HierarchyTreeItemRenderer": "resource/custom_skins/HierarchyTreeItemRenderer.exml",
         "editor.Accordion": "resource/custom_skins/Accordion.exml",
         "editor.MinMaxGradientView": "resource/custom_skins/MinMaxGradientView.exml",
+        "editor.MinMaxCurveView": "resource/custom_skins/MinMaxCurveView.exml",
         "RenameTextInput": "resource/eui_skins/RenameTextInput.exml",
         "ComboBox": "resource/eui_skins/ComboBox.exml"
     },
@@ -49,6 +50,8 @@
         "resource/custom_skins/ColorPickerView.exml",
         "resource/custom_skins/TipString.exml",
         "resource/custom_skins/ParticleEffectController.exml",
+        "resource/custom_skins/MinMaxCurveView.exml",
+        "resource/custom_skins/OAVMinMaxCurve.exml",
         "resource/custom_skins/MinMaxGradientView.exml",
         "resource/custom_skins/GradientEditor.exml",
         "resource/custom_skins/OAVMinMaxGradient.exml",

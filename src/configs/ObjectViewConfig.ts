@@ -16,4 +16,5 @@ namespace editor
     feng3d.objectview.setDefaultTypeAttributeView("Color4", { component: "OAVColorPicker" });
     feng3d.objectview.setDefaultTypeAttributeView("UrlImageTexture2D", { component: "OAVTexture2D" });
     feng3d.objectview.setDefaultTypeAttributeView("MinMaxGradient", { component: "OAVMinMaxGradient" });
+    feng3d.objectview.setDefaultTypeAttributeView("MinMaxCurve", { component: "OAVMinMaxCurve" });
 }

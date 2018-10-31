@@ -762,6 +762,29 @@ declare namespace editor {
 }
 declare namespace editor {
     /**
+     * 最大最小曲线界面
+     */
+    class MinMaxCurveView extends eui.Component {
+        minMaxCurve: feng3d.MinMaxCurve;
+        constantGroup: eui.Group;
+        constantTextInput: eui.TextInput;
+        curveGroup: eui.Group;
+        curveImage: eui.Image;
+        randomBetweenTwoConstantsGroup: eui.Group;
+        minValueTextInput: eui.TextInput;
+        maxValueTextInput: eui.TextInput;
+        modeBtn: eui.Button;
+        constructor();
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        updateView(): void;
+        private onReSize;
+        private _onMinMaxCurveChanged;
+        private onClick;
+    }
+}
+declare namespace editor {
+    /**
      * 最大最小颜色渐变界面
      */
     class MinMaxGradientView extends eui.Component {
@@ -1435,6 +1458,17 @@ declare namespace editor {
         private onMouseUp;
         updateView(): void;
         onResize(): void;
+    }
+}
+declare namespace editor {
+    class OAVMinMaxCurve extends OAVBase {
+        labelLab: eui.Label;
+        minMaxCurveView: editor.MinMaxCurveView;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
+        dispose(): void;
+        updateView(): void;
+        private onChange;
     }
 }
 declare namespace editor {

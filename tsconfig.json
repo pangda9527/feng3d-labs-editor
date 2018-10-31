@@ -49,6 +49,7 @@
         "src/ui/components/ToolTip.ts",
         "src/ui/components/ColorPickerView.ts",
         "src/ui/components/AreaSelectRect.ts",
+        "src/ui/components/MinMaxCurveView.ts",
         "src/ui/components/MinMaxGradientView.ts",
         "src/ui/components/GradientEditor.ts",
         // tipviews
@@ -88,6 +89,7 @@
         "src/objectview/oav/OAVTexture2D.ts",
         "src/objectview/oav/OAVParticleComponentList.ts",
         "src/objectview/oav/OAVFeng3dPreView.ts",
+        "src/objectview/oav/OAVMinMaxCurve.ts",
         "src/objectview/oav/OAVMinMaxGradient.ts",
         //
         "src/ui/inspector/InspectorView.ts",
