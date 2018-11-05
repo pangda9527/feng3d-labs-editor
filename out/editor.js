@@ -2795,10 +2795,12 @@ var editor;
         MinMaxCurveView.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.curveGroup.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.updateView();
         };
         MinMaxCurveView.prototype.$onRemoveFromStage = function () {
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.curveGroup.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
         MinMaxCurveView.prototype.updateView = function () {
@@ -2854,7 +2856,22 @@ var editor;
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     }, { width: 210 });
                     break;
+                case this.curveGroup:
+                    editor.minMaxCurveEditor = editor.minMaxCurveEditor || new editor.MinMaxCurveEditor();
+                    editor.minMaxCurveEditor.minMaxCurve = this.minMaxCurve;
+                    var pos = this.localToGlobal(0, 0);
+                    pos.x = pos.x - 318;
+                    editor.minMaxCurveEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                    //
+                    editor.popupview.popupView(editor.minMaxCurveEditor, function () {
+                        editor.minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                    }, pos.x, pos.y);
+                    break;
             }
+        };
+        MinMaxCurveView.prototype.onPickerViewChanged = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
         __decorate([
             feng3d.watch("_onMinMaxCurveChanged")
@@ -2862,6 +2879,52 @@ var editor;
         return MinMaxCurveView;
     }(eui.Component));
     editor.MinMaxCurveView = MinMaxCurveView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var MinMaxCurveEditor = /** @class */ (function (_super) {
+        __extends(MinMaxCurveEditor, _super);
+        function MinMaxCurveEditor() {
+            var _this = _super.call(this) || this;
+            _this.minMaxCurve = new feng3d.MinMaxCurve();
+            _this.skinName = "MinMaxCurveEditor";
+            return _this;
+        }
+        MinMaxCurveEditor.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.updateView();
+            this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
+        };
+        MinMaxCurveEditor.prototype.$onRemoveFromStage = function () {
+            this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        MinMaxCurveEditor.prototype.updateView = function () {
+            if (!this.stage)
+                return;
+            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
+                var animationCurve = this.minMaxCurve.minMaxCurve;
+                var imagedata = feng3d.imageUtil.createAnimationCurveRect(animationCurve, this.minMaxCurve.between0And1, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
+                this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+            }
+            else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
+                var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
+                var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
+                this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+            }
+        };
+        MinMaxCurveEditor.prototype._onMinMaxCurveChanged = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        };
+        MinMaxCurveEditor.prototype._onReSize = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        };
+        __decorate([
+            feng3d.watch("_onMinMaxCurveChanged")
+        ], MinMaxCurveEditor.prototype, "minMaxCurve", void 0);
+        return MinMaxCurveEditor;
+    }(eui.Component));
+    editor.MinMaxCurveEditor = MinMaxCurveEditor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

@@ -51,6 +51,7 @@
         "resource/custom_skins/TipString.exml",
         "resource/custom_skins/ParticleEffectController.exml",
         "resource/custom_skins/MinMaxCurveView.exml",
+        "resource/custom_skins/MinMaxCurveEditor.exml",
         "resource/custom_skins/OAVMinMaxCurve.exml",
         "resource/custom_skins/MinMaxGradientView.exml",
         "resource/custom_skins/GradientEditor.exml",

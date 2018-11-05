@@ -781,6 +781,21 @@ declare namespace editor {
         private onReSize;
         private _onMinMaxCurveChanged;
         private onClick;
+        private onPickerViewChanged;
+    }
+}
+declare namespace editor {
+    var minMaxCurveEditor: MinMaxCurveEditor;
+    class MinMaxCurveEditor extends eui.Component {
+        minMaxCurve: feng3d.MinMaxCurve;
+        curveGroup: eui.Group;
+        curveImage: eui.Image;
+        constructor();
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        updateView(): void;
+        private _onMinMaxCurveChanged;
+        private _onReSize;
     }
 }
 declare namespace editor {
@@ -808,6 +823,7 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    var gradientEditor: GradientEditor;
     class GradientEditor extends eui.Component {
         gradient: feng3d.Gradient;
         modeCB: ComboBox;
@@ -847,7 +863,6 @@ declare namespace editor {
         private _onAlphaColorMouseMove;
         private _onAlphaColorMouseUp;
     }
-    var gradientEditor: GradientEditor;
 }
 declare namespace editor {
     /**

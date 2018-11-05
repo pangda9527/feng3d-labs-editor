@@ -50,6 +50,7 @@
         "src/ui/components/ColorPickerView.ts",
         "src/ui/components/AreaSelectRect.ts",
         "src/ui/components/MinMaxCurveView.ts",
+        "src/ui/components/MinMaxCurveEditor.ts",
         "src/ui/components/MinMaxGradientView.ts",
         "src/ui/components/GradientEditor.ts",
         // tipviews

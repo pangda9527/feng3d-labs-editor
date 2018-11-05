@@ -28,6 +28,7 @@ namespace editor
             super.$onAddToStage(stage, nestLevel);
 
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.curveGroup.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
 
             this.updateView();
         }
@@ -36,6 +37,7 @@ namespace editor
         {
 
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.curveGroup.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
 
             super.$onRemoveFromStage()
         }
@@ -105,7 +107,27 @@ namespace editor
                         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                     }, { width: 210 });
                     break;
+                case this.curveGroup:
+                    minMaxCurveEditor = minMaxCurveEditor || new editor.MinMaxCurveEditor();
+                    minMaxCurveEditor.minMaxCurve = this.minMaxCurve;
+
+                    var pos = this.localToGlobal(0, 0);
+                    pos.x = pos.x - 318;
+                    minMaxCurveEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                    //
+                    popupview.popupView(minMaxCurveEditor, () =>
+                    {
+                        minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                    }, pos.x, pos.y);
+                    break;
             }
+        }
+
+        private onPickerViewChanged()
+        {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
     }
 }

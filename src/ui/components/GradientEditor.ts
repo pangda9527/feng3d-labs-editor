@@ -1,5 +1,7 @@
 namespace editor
 {
+    export var gradientEditor: GradientEditor;
+
     export class GradientEditor extends eui.Component
     {
         @feng3d.watch("_onGradientChanged")
@@ -18,7 +20,6 @@ namespace editor
         public alphaInput: eui.TextInput;
         public locationLabel: eui.Label;
         public locationInput: eui.TextInput;
-
 
         public constructor()
         {
@@ -351,5 +352,4 @@ namespace editor
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
     }
-    export var gradientEditor: GradientEditor;
 }
