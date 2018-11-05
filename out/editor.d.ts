@@ -797,6 +797,15 @@ declare namespace editor {
         private drawCurve;
         private _onMinMaxCurveChanged;
         private _onReSize;
+        private editKey;
+        private controlkey;
+        private editing;
+        private mousedownxy;
+        private onMouseDown;
+        private onMouseMove;
+        private onMouseUp;
+        private findControlPoint;
+        private ondblclick;
     }
 }
 declare namespace editor {

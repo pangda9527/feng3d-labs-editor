@@ -38,13 +38,7 @@ namespace editor
 
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
             {
-                // var animationCurve = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
-                // var imagedata = feng3d.imageUtil.createAnimationCurveRect(animationCurve, this.minMaxCurve.between0And1, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
-                // this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
-
                 this.drawCurve();
-
-
             } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
             {
                 var minMaxCurveRandomBetweenTwoCurves = <feng3d.MinMaxCurveRandomBetweenTwoCurves>this.minMaxCurve.minMaxCurve;
@@ -53,26 +47,29 @@ namespace editor
             }
         }
 
+        private timeline: feng3d.AnimationCurve;
+        private curveRect: feng3d.Rectangle;
+
         private drawCurve()
         {
-            var animationCurve = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
+            var animationCurve = this.timeline = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
 
             //
             var canvasWidth = this.curveGroup.width - 2;
             var canvasHeight = this.curveGroup.height - 2;
 
             // 曲线绘制区域
-            var curveRect = new feng3d.Rectangle(0, 0, canvasWidth, canvasHeight);
-            curveRect.inflate(-20, - 20);
+            this.curveRect = new feng3d.Rectangle(0, 0, canvasWidth, canvasHeight);
+            // this.curveRect.inflate(-20, - 20);
 
             //
             clearCanvas(canvas, canvasWidth, canvasHeight, "#565656");
 
             if (animationCurve.keys.length > 0)
             {
-                var sameples = animationCurve.getSamples(curveRect.width);
-                var xSamples = sameples.map((value, i) => (curveRect.x + curveRect.width * i / (sameples.length - 1)));
-                var ySamples = sameples.map(value => (curveRect.y + curveRect.height * (1 - value)));
+                var sameples = animationCurve.getSamples(this.curveRect.width);
+                var xSamples = sameples.map((value, i) => (this.curveRect.x + this.curveRect.width * i / (sameples.length - 1)));
+                var ySamples = sameples.map(value => (this.curveRect.y + this.curveRect.height * (1 - value)));
                 // 绘制曲线
                 drawPointsCurve(canvas, xSamples, ySamples, 'white', 3);
             }
@@ -80,9 +77,9 @@ namespace editor
             for (let i = 0, n = animationCurve.keys.length; i < n; i++)
             {
                 var key = animationCurve.keys[i];
-                var currentx = curveRect.x + key.time * curveRect.width;
-                var currenty = curveRect.y + (1 - key.value) * curveRect.height;
-                var currenttan = key.tangent * curveRect.height / curveRect.width;
+                var currentx = this.curveRect.x + key.time * this.curveRect.width;
+                var currenty = this.curveRect.y + (1 - key.value) * this.curveRect.height;
+                var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
 
                 // 绘制曲线端点
                 drawPoints(canvas, [currentx], [currenty], "red", pointSize)
@@ -124,6 +121,121 @@ namespace editor
         private _onReSize()
         {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        }
+
+        private editKey: feng3d.AnimationCurveKeyframe;
+        private controlkey: feng3d.AnimationCurveKeyframe;
+        private editing = false;
+        private mousedownxy = { x: -1, y: -1 }
+
+        private onMouseDown(ev: MouseEvent)
+        {
+            var rect = canvas.getBoundingClientRect();
+            if (!(rect.left < ev.clientX && ev.clientX < rect.right && rect.top < ev.clientY && ev.clientY < rect.bottom))
+                return;
+            var x = ev.clientX - rect.left;
+            var y = ev.clientY - rect.top;
+
+            this.mousedownxy.x = x;
+            this.mousedownxy.y = y;
+
+            this.editKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height / 2);
+            if (this.editKey == null)
+            {
+                this.controlkey = this.findControlPoint(x, y);
+            }
+
+            window.addEventListener("mousemove", this.onMouseMove);
+            window.addEventListener("mouseup", this.onMouseUp);
+        }
+
+        private onMouseMove(ev: MouseEvent)
+        {
+            if (this.editKey == null && this.controlkey == null)
+                return;
+            this.editing = true;
+
+            var rect = canvas.getBoundingClientRect();
+            if (!(rect.left < ev.clientX && ev.clientX < rect.right && rect.top < ev.clientY && ev.clientY < rect.bottom))
+                return;
+            var x = ev.clientX - rect.left;
+            var y = ev.clientY - rect.top;
+
+            if (this.editKey)
+            {
+                this.editKey.time = x / this.curveRect.width;
+                this.editKey.value = y / this.curveRect.height;
+                this.timeline.sort();
+            } else if (this.controlkey)
+            {
+                var index = this.timeline.indexOfKeys(this.controlkey);
+                if (index == 0 && x / this.curveRect.width < this.controlkey.time)
+                {
+                    this.controlkey.tangent = y / this.curveRect.height > this.controlkey.value ? Infinity : -Infinity;
+                    return;
+                }
+                if (index == this.timeline.numKeys - 1 && x / this.curveRect.width > this.controlkey.time) 
+                {
+                    this.controlkey.tangent = y / this.curveRect.height > this.controlkey.value ? -Infinity : Infinity;
+                    return;
+                }
+                this.controlkey.tangent = (y / this.curveRect.height - this.controlkey.value) / (x / this.curveRect.width - this.controlkey.time);
+            }
+        }
+
+        private onMouseUp(ev: MouseEvent)
+        {
+            this.editing = false;
+            this.editKey = null;
+            this.controlkey = null;
+
+            window.removeEventListener("mousemove", this.onMouseMove);
+            window.removeEventListener("mouseup", this.onMouseUp);
+        }
+
+        private findControlPoint(x: number, y: number)
+        {
+            for (let i = 0; i < this.timeline.numKeys; i++)
+            {
+                var key = this.timeline.getKey(i);
+                var currentx = key.time * this.curveRect.width;
+                var currenty = key.value * this.curveRect.height;
+                var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
+                var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+                if (Math.abs(lcp.x - x) < pointSize / 2 && Math.abs(lcp.y - y) < pointSize / 2)
+                {
+                    return key;
+                }
+                var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+                if (Math.abs(rcp.x - x) < pointSize / 2 && Math.abs(rcp.y - y) < pointSize / 2)
+                {
+                    return key;
+                }
+            }
+            return null;
+        }
+
+        private ondblclick(ev: MouseEvent)
+        {
+            this.editing = false;
+            this.editKey = null;
+            this.controlkey = null;
+
+            var rect = canvas.getBoundingClientRect();
+            if (!(rect.left < ev.clientX && ev.clientX < rect.right && rect.top < ev.clientY && ev.clientY < rect.bottom))
+                return;
+            var x = ev.clientX - rect.left;
+            var y = ev.clientY - rect.top;
+
+            var selectedKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height / 2);
+            if (selectedKey != null)
+            {
+                this.timeline.deleteKey(selectedKey);
+            } else 
+            {
+                // 没有选中关键与控制点时，检查是否点击到曲线
+                var result = this.timeline.addKeyAtCurve(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height / 2);
+            }
         }
     }
 

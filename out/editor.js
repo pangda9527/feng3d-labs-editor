@@ -2887,6 +2887,8 @@ var editor;
         function MinMaxCurveEditor() {
             var _this = _super.call(this) || this;
             _this.minMaxCurve = new feng3d.MinMaxCurve();
+            _this.editing = false;
+            _this.mousedownxy = { x: -1, y: -1 };
             _this.skinName = "MinMaxCurveEditor";
             return _this;
         }
@@ -2967,6 +2969,90 @@ var editor;
         };
         MinMaxCurveEditor.prototype._onReSize = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        };
+        MinMaxCurveEditor.prototype.onMouseDown = function (ev) {
+            var rect = canvas.getBoundingClientRect();
+            if (!(rect.left < ev.clientX && ev.clientX < rect.right && rect.top < ev.clientY && ev.clientY < rect.bottom))
+                return;
+            var x = ev.clientX - rect.left;
+            var y = ev.clientY - rect.top;
+            this.mousedownxy.x = x;
+            this.mousedownxy.y = y;
+            this.editKey = timeline.findKey(x / canvaswidth, y / canvasheight, pointSize / canvasheight / 2);
+            if (editKey == null) {
+                controlkey = findControlPoint(x, y);
+            }
+            window.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("mouseup", onMouseUp);
+        };
+        MinMaxCurveEditor.prototype.onMouseMove = function (ev) {
+            if (editKey == null && controlkey == null)
+                return;
+            editing = true;
+            var rect = canvas.getBoundingClientRect();
+            if (!(rect.left < ev.clientX && ev.clientX < rect.right && rect.top < ev.clientY && ev.clientY < rect.bottom))
+                return;
+            var x = ev.clientX - rect.left;
+            var y = ev.clientY - rect.top;
+            if (editKey) {
+                editKey.t = x / canvaswidth;
+                editKey.y = y / canvasheight;
+                timeline.sort();
+            }
+            else if (controlkey) {
+                var index = timeline.indexOfKeys(controlkey);
+                if (index == 0 && x / canvaswidth < controlkey.t) {
+                    controlkey.tan = y / canvasheight > controlkey.y ? Infinity : -Infinity;
+                    return;
+                }
+                if (index == timeline.numKeys - 1 && x / canvaswidth > controlkey.t) {
+                    controlkey.tan = y / canvasheight > controlkey.y ? -Infinity : Infinity;
+                    return;
+                }
+                controlkey.tan = (y / canvasheight - controlkey.y) / (x / canvaswidth - controlkey.t);
+            }
+        };
+        MinMaxCurveEditor.prototype.onMouseUp = function (ev) {
+            editing = false;
+            editKey = null;
+            controlkey = null;
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mouseup", onMouseUp);
+        };
+        MinMaxCurveEditor.prototype.findControlPoint = function (x, y) {
+            for (var i = 0; i < timeline.numKeys; i++) {
+                var key = timeline.getKey(i);
+                var currentx = key.t * canvaswidth;
+                var currenty = key.y * canvasheight;
+                var currenttan = key.tan * canvasheight / canvaswidth;
+                var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+                if (Math.abs(lcp.x - x) < pointSize / 2 && Math.abs(lcp.y - y) < pointSize / 2) {
+                    return key;
+                }
+                var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+                if (Math.abs(rcp.x - x) < pointSize / 2 && Math.abs(rcp.y - y) < pointSize / 2) {
+                    return key;
+                }
+            }
+            return null;
+        };
+        MinMaxCurveEditor.prototype.ondblclick = function (ev) {
+            editing = false;
+            editKey = null;
+            controlkey = null;
+            var rect = canvas.getBoundingClientRect();
+            if (!(rect.left < ev.clientX && ev.clientX < rect.right && rect.top < ev.clientY && ev.clientY < rect.bottom))
+                return;
+            var x = ev.clientX - rect.left;
+            var y = ev.clientY - rect.top;
+            var selectedKey = timeline.findKey(x / canvaswidth, y / canvasheight, pointSize / canvasheight / 2);
+            if (selectedKey != null) {
+                timeline.deleteKey(selectedKey);
+            }
+            else {
+                // 没有选中关键与控制点时，检查是否点击到曲线
+                var result = timeline.addKeyAtCurve(x / canvaswidth, y / canvasheight, pointSize / canvasheight / 2);
+            }
         };
         __decorate([
             feng3d.watch("_onMinMaxCurveChanged")
