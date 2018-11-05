@@ -20,14 +20,20 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
 
-            this.updateView();
+            feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+            feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
 
+            this.addEventListener(egret.Event.ENTER_FRAME, this.updateView, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         }
 
         $onRemoveFromStage()
         {
+            this.removeEventListener(egret.Event.ENTER_FRAME, this.updateView, this);
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
+
+            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
 
             super.$onRemoveFromStage()
         }
@@ -35,6 +41,12 @@ namespace editor
         updateView()
         {
             if (!this.stage) return;
+
+            // 曲线绘制区域
+            this.curveRect = new feng3d.Rectangle(0, 0, this.curveGroup.width, this.curveGroup.height);
+            // this.curveRect.inflate(-20, - 20);
+
+            if (this.curveGroup.width < 10 || this.curveGroup.height < 10) return;
 
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
             {
@@ -55,30 +67,22 @@ namespace editor
             var animationCurve = this.timeline = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
 
             //
-            var canvasWidth = this.curveGroup.width - 2;
-            var canvasHeight = this.curveGroup.height - 2;
-
-            // 曲线绘制区域
-            this.curveRect = new feng3d.Rectangle(0, 0, canvasWidth, canvasHeight);
-            // this.curveRect.inflate(-20, - 20);
-
-            //
-            clearCanvas(canvas, canvasWidth, canvasHeight, "#565656");
+            clearCanvas(canvas, this.curveRect.width, this.curveRect.height, "#565656");
 
             if (animationCurve.keys.length > 0)
             {
                 var sameples = animationCurve.getSamples(this.curveRect.width);
                 var xSamples = sameples.map((value, i) => (this.curveRect.x + this.curveRect.width * i / (sameples.length - 1)));
-                var ySamples = sameples.map(value => (this.curveRect.y + this.curveRect.height * (1 - value)));
+                var ySamples = sameples.map(value => (this.curveRect.y + this.curveRect.height * value));
                 // 绘制曲线
-                drawPointsCurve(canvas, xSamples, ySamples, 'white', 3);
+                drawPointsCurve(canvas, xSamples, ySamples, 'white', 1);
             }
 
             for (let i = 0, n = animationCurve.keys.length; i < n; i++)
             {
                 var key = animationCurve.keys[i];
                 var currentx = this.curveRect.x + key.time * this.curveRect.width;
-                var currenty = this.curveRect.y + (1 - key.value) * this.curveRect.height;
+                var currenty = this.curveRect.y + key.value * this.curveRect.height;
                 var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
 
                 // 绘制曲线端点
@@ -109,7 +113,7 @@ namespace editor
                     drawPointsCurve(canvas, [currentx, rcp.x], [currenty, rcp.y], "yellow", 1)
                 }
             }
-            var imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+            var imageData = ctx.getImageData(0, 0, this.curveRect.width, this.curveRect.height);
             this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
         }
 
@@ -130,11 +134,12 @@ namespace editor
 
         private onMouseDown(ev: MouseEvent)
         {
-            var rect = canvas.getBoundingClientRect();
-            if (!(rect.left < ev.clientX && ev.clientX < rect.right && rect.top < ev.clientY && ev.clientY < rect.bottom))
+            var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
+
+            if (!this.curveRect.contains(lp.x, lp.y))
                 return;
-            var x = ev.clientX - rect.left;
-            var y = ev.clientY - rect.top;
+            var x = lp.x;
+            var y = lp.y;
 
             this.mousedownxy.x = x;
             this.mousedownxy.y = y;
@@ -145,8 +150,8 @@ namespace editor
                 this.controlkey = this.findControlPoint(x, y);
             }
 
-            window.addEventListener("mousemove", this.onMouseMove);
-            window.addEventListener("mouseup", this.onMouseUp);
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
         }
 
         private onMouseMove(ev: MouseEvent)
@@ -155,11 +160,12 @@ namespace editor
                 return;
             this.editing = true;
 
-            var rect = canvas.getBoundingClientRect();
-            if (!(rect.left < ev.clientX && ev.clientX < rect.right && rect.top < ev.clientY && ev.clientY < rect.bottom))
+            var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
+
+            if (!this.curveRect.contains(lp.x, lp.y))
                 return;
-            var x = ev.clientX - rect.left;
-            var y = ev.clientY - rect.top;
+            var x = lp.x;
+            var y = lp.y;
 
             if (this.editKey)
             {
@@ -189,8 +195,8 @@ namespace editor
             this.editKey = null;
             this.controlkey = null;
 
-            window.removeEventListener("mousemove", this.onMouseMove);
-            window.removeEventListener("mouseup", this.onMouseUp);
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp);
         }
 
         private findControlPoint(x: number, y: number)
@@ -221,11 +227,12 @@ namespace editor
             this.editKey = null;
             this.controlkey = null;
 
-            var rect = canvas.getBoundingClientRect();
-            if (!(rect.left < ev.clientX && ev.clientX < rect.right && rect.top < ev.clientY && ev.clientY < rect.bottom))
+            var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
+
+            if (!this.curveRect.contains(lp.x, lp.y))
                 return;
-            var x = ev.clientX - rect.left;
-            var y = ev.clientY - rect.top;
+            var x = lp.x;
+            var y = lp.y;
 
             var selectedKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height / 2);
             if (selectedKey != null)
@@ -244,12 +251,12 @@ namespace editor
     /**
      * 点绘制尺寸
      */
-    var pointSize = 16;
+    var pointSize = 5;
 
     /**
      * 控制柄长度
      */
-    var controllerLength = 100;
+    var controllerLength = 50;
 
     /**
      * 清理画布
@@ -275,7 +282,7 @@ namespace editor
      * @param points 曲线上的点
      * @param strokeStyle 曲线颜色
      */
-    function drawPointsCurve(canvas: HTMLCanvasElement, xpoints: number[], ypoints: number[], strokeStyle = 'white', lineWidth = 3)
+    function drawPointsCurve(canvas: HTMLCanvasElement, xpoints: number[], ypoints: number[], strokeStyle = 'white', lineWidth = 1)
     {
         var ctx = canvas.getContext("2d");
         ctx.beginPath();
@@ -296,7 +303,7 @@ namespace editor
      * @param ypoints 曲线上的点y坐标
      * @param fillStyle 曲线颜色
      */
-    function drawPoints(canvas: HTMLCanvasElement, xpoints: number[], ypoints: number[], fillStyle = 'white', lineWidth = 3)
+    function drawPoints(canvas: HTMLCanvasElement, xpoints: number[], ypoints: number[], fillStyle = 'white', lineWidth = 1)
     {
         var ctx = canvas.getContext("2d");
         ctx.fillStyle = fillStyle;

@@ -794,6 +794,8 @@ declare namespace editor {
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         updateView(): void;
+        private timeline;
+        private curveRect;
         private drawCurve;
         private _onMinMaxCurveChanged;
         private _onReSize;
