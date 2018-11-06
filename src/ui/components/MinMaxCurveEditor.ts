@@ -10,6 +10,17 @@ namespace editor
         public curveGroup: eui.Group;
         public curveImage: eui.Image;
 
+
+        //
+        private timeline: feng3d.AnimationCurve;
+        private curveRect: feng3d.Rectangle;
+        private canvasRect: feng3d.Rectangle;
+
+        private editKey: feng3d.AnimationCurveKeyframe;
+        private controlkey: feng3d.AnimationCurveKeyframe;
+        private editing = false;
+        private mousedownxy = { x: -1, y: -1 }
+
         constructor()
         {
             super();
@@ -43,8 +54,8 @@ namespace editor
             if (!this.stage) return;
 
             // 曲线绘制区域
-            this.curveRect = new feng3d.Rectangle(0, 0, this.curveGroup.width, this.curveGroup.height);
-            // this.curveRect.inflate(-20, - 20);
+            this.curveRect = new feng3d.Rectangle(this.curveGroup.x, this.curveGroup.y, this.curveGroup.width, this.curveGroup.height);
+            this.canvasRect = new feng3d.Rectangle(0, 0, this.width, this.height);
 
             if (this.curveGroup.width < 10 || this.curveGroup.height < 10) return;
 
@@ -59,15 +70,12 @@ namespace editor
             }
         }
 
-        private timeline: feng3d.AnimationCurve;
-        private curveRect: feng3d.Rectangle;
-
         private drawCurve()
         {
             var animationCurve = this.timeline = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
 
             //
-            clearCanvas(canvas, this.curveRect.width, this.curveRect.height, "#565656");
+            this.clearCanvas();
 
             if (animationCurve.keys.length > 0)
             {
@@ -113,24 +121,54 @@ namespace editor
                     drawPointsCurve(canvas, [currentx, rcp.x], [currenty, rcp.y], "yellow", 1)
                 }
             }
-            var imageData = ctx.getImageData(0, 0, this.curveRect.width, this.curveRect.height);
+            var imageData = ctx.getImageData(0, 0, this.canvasRect.width, this.canvasRect.height);
             this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
+        }
+
+        private clearCanvas()
+        {
+            clearCanvas(canvas, this.canvasRect.width, this.canvasRect.height, "#565656");
+
+            //
+            var lines0: Line[] = [];
+            var lines1: Line[] = [];
+            var line: { start: { x: number, y: number }, end: { x: number, y: number } };
+            for (var i = 0; i <= 2; i++)
+            {
+                line = { start: { x: i / 10, y: 0 }, end: { x: i / 10, y: 1 } };
+                if (i % 2 == 0)
+                    lines0.push(line);
+                else
+                    lines1.push(line);
+            }
+            for (var i = 0; i <= 2; i++)
+            {
+                line = { start: { x: 0, y: i / 2 }, end: { x: 1, y: i / 2 } };
+                if (i % 2 == 0)
+                    lines0.push(line);
+                else
+                    lines1.push(line);
+            }
+            lines0.concat(lines1).forEach(v =>
+            {
+                v.start.x = this.curveRect.x + this.curveRect.width * v.start.x;
+                v.start.y = this.curveRect.y + this.curveRect.height * v.start.y;
+                v.end.x = this.curveRect.x + this.curveRect.width * v.end.x;
+                v.end.y = this.curveRect.y + this.curveRect.height * v.end.y;
+            });
+            drawLines(canvas, lines0, "#494949");
+            drawLines(canvas, lines1, "#4f4f4f");
         }
 
         private _onMinMaxCurveChanged()
         {
-            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            // this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
 
         private _onReSize()
         {
-            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            // this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
-
-        private editKey: feng3d.AnimationCurveKeyframe;
-        private controlkey: feng3d.AnimationCurveKeyframe;
-        private editing = false;
-        private mousedownxy = { x: -1, y: -1 }
 
         private onMouseDown(ev: MouseEvent)
         {
@@ -262,7 +300,7 @@ namespace editor
      * 清理画布
      * @param canvas 画布
      */
-    function clearCanvas(canvas: HTMLCanvasElement, width: number, height: number, fillStyle = 'black')
+    function clearCanvas(canvas: HTMLCanvasElement, width: number, height: number, fillStyle = "#565656")
     {
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
@@ -270,10 +308,10 @@ namespace editor
         canvas.height = height;
         //
         var ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // ctx.clearRect(0, 0, width, height);
         // 绘制背景
         ctx.fillStyle = fillStyle;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, width, height);
     }
 
     /**
@@ -311,6 +349,28 @@ namespace editor
         {
             ctx.fillRect(xpoints[i] - lineWidth / 2, ypoints[i] - lineWidth / 2, lineWidth, lineWidth);
         }
-
     }
+
+    /**
+     * 绘制线条
+     * @param canvas 画布 
+     * @param lines 线条列表数据
+     * @param strokeStyle 线条颜色
+     */
+    function drawLines(canvas: HTMLCanvasElement, lines: Line[], strokeStyle = 'white', lineWidth = 1)
+    {
+        var ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = strokeStyle;
+        for (let i = 1; i < lines.length; i++)
+        {
+            ctx.moveTo(lines[i].start.x, lines[i].start.y);
+            ctx.lineTo(lines[i].end.x, lines[i].end.y);
+        }
+        ctx.stroke();
+    }
+
+    interface Line { start: { x: number, y: number }, end: { x: number, y: number } }
+
 }
