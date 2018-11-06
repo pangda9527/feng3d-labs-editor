@@ -39,6 +39,8 @@ namespace editor
             feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
 
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
+
+            this.updateView();
         }
 
         $onRemoveFromStage()
@@ -79,7 +81,7 @@ namespace editor
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
 
-                var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveRect.width, this.curveRect.height, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
+                var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveRect.width, this.curveRect.height, new feng3d.Color4(1, 0, 0), new feng3d.Color4().fromUnit(0xff565656));
                 ctx.putImageData(imagedata, this.curveRect.x, this.curveRect.y);
 
                 this.drawCurve(this.timeline);
@@ -105,8 +107,9 @@ namespace editor
             if (animationCurve.keys.length > 0)
             {
                 var sameples = animationCurve.getSamples(this.curveRect.width);
-                var xSamples = sameples.map((value, i) => (this.curveRect.x + this.curveRect.width * i / (sameples.length - 1)));
-                var ySamples = sameples.map(value => (this.curveRect.y + this.curveRect.height * (1 - value)));
+
+                var xSamples = sameples.map(value => (this.curveRect.x + this.curveRect.width * value.time));
+                var ySamples = sameples.map(value => (this.curveRect.y + this.curveRect.height * (1 - value.value)));
                 // 绘制曲线
                 drawPointsCurve(canvas, xSamples, ySamples, 'white', 1);
             }
