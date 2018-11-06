@@ -2895,14 +2895,12 @@ var editor;
         MinMaxCurveEditor.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
-            // feng3d.windowEventProxy.on("click", this.onClick, this);
             feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         };
         MinMaxCurveEditor.prototype.$onRemoveFromStage = function () {
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
-            // feng3d.windowEventProxy.off("click", this.onClick, this);
             feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
@@ -2917,18 +2915,34 @@ var editor;
             clearCanvas(canvas, this.canvasRect.width, this.canvasRect.height, "#565656");
             this.drawGrid();
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
-                this.drawCurve();
+                this.timeline = this.minMaxCurve.minMaxCurve;
+                this.drawCurve(this.timeline);
+                this.drawCurveKeys(this.timeline);
             }
             else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
                 var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
-                var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
-                this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
+                this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
+                var ctx = canvas.getContext("2d");
+                var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveRect.width, this.curveRect.height, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
+                ctx.putImageData(imagedata, this.curveRect.x, this.curveRect.y);
+                this.drawCurve(this.timeline);
+                this.drawCurveKeys(this.timeline);
+                this.drawCurve(this.timeline1);
+                this.drawCurveKeys(this.timeline1);
             }
+            this.drawSelectedKey();
+            // 设置绘制结果
+            var imageData = ctx.getImageData(0, 0, this.canvasRect.width, this.canvasRect.height);
+            this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
         };
-        MinMaxCurveEditor.prototype.drawCurve = function () {
+        /**
+         * 绘制曲线
+         * @param animationCurve
+         */
+        MinMaxCurveEditor.prototype.drawCurve = function (animationCurve) {
             var _this = this;
-            var animationCurve = this.timeline = this.minMaxCurve.minMaxCurve;
-            //
+            // 绘制曲线
             if (animationCurve.keys.length > 0) {
                 var sameples = animationCurve.getSamples(this.curveRect.width);
                 var xSamples = sameples.map(function (value, i) { return (_this.curveRect.x + _this.curveRect.width * i / (sameples.length - 1)); });
@@ -2936,38 +2950,56 @@ var editor;
                 // 绘制曲线
                 drawPointsCurve(canvas, xSamples, ySamples, 'white', 1);
             }
+        };
+        /**
+         * 绘制曲线关键点
+         * @param animationCurve
+         */
+        MinMaxCurveEditor.prototype.drawCurveKeys = function (animationCurve) {
+            // 绘制曲线关键点
             for (var i = 0, n = animationCurve.keys.length; i < n; i++) {
                 var key = animationCurve.keys[i];
                 var currentx = this.curveRect.x + key.time * this.curveRect.width;
                 var currenty = this.curveRect.y + key.value * this.curveRect.height;
-                var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
                 // 绘制曲线端点
                 drawPoints(canvas, [currentx], [currenty], "red", pointSize);
-                if (this.selectedKey == key) {
-                    // 绘制控制点
-                    if (i > 0) {
-                        // 左边控制点
-                        var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
-                        drawPoints(canvas, [lcp.x], [lcp.y], "blue", pointSize);
-                    }
-                    if (i < n - 1) {
-                        var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
-                        drawPoints(canvas, [rcp.x], [rcp.y], "blue", pointSize);
-                    }
-                    // 绘制控制点
-                    if (i > 0) {
-                        // 左边控制点
-                        var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
-                        drawPointsCurve(canvas, [currentx, lcp.x], [currenty, lcp.y], "yellow", 1);
-                    }
-                    if (i < n - 1) {
-                        var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
-                        drawPointsCurve(canvas, [currentx, rcp.x], [currenty, rcp.y], "yellow", 1);
-                    }
+            }
+        };
+        /**
+         * 绘制选中的关键点
+         */
+        MinMaxCurveEditor.prototype.drawSelectedKey = function () {
+            var animationCurve = this.timeline;
+            var key = this.selectedKey;
+            var i = animationCurve.keys.indexOf(key);
+            var n = animationCurve.keys.length;
+            if (i == -1)
+                return;
+            var currentx = this.curveRect.x + key.time * this.curveRect.width;
+            var currenty = this.curveRect.y + key.value * this.curveRect.height;
+            var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
+            if (this.selectedKey == key) {
+                // 绘制控制点
+                if (i > 0) {
+                    // 左边控制点
+                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+                    drawPoints(canvas, [lcp.x], [lcp.y], "blue", pointSize);
+                }
+                if (i < n - 1) {
+                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+                    drawPoints(canvas, [rcp.x], [rcp.y], "blue", pointSize);
+                }
+                // 绘制控制点
+                if (i > 0) {
+                    // 左边控制点
+                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+                    drawPointsCurve(canvas, [currentx, lcp.x], [currenty, lcp.y], "yellow", 1);
+                }
+                if (i < n - 1) {
+                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+                    drawPointsCurve(canvas, [currentx, rcp.x], [currenty, rcp.y], "yellow", 1);
                 }
             }
-            var imageData = ctx.getImageData(0, 0, this.canvasRect.width, this.canvasRect.height);
-            this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
         };
         MinMaxCurveEditor.prototype.drawGrid = function () {
             var _this = this;
@@ -3016,9 +3048,9 @@ var editor;
             }
             else if (this.selectedKey) {
                 this.editorControlkey = this.findControlKey(this.selectedKey, x, y, pointSize);
-            }
-            else {
-                this.selectedKey = null;
+                if (this.editorControlkey == null) {
+                    this.selectedKey = null;
+                }
             }
             if (this.editKey != null || this.editorControlkey != null) {
                 feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
@@ -3077,13 +3109,6 @@ var editor;
             }
             return null;
         };
-        // private onClick(ev: MouseEvent)
-        // {
-        //     var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
-        //     var x = lp.x;
-        //     var y = lp.y;
-        //     this.selectedKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height);
-        // }
         MinMaxCurveEditor.prototype.ondblclick = function (ev) {
             this.editing = false;
             this.editKey = null;

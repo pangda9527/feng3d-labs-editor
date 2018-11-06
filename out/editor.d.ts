@@ -791,6 +791,7 @@ declare namespace editor {
         curveGroup: eui.Group;
         curveImage: eui.Image;
         private timeline;
+        private timeline1;
         private curveRect;
         private canvasRect;
         private editKey;
@@ -802,7 +803,20 @@ declare namespace editor {
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         updateView(): void;
+        /**
+         * 绘制曲线
+         * @param animationCurve
+         */
         private drawCurve;
+        /**
+         * 绘制曲线关键点
+         * @param animationCurve
+         */
+        private drawCurveKeys;
+        /**
+         * 绘制选中的关键点
+         */
+        private drawSelectedKey;
         private drawGrid;
         private _onMinMaxCurveChanged;
         private _onReSize;
