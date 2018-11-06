@@ -2572,8 +2572,7 @@ var editor;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             var w = this.group1.width - 4;
             var h = this.group1.height - 4;
-            var imagedata1 = feng3d.imageUtil.createColorPickerStripe(w, h, colors, null, false);
-            this.image1.source = feng3d.dataTransform.imageDataToDataURL(imagedata1);
+            this.image1.source = new feng3d.ImageUtil(w, h).drawMinMaxGradient(new feng3d.Gradient().fromColors(colors), false).toDataURL();
             this.updateView();
             //
             this.txtR.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
@@ -2638,12 +2637,12 @@ var editor;
             if (this.group0 == this._mouseDownGroup) {
                 this.rw = rw;
                 this.rh = rh;
-                var color = feng3d.imageUtil.getColorPickerRectAtPosition(this.basecolor.toInt(), rw, rh);
+                var color = getColorPickerRectAtPosition(this.basecolor.toInt(), rw, rh);
             }
             else if (this.group1 == this._mouseDownGroup) {
                 this.ratio = rh;
-                var basecolor = this.basecolor = feng3d.imageUtil.getMixColorAtRatio(rh, colors);
-                var color = feng3d.imageUtil.getColorPickerRectAtPosition(basecolor.toInt(), this.rw, this.rh);
+                var basecolor = this.basecolor = getMixColorAtRatio(rh, colors);
+                var color = getColorPickerRectAtPosition(basecolor.toInt(), this.rw, this.rh);
             }
             if (this.color instanceof feng3d.Color3) {
                 this.color = color;
@@ -2706,16 +2705,15 @@ var editor;
                 this.txtColor.text = this.color.toHexString().substr(1);
             if (this._mouseDownGroup == null) {
                 //
-                var result = feng3d.imageUtil.getColorPickerRectPosition(this.color.toInt());
+                var result = getColorPickerRectPosition(this.color.toInt());
                 this.basecolor = result.color;
                 this.rw = result.ratioW;
                 this.rh = result.ratioH;
-                this.ratio = feng3d.imageUtil.getMixColorRatio(this.basecolor.toInt(), colors);
+                this.ratio = getMixColorRatio(this.basecolor.toInt(), colors);
             }
             if (this._mouseDownGroup != this.group0) {
                 //
-                var imagedata = feng3d.imageUtil.createColorPickerRect(this.basecolor.toInt(), this.group0.width - 16, this.group0.height - 16);
-                this.image0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                this.image0.source = new feng3d.ImageUtil(this.group0.width - 16, this.group0.height - 16).drawColorPickerRect(this.basecolor.toInt()).toDataURL();
             }
             this.pos1.y = this.ratio * (this.group1.height - this.pos1.height);
             //
@@ -2738,6 +2736,110 @@ var editor;
         return ColorPickerView;
     }(eui.Component));
     editor.ColorPickerView = ColorPickerView;
+    /**
+     * 获取颜色的基色以及颜色拾取矩形所在位置
+     * @param color 查找颜色
+     */
+    function getColorPickerRectPosition(color) {
+        var black = new feng3d.Color3(0, 0, 0);
+        var white = new feng3d.Color3(1, 1, 1);
+        var c = new feng3d.Color3().fromUnit(color);
+        var max = Math.max(c.r, c.g, c.b);
+        if (max != 0)
+            c = black.mix(c, 1 / max);
+        var min = Math.min(c.r, c.g, c.b);
+        if (min != 1)
+            c = white.mix(c, 1 / (1 - min));
+        var ratioH = 1 - max;
+        var ratioW = 1 - min;
+        return {
+            /**
+             * 基色
+             */
+            color: c,
+            /**
+             * 横向位置
+             */
+            ratioW: ratioW,
+            /**
+             * 纵向位置
+             */
+            ratioH: ratioH
+        };
+    }
+    function getMixColorRatio(color, colors, ratios) {
+        if (!ratios) {
+            ratios = [];
+            for (var i_1 = 0; i_1 < colors.length; i_1++) {
+                ratios[i_1] = i_1 / (colors.length - 1);
+            }
+        }
+        var colors1 = colors.map(function (v) { return new feng3d.Color3().fromUnit(v); });
+        var c = new feng3d.Color3().fromUnit(color);
+        var r = c.r;
+        var g = c.g;
+        var b = c.b;
+        for (var i = 0; i < colors1.length - 1; i++) {
+            var c0 = colors1[i];
+            var c1 = colors1[i + 1];
+            //
+            if (c.equals(c0))
+                return ratios[i];
+            if (c.equals(c1))
+                return ratios[i + 1];
+            //
+            var r1 = c0.r + c1.r;
+            var g1 = c0.g + c1.g;
+            var b1 = c0.b + c1.b;
+            //
+            var v = r * r1 + g * g1 + b * b1;
+            if (v > 2) {
+                var result = 0;
+                if (r1 == 1) {
+                    result = feng3d.FMath.mapLinear(r, c0.r, c1.r, ratios[i], ratios[i + 1]);
+                }
+                else if (g1 == 1) {
+                    result = feng3d.FMath.mapLinear(g, c0.g, c1.g, ratios[i], ratios[i + 1]);
+                }
+                else if (b1 == 1) {
+                    result = feng3d.FMath.mapLinear(b, c0.b, c1.b, ratios[i], ratios[i + 1]);
+                }
+                return result;
+            }
+        }
+        return 0;
+    }
+    /**
+     * 获取颜色的基色以及颜色拾取矩形所在位置
+     * @param color 查找颜色
+     */
+    function getColorPickerRectAtPosition(color, rw, rh) {
+        var leftTop = new feng3d.Color3(1, 1, 1);
+        var rightTop = new feng3d.Color3().fromUnit(color);
+        var leftBottom = new feng3d.Color3(0, 0, 0);
+        var rightBottom = new feng3d.Color3(0, 0, 0);
+        var top = leftTop.mixTo(rightTop, rw);
+        var bottom = leftBottom.mixTo(rightBottom, rw);
+        var v = top.mixTo(bottom, rh);
+        return v;
+    }
+    function getMixColorAtRatio(ratio, colors, ratios) {
+        if (!ratios) {
+            ratios = [];
+            for (var i_2 = 0; i_2 < colors.length; i_2++) {
+                ratios[i_2] = i_2 / (colors.length - 1);
+            }
+        }
+        var colors1 = colors.map(function (v) { return new feng3d.Color3().fromUnit(v); });
+        for (var i = 0; i < colors1.length - 1; i++) {
+            if (ratios[i] <= ratio && ratio <= ratios[i + 1]) {
+                var mix = feng3d.FMath.mapLinear(ratio, ratios[i], ratios[i + 1], 0, 1);
+                var c = colors1[i].mixTo(colors1[i + 1], mix);
+                return c;
+            }
+        }
+        return colors1[0];
+    }
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -2829,16 +2931,16 @@ var editor;
             }
             else {
                 this.curveGroup.visible = true;
-                var imageData = feng3d.imageUtil.createImageData(this.curveGroup.width - 2, this.curveGroup.height - 2, feng3d.Color4.fromUnit(0xff565656));
+                var imageUtil = new feng3d.ImageUtil(this.curveGroup.width - 2, this.curveGroup.height - 2, feng3d.Color4.fromUnit(0xff565656));
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
                     var animationCurve = this.minMaxCurve.minMaxCurve;
-                    feng3d.imageUtil.drawImageDataCurve(imageData, animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawImageDataCurve(animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
                 else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
                     var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
-                    feng3d.imageUtil.drawImageDataBetweenTwoCurves(imageData, minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawImageDataBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
-                this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
+                this.curveImage.source = imageUtil.toDataURL();
             }
         };
         MinMaxCurveView.prototype.onReSize = function () {
@@ -2925,9 +3027,9 @@ var editor;
                 var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
-                var imagedata = feng3d.imageUtil.createImageData(this.curveRect.width, this.curveRect.height, new feng3d.Color4().fromUnit(0xff565656));
-                feng3d.imageUtil.drawImageDataBetweenTwoCurves(imagedata, minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
-                ctx.putImageData(imagedata, this.curveRect.x, this.curveRect.y);
+                var imagedata = new feng3d.ImageUtil(this.curveRect.width, this.curveRect.height, new feng3d.Color4().fromUnit(0xff565656))
+                    .drawImageDataBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                ctx.putImageData(imagedata.imageData, this.curveRect.x, this.curveRect.y);
                 this.drawCurve(this.timeline);
                 this.drawCurveKeys(this.timeline);
                 this.drawCurve(this.timeline1);
@@ -3288,44 +3390,37 @@ var editor;
             if (this.colorGroup0.width > 0 && this.colorGroup0.height > 0) {
                 if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color) {
                     var color = this.minMaxGradient.getValue(0);
-                    var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).createColorRect(color).toDataURL();
                     //
                     if (this.secondGroup.parent)
                         this.secondGroup.parent.removeChild(this.secondGroup);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient) {
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.minMaxGradient).toDataURL();
                     //
                     if (this.secondGroup.parent)
                         this.secondGroup.parent.removeChild(this.secondGroup);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
                     var randomBetweenTwoColors = this.minMaxGradient.minMaxGradient;
-                    var imagedata = feng3d.imageUtil.createColorRect(randomBetweenTwoColors.colorMin, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).createColorRect(randomBetweenTwoColors.colorMin).toDataURL();
                     //
-                    var imagedata = feng3d.imageUtil.createColorRect(randomBetweenTwoColors.colorMax, this.colorGroup1.width, this.colorGroup1.height);
-                    this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).createColorRect(randomBetweenTwoColors.colorMax).toDataURL();
                     //
                     if (!this.secondGroup.parent)
                         this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients) {
                     var randomBetweenTwoGradients = this.minMaxGradient.minMaxGradient;
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(randomBetweenTwoGradients.gradientMin, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(randomBetweenTwoGradients.gradientMin).toDataURL();
                     //
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(randomBetweenTwoGradients.gradientMax, this.colorGroup1.width, this.colorGroup1.height);
-                    this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawMinMaxGradient(randomBetweenTwoGradients.gradientMax).toDataURL();
                     //
                     if (!this.secondGroup.parent)
                         this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomColor) {
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient.gradient, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.minMaxGradient.gradient).toDataURL();
                     //
                     if (this.secondGroup.parent)
                         this.secondGroup.parent.removeChild(this.secondGroup);
@@ -3479,8 +3574,7 @@ var editor;
             this.modeCB.data = list.filter(function (v) { return v.value == _this.gradient.mode; })[0];
             //
             if (this.colorImage.width > 0 && this.colorImage.height > 0) {
-                var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.gradient, this.colorImage.width, this.colorImage.height);
-                this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                this.colorImage.source = new feng3d.ImageUtil(this.colorImage.width, this.colorImage.height).drawMinMaxGradient(this.gradient).toDataURL();
             }
             if (!this._alphaSprite) {
                 this.alphaLineGroup.addChild(this._alphaSprite = new egret.Sprite());
@@ -9933,7 +10027,6 @@ var editor;
             var context2D = canvas2D.getContext("2d");
             context2D.fillStyle = "black";
             // context2D.fillRect(10, 10, 100, 100);
-            feng3d.imageUtil.createImageData;
             var w4 = Math.round(width / 4);
             var Yoffset = w4 / 2;
             //

@@ -68,8 +68,7 @@ namespace editor
             //
             if (this.colorImage.width > 0 && this.colorImage.height > 0)
             {
-                var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.gradient, this.colorImage.width, this.colorImage.height);
-                this.colorImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                this.colorImage.source = new feng3d.ImageUtil(this.colorImage.width, this.colorImage.height).drawMinMaxGradient(this.gradient).toDataURL();
             }
             if (!this._alphaSprite)
             {

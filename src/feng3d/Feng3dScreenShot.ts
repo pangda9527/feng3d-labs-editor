@@ -86,8 +86,6 @@ namespace editor
             context2D.fillStyle = "black";
             // context2D.fillRect(10, 10, 100, 100);
 
-            feng3d.imageUtil.createImageData
-
             var w4 = Math.round(width / 4);
             var Yoffset = w4 / 2;
             //

@@ -60,50 +60,41 @@ namespace editor
                 if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color)
                 {
                     var color = this.minMaxGradient.getValue(0);
-                    var imagedata = feng3d.imageUtil.createColorRect(color, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).createColorRect(color).toDataURL();
                     //
                     if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient)
                 {
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(this.minMaxGradient.minMaxGradient, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.minMaxGradient).toDataURL();
                     //
                     if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                 {
                     var randomBetweenTwoColors = <feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient
-                    var imagedata = feng3d.imageUtil.createColorRect(randomBetweenTwoColors.colorMin, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).createColorRect(randomBetweenTwoColors.colorMin).toDataURL();
                     //
-                    var imagedata = feng3d.imageUtil.createColorRect(randomBetweenTwoColors.colorMax, this.colorGroup1.width, this.colorGroup1.height);
-                    this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).createColorRect(randomBetweenTwoColors.colorMax).toDataURL();
                     //
                     if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients)
                 {
                     var randomBetweenTwoGradients = <feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(randomBetweenTwoGradients.gradientMin, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(randomBetweenTwoGradients.gradientMin).toDataURL();
                     //
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect(randomBetweenTwoGradients.gradientMax, this.colorGroup1.width, this.colorGroup1.height);
-                    this.colorImage1.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawMinMaxGradient(randomBetweenTwoGradients.gradientMax).toDataURL();
                     //
                     if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomColor)
                 {
-                    var imagedata = feng3d.imageUtil.createMinMaxGradientRect((<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient, this.colorGroup0.width, this.colorGroup0.height);
-                    this.colorImage0.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient((<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient).toDataURL();
                     //
                     if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
                 }
-
             }
-
         }
 
         private onReSize()
