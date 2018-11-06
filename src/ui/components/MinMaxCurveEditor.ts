@@ -34,13 +34,11 @@ namespace editor
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
 
-            this.addEventListener(egret.Event.ENTER_FRAME, this.updateView, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
         }
 
         $onRemoveFromStage()
         {
-            this.removeEventListener(egret.Event.ENTER_FRAME, this.updateView, this);
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
 
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
@@ -59,6 +57,9 @@ namespace editor
 
             if (this.curveGroup.width < 10 || this.curveGroup.height < 10) return;
 
+            clearCanvas(canvas, this.canvasRect.width, this.canvasRect.height, "#565656");
+            this.drawGrid();
+
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
             {
                 this.drawCurve();
@@ -75,8 +76,6 @@ namespace editor
             var animationCurve = this.timeline = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
 
             //
-            this.clearCanvas();
-
             if (animationCurve.keys.length > 0)
             {
                 var sameples = animationCurve.getSamples(this.curveRect.width);
@@ -125,15 +124,13 @@ namespace editor
             this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
         }
 
-        private clearCanvas()
+        private drawGrid()
         {
-            clearCanvas(canvas, this.canvasRect.width, this.canvasRect.height, "#565656");
-
             //
             var lines0: Line[] = [];
             var lines1: Line[] = [];
             var line: { start: { x: number, y: number }, end: { x: number, y: number } };
-            for (var i = 0; i <= 2; i++)
+            for (var i = 0; i <= 10; i++)
             {
                 line = { start: { x: i / 10, y: 0 }, end: { x: i / 10, y: 1 } };
                 if (i % 2 == 0)
@@ -162,20 +159,18 @@ namespace editor
 
         private _onMinMaxCurveChanged()
         {
-            // this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
 
         private _onReSize()
         {
-            // this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
 
         private onMouseDown(ev: MouseEvent)
         {
             var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
 
-            if (!this.curveRect.contains(lp.x, lp.y))
-                return;
             var x = lp.x;
             var y = lp.y;
 
@@ -188,28 +183,32 @@ namespace editor
                 this.controlkey = this.findControlPoint(x, y);
             }
 
-            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+            if (this.editKey != null || this.controlkey != null)
+            {
+                feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+                feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+            }
         }
 
         private onMouseMove(ev: MouseEvent)
         {
-            if (this.editKey == null && this.controlkey == null)
-                return;
             this.editing = true;
 
             var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
 
-            if (!this.curveRect.contains(lp.x, lp.y))
-                return;
             var x = lp.x;
             var y = lp.y;
 
             if (this.editKey)
             {
+                x = feng3d.FMath.clamp(x, 0, this.curveRect.width);
+                y = feng3d.FMath.clamp(y, 0, this.curveRect.height);
+                //
                 this.editKey.time = x / this.curveRect.width;
                 this.editKey.value = y / this.curveRect.height;
                 this.timeline.sort();
+
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             } else if (this.controlkey)
             {
                 var index = this.timeline.indexOfKeys(this.controlkey);
@@ -224,6 +223,8 @@ namespace editor
                     return;
                 }
                 this.controlkey.tangent = (y / this.curveRect.height - this.controlkey.value) / (x / this.curveRect.width - this.controlkey.time);
+
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
         }
 
@@ -267,8 +268,6 @@ namespace editor
 
             var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
 
-            if (!this.curveRect.contains(lp.x, lp.y))
-                return;
             var x = lp.x;
             var y = lp.y;
 
@@ -276,10 +275,14 @@ namespace editor
             if (selectedKey != null)
             {
                 this.timeline.deleteKey(selectedKey);
+
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             } else 
             {
                 // 没有选中关键与控制点时，检查是否点击到曲线
                 var result = this.timeline.addKeyAtCurve(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height / 2);
+
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
         }
     }
@@ -363,7 +366,7 @@ namespace editor
         ctx.beginPath();
         ctx.lineWidth = lineWidth;
         ctx.strokeStyle = strokeStyle;
-        for (let i = 1; i < lines.length; i++)
+        for (let i = 0; i < lines.length; i++)
         {
             ctx.moveTo(lines[i].start.x, lines[i].start.y);
             ctx.lineTo(lines[i].end.x, lines[i].end.y);

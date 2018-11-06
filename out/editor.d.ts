@@ -802,7 +802,7 @@ declare namespace editor {
         $onRemoveFromStage(): void;
         updateView(): void;
         private drawCurve;
-        private clearCanvas;
+        private drawGrid;
         private _onMinMaxCurveChanged;
         private _onReSize;
         private onMouseDown;
