@@ -796,9 +796,11 @@ declare namespace editor {
         private canvasRect;
         private editKey;
         private editorControlkey;
+        private editTimeline;
         private editing;
         private mousedownxy;
         private selectedKey;
+        private selectTimeline;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;

@@ -2916,6 +2916,7 @@ var editor;
             this.drawGrid();
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
                 this.timeline = this.minMaxCurve.minMaxCurve;
+                this.timeline1 = null;
                 this.drawCurve(this.timeline);
                 this.drawCurveKeys(this.timeline);
             }
@@ -2923,7 +2924,6 @@ var editor;
                 var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
-                var ctx = canvas.getContext("2d");
                 var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveRect.width, this.curveRect.height, new feng3d.Color3(1, 0, 0), new feng3d.Color3().fromUnit(0x565656));
                 ctx.putImageData(imagedata, this.curveRect.x, this.curveRect.y);
                 this.drawCurve(this.timeline);
@@ -2969,12 +2969,14 @@ var editor;
          * 绘制选中的关键点
          */
         MinMaxCurveEditor.prototype.drawSelectedKey = function () {
-            var animationCurve = this.timeline;
+            if (this.selectedKey == null || this.selectTimeline == null)
+                return;
             var key = this.selectedKey;
-            var i = animationCurve.keys.indexOf(key);
-            var n = animationCurve.keys.length;
+            //
+            var i = this.selectTimeline.keys.indexOf(key);
             if (i == -1)
                 return;
+            var n = this.selectTimeline.keys.length;
             var currentx = this.curveRect.x + key.time * this.curveRect.width;
             var currenty = this.curveRect.y + (1 - key.value) * this.curveRect.height;
             var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
@@ -3042,14 +3044,21 @@ var editor;
             var y = lp.y;
             this.mousedownxy.x = x;
             this.mousedownxy.y = y;
-            this.editKey = this.timeline.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+            var timeline = this.timeline;
+            this.editKey = timeline.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+            if (this.editKey == null && this.timeline1 != null) {
+                timeline = this.timeline1;
+                this.editKey = timeline.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+            }
             if (this.editKey != null) {
                 this.selectedKey = this.editKey;
+                this.selectTimeline = timeline;
             }
             else if (this.selectedKey) {
                 this.editorControlkey = this.findControlKey(this.selectedKey, x, y, pointSize);
                 if (this.editorControlkey == null) {
                     this.selectedKey = null;
+                    this.selectTimeline = null;
                 }
             }
             if (this.editKey != null || this.editorControlkey != null) {
@@ -3070,17 +3079,17 @@ var editor;
                 //
                 this.editKey.time = x / this.curveRect.width;
                 this.editKey.value = 1 - y / this.curveRect.height;
-                this.timeline.sort();
+                this.selectTimeline.sort();
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }
             else if (this.editorControlkey) {
-                var index = this.timeline.indexOfKeys(this.editorControlkey);
+                var index = this.selectTimeline.indexOfKeys(this.editorControlkey);
                 if (index == 0 && x / this.curveRect.width < this.editorControlkey.time) {
                     this.editorControlkey.tangent = 1 - y / this.curveRect.height > this.editorControlkey.value ? Infinity : -Infinity;
                     return;
                 }
-                if (index == this.timeline.numKeys - 1 && x / this.curveRect.width > this.editorControlkey.time) {
+                if (index == this.selectTimeline.numKeys - 1 && x / this.curveRect.width > this.editorControlkey.time) {
                     this.editorControlkey.tangent = 1 - y / this.curveRect.height > this.editorControlkey.value ? -Infinity : Infinity;
                     return;
                 }
@@ -3121,13 +3130,35 @@ var editor;
                 this.timeline.deleteKey(selectedKey);
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                return;
             }
-            else {
-                // 没有选中关键与控制点时，检查是否点击到曲线
-                var result = this.timeline.addKeyAtCurve(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
-                this.selectedKey = result;
+            if (this.timeline1 != null) {
+                var selectedKey = this.timeline1.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+                if (selectedKey != null) {
+                    this.timeline1.deleteKey(selectedKey);
+                    this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                    this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                    return;
+                }
+            }
+            // 没有选中关键与控制点时，检查是否点击到曲线
+            var newKey = this.timeline.addKeyAtCurve(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+            if (newKey) {
+                this.selectedKey = newKey;
+                this.selectTimeline = this.timeline;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                return;
+            }
+            if (this.timeline1 != null) {
+                var newKey = this.timeline1.addKeyAtCurve(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+                if (newKey) {
+                    this.selectedKey = newKey;
+                    this.selectTimeline = this.timeline1;
+                    this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                    this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                    return;
+                }
             }
         };
         __decorate([
