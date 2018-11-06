@@ -17,9 +17,10 @@ namespace editor
         private canvasRect: feng3d.Rectangle;
 
         private editKey: feng3d.AnimationCurveKeyframe;
-        private controlkey: feng3d.AnimationCurveKeyframe;
+        private editorControlkey: feng3d.AnimationCurveKeyframe;
         private editing = false;
         private mousedownxy = { x: -1, y: -1 }
+        private selectedKey: feng3d.AnimationCurveKeyframe;
 
         constructor()
         {
@@ -32,6 +33,7 @@ namespace editor
             super.$onAddToStage(stage, nestLevel);
 
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+            // feng3d.windowEventProxy.on("click", this.onClick, this);
             feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
 
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
@@ -42,6 +44,7 @@ namespace editor
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
 
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            // feng3d.windowEventProxy.off("click", this.onClick, this);
             feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
 
             super.$onRemoveFromStage()
@@ -95,30 +98,34 @@ namespace editor
                 // 绘制曲线端点
                 drawPoints(canvas, [currentx], [currenty], "red", pointSize)
 
-                // 绘制控制点
-                if (i > 0)
+                if (this.selectedKey == key)
                 {
-                    // 左边控制点
-                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPoints(canvas, [lcp.x], [lcp.y], "blue", pointSize)
+                    // 绘制控制点
+                    if (i > 0)
+                    {
+                        // 左边控制点
+                        var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+                        drawPoints(canvas, [lcp.x], [lcp.y], "blue", pointSize)
+                    }
+                    if (i < n - 1)
+                    {
+                        var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+                        drawPoints(canvas, [rcp.x], [rcp.y], "blue", pointSize)
+                    }
+                    // 绘制控制点
+                    if (i > 0)
+                    {
+                        // 左边控制点
+                        var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+                        drawPointsCurve(canvas, [currentx, lcp.x], [currenty, lcp.y], "yellow", 1)
+                    }
+                    if (i < n - 1)
+                    {
+                        var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+                        drawPointsCurve(canvas, [currentx, rcp.x], [currenty, rcp.y], "yellow", 1)
+                    }
                 }
-                if (i < n - 1)
-                {
-                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPoints(canvas, [rcp.x], [rcp.y], "blue", pointSize)
-                }
-                // 绘制控制点
-                if (i > 0)
-                {
-                    // 左边控制点
-                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPointsCurve(canvas, [currentx, lcp.x], [currenty, lcp.y], "yellow", 1)
-                }
-                if (i < n - 1)
-                {
-                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPointsCurve(canvas, [currentx, rcp.x], [currenty, rcp.y], "yellow", 1)
-                }
+
             }
             var imageData = ctx.getImageData(0, 0, this.canvasRect.width, this.canvasRect.height);
             this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
@@ -177,17 +184,26 @@ namespace editor
             this.mousedownxy.x = x;
             this.mousedownxy.y = y;
 
-            this.editKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height / 2);
-            if (this.editKey == null)
+            this.editKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height);
+            if (this.editKey != null)
             {
-                this.controlkey = this.findControlPoint(x, y);
+                this.selectedKey = this.editKey;
+            } else if (this.selectedKey)
+            {
+                this.editorControlkey = this.findControlKey(this.selectedKey, x, y, pointSize);
+            } else
+            {
+                this.selectedKey = null;
             }
 
-            if (this.editKey != null || this.controlkey != null)
+            if (this.editKey != null || this.editorControlkey != null)
             {
                 feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
                 feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
             }
+
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
 
         private onMouseMove(ev: MouseEvent)
@@ -209,80 +225,90 @@ namespace editor
                 this.timeline.sort();
 
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-            } else if (this.controlkey)
+                this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+            } else if (this.editorControlkey)
             {
-                var index = this.timeline.indexOfKeys(this.controlkey);
-                if (index == 0 && x / this.curveRect.width < this.controlkey.time)
+                var index = this.timeline.indexOfKeys(this.editorControlkey);
+                if (index == 0 && x / this.curveRect.width < this.editorControlkey.time)
                 {
-                    this.controlkey.tangent = y / this.curveRect.height > this.controlkey.value ? Infinity : -Infinity;
+                    this.editorControlkey.tangent = y / this.curveRect.height > this.editorControlkey.value ? Infinity : -Infinity;
                     return;
                 }
-                if (index == this.timeline.numKeys - 1 && x / this.curveRect.width > this.controlkey.time) 
+                if (index == this.timeline.numKeys - 1 && x / this.curveRect.width > this.editorControlkey.time) 
                 {
-                    this.controlkey.tangent = y / this.curveRect.height > this.controlkey.value ? -Infinity : Infinity;
+                    this.editorControlkey.tangent = y / this.curveRect.height > this.editorControlkey.value ? -Infinity : Infinity;
                     return;
                 }
-                this.controlkey.tangent = (y / this.curveRect.height - this.controlkey.value) / (x / this.curveRect.width - this.controlkey.time);
+                this.editorControlkey.tangent = (y / this.curveRect.height - this.editorControlkey.value) / (x / this.curveRect.width - this.editorControlkey.time);
 
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }
         }
 
         private onMouseUp(ev: MouseEvent)
         {
             this.editing = false;
-            this.editKey = null;
-            this.controlkey = null;
+            this.editorControlkey = null;
 
-            feng3d.windowEventProxy.off("mousemove", this.onMouseMove);
-            feng3d.windowEventProxy.off("mouseup", this.onMouseUp);
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         }
 
-        private findControlPoint(x: number, y: number)
+        private findControlKey(key: feng3d.AnimationCurveKeyframe, x: number, y: number, radius: number)
         {
-            for (let i = 0; i < this.timeline.numKeys; i++)
+            var currentx = key.time * this.curveRect.width;
+            var currenty = key.value * this.curveRect.height;
+            var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
+            var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+            if (Math.abs(lcp.x - x) < radius && Math.abs(lcp.y - y) < radius)
             {
-                var key = this.timeline.getKey(i);
-                var currentx = key.time * this.curveRect.width;
-                var currenty = key.value * this.curveRect.height;
-                var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
-                var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
-                if (Math.abs(lcp.x - x) < pointSize / 2 && Math.abs(lcp.y - y) < pointSize / 2)
-                {
-                    return key;
-                }
-                var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
-                if (Math.abs(rcp.x - x) < pointSize / 2 && Math.abs(rcp.y - y) < pointSize / 2)
-                {
-                    return key;
-                }
+                return key;
+            }
+            var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+            if (Math.abs(rcp.x - x) < radius && Math.abs(rcp.y - y) < radius)
+            {
+                return key;
             }
             return null;
         }
+
+        // private onClick(ev: MouseEvent)
+        // {
+        //     var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
+
+        //     var x = lp.x;
+        //     var y = lp.y;
+
+        //     this.selectedKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height);
+        // }
 
         private ondblclick(ev: MouseEvent)
         {
             this.editing = false;
             this.editKey = null;
-            this.controlkey = null;
+            this.editorControlkey = null;
 
             var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
 
             var x = lp.x;
             var y = lp.y;
 
-            var selectedKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height / 2);
+            var selectedKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height);
             if (selectedKey != null)
             {
                 this.timeline.deleteKey(selectedKey);
 
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             } else 
             {
                 // 没有选中关键与控制点时，检查是否点击到曲线
-                var result = this.timeline.addKeyAtCurve(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height / 2);
+                var result = this.timeline.addKeyAtCurve(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height);
 
+                this.selectedKey = result;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }
         }
     }

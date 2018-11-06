@@ -794,9 +794,10 @@ declare namespace editor {
         private curveRect;
         private canvasRect;
         private editKey;
-        private controlkey;
+        private editorControlkey;
         private editing;
         private mousedownxy;
+        private selectedKey;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -808,7 +809,7 @@ declare namespace editor {
         private onMouseDown;
         private onMouseMove;
         private onMouseUp;
-        private findControlPoint;
+        private findControlKey;
         private ondblclick;
     }
 }
