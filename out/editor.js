@@ -2829,16 +2829,16 @@ var editor;
             }
             else {
                 this.curveGroup.visible = true;
+                var imageData = feng3d.imageUtil.createImageData(this.curveGroup.width - 2, this.curveGroup.height - 2, feng3d.Color4.fromUnit(0xff565656));
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
                     var animationCurve = this.minMaxCurve.minMaxCurve;
-                    var imagedata = feng3d.imageUtil.createAnimationCurveRect(animationCurve, this.minMaxCurve.between0And1, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color4(1, 0, 0), feng3d.Color4.fromUnit(0xff565656));
-                    this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    feng3d.imageUtil.drawImageDataCurve(imageData, animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
                 else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
                     var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
-                    var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color4(1, 0, 0), new feng3d.Color4().fromUnit(0xff565656));
-                    this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    feng3d.imageUtil.drawImageDataBetweenTwoCurves(imageData, minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
+                this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
             }
         };
         MinMaxCurveView.prototype.onReSize = function () {
@@ -2925,7 +2925,8 @@ var editor;
                 var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
-                var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveRect.width, this.curveRect.height, new feng3d.Color4(1, 0, 0), new feng3d.Color4().fromUnit(0xff565656));
+                var imagedata = feng3d.imageUtil.createImageData(this.curveRect.width, this.curveRect.height, new feng3d.Color4().fromUnit(0xff565656));
+                feng3d.imageUtil.drawImageDataBetweenTwoCurves(imagedata, minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 ctx.putImageData(imagedata, this.curveRect.x, this.curveRect.y);
                 this.drawCurve(this.timeline);
                 this.drawCurveKeys(this.timeline);
@@ -2949,7 +2950,7 @@ var editor;
                 var xSamples = sameples.map(function (value) { return (_this.curveRect.x + _this.curveRect.width * value.time); });
                 var ySamples = sameples.map(function (value) { return (_this.curveRect.y + _this.curveRect.height * (1 - value.value)); });
                 // 绘制曲线
-                drawPointsCurve(canvas, xSamples, ySamples, 'white', 1);
+                drawPointsCurve(canvas, xSamples, ySamples, 'red', 1);
             }
         };
         /**

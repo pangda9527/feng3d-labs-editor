@@ -72,17 +72,17 @@ namespace editor
             } else
             {
                 this.curveGroup.visible = true;
+                var imageData = feng3d.imageUtil.createImageData(this.curveGroup.width - 2, this.curveGroup.height - 2, feng3d.Color4.fromUnit(0xff565656));
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
                 {
                     var animationCurve = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
-                    var imagedata = feng3d.imageUtil.createAnimationCurveRect(animationCurve, this.minMaxCurve.between0And1, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color4(1, 0, 0), feng3d.Color4.fromUnit(0xff565656));
-                    this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    feng3d.imageUtil.drawImageDataCurve(imageData, animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
                 {
                     var minMaxCurveRandomBetweenTwoCurves = <feng3d.MinMaxCurveRandomBetweenTwoCurves>this.minMaxCurve.minMaxCurve;
-                    var imagedata = feng3d.imageUtil.createMinMaxCurveRandomBetweenTwoCurvesRect(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveGroup.width - 2, this.curveGroup.height - 2, new feng3d.Color4(1, 0, 0), new feng3d.Color4().fromUnit(0xff565656));
-                    this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imagedata);
+                    feng3d.imageUtil.drawImageDataBetweenTwoCurves(imageData, minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
+                this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
             }
         }
 
