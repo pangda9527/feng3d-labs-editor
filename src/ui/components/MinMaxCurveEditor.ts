@@ -104,7 +104,7 @@ namespace editor
             {
                 var sameples = animationCurve.getSamples(this.curveRect.width);
                 var xSamples = sameples.map((value, i) => (this.curveRect.x + this.curveRect.width * i / (sameples.length - 1)));
-                var ySamples = sameples.map(value => (this.curveRect.y + this.curveRect.height * value));
+                var ySamples = sameples.map(value => (this.curveRect.y + this.curveRect.height * (1 - value)));
                 // 绘制曲线
                 drawPointsCurve(canvas, xSamples, ySamples, 'white', 1);
             }
@@ -121,7 +121,7 @@ namespace editor
             {
                 var key = animationCurve.keys[i];
                 var currentx = this.curveRect.x + key.time * this.curveRect.width;
-                var currenty = this.curveRect.y + key.value * this.curveRect.height;
+                var currenty = this.curveRect.y + (1 - key.value) * this.curveRect.height;
 
                 // 绘制曲线端点
                 drawPoints(canvas, [currentx], [currenty], "red", pointSize)
@@ -141,7 +141,7 @@ namespace editor
             if (i == -1) return;
 
             var currentx = this.curveRect.x + key.time * this.curveRect.width;
-            var currenty = this.curveRect.y + key.value * this.curveRect.height;
+            var currenty = this.curveRect.y + (1 - key.value) * this.curveRect.height;
             var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
 
             if (this.selectedKey == key)
@@ -150,24 +150,24 @@ namespace editor
                 if (i > 0)
                 {
                     // 左边控制点
-                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
                     drawPoints(canvas, [lcp.x], [lcp.y], "blue", pointSize)
                 }
                 if (i < n - 1)
                 {
-                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
                     drawPoints(canvas, [rcp.x], [rcp.y], "blue", pointSize)
                 }
                 // 绘制控制点
                 if (i > 0)
                 {
                     // 左边控制点
-                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
                     drawPointsCurve(canvas, [currentx, lcp.x], [currenty, lcp.y], "yellow", 1)
                 }
                 if (i < n - 1)
                 {
-                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
                     drawPointsCurve(canvas, [currentx, rcp.x], [currenty, rcp.y], "yellow", 1)
                 }
             }
@@ -226,7 +226,7 @@ namespace editor
             this.mousedownxy.x = x;
             this.mousedownxy.y = y;
 
-            this.editKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height);
+            this.editKey = this.timeline.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
             if (this.editKey != null)
             {
                 this.selectedKey = this.editKey;
@@ -264,7 +264,7 @@ namespace editor
                 y = feng3d.FMath.clamp(y, 0, this.curveRect.height);
                 //
                 this.editKey.time = x / this.curveRect.width;
-                this.editKey.value = y / this.curveRect.height;
+                this.editKey.value = 1 - y / this.curveRect.height;
                 this.timeline.sort();
 
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -274,15 +274,15 @@ namespace editor
                 var index = this.timeline.indexOfKeys(this.editorControlkey);
                 if (index == 0 && x / this.curveRect.width < this.editorControlkey.time)
                 {
-                    this.editorControlkey.tangent = y / this.curveRect.height > this.editorControlkey.value ? Infinity : -Infinity;
+                    this.editorControlkey.tangent = 1 - y / this.curveRect.height > this.editorControlkey.value ? Infinity : -Infinity;
                     return;
                 }
                 if (index == this.timeline.numKeys - 1 && x / this.curveRect.width > this.editorControlkey.time) 
                 {
-                    this.editorControlkey.tangent = y / this.curveRect.height > this.editorControlkey.value ? -Infinity : Infinity;
+                    this.editorControlkey.tangent = 1 - y / this.curveRect.height > this.editorControlkey.value ? -Infinity : Infinity;
                     return;
                 }
-                this.editorControlkey.tangent = (y / this.curveRect.height - this.editorControlkey.value) / (x / this.curveRect.width - this.editorControlkey.time);
+                this.editorControlkey.tangent = (1 - y / this.curveRect.height - this.editorControlkey.value) / (x / this.curveRect.width - this.editorControlkey.time);
 
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
@@ -301,14 +301,14 @@ namespace editor
         private findControlKey(key: feng3d.AnimationCurveKeyframe, x: number, y: number, radius: number)
         {
             var currentx = key.time * this.curveRect.width;
-            var currenty = key.value * this.curveRect.height;
+            var currenty = (1 - key.value) * this.curveRect.height;
             var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
-            var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+            var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
             if (Math.abs(lcp.x - x) < radius && Math.abs(lcp.y - y) < radius)
             {
                 return key;
             }
-            var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+            var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
             if (Math.abs(rcp.x - x) < radius && Math.abs(rcp.y - y) < radius)
             {
                 return key;
@@ -327,7 +327,7 @@ namespace editor
             var x = lp.x;
             var y = lp.y;
 
-            var selectedKey = this.timeline.findKey(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height);
+            var selectedKey = this.timeline.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
             if (selectedKey != null)
             {
                 this.timeline.deleteKey(selectedKey);
@@ -337,7 +337,7 @@ namespace editor
             } else 
             {
                 // 没有选中关键与控制点时，检查是否点击到曲线
-                var result = this.timeline.addKeyAtCurve(x / this.curveRect.width, y / this.curveRect.height, pointSize / this.curveRect.height);
+                var result = this.timeline.addKeyAtCurve(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
 
                 this.selectedKey = result;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
