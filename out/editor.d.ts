@@ -804,6 +804,16 @@ declare namespace editor {
         private curveColor;
         private backColor;
         private fillTwoCurvesColor;
+        private range;
+        private imageUtil;
+        /**
+         * 点绘制尺寸
+         */
+        private pointSize;
+        /**
+         * 控制柄长度
+         */
+        private controllerLength;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -813,6 +823,21 @@ declare namespace editor {
          * @param animationCurve
          */
         private drawCurveKeys;
+        /**
+         * 曲线上的坐标转换为UI上的坐标
+         * @param time
+         * @param value
+         */
+        private curveToUIPos;
+        /**
+         * UI上坐标转换为曲线上坐标
+         * @param x
+         * @param y
+         */
+        private uiToCurvePos;
+        private getKeyUIPos;
+        private getKeyLeftControlUIPos;
+        private getKeyRightControlUIPos;
         /**
          * 绘制选中的关键点
          */

@@ -30,6 +30,18 @@ namespace editor
         private fillTwoCurvesColor = new feng3d.Color4(1, 1, 1, 0.2);
         private range = [1, -1];
 
+        private imageUtil = new feng3d.ImageUtil();
+
+        /**
+         * 点绘制尺寸
+         */
+        private pointSize = 5;
+
+        /**
+         * 控制柄长度
+         */
+        private controllerLength = 50;
+
         constructor()
         {
             super();
@@ -68,7 +80,7 @@ namespace editor
 
             if (this.curveGroup.width < 10 || this.curveGroup.height < 10) return;
 
-            imageUtil.init(this.canvasRect.width, this.canvasRect.height, this.backColor);
+            this.imageUtil.init(this.canvasRect.width, this.canvasRect.height, this.backColor);
             this.drawGrid();
 
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
@@ -76,7 +88,7 @@ namespace editor
                 this.timeline = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
                 this.timeline1 = null;
 
-                imageUtil.drawCurve(this.timeline, this.minMaxCurve.between0And1, this.curveColor, this.curveRect);
+                this.imageUtil.drawCurve(this.timeline, this.minMaxCurve.between0And1, this.curveColor, this.curveRect);
 
                 this.drawCurveKeys(this.timeline);
             } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
@@ -85,7 +97,7 @@ namespace editor
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
 
-                imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveColor, this.fillTwoCurvesColor, this.curveRect);
+                this.imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveColor, this.fillTwoCurvesColor, this.curveRect);
 
                 this.drawCurveKeys(this.timeline);
                 this.drawCurveKeys(this.timeline1);
@@ -94,7 +106,7 @@ namespace editor
             this.drawSelectedKey();
 
             // 设置绘制结果
-            this.curveImage.source = imageUtil.toDataURL();
+            this.curveImage.source = this.imageUtil.toDataURL();
         }
 
         /**
@@ -107,7 +119,7 @@ namespace editor
             animationCurve.keys.forEach(key =>
             {
                 var pos = this.curveToUIPos(key.time, key.value);
-                imageUtil.drawPoint(pos.x, pos.y, c, pointSize);
+                this.imageUtil.drawPoint(pos.x, pos.y, c, this.pointSize);
             });
         }
 
@@ -120,7 +132,7 @@ namespace editor
         {
             var x = feng3d.FMath.mapLinear(time, 0, 1, this.curveRect.left, this.curveRect.right);
             var y = feng3d.FMath.mapLinear(value, this.range[0], this.range[1], this.curveRect.top, this.curveRect.bottom);
-            return { x: x, y: y };
+            return new feng3d.Vector2(x, y);
         }
 
         /**
@@ -133,6 +145,27 @@ namespace editor
             var time = feng3d.FMath.mapLinear(x, this.curveRect.left, this.curveRect.right, 0, 1);
             var value = feng3d.FMath.mapLinear(y, this.curveRect.top, this.curveRect.bottom, this.range[0], this.range[1]);
             return { time: time, value: value };
+        }
+
+        private getKeyUIPos(key: feng3d.AnimationCurveKeyframe)
+        {
+            return this.curveToUIPos(key.time, key.value);
+        }
+
+        private getKeyLeftControlUIPos(key: feng3d.AnimationCurveKeyframe)
+        {
+            var current = this.curveToUIPos(key.time, key.value);
+            var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
+            var lcp = new feng3d.Vector2(current.x - this.controllerLength * Math.cos(Math.atan(currenttan)), current.y + this.controllerLength * Math.sin(Math.atan(currenttan)));
+            return lcp;
+        }
+
+        private getKeyRightControlUIPos(key: feng3d.AnimationCurveKeyframe)
+        {
+            var current = this.curveToUIPos(key.time, key.value);
+            var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
+            var rcp = new feng3d.Vector2(current.x + this.controllerLength * Math.cos(Math.atan(currenttan)), current.y - this.controllerLength * Math.sin(Math.atan(currenttan)));
+            return rcp;
         }
 
         /**
@@ -150,30 +183,23 @@ namespace editor
             var n = this.selectTimeline.keys.length;
             var c = new feng3d.Color4();
 
-            var range = this.minMaxCurve.between0And1 ? [1, 0] : [1, -1];
-            var current = new feng3d.Vector2(feng3d.FMath.mapLinear(key.time, 0, 1, this.curveRect.left, this.curveRect.right),
-                feng3d.FMath.mapLinear(key.value, range[0], range[1], this.curveRect.top, this.curveRect.bottom));
-
-            imageUtil.drawPoint(current.x, current.y, c, pointSize);
-
-            var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
+            var current = this.getKeyUIPos(key);
+            this.imageUtil.drawPoint(current.x, current.y, c, this.pointSize);
 
             if (this.selectedKey == key)
             {
                 // 绘制控制点
                 if (i > 0)
                 {
-                    var lcp = new feng3d.Vector2(current.x - controllerLength * Math.cos(Math.atan(currenttan)), current.y + controllerLength * Math.sin(Math.atan(currenttan)));
-
-                    imageUtil.drawPoint(lcp.x, lcp.y, c, pointSize);
-                    imageUtil.drawLine(current, lcp, new feng3d.Color4());
+                    var lcp = this.getKeyLeftControlUIPos(key);
+                    this.imageUtil.drawPoint(lcp.x, lcp.y, c, this.pointSize);
+                    this.imageUtil.drawLine(current, lcp, new feng3d.Color4());
                 }
                 if (i < n - 1)
                 {
-                    var rcp = new feng3d.Vector2(current.x + controllerLength * Math.cos(Math.atan(currenttan)), current.y - controllerLength * Math.sin(Math.atan(currenttan)));
-
-                    imageUtil.drawPoint(rcp.x, rcp.y, c, pointSize);
-                    imageUtil.drawLine(current, rcp, new feng3d.Color4());
+                    var rcp = this.getKeyRightControlUIPos(key);
+                    this.imageUtil.drawPoint(rcp.x, rcp.y, c, this.pointSize);
+                    this.imageUtil.drawLine(current, rcp, new feng3d.Color4());
                 }
             }
         }
@@ -181,7 +207,7 @@ namespace editor
         private drawGrid()
         {
             //
-            var lines: Line[] = [];
+            var lines: { start: feng3d.Vector2, end: feng3d.Vector2, color: feng3d.Color4 }[] = [];
             var c0 = feng3d.Color4.fromUnit24(0x494949);
             var c1 = feng3d.Color4.fromUnit24(0x4f4f4f);
             for (var i = 0; i <= 10; i++)
@@ -199,7 +225,7 @@ namespace editor
                 v.end.x = this.curveRect.x + this.curveRect.width * v.end.x;
                 v.end.y = this.curveRect.y + this.curveRect.height * v.end.y;
                 //
-                imageUtil.drawLine(v.start, v.end, v.color);
+                this.imageUtil.drawLine(v.start, v.end, v.color);
             });
         }
 
@@ -217,7 +243,7 @@ namespace editor
 
         private onMouseDown(ev: MouseEvent)
         {
-            var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
+            var lp = this.globalToLocal(ev.clientX, ev.clientY);
 
             var x = lp.x;
             var y = lp.y;
@@ -225,12 +251,14 @@ namespace editor
             this.mousedownxy.x = x;
             this.mousedownxy.y = y;
 
+            var curvePos = this.uiToCurvePos(x, y);
+
             var timeline = this.timeline;
-            this.editKey = timeline.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+            this.editKey = timeline.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
             if (this.editKey == null && this.timeline1 != null)
             {
                 timeline = this.timeline1;
-                this.editKey = timeline.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+                this.editKey = timeline.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
             }
             if (this.editKey != null)
             {
@@ -238,7 +266,7 @@ namespace editor
                 this.selectTimeline = timeline;
             } else if (this.selectedKey)
             {
-                this.editorControlkey = this.findControlKey(this.selectedKey, x, y, pointSize);
+                this.editorControlkey = this.findControlKey(this.selectedKey, x, y, this.pointSize);
                 if (this.editorControlkey == null)
                 {
                     this.selectedKey = null;
@@ -260,18 +288,21 @@ namespace editor
         {
             this.editing = true;
 
-            var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
+            var lp = this.globalToLocal(ev.clientX, ev.clientY);
 
             var x = lp.x;
             var y = lp.y;
 
+            var curvePos = this.uiToCurvePos(x, y);
+
             if (this.editKey)
             {
-                x = feng3d.FMath.clamp(x, 0, this.curveRect.width);
-                y = feng3d.FMath.clamp(y, 0, this.curveRect.height);
+                curvePos.time = feng3d.FMath.clamp(curvePos.time, 0, 1);
+                curvePos.value = feng3d.FMath.clamp(curvePos.value, this.range[0], this.range[1]);
+
                 //
-                this.editKey.time = x / this.curveRect.width;
-                this.editKey.value = 1 - y / this.curveRect.height;
+                this.editKey.time = curvePos.time;
+                this.editKey.value = curvePos.value;
                 this.selectTimeline.sort();
 
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -279,17 +310,18 @@ namespace editor
             } else if (this.editorControlkey)
             {
                 var index = this.selectTimeline.indexOfKeys(this.editorControlkey);
-                if (index == 0 && x / this.curveRect.width < this.editorControlkey.time)
+
+                if (index == 0 && curvePos.time < this.editorControlkey.time)
                 {
-                    this.editorControlkey.tangent = 1 - y / this.curveRect.height > this.editorControlkey.value ? Infinity : -Infinity;
+                    this.editorControlkey.tangent = curvePos.value > this.editorControlkey.value ? Infinity : -Infinity;
                     return;
                 }
-                if (index == this.selectTimeline.numKeys - 1 && x / this.curveRect.width > this.editorControlkey.time) 
+                if (index == this.selectTimeline.numKeys - 1 && curvePos.time > this.editorControlkey.time) 
                 {
-                    this.editorControlkey.tangent = 1 - y / this.curveRect.height > this.editorControlkey.value ? -Infinity : Infinity;
+                    this.editorControlkey.tangent = curvePos.value > this.editorControlkey.value ? -Infinity : Infinity;
                     return;
                 }
-                this.editorControlkey.tangent = (1 - y / this.curveRect.height - this.editorControlkey.value) / (x / this.curveRect.width - this.editorControlkey.time);
+                this.editorControlkey.tangent = (curvePos.value - this.editorControlkey.value) / (curvePos.time - this.editorControlkey.time);
 
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
@@ -307,15 +339,14 @@ namespace editor
 
         private findControlKey(key: feng3d.AnimationCurveKeyframe, x: number, y: number, radius: number)
         {
-            var currentx = key.time * this.curveRect.width;
-            var currenty = (1 - key.value) * this.curveRect.height;
-            var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
-            var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
+            var lcp = this.getKeyLeftControlUIPos(key);
+
             if (Math.abs(lcp.x - x) < radius && Math.abs(lcp.y - y) < radius)
             {
                 return key;
             }
-            var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
+
+            var rcp = this.getKeyRightControlUIPos(key);
             if (Math.abs(rcp.x - x) < radius && Math.abs(rcp.y - y) < radius)
             {
                 return key;
@@ -329,12 +360,14 @@ namespace editor
             this.editKey = null;
             this.editorControlkey = null;
 
-            var lp = this.curveGroup.globalToLocal(ev.clientX, ev.clientY);
+            var lp = this.globalToLocal(ev.clientX, ev.clientY);
 
             var x = lp.x;
             var y = lp.y;
 
-            var selectedKey = this.timeline.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+            var curvePos = this.uiToCurvePos(x, y);
+
+            var selectedKey = this.timeline.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
             if (selectedKey != null)
             {
                 this.timeline.deleteKey(selectedKey);
@@ -345,7 +378,7 @@ namespace editor
             }
             if (this.timeline1 != null)
             {
-                var selectedKey = this.timeline1.findKey(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+                var selectedKey = this.timeline1.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
                 if (selectedKey != null)
                 {
                     this.timeline1.deleteKey(selectedKey);
@@ -356,7 +389,7 @@ namespace editor
                 }
             }
             // 没有选中关键与控制点时，检查是否点击到曲线
-            var newKey = this.timeline.addKeyAtCurve(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+            var newKey = this.timeline.addKeyAtCurve(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
             if (newKey)
             {
                 this.selectedKey = newKey;
@@ -367,7 +400,7 @@ namespace editor
             }
             if (this.timeline1 != null)
             {
-                var newKey = this.timeline1.addKeyAtCurve(x / this.curveRect.width, 1 - y / this.curveRect.height, pointSize / this.curveRect.height);
+                var newKey = this.timeline1.addKeyAtCurve(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
                 if (newKey)
                 {
                     this.selectedKey = newKey;
@@ -380,18 +413,4 @@ namespace editor
 
         }
     }
-
-    var imageUtil = new feng3d.ImageUtil();
-
-    /**
-     * 点绘制尺寸
-     */
-    var pointSize = 5;
-
-    /**
-     * 控制柄长度
-     */
-    var controllerLength = 50;
-
-    interface Line { start: feng3d.Vector2, end: feng3d.Vector2, color: feng3d.Color4 }
 }
