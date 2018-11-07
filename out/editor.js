@@ -2934,11 +2934,11 @@ var editor;
                 var imageUtil = new feng3d.ImageUtil(this.curveGroup.width - 2, this.curveGroup.height - 2, feng3d.Color4.fromUnit(0xff565656));
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
                     var animationCurve = this.minMaxCurve.minMaxCurve;
-                    imageUtil.drawImageDataCurve(animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawCurve(animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
                 else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
                     var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
-                    imageUtil.drawImageDataBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
                 this.curveImage.source = imageUtil.toDataURL();
             }
@@ -3027,12 +3027,8 @@ var editor;
                 var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
-                var imagedata = new feng3d.ImageUtil(this.curveRect.width, this.curveRect.height)
-                    .drawImageDataBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
-                imageUtil.drawImageData(imagedata.imageData, this.curveRect.x, this.curveRect.y);
-                this.drawCurve(this.timeline);
+                imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0), new feng3d.Color4(1, 1, 1, 0.2), this.curveRect);
                 this.drawCurveKeys(this.timeline);
-                this.drawCurve(this.timeline1);
                 this.drawCurveKeys(this.timeline1);
             }
             this.drawSelectedKey();
@@ -3367,7 +3363,7 @@ var editor;
             if (this.colorGroup0.width > 0 && this.colorGroup0.height > 0) {
                 if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color) {
                     var color = this.minMaxGradient.getValue(0);
-                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).createColorRect(color).toDataURL();
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(color).toDataURL();
                     //
                     if (this.secondGroup.parent)
                         this.secondGroup.parent.removeChild(this.secondGroup);
@@ -3380,9 +3376,9 @@ var editor;
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
                     var randomBetweenTwoColors = this.minMaxGradient.minMaxGradient;
-                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).createColorRect(randomBetweenTwoColors.colorMin).toDataURL();
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(randomBetweenTwoColors.colorMin).toDataURL();
                     //
-                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).createColorRect(randomBetweenTwoColors.colorMax).toDataURL();
+                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawColorRect(randomBetweenTwoColors.colorMax).toDataURL();
                     //
                     if (!this.secondGroup.parent)
                         this.secondGroupParent.addChildAt(this.secondGroup, 1);

@@ -76,11 +76,11 @@ namespace editor
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
                 {
                     var animationCurve = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
-                    imageUtil.drawImageDataCurve(animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawCurve(animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
                 {
                     var minMaxCurveRandomBetweenTwoCurves = <feng3d.MinMaxCurveRandomBetweenTwoCurves>this.minMaxCurve.minMaxCurve;
-                    imageUtil.drawImageDataBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
                 this.curveImage.source = imageUtil.toDataURL();
             }

@@ -79,13 +79,9 @@ namespace editor
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
 
-                var imagedata = new feng3d.ImageUtil(this.curveRect.width, this.curveRect.height)
-                    .drawImageDataBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
-                imageUtil.drawImageData(imagedata.imageData, this.curveRect.x, this.curveRect.y);
+                imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0), new feng3d.Color4(1, 1, 1, 0.2), this.curveRect);
 
-                this.drawCurve(this.timeline);
                 this.drawCurveKeys(this.timeline);
-                this.drawCurve(this.timeline1);
                 this.drawCurveKeys(this.timeline1);
             }
 
