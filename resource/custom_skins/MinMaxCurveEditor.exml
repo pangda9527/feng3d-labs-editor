@@ -5,7 +5,9 @@
 	<e:Group id="curveGroup" top="20" left="40" right="40" bottom="30">
 		<e:TextInput id="multiplierInput" width="35" scaleX="1" scaleY="1" x="-40" text="1.0" y="-8" skinName="skins.TextInputRightSkin"/>
 		<e:Label id="y_0" text="0.0" size="12" width="35" textColor="0x000000" verticalAlign="middle" multiline="false" textAlign="right" x="-40" y="144" scaleX="1" scaleY="1"/>
-		<e:Label id="y_1" text="0.5" size="12" width="35" textColor="0x000000" verticalAlign="middle" multiline="false" textAlign="right" x="-40" y="69" scaleX="1" scaleY="1"/>
+		<e:Label id="y_1" text="0.25" size="12" width="35" textColor="0x000000" verticalAlign="middle" multiline="false" textAlign="right" x="-40" scaleX="1" scaleY="1" y="106"/>
+		<e:Label id="y_2" text="0.5" size="12" width="35" textColor="0x000000" verticalAlign="middle" multiline="false" textAlign="right" x="-40" scaleX="1" scaleY="1" verticalCenter="0"/>
+		<e:Label id="y_3" text="0.5" size="12" width="35" textColor="0x000000" verticalAlign="middle" multiline="false" textAlign="right" x="-40" scaleX="1" scaleY="1" y="32"/>
 		<e:Label id="x_0" text="0.0" size="12" width="40" textColor="0x000000" verticalAlign="middle" multiline="false" textAlign="center" x="-20" y="156"/>
 		<e:Label id="x_1" text="0.1" size="12" width="40" textColor="0x000000" verticalAlign="middle" multiline="false" textAlign="center" x="12" y="156"/>
 		<e:Label id="x_2" text="0.2" size="12" width="40" textColor="0x000000" verticalAlign="middle" multiline="false" textAlign="center" x="44" y="156"/>

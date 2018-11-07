@@ -3009,15 +3009,24 @@ var editor;
         }
         MinMaxCurveEditor.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.yLabels = [this.y_0, this.y_1, this.y_2, this.y_3];
+            this.xLabels = [this.x_0, this.x_1, this.x_2, this.x_3, this.x_4, this.x_5, this.x_6, this.x_7, this.x_8, this.x_9, this.x_10];
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.minMaxCurve, attribute: "curveMultiplier", textInput: this.multiplierInput, editable: true,
+                controller: null,
+            }));
+            feng3d.watcher.watch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
+            this.updateXYLabels();
             this.updateView();
         };
         MinMaxCurveEditor.prototype.$onRemoveFromStage = function () {
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
+            feng3d.watcher.unwatch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
         MinMaxCurveEditor.prototype.updateView = function () {
@@ -3047,6 +3056,16 @@ var editor;
             this.drawSelectedKey();
             // 设置绘制结果
             this.curveImage.source = this.imageUtil.toDataURL();
+        };
+        MinMaxCurveEditor.prototype.updateXYLabels = function () {
+            this.yLabels[0].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[1].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0.25, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[2].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0.5, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[3].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0.75, 1, 0, this.range[0], this.range[1])).toString();
+            // for (let i = 0; i <= 10; i++)
+            // {
+            //     this.xLabels[i].text = (this.minMaxCurve.curveMultiplier * i / 10).toString();
+            // }
         };
         /**
          * 绘制曲线关键点

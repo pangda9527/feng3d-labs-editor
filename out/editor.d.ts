@@ -788,8 +788,24 @@ declare namespace editor {
     var minMaxCurveEditor: MinMaxCurveEditor;
     class MinMaxCurveEditor extends eui.Component {
         minMaxCurve: feng3d.MinMaxCurve;
-        curveGroup: eui.Group;
         curveImage: eui.Image;
+        curveGroup: eui.Group;
+        multiplierInput: eui.TextInput;
+        y_0: eui.Label;
+        y_1: eui.Label;
+        y_2: eui.Label;
+        y_3: eui.Label;
+        x_0: eui.Label;
+        x_1: eui.Label;
+        x_2: eui.Label;
+        x_3: eui.Label;
+        x_4: eui.Label;
+        x_5: eui.Label;
+        x_6: eui.Label;
+        x_7: eui.Label;
+        x_8: eui.Label;
+        x_9: eui.Label;
+        x_10: eui.Label;
         private timeline;
         private timeline1;
         private curveRect;
@@ -814,10 +830,13 @@ declare namespace editor {
          * 控制柄长度
          */
         private controllerLength;
+        private yLabels;
+        private xLabels;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         updateView(): void;
+        private updateXYLabels;
         /**
          * 绘制曲线关键点
          * @param animationCurve

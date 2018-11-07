@@ -7,9 +7,24 @@ namespace editor
         @feng3d.watch("_onMinMaxCurveChanged")
         minMaxCurve = new feng3d.MinMaxCurve();
 
-        public curveGroup: eui.Group;
         public curveImage: eui.Image;
-
+        public curveGroup: eui.Group;
+        public multiplierInput: eui.TextInput;
+        public y_0: eui.Label;
+        public y_1: eui.Label;
+        public y_2: eui.Label;
+        public y_3: eui.Label;
+        public x_0: eui.Label;
+        public x_1: eui.Label;
+        public x_2: eui.Label;
+        public x_3: eui.Label;
+        public x_4: eui.Label;
+        public x_5: eui.Label;
+        public x_6: eui.Label;
+        public x_7: eui.Label;
+        public x_8: eui.Label;
+        public x_9: eui.Label;
+        public x_10: eui.Label;
 
         //
         private timeline: feng3d.AnimationCurve;
@@ -41,6 +56,8 @@ namespace editor
          * 控制柄长度
          */
         private controllerLength = 50;
+        private yLabels: eui.Label[];
+        private xLabels: eui.Label[];
 
         constructor()
         {
@@ -52,11 +69,22 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
 
+            this.yLabels = [this.y_0, this.y_1, this.y_2, this.y_3];
+            this.xLabels = [this.x_0, this.x_1, this.x_2, this.x_3, this.x_4, this.x_5, this.x_6, this.x_7, this.x_8, this.x_9, this.x_10];
+
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
 
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
 
+            this.addBinder(new NumberTextInputBinder().init({
+                space: this.minMaxCurve, attribute: "curveMultiplier", textInput: this.multiplierInput, editable: true,
+                controller: null,
+            }));
+
+            feng3d.watcher.watch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
+
+            this.updateXYLabels();
             this.updateView();
         }
 
@@ -66,6 +94,8 @@ namespace editor
 
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
+
+            feng3d.watcher.unwatch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
 
             super.$onRemoveFromStage()
         }
@@ -107,6 +137,19 @@ namespace editor
 
             // 设置绘制结果
             this.curveImage.source = this.imageUtil.toDataURL();
+        }
+
+        private updateXYLabels()
+        {
+            this.yLabels[0].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[1].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0.25, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[2].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0.5, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[3].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0.75, 1, 0, this.range[0], this.range[1])).toString();
+
+            // for (let i = 0; i <= 10; i++)
+            // {
+            //     this.xLabels[i].text = (this.minMaxCurve.curveMultiplier * i / 10).toString();
+            // }
         }
 
         /**
