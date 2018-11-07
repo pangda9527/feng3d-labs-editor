@@ -3027,9 +3027,9 @@ var editor;
                 var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
-                var imagedata = new feng3d.ImageUtil(this.curveRect.width, this.curveRect.height, new feng3d.Color4().fromUnit(0xff565656))
+                var imagedata = new feng3d.ImageUtil(this.curveRect.width, this.curveRect.height)
                     .drawImageDataBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
-                ctx.putImageData(imagedata.imageData, this.curveRect.x, this.curveRect.y);
+                imageUtil.drawImageData(imagedata.imageData, this.curveRect.x, this.curveRect.y);
                 this.drawCurve(this.timeline);
                 this.drawCurveKeys(this.timeline);
                 this.drawCurve(this.timeline1);
@@ -3037,8 +3037,7 @@ var editor;
             }
             this.drawSelectedKey();
             // 设置绘制结果
-            var imageData = ctx.getImageData(0, 0, this.canvasRect.width, this.canvasRect.height);
-            this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
+            this.curveImage.source = imageUtil.toDataURL();
         };
         /**
          * 绘制曲线
@@ -3271,8 +3270,6 @@ var editor;
         return MinMaxCurveEditor;
     }(eui.Component));
     editor.MinMaxCurveEditor = MinMaxCurveEditor;
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
     var imageUtil = new feng3d.ImageUtil();
     /**
      * 点绘制尺寸
@@ -3288,16 +3285,6 @@ var editor;
      */
     function clearCanvas(width, height, fillStyle) {
         if (fillStyle === void 0) { fillStyle = feng3d.Color4.fromUnit24(0x565656); }
-        canvas.style.width = width + "px";
-        canvas.style.height = height + "px";
-        canvas.width = width;
-        canvas.height = height;
-        //
-        var ctx = canvas.getContext("2d");
-        // ctx.clearRect(0, 0, width, height);
-        // 绘制背景
-        ctx.fillStyle = fillStyle.toColor3().toHexString();
-        ctx.fillRect(0, 0, width, height);
         imageUtil.init(width, height, fillStyle);
     }
     /**
@@ -3308,15 +3295,6 @@ var editor;
      */
     function drawPointsCurve(xpoints, ypoints, strokeStyle) {
         if (strokeStyle === void 0) { strokeStyle = new feng3d.Color4(); }
-        var ctx = canvas.getContext("2d");
-        ctx.beginPath();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = strokeStyle.toColor3().toHexString();
-        ctx.moveTo(xpoints[0], ypoints[0]);
-        for (var i = 1; i < xpoints.length; i++) {
-            ctx.lineTo(xpoints[i], ypoints[i]);
-        }
-        ctx.stroke();
         //
         for (var i = 0; i < xpoints.length - 1; i++) {
             imageUtil.drawLine(new feng3d.Vector2(xpoints[i], ypoints[i]), new feng3d.Vector2(xpoints[i + 1], ypoints[i + 1]), strokeStyle);
@@ -3332,11 +3310,6 @@ var editor;
     function drawPoints(xpoints, ypoints, fillStyle, pointSize) {
         if (fillStyle === void 0) { fillStyle = new feng3d.Color4(); }
         if (pointSize === void 0) { pointSize = 1; }
-        var ctx = canvas.getContext("2d");
-        ctx.fillStyle = fillStyle.toColor3().toHexString();
-        for (var i = 0; i < xpoints.length; i++) {
-            ctx.fillRect(xpoints[i] - pointSize / 2, ypoints[i] - pointSize / 2, pointSize, pointSize);
-        }
         //
         for (var i = 0; i < xpoints.length; i++) {
             imageUtil.drawPoint(xpoints[i], ypoints[i], fillStyle, pointSize);
@@ -3351,17 +3324,8 @@ var editor;
     function drawLines(lines, strokeStyle, lineWidth) {
         if (strokeStyle === void 0) { strokeStyle = new feng3d.Color4(); }
         if (lineWidth === void 0) { lineWidth = 1; }
-        var ctx = canvas.getContext("2d");
-        ctx.beginPath();
-        ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = strokeStyle.toColor3().toHexString();
-        for (var i = 0; i < lines.length; i++) {
-            ctx.moveTo(lines[i].start.x, lines[i].start.y);
-            ctx.lineTo(lines[i].end.x, lines[i].end.y);
-        }
-        ctx.stroke();
         //
-        for (var i = 0; i < lines.length - 1; i++) {
+        for (var i = 0; i < lines.length; i++) {
             imageUtil.drawLine(lines[i].start, lines[i].end, strokeStyle);
         }
     }

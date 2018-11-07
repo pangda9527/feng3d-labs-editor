@@ -79,9 +79,9 @@ namespace editor
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
 
-                var imagedata = new feng3d.ImageUtil(this.curveRect.width, this.curveRect.height, new feng3d.Color4().fromUnit(0xff565656))
+                var imagedata = new feng3d.ImageUtil(this.curveRect.width, this.curveRect.height)
                     .drawImageDataBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
-                ctx.putImageData(imagedata.imageData, this.curveRect.x, this.curveRect.y);
+                imageUtil.drawImageData(imagedata.imageData, this.curveRect.x, this.curveRect.y);
 
                 this.drawCurve(this.timeline);
                 this.drawCurveKeys(this.timeline);
@@ -92,8 +92,7 @@ namespace editor
             this.drawSelectedKey();
 
             // 设置绘制结果
-            var imageData = ctx.getImageData(0, 0, this.canvasRect.width, this.canvasRect.height);
-            this.curveImage.source = feng3d.dataTransform.imageDataToDataURL(imageData);
+            this.curveImage.source = imageUtil.toDataURL();
         }
 
         /**
@@ -388,8 +387,6 @@ namespace editor
         }
     }
 
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
     var imageUtil = new feng3d.ImageUtil();
 
     /**
@@ -408,17 +405,6 @@ namespace editor
      */
     function clearCanvas(width: number, height: number, fillStyle = feng3d.Color4.fromUnit24(0x565656))
     {
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-        canvas.width = width;
-        canvas.height = height;
-        //
-        var ctx = canvas.getContext("2d");
-        // ctx.clearRect(0, 0, width, height);
-        // 绘制背景
-        ctx.fillStyle = fillStyle.toColor3().toHexString();
-        ctx.fillRect(0, 0, width, height);
-
         imageUtil.init(width, height, fillStyle);
     }
 
@@ -430,17 +416,6 @@ namespace editor
      */
     function drawPointsCurve(xpoints: number[], ypoints: number[], strokeStyle = new feng3d.Color4())
     {
-        var ctx = canvas.getContext("2d");
-        ctx.beginPath();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = strokeStyle.toColor3().toHexString();
-        ctx.moveTo(xpoints[0], ypoints[0]);
-        for (let i = 1; i < xpoints.length; i++)
-        {
-            ctx.lineTo(xpoints[i], ypoints[i]);
-        }
-        ctx.stroke();
-
         //
         for (let i = 0; i < xpoints.length - 1; i++)
         {
@@ -457,13 +432,6 @@ namespace editor
      */
     function drawPoints(xpoints: number[], ypoints: number[], fillStyle = new feng3d.Color4(), pointSize = 1)
     {
-        var ctx = canvas.getContext("2d");
-        ctx.fillStyle = fillStyle.toColor3().toHexString();
-        for (let i = 0; i < xpoints.length; i++)
-        {
-            ctx.fillRect(xpoints[i] - pointSize / 2, ypoints[i] - pointSize / 2, pointSize, pointSize);
-        }
-
         //
         for (let i = 0; i < xpoints.length; i++)
         {
@@ -479,19 +447,8 @@ namespace editor
      */
     function drawLines(lines: Line[], strokeStyle = new feng3d.Color4(), lineWidth = 1)
     {
-        var ctx = canvas.getContext("2d");
-        ctx.beginPath();
-        ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = strokeStyle.toColor3().toHexString();
-        for (let i = 0; i < lines.length; i++)
-        {
-            ctx.moveTo(lines[i].start.x, lines[i].start.y);
-            ctx.lineTo(lines[i].end.x, lines[i].end.y);
-        }
-        ctx.stroke();
-
         //
-        for (let i = 0; i < lines.length - 1; i++)
+        for (let i = 0; i < lines.length; i++)
         {
             imageUtil.drawLine(lines[i].start, lines[i].end, strokeStyle);
         }
