@@ -63,7 +63,7 @@ namespace editor
 
             if (this.curveGroup.width < 10 || this.curveGroup.height < 10) return;
 
-            clearCanvas(canvas, this.canvasRect.width, this.canvasRect.height, "#565656");
+            clearCanvas(this.canvasRect.width, this.canvasRect.height, feng3d.Color4.fromUnit24(0x565656));
             this.drawGrid();
 
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
@@ -110,7 +110,7 @@ namespace editor
                 var xSamples = sameples.map(value => (this.curveRect.x + this.curveRect.width * value.time));
                 var ySamples = sameples.map(value => (this.curveRect.y + this.curveRect.height * (1 - value.value)));
                 // 绘制曲线
-                drawPointsCurve(canvas, xSamples, ySamples, 'red', 1);
+                drawPointsCurve(xSamples, ySamples, new feng3d.Color4(1, 0, 0));
             }
         }
 
@@ -128,7 +128,7 @@ namespace editor
                 var currenty = this.curveRect.y + (1 - key.value) * this.curveRect.height;
 
                 // 绘制曲线端点
-                drawPoints(canvas, [currentx], [currenty], "red", pointSize)
+                drawPoints([currentx], [currenty], new feng3d.Color4(1, 0, 0), pointSize)
             }
         }
 
@@ -157,24 +157,24 @@ namespace editor
                 {
                     // 左边控制点
                     var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPoints(canvas, [lcp.x], [lcp.y], "blue", pointSize)
+                    drawPoints([lcp.x], [lcp.y], new feng3d.Color4(0, 0, 1), pointSize)
                 }
                 if (i < n - 1)
                 {
                     var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPoints(canvas, [rcp.x], [rcp.y], "blue", pointSize)
+                    drawPoints([rcp.x], [rcp.y], new feng3d.Color4(0, 0, 1), pointSize)
                 }
                 // 绘制控制点
                 if (i > 0)
                 {
                     // 左边控制点
                     var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPointsCurve(canvas, [currentx, lcp.x], [currenty, lcp.y], "yellow", 1)
+                    drawPointsCurve([currentx, lcp.x], [currenty, lcp.y], new feng3d.Color4(1, 1, 0));
                 }
                 if (i < n - 1)
                 {
                     var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPointsCurve(canvas, [currentx, rcp.x], [currenty, rcp.y], "yellow", 1)
+                    drawPointsCurve([currentx, rcp.x], [currenty, rcp.y], new feng3d.Color4(1, 1, 0));
                 }
             }
         }
@@ -184,10 +184,10 @@ namespace editor
             //
             var lines0: Line[] = [];
             var lines1: Line[] = [];
-            var line: { start: { x: number, y: number }, end: { x: number, y: number } };
+            var line: Line;
             for (var i = 0; i <= 10; i++)
             {
-                line = { start: { x: i / 10, y: 0 }, end: { x: i / 10, y: 1 } };
+                line = { start: new feng3d.Vector2(i / 10, 0), end: new feng3d.Vector2(i / 10, 1) };
                 if (i % 2 == 0)
                     lines0.push(line);
                 else
@@ -195,7 +195,7 @@ namespace editor
             }
             for (var i = 0; i <= 2; i++)
             {
-                line = { start: { x: 0, y: i / 2 }, end: { x: 1, y: i / 2 } };
+                line = { start: new feng3d.Vector2(0, i / 2), end: new feng3d.Vector2(1, i / 2) };
                 if (i % 2 == 0)
                     lines0.push(line);
                 else
@@ -208,8 +208,8 @@ namespace editor
                 v.end.x = this.curveRect.x + this.curveRect.width * v.end.x;
                 v.end.y = this.curveRect.y + this.curveRect.height * v.end.y;
             });
-            drawLines(canvas, lines0, "#494949");
-            drawLines(canvas, lines1, "#4f4f4f");
+            drawLines(lines0, feng3d.Color4.fromUnit24(0x494949));
+            drawLines(lines1, feng3d.Color4.fromUnit24(0x4f4f4f));
         }
 
         private _onMinMaxCurveChanged()
@@ -390,6 +390,8 @@ namespace editor
 
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
+    var imageUtil = new feng3d.ImageUtil();
+
     /**
      * 点绘制尺寸
      */
@@ -404,7 +406,7 @@ namespace editor
      * 清理画布
      * @param canvas 画布
      */
-    function clearCanvas(canvas: HTMLCanvasElement, width: number, height: number, fillStyle = "#565656")
+    function clearCanvas(width: number, height: number, fillStyle = feng3d.Color4.fromUnit24(0x565656))
     {
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
@@ -414,8 +416,10 @@ namespace editor
         var ctx = canvas.getContext("2d");
         // ctx.clearRect(0, 0, width, height);
         // 绘制背景
-        ctx.fillStyle = fillStyle;
+        ctx.fillStyle = fillStyle.toColor3().toHexString();
         ctx.fillRect(0, 0, width, height);
+
+        imageUtil.init(width, height, fillStyle);
     }
 
     /**
@@ -424,18 +428,24 @@ namespace editor
      * @param points 曲线上的点
      * @param strokeStyle 曲线颜色
      */
-    function drawPointsCurve(canvas: HTMLCanvasElement, xpoints: number[], ypoints: number[], strokeStyle = 'white', lineWidth = 1)
+    function drawPointsCurve(xpoints: number[], ypoints: number[], strokeStyle = new feng3d.Color4())
     {
         var ctx = canvas.getContext("2d");
         ctx.beginPath();
-        ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = strokeStyle;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = strokeStyle.toColor3().toHexString();
         ctx.moveTo(xpoints[0], ypoints[0]);
         for (let i = 1; i < xpoints.length; i++)
         {
             ctx.lineTo(xpoints[i], ypoints[i]);
         }
         ctx.stroke();
+
+        //
+        for (let i = 0; i < xpoints.length - 1; i++)
+        {
+            imageUtil.drawLine(new feng3d.Vector2(xpoints[i], ypoints[i]), new feng3d.Vector2(xpoints[i + 1], ypoints[i + 1]), strokeStyle);
+        }
     }
 
     /**
@@ -445,13 +455,19 @@ namespace editor
      * @param ypoints 曲线上的点y坐标
      * @param fillStyle 曲线颜色
      */
-    function drawPoints(canvas: HTMLCanvasElement, xpoints: number[], ypoints: number[], fillStyle = 'white', lineWidth = 1)
+    function drawPoints(xpoints: number[], ypoints: number[], fillStyle = new feng3d.Color4(), pointSize = 1)
     {
         var ctx = canvas.getContext("2d");
-        ctx.fillStyle = fillStyle;
+        ctx.fillStyle = fillStyle.toColor3().toHexString();
         for (let i = 0; i < xpoints.length; i++)
         {
-            ctx.fillRect(xpoints[i] - lineWidth / 2, ypoints[i] - lineWidth / 2, lineWidth, lineWidth);
+            ctx.fillRect(xpoints[i] - pointSize / 2, ypoints[i] - pointSize / 2, pointSize, pointSize);
+        }
+
+        //
+        for (let i = 0; i < xpoints.length; i++)
+        {
+            imageUtil.drawPoint(xpoints[i], ypoints[i], fillStyle, pointSize);
         }
     }
 
@@ -461,20 +477,25 @@ namespace editor
      * @param lines 线条列表数据
      * @param strokeStyle 线条颜色
      */
-    function drawLines(canvas: HTMLCanvasElement, lines: Line[], strokeStyle = 'white', lineWidth = 1)
+    function drawLines(lines: Line[], strokeStyle = new feng3d.Color4(), lineWidth = 1)
     {
         var ctx = canvas.getContext("2d");
         ctx.beginPath();
         ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = strokeStyle;
+        ctx.strokeStyle = strokeStyle.toColor3().toHexString();
         for (let i = 0; i < lines.length; i++)
         {
             ctx.moveTo(lines[i].start.x, lines[i].start.y);
             ctx.lineTo(lines[i].end.x, lines[i].end.y);
         }
         ctx.stroke();
+
+        //
+        for (let i = 0; i < lines.length - 1; i++)
+        {
+            imageUtil.drawLine(lines[i].start, lines[i].end, strokeStyle);
+        }
     }
 
-    interface Line { start: { x: number, y: number }, end: { x: number, y: number } }
-
+    interface Line { start: feng3d.Vector2, end: feng3d.Vector2 }
 }
