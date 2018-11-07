@@ -2991,6 +2991,9 @@ var editor;
             _this.minMaxCurve = new feng3d.MinMaxCurve();
             _this.editing = false;
             _this.mousedownxy = { x: -1, y: -1 };
+            _this.curveColor = new feng3d.Color4(1, 0, 0);
+            _this.backColor = feng3d.Color4.fromUnit24(0x565656);
+            _this.fillTwoCurvesColor = new feng3d.Color4(1, 1, 1, 0.2);
             _this.skinName = "MinMaxCurveEditor";
             return _this;
         }
@@ -3015,19 +3018,19 @@ var editor;
             this.canvasRect = new feng3d.Rectangle(0, 0, this.width, this.height);
             if (this.curveGroup.width < 10 || this.curveGroup.height < 10)
                 return;
-            clearCanvas(this.canvasRect.width, this.canvasRect.height, feng3d.Color4.fromUnit24(0x565656));
+            imageUtil.init(this.canvasRect.width, this.canvasRect.height, this.backColor);
             this.drawGrid();
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
                 this.timeline = this.minMaxCurve.minMaxCurve;
                 this.timeline1 = null;
-                this.drawCurve(this.timeline);
+                imageUtil.drawCurve(this.timeline, this.minMaxCurve.between0And1, this.curveColor, this.curveRect);
                 this.drawCurveKeys(this.timeline);
             }
             else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
                 var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
                 this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
                 this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
-                imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0), new feng3d.Color4(1, 1, 1, 0.2), this.curveRect);
+                imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveColor, this.fillTwoCurvesColor, this.curveRect);
                 this.drawCurveKeys(this.timeline);
                 this.drawCurveKeys(this.timeline1);
             }
@@ -3036,33 +3039,18 @@ var editor;
             this.curveImage.source = imageUtil.toDataURL();
         };
         /**
-         * 绘制曲线
-         * @param animationCurve
-         */
-        MinMaxCurveEditor.prototype.drawCurve = function (animationCurve) {
-            var _this = this;
-            // 绘制曲线
-            if (animationCurve.keys.length > 0) {
-                var sameples = animationCurve.getSamples(this.curveRect.width);
-                var xSamples = sameples.map(function (value) { return (_this.curveRect.x + _this.curveRect.width * value.time); });
-                var ySamples = sameples.map(function (value) { return (_this.curveRect.y + _this.curveRect.height * (1 - value.value)); });
-                // 绘制曲线
-                drawPointsCurve(xSamples, ySamples, new feng3d.Color4(1, 0, 0));
-            }
-        };
-        /**
          * 绘制曲线关键点
          * @param animationCurve
          */
         MinMaxCurveEditor.prototype.drawCurveKeys = function (animationCurve) {
-            // 绘制曲线关键点
-            for (var i = 0, n = animationCurve.keys.length; i < n; i++) {
-                var key = animationCurve.keys[i];
-                var currentx = this.curveRect.x + key.time * this.curveRect.width;
-                var currenty = this.curveRect.y + (1 - key.value) * this.curveRect.height;
-                // 绘制曲线端点
-                drawPoints([currentx], [currenty], new feng3d.Color4(1, 0, 0), pointSize);
-            }
+            var _this = this;
+            var c = new feng3d.Color4(1, 0, 0);
+            var range = this.minMaxCurve.between0And1 ? [1, 0] : [1, -1];
+            animationCurve.keys.forEach(function (key) {
+                var x = feng3d.FMath.mapLinear(key.time, 0, 1, _this.curveRect.left, _this.curveRect.right);
+                var y = feng3d.FMath.mapLinear(key.value, range[0], range[1], _this.curveRect.top, _this.curveRect.bottom);
+                imageUtil.drawPoint(x, y, c, pointSize);
+            });
         };
         /**
          * 绘制选中的关键点
@@ -3076,19 +3064,21 @@ var editor;
             if (i == -1)
                 return;
             var n = this.selectTimeline.keys.length;
-            var current = new feng3d.Vector2(this.curveRect.x + key.time * this.curveRect.width, this.curveRect.y + (1 - key.value) * this.curveRect.height);
-            imageUtil.drawPoint(current.x, current.y, new feng3d.Color4(), pointSize);
+            var c = new feng3d.Color4();
+            var range = this.minMaxCurve.between0And1 ? [1, 0] : [1, -1];
+            var current = new feng3d.Vector2(feng3d.FMath.mapLinear(key.time, 0, 1, this.curveRect.left, this.curveRect.right), feng3d.FMath.mapLinear(key.value, range[0], range[1], this.curveRect.top, this.curveRect.bottom));
+            imageUtil.drawPoint(current.x, current.y, c, pointSize);
             var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
             if (this.selectedKey == key) {
                 // 绘制控制点
                 if (i > 0) {
                     var lcp = new feng3d.Vector2(current.x - controllerLength * Math.cos(Math.atan(currenttan)), current.y + controllerLength * Math.sin(Math.atan(currenttan)));
-                    drawPoints([lcp.x], [lcp.y], new feng3d.Color4(), pointSize);
+                    imageUtil.drawPoint(lcp.x, lcp.y, c, pointSize);
                     imageUtil.drawLine(current, lcp, new feng3d.Color4());
                 }
                 if (i < n - 1) {
                     var rcp = new feng3d.Vector2(current.x + controllerLength * Math.cos(Math.atan(currenttan)), current.y - controllerLength * Math.sin(Math.atan(currenttan)));
-                    drawPoints([rcp.x], [rcp.y], new feng3d.Color4(), pointSize);
+                    imageUtil.drawPoint(rcp.x, rcp.y, c, pointSize);
                     imageUtil.drawLine(current, rcp, new feng3d.Color4());
                 }
             }
@@ -3096,31 +3086,23 @@ var editor;
         MinMaxCurveEditor.prototype.drawGrid = function () {
             var _this = this;
             //
-            var lines0 = [];
-            var lines1 = [];
-            var line;
+            var lines = [];
+            var c0 = feng3d.Color4.fromUnit24(0x494949);
+            var c1 = feng3d.Color4.fromUnit24(0x4f4f4f);
             for (var i = 0; i <= 10; i++) {
-                line = { start: new feng3d.Vector2(i / 10, 0), end: new feng3d.Vector2(i / 10, 1) };
-                if (i % 2 == 0)
-                    lines0.push(line);
-                else
-                    lines1.push(line);
+                lines.push({ start: new feng3d.Vector2(i / 10, 0), end: new feng3d.Vector2(i / 10, 1), color: i % 2 == 0 ? c0 : c1 });
             }
             for (var i = 0; i <= 2; i++) {
-                line = { start: new feng3d.Vector2(0, i / 2), end: new feng3d.Vector2(1, i / 2) };
-                if (i % 2 == 0)
-                    lines0.push(line);
-                else
-                    lines1.push(line);
+                lines.push({ start: new feng3d.Vector2(0, i / 2), end: new feng3d.Vector2(1, i / 2), color: i % 2 == 0 ? c0 : c1 });
             }
-            lines0.concat(lines1).forEach(function (v) {
+            lines.forEach(function (v) {
                 v.start.x = _this.curveRect.x + _this.curveRect.width * v.start.x;
                 v.start.y = _this.curveRect.y + _this.curveRect.height * v.start.y;
                 v.end.x = _this.curveRect.x + _this.curveRect.width * v.end.x;
                 v.end.y = _this.curveRect.y + _this.curveRect.height * v.end.y;
+                //
+                imageUtil.drawLine(v.start, v.end, v.color);
             });
-            drawLines(lines0, feng3d.Color4.fromUnit24(0x494949));
-            drawLines(lines1, feng3d.Color4.fromUnit24(0x4f4f4f));
         };
         MinMaxCurveEditor.prototype._onMinMaxCurveChanged = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -3266,56 +3248,6 @@ var editor;
      * 控制柄长度
      */
     var controllerLength = 50;
-    /**
-     * 清理画布
-     * @param canvas 画布
-     */
-    function clearCanvas(width, height, fillStyle) {
-        if (fillStyle === void 0) { fillStyle = feng3d.Color4.fromUnit24(0x565656); }
-        imageUtil.init(width, height, fillStyle);
-    }
-    /**
-     * 绘制曲线
-     * @param canvas 画布
-     * @param points 曲线上的点
-     * @param strokeStyle 曲线颜色
-     */
-    function drawPointsCurve(xpoints, ypoints, strokeStyle) {
-        if (strokeStyle === void 0) { strokeStyle = new feng3d.Color4(); }
-        //
-        for (var i = 0; i < xpoints.length - 1; i++) {
-            imageUtil.drawLine(new feng3d.Vector2(xpoints[i], ypoints[i]), new feng3d.Vector2(xpoints[i + 1], ypoints[i + 1]), strokeStyle);
-        }
-    }
-    /**
-     * 绘制点
-     * @param canvas 画布
-     * @param xpoints 曲线上的点x坐标
-     * @param ypoints 曲线上的点y坐标
-     * @param fillStyle 曲线颜色
-     */
-    function drawPoints(xpoints, ypoints, fillStyle, pointSize) {
-        if (fillStyle === void 0) { fillStyle = new feng3d.Color4(); }
-        if (pointSize === void 0) { pointSize = 1; }
-        //
-        for (var i = 0; i < xpoints.length; i++) {
-            imageUtil.drawPoint(xpoints[i], ypoints[i], fillStyle, pointSize);
-        }
-    }
-    /**
-     * 绘制线条
-     * @param canvas 画布
-     * @param lines 线条列表数据
-     * @param strokeStyle 线条颜色
-     */
-    function drawLines(lines, strokeStyle, lineWidth) {
-        if (strokeStyle === void 0) { strokeStyle = new feng3d.Color4(); }
-        if (lineWidth === void 0) { lineWidth = 1; }
-        //
-        for (var i = 0; i < lines.length; i++) {
-            imageUtil.drawLine(lines[i].start, lines[i].end, strokeStyle);
-        }
-    }
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

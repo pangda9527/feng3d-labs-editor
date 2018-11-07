@@ -801,15 +801,13 @@ declare namespace editor {
         private mousedownxy;
         private selectedKey;
         private selectTimeline;
+        private curveColor;
+        private backColor;
+        private fillTwoCurvesColor;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
         updateView(): void;
-        /**
-         * 绘制曲线
-         * @param animationCurve
-         */
-        private drawCurve;
         /**
          * 绘制曲线关键点
          * @param animationCurve
