@@ -3076,29 +3076,20 @@ var editor;
             if (i == -1)
                 return;
             var n = this.selectTimeline.keys.length;
-            var currentx = this.curveRect.x + key.time * this.curveRect.width;
-            var currenty = this.curveRect.y + (1 - key.value) * this.curveRect.height;
+            var current = new feng3d.Vector2(this.curveRect.x + key.time * this.curveRect.width, this.curveRect.y + (1 - key.value) * this.curveRect.height);
+            imageUtil.drawPoint(current.x, current.y, new feng3d.Color4(), pointSize);
             var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
             if (this.selectedKey == key) {
                 // 绘制控制点
                 if (i > 0) {
-                    // 左边控制点
-                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPoints([lcp.x], [lcp.y], new feng3d.Color4(0, 0, 1), pointSize);
+                    var lcp = new feng3d.Vector2(current.x - controllerLength * Math.cos(Math.atan(currenttan)), current.y + controllerLength * Math.sin(Math.atan(currenttan)));
+                    drawPoints([lcp.x], [lcp.y], new feng3d.Color4(), pointSize);
+                    imageUtil.drawLine(current, lcp, new feng3d.Color4());
                 }
                 if (i < n - 1) {
-                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPoints([rcp.x], [rcp.y], new feng3d.Color4(0, 0, 1), pointSize);
-                }
-                // 绘制控制点
-                if (i > 0) {
-                    // 左边控制点
-                    var lcp = { x: currentx - controllerLength * Math.cos(Math.atan(currenttan)), y: currenty + controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPointsCurve([currentx, lcp.x], [currenty, lcp.y], new feng3d.Color4(1, 1, 0));
-                }
-                if (i < n - 1) {
-                    var rcp = { x: currentx + controllerLength * Math.cos(Math.atan(currenttan)), y: currenty - controllerLength * Math.sin(Math.atan(currenttan)) };
-                    drawPointsCurve([currentx, rcp.x], [currenty, rcp.y], new feng3d.Color4(1, 1, 0));
+                    var rcp = new feng3d.Vector2(current.x + controllerLength * Math.cos(Math.atan(currenttan)), current.y - controllerLength * Math.sin(Math.atan(currenttan)));
+                    drawPoints([rcp.x], [rcp.y], new feng3d.Color4(), pointSize);
+                    imageUtil.drawLine(current, rcp, new feng3d.Color4());
                 }
             }
         };
