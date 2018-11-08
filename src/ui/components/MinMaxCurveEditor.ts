@@ -247,19 +247,19 @@ namespace editor
             }
         }
 
-        private drawGrid()
+        private drawGrid(segmentW = 10, segmentH = 2)
         {
             //
             var lines: { start: feng3d.Vector2, end: feng3d.Vector2, color: feng3d.Color4 }[] = [];
             var c0 = feng3d.Color4.fromUnit24(0x494949);
             var c1 = feng3d.Color4.fromUnit24(0x4f4f4f);
-            for (var i = 0; i <= 10; i++)
+            for (var i = 0; i <= segmentW; i++)
             {
-                lines.push({ start: new feng3d.Vector2(i / 10, 0), end: new feng3d.Vector2(i / 10, 1), color: i % 2 == 0 ? c0 : c1 });
+                lines.push({ start: new feng3d.Vector2(i / segmentW, 0), end: new feng3d.Vector2(i / segmentW, 1), color: i % 2 == 0 ? c0 : c1 });
             }
-            for (var i = 0; i <= 2; i++)
+            for (var i = 0; i <= segmentH; i++)
             {
-                lines.push({ start: new feng3d.Vector2(0, i / 2), end: new feng3d.Vector2(1, i / 2), color: i % 2 == 0 ? c0 : c1 });
+                lines.push({ start: new feng3d.Vector2(0, i / segmentH), end: new feng3d.Vector2(1, i / segmentH), color: i % 2 == 0 ? c0 : c1 });
             }
             lines.forEach(v =>
             {
