@@ -66,31 +66,29 @@ namespace editor
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient)
                 {
-                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.minMaxGradient).toDataURL();
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
                     //
                     if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                 {
-                    var randomBetweenTwoColors = <feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient
-                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(randomBetweenTwoColors.colorMin).toDataURL();
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(this.minMaxGradient.color).toDataURL();
                     //
-                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawColorRect(randomBetweenTwoColors.colorMax).toDataURL();
+                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawColorRect(this.minMaxGradient.color1).toDataURL();
                     //
                     if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients)
                 {
-                    var randomBetweenTwoGradients = <feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient
-                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(randomBetweenTwoGradients.gradientMin).toDataURL();
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
                     //
-                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawMinMaxGradient(randomBetweenTwoGradients.gradientMax).toDataURL();
+                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawMinMaxGradient(this.minMaxGradient.gradient1).toDataURL();
                     //
                     if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
                 else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomColor)
                 {
-                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient((<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient).toDataURL();
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
                     //
                     if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
                 }
@@ -119,23 +117,23 @@ namespace editor
                     {
                         case feng3d.MinMaxGradientMode.Color:
                             view = colorPickerView = colorPickerView || new editor.ColorPickerView();
-                            colorPickerView.color = (<feng3d.MinMaxGradientColor>this.minMaxGradient.minMaxGradient).color;
+                            colorPickerView.color = this.minMaxGradient.color;
                             break;
                         case feng3d.MinMaxGradientMode.Gradient:
                             view = gradientEditor = gradientEditor || new editor.GradientEditor();
-                            gradientEditor.gradient = (<feng3d.Gradient>this.minMaxGradient.minMaxGradient);
+                            gradientEditor.gradient = this.minMaxGradient.gradient;
                             break;
                         case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
                             view = colorPickerView = colorPickerView || new editor.ColorPickerView();
-                            colorPickerView.color = (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMin;
+                            colorPickerView.color = this.minMaxGradient.color;
                             break;
                         case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
                             view = gradientEditor = gradientEditor || new editor.GradientEditor();
-                            gradientEditor.gradient = (<feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient).gradientMin;
+                            gradientEditor.gradient = this.minMaxGradient.gradient;
                             break;
                         case feng3d.MinMaxGradientMode.RandomColor:
                             view = gradientEditor = gradientEditor || new editor.GradientEditor();
-                            gradientEditor.gradient = (<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient;
+                            gradientEditor.gradient = this.minMaxGradient.gradient;
                             break;
                     }
                     break;
@@ -145,11 +143,11 @@ namespace editor
                     {
                         case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
                             view = colorPickerView = colorPickerView || new editor.ColorPickerView();
-                            colorPickerView.color = (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMax;
+                            colorPickerView.color = this.minMaxGradient.color1;
                             break;
                         case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
                             view = gradientEditor = gradientEditor || new editor.GradientEditor();
-                            gradientEditor.gradient = (<feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient).gradientMax;
+                            gradientEditor.gradient = this.minMaxGradient.gradient1;
                             break;
                     }
                     break;
@@ -182,19 +180,19 @@ namespace editor
                 switch (this.minMaxGradient.mode)
                 {
                     case feng3d.MinMaxGradientMode.Color:
-                        (<feng3d.MinMaxGradientColor>this.minMaxGradient.minMaxGradient).color = (<feng3d.Color4>colorPickerView.color).clone();
+                        this.minMaxGradient.color = (<feng3d.Color4>colorPickerView.color).clone();
                         break;
                     case feng3d.MinMaxGradientMode.Gradient:
-                        this.minMaxGradient.minMaxGradient = gradientEditor.gradient;
+                        this.minMaxGradient.gradient = gradientEditor.gradient;
                         break;
                     case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
-                        (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMin = (<feng3d.Color4>colorPickerView.color).clone();
+                        this.minMaxGradient.color = (<feng3d.Color4>colorPickerView.color).clone();
                         break;
                     case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
-                        (<feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient).gradientMin = gradientEditor.gradient;
+                        this.minMaxGradient.gradient = gradientEditor.gradient;
                         break;
                     case feng3d.MinMaxGradientMode.RandomColor:
-                        (<feng3d.MinMaxGradientRandomColor>this.minMaxGradient.minMaxGradient).gradient = gradientEditor.gradient;
+                        this.minMaxGradient.gradient = gradientEditor.gradient;
                         break;
                 }
             } else if (this.activeColorGroup == this.colorGroup1)
@@ -202,10 +200,10 @@ namespace editor
                 switch (this.minMaxGradient.mode)
                 {
                     case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
-                        (<feng3d.RandomBetweenTwoColors>this.minMaxGradient.minMaxGradient).colorMax = (<feng3d.Color4>colorPickerView.color).clone();
+                        this.minMaxGradient.color1 = (<feng3d.Color4>colorPickerView.color).clone();
                         break;
                     case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
-                        (<feng3d.RandomBetweenTwoGradients>this.minMaxGradient.minMaxGradient).gradientMax = gradientEditor.gradient;
+                        this.minMaxGradient.gradient1 = gradientEditor.gradient;
                         break;
                 }
             }
