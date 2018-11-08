@@ -84,10 +84,12 @@ namespace editor
             this.yLabels = [this.y_0, this.y_1, this.y_2, this.y_3];
             this.xLabels = [this.x_0, this.x_1, this.x_2, this.x_3, this.x_4, this.x_5, this.x_6, this.x_7, this.x_8, this.x_9, this.x_10];
 
-            this.sampleImages = [this.sample_0, this.sample_1, this.sample_2, this.sample_3, this.sample_4, this.sample_5, this.sample_5, this.sample_6, this.sample_7];
+            this.sampleImages = [this.sample_0, this.sample_1, this.sample_2, this.sample_3, this.sample_4, this.sample_5, this.sample_6, this.sample_7];
 
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
+
+            this.sampleImages.forEach(v => v.addEventListener(egret.MouseEvent.CLICK, this.onSampleClick, this));
 
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
 
@@ -105,6 +107,8 @@ namespace editor
 
         $onRemoveFromStage()
         {
+            this.sampleImages.forEach(v => v.removeEventListener(egret.MouseEvent.CLICK, this.onSampleClick, this));
+
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
 
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
@@ -195,6 +199,31 @@ namespace editor
                 else
                 {
                     element.parent && element.parent.removeChild(element);
+                }
+            }
+        }
+
+        private onSampleClick(e: egret.MouseEvent)
+        {
+            for (let i = 0; i < this.sampleImages.length; i++)
+            {
+                const element = this.sampleImages[i];
+                if (element == e.currentTarget)
+                {
+                    var curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
+                    var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
+                    if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
+                    {
+                        var curve = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
+                        Object.setValue(curve, curves[i]);
+                    } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
+                    {
+                        var doubleCurve = <feng3d.MinMaxCurveRandomBetweenTwoCurves>this.minMaxCurve.minMaxCurve;
+                        Object.setValue(doubleCurve, doubleCurves[i]);
+                    }
+                    this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                    this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                    break;
                 }
             }
         }

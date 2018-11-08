@@ -3008,12 +3008,14 @@ var editor;
             return _this;
         }
         MinMaxCurveEditor.prototype.$onAddToStage = function (stage, nestLevel) {
+            var _this = this;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.yLabels = [this.y_0, this.y_1, this.y_2, this.y_3];
             this.xLabels = [this.x_0, this.x_1, this.x_2, this.x_3, this.x_4, this.x_5, this.x_6, this.x_7, this.x_8, this.x_9, this.x_10];
-            this.sampleImages = [this.sample_0, this.sample_1, this.sample_2, this.sample_3, this.sample_4, this.sample_5, this.sample_5, this.sample_6, this.sample_7];
+            this.sampleImages = [this.sample_0, this.sample_1, this.sample_2, this.sample_3, this.sample_4, this.sample_5, this.sample_6, this.sample_7];
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
+            this.sampleImages.forEach(function (v) { return v.addEventListener(egret.MouseEvent.CLICK, _this.onSampleClick, _this); });
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.minMaxCurve, attribute: "curveMultiplier", textInput: this.multiplierInput, editable: true,
@@ -3025,6 +3027,8 @@ var editor;
             this.updateView();
         };
         MinMaxCurveEditor.prototype.$onRemoveFromStage = function () {
+            var _this = this;
+            this.sampleImages.forEach(function (v) { return v.removeEventListener(egret.MouseEvent.CLICK, _this.onSampleClick, _this); });
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
@@ -3092,6 +3096,26 @@ var editor;
                 }
                 else {
                     element.parent && element.parent.removeChild(element);
+                }
+            }
+        };
+        MinMaxCurveEditor.prototype.onSampleClick = function (e) {
+            for (var i = 0; i < this.sampleImages.length; i++) {
+                var element = this.sampleImages[i];
+                if (element == e.currentTarget) {
+                    var curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
+                    var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
+                    if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
+                        var curve = this.minMaxCurve.minMaxCurve;
+                        Object.setValue(curve, curves[i]);
+                    }
+                    else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
+                        var doubleCurve = this.minMaxCurve.minMaxCurve;
+                        Object.setValue(doubleCurve, doubleCurves[i]);
+                    }
+                    this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                    this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                    break;
                 }
             }
         };

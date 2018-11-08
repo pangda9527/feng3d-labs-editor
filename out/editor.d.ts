@@ -850,6 +850,7 @@ declare namespace editor {
         updateView(): void;
         private updateXYLabels;
         private updateSampleImages;
+        private onSampleClick;
         /**
          * 绘制曲线关键点
          * @param animationCurve
