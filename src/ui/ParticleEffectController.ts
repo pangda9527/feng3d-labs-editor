@@ -7,13 +7,14 @@ namespace editor
     {
         public pauseBtn: eui.Button;
         public stopBtn: eui.Button;
+        public speedInput: eui.TextInput;
+        public timeInput: eui.TextInput;
+        public particlesInput: eui.TextInput;
+
         //
         private saveParent: egret.DisplayObjectContainer;
         private particleSystems: feng3d.ParticleSystem[] = [];
-        //
-        private playbackSpeed: number;
-        private playbackTime: number;
-        private particles: number;
+
 
         constructor()
         {
@@ -61,9 +62,14 @@ namespace editor
             var v = this.particleSystems;
             if (v)
             {
-                this.playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
-                this.playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
-                this.particles = this.particleSystems.reduce((pv, cv) => { pv += cv.numActiveParticles; return pv; }, 0);
+                var playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
+                var playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
+                var particles = this.particleSystems.reduce((pv, cv) => { pv += cv.numActiveParticles; return pv; }, 0);
+
+                //
+                this.speedInput.text = playbackSpeed.toString();
+                this.timeInput.text = playbackTime.toFixed(3);
+                this.particlesInput.text = particles.toString();
             }
         }
 

@@ -312,11 +312,11 @@ declare namespace editor {
     class ParticleEffectController extends eui.Component {
         pauseBtn: eui.Button;
         stopBtn: eui.Button;
+        speedInput: eui.TextInput;
+        timeInput: eui.TextInput;
+        particlesInput: eui.TextInput;
         private saveParent;
         private particleSystems;
-        private playbackSpeed;
-        private playbackTime;
-        private particles;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;

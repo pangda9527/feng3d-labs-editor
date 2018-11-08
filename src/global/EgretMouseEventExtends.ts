@@ -48,39 +48,6 @@ namespace egret
         MouseEvent.RIGHT_CLICK = "rightclick";
         MouseEvent.DOUBLE_CLICK = "dblclick";
         //
-
-        //解决TextInput.text绑定Number是不显示0的bug
-        var p = egret.DisplayObject.prototype;
-        var old = p.dispatchEvent;
-        p.dispatchEvent = function (event: egret.Event): boolean
-        {
-            if (event.type == MouseEvent.MOUSE_OVER)
-            {
-                //鼠标已经在对象上时停止over冒泡
-                if (this.isMouseOver)
-                {
-                    event.stopPropagation();
-                    return true;
-                }
-                this.isMouseOver = true;
-            }
-            if (event.type == MouseEvent.MOUSE_OUT)
-            {
-                //如果再次mouseover的对象是该对象的子对象时停止out事件冒泡
-                var displayObject = overDisplayObject;
-                while (displayObject)
-                {
-                    if (this == displayObject)
-                    {
-                        event.stopPropagation();
-                        return true;
-                    }
-                    displayObject = displayObject.parent;
-                }
-                this.isMouseOver = false;
-            }
-            return old.call(this, event);
-        };
     })();
 
     var overDisplayObject: egret.DisplayObject;

@@ -1193,9 +1193,13 @@ var editor;
         ParticleEffectController.prototype.onEnterFrame = function () {
             var v = this.particleSystems;
             if (v) {
-                this.playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
-                this.playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
-                this.particles = this.particleSystems.reduce(function (pv, cv) { pv += cv.numActiveParticles; return pv; }, 0);
+                var playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
+                var playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
+                var particles = this.particleSystems.reduce(function (pv, cv) { pv += cv.numActiveParticles; return pv; }, 0);
+                //
+                this.speedInput.text = playbackSpeed.toString();
+                this.timeInput.text = playbackTime.toFixed(3);
+                this.particlesInput.text = particles.toString();
             }
         };
         ParticleEffectController.prototype.initView = function () {
@@ -11420,32 +11424,6 @@ var egret;
         egret.MouseEvent.RIGHT_CLICK = "rightclick";
         egret.MouseEvent.DOUBLE_CLICK = "dblclick";
         //
-        //解决TextInput.text绑定Number是不显示0的bug
-        var p = egret.DisplayObject.prototype;
-        var old = p.dispatchEvent;
-        p.dispatchEvent = function (event) {
-            if (event.type == egret.MouseEvent.MOUSE_OVER) {
-                //鼠标已经在对象上时停止over冒泡
-                if (this.isMouseOver) {
-                    event.stopPropagation();
-                    return true;
-                }
-                this.isMouseOver = true;
-            }
-            if (event.type == egret.MouseEvent.MOUSE_OUT) {
-                //如果再次mouseover的对象是该对象的子对象时停止out事件冒泡
-                var displayObject = overDisplayObject;
-                while (displayObject) {
-                    if (this == displayObject) {
-                        event.stopPropagation();
-                        return true;
-                    }
-                    displayObject = displayObject.parent;
-                }
-                this.isMouseOver = false;
-            }
-            return old.call(this, event);
-        };
     })();
     var overDisplayObject;
     egret.mouseEventEnvironment = function () {
