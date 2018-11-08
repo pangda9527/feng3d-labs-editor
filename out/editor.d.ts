@@ -2841,15 +2841,17 @@ declare namespace egret {
         new (): TouchEvent;
         /** 鼠标按下 */
         MOUSE_DOWN: "mousedown";
-        MOUSE_MIDDLE_DOWN: "mousemiddledown";
         /** 鼠标弹起 */
         MOUSE_UP: "mouseup";
-        MIDDLE_MOUSE_UP: "middlemouseup";
-        RIGHT_MOUSE_UP: "rightmouseup";
         /** 鼠标移动 */
         MOUSE_MOVE: "mousemove";
         /** 鼠标单击 */
         CLICK: "click";
+        /** 鼠标中键按下 */
+        MIDDLE_MOUSE_DOWN: "middlemousedown";
+        /** 鼠标中键弹起 */
+        MIDDLE_MOUSE_UP: "middlemouseup";
+        /** 鼠标中键点击 */
         MIDDLE_Click: "middleclick";
         /** 鼠标移出 */
         MOUSE_OUT: "mouseout";
@@ -2857,6 +2859,8 @@ declare namespace egret {
         MOUSE_OVER: "mouseover";
         /** 右键按下 */
         RIGHT_MOUSE_DOWN: "rightmousedown";
+        /** 鼠标右键弹起 */
+        RIGHT_MOUSE_UP: "rightmouseup";
         /** 右键点击 */
         RIGHT_CLICK: "rightclick";
         /** 双击 */

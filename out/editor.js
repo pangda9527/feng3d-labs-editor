@@ -11408,7 +11408,7 @@ var egret;
     (function () {
         //映射事件名称
         egret.MouseEvent.MOUSE_DOWN = "mousedown";
-        egret.MouseEvent.MOUSE_MIDDLE_DOWN = "mousemiddledown";
+        egret.MouseEvent.MIDDLE_MOUSE_DOWN = "middlemousedown";
         egret.MouseEvent.MOUSE_UP = "mouseup";
         egret.MouseEvent.MIDDLE_MOUSE_UP = "middlemouseup";
         egret.MouseEvent.RIGHT_MOUSE_UP = "rightmouseup";
@@ -11473,7 +11473,7 @@ var egret;
                 egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_DOWN, true, true, x, y);
             }
             else if (e.button == 1) {
-                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_MIDDLE_DOWN, true, true, x, y);
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MIDDLE_MOUSE_DOWN, true, true, x, y);
             }
             else if (e.button == 2) {
                 egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_MOUSE_DOWN, true, true, x, y);

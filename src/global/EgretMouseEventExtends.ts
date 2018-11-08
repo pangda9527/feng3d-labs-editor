@@ -7,15 +7,17 @@ namespace egret
         new(): TouchEvent;
         /** 鼠标按下 */
         MOUSE_DOWN: "mousedown";
-        MOUSE_MIDDLE_DOWN: "mousemiddledown";
         /** 鼠标弹起 */
         MOUSE_UP: "mouseup";
-        MIDDLE_MOUSE_UP: "middlemouseup";
-        RIGHT_MOUSE_UP: "rightmouseup";
         /** 鼠标移动 */
         MOUSE_MOVE: "mousemove";
         /** 鼠标单击 */
         CLICK: "click";
+        /** 鼠标中键按下 */
+        MIDDLE_MOUSE_DOWN: "middlemousedown";
+        /** 鼠标中键弹起 */
+        MIDDLE_MOUSE_UP: "middlemouseup";
+        /** 鼠标中键点击 */
         MIDDLE_Click: "middleclick";
         /** 鼠标移出 */
         MOUSE_OUT: "mouseout";
@@ -23,6 +25,8 @@ namespace egret
         MOUSE_OVER: "mouseover";
         /** 右键按下 */
         RIGHT_MOUSE_DOWN: "rightmousedown";
+        /** 鼠标右键弹起 */
+        RIGHT_MOUSE_UP: "rightmouseup";
         /** 右键点击 */
         RIGHT_CLICK: "rightclick";
         /** 双击 */
@@ -32,7 +36,7 @@ namespace egret
     {
         //映射事件名称
         MouseEvent.MOUSE_DOWN = "mousedown";
-        MouseEvent.MOUSE_MIDDLE_DOWN = "mousemiddledown";
+        MouseEvent.MIDDLE_MOUSE_DOWN = "middlemousedown";
         MouseEvent.MOUSE_UP = "mouseup";
         MouseEvent.MIDDLE_MOUSE_UP = "middlemouseup";
         MouseEvent.RIGHT_MOUSE_UP = "rightmouseup";
@@ -114,7 +118,7 @@ namespace egret
                 egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MOUSE_DOWN, true, true, x, y);
             } else if (e.button == 1)
             {
-                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MOUSE_MIDDLE_DOWN, true, true, x, y);
+                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MIDDLE_MOUSE_DOWN, true, true, x, y);
             } else if (e.button == 2)
             {
                 egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.RIGHT_MOUSE_DOWN, true, true, x, y);
