@@ -29,6 +29,7 @@ namespace editor
 
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.curveGroup.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
 
             this.updateView();
         }
@@ -38,6 +39,7 @@ namespace editor
 
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.curveGroup.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
 
             super.$onRemoveFromStage()
         }
@@ -129,5 +131,32 @@ namespace editor
 
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
+
+        private _onRightClick()
+        {
+            var menus: MenuItem[] = [{
+                label: "Copy", click: () =>
+                {
+                    copyCurve = this.minMaxCurve.minMaxCurve;
+                    copyMode = this.minMaxCurve.mode;
+                    copyBetween0And1 = this.minMaxCurve.between0And1;
+                }
+            }];
+            if (copyCurve && this.minMaxCurve.mode == copyMode && copyBetween0And1 == this.minMaxCurve.between0And1)
+            {
+                menus.push({
+                    label: "Paste", click: () =>
+                    {
+                        Object.setValue(this.minMaxCurve.minMaxCurve, copyCurve);
+                        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                    }
+                });
+            }
+            menu.popup(menus)
+        }
     }
+
+    var copyCurve: feng3d.IMinMaxCurve;
+    var copyMode: feng3d.MinMaxCurveMode;
+    var copyBetween0And1: boolean;
 }

@@ -2898,11 +2898,13 @@ var editor;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.curveGroup.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
             this.updateView();
         };
         MinMaxCurveView.prototype.$onRemoveFromStage = function () {
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.curveGroup.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
         MinMaxCurveView.prototype.updateView = function () {
@@ -2975,12 +2977,34 @@ var editor;
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
+        MinMaxCurveView.prototype._onRightClick = function () {
+            var _this = this;
+            var menus = [{
+                    label: "Copy", click: function () {
+                        copyCurve = _this.minMaxCurve.minMaxCurve;
+                        copyMode = _this.minMaxCurve.mode;
+                        copyBetween0And1 = _this.minMaxCurve.between0And1;
+                    }
+                }];
+            if (copyCurve && this.minMaxCurve.mode == copyMode && copyBetween0And1 == this.minMaxCurve.between0And1) {
+                menus.push({
+                    label: "Paste", click: function () {
+                        Object.setValue(_this.minMaxCurve.minMaxCurve, copyCurve);
+                        _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
+                    }
+                });
+            }
+            editor.menu.popup(menus);
+        };
         __decorate([
             feng3d.watch("_onMinMaxCurveChanged")
         ], MinMaxCurveView.prototype, "minMaxCurve", void 0);
         return MinMaxCurveView;
     }(eui.Component));
     editor.MinMaxCurveView = MinMaxCurveView;
+    var copyCurve;
+    var copyMode;
+    var copyBetween0And1;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

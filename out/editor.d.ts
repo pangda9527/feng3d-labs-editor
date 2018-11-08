@@ -782,6 +782,7 @@ declare namespace editor {
         private _onMinMaxCurveChanged;
         private onClick;
         private onPickerViewChanged;
+        private _onRightClick;
     }
 }
 declare namespace editor {
