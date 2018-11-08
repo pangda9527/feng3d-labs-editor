@@ -53,22 +53,20 @@ namespace editor
             {
                 this.constantGroup.visible = true;
 
-                var minMaxCurveConstant = <feng3d.MinMaxCurveConstant>this.minMaxCurve.minMaxCurve;
                 this.addBinder(new NumberTextInputBinder().init({
-                    space: minMaxCurveConstant, attribute: "value", textInput: this.constantTextInput, editable: true,
+                    space: this.minMaxCurve, attribute: "constant", textInput: this.constantTextInput, editable: true,
                     controller: null,
                 }));
             } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants)
             {
                 this.randomBetweenTwoConstantsGroup.visible = true;
 
-                var minMaxCurveRandomBetweenTwoConstants = <feng3d.MinMaxCurveRandomBetweenTwoConstants>this.minMaxCurve.minMaxCurve;
                 this.addBinder(new NumberTextInputBinder().init({
-                    space: minMaxCurveRandomBetweenTwoConstants, attribute: "minValue", textInput: this.minValueTextInput, editable: true,
+                    space: this.minMaxCurve, attribute: "constant", textInput: this.minValueTextInput, editable: true,
                     controller: null,
                 }));
                 this.addBinder(new NumberTextInputBinder().init({
-                    space: minMaxCurveRandomBetweenTwoConstants, attribute: "maxValue", textInput: this.maxValueTextInput, editable: true,
+                    space: this.minMaxCurve, attribute: "constant1", textInput: this.maxValueTextInput, editable: true,
                     controller: null,
                 }));
             } else
@@ -77,12 +75,10 @@ namespace editor
                 var imageUtil = new feng3d.ImageUtil(this.curveGroup.width - 2, this.curveGroup.height - 2, feng3d.Color4.fromUnit(0xff565656));
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
                 {
-                    var animationCurve = <feng3d.AnimationCurve>this.minMaxCurve.minMaxCurve;
-                    imageUtil.drawCurve(animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawCurve(this.minMaxCurve.curve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
                 {
-                    var minMaxCurveRandomBetweenTwoCurves = <feng3d.MinMaxCurveRandomBetweenTwoCurves>this.minMaxCurve.minMaxCurve;
-                    imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curve1, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
                 this.curveImage.source = imageUtil.toDataURL();
             }
@@ -137,7 +133,7 @@ namespace editor
             var menus: MenuItem[] = [{
                 label: "Copy", click: () =>
                 {
-                    copyCurve = this.minMaxCurve.minMaxCurve;
+                    copyCurve = this.minMaxCurve;
                     copyMode = this.minMaxCurve.mode;
                     copyBetween0And1 = this.minMaxCurve.between0And1;
                 }
@@ -147,7 +143,9 @@ namespace editor
                 menus.push({
                     label: "Paste", click: () =>
                     {
-                        Object.setValue(this.minMaxCurve.minMaxCurve, copyCurve);
+                        Object.setValue(this.minMaxCurve.curve, copyCurve.curve);
+                        if (copyMode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
+                            Object.setValue(this.minMaxCurve.curve1, copyCurve.curve1);
                         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                     }
                 });
@@ -156,7 +154,7 @@ namespace editor
         }
     }
 
-    var copyCurve: feng3d.IMinMaxCurve;
+    var copyCurve: feng3d.MinMaxCurve;
     var copyMode: feng3d.MinMaxCurveMode;
     var copyBetween0And1: boolean;
 }

@@ -2883,21 +2883,19 @@ var editor;
             this.randomBetweenTwoConstantsGroup.visible = false;
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant) {
                 this.constantGroup.visible = true;
-                var minMaxCurveConstant = this.minMaxCurve.minMaxCurve;
                 this.addBinder(new editor.NumberTextInputBinder().init({
-                    space: minMaxCurveConstant, attribute: "value", textInput: this.constantTextInput, editable: true,
+                    space: this.minMaxCurve, attribute: "constant", textInput: this.constantTextInput, editable: true,
                     controller: null,
                 }));
             }
             else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants) {
                 this.randomBetweenTwoConstantsGroup.visible = true;
-                var minMaxCurveRandomBetweenTwoConstants = this.minMaxCurve.minMaxCurve;
                 this.addBinder(new editor.NumberTextInputBinder().init({
-                    space: minMaxCurveRandomBetweenTwoConstants, attribute: "minValue", textInput: this.minValueTextInput, editable: true,
+                    space: this.minMaxCurve, attribute: "constant", textInput: this.minValueTextInput, editable: true,
                     controller: null,
                 }));
                 this.addBinder(new editor.NumberTextInputBinder().init({
-                    space: minMaxCurveRandomBetweenTwoConstants, attribute: "maxValue", textInput: this.maxValueTextInput, editable: true,
+                    space: this.minMaxCurve, attribute: "constant1", textInput: this.maxValueTextInput, editable: true,
                     controller: null,
                 }));
             }
@@ -2905,12 +2903,10 @@ var editor;
                 this.curveGroup.visible = true;
                 var imageUtil = new feng3d.ImageUtil(this.curveGroup.width - 2, this.curveGroup.height - 2, feng3d.Color4.fromUnit(0xff565656));
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
-                    var animationCurve = this.minMaxCurve.minMaxCurve;
-                    imageUtil.drawCurve(animationCurve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawCurve(this.minMaxCurve.curve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
                 else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
-                    var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
-                    imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                    imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curve1, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
                 this.curveImage.source = imageUtil.toDataURL();
             }
@@ -2951,7 +2947,7 @@ var editor;
             var _this = this;
             var menus = [{
                     label: "Copy", click: function () {
-                        copyCurve = _this.minMaxCurve.minMaxCurve;
+                        copyCurve = _this.minMaxCurve;
                         copyMode = _this.minMaxCurve.mode;
                         copyBetween0And1 = _this.minMaxCurve.between0And1;
                     }
@@ -2959,7 +2955,9 @@ var editor;
             if (copyCurve && this.minMaxCurve.mode == copyMode && copyBetween0And1 == this.minMaxCurve.between0And1) {
                 menus.push({
                     label: "Paste", click: function () {
-                        Object.setValue(_this.minMaxCurve.minMaxCurve, copyCurve);
+                        Object.setValue(_this.minMaxCurve.curve, copyCurve.curve);
+                        if (copyMode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
+                            Object.setValue(_this.minMaxCurve.curve1, copyCurve.curve1);
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     }
                 });
@@ -3039,17 +3037,14 @@ var editor;
                 return;
             this.imageUtil.init(this.canvasRect.width, this.canvasRect.height, this.backColor);
             this.drawGrid();
+            this.timeline = this.minMaxCurve.curve;
+            this.timeline1 = this.minMaxCurve.curve1;
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
-                this.timeline = this.minMaxCurve.minMaxCurve;
-                this.timeline1 = null;
                 this.imageUtil.drawCurve(this.timeline, this.minMaxCurve.between0And1, this.curveColor, this.curveRect);
                 this.drawCurveKeys(this.timeline);
             }
             else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
-                var minMaxCurveRandomBetweenTwoCurves = this.minMaxCurve.minMaxCurve;
-                this.timeline = minMaxCurveRandomBetweenTwoCurves.curveMin;
-                this.timeline1 = minMaxCurveRandomBetweenTwoCurves.curveMax;
-                this.imageUtil.drawBetweenTwoCurves(minMaxCurveRandomBetweenTwoCurves, this.minMaxCurve.between0And1, this.curveColor, this.fillTwoCurvesColor, this.curveRect);
+                this.imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curve1, this.minMaxCurve.between0And1, this.curveColor, this.fillTwoCurvesColor, this.curveRect);
                 this.drawCurveKeys(this.timeline);
                 this.drawCurveKeys(this.timeline1);
             }
@@ -3084,7 +3079,7 @@ var editor;
                     var imageUtil = new feng3d.ImageUtil(element.width, element.height, this.backColor);
                     if (!this.minMaxCurve.between0And1)
                         imageUtil.drawLine(new feng3d.Vector2(0, element.height / 2), new feng3d.Vector2(element.width, element.height / 2), feng3d.Color4.BLACK);
-                    imageUtil.drawBetweenTwoCurves(doubleCurves[i], this.minMaxCurve.between0And1, feng3d.Color4.WHITE);
+                    imageUtil.drawBetweenTwoCurves(doubleCurves[i].curveMin, doubleCurves[i].curveMax, this.minMaxCurve.between0And1, feng3d.Color4.WHITE);
                     element.source = imageUtil.toDataURL();
                     this.samplesGroup.addChild(element);
                 }
@@ -3100,12 +3095,12 @@ var editor;
                     var curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
                     var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
                     if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
-                        var curve = this.minMaxCurve.minMaxCurve;
+                        var curve = this.minMaxCurve.curve;
                         Object.setValue(curve, curves[i]);
                     }
                     else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
-                        var doubleCurve = this.minMaxCurve.minMaxCurve;
-                        Object.setValue(doubleCurve, doubleCurves[i]);
+                        Object.setValue(this.minMaxCurve.curve, doubleCurves[i].curveMin);
+                        Object.setValue(this.minMaxCurve.curve1, doubleCurves[i].curveMax);
                     }
                     this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                     this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
@@ -3368,73 +3363,72 @@ var editor;
         Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
         Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
     ];
-    var particleDoubleCurves = [
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
+    var particleDoubleCurves = [{
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
     ];
     var particleDoubleCurvesSingend = [
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: -1, tangent: 0 }, { time: 1, value: -1, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
-        Object.setValue(new feng3d.MinMaxCurveRandomBetweenTwoCurves(), {
-            curveMin: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
-        }),
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: -1, tangent: 0 }, { time: 1, value: -1, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
+        {
+            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+        },
     ];
 })(editor || (editor = {}));
 var editor;
