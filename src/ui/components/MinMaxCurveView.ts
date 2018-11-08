@@ -130,23 +130,24 @@ namespace editor
 
         private _onRightClick()
         {
+            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant || this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants)
+                return;
+
             var menus: MenuItem[] = [{
                 label: "Copy", click: () =>
                 {
-                    copyCurve = this.minMaxCurve;
-                    copyMode = this.minMaxCurve.mode;
-                    copyBetween0And1 = this.minMaxCurve.between0And1;
+                    copyCurve = Object.deepClone(this.minMaxCurve);
                 }
             }];
-            if (copyCurve && this.minMaxCurve.mode == copyMode && copyBetween0And1 == this.minMaxCurve.between0And1)
+            if (copyCurve && this.minMaxCurve.mode == copyCurve.mode && copyCurve.between0And1 == this.minMaxCurve.between0And1)
             {
                 menus.push({
                     label: "Paste", click: () =>
                     {
-                        Object.setValue(this.minMaxCurve.curve, copyCurve.curve);
-                        if (copyMode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
-                            Object.setValue(this.minMaxCurve.curve1, copyCurve.curve1);
+                        Object.setValue(this.minMaxCurve, copyCurve);
+
                         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                        this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
                     }
                 });
             }
@@ -155,6 +156,4 @@ namespace editor
     }
 
     var copyCurve: feng3d.MinMaxCurve;
-    var copyMode: feng3d.MinMaxCurveMode;
-    var copyBetween0And1: boolean;
 }

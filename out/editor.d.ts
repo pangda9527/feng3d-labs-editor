@@ -918,6 +918,7 @@ declare namespace editor {
         private activeColorGroup;
         private onClick;
         private onPickerViewChanged;
+        private _onRightClick;
     }
 }
 declare namespace editor {

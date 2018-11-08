@@ -2945,20 +2945,19 @@ var editor;
         };
         MinMaxCurveView.prototype._onRightClick = function () {
             var _this = this;
+            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant || this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants)
+                return;
             var menus = [{
                     label: "Copy", click: function () {
-                        copyCurve = _this.minMaxCurve;
-                        copyMode = _this.minMaxCurve.mode;
-                        copyBetween0And1 = _this.minMaxCurve.between0And1;
+                        copyCurve = Object.deepClone(_this.minMaxCurve);
                     }
                 }];
-            if (copyCurve && this.minMaxCurve.mode == copyMode && copyBetween0And1 == this.minMaxCurve.between0And1) {
+            if (copyCurve && this.minMaxCurve.mode == copyCurve.mode && copyCurve.between0And1 == this.minMaxCurve.between0And1) {
                 menus.push({
                     label: "Paste", click: function () {
-                        Object.setValue(_this.minMaxCurve.curve, copyCurve.curve);
-                        if (copyMode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
-                            Object.setValue(_this.minMaxCurve.curve1, copyCurve.curve1);
+                        Object.setValue(_this.minMaxCurve, copyCurve);
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
+                        _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
                     }
                 });
             }
@@ -2971,8 +2970,6 @@ var editor;
     }(eui.Component));
     editor.MinMaxCurveView = MinMaxCurveView;
     var copyCurve;
-    var copyMode;
-    var copyBetween0And1;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -3495,6 +3492,8 @@ var editor;
             this.colorGroup1.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.colorGroup1.addEventListener(egret.Event.RESIZE, this.onReSize, this);
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup0.addEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
+            this.colorGroup1.addEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
             this.updateView();
         };
         MinMaxGradientView.prototype.$onRemoveFromStage = function () {
@@ -3503,6 +3502,8 @@ var editor;
             this.colorGroup1.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.colorGroup1.removeEventListener(egret.Event.RESIZE, this.onReSize, this);
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.colorGroup0.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
+            this.colorGroup1.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
             _super.prototype.$onRemoveFromStage.call(this);
         };
         MinMaxGradientView.prototype.updateView = function () {
@@ -3645,12 +3646,57 @@ var editor;
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
+        MinMaxGradientView.prototype._onRightClick = function (e) {
+            var _this = this;
+            var mode = this.minMaxGradient.mode;
+            var target = e.currentTarget;
+            var menus = [{
+                    label: "Copy", click: function () {
+                        if (target == _this.colorGroup0) {
+                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                                copyColor = _this.minMaxGradient.color.clone();
+                            else
+                                copyGradient = Object.deepClone(_this.minMaxGradient.gradient);
+                        }
+                        else if (target == _this.colorGroup1) {
+                            if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                                copyColor = _this.minMaxGradient.color1.clone();
+                            else
+                                copyGradient = Object.deepClone(_this.minMaxGradient.gradient1);
+                        }
+                    }
+                }];
+            if ((copyGradient != null && (mode == feng3d.MinMaxGradientMode.Gradient || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients || mode == feng3d.MinMaxGradientMode.RandomColor))
+                || (copyColor != null && (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors))) {
+                menus.push({
+                    label: "Paste", click: function () {
+                        if (target == _this.colorGroup0) {
+                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                                _this.minMaxGradient.color.copy(copyColor);
+                            else
+                                Object.setValue(_this.minMaxGradient.gradient, copyGradient);
+                        }
+                        else if (target == _this.colorGroup1) {
+                            if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                                _this.minMaxGradient.color1.copy(copyColor);
+                            else
+                                Object.setValue(_this.minMaxGradient.gradient1, copyGradient);
+                        }
+                        _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
+                        _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                    }
+                });
+            }
+            editor.menu.popup(menus);
+        };
         __decorate([
             feng3d.watch("_onMinMaxGradientChanged")
         ], MinMaxGradientView.prototype, "minMaxGradient", void 0);
         return MinMaxGradientView;
     }(eui.Component));
     editor.MinMaxGradientView = MinMaxGradientView;
+    var copyGradient;
+    var copyColor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

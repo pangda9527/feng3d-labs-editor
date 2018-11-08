@@ -37,6 +37,9 @@ namespace editor
 
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
 
+            this.colorGroup0.addEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
+            this.colorGroup1.addEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
+
             this.updateView();
         }
 
@@ -48,6 +51,9 @@ namespace editor
             this.colorGroup1.removeEventListener(egret.Event.RESIZE, this.onReSize, this);
 
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+
+            this.colorGroup0.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
+            this.colorGroup1.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
 
             super.$onRemoveFromStage()
         }
@@ -209,9 +215,64 @@ namespace editor
             }
 
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
 
+        private _onRightClick(e: egret.MouseEvent)
+        {
+            var mode = this.minMaxGradient.mode;
+            var target = e.currentTarget;
+
+            var menus: MenuItem[] = [{
+                label: "Copy", click: () =>
+                {
+                    if (target == this.colorGroup0)
+                    {
+                        if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                            copyColor = this.minMaxGradient.color.clone();
+                        else
+                            copyGradient = Object.deepClone(this.minMaxGradient.gradient);
+                    } else if (target == this.colorGroup1)
+                    {
+                        if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                            copyColor = this.minMaxGradient.color1.clone();
+                        else
+                            copyGradient = Object.deepClone(this.minMaxGradient.gradient1);
+                    }
+                }
+            }];
+            if ((copyGradient != null && (mode == feng3d.MinMaxGradientMode.Gradient || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients || mode == feng3d.MinMaxGradientMode.RandomColor))
+                || (copyColor != null && (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors))
+            )
+            {
+                menus.push({
+                    label: "Paste", click: () =>
+                    {
+                        if (target == this.colorGroup0)
+                        {
+                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                                this.minMaxGradient.color.copy(copyColor);
+                            else
+                                Object.setValue(this.minMaxGradient.gradient, copyGradient);
+                        } else if (target == this.colorGroup1)
+                        {
+                            if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                                this.minMaxGradient.color1.copy(copyColor);
+                            else
+                                Object.setValue(this.minMaxGradient.gradient1, copyGradient);
+                        }
+
+                        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                        this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                    }
+                });
+            }
+            menu.popup(menus)
+        }
+
     }
+
+    var copyGradient: feng3d.Gradient;
+    var copyColor: feng3d.Color4;
+
 }
