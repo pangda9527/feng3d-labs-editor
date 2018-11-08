@@ -51,14 +51,16 @@ namespace editor
             super.initView();
             if (this.editable)
             {
-                feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+                // feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+                this.controller && this.controller.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             }
         }
 
         dispose()
         {
             super.dispose();
-            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            // feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            this.controller && this.controller.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         }
 
         protected onValueChanged()
@@ -79,12 +81,9 @@ namespace editor
         private mouseDownPosition = new feng3d.Vector2();
         private mouseDownValue = 0;
 
-        private onMouseDown()
+        private onMouseDown(e: egret.MouseEvent)
         {
-            if (!this.controller) return;
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var p = this.controller.localToGlobal(0, 0);
-            if (!new feng3d.Rectangle(p.x, p.y, this.controller.width, this.controller.height).containsPoint(mousePos)) return;
 
             //
             this.mouseDownPosition = mousePos;

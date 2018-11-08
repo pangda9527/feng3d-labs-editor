@@ -11,6 +11,7 @@ namespace editor
         {
             super();
             this.skinName = "TipString";
+            this.touchChildren = this.touchEnabled = false;
         }
 
         @feng3d.watch("valuechanged")

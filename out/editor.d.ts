@@ -359,9 +359,6 @@ declare namespace editor {
      * 注：不支持 SplitGroup 中两个对象都是Group，不支持两个对象都使用百分比宽高
      */
     class SplitGroup extends eui.Group {
-        private _onMouseMovethis;
-        private _onMouseDownthis;
-        private _onMouseUpthis;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -690,9 +687,8 @@ declare namespace editor {
         private tipView;
         register(displayObject: egret.DisplayObject, tip: any): void;
         unregister(displayObject: egret.DisplayObject): void;
-        private ischeck;
-        private _ischeck;
-        private onMouseMove;
+        private onMouseOver;
+        private onMouseOut;
         private removeTipview;
     }
 }
@@ -2844,17 +2840,23 @@ declare namespace egret {
         prototype: TouchEvent;
         new (): TouchEvent;
         /** 鼠标按下 */
-        MOUSE_DOWN: string;
+        MOUSE_DOWN: "mousedown";
+        MOUSE_MIDDLE_DOWN: "mousemiddledown";
         /** 鼠标弹起 */
-        MOUSE_UP: string;
+        MOUSE_UP: "mouseup";
+        MIDDLE_MOUSE_UP: "middlemouseup";
+        RIGHT_MOUSE_UP: "rightmouseup";
         /** 鼠标移动 */
-        MOUSE_MOVE: string;
+        MOUSE_MOVE: "mousemove";
         /** 鼠标单击 */
-        CLICK: string;
+        CLICK: "click";
+        MIDDLE_Click: "middleclick";
         /** 鼠标移出 */
         MOUSE_OUT: "mouseout";
         /** 鼠标移入 */
         MOUSE_OVER: "mouseover";
+        /** 右键按下 */
+        RIGHT_MOUSE_DOWN: "rightmousedown";
         /** 右键点击 */
         RIGHT_CLICK: "rightclick";
         /** 双击 */

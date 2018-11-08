@@ -1394,37 +1394,31 @@ var editor;
         }
         SplitGroup.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            this._onMouseMovethis = this.onMouseMove.bind(this);
-            this._onMouseDownthis = this.onMouseDown.bind(this);
-            this._onMouseUpthis = this.onMouseUp.bind(this);
-            egretDiv.addEventListener("mousemove", this._onMouseMovethis);
-            egretDiv.addEventListener("mousedown", this._onMouseDownthis);
-            egretDiv.addEventListener("mouseup", this._onMouseUpthis);
+            this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            this.addEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
         };
         SplitGroup.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
-            egretDiv.removeEventListener("mousemove", this._onMouseMovethis);
-            egretDiv.removeEventListener("mousedown", this._onMouseDownthis);
-            egretDiv.removeEventListener("mouseup", this._onMouseUpthis);
-            this._onMouseMovethis = null;
-            this._onMouseDownthis = null;
-            this._onMouseUpthis = null;
+            this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            this.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
         };
         SplitGroup.prototype.onMouseMove = function (e) {
             if (splitdragData.splitGroupState == SplitGroupState.default) {
-                this._findSplit(e.layerX, e.layerY);
+                this._findSplit(e.stageX, e.stageY);
                 return;
             }
             if (splitdragData.splitGroup != this)
                 return;
             if (splitdragData.splitGroupState == SplitGroupState.onSplit) {
-                this._findSplit(e.layerX, e.layerY);
+                this._findSplit(e.stageX, e.stageY);
             }
             else if (splitdragData.splitGroupState == SplitGroupState.draging) {
                 var preElement = splitdragData.preElement;
                 var nextElement = splitdragData.nextElement;
                 if (splitdragData.layouttype == 1) {
-                    var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, e.layerX));
+                    var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, e.stageX));
                     var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
                     var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
                     if (preElement instanceof eui.Group) {
@@ -1441,7 +1435,7 @@ var editor;
                     }
                 }
                 else {
-                    var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, e.layerY));
+                    var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, e.stageY));
                     var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
                     var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
                     if (preElement instanceof eui.Group) {
@@ -1498,7 +1492,7 @@ var editor;
         SplitGroup.prototype.onMouseDown = function (e) {
             if (splitdragData.splitGroupState == SplitGroupState.onSplit) {
                 splitdragData.splitGroupState = SplitGroupState.draging;
-                splitdragData.dragingMousePoint = new feng3d.Vector2(e.layerX, e.layerY);
+                splitdragData.dragingMousePoint = new feng3d.Vector2(e.stageX, e.stageY);
                 //
                 var preElement = splitdragData.preElement;
                 var nextElement = splitdragData.nextElement;
@@ -2482,66 +2476,38 @@ var editor;
              */
             this.tipviewmap = new Map();
             this.tipmap = new Map();
-            this._ischeck = false;
         }
         ToolTip.prototype.register = function (displayObject, tip) {
             if (!displayObject)
                 return;
             this.tipmap.set(displayObject, tip);
-            this.ischeck = !!this.tipmap.size;
+            displayObject.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
         };
         ToolTip.prototype.unregister = function (displayObject) {
             if (!displayObject)
                 return;
             this.tipmap.delete(displayObject);
-            this.ischeck = !!this.tipmap.size;
+            displayObject.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
         };
-        Object.defineProperty(ToolTip.prototype, "ischeck", {
-            get: function () {
-                return this._ischeck;
-            },
-            set: function (v) {
-                if (this._ischeck == v)
-                    return;
-                this._ischeck = v;
-                if (this._ischeck) {
-                    feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-                }
-                else {
-                    feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ToolTip.prototype.onMouseMove = function (event) {
-            var displayObjects = this.tipmap.getKeys().filter(function (item) {
-                if (!item.stage)
-                    return false;
-                return item.getTransformedBounds(item.stage).contains(event.clientX, event.clientY);
-            });
-            var displayObject = displayObjects[0];
-            if (displayObject) {
-                var tip = this.tipmap.get(displayObject);
-                var tipviewcls = this.tipviewmap.get(tip.constructor);
-                if (!tipviewcls)
-                    tipviewcls = this.defaultTipview();
-                if (this.tipView) {
-                    if (!(this.tipView instanceof tipviewcls)) {
-                        this.removeTipview();
-                    }
-                }
-                if (!this.tipView) {
-                    this.tipView = new tipviewcls();
-                }
-                editor.editorui.tooltipLayer.addChild(this.tipView);
-                this.tipView.value = tip;
-                this.tipView.x = event.clientX;
-                this.tipView.y = event.clientY - this.tipView.height;
-            }
-            else {
-                this.removeTipview();
-            }
+        ToolTip.prototype.onMouseOver = function (event) {
+            this.removeTipview();
+            var displayObject = event.currentTarget;
+            var tip = this.tipmap.get(displayObject);
+            var tipviewcls = this.tipviewmap.get(tip.constructor);
+            if (!tipviewcls)
+                tipviewcls = this.defaultTipview();
+            this.tipView = new tipviewcls();
+            editor.editorui.tooltipLayer.addChild(this.tipView);
+            this.tipView.value = tip;
+            this.tipView.x = feng3d.windowEventProxy.clientX;
+            this.tipView.y = feng3d.windowEventProxy.clientY - this.tipView.height;
+            //
+            displayObject.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+        };
+        ToolTip.prototype.onMouseOut = function (event) {
+            var displayObject = event.currentTarget;
+            displayObject.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+            this.removeTipview();
         };
         ToolTip.prototype.removeTipview = function () {
             if (this.tipView) {
@@ -3940,6 +3906,7 @@ var editor;
             var _this = _super.call(this) || this;
             _this.value = "";
             _this.skinName = "TipString";
+            _this.touchChildren = _this.touchEnabled = false;
             return _this;
         }
         TipString.prototype.$onAddToStage = function (stage, nestLevel) {
@@ -4102,12 +4069,14 @@ var editor;
         NumberTextInputBinder.prototype.initView = function () {
             _super.prototype.initView.call(this);
             if (this.editable) {
-                feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+                // feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+                this.controller && this.controller.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             }
         };
         NumberTextInputBinder.prototype.dispose = function () {
             _super.prototype.dispose.call(this);
-            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            // feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            this.controller && this.controller.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         };
         NumberTextInputBinder.prototype.onValueChanged = function () {
             var value = this.space[this.attribute];
@@ -4120,13 +4089,8 @@ var editor;
             this.space[this.attribute] = value;
             _super.prototype.onValueChanged.call(this);
         };
-        NumberTextInputBinder.prototype.onMouseDown = function () {
-            if (!this.controller)
-                return;
+        NumberTextInputBinder.prototype.onMouseDown = function (e) {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var p = this.controller.localToGlobal(0, 0);
-            if (!new feng3d.Rectangle(p.x, p.y, this.controller.width, this.controller.height).containsPoint(mousePos))
-                return;
             //
             this.mouseDownPosition = mousePos;
             this.mouseDownValue = this.space[this.attribute];
@@ -11443,11 +11407,16 @@ var egret;
     egret.MouseEvent = egret.TouchEvent;
     (function () {
         //映射事件名称
-        egret.MouseEvent.MOUSE_DOWN = egret.TouchEvent.TOUCH_BEGIN;
-        egret.MouseEvent.MOUSE_UP = egret.TouchEvent.TOUCH_END;
-        egret.MouseEvent.MOUSE_MOVE = egret.TouchEvent.TOUCH_MOVE;
-        egret.MouseEvent.CLICK = egret.TouchEvent.TOUCH_TAP;
+        egret.MouseEvent.MOUSE_DOWN = "mousedown";
+        egret.MouseEvent.MOUSE_MIDDLE_DOWN = "mousemiddledown";
+        egret.MouseEvent.MOUSE_UP = "mouseup";
+        egret.MouseEvent.MIDDLE_MOUSE_UP = "middlemouseup";
+        egret.MouseEvent.RIGHT_MOUSE_UP = "rightmouseup";
+        egret.MouseEvent.MOUSE_MOVE = "mousemove";
+        egret.MouseEvent.CLICK = "click";
+        egret.MouseEvent.MIDDLE_Click = "middleclick";
         egret.MouseEvent.MOUSE_OUT = "mouseout";
+        egret.MouseEvent.RIGHT_MOUSE_DOWN = "rightmousedown";
         egret.MouseEvent.RIGHT_CLICK = "rightclick";
         egret.MouseEvent.DOUBLE_CLICK = "dblclick";
         //
@@ -11483,32 +11452,58 @@ var egret;
         var webTouchHandler;
         var canvas;
         var touch;
-        var rightmousedownObject;
+        // 鼠标按下时选中对象
+        var mousedownObject;
+        // /**
+        //  * 鼠标按下的按钮编号
+        //  */
+        // var mousedownButton: number;
         webTouchHandler = getWebTouchHandler();
         canvas = webTouchHandler.canvas;
         touch = webTouchHandler.touch;
         webTouchHandler.canvas.addEventListener("mousemove", onMouseMove);
         feng3d.windowEventProxy.on("mousedown", function (e) {
-            //右键按下
-            if (e.button != 2)
-                return;
-            var location = webTouchHandler.getLocation(e);
-            var x = location.x;
-            var y = location.y;
-            rightmousedownObject = touch["findTarget"](x, y);
-        });
-        feng3d.windowEventProxy.on("mouseup", function (e) {
-            //右键按下
-            if (e.button != 2)
-                return;
             var location = webTouchHandler.getLocation(e);
             var x = location.x;
             var y = location.y;
             var target = touch["findTarget"](x, y);
-            if (target == rightmousedownObject) {
-                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_CLICK, true, true, x, y);
-                rightmousedownObject = null;
+            // mousedownButton = e.button;
+            mousedownObject = target;
+            if (e.button == 0) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_DOWN, true, true, x, y);
             }
+            else if (e.button == 1) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_MIDDLE_DOWN, true, true, x, y);
+            }
+            else if (e.button == 2) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_MOUSE_DOWN, true, true, x, y);
+            }
+        });
+        feng3d.windowEventProxy.on("mouseup", function (e) {
+            //右键按下
+            var location = webTouchHandler.getLocation(e);
+            var x = location.x;
+            var y = location.y;
+            var target = touch["findTarget"](x, y);
+            if (e.button == 0) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_UP, true, true, x, y);
+                if (mousedownObject == target) {
+                    egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.CLICK, true, true, x, y);
+                }
+            }
+            else if (e.button == 1) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MIDDLE_MOUSE_UP, true, true, x, y);
+                if (mousedownObject == target) {
+                    egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MIDDLE_Click, true, true, x, y);
+                }
+            }
+            else if (e.button == 2) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_MOUSE_UP, true, true, x, y);
+                if (mousedownObject == target) {
+                    egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_CLICK, true, true, x, y);
+                }
+            }
+            mousedownObject = null;
         });
         feng3d.windowEventProxy.on("dblclick", function (e) {
             var location = webTouchHandler.getLocation(e);

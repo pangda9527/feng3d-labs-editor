@@ -25,67 +25,41 @@ namespace editor
         {
             if (!displayObject) return;
             this.tipmap.set(displayObject, tip);
-            this.ischeck = !!this.tipmap.size;
+            displayObject.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
         }
 
         unregister(displayObject: egret.DisplayObject)
         {
             if (!displayObject) return;
             this.tipmap.delete(displayObject);
-            this.ischeck = !!this.tipmap.size;
+            displayObject.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
         }
 
-        private get ischeck()
+        private onMouseOver(event: egret.MouseEvent)
         {
-            return this._ischeck;
-        }
-        private set ischeck(v)
-        {
-            if (this._ischeck == v) return;
-            this._ischeck = v;
-            if (this._ischeck)
-            {
-                feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-            } else
-            {
-                feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-            }
-        }
-        private _ischeck = false;
+            this.removeTipview();
 
-        private onMouseMove(event: MouseEvent)
+            var displayObject = event.currentTarget;
+            var tip = this.tipmap.get(displayObject);
+            var tipviewcls = this.tipviewmap.get(tip.constructor);
+            if (!tipviewcls)
+                tipviewcls = this.defaultTipview();
+
+            this.tipView = new tipviewcls();
+            editorui.tooltipLayer.addChild(this.tipView);
+            this.tipView.value = tip;
+            this.tipView.x = feng3d.windowEventProxy.clientX;
+            this.tipView.y = feng3d.windowEventProxy.clientY - this.tipView.height;
+
+            //
+            displayObject.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+        }
+
+        private onMouseOut(event: egret.MouseEvent)
         {
-            var displayObjects = this.tipmap.getKeys().filter((item) =>
-            {
-                if (!item.stage) return false;
-                return item.getTransformedBounds(item.stage).contains(event.clientX, event.clientY);
-            });
-            var displayObject = displayObjects[0];
-            if (displayObject)
-            {
-                var tip = this.tipmap.get(displayObject);
-                var tipviewcls = this.tipviewmap.get(tip.constructor);
-                if (!tipviewcls)
-                    tipviewcls = this.defaultTipview();
-                if (this.tipView)
-                {
-                    if (!(this.tipView instanceof tipviewcls))
-                    {
-                        this.removeTipview();
-                    }
-                }
-                if (!this.tipView)
-                {
-                    this.tipView = new tipviewcls();
-                }
-                editorui.tooltipLayer.addChild(this.tipView);
-                this.tipView.value = tip;
-                this.tipView.x = event.clientX;
-                this.tipView.y = event.clientY - this.tipView.height;
-            } else
-            {
-                this.removeTipview();
-            }
+            var displayObject = event.currentTarget;
+            displayObject.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+            this.removeTipview();
         }
 
         private removeTipview()

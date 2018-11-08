@@ -75,10 +75,6 @@ namespace editor
      */
     export class SplitGroup extends eui.Group
     {
-        private _onMouseMovethis: (e: MouseEvent) => void;
-        private _onMouseDownthis: (e: MouseEvent) => void;
-        private _onMouseUpthis: (e: MouseEvent) => void;
-
         constructor()
         {
             super();
@@ -88,47 +84,39 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
 
-            this._onMouseMovethis = this.onMouseMove.bind(this);
-            this._onMouseDownthis = this.onMouseDown.bind(this);
-            this._onMouseUpthis = this.onMouseUp.bind(this);
-
-            egretDiv.addEventListener("mousemove", this._onMouseMovethis);
-            egretDiv.addEventListener("mousedown", this._onMouseDownthis);
-            egretDiv.addEventListener("mouseup", this._onMouseUpthis);
+            this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            this.addEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
         }
 
         $onRemoveFromStage()
         {
             super.$onRemoveFromStage()
 
-            egretDiv.removeEventListener("mousemove", this._onMouseMovethis);
-            egretDiv.removeEventListener("mousedown", this._onMouseDownthis);
-            egretDiv.removeEventListener("mouseup", this._onMouseUpthis);
-
-            this._onMouseMovethis = null;
-            this._onMouseDownthis = null;
-            this._onMouseUpthis = null;
+            this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            this.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
         }
 
-        private onMouseMove(e: MouseEvent)
+        private onMouseMove(e: egret.MouseEvent)
         {
             if (splitdragData.splitGroupState == SplitGroupState.default)
             {
-                this._findSplit(e.layerX, e.layerY);
+                this._findSplit(e.stageX, e.stageY);
                 return;
             }
             if (splitdragData.splitGroup != this)
                 return;
             if (splitdragData.splitGroupState == SplitGroupState.onSplit)
             {
-                this._findSplit(e.layerX, e.layerY);
+                this._findSplit(e.stageX, e.stageY);
             } else if (splitdragData.splitGroupState == SplitGroupState.draging)
             {
                 var preElement = splitdragData.preElement;
                 var nextElement = splitdragData.nextElement;
                 if (splitdragData.layouttype == 1)
                 {
-                    var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, e.layerX));
+                    var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, e.stageX));
                     var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
                     var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
                     if (preElement instanceof eui.Group)
@@ -147,7 +135,7 @@ namespace editor
                     }
                 } else
                 {
-                    var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, e.layerY));
+                    var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, e.stageY));
                     var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
                     var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
                     if (preElement instanceof eui.Group)
@@ -213,12 +201,12 @@ namespace editor
             }
         }
 
-        private onMouseDown(e: MouseEvent)
+        private onMouseDown(e: egret.MouseEvent)
         {
             if (splitdragData.splitGroupState == SplitGroupState.onSplit)
             {
                 splitdragData.splitGroupState = SplitGroupState.draging;
-                splitdragData.dragingMousePoint = new feng3d.Vector2(e.layerX, e.layerY);
+                splitdragData.dragingMousePoint = new feng3d.Vector2(e.stageX, e.stageY);
                 //
                 var preElement = splitdragData.preElement;
                 var nextElement = splitdragData.nextElement;
@@ -233,7 +221,7 @@ namespace editor
             }
         }
 
-        private onMouseUp(e: MouseEvent)
+        private onMouseUp(e: egret.MouseEvent)
         {
             if (splitdragData.splitGroupState == SplitGroupState.draging)
             {

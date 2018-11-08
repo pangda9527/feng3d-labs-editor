@@ -6,17 +6,23 @@ namespace egret
         prototype: TouchEvent;
         new(): TouchEvent;
         /** 鼠标按下 */
-        MOUSE_DOWN: string;
+        MOUSE_DOWN: "mousedown";
+        MOUSE_MIDDLE_DOWN: "mousemiddledown";
         /** 鼠标弹起 */
-        MOUSE_UP: string;
+        MOUSE_UP: "mouseup";
+        MIDDLE_MOUSE_UP: "middlemouseup";
+        RIGHT_MOUSE_UP: "rightmouseup";
         /** 鼠标移动 */
-        MOUSE_MOVE: string;
+        MOUSE_MOVE: "mousemove";
         /** 鼠标单击 */
-        CLICK: string;
+        CLICK: "click";
+        MIDDLE_Click: "middleclick";
         /** 鼠标移出 */
         MOUSE_OUT: "mouseout";
         /** 鼠标移入 */
         MOUSE_OVER: "mouseover";
+        /** 右键按下 */
+        RIGHT_MOUSE_DOWN: "rightmousedown";
         /** 右键点击 */
         RIGHT_CLICK: "rightclick";
         /** 双击 */
@@ -25,11 +31,16 @@ namespace egret
     (() =>
     {
         //映射事件名称
-        MouseEvent.MOUSE_DOWN = egret.TouchEvent.TOUCH_BEGIN;
-        MouseEvent.MOUSE_UP = egret.TouchEvent.TOUCH_END;
-        MouseEvent.MOUSE_MOVE = egret.TouchEvent.TOUCH_MOVE;
-        MouseEvent.CLICK = egret.TouchEvent.TOUCH_TAP;
+        MouseEvent.MOUSE_DOWN = "mousedown";
+        MouseEvent.MOUSE_MIDDLE_DOWN = "mousemiddledown";
+        MouseEvent.MOUSE_UP = "mouseup";
+        MouseEvent.MIDDLE_MOUSE_UP = "middlemouseup";
+        MouseEvent.RIGHT_MOUSE_UP = "rightmouseup";
+        MouseEvent.MOUSE_MOVE = "mousemove";
+        MouseEvent.CLICK = "click";
+        MouseEvent.MIDDLE_Click = "middleclick";
         MouseEvent.MOUSE_OUT = "mouseout";
+        MouseEvent.RIGHT_MOUSE_DOWN = "rightmousedown";
         MouseEvent.RIGHT_CLICK = "rightclick";
         MouseEvent.DOUBLE_CLICK = "dblclick";
         //
@@ -75,7 +86,12 @@ namespace egret
         var canvas: HTMLCanvasElement;
         var touch: egret.sys.TouchHandler;
 
-        var rightmousedownObject: egret.DisplayObject;
+        // 鼠标按下时选中对象
+        var mousedownObject: egret.DisplayObject;
+        // /**
+        //  * 鼠标按下的按钮编号
+        //  */
+        // var mousedownButton: number;
         webTouchHandler = getWebTouchHandler();
         canvas = webTouchHandler.canvas;
         touch = webTouchHandler.touch;
@@ -84,29 +100,59 @@ namespace egret
 
         feng3d.windowEventProxy.on("mousedown", (e) =>
         {
-            //右键按下
-            if (e.button != 2) return;
             var location = webTouchHandler.getLocation(e);
             var x = location.x;
             var y = location.y;
 
-            rightmousedownObject = touch["findTarget"](x, y);
+            var target = touch["findTarget"](x, y);
+
+            // mousedownButton = e.button;
+            mousedownObject = target;
+
+            if (e.button == 0)
+            {
+                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MOUSE_DOWN, true, true, x, y);
+            } else if (e.button == 1)
+            {
+                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MOUSE_MIDDLE_DOWN, true, true, x, y);
+            } else if (e.button == 2)
+            {
+                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.RIGHT_MOUSE_DOWN, true, true, x, y);
+            }
         });
+
         feng3d.windowEventProxy.on("mouseup", (e) =>
         {
             //右键按下
-            if (e.button != 2) return;
-
             var location = webTouchHandler.getLocation(e);
             var x = location.x;
             var y = location.y;
 
             var target: egret.DisplayObject = touch["findTarget"](x, y);
-            if (target == rightmousedownObject)
+
+            if (e.button == 0)
             {
-                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.RIGHT_CLICK, true, true, x, y);
-                rightmousedownObject = null;
+                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MOUSE_UP, true, true, x, y);
+                if (mousedownObject == target)
+                {
+                    egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.CLICK, true, true, x, y);
+                }
+            } else if (e.button == 1)
+            {
+                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MIDDLE_MOUSE_UP, true, true, x, y);
+                if (mousedownObject == target)
+                {
+                    egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MIDDLE_Click, true, true, x, y);
+                }
+            } else if (e.button == 2)
+            {
+                egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.RIGHT_MOUSE_UP, true, true, x, y);
+                if (mousedownObject == target)
+                {
+                    egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.RIGHT_CLICK, true, true, x, y);
+                }
             }
+            mousedownObject = null;
         });
         feng3d.windowEventProxy.on("dblclick", (e) =>
         {
