@@ -51,6 +51,7 @@
         "src/ui/components/AreaSelectRect.ts",
         "src/ui/components/MinMaxCurveView.ts",
         "src/ui/components/MinMaxCurveEditor.ts",
+        "src/ui/components/MinMaxCurveVector3View.ts",
         "src/ui/components/MinMaxGradientView.ts",
         "src/ui/components/GradientEditor.ts",
         // tipviews
@@ -91,6 +92,7 @@
         "src/objectview/oav/OAVParticleComponentList.ts",
         "src/objectview/oav/OAVFeng3dPreView.ts",
         "src/objectview/oav/OAVMinMaxCurve.ts",
+        "src/objectview/oav/OAVMinMaxCurveVector3.ts",
         "src/objectview/oav/OAVMinMaxGradient.ts",
         //
         "src/ui/inspector/InspectorView.ts",

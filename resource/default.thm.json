@@ -27,6 +27,7 @@
         "editor.Accordion": "resource/custom_skins/Accordion.exml",
         "editor.MinMaxGradientView": "resource/custom_skins/MinMaxGradientView.exml",
         "editor.MinMaxCurveView": "resource/custom_skins/MinMaxCurveView.exml",
+        "editor.MinMaxCurveVector3View": "resource/custom_skins/MinMaxCurveVector3View.exml",
         "RenameTextInput": "resource/eui_skins/RenameTextInput.exml",
         "ComboBox": "resource/eui_skins/ComboBox.exml"
     },
@@ -54,6 +55,8 @@
         "resource/custom_skins/MinMaxCurveView.exml",
         "resource/custom_skins/MinMaxCurveEditor.exml",
         "resource/custom_skins/OAVMinMaxCurve.exml",
+        "resource/custom_skins/MinMaxCurveVector3View.exml",
+        "resource/custom_skins/OAVMinMaxCurveVector3.exml",
         "resource/custom_skins/MinMaxGradientView.exml",
         "resource/custom_skins/GradientEditor.exml",
         "resource/custom_skins/OAVMinMaxGradient.exml",

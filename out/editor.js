@@ -3439,6 +3439,48 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var MinMaxCurveVector3View = /** @class */ (function (_super) {
+        __extends(MinMaxCurveVector3View, _super);
+        function MinMaxCurveVector3View() {
+            var _this = _super.call(this) || this;
+            _this.minMaxCurveVector3 = new feng3d.MinMaxCurveVector3();
+            _this.skinName = "MinMaxCurveVector3View";
+            return _this;
+        }
+        MinMaxCurveVector3View.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.xMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
+            this.yMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
+            this.zMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
+        };
+        MinMaxCurveVector3View.prototype.$onRemoveFromStage = function () {
+            this.xMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
+            this.yMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
+            this.zMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        MinMaxCurveVector3View.prototype.updateView = function () {
+            if (!this.stage)
+                return;
+            this.xMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.xCurve;
+            this.yMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.yCurve;
+            this.zMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.zCurve;
+        };
+        MinMaxCurveVector3View.prototype._onMinMaxCurveVector3Changed = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        };
+        MinMaxCurveVector3View.prototype._onchanged = function () {
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+        };
+        __decorate([
+            feng3d.watch("_onMinMaxCurveVector3Changed")
+        ], MinMaxCurveVector3View.prototype, "minMaxCurveVector3", void 0);
+        return MinMaxCurveVector3View;
+    }(eui.Component));
+    editor.MinMaxCurveVector3View = MinMaxCurveVector3View;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     /**
      * 最大最小颜色渐变界面
      */
@@ -5987,6 +6029,38 @@ var editor;
         return OAVMinMaxCurve;
     }(editor.OAVBase));
     editor.OAVMinMaxCurve = OAVMinMaxCurve;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var OAVMinMaxCurveVector3 = /** @class */ (function (_super) {
+        __extends(OAVMinMaxCurveVector3, _super);
+        function OAVMinMaxCurveVector3(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVMinMaxCurveVector3";
+            return _this;
+        }
+        OAVMinMaxCurveVector3.prototype.initView = function () {
+            if (this._attributeViewInfo.editable) {
+                this.minMaxCurveVector3View.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
+            this.minMaxCurveVector3View.minMaxCurveVector3 = this.attributeValue;
+            this.minMaxCurveVector3View.touchEnabled = this.minMaxCurveVector3View.touchChildren = this._attributeViewInfo.editable;
+        };
+        OAVMinMaxCurveVector3.prototype.dispose = function () {
+            if (this._attributeViewInfo.editable) {
+                this.minMaxCurveVector3View.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
+        };
+        OAVMinMaxCurveVector3.prototype.updateView = function () {
+        };
+        OAVMinMaxCurveVector3.prototype.onChange = function () {
+        };
+        OAVMinMaxCurveVector3 = __decorate([
+            feng3d.OAVComponent()
+        ], OAVMinMaxCurveVector3);
+        return OAVMinMaxCurveVector3;
+    }(editor.OAVBase));
+    editor.OAVMinMaxCurveVector3 = OAVMinMaxCurveVector3;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -12916,6 +12990,7 @@ var editor;
     feng3d.objectview.setDefaultTypeAttributeView("UrlImageTexture2D", { component: "OAVTexture2D" });
     feng3d.objectview.setDefaultTypeAttributeView("MinMaxGradient", { component: "OAVMinMaxGradient" });
     feng3d.objectview.setDefaultTypeAttributeView("MinMaxCurve", { component: "OAVMinMaxCurve" });
+    feng3d.objectview.setDefaultTypeAttributeView("MinMaxCurveVector3", { component: "OAVMinMaxCurveVector3" });
 })(editor || (editor = {}));
 /**
  * 快捷键配置

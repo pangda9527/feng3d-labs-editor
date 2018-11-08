@@ -883,6 +883,20 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    class MinMaxCurveVector3View extends eui.Component {
+        minMaxCurveVector3: feng3d.MinMaxCurveVector3;
+        xMinMaxCurveView: editor.MinMaxCurveView;
+        yMinMaxCurveView: editor.MinMaxCurveView;
+        zMinMaxCurveView: editor.MinMaxCurveView;
+        constructor();
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        updateView(): void;
+        private _onMinMaxCurveVector3Changed;
+        private _onchanged;
+    }
+}
+declare namespace editor {
     /**
      * 最大最小颜色渐变界面
      */
@@ -1563,6 +1577,17 @@ declare namespace editor {
     class OAVMinMaxCurve extends OAVBase {
         labelLab: eui.Label;
         minMaxCurveView: editor.MinMaxCurveView;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
+        dispose(): void;
+        updateView(): void;
+        private onChange;
+    }
+}
+declare namespace editor {
+    class OAVMinMaxCurveVector3 extends OAVBase {
+        labelLab: eui.Label;
+        minMaxCurveVector3View: editor.MinMaxCurveVector3View;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
         dispose(): void;
