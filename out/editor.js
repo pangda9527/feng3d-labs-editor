@@ -11387,6 +11387,59 @@ var egret;
             feng3d.shortcut.enable = !this._isFocus;
         };
     })();
+    // (() =>
+    // {
+    //     // 扩展 TextInput , 焦点在文本中时，延缓外部通过text属性赋值到失去焦点时生效
+    //     var descriptor = Object.getOwnPropertyDescriptor(eui.TextInput.prototype, "text");
+    //     var oldTextSet = descriptor.set;
+    //     descriptor.set = function (value)
+    //     {
+    //         if (this["isFocus"])
+    //         {
+    //             this["__temp_value__"] = value;
+    //         }
+    //         else
+    //         {
+    //             oldTextSet.call(this, value);
+    //         }
+    //     }
+    //     Object.defineProperty(eui.TextInput.prototype, "text", descriptor);
+    //     var oldFocusOutHandler = eui.TextInput.prototype["focusOutHandler"];
+    //     eui.TextInput.prototype["focusOutHandler"] = function (event)
+    //     {
+    //         oldFocusOutHandler.call(this, event);
+    //         if (this["__temp_value__"] != undefined)
+    //         {
+    //             this["text"] = this["__temp_value__"];
+    //             delete this["__temp_value__"];
+    //         }
+    //     }
+    // })();
+    // 扩展 Scroller 组件，添加鼠标滚轮事件
+    (function () {
+        var oldOnAddToStage = eui.Scroller.prototype.$onAddToStage;
+        eui.Scroller.prototype.$onAddToStage = function (stage, nestLevel) {
+            oldOnAddToStage.call(this, stage, nestLevel);
+            feng3d.windowEventProxy.on("mousewheel", onMouseWheel, this);
+        };
+        var oldOnRemoveFromStage = eui.Scroller.prototype.$onRemoveFromStage;
+        eui.Scroller.prototype.$onRemoveFromStage = function () {
+            oldOnRemoveFromStage.call(this);
+            feng3d.windowEventProxy.off("mousewheel", onMouseWheel, this);
+        };
+        // 阻止拖拽滚动面板
+        eui.Scroller.prototype["onTouchBeginCapture"] = function () {
+        };
+        function onMouseWheel(event) {
+            var scroller = this;
+            if (scroller.hitTestPoint(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY)) {
+                scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV - event.wheelDelta * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
+            }
+        }
+    })();
+})(egret || (egret = {}));
+var egret;
+(function (egret) {
     egret.MouseEvent = egret.TouchEvent;
     (function () {
         //映射事件名称
@@ -11508,28 +11561,6 @@ var egret;
             return player.webTouchHandler;
         }
     };
-    // 扩展 Scroller 组件，添加鼠标滚轮事件
-    (function () {
-        var oldOnAddToStage = eui.Scroller.prototype.$onAddToStage;
-        eui.Scroller.prototype.$onAddToStage = function (stage, nestLevel) {
-            oldOnAddToStage.call(this, stage, nestLevel);
-            feng3d.windowEventProxy.on("mousewheel", onMouseWheel, this);
-        };
-        var oldOnRemoveFromStage = eui.Scroller.prototype.$onRemoveFromStage;
-        eui.Scroller.prototype.$onRemoveFromStage = function () {
-            oldOnRemoveFromStage.call(this);
-            feng3d.windowEventProxy.off("mousewheel", onMouseWheel, this);
-        };
-        // 阻止拖拽滚动面板
-        eui.Scroller.prototype["onTouchBeginCapture"] = function () {
-        };
-        function onMouseWheel(event) {
-            var scroller = this;
-            if (scroller.hitTestPoint(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY)) {
-                scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV - event.wheelDelta * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
-            }
-        }
-    })();
 })(egret || (egret = {}));
 var editor;
 (function (editor) {

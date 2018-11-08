@@ -141,6 +141,7 @@
         "src/navigation/NavigationProcess.ts",
         //
         "src/global/EgretExtend.ts",
+        "src/global/EgretMouseEventExtends.ts",
         //
         "src/scripts/EditorScript.ts",
         "src/scripts/MouseRayTestScript.ts",

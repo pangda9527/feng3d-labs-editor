@@ -2837,6 +2837,8 @@ declare var pointGeometry: feng3d.PointGeometry;
 declare var debugPoint: feng3d.GameObject;
 declare function createSegment(): void;
 declare namespace egret {
+}
+declare namespace egret {
     type MouseEvent = egret.TouchEvent;
     var MouseEvent: {
         prototype: TouchEvent;
