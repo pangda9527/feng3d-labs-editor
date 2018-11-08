@@ -50,6 +50,13 @@ namespace editor
 
                 callback && callback(outputStr);
 
+                assets.writeString("project.js", outputStr);
+
+                editorAssets.runProjectScript(() =>
+                {
+                    feng3d.feng3dDispatcher.dispatch("assets.scriptChanged");
+                });
+
                 return outputStr;
             }
             catch (e)

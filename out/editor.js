@@ -11660,7 +11660,7 @@ var editor;
             return _this;
         }
         return EditorScript;
-    }(feng3d.ScriptComponent));
+    }(feng3d.Behaviour));
     editor.EditorScript = EditorScript;
 })(editor || (editor = {}));
 var editor;
@@ -13095,6 +13095,10 @@ var editor;
                 }, "");
                 outputStr += "\n//# sourceURL=project.js";
                 callback && callback(outputStr);
+                editor.assets.writeString("project.js", outputStr);
+                editor.editorAssets.runProjectScript(function () {
+                    feng3d.feng3dDispatcher.dispatch("assets.scriptChanged");
+                });
                 return outputStr;
             }
             catch (e) {

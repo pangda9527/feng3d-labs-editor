@@ -2898,7 +2898,7 @@ declare namespace editor {
     /**
      * 编辑器脚本
      */
-    class EditorScript extends feng3d.ScriptComponent {
+    class EditorScript extends feng3d.Behaviour {
         flag: feng3d.RunEnvironment;
     }
 }
