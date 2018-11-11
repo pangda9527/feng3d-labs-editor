@@ -6636,6 +6636,20 @@ var editor;
                     }
                 });
             }
+            if (assetsFile.feng3dAssets instanceof feng3d.UrlImageTexture2D) {
+                menuconfig.push({
+                    label: "去除背景色", click: function () {
+                        var image = assetsFile.feng3dAssets["image"];
+                        var imageUtil = new feng3d.ImageUtil().fromImage(image);
+                        var backColor = new feng3d.Color4(222 / 255, 222 / 255, 222 / 255);
+                        imageUtil.clearBackColor(backColor);
+                        feng3d.dataTransform.imagedataToImage(imageUtil.imageData, function (img) {
+                            assetsFile.feng3dAssets["image"] = img;
+                            editor.assets.writeAssets(assetsFile.feng3dAssets);
+                        });
+                    }
+                });
+            }
             editor.menu.popup(menuconfig);
         };
         EditorAssets.prototype.saveObject = function (object, callback) {
