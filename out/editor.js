@@ -4243,6 +4243,31 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var TerrainView = /** @class */ (function (_super) {
+        __extends(TerrainView, _super);
+        function TerrainView() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return TerrainView;
+    }(eui.Component));
+    editor.TerrainView = TerrainView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var OVTerrainView = /** @class */ (function (_super) {
+        __extends(OVTerrainView, _super);
+        function OVTerrainView() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        OVTerrainView = __decorate([
+            feng3d.OVComponent()
+        ], OVTerrainView);
+        return OVTerrainView;
+    }(eui.Component));
+    editor.OVTerrainView = OVTerrainView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     /**
      * 默认基础对象界面
      */

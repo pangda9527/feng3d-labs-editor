@@ -18,4 +18,5 @@ namespace editor
     feng3d.objectview.setDefaultTypeAttributeView("MinMaxGradient", { component: "OAVMinMaxGradient" });
     feng3d.objectview.setDefaultTypeAttributeView("MinMaxCurve", { component: "OAVMinMaxCurve" });
     feng3d.objectview.setDefaultTypeAttributeView("MinMaxCurveVector3", { component: "OAVMinMaxCurveVector3" });
+    //
 }

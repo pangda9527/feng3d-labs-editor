@@ -1077,6 +1077,17 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    class TerrainView extends eui.Component {
+    }
+}
+declare namespace editor {
+    class OVTerrainView extends eui.Component implements feng3d.IObjectView {
+        private _space;
+        private _objectViewInfo;
+        private blockViews;
+    }
+}
+declare namespace editor {
     /**
      * 默认基础对象界面
      */

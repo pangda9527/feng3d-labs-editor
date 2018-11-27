@@ -88,6 +88,7 @@
         "resource/custom_skins/TreeItemRendererSkin.exml",
         "resource/custom_skins/HierarchyTreeItemRenderer.exml",
         "resource/custom_skins/MenuItemRender.exml",
+        "resource/custom_skins/terrain/TerrainView.exml",
         "resource/custom_skins/Accordion.exml",
         "resource/custom_skins/Vector3DViewSkin.exml",
         "resource/custom_skins/ComponentAccordion.exml",

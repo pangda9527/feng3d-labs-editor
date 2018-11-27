@@ -34,22 +34,6 @@
 				</e:Skin>
 			</e:skinName>
 			</e:Button>
-			<e:Button id="placeTreesBtn" label="" scaleX="1" scaleY="1">
-			<e:skinName>
-				<e:Skin states="up,down,disabled">
-				<e:Image width="100%" height="100%" source="placeTrees_up_png" source.down="placeTrees_down_png"/>
-				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
-				</e:Skin>
-			</e:skinName>
-			</e:Button>
-			<e:Button id="paintDetailsBtn" label="" scaleX="1" scaleY="1">
-			<e:skinName>
-				<e:Skin states="up,down,disabled">
-				<e:Image width="100%" height="100%" source="paintDetails_up_png" source.down="paintDetails_down_png"/>
-				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
-				</e:Skin>
-			</e:skinName>
-			</e:Button>
 			<e:Button id="settingsBtn" label="" scaleX="1" scaleY="1">
 			<e:skinName>
 				<e:Skin states="up,down,disabled">
