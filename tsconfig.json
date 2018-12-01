@@ -145,6 +145,8 @@
         "src/navigation/ThreeBSP.ts",
         "src/navigation/NavigationProcess.ts",
         //
+        "src/recastnavigation/Recastnavigation.ts",
+        //
         "src/global/EgretExtend.ts",
         "src/global/EgretMouseEventExtends.ts",
         //

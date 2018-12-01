@@ -4246,25 +4246,47 @@ var editor;
     var TerrainView = /** @class */ (function (_super) {
         __extends(TerrainView, _super);
         function TerrainView() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super.call(this) || this;
+            _this.skinName = "TerrainView";
+            return _this;
         }
+        TerrainView.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.updateView();
+        };
+        TerrainView.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        TerrainView.prototype.updateView = function () {
+            if (!this.stage)
+                return;
+        };
         return TerrainView;
     }(eui.Component));
     editor.TerrainView = TerrainView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var OVTerrainView = /** @class */ (function (_super) {
-        __extends(OVTerrainView, _super);
-        function OVTerrainView() {
-            return _super !== null && _super.apply(this, arguments) || this;
+    var OVTerrain = /** @class */ (function (_super) {
+        __extends(OVTerrain, _super);
+        function OVTerrain(objectViewInfo) {
+            var _this = _super.call(this) || this;
+            _this._objectViewInfo = objectViewInfo;
+            _this.space = objectViewInfo.owner;
+            return _this;
         }
-        OVTerrainView = __decorate([
+        OVTerrain.prototype.getAttributeView = function (attributeName) {
+            return null;
+        };
+        OVTerrain.prototype.getblockView = function (blockName) {
+            return null;
+        };
+        OVTerrain = __decorate([
             feng3d.OVComponent()
-        ], OVTerrainView);
-        return OVTerrainView;
-    }(eui.Component));
-    editor.OVTerrainView = OVTerrainView;
+        ], OVTerrain);
+        return OVTerrain;
+    }(editor.TerrainView));
+    editor.OVTerrain = OVTerrain;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -11482,6 +11504,39 @@ function createSegment() {
     pointGeometry.points = [];
     parentobject.addChild(debugPoint);
 }
+var editor;
+(function (editor) {
+    /**
+     * 重铸导航
+     *
+     *  将接收的网格模型转换为导航网格数据
+     *
+     * #### 设计思路
+     * 1. 将接收到的网格模型的所有三角形栅格化为体素保存到三维数组内
+     * 1. 遍历所有体素计算出可行走体素
+     * 1. 构建可行走轮廓
+     * 1. 构建可行走（导航）网格
+     *
+     * #### 参考
+     * @see https://github.com/recastnavigation/recastnavigation
+     */
+    var Recastnavigation = /** @class */ (function () {
+        function Recastnavigation() {
+        }
+        /**
+         * 执行重铸导航
+         */
+        Recastnavigation.prototype.doRecastnavigation = function (mesh) {
+        };
+        /**
+         * 栅格化三角形
+         */
+        Recastnavigation.prototype.rcRasterizeTriangles = function () {
+        };
+        return Recastnavigation;
+    }());
+    editor.Recastnavigation = Recastnavigation;
+})(editor || (editor = {}));
 var egret;
 (function (egret) {
     (function () {
@@ -13068,6 +13123,7 @@ var editor;
     feng3d.objectview.setDefaultTypeAttributeView("MinMaxGradient", { component: "OAVMinMaxGradient" });
     feng3d.objectview.setDefaultTypeAttributeView("MinMaxCurve", { component: "OAVMinMaxCurve" });
     feng3d.objectview.setDefaultTypeAttributeView("MinMaxCurveVector3", { component: "OAVMinMaxCurveVector3" });
+    //
 })(editor || (editor = {}));
 /**
  * 快捷键配置
