@@ -99,29 +99,16 @@ namespace editor
                 if (i % 3 == 2) return Math.round((v - this._aabb.min.z) / this._voxelSize);
             });
 
-            var aabb = feng3d.Box.formPositions(positions);
             var triangle = feng3d.Triangle3D.fromPositions(positions);
-            var point = new feng3d.Vector3();
-            var result: number[] = [];
-            for (let x = aabb.min.x; x < aabb.max.x; x++)
+            var result = triangle.rasterize();
+
+            result.forEach((v, i) =>
             {
-                for (let y = aabb.min.y; y < aabb.max.y; y++)
+                if (i % 3 == 0)
                 {
-                    for (let z = aabb.min.z; z < aabb.max.y; z++)
-                    {
-                        // 判定是否在三角形上
-                        var onTri = triangle.onWithPoint(point.init(x, y, z), 0.5);
-                        if (onTri)
-                        {
-                            result.push(x, y, z);
-                        }
-                    }
+                    this._voxels[result[i]][result[i + 1]][result[i + 2]] = { type: VoxelType.Triangle }
                 }
-            }
-
-
-            // this._voxels[x][y][z] = { x: x, y: y, z: z, type: VoxelType.Triangle }
-
+            });
         }
     }
 
@@ -130,9 +117,9 @@ namespace editor
      */
     interface Voxel
     {
-        x: number;
-        y: number;
-        z: number;
+        // x: number;
+        // y: number;
+        // z: number;
         type: VoxelType;
     }
 

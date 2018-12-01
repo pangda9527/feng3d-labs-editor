@@ -11575,21 +11575,8 @@ var editor;
                 if (i % 3 == 2)
                     return Math.round((v - _this._aabb.min.z) / _this._voxelSize);
             });
-            var aabb = feng3d.Box.formPositions(positions);
             var triangle = feng3d.Triangle3D.fromPositions(positions);
-            var point = new feng3d.Vector3();
-            var result = [];
-            for (var x = aabb.min.x; x < aabb.max.x; x++) {
-                for (var y = aabb.min.y; y < aabb.max.y; y++) {
-                    for (var z = aabb.min.z; z < aabb.max.y; z++) {
-                        // 判定是否在三角形上
-                        var onTri = triangle.onWithPoint(point.init(x, y, z), 0.5);
-                        if (onTri) {
-                            result.push(x, y, z);
-                        }
-                    }
-                }
-            }
+            var result = triangle.rasterize();
             // this._voxels[x][y][z] = { x: x, y: y, z: z, type: VoxelType.Triangle }
         };
         return Recastnavigation;
