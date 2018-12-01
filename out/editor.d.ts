@@ -2892,16 +2892,47 @@ declare namespace editor {
      */
     class Recastnavigation {
         /**
+         * 包围盒
+         */
+        private _aabb;
+        /**
+         * 体素尺寸
+         */
+        private _voxelSize;
+        /**
+         * X 轴上 体素数量
+         */
+        private _numX;
+        /**
+         * Y 轴上 体素数量
+         */
+        private _numY;
+        /**
+         * Z 轴上 体素数量
+         */
+        private _numZ;
+        /**
+         * 体素三维数组
+         */
+        private _voxels;
+        /**
          * 执行重铸导航
          */
         doRecastnavigation(mesh: {
             positions: number[];
             indices: number[];
-        }): void;
+        }, voxelSize?: number): void;
+        /**
+         * 栅格化网格
+         */
+        private _rasterizeMesh;
         /**
          * 栅格化三角形
+         * @param p0 三角形第一个顶点
+         * @param p1 三角形第二个顶点
+         * @param p2 三角形第三个顶点
          */
-        private rcRasterizeTriangles;
+        private _rasterizeTriangle;
     }
 }
 declare namespace egret {
