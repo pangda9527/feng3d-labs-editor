@@ -901,8 +901,8 @@ var editor;
             var scale = editor.editorCamera.getScaleByDepth(editor.sceneControlConfig.lookDistance);
             var up = this.dragSceneCameraGlobalMatrix3D.up;
             var right = this.dragSceneCameraGlobalMatrix3D.right;
-            up.scale(addPoint.y * scale);
-            right.scale(-addPoint.x * scale);
+            up.scaleNumber(addPoint.y * scale);
+            right.scaleNumber(-addPoint.x * scale);
             var globalMatrix3D = this.dragSceneCameraGlobalMatrix3D.clone();
             globalMatrix3D.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
             editor.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
@@ -932,7 +932,7 @@ var editor;
             }
             else {
                 this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
-                this.rotateSceneCenter.scale(editor.sceneControlConfig.lookDistance);
+                this.rotateSceneCenter.scaleNumber(editor.sceneControlConfig.lookDistance);
                 this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.position);
             }
         };
@@ -961,7 +961,7 @@ var editor;
                 //
                 editor.sceneControlConfig.lookDistance = lookDistance;
                 var lookPos = editor.editorCamera.transform.localToWorldMatrix.forward;
-                lookPos.scale(-lookDistance);
+                lookPos.scaleNumber(-lookDistance);
                 lookPos.add(scenePosition);
                 var localLookPos = lookPos.clone();
                 if (editor.editorCamera.transform.parent) {
@@ -8195,7 +8195,7 @@ var editor;
                 for (var i = 0; i < this._controllerTargets.length; i++) {
                     position.add(this._controllerTargets[i].scenePosition);
                 }
-                position.scale(1 / this._controllerTargets.length);
+                position.scaleNumber(1 / this._controllerTargets.length);
             }
             var rotation = new feng3d.Vector3();
             if (!editor.editorData.isWoldCoordinate) {
@@ -8363,7 +8363,7 @@ var editor;
             rotationmatrix3d.appendRotation(feng3d.Vector3.Z_AXIS, rotation.z);
             rotationmatrix3d.appendRotation(axis, angle);
             var newrotation = rotationmatrix3d.decompose()[1];
-            newrotation.scale(180 / Math.PI);
+            newrotation.scaleNumber(180 / Math.PI);
             var v = Math.round((newrotation.x - rotation.x) / 180);
             if (v % 2 != 0) {
                 newrotation.x += 180;
@@ -8678,7 +8678,7 @@ var editor;
             var points = [];
             for (var i = 0; i <= 360; i++) {
                 points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
-                points[i].scale(this.radius);
+                points[i].scaleNumber(this.radius);
                 if (i > 0) {
                     var show = true;
                     if (localNormal) {
@@ -8842,7 +8842,7 @@ var editor;
             var points = [];
             for (var i = 0; i <= 360; i++) {
                 points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
-                points[i].scale(this.radius);
+                points[i].scaleNumber(this.radius);
                 if (i > 0) {
                     segments.push({ start: points[i - 1], end: points[i], startColor: color, endColor: color });
                 }
@@ -9338,7 +9338,7 @@ var editor;
             var temp = cameraSceneTransform.clone();
             temp.append(this.toolModel.transform.worldToLocalMatrix);
             var rotation = temp.decompose()[1];
-            rotation.scale(feng3d.FMath.RAD2DEG);
+            rotation.scaleNumber(feng3d.FMath.RAD2DEG);
             this.toolModel.freeAxis.transform.rotation = rotation;
             this.toolModel.cameraAxis.transform.rotation = rotation;
         };
@@ -9768,7 +9768,7 @@ var editor;
                 var rect = editor.engine.canvas.getBoundingClientRect();
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
-                var rotation = editor.editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scale(180 / Math.PI);
+                var rotation = editor.editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleNumber(180 / Math.PI);
                 rotationToolModel.transform.rotation = rotation;
                 //隐藏角度
                 var visibleAngle = Math.cos(15 * feng3d.FMath.DEG2RAD);
@@ -9877,7 +9877,7 @@ var editor;
                     var cameraTargetMatrix3D = feng3d.Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
                     cameraTargetMatrix3D.invert();
                     var result = cameraTargetMatrix3D.decompose()[1];
-                    result.scale(180 / Math.PI);
+                    result.scaleNumber(180 / Math.PI);
                     feng3d.feng3dDispatcher.dispatch("editorCameraRotate", result);
                 }
             }
@@ -10059,10 +10059,10 @@ var editor;
                 lookDistance = editor.sceneControlConfig.lookDistance;
             }
             //旋转中心
-            var rotateCenter = camera.transform.scenePosition.addTo(forward.scale(lookDistance));
+            var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
             //计算目标四元素旋转
             var targetQuat = new feng3d.Quaternion();
-            resultRotation.scale(feng3d.FMath.DEG2RAD);
+            resultRotation.scaleNumber(feng3d.FMath.DEG2RAD);
             targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
             //
             var sourceQuat = new feng3d.Quaternion();
@@ -10076,7 +10076,7 @@ var editor;
                     //
                     var translation = camera.transform.forwardVector;
                     translation.negate();
-                    translation.scale(lookDistance);
+                    translation.scaleNumber(lookDistance);
                     camera.transform.position = rotateCenter.addTo(translation);
                 },
             }).to({ rate: 1 }, 300, egret.Ease.sineIn);
@@ -10388,7 +10388,7 @@ var editor;
             }
             //
             var lookPos = this.camera.transform.localToWorldMatrix.forward;
-            lookPos.scale(-lookDistance);
+            lookPos.scaleNumber(-lookDistance);
             lookPos.add(scenePosition);
             var localLookPos = lookPos.clone();
             if (this.camera.transform.parent) {
@@ -10698,7 +10698,7 @@ var feng3d;
          * 翻转多边形
          */
         ThreeBSPPolygon.prototype.invert = function () {
-            this.normal.scale(-1);
+            this.normal.scaleNumber(-1);
             this.w *= -1;
             this.vertices.reverse();
             return this;
@@ -11075,7 +11075,7 @@ var navigation;
                             point.setPoint(rp);
                         }
                         else {
-                            point.setPoint(point.getPoint().addTo(line0.direction.clone().scale(agentRadius - cd)));
+                            point.setPoint(point.getPoint().addTo(line0.direction.clone().scaleNumber(agentRadius - cd)));
                         }
                         //标记该点以被处理
                         hpmap[point.index] = true;
@@ -11121,7 +11121,7 @@ var navigation;
                 if (crossline0s.length == 0)
                     return;
                 if (crossline0s.length == 1) {
-                    point.setPoint(point.getPoint().addTo(crossline0s[0][0].direction.clone().scale(agentRadius - crossline0s[0][1])));
+                    point.setPoint(point.getPoint().addTo(crossline0s[0][0].direction.clone().scaleNumber(agentRadius - crossline0s[0][1])));
                 }
                 else {
                     //如果多于两条线段，取距离最近两条
@@ -11139,7 +11139,7 @@ var navigation;
                         var cos = djx.dot(crossline0s[0][0].segment.p1.subTo(crossline0s[0][0].segment.p0).normalize());
                         var sin = Math.sqrt(1 - cos * cos);
                         var length = agentRadius / sin;
-                        var targetPoint = cross.addTo(djx.clone().scale(length));
+                        var targetPoint = cross.addTo(djx.clone().scaleNumber(length));
                         point.setPoint(targetPoint);
                     }
                     else {
@@ -11219,7 +11219,7 @@ var navigation;
         NavigationProcess.prototype.debugShowLines1 = function (line0s, length) {
             var segments = [];
             line0s.forEach(function (element) {
-                var p0 = element.segment.p0.addTo(element.segment.p1).scale(0.5);
+                var p0 = element.segment.p0.addTo(element.segment.p1).scaleNumber(0.5);
                 var p1 = p0.addTo(element.direction.clone().normalize(length));
                 segments.push({ start: p0, end: p1, startColor: new feng3d.Color4(1), endColor: new feng3d.Color4(0, 1) });
             });
@@ -11577,7 +11577,11 @@ var editor;
             });
             var triangle = feng3d.Triangle3D.fromPositions(positions);
             var result = triangle.rasterize();
-            // this._voxels[x][y][z] = { x: x, y: y, z: z, type: VoxelType.Triangle }
+            result.forEach(function (v, i) {
+                if (i % 3 == 0) {
+                    _this._voxels[result[i]][result[i + 1]][result[i + 2]] = { type: VoxelType.Triangle };
+                }
+            });
         };
         return Recastnavigation;
     }());

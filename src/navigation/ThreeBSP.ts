@@ -211,7 +211,7 @@ namespace feng3d
          */
         invert()
         {
-            this.normal.scale(-1);
+            this.normal.scaleNumber(-1);
             this.w *= -1;
             this.vertices.reverse();
             return this;

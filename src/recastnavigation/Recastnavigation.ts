@@ -64,7 +64,8 @@ namespace editor
                 }
             }
 
-            this._rasterizeMesh(mesh.indices, mesh.positions)
+            this._rasterizeMesh(mesh.indices, mesh.positions);
+            
         }
 
         /**

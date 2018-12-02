@@ -131,10 +131,10 @@ namespace editor
                 lookDistance = sceneControlConfig.lookDistance;
             }
             //旋转中心
-            var rotateCenter = camera.transform.scenePosition.addTo(forward.scale(lookDistance));
+            var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
             //计算目标四元素旋转
             var targetQuat = new feng3d.Quaternion();
-            resultRotation.scale(feng3d.FMath.DEG2RAD);
+            resultRotation.scaleNumber(feng3d.FMath.DEG2RAD);
             targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
             //
             var sourceQuat = new feng3d.Quaternion();
@@ -149,7 +149,7 @@ namespace editor
                     //
                     var translation = camera.transform.forwardVector;
                     translation.negate();
-                    translation.scale(lookDistance);
+                    translation.scaleNumber(lookDistance);
                     camera.transform.position = rotateCenter.addTo(translation);
                 },
             }).to({ rate: 1 }, 300, egret.Ease.sineIn);

@@ -193,7 +193,7 @@ namespace editor
             }
             //
             var lookPos = this.camera.transform.localToWorldMatrix.forward;
-            lookPos.scale(-lookDistance);
+            lookPos.scaleNumber(-lookDistance);
             lookPos.add(scenePosition);
             var localLookPos = lookPos.clone();
             if (this.camera.transform.parent)

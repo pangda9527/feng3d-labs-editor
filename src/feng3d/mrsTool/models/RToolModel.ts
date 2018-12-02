@@ -129,7 +129,7 @@ namespace editor
             for (var i = 0; i <= 360; i++)
             {
                 points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
-                points[i].scale(this.radius);
+                points[i].scaleNumber(this.radius);
                 if (i > 0)
                 {
                     var show = true;
@@ -314,7 +314,7 @@ namespace editor
             for (var i = 0; i <= 360; i++)
             {
                 points[i] = new feng3d.Vector3(Math.sin(i * feng3d.FMath.DEG2RAD), Math.cos(i * feng3d.FMath.DEG2RAD), 0);
-                points[i].scale(this.radius);
+                points[i].scaleNumber(this.radius);
                 if (i > 0)
                 {
                     segments.push({ start: points[i - 1], end: points[i], startColor: color, endColor: color });

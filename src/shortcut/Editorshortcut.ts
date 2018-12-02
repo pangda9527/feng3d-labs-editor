@@ -189,8 +189,8 @@ namespace editor
             var scale = editorCamera.getScaleByDepth(sceneControlConfig.lookDistance);
             var up = this.dragSceneCameraGlobalMatrix3D.up;
             var right = this.dragSceneCameraGlobalMatrix3D.right;
-            up.scale(addPoint.y * scale);
-            right.scale(-addPoint.x * scale);
+            up.scaleNumber(addPoint.y * scale);
+            right.scaleNumber(-addPoint.x * scale);
             var globalMatrix3D = this.dragSceneCameraGlobalMatrix3D.clone();
             globalMatrix3D.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
             editorCamera.transform.localToWorldMatrix = globalMatrix3D;
@@ -229,7 +229,7 @@ namespace editor
             } else
             {
                 this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
-                this.rotateSceneCenter.scale(sceneControlConfig.lookDistance);
+                this.rotateSceneCenter.scaleNumber(sceneControlConfig.lookDistance);
                 this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.position);
             }
         }
@@ -264,7 +264,7 @@ namespace editor
                 //
                 sceneControlConfig.lookDistance = lookDistance;
                 var lookPos = editorCamera.transform.localToWorldMatrix.forward;
-                lookPos.scale(-lookDistance);
+                lookPos.scaleNumber(-lookDistance);
                 lookPos.add(scenePosition);
                 var localLookPos = lookPos.clone();
                 if (editorCamera.transform.parent)

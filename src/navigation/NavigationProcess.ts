@@ -107,7 +107,7 @@ namespace navigation
                             point.setPoint(rp);
                         } else
                         {
-                            point.setPoint(point.getPoint().addTo(line0.direction.clone().scale(agentRadius - cd)));
+                            point.setPoint(point.getPoint().addTo(line0.direction.clone().scaleNumber(agentRadius - cd)));
                         }
                         //标记该点以被处理
                         hpmap[point.index] = true;
@@ -161,7 +161,7 @@ namespace navigation
                     return;
                 if (crossline0s.length == 1)
                 {
-                    point.setPoint(point.getPoint().addTo(crossline0s[0][0].direction.clone().scale(agentRadius - crossline0s[0][1])));
+                    point.setPoint(point.getPoint().addTo(crossline0s[0][0].direction.clone().scaleNumber(agentRadius - crossline0s[0][1])));
                 } else 
                 {
                     //如果多于两条线段，取距离最近两条
@@ -181,7 +181,7 @@ namespace navigation
                         var cos = djx.dot(crossline0s[0][0].segment.p1.subTo(crossline0s[0][0].segment.p0).normalize());
                         var sin = Math.sqrt(1 - cos * cos);
                         var length = agentRadius / sin;
-                        var targetPoint = cross.addTo(djx.clone().scale(length));
+                        var targetPoint = cross.addTo(djx.clone().scaleNumber(length));
                         point.setPoint(targetPoint);
                     } else
                     {
@@ -283,7 +283,7 @@ namespace navigation
             var segments: feng3d.Segment[] = [];
             line0s.forEach(element =>
             {
-                var p0 = element.segment.p0.addTo(element.segment.p1).scale(0.5);
+                var p0 = element.segment.p0.addTo(element.segment.p1).scaleNumber(0.5);
                 var p1 = p0.addTo(element.direction.clone().normalize(length));
                 segments.push({ start: p0, end: p1, startColor: new feng3d.Color4(1), endColor: new feng3d.Color4(0, 1) });
             });

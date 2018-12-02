@@ -76,7 +76,7 @@ namespace editor
                 {
                     position.add(this._controllerTargets[i].scenePosition);
                 }
-                position.scale(1 / this._controllerTargets.length);
+                position.scaleNumber(1 / this._controllerTargets.length);
             }
             var rotation = new feng3d.Vector3();
             if (!editorData.isWoldCoordinate)
@@ -286,7 +286,7 @@ namespace editor
             rotationmatrix3d.appendRotation(feng3d.Vector3.Z_AXIS, rotation.z);
             rotationmatrix3d.appendRotation(axis, angle);
             var newrotation = rotationmatrix3d.decompose()[1];
-            newrotation.scale(180 / Math.PI);
+            newrotation.scaleNumber(180 / Math.PI);
             var v = Math.round((newrotation.x - rotation.x) / 180);
             if (v % 2 != 0)
             {
