@@ -50,9 +50,9 @@ namespace editor
             this._voxelSize = voxelSize;
             // 
             var size = this._aabb.getSize().divideNumber(this._voxelSize).ceil();
-            this._numX = size.x;
-            this._numY = size.y;
-            this._numZ = size.z;
+            this._numX = size.x + 1;
+            this._numY = size.y + 1;
+            this._numZ = size.z + 1;
             //
             this._voxels = [];
             for (let x = 0; x < this._numX; x++)
@@ -65,7 +65,26 @@ namespace editor
             }
 
             this._rasterizeMesh(mesh.indices, mesh.positions);
-            
+
+        }
+
+        /**
+         * 获取体素列表
+         */
+        getVoxels()
+        {
+            var voxels: Voxel[] = [];
+            for (let x = 0; x < this._numX; x++)
+            {
+                for (let y = 0; y < this._numY; y++)
+                {
+                    for (let z = 0; z < this._numZ; z++)
+                    {
+                        if (this._voxels[x][y][z]) voxels.push(this._voxels[x][y][z]);
+                    }
+                }
+            }
+            return voxels;
         }
 
         /**
@@ -107,7 +126,15 @@ namespace editor
             {
                 if (i % 3 == 0)
                 {
-                    this._voxels[result[i]][result[i + 1]][result[i + 2]] = { type: VoxelType.Triangle }
+                    var x = result[i];
+                    var y = result[i + 1];
+                    var z = result[i + 2]
+                    this._voxels[x][y][z] = {
+                        x: this._aabb.min.x + x * this._voxelSize,
+                        y: this._aabb.min.y + y * this._voxelSize,
+                        z: this._aabb.min.z + z * this._voxelSize,
+                        type: VoxelType.Triangle
+                    }
                 }
             });
         }
@@ -118,9 +145,9 @@ namespace editor
      */
     interface Voxel
     {
-        // x: number;
-        // y: number;
-        // z: number;
+        x: number;
+        y: number;
+        z: number;
         type: VoxelType;
     }
 

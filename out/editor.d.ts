@@ -2658,8 +2658,10 @@ declare namespace editor {
          * 允许行走坡度
          */
         maxSlope: number;
-        init(gameobject: feng3d.GameObject): void;
         private _navobject;
+        private _recastnavigation;
+        private _debugNavVoxelsPointGeometry;
+        init(gameobject: feng3d.GameObject): void;
         /**
          * 清楚oav网格模型
          */
@@ -2668,6 +2670,7 @@ declare namespace editor {
          * 计算导航网格数据
          */
         bake(): void;
+        private _getNavGeometrys;
     }
 }
 declare namespace feng3d {
@@ -2931,6 +2934,10 @@ declare namespace editor {
             indices: number[];
         }, voxelSize?: number): void;
         /**
+         * 获取体素列表
+         */
+        getVoxels(): Voxel[];
+        /**
          * 栅格化网格
          */
         private _rasterizeMesh;
@@ -2941,6 +2948,21 @@ declare namespace editor {
          * @param p2 三角形第三个顶点
          */
         private _rasterizeTriangle;
+    }
+    /**
+     * 体素
+     */
+    interface Voxel {
+        x: number;
+        y: number;
+        z: number;
+        type: VoxelType;
+    }
+    /**
+     * 体素类型
+     */
+    enum VoxelType {
+        Triangle = 0
     }
 }
 declare namespace egret {

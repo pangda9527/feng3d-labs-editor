@@ -28,12 +28,25 @@ namespace editor
         @feng3d.oav()
         maxSlope = 45;//[0,60]
 
+        private _navobject: feng3d.GameObject;
+        private _recastnavigation: Recastnavigation;
+        private _debugNavVoxelsPointGeometry: feng3d.PointGeometry;
+
         init(gameobject: feng3d.GameObject)
         {
             super.init(gameobject);
-        }
 
-        private _navobject: feng3d.GameObject;
+            this._navobject = Object.setValue(new feng3d.GameObject(), { name: "NavObject" });
+            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+                name: "DebugNavVoxels",
+                components: [{
+                    __class__: "feng3d.MeshModel",
+                    material: Object.setValue(new feng3d.Material(), { shaderName: "point", renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                    geometry: this._debugNavVoxelsPointGeometry = new feng3d.PointGeometry()
+                },]
+            });
+            this._navobject.addChild(pointsObject);
+        }
 
         /**
          * 清楚oav网格模型
@@ -50,98 +63,45 @@ namespace editor
         @feng3d.oav()
         bake()
         {
-            var geometrys = getNavGeometry(this.gameObject.scene.gameObject);
+            var geometrys = this._getNavGeometrys(this.gameObject.scene.gameObject);
             if (geometrys.length == 0)
             {
                 this._navobject && this._navobject.remove();
                 return;
             }
-            var geometry = mergeGeometry(geometrys);
+            this.gameObject.scene.gameObject.addChild(this._navobject);
 
-            //
-            var geometrydata = getGeometryData(geometry);
-            var process = new navigation.NavigationProcess(geometrydata);
-            //
-            process.checkMaxSlope(this.maxSlope);
-            process.checkAgentRadius(this.agentRadius);
-            process.checkAgentHeight(this.agentHeight);
-            //
-            geometrydata = process.getGeometry();
-            if (geometrydata.indices.length == 0)
-            {
-                this._navobject && this._navobject.remove();
-                return;
-            }
-            //
-            var navobject = this._navobject = this._navobject || createNavObject();
-            navobject.getComponent(feng3d.Model).geometry = getGeometry(geometrydata);
-            var parentobject = this.gameObject.scene.gameObject.find("editorObject") || this.gameObject.scene.gameObject;
-            parentobject.addChild(navobject);
+            var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
 
-            function getGeometry(geometrydata: { positions: number[], indices: number[] })
-            {
-                var customGeometry = new feng3d.CustomGeometry();
-                customGeometry.positions = geometrydata.positions;
-                customGeometry.indices = geometrydata.indices;
-                return customGeometry;
-            }
+            this._recastnavigation = this._recastnavigation || new Recastnavigation();
+            this._recastnavigation.doRecastnavigation(geometry);
 
-            function getGeometryData(geometry: feng3d.Geometry)
-            {
-                var positions: number[] = [];
-                var indices: number[] = [];
-                positions.push.apply(positions, geometry.positions);
-                indices.push.apply(indices, geometry.indices);
-                return { positions: positions, indices: indices }
-            }
+            var voxels = this._recastnavigation.getVoxels();
+            this._debugNavVoxelsPointGeometry.points = voxels.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z), a: 1 } })
+        }
 
-            function createNavObject()
-            {
-                var navobject = Object.setValue(new feng3d.GameObject(), { name: "navigation" });
-                navobject.mouseEnabled = false;
-                var model = navobject.addComponent(feng3d.Model);
-                model.geometry = new feng3d.CustomGeometry();
-                model.material = Object.setValue(new feng3d.Material(), { shaderName: "color", uniforms: { u_diffuseInput: new feng3d.Color4(0, 1, 0, 0.5) } });
-                navobject.transform.y = 0.01;
-                return navobject;
-            }
+        private _getNavGeometrys(gameobject: feng3d.GameObject, geometrys?: { positions: number[], indices: number[] }[])
+        {
+            geometrys = geometrys || [];
 
-            function mergeGeometry(geometrys: feng3d.CustomGeometry[])
-            {
-                var customGeometry = new feng3d.CustomGeometry();
-                geometrys.forEach(element =>
-                {
-                    customGeometry.addGeometry(element);
-                });
-                return customGeometry;
-            }
-
-            function getNavGeometry(gameobject: feng3d.GameObject, geometrys?: feng3d.CustomGeometry[])
-            {
-                geometrys = geometrys || [];
-
-                if (!gameobject.visible)
-                    return geometrys;
-                var model = gameobject.getComponent(feng3d.Model);
-                var geometry = model && model.geometry;
-                if (geometry && gameobject.navigationArea != -1)
-                {
-                    var matrix3d = gameobject.transform.localToWorldMatrix;
-                    var positions = Array.apply(null, geometry.positions);
-                    matrix3d.transformVectors(positions, positions);
-                    var indices = Array.apply(null, geometry.indices);
-                    //
-                    var customGeometry = new feng3d.CustomGeometry();
-                    customGeometry.positions = positions;
-                    customGeometry.indices = indices;
-                    geometrys.push(customGeometry);
-                }
-                gameobject.children.forEach(element =>
-                {
-                    getNavGeometry(element, geometrys);
-                });
+            if (!gameobject.visible)
                 return geometrys;
+            var model = gameobject.getComponent(feng3d.Model);
+            var geometry = model && model.geometry;
+            if (geometry && gameobject.navigationArea != -1)
+            {
+                var matrix3d = gameobject.transform.localToWorldMatrix;
+                var positions = Array.apply(null, geometry.positions);
+                matrix3d.transformVectors(positions, positions);
+                var indices = Array.apply(null, geometry.indices);
+                //
+                geometrys.push({ positions: positions, indices: indices });
             }
+            gameobject.children.forEach(element =>
+            {
+                this._getNavGeometrys(element, geometrys);
+            });
+            return geometrys;
         }
     }
 }
