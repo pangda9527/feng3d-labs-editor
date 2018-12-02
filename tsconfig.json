@@ -112,6 +112,7 @@
         "src/ui/assets/AssetsFileTemplates.ts",
         //
         "src/ui/TopView.ts",
+        "src/ui/NavigationView.ts",
         "src/ui/MainView.ts",
         //
         "src/ui/AssetAdapter.ts",

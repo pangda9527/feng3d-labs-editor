@@ -7564,6 +7564,31 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var NavigationView = /** @class */ (function (_super) {
+        __extends(NavigationView, _super);
+        function NavigationView() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "NavigationView";
+            return _this;
+        }
+        NavigationView.prototype.onComplete = function () {
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            if (this.stage) {
+                this.onAddedToStage();
+            }
+        };
+        NavigationView.prototype.onAddedToStage = function () {
+        };
+        NavigationView.prototype.onRemovedFromStage = function () {
+        };
+        return NavigationView;
+    }(eui.Component));
+    editor.NavigationView = NavigationView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var MainView = /** @class */ (function (_super) {
         __extends(MainView, _super);
         function MainView() {

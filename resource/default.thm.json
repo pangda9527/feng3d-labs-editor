@@ -21,6 +21,7 @@
         "editor.ParticleEffectController": "resource/custom_skins/ParticleEffectController.exml",
         "editor.HierarchyView": "resource/custom_skins/HierarchyView.exml",
         "editor.AssetsView": "resource/custom_skins/AssetsView.exml",
+        "editor.NavigationView": "resource/custom_skins/NavigationView.exml",
         "editor.MainView": "resource/custom_skins/MainView.exml",
         "editor.BooleanAttrView": "resource/custom_skins/BooleanAttrView.exml",
         "editor.HierarchyTreeItemRenderer": "resource/custom_skins/HierarchyTreeItemRenderer.exml",
@@ -103,6 +104,7 @@
         "resource/custom_skins/AssetsTreeItemRenderer.exml",
         "resource/custom_skins/AssetsFileItemRenderer.exml",
         "resource/custom_skins/AssetsView.exml",
+        "resource/custom_skins/NavigationView.exml",
         "resource/custom_skins/MainView.exml"
     ]
 }

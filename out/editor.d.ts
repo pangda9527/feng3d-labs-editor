@@ -1919,6 +1919,14 @@ declare namespace editor {
     var runwin: Window;
 }
 declare namespace editor {
+    class NavigationView extends eui.Component {
+        constructor();
+        private onComplete;
+        private onAddedToStage;
+        private onRemovedFromStage;
+    }
+}
+declare namespace editor {
     class MainView extends eui.Component implements eui.UIComponent {
         constructor();
         private onComplete;
