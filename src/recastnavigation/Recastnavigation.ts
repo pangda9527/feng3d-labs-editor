@@ -120,6 +120,7 @@ namespace editor
             });
 
             var triangle = feng3d.Triangle3D.fromPositions(positions);
+            var normal = triangle.getNormal();
             var result = triangle.rasterize();
 
             result.forEach((v, i) =>
@@ -133,7 +134,8 @@ namespace editor
                         x: this._aabb.min.x + x * this._voxelSize,
                         y: this._aabb.min.y + y * this._voxelSize,
                         z: this._aabb.min.z + z * this._voxelSize,
-                        type: VoxelType.Triangle
+                        type: VoxelType.Triangle,
+                        normal: normal,
                     }
                 }
             });
@@ -149,6 +151,7 @@ namespace editor
         y: number;
         z: number;
         type: VoxelType;
+        normal: feng3d.Vector3;
     }
 
     /**

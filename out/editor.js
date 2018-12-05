@@ -9552,6 +9552,10 @@ var editor;
             _super.prototype.dispose.call(this);
         };
         MRSTool.prototype.onSelectedGameObjectChange = function () {
+            if (editor.editorData.selectedGameObjects.length == 1 && editor.editorData.selectedGameObjects[0] == editor.engine.scene.gameObject) {
+                this.mrsToolObject.remove();
+                return;
+            }
             //筛选出 工具控制的对象
             if (editor.editorData.selectedGameObjects.length > 0) {
                 this.gameObject.addChild(this.mrsToolObject);
@@ -10491,7 +10495,7 @@ var editor;
             this.gameObject.scene.gameObject.addChild(this._navobject);
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
             this._recastnavigation = this._recastnavigation || new editor.Recastnavigation();
-            this._recastnavigation.doRecastnavigation(geometry);
+            this._recastnavigation.doRecastnavigation(geometry, 0.1);
             var voxels = this._recastnavigation.getVoxels();
             this._debugNavVoxelsPointGeometry.points = voxels.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z), a: 1 }; });
         };
@@ -11582,6 +11586,7 @@ var editor;
                     return Math.round((v - _this._aabb.min.z) / _this._voxelSize);
             });
             var triangle = feng3d.Triangle3D.fromPositions(positions);
+            var normal = triangle.getNormal();
             var result = triangle.rasterize();
             result.forEach(function (v, i) {
                 if (i % 3 == 0) {
@@ -11592,7 +11597,8 @@ var editor;
                         x: _this._aabb.min.x + x * _this._voxelSize,
                         y: _this._aabb.min.y + y * _this._voxelSize,
                         z: _this._aabb.min.z + z * _this._voxelSize,
-                        type: VoxelType.Triangle
+                        type: VoxelType.Triangle,
+                        normal: normal,
                     };
                 }
             });

@@ -74,7 +74,7 @@ namespace editor
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
 
             this._recastnavigation = this._recastnavigation || new Recastnavigation();
-            this._recastnavigation.doRecastnavigation(geometry);
+            this._recastnavigation.doRecastnavigation(geometry, 0.1);
 
             var voxels = this._recastnavigation.getVoxels();
             this._debugNavVoxelsPointGeometry.points = voxels.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z), a: 1 } })

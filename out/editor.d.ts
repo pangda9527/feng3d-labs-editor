@@ -2957,6 +2957,7 @@ declare namespace editor {
         y: number;
         z: number;
         type: VoxelType;
+        normal: feng3d.Vector3;
     }
     /**
      * 体素类型
