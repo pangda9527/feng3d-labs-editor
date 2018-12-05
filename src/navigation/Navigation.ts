@@ -111,7 +111,7 @@ namespace editor
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
 
             this._recastnavigation = this._recastnavigation || new Recastnavigation();
-            this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.1, 0.1, 0.1));
+            this._recastnavigation.doRecastnavigation(geometry, this.agent);
 
             var voxels = this._recastnavigation.getVoxels().filter(v => v.flag == VoxelFlag.Default);
             var voxels1 = this._recastnavigation.getVoxels().filter(v => v.flag != VoxelFlag.Default);

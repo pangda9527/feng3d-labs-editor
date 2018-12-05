@@ -10537,7 +10537,7 @@ var editor;
             this._navobject.transform.position = new feng3d.Vector3();
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
             this._recastnavigation = this._recastnavigation || new editor.Recastnavigation();
-            this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.1, 0.1, 0.1));
+            this._recastnavigation.doRecastnavigation(geometry, this.agent);
             var voxels = this._recastnavigation.getVoxels().filter(function (v) { return v.flag == editor.VoxelFlag.Default; });
             var voxels1 = this._recastnavigation.getVoxels().filter(function (v) { return v.flag != editor.VoxelFlag.Default; });
             var voxels2 = this._recastnavigation.getVoxels().filter(function (v) { return !!(v.flag & editor.VoxelFlag.IsContour); });
@@ -11572,9 +11572,8 @@ var editor;
          */
         Recastnavigation.prototype.doRecastnavigation = function (mesh, agent, voxelSize) {
             if (agent === void 0) { agent = new editor.NavigationAgent(); }
-            if (voxelSize === void 0) { voxelSize = new feng3d.Vector3(0.1, 0.1, 0.1); }
             this._aabb = feng3d.Box.formPositions(mesh.positions);
-            this._voxelSize = voxelSize;
+            this._voxelSize = voxelSize || new feng3d.Vector3(agent.radius / 3, agent.radius / 3, agent.radius / 3);
             this._agent = agent;
             // 
             var size = this._aabb.getSize().divide(this._voxelSize).ceil();
@@ -11589,7 +11588,7 @@ var editor;
                     this._voxels[x][y] = [];
                 }
             }
-            this._rasterizeMesh(mesh.indices, mesh.positions);
+            this._voxelizationMesh(mesh.indices, mesh.positions);
             this._applyAgent();
         };
         /**
@@ -11610,7 +11609,7 @@ var editor;
         /**
          * 栅格化网格
          */
-        Recastnavigation.prototype._rasterizeMesh = function (indices, positions) {
+        Recastnavigation.prototype._voxelizationMesh = function (indices, positions) {
             for (var i = 0, n = indices.length; i < n; i += 3) {
                 var pi0 = indices[i] * 3;
                 var p0 = [positions[pi0], positions[pi0 + 1], positions[pi0 + 2]];
@@ -11618,7 +11617,7 @@ var editor;
                 var p1 = [positions[pi1], positions[pi1 + 1], positions[pi1 + 2]];
                 var pi2 = indices[i + 2] * 3;
                 var p2 = [positions[pi2], positions[pi2 + 1], positions[pi2 + 2]];
-                this._rasterizeTriangle(p0, p1, p2);
+                this._voxelizationTriangle(p0, p1, p2);
             }
         };
         /**
@@ -11627,7 +11626,7 @@ var editor;
          * @param p1 三角形第二个顶点
          * @param p2 三角形第三个顶点
          */
-        Recastnavigation.prototype._rasterizeTriangle = function (p0, p1, p2) {
+        Recastnavigation.prototype._voxelizationTriangle = function (p0, p1, p2) {
             var _this = this;
             var triangle = feng3d.Triangle3D.fromPositions(p0.concat(p1).concat(p2));
             var normal = triangle.getNormal();

@@ -52,10 +52,10 @@ namespace editor
         /**
          * 执行重铸导航
          */
-        doRecastnavigation(mesh: { positions: number[], indices: number[] }, agent = new NavigationAgent(), voxelSize = new feng3d.Vector3(0.1, 0.1, 0.1))
+        doRecastnavigation(mesh: { positions: number[], indices: number[] }, agent = new NavigationAgent(), voxelSize?: feng3d.Vector3)
         {
             this._aabb = feng3d.Box.formPositions(mesh.positions);
-            this._voxelSize = voxelSize;
+            this._voxelSize = voxelSize || new feng3d.Vector3(agent.radius / 3, agent.radius / 3, agent.radius / 3);
             this._agent = agent;
             // 
             var size = this._aabb.getSize().divide(this._voxelSize).ceil();
@@ -73,7 +73,7 @@ namespace editor
                 }
             }
 
-            this._rasterizeMesh(mesh.indices, mesh.positions);
+            this._voxelizationMesh(mesh.indices, mesh.positions);
             this._applyAgent();
         }
 
@@ -99,7 +99,7 @@ namespace editor
         /**
          * 栅格化网格
          */
-        private _rasterizeMesh(indices: number[], positions: number[])
+        private _voxelizationMesh(indices: number[], positions: number[])
         {
             for (let i = 0, n = indices.length; i < n; i += 3)
             {
@@ -109,7 +109,7 @@ namespace editor
                 var p1 = [positions[pi1], positions[pi1 + 1], positions[pi1 + 2]]
                 var pi2 = indices[i + 2] * 3
                 var p2 = [positions[pi2], positions[pi2 + 1], positions[pi2 + 2]]
-                this._rasterizeTriangle(p0, p1, p2);
+                this._voxelizationTriangle(p0, p1, p2);
             }
         }
 
@@ -119,7 +119,7 @@ namespace editor
          * @param p1 三角形第二个顶点
          * @param p2 三角形第三个顶点
          */
-        private _rasterizeTriangle(p0: number[], p1: number[], p2: number[])
+        private _voxelizationTriangle(p0: number[], p1: number[], p2: number[])
         {
             var triangle = feng3d.Triangle3D.fromPositions(p0.concat(p1).concat(p2));
             var normal = triangle.getNormal();

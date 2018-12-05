@@ -2965,14 +2965,14 @@ declare namespace editor {
         /**
          * 栅格化网格
          */
-        private _rasterizeMesh;
+        private _voxelizationMesh;
         /**
          * 栅格化三角形
          * @param p0 三角形第一个顶点
          * @param p1 三角形第二个顶点
          * @param p2 三角形第三个顶点
          */
-        private _rasterizeTriangle;
+        private _voxelizationTriangle;
         /**
          * 应用代理进行计算出可行走体素
          */
