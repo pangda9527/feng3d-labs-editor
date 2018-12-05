@@ -2948,6 +2948,10 @@ declare namespace editor {
          */
         private _agent;
         /**
+         * 用于体素区分是否同属一个三角形
+         */
+        private _triangleId;
+        /**
          * 执行重铸导航
          */
         doRecastnavigation(mesh: {
@@ -2980,7 +2984,8 @@ declare namespace editor {
         private _applyAgentHeight;
         private _applyAgentRadius;
         private _calculateContour;
-        private _isContourVoxel;
+        private _checkContourVoxel;
+        private _isVoxelFlagDefault;
     }
     /**
      * 体素
@@ -2990,6 +2995,7 @@ declare namespace editor {
         y: number;
         z: number;
         normal: feng3d.Vector3;
+        triangleId: number;
         flag: VoxelFlag;
     }
     enum VoxelFlag {

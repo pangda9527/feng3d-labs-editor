@@ -10543,7 +10543,7 @@ var editor;
             var voxels2 = this._recastnavigation.getVoxels().filter(function (v) { return !!(v.flag & editor.VoxelFlag.IsContour); });
             this._allowedVoxelsPointGeometry.points = voxels.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
             this._rejectivedVoxelsPointGeometry.points = voxels1.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
-            this._debugVoxelsPointGeometry.points = voxels2.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
+            // this._debugVoxelsPointGeometry.points = voxels2.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
         };
         /**
          * 获取参与导航的几何体列表
@@ -11562,6 +11562,10 @@ var editor;
      */
     var Recastnavigation = /** @class */ (function () {
         function Recastnavigation() {
+            /**
+             * 用于体素区分是否同属一个三角形
+             */
+            this._triangleId = 0;
         }
         /**
          * 执行重铸导航
@@ -11634,9 +11638,11 @@ var editor;
                     y: v.yv,
                     z: v.zv,
                     normal: normal,
+                    triangleId: _this._triangleId,
                     flag: VoxelFlag.Default,
                 };
             });
+            this._triangleId++;
         };
         /**
          * 应用代理进行计算出可行走体素
@@ -11645,32 +11651,32 @@ var editor;
             this._agent.maxSlope;
             this._applyAgentMaxSlope();
             this._applyAgentHeight();
-            this._applyAgentRadius();
+            // this._applyAgentRadius();
         };
         /**
          * 筛选出允许行走坡度的体素
          */
         Recastnavigation.prototype._applyAgentMaxSlope = function () {
-            var up = new feng3d.Vector3(0, 1, 0);
             var mincos = Math.cos(this._agent.maxSlope * feng3d.FMath.DEG2RAD);
             this.getVoxels().forEach(function (v) {
-                var dot = v.normal.dot(up);
-                if (Math.abs(dot) < mincos)
+                var dot = v.normal.dot(feng3d.Vector3.Y_AXIS);
+                if (dot < mincos)
                     v.flag = v.flag | VoxelFlag.DontMaxSlope;
             });
         };
         Recastnavigation.prototype._applyAgentHeight = function () {
             for (var x = 0; x < this._numX; x++) {
                 for (var z = 0; z < this._numZ; z++) {
-                    var preY = Number.MAX_VALUE;
+                    var preVoxel = null;
                     for (var y = this._numY - 1; y >= 0; y--) {
                         var voxel = this._voxels[x][y][z];
                         if (!voxel)
                             continue;
-                        if ((preY - voxel.y) < this._agent.height) {
+                        // 不同属一个三角形且上下距离小于指定高度
+                        if (preVoxel != null && preVoxel.triangleId != voxel.triangleId && preVoxel.y - voxel.y < this._agent.height) {
                             voxel.flag = voxel.flag | VoxelFlag.DontHeight;
                         }
-                        preY = voxel.y;
+                        preVoxel = voxel;
                     }
                 }
             }
@@ -11682,35 +11688,47 @@ var editor;
             for (var x = 0; x < this._numX; x++) {
                 for (var y = 0; y < this._numY; y++) {
                     for (var z = 0; z < this._numZ; z++) {
-                        var voxel = this._voxels[x][y][z];
-                        if (!voxel)
-                            continue;
-                        if (x == 0 || x == this._numX - 1 || y == 0 || y == this._numY - 1 || z == 0 || z == this._numZ - 1) {
-                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
-                            continue;
-                        }
-                        if (!(this._voxels[x][y][z + 1] || this._voxels[x][y + 1][z + 1] || this._voxels[x][y - 1][z + 1])) {
-                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
-                            continue;
-                        } // 前
-                        if (!(this._voxels[x][y][z - 1] || this._voxels[x][y + 1][z - 1] || this._voxels[x][y - 1][z - 1])) {
-                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
-                            continue;
-                        } // 后
-                        if (!(this._voxels[x - 1][y][z] || this._voxels[x - 1][y + 1][z] || this._voxels[x - 1][y - 1][z])) {
-                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
-                            continue;
-                        } // 左
-                        if (!(this._voxels[x + 1][y][z] || this._voxels[x + 1][y + 1][z] || this._voxels[x + 1][y - 1][z])) {
-                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
-                            continue;
-                        } // 右
+                        this._checkContourVoxel(x, y, z);
                     }
                 }
             }
         };
-        Recastnavigation.prototype._isContourVoxel = function (xi, yi, zi) {
-            // if(this._voxels[xi][yi][zi] == null)
+        Recastnavigation.prototype._checkContourVoxel = function (x, y, z) {
+            var voxel = this._voxels[x][y][z];
+            if (!voxel)
+                return;
+            if (x == 0 || x == this._numX - 1 || y == 0 || y == this._numY - 1 || z == 0 || z == this._numZ - 1) {
+                voxel.flag = voxel.flag | VoxelFlag.IsContour;
+                return;
+            }
+            // this._getRoundVoxels();
+            // 获取周围格子
+            if (voxel.normal.equals(feng3d.Vector3.Z_AXIS)) {
+            }
+            voxel.normal;
+            voxel.normal;
+            if (!(this._isVoxelFlagDefault(x, y, z + 1) || this._voxels[x][y + 1][z + 1] || this._voxels[x][y - 1][z + 1])) {
+                voxel.flag = voxel.flag | VoxelFlag.IsContour;
+                return;
+            } // 前
+            if (!(this._voxels[x][y][z - 1] || this._voxels[x][y + 1][z - 1] || this._voxels[x][y - 1][z - 1])) {
+                voxel.flag = voxel.flag | VoxelFlag.IsContour;
+                return;
+            } // 后
+            if (!(this._voxels[x - 1][y][z] || this._voxels[x - 1][y + 1][z] || this._voxels[x - 1][y - 1][z])) {
+                voxel.flag = voxel.flag | VoxelFlag.IsContour;
+                return;
+            } // 左
+            if (!(this._voxels[x + 1][y][z] || this._voxels[x + 1][y + 1][z] || this._voxels[x + 1][y - 1][z])) {
+                voxel.flag = voxel.flag | VoxelFlag.IsContour;
+                return;
+            } // 右
+        };
+        Recastnavigation.prototype._isVoxelFlagDefault = function (x, y, z) {
+            var voxel = this._voxels[x][y][z];
+            if (!voxel)
+                return false;
+            return voxel.flag == VoxelFlag.Default;
         };
         return Recastnavigation;
     }());

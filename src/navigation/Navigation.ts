@@ -119,7 +119,7 @@ namespace editor
 
             this._allowedVoxelsPointGeometry.points = voxels.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
             this._rejectivedVoxelsPointGeometry.points = voxels1.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
-            this._debugVoxelsPointGeometry.points = voxels2.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
+            // this._debugVoxelsPointGeometry.points = voxels2.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
         }
 
         /**
