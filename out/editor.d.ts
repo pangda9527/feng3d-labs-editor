@@ -2672,6 +2672,7 @@ declare namespace editor {
         private _recastnavigation;
         private _allowedVoxelsPointGeometry;
         private _rejectivedVoxelsPointGeometry;
+        private _debugVoxelsPointGeometry;
         init(gameobject: feng3d.GameObject): void;
         /**
          * 清楚oav网格模型
@@ -2977,6 +2978,9 @@ declare namespace editor {
          */
         private _applyAgentMaxSlope;
         private _applyAgentHeight;
+        private _applyAgentRadius;
+        private _calculateContour;
+        private _isContourVoxel;
     }
     /**
      * 体素
@@ -2992,6 +2996,7 @@ declare namespace editor {
          */
         allowedMaxSlope?: boolean;
         allowedHeight?: boolean;
+        isContour?: boolean;
     }
     /**
      * 体素类型

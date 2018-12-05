@@ -143,7 +143,7 @@ namespace editor
 
             this._applyAgentMaxSlope();
             this._applyAgentHeight();
-            this._agent.height
+            this._applyAgentRadius();
         }
 
         /**
@@ -178,6 +178,38 @@ namespace editor
                 }
             }
         }
+
+        private _applyAgentRadius()
+        {
+            this._calculateContour();
+        }
+
+        private _calculateContour()
+        {
+            for (let x = 0; x < this._numX; x++)
+            {
+                for (let y = 0; y < this._numY; y++)
+                {
+                    for (let z = 0; z < this._numZ; z++)
+                    {
+                        var voxel = this._voxels[x][y][z];
+                        if (!voxel) continue;
+                        voxel.isContour = false;
+                        if (x == 0 || x == this._numX - 1 || y == 0 || y == this._numY - 1 || z == 0 || z == this._numZ - 1) { voxel.isContour = true; continue; }
+                        if (!(this._voxels[x][y][z + 1] || this._voxels[x][y + 1][z + 1] || this._voxels[x][y - 1][z + 1])) { voxel.isContour = true; continue; }// 前
+                        if (!(this._voxels[x][y][z - 1] || this._voxels[x][y + 1][z - 1] || this._voxels[x][y - 1][z - 1])) { voxel.isContour = true; continue; }// 后
+                        if (!(this._voxels[x - 1][y][z] || this._voxels[x - 1][y + 1][z] || this._voxels[x - 1][y - 1][z])) { voxel.isContour = true; continue; }// 左
+                        if (!(this._voxels[x + 1][y][z] || this._voxels[x + 1][y + 1][z] || this._voxels[x + 1][y - 1][z])) { voxel.isContour = true; continue; }// 右
+                    }
+                }
+            }
+        }
+
+        private _isContourVoxel(xi: number, yi: number, zi: number)
+        {
+            // if(this._voxels[xi][yi][zi] == null)
+
+        }
     }
 
     /**
@@ -195,6 +227,7 @@ namespace editor
          */
         allowedMaxSlope?: boolean;
         allowedHeight?: boolean;
+        isContour?: boolean;
     }
 
     /**
@@ -204,4 +237,6 @@ namespace editor
     {
         Triangle,
     }
+
+    
 }

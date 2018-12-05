@@ -47,6 +47,7 @@ namespace editor
         private _recastnavigation: Recastnavigation;
         private _allowedVoxelsPointGeometry: feng3d.PointGeometry;
         private _rejectivedVoxelsPointGeometry: feng3d.PointGeometry;
+        private _debugVoxelsPointGeometry: feng3d.PointGeometry;
 
         init(gameobject: feng3d.GameObject)
         {
@@ -69,6 +70,15 @@ namespace editor
                     __class__: "feng3d.MeshModel",
                     material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(1, 0, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
                     geometry: this._rejectivedVoxelsPointGeometry = new feng3d.PointGeometry()
+                },]
+            });
+            this._navobject.addChild(pointsObject);
+            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+                name: "debugVoxels",
+                components: [{
+                    __class__: "feng3d.MeshModel",
+                    material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 0, 1), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                    geometry: this._debugVoxelsPointGeometry = new feng3d.PointGeometry()
                 },]
             });
             this._navobject.addChild(pointsObject);
@@ -105,9 +115,11 @@ namespace editor
 
             var voxels = this._recastnavigation.getVoxels().filter(v => v.allowedMaxSlope && v.allowedHeight);
             var voxels1 = this._recastnavigation.getVoxels().filter(v => !(v.allowedMaxSlope && v.allowedHeight));
+            var voxels2 = this._recastnavigation.getVoxels().filter(v => v.isContour);
 
             this._allowedVoxelsPointGeometry.points = voxels.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
             this._rejectivedVoxelsPointGeometry.points = voxels1.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
+            this._debugVoxelsPointGeometry.points = voxels2.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
         }
 
         /**

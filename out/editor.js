@@ -10508,6 +10508,15 @@ var editor;
                     },]
             });
             this._navobject.addChild(pointsObject);
+            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+                name: "debugVoxels",
+                components: [{
+                        __class__: "feng3d.MeshModel",
+                        material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 0, 1), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                        geometry: this._debugVoxelsPointGeometry = new feng3d.PointGeometry()
+                    },]
+            });
+            this._navobject.addChild(pointsObject);
         };
         /**
          * 清楚oav网格模型
@@ -10531,8 +10540,10 @@ var editor;
             this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.1, 0.1, 0.1));
             var voxels = this._recastnavigation.getVoxels().filter(function (v) { return v.allowedMaxSlope && v.allowedHeight; });
             var voxels1 = this._recastnavigation.getVoxels().filter(function (v) { return !(v.allowedMaxSlope && v.allowedHeight); });
+            var voxels2 = this._recastnavigation.getVoxels().filter(function (v) { return v.isContour; });
             this._allowedVoxelsPointGeometry.points = voxels.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
             this._rejectivedVoxelsPointGeometry.points = voxels1.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
+            this._debugVoxelsPointGeometry.points = voxels2.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
         };
         /**
          * 获取参与导航的几何体列表
@@ -11634,7 +11645,7 @@ var editor;
             this._agent.maxSlope;
             this._applyAgentMaxSlope();
             this._applyAgentHeight();
-            this._agent.height;
+            this._applyAgentRadius();
         };
         /**
          * 筛选出允许行走坡度的体素
@@ -11660,6 +11671,44 @@ var editor;
                     }
                 }
             }
+        };
+        Recastnavigation.prototype._applyAgentRadius = function () {
+            this._calculateContour();
+        };
+        Recastnavigation.prototype._calculateContour = function () {
+            for (var x = 0; x < this._numX; x++) {
+                for (var y = 0; y < this._numY; y++) {
+                    for (var z = 0; z < this._numZ; z++) {
+                        var voxel = this._voxels[x][y][z];
+                        if (!voxel)
+                            continue;
+                        voxel.isContour = false;
+                        if (x == 0 || x == this._numX - 1 || y == 0 || y == this._numY - 1 || z == 0 || z == this._numZ - 1) {
+                            voxel.isContour = true;
+                            continue;
+                        }
+                        if (!(this._voxels[x][y][z + 1] || this._voxels[x][y + 1][z + 1] || this._voxels[x][y - 1][z + 1])) {
+                            voxel.isContour = true;
+                            continue;
+                        } // 前
+                        if (!(this._voxels[x][y][z - 1] || this._voxels[x][y + 1][z - 1] || this._voxels[x][y - 1][z - 1])) {
+                            voxel.isContour = true;
+                            continue;
+                        } // 后
+                        if (!(this._voxels[x - 1][y][z] || this._voxels[x - 1][y + 1][z] || this._voxels[x - 1][y - 1][z])) {
+                            voxel.isContour = true;
+                            continue;
+                        } // 左
+                        if (!(this._voxels[x + 1][y][z] || this._voxels[x + 1][y + 1][z] || this._voxels[x + 1][y - 1][z])) {
+                            voxel.isContour = true;
+                            continue;
+                        } // 右
+                    }
+                }
+            }
+        };
+        Recastnavigation.prototype._isContourVoxel = function (xi, yi, zi) {
+            // if(this._voxels[xi][yi][zi] == null)
         };
         return Recastnavigation;
     }());
