@@ -10531,7 +10531,7 @@ var editor;
             this.gameObject.scene.gameObject.addChild(this._navobject);
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
             this._recastnavigation = this._recastnavigation || new editor.Recastnavigation();
-            this._recastnavigation.doRecastnavigation(geometry, 0.1, this.agent);
+            this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.05, 0.05, 0.05));
             var voxels = this._recastnavigation.getVoxels().filter(function (v) { return v.allowedMaxSlope && v.allowedHeight; });
             var voxels1 = this._recastnavigation.getVoxels().filter(function (v) { return !(v.allowedMaxSlope && v.allowedHeight); });
             this._allowedVoxelsPointGeometry.points = voxels.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
@@ -11558,14 +11558,14 @@ var editor;
         /**
          * 执行重铸导航
          */
-        Recastnavigation.prototype.doRecastnavigation = function (mesh, voxelSize, agent) {
-            if (voxelSize === void 0) { voxelSize = 0.1; }
+        Recastnavigation.prototype.doRecastnavigation = function (mesh, agent, voxelSize) {
             if (agent === void 0) { agent = new editor.NavigationAgent(); }
+            if (voxelSize === void 0) { voxelSize = new feng3d.Vector3(0.1, 0.1, 0.1); }
             this._aabb = feng3d.Box.formPositions(mesh.positions);
             this._voxelSize = voxelSize;
             this._agent = agent;
             // 
-            var size = this._aabb.getSize().divideNumber(this._voxelSize).ceil();
+            var size = this._aabb.getSize().divide(this._voxelSize).ceil();
             this._numX = size.x + 1;
             this._numY = size.y + 1;
             this._numZ = size.z + 1;
@@ -11617,30 +11617,17 @@ var editor;
          */
         Recastnavigation.prototype._rasterizeTriangle = function (p0, p1, p2) {
             var _this = this;
-            var positions = p0.concat(p1).concat(p2).map(function (v, i) {
-                if (i % 3 == 0)
-                    return Math.round((v - _this._aabb.min.x) / _this._voxelSize);
-                if (i % 3 == 1)
-                    return Math.round((v - _this._aabb.min.y) / _this._voxelSize);
-                if (i % 3 == 2)
-                    return Math.round((v - _this._aabb.min.z) / _this._voxelSize);
-            });
-            var triangle = feng3d.Triangle3D.fromPositions(positions);
+            var triangle = feng3d.Triangle3D.fromPositions(p0.concat(p1).concat(p2));
             var normal = triangle.getNormal();
-            var result = triangle.rasterize();
+            var result = triangle.rasterizeCustom(this._voxelSize, this._aabb.min);
             result.forEach(function (v, i) {
-                if (i % 3 == 0) {
-                    var x = result[i];
-                    var y = result[i + 1];
-                    var z = result[i + 2];
-                    _this._voxels[x][y][z] = {
-                        x: _this._aabb.min.x + x * _this._voxelSize,
-                        y: _this._aabb.min.y + y * _this._voxelSize,
-                        z: _this._aabb.min.z + z * _this._voxelSize,
-                        type: VoxelType.Triangle,
-                        normal: normal,
-                    };
-                }
+                _this._voxels[v.xi][v.yi][v.zi] = {
+                    x: v.xv,
+                    y: v.yv,
+                    z: v.zv,
+                    type: VoxelType.Triangle,
+                    normal: normal,
+                };
             });
         };
         /**

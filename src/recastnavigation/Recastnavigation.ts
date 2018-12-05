@@ -23,7 +23,7 @@ namespace editor
         /**
          * 体素尺寸
          */
-        private _voxelSize: number;
+        private _voxelSize: feng3d.Vector3;
         /**
          * X 轴上 体素数量
          */
@@ -49,13 +49,13 @@ namespace editor
         /**
          * 执行重铸导航
          */
-        doRecastnavigation(mesh: { positions: number[], indices: number[] }, voxelSize = 0.1, agent = new NavigationAgent())
+        doRecastnavigation(mesh: { positions: number[], indices: number[] }, agent = new NavigationAgent(), voxelSize = new feng3d.Vector3(0.1, 0.1, 0.1))
         {
             this._aabb = feng3d.Box.formPositions(mesh.positions);
             this._voxelSize = voxelSize;
             this._agent = agent;
             // 
-            var size = this._aabb.getSize().divideNumber(this._voxelSize).ceil();
+            var size = this._aabb.getSize().divide(this._voxelSize).ceil();
             this._numX = size.x + 1;
             this._numY = size.y + 1;
             this._numZ = size.z + 1;
@@ -118,31 +118,18 @@ namespace editor
          */
         private _rasterizeTriangle(p0: number[], p1: number[], p2: number[])
         {
-            var positions = p0.concat(p1).concat(p2).map((v, i) =>
-            {
-                if (i % 3 == 0) return Math.round((v - this._aabb.min.x) / this._voxelSize);
-                if (i % 3 == 1) return Math.round((v - this._aabb.min.y) / this._voxelSize);
-                if (i % 3 == 2) return Math.round((v - this._aabb.min.z) / this._voxelSize);
-            });
-
-            var triangle = feng3d.Triangle3D.fromPositions(positions);
+            var triangle = feng3d.Triangle3D.fromPositions(p0.concat(p1).concat(p2));
             var normal = triangle.getNormal();
-            var result = triangle.rasterize();
+            var result = triangle.rasterizeCustom(this._voxelSize, this._aabb.min);
 
             result.forEach((v, i) =>
             {
-                if (i % 3 == 0)
-                {
-                    var x = result[i];
-                    var y = result[i + 1];
-                    var z = result[i + 2]
-                    this._voxels[x][y][z] = {
-                        x: this._aabb.min.x + x * this._voxelSize,
-                        y: this._aabb.min.y + y * this._voxelSize,
-                        z: this._aabb.min.z + z * this._voxelSize,
-                        type: VoxelType.Triangle,
-                        normal: normal,
-                    }
+                this._voxels[v.xi][v.yi][v.zi] = {
+                    x: v.xv,
+                    y: v.yv,
+                    z: v.zv,
+                    type: VoxelType.Triangle,
+                    normal: normal,
                 }
             });
         }

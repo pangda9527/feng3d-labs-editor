@@ -2952,7 +2952,7 @@ declare namespace editor {
         doRecastnavigation(mesh: {
             positions: number[];
             indices: number[];
-        }, voxelSize?: number, agent?: NavigationAgent): void;
+        }, agent?: NavigationAgent, voxelSize?: feng3d.Vector3): void;
         /**
          * 获取体素列表
          */

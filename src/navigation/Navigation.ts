@@ -100,7 +100,7 @@ namespace editor
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
 
             this._recastnavigation = this._recastnavigation || new Recastnavigation();
-            this._recastnavigation.doRecastnavigation(geometry, 0.1, this.agent);
+            this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.05, 0.05, 0.05));
 
             var voxels = this._recastnavigation.getVoxels().filter(v => v.allowedMaxSlope && v.allowedHeight);
             var voxels1 = this._recastnavigation.getVoxels().filter(v => !(v.allowedMaxSlope && v.allowedHeight));
