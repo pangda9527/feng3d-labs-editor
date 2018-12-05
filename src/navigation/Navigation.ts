@@ -51,8 +51,9 @@ namespace editor
         init(gameobject: feng3d.GameObject)
         {
             super.init(gameobject);
+            this.hideFlags = this.hideFlags | feng3d.HideFlags.DontSaveInBuild;
 
-            this._navobject = Object.setValue(new feng3d.GameObject(), { name: "NavObject" });
+            this._navobject = Object.setValue(new feng3d.GameObject(), { name: "NavObject", hideFlags: feng3d.HideFlags.DontSave });
             var pointsObject = Object.setValue(new feng3d.GameObject(), {
                 name: "allowedVoxels",
                 components: [{
@@ -71,7 +72,6 @@ namespace editor
                 },]
             });
             this._navobject.addChild(pointsObject);
-            this._navobject.hideFlags = feng3d.HideFlags.DontSave;
         }
 
         /**
@@ -96,11 +96,12 @@ namespace editor
                 return;
             }
             this.gameObject.scene.gameObject.addChild(this._navobject);
+            this._navobject.transform.position = new feng3d.Vector3();
 
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
 
             this._recastnavigation = this._recastnavigation || new Recastnavigation();
-            this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.05, 0.05, 0.05));
+            this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.1, 0.1, 0.1));
 
             var voxels = this._recastnavigation.getVoxels().filter(v => v.allowedMaxSlope && v.allowedHeight);
             var voxels1 = this._recastnavigation.getVoxels().filter(v => !(v.allowedMaxSlope && v.allowedHeight));

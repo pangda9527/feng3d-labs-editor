@@ -92,8 +92,7 @@ namespace editor
 
 		private addComponentView(component: feng3d.Components)
 		{
-			var o: Object;
-			if (component.hideFlags & feng3d.HideFlags.HideInHierarchy)
+			if (component.hideFlags & feng3d.HideFlags.HideInInspector)
 				return;
 
 			var displayObject = new ComponentView(component);

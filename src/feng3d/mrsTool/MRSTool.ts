@@ -73,14 +73,10 @@ namespace editor
 
         private onSelectedGameObjectChange()
         {
-            if (editorData.selectedGameObjects.length == 1 && editorData.selectedGameObjects[0] == engine.scene.gameObject)
-            {
-                this.mrsToolObject.remove();
-                return;
-            }
+            var objects = editorData.selectedGameObjects.filter(v => !(v.hideFlags & feng3d.HideFlags.DontTransform));
 
             //筛选出 工具控制的对象
-            if (editorData.selectedGameObjects.length > 0)
+            if (objects.length > 0)
             {
                 this.gameObject.addChild(this.mrsToolObject);
             }

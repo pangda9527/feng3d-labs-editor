@@ -5406,8 +5406,7 @@ var editor;
             this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
         };
         OAVComponentList.prototype.addComponentView = function (component) {
-            var o;
-            if (component.hideFlags & feng3d.HideFlags.HideInHierarchy)
+            if (component.hideFlags & feng3d.HideFlags.HideInInspector)
                 return;
             var displayObject = new editor.ComponentView(component);
             displayObject.percentWidth = 100;
@@ -9552,12 +9551,9 @@ var editor;
             _super.prototype.dispose.call(this);
         };
         MRSTool.prototype.onSelectedGameObjectChange = function () {
-            if (editor.editorData.selectedGameObjects.length == 1 && editor.editorData.selectedGameObjects[0] == editor.engine.scene.gameObject) {
-                this.mrsToolObject.remove();
-                return;
-            }
+            var objects = editor.editorData.selectedGameObjects.filter(function (v) { return !(v.hideFlags & feng3d.HideFlags.DontTransform); });
             //筛选出 工具控制的对象
-            if (editor.editorData.selectedGameObjects.length > 0) {
+            if (objects.length > 0) {
                 this.gameObject.addChild(this.mrsToolObject);
             }
             else {
@@ -10492,7 +10488,8 @@ var editor;
         }
         Navigation.prototype.init = function (gameobject) {
             _super.prototype.init.call(this, gameobject);
-            this._navobject = Object.setValue(new feng3d.GameObject(), { name: "NavObject" });
+            this.hideFlags = this.hideFlags | feng3d.HideFlags.DontSaveInBuild;
+            this._navobject = Object.setValue(new feng3d.GameObject(), { name: "NavObject", hideFlags: feng3d.HideFlags.DontSave });
             var pointsObject = Object.setValue(new feng3d.GameObject(), {
                 name: "allowedVoxels",
                 components: [{
@@ -10511,7 +10508,6 @@ var editor;
                     },]
             });
             this._navobject.addChild(pointsObject);
-            this._navobject.hideFlags = feng3d.HideFlags.DontSave;
         };
         /**
          * 清楚oav网格模型
@@ -10529,9 +10525,10 @@ var editor;
                 return;
             }
             this.gameObject.scene.gameObject.addChild(this._navobject);
+            this._navobject.transform.position = new feng3d.Vector3();
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
             this._recastnavigation = this._recastnavigation || new editor.Recastnavigation();
-            this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.05, 0.05, 0.05));
+            this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.1, 0.1, 0.1));
             var voxels = this._recastnavigation.getVoxels().filter(function (v) { return v.allowedMaxSlope && v.allowedHeight; });
             var voxels1 = this._recastnavigation.getVoxels().filter(function (v) { return !(v.allowedMaxSlope && v.allowedHeight); });
             this._allowedVoxelsPointGeometry.points = voxels.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
