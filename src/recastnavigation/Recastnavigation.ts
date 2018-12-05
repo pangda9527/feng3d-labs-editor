@@ -128,8 +128,8 @@ namespace editor
                     x: v.xv,
                     y: v.yv,
                     z: v.zv,
-                    type: VoxelType.Triangle,
                     normal: normal,
+                    flag: VoxelFlag.Default,
                 }
             });
         }
@@ -157,7 +157,8 @@ namespace editor
             this.getVoxels().forEach(v =>
             {
                 var dot = v.normal.dot(up);
-                v.allowedMaxSlope = Math.abs(dot) >= mincos;
+                if (Math.abs(dot) < mincos)
+                    v.flag = v.flag | VoxelFlag.DontMaxSlope;
             });
         }
 
@@ -172,7 +173,10 @@ namespace editor
                     {
                         var voxel = this._voxels[x][y][z];
                         if (!voxel) continue;
-                        voxel.allowedHeight = (preY - voxel.y) > this._agent.height;
+                        if ((preY - voxel.y) < this._agent.height)
+                        {
+                            voxel.flag = voxel.flag | VoxelFlag.DontHeight;
+                        }
                         preY = voxel.y;
                     }
                 }
@@ -194,12 +198,11 @@ namespace editor
                     {
                         var voxel = this._voxels[x][y][z];
                         if (!voxel) continue;
-                        voxel.isContour = false;
-                        if (x == 0 || x == this._numX - 1 || y == 0 || y == this._numY - 1 || z == 0 || z == this._numZ - 1) { voxel.isContour = true; continue; }
-                        if (!(this._voxels[x][y][z + 1] || this._voxels[x][y + 1][z + 1] || this._voxels[x][y - 1][z + 1])) { voxel.isContour = true; continue; }// 前
-                        if (!(this._voxels[x][y][z - 1] || this._voxels[x][y + 1][z - 1] || this._voxels[x][y - 1][z - 1])) { voxel.isContour = true; continue; }// 后
-                        if (!(this._voxels[x - 1][y][z] || this._voxels[x - 1][y + 1][z] || this._voxels[x - 1][y - 1][z])) { voxel.isContour = true; continue; }// 左
-                        if (!(this._voxels[x + 1][y][z] || this._voxels[x + 1][y + 1][z] || this._voxels[x + 1][y - 1][z])) { voxel.isContour = true; continue; }// 右
+                        if (x == 0 || x == this._numX - 1 || y == 0 || y == this._numY - 1 || z == 0 || z == this._numZ - 1) { voxel.flag = voxel.flag | VoxelFlag.IsContour; continue; }
+                        if (!(this._voxels[x][y][z + 1] || this._voxels[x][y + 1][z + 1] || this._voxels[x][y - 1][z + 1])) { voxel.flag = voxel.flag | VoxelFlag.IsContour; continue; }// 前
+                        if (!(this._voxels[x][y][z - 1] || this._voxels[x][y + 1][z - 1] || this._voxels[x][y - 1][z - 1])) { voxel.flag = voxel.flag | VoxelFlag.IsContour; continue; }// 后
+                        if (!(this._voxels[x - 1][y][z] || this._voxels[x - 1][y + 1][z] || this._voxels[x - 1][y - 1][z])) { voxel.flag = voxel.flag | VoxelFlag.IsContour; continue; }// 左
+                        if (!(this._voxels[x + 1][y][z] || this._voxels[x + 1][y + 1][z] || this._voxels[x + 1][y - 1][z])) { voxel.flag = voxel.flag | VoxelFlag.IsContour; continue; }// 右
                     }
                 }
             }
@@ -215,28 +218,23 @@ namespace editor
     /**
      * 体素
      */
-    interface Voxel
+    export interface Voxel
     {
         x: number;
         y: number;
         z: number;
-        type: VoxelType;
         normal: feng3d.Vector3;
-        /**
-         * 是否满足行走坡度
-         */
-        allowedMaxSlope?: boolean;
-        allowedHeight?: boolean;
-        isContour?: boolean;
+
+        flag: VoxelFlag;
     }
 
-    /**
-     * 体素类型
-     */
-    enum VoxelType
+    export enum VoxelFlag
     {
-        Triangle,
+        Default = 0,
+        DontMaxSlope = 1,
+        DontHeight = 2,
+        IsContour = 4,
     }
 
-    
+
 }

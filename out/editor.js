@@ -10538,9 +10538,9 @@ var editor;
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
             this._recastnavigation = this._recastnavigation || new editor.Recastnavigation();
             this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.1, 0.1, 0.1));
-            var voxels = this._recastnavigation.getVoxels().filter(function (v) { return v.allowedMaxSlope && v.allowedHeight; });
-            var voxels1 = this._recastnavigation.getVoxels().filter(function (v) { return !(v.allowedMaxSlope && v.allowedHeight); });
-            var voxels2 = this._recastnavigation.getVoxels().filter(function (v) { return v.isContour; });
+            var voxels = this._recastnavigation.getVoxels().filter(function (v) { return v.flag == editor.VoxelFlag.Default; });
+            var voxels1 = this._recastnavigation.getVoxels().filter(function (v) { return v.flag != editor.VoxelFlag.Default; });
+            var voxels2 = this._recastnavigation.getVoxels().filter(function (v) { return !!(v.flag & editor.VoxelFlag.IsContour); });
             this._allowedVoxelsPointGeometry.points = voxels.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
             this._rejectivedVoxelsPointGeometry.points = voxels1.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
             this._debugVoxelsPointGeometry.points = voxels2.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
@@ -11633,8 +11633,8 @@ var editor;
                     x: v.xv,
                     y: v.yv,
                     z: v.zv,
-                    type: VoxelType.Triangle,
                     normal: normal,
+                    flag: VoxelFlag.Default,
                 };
             });
         };
@@ -11655,7 +11655,8 @@ var editor;
             var mincos = Math.cos(this._agent.maxSlope * feng3d.FMath.DEG2RAD);
             this.getVoxels().forEach(function (v) {
                 var dot = v.normal.dot(up);
-                v.allowedMaxSlope = Math.abs(dot) >= mincos;
+                if (Math.abs(dot) < mincos)
+                    v.flag = v.flag | VoxelFlag.DontMaxSlope;
             });
         };
         Recastnavigation.prototype._applyAgentHeight = function () {
@@ -11666,7 +11667,9 @@ var editor;
                         var voxel = this._voxels[x][y][z];
                         if (!voxel)
                             continue;
-                        voxel.allowedHeight = (preY - voxel.y) > this._agent.height;
+                        if ((preY - voxel.y) < this._agent.height) {
+                            voxel.flag = voxel.flag | VoxelFlag.DontHeight;
+                        }
                         preY = voxel.y;
                     }
                 }
@@ -11682,25 +11685,24 @@ var editor;
                         var voxel = this._voxels[x][y][z];
                         if (!voxel)
                             continue;
-                        voxel.isContour = false;
                         if (x == 0 || x == this._numX - 1 || y == 0 || y == this._numY - 1 || z == 0 || z == this._numZ - 1) {
-                            voxel.isContour = true;
+                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
                             continue;
                         }
                         if (!(this._voxels[x][y][z + 1] || this._voxels[x][y + 1][z + 1] || this._voxels[x][y - 1][z + 1])) {
-                            voxel.isContour = true;
+                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
                             continue;
                         } // 前
                         if (!(this._voxels[x][y][z - 1] || this._voxels[x][y + 1][z - 1] || this._voxels[x][y - 1][z - 1])) {
-                            voxel.isContour = true;
+                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
                             continue;
                         } // 后
                         if (!(this._voxels[x - 1][y][z] || this._voxels[x - 1][y + 1][z] || this._voxels[x - 1][y - 1][z])) {
-                            voxel.isContour = true;
+                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
                             continue;
                         } // 左
                         if (!(this._voxels[x + 1][y][z] || this._voxels[x + 1][y + 1][z] || this._voxels[x + 1][y - 1][z])) {
-                            voxel.isContour = true;
+                            voxel.flag = voxel.flag | VoxelFlag.IsContour;
                             continue;
                         } // 右
                     }
@@ -11713,13 +11715,13 @@ var editor;
         return Recastnavigation;
     }());
     editor.Recastnavigation = Recastnavigation;
-    /**
-     * 体素类型
-     */
-    var VoxelType;
-    (function (VoxelType) {
-        VoxelType[VoxelType["Triangle"] = 0] = "Triangle";
-    })(VoxelType || (VoxelType = {}));
+    var VoxelFlag;
+    (function (VoxelFlag) {
+        VoxelFlag[VoxelFlag["Default"] = 0] = "Default";
+        VoxelFlag[VoxelFlag["DontMaxSlope"] = 1] = "DontMaxSlope";
+        VoxelFlag[VoxelFlag["DontHeight"] = 2] = "DontHeight";
+        VoxelFlag[VoxelFlag["IsContour"] = 4] = "IsContour";
+    })(VoxelFlag = editor.VoxelFlag || (editor.VoxelFlag = {}));
 })(editor || (editor = {}));
 var egret;
 (function (egret) {

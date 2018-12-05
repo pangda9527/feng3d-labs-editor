@@ -2989,20 +2989,14 @@ declare namespace editor {
         x: number;
         y: number;
         z: number;
-        type: VoxelType;
         normal: feng3d.Vector3;
-        /**
-         * 是否满足行走坡度
-         */
-        allowedMaxSlope?: boolean;
-        allowedHeight?: boolean;
-        isContour?: boolean;
+        flag: VoxelFlag;
     }
-    /**
-     * 体素类型
-     */
-    enum VoxelType {
-        Triangle = 0
+    enum VoxelFlag {
+        Default = 0,
+        DontMaxSlope = 1,
+        DontHeight = 2,
+        IsContour = 4
     }
 }
 declare namespace egret {

@@ -113,9 +113,9 @@ namespace editor
             this._recastnavigation = this._recastnavigation || new Recastnavigation();
             this._recastnavigation.doRecastnavigation(geometry, this.agent, new feng3d.Vector3(0.1, 0.1, 0.1));
 
-            var voxels = this._recastnavigation.getVoxels().filter(v => v.allowedMaxSlope && v.allowedHeight);
-            var voxels1 = this._recastnavigation.getVoxels().filter(v => !(v.allowedMaxSlope && v.allowedHeight));
-            var voxels2 = this._recastnavigation.getVoxels().filter(v => v.isContour);
+            var voxels = this._recastnavigation.getVoxels().filter(v => v.flag == VoxelFlag.Default);
+            var voxels1 = this._recastnavigation.getVoxels().filter(v => v.flag != VoxelFlag.Default);
+            var voxels2 = this._recastnavigation.getVoxels().filter(v => !!(v.flag & VoxelFlag.IsContour));
 
             this._allowedVoxelsPointGeometry.points = voxels.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
             this._rejectivedVoxelsPointGeometry.points = voxels1.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
