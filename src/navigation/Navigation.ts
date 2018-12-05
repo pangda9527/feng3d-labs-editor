@@ -111,13 +111,15 @@ namespace editor
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
 
             this._recastnavigation = this._recastnavigation || new Recastnavigation();
+
             this._recastnavigation.doRecastnavigation(geometry, this.agent);
+            var voxels = this._recastnavigation.getVoxels();
 
-            var voxels = this._recastnavigation.getVoxels().filter(v => v.flag == VoxelFlag.Default);
-            var voxels1 = this._recastnavigation.getVoxels().filter(v => v.flag != VoxelFlag.Default);
-            var voxels2 = this._recastnavigation.getVoxels().filter(v => !!(v.flag & VoxelFlag.IsContour));
+            var voxels0 = voxels.filter(v => v.flag == VoxelFlag.Default);
+            var voxels1 = voxels.filter(v => v.flag != VoxelFlag.Default);
+            var voxels2 = voxels.filter(v => !!(v.flag & VoxelFlag.IsContour));
 
-            this._allowedVoxelsPointGeometry.points = voxels.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
+            this._allowedVoxelsPointGeometry.points = voxels0.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
             this._rejectivedVoxelsPointGeometry.points = voxels1.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
             // this._debugVoxelsPointGeometry.points = voxels2.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
         }
