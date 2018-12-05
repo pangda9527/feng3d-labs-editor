@@ -10444,38 +10444,74 @@ var editor;
 var editor;
 (function (editor) {
     /**
+     * 导航代理
+     */
+    var NavigationAgent = /** @class */ (function () {
+        function NavigationAgent() {
+            /**
+             * 距离边缘半径
+             */
+            this.radius = 0.5;
+            /**
+             * 允许行走高度
+             */
+            this.height = 2;
+            /**
+             * 允许爬上的阶梯高度
+             */
+            this.stepHeight = 0.4;
+            /**
+             * 允许行走坡度
+             */
+            this.maxSlope = 45; //[0,60]
+        }
+        __decorate([
+            feng3d.oav()
+        ], NavigationAgent.prototype, "radius", void 0);
+        __decorate([
+            feng3d.oav()
+        ], NavigationAgent.prototype, "height", void 0);
+        __decorate([
+            feng3d.oav()
+        ], NavigationAgent.prototype, "stepHeight", void 0);
+        __decorate([
+            feng3d.oav()
+        ], NavigationAgent.prototype, "maxSlope", void 0);
+        return NavigationAgent;
+    }());
+    editor.NavigationAgent = NavigationAgent;
+    /**
      * 导航组件，提供生成导航网格功能
      */
     var Navigation = /** @class */ (function (_super) {
         __extends(Navigation, _super);
         function Navigation() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            /**
-             * 距离边缘半径
-             */
-            _this.agentRadius = 0.5;
-            /**
-             * 允许行走高度
-             */
-            _this.agentHeight = 2;
-            /**
-             * 允许行走坡度
-             */
-            _this.maxSlope = 45; //[0,60]
+            _this.agent = new NavigationAgent();
             return _this;
         }
         Navigation.prototype.init = function (gameobject) {
             _super.prototype.init.call(this, gameobject);
             this._navobject = Object.setValue(new feng3d.GameObject(), { name: "NavObject" });
             var pointsObject = Object.setValue(new feng3d.GameObject(), {
-                name: "DebugNavVoxels",
+                name: "allowedVoxels",
                 components: [{
                         __class__: "feng3d.MeshModel",
-                        material: Object.setValue(new feng3d.Material(), { shaderName: "point", renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
-                        geometry: this._debugNavVoxelsPointGeometry = new feng3d.PointGeometry()
+                        material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 1, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                        geometry: this._allowedVoxelsPointGeometry = new feng3d.PointGeometry()
                     },]
             });
             this._navobject.addChild(pointsObject);
+            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+                name: "rejectivedVoxels",
+                components: [{
+                        __class__: "feng3d.MeshModel",
+                        material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(1, 0, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                        geometry: this._rejectivedVoxelsPointGeometry = new feng3d.PointGeometry()
+                    },]
+            });
+            this._navobject.addChild(pointsObject);
+            this._navobject.hideFlags = feng3d.HideFlags.DontSave;
         };
         /**
          * 清楚oav网格模型
@@ -10495,10 +10531,17 @@ var editor;
             this.gameObject.scene.gameObject.addChild(this._navobject);
             var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
             this._recastnavigation = this._recastnavigation || new editor.Recastnavigation();
-            this._recastnavigation.doRecastnavigation(geometry, 0.1);
-            var voxels = this._recastnavigation.getVoxels();
-            this._debugNavVoxelsPointGeometry.points = voxels.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z), a: 1 }; });
+            this._recastnavigation.doRecastnavigation(geometry, 0.1, this.agent);
+            var voxels = this._recastnavigation.getVoxels().filter(function (v) { return v.allowedMaxSlope && v.allowedHeight; });
+            var voxels1 = this._recastnavigation.getVoxels().filter(function (v) { return !(v.allowedMaxSlope && v.allowedHeight); });
+            this._allowedVoxelsPointGeometry.points = voxels.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
+            this._rejectivedVoxelsPointGeometry.points = voxels1.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
         };
+        /**
+         * 获取参与导航的几何体列表
+         * @param gameobject
+         * @param geometrys
+         */
         Navigation.prototype._getNavGeometrys = function (gameobject, geometrys) {
             var _this = this;
             geometrys = geometrys || [];
@@ -10520,14 +10563,8 @@ var editor;
             return geometrys;
         };
         __decorate([
-            feng3d.oav()
-        ], Navigation.prototype, "agentRadius", void 0);
-        __decorate([
-            feng3d.oav()
-        ], Navigation.prototype, "agentHeight", void 0);
-        __decorate([
-            feng3d.oav()
-        ], Navigation.prototype, "maxSlope", void 0);
+            feng3d.oav({ component: "OAVObjectView" })
+        ], Navigation.prototype, "agent", void 0);
         __decorate([
             feng3d.oav()
         ], Navigation.prototype, "clear", null);
@@ -11521,10 +11558,12 @@ var editor;
         /**
          * 执行重铸导航
          */
-        Recastnavigation.prototype.doRecastnavigation = function (mesh, voxelSize) {
+        Recastnavigation.prototype.doRecastnavigation = function (mesh, voxelSize, agent) {
             if (voxelSize === void 0) { voxelSize = 0.1; }
+            if (agent === void 0) { agent = new editor.NavigationAgent(); }
             this._aabb = feng3d.Box.formPositions(mesh.positions);
             this._voxelSize = voxelSize;
+            this._agent = agent;
             // 
             var size = this._aabb.getSize().divideNumber(this._voxelSize).ceil();
             this._numX = size.x + 1;
@@ -11539,6 +11578,7 @@ var editor;
                 }
             }
             this._rasterizeMesh(mesh.indices, mesh.positions);
+            this._applyAgent();
         };
         /**
          * 获取体素列表
@@ -11602,6 +11642,40 @@ var editor;
                     };
                 }
             });
+        };
+        /**
+         * 应用代理进行计算出可行走体素
+         */
+        Recastnavigation.prototype._applyAgent = function () {
+            this._agent.maxSlope;
+            this._applyAgentMaxSlope();
+            this._applyAgentHeight();
+            this._agent.height;
+        };
+        /**
+         * 筛选出允许行走坡度的体素
+         */
+        Recastnavigation.prototype._applyAgentMaxSlope = function () {
+            var up = new feng3d.Vector3(0, 1, 0);
+            var mincos = Math.cos(this._agent.maxSlope * feng3d.FMath.DEG2RAD);
+            this.getVoxels().forEach(function (v) {
+                var dot = v.normal.dot(up);
+                v.allowedMaxSlope = Math.abs(dot) >= mincos;
+            });
+        };
+        Recastnavigation.prototype._applyAgentHeight = function () {
+            for (var x = 0; x < this._numX; x++) {
+                for (var z = 0; z < this._numZ; z++) {
+                    var preY = Number.MAX_VALUE;
+                    for (var y = this._numY - 1; y >= 0; y--) {
+                        var voxel = this._voxels[x][y][z];
+                        if (!voxel)
+                            continue;
+                        voxel.allowedHeight = (preY - voxel.y) > this._agent.height;
+                        preY = voxel.y;
+                    }
+                }
+            }
         };
         return Recastnavigation;
     }());

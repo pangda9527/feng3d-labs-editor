@@ -42,12 +42,18 @@ namespace editor
         private _voxels: Voxel[][][];
 
         /**
+         * 导航代理
+         */
+        private _agent: NavigationAgent;
+
+        /**
          * 执行重铸导航
          */
-        doRecastnavigation(mesh: { positions: number[], indices: number[] }, voxelSize = 0.1)
+        doRecastnavigation(mesh: { positions: number[], indices: number[] }, voxelSize = 0.1, agent = new NavigationAgent())
         {
             this._aabb = feng3d.Box.formPositions(mesh.positions);
             this._voxelSize = voxelSize;
+            this._agent = agent;
             // 
             var size = this._aabb.getSize().divideNumber(this._voxelSize).ceil();
             this._numX = size.x + 1;
@@ -65,7 +71,7 @@ namespace editor
             }
 
             this._rasterizeMesh(mesh.indices, mesh.positions);
-
+            this._applyAgent();
         }
 
         /**
@@ -140,6 +146,51 @@ namespace editor
                 }
             });
         }
+
+        /**
+         * 应用代理进行计算出可行走体素
+         */
+        private _applyAgent()
+        {
+            this._agent.maxSlope
+
+            this._applyAgentMaxSlope();
+            this._applyAgentHeight();
+            this._agent.height
+        }
+
+        /**
+         * 筛选出允许行走坡度的体素
+         */
+        private _applyAgentMaxSlope()
+        {
+            var up = new feng3d.Vector3(0, 1, 0);
+            var mincos = Math.cos(this._agent.maxSlope * feng3d.FMath.DEG2RAD);
+
+            this.getVoxels().forEach(v =>
+            {
+                var dot = v.normal.dot(up);
+                v.allowedMaxSlope = Math.abs(dot) >= mincos;
+            });
+        }
+
+        private _applyAgentHeight()
+        {
+            for (let x = 0; x < this._numX; x++)
+            {
+                for (let z = 0; z < this._numZ; z++)
+                {
+                    var preY = Number.MAX_VALUE;
+                    for (let y = this._numY - 1; y >= 0; y--)
+                    {
+                        var voxel = this._voxels[x][y][z];
+                        if (!voxel) continue;
+                        voxel.allowedHeight = (preY - voxel.y) > this._agent.height;
+                        preY = voxel.y;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -152,6 +203,11 @@ namespace editor
         z: number;
         type: VoxelType;
         normal: feng3d.Vector3;
+        /**
+         * 是否满足行走坡度
+         */
+        allowedMaxSlope?: boolean;
+        allowedHeight?: boolean;
     }
 
     /**
@@ -159,7 +215,6 @@ namespace editor
      */
     enum VoxelType
     {
-
         Triangle,
     }
 }

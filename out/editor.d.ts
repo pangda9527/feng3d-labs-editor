@@ -2643,24 +2643,35 @@ declare namespace feng3d {
 }
 declare namespace editor {
     /**
-     * 导航组件，提供生成导航网格功能
+     * 导航代理
      */
-    class Navigation extends feng3d.Component {
+    class NavigationAgent {
         /**
          * 距离边缘半径
          */
-        agentRadius: number;
+        radius: number;
         /**
          * 允许行走高度
          */
-        agentHeight: number;
+        height: number;
+        /**
+         * 允许爬上的阶梯高度
+         */
+        stepHeight: number;
         /**
          * 允许行走坡度
          */
         maxSlope: number;
+    }
+    /**
+     * 导航组件，提供生成导航网格功能
+     */
+    class Navigation extends feng3d.Component {
+        agent: NavigationAgent;
         private _navobject;
         private _recastnavigation;
-        private _debugNavVoxelsPointGeometry;
+        private _allowedVoxelsPointGeometry;
+        private _rejectivedVoxelsPointGeometry;
         init(gameobject: feng3d.GameObject): void;
         /**
          * 清楚oav网格模型
@@ -2670,6 +2681,11 @@ declare namespace editor {
          * 计算导航网格数据
          */
         bake(): void;
+        /**
+         * 获取参与导航的几何体列表
+         * @param gameobject
+         * @param geometrys
+         */
         private _getNavGeometrys;
     }
 }
@@ -2927,12 +2943,16 @@ declare namespace editor {
          */
         private _voxels;
         /**
+         * 导航代理
+         */
+        private _agent;
+        /**
          * 执行重铸导航
          */
         doRecastnavigation(mesh: {
             positions: number[];
             indices: number[];
-        }, voxelSize?: number): void;
+        }, voxelSize?: number, agent?: NavigationAgent): void;
         /**
          * 获取体素列表
          */
@@ -2948,6 +2968,15 @@ declare namespace editor {
          * @param p2 三角形第三个顶点
          */
         private _rasterizeTriangle;
+        /**
+         * 应用代理进行计算出可行走体素
+         */
+        private _applyAgent;
+        /**
+         * 筛选出允许行走坡度的体素
+         */
+        private _applyAgentMaxSlope;
+        private _applyAgentHeight;
     }
     /**
      * 体素
@@ -2958,6 +2987,11 @@ declare namespace editor {
         z: number;
         type: VoxelType;
         normal: feng3d.Vector3;
+        /**
+         * 是否满足行走坡度
+         */
+        allowedMaxSlope?: boolean;
+        allowedHeight?: boolean;
     }
     /**
      * 体素类型
