@@ -105,6 +105,8 @@
         "resource/custom_skins/AssetsFileItemRenderer.exml",
         "resource/custom_skins/AssetsView.exml",
         "resource/custom_skins/NavigationView.exml",
+        "resource/custom_skins/TabViewButtonSkin.exml",
+        "resource/custom_skins/TabView.exml",
         "resource/custom_skins/MainView.exml"
     ]
 }
