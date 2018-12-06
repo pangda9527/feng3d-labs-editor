@@ -1520,6 +1520,21 @@ var editor;
     }(eui.Group));
     editor.SplitGroup = SplitGroup;
 })(editor || (editor = {}));
+var TabViewButton = /** @class */ (function (_super) {
+    __extends(TabViewButton, _super);
+    function TabViewButton() {
+        var _this = _super.call(this) || this;
+        _this.skinName = "TabViewButtonSkin";
+        return _this;
+    }
+    TabViewButton.prototype.partAdded = function (partName, instance) {
+        _super.prototype.partAdded.call(this, partName, instance);
+    };
+    TabViewButton.prototype.childrenCreated = function () {
+        _super.prototype.childrenCreated.call(this);
+    };
+    return TabViewButton;
+}(eui.Button));
 var editor;
 (function (editor) {
     var Maskview = /** @class */ (function () {

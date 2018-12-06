@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="TabViewButton" states="normal,selected" 
+﻿<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="TabViewButtonSkin" states="normal,selected" 
         xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
 	<e:Image source="TabViewButton_normal_png" includeIn="normal"/>
 	<e:Image source="TabViewButton_Selected_png" includeIn="selected"/>

@@ -1,131 +1,151 @@
 {
-    "15a5ffac1ae": {
-        "path": "..\\resource\\view\\TTT.ts",
-        "class": "TTT",
-        "parentPath": ""
-    },
-    "15a5ffee890": {
-        "path": "ui\\view\\CustomView.ts",
-        "class": "CustomView",
-        "parentPath": "",
-        "bindingDataTestObj": []
-    },
-    "global": {
-        "globalBindingDataTestObj": [],
-        "globalAutoLayerMarkEnable": false,
-        "gridColor": 15011856,
-        "gridEnabled": false,
-        "gridSize": 20,
-        "globalRulerEnable": true,
-        "globalAdsorbEnable": false,
-        "globalBackgroundAlpha": 100,
-        "globalBackgroundX": 0,
-        "globalBackgroundY": 0,
-        "globalBackgroundWidth": -1,
-        "globalBackgroundHeight": -1,
-        "globalBackgroundColor": "#c2c2c2",
-        "globalBackgroundImage": ""
-    },
-    "15a64cb93c1": {
-        "bindingDataTestObj": []
-    },
-    "15a6521014b": {
-        "path": "ui\\customcomponents\\Transform.ts",
-        "class": "Transform",
-        "parentPath": "",
-        "bindingDataTestObj": [],
-        "guideLinesEnabled": false
-    },
-    "15a6adcd3c5": {
-        "path": "ui\\components\\Vector3DView.ts",
-        "class": "Vector3DView",
-        "parentPath": ""
-    },
-    "15a6ae1c5b4": {
-        "path": "objectview\\oav\\OAVVector3D.ts",
-        "class": "OAVVector3D",
-        "parentPath": ""
-    },
-    "15a6f3c4abf": {
-        "path": "ui\\components\\Accordion.ts",
-        "class": "Accordion",
-        "parentPath": ""
-    },
-    "15a6f64675f": {
-        "path": "ui\\components\\TransformView.ts",
-        "class": "TransformView",
-        "parentPath": ""
-    },
-    "15a73de4177": {
-        "path": "ui\\MainView.ts",
-        "class": "MainView",
-        "parentPath": ""
-    },
-    "15a73e1089e": {
-        "path": "ui\\inspector\\InspectorView.ts",
-        "class": "InspectorView",
-        "parentPath": ""
-    },
-    "15a7457514f": {
-        "path": "ui\\components\\Accordion.ts",
-        "class": "Accordion",
-        "parentPath": "",
-        "guideLinesEnabled": false,
-        "backgroundType": "user",
-        "backgroundColor": "#c2c2c2",
-        "backgroundAlpha": 100
-    },
-    "15a7d5dea78": {
-        "path": "ui\\Feng3dView.ts",
-        "class": "Feng3dView",
-        "parentPath": ""
-    },
-    "15a7ed011a7": {
-        "path": "ui\\hierarchy\\HierarchyView.ts",
-        "class": "HierarchyView",
-        "parentPath": ""
-    },
-    "15ab2b32b3f": {
-        "path": "ui\\components\\Tree.ts",
-        "class": "Tree",
-        "parentPath": ""
-    },
-    "15ab2b4214e": {
-        "path": "ui\\components\\Tree.ts",
-        "class": "Tree",
-        "parentPath": ""
-    },
-    "1630b9a091e": {
-        "path": "ui\\components\\RenameTextInput.ts",
-        "class": "RenameTextInput",
-        "parentPath": ""
-    },
-    "1631153cabe": {
-        "backgroundType": "user",
-        "backgroundColor": "#a2a2a2",
-        "backgroundAlpha": 100,
-        "useBgImage": false,
-        "useBgColor": true
-    },
-    "163779dbbcc": {
-        "backgroundType": "user",
-        "backgroundColor": "#c2c2c2",
-        "backgroundAlpha": 100
-    },
-    "16782a75fe7": {
-        "bindingDataTestObj": [],
-        "guideLinesEnabled": false,
-        "backgroundX": 0,
-        "backgroundY": 0,
-        "backgroundWidth": -1,
-        "backgroundHeight": -1,
-        "useBgImage": true,
-        "useBgColor": true,
-        "backgroundAlpha": 100
-    },
-    "16782bb7067": {
-        "path": "..\\resource\\custom_skins\\TTTT.ts",
-        "class": "TTTT",
-        "parentPath": ""
-    }
+  "15a5ffac1ae": {
+    "path": "..\\resource\\view\\TTT.ts",
+    "class": "TTT",
+    "parentPath": ""
+  },
+  "15a5ffee890": {
+    "path": "ui\\view\\CustomView.ts",
+    "class": "CustomView",
+    "parentPath": "",
+    "bindingDataTestObj": []
+  },
+  "global": {
+    "globalBindingDataTestObj": [],
+    "globalAutoLayerMarkEnable": false,
+    "gridColor": 15011856,
+    "gridEnabled": false,
+    "gridSize": 20,
+    "globalRulerEnable": true,
+    "globalAdsorbEnable": false,
+    "globalBackgroundAlpha": 100,
+    "globalBackgroundX": 0,
+    "globalBackgroundY": 0,
+    "globalBackgroundWidth": -1,
+    "globalBackgroundHeight": -1,
+    "globalBackgroundColor": "#c2c2c2",
+    "globalBackgroundImage": ""
+  },
+  "15a64cb93c1": {
+    "bindingDataTestObj": []
+  },
+  "15a6521014b": {
+    "path": "ui\\customcomponents\\Transform.ts",
+    "class": "Transform",
+    "parentPath": "",
+    "bindingDataTestObj": [],
+    "guideLinesEnabled": false
+  },
+  "15a6adcd3c5": {
+    "path": "ui\\components\\Vector3DView.ts",
+    "class": "Vector3DView",
+    "parentPath": ""
+  },
+  "15a6ae1c5b4": {
+    "path": "objectview\\oav\\OAVVector3D.ts",
+    "class": "OAVVector3D",
+    "parentPath": ""
+  },
+  "15a6f3c4abf": {
+    "path": "ui\\components\\Accordion.ts",
+    "class": "Accordion",
+    "parentPath": ""
+  },
+  "15a6f64675f": {
+    "path": "ui\\components\\TransformView.ts",
+    "class": "TransformView",
+    "parentPath": ""
+  },
+  "15a73de4177": {
+    "path": "ui\\MainView.ts",
+    "class": "MainView",
+    "parentPath": ""
+  },
+  "15a73e1089e": {
+    "path": "ui\\inspector\\InspectorView.ts",
+    "class": "InspectorView",
+    "parentPath": ""
+  },
+  "15a7457514f": {
+    "path": "ui\\components\\Accordion.ts",
+    "class": "Accordion",
+    "parentPath": "",
+    "guideLinesEnabled": false,
+    "backgroundType": "user",
+    "backgroundColor": "#c2c2c2",
+    "backgroundAlpha": 100
+  },
+  "15a7d5dea78": {
+    "path": "ui\\Feng3dView.ts",
+    "class": "Feng3dView",
+    "parentPath": ""
+  },
+  "15a7ed011a7": {
+    "path": "ui\\hierarchy\\HierarchyView.ts",
+    "class": "HierarchyView",
+    "parentPath": ""
+  },
+  "15ab2b32b3f": {
+    "path": "ui\\components\\Tree.ts",
+    "class": "Tree",
+    "parentPath": ""
+  },
+  "15ab2b4214e": {
+    "path": "ui\\components\\Tree.ts",
+    "class": "Tree",
+    "parentPath": ""
+  },
+  "1630b9a091e": {
+    "path": "ui\\components\\RenameTextInput.ts",
+    "class": "RenameTextInput",
+    "parentPath": ""
+  },
+  "1631153cabe": {
+    "backgroundType": "user",
+    "backgroundColor": "#a2a2a2",
+    "backgroundAlpha": 100,
+    "useBgImage": false,
+    "useBgColor": true
+  },
+  "163779dbbcc": {
+    "backgroundType": "user",
+    "backgroundColor": "#c2c2c2",
+    "backgroundAlpha": 100
+  },
+  "16782a75fe7": {
+    "bindingDataTestObj": [],
+    "guideLinesEnabled": false,
+    "backgroundX": 0,
+    "backgroundY": 0,
+    "backgroundWidth": -1,
+    "backgroundHeight": -1,
+    "useBgImage": true,
+    "useBgColor": true,
+    "backgroundAlpha": 100
+  },
+  "16782c3372e": {
+    "path": "ui\\components\\TabViewTabButton.ts",
+    "class": "TabViewTabButton",
+    "parentPath": "resource/eui_skins/ButtonSkin.exml"
+  },
+  "16782d01fa2": {
+    "path": "ui\\components\\TTT.ts",
+    "class": "TTT",
+    "parentPath": ""
+  },
+  "16782e1caa6": {
+    "path": "ui\\components\\editor.TabViewButton.ts",
+    "class": "editor.TabViewButton",
+    "parentPath": "resource/eui_skins/ButtonSkin.exml"
+  },
+  "16782e280f9": {
+    "path": "ui\\components\\TabViewButton.ts",
+    "class": "TabViewButton",
+    "parentPath": "resource/eui_skins/ButtonSkin.exml"
+  },
+  "16782e986c3": {
+    "path": "ui\\components\\TabView.ts",
+    "class": "TabView",
+    "parentPath": ""
+  }
 }

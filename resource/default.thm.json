@@ -30,10 +30,13 @@
         "editor.MinMaxCurveView": "resource/custom_skins/MinMaxCurveView.exml",
         "editor.MinMaxCurveVector3View": "resource/custom_skins/MinMaxCurveVector3View.exml",
         "RenameTextInput": "resource/eui_skins/RenameTextInput.exml",
-        "ComboBox": "resource/eui_skins/ComboBox.exml"
+        "ComboBox": "resource/eui_skins/ComboBox.exml",
+        "TabViewButton": "resource/eui_skins/TabViewButton.exml",
+        "TabView": "resource/eui_skins/TabView.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [
+        "resource/eui_skins/TabView.exml",
         "resource/eui_skins/ButtonSkin.exml",
         "resource/eui_skins/CheckBoxSkin.exml",
         "resource/eui_skins/HScrollBarSkin.exml",
@@ -50,6 +53,7 @@
         "resource/eui_skins/VSliderSkin.exml",
         "resource/eui_skins/RenameTextInput.exml",
         "resource/eui_skins/ComboBox.exml",
+        "resource/eui_skins/TabViewButton.exml",
         "resource/custom_skins/ColorPickerView.exml",
         "resource/custom_skins/TipString.exml",
         "resource/custom_skins/ParticleEffectController.exml",
@@ -105,8 +109,6 @@
         "resource/custom_skins/AssetsFileItemRenderer.exml",
         "resource/custom_skins/AssetsView.exml",
         "resource/custom_skins/NavigationView.exml",
-        "resource/custom_skins/TabViewButtonSkin.exml",
-        "resource/custom_skins/TabView.exml",
         "resource/custom_skins/MainView.exml"
     ]
 }
