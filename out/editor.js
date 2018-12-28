@@ -1535,6 +1535,19 @@ var TabViewButton = /** @class */ (function (_super) {
     };
     return TabViewButton;
 }(eui.Button));
+var TabView = /** @class */ (function (_super) {
+    __extends(TabView, _super);
+    function TabView() {
+        return _super.call(this) || this;
+    }
+    TabView.prototype.partAdded = function (partName, instance) {
+        _super.prototype.partAdded.call(this, partName, instance);
+    };
+    TabView.prototype.childrenCreated = function () {
+        _super.prototype.childrenCreated.call(this);
+    };
+    return TabView;
+}(eui.Component));
 var editor;
 (function (editor) {
     var Maskview = /** @class */ (function () {

@@ -373,6 +373,11 @@ declare class TabViewButton extends eui.Button implements eui.UIComponent {
     protected partAdded(partName: string, instance: any): void;
     protected childrenCreated(): void;
 }
+declare class TabView extends eui.Component implements eui.UIComponent {
+    constructor();
+    protected partAdded(partName: string, instance: any): void;
+    protected childrenCreated(): void;
+}
 declare namespace editor {
     var maskview: Maskview;
     class Maskview {
