@@ -15,7 +15,7 @@ namespace editor
         }
 
         /**
-         * 获取选中节点
+         * 获取选中结点
          */
         getSelectedNode()
         {
@@ -24,7 +24,7 @@ namespace editor
         }
 
         /**
-         * 获取节点
+         * 获取结点
          */
         getNode(gameObject: feng3d.GameObject)
         {

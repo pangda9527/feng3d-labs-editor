@@ -354,7 +354,7 @@ namespace feng3d
     }
 
     /**
-     * 节点
+     * 结点
      */
     export class ThreeBSPNode
     {
@@ -439,7 +439,7 @@ namespace feng3d
         };
 
         /**
-         * 构建树节点
+         * 构建树结点
          * @param polygons 多边形列表
          */
         build(polygons: ThreeBSPPolygon[])

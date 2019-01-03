@@ -6,7 +6,7 @@ namespace editor
         disclosureButton: eui.ToggleButton;
 
         /**
-		 * 子节点相对父节点的缩进值，以像素为单位。默认17。
+		 * 子结点相对父结点的缩进值，以像素为单位。默认17。
 		 */
         indentation = 17
         data: TreeNode;

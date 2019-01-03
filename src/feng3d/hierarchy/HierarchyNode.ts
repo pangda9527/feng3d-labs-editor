@@ -9,11 +9,11 @@ namespace editor
          */
         gameobject: feng3d.GameObject;
         /** 
-         * 父节点
+         * 父结点
          */
         parent: HierarchyNode = null;
         /**
-         * 子节点列表
+         * 子结点列表
          */
         children: HierarchyNode[] = [];
 

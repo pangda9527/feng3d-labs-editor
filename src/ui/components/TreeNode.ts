@@ -47,11 +47,11 @@ namespace editor
 		 */
 		selected = false;
         /** 
-         * 父节点
+         * 父结点
          */
 		parent: TreeNode = null;
         /**
-         * 子节点列表
+         * 子结点列表
          */
 		children: TreeNode[];
 
@@ -83,7 +83,7 @@ namespace editor
 		}
 
 		/**
-         * 判断是否包含节点
+         * 判断是否包含结点
          */
 		contain(node: TreeNode)
 		{
@@ -99,7 +99,7 @@ namespace editor
 		{
 			node.remove();
 
-			feng3d.assert(!node.contain(this), "无法添加到自身节点中!");
+			feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
 
 			if (this.children.indexOf(node) == -1) this.children.push(node);
 			node.parent = this;
