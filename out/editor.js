@@ -1844,7 +1844,7 @@ var editor;
         function TreeItemRenderer() {
             var _this = _super.call(this) || this;
             /**
-             * 子节点相对父节点的缩进值，以像素为单位。默认17。
+             * 子结点相对父结点的缩进值，以像素为单位。默认17。
              */
             _this.indentation = 17;
             _this.watchers = [];
@@ -1980,7 +1980,7 @@ var editor;
              */
             _this.selected = false;
             /**
-             * 父节点
+             * 父结点
              */
             _this.parent = null;
             if (obj) {
@@ -2018,7 +2018,7 @@ var editor;
             this.children = null;
         };
         /**
-         * 判断是否包含节点
+         * 判断是否包含结点
          */
         TreeNode.prototype.contain = function (node) {
             while (node) {
@@ -2030,7 +2030,7 @@ var editor;
         };
         TreeNode.prototype.addChild = function (node) {
             node.remove();
-            feng3d.assert(!node.contain(this), "无法添加到自身节点中!");
+            feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
             if (this.children.indexOf(node) == -1)
                 this.children.push(node);
             node.parent = this;
@@ -9628,11 +9628,11 @@ var editor;
             var _this = _super.call(this, obj) || this;
             _this.isOpen = false;
             /**
-             * 父节点
+             * 父结点
              */
             _this.parent = null;
             /**
-             * 子节点列表
+             * 子结点列表
              */
             _this.children = [];
             feng3d.watcher.watch(_this.gameobject, "name", _this.update, _this);
@@ -9662,7 +9662,7 @@ var editor;
             feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
         }
         /**
-         * 获取选中节点
+         * 获取选中结点
          */
         Hierarchy.prototype.getSelectedNode = function () {
             var _this = this;
@@ -9670,7 +9670,7 @@ var editor;
             return node;
         };
         /**
-         * 获取节点
+         * 获取结点
          */
         Hierarchy.prototype.getNode = function (gameObject) {
             var node = nodeMap.get(gameObject);
@@ -10889,7 +10889,7 @@ var feng3d;
     }());
     feng3d.ThreeBSPPolygon = ThreeBSPPolygon;
     /**
-     * 节点
+     * 结点
      */
     var ThreeBSPNode = /** @class */ (function () {
         function ThreeBSPNode(data) {
@@ -10948,7 +10948,7 @@ var feng3d;
         };
         ;
         /**
-         * 构建树节点
+         * 构建树结点
          * @param polygons 多边形列表
          */
         ThreeBSPNode.prototype.build = function (polygons) {

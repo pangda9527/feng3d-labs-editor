@@ -466,7 +466,7 @@ declare namespace editor {
         contentGroup: eui.Group;
         disclosureButton: eui.ToggleButton;
         /**
-         * 子节点相对父节点的缩进值，以像素为单位。默认17。
+         * 子结点相对父结点的缩进值，以像素为单位。默认17。
          */
         indentation: number;
         data: TreeNode;
@@ -526,11 +526,11 @@ declare namespace editor {
          */
         selected: boolean;
         /**
-         * 父节点
+         * 父结点
          */
         parent: TreeNode;
         /**
-         * 子节点列表
+         * 子结点列表
          */
         children: TreeNode[];
         constructor(obj?: gPartial<TreeNode>);
@@ -539,7 +539,7 @@ declare namespace editor {
          */
         destroy(): void;
         /**
-         * 判断是否包含节点
+         * 判断是否包含结点
          */
         contain(node: TreeNode): boolean;
         addChild(node: TreeNode): void;
@@ -2486,11 +2486,11 @@ declare namespace editor {
          */
         gameobject: feng3d.GameObject;
         /**
-         * 父节点
+         * 父结点
          */
         parent: HierarchyNode;
         /**
-         * 子节点列表
+         * 子结点列表
          */
         children: HierarchyNode[];
         constructor(obj: gPartial<HierarchyNode>);
@@ -2508,11 +2508,11 @@ declare namespace editor {
         rootGameObject: feng3d.GameObject;
         constructor();
         /**
-         * 获取选中节点
+         * 获取选中结点
          */
         getSelectedNode(): HierarchyNode;
         /**
-         * 获取节点
+         * 获取结点
          */
         getNode(gameObject: feng3d.GameObject): HierarchyNode;
         delete(gameobject: feng3d.GameObject): void;
@@ -2828,7 +2828,7 @@ declare namespace feng3d {
         subdivide(polygon: ThreeBSPPolygon, coplanar_front: ThreeBSPPolygon[], coplanar_back: ThreeBSPPolygon[], front: ThreeBSPPolygon[], back: ThreeBSPPolygon[]): void;
     }
     /**
-     * 节点
+     * 结点
      */
     class ThreeBSPNode {
         /**
@@ -2861,7 +2861,7 @@ declare namespace feng3d {
          */
         clone(): ThreeBSPNode;
         /**
-         * 构建树节点
+         * 构建树结点
          * @param polygons 多边形列表
          */
         build(polygons: ThreeBSPPolygon[]): this;
