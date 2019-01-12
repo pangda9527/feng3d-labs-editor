@@ -93,7 +93,7 @@ namespace editor
                         menus.push({
                             label: item.name, click: () =>
                             {
-                                this.attributeValue = item.filePath;
+                                this.attributeValue = item.path;
                             }
                         });
                     }, []);

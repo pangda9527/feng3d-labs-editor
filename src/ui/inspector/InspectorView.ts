@@ -44,8 +44,14 @@ namespace editor
 			{
 				if (this._viewData instanceof AssetsFile)
 				{
-					this._viewData.updateImage();
-					this.updateShowData(this._viewData.feng3dAssets);
+					if (this._viewData.isDirectory) return;
+					var viewData = this._viewData;
+					viewData.load(() =>
+					{
+						feng3d.assert(!!viewData.feng3dAssets);
+						if (viewData == this._viewData)
+							this.updateShowData(viewData.feng3dAssets);
+					});
 				} else
 				{
 					this.updateShowData(this._viewData);
@@ -64,13 +70,12 @@ namespace editor
 				{
 					if (this._viewData.assetsId)
 					{
-						var assetsFile = editorAssets.files[this._viewData.assetsId];
-						assetsFile && assets.writeAssets(assetsFile.feng3dAssets, callback);
+						var assetsFile = editorAssets.assetsIDMap[this._viewData.assetsId];
+						assetsFile && assetsFile.save();
 					}
 				} else if (this._viewData instanceof AssetsFile)
 				{
-					this._viewData.updateImage();
-					assets.writeAssets(this._viewData.feng3dAssets, callback);
+					assetsFile.save();
 				}
 
 				this._dataChanged = false;
@@ -140,7 +145,7 @@ namespace editor
 			{
 				if (this._viewData.assetsId)
 				{
-					var assetsFile = editorAssets.files[this._viewData.assetsId];
+					var assetsFile = editorAssets.assetsIDMap[this._viewData.assetsId];
 					assetsFile && assetsFile.updateImage();
 				}
 			} else if (this._viewData instanceof AssetsFile)

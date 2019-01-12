@@ -68,7 +68,7 @@ namespace editor
 
         getScripts()
         {
-            var files = editorAssets.files
+            var files = editorAssets.assetsIDMap
             var tslist: feng3d.ScriptFile[] = [];
             for (const key in files)
             {

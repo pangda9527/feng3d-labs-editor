@@ -10,26 +10,24 @@ namespace editor
     /**
      * 资源文件夹路径
      */
-    const AssetsPath = "Assets";
+    const AssetsPath = "Assets/";
 
     export class EditorAssets
     {
         /**
          * 资源ID字典
          */
-        private assetsIDMap: { [id: string]: AssetsFile } = {};
+        assetsIDMap: { [id: string]: AssetsFile } = {};
         /**
          * 资源路径字典
          */
-        private assetsPathMap: { [path: string]: AssetsFile } = {};
+        assetsPathMap: { [path: string]: AssetsFile } = {};
 
         /**
          * 显示文件夹
          */
         @feng3d.watch("showFloderChanged")
         showFloder: AssetsFile;
-
-        files: { [id: string]: AssetsFile } = {};
 
         /**
          * 项目资源id树形结构
@@ -47,27 +45,20 @@ namespace editor
          */
         initproject(callback: () => void)
         {
-            assets.readObject(assetsFilePath, (err, object: { id: string, path: string }[]) =>
+            assets.readObject(assetsFilePath, (err, object: { id: string, path: string, isDirectory: boolean }[]) =>
             {
-                assets[AssetsPath] = { path: AssetsPath };
+                object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
 
                 var files = object.map(element =>
                 {
-                    return this.assetsPathMap[element.path] = this.assetsIDMap[element.id] = new AssetsFile(element.id, element.path);
+                    return this.assetsPathMap[element.path] = this.assetsIDMap[element.id] = new AssetsFile(element.id, element.path, element.isDirectory);
                 });
-
-                if (!this.assetsPathMap[AssetsPath])
-                {
-                    this.assetsPathMap[AssetsPath] = new AssetsFile(AssetsPath, AssetsPath);
-                }
 
                 files.forEach(element =>
                 {
-                    var paths = element.path.split("/");
-                    paths.pop();
-                    if (paths.length > 0)
+                    var parentPath = feng3d.pathUtils.getParentPath(element.path);
+                    if (parentPath != "/" && parentPath.length > 0)
                     {
-                        var parentPath = paths.join("/");
                         this.assetsPathMap[parentPath].addChild(element);
                     }
                 });
@@ -87,7 +78,12 @@ namespace editor
          */
         saveProject(callback?: (err: Error) => void)
         {
-            assets.writeObject("project.json", this.rootFile, callback);
+            var object = Object.keys(this.assetsIDMap).map(element =>
+            {
+                return { id: element, path: this.assetsIDMap[element].path, isDirectory: this.assetsIDMap[element].isDirectory };
+            });
+
+            assets.writeObject(assetsFilePath, object, callback);
         }
 
         /**
@@ -96,7 +92,7 @@ namespace editor
          */
         getFile(assetsId: string): AssetsFile
         {
-            return this.files[assetsId];
+            return this.assetsIDMap[assetsId];
         }
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
@@ -128,42 +124,43 @@ namespace editor
                             {
                                 label: "文件夹", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.Feng3dFolder(), { name: assetsFile.getNewChildName("New Folder") })));
+                                    editorData.selectObject(assetsFile.addFolder("NewFolder"));
+                                    // editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.Feng3dFolder(), { name: assetsFile.getNewChildName("New Folder") })));
                                 }
                             },
                             {
                                 label: "脚本", click: () =>
                                 {
-                                    var name = assetsFile.getNewChildName("NewScript");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.ScriptFile(), { name: name, filename: "script.ts", textContent: assetsFileTemplates.getNewScript(name) })));
+                                    var name = assetsFile.getNewChildName("NewScript.ts");
+                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.ScriptFile(), { name: name, textContent: assetsFileTemplates.getNewScript(name) })));
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
-                                    var name = assetsFile.getNewChildName("NewShader");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.ShaderFile(), { name: name, filename: "shader.ts", textContent: assetsFileTemplates.getNewShader(name) })));
+                                    var name = assetsFile.getNewChildName("NewShader.ts");
+                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.ShaderFile(), { name: name, textContent: assetsFileTemplates.getNewShader(name) })));
                                 }
                             },
                             {
                                 label: "js", click: () =>
                                 {
-                                    var name = assetsFile.getNewChildName("New Js");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JSFile(), { name: name, filename: "js.js", textContent: "" })));
+                                    var path = assetsFile.getNewChildName("NewJs.js");
+                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JSFile(), { name: path, textContent: "" })));
                                 }
                             },
                             {
                                 label: "Json", click: () =>
                                 {
                                     var name = assetsFile.getNewChildName("New Json");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JsonFile(), { name: name, filename: "json.json", textContent: "{}" })));
+                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JsonFile(), { name: name, textContent: "{}" })));
                                 }
                             },
                             {
                                 label: "文本", click: () =>
                                 {
                                     var name = assetsFile.getNewChildName("New Text");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.TextFile(), { name: name, filename: "text.txt", textContent: "" })));
+                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.TextFile(), { name: name, textContent: "" })));
                                 }
                             },
                             { type: "separator" },
@@ -298,7 +295,7 @@ namespace editor
                         feng3d.dataTransform.imagedataToImage(imageUtil.imageData, (img) =>
                         {
                             assetsFile.feng3dAssets["image"] = img;
-                            assets.writeAssets(assetsFile.feng3dAssets);
+                            assetsFile.save();
                         });
 
                     }
@@ -335,12 +332,11 @@ namespace editor
                 var showFloder = this.showFloder;
                 if (feng3d.regExps.image.test(file.name))
                 {
-                    var urlImageTexture2D = Object.setValue(new feng3d.UrlImageTexture2D(), { name: file.name })
-                    assets.writeAssets(urlImageTexture2D);
-                    showFloder.path
-                    var imagePath = `Library/${urlImageTexture2D.assetsId}/file/` + file.name;
+                    var imagePath = showFloder.getNewChildPath(file.name);
+
                     assets.writeArrayBuffer(imagePath, result, err =>
                     {
+                        var urlImageTexture2D = Object.setValue(new feng3d.UrlImageTexture2D(), { name: file.name })
                         urlImageTexture2D.url = imagePath;
                         var assetsFile = showFloder.addAssets(urlImageTexture2D);
                         assetsFiles.push(assetsFile);
@@ -404,8 +400,8 @@ namespace editor
         {
             if (assetsFile.feng3dAssets instanceof feng3d.Feng3dFile)
             {
-                var extensions = assetsFile.feng3dAssets.filename.split(".").pop();
-                var filePath = assetsFile.feng3dAssets.filePath;
+                var extensions = feng3d.pathUtils.getExtension(assetsFile.feng3dAssets.path);
+                var filePath = assetsFile.feng3dAssets.path;
                 switch (extensions)
                 {
                     case "mdl": menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(filePath) }); break;

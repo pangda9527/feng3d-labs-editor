@@ -62,6 +62,16 @@ namespace editor
                 }
                 else
                 {
+                    if (!this.data.isLoaded)
+                    {
+                        this.data.load(() =>
+                        {
+                            feng3d.assert(this.data.isLoaded);
+                            this.dataChanged();
+                        })
+                        return;
+                    }
+
                     drag.register(this, (dragsource) =>
                     {
                         var extension = this.data.feng3dAssets.assetType;

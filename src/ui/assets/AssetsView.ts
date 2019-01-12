@@ -227,7 +227,7 @@ namespace editor
 
         private onfloderpathTxtLink(evt: egret.TextEvent)
         {
-            editorAssets.showFloder = editorAssets.files[evt.text];
+            editorAssets.showFloder = editorAssets.assetsIDMap[evt.text];
         }
 
         private areaSelectStartPosition: feng3d.Vector2;

@@ -19,9 +19,15 @@ namespace editor
 
     export class AssetsFile extends TreeNode
     {
-        @feng3d.serialize
-        @feng3d.watch("idChanged")
-        id = "";
+        /**
+         * 编号
+         */
+        id: string;
+
+        /**
+         * 路径
+         */
+        path: string;
 
         /**
          * 是否文件夹
@@ -45,10 +51,19 @@ namespace editor
 
         feng3dAssets: feng3d.Feng3dAssets;
 
+        data: string | ArrayBuffer;
+
+        meta: { dataType: string };
+
         /**
-         * 路径
+         * 是否已加载
          */
-        path: string;
+        isLoaded = false;
+
+        /**
+         * 是否加载中
+         */
+        private isLoading: boolean;
 
         /**
          * 构建
@@ -56,45 +71,17 @@ namespace editor
          * @param id 编号
          * @param path 路径
          */
-        constructor(id: string = "", path?: string)
+        constructor(id: string, path: string, isDirectory: boolean)
         {
             super();
+            feng3d.assert(!!id);
+            feng3d.assert(!!path);
+
             this.id = id;
-        }
-
-        /**
-         * 更新父对象
-         */
-        updateParent()
-        {
-            this.children.forEach(element =>
-            {
-                element.parent = this;
-                element.updateParent();
-            });
-        }
-
-        private idChanged()
-        {
-            if (this.id == "") return;
-
-            editorAssets.files[this.id] = this;
-
-            assets.readAssets(this.id, (err, feng3dAssets) =>
-            {
-                if (err) feng3d.error(err.message);
-
-                this.feng3dAssets = feng3dAssets;
-                this.init();
-            });
-        }
-
-        private init()
-        {
-            this.isDirectory = this.feng3dAssets instanceof feng3d.Feng3dFolder;
-            this.label = this.feng3dAssets.name;
-            feng3d.watcher.watch(this.feng3dAssets, "name", () => { this.label = this.feng3dAssets.name; });
-
+            this.path = path;
+            this.isDirectory = isDirectory;
+            if (isDirectory) this.isLoaded = true;
+            this.label = feng3d.pathUtils.getName(path);
             // 更新图标
             if (this.isDirectory)
             {
@@ -104,9 +91,56 @@ namespace editor
             {
                 this.image = "file_png";
             }
-            this.updateImage();
+            //
+            feng3d.assert(!editorAssets.assetsIDMap[id]);
+            feng3d.assert(!editorAssets.assetsPathMap[path]);
+            editorAssets.assetsIDMap[id] = this;
+            editorAssets.assetsPathMap[path] = this;
         }
 
+        /**
+         * 加载
+         * 
+         * @param callback 加载完成回调
+         */
+        load(callback?: () => void)
+        {
+            if (this.isLoaded)
+            {
+                callback && callback();
+                return;
+            }
+
+            if (this.isLoading)
+            {
+                callback && this.on("loaded", callback);
+                return;
+            }
+
+            this.isLoading = true;
+
+            assets.readObject(this.path, (err, assets: feng3d.Feng3dAssets) =>
+            {
+                feng3d.assert(!err);
+
+                assets.path = this.path;
+                assets.name = feng3d.pathUtils.getName(this.path);
+                this.feng3dAssets = assets;
+
+                this.updateImage();
+
+                this.dispatch("loaded", this);
+
+                this.isLoading = false;
+                this.isLoaded = true;
+
+                callback && callback();
+            });
+        }
+
+        /**
+         * 更新缩略图
+         */
         updateImage()
         {
             if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D)
@@ -143,10 +177,59 @@ namespace editor
             }
         }
 
+        /**
+         * 保存
+         * 
+         * @param callback 完成回调函数
+         */
+        save(callback?: () => void)
+        {
+            feng3d.assert(!!editorAssets.assetsIDMap[this.id], `无法保存已经被删除的资源！`);
+
+            if (this.isDirectory)
+            {
+                callback && callback();
+                return;
+            }
+            assets.writeObject(this.path, this.feng3dAssets, (err) =>
+            {
+                feng3d.assert(!err, `资源 ${this.path} 保存失败！`);
+                callback && callback();
+            });
+        }
+
+        /**
+         * 新增文件夹
+         * 
+         * @param folderName 文件夹名称
+         */
+        addFolder(folderName: string)
+        {
+            var newName = this.getNewChildName(folderName);
+
+            var newFolderPath = feng3d.pathUtils.getChildFolderPath(this.path, newName);
+
+            var assetsFile = new AssetsFile(feng3d.FMath.uuid(), newFolderPath, true);
+            assets.mkdir(assetsFile.path, (err) =>
+            {
+                if (err) feng3d.assert(!err);
+            });
+            this.addChild(assetsFile);
+            return assetsFile;
+        }
+
+        /**
+         * 新增资源
+         * 
+         * @param feng3dAssets 
+         */
         addAssets(feng3dAssets: feng3d.Feng3dAssets)
         {
-            assets.writeAssets(feng3dAssets);
-            var assetsFile = new AssetsFile(feng3dAssets.assetsId);
+            feng3dAssets.path = feng3d.pathUtils.getChildFilePath(this.path, feng3dAssets.name);
+
+            var assetsFile = new AssetsFile(feng3d.FMath.uuid(), feng3dAssets.path, false);
+            assetsFile.feng3dAssets = feng3dAssets;
+            assetsFile.save();
             this.addChild(assetsFile);
             return assetsFile;
         }
@@ -161,8 +244,10 @@ namespace editor
                 element.delete();
             });
             this.remove();
-            assets.deleteAssets(this.id);
-            delete editorAssets.files[this.id];
+            assets.deleteFile(this.path);
+
+            delete editorAssets.assetsIDMap[this.id];
+            delete editorAssets.assetsPathMap[this.path];
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
         }
 
@@ -185,7 +270,8 @@ namespace editor
         }
 
         /**
-         * 获取新子对象名称
+         * 获取新子文件名称
+         * 
          * @param basename 基础名称
          */
         getNewChildName(basename: string)
@@ -201,6 +287,17 @@ namespace editor
         }
 
         /**
+         * 获取新子文件路径
+         * 
+         * @param basename 基础名称
+         */
+        getNewChildPath(basename: string)
+        {
+            var path = feng3d.pathUtils.getChildFilePath(this.path, basename);
+            return path;
+        }
+
+        /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
          * @param arraybuffer 文件数据
@@ -208,9 +305,12 @@ namespace editor
          */
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsFile) => void)
         {
-            var feng3dFile = Object.setValue(new feng3d.ArrayBufferFile(), { name: filename, filename: filename, arraybuffer: arraybuffer });
-            assets.writeAssets(feng3dFile);
-            assets.writeArrayBuffer(feng3dFile.filePath, arraybuffer, err =>
+            var feng3dFile = Object.setValue(new feng3d.ArrayBufferFile(), { name: filename, path: filename, arraybuffer: arraybuffer });
+
+            feng3d.error(`未实现`);
+
+            // assets.writeAssets(feng3dFile);
+            assets.writeArrayBuffer(feng3dFile.path, arraybuffer, err =>
             {
                 var assetsFile = this.addAssets(feng3dFile);
                 callback(err, assetsFile);

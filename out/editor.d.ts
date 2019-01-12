@@ -1709,18 +1709,19 @@ declare namespace editor {
         /**
          * 资源ID字典
          */
-        private assetsIDMap;
+        assetsIDMap: {
+            [id: string]: AssetsFile;
+        };
         /**
          * 资源路径字典
          */
-        private assetsPathMap;
+        assetsPathMap: {
+            [path: string]: AssetsFile;
+        };
         /**
          * 显示文件夹
          */
         showFloder: AssetsFile;
-        files: {
-            [id: string]: AssetsFile;
-        };
         /**
          * 项目资源id树形结构
          */
@@ -1799,7 +1800,14 @@ declare namespace editor {
         off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any): any;
     }
     class AssetsFile extends TreeNode {
+        /**
+         * 编号
+         */
         id: string;
+        /**
+         * 路径
+         */
+        path: string;
         /**
          * 是否文件夹
          */
@@ -1815,24 +1823,52 @@ declare namespace editor {
         children: AssetsFile[];
         parent: AssetsFile;
         feng3dAssets: feng3d.Feng3dAssets;
+        data: string | ArrayBuffer;
+        meta: {
+            dataType: string;
+        };
         /**
-         * 路径
+         * 是否已加载
          */
-        path: string;
+        isLoaded: boolean;
+        /**
+         * 是否加载中
+         */
+        private isLoading;
         /**
          * 构建
          *
          * @param id 编号
          * @param path 路径
          */
-        constructor(id?: string, path?: string);
+        constructor(id: string, path: string, isDirectory: boolean);
         /**
-         * 更新父对象
+         * 加载
+         *
+         * @param callback 加载完成回调
          */
-        updateParent(): void;
-        private idChanged;
-        private init;
+        load(callback?: () => void): void;
+        /**
+         * 更新缩略图
+         */
         updateImage(): void;
+        /**
+         * 保存
+         *
+         * @param callback 完成回调函数
+         */
+        save(callback?: () => void): void;
+        /**
+         * 新增文件夹
+         *
+         * @param folderName 文件夹名称
+         */
+        addFolder(folderName: string): AssetsFile;
+        /**
+         * 新增资源
+         *
+         * @param feng3dAssets
+         */
         addAssets(feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
         /**
          * 删除
@@ -1840,10 +1876,17 @@ declare namespace editor {
         delete(): void;
         getFolderList(includeClose?: boolean): any[];
         /**
-         * 获取新子对象名称
+         * 获取新子文件名称
+         *
          * @param basename 基础名称
          */
         getNewChildName(basename: string): string;
+        /**
+         * 获取新子文件路径
+         *
+         * @param basename 基础名称
+         */
+        getNewChildPath(basename: string): string;
         /**
          * 新增文件从ArrayBuffer
          * @param filename 新增文件名称
