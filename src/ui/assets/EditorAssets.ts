@@ -2,8 +2,27 @@ namespace editor
 {
     export var editorAssets: EditorAssets;
 
+    /**
+     * 资源字典表存储路径
+     */
+    const assetsFilePath = "assets.json";
+
+    /**
+     * 资源文件夹路径
+     */
+    const AssetsPath = "Assets";
+
     export class EditorAssets
     {
+        /**
+         * 资源ID字典
+         */
+        private assetsIDMap: { [id: string]: AssetsFile } = {};
+        /**
+         * 资源路径字典
+         */
+        private assetsPathMap: { [path: string]: AssetsFile } = {};
+
         /**
          * 显示文件夹
          */
@@ -28,35 +47,37 @@ namespace editor
          */
         initproject(callback: () => void)
         {
-            //
-            assets.readObject("project.json", (err, data: AssetsFile) =>
+            assets.readObject(assetsFilePath, (err, object: { id: string, path: string }[]) =>
             {
-                if (data)
+                assets[AssetsPath] = { path: AssetsPath };
+
+                var files = object.map(element =>
                 {
-                    this.rootFile = <any>data;
-                } else
+                    return this.assetsPathMap[element.path] = this.assetsIDMap[element.id] = new AssetsFile(element.id, element.path);
+                });
+
+                if (!this.assetsPathMap[AssetsPath])
                 {
-                    var folder = Object.setValue(new feng3d.Feng3dFolder(), { name: "Assets" });
-                    assets.writeAssets(folder)
-                    this.rootFile = new AssetsFile(folder.assetsId)
-                    this.saveProject();
+                    this.assetsPathMap[AssetsPath] = new AssetsFile(AssetsPath, AssetsPath);
                 }
-                this.rootFile.updateParent();
+
+                files.forEach(element =>
+                {
+                    var paths = element.path.split("/");
+                    paths.pop();
+                    if (paths.length > 0)
+                    {
+                        var parentPath = paths.join("/");
+                        this.assetsPathMap[parentPath].addChild(element);
+                    }
+                });
+
+                this.rootFile = this.assetsIDMap[AssetsPath];
                 this.showFloder = this.rootFile;
                 this.rootFile.on("added", () => { this.saveProject() });
                 this.rootFile.on("removed", () => { this.saveProject() });
                 this.rootFile.isOpen = true;
-                if (loadingNum == 0)
-                {
-                    callback();
-                }
-                else
-                {
-                    feng3d.feng3dDispatcher.once("editor.allLoaded", () =>
-                    {
-                        callback();
-                    });
-                }
+                callback();
             });
         }
 
@@ -316,6 +337,7 @@ namespace editor
                 {
                     var urlImageTexture2D = Object.setValue(new feng3d.UrlImageTexture2D(), { name: file.name })
                     assets.writeAssets(urlImageTexture2D);
+                    showFloder.path
                     var imagePath = `Library/${urlImageTexture2D.assetsId}/file/` + file.name;
                     assets.writeArrayBuffer(imagePath, result, err =>
                     {

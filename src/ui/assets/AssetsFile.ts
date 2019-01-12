@@ -17,8 +17,6 @@ namespace editor
         off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any);
     }
 
-    export var loadingNum = 0;
-
     export class AssetsFile extends TreeNode
     {
         @feng3d.serialize
@@ -47,7 +45,18 @@ namespace editor
 
         feng3dAssets: feng3d.Feng3dAssets;
 
-        constructor(id: string = "")
+        /**
+         * 路径
+         */
+        path: string;
+
+        /**
+         * 构建
+         * 
+         * @param id 编号
+         * @param path 路径
+         */
+        constructor(id: string = "", path?: string)
         {
             super();
             this.id = id;
@@ -71,19 +80,12 @@ namespace editor
 
             editorAssets.files[this.id] = this;
 
-            loadingNum++;
             assets.readAssets(this.id, (err, feng3dAssets) =>
             {
                 if (err) feng3d.error(err.message);
 
                 this.feng3dAssets = feng3dAssets;
                 this.init();
-                loadingNum--;
-                this.dispatch("loaded");
-                if (loadingNum == 0)
-                {
-                    feng3d.feng3dDispatcher.dispatch("editor.allLoaded");
-                }
             });
         }
 

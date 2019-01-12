@@ -1707,6 +1707,14 @@ declare namespace editor {
     var editorAssets: EditorAssets;
     class EditorAssets {
         /**
+         * 资源ID字典
+         */
+        private assetsIDMap;
+        /**
+         * 资源路径字典
+         */
+        private assetsPathMap;
+        /**
          * 显示文件夹
          */
         showFloder: AssetsFile;
@@ -1790,7 +1798,6 @@ declare namespace editor {
         on<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
         off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any): any;
     }
-    var loadingNum: number;
     class AssetsFile extends TreeNode {
         id: string;
         /**
@@ -1808,7 +1815,17 @@ declare namespace editor {
         children: AssetsFile[];
         parent: AssetsFile;
         feng3dAssets: feng3d.Feng3dAssets;
-        constructor(id?: string);
+        /**
+         * 路径
+         */
+        path: string;
+        /**
+         * 构建
+         *
+         * @param id 编号
+         * @param path 路径
+         */
+        constructor(id?: string, path?: string);
         /**
          * 更新父对象
          */
