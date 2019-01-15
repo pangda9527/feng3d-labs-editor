@@ -1717,10 +1717,6 @@ declare namespace editor {
          */
         private assetsIDMap;
         /**
-         * 资源路径字典
-         */
-        private assetsPathMap;
-        /**
          * 显示文件夹
          */
         showFloder: AssetsFile;
@@ -1759,10 +1755,17 @@ declare namespace editor {
          */
         deleteAssets(assetsFile: AssetsFile): void;
         /**
-         * 获取文件
+         * 根据资源编号获取文件
+         *
          * @param assetsId 文件路径
          */
-        getFile(assetsId: string): AssetsFile;
+        getAssetsByID(assetsId: string): AssetsFile;
+        /**
+         * 根据路径获取资源
+         *
+         * @param assetsPath 资源路径
+         */
+        getAssetsByPath(assetsPath: string): AssetsFile;
         /**
          * 获取脚本列表
          */

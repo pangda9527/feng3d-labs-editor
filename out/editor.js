@@ -6267,7 +6267,7 @@ var editor;
             if (this._dataChanged) {
                 if (this._viewData instanceof feng3d.Feng3dAssets) {
                     if (this._viewData.assetsId) {
-                        var assetsFile = editor.editorAssets.getFile(this._viewData.assetsId);
+                        var assetsFile = editor.editorAssets.getAssetsByID(this._viewData.assetsId);
                         assetsFile && assetsFile.save();
                     }
                 }
@@ -6318,7 +6318,7 @@ var editor;
             this._dataChanged = true;
             if (this._viewData instanceof feng3d.Feng3dAssets) {
                 if (this._viewData.assetsId) {
-                    var assetsFile = editor.editorAssets.getFile(this._viewData.assetsId);
+                    var assetsFile = editor.editorAssets.getAssetsByID(this._viewData.assetsId);
                     assetsFile && assetsFile.updateImage();
                 }
             }
@@ -6528,10 +6528,6 @@ var editor;
              */
             this.assetsIDMap = {};
             /**
-             * 资源路径字典
-             */
-            this.assetsPathMap = {};
-            /**
              * 上次执行的项目脚本
              */
             this._preProjectJsContent = null;
@@ -6545,13 +6541,15 @@ var editor;
             var _this = this;
             editor.editorFS.readObject(assetsFilePath, function (err, object) {
                 object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
+                feng3d.assetsIDPathMap.init();
                 var files = object.map(function (element) {
-                    return _this.assetsPathMap[element.path] = _this.assetsIDMap[element.id] = new editor.AssetsFile(element.id, element.path, element.isDirectory);
+                    feng3d.assetsIDPathMap.addIDPathMap(element.id, element.path);
+                    return _this.assetsIDMap[element.id] = new editor.AssetsFile(element.id, element.path, element.isDirectory);
                 });
                 files.forEach(function (element) {
                     var parentPath = feng3d.pathUtils.getParentPath(element.path);
                     if (parentPath != "/" && parentPath.length > 0) {
-                        _this.assetsPathMap[parentPath].addChild(element);
+                        _this.getAssetsByPath(parentPath).addChild(element);
                     }
                 });
                 _this.rootFile = _this.assetsIDMap[AssetsPath];
@@ -6581,9 +6579,8 @@ var editor;
         EditorAssets.prototype.addAssets = function (assetsFile) {
             //
             feng3d.assert(!editor.editorAssets.assetsIDMap[assetsFile.id]);
-            feng3d.assert(!editor.editorAssets.assetsPathMap[assetsFile.path]);
             editor.editorAssets.assetsIDMap[assetsFile.id] = assetsFile;
-            editor.editorAssets.assetsPathMap[assetsFile.path] = assetsFile;
+            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, assetsFile.path);
             this.saveProject();
         };
         /**
@@ -6614,19 +6611,28 @@ var editor;
          */
         EditorAssets.prototype.deleteAssets = function (assetsFile) {
             feng3d.assert(!!editor.editorAssets.assetsIDMap[assetsFile.id]);
-            feng3d.assert(!!editor.editorAssets.assetsPathMap[assetsFile.path]);
             delete editor.editorAssets.assetsIDMap[assetsFile.id];
-            delete editor.editorAssets.assetsPathMap[assetsFile.path];
+            feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
             editor.editorFS.deleteFile(assetsFile.path);
             this.saveProject();
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
         };
         /**
-         * 获取文件
+         * 根据资源编号获取文件
+         *
          * @param assetsId 文件路径
          */
-        EditorAssets.prototype.getFile = function (assetsId) {
+        EditorAssets.prototype.getAssetsByID = function (assetsId) {
             return this.assetsIDMap[assetsId];
+        };
+        /**
+         * 根据路径获取资源
+         *
+         * @param assetsPath 资源路径
+         */
+        EditorAssets.prototype.getAssetsByPath = function (assetsPath) {
+            var id = feng3d.assetsIDPathMap.getID(assetsPath);
+            return this.getAssetsByID(id);
         };
         /**
          * 获取脚本列表
@@ -7530,7 +7536,7 @@ var editor;
             editor.editorAssets.popupmenu(editor.editorAssets.showFloder);
         };
         AssetsView.prototype.onfloderpathTxtLink = function (evt) {
-            editor.editorAssets.showFloder = editor.editorAssets.getFile(evt.text);
+            editor.editorAssets.showFloder = editor.editorAssets.getAssetsByID(evt.text);
         };
         AssetsView.prototype.onMouseDown = function (e) {
             if (e.target != this.filelist)

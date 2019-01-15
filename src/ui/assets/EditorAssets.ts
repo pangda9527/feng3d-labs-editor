@@ -18,10 +18,6 @@ namespace editor
          * 资源ID字典
          */
         private assetsIDMap: { [id: string]: AssetsFile } = {};
-        /**
-         * 资源路径字典
-         */
-        private assetsPathMap: { [path: string]: AssetsFile } = {};
 
         /**
          * 显示文件夹
@@ -49,9 +45,12 @@ namespace editor
             {
                 object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
 
+                feng3d.assetsIDPathMap.init();
+
                 var files = object.map(element =>
                 {
-                    return this.assetsPathMap[element.path] = this.assetsIDMap[element.id] = new AssetsFile(element.id, element.path, element.isDirectory);
+                    feng3d.assetsIDPathMap.addIDPathMap(element.id, element.path);
+                    return this.assetsIDMap[element.id] = new AssetsFile(element.id, element.path, element.isDirectory);
                 });
 
                 files.forEach(element =>
@@ -59,7 +58,7 @@ namespace editor
                     var parentPath = feng3d.pathUtils.getParentPath(element.path);
                     if (parentPath != "/" && parentPath.length > 0)
                     {
-                        this.assetsPathMap[parentPath].addChild(element);
+                        this.getAssetsByPath(parentPath).addChild(element);
                     }
                 });
 
@@ -95,9 +94,9 @@ namespace editor
         {
             //
             feng3d.assert(!editorAssets.assetsIDMap[assetsFile.id]);
-            feng3d.assert(!editorAssets.assetsPathMap[assetsFile.path]);
             editorAssets.assetsIDMap[assetsFile.id] = assetsFile;
-            editorAssets.assetsPathMap[assetsFile.path] = assetsFile;
+
+            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, assetsFile.path);
 
             this.saveProject();
         }
@@ -136,10 +135,9 @@ namespace editor
         deleteAssets(assetsFile: AssetsFile)
         {
             feng3d.assert(!!editorAssets.assetsIDMap[assetsFile.id]);
-            feng3d.assert(!!editorAssets.assetsPathMap[assetsFile.path]);
 
             delete editorAssets.assetsIDMap[assetsFile.id];
-            delete editorAssets.assetsPathMap[assetsFile.path];
+            feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
 
             editorFS.deleteFile(assetsFile.path);
 
@@ -149,12 +147,24 @@ namespace editor
         }
 
         /**
-         * 获取文件
+         * 根据资源编号获取文件
+         * 
          * @param assetsId 文件路径
          */
-        getFile(assetsId: string): AssetsFile
+        getAssetsByID(assetsId: string)
         {
             return this.assetsIDMap[assetsId];
+        }
+
+        /**
+         * 根据路径获取资源
+         * 
+         * @param assetsPath 资源路径
+         */
+        getAssetsByPath(assetsPath: string)
+        {
+            var id = feng3d.assetsIDPathMap.getID(assetsPath);
+            return this.getAssetsByID(id);
         }
 
         /**
