@@ -222,6 +222,8 @@ namespace editor
 
         private onfilelistrightclick(e: egret.MouseEvent)
         {
+            editorData.clearSelectedObjects();
+
             editorAssets.popupmenu(editorAssets.showFloder);
         }
 

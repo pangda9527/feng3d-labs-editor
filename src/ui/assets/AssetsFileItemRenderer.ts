@@ -64,10 +64,11 @@ namespace editor
                 {
                     if (!this.data.isLoaded)
                     {
-                        this.data.load(() =>
+                        var data = this.data;
+                        data.load(() =>
                         {
-                            feng3d.assert(this.data.isLoaded);
-                            this.dataChanged();
+                            feng3d.assert(data.isLoaded);
+                            if (data == this.data) this.dataChanged();
                         })
                         return;
                     }
@@ -109,9 +110,6 @@ namespace editor
                         {
                             dragsource.assetsFiles = [this.data];
                         }
-
-
-
                     }, []);
                 }
             } else
@@ -162,6 +160,7 @@ namespace editor
         private onrightclick(e: egret.Event)
         {
             e.stopPropagation();
+            editorData.selectObject(this.data);
             editorAssets.popupmenu(this.data);
         }
 

@@ -45,13 +45,22 @@ namespace editor
 				if (this._viewData instanceof AssetsFile)
 				{
 					if (this._viewData.isDirectory) return;
-					var viewData = this._viewData;
-					viewData.load(() =>
+					if (this._viewData.feng3dAssets)
 					{
-						feng3d.assert(!!viewData.feng3dAssets);
-						if (viewData == this._viewData)
-							this.updateShowData(viewData.feng3dAssets);
-					});
+						this.updateShowData(this._viewData.feng3dAssets);
+					} else
+					{
+						if (!this._viewData.isLoaded)
+						{
+							var viewData = this._viewData;
+							viewData.load(() =>
+							{
+								feng3d.assert(!!viewData.feng3dAssets);
+								if (viewData == this._viewData)
+									this.updateShowData(viewData.feng3dAssets);
+							});
+						}
+					}
 				} else
 				{
 					this.updateShowData(this._viewData);

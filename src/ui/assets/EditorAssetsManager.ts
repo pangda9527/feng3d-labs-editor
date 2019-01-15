@@ -117,6 +117,27 @@ namespace editor
         }
 
         /**
+         * 移动资源
+         * 
+         * @param assetsFile 资源文件
+         * @param newPath 新路径
+         */
+        moveAssets(assetsFile: AssetsFile, newPath: string)
+        {
+            var oldPath = assetsFile.path;
+            editorFS.move(oldPath, newPath);
+
+            var files = assetsFile.getFileList();
+            // 更新资源结点中文件路径
+            files.forEach(file =>
+            {
+                feng3d.assetsIDPathMap.deleteByID(file.id);
+                file.path = file.path.replace(oldPath, newPath);
+                feng3d.assetsIDPathMap.addIDPathMap(file.id, file.path);
+            });
+        }
+
+        /**
          * 获取脚本列表
          */
         getScripts()

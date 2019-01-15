@@ -1763,6 +1763,13 @@ declare namespace editor {
          */
         saveAssets(assetsFile: AssetsFile, callback?: () => void): void;
         /**
+         * 移动资源
+         *
+         * @param assetsFile 资源文件
+         * @param newPath 新路径
+         */
+        moveAssets(assetsFile: AssetsFile, newPath: string): void;
+        /**
          * 获取脚本列表
          */
         getScripts(): feng3d.ScriptFile[];
@@ -1857,7 +1864,8 @@ declare namespace editor {
         /**
          * 编号
          */
-        id: string;
+        readonly id: string;
+        private _id;
         /**
          * 路径
          */
@@ -1877,10 +1885,6 @@ declare namespace editor {
         children: AssetsFile[];
         parent: AssetsFile;
         feng3dAssets: feng3d.Feng3dAssets;
-        data: string | ArrayBuffer;
-        meta: {
-            dataType: string;
-        };
         /**
          * 是否已加载
          */
@@ -1922,7 +1926,16 @@ declare namespace editor {
          * 删除
          */
         delete(): void;
-        getFolderList(includeClose?: boolean): any[];
+        /**
+         * 获取文件夹列表
+         *
+         * @param includeClose 是否包含关闭的文件夹
+         */
+        getFolderList(includeClose?: boolean): AssetsFile[];
+        /**
+         * 获取文件列表
+         */
+        getFileList(): AssetsFile[];
         /**
          * 获取新子文件名称
          *
@@ -1942,6 +1955,12 @@ declare namespace editor {
          * @param callback 完成回调
          */
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override?: boolean, callback?: (e: Error, file: AssetsFile) => void): void;
+        /**
+         * 新增子结点
+         *
+         * @param assetsFile
+         */
+        addChild(assetsFile: AssetsFile): void;
         /**
          * 导出
          */

@@ -22,7 +22,8 @@ namespace editor
         /**
          * 编号
          */
-        id: string;
+        get id() { return this._id; }
+        private _id: string;
 
         /**
          * 路径
@@ -51,10 +52,6 @@ namespace editor
 
         feng3dAssets: feng3d.Feng3dAssets;
 
-        data: string | ArrayBuffer;
-
-        meta: { dataType: string };
-
         /**
          * 是否已加载
          */
@@ -77,7 +74,7 @@ namespace editor
             feng3d.assert(!!id);
             feng3d.assert(!!path);
 
-            this.id = id;
+            this._id = id;
             this.path = path;
             this.isDirectory = isDirectory;
             if (isDirectory) this.isLoaded = true;
@@ -122,14 +119,12 @@ namespace editor
                 assets.name = feng3d.pathUtils.getNameWithExtension(this.path);
                 this.feng3dAssets = assets;
 
-                this.updateImage();
-
-                this.dispatch("loaded", this);
-
                 this.isLoading = false;
                 this.isLoaded = true;
 
                 callback && callback();
+
+                this.dispatch("loaded", this);
             });
         }
 
@@ -200,6 +195,7 @@ namespace editor
             var assetsFile = new AssetsFile(feng3d.FMath.uuid(), path, false);
             feng3dAssets.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dAssets;
+            assetsFile.isLoaded = true;
             editorAssetsManager.saveAssets(assetsFile);
             this.addChild(assetsFile);
             return assetsFile;
@@ -219,9 +215,14 @@ namespace editor
             editorAssetsManager.deleteAssets(this);
         }
 
+        /**
+         * 获取文件夹列表
+         * 
+         * @param includeClose 是否包含关闭的文件夹
+         */
         getFolderList(includeClose = false)
         {
-            var folders = [];
+            var folders: AssetsFile[] = [];
             if (this.isDirectory)
             {
                 folders.push(this);
@@ -235,6 +236,21 @@ namespace editor
                 });
             }
             return folders;
+        }
+
+        /**
+         * 获取文件列表
+         */
+        getFileList()
+        {
+            var files: AssetsFile[] = [];
+            files.push(this);
+            this.children.forEach(v =>
+            {
+                var cfiles = v.getFileList();
+                files = files.concat(cfiles);
+            });
+            return files;
         }
 
         /**
@@ -295,6 +311,28 @@ namespace editor
                 var assetsFile = this.addAssets(filename, feng3dFile);
                 callback(err, assetsFile);
             });
+        }
+
+        /**
+         * 新增子结点
+         * 
+         * @param assetsFile 
+         */
+        addChild(assetsFile: AssetsFile)
+        {
+            feng3d.assert(this.isDirectory);
+
+            if (assetsFile.parent)
+            {
+                var newDirPath = this.path;
+                var oldDirPath = assetsFile.parent.path;
+
+                // 移动文件
+                var newPath = assetsFile.path.replace(oldDirPath, newDirPath);
+                editorAssetsManager.moveAssets(assetsFile, newPath);
+            }
+
+            super.addChild(assetsFile);
         }
 
         /**

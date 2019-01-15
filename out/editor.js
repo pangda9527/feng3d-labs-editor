@@ -6248,12 +6248,19 @@ var editor;
                 if (this._viewData instanceof editor.AssetsFile) {
                     if (this._viewData.isDirectory)
                         return;
-                    var viewData = this._viewData;
-                    viewData.load(function () {
-                        feng3d.assert(!!viewData.feng3dAssets);
-                        if (viewData == _this._viewData)
-                            _this.updateShowData(viewData.feng3dAssets);
-                    });
+                    if (this._viewData.feng3dAssets) {
+                        this.updateShowData(this._viewData.feng3dAssets);
+                    }
+                    else {
+                        if (!this._viewData.isLoaded) {
+                            var viewData = this._viewData;
+                            viewData.load(function () {
+                                feng3d.assert(!!viewData.feng3dAssets);
+                                if (viewData == _this._viewData)
+                                    _this.updateShowData(viewData.feng3dAssets);
+                            });
+                        }
+                    }
                 }
                 else {
                     this.updateShowData(this._viewData);
@@ -6599,6 +6606,23 @@ var editor;
             editor.editorFS.writeObject(assetsFile.path, assetsFile.feng3dAssets, function (err) {
                 feng3d.assert(!err, "\u8D44\u6E90 " + assetsFile.path + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
+            });
+        };
+        /**
+         * 移动资源
+         *
+         * @param assetsFile 资源文件
+         * @param newPath 新路径
+         */
+        EditorAssetsManager.prototype.moveAssets = function (assetsFile, newPath) {
+            var oldPath = assetsFile.path;
+            editor.editorFS.move(oldPath, newPath);
+            var files = assetsFile.getFileList();
+            // 更新资源结点中文件路径
+            files.forEach(function (file) {
+                feng3d.assetsIDPathMap.deleteByID(file.id);
+                file.path = file.path.replace(oldPath, newPath);
+                feng3d.assetsIDPathMap.addIDPathMap(file.id, file.path);
             });
         };
         /**
@@ -7004,9 +7028,11 @@ var editor;
                 }
                 else {
                     if (!this.data.isLoaded) {
-                        this.data.load(function () {
-                            feng3d.assert(_this.data.isLoaded);
-                            _this.dataChanged();
+                        var data = this.data;
+                        data.load(function () {
+                            feng3d.assert(data.isLoaded);
+                            if (data == _this.data)
+                                _this.dataChanged();
                         });
                         return;
                     }
@@ -7086,6 +7112,7 @@ var editor;
         };
         AssetsFileItemRenderer.prototype.onrightclick = function (e) {
             e.stopPropagation();
+            editor.editorData.selectObject(this.data);
             editor.editorAssets.popupmenu(this.data);
         };
         AssetsFileItemRenderer.prototype.selectedfilechanged = function () {
@@ -7119,7 +7146,7 @@ var editor;
             _this.isLoaded = false;
             feng3d.assert(!!id);
             feng3d.assert(!!path);
-            _this.id = id;
+            _this._id = id;
             _this.path = path;
             _this.isDirectory = isDirectory;
             if (isDirectory)
@@ -7135,6 +7162,14 @@ var editor;
             editor.editorAssetsManager.addAssets(_this);
             return _this;
         }
+        Object.defineProperty(AssetsFile.prototype, "id", {
+            /**
+             * 编号
+             */
+            get: function () { return this._id; },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 加载
          *
@@ -7155,11 +7190,10 @@ var editor;
                 feng3d.assert(!err);
                 assets.name = feng3d.pathUtils.getNameWithExtension(_this.path);
                 _this.feng3dAssets = assets;
-                _this.updateImage();
-                _this.dispatch("loaded", _this);
                 _this.isLoading = false;
                 _this.isLoaded = true;
                 callback && callback();
+                _this.dispatch("loaded", _this);
             });
         };
         /**
@@ -7218,6 +7252,7 @@ var editor;
             var assetsFile = new AssetsFile(feng3d.FMath.uuid(), path, false);
             feng3dAssets.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dAssets;
+            assetsFile.isLoaded = true;
             editor.editorAssetsManager.saveAssets(assetsFile);
             this.addChild(assetsFile);
             return assetsFile;
@@ -7232,6 +7267,11 @@ var editor;
             this.remove();
             editor.editorAssetsManager.deleteAssets(this);
         };
+        /**
+         * 获取文件夹列表
+         *
+         * @param includeClose 是否包含关闭的文件夹
+         */
         AssetsFile.prototype.getFolderList = function (includeClose) {
             if (includeClose === void 0) { includeClose = false; }
             var folders = [];
@@ -7245,6 +7285,18 @@ var editor;
                 });
             }
             return folders;
+        };
+        /**
+         * 获取文件列表
+         */
+        AssetsFile.prototype.getFileList = function () {
+            var files = [];
+            files.push(this);
+            this.children.forEach(function (v) {
+                var cfiles = v.getFileList();
+                files = files.concat(cfiles);
+            });
+            return files;
         };
         /**
          * 获取新子文件名称
@@ -7294,6 +7346,22 @@ var editor;
                 var assetsFile = _this.addAssets(filename, feng3dFile);
                 callback(err, assetsFile);
             });
+        };
+        /**
+         * 新增子结点
+         *
+         * @param assetsFile
+         */
+        AssetsFile.prototype.addChild = function (assetsFile) {
+            feng3d.assert(this.isDirectory);
+            if (assetsFile.parent) {
+                var newDirPath = this.path;
+                var oldDirPath = assetsFile.parent.path;
+                // 移动文件
+                var newPath = assetsFile.path.replace(oldDirPath, newDirPath);
+                editor.editorAssetsManager.moveAssets(assetsFile, newPath);
+            }
+            _super.prototype.addChild.call(this, assetsFile);
         };
         /**
          * 导出
@@ -7538,6 +7606,7 @@ var editor;
             }
         };
         AssetsView.prototype.onfilelistrightclick = function (e) {
+            editor.editorData.clearSelectedObjects();
             editor.editorAssets.popupmenu(editor.editorAssets.showFloder);
         };
         AssetsView.prototype.onfloderpathTxtLink = function (evt) {
