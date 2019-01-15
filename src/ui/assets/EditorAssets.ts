@@ -17,11 +17,11 @@ namespace editor
         /**
          * 资源ID字典
          */
-        assetsIDMap: { [id: string]: AssetsFile } = {};
+        private assetsIDMap: { [id: string]: AssetsFile } = {};
         /**
          * 资源路径字典
          */
-        assetsPathMap: { [path: string]: AssetsFile } = {};
+        private assetsPathMap: { [path: string]: AssetsFile } = {};
 
         /**
          * 显示文件夹
@@ -87,12 +87,88 @@ namespace editor
         }
 
         /**
+         * 新增资源
+         * 
+         * @param assetsFile 资源
+         */
+        addAssets(assetsFile: AssetsFile)
+        {
+            //
+            feng3d.assert(!editorAssets.assetsIDMap[assetsFile.id]);
+            feng3d.assert(!editorAssets.assetsPathMap[assetsFile.path]);
+            editorAssets.assetsIDMap[assetsFile.id] = assetsFile;
+            editorAssets.assetsPathMap[assetsFile.path] = assetsFile;
+
+            this.saveProject();
+        }
+
+        /**
+         * 保存资源
+         * 
+         * @param assetsFile 资源
+         * @param callback 完成回调
+         */
+        saveAssets(assetsFile: AssetsFile, callback?: () => void)
+        {
+            feng3d.assert(!!editorAssets.assetsIDMap[assetsFile.id], `无法保存已经被删除的资源！`);
+
+            if (assetsFile.isDirectory)
+            {
+                callback && callback();
+                return;
+            }
+            assets.writeObject(assetsFile.path, assetsFile.feng3dAssets, (err) =>
+            {
+                feng3d.assert(!err, `资源 ${assetsFile.path} 保存失败！`);
+                callback && callback();
+            });
+        }
+
+        /**
+         * 删除资源
+         * 
+         * @param assetsFile 资源
+         */
+        deleteAssets(assetsFile: AssetsFile)
+        {
+            feng3d.assert(!!editorAssets.assetsIDMap[assetsFile.id]);
+            feng3d.assert(!!editorAssets.assetsPathMap[assetsFile.path]);
+
+            delete editorAssets.assetsIDMap[assetsFile.id];
+            delete editorAssets.assetsPathMap[assetsFile.path];
+
+            assets.deleteFile(assetsFile.path);
+
+            this.saveProject();
+
+            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
+        }
+
+        /**
          * 获取文件
          * @param assetsId 文件路径
          */
         getFile(assetsId: string): AssetsFile
         {
             return this.assetsIDMap[assetsId];
+        }
+
+        /**
+         * 获取脚本列表
+         */
+        getScripts()
+        {
+            var files = editorAssets.assetsIDMap
+            var tslist: feng3d.ScriptFile[] = [];
+            for (const key in files)
+            {
+                var file = files[key].feng3dAssets;
+                if (file instanceof feng3d.ScriptFile)
+                {
+                    tslist.push(file);
+                }
+            }
+            return tslist;
         }
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
@@ -145,8 +221,8 @@ namespace editor
                             {
                                 label: "js", click: () =>
                                 {
-                                    var path = assetsFile.getNewChildName("NewJs.js");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JSFile(), { name: path, textContent: "" })));
+                                    var name = assetsFile.getNewChildName("NewJs.js");
+                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JSFile(), { name: name, textContent: "" })));
                                 }
                             },
                             {

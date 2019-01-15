@@ -207,7 +207,7 @@ namespace editor
         {
             var selectedAssetsFile = editorData.selectedAssetsFile;
             if (selectedAssetsFile.length > 0)
-                this.filepathLabel.text = selectedAssetsFile.map(v => v.label).join(",");
+                this.filepathLabel.text = selectedAssetsFile.map(v => v.path).join(",");
             else
                 this.filepathLabel.text = "";
         }
@@ -227,7 +227,7 @@ namespace editor
 
         private onfloderpathTxtLink(evt: egret.TextEvent)
         {
-            editorAssets.showFloder = editorAssets.assetsIDMap[evt.text];
+            editorAssets.showFloder = editorAssets.getFile(evt.text);
         }
 
         private areaSelectStartPosition: feng3d.Vector2;

@@ -70,7 +70,7 @@ namespace editor
 				{
 					if (this._viewData.assetsId)
 					{
-						var assetsFile = editorAssets.assetsIDMap[this._viewData.assetsId];
+						var assetsFile = editorAssets.getFile(this._viewData.assetsId);
 						assetsFile && assetsFile.save();
 					}
 				} else if (this._viewData instanceof AssetsFile)
@@ -145,7 +145,7 @@ namespace editor
 			{
 				if (this._viewData.assetsId)
 				{
-					var assetsFile = editorAssets.assetsIDMap[this._viewData.assetsId];
+					var assetsFile = editorAssets.getFile(this._viewData.assetsId);
 					assetsFile && assetsFile.updateImage();
 				}
 			} else if (this._viewData instanceof AssetsFile)

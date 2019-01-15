@@ -6264,7 +6264,7 @@ var editor;
             if (this._dataChanged) {
                 if (this._viewData instanceof feng3d.Feng3dAssets) {
                     if (this._viewData.assetsId) {
-                        var assetsFile = editor.editorAssets.assetsIDMap[this._viewData.assetsId];
+                        var assetsFile = editor.editorAssets.getFile(this._viewData.assetsId);
                         assetsFile && assetsFile.save();
                     }
                 }
@@ -6315,7 +6315,7 @@ var editor;
             this._dataChanged = true;
             if (this._viewData instanceof feng3d.Feng3dAssets) {
                 if (this._viewData.assetsId) {
-                    var assetsFile = editor.editorAssets.assetsIDMap[this._viewData.assetsId];
+                    var assetsFile = editor.editorAssets.getFile(this._viewData.assetsId);
                     assetsFile && assetsFile.updateImage();
                 }
             }
@@ -6571,11 +6571,69 @@ var editor;
             editor.assets.writeObject(assetsFilePath, object, callback);
         };
         /**
+         * 新增资源
+         *
+         * @param assetsFile 资源
+         */
+        EditorAssets.prototype.addAssets = function (assetsFile) {
+            //
+            feng3d.assert(!editor.editorAssets.assetsIDMap[assetsFile.id]);
+            feng3d.assert(!editor.editorAssets.assetsPathMap[assetsFile.path]);
+            editor.editorAssets.assetsIDMap[assetsFile.id] = assetsFile;
+            editor.editorAssets.assetsPathMap[assetsFile.path] = assetsFile;
+            this.saveProject();
+        };
+        /**
+         * 保存资源
+         *
+         * @param assetsFile 资源
+         * @param callback 完成回调
+         */
+        EditorAssets.prototype.saveAssets = function (assetsFile, callback) {
+            feng3d.assert(!!editor.editorAssets.assetsIDMap[assetsFile.id], "\u65E0\u6CD5\u4FDD\u5B58\u5DF2\u7ECF\u88AB\u5220\u9664\u7684\u8D44\u6E90\uFF01");
+            if (assetsFile.isDirectory) {
+                callback && callback();
+                return;
+            }
+            editor.assets.writeObject(assetsFile.path, assetsFile.feng3dAssets, function (err) {
+                feng3d.assert(!err, "\u8D44\u6E90 " + assetsFile.path + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                callback && callback();
+            });
+        };
+        /**
+         * 删除资源
+         *
+         * @param assetsFile 资源
+         */
+        EditorAssets.prototype.deleteAssets = function (assetsFile) {
+            feng3d.assert(!!editor.editorAssets.assetsIDMap[assetsFile.id]);
+            feng3d.assert(!!editor.editorAssets.assetsPathMap[assetsFile.path]);
+            delete editor.editorAssets.assetsIDMap[assetsFile.id];
+            delete editor.editorAssets.assetsPathMap[assetsFile.path];
+            editor.assets.deleteFile(assetsFile.path);
+            this.saveProject();
+            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
+        };
+        /**
          * 获取文件
          * @param assetsId 文件路径
          */
         EditorAssets.prototype.getFile = function (assetsId) {
             return this.assetsIDMap[assetsId];
+        };
+        /**
+         * 获取脚本列表
+         */
+        EditorAssets.prototype.getScripts = function () {
+            var files = editor.editorAssets.assetsIDMap;
+            var tslist = [];
+            for (var key in files) {
+                var file = files[key].feng3dAssets;
+                if (file instanceof feng3d.ScriptFile) {
+                    tslist.push(file);
+                }
+            }
+            return tslist;
         };
         EditorAssets.prototype.readScene = function (path, callback) {
             editor.assets.readObject(path, function (err, object) {
@@ -6617,8 +6675,8 @@ var editor;
                         },
                         {
                             label: "js", click: function () {
-                                var path = assetsFile.getNewChildName("NewJs.js");
-                                editor.editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JSFile(), { name: path, textContent: "" })));
+                                var name = assetsFile.getNewChildName("NewJs.js");
+                                editor.editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JSFile(), { name: name, textContent: "" })));
                             }
                         },
                         {
@@ -7035,11 +7093,7 @@ var editor;
             else {
                 _this.image = "file_png";
             }
-            //
-            feng3d.assert(!editor.editorAssets.assetsIDMap[id]);
-            feng3d.assert(!editor.editorAssets.assetsPathMap[path]);
-            editor.editorAssets.assetsIDMap[id] = _this;
-            editor.editorAssets.assetsPathMap[path] = _this;
+            editor.editorAssets.addAssets(_this);
             return _this;
         }
         /**
@@ -7109,16 +7163,7 @@ var editor;
          * @param callback 完成回调函数
          */
         AssetsFile.prototype.save = function (callback) {
-            var _this = this;
-            feng3d.assert(!!editor.editorAssets.assetsIDMap[this.id], "\u65E0\u6CD5\u4FDD\u5B58\u5DF2\u7ECF\u88AB\u5220\u9664\u7684\u8D44\u6E90\uFF01");
-            if (this.isDirectory) {
-                callback && callback();
-                return;
-            }
-            editor.assets.writeObject(this.path, this.feng3dAssets, function (err) {
-                feng3d.assert(!err, "\u8D44\u6E90 " + _this.path + " \u4FDD\u5B58\u5931\u8D25\uFF01");
-                callback && callback();
-            });
+            editor.editorAssets.saveAssets(this, callback);
         };
         /**
          * 新增文件夹
@@ -7157,10 +7202,7 @@ var editor;
                 element.delete();
             });
             this.remove();
-            editor.assets.deleteFile(this.path);
-            delete editor.editorAssets.assetsIDMap[this.id];
-            delete editor.editorAssets.assetsPathMap[this.path];
-            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
+            editor.editorAssets.deleteAssets(this);
         };
         AssetsFile.prototype.getFolderList = function (includeClose) {
             if (includeClose === void 0) { includeClose = false; }
@@ -7448,7 +7490,7 @@ var editor;
         AssetsView.prototype.selectedfilechanged = function () {
             var selectedAssetsFile = editor.editorData.selectedAssetsFile;
             if (selectedAssetsFile.length > 0)
-                this.filepathLabel.text = selectedAssetsFile.map(function (v) { return v.label; }).join(",");
+                this.filepathLabel.text = selectedAssetsFile.map(function (v) { return v.path; }).join(",");
             else
                 this.filepathLabel.text = "";
         };
@@ -7461,7 +7503,7 @@ var editor;
             editor.editorAssets.popupmenu(editor.editorAssets.showFloder);
         };
         AssetsView.prototype.onfloderpathTxtLink = function (evt) {
-            editor.editorAssets.showFloder = editor.editorAssets.assetsIDMap[evt.text];
+            editor.editorAssets.showFloder = editor.editorAssets.getFile(evt.text);
         };
         AssetsView.prototype.onMouseDown = function (e) {
             if (e.target != this.filelist)
@@ -13522,14 +13564,7 @@ var editor;
             callback && callback("");
         };
         ScriptCompiler.prototype.getScripts = function () {
-            var files = editor.editorAssets.assetsIDMap;
-            var tslist = [];
-            for (var key in files) {
-                var file = files[key].feng3dAssets;
-                if (file instanceof feng3d.ScriptFile) {
-                    tslist.push(file);
-                }
-            }
+            var tslist = editor.editorAssets.getScripts();
             this.tssort(tslist);
             return tslist;
         };

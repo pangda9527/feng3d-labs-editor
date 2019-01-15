@@ -91,11 +91,7 @@ namespace editor
             {
                 this.image = "file_png";
             }
-            //
-            feng3d.assert(!editorAssets.assetsIDMap[id]);
-            feng3d.assert(!editorAssets.assetsPathMap[path]);
-            editorAssets.assetsIDMap[id] = this;
-            editorAssets.assetsPathMap[path] = this;
+            editorAssets.addAssets(this);
         }
 
         /**
@@ -184,18 +180,7 @@ namespace editor
          */
         save(callback?: () => void)
         {
-            feng3d.assert(!!editorAssets.assetsIDMap[this.id], `无法保存已经被删除的资源！`);
-
-            if (this.isDirectory)
-            {
-                callback && callback();
-                return;
-            }
-            assets.writeObject(this.path, this.feng3dAssets, (err) =>
-            {
-                feng3d.assert(!err, `资源 ${this.path} 保存失败！`);
-                callback && callback();
-            });
+            editorAssets.saveAssets(this, callback);
         }
 
         /**
@@ -244,11 +229,8 @@ namespace editor
                 element.delete();
             });
             this.remove();
-            assets.deleteFile(this.path);
 
-            delete editorAssets.assetsIDMap[this.id];
-            delete editorAssets.assetsPathMap[this.path];
-            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: this.id });
+            editorAssets.deleteAssets(this);
         }
 
         getFolderList(includeClose = false)

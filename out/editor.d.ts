@@ -1709,15 +1709,11 @@ declare namespace editor {
         /**
          * 资源ID字典
          */
-        assetsIDMap: {
-            [id: string]: AssetsFile;
-        };
+        private assetsIDMap;
         /**
          * 资源路径字典
          */
-        assetsPathMap: {
-            [path: string]: AssetsFile;
-        };
+        private assetsPathMap;
         /**
          * 显示文件夹
          */
@@ -1738,10 +1734,33 @@ declare namespace editor {
          */
         saveProject(callback?: (err: Error) => void): void;
         /**
+         * 新增资源
+         *
+         * @param assetsFile 资源
+         */
+        addAssets(assetsFile: AssetsFile): void;
+        /**
+         * 保存资源
+         *
+         * @param assetsFile 资源
+         * @param callback 完成回调
+         */
+        saveAssets(assetsFile: AssetsFile, callback?: () => void): void;
+        /**
+         * 删除资源
+         *
+         * @param assetsFile 资源
+         */
+        deleteAssets(assetsFile: AssetsFile): void;
+        /**
          * 获取文件
          * @param assetsId 文件路径
          */
         getFile(assetsId: string): AssetsFile;
+        /**
+         * 获取脚本列表
+         */
+        getScripts(): feng3d.ScriptFile[];
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void): void;
         /**
          * 弹出文件菜单
