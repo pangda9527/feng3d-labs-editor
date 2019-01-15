@@ -115,12 +115,11 @@ namespace editor
 
             this.isLoading = true;
 
-            assets.readObject(this.path, (err, assets: feng3d.Feng3dAssets) =>
+            editorFS.readObject(this.path, (err, assets: feng3d.Feng3dAssets) =>
             {
                 feng3d.assert(!err);
 
-                assets.path = this.path;
-                assets.name = feng3d.pathUtils.getName(this.path);
+                assets.name = feng3d.pathUtils.getNameWithExtension(this.path);
                 this.feng3dAssets = assets;
 
                 this.updateImage();
@@ -190,15 +189,11 @@ namespace editor
          */
         addFolder(folderName: string)
         {
-            var newName = this.getNewChildName(folderName);
-
+            var newName = this.getNewChildFileName(folderName);
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(this.path, newName);
 
             var assetsFile = new AssetsFile(feng3d.FMath.uuid(), newFolderPath, true);
-            assets.mkdir(assetsFile.path, (err) =>
-            {
-                if (err) feng3d.assert(!err);
-            });
+            assetsFile.save();
             this.addChild(assetsFile);
             return assetsFile;
         }
@@ -208,11 +203,12 @@ namespace editor
          * 
          * @param feng3dAssets 
          */
-        addAssets(feng3dAssets: feng3d.Feng3dAssets)
+        addAssets(fileName: string, feng3dAssets: feng3d.Feng3dAssets)
         {
-            feng3dAssets.path = feng3d.pathUtils.getChildFilePath(this.path, feng3dAssets.name);
+            var path = this.getNewChildPath(fileName);
 
-            var assetsFile = new AssetsFile(feng3d.FMath.uuid(), feng3dAssets.path, false);
+            var assetsFile = new AssetsFile(feng3d.FMath.uuid(), path, false);
+            feng3dAssets.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.save();
             this.addChild(assetsFile);
@@ -254,18 +250,26 @@ namespace editor
         /**
          * 获取新子文件名称
          * 
-         * @param basename 基础名称
+         * @param childName 基础名称
          */
-        getNewChildName(basename: string)
+        getNewChildFileName(childName: string)
         {
-            var labels = this.children.map(v => v.label);
-            var name = basename;
+            var childrenNames = this.children.map(v => feng3d.pathUtils.getNameWithExtension(v.path));
+            if (childrenNames.indexOf(childName) == -1) return childName;
+
+            var baseName = feng3d.pathUtils.getName(childName);
+            var extension = feng3d.pathUtils.getExtension(childName);
+            if (extension.length > 0) extension = "." + extension;
+
             var i = 1;
-            while (labels.indexOf(name) != -1)
+            var newName = baseName + extension;
+            while (childrenNames.indexOf(newName) != -1)
             {
-                name = basename + i++;
+                newName = baseName + i + extension;
+                i++;
             }
-            return name;
+
+            return newName;
         }
 
         /**
@@ -275,7 +279,8 @@ namespace editor
          */
         getNewChildPath(basename: string)
         {
-            var path = feng3d.pathUtils.getChildFilePath(this.path, basename);
+            var newName = this.getNewChildFileName(basename);
+            var path = feng3d.pathUtils.getChildFilePath(this.path, newName);
             return path;
         }
 
@@ -287,14 +292,17 @@ namespace editor
          */
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsFile) => void)
         {
-            var feng3dFile = Object.setValue(new feng3d.ArrayBufferFile(), { name: filename, path: filename, arraybuffer: arraybuffer });
+
+            var feng3dFile = Object.setValue(new feng3d.ArrayBufferFile(), { name: filename, arraybuffer: arraybuffer });
+
+            var path = this.getNewChildPath(filename);
 
             feng3d.error(`未实现`);
 
             // assets.writeAssets(feng3dFile);
-            assets.writeArrayBuffer(feng3dFile.path, arraybuffer, err =>
+            editorFS.writeArrayBuffer(path, arraybuffer, err =>
             {
-                var assetsFile = this.addAssets(feng3dFile);
+                var assetsFile = this.addAssets(filename, feng3dFile);
                 callback(err, assetsFile);
             });
         }
@@ -305,10 +313,13 @@ namespace editor
         export()
         {
             var zip = new JSZip();
-            var path = this.feng3dAssets.path;
-            path = path.substring(0, path.lastIndexOf("/") + 1);
+
+            var path = this.path;
+            if (!feng3d.pathUtils.isDirectory(path))
+                path = feng3d.pathUtils.getParentPath(path);
+
             var filename = this.label;
-            assets.getAllfilepathInFolder(path, (err, filepaths) =>
+            editorFS.getAllfilepathInFolder(path, (err, filepaths) =>
             {
                 readfiles();
                 function readfiles()
@@ -316,7 +327,7 @@ namespace editor
                     if (filepaths.length > 0)
                     {
                         var filepath = filepaths.shift();
-                        assets.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        editorFS.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                         {
                             //处理文件夹
                             data && zip.file(filepath, data);

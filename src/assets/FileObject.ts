@@ -155,7 +155,7 @@ namespace editor
          */
         getDirectoryListing(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            assets.readdir(this._path, (err, files) =>
+            editorFS.readdir(this._path, (err, files) =>
             {
                 if (err)
                 {
@@ -176,7 +176,7 @@ namespace editor
          */
         createDirectory(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            assets.mkdir(this._path, (err) =>
+            editorFS.mkdir(this._path, (err) =>
             {
                 if (err)
                 {
@@ -222,7 +222,7 @@ namespace editor
                 return;
             }
 
-            assets.writeArrayBuffer(this._path, content, (err) =>
+            editorFS.writeArrayBuffer(this._path, content, (err) =>
             {
                 if (err)
                 {
@@ -248,7 +248,7 @@ namespace editor
         {
             var oldPath = this._path;
             var newPath = this.location ? (this.location + "/" + newName) : newName;
-            assets.rename(oldPath, newPath, (err) =>
+            editorFS.rename(oldPath, newPath, (err) =>
             {
                 if (err)
                 {
@@ -272,7 +272,7 @@ namespace editor
          */
         move(newPath: string, onComplete: Function, onError: Function, thisPtr: any): void
         {
-            assets.move(this._path, newPath, (err) =>
+            editorFS.move(this._path, newPath, (err) =>
             {
                 if (err)
                 {
@@ -295,7 +295,7 @@ namespace editor
          */
         delete(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            assets.delete(this._path, (err) =>
+            editorFS.delete(this._path, (err) =>
             {
                 if (err)
                 {
@@ -324,7 +324,7 @@ namespace editor
          */
         private updateStats(path: string, callback: () => void, onComplete?: Function, onError?: Function)
         {
-            assets.exists(path, (exists) =>
+            editorFS.exists(path, (exists) =>
             {
                 if (!exists)
                 {

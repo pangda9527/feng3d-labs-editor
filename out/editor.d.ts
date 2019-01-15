@@ -152,8 +152,14 @@ declare namespace editor {
 declare function require(module: string): any;
 declare var __dirname: string;
 declare namespace editor {
-    var assets: EditorAssets1;
-    class EditorAssets1 extends feng3d.ReadWriteAssets {
+    /**
+     * 编辑器文件系统
+     */
+    var editorFS: EditorFS;
+    /**
+     * 编辑器文件系统
+     */
+    class EditorFS extends feng3d.ReadWriteAssets {
         constructor(readWriteFS?: feng3d.ReadWriteFS);
         /**
          * 是否存在指定项目
@@ -1761,11 +1767,22 @@ declare namespace editor {
          * 获取脚本列表
          */
         getScripts(): feng3d.ScriptFile[];
+        /**
+         * 获取指定类型资源
+         * @param type 资源类型
+         */
+        getAssetsByType<T extends feng3d.Feng3dAssets>(type: feng3d.Constructor<T>): AssetsFile[];
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void): void;
         /**
          * 弹出文件菜单
          */
         popupmenu(assetsFile: AssetsFile): void;
+        /**
+         * 保存对象
+         *
+         * @param object 对象
+         * @param callback
+         */
         saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsFile) => void): void;
         /**
          *
@@ -1888,7 +1905,7 @@ declare namespace editor {
          *
          * @param feng3dAssets
          */
-        addAssets(feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
+        addAssets(fileName: string, feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
         /**
          * 删除
          */
@@ -1897,9 +1914,9 @@ declare namespace editor {
         /**
          * 获取新子文件名称
          *
-         * @param basename 基础名称
+         * @param childName 基础名称
          */
-        getNewChildName(basename: string): string;
+        getNewChildFileName(childName: string): string;
         /**
          * 获取新子文件路径
          *

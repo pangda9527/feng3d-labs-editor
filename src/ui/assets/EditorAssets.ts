@@ -45,7 +45,7 @@ namespace editor
          */
         initproject(callback: () => void)
         {
-            assets.readObject(assetsFilePath, (err, object: { id: string, path: string, isDirectory: boolean }[]) =>
+            editorFS.readObject(assetsFilePath, (err, object: { id: string, path: string, isDirectory: boolean }[]) =>
             {
                 object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
 
@@ -83,7 +83,7 @@ namespace editor
                 return { id: element, path: this.assetsIDMap[element].path, isDirectory: this.assetsIDMap[element].isDirectory };
             });
 
-            assets.writeObject(assetsFilePath, object, callback);
+            editorFS.writeObject(assetsFilePath, object, callback);
         }
 
         /**
@@ -114,10 +114,14 @@ namespace editor
 
             if (assetsFile.isDirectory)
             {
-                callback && callback();
+                editorFS.mkdir(assetsFile.path, (err) =>
+                {
+                    if (err) feng3d.assert(!err);
+                    callback && callback();
+                });
                 return;
             }
-            assets.writeObject(assetsFile.path, assetsFile.feng3dAssets, (err) =>
+            editorFS.writeObject(assetsFile.path, assetsFile.feng3dAssets, (err) =>
             {
                 feng3d.assert(!err, `资源 ${assetsFile.path} 保存失败！`);
                 callback && callback();
@@ -137,7 +141,7 @@ namespace editor
             delete editorAssets.assetsIDMap[assetsFile.id];
             delete editorAssets.assetsPathMap[assetsFile.path];
 
-            assets.deleteFile(assetsFile.path);
+            editorFS.deleteFile(assetsFile.path);
 
             this.saveProject();
 
@@ -158,7 +162,7 @@ namespace editor
          */
         getScripts()
         {
-            var files = editorAssets.assetsIDMap
+            var files = editorAssets.assetsIDMap;
             var tslist: feng3d.ScriptFile[] = [];
             for (const key in files)
             {
@@ -171,9 +175,19 @@ namespace editor
             return tslist;
         }
 
+        /**
+         * 获取指定类型资源
+         * @param type 资源类型
+         */
+        getAssetsByType<T extends feng3d.Feng3dAssets>(type: feng3d.Constructor<T>)
+        {
+            var assetsFiles = Object.keys(editorAssets.assetsIDMap).map(key => editorAssets.assetsIDMap[key]).filter(element => element.feng3dAssets instanceof type);
+            return assetsFiles;
+        }
+
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
-            assets.readObject(path, (err, object: feng3d.GameObject) =>
+            editorFS.readObject(path, (err, object: feng3d.GameObject) =>
             {
                 if (err)
                 {
@@ -201,55 +215,56 @@ namespace editor
                                 label: "文件夹", click: () =>
                                 {
                                     editorData.selectObject(assetsFile.addFolder("NewFolder"));
-                                    // editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.Feng3dFolder(), { name: assetsFile.getNewChildName("New Folder") })));
                                 }
                             },
                             {
                                 label: "脚本", click: () =>
                                 {
-                                    var name = assetsFile.getNewChildName("NewScript.ts");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.ScriptFile(), { name: name, textContent: assetsFileTemplates.getNewScript(name) })));
+                                    var fileName = assetsFile.getNewChildFileName("NewScript.ts");
+                                    var scriptName = fileName.split(".").shift();
+
+                                    editorData.selectObject(assetsFile.addAssets(fileName, Object.setValue(new feng3d.ScriptFile(), { textContent: assetsFileTemplates.getNewScript(scriptName) })));
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
-                                    var name = assetsFile.getNewChildName("NewShader.ts");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.ShaderFile(), { name: name, textContent: assetsFileTemplates.getNewShader(name) })));
+                                    var fileName = assetsFile.getNewChildFileName("NewShader.ts");
+                                    var shaderName = fileName.split(".").shift();
+
+
+                                    editorData.selectObject(assetsFile.addAssets(fileName, Object.setValue(new feng3d.ShaderFile(), { textContent: assetsFileTemplates.getNewShader(shaderName) })));
                                 }
                             },
                             {
                                 label: "js", click: () =>
                                 {
-                                    var name = assetsFile.getNewChildName("NewJs.js");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JSFile(), { name: name, textContent: "" })));
+                                    editorData.selectObject(assetsFile.addAssets("NewJs.js", new feng3d.JSFile()));
                                 }
                             },
                             {
                                 label: "Json", click: () =>
                                 {
-                                    var name = assetsFile.getNewChildName("New Json");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.JsonFile(), { name: name, textContent: "{}" })));
+                                    editorData.selectObject(assetsFile.addAssets("New Json.json", new feng3d.JsonFile()));
                                 }
                             },
                             {
                                 label: "文本", click: () =>
                                 {
-                                    var name = assetsFile.getNewChildName("New Text");
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.TextFile(), { name: name, textContent: "" })));
+                                    editorData.selectObject(assetsFile.addAssets("New Text.txt", new feng3d.TextFile()));
                                 }
                             },
                             { type: "separator" },
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.TextureCube(), { name: assetsFile.getNewChildName("New TextureCube") })));
+                                    editorData.selectObject(assetsFile.addAssets("new TextureCube.json", new feng3d.TextureCube()));
                                 }
                             },
                             {
                                 label: "材质", click: () =>
                                 {
-                                    editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.Material(), { name: assetsFile.getNewChildName("New Material") })));
+                                    editorData.selectObject(assetsFile.addAssets("New Material.json", new feng3d.Material()));
                                 }
                             },
                             {
@@ -258,49 +273,49 @@ namespace editor
                                     {
                                         label: "平面", click: () =>
                                         {
-                                            editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.PlaneGeometry(), { name: assetsFile.getNewChildName("New PlaneGeometry") })));
+                                            editorData.selectObject(assetsFile.addAssets("New PlaneGeometry.json", new feng3d.PlaneGeometry()));
                                         }
                                     },
                                     {
                                         label: "立方体", click: () =>
                                         {
-                                            editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.CubeGeometry(), { name: assetsFile.getNewChildName("New CubeGeometry") })));
+                                            editorData.selectObject(assetsFile.addAssets("New CubeGeometry.json", new feng3d.CubeGeometry()));
                                         }
                                     },
                                     {
                                         label: "球体", click: () =>
                                         {
-                                            editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.SphereGeometry(), { name: assetsFile.getNewChildName("New SphereGeometry") })));
+                                            editorData.selectObject(assetsFile.addAssets("New SphereGeometry.json", new feng3d.SphereGeometry()));
                                         }
                                     },
                                     {
                                         label: "胶囊体", click: () =>
                                         {
-                                            editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.CapsuleGeometry(), { name: assetsFile.getNewChildName("New CapsuleGeometry") })));
+                                            editorData.selectObject(assetsFile.addAssets("New CapsuleGeometry.json", new feng3d.CapsuleGeometry()));
                                         }
                                     },
                                     {
                                         label: "圆柱体", click: () =>
                                         {
-                                            editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.CylinderGeometry(), { name: assetsFile.getNewChildName("New CylinderGeometry") })));
+                                            editorData.selectObject(assetsFile.addAssets("New CylinderGeometry.json", new feng3d.CylinderGeometry()));
                                         }
                                     },
                                     {
                                         label: "圆锥体", click: () =>
                                         {
-                                            editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.ConeGeometry(), { name: assetsFile.getNewChildName("New ConeGeometry") })));
+                                            editorData.selectObject(assetsFile.addAssets("New ConeGeometry.json", new feng3d.ConeGeometry()));
                                         }
                                     },
                                     {
                                         label: "圆环", click: () =>
                                         {
-                                            editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.TorusGeometry(), { name: assetsFile.getNewChildName("New TorusGeometry") })));
+                                            editorData.selectObject(assetsFile.addAssets("New TorusGeometry.json", new feng3d.TorusGeometry()));
                                         }
                                     },
                                     {
                                         label: "地形", click: () =>
                                         {
-                                            editorData.selectObject(assetsFile.addAssets(Object.setValue(new feng3d.TerrainGeometry(), { name: assetsFile.getNewChildName("New TerrainGeometry") })));
+                                            editorData.selectObject(assetsFile.addAssets("New TerrainGeometry.json", new feng3d.TerrainGeometry()));
                                         }
                                     },
                                 ],
@@ -311,7 +326,7 @@ namespace editor
                     {
                         label: "导入资源", click: () =>
                         {
-                            assets.selectFile((fileList: FileList) =>
+                            editorFS.selectFile((fileList: FileList) =>
                             {
                                 var files = [];
                                 for (let i = 0; i < fileList.length; i++)
@@ -380,9 +395,17 @@ namespace editor
             menu.popup(menuconfig);
         }
 
+        /**
+         * 保存对象
+         * 
+         * @param object 对象
+         * @param callback 
+         */
         saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsFile) => void)
         {
-            var assetsFile = this.showFloder.addAssets(object);
+            feng3d.error(`未实现`);
+
+            var assetsFile = this.showFloder.addAssets(object.name, object);
             callback && callback(assetsFile);
         }
 
@@ -410,11 +433,11 @@ namespace editor
                 {
                     var imagePath = showFloder.getNewChildPath(file.name);
 
-                    assets.writeArrayBuffer(imagePath, result, err =>
+                    editorFS.writeArrayBuffer(imagePath, result, err =>
                     {
                         var urlImageTexture2D = Object.setValue(new feng3d.UrlImageTexture2D(), { name: file.name })
                         urlImageTexture2D.url = imagePath;
-                        var assetsFile = showFloder.addAssets(urlImageTexture2D);
+                        var assetsFile = showFloder.addAssets(file.name, urlImageTexture2D);
                         assetsFiles.push(assetsFile);
                         this.inputFiles(files, callback, assetsFiles);
                     });
@@ -440,7 +463,7 @@ namespace editor
 
         runProjectScript(callback?: () => void)
         {
-            assets.readString("project.js", (err, content) =>
+            editorFS.readString("project.js", (err, content) =>
             {
                 if (content != this._preProjectJsContent)
                 {
@@ -476,8 +499,8 @@ namespace editor
         {
             if (assetsFile.feng3dAssets instanceof feng3d.Feng3dFile)
             {
-                var extensions = feng3d.pathUtils.getExtension(assetsFile.feng3dAssets.path);
-                var filePath = assetsFile.feng3dAssets.path;
+                var extensions = feng3d.pathUtils.getExtension(assetsFile.path);
+                var filePath = assetsFile.path;
                 switch (extensions)
                 {
                     case "mdl": menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(filePath) }); break;

@@ -21,7 +21,7 @@
         "libs/FileSaver.d.ts",
         //
         "src/assets/FileObject.ts",
-        "src/assets/io.ts",
+        "src/assets/EditorFS.ts",
         //
         "src/caches/Editorcache.ts",
         //

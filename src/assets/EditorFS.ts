@@ -3,9 +3,15 @@ declare var __dirname: string;
 
 namespace editor
 {
-    export var assets: EditorAssets1;
+    /**
+     * 编辑器文件系统
+     */
+    export var editorFS: EditorFS;
 
-    export class EditorAssets1 extends feng3d.ReadWriteAssets
+    /**
+     * 编辑器文件系统
+     */
+    export class EditorFS extends feng3d.ReadWriteAssets
     {
         constructor(readWriteFS?: feng3d.ReadWriteFS)
         {
@@ -100,7 +106,7 @@ namespace editor
          */
         createproject(projectname: string, callback: () => void)
         {
-            assets.initproject(projectname, () =>
+            editorFS.initproject(projectname, () =>
             {
                 //
                 var zip = new JSZip();
@@ -126,12 +132,12 @@ namespace editor
                                 var file = zip.files[filepath];
                                 if (file.dir)
                                 {
-                                    assets.mkdir(filepath, readfiles);
+                                    editorFS.mkdir(filepath, readfiles);
                                 } else
                                 {
                                     file.async("arraybuffer").then((data) =>
                                     {
-                                        assets.writeArrayBuffer(filepath, data, (err: Error) =>
+                                        editorFS.writeArrayBuffer(filepath, data, (err: Error) =>
                                         {
                                             if (err)
                                                 console.log(err);
@@ -192,12 +198,12 @@ namespace editor
                             var file = zip.files[filepath];
                             if (file.dir)
                             {
-                                assets.mkdir(filepath, readfiles);
+                                editorFS.mkdir(filepath, readfiles);
                             } else
                             {
                                 file.async("arraybuffer").then((data) =>
                                 {
-                                    assets.writeArrayBuffer(filepath, data, (err: Error) =>
+                                    editorFS.writeArrayBuffer(filepath, data, (err: Error) =>
                                     {
                                         if (err)
                                             console.log(err);
@@ -235,7 +241,7 @@ namespace editor
         exportProject(callback: (err: Error, data: Blob) => void)
         {
             var zip = new JSZip();
-            assets.getAllfilepathInFolder("", (err, filepaths) =>
+            editorFS.getAllfilepathInFolder("", (err, filepaths) =>
             {
                 readfiles();
                 function readfiles()
@@ -243,7 +249,7 @@ namespace editor
                     if (filepaths.length > 0)
                     {
                         var filepath = filepaths.shift();
-                        assets.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        editorFS.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                         {
                             //处理文件夹
                             data && zip.file(filepath, data);
@@ -279,7 +285,7 @@ namespace editor
                         var filepath = filepaths.shift();
                         if (value.files[filepath].dir)
                         {
-                            assets.mkdir(filepath, (err) =>
+                            editorFS.mkdir(filepath, (err) =>
                             {
                                 writeFiles();
                             });
@@ -287,7 +293,7 @@ namespace editor
                         {
                             zip.file(filepath).async("arraybuffer").then((data) =>
                             {
-                                assets.writeArrayBuffer(filepath, data, (err) =>
+                                editorFS.writeArrayBuffer(filepath, data, (err) =>
                                 {
                                     writeFiles();
                                 });
@@ -306,11 +312,11 @@ namespace editor
 
     if (typeof require == "undefined")
     {
-        feng3d.assets = assets = new EditorAssets1(feng3d.indexedDBfs);
+        feng3d.assets = editorFS = new EditorFS(feng3d.indexedDBfs);
     } else
     {
         var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
-        feng3d.assets = assets = new EditorAssets1(nativeFS);
+        feng3d.assets = editorFS = new EditorFS(nativeFS);
     }
 
     //
