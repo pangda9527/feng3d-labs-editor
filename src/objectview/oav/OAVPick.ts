@@ -88,7 +88,7 @@ namespace editor
                 {
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
 
-                    var audioFiles = editorAssets.getAssetsByType(feng3d.AudioFile);
+                    var audioFiles = editorAssetsManager.getAssetsByType(feng3d.AudioFile);
                     audioFiles.forEach(item =>
                     {
                         menus.push({

@@ -91,7 +91,7 @@ namespace editor
             {
                 this.image = "file_png";
             }
-            editorAssets.addAssets(this);
+            editorAssetsManager.addAssets(this);
         }
 
         /**
@@ -173,16 +173,6 @@ namespace editor
         }
 
         /**
-         * 保存
-         * 
-         * @param callback 完成回调函数
-         */
-        save(callback?: () => void)
-        {
-            editorAssets.saveAssets(this, callback);
-        }
-
-        /**
          * 新增文件夹
          * 
          * @param folderName 文件夹名称
@@ -193,7 +183,7 @@ namespace editor
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(this.path, newName);
 
             var assetsFile = new AssetsFile(feng3d.FMath.uuid(), newFolderPath, true);
-            assetsFile.save();
+            editorAssetsManager.saveAssets(assetsFile);
             this.addChild(assetsFile);
             return assetsFile;
         }
@@ -210,7 +200,7 @@ namespace editor
             var assetsFile = new AssetsFile(feng3d.FMath.uuid(), path, false);
             feng3dAssets.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dAssets;
-            assetsFile.save();
+            editorAssetsManager.saveAssets(assetsFile);
             this.addChild(assetsFile);
             return assetsFile;
         }
@@ -226,7 +216,7 @@ namespace editor
             });
             this.remove();
 
-            editorAssets.deleteAssets(this);
+            editorAssetsManager.deleteAssets(this);
         }
 
         getFolderList(includeClose = false)

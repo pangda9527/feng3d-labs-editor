@@ -68,7 +68,7 @@ namespace editor
 
         getScripts()
         {
-            var tslist = editorAssets.getScripts();
+            var tslist = editorAssetsManager.getScripts();
 
             this.tssort(tslist);
 

@@ -1710,26 +1710,40 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    var editorAssets: EditorAssets;
-    class EditorAssets {
+    /**
+     * 资源字典表存储路径
+     */
+    const assetsFilePath = "assets.json";
+    /**
+     * 编辑器资源管理器
+     */
+    var editorAssetsManager: EditorAssetsManager;
+    /**
+     * 编辑器资源管理器
+     */
+    class EditorAssetsManager {
         /**
          * 资源ID字典
          */
-        private assetsIDMap;
+        private _assetsIDMap;
         /**
-         * 显示文件夹
+         * 根据资源编号获取文件
+         *
+         * @param assetsId 文件路径
          */
-        showFloder: AssetsFile;
+        getAssetsByID(assetsId: string): AssetsFile;
         /**
-         * 项目资源id树形结构
+         * 根据路径获取资源
+         *
+         * @param assetsPath 资源路径
          */
-        rootFile: AssetsFile;
-        constructor();
+        getAssetsByPath(assetsPath: string): AssetsFile;
         /**
-         * 初始化项目
-         * @param callback
+         * 删除资源
+         *
+         * @param assetsFile 资源
          */
-        initproject(callback: () => void): void;
+        deleteAssets(assetsFile: AssetsFile): void;
         /**
          * 保存项目
          * @param callback 完成回调
@@ -1749,24 +1763,6 @@ declare namespace editor {
          */
         saveAssets(assetsFile: AssetsFile, callback?: () => void): void;
         /**
-         * 删除资源
-         *
-         * @param assetsFile 资源
-         */
-        deleteAssets(assetsFile: AssetsFile): void;
-        /**
-         * 根据资源编号获取文件
-         *
-         * @param assetsId 文件路径
-         */
-        getAssetsByID(assetsId: string): AssetsFile;
-        /**
-         * 根据路径获取资源
-         *
-         * @param assetsPath 资源路径
-         */
-        getAssetsByPath(assetsPath: string): AssetsFile;
-        /**
          * 获取脚本列表
          */
         getScripts(): feng3d.ScriptFile[];
@@ -1775,6 +1771,25 @@ declare namespace editor {
          * @param type 资源类型
          */
         getAssetsByType<T extends feng3d.Feng3dAssets>(type: feng3d.Constructor<T>): AssetsFile[];
+    }
+}
+declare namespace editor {
+    var editorAssets: EditorAssets;
+    class EditorAssets {
+        /**
+         * 显示文件夹
+         */
+        showFloder: AssetsFile;
+        /**
+         * 项目资源id树形结构
+         */
+        rootFile: AssetsFile;
+        constructor();
+        /**
+         * 初始化项目
+         * @param callback
+         */
+        initproject(callback: () => void): void;
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void): void;
         /**
          * 弹出文件菜单
@@ -1891,12 +1906,6 @@ declare namespace editor {
          * 更新缩略图
          */
         updateImage(): void;
-        /**
-         * 保存
-         *
-         * @param callback 完成回调函数
-         */
-        save(callback?: () => void): void;
         /**
          * 新增文件夹
          *
