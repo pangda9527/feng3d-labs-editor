@@ -888,7 +888,7 @@ var editor;
                 if (element instanceof feng3d.GameObject) {
                     element.remove();
                 }
-                else if (element instanceof editor.AssetsFile) {
+                else if (element instanceof editor.AssetsNode) {
                     element.delete();
                 }
             });
@@ -6245,7 +6245,7 @@ var editor;
                 this._view.parent.removeChild(this._view);
             }
             if (this._viewData) {
-                if (this._viewData instanceof editor.AssetsFile) {
+                if (this._viewData instanceof editor.AssetsNode) {
                     if (this._viewData.isDirectory)
                         return;
                     if (this._viewData.feng3dAssets) {
@@ -6278,7 +6278,7 @@ var editor;
                         assetsFile && editor.editorAssets.saveAssets(assetsFile);
                     }
                 }
-                else if (this._viewData instanceof editor.AssetsFile) {
+                else if (this._viewData instanceof editor.AssetsNode) {
                     editor.editorAssets.saveAssets(assetsFile);
                 }
                 this._dataChanged = false;
@@ -6329,7 +6329,7 @@ var editor;
                     assetsFile && assetsFile.updateImage();
                 }
             }
-            else if (this._viewData instanceof editor.AssetsFile) {
+            else if (this._viewData instanceof editor.AssetsNode) {
                 this._viewData.updateImage();
             }
         };
@@ -6358,7 +6358,7 @@ var editor;
                 return objects[0];
             var data = {};
             objects.forEach(function (element) {
-                if (element instanceof editor.AssetsFile) {
+                if (element instanceof editor.AssetsNode) {
                     element = element.feng3dAssets;
                 }
                 var type = feng3d.classUtils.getQualifiedClassName(element);
@@ -6550,7 +6550,7 @@ var editor;
                 object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
                 feng3d.assetsIDPathMap.init();
                 var files = object.map(function (element) {
-                    var file = new editor.AssetsFile(element.id, element.path, element.isDirectory);
+                    var file = new editor.AssetsNode(element.id, element.path, element.isDirectory);
                     feng3d.assetsIDPathMap.addIDPathMap(element.id, element.path);
                     _this._assetsIDMap[element.id] = file;
                     return file;
@@ -6699,7 +6699,7 @@ var editor;
         EditorAssets.prototype.createFolder = function (parentAssets, folderName) {
             var newName = parentAssets.getNewChildFileName(folderName);
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentAssets.path, newName);
-            var assetsFile = new editor.AssetsFile(feng3d.FMath.uuid(), newFolderPath, true);
+            var assetsFile = new editor.AssetsNode(feng3d.FMath.uuid(), newFolderPath, true);
             this._assetsIDMap[assetsFile.id] = assetsFile;
             feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, assetsFile.path);
             this.saveProject();
@@ -6714,7 +6714,7 @@ var editor;
          */
         EditorAssets.prototype.createAssets = function (parentAssets, fileName, feng3dAssets) {
             var path = parentAssets.getNewChildPath(fileName);
-            var assetsFile = new editor.AssetsFile(feng3d.FMath.uuid(), path, false);
+            var assetsFile = new editor.AssetsNode(feng3d.FMath.uuid(), path, false);
             feng3dAssets.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.isLoaded = true;
@@ -7165,15 +7165,15 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var AssetsFile = /** @class */ (function (_super) {
-        __extends(AssetsFile, _super);
+    var AssetsNode = /** @class */ (function (_super) {
+        __extends(AssetsNode, _super);
         /**
          * 构建
          *
          * @param id 编号
          * @param path 路径
          */
-        function AssetsFile(id, path, isDirectory) {
+        function AssetsNode(id, path, isDirectory) {
             var _this = _super.call(this) || this;
             _this.children = [];
             /**
@@ -7197,7 +7197,7 @@ var editor;
             }
             return _this;
         }
-        Object.defineProperty(AssetsFile.prototype, "id", {
+        Object.defineProperty(AssetsNode.prototype, "id", {
             /**
              * 编号
              */
@@ -7210,14 +7210,14 @@ var editor;
          *
          * @param callback 加载完成回调
          */
-        AssetsFile.prototype.loadMeta = function (callback) {
+        AssetsNode.prototype.loadMeta = function (callback) {
         };
         /**
          * 加载
          *
          * @param callback 加载完成回调
          */
-        AssetsFile.prototype.load = function (callback) {
+        AssetsNode.prototype.load = function (callback) {
             var _this = this;
             if (this.isLoaded) {
                 callback && callback();
@@ -7241,7 +7241,7 @@ var editor;
         /**
          * 更新缩略图
          */
-        AssetsFile.prototype.updateImage = function () {
+        AssetsNode.prototype.updateImage = function () {
             var _this = this;
             if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D) {
                 var texture = this.feng3dAssets;
@@ -7274,7 +7274,7 @@ var editor;
         /**
          * 删除
          */
-        AssetsFile.prototype.delete = function () {
+        AssetsNode.prototype.delete = function () {
             this.children.forEach(function (element) {
                 element.delete();
             });
@@ -7286,7 +7286,7 @@ var editor;
          *
          * @param includeClose 是否包含关闭的文件夹
          */
-        AssetsFile.prototype.getFolderList = function (includeClose) {
+        AssetsNode.prototype.getFolderList = function (includeClose) {
             if (includeClose === void 0) { includeClose = false; }
             var folders = [];
             if (this.isDirectory) {
@@ -7303,7 +7303,7 @@ var editor;
         /**
          * 获取文件列表
          */
-        AssetsFile.prototype.getFileList = function () {
+        AssetsNode.prototype.getFileList = function () {
             var files = [];
             files.push(this);
             this.children.forEach(function (v) {
@@ -7317,7 +7317,7 @@ var editor;
          *
          * @param childName 基础名称
          */
-        AssetsFile.prototype.getNewChildFileName = function (childName) {
+        AssetsNode.prototype.getNewChildFileName = function (childName) {
             var childrenNames = this.children.map(function (v) { return feng3d.pathUtils.getNameWithExtension(v.path); });
             if (childrenNames.indexOf(childName) == -1)
                 return childName;
@@ -7338,7 +7338,7 @@ var editor;
          *
          * @param basename 基础名称
          */
-        AssetsFile.prototype.getNewChildPath = function (basename) {
+        AssetsNode.prototype.getNewChildPath = function (basename) {
             var newName = this.getNewChildFileName(basename);
             var path = feng3d.pathUtils.getChildFilePath(this.path, newName);
             return path;
@@ -7350,7 +7350,7 @@ var editor;
          * @param arraybuffer 文件数据
          * @param callback 完成回调
          */
-        AssetsFile.prototype.addfileFromArrayBuffer = function (filename, arraybuffer, override, callback) {
+        AssetsNode.prototype.addfileFromArrayBuffer = function (filename, arraybuffer, override, callback) {
             var _this = this;
             if (override === void 0) { override = false; }
             var feng3dFile = Object.setValue(new feng3d.ArrayBufferFile(), { name: filename, arraybuffer: arraybuffer });
@@ -7365,7 +7365,7 @@ var editor;
         /**
          * 导出
          */
-        AssetsFile.prototype.export = function () {
+        AssetsNode.prototype.export = function () {
             var zip = new JSZip();
             var path = this.path;
             if (!feng3d.pathUtils.isDirectory(path))
@@ -7392,10 +7392,10 @@ var editor;
         };
         __decorate([
             feng3d.serialize
-        ], AssetsFile.prototype, "children", void 0);
-        return AssetsFile;
+        ], AssetsNode.prototype, "children", void 0);
+        return AssetsNode;
     }(editor.TreeNode));
-    editor.AssetsFile = AssetsFile;
+    editor.AssetsNode = AssetsNode;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -8403,7 +8403,7 @@ var editor;
                 if (this._selectedAssetsFileInvalid) {
                     this._selectedAssetsFile.length = 0;
                     this._selectedObjects.forEach(function (v) {
-                        if (v instanceof editor.AssetsFile)
+                        if (v instanceof editor.AssetsNode)
                             _this._selectedAssetsFile.push(v);
                     });
                     this._selectedAssetsFileInvalid = false;

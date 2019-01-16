@@ -4,7 +4,7 @@ namespace editor
     {
         public icon: eui.Image;
 
-        data: AssetsFile;
+        data: AssetsNode;
         itemSelected = false;
 
         constructor()
@@ -176,5 +176,5 @@ namespace editor
             }
         }
     }
-    var preAssetsFile: AssetsFile;
+    var preAssetsFile: AssetsNode;
 }

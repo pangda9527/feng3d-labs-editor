@@ -168,7 +168,7 @@ namespace editor
                 if (element instanceof feng3d.GameObject)
                 {
                     element.remove();
-                } else if (element instanceof AssetsFile)
+                } else if (element instanceof AssetsNode)
                 {
                     element.delete();
                 }

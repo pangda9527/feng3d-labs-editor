@@ -5,7 +5,7 @@ namespace editor
         public contentGroup: eui.Group;
         public disclosureButton: eui.ToggleButton;
 
-        data: AssetsFile;
+        data: AssetsNode;
 
         constructor()
         {

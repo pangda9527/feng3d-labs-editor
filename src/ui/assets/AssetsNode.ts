@@ -8,7 +8,7 @@ namespace editor
         loaded
     }
 
-    export interface AssetsFile
+    export interface AssetsNode
     {
         once<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => void, thisObject?: any, priority?: number): void;
         dispatch<K extends keyof AssetsFileEventMap>(type: K, data?: AssetsFileEventMap[K], bubbles?: boolean): feng3d.Event<AssetsFileEventMap[K]>;
@@ -17,7 +17,7 @@ namespace editor
         off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any);
     }
 
-    export class AssetsFile extends TreeNode
+    export class AssetsNode extends TreeNode
     {
         /**
          * 编号
@@ -46,9 +46,9 @@ namespace editor
         label: string;
 
         @feng3d.serialize
-        children: AssetsFile[] = [];
+        children: AssetsNode[] = [];
 
-        parent: AssetsFile;
+        parent: AssetsNode;
 
         feng3dAssets: feng3d.Feng3dAssets;
 
@@ -202,7 +202,7 @@ namespace editor
          */
         getFolderList(includeClose = false)
         {
-            var folders: AssetsFile[] = [];
+            var folders: AssetsNode[] = [];
             if (this.isDirectory)
             {
                 folders.push(this);
@@ -223,7 +223,7 @@ namespace editor
          */
         getFileList()
         {
-            var files: AssetsFile[] = [];
+            var files: AssetsNode[] = [];
             files.push(this);
             this.children.forEach(v =>
             {
@@ -277,7 +277,7 @@ namespace editor
          * @param arraybuffer 文件数据
          * @param callback 完成回调
          */
-        addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsFile) => void)
+        addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsNode) => void)
         {
             var feng3dFile = Object.setValue(new feng3d.ArrayBufferFile(), { name: filename, arraybuffer: arraybuffer });
 

@@ -42,7 +42,7 @@ namespace editor
 			}
 			if (this._viewData)
 			{
-				if (this._viewData instanceof AssetsFile)
+				if (this._viewData instanceof AssetsNode)
 				{
 					if (this._viewData.isDirectory) return;
 					if (this._viewData.feng3dAssets)
@@ -82,7 +82,7 @@ namespace editor
 						var assetsFile = editorAssets.getAssetsByID(this._viewData.assetsId);
 						assetsFile && editorAssets.saveAssets(assetsFile);
 					}
-				} else if (this._viewData instanceof AssetsFile)
+				} else if (this._viewData instanceof AssetsNode)
 				{
 					editorAssets.saveAssets(assetsFile);
 				}
@@ -157,7 +157,7 @@ namespace editor
 					var assetsFile = editorAssets.getAssetsByID(this._viewData.assetsId);
 					assetsFile && assetsFile.updateImage();
 				}
-			} else if (this._viewData instanceof AssetsFile)
+			} else if (this._viewData instanceof AssetsNode)
 			{
 				this._viewData.updateImage();
 			}

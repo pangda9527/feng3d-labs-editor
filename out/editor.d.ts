@@ -229,7 +229,7 @@ declare namespace editor {
         /**
          * 文件
          */
-        assetsFiles?: AssetsFile[];
+        assetsFiles?: AssetsNode[];
         /**
          * 声音路径
          */
@@ -1719,11 +1719,11 @@ declare namespace editor {
         /**
          * 显示文件夹
          */
-        showFloder: AssetsFile;
+        showFloder: AssetsNode;
         /**
          * 项目资源id树形结构
          */
-        rootFile: AssetsFile;
+        rootFile: AssetsNode;
         constructor();
         /**
          * 初始化项目
@@ -1736,19 +1736,19 @@ declare namespace editor {
          *
          * @param assetsId 文件路径
          */
-        getAssetsByID(assetsId: string): AssetsFile;
+        getAssetsByID(assetsId: string): AssetsNode;
         /**
          * 根据路径获取资源
          *
          * @param assetsPath 资源路径
          */
-        getAssetsByPath(assetsPath: string): AssetsFile;
+        getAssetsByPath(assetsPath: string): AssetsNode;
         /**
          * 删除资源
          *
          * @param assetsFile 资源
          */
-        deleteAssets(assetsFile: AssetsFile): void;
+        deleteAssets(assetsFile: AssetsNode): void;
         /**
          * 保存项目
          * @param callback 完成回调
@@ -1760,7 +1760,7 @@ declare namespace editor {
          * @param assetsFile 资源
          * @param callback 完成回调
          */
-        saveAssets(assetsFile: AssetsFile, callback?: () => void): void;
+        saveAssets(assetsFile: AssetsNode, callback?: () => void): void;
         /**
          * 移动资源
          *
@@ -1768,7 +1768,7 @@ declare namespace editor {
          * @param newPath 新路径
          * @param callback 回调函数，当文件系统中文件全部移动完成后调用
          */
-        moveAssets(assetsFile: AssetsFile, newPath: string, callback?: (err?: Error) => void): void;
+        moveAssets(assetsFile: AssetsNode, newPath: string, callback?: (err?: Error) => void): void;
         /**
          * 获取脚本列表
          */
@@ -1777,37 +1777,37 @@ declare namespace editor {
          * 获取指定类型资源
          * @param type 资源类型
          */
-        getAssetsByType<T extends feng3d.Feng3dAssets>(type: feng3d.Constructor<T>): AssetsFile[];
+        getAssetsByType<T extends feng3d.Feng3dAssets>(type: feng3d.Constructor<T>): AssetsNode[];
         /**
          * 新增文件夹
          *
          * @param folderName 文件夹名称
          */
-        createFolder(parentAssets: AssetsFile, folderName: string): AssetsFile;
+        createFolder(parentAssets: AssetsNode, folderName: string): AssetsNode;
         /**
          * 新增资源
          *
          * @param feng3dAssets
          */
-        createAssets(parentAssets: AssetsFile, fileName: string, feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
+        createAssets(parentAssets: AssetsNode, fileName: string, feng3dAssets: feng3d.Feng3dAssets): AssetsNode;
         /**
          * 弹出文件菜单
          */
-        popupmenu(assetsFile: AssetsFile): void;
+        popupmenu(assetsFile: AssetsNode): void;
         /**
          * 保存对象
          *
          * @param object 对象
          * @param callback
          */
-        saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsFile) => void): void;
+        saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsNode) => void): void;
         /**
          *
          * @param files 需要导入的文件列表
          * @param callback 完成回调
          * @param assetsFiles 生成资源文件列表（不用赋值，函数递归时使用）
          */
-        inputFiles(files: File[], callback?: (files: AssetsFile[]) => void, assetsFiles?: AssetsFile[]): void;
+        inputFiles(files: File[], callback?: (files: AssetsNode[]) => void, assetsFiles?: AssetsNode[]): void;
         runProjectScript(callback?: () => void): void;
         /**
          * 上次执行的项目脚本
@@ -1826,7 +1826,7 @@ declare namespace editor {
 declare namespace editor {
     class AssetsFileItemRenderer extends eui.ItemRenderer {
         icon: eui.Image;
-        data: AssetsFile;
+        data: AssetsNode;
         itemSelected: boolean;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
@@ -1861,14 +1861,14 @@ declare namespace editor {
          */
         loaded: any;
     }
-    interface AssetsFile {
+    interface AssetsNode {
         once<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => void, thisObject?: any, priority?: number): void;
         dispatch<K extends keyof AssetsFileEventMap>(type: K, data?: AssetsFileEventMap[K], bubbles?: boolean): feng3d.Event<AssetsFileEventMap[K]>;
         has<K extends keyof AssetsFileEventMap>(type: K): boolean;
         on<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
         off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any): any;
     }
-    class AssetsFile extends TreeNode {
+    class AssetsNode extends TreeNode {
         /**
          * 编号
          */
@@ -1890,8 +1890,8 @@ declare namespace editor {
          * 显示标签
          */
         label: string;
-        children: AssetsFile[];
-        parent: AssetsFile;
+        children: AssetsNode[];
+        parent: AssetsNode;
         feng3dAssets: feng3d.Feng3dAssets;
         /**
          * 元标签，用于描述资源类型等信息
@@ -1937,11 +1937,11 @@ declare namespace editor {
          *
          * @param includeClose 是否包含关闭的文件夹
          */
-        getFolderList(includeClose?: boolean): AssetsFile[];
+        getFolderList(includeClose?: boolean): AssetsNode[];
         /**
          * 获取文件列表
          */
-        getFileList(): AssetsFile[];
+        getFileList(): AssetsNode[];
         /**
          * 获取新子文件名称
          *
@@ -1961,7 +1961,7 @@ declare namespace editor {
          * @param arraybuffer 文件数据
          * @param callback 完成回调
          */
-        addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override?: boolean, callback?: (e: Error, file: AssetsFile) => void): void;
+        addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override?: boolean, callback?: (e: Error, file: AssetsNode) => void): void;
         /**
          * 导出
          */
@@ -1972,7 +1972,7 @@ declare namespace editor {
     class AssetsTreeItemRenderer extends TreeItemRenderer {
         contentGroup: eui.Group;
         disclosureButton: eui.ToggleButton;
-        data: AssetsFile;
+        data: AssetsNode;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -2201,7 +2201,7 @@ declare namespace editor {
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
          */
-        readonly selectedObjects: (feng3d.GameObject | AssetsFile)[];
+        readonly selectedObjects: (feng3d.GameObject | AssetsNode)[];
         private _selectedObjects;
         clearSelectedObjects(): void;
         /**
@@ -2209,13 +2209,13 @@ declare namespace editor {
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectObject(object: (feng3d.GameObject | AssetsFile)): void;
+        selectObject(object: (feng3d.GameObject | AssetsNode)): void;
         /**
          * 选择对象
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectMultiObject(objs: (feng3d.GameObject | AssetsFile)[]): void;
+        selectMultiObject(objs: (feng3d.GameObject | AssetsNode)[]): void;
         /**
          * 使用的控制工具类型
          */
@@ -2249,7 +2249,7 @@ declare namespace editor {
         /**
          * 选中游戏对象列表
          */
-        readonly selectedAssetsFile: AssetsFile[];
+        readonly selectedAssetsFile: AssetsNode[];
         private _selectedAssetsFileInvalid;
         private _selectedAssetsFile;
         /**

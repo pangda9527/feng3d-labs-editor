@@ -58,7 +58,7 @@ namespace editor
 		/**
 		 * 文件
 		 */
-		assetsFiles?: AssetsFile[];
+		assetsFiles?: AssetsNode[];
 		/**
 		 * 声音路径
 		 */

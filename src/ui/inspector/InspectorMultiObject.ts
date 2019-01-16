@@ -17,7 +17,7 @@ namespace editor
             var data: { [type: string]: any[] } = {};
             objects.forEach(element =>
             {
-                if (element instanceof AssetsFile)
+                if (element instanceof AssetsNode)
                 {
                     element = element.feng3dAssets;
                 }

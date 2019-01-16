@@ -17,18 +17,18 @@ namespace editor
         /**
          * 资源ID字典
          */
-        private _assetsIDMap: { [id: string]: AssetsFile } = {};
+        private _assetsIDMap: { [id: string]: AssetsNode } = {};
 
         /**
          * 显示文件夹
          */
         @feng3d.watch("showFloderChanged")
-        showFloder: AssetsFile;
+        showFloder: AssetsNode;
 
         /**
          * 项目资源id树形结构
          */
-        rootFile: AssetsFile;
+        rootFile: AssetsNode;
 
         constructor()
         {
@@ -49,7 +49,7 @@ namespace editor
 
                 var files = object.map(element =>
                 {
-                    var file = new AssetsFile(element.id, element.path, element.isDirectory);
+                    var file = new AssetsNode(element.id, element.path, element.isDirectory);
                     feng3d.assetsIDPathMap.addIDPathMap(element.id, element.path);
                     this._assetsIDMap[element.id] = file;
                     return file;
@@ -113,7 +113,7 @@ namespace editor
          * 
          * @param assetsFile 资源
          */
-        deleteAssets(assetsFile: AssetsFile)
+        deleteAssets(assetsFile: AssetsNode)
         {
             feng3d.assert(!!this._assetsIDMap[assetsFile.id]);
 
@@ -147,7 +147,7 @@ namespace editor
          * @param assetsFile 资源
          * @param callback 完成回调
          */
-        saveAssets(assetsFile: AssetsFile, callback?: () => void)
+        saveAssets(assetsFile: AssetsNode, callback?: () => void)
         {
             feng3d.assert(!!this._assetsIDMap[assetsFile.id], `无法保存已经被删除的资源！`);
 
@@ -174,7 +174,7 @@ namespace editor
          * @param newPath 新路径
          * @param callback 回调函数，当文件系统中文件全部移动完成后调用
          */
-        moveAssets(assetsFile: AssetsFile, newPath: string, callback?: (err?: Error) => void)
+        moveAssets(assetsFile: AssetsNode, newPath: string, callback?: (err?: Error) => void)
         {
             if (feng3d.assetsIDPathMap.existPath(newPath))
             {
@@ -234,12 +234,12 @@ namespace editor
          * 
          * @param folderName 文件夹名称
          */
-        createFolder(parentAssets: AssetsFile, folderName: string)
+        createFolder(parentAssets: AssetsNode, folderName: string)
         {
             var newName = parentAssets.getNewChildFileName(folderName);
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentAssets.path, newName);
 
-            var assetsFile = new AssetsFile(feng3d.FMath.uuid(), newFolderPath, true);
+            var assetsFile = new AssetsNode(feng3d.FMath.uuid(), newFolderPath, true);
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
             feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, assetsFile.path);
@@ -256,11 +256,11 @@ namespace editor
          * 
          * @param feng3dAssets 
          */
-        createAssets(parentAssets: AssetsFile, fileName: string, feng3dAssets: feng3d.Feng3dAssets)
+        createAssets(parentAssets: AssetsNode, fileName: string, feng3dAssets: feng3d.Feng3dAssets)
         {
             var path = parentAssets.getNewChildPath(fileName);
 
-            var assetsFile = new AssetsFile(feng3d.FMath.uuid(), path, false);
+            var assetsFile = new AssetsNode(feng3d.FMath.uuid(), path, false);
             feng3dAssets.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.isLoaded = true;
@@ -278,7 +278,7 @@ namespace editor
         /**
          * 弹出文件菜单
          */
-        popupmenu(assetsFile: AssetsFile)
+        popupmenu(assetsFile: AssetsNode)
         {
             var menuconfig: MenuItem[] = [];
             if (assetsFile.isDirectory)
@@ -477,7 +477,7 @@ namespace editor
          * @param object 对象
          * @param callback 
          */
-        saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsFile) => void)
+        saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsNode) => void)
         {
             feng3d.error(`未实现`);
 
@@ -491,7 +491,7 @@ namespace editor
          * @param callback 完成回调
          * @param assetsFiles 生成资源文件列表（不用赋值，函数递归时使用）
          */
-        inputFiles(files: File[], callback?: (files: AssetsFile[]) => void, assetsFiles: AssetsFile[] = [])
+        inputFiles(files: File[], callback?: (files: AssetsNode[]) => void, assetsFiles: AssetsNode[] = [])
         {
             if (files.length == 0)
             {
@@ -571,7 +571,7 @@ namespace editor
          * @param menuconfig 菜单
          * @param assetsFile 文件
          */
-        private parserMenu(menuconfig: MenuItem[], assetsFile: AssetsFile)
+        private parserMenu(menuconfig: MenuItem[], assetsFile: AssetsNode)
         {
             if (assetsFile.feng3dAssets instanceof feng3d.Feng3dFile)
             {
