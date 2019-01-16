@@ -5825,7 +5825,7 @@ var editor;
                 }
                 else if (param.accepttype == "audio") {
                     var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
-                    var audioFiles = editor.editorAssetsManager.getAssetsByType(feng3d.AudioFile);
+                    var audioFiles = editor.editorAssets.getAssetsByType(feng3d.AudioFile);
                     audioFiles.forEach(function (item) {
                         menus.push({
                             label: item.label, click: function () {
@@ -6274,12 +6274,12 @@ var editor;
             if (this._dataChanged) {
                 if (this._viewData instanceof feng3d.Feng3dAssets) {
                     if (this._viewData.assetsId) {
-                        var assetsFile = editor.editorAssetsManager.getAssetsByID(this._viewData.assetsId);
-                        assetsFile && editor.editorAssetsManager.saveAssets(assetsFile);
+                        var assetsFile = editor.editorAssets.getAssetsByID(this._viewData.assetsId);
+                        assetsFile && editor.editorAssets.saveAssets(assetsFile);
                     }
                 }
                 else if (this._viewData instanceof editor.AssetsFile) {
-                    editor.editorAssetsManager.saveAssets(assetsFile);
+                    editor.editorAssets.saveAssets(assetsFile);
                 }
                 this._dataChanged = false;
             }
@@ -6325,7 +6325,7 @@ var editor;
             this._dataChanged = true;
             if (this._viewData instanceof feng3d.Feng3dAssets) {
                 if (this._viewData.assetsId) {
-                    var assetsFile = editor.editorAssetsManager.getAssetsByID(this._viewData.assetsId);
+                    var assetsFile = editor.editorAssets.getAssetsByID(this._viewData.assetsId);
                     assetsFile && assetsFile.updateImage();
                 }
             }
@@ -6523,23 +6523,68 @@ var editor;
     /**
      * 资源字典表存储路径
      */
-    editor.assetsFilePath = "assets.json";
+    var assetsFilePath = "assets.json";
     /**
-     * 编辑器资源管理器
+     * 资源文件夹路径
      */
-    var EditorAssetsManager = /** @class */ (function () {
-        function EditorAssetsManager() {
+    var AssetsPath = "Assets/";
+    var EditorAssets = /** @class */ (function () {
+        function EditorAssets() {
             /**
              * 资源ID字典
              */
             this._assetsIDMap = {};
+            /**
+             * 上次执行的项目脚本
+             */
+            this._preProjectJsContent = null;
+            feng3d.feng3dDispatcher.on("assets.parsed", this.onParsed, this);
         }
+        /**
+         * 初始化项目
+         * @param callback
+         */
+        EditorAssets.prototype.initproject = function (callback) {
+            var _this = this;
+            editor.editorFS.readObject(assetsFilePath, function (err, object) {
+                object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
+                feng3d.assetsIDPathMap.init();
+                var files = object.map(function (element) {
+                    var file = new editor.AssetsFile(element.id, element.path, element.isDirectory);
+                    feng3d.assetsIDPathMap.addIDPathMap(element.id, element.path);
+                    _this._assetsIDMap[element.id] = file;
+                    return file;
+                });
+                files.forEach(function (element) {
+                    var parentPath = feng3d.pathUtils.getParentPath(element.path);
+                    if (parentPath != "/" && parentPath.length > 0) {
+                        _this.getAssetsByPath(parentPath).addChild(element);
+                    }
+                });
+                _this.rootFile = _this.getAssetsByID(AssetsPath);
+                _this.showFloder = _this.rootFile;
+                _this.rootFile.on("added", function () { _this.saveProject(); });
+                _this.rootFile.on("removed", function () { _this.saveProject(); });
+                _this.rootFile.isOpen = true;
+                callback();
+            });
+        };
+        EditorAssets.prototype.readScene = function (path, callback) {
+            editor.editorFS.readObject(path, function (err, object) {
+                if (err) {
+                    callback(err, null);
+                    return;
+                }
+                var scene = object.getComponent(feng3d.Scene3D);
+                callback(null, scene);
+            });
+        };
         /**
          * 根据资源编号获取文件
          *
          * @param assetsId 文件路径
          */
-        EditorAssetsManager.prototype.getAssetsByID = function (assetsId) {
+        EditorAssets.prototype.getAssetsByID = function (assetsId) {
             return this._assetsIDMap[assetsId];
         };
         /**
@@ -6547,7 +6592,7 @@ var editor;
          *
          * @param assetsPath 资源路径
          */
-        EditorAssetsManager.prototype.getAssetsByPath = function (assetsPath) {
+        EditorAssets.prototype.getAssetsByPath = function (assetsPath) {
             var id = feng3d.assetsIDPathMap.getID(assetsPath);
             return this.getAssetsByID(id);
         };
@@ -6556,7 +6601,7 @@ var editor;
          *
          * @param assetsFile 资源
          */
-        EditorAssetsManager.prototype.deleteAssets = function (assetsFile) {
+        EditorAssets.prototype.deleteAssets = function (assetsFile) {
             feng3d.assert(!!this._assetsIDMap[assetsFile.id]);
             delete this._assetsIDMap[assetsFile.id];
             feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
@@ -6568,19 +6613,19 @@ var editor;
          * 保存项目
          * @param callback 完成回调
          */
-        EditorAssetsManager.prototype.saveProject = function (callback) {
+        EditorAssets.prototype.saveProject = function (callback) {
             var _this = this;
             var object = Object.keys(this._assetsIDMap).map(function (element) {
                 return { id: element, path: _this._assetsIDMap[element].path, isDirectory: _this._assetsIDMap[element].isDirectory };
             });
-            editor.editorFS.writeObject(editor.assetsFilePath, object, callback);
+            editor.editorFS.writeObject(assetsFilePath, object, callback);
         };
         /**
          * 新增资源
          *
          * @param assetsFile 资源
          */
-        EditorAssetsManager.prototype.addAssets = function (assetsFile) {
+        EditorAssets.prototype.addAssets = function (assetsFile) {
             //
             feng3d.assert(!this._assetsIDMap[assetsFile.id]);
             this._assetsIDMap[assetsFile.id] = assetsFile;
@@ -6593,7 +6638,7 @@ var editor;
          * @param assetsFile 资源
          * @param callback 完成回调
          */
-        EditorAssetsManager.prototype.saveAssets = function (assetsFile, callback) {
+        EditorAssets.prototype.saveAssets = function (assetsFile, callback) {
             feng3d.assert(!!this._assetsIDMap[assetsFile.id], "\u65E0\u6CD5\u4FDD\u5B58\u5DF2\u7ECF\u88AB\u5220\u9664\u7684\u8D44\u6E90\uFF01");
             if (assetsFile.isDirectory) {
                 editor.editorFS.mkdir(assetsFile.path, function (err) {
@@ -6614,7 +6659,7 @@ var editor;
          * @param assetsFile 资源文件
          * @param newPath 新路径
          */
-        EditorAssetsManager.prototype.moveAssets = function (assetsFile, newPath) {
+        EditorAssets.prototype.moveAssets = function (assetsFile, newPath) {
             var oldPath = assetsFile.path;
             editor.editorFS.move(oldPath, newPath);
             var files = assetsFile.getFileList();
@@ -6628,7 +6673,7 @@ var editor;
         /**
          * 获取脚本列表
          */
-        EditorAssetsManager.prototype.getScripts = function () {
+        EditorAssets.prototype.getScripts = function () {
             var files = this._assetsIDMap;
             var tslist = [];
             for (var key in files) {
@@ -6643,65 +6688,10 @@ var editor;
          * 获取指定类型资源
          * @param type 资源类型
          */
-        EditorAssetsManager.prototype.getAssetsByType = function (type) {
+        EditorAssets.prototype.getAssetsByType = function (type) {
             var _this = this;
             var assetsFiles = Object.keys(this._assetsIDMap).map(function (key) { return _this._assetsIDMap[key]; }).filter(function (element) { return element.feng3dAssets instanceof type; });
             return assetsFiles;
-        };
-        return EditorAssetsManager;
-    }());
-    editor.EditorAssetsManager = EditorAssetsManager;
-    editor.editorAssetsManager = new EditorAssetsManager();
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    /**
-     * 资源文件夹路径
-     */
-    var AssetsPath = "Assets/";
-    var EditorAssets = /** @class */ (function () {
-        function EditorAssets() {
-            /**
-             * 上次执行的项目脚本
-             */
-            this._preProjectJsContent = null;
-            feng3d.feng3dDispatcher.on("assets.parsed", this.onParsed, this);
-        }
-        /**
-         * 初始化项目
-         * @param callback
-         */
-        EditorAssets.prototype.initproject = function (callback) {
-            var _this = this;
-            editor.editorFS.readObject(editor.assetsFilePath, function (err, object) {
-                object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
-                feng3d.assetsIDPathMap.init();
-                var files = object.map(function (element) {
-                    return new editor.AssetsFile(element.id, element.path, element.isDirectory);
-                });
-                files.forEach(function (element) {
-                    var parentPath = feng3d.pathUtils.getParentPath(element.path);
-                    if (parentPath != "/" && parentPath.length > 0) {
-                        editor.editorAssetsManager.getAssetsByPath(parentPath).addChild(element);
-                    }
-                });
-                _this.rootFile = editor.editorAssetsManager.getAssetsByID(AssetsPath);
-                _this.showFloder = _this.rootFile;
-                _this.rootFile.on("added", function () { editor.editorAssetsManager.saveProject(); });
-                _this.rootFile.on("removed", function () { editor.editorAssetsManager.saveProject(); });
-                _this.rootFile.isOpen = true;
-                callback();
-            });
-        };
-        EditorAssets.prototype.readScene = function (path, callback) {
-            editor.editorFS.readObject(path, function (err, object) {
-                if (err) {
-                    callback(err, null);
-                    return;
-                }
-                var scene = object.getComponent(feng3d.Scene3D);
-                callback(null, scene);
-            });
         };
         /**
          * 弹出文件菜单
@@ -6852,7 +6842,7 @@ var editor;
                         imageUtil.clearBackColor(backColor);
                         feng3d.dataTransform.imagedataToImage(imageUtil.imageData, function (img) {
                             assetsFile.feng3dAssets["image"] = img;
-                            editor.editorAssetsManager.saveAssets(assetsFile);
+                            _this.saveAssets(assetsFile);
                         });
                     }
                 });
@@ -7129,6 +7119,18 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    /**
+     * 资源元数据
+     */
+    var AssetsMeta = /** @class */ (function () {
+        function AssetsMeta() {
+        }
+        return AssetsMeta;
+    }());
+    editor.AssetsMeta = AssetsMeta;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var AssetsFile = /** @class */ (function (_super) {
         __extends(AssetsFile, _super);
         /**
@@ -7159,7 +7161,6 @@ var editor;
             else {
                 _this.image = "file_png";
             }
-            editor.editorAssetsManager.addAssets(_this);
             return _this;
         }
         Object.defineProperty(AssetsFile.prototype, "id", {
@@ -7170,6 +7171,13 @@ var editor;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 加载元标签文件
+         *
+         * @param callback 加载完成回调
+         */
+        AssetsFile.prototype.loadMeta = function (callback) {
+        };
         /**
          * 加载
          *
@@ -7238,7 +7246,7 @@ var editor;
             var newName = this.getNewChildFileName(folderName);
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(this.path, newName);
             var assetsFile = new AssetsFile(feng3d.FMath.uuid(), newFolderPath, true);
-            editor.editorAssetsManager.saveAssets(assetsFile);
+            editor.editorAssets.saveAssets(assetsFile);
             this.addChild(assetsFile);
             return assetsFile;
         };
@@ -7253,7 +7261,7 @@ var editor;
             feng3dAssets.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.isLoaded = true;
-            editor.editorAssetsManager.saveAssets(assetsFile);
+            editor.editorAssets.saveAssets(assetsFile);
             this.addChild(assetsFile);
             return assetsFile;
         };
@@ -7265,7 +7273,7 @@ var editor;
                 element.delete();
             });
             this.remove();
-            editor.editorAssetsManager.deleteAssets(this);
+            editor.editorAssets.deleteAssets(this);
         };
         /**
          * 获取文件夹列表
@@ -7359,7 +7367,7 @@ var editor;
                 var oldDirPath = assetsFile.parent.path;
                 // 移动文件
                 var newPath = assetsFile.path.replace(oldDirPath, newDirPath);
-                editor.editorAssetsManager.moveAssets(assetsFile, newPath);
+                editor.editorAssets.moveAssets(assetsFile, newPath);
             }
             _super.prototype.addChild.call(this, assetsFile);
         };
@@ -7610,7 +7618,7 @@ var editor;
             editor.editorAssets.popupmenu(editor.editorAssets.showFloder);
         };
         AssetsView.prototype.onfloderpathTxtLink = function (evt) {
-            editor.editorAssets.showFloder = editor.editorAssetsManager.getAssetsByID(evt.text);
+            editor.editorAssets.showFloder = editor.editorAssets.getAssetsByID(evt.text);
         };
         AssetsView.prototype.onMouseDown = function (e) {
             if (e.target != this.filelist)
@@ -13671,7 +13679,7 @@ var editor;
             callback && callback("");
         };
         ScriptCompiler.prototype.getScripts = function () {
-            var tslist = editor.editorAssetsManager.getScripts();
+            var tslist = editor.editorAssets.getScripts();
             this.tssort(tslist);
             return tslist;
         };

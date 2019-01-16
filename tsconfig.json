@@ -106,9 +106,9 @@
         "src/ui/hierarchy/HierarchyTreeItemRenderer.ts",
         "src/ui/hierarchy/HierarchyView.ts",
         //
-        "src/ui/assets/EditorAssetsManager.ts",
         "src/ui/assets/EditorAssets.ts",
         "src/ui/assets/AssetsFileItemRenderer.ts",
+        "src/ui/assets/AssetsMeta.ts",
         "src/ui/assets/AssetsFile.ts",
         "src/ui/assets/AssetsTreeItemRenderer.ts",
         "src/ui/assets/AssetsView.ts",

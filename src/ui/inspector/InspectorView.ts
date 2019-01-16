@@ -79,12 +79,12 @@ namespace editor
 				{
 					if (this._viewData.assetsId)
 					{
-						var assetsFile = editorAssetsManager.getAssetsByID(this._viewData.assetsId);
-						assetsFile && editorAssetsManager.saveAssets(assetsFile);
+						var assetsFile = editorAssets.getAssetsByID(this._viewData.assetsId);
+						assetsFile && editorAssets.saveAssets(assetsFile);
 					}
 				} else if (this._viewData instanceof AssetsFile)
 				{
-					editorAssetsManager.saveAssets(assetsFile);
+					editorAssets.saveAssets(assetsFile);
 				}
 
 				this._dataChanged = false;
@@ -154,7 +154,7 @@ namespace editor
 			{
 				if (this._viewData.assetsId)
 				{
-					var assetsFile = editorAssetsManager.getAssetsByID(this._viewData.assetsId);
+					var assetsFile = editorAssets.getAssetsByID(this._viewData.assetsId);
 					assetsFile && assetsFile.updateImage();
 				}
 			} else if (this._viewData instanceof AssetsFile)

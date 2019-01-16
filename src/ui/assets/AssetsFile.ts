@@ -53,6 +53,11 @@ namespace editor
         feng3dAssets: feng3d.Feng3dAssets;
 
         /**
+         * 元标签，用于描述资源类型等信息
+         */
+        meta: AssetsMeta;
+
+        /**
          * 是否已加载
          */
         isLoaded = false;
@@ -88,7 +93,16 @@ namespace editor
             {
                 this.image = "file_png";
             }
-            editorAssetsManager.addAssets(this);
+        }
+
+        /**
+         * 加载元标签文件
+         * 
+         * @param callback 加载完成回调
+         */
+        loadMeta(callback?: () => void)
+        {
+
         }
 
         /**
@@ -178,7 +192,7 @@ namespace editor
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(this.path, newName);
 
             var assetsFile = new AssetsFile(feng3d.FMath.uuid(), newFolderPath, true);
-            editorAssetsManager.saveAssets(assetsFile);
+            editorAssets.saveAssets(assetsFile);
             this.addChild(assetsFile);
             return assetsFile;
         }
@@ -196,7 +210,7 @@ namespace editor
             feng3dAssets.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.isLoaded = true;
-            editorAssetsManager.saveAssets(assetsFile);
+            editorAssets.saveAssets(assetsFile);
             this.addChild(assetsFile);
             return assetsFile;
         }
@@ -212,7 +226,7 @@ namespace editor
             });
             this.remove();
 
-            editorAssetsManager.deleteAssets(this);
+            editorAssets.deleteAssets(this);
         }
 
         /**
@@ -329,7 +343,7 @@ namespace editor
 
                 // 移动文件
                 var newPath = assetsFile.path.replace(oldDirPath, newDirPath);
-                editorAssetsManager.moveAssets(assetsFile, newPath);
+                editorAssets.moveAssets(assetsFile, newPath);
             }
 
             super.addChild(assetsFile);
