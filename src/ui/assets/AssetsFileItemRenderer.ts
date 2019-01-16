@@ -56,7 +56,9 @@ namespace editor
                         {
                             dragdata.assetsFiles.forEach(v =>
                             {
-                                this.data.addChild(v);
+                                // 移动文件
+                                var newPath = v.path.replace(feng3d.pathUtils.getParentPath(v.path), this.data.path);
+                                editorAssets.moveAssets(v, newPath);
                             });
                         });
                 }

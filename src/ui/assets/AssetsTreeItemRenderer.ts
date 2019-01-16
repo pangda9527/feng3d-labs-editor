@@ -45,7 +45,8 @@ namespace editor
                     {
                         dragdata.assetsFiles.forEach(v =>
                         {
-                            this.data.addChild(v);
+                            var newPath = v.path.replace(feng3d.pathUtils.getParentPath(v.path), this.data.path);
+                            editorAssets.moveAssets(v, newPath)
                         });
                     });
             } else

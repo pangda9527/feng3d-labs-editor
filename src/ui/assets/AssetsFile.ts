@@ -182,40 +182,6 @@ namespace editor
         }
 
         /**
-         * 新增文件夹
-         * 
-         * @param folderName 文件夹名称
-         */
-        addFolder(folderName: string)
-        {
-            var newName = this.getNewChildFileName(folderName);
-            var newFolderPath = feng3d.pathUtils.getChildFolderPath(this.path, newName);
-
-            var assetsFile = new AssetsFile(feng3d.FMath.uuid(), newFolderPath, true);
-            editorAssets.saveAssets(assetsFile);
-            this.addChild(assetsFile);
-            return assetsFile;
-        }
-
-        /**
-         * 新增资源
-         * 
-         * @param feng3dAssets 
-         */
-        addAssets(fileName: string, feng3dAssets: feng3d.Feng3dAssets)
-        {
-            var path = this.getNewChildPath(fileName);
-
-            var assetsFile = new AssetsFile(feng3d.FMath.uuid(), path, false);
-            feng3dAssets.assetsId = assetsFile.id;
-            assetsFile.feng3dAssets = feng3dAssets;
-            assetsFile.isLoaded = true;
-            editorAssets.saveAssets(assetsFile);
-            this.addChild(assetsFile);
-            return assetsFile;
-        }
-
-        /**
          * 删除
          */
         delete()
@@ -306,13 +272,13 @@ namespace editor
 
         /**
          * 新增文件从ArrayBuffer
+         * 
          * @param filename 新增文件名称
          * @param arraybuffer 文件数据
          * @param callback 完成回调
          */
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsFile) => void)
         {
-
             var feng3dFile = Object.setValue(new feng3d.ArrayBufferFile(), { name: filename, arraybuffer: arraybuffer });
 
             var path = this.getNewChildPath(filename);
@@ -322,31 +288,9 @@ namespace editor
             // assets.writeAssets(feng3dFile);
             editorFS.writeArrayBuffer(path, arraybuffer, err =>
             {
-                var assetsFile = this.addAssets(filename, feng3dFile);
+                var assetsFile = editorAssets.createAssets(this, filename, feng3dFile);
                 callback(err, assetsFile);
             });
-        }
-
-        /**
-         * 新增子结点
-         * 
-         * @param assetsFile 
-         */
-        addChild(assetsFile: AssetsFile)
-        {
-            feng3d.assert(this.isDirectory);
-
-            if (assetsFile.parent)
-            {
-                var newDirPath = this.path;
-                var oldDirPath = assetsFile.parent.path;
-
-                // 移动文件
-                var newPath = assetsFile.path.replace(oldDirPath, newDirPath);
-                editorAssets.moveAssets(assetsFile, newPath);
-            }
-
-            super.addChild(assetsFile);
         }
 
         /**

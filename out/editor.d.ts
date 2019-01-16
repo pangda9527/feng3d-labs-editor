@@ -1710,8 +1710,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-}
-declare namespace editor {
     var editorAssets: EditorAssets;
     class EditorAssets {
         /**
@@ -1757,12 +1755,6 @@ declare namespace editor {
          */
         saveProject(callback?: (err: Error) => void): void;
         /**
-         * 新增资源
-         *
-         * @param assetsFile 资源
-         */
-        addAssets(assetsFile: AssetsFile): void;
-        /**
          * 保存资源
          *
          * @param assetsFile 资源
@@ -1774,8 +1766,9 @@ declare namespace editor {
          *
          * @param assetsFile 资源文件
          * @param newPath 新路径
+         * @param callback 回调函数，当文件系统中文件全部移动完成后调用
          */
-        moveAssets(assetsFile: AssetsFile, newPath: string): void;
+        moveAssets(assetsFile: AssetsFile, newPath: string, callback?: (err?: Error) => void): void;
         /**
          * 获取脚本列表
          */
@@ -1785,6 +1778,18 @@ declare namespace editor {
          * @param type 资源类型
          */
         getAssetsByType<T extends feng3d.Feng3dAssets>(type: feng3d.Constructor<T>): AssetsFile[];
+        /**
+         * 新增文件夹
+         *
+         * @param folderName 文件夹名称
+         */
+        createFolder(parentAssets: AssetsFile, folderName: string): AssetsFile;
+        /**
+         * 新增资源
+         *
+         * @param feng3dAssets
+         */
+        createAssets(parentAssets: AssetsFile, fileName: string, feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
         /**
          * 弹出文件菜单
          */
@@ -1924,18 +1929,6 @@ declare namespace editor {
          */
         updateImage(): void;
         /**
-         * 新增文件夹
-         *
-         * @param folderName 文件夹名称
-         */
-        addFolder(folderName: string): AssetsFile;
-        /**
-         * 新增资源
-         *
-         * @param feng3dAssets
-         */
-        addAssets(fileName: string, feng3dAssets: feng3d.Feng3dAssets): AssetsFile;
-        /**
          * 删除
          */
         delete(): void;
@@ -1963,17 +1956,12 @@ declare namespace editor {
         getNewChildPath(basename: string): string;
         /**
          * 新增文件从ArrayBuffer
+         *
          * @param filename 新增文件名称
          * @param arraybuffer 文件数据
          * @param callback 完成回调
          */
         addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override?: boolean, callback?: (e: Error, file: AssetsFile) => void): void;
-        /**
-         * 新增子结点
-         *
-         * @param assetsFile
-         */
-        addChild(assetsFile: AssetsFile): void;
         /**
          * 导出
          */
