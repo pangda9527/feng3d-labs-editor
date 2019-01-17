@@ -1,4 +1,4 @@
-/// <reference path="../libs/feng3d.module.d.ts" />
+/// <reference path="../../feng3d/out/feng3d.d.ts" />
 
 import * as fs from 'fs';
 

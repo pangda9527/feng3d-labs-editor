@@ -1,7 +1,14 @@
 "use strict";
-/// <reference path="../libs/feng3d.module.d.ts" />
+/// <reference path="../../feng3d/out/feng3d.d.ts" />
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var fs = require("fs");
+var fs = __importStar(require("fs"));
 /**
  * Native文件系统
  */
@@ -48,25 +55,13 @@ var NativeFS = /** @class */ (function () {
         });
     };
     /**
-     * 获取文件信息
+     * 文件是否存在
      * @param path 文件路径
      * @param callback 回调函数
      */
-    NativeFS.prototype.stat = function (path, callback) {
+    NativeFS.prototype.exists = function (path, callback) {
         this.getAbsolutePath(path, function (err, absolutePath) {
-            fs.stat(absolutePath, function (err, stats) {
-                if (err) {
-                    callback(err, null);
-                    return;
-                }
-                callback(err, {
-                    path: path,
-                    size: stats.size,
-                    isDirectory: stats.isDirectory(),
-                    birthtime: stats.birthtime.getTime(),
-                    mtime: stats.mtime.getTime(),
-                });
-            });
+            fs.exists(absolutePath, callback);
         });
     };
     /**
