@@ -974,7 +974,7 @@ var editor;
             }
         };
         Editorshortcut.prototype.onMouseWheelMoveSceneCamera = function () {
-            var distance = feng3d.windowEventProxy.wheelDelta * editor.sceneControlConfig.mouseWheelMoveStep * editor.sceneControlConfig.lookDistance / 10;
+            var distance = -feng3d.windowEventProxy.deltaY * editor.sceneControlConfig.mouseWheelMoveStep * editor.sceneControlConfig.lookDistance / 10;
             editor.editorCamera.transform.localToWorldMatrix = editor.editorCamera.transform.localToWorldMatrix.moveForward(distance);
             editor.sceneControlConfig.lookDistance -= distance;
         };
@@ -12063,12 +12063,12 @@ var egret;
         var oldOnAddToStage = eui.Scroller.prototype.$onAddToStage;
         eui.Scroller.prototype.$onAddToStage = function (stage, nestLevel) {
             oldOnAddToStage.call(this, stage, nestLevel);
-            feng3d.windowEventProxy.on("mousewheel", onMouseWheel, this);
+            feng3d.windowEventProxy.on("wheel", onMouseWheel, this);
         };
         var oldOnRemoveFromStage = eui.Scroller.prototype.$onRemoveFromStage;
         eui.Scroller.prototype.$onRemoveFromStage = function () {
             oldOnRemoveFromStage.call(this);
-            feng3d.windowEventProxy.off("mousewheel", onMouseWheel, this);
+            feng3d.windowEventProxy.off("wheel", onMouseWheel, this);
         };
         // 阻止拖拽滚动面板
         eui.Scroller.prototype["onTouchBeginCapture"] = function () {
@@ -12076,7 +12076,7 @@ var egret;
         function onMouseWheel(event) {
             var scroller = this;
             if (scroller.hitTestPoint(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY)) {
-                scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV - event.wheelDelta * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
+                scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV + event.deltaY * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
             }
         }
     })();
@@ -13612,7 +13612,7 @@ var shortcutConfig = [
     { key: "middlemousedown", command: "dragSceneStart", stateCommand: "dragSceneing", when: "mouseInView3D" },
     { key: "mousemove", command: "dragScene", when: "dragSceneing" },
     { key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
-    { key: "mousewheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
+    { key: "wheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
     { key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "mouseInView3D" },
     { key: "f", command: "lookToSelectedGameObject", when: "" },
     { key: "w", command: "gameobjectMoveTool", when: "!fpsViewing" },

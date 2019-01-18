@@ -72,13 +72,13 @@ namespace egret
         eui.Scroller.prototype.$onAddToStage = function (stage: egret.Stage, nestLevel: number): void
         {
             oldOnAddToStage.call(this, stage, nestLevel);
-            feng3d.windowEventProxy.on("mousewheel", onMouseWheel, this);
+            feng3d.windowEventProxy.on("wheel", onMouseWheel, this);
         }
         var oldOnRemoveFromStage = eui.Scroller.prototype.$onRemoveFromStage;
         eui.Scroller.prototype.$onRemoveFromStage = function (): void
         {
             oldOnRemoveFromStage.call(this);
-            feng3d.windowEventProxy.off("mousewheel", onMouseWheel, this);
+            feng3d.windowEventProxy.off("wheel", onMouseWheel, this);
         }
 
         // 阻止拖拽滚动面板
@@ -92,7 +92,7 @@ namespace egret
             var scroller: eui.Scroller = this;
             if (scroller.hitTestPoint(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
             {
-                scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV - event.wheelDelta * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
+                scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV + event.deltaY * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
             }
         }
     })();

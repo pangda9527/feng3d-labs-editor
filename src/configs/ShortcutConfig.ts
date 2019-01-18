@@ -17,7 +17,7 @@ var shortcutConfig = [ //
 	{ key: "middlemousedown", command: "dragSceneStart", stateCommand: "dragSceneing", when: "mouseInView3D" },
 	{ key: "mousemove", command: "dragScene", when: "dragSceneing" },
 	{ key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
-	{ key: "mousewheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
+	{ key: "wheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
 	{ key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "mouseInView3D" },
 
 	{ key: "f", command: "lookToSelectedGameObject", when: "" },
