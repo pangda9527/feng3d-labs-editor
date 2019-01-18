@@ -30,7 +30,7 @@ namespace editor
             var readWriteFS = this.fs;
             if (readWriteFS instanceof feng3d.IndexedDBfs)
             {
-                feng3d.storage.hasObjectStore(readWriteFS.DBname, projectname, callback);
+                feng3d._indexedDB.hasObjectStore(readWriteFS.DBname, projectname, callback);
             } else if (readWriteFS["getProjectList"] != null)
             {
                 readWriteFS["getProjectList"]((err: Error, projects: string[]) =>
@@ -54,7 +54,7 @@ namespace editor
             var readWriteFS = this.fs;
             if (readWriteFS instanceof feng3d.IndexedDBfs)
             {
-                feng3d.storage.getObjectStoreNames(readWriteFS.DBname, callback)
+                feng3d._indexedDB.getObjectStoreNames(readWriteFS.DBname, callback)
             } else if (readWriteFS["getProjectList"] != null)
             {
                 readWriteFS["getProjectList"](callback);
@@ -74,7 +74,7 @@ namespace editor
             var readWriteFS = this.fs;
             if (readWriteFS instanceof feng3d.IndexedDBfs)
             {
-                feng3d.storage.createObjectStore(readWriteFS.DBname, projectname, (err) =>
+                feng3d._indexedDB.createObjectStore(readWriteFS.DBname, projectname, (err) =>
                 {
                     if (err)
                     {

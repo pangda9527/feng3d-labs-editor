@@ -365,7 +365,7 @@ var editor;
         EditorFS.prototype.hasProject = function (projectname, callback) {
             var readWriteFS = this.fs;
             if (readWriteFS instanceof feng3d.IndexedDBfs) {
-                feng3d.storage.hasObjectStore(readWriteFS.DBname, projectname, callback);
+                feng3d._indexedDB.hasObjectStore(readWriteFS.DBname, projectname, callback);
             }
             else if (readWriteFS["getProjectList"] != null) {
                 readWriteFS["getProjectList"](function (err, projects) {
@@ -385,7 +385,7 @@ var editor;
         EditorFS.prototype.getProjectList = function (callback) {
             var readWriteFS = this.fs;
             if (readWriteFS instanceof feng3d.IndexedDBfs) {
-                feng3d.storage.getObjectStoreNames(readWriteFS.DBname, callback);
+                feng3d._indexedDB.getObjectStoreNames(readWriteFS.DBname, callback);
             }
             else if (readWriteFS["getProjectList"] != null) {
                 readWriteFS["getProjectList"](callback);
@@ -402,7 +402,7 @@ var editor;
         EditorFS.prototype.initproject = function (projectname, callback) {
             var readWriteFS = this.fs;
             if (readWriteFS instanceof feng3d.IndexedDBfs) {
-                feng3d.storage.createObjectStore(readWriteFS.DBname, projectname, function (err) {
+                feng3d._indexedDB.createObjectStore(readWriteFS.DBname, projectname, function (err) {
                     if (err) {
                         feng3d.warn(err);
                         return;
