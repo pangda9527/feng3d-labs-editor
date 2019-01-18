@@ -233,7 +233,7 @@ var editor;
         FileObject.prototype.saveFile = function (content, onComplete, onError, thisPtr) {
             var _this = this;
             if (typeof content == "string") {
-                feng3d.dataTransform.stringToUint8Array(content, function (uint8Array) {
+                feng3d.dataTransform.stringToArrayBuffer(content, function (uint8Array) {
                     _this.saveFile(uint8Array, onComplete, onError, thisPtr);
                 });
                 return;
