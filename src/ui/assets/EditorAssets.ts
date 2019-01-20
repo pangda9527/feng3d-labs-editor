@@ -120,7 +120,7 @@ namespace editor
             delete this._assetsIDMap[assetsFile.id];
             feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
 
-            editorFS.deleteFile(assetsFile.path);
+            editorFS.fs.deleteFile(assetsFile.path);
 
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
 
@@ -138,7 +138,7 @@ namespace editor
                 return { id: element, path: this._assetsIDMap[element].path, isDirectory: this._assetsIDMap[element].isDirectory };
             });
 
-            editorFS.writeObject(assetsFilePath, object, callback);
+            editorFS.fs.writeObject(assetsFilePath, object, callback);
         }
 
         /**
@@ -153,14 +153,14 @@ namespace editor
 
             if (assetsFile.isDirectory)
             {
-                editorFS.mkdir(assetsFile.path, (err) =>
+                editorFS.fs.mkdir(assetsFile.path, (err) =>
                 {
                     if (err) feng3d.assert(!err);
                     callback && callback();
                 });
                 return;
             }
-            editorFS.writeObject(assetsFile.path, assetsFile.feng3dAssets, (err) =>
+            editorFS.fs.writeObject(assetsFile.path, assetsFile.feng3dAssets, (err) =>
             {
                 feng3d.assert(!err, `资源 ${assetsFile.path} 保存失败！`);
                 callback && callback();
@@ -509,7 +509,7 @@ namespace editor
                 {
                     var imagePath = showFloder.getNewChildPath(file.name);
 
-                    editorFS.writeArrayBuffer(imagePath, result, err =>
+                    editorFS.fs.writeArrayBuffer(imagePath, result, err =>
                     {
                         var urlImageTexture2D = Object.setValue(new feng3d.UrlImageTexture2D(), { name: file.name })
                         urlImageTexture2D.url = imagePath;
@@ -539,7 +539,7 @@ namespace editor
 
         runProjectScript(callback?: () => void)
         {
-            editorFS.readString("project.js", (err, content) =>
+            editorFS.fs.readString("project.js", (err, content) =>
             {
                 if (content != this._preProjectJsContent)
                 {

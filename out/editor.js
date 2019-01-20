@@ -184,7 +184,7 @@ var editor;
          */
         FileObject.prototype.getDirectoryListing = function (onComplete, onError, thisPtr) {
             var _this = this;
-            editor.editorFS.readdir(this._path, function (err, files) {
+            editor.editorFS.fs.readdir(this._path, function (err, files) {
                 if (err) {
                     feng3d.warn(err);
                     onError(_this);
@@ -202,7 +202,7 @@ var editor;
          */
         FileObject.prototype.createDirectory = function (onComplete, onError, thisPtr) {
             var _this = this;
-            editor.editorFS.mkdir(this._path, function (err) {
+            editor.editorFS.fs.mkdir(this._path, function (err) {
                 if (err) {
                     feng3d.warn(_this);
                     onError(_this);
@@ -238,7 +238,7 @@ var editor;
                 });
                 return;
             }
-            editor.editorFS.writeArrayBuffer(this._path, content, function (err) {
+            editor.editorFS.fs.writeArrayBuffer(this._path, content, function (err) {
                 if (err) {
                     onError(_this);
                 }
@@ -323,7 +323,7 @@ var editor;
          */
         FileObject.prototype.updateStats = function (path, callback, onComplete, onError) {
             var _this = this;
-            editor.editorFS.exists(path, function (exists) {
+            editor.editorFS.fs.exists(path, function (exists) {
                 if (!exists) {
                     _this._exists = false;
                     onError && onError(_this);
@@ -447,11 +447,11 @@ var editor;
                                 var filepath = filepaths.shift();
                                 var file = zip.files[filepath];
                                 if (file.dir) {
-                                    editor.editorFS.mkdir(filepath, readfiles);
+                                    editor.editorFS.fs.mkdir(filepath, readfiles);
                                 }
                                 else {
                                     file.async("arraybuffer").then(function (data) {
-                                        editor.editorFS.writeArrayBuffer(filepath, data, function (err) {
+                                        editor.editorFS.fs.writeArrayBuffer(filepath, data, function (err) {
                                             if (err)
                                                 console.log(err);
                                             readfiles();
@@ -500,11 +500,11 @@ var editor;
                             var filepath = filepaths.shift();
                             var file = zip.files[filepath];
                             if (file.dir) {
-                                editor.editorFS.mkdir(filepath, readfiles);
+                                editor.editorFS.fs.mkdir(filepath, readfiles);
                             }
                             else {
                                 file.async("arraybuffer").then(function (data) {
-                                    editor.editorFS.writeArrayBuffer(filepath, data, function (err) {
+                                    editor.editorFS.fs.writeArrayBuffer(filepath, data, function (err) {
                                         if (err)
                                             console.log(err);
                                         readfiles();
@@ -540,7 +540,7 @@ var editor;
                 function readfiles() {
                     if (filepaths.length > 0) {
                         var filepath = filepaths.shift();
-                        editor.editorFS.readArrayBuffer(filepath, function (err, data) {
+                        editor.editorFS.fs.readArrayBuffer(filepath, function (err, data) {
                             //处理文件夹
                             data && zip.file(filepath, data);
                             readfiles();
@@ -567,13 +567,13 @@ var editor;
                     if (filepaths.length > 0) {
                         var filepath = filepaths.shift();
                         if (value.files[filepath].dir) {
-                            editor.editorFS.mkdir(filepath, function (err) {
+                            editor.editorFS.fs.mkdir(filepath, function (err) {
                                 writeFiles();
                             });
                         }
                         else {
                             zip.file(filepath).async("arraybuffer").then(function (data) {
-                                editor.editorFS.writeArrayBuffer(filepath, data, function (err) {
+                                editor.editorFS.fs.writeArrayBuffer(filepath, data, function (err) {
                                     writeFiles();
                                 });
                             }, function (reason) {
@@ -5287,7 +5287,7 @@ var editor;
             var imagePath = textureCube[propertys[i]];
             var image = this.images[i];
             if (imagePath) {
-                editor.editorFS.readArrayBuffer(imagePath, function (err, data) {
+                editor.editorFS.fs.readArrayBuffer(imagePath, function (err, data) {
                     feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
                         image.source = dataurl;
                     });
@@ -6605,7 +6605,7 @@ var editor;
             feng3d.assert(!!this._assetsIDMap[assetsFile.id]);
             delete this._assetsIDMap[assetsFile.id];
             feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
-            editor.editorFS.deleteFile(assetsFile.path);
+            editor.editorFS.fs.deleteFile(assetsFile.path);
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
             this.saveProject();
         };
@@ -6618,7 +6618,7 @@ var editor;
             var object = Object.keys(this._assetsIDMap).map(function (element) {
                 return { id: element, path: _this._assetsIDMap[element].path, isDirectory: _this._assetsIDMap[element].isDirectory };
             });
-            editor.editorFS.writeObject(assetsFilePath, object, callback);
+            editor.editorFS.fs.writeObject(assetsFilePath, object, callback);
         };
         /**
          * 保存资源
@@ -6629,14 +6629,14 @@ var editor;
         EditorAssets.prototype.saveAssets = function (assetsFile, callback) {
             feng3d.assert(!!this._assetsIDMap[assetsFile.id], "\u65E0\u6CD5\u4FDD\u5B58\u5DF2\u7ECF\u88AB\u5220\u9664\u7684\u8D44\u6E90\uFF01");
             if (assetsFile.isDirectory) {
-                editor.editorFS.mkdir(assetsFile.path, function (err) {
+                editor.editorFS.fs.mkdir(assetsFile.path, function (err) {
                     if (err)
                         feng3d.assert(!err);
                     callback && callback();
                 });
                 return;
             }
-            editor.editorFS.writeObject(assetsFile.path, assetsFile.feng3dAssets, function (err) {
+            editor.editorFS.fs.writeObject(assetsFile.path, assetsFile.feng3dAssets, function (err) {
                 feng3d.assert(!err, "\u8D44\u6E90 " + assetsFile.path + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
             });
@@ -6913,7 +6913,7 @@ var editor;
                 var showFloder = _this.showFloder;
                 if (feng3d.regExps.image.test(file.name)) {
                     var imagePath = showFloder.getNewChildPath(file.name);
-                    editor.editorFS.writeArrayBuffer(imagePath, result, function (err) {
+                    editor.editorFS.fs.writeArrayBuffer(imagePath, result, function (err) {
                         var urlImageTexture2D = Object.setValue(new feng3d.UrlImageTexture2D(), { name: file.name });
                         urlImageTexture2D.url = imagePath;
                         var assetsFile = _this.createAssets(showFloder, file.name, urlImageTexture2D);
@@ -6938,7 +6938,7 @@ var editor;
         };
         EditorAssets.prototype.runProjectScript = function (callback) {
             var _this = this;
-            editor.editorFS.readString("project.js", function (err, content) {
+            editor.editorFS.fs.readString("project.js", function (err, content) {
                 if (content != _this._preProjectJsContent) {
                     //
                     var windowEval = eval.bind(window);
@@ -7357,7 +7357,7 @@ var editor;
             var path = this.getNewChildPath(filename);
             feng3d.error("\u672A\u5B9E\u73B0");
             // assets.writeAssets(feng3dFile);
-            editor.editorFS.writeArrayBuffer(path, arraybuffer, function (err) {
+            editor.editorFS.fs.writeArrayBuffer(path, arraybuffer, function (err) {
                 var assetsFile = editor.editorAssets.createAssets(_this, filename, feng3dFile);
                 callback(err, assetsFile);
             });
@@ -7376,7 +7376,7 @@ var editor;
                 function readfiles() {
                     if (filepaths.length > 0) {
                         var filepath = filepaths.shift();
-                        editor.editorFS.readArrayBuffer(filepath, function (err, data) {
+                        editor.editorFS.fs.readArrayBuffer(filepath, function (err, data) {
                             //处理文件夹
                             data && zip.file(filepath, data);
                             readfiles();
@@ -7785,7 +7785,7 @@ var editor;
                     break;
                 case this.playBtn:
                     editor.editorui.inspectorView.saveShowData(function () {
-                        editor.editorFS.writeObject("default.scene.json", editor.engine.scene.gameObject, function (err) {
+                        editor.editorFS.fs.writeObject("default.scene.json", editor.engine.scene.gameObject, function (err) {
                             if (err) {
                                 feng3d.warn(err);
                                 return;
@@ -7796,7 +7796,7 @@ var editor;
                                 editor.runwin = window.open("run.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname);
                                 return;
                             }
-                            editor.editorFS.getAbsolutePath("index.html", function (err, path) {
+                            editor.editorFS.fs.getAbsolutePath("index.html", function (err, path) {
                                 if (err) {
                                     feng3d.warn(err);
                                     return;
@@ -10331,7 +10331,7 @@ var editor;
                 });
             });
             window.addEventListener("beforeunload", function () {
-                editor.editorFS.writeObject("default.scene.json", editor.engine.scene.gameObject);
+                editor.editorFS.fs.writeObject("default.scene.json", editor.engine.scene.gameObject);
             });
         };
         Main3D.prototype.onEditorCameraRotate = function (e) {
@@ -12914,7 +12914,7 @@ var editor;
         function ThreejsLoader() {
         }
         ThreejsLoader.prototype.load = function (url, completed) {
-            editor.editorFS.readArrayBuffer(url, function (err, data) {
+            editor.editorFS.fs.readArrayBuffer(url, function (err, data) {
                 load(data, function (gameobject) {
                     gameobject.name = feng3d.pathUtils.getName(url);
                     feng3d.feng3dDispatcher.dispatch("assets.parsed", gameobject);
@@ -13659,7 +13659,7 @@ var editor;
                 }, "");
                 outputStr += "\n//# sourceURL=project.js";
                 callback && callback(outputStr);
-                editor.editorFS.writeString("project.js", outputStr);
+                editor.editorFS.fs.writeString("project.js", outputStr);
                 editor.editorAssets.runProjectScript(function () {
                     feng3d.feng3dDispatcher.dispatch("assets.scriptChanged");
                 });

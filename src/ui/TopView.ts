@@ -108,7 +108,7 @@ namespace editor
 				case this.playBtn:
 					editorui.inspectorView.saveShowData(() =>
 					{
-						editorFS.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
+						editorFS.fs.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
 						{
 							if (err)
 							{
@@ -121,7 +121,7 @@ namespace editor
 								runwin = window.open(`run.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}`);
 								return;
 							}
-							editorFS.getAbsolutePath("index.html", (err, path) =>
+							editorFS.fs.getAbsolutePath("index.html", (err, path) =>
 							{
 								if (err)
 								{

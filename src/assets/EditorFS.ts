@@ -132,12 +132,12 @@ namespace editor
                                 var file = zip.files[filepath];
                                 if (file.dir)
                                 {
-                                    editorFS.mkdir(filepath, readfiles);
+                                    editorFS.fs.mkdir(filepath, readfiles);
                                 } else
                                 {
                                     file.async("arraybuffer").then((data) =>
                                     {
-                                        editorFS.writeArrayBuffer(filepath, data, (err: Error) =>
+                                        editorFS.fs.writeArrayBuffer(filepath, data, (err: Error) =>
                                         {
                                             if (err)
                                                 console.log(err);
@@ -198,12 +198,12 @@ namespace editor
                             var file = zip.files[filepath];
                             if (file.dir)
                             {
-                                editorFS.mkdir(filepath, readfiles);
+                                editorFS.fs.mkdir(filepath, readfiles);
                             } else
                             {
                                 file.async("arraybuffer").then((data) =>
                                 {
-                                    editorFS.writeArrayBuffer(filepath, data, (err: Error) =>
+                                    editorFS.fs.writeArrayBuffer(filepath, data, (err: Error) =>
                                     {
                                         if (err)
                                             console.log(err);
@@ -249,7 +249,7 @@ namespace editor
                     if (filepaths.length > 0)
                     {
                         var filepath = filepaths.shift();
-                        editorFS.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        editorFS.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                         {
                             //处理文件夹
                             data && zip.file(filepath, data);
@@ -285,7 +285,7 @@ namespace editor
                         var filepath = filepaths.shift();
                         if (value.files[filepath].dir)
                         {
-                            editorFS.mkdir(filepath, (err) =>
+                            editorFS.fs.mkdir(filepath, (err) =>
                             {
                                 writeFiles();
                             });
@@ -293,7 +293,7 @@ namespace editor
                         {
                             zip.file(filepath).async("arraybuffer").then((data) =>
                             {
-                                editorFS.writeArrayBuffer(filepath, data, (err) =>
+                                editorFS.fs.writeArrayBuffer(filepath, data, (err) =>
                                 {
                                     writeFiles();
                                 });

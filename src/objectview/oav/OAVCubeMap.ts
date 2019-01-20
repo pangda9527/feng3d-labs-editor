@@ -64,7 +64,7 @@ namespace editor
 			const image = this.images[i];
 			if (imagePath)
 			{
-				editorFS.readArrayBuffer(imagePath, (err, data) =>
+				editorFS.fs.readArrayBuffer(imagePath, (err, data) =>
 				{
 					feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
 					{

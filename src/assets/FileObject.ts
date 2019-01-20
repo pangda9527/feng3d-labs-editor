@@ -155,7 +155,7 @@ namespace editor
          */
         getDirectoryListing(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            editorFS.readdir(this._path, (err, files) =>
+            editorFS.fs.readdir(this._path, (err, files) =>
             {
                 if (err)
                 {
@@ -176,7 +176,7 @@ namespace editor
          */
         createDirectory(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            editorFS.mkdir(this._path, (err) =>
+            editorFS.fs.mkdir(this._path, (err) =>
             {
                 if (err)
                 {
@@ -222,7 +222,7 @@ namespace editor
                 return;
             }
 
-            editorFS.writeArrayBuffer(this._path, content, (err) =>
+            editorFS.fs.writeArrayBuffer(this._path, content, (err) =>
             {
                 if (err)
                 {
@@ -324,7 +324,7 @@ namespace editor
          */
         private updateStats(path: string, callback: () => void, onComplete?: Function, onError?: Function)
         {
-            editorFS.exists(path, (exists) =>
+            editorFS.fs.exists(path, (exists) =>
             {
                 if (!exists)
                 {

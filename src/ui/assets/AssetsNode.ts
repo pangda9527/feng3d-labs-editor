@@ -286,7 +286,7 @@ namespace editor
             feng3d.error(`未实现`);
 
             // assets.writeAssets(feng3dFile);
-            editorFS.writeArrayBuffer(path, arraybuffer, err =>
+            editorFS.fs.writeArrayBuffer(path, arraybuffer, err =>
             {
                 var assetsFile = editorAssets.createAssets(this, filename, feng3dFile);
                 callback(err, assetsFile);
@@ -313,7 +313,7 @@ namespace editor
                     if (filepaths.length > 0)
                     {
                         var filepath = filepaths.shift();
-                        editorFS.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        editorFS.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                         {
                             //处理文件夹
                             data && zip.file(filepath, data);
