@@ -41,7 +41,7 @@ namespace editor
          */
         initproject(callback: () => void)
         {
-            editorFS.readObject(assetsFilePath, (err, object: { id: string, path: string, isDirectory: boolean }[]) =>
+            editorFS.fs.readObject(assetsFilePath, (err, object: { id: string, path: string, isDirectory: boolean }[]) =>
             {
                 object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
 
@@ -75,7 +75,7 @@ namespace editor
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
-            editorFS.readObject(path, (err, object: feng3d.GameObject) =>
+            editorFS.fs.readObject(path, (err, object: feng3d.GameObject) =>
             {
                 if (err)
                 {

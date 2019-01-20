@@ -115,10 +115,10 @@ namespace editor
 								feng3d.warn(err);
 								return;
 							}
-							if (editorFS.type == feng3d.FSType.indexedDB)
+							if (editorFS.fs.type == feng3d.FSType.indexedDB)
 							{
 								if (runwin) runwin.close();
-								runwin = window.open(`run.html?fstype=${feng3d.assets.type}&project=${editorcache.projectname}`);
+								runwin = window.open(`run.html?fstype=${feng3d.assets.fs.type}&project=${editorcache.projectname}`);
 								return;
 							}
 							editorFS.fs.getAbsolutePath("index.html", (err, path) =>

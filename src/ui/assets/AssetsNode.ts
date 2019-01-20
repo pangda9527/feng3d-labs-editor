@@ -126,7 +126,7 @@ namespace editor
 
             this.isLoading = true;
 
-            editorFS.readObject(this.path, (err, assets: feng3d.Feng3dAssets) =>
+            editorFS.fs.readObject(this.path, (err, assets: feng3d.Feng3dAssets) =>
             {
                 feng3d.assert(!err);
 

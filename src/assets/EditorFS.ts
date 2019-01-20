@@ -28,7 +28,7 @@ namespace editor
         hasProject(projectname: string, callback: (has: boolean) => void)
         {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBfs)
+            if (readWriteFS instanceof feng3d.IndexedDBFS)
             {
                 feng3d._indexedDB.hasObjectStore(readWriteFS.DBname, projectname, callback);
             } else if (readWriteFS["getProjectList"] != null)
@@ -52,7 +52,7 @@ namespace editor
         getProjectList(callback: (err: Error, projects: string[]) => void)
         {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBfs)
+            if (readWriteFS instanceof feng3d.IndexedDBFS)
             {
                 feng3d._indexedDB.getObjectStoreNames(readWriteFS.DBname, callback)
             } else if (readWriteFS["getProjectList"] != null)
@@ -72,7 +72,7 @@ namespace editor
         initproject(projectname: string, callback: () => void)
         {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBfs)
+            if (readWriteFS instanceof feng3d.IndexedDBFS)
             {
                 feng3d._indexedDB.createObjectStore(readWriteFS.DBname, projectname, (err) =>
                 {
@@ -312,7 +312,7 @@ namespace editor
 
     if (typeof require == "undefined")
     {
-        feng3d.assets = editorFS = new EditorFS(feng3d.indexedDBfs);
+        feng3d.assets = editorFS = new EditorFS(feng3d.indexedDBFS);
     } else
     {
         var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;

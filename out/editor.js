@@ -364,7 +364,7 @@ var editor;
          */
         EditorFS.prototype.hasProject = function (projectname, callback) {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBfs) {
+            if (readWriteFS instanceof feng3d.IndexedDBFS) {
                 feng3d._indexedDB.hasObjectStore(readWriteFS.DBname, projectname, callback);
             }
             else if (readWriteFS["getProjectList"] != null) {
@@ -384,7 +384,7 @@ var editor;
          */
         EditorFS.prototype.getProjectList = function (callback) {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBfs) {
+            if (readWriteFS instanceof feng3d.IndexedDBFS) {
                 feng3d._indexedDB.getObjectStoreNames(readWriteFS.DBname, callback);
             }
             else if (readWriteFS["getProjectList"] != null) {
@@ -401,7 +401,7 @@ var editor;
          */
         EditorFS.prototype.initproject = function (projectname, callback) {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBfs) {
+            if (readWriteFS instanceof feng3d.IndexedDBFS) {
                 feng3d._indexedDB.createObjectStore(readWriteFS.DBname, projectname, function (err) {
                     if (err) {
                         feng3d.warn(err);
@@ -590,7 +590,7 @@ var editor;
     }(feng3d.ReadWriteAssetsFS));
     editor.EditorFS = EditorFS;
     if (typeof require == "undefined") {
-        feng3d.assets = editor.editorFS = new EditorFS(feng3d.indexedDBfs);
+        feng3d.assets = editor.editorFS = new EditorFS(feng3d.indexedDBFS);
     }
     else {
         var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
@@ -6546,7 +6546,7 @@ var editor;
          */
         EditorAssets.prototype.initproject = function (callback) {
             var _this = this;
-            editor.editorFS.readObject(assetsFilePath, function (err, object) {
+            editor.editorFS.fs.readObject(assetsFilePath, function (err, object) {
                 object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
                 feng3d.assetsIDPathMap.init();
                 var files = object.map(function (element) {
@@ -6570,7 +6570,7 @@ var editor;
             });
         };
         EditorAssets.prototype.readScene = function (path, callback) {
-            editor.editorFS.readObject(path, function (err, object) {
+            editor.editorFS.fs.readObject(path, function (err, object) {
                 if (err) {
                     callback(err, null);
                     return;
@@ -7228,7 +7228,7 @@ var editor;
                 return;
             }
             this.isLoading = true;
-            editor.editorFS.readObject(this.path, function (err, assets) {
+            editor.editorFS.fs.readObject(this.path, function (err, assets) {
                 feng3d.assert(!err);
                 assets.name = feng3d.pathUtils.getNameWithExtension(_this.path);
                 _this.feng3dAssets = assets;
@@ -7790,10 +7790,10 @@ var editor;
                                 feng3d.warn(err);
                                 return;
                             }
-                            if (editor.editorFS.type == feng3d.FSType.indexedDB) {
+                            if (editor.editorFS.fs.type == feng3d.FSType.indexedDB) {
                                 if (editor.runwin)
                                     editor.runwin.close();
-                                editor.runwin = window.open("run.html?fstype=" + feng3d.assets.type + "&project=" + editor.editorcache.projectname);
+                                editor.runwin = window.open("run.html?fstype=" + feng3d.assets.fs.type + "&project=" + editor.editorcache.projectname);
                                 return;
                             }
                             editor.editorFS.fs.getAbsolutePath("index.html", function (err, path) {
