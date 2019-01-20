@@ -160,7 +160,6 @@ declare namespace editor {
      * 编辑器文件系统
      */
     class EditorFS extends feng3d.ReadWriteAssetsFS {
-        constructor(readWriteFS?: feng3d.ReadWriteFS);
         /**
          * 是否存在指定项目
          * @param projectname 项目名称

@@ -351,11 +351,8 @@ var editor;
      */
     var EditorFS = /** @class */ (function (_super) {
         __extends(EditorFS, _super);
-        function EditorFS(readWriteFS) {
-            var _this = _super.call(this) || this;
-            if (readWriteFS)
-                _this.fs = readWriteFS;
-            return _this;
+        function EditorFS() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         /**
          * 是否存在指定项目

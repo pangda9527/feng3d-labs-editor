@@ -13,12 +13,6 @@ namespace editor
      */
     export class EditorFS extends feng3d.ReadWriteAssetsFS
     {
-        constructor(readWriteFS?: feng3d.ReadWriteFS)
-        {
-            super();
-            if (readWriteFS)
-                this.fs = <any>readWriteFS;
-        }
 
         /**
          * 是否存在指定项目
