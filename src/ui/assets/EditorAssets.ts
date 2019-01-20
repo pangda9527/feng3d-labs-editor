@@ -160,7 +160,7 @@ namespace editor
                 });
                 return;
             }
-            editorFS.fs.writeObject(assetsFile.path, assetsFile.feng3dAssets, (err) =>
+            editorFS.writeAssets(assetsFile.feng3dAssets, (err) =>
             {
                 feng3d.assert(!err, `资源 ${assetsFile.path} 保存失败！`);
                 callback && callback();

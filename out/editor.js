@@ -6633,7 +6633,7 @@ var editor;
                 });
                 return;
             }
-            editor.editorFS.fs.writeObject(assetsFile.path, assetsFile.feng3dAssets, function (err) {
+            editor.editorFS.writeAssets(assetsFile.feng3dAssets, function (err) {
                 feng3d.assert(!err, "\u8D44\u6E90 " + assetsFile.path + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
             });
