@@ -305,7 +305,7 @@ namespace editor
                 path = feng3d.pathUtils.getParentPath(path);
 
             var filename = this.label;
-            editorFS.getAllfilepathInFolder(path, (err, filepaths) =>
+            editorFS.fs.getAllfilepathInFolder(path, (err, filepaths) =>
             {
                 readfiles();
                 function readfiles()

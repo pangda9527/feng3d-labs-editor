@@ -260,7 +260,7 @@ var editor;
             var _this = this;
             var oldPath = this._path;
             var newPath = this.location ? (this.location + "/" + newName) : newName;
-            editor.editorFS.rename(oldPath, newPath, function (err) {
+            editor.editorFS.fs.rename(oldPath, newPath, function (err) {
                 if (err) {
                     feng3d.warn(err);
                     onError(_this);
@@ -280,7 +280,7 @@ var editor;
          */
         FileObject.prototype.move = function (newPath, onComplete, onError, thisPtr) {
             var _this = this;
-            editor.editorFS.move(this._path, newPath, function (err) {
+            editor.editorFS.fs.move(this._path, newPath, function (err) {
                 if (err) {
                     feng3d.warn(err);
                     onError(_this);
@@ -299,7 +299,7 @@ var editor;
          */
         FileObject.prototype.delete = function (onComplete, onError, thisPtr) {
             var _this = this;
-            editor.editorFS.delete(this._path, function (err) {
+            editor.editorFS.fs.delete(this._path, function (err) {
                 if (err) {
                     feng3d.warn(err);
                     onError(_this);
@@ -532,7 +532,7 @@ var editor;
          */
         EditorFS.prototype.exportProject = function (callback) {
             var zip = new JSZip();
-            editor.editorFS.getAllfilepathInFolder("", function (err, filepaths) {
+            editor.editorFS.fs.getAllfilepathInFolder("", function (err, filepaths) {
                 readfiles();
                 function readfiles() {
                     if (filepaths.length > 0) {
@@ -6663,7 +6663,7 @@ var editor;
             var newParentAssetsFile = this.getAssetsByPath(newParentPath);
             newParentAssetsFile.addChild(assetsFile);
             // 移动文件
-            editor.editorFS.move(oldPath, newPath, callback);
+            editor.editorFS.fs.move(oldPath, newPath, callback);
         };
         /**
          * 获取脚本列表
@@ -7368,7 +7368,7 @@ var editor;
             if (!feng3d.pathUtils.isDirectory(path))
                 path = feng3d.pathUtils.getParentPath(path);
             var filename = this.label;
-            editor.editorFS.getAllfilepathInFolder(path, function (err, filepaths) {
+            editor.editorFS.fs.getAllfilepathInFolder(path, function (err, filepaths) {
                 readfiles();
                 function readfiles() {
                     if (filepaths.length > 0) {

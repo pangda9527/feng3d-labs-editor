@@ -235,7 +235,7 @@ namespace editor
         exportProject(callback: (err: Error, data: Blob) => void)
         {
             var zip = new JSZip();
-            editorFS.getAllfilepathInFolder("", (err, filepaths) =>
+            editorFS.fs.getAllfilepathInFolder("", (err, filepaths) =>
             {
                 readfiles();
                 function readfiles()

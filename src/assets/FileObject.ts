@@ -248,7 +248,7 @@ namespace editor
         {
             var oldPath = this._path;
             var newPath = this.location ? (this.location + "/" + newName) : newName;
-            editorFS.rename(oldPath, newPath, (err) =>
+            editorFS.fs.rename(oldPath, newPath, (err) =>
             {
                 if (err)
                 {
@@ -272,7 +272,7 @@ namespace editor
          */
         move(newPath: string, onComplete: Function, onError: Function, thisPtr: any): void
         {
-            editorFS.move(this._path, newPath, (err) =>
+            editorFS.fs.move(this._path, newPath, (err) =>
             {
                 if (err)
                 {
@@ -295,7 +295,7 @@ namespace editor
          */
         delete(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            editorFS.delete(this._path, (err) =>
+            editorFS.fs.delete(this._path, (err) =>
             {
                 if (err)
                 {

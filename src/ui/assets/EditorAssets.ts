@@ -198,7 +198,7 @@ namespace editor
             newParentAssetsFile.addChild(assetsFile);
 
             // 移动文件
-            editorFS.move(oldPath, newPath, callback);
+            editorFS.fs.move(oldPath, newPath, callback);
         }
 
         /**
