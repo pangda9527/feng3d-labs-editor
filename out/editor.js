@@ -587,7 +587,7 @@ var editor;
             });
         };
         return EditorFS;
-    }(feng3d.ReadWriteAssets));
+    }(feng3d.ReadWriteAssetsFS));
     editor.EditorFS = EditorFS;
     if (typeof require == "undefined") {
         feng3d.assets = editor.editorFS = new EditorFS(feng3d.indexedDBfs);

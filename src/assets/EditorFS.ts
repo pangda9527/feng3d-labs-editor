@@ -11,7 +11,7 @@ namespace editor
     /**
      * 编辑器文件系统
      */
-    export class EditorFS extends feng3d.ReadWriteAssets
+    export class EditorFS extends feng3d.ReadWriteAssetsFS
     {
         constructor(readWriteFS?: feng3d.ReadWriteFS)
         {
