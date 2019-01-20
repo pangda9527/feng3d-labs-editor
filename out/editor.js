@@ -6599,13 +6599,20 @@ var editor;
          *
          * @param assetsFile 资源
          */
-        EditorAssets.prototype.deleteAssets = function (assetsFile) {
+        EditorAssets.prototype.deleteAssets = function (assetsFile, callback) {
+            var _this = this;
             feng3d.assert(!!this._assetsIDMap[assetsFile.id]);
-            delete this._assetsIDMap[assetsFile.id];
-            feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
-            editor.editorFS.deleteAssets(assetsFile.feng3dAssets);
-            feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
-            this.saveProject();
+            editor.editorFS.deleteAssets(assetsFile.feng3dAssets, function (err) {
+                if (err) {
+                    callback && callback(err);
+                    return;
+                }
+                delete _this._assetsIDMap[assetsFile.id];
+                feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
+                feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
+                _this.saveProject();
+                callback && callback(err);
+            });
         };
         /**
          * 保存项目
@@ -6626,15 +6633,6 @@ var editor;
          */
         EditorAssets.prototype.saveAssets = function (assetsFile, callback) {
             feng3d.assert(!!this._assetsIDMap[assetsFile.id], "\u65E0\u6CD5\u4FDD\u5B58\u5DF2\u7ECF\u88AB\u5220\u9664\u7684\u8D44\u6E90\uFF01");
-            var path = feng3d.assetsIDPathMap.getPath(assetsFile.id);
-            if (assetsFile.isDirectory) {
-                editor.editorFS.fs.mkdir(path, function (err) {
-                    if (err)
-                        feng3d.assert(!err);
-                    callback && callback();
-                });
-                return;
-            }
             editor.editorFS.writeAssets(assetsFile.feng3dAssets, function (err) {
                 feng3d.assert(!err, "\u8D44\u6E90 " + assetsFile.id + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
@@ -6701,6 +6699,10 @@ var editor;
             var parentPath = feng3d.assetsIDPathMap.getPath(parentAssets.id);
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentPath, newName);
             var assetsFile = new editor.AssetsNode(feng3d.FMath.uuid(), newFolderPath, true);
+            var feng3dFolder = new feng3d.Feng3dFolder();
+            feng3dFolder.assetsId = assetsFile.id;
+            assetsFile.feng3dAssets = feng3dFolder;
+            assetsFile.isLoaded = true;
             this._assetsIDMap[assetsFile.id] = assetsFile;
             feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, newFolderPath);
             this.saveProject();
@@ -7187,8 +7189,6 @@ var editor;
             feng3d.assert(!!path);
             _this._id = id;
             _this.isDirectory = isDirectory;
-            if (isDirectory)
-                _this.isLoaded = true;
             _this.label = feng3d.pathUtils.getName(path);
             // 更新图标
             if (_this.isDirectory) {

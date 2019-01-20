@@ -76,7 +76,6 @@ namespace editor
 
             this._id = id;
             this.isDirectory = isDirectory;
-            if (isDirectory) this.isLoaded = true;
             this.label = feng3d.pathUtils.getName(path);
             // 更新图标
             if (this.isDirectory)
