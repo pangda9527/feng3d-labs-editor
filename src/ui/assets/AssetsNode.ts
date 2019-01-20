@@ -26,11 +26,6 @@ namespace editor
         private _id: string;
 
         /**
-         * 路径
-         */
-        path: string;
-
-        /**
          * 是否文件夹
          */
         isDirectory: boolean;
@@ -80,7 +75,6 @@ namespace editor
             feng3d.assert(!!path);
 
             this._id = id;
-            this.path = path;
             this.isDirectory = isDirectory;
             if (isDirectory) this.isLoaded = true;
             this.label = feng3d.pathUtils.getName(path);
@@ -126,11 +120,12 @@ namespace editor
 
             this.isLoading = true;
 
-            editorFS.fs.readObject(this.path, (err, assets: feng3d.Feng3dAssets) =>
+            editorFS.readAssets(this.id, (err, assets: feng3d.Feng3dAssets) =>
             {
                 feng3d.assert(!err);
 
-                assets.name = feng3d.pathUtils.getNameWithExtension(this.path);
+                var path = feng3d.assetsIDPathMap.getPath(this.id);
+                assets.name = feng3d.pathUtils.getNameWithExtension(path);
                 this.feng3dAssets = assets;
 
                 this.isLoading = false;
@@ -240,7 +235,12 @@ namespace editor
          */
         getNewChildFileName(childName: string)
         {
-            var childrenNames = this.children.map(v => feng3d.pathUtils.getNameWithExtension(v.path));
+            var childrenNames = this.children.map(v =>
+            {
+                var filepath = feng3d.assetsIDPathMap.getPath(v.id);
+                var filename = feng3d.pathUtils.getNameWithExtension(filepath);
+                return filename;
+            });
             if (childrenNames.indexOf(childName) == -1) return childName;
 
             var baseName = feng3d.pathUtils.getName(childName);
@@ -266,7 +266,8 @@ namespace editor
         getNewChildPath(basename: string)
         {
             var newName = this.getNewChildFileName(basename);
-            var path = feng3d.pathUtils.getChildFilePath(this.path, newName);
+            var filepath = feng3d.assetsIDPathMap.getPath(this.id);
+            var path = feng3d.pathUtils.getChildFilePath(filepath, newName);
             return path;
         }
 
@@ -300,7 +301,7 @@ namespace editor
         {
             var zip = new JSZip();
 
-            var path = this.path;
+            var path = feng3d.assetsIDPathMap.getPath(this.id);
             if (!feng3d.pathUtils.isDirectory(path))
                 path = feng3d.pathUtils.getParentPath(path);
 

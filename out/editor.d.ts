@@ -1874,10 +1874,6 @@ declare namespace editor {
         readonly id: string;
         private _id;
         /**
-         * 路径
-         */
-        path: string;
-        /**
          * 是否文件夹
          */
         isDirectory: boolean;

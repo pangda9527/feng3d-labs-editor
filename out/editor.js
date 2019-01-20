@@ -361,8 +361,8 @@ var editor;
          */
         EditorFS.prototype.hasProject = function (projectname, callback) {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBFS) {
-                feng3d._indexedDB.hasObjectStore(readWriteFS.DBname, projectname, callback);
+            if (readWriteFS.baseFS instanceof feng3d.IndexedDBFS) {
+                feng3d._indexedDB.hasObjectStore(readWriteFS.baseFS.DBname, projectname, callback);
             }
             else if (readWriteFS["getProjectList"] != null) {
                 readWriteFS["getProjectList"](function (err, projects) {
@@ -381,8 +381,8 @@ var editor;
          */
         EditorFS.prototype.getProjectList = function (callback) {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBFS) {
-                feng3d._indexedDB.getObjectStoreNames(readWriteFS.DBname, callback);
+            if (readWriteFS.baseFS instanceof feng3d.IndexedDBFS) {
+                feng3d._indexedDB.getObjectStoreNames(readWriteFS.baseFS.DBname, callback);
             }
             else if (readWriteFS["getProjectList"] != null) {
                 readWriteFS["getProjectList"](callback);
@@ -398,8 +398,8 @@ var editor;
          */
         EditorFS.prototype.initproject = function (projectname, callback) {
             var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBFS) {
-                feng3d._indexedDB.createObjectStore(readWriteFS.DBname, projectname, function (err) {
+            if (readWriteFS.baseFS instanceof feng3d.IndexedDBFS) {
+                feng3d._indexedDB.createObjectStore(readWriteFS.baseFS.DBname, projectname, function (err) {
                     if (err) {
                         feng3d.warn(err);
                         return;
@@ -5826,7 +5826,7 @@ var editor;
                     audioFiles.forEach(function (item) {
                         menus.push({
                             label: item.label, click: function () {
-                                _this.attributeValue = item.path;
+                                _this.attributeValue = feng3d.assetsIDPathMap.getPath(item.id);
                             }
                         });
                     }, []);
@@ -6553,7 +6553,8 @@ var editor;
                     return file;
                 });
                 files.forEach(function (element) {
-                    var parentPath = feng3d.pathUtils.getParentPath(element.path);
+                    var elementpath = feng3d.assetsIDPathMap.getPath(element.id);
+                    var parentPath = feng3d.pathUtils.getParentPath(elementpath);
                     if (parentPath != "/" && parentPath.length > 0) {
                         _this.getAssetsByPath(parentPath).addChild(element);
                     }
@@ -6602,7 +6603,7 @@ var editor;
             feng3d.assert(!!this._assetsIDMap[assetsFile.id]);
             delete this._assetsIDMap[assetsFile.id];
             feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
-            editor.editorFS.fs.deleteFile(assetsFile.path);
+            editor.editorFS.deleteAssets(assetsFile.feng3dAssets);
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
             this.saveProject();
         };
@@ -6613,7 +6614,7 @@ var editor;
         EditorAssets.prototype.saveProject = function (callback) {
             var _this = this;
             var object = Object.keys(this._assetsIDMap).map(function (element) {
-                return { id: element, path: _this._assetsIDMap[element].path, isDirectory: _this._assetsIDMap[element].isDirectory };
+                return { id: element, path: feng3d.assetsIDPathMap.getPath(element), isDirectory: _this._assetsIDMap[element].isDirectory };
             });
             editor.editorFS.fs.writeObject(assetsFilePath, object, callback);
         };
@@ -6625,8 +6626,9 @@ var editor;
          */
         EditorAssets.prototype.saveAssets = function (assetsFile, callback) {
             feng3d.assert(!!this._assetsIDMap[assetsFile.id], "\u65E0\u6CD5\u4FDD\u5B58\u5DF2\u7ECF\u88AB\u5220\u9664\u7684\u8D44\u6E90\uFF01");
+            var path = feng3d.assetsIDPathMap.getPath(assetsFile.id);
             if (assetsFile.isDirectory) {
-                editor.editorFS.fs.mkdir(assetsFile.path, function (err) {
+                editor.editorFS.fs.mkdir(path, function (err) {
                     if (err)
                         feng3d.assert(!err);
                     callback && callback();
@@ -6634,7 +6636,7 @@ var editor;
                 return;
             }
             editor.editorFS.writeAssets(assetsFile.feng3dAssets, function (err) {
-                feng3d.assert(!err, "\u8D44\u6E90 " + assetsFile.path + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                feng3d.assert(!err, "\u8D44\u6E90 " + assetsFile.id + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
             });
         };
@@ -6650,13 +6652,14 @@ var editor;
                 callback && callback();
                 return;
             }
-            var oldPath = assetsFile.path;
+            var oldPath = feng3d.assetsIDPathMap.getPath(assetsFile.id);
             var files = assetsFile.getFileList();
             // 更新资源结点中文件路径
             files.forEach(function (file) {
                 feng3d.assetsIDPathMap.deleteByID(file.id);
-                file.path = file.path.replace(oldPath, newPath);
-                feng3d.assetsIDPathMap.addIDPathMap(file.id, file.path);
+                var filepath = feng3d.assetsIDPathMap.getPath(file.id);
+                filepath = filepath.replace(oldPath, newPath);
+                feng3d.assetsIDPathMap.addIDPathMap(file.id, filepath);
             });
             // 更新结点父子关系
             var newParentPath = feng3d.pathUtils.getParentPath(newPath);
@@ -6695,10 +6698,11 @@ var editor;
          */
         EditorAssets.prototype.createFolder = function (parentAssets, folderName) {
             var newName = parentAssets.getNewChildFileName(folderName);
-            var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentAssets.path, newName);
+            var parentPath = feng3d.assetsIDPathMap.getPath(parentAssets.id);
+            var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentPath, newName);
             var assetsFile = new editor.AssetsNode(feng3d.FMath.uuid(), newFolderPath, true);
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, assetsFile.path);
+            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, newFolderPath);
             this.saveProject();
             this.saveAssets(assetsFile);
             parentAssets.addChild(assetsFile);
@@ -6716,7 +6720,7 @@ var editor;
             assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.isLoaded = true;
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, assetsFile.path);
+            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, path);
             this.saveProject();
             this.saveAssets(assetsFile);
             parentAssets.addChild(assetsFile);
@@ -6960,8 +6964,8 @@ var editor;
          */
         EditorAssets.prototype.parserMenu = function (menuconfig, assetsFile) {
             if (assetsFile.feng3dAssets instanceof feng3d.Feng3dFile) {
-                var extensions = feng3d.pathUtils.getExtension(assetsFile.path);
-                var filePath = assetsFile.path;
+                var filePath = feng3d.assetsIDPathMap.getPath(assetsFile.id);
+                var extensions = feng3d.pathUtils.getExtension(filePath);
                 switch (extensions) {
                     case "mdl":
                         menuconfig.push({ label: "解析", click: function () { return feng3d.mdlLoader.load(filePath); } });
@@ -7042,7 +7046,9 @@ var editor;
                     }, ["assetsFiles"], function (dragdata) {
                         dragdata.assetsFiles.forEach(function (v) {
                             // 移动文件
-                            var newPath = v.path.replace(feng3d.pathUtils.getParentPath(v.path), _this.data.path);
+                            var oldPath = feng3d.assetsIDPathMap.getPath(v.id);
+                            var newParentPath = feng3d.assetsIDPathMap.getPath(_this.data.id);
+                            var newPath = oldPath.replace(feng3d.pathUtils.getParentPath(oldPath), newParentPath);
                             editor.editorAssets.moveAssets(v, newPath);
                         });
                     });
@@ -7180,7 +7186,6 @@ var editor;
             feng3d.assert(!!id);
             feng3d.assert(!!path);
             _this._id = id;
-            _this.path = path;
             _this.isDirectory = isDirectory;
             if (isDirectory)
                 _this.isLoaded = true;
@@ -7225,9 +7230,10 @@ var editor;
                 return;
             }
             this.isLoading = true;
-            editor.editorFS.fs.readObject(this.path, function (err, assets) {
+            editor.editorFS.readAssets(this.id, function (err, assets) {
                 feng3d.assert(!err);
-                assets.name = feng3d.pathUtils.getNameWithExtension(_this.path);
+                var path = feng3d.assetsIDPathMap.getPath(_this.id);
+                assets.name = feng3d.pathUtils.getNameWithExtension(path);
                 _this.feng3dAssets = assets;
                 _this.isLoading = false;
                 _this.isLoaded = true;
@@ -7315,7 +7321,11 @@ var editor;
          * @param childName 基础名称
          */
         AssetsNode.prototype.getNewChildFileName = function (childName) {
-            var childrenNames = this.children.map(function (v) { return feng3d.pathUtils.getNameWithExtension(v.path); });
+            var childrenNames = this.children.map(function (v) {
+                var filepath = feng3d.assetsIDPathMap.getPath(v.id);
+                var filename = feng3d.pathUtils.getNameWithExtension(filepath);
+                return filename;
+            });
             if (childrenNames.indexOf(childName) == -1)
                 return childName;
             var baseName = feng3d.pathUtils.getName(childName);
@@ -7337,7 +7347,8 @@ var editor;
          */
         AssetsNode.prototype.getNewChildPath = function (basename) {
             var newName = this.getNewChildFileName(basename);
-            var path = feng3d.pathUtils.getChildFilePath(this.path, newName);
+            var filepath = feng3d.assetsIDPathMap.getPath(this.id);
+            var path = feng3d.pathUtils.getChildFilePath(filepath, newName);
             return path;
         };
         /**
@@ -7364,7 +7375,7 @@ var editor;
          */
         AssetsNode.prototype.export = function () {
             var zip = new JSZip();
-            var path = this.path;
+            var path = feng3d.assetsIDPathMap.getPath(this.id);
             if (!feng3d.pathUtils.isDirectory(path))
                 path = feng3d.pathUtils.getParentPath(path);
             var filename = this.label;
@@ -7424,7 +7435,10 @@ var editor;
                     dragsource.assetsFiles = [_this.data];
                 }, ["assetsFiles"], function (dragdata) {
                     dragdata.assetsFiles.forEach(function (v) {
-                        var newPath = v.path.replace(feng3d.pathUtils.getParentPath(v.path), _this.data.path);
+                        // 移动文件
+                        var oldPath = feng3d.assetsIDPathMap.getPath(v.id);
+                        var newParentPath = feng3d.assetsIDPathMap.getPath(_this.data.id);
+                        var newPath = oldPath.replace(feng3d.pathUtils.getParentPath(oldPath), newParentPath);
                         editor.editorAssets.moveAssets(v, newPath);
                     });
                 });
@@ -7593,7 +7607,10 @@ var editor;
         AssetsView.prototype.selectedfilechanged = function () {
             var selectedAssetsFile = editor.editorData.selectedAssetsFile;
             if (selectedAssetsFile.length > 0)
-                this.filepathLabel.text = selectedAssetsFile.map(function (v) { return feng3d.pathUtils.getNameWithExtension(v.path); }).join(",");
+                this.filepathLabel.text = selectedAssetsFile.map(function (v) {
+                    var vpath = feng3d.assetsIDPathMap.getPath(v.id);
+                    return feng3d.pathUtils.getNameWithExtension(vpath);
+                }).join(",");
             else
                 this.filepathLabel.text = "";
         };

@@ -45,8 +45,11 @@ namespace editor
                     {
                         dragdata.assetsFiles.forEach(v =>
                         {
-                            var newPath = v.path.replace(feng3d.pathUtils.getParentPath(v.path), this.data.path);
-                            editorAssets.moveAssets(v, newPath)
+                            // 移动文件
+                            var oldPath = feng3d.assetsIDPathMap.getPath(v.id);
+                            var newParentPath = feng3d.assetsIDPathMap.getPath(this.data.id);
+                            var newPath = oldPath.replace(feng3d.pathUtils.getParentPath(oldPath), newParentPath);
+                            editorAssets.moveAssets(v, newPath);
                         });
                     });
             } else

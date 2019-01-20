@@ -57,7 +57,8 @@ namespace editor
 
                 files.forEach(element =>
                 {
-                    var parentPath = feng3d.pathUtils.getParentPath(element.path);
+                    var elementpath = feng3d.assetsIDPathMap.getPath(element.id);
+                    var parentPath = feng3d.pathUtils.getParentPath(elementpath);
                     if (parentPath != "/" && parentPath.length > 0)
                     {
                         this.getAssetsByPath(parentPath).addChild(element);
@@ -120,7 +121,7 @@ namespace editor
             delete this._assetsIDMap[assetsFile.id];
             feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
 
-            editorFS.fs.deleteFile(assetsFile.path);
+            editorFS.deleteAssets(assetsFile.feng3dAssets);
 
             feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
 
@@ -135,7 +136,7 @@ namespace editor
         {
             var object = Object.keys(this._assetsIDMap).map(element =>
             {
-                return { id: element, path: this._assetsIDMap[element].path, isDirectory: this._assetsIDMap[element].isDirectory };
+                return { id: element, path: feng3d.assetsIDPathMap.getPath(element), isDirectory: this._assetsIDMap[element].isDirectory };
             });
 
             editorFS.fs.writeObject(assetsFilePath, object, callback);
@@ -150,10 +151,11 @@ namespace editor
         saveAssets(assetsFile: AssetsNode, callback?: () => void)
         {
             feng3d.assert(!!this._assetsIDMap[assetsFile.id], `无法保存已经被删除的资源！`);
+            var path = feng3d.assetsIDPathMap.getPath(assetsFile.id);
 
             if (assetsFile.isDirectory)
             {
-                editorFS.fs.mkdir(assetsFile.path, (err) =>
+                editorFS.fs.mkdir(path, (err) =>
                 {
                     if (err) feng3d.assert(!err);
                     callback && callback();
@@ -162,7 +164,7 @@ namespace editor
             }
             editorFS.writeAssets(assetsFile.feng3dAssets, (err) =>
             {
-                feng3d.assert(!err, `资源 ${assetsFile.path} 保存失败！`);
+                feng3d.assert(!err, `资源 ${assetsFile.id} 保存失败！`);
                 callback && callback();
             });
         }
@@ -181,15 +183,18 @@ namespace editor
                 callback && callback();
                 return;
             }
-            var oldPath = assetsFile.path;
+
+
+            var oldPath = feng3d.assetsIDPathMap.getPath(assetsFile.id);
 
             var files = assetsFile.getFileList();
             // 更新资源结点中文件路径
             files.forEach(file =>
             {
                 feng3d.assetsIDPathMap.deleteByID(file.id);
-                file.path = file.path.replace(oldPath, newPath);
-                feng3d.assetsIDPathMap.addIDPathMap(file.id, file.path);
+                var filepath = feng3d.assetsIDPathMap.getPath(file.id);
+                filepath = filepath.replace(oldPath, newPath);
+                feng3d.assetsIDPathMap.addIDPathMap(file.id, filepath);
             });
 
             // 更新结点父子关系
@@ -237,12 +242,13 @@ namespace editor
         createFolder(parentAssets: AssetsNode, folderName: string)
         {
             var newName = parentAssets.getNewChildFileName(folderName);
-            var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentAssets.path, newName);
+            var parentPath = feng3d.assetsIDPathMap.getPath(parentAssets.id);
+            var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentPath, newName);
 
             var assetsFile = new AssetsNode(feng3d.FMath.uuid(), newFolderPath, true);
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, assetsFile.path);
+            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, newFolderPath);
 
             this.saveProject();
 
@@ -266,7 +272,7 @@ namespace editor
             assetsFile.isLoaded = true;
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, assetsFile.path);
+            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, path);
 
             this.saveProject();
 
@@ -575,8 +581,8 @@ namespace editor
         {
             if (assetsFile.feng3dAssets instanceof feng3d.Feng3dFile)
             {
-                var extensions = feng3d.pathUtils.getExtension(assetsFile.path);
-                var filePath = assetsFile.path;
+                var filePath = feng3d.assetsIDPathMap.getPath(assetsFile.id);
+                var extensions = feng3d.pathUtils.getExtension(filePath);
                 switch (extensions)
                 {
                     case "mdl": menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(filePath) }); break;
