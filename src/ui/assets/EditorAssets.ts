@@ -41,21 +41,16 @@ namespace editor
          */
         initproject(callback: () => void)
         {
-            editorFS.fs.readObject(assetsFilePath, (err, object: { id: string, path: string, isDirectory: boolean }[]) =>
+            editorFS.fs.readObject(assetsFilePath, (err, list: { id: string, path: string, isDirectory: boolean }[]) =>
             {
-                object = object || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
+                list = list || [{ id: AssetsPath, path: AssetsPath, isDirectory: true }];
 
-                feng3d.assetsIDPathMap.init();
+                feng3d.assetsIDPathMap.init(list);
 
-                var files = object.map(element =>
+                list.map(element =>
                 {
-                    var file = new AssetsNode(element.id, element.path, element.isDirectory);
-                    feng3d.assetsIDPathMap.addIDPathMap(element.id, element.path);
-                    this._assetsIDMap[element.id] = file;
-                    return file;
-                });
-
-                files.forEach(element =>
+                    return this._assetsIDMap[element.id] = new AssetsNode(element.id, element.path, element.isDirectory);
+                }).forEach(element =>
                 {
                     var elementpath = feng3d.assetsIDPathMap.getPath(element.id);
                     var parentPath = feng3d.pathUtils.getParentPath(elementpath);
@@ -126,9 +121,8 @@ namespace editor
                     return;
                 }
                 delete this._assetsIDMap[assetsFile.id];
-                feng3d.assetsIDPathMap.deleteByID(assetsFile.id);
 
-                feng3d.feng3dDispatcher.dispatch("assets.deletefile", { path: assetsFile.id });
+                feng3d.feng3dDispatcher.dispatch("assets.deletefile", { id: assetsFile.id });
 
                 this.saveProject();
 
@@ -142,12 +136,7 @@ namespace editor
          */
         saveProject(callback?: (err: Error) => void)
         {
-            var object = Object.keys(this._assetsIDMap).map(element =>
-            {
-                return { id: element, path: feng3d.assetsIDPathMap.getPath(element), isDirectory: this._assetsIDMap[element].isDirectory };
-            });
-
-            editorFS.fs.writeObject(assetsFilePath, object, callback);
+            editorFS.fs.writeObject(assetsFilePath, feng3d.assetsIDPathMap.toList(), callback);
         }
 
         /**
@@ -189,10 +178,10 @@ namespace editor
             // 更新资源结点中文件路径
             files.forEach(file =>
             {
-                feng3d.assetsIDPathMap.deleteByID(file.id);
                 var filepath = feng3d.assetsIDPathMap.getPath(file.id);
                 filepath = filepath.replace(oldPath, newPath);
-                feng3d.assetsIDPathMap.addIDPathMap(file.id, filepath);
+                feng3d.assetsIDPathMap.deleteByID(file.id);
+                feng3d.assetsIDPathMap.addItem({ id: file.id, path: filepath, isDirectory: file.isDirectory });
             });
 
             // 更新结点父子关系
@@ -252,12 +241,14 @@ namespace editor
             assetsFile.isLoaded = true;
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, newFolderPath);
 
-            this.saveProject();
+            feng3d.assetsIDPathMap.addItem({ id: assetsFile.id, path: newFolderPath, isDirectory: assetsFile.isDirectory });
 
-            this.saveAssets(assetsFile);
-            parentAssets.addChild(assetsFile);
+            this.saveAssets(assetsFile, () =>
+            {
+                this.saveProject();
+                parentAssets.addChild(assetsFile);
+            });
             return assetsFile;
         }
 
@@ -276,11 +267,13 @@ namespace editor
             assetsFile.isLoaded = true;
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            feng3d.assetsIDPathMap.addIDPathMap(assetsFile.id, path);
+            feng3d.assetsIDPathMap.addItem({ id: assetsFile.id, path: path, isDirectory: assetsFile.isDirectory });
 
-            this.saveProject();
 
-            this.saveAssets(assetsFile);
+            this.saveAssets(assetsFile, () =>
+            {
+                this.saveProject();
+            });
             parentAssets.addChild(assetsFile);
             return assetsFile;
         }

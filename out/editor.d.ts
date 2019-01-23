@@ -3326,7 +3326,7 @@ declare namespace feng3d {
          * 删除文件
          */
         "assets.deletefile": {
-            path: string;
+            id: string;
         };
         /**
          * 旋转场景摄像机
