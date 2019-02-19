@@ -1838,22 +1838,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    /**
-     * 资源元数据
-     */
-    class AssetsMeta {
-        /**
-         * 资源编号
-         */
-        guid: string;
-        /**
-         * 是否为文件夹资源
-         */
-        folderAsset: boolean;
-        type: string;
-    }
-}
-declare namespace editor {
     interface AssetsFileEventMap extends TreeNodeMap {
         /**
          * 加载完成
@@ -1891,7 +1875,7 @@ declare namespace editor {
         /**
          * 元标签，用于描述资源类型等信息
          */
-        meta: AssetsMeta;
+        meta: feng3d.AssetsMeta;
         /**
          * 是否已加载
          */

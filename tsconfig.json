@@ -108,7 +108,6 @@
         //
         "src/ui/assets/EditorAssets.ts",
         "src/ui/assets/AssetsFileItemRenderer.ts",
-        "src/ui/assets/AssetsMeta.ts",
         "src/ui/assets/AssetsNode.ts",
         "src/ui/assets/AssetsTreeItemRenderer.ts",
         "src/ui/assets/AssetsView.ts",

@@ -7153,18 +7153,6 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    /**
-     * 资源元数据
-     */
-    var AssetsMeta = /** @class */ (function () {
-        function AssetsMeta() {
-        }
-        return AssetsMeta;
-    }());
-    editor.AssetsMeta = AssetsMeta;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
     var AssetsNode = /** @class */ (function (_super) {
         __extends(AssetsNode, _super);
         /**

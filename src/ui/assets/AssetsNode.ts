@@ -50,7 +50,7 @@ namespace editor
         /**
          * 元标签，用于描述资源类型等信息
          */
-        meta: AssetsMeta;
+        meta: feng3d.AssetsMeta;
 
         /**
          * 是否已加载
