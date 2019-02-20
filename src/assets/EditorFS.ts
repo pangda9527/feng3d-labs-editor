@@ -113,40 +113,7 @@ namespace editor
                         var filepaths = Object.keys(zip.files);
                         filepaths.sort();
 
-                        readfiles()
-                        /**
-                         * 读取zip中所有文件
-                         */
-                        function readfiles()
-                        {
-                            if (filepaths.length > 0)
-                            {
-                                var filepath = filepaths.shift();
-                                var file = zip.files[filepath];
-                                if (file.dir)
-                                {
-                                    editorFS.fs.mkdir(filepath, readfiles);
-                                } else
-                                {
-                                    file.async("arraybuffer").then((data) =>
-                                    {
-                                        editorFS.fs.writeArrayBuffer(filepath, data, (err: Error) =>
-                                        {
-                                            if (err)
-                                                console.log(err);
-                                            readfiles()
-                                        });
-                                    }, (reason) =>
-                                        {
-                                            console.warn(reason);
-                                            readfiles();
-                                        });
-                                }
-                            } else
-                            {
-                                callback();
-                            }
-                        }
+                        readfiles(zip, filepaths, callback)
                     });
                 };
                 request.onerror = (ev) =>
@@ -179,40 +146,8 @@ namespace editor
                     });
                     filepaths.sort();
 
-                    readfiles()
-                    /**
-                     * 读取zip中所有文件
-                     */
-                    function readfiles()
-                    {
-                        if (filepaths.length > 0)
-                        {
-                            var filepath = filepaths.shift();
-                            var file = zip.files[filepath];
-                            if (file.dir)
-                            {
-                                editorFS.fs.mkdir(filepath, readfiles);
-                            } else
-                            {
-                                file.async("arraybuffer").then((data) =>
-                                {
-                                    editorFS.fs.writeArrayBuffer(filepath, data, (err: Error) =>
-                                    {
-                                        if (err)
-                                            console.log(err);
-                                        readfiles()
-                                    });
-                                }, (reason) =>
-                                    {
-                                        console.warn(reason);
-                                        readfiles();
-                                    });
-                            }
-                        } else
-                        {
-                            callback();
-                        }
-                    }
+                    readfiles(zip, filepaths, callback)
+
                 });
             };
             request.onerror = (ev) =>
@@ -300,6 +235,61 @@ namespace editor
                     }
                 }
             });
+        }
+    }
+
+    /**
+     * 读取zip中所有文件到 fs
+     */
+    function readfiles(zip: JSZip, filepaths: string[], callback: () => void)
+    {
+        if (filepaths.length > 0)
+        {
+            var filepath = filepaths.shift();
+            var file = zip.files[filepath];
+            if (file.dir)
+            {
+                editorFS.fs.mkdir(filepath, (err) =>
+                {
+                    readfiles(zip, filepaths, callback);
+                });
+            } else
+            {
+                if (feng3d.regExps.image.test(filepath))
+                {
+                    file.async("arraybuffer").then((data) =>
+                    {
+                        editorFS.fs.writeArrayBuffer(filepath, data, (err: Error) =>
+                        {
+                            if (err)
+                                console.log(err);
+                            readfiles(zip, filepaths, callback)
+                        });
+                    }, (reason) =>
+                        {
+                            console.warn(reason);
+                            readfiles(zip, filepaths, callback);
+                        });
+                } else
+                {
+                    file.async("string").then((data) =>
+                    {
+                        editorFS.fs.writeString(filepath, data, (err: Error) =>
+                        {
+                            if (err)
+                                console.log(err);
+                            readfiles(zip, filepaths, callback)
+                        });
+                    }, (reason) =>
+                        {
+                            console.warn(reason);
+                            readfiles(zip, filepaths, callback);
+                        });
+                }
+            }
+        } else
+        {
+            callback();
         }
     }
 

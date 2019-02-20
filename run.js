@@ -2,40 +2,40 @@
 
 var view3D = new feng3d.Engine();
 
-var fstype = feng3d.assets.fstype = GetQueryString("fstype");
+var fstype = GetQueryString("fstype");
 
 if (fstype == "indexedDB")
 {
-    feng3d.assets.fs = feng3d.indexedDBfs;
-    feng3d.indexedDBfs.projectname = decodeURI(GetQueryString("project"));
-
-    feng3d.assets.readString("project.js", (err, content) =>
-    {
-        //
-        var windowEval = eval.bind(window);
-        // 运行project.js
-        windowEval(content);
-
-        // 加载并初始化场景
-        feng3d.assets.readObject("default.scene.json", (err, scene) =>
-        {
-            if (scene.getComponent(feng3d.Scene3D))
-                view3D.scene = scene.getComponent(feng3d.Scene3D);
-
-            var cameras = view3D.root.getComponentsInChildren(feng3d.Camera);
-            if (cameras.length > 0)
-            {
-                view3D.camera = cameras[0];
-            } else
-            {
-                var camera = view3D.camera;
-                camera.transform.z = -10;
-                camera.transform.lookAt(new feng3d.Vector3D());
-                //
-            }
-        });
-    });
+    feng3d.assets = new feng3d.ReadAssetsFS(feng3d.indexedDBFS);
+    feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
 }
+
+feng3d.assets.fs.readString("project.js", (err, content) =>
+{
+    //
+    var windowEval = eval.bind(window);
+    // 运行project.js
+    windowEval(content);
+
+    // 加载并初始化场景
+    feng3d.assets.fs.readObject("default.scene.json", (err, scene) =>
+    {
+        if (scene.getComponent(feng3d.Scene3D))
+            view3D.scene = scene.getComponent(feng3d.Scene3D);
+
+        var cameras = view3D.root.getComponentsInChildren(feng3d.Camera);
+        if (cameras.length > 0)
+        {
+            view3D.camera = cameras[0];
+        } else
+        {
+            var camera = view3D.camera;
+            camera.transform.z = -10;
+            camera.transform.lookAt(new feng3d.Vector3D());
+            //
+        }
+    });
+});
 
 function GetQueryString(name)
 {

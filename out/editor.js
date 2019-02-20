@@ -435,34 +435,7 @@ var editor;
                     zip.loadAsync(request.response).then(function () {
                         var filepaths = Object.keys(zip.files);
                         filepaths.sort();
-                        readfiles();
-                        /**
-                         * 读取zip中所有文件
-                         */
-                        function readfiles() {
-                            if (filepaths.length > 0) {
-                                var filepath = filepaths.shift();
-                                var file = zip.files[filepath];
-                                if (file.dir) {
-                                    editor.editorFS.fs.mkdir(filepath, readfiles);
-                                }
-                                else {
-                                    file.async("arraybuffer").then(function (data) {
-                                        editor.editorFS.fs.writeArrayBuffer(filepath, data, function (err) {
-                                            if (err)
-                                                console.log(err);
-                                            readfiles();
-                                        });
-                                    }, function (reason) {
-                                        console.warn(reason);
-                                        readfiles();
-                                    });
-                                }
-                            }
-                            else {
-                                callback();
-                            }
-                        }
+                        readfiles(zip, filepaths, callback);
                     });
                 };
                 request.onerror = function (ev) {
@@ -488,34 +461,7 @@ var editor;
                         return true;
                     });
                     filepaths.sort();
-                    readfiles();
-                    /**
-                     * 读取zip中所有文件
-                     */
-                    function readfiles() {
-                        if (filepaths.length > 0) {
-                            var filepath = filepaths.shift();
-                            var file = zip.files[filepath];
-                            if (file.dir) {
-                                editor.editorFS.fs.mkdir(filepath, readfiles);
-                            }
-                            else {
-                                file.async("arraybuffer").then(function (data) {
-                                    editor.editorFS.fs.writeArrayBuffer(filepath, data, function (err) {
-                                        if (err)
-                                            console.log(err);
-                                        readfiles();
-                                    });
-                                }, function (reason) {
-                                    console.warn(reason);
-                                    readfiles();
-                                });
-                            }
-                        }
-                        else {
-                            callback();
-                        }
-                    }
+                    readfiles(zip, filepaths, callback);
                 });
             };
             request.onerror = function (ev) {
@@ -586,6 +532,49 @@ var editor;
         return EditorFS;
     }(feng3d.ReadWriteAssetsFS));
     editor.EditorFS = EditorFS;
+    /**
+     * 读取zip中所有文件到 fs
+     */
+    function readfiles(zip, filepaths, callback) {
+        if (filepaths.length > 0) {
+            var filepath = filepaths.shift();
+            var file = zip.files[filepath];
+            if (file.dir) {
+                editor.editorFS.fs.mkdir(filepath, function (err) {
+                    readfiles(zip, filepaths, callback);
+                });
+            }
+            else {
+                if (feng3d.regExps.image.test(filepath)) {
+                    file.async("arraybuffer").then(function (data) {
+                        editor.editorFS.fs.writeArrayBuffer(filepath, data, function (err) {
+                            if (err)
+                                console.log(err);
+                            readfiles(zip, filepaths, callback);
+                        });
+                    }, function (reason) {
+                        console.warn(reason);
+                        readfiles(zip, filepaths, callback);
+                    });
+                }
+                else {
+                    file.async("string").then(function (data) {
+                        editor.editorFS.fs.writeString(filepath, data, function (err) {
+                            if (err)
+                                console.log(err);
+                            readfiles(zip, filepaths, callback);
+                        });
+                    }, function (reason) {
+                        console.warn(reason);
+                        readfiles(zip, filepaths, callback);
+                    });
+                }
+            }
+        }
+        else {
+            callback();
+        }
+    }
     if (typeof require == "undefined") {
         feng3d.assets = editor.editorFS = new EditorFS(feng3d.indexedDBFS);
     }
