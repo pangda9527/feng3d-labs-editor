@@ -1890,7 +1890,7 @@ declare namespace editor {
          * @param id 编号
          * @param path 路径
          */
-        constructor(id: string, path: string, isDirectory: boolean);
+        constructor(id: string);
         /**
          * 加载元标签文件
          *

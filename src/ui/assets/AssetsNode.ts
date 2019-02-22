@@ -68,15 +68,15 @@ namespace editor
          * @param id 编号
          * @param path 路径
          */
-        constructor(id: string, path: string, isDirectory: boolean)
+        constructor(id: string)
         {
             super();
-            feng3d.assert(!!id);
-            feng3d.assert(!!path);
+
+            var item = feng3d.assetsIDPathMap.getItem(id);
 
             this._id = id;
-            this.isDirectory = isDirectory;
-            this.label = feng3d.pathUtils.getName(path);
+            this.isDirectory = item.isDirectory;
+            this.label = feng3d.pathUtils.getName(item.path);
             // 更新图标
             if (this.isDirectory)
             {

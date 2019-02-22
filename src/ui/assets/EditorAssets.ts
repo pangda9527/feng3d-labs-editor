@@ -49,7 +49,7 @@ namespace editor
 
                 list.map(element =>
                 {
-                    return this._assetsIDMap[element.id] = new AssetsNode(element.id, element.path, element.isDirectory);
+                    return this._assetsIDMap[element.id] = new AssetsNode(element.id);
                 }).forEach(element =>
                 {
                     var elementpath = feng3d.assetsIDPathMap.getPath(element.id);
@@ -232,7 +232,10 @@ namespace editor
             var parentPath = feng3d.assetsIDPathMap.getPath(parentAssets.id);
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentPath, newName);
 
-            var assetsFile = new AssetsNode(feng3d.FMath.uuid(), newFolderPath, true);
+            var newId = feng3d.FMath.uuid();
+            feng3d.assetsIDPathMap.addItem({ id: newId, path: newFolderPath, isDirectory: true });
+
+            var assetsFile = new AssetsNode(newId);
 
             var feng3dFolder = new feng3d.Feng3dFolder();
             feng3dFolder.assetsId = assetsFile.id;
@@ -242,7 +245,6 @@ namespace editor
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
 
-            feng3d.assetsIDPathMap.addItem({ id: assetsFile.id, path: newFolderPath, isDirectory: assetsFile.isDirectory });
 
             this.saveAssets(assetsFile, () =>
             {
@@ -261,13 +263,15 @@ namespace editor
         {
             var path = parentAssets.getNewChildPath(fileName);
 
-            var assetsFile = new AssetsNode(feng3d.FMath.uuid(), path, false);
+            var newId = feng3d.FMath.uuid();
+            feng3d.assetsIDPathMap.addItem({ id: newId, path: path, isDirectory: false });
+
+            var assetsFile = new AssetsNode(newId);
             feng3dAssets.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.isLoaded = true;
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            feng3d.assetsIDPathMap.addItem({ id: assetsFile.id, path: path, isDirectory: assetsFile.isDirectory });
 
 
             this.saveAssets(assetsFile, () =>
