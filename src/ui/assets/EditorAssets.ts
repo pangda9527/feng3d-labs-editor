@@ -113,7 +113,7 @@ namespace editor
         {
             feng3d.assert(!!this._assetsIDMap[assetsFile.id]);
 
-            editorFS.deleteAssets(assetsFile.feng3dAssets, (err) =>
+            editorFS.deleteAssets(assetsFile.id, (err) =>
             {
                 if (err)
                 {

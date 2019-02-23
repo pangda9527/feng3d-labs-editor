@@ -6587,7 +6587,7 @@ var editor;
         EditorAssets.prototype.deleteAssets = function (assetsFile, callback) {
             var _this = this;
             feng3d.assert(!!this._assetsIDMap[assetsFile.id]);
-            editor.editorFS.deleteAssets(assetsFile.feng3dAssets, function (err) {
+            editor.editorFS.deleteAssets(assetsFile.id, function (err) {
                 if (err) {
                     callback && callback(err);
                     return;
