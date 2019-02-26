@@ -516,13 +516,9 @@ namespace editor
                 var showFloder = this.showFloder;
                 if (feng3d.regExps.image.test(file.name))
                 {
-                    var imagePath = showFloder.getNewChildPath(file.name);
-
-                    editorFS.fs.writeArrayBuffer(imagePath, result, err =>
+                    feng3d.dataTransform.arrayBufferToImage(result, (img) =>
                     {
-                        var urlImageTexture2D = Object.setValue(new feng3d.UrlImageTexture2D(), { name: file.name })
-                        urlImageTexture2D.url = imagePath;
-                        var assetsFile = this.createAssets(showFloder, file.name, urlImageTexture2D);
+                        var assetsFile = this.createAssets(showFloder, file.name, Object.setValue(new feng3d.TextureFile(), { image: img }));
                         assetsFiles.push(assetsFile);
                         this.inputFiles(files, callback, assetsFiles);
                     });

@@ -6904,11 +6904,8 @@ var editor;
                 var result = event.target["result"];
                 var showFloder = _this.showFloder;
                 if (feng3d.regExps.image.test(file.name)) {
-                    var imagePath = showFloder.getNewChildPath(file.name);
-                    editor.editorFS.fs.writeArrayBuffer(imagePath, result, function (err) {
-                        var urlImageTexture2D = Object.setValue(new feng3d.UrlImageTexture2D(), { name: file.name });
-                        urlImageTexture2D.url = imagePath;
-                        var assetsFile = _this.createAssets(showFloder, file.name, urlImageTexture2D);
+                    feng3d.dataTransform.arrayBufferToImage(result, function (img) {
+                        var assetsFile = _this.createAssets(showFloder, file.name, Object.setValue(new feng3d.TextureFile(), { image: img }));
                         assetsFiles.push(assetsFile);
                         _this.inputFiles(files, callback, assetsFiles);
                     });
