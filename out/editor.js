@@ -4088,8 +4088,8 @@ var editor;
         };
         TextInputBinder.prototype.initView = function () {
             //
-            feng3d.watcher.watch(this.space, this.attribute, this.onValueChanged, this);
             if (this.editable) {
+                feng3d.watcher.watch(this.space, this.attribute, this.onValueChanged, this);
                 this.textInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
                 this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
@@ -7205,8 +7205,6 @@ var editor;
             this.isLoading = true;
             editor.editorFS.readAssets(this.id, function (err, assets) {
                 feng3d.assert(!err);
-                var path = feng3d.assetsIDPathMap.getPath(_this.id);
-                assets.name = feng3d.pathUtils.getNameWithExtension(path);
                 _this.feng3dAssets = assets;
                 _this.isLoading = false;
                 _this.isLoaded = true;

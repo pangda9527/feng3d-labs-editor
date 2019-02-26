@@ -122,7 +122,7 @@ function codeEditor(file)
     {
         logLabel.textContent = "";
         file.textContent = monacoEditor.getValue();
-        editor.assets.writeAssets(file, (err) =>
+        editor.editorFS.writeAssets(file, (err) =>
         {
             if (err) console.warn(err);
             logLabel.textContent = "自动保存完成！";

@@ -123,8 +123,6 @@ namespace editor
             {
                 feng3d.assert(!err);
 
-                var path = feng3d.assetsIDPathMap.getPath(this.id);
-                assets.name = feng3d.pathUtils.getNameWithExtension(path);
                 this.feng3dAssets = assets;
 
                 this.isLoading = false;
