@@ -263,12 +263,14 @@ namespace editor
         {
             var path = parentAssets.getNewChildPath(fileName);
 
-            var newId = feng3d.FMath.uuid();
-            feng3d.assetsIDPathMap.addItem({ id: newId, path: path, isDirectory: false });
+            feng3dAssets.assetsId = feng3d.FMath.uuid();
+            feng3d.Feng3dAssets.setAssets(feng3dAssets);
 
-            var assetsFile = new AssetsNode(newId);
-            feng3dAssets.assetsId = assetsFile.id;
+            feng3d.assetsIDPathMap.addItem({ id: feng3dAssets.assetsId, path: path, isDirectory: false });
+
+            var assetsFile = new AssetsNode(feng3dAssets.assetsId);
             assetsFile.feng3dAssets = feng3dAssets;
+
             assetsFile.isLoaded = true;
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
@@ -347,7 +349,7 @@ namespace editor
                             {
                                 label: "材质", click: () =>
                                 {
-                                    editorData.selectObject(this.createAssets(assetsFile, "New Material.json", new feng3d.Material()));
+                                    editorData.selectObject(this.createAssets(assetsFile, "New Material.json", Object.setValue(new feng3d.MaterialFile(), { material: new feng3d.Material() })));
                                 }
                             },
                             {

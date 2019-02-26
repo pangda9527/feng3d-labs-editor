@@ -48,11 +48,6 @@ namespace editor
         feng3dAssets: feng3d.Feng3dAssets;
 
         /**
-         * 元标签，用于描述资源类型等信息
-         */
-        meta: feng3d.AssetsMeta;
-
-        /**
          * 是否已加载
          */
         isLoaded = false;
@@ -66,7 +61,6 @@ namespace editor
          * 构建
          * 
          * @param id 编号
-         * @param path 路径
          */
         constructor(id: string)
         {
@@ -153,12 +147,12 @@ namespace editor
                 {
                     this.image = feng3dScreenShot.drawTextureCube(textureCube);
                 });
-            } else if (this.feng3dAssets instanceof feng3d.Material)
+            } else if (this.feng3dAssets instanceof feng3d.MaterialFile)
             {
                 var mat = this.feng3dAssets;
-                mat.onLoadCompleted(() =>
+                mat.material.onLoadCompleted(() =>
                 {
-                    this.image = feng3dScreenShot.drawMaterial(mat).toDataURL();
+                    this.image = feng3dScreenShot.drawMaterial(mat.material).toDataURL();
                 });
             } else if (this.feng3dAssets instanceof feng3d.Geometry)
             {

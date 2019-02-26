@@ -6258,14 +6258,17 @@ var editor;
          */
         InspectorView.prototype.saveShowData = function (callback) {
             if (this._dataChanged) {
-                if (this._viewData instanceof feng3d.Feng3dAssets) {
-                    if (this._viewData.assetsId) {
-                        var assetsFile = editor.editorAssets.getAssetsByID(this._viewData.assetsId);
-                        assetsFile && editor.editorAssets.saveAssets(assetsFile);
+                if (this._viewData.assetsId) {
+                    var feng3dAssets = feng3d.Feng3dAssets.getAssets(this._viewData.assetsId);
+                    if (feng3dAssets) {
+                        editor.editorFS.writeAssets(feng3dAssets, function (err) {
+                            feng3d.assert(!err, "\u8D44\u6E90 " + feng3dAssets.assetsId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                            callback && callback();
+                        });
                     }
                 }
                 else if (this._viewData instanceof editor.AssetsNode) {
-                    editor.editorAssets.saveAssets(assetsFile);
+                    editor.editorAssets.saveAssets(this._viewData);
                 }
                 this._dataChanged = false;
             }
@@ -6701,10 +6704,10 @@ var editor;
         EditorAssets.prototype.createAssets = function (parentAssets, fileName, feng3dAssets) {
             var _this = this;
             var path = parentAssets.getNewChildPath(fileName);
-            var newId = feng3d.FMath.uuid();
-            feng3d.assetsIDPathMap.addItem({ id: newId, path: path, isDirectory: false });
-            var assetsFile = new editor.AssetsNode(newId);
-            feng3dAssets.assetsId = assetsFile.id;
+            feng3dAssets.assetsId = feng3d.FMath.uuid();
+            feng3d.Feng3dAssets.setAssets(feng3dAssets);
+            feng3d.assetsIDPathMap.addItem({ id: feng3dAssets.assetsId, path: path, isDirectory: false });
+            var assetsFile = new editor.AssetsNode(feng3dAssets.assetsId);
             assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.isLoaded = true;
             this._assetsIDMap[assetsFile.id] = assetsFile;
@@ -6766,7 +6769,7 @@ var editor;
                         },
                         {
                             label: "材质", click: function () {
-                                editor.editorData.selectObject(_this.createAssets(assetsFile, "New Material.json", new feng3d.Material()));
+                                editor.editorData.selectObject(_this.createAssets(assetsFile, "New Material.json", Object.setValue(new feng3d.MaterialFile(), { material: new feng3d.Material() })));
                             }
                         },
                         {
@@ -7150,7 +7153,6 @@ var editor;
          * 构建
          *
          * @param id 编号
-         * @param path 路径
          */
         function AssetsNode(id) {
             var _this = _super.call(this) || this;
@@ -7229,10 +7231,10 @@ var editor;
                     _this.image = editor.feng3dScreenShot.drawTextureCube(textureCube);
                 });
             }
-            else if (this.feng3dAssets instanceof feng3d.Material) {
+            else if (this.feng3dAssets instanceof feng3d.MaterialFile) {
                 var mat = this.feng3dAssets;
-                mat.onLoadCompleted(function () {
-                    _this.image = editor.feng3dScreenShot.drawMaterial(mat).toDataURL();
+                mat.material.onLoadCompleted(function () {
+                    _this.image = editor.feng3dScreenShot.drawMaterial(mat.material).toDataURL();
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.Geometry) {

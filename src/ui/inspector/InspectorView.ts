@@ -75,16 +75,20 @@ namespace editor
 		{
 			if (this._dataChanged)
 			{
-				if (this._viewData instanceof feng3d.Feng3dAssets)
+				if (this._viewData.assetsId)
 				{
-					if (this._viewData.assetsId)
+					var feng3dAssets = feng3d.Feng3dAssets.getAssets(this._viewData.assetsId);
+					if (feng3dAssets)
 					{
-						var assetsFile = editorAssets.getAssetsByID(this._viewData.assetsId);
-						assetsFile && editorAssets.saveAssets(assetsFile);
+						editorFS.writeAssets(feng3dAssets, (err) =>
+						{
+							feng3d.assert(!err, `资源 ${feng3dAssets.assetsId} 保存失败！`);
+							callback && callback();
+						});
 					}
 				} else if (this._viewData instanceof AssetsNode)
 				{
-					editorAssets.saveAssets(assetsFile);
+					editorAssets.saveAssets(this._viewData);
 				}
 
 				this._dataChanged = false;

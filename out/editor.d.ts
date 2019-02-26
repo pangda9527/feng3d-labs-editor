@@ -1873,10 +1873,6 @@ declare namespace editor {
         parent: AssetsNode;
         feng3dAssets: feng3d.Feng3dAssets;
         /**
-         * 元标签，用于描述资源类型等信息
-         */
-        meta: feng3d.AssetsMeta;
-        /**
          * 是否已加载
          */
         isLoaded: boolean;
@@ -1888,7 +1884,6 @@ declare namespace editor {
          * 构建
          *
          * @param id 编号
-         * @param path 路径
          */
         constructor(id: string);
         /**
