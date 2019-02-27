@@ -233,18 +233,18 @@ namespace editor
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentPath, newName);
 
             var newId = feng3d.FMath.uuid();
+            var feng3dFolder = new feng3d.Feng3dFolder();
+            feng3dFolder.assetsId = newId;
+            feng3dFolder.meta = { guid: newId, isDirectory: true, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dFolder.assetType };
+
             feng3d.assetsIDPathMap.addItem({ id: newId, path: newFolderPath, isDirectory: true });
 
             var assetsFile = new AssetsNode(newId);
-
-            var feng3dFolder = new feng3d.Feng3dFolder();
-            feng3dFolder.assetsId = assetsFile.id;
             assetsFile.feng3dAssets = feng3dFolder;
 
             assetsFile.isLoaded = true;
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
-
 
             this.saveAssets(assetsFile, () =>
             {
@@ -264,6 +264,9 @@ namespace editor
             var path = parentAssets.getNewChildPath(fileName);
 
             feng3dAssets.assetsId = feng3d.FMath.uuid();
+
+            feng3dAssets.meta = { guid: feng3dAssets.assetsId, isDirectory: false, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dAssets.assetType };
+
             feng3d.Feng3dAssets.setAssets(feng3dAssets);
 
             feng3d.assetsIDPathMap.addItem({ id: feng3dAssets.assetsId, path: path, isDirectory: false });
@@ -274,7 +277,6 @@ namespace editor
             assetsFile.isLoaded = true;
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
-
 
             this.saveAssets(assetsFile, () =>
             {
