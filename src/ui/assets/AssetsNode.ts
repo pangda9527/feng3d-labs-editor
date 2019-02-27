@@ -17,6 +17,7 @@ namespace editor
         off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any);
     }
 
+
     export class AssetsNode extends TreeNode
     {
         /**
