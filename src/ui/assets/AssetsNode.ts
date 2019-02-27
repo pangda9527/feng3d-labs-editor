@@ -69,7 +69,7 @@ namespace editor
             var item = feng3d.assetsIDPathMap.getItem(id);
 
             this._id = id;
-            this.isDirectory = item.isDirectory;
+            this.isDirectory = item.assetType == feng3d.AssetExtension.folder;
             this.label = feng3d.pathUtils.getName(item.path);
             // 更新图标
             if (this.isDirectory)
