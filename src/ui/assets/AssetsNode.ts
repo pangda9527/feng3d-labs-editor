@@ -67,11 +67,11 @@ namespace editor
         {
             super();
 
-            var item = feng3d.assetsIDPathMap.getItem(id);
+            var item = editorFS.idMap[id];
 
             this._id = id;
             this.isDirectory = item.assetType == feng3d.AssetExtension.folder;
-            this.label = feng3d.pathUtils.getName(item.path);
+            this.label = feng3d.pathUtils.getName(item.assetsPath);
             // 更新图标
             if (this.isDirectory)
             {
@@ -237,7 +237,7 @@ namespace editor
         {
             var childrenNames = this.children.map(v =>
             {
-                var filepath = feng3d.assetsIDPathMap.getPath(v.id);
+                var filepath = editorFS.getPath(v.id);
                 var filename = feng3d.pathUtils.getNameWithExtension(filepath);
                 return filename;
             });
@@ -266,7 +266,7 @@ namespace editor
         getNewChildPath(basename: string)
         {
             var newName = this.getNewChildFileName(basename);
-            var filepath = feng3d.assetsIDPathMap.getPath(this.id);
+            var filepath = editorFS.getPath(this.id);
             var path = feng3d.pathUtils.getChildFilePath(filepath, newName);
             return path;
         }
@@ -301,7 +301,7 @@ namespace editor
         {
             var zip = new JSZip();
 
-            var path = feng3d.assetsIDPathMap.getPath(this.id);
+            var path = editorFS.getPath(this.id);
             if (!feng3d.pathUtils.isDirectory(path))
                 path = feng3d.pathUtils.getParentPath(path);
 

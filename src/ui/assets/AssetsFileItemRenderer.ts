@@ -57,8 +57,8 @@ namespace editor
                             dragdata.assetsFiles.forEach(v =>
                             {
                                 // 移动文件
-                                var oldPath = feng3d.assetsIDPathMap.getPath(v.id);
-                                var newParentPath = feng3d.assetsIDPathMap.getPath(this.data.id);
+                                var oldPath = editorFS.getPath(v.id);
+                                var newParentPath = editorFS.getPath(this.data.id);
                                 var newPath = oldPath.replace(feng3d.pathUtils.getParentPath(oldPath), newParentPath);
                                 editorAssets.moveAssets(v, newPath);
                             });

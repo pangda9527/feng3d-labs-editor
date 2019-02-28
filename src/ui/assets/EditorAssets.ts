@@ -52,7 +52,7 @@ namespace editor
                     return this._assetsIDMap[element.id] = new AssetsNode(element.id);
                 }).forEach(element =>
                 {
-                    var elementpath = feng3d.assetsIDPathMap.getPath(element.id);
+                    var elementpath = editorFS.getPath(element.id);
                     var parentPath = feng3d.pathUtils.getParentPath(elementpath);
                     if (parentPath != "/" && parentPath.length > 0)
                     {
@@ -172,13 +172,13 @@ namespace editor
             }
 
 
-            var oldPath = feng3d.assetsIDPathMap.getPath(assetsFile.id);
+            var oldPath = editorFS.getPath(assetsFile.id);
 
             var files = assetsFile.getFileList();
             // 更新资源结点中文件路径
             files.forEach(file =>
             {
-                var filepath = feng3d.assetsIDPathMap.getPath(file.id);
+                var filepath = editorFS.getPath(file.id);
                 filepath = filepath.replace(oldPath, newPath);
                 feng3d.assetsIDPathMap.deleteByID(file.id);
                 feng3d.assetsIDPathMap.addItem({ id: file.id, path: filepath, assetType: file.feng3dAssets.assetType });
@@ -229,7 +229,7 @@ namespace editor
         createFolder(parentAssets: AssetsNode, folderName: string)
         {
             var newName = parentAssets.getNewChildFileName(folderName);
-            var parentPath = feng3d.assetsIDPathMap.getPath(parentAssets.id);
+            var parentPath = editorFS.getPath(parentAssets.id);
             var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentPath, newName);
 
             var newId = feng3d.FMath.uuid();
@@ -582,7 +582,7 @@ namespace editor
         {
             if (assetsFile.feng3dAssets instanceof feng3d.Feng3dFile)
             {
-                var filePath = feng3d.assetsIDPathMap.getPath(assetsFile.id);
+                var filePath = editorFS.getPath(assetsFile.id);
                 var extensions = feng3d.pathUtils.getExtension(filePath);
                 switch (extensions)
                 {

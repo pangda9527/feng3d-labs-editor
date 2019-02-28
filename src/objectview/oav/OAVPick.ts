@@ -94,7 +94,7 @@ namespace editor
                         menus.push({
                             label: item.label, click: () =>
                             {
-                                this.attributeValue = feng3d.assetsIDPathMap.getPath(item.id);
+                                this.attributeValue = editorFS.getPath(item.id);
                             }
                         });
                     }, []);
