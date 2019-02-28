@@ -6555,11 +6555,9 @@ var editor;
          */
         EditorAssets.prototype.initproject = function (callback) {
             var _this = this;
-            editor.editorFS.fs.readObject(assetsFilePath, function (err, list) {
-                list = list || [{ id: AssetsPath, path: AssetsPath, assetType: feng3d.AssetExtension.folder }];
-                feng3d.assetsIDPathMap.init(list);
-                list.map(function (element) {
-                    return _this._assetsIDMap[element.id] = new editor.AssetsNode(element.id);
+            editor.editorFS.init(function () {
+                Object.keys(editor.editorFS.idMap).map(function (id) { return editor.editorFS.idMap[id]; }).map(function (v) {
+                    return _this._assetsIDMap[v.assetsId] = new editor.AssetsNode(v.assetsId);
                 }).forEach(function (element) {
                     var elementpath = editor.editorFS.getPath(element.id);
                     var parentPath = feng3d.pathUtils.getParentPath(elementpath);
@@ -6567,7 +6565,7 @@ var editor;
                         _this.getAssetsByPath(parentPath).addChild(element);
                     }
                 });
-                _this.rootFile = _this.getAssetsByID(AssetsPath);
+                _this.rootFile = _this._assetsIDMap[editor.editorFS.root.assetsId];
                 _this.showFloder = _this.rootFile;
                 _this.rootFile.on("added", function () { _this.saveProject(); });
                 _this.rootFile.on("removed", function () { _this.saveProject(); });
@@ -6599,7 +6597,7 @@ var editor;
          * @param assetsPath 资源路径
          */
         EditorAssets.prototype.getAssetsByPath = function (assetsPath) {
-            var id = feng3d.assetsIDPathMap.getID(assetsPath);
+            var id = editor.editorFS.pathMap[assetsPath].assetsId;
             return this.getAssetsByID(id);
         };
         /**
@@ -6626,7 +6624,7 @@ var editor;
          * @param callback 完成回调
          */
         EditorAssets.prototype.saveProject = function (callback) {
-            editor.editorFS.fs.writeObject(assetsFilePath, feng3d.assetsIDPathMap.toList(), callback);
+            editor.editorFS.save(callback);
         };
         /**
          * 保存资源
@@ -6649,7 +6647,7 @@ var editor;
          * @param callback 回调函数，当文件系统中文件全部移动完成后调用
          */
         EditorAssets.prototype.moveAssets = function (assetsFile, newPath, callback) {
-            if (feng3d.assetsIDPathMap.existPath(newPath)) {
+            if (editor.editorFS.pathMap[newPath]) {
                 callback && callback();
                 return;
             }
@@ -6658,9 +6656,10 @@ var editor;
             // 更新资源结点中文件路径
             files.forEach(function (file) {
                 var filepath = editor.editorFS.getPath(file.id);
+                delete editor.editorFS.pathMap[filepath];
                 filepath = filepath.replace(oldPath, newPath);
-                feng3d.assetsIDPathMap.deleteByID(file.id);
-                feng3d.assetsIDPathMap.addItem({ id: file.id, path: filepath, assetType: file.feng3dAssets.assetType });
+                file.feng3dAssets.assetsPath = filepath;
+                editor.editorFS.pathMap[filepath] = file.feng3dAssets;
             });
             // 更新结点父子关系
             var newParentPath = feng3d.pathUtils.getParentPath(newPath);
@@ -6706,7 +6705,6 @@ var editor;
             var feng3dFolder = new feng3d.Feng3dFolder();
             feng3dFolder.assetsId = newId;
             feng3dFolder.meta = { guid: newId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dFolder.assetType };
-            feng3d.assetsIDPathMap.addItem({ id: newId, path: newFolderPath, assetType: feng3dFolder.assetType });
             var assetsFile = new editor.AssetsNode(newId);
             assetsFile.feng3dAssets = feng3dFolder;
             assetsFile.isLoaded = true;
@@ -6728,7 +6726,6 @@ var editor;
             feng3dAssets.assetsId = feng3d.FMath.uuid();
             feng3dAssets.meta = { guid: feng3dAssets.assetsId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dAssets.assetType };
             feng3d.Feng3dAssets.setAssets(feng3dAssets);
-            feng3d.assetsIDPathMap.addItem({ id: feng3dAssets.assetsId, path: path, assetType: feng3dAssets.assetType });
             var assetsFile = new editor.AssetsNode(feng3dAssets.assetsId);
             assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.isLoaded = true;
