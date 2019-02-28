@@ -152,47 +152,6 @@ namespace editor
         }
 
         /**
-         * 移动资源
-         * 
-         * @param assetsFile 资源文件
-         * @param newPath 新路径
-         * @param callback 回调函数，当文件系统中文件全部移动完成后调用
-         */
-        moveAssets(assetsFile: AssetsNode, newPath: string, callback?: (err?: Error) => void)
-        {
-            if (editorFS.pathMap[newPath])
-            {
-                callback && callback();
-                return;
-            }
-
-
-            var oldPath = editorFS.getPath(assetsFile.id);
-
-            var files = assetsFile.getFileList();
-            // 更新资源结点中文件路径
-            files.forEach(file =>
-            {
-                var filepath = editorFS.getPath(file.id);
-
-                delete editorFS.pathMap[filepath];
-
-                filepath = filepath.replace(oldPath, newPath);
-
-                file.feng3dAssets.assetsPath = filepath;
-                editorFS.pathMap[filepath] = file.feng3dAssets;
-            });
-
-            // 更新结点父子关系
-            var newParentPath = feng3d.pathUtils.getParentPath(newPath);
-            var newParentAssetsFile = this.getAssetsByPath(newParentPath);
-            newParentAssetsFile.addChild(assetsFile);
-
-            // 移动文件
-            editorFS.fs.move(oldPath, newPath, callback);
-        }
-
-        /**
          * 获取脚本列表
          */
         getScripts()
@@ -225,28 +184,16 @@ namespace editor
          * 
          * @param folderName 文件夹名称
          */
-        createFolder(parentAssets: AssetsNode, folderName: string)
+        createFolder(parentAssets: AssetsNode, feng3dFolder: feng3d.Feng3dFolder)
         {
-            var newName = parentAssets.getNewChildFileName(folderName);
-            var parentPath = editorFS.getPath(parentAssets.id);
-            var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentPath, newName);
-
-            var newId = feng3d.FMath.uuid();
-            var feng3dFolder = new feng3d.Feng3dFolder();
-            feng3dFolder.assetsId = newId;
-            feng3dFolder.meta = { guid: newId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dFolder.assetType };
-
-            var assetsFile = new AssetsNode(newId);
+            var assetsFile = new AssetsNode(feng3dFolder.assetsId);
 
             assetsFile.isLoaded = true;
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
 
-            this.saveAssets(assetsFile, () =>
-            {
-                this.saveProject();
-                parentAssets.addChild(assetsFile);
-            });
+            this.saveProject();
+            parentAssets.addChild(assetsFile);
             return assetsFile;
         }
 
@@ -274,6 +221,7 @@ namespace editor
         popupmenu(assetsFile: AssetsNode)
         {
             var menuconfig: MenuItem[] = [];
+            var folder = <feng3d.Feng3dFolder>assetsFile.feng3dAssets;
             if (assetsFile.isDirectory)
             {
                 menuconfig.push(
@@ -283,7 +231,11 @@ namespace editor
                             {
                                 label: "文件夹", click: () =>
                                 {
-                                    editorData.selectObject(this.createFolder(assetsFile, "NewFolder"));
+                                    editorFS.createAsset(feng3d.Feng3dFolder, { name: "NewFolder" }, folder, (err, asset) =>
+                                    {
+                                        editorData.selectObject(this.createFolder(assetsFile, asset));
+                                    });
+
                                 }
                             },
                             {
@@ -320,7 +272,7 @@ namespace editor
                             {
                                 label: "文本", click: () =>
                                 {
-                                    editorFS.createAsset(feng3d.TextFile, null, <any>assetsFile.feng3dAssets, (err, asset) =>
+                                    editorFS.createAsset(feng3d.TextFile, { name: "New Text" }, folder, (err, asset) =>
                                     {
                                         editorData.selectObject(this.createAssets(assetsFile, "New Text.txt", asset));
                                     });

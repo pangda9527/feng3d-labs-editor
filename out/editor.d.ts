@@ -1776,14 +1776,6 @@ declare namespace editor {
          */
         saveAssets(assetsFile: AssetsNode, callback?: () => void): void;
         /**
-         * 移动资源
-         *
-         * @param assetsFile 资源文件
-         * @param newPath 新路径
-         * @param callback 回调函数，当文件系统中文件全部移动完成后调用
-         */
-        moveAssets(assetsFile: AssetsNode, newPath: string, callback?: (err?: Error) => void): void;
-        /**
          * 获取脚本列表
          */
         getScripts(): feng3d.ScriptFile[];
@@ -1797,7 +1789,7 @@ declare namespace editor {
          *
          * @param folderName 文件夹名称
          */
-        createFolder(parentAssets: AssetsNode, folderName: string): AssetsNode;
+        createFolder(parentAssets: AssetsNode, feng3dFolder: feng3d.Feng3dFolder): AssetsNode;
         /**
          * 新增资源
          *

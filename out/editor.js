@@ -6639,35 +6639,6 @@ var editor;
             });
         };
         /**
-         * 移动资源
-         *
-         * @param assetsFile 资源文件
-         * @param newPath 新路径
-         * @param callback 回调函数，当文件系统中文件全部移动完成后调用
-         */
-        EditorAssets.prototype.moveAssets = function (assetsFile, newPath, callback) {
-            if (editor.editorFS.pathMap[newPath]) {
-                callback && callback();
-                return;
-            }
-            var oldPath = editor.editorFS.getPath(assetsFile.id);
-            var files = assetsFile.getFileList();
-            // 更新资源结点中文件路径
-            files.forEach(function (file) {
-                var filepath = editor.editorFS.getPath(file.id);
-                delete editor.editorFS.pathMap[filepath];
-                filepath = filepath.replace(oldPath, newPath);
-                file.feng3dAssets.assetsPath = filepath;
-                editor.editorFS.pathMap[filepath] = file.feng3dAssets;
-            });
-            // 更新结点父子关系
-            var newParentPath = feng3d.pathUtils.getParentPath(newPath);
-            var newParentAssetsFile = this.getAssetsByPath(newParentPath);
-            newParentAssetsFile.addChild(assetsFile);
-            // 移动文件
-            editor.editorFS.fs.move(oldPath, newPath, callback);
-        };
-        /**
          * 获取脚本列表
          */
         EditorAssets.prototype.getScripts = function () {
@@ -6695,22 +6666,12 @@ var editor;
          *
          * @param folderName 文件夹名称
          */
-        EditorAssets.prototype.createFolder = function (parentAssets, folderName) {
-            var _this = this;
-            var newName = parentAssets.getNewChildFileName(folderName);
-            var parentPath = editor.editorFS.getPath(parentAssets.id);
-            var newFolderPath = feng3d.pathUtils.getChildFolderPath(parentPath, newName);
-            var newId = feng3d.FMath.uuid();
-            var feng3dFolder = new feng3d.Feng3dFolder();
-            feng3dFolder.assetsId = newId;
-            feng3dFolder.meta = { guid: newId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dFolder.assetType };
-            var assetsFile = new editor.AssetsNode(newId);
+        EditorAssets.prototype.createFolder = function (parentAssets, feng3dFolder) {
+            var assetsFile = new editor.AssetsNode(feng3dFolder.assetsId);
             assetsFile.isLoaded = true;
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            this.saveAssets(assetsFile, function () {
-                _this.saveProject();
-                parentAssets.addChild(assetsFile);
-            });
+            this.saveProject();
+            parentAssets.addChild(assetsFile);
             return assetsFile;
         };
         /**
@@ -6732,13 +6693,16 @@ var editor;
         EditorAssets.prototype.popupmenu = function (assetsFile) {
             var _this = this;
             var menuconfig = [];
+            var folder = assetsFile.feng3dAssets;
             if (assetsFile.isDirectory) {
                 menuconfig.push({
                     label: "新建",
                     submenu: [
                         {
                             label: "文件夹", click: function () {
-                                editor.editorData.selectObject(_this.createFolder(assetsFile, "NewFolder"));
+                                editor.editorFS.createAsset(feng3d.Feng3dFolder, { name: "NewFolder" }, folder, function (err, asset) {
+                                    editor.editorData.selectObject(_this.createFolder(assetsFile, asset));
+                                });
                             }
                         },
                         {
@@ -6767,7 +6731,7 @@ var editor;
                         },
                         {
                             label: "文本", click: function () {
-                                editor.editorFS.createAsset(feng3d.TextFile, null, assetsFile.feng3dAssets, function (err, asset) {
+                                editor.editorFS.createAsset(feng3d.TextFile, { name: "New Text" }, folder, function (err, asset) {
                                     editor.editorData.selectObject(_this.createAssets(assetsFile, "New Text.txt", asset));
                                 });
                             }
@@ -7035,6 +6999,7 @@ var editor;
             _super.prototype.dataChanged.call(this);
             if (this.data) {
                 if (this.data.isDirectory) {
+                    var folder = this.data.feng3dAssets;
                     editor.drag.register(this, function (dragsource) {
                         if (editor.editorData.selectedAssetsFile.indexOf(_this.data) != -1) {
                             dragsource.assetsFiles = editor.editorData.selectedAssetsFile.concat();
@@ -7044,11 +7009,14 @@ var editor;
                         }
                     }, ["assetsFiles"], function (dragdata) {
                         dragdata.assetsFiles.forEach(function (v) {
-                            // 移动文件
-                            var oldPath = editor.editorFS.getPath(v.id);
-                            var newParentPath = editor.editorFS.getPath(_this.data.id);
-                            var newPath = oldPath.replace(feng3d.pathUtils.getParentPath(oldPath), newParentPath);
-                            editor.editorAssets.moveAssets(v, newPath);
+                            editor.editorFS.moveAssets(v.feng3dAssets, folder, function (err) {
+                                if (!err) {
+                                    _this.data.addChild(v);
+                                }
+                                else {
+                                    alert(err.message);
+                                }
+                            });
                         });
                     });
                 }
@@ -7423,15 +7391,19 @@ var editor;
             var _this = this;
             _super.prototype.dataChanged.call(this);
             if (this.data) {
+                var folder = this.data.feng3dAssets;
                 editor.drag.register(this, function (dragsource) {
                     dragsource.assetsFiles = [_this.data];
                 }, ["assetsFiles"], function (dragdata) {
                     dragdata.assetsFiles.forEach(function (v) {
-                        // 移动文件
-                        var oldPath = editor.editorFS.getPath(v.id);
-                        var newParentPath = editor.editorFS.getPath(_this.data.id);
-                        var newPath = oldPath.replace(feng3d.pathUtils.getParentPath(oldPath), newParentPath);
-                        editor.editorAssets.moveAssets(v, newPath);
+                        editor.editorFS.moveAssets(v.feng3dAssets, folder, function (err) {
+                            if (!err) {
+                                _this.data.addChild(v);
+                            }
+                            else {
+                                alert(err.message);
+                            }
+                        });
                     });
                 });
             }

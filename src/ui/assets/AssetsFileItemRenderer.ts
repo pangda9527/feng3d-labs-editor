@@ -43,6 +43,7 @@ namespace editor
             {
                 if (this.data.isDirectory)
                 {
+                    var folder = <feng3d.Feng3dFolder>this.data.feng3dAssets;
                     drag.register(this, (dragsource) =>
                     {
                         if (editorData.selectedAssetsFile.indexOf(this.data) != -1)
@@ -56,11 +57,16 @@ namespace editor
                         {
                             dragdata.assetsFiles.forEach(v =>
                             {
-                                // 移动文件
-                                var oldPath = editorFS.getPath(v.id);
-                                var newParentPath = editorFS.getPath(this.data.id);
-                                var newPath = oldPath.replace(feng3d.pathUtils.getParentPath(oldPath), newParentPath);
-                                editorAssets.moveAssets(v, newPath);
+                                editorFS.moveAssets(v.feng3dAssets, folder, (err) =>
+                                {
+                                    if (!err)
+                                    {
+                                        this.data.addChild(v);
+                                    } else
+                                    {
+                                        alert(err.message);
+                                    }
+                                });
                             });
                         });
                 }
