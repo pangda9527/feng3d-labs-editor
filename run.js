@@ -6,11 +6,12 @@ var fstype = GetQueryString("fstype");
 
 if (fstype == "indexedDB")
 {
-    feng3d.assets = new feng3d.ReadAssetsFS(feng3d.indexedDBFS);
+    feng3d.fs = feng3d.indexedDBFS;
+    feng3d.rs = new feng3d.ReadRS(feng3d.indexedDBFS);
     feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
 }
 
-feng3d.assets.fs.readString("project.js", (err, content) =>
+feng3d.fs.readString("project.js", (err, content) =>
 {
     //
     var windowEval = eval.bind(window);
@@ -18,7 +19,7 @@ feng3d.assets.fs.readString("project.js", (err, content) =>
     windowEval(content);
 
     // 加载并初始化场景
-    feng3d.assets.fs.readObject("default.scene.json", (err, scene) =>
+    feng3d.fs.readObject("default.scene.json", (err, scene) =>
     {
         if (scene.getComponent(feng3d.Scene3D))
             view3D.scene = scene.getComponent(feng3d.Scene3D);

@@ -43,16 +43,15 @@ namespace editor
         {
             editorFS.init(() =>
             {
-                Object.keys(editorFS.idMap).map(id => editorFS.idMap[id]).map(v =>
+                Object.keys(editorFS.idMap).map(assetsId =>
                 {
-                    return this._assetsIDMap[v.assetsId] = new AssetsNode(v.assetsId);
+                    return this._assetsIDMap[assetsId] = new AssetsNode(assetsId);
                 }).forEach(element =>
                 {
-                    var elementpath = editorFS.getPath(element.id);
-                    var parentPath = feng3d.pathUtils.getParentPath(elementpath);
-                    if (parentPath != "/" && parentPath.length > 0)
+                    if (element.feng3dAssets.parentAsset)
                     {
-                        this.getAssetsByPath(parentPath).addChild(element);
+                        var parentNode = this._assetsIDMap[element.feng3dAssets.parentAsset.assetsId];
+                        parentNode.addChild(element);
                     }
                 });
 
@@ -238,7 +237,6 @@ namespace editor
             feng3dFolder.meta = { guid: newId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dFolder.assetType };
 
             var assetsFile = new AssetsNode(newId);
-            assetsFile.feng3dAssets = feng3dFolder;
 
             assetsFile.isLoaded = true;
 
@@ -259,25 +257,13 @@ namespace editor
          */
         createAssets(parentAssets: AssetsNode, fileName: string, feng3dAssets: feng3d.Feng3dAssets)
         {
-            var path = parentAssets.getNewChildPath(fileName);
-
-            feng3dAssets.assetsId = feng3d.FMath.uuid();
-
-            feng3dAssets.meta = { guid: feng3dAssets.assetsId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dAssets.assetType };
-
-            feng3d.Feng3dAssets.setAssets(feng3dAssets);
-
             var assetsFile = new AssetsNode(feng3dAssets.assetsId);
-            assetsFile.feng3dAssets = feng3dAssets;
 
             assetsFile.isLoaded = true;
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
 
-            this.saveAssets(assetsFile, () =>
-            {
-                this.saveProject();
-            });
+            this.saveProject();
             parentAssets.addChild(assetsFile);
             return assetsFile;
         }
@@ -334,7 +320,10 @@ namespace editor
                             {
                                 label: "文本", click: () =>
                                 {
-                                    editorData.selectObject(this.createAssets(assetsFile, "New Text.txt", new feng3d.TextFile()));
+                                    editorFS.createAsset(feng3d.TextFile, null, <any>assetsFile.feng3dAssets, (err, asset) =>
+                                    {
+                                        editorData.selectObject(this.createAssets(assetsFile, "New Text.txt", asset));
+                                    });
                                 }
                             },
                             { type: "separator" },

@@ -46,7 +46,10 @@ namespace editor
 
         parent: AssetsNode;
 
-        feng3dAssets: feng3d.Feng3dAssets;
+        get feng3dAssets()
+        {
+            return editorFS.idMap[this._id];
+        }
 
         /**
          * 是否已加载
@@ -117,8 +120,6 @@ namespace editor
             editorFS.readAssets(this.id, (err, assets: feng3d.Feng3dAssets) =>
             {
                 feng3d.assert(!err);
-
-                this.feng3dAssets = assets;
 
                 this.isLoading = false;
                 this.isLoaded = true;

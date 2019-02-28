@@ -6556,13 +6556,12 @@ var editor;
         EditorAssets.prototype.initproject = function (callback) {
             var _this = this;
             editor.editorFS.init(function () {
-                Object.keys(editor.editorFS.idMap).map(function (id) { return editor.editorFS.idMap[id]; }).map(function (v) {
-                    return _this._assetsIDMap[v.assetsId] = new editor.AssetsNode(v.assetsId);
+                Object.keys(editor.editorFS.idMap).map(function (assetsId) {
+                    return _this._assetsIDMap[assetsId] = new editor.AssetsNode(assetsId);
                 }).forEach(function (element) {
-                    var elementpath = editor.editorFS.getPath(element.id);
-                    var parentPath = feng3d.pathUtils.getParentPath(elementpath);
-                    if (parentPath != "/" && parentPath.length > 0) {
-                        _this.getAssetsByPath(parentPath).addChild(element);
+                    if (element.feng3dAssets.parentAsset) {
+                        var parentNode = _this._assetsIDMap[element.feng3dAssets.parentAsset.assetsId];
+                        parentNode.addChild(element);
                     }
                 });
                 _this.rootFile = _this._assetsIDMap[editor.editorFS.root.assetsId];
@@ -6706,7 +6705,6 @@ var editor;
             feng3dFolder.assetsId = newId;
             feng3dFolder.meta = { guid: newId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dFolder.assetType };
             var assetsFile = new editor.AssetsNode(newId);
-            assetsFile.feng3dAssets = feng3dFolder;
             assetsFile.isLoaded = true;
             this._assetsIDMap[assetsFile.id] = assetsFile;
             this.saveAssets(assetsFile, function () {
@@ -6721,18 +6719,10 @@ var editor;
          * @param feng3dAssets
          */
         EditorAssets.prototype.createAssets = function (parentAssets, fileName, feng3dAssets) {
-            var _this = this;
-            var path = parentAssets.getNewChildPath(fileName);
-            feng3dAssets.assetsId = feng3d.FMath.uuid();
-            feng3dAssets.meta = { guid: feng3dAssets.assetsId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: feng3dAssets.assetType };
-            feng3d.Feng3dAssets.setAssets(feng3dAssets);
             var assetsFile = new editor.AssetsNode(feng3dAssets.assetsId);
-            assetsFile.feng3dAssets = feng3dAssets;
             assetsFile.isLoaded = true;
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            this.saveAssets(assetsFile, function () {
-                _this.saveProject();
-            });
+            this.saveProject();
             parentAssets.addChild(assetsFile);
             return assetsFile;
         };
@@ -6777,7 +6767,9 @@ var editor;
                         },
                         {
                             label: "文本", click: function () {
-                                editor.editorData.selectObject(_this.createAssets(assetsFile, "New Text.txt", new feng3d.TextFile()));
+                                editor.editorFS.createAsset(feng3d.TextFile, null, assetsFile.feng3dAssets, function (err, asset) {
+                                    editor.editorData.selectObject(_this.createAssets(assetsFile, "New Text.txt", asset));
+                                });
                             }
                         },
                         { type: "separator" },
@@ -7206,6 +7198,13 @@ var editor;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(AssetsNode.prototype, "feng3dAssets", {
+            get: function () {
+                return editor.editorFS.idMap[this._id];
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 加载
          *
@@ -7224,7 +7223,6 @@ var editor;
             this.isLoading = true;
             editor.editorFS.readAssets(this.id, function (err, assets) {
                 feng3d.assert(!err);
-                _this.feng3dAssets = assets;
                 _this.isLoading = false;
                 _this.isLoaded = true;
                 callback && callback();

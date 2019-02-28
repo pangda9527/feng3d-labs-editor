@@ -1886,7 +1886,7 @@ declare namespace editor {
         label: string;
         children: AssetsNode[];
         parent: AssetsNode;
-        feng3dAssets: feng3d.Feng3dAssets;
+        readonly feng3dAssets: feng3d.Feng3dAssets;
         /**
          * 是否已加载
          */
