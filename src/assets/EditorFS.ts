@@ -21,9 +21,9 @@ namespace editor
         hasProject(projectname: string, callback: (has: boolean) => void)
         {
             var readWriteFS = this.fs;
-            if (readWriteFS.baseFS instanceof feng3d.IndexedDBFS)
+            if (readWriteFS instanceof feng3d.IndexedDBFS)
             {
-                feng3d._indexedDB.hasObjectStore(readWriteFS.baseFS.DBname, projectname, callback);
+                feng3d._indexedDB.hasObjectStore(readWriteFS.DBname, projectname, callback);
             } else if (readWriteFS["getProjectList"] != null)
             {
                 readWriteFS["getProjectList"]((err: Error, projects: string[]) =>
@@ -45,9 +45,9 @@ namespace editor
         getProjectList(callback: (err: Error, projects: string[]) => void)
         {
             var readWriteFS = this.fs;
-            if (readWriteFS.baseFS instanceof feng3d.IndexedDBFS)
+            if (readWriteFS instanceof feng3d.IndexedDBFS)
             {
-                feng3d._indexedDB.getObjectStoreNames(readWriteFS.baseFS.DBname, callback)
+                feng3d._indexedDB.getObjectStoreNames(readWriteFS.DBname, callback)
             } else if (readWriteFS["getProjectList"] != null)
             {
                 readWriteFS["getProjectList"](callback);
@@ -65,9 +65,9 @@ namespace editor
         initproject(projectname: string, callback: () => void)
         {
             var readWriteFS = this.fs;
-            if (readWriteFS.baseFS instanceof feng3d.IndexedDBFS)
+            if (readWriteFS instanceof feng3d.IndexedDBFS)
             {
-                feng3d._indexedDB.createObjectStore(readWriteFS.baseFS.DBname, projectname, (err) =>
+                feng3d._indexedDB.createObjectStore(readWriteFS.DBname, projectname, (err) =>
                 {
                     if (err)
                     {
