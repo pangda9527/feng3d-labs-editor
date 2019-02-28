@@ -303,8 +303,6 @@ namespace editor
         {
             this.fs.readImage("assetsIcon/" + assetsId + ".png", callback);
         }
-
-
     }
 
     /**
