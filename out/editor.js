@@ -7240,12 +7240,9 @@ var editor;
             var _this = this;
             if (this.feng3dAssets instanceof feng3d.TextureFile) {
                 var texture = this.feng3dAssets.texture;
-                texture.onLoadCompleted(function () {
-                    _this.image = texture.dataURL;
-                    feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
-                        editor.editorFS.writeAssetsIcon(_this.id, image);
-                    });
-                    // editorFS.fs.writeImage()
+                this.image = texture.dataURL;
+                feng3d.dataTransform.dataURLToImage(this.image, function (image) {
+                    editor.editorFS.writeAssetsIcon(_this.id, image);
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.TextureCube) {

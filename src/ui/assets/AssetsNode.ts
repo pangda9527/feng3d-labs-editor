@@ -136,18 +136,14 @@ namespace editor
             if (this.feng3dAssets instanceof feng3d.TextureFile)
             {
                 var texture = this.feng3dAssets.texture;
-                texture.onLoadCompleted(() =>
+
+                this.image = texture.dataURL;
+
+                feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
-                    this.image = texture.dataURL;
-
-                    feng3d.dataTransform.dataURLToImage(this.image, (image) =>
-                    {
-                        editorFS.writeAssetsIcon(this.id, image);
-                    });
-
-
-                    // editorFS.fs.writeImage()
+                    editorFS.writeAssetsIcon(this.id, image);
                 });
+
             } else if (this.feng3dAssets instanceof feng3d.TextureCube)
             {
                 var textureCube = this.feng3dAssets;
