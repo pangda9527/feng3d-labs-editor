@@ -215,10 +215,8 @@ namespace editor
         {
             if (typeof content == "string")
             {
-                feng3d.dataTransform.stringToArrayBuffer(content, (uint8Array) =>
-                {
-                    this.saveFile(uint8Array, onComplete, onError, thisPtr);
-                })
+                var uint8Array = feng3d.dataTransform.stringToArrayBuffer(content);
+                this.saveFile(uint8Array, onComplete, onError, thisPtr);
                 return;
             }
 

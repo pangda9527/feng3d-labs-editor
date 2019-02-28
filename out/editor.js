@@ -233,9 +233,8 @@ var editor;
         FileObject.prototype.saveFile = function (content, onComplete, onError, thisPtr) {
             var _this = this;
             if (typeof content == "string") {
-                feng3d.dataTransform.stringToArrayBuffer(content, function (uint8Array) {
-                    _this.saveFile(uint8Array, onComplete, onError, thisPtr);
-                });
+                var uint8Array = feng3d.dataTransform.stringToArrayBuffer(content);
+                this.saveFile(uint8Array, onComplete, onError, thisPtr);
                 return;
             }
             editor.editorFS.fs.writeArrayBuffer(this._path, content, function (err) {
