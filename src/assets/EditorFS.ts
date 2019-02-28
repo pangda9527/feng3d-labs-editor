@@ -236,6 +236,20 @@ namespace editor
                 }
             });
         }
+
+        /**
+         * 写资源缩略图标
+         * 
+         * @param assetsId 资源编号
+         * @param image 资源缩略图标
+         * @param callback 完成回调
+         */
+        writeAssetsIcon(assetsId: string, image: HTMLImageElement, callback?: (err: Error) => void)
+        {
+            this.fs.writeImage("assetsIcon/" + assetsId + ".png", image, callback);
+        }
+
+        
     }
 
     /**

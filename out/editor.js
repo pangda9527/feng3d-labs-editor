@@ -529,6 +529,16 @@ var editor;
                 }
             });
         };
+        /**
+         * 写资源缩略图标
+         *
+         * @param assetsId 资源编号
+         * @param image 资源缩略图标
+         * @param callback 完成回调
+         */
+        EditorFS.prototype.writeAssetsIcon = function (assetsId, image, callback) {
+            this.fs.writeImage("assetsIcon/" + assetsId + ".png", image, callback);
+        };
         return EditorFS;
     }(feng3d.ReadWriteAssetsFS));
     editor.EditorFS = EditorFS;
@@ -7222,6 +7232,10 @@ var editor;
                 var texture = this.feng3dAssets;
                 texture.onLoadCompleted(function () {
                     _this.image = texture.dataURL;
+                    feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
+                        editor.editorFS.writeAssetsIcon(_this.id, image);
+                    });
+                    // editorFS.fs.writeImage()
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.TextureCube) {

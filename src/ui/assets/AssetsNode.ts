@@ -139,6 +139,14 @@ namespace editor
                 texture.onLoadCompleted(() =>
                 {
                     this.image = texture.dataURL;
+
+                    feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+                    {
+                        editorFS.writeAssetsIcon(this.id, image);
+                    });
+
+
+                    // editorFS.fs.writeImage()
                 });
             } else if (this.feng3dAssets instanceof feng3d.TextureCube)
             {
