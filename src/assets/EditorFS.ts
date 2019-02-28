@@ -320,11 +320,13 @@ namespace editor
 
     if (typeof require == "undefined")
     {
-        feng3d.assets = editorFS = new EditorFS(feng3d.indexedDBFS);
+        feng3d.fs = feng3d.indexedDBFS;
+        editorFS = new EditorFS(feng3d.indexedDBFS);
     } else
     {
         var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
-        feng3d.assets = editorFS = new EditorFS(nativeFS);
+        feng3d.fs = nativeFS;
+        editorFS = new EditorFS(nativeFS);
     }
 
     //

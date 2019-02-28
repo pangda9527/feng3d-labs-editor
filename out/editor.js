@@ -594,11 +594,13 @@ var editor;
         }
     }
     if (typeof require == "undefined") {
-        feng3d.assets = editor.editorFS = new EditorFS(feng3d.indexedDBFS);
+        feng3d.fs = feng3d.indexedDBFS;
+        editor.editorFS = new EditorFS(feng3d.indexedDBFS);
     }
     else {
         var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
-        feng3d.assets = editor.editorFS = new EditorFS(nativeFS);
+        feng3d.fs = nativeFS;
+        editor.editorFS = new EditorFS(nativeFS);
     }
     //
     var isSelectFile = false;
@@ -7802,7 +7804,7 @@ var editor;
                             if (editor.editorFS.fs.type == feng3d.FSType.indexedDB) {
                                 if (editor.runwin)
                                     editor.runwin.close();
-                                editor.runwin = window.open("run.html?fstype=" + feng3d.assets.fs.type + "&project=" + editor.editorcache.projectname);
+                                editor.runwin = window.open("run.html?fstype=" + feng3d.fs.type + "&project=" + editor.editorcache.projectname);
                                 return;
                             }
                             editor.editorFS.fs.getAbsolutePath("index.html", function (err, path) {
