@@ -80,16 +80,16 @@ namespace editor
             {
                 this.image = "file_png";
             }
-        }
-
-        /**
-         * 加载元标签文件
-         * 
-         * @param callback 加载完成回调
-         */
-        loadMeta(callback?: () => void)
-        {
-
+            editorFS.readAssetsIcon(id, (err, image) =>
+            {
+                if (image)
+                {
+                    this.image = feng3d.dataTransform.imageToDataURL(image);
+                } else
+                {
+                    this.updateImage();
+                }
+            });
         }
 
         /**
@@ -133,9 +133,9 @@ namespace editor
          */
         updateImage()
         {
-            if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D)
+            if (this.feng3dAssets instanceof feng3d.TextureFile)
             {
-                var texture = this.feng3dAssets;
+                var texture = this.feng3dAssets.texture;
                 texture.onLoadCompleted(() =>
                 {
                     this.image = texture.dataURL;
@@ -161,6 +161,10 @@ namespace editor
                 mat.material.onLoadCompleted(() =>
                 {
                     this.image = feng3dScreenShot.drawMaterial(mat.material).toDataURL();
+                    feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+                    {
+                        editorFS.writeAssetsIcon(this.id, image);
+                    });
                 });
             } else if (this.feng3dAssets instanceof feng3d.Geometry)
             {

@@ -539,6 +539,15 @@ var editor;
         EditorFS.prototype.writeAssetsIcon = function (assetsId, image, callback) {
             this.fs.writeImage("assetsIcon/" + assetsId + ".png", image, callback);
         };
+        /**
+         * 读取资源缩略图标
+         *
+         * @param assetsId 资源编号
+         * @param callback 完成回调
+         */
+        EditorFS.prototype.readAssetsIcon = function (assetsId, callback) {
+            this.fs.readImage("assetsIcon/" + assetsId + ".png", callback);
+        };
         return EditorFS;
     }(feng3d.ReadWriteAssetsFS));
     editor.EditorFS = EditorFS;
@@ -7181,6 +7190,14 @@ var editor;
             else {
                 _this.image = "file_png";
             }
+            editor.editorFS.readAssetsIcon(id, function (err, image) {
+                if (image) {
+                    _this.image = feng3d.dataTransform.imageToDataURL(image);
+                }
+                else {
+                    _this.updateImage();
+                }
+            });
             return _this;
         }
         Object.defineProperty(AssetsNode.prototype, "id", {
@@ -7191,13 +7208,6 @@ var editor;
             enumerable: true,
             configurable: true
         });
-        /**
-         * 加载元标签文件
-         *
-         * @param callback 加载完成回调
-         */
-        AssetsNode.prototype.loadMeta = function (callback) {
-        };
         /**
          * 加载
          *
@@ -7228,8 +7238,8 @@ var editor;
          */
         AssetsNode.prototype.updateImage = function () {
             var _this = this;
-            if (this.feng3dAssets instanceof feng3d.UrlImageTexture2D) {
-                var texture = this.feng3dAssets;
+            if (this.feng3dAssets instanceof feng3d.TextureFile) {
+                var texture = this.feng3dAssets.texture;
                 texture.onLoadCompleted(function () {
                     _this.image = texture.dataURL;
                     feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
@@ -7248,6 +7258,9 @@ var editor;
                 var mat = this.feng3dAssets;
                 mat.material.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawMaterial(mat.material).toDataURL();
+                    feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
+                        editor.editorFS.writeAssetsIcon(_this.id, image);
+                    });
                 });
             }
             else if (this.feng3dAssets instanceof feng3d.Geometry) {

@@ -249,7 +249,18 @@ namespace editor
             this.fs.writeImage("assetsIcon/" + assetsId + ".png", image, callback);
         }
 
-        
+        /**
+         * 读取资源缩略图标
+         * 
+         * @param assetsId 资源编号
+         * @param callback 完成回调
+         */
+        readAssetsIcon(assetsId: string, callback?: (err: Error, image: HTMLImageElement) => void)
+        {
+            this.fs.readImage("assetsIcon/" + assetsId + ".png", callback);
+        }
+
+
     }
 
     /**

@@ -199,6 +199,13 @@ declare namespace editor {
          * @param callback 完成回调
          */
         writeAssetsIcon(assetsId: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
+        /**
+         * 读取资源缩略图标
+         *
+         * @param assetsId 资源编号
+         * @param callback 完成回调
+         */
+        readAssetsIcon(assetsId: string, callback?: (err: Error, image: HTMLImageElement) => void): void;
     }
 }
 declare namespace editor {
@@ -1894,12 +1901,6 @@ declare namespace editor {
          * @param id 编号
          */
         constructor(id: string);
-        /**
-         * 加载元标签文件
-         *
-         * @param callback 加载完成回调
-         */
-        loadMeta(callback?: () => void): void;
         /**
          * 加载
          *
