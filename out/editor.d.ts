@@ -159,7 +159,33 @@ declare namespace editor {
     /**
      * 编辑器文件系统
      */
-    class EditorFS extends feng3d.ReadWriteAssetsFS {
+    class EditorFS {
+        /**
+         * 可读写文件系统
+         */
+        readonly fs: feng3d.ReadWriteFS;
+        protected _fs: feng3d.ReadWriteFS;
+        constructor(readWriteFS?: feng3d.ReadWriteFS);
+        /**
+         * 读取文件为资源对象
+         * @param id 资源编号
+         * @param callback 读取完成回调
+         */
+        readAssets(id: string, callback: (err: Error, assets: feng3d.Feng3dAssets) => void): void;
+        /**
+         * 写（保存）资源
+         *
+         * @param assets 资源对象
+         * @param callback 完成回调
+         */
+        writeAssets(assets: feng3d.Feng3dAssets, callback?: (err: Error) => void): void;
+        /**
+         * 删除资源
+         *
+         * @param assetsId 资源编号
+         * @param callback 完成回调
+         */
+        deleteAssets(assetsId: string, callback?: (err: Error) => void): void;
         /**
          * 是否存在指定项目
          * @param projectname 项目名称

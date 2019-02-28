@@ -11,8 +11,52 @@ namespace editor
     /**
      * 编辑器文件系统
      */
-    export class EditorFS extends feng3d.ReadWriteAssetsFS
+    export class EditorFS
     {
+        /**
+         * 可读写文件系统
+         */
+        get fs() { return this._fs; }
+        protected _fs: feng3d.ReadWriteFS;
+
+        constructor(readWriteFS: feng3d.ReadWriteFS = feng3d.indexedDBFS)
+        {
+            this._fs = readWriteFS;
+        }
+
+        /**
+         * 读取文件为资源对象
+         * @param id 资源编号
+         * @param callback 读取完成回调
+         */
+        readAssets(id: string, callback: (err: Error, assets: feng3d.Feng3dAssets) => void)
+        {
+            feng3d.Feng3dAssets.readAssets(this.fs, id, callback);
+        }
+
+
+        /**
+         * 写（保存）资源
+         * 
+         * @param assets 资源对象
+         * @param callback 完成回调
+         */
+        writeAssets(assets: feng3d.Feng3dAssets, callback?: (err: Error) => void)
+        {
+            feng3d.Feng3dAssets.writeAssets(this.fs, assets, callback);
+        }
+
+        /**
+         * 删除资源
+         * 
+         * @param assetsId 资源编号
+         * @param callback 完成回调
+         */
+        deleteAssets(assetsId: string, callback?: (err: Error) => void)
+        {
+            feng3d.Feng3dAssets.deleteAssets(this.fs, assetsId, callback);
+        }
+
         /**
          * 是否存在指定项目
          * @param projectname 项目名称

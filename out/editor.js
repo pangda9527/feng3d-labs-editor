@@ -348,11 +348,45 @@ var editor;
     /**
      * 编辑器文件系统
      */
-    var EditorFS = /** @class */ (function (_super) {
-        __extends(EditorFS, _super);
-        function EditorFS() {
-            return _super !== null && _super.apply(this, arguments) || this;
+    var EditorFS = /** @class */ (function () {
+        function EditorFS(readWriteFS) {
+            if (readWriteFS === void 0) { readWriteFS = feng3d.indexedDBFS; }
+            this._fs = readWriteFS;
         }
+        Object.defineProperty(EditorFS.prototype, "fs", {
+            /**
+             * 可读写文件系统
+             */
+            get: function () { return this._fs; },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 读取文件为资源对象
+         * @param id 资源编号
+         * @param callback 读取完成回调
+         */
+        EditorFS.prototype.readAssets = function (id, callback) {
+            feng3d.Feng3dAssets.readAssets(this.fs, id, callback);
+        };
+        /**
+         * 写（保存）资源
+         *
+         * @param assets 资源对象
+         * @param callback 完成回调
+         */
+        EditorFS.prototype.writeAssets = function (assets, callback) {
+            feng3d.Feng3dAssets.writeAssets(this.fs, assets, callback);
+        };
+        /**
+         * 删除资源
+         *
+         * @param assetsId 资源编号
+         * @param callback 完成回调
+         */
+        EditorFS.prototype.deleteAssets = function (assetsId, callback) {
+            feng3d.Feng3dAssets.deleteAssets(this.fs, assetsId, callback);
+        };
         /**
          * 是否存在指定项目
          * @param projectname 项目名称
@@ -548,7 +582,7 @@ var editor;
             this.fs.readImage("assetsIcon/" + assetsId + ".png", callback);
         };
         return EditorFS;
-    }(feng3d.ReadWriteAssetsFS));
+    }());
     editor.EditorFS = EditorFS;
     /**
      * 读取zip中所有文件到 fs
