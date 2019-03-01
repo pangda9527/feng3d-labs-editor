@@ -6529,14 +6529,6 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    /**
-     * 资源字典表存储路径
-     */
-    var assetsFilePath = "assets.json";
-    /**
-     * 资源文件夹路径
-     */
-    var AssetsPath = "Assets/";
     var EditorAssets = /** @class */ (function () {
         function EditorAssets() {
             /**
@@ -6589,22 +6581,12 @@ var editor;
             return this._assetsIDMap[assetsId];
         };
         /**
-         * 根据路径获取资源
-         *
-         * @param assetsPath 资源路径
-         */
-        EditorAssets.prototype.getAssetsByPath = function (assetsPath) {
-            var id = editor.editorFS.pathMap[assetsPath].assetsId;
-            return this.getAssetsByID(id);
-        };
-        /**
          * 删除资源
          *
          * @param assetsFile 资源
          */
         EditorAssets.prototype.deleteAssets = function (assetsFile, callback) {
             var _this = this;
-            feng3d.assert(!!this._assetsIDMap[assetsFile.id]);
             editor.editorFS.deleteAssets(assetsFile.id, function (err) {
                 if (err) {
                     callback && callback(err);
@@ -6622,7 +6604,6 @@ var editor;
          * @param callback 完成回调
          */
         EditorAssets.prototype.saveAssets = function (assetsFile, callback) {
-            feng3d.assert(!!this._assetsIDMap[assetsFile.id], "\u65E0\u6CD5\u4FDD\u5B58\u5DF2\u7ECF\u88AB\u5220\u9664\u7684\u8D44\u6E90\uFF01");
             editor.editorFS.writeAssets(assetsFile.feng3dAssets, function (err) {
                 feng3d.assert(!err, "\u8D44\u6E90 " + assetsFile.id + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
@@ -6719,12 +6700,12 @@ var editor;
                         { type: "separator" },
                         {
                             label: "立方体贴图", click: function () {
-                                // this.createAssets(assetsFile, "new TextureCube.json", new feng3d.TextureCube());
+                                _this.createAssets(assetsFile, feng3d.TextureCubeFile, { name: "new TextureCube.json" });
                             }
                         },
                         {
                             label: "材质", click: function () {
-                                _this.createAssets(assetsFile, feng3d.MaterialFile, { name: "New Material", material: new feng3d.Material() });
+                                _this.createAssets(assetsFile, feng3d.MaterialFile, { name: "New Material" });
                             }
                         },
                         {

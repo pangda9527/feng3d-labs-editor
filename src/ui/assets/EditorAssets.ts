@@ -2,16 +2,6 @@ namespace editor
 {
     export var editorAssets: EditorAssets;
 
-    /**
-     * 资源字典表存储路径
-     */
-    const assetsFilePath = "assets.json";
-
-    /**
-     * 资源文件夹路径
-     */
-    const AssetsPath = "Assets/";
-
     export class EditorAssets
     {
         /**
@@ -87,25 +77,12 @@ namespace editor
         }
 
         /**
-         * 根据路径获取资源
-         * 
-         * @param assetsPath 资源路径
-         */
-        getAssetsByPath(assetsPath: string)
-        {
-            var id = editorFS.pathMap[assetsPath].assetsId;
-            return this.getAssetsByID(id);
-        }
-
-        /**
          * 删除资源
          * 
          * @param assetsFile 资源
          */
         deleteAssets(assetsFile: AssetsNode, callback?: (err: Error) => void)
         {
-            feng3d.assert(!!this._assetsIDMap[assetsFile.id]);
-
             editorFS.deleteAssets(assetsFile.id, (err) =>
             {
                 if (err)
@@ -129,8 +106,6 @@ namespace editor
          */
         saveAssets(assetsFile: AssetsNode, callback?: () => void)
         {
-            feng3d.assert(!!this._assetsIDMap[assetsFile.id], `无法保存已经被删除的资源！`);
-
             editorFS.writeAssets(assetsFile.feng3dAssets, (err) =>
             {
                 feng3d.assert(!err, `资源 ${assetsFile.id} 保存失败！`);
@@ -251,13 +226,13 @@ namespace editor
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    // this.createAssets(assetsFile, "new TextureCube.json", new feng3d.TextureCube());
+                                    this.createAssets(assetsFile, feng3d.TextureCubeFile, { name: "new TextureCube.json" });
                                 }
                             },
                             {
                                 label: "材质", click: () =>
                                 {
-                                    this.createAssets(assetsFile, feng3d.MaterialFile, { name: "New Material", material: new feng3d.Material() });
+                                    this.createAssets(assetsFile, feng3d.MaterialFile, { name: "New Material" });
                                 }
                             },
                             {

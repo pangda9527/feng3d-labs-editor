@@ -1752,12 +1752,6 @@ declare namespace editor {
          */
         getAssetsByID(assetsId: string): AssetsNode;
         /**
-         * 根据路径获取资源
-         *
-         * @param assetsPath 资源路径
-         */
-        getAssetsByPath(assetsPath: string): AssetsNode;
-        /**
          * 删除资源
          *
          * @param assetsFile 资源
