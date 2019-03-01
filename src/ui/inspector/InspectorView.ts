@@ -42,12 +42,12 @@ namespace editor
 			}
 			if (this._viewData)
 			{
-				if (this._viewData instanceof AssetsNode)
+				if (this._viewData instanceof AssetNode)
 				{
 					if (this._viewData.isDirectory) return;
-					if (this._viewData.feng3dAssets)
+					if (this._viewData.asset)
 					{
-						this.updateShowData(this._viewData.feng3dAssets);
+						this.updateShowData(this._viewData.asset);
 					} else
 					{
 						if (!this._viewData.isLoaded)
@@ -55,9 +55,9 @@ namespace editor
 							var viewData = this._viewData;
 							viewData.load(() =>
 							{
-								feng3d.assert(!!viewData.feng3dAssets);
+								feng3d.assert(!!viewData.asset);
 								if (viewData == this._viewData)
-									this.updateShowData(viewData.feng3dAssets);
+									this.updateShowData(viewData.asset);
 							});
 						}
 					}
@@ -75,20 +75,20 @@ namespace editor
 		{
 			if (this._dataChanged)
 			{
-				if (this._viewData.assetsId)
+				if (this._viewData.assetId)
 				{
-					var feng3dAssets = feng3d.rs.getAssets(this._viewData.assetsId);
-					if (feng3dAssets)
+					var feng3dAsset = feng3d.rs.getAsset(this._viewData.assetId);
+					if (feng3dAsset)
 					{
-						editorRS.writeAssets(feng3dAssets, (err) =>
+						editorRS.writeAsset(feng3dAsset, (err) =>
 						{
-							feng3d.assert(!err, `资源 ${feng3dAssets.assetsId} 保存失败！`);
+							feng3d.assert(!err, `资源 ${feng3dAsset.assetId} 保存失败！`);
 							callback && callback();
 						});
 					}
-				} else if (this._viewData instanceof AssetsNode)
+				} else if (this._viewData instanceof AssetNode)
 				{
-					editorAssets.saveAssets(this._viewData);
+					editorAsset.saveAsset(this._viewData);
 				}
 
 				this._dataChanged = false;
@@ -156,12 +156,12 @@ namespace editor
 			this._dataChanged = true;
 			if (this._viewData instanceof feng3d.FileAsset)
 			{
-				if (this._viewData.assetsId)
+				if (this._viewData.assetId)
 				{
-					var assetsFile = editorAssets.getAssetsByID(this._viewData.assetsId);
-					assetsFile && assetsFile.updateImage();
+					var assetNode = editorAsset.getAssetByID(this._viewData.assetId);
+					assetNode && assetNode.updateImage();
 				}
-			} else if (this._viewData instanceof AssetsNode)
+			} else if (this._viewData instanceof AssetNode)
 			{
 				this._viewData.updateImage();
 			}

@@ -107,11 +107,11 @@
         "src/ui/hierarchy/HierarchyView.ts",
         //
         "src/ui/assets/EditorAssets.ts",
-        "src/ui/assets/AssetsFileItemRenderer.ts",
-        "src/ui/assets/AssetsNode.ts",
-        "src/ui/assets/AssetsTreeItemRenderer.ts",
-        "src/ui/assets/AssetsView.ts",
-        "src/ui/assets/AssetsFileTemplates.ts",
+        "src/ui/assets/AssetFileItemRenderer.ts",
+        "src/ui/assets/AssetNode.ts",
+        "src/ui/assets/AssetTreeItemRenderer.ts",
+        "src/ui/assets/AssetView.ts",
+        "src/ui/assets/AssetFileTemplates.ts",
         //
         "src/ui/TopView.ts",
         "src/ui/NavigationView.ts",

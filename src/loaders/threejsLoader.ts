@@ -9,7 +9,7 @@ namespace editor
                 load(data, (gameobject) =>
                 {
                     gameobject.name = feng3d.pathUtils.getName(url);
-                    feng3d.feng3dDispatcher.dispatch("assets.parsed", gameobject);
+                    feng3d.feng3dDispatcher.dispatch("asset.parsed", gameobject);
                 });
             });
         }
@@ -381,7 +381,7 @@ namespace editor
                     "threejs/loaders/ctm/lzma.js",
                     "threejs/loaders/ctm/ctm.js",
                     "threejs/loaders/ctm/CTMLoader.js",
-                ].map((value) => { return editorData.getEditorAssetsPath(value); }),
+                ].map((value) => { return editorData.getEditorAssetPath(value); }),
                 bundleId: "threejs",
                 success: () =>
                 {

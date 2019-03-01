@@ -24,7 +24,7 @@ namespace editor
                             uniforms: {
                                 s_texture: {
                                     __class__: "feng3d.UrlImageTexture2D",
-                                    url: editorData.getEditorAssetsPath("assets/3d/icons/spot.png"),
+                                    url: editorData.getEditorAssetPath("assets/3d/icons/spot.png"),
                                     format: feng3d.TextureFormat.RGBA,
                                     premulAlpha: true,
                                 }

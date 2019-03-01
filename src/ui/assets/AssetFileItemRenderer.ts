@@ -1,16 +1,16 @@
 namespace editor
 {
-    export class AssetsFileItemRenderer extends eui.ItemRenderer
+    export class AssetFileItemRenderer extends eui.ItemRenderer
     {
         public icon: eui.Image;
 
-        data: AssetsNode;
+        data: AssetNode;
         itemSelected = false;
 
         constructor()
         {
             super();
-            this.skinName = "AssetsFileItemRenderer";
+            this.skinName = "AssetFileItemRenderer";
         }
 
         $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -43,21 +43,21 @@ namespace editor
             {
                 if (this.data.isDirectory)
                 {
-                    var folder = <feng3d.FolderAsset>this.data.feng3dAssets;
+                    var folder = <feng3d.FolderAsset>this.data.asset;
                     drag.register(this, (dragsource) =>
                     {
-                        if (editorData.selectedAssetsFile.indexOf(this.data) != -1)
+                        if (editorData.selectedAssetNodes.indexOf(this.data) != -1)
                         {
-                            dragsource.assetsFiles = editorData.selectedAssetsFile.concat();
+                            dragsource.assetNodes = editorData.selectedAssetNodes.concat();
                         } else
                         {
-                            dragsource.assetsFiles = [this.data];
+                            dragsource.assetNodes = [this.data];
                         }
-                    }, ["assetsFiles"], (dragdata) =>
+                    }, ["assetNodes"], (dragdata) =>
                         {
-                            dragdata.assetsFiles.forEach(v =>
+                            dragdata.assetNodes.forEach(v =>
                             {
-                                editorRS.moveAssets(v.feng3dAssets, folder, (err) =>
+                                editorRS.moveAsset(v.asset, folder, (err) =>
                                 {
                                     if (!err)
                                     {
@@ -85,40 +85,40 @@ namespace editor
 
                     drag.register(this, (dragsource) =>
                     {
-                        var extension = this.data.feng3dAssets.assetType;
+                        var extension = this.data.asset.assetType;
                         switch (extension)
                         {
                             case feng3d.AssetExtension.gameobject:
-                                dragsource.file_gameobject = feng3d.serialization.clone(<feng3d.GameObject>this.data.feng3dAssets.data);
+                                dragsource.file_gameobject = feng3d.serialization.clone(<feng3d.GameObject>this.data.asset.data);
                                 break;
                             case feng3d.AssetExtension.script:
-                                dragsource.file_script = <any>this.data.feng3dAssets.data;
+                                dragsource.file_script = <any>this.data.asset.data;
                                 break;
                             case feng3d.AssetExtension.anim:
-                                dragsource.animationclip = <any>this.data.feng3dAssets.data;
+                                dragsource.animationclip = <any>this.data.asset.data;
                                 break;
                             case feng3d.AssetExtension.material:
-                                dragsource.material = <any>this.data.feng3dAssets.data;
+                                dragsource.material = <any>this.data.asset.data;
                                 break;
                             case feng3d.AssetExtension.texturecube:
-                                dragsource.texturecube = <any>this.data.feng3dAssets.data;
+                                dragsource.texturecube = <any>this.data.asset.data;
                                 break;
                             case feng3d.AssetExtension.geometry:
-                                dragsource.geometry = <any>this.data.feng3dAssets.data;
+                                dragsource.geometry = <any>this.data.asset.data;
                                 break;
                             case feng3d.AssetExtension.texture:
-                                dragsource.texture2d = <any>this.data.feng3dAssets.data;
+                                dragsource.texture2d = <any>this.data.asset.data;
                                 break;
                             case feng3d.AssetExtension.audio:
-                                dragsource.audio = <any>this.data.feng3dAssets.data;
+                                dragsource.audio = <any>this.data.asset.data;
                                 break;
                         }
-                        if (editorData.selectedAssetsFile.indexOf(this.data) != -1)
+                        if (editorData.selectedAssetNodes.indexOf(this.data) != -1)
                         {
-                            dragsource.assetsFiles = editorData.selectedAssetsFile.concat();
+                            dragsource.assetNodes = editorData.selectedAssetNodes.concat();
                         } else
                         {
-                            dragsource.assetsFiles = [this.data];
+                            dragsource.assetNodes = [this.data];
                         }
                     }, []);
                 }
@@ -133,10 +133,10 @@ namespace editor
         {
             if (this.data.isDirectory)
             {
-                editorAssets.showFloder = this.data;
-            } else if (this.data.feng3dAssets instanceof feng3d.GameObject)
+                editorAsset.showFloder = this.data;
+            } else if (this.data.asset instanceof feng3d.GameObject)
             {
-                var scene = this.data.feng3dAssets.getComponent(feng3d.Scene3D);
+                var scene = this.data.asset.getComponent(feng3d.Scene3D);
                 if (scene)
                 {
                     engine.scene = scene;
@@ -153,9 +153,9 @@ namespace editor
                 var source = (<eui.ArrayCollection>(<eui.List>this.parent).dataProvider).source;
                 var index = source.indexOf(this.data);
                 var min = index, max = index;
-                if (editorData.selectedAssetsFile.indexOf(preAssetsFile) != -1)
+                if (editorData.selectedAssetNodes.indexOf(preAssetFile) != -1)
                 {
-                    index = source.indexOf(preAssetsFile);
+                    index = source.indexOf(preAssetFile);
                     if (index < min) min = index;
                     if (index > max) max = index;
                 }
@@ -163,7 +163,7 @@ namespace editor
             } else
             {
                 editorData.selectObject(this.data);
-                preAssetsFile = this.data;
+                preAssetFile = this.data;
             }
         }
 
@@ -171,18 +171,18 @@ namespace editor
         {
             e.stopPropagation();
             editorData.selectObject(this.data);
-            editorAssets.popupmenu(this.data);
+            editorAsset.popupmenu(this.data);
         }
 
         private selectedfilechanged()
         {
-            var selectedAssetsFile = editorData.selectedAssetsFile;
-            var selected = this.data ? selectedAssetsFile.indexOf(this.data) != -1 : false;
+            var selectedAssetFile = editorData.selectedAssetNodes;
+            var selected = this.data ? selectedAssetFile.indexOf(this.data) != -1 : false;
             if (this.itemSelected != selected)
             {
                 this.itemSelected = selected;
             }
         }
     }
-    var preAssetsFile: AssetsNode;
+    var preAssetFile: AssetNode;
 }

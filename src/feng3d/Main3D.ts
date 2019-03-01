@@ -85,7 +85,7 @@ namespace editor
             editorScene.gameObject.addComponent(MRSTool);
             editorComponent = editorScene.gameObject.addComponent(EditorComponent);
 
-            feng3d.loader.loadText(editorData.getEditorAssetsPath("gameobjects/Trident.gameobject.json"), (content) =>
+            feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
             {
                 var trident: feng3d.GameObject = feng3d.serialization.deserialize(JSON.parse(content));
                 editorScene.gameObject.addChild(trident);
@@ -97,9 +97,9 @@ namespace editor
             var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
             engine = new EditorEngine(canvas, null, editorCamera);
             //
-            editorAssets.runProjectScript(() =>
+            editorAsset.runProjectScript(() =>
             {
-                editorAssets.readScene("default.scene.json", (err, scene) =>
+                editorAsset.readScene("default.scene.json", (err, scene) =>
                 {
                     if (err)
                         engine.scene = creatNewScene();

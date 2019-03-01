@@ -1,9 +1,9 @@
 namespace editor
 {
-    export class AssetsView extends eui.Component implements eui.UIComponent
+    export class AssetView extends eui.Component implements eui.UIComponent
     {
-        public assetsTreeScroller: eui.Scroller;
-        public assetsTreeList: eui.List;
+        public assetTreeScroller: eui.Scroller;
+        public assetTreeList: eui.List;
 
         public floderpathTxt: eui.Label;
         public includeTxt: eui.TextInput;
@@ -13,7 +13,7 @@ namespace editor
         public filelist: eui.List;
         public filepathLabel: eui.Label;
         //
-        private _assetstreeInvalid = true;
+        private _assettreeInvalid = true;
         private listData: eui.ArrayCollection;
         private filelistData: eui.ArrayCollection;
 
@@ -23,21 +23,21 @@ namespace editor
         {
             super();
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "AssetsView";
-            editorui.assetsview = this;
+            this.skinName = "AssetView";
+            editorui.assetview = this;
 
             this.fileDrag = new FileDrag(this);
         }
 
         private onComplete(): void
         {
-            this.assetsTreeList.itemRenderer = AssetsTreeItemRenderer;
-            this.filelist.itemRenderer = AssetsFileItemRenderer;
+            this.assetTreeList.itemRenderer = AssetTreeItemRenderer;
+            this.filelist.itemRenderer = AssetFileItemRenderer;
 
             this.floderScroller.viewport = this.filelist;
-            this.assetsTreeScroller.viewport = this.assetsTreeList;
+            this.assetTreeScroller.viewport = this.assetTreeList;
 
-            this.listData = this.assetsTreeList.dataProvider = new eui.ArrayCollection();
+            this.listData = this.assetTreeList.dataProvider = new eui.ArrayCollection();
             this.filelistData = this.filelist.dataProvider = new eui.ArrayCollection();
         }
 
@@ -54,7 +54,7 @@ namespace editor
                 if (dragSource.gameobject)
                 {
                     var gameobject = feng3d.serialization.clone(dragSource.gameobject);
-                    editorAssets.saveObject(gameobject);
+                    editorAsset.saveObject(gameobject);
                 }
             });
 
@@ -88,7 +88,7 @@ namespace editor
 
             this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
-            feng3d.watcher.unwatch(editorAssets, "showFloder", this.updateShowFloder, this);
+            feng3d.watcher.unwatch(editorAsset, "showFloder", this.updateShowFloder, this);
 
             feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
 
@@ -100,43 +100,43 @@ namespace editor
 
         private initlist()
         {
-            editorAssets.initproject(() =>
+            editorAsset.initproject(() =>
             {
-                this.invalidateAssetstree();
+                this.invalidateAssettree();
 
-                editorAssets.rootFile.on("openChanged", this.invalidateAssetstree, this);
-                editorAssets.rootFile.on("added", this.invalidateAssetstree, this);
-                editorAssets.rootFile.on("removed", this.invalidateAssetstree, this);
+                editorAsset.rootFile.on("openChanged", this.invalidateAssettree, this);
+                editorAsset.rootFile.on("added", this.invalidateAssettree, this);
+                editorAsset.rootFile.on("removed", this.invalidateAssettree, this);
 
-                feng3d.watcher.watch(editorAssets, "showFloder", this.updateShowFloder, this);
+                feng3d.watcher.watch(editorAsset, "showFloder", this.updateShowFloder, this);
             });
         }
 
         private update()
         {
-            if (this._assetstreeInvalid)
+            if (this._assettreeInvalid)
             {
-                this.updateAssetsTree();
+                this.updateAssetTree();
                 this.updateShowFloder();
-                this._assetstreeInvalid = false;
+                this._assettreeInvalid = false;
             }
         }
 
-        invalidateAssetstree()
+        invalidateAssettree()
         {
-            this._assetstreeInvalid = true;
+            this._assettreeInvalid = true;
             feng3d.ticker.nextframe(this.update, this);
         }
 
-        private updateAssetsTree()
+        private updateAssetTree()
         {
-            var folders = editorAssets.rootFile.getFolderList();
+            var folders = editorAsset.rootFile.getFolderList();
             this.listData.replaceAll(folders);
         }
 
         private updateShowFloder(host?: any, property?: string, oldvalue?: any)
         {
-            var floder = editorAssets.showFloder;
+            var floder = editorAsset.showFloder;
             if (!floder) return;
 
             var textFlow = new Array<egret.ITextElement>();
@@ -144,13 +144,13 @@ namespace editor
             {
                 if (textFlow.length > 0)
                     textFlow.unshift({ text: " > " });
-                textFlow.unshift({ text: floder.label, style: { "href": `event:${floder.feng3dAssets.assetsId}` } });
+                textFlow.unshift({ text: floder.label, style: { "href": `event:${floder.asset.assetId}` } });
                 floder = floder.parent;
             }
             while (floder)
             this.floderpathTxt.textFlow = textFlow;
 
-            var children = editorAssets.showFloder.children;
+            var children = editorAsset.showFloder.children;
 
             try
             {
@@ -205,11 +205,11 @@ namespace editor
 
         private selectedfilechanged()
         {
-            var selectedAssetsFile = editorData.selectedAssetsFile;
-            if (selectedAssetsFile.length > 0)
-                this.filepathLabel.text = selectedAssetsFile.map(v =>
+            var selectedAssetFile = editorData.selectedAssetNodes;
+            if (selectedAssetFile.length > 0)
+                this.filepathLabel.text = selectedAssetFile.map(v =>
                 {
-                    return v.feng3dAssets.name + v.feng3dAssets.extenson;
+                    return v.asset.name + v.asset.extenson;
                 }).join(",");
             else
                 this.filepathLabel.text = "";
@@ -227,12 +227,12 @@ namespace editor
         {
             editorData.clearSelectedObjects();
 
-            editorAssets.popupmenu(editorAssets.showFloder);
+            editorAsset.popupmenu(editorAsset.showFloder);
         }
 
         private onfloderpathTxtLink(evt: egret.TextEvent)
         {
-            editorAssets.showFloder = editorAssets.getAssetsByID(evt.text);
+            editorAsset.showFloder = editorAsset.getAssetByID(evt.text);
         }
 
         private areaSelectStartPosition: feng3d.Vector2;
@@ -320,7 +320,7 @@ namespace editor
                 }
                 if (displayobject.getTransformedBounds(displayobject.stage).contains(e.clientX, e.clientY))
                 {
-                    editorAssets.inputFiles(files);
+                    editorAsset.inputFiles(files);
                 }
             }
         }

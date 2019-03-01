@@ -105,7 +105,7 @@ namespace editor
                 //
                 var zip = new JSZip();
                 var request = new XMLHttpRequest();
-                request.open('Get', editorData.getEditorAssetsPath("templates/template.zip"), true);
+                request.open('Get', editorData.getEditorAssetPath("templates/template.zip"), true);
                 request.responseType = "arraybuffer";
                 request.onload = (ev) =>
                 {
@@ -130,7 +130,7 @@ namespace editor
             //
             var zip = new JSZip();
             var request = new XMLHttpRequest();
-            request.open('Get', editorData.getEditorAssetsPath("templates/template.zip"), true);
+            request.open('Get', editorData.getEditorAssetPath("templates/template.zip"), true);
             request.responseType = "arraybuffer";
             request.onload = (ev) =>
             {
@@ -241,24 +241,24 @@ namespace editor
         /**
          * 写资源缩略图标
          * 
-         * @param assetsId 资源编号
+         * @param assetId 资源编号
          * @param image 资源缩略图标
          * @param callback 完成回调
          */
-        writeAssetsIcon(assetsId: string, image: HTMLImageElement, callback?: (err: Error) => void)
+        writeAssetIcon(assetId: string, image: HTMLImageElement, callback?: (err: Error) => void)
         {
-            this.fs.writeImage("assetsIcon/" + assetsId + ".png", image, callback);
+            this.fs.writeImage("assetIcon/" + assetId + ".png", image, callback);
         }
 
         /**
          * 读取资源缩略图标
          * 
-         * @param assetsId 资源编号
+         * @param assetId 资源编号
          * @param callback 完成回调
          */
-        readAssetsIcon(assetsId: string, callback?: (err: Error, image: HTMLImageElement) => void)
+        readAssetIcon(assetId: string, callback?: (err: Error, image: HTMLImageElement) => void)
         {
-            this.fs.readImage("assetsIcon/" + assetsId + ".png", callback);
+            this.fs.readImage("assetIcon/" + assetId + ".png", callback);
         }
     }
 

@@ -14,7 +14,7 @@
 						<e:HorizontalLayout gap="4" />
 					</e:layout>
 				</editor:SplitGroup>
-				<editor:AssetsView width="100%" height="250" x="0" scaleX="1" scaleY="1" minHeight="100" skinName="AssetsView"/>
+				<editor:AssetView width="100%" height="250" x="0" scaleX="1" scaleY="1" minHeight="100" skinName="AssetView"/>
 
 				<e:layout>
 					<e:VerticalLayout gap="4" />

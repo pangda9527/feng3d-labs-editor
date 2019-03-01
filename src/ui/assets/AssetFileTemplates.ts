@@ -1,8 +1,8 @@
 namespace editor
 {
-    export var assetsFileTemplates: AssetsFileTemplates;
+    export var assetFileTemplates: AssetFileTemplates;
 
-    export class AssetsFileTemplates
+    export class AssetFileTemplates
     {
         /**
          * 
@@ -22,7 +22,7 @@ namespace editor
         }
     }
 
-    assetsFileTemplates = new AssetsFileTemplates();
+    assetFileTemplates = new AssetFileTemplates();
 
     var scriptTemplate = `
 class NewScript extends feng3d.Script

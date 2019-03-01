@@ -43,13 +43,13 @@ namespace editor
         {
             return this._selectedObjects;
         }
-        private _selectedObjects: (feng3d.GameObject | AssetsNode)[] = [];
+        private _selectedObjects: (feng3d.GameObject | AssetNode)[] = [];
 
         clearSelectedObjects()
         {
             this._selectedObjects.length = 0;
             this._selectedGameObjectsInvalid = true;
-            this._selectedAssetsFileInvalid = true;
+            this._selectedAssetFileInvalid = true;
             this._transformGameObjectInvalid = true;
             this._transformBoxInvalid = true;
             feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
@@ -60,7 +60,7 @@ namespace editor
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectObject(object: (feng3d.GameObject | AssetsNode))
+        selectObject(object: (feng3d.GameObject | AssetNode))
         {
             var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
             if (!isAdd) this._selectedObjects.length = 0;
@@ -70,7 +70,7 @@ namespace editor
             else this._selectedObjects.splice(index, 1);
             //
             this._selectedGameObjectsInvalid = true;
-            this._selectedAssetsFileInvalid = true;
+            this._selectedAssetFileInvalid = true;
             this._transformGameObjectInvalid = true;
             this._transformBoxInvalid = true;
             feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
@@ -81,7 +81,7 @@ namespace editor
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectMultiObject(objs: (feng3d.GameObject | AssetsNode)[])
+        selectMultiObject(objs: (feng3d.GameObject | AssetNode)[])
         {
             var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
             if (!isAdd) this._selectedObjects.length = 0;
@@ -92,7 +92,7 @@ namespace editor
                 else this._selectedObjects.splice(index, 1);
             });
             this._selectedGameObjectsInvalid = true;
-            this._selectedAssetsFileInvalid = true;
+            this._selectedAssetFileInvalid = true;
             this._transformGameObjectInvalid = true;
             this._transformBoxInvalid = true;
             feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
@@ -220,27 +220,27 @@ namespace editor
         /**
          * 选中游戏对象列表
          */
-        get selectedAssetsFile()
+        get selectedAssetNodes()
         {
-            if (this._selectedAssetsFileInvalid)
+            if (this._selectedAssetFileInvalid)
             {
-                this._selectedAssetsFile.length = 0;
+                this._selectedAssetNodes.length = 0;
                 this._selectedObjects.forEach(v =>
                 {
-                    if (v instanceof AssetsNode) this._selectedAssetsFile.push(v);
+                    if (v instanceof AssetNode) this._selectedAssetNodes.push(v);
                 });
-                this._selectedAssetsFileInvalid = false;
+                this._selectedAssetFileInvalid = false;
             }
-            return this._selectedAssetsFile;
+            return this._selectedAssetNodes;
         }
-        private _selectedAssetsFileInvalid = true;
-        private _selectedAssetsFile: AssetsNode[] = [];
+        private _selectedAssetFileInvalid = true;
+        private _selectedAssetNodes: AssetNode[] = [];
 
         /**
          * 获取编辑器资源绝对路径
          * @param url 编辑器资源相对路径
          */
-        getEditorAssetsPath(url: string)
+        getEditorAssetPath(url: string)
         {
             return document.URL.substring(0, document.URL.lastIndexOf("/") + 1) + "resource/" + url;
         }

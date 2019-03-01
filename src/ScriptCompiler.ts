@@ -52,9 +52,9 @@ namespace editor
 
                 editorRS.fs.writeString("project.js", outputStr);
 
-                editorAssets.runProjectScript(() =>
+                editorAsset.runProjectScript(() =>
                 {
-                    feng3d.feng3dDispatcher.dispatch("assets.scriptChanged");
+                    feng3d.feng3dDispatcher.dispatch("asset.scriptChanged");
                 });
 
                 return outputStr;
@@ -96,8 +96,8 @@ namespace editor
 
             this.tslist.forEach((item) =>
             {
-                fileNames.push(item.assetsId + ".ts");
-                tsSourceMap[item.assetsId + ".ts"] = ts.createSourceFile(item.assetsId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
+                fileNames.push(item.assetId + ".ts");
+                tsSourceMap[item.assetId + ".ts"] = ts.createSourceFile(item.assetId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
             })
 
             // Output

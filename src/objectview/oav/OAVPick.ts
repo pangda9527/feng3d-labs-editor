@@ -94,7 +94,7 @@ namespace editor
                         menus.push({
                             label: item.name, click: () =>
                             {
-                                this.attributeValue = item.assetsPath;
+                                this.attributeValue = item.assetPath;
                             }
                         });
                     }, []);

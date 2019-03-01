@@ -11,11 +11,11 @@ namespace feng3d
         /**
          * 资源显示文件夹发生变化
          */
-        "assets.showFloderChanged": { oldpath: string, newpath: string };
+        "asset.showFloderChanged": { oldpath: string, newpath: string };
         /**
          * 删除文件
          */
-        "assets.deletefile": { id: string };
+        "asset.deletefile": { id: string };
 
         /**
          * 旋转场景摄像机

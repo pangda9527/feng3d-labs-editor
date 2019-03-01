@@ -20,7 +20,7 @@
         "editor.CameraPreview": "resource/custom_skins/CameraPreview.exml",
         "editor.ParticleEffectController": "resource/custom_skins/ParticleEffectController.exml",
         "editor.HierarchyView": "resource/custom_skins/HierarchyView.exml",
-        "editor.AssetsView": "resource/custom_skins/AssetsView.exml",
+        "editor.AssetView": "resource/custom_skins/AssetView.exml",
         "editor.NavigationView": "resource/custom_skins/NavigationView.exml",
         "editor.MainView": "resource/custom_skins/MainView.exml",
         "editor.BooleanAttrView": "resource/custom_skins/BooleanAttrView.exml",
@@ -105,9 +105,9 @@
         "resource/custom_skins/Feng3dView.exml",
         "resource/custom_skins/CameraPreview.exml",
         "resource/custom_skins/HierarchyView.exml",
-        "resource/custom_skins/AssetsTreeItemRenderer.exml",
-        "resource/custom_skins/AssetsFileItemRenderer.exml",
-        "resource/custom_skins/AssetsView.exml",
+        "resource/custom_skins/AssetTreeItemRenderer.exml",
+        "resource/custom_skins/AssetFileItemRenderer.exml",
+        "resource/custom_skins/AssetView.exml",
         "resource/custom_skins/NavigationView.exml",
         "resource/custom_skins/MainView.exml"
     ]

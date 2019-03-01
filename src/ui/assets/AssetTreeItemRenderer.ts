@@ -1,16 +1,16 @@
 namespace editor
 {
-    export class AssetsTreeItemRenderer extends TreeItemRenderer
+    export class AssetTreeItemRenderer extends TreeItemRenderer
     {
         public contentGroup: eui.Group;
         public disclosureButton: eui.ToggleButton;
 
-        data: AssetsNode;
+        data: AssetNode;
 
         constructor()
         {
             super();
-            this.skinName = "AssetsTreeItemRenderer";
+            this.skinName = "AssetTreeItemRenderer";
         }
 
         $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -19,7 +19,7 @@ namespace editor
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-            feng3d.watcher.watch(editorAssets, "showFloder", this.showFloderChanged, this);
+            feng3d.watcher.watch(editorAsset, "showFloder", this.showFloderChanged, this);
             this.showFloderChanged();
         }
 
@@ -29,7 +29,7 @@ namespace editor
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-            feng3d.watcher.unwatch(editorAssets, "showFloder", this.showFloderChanged, this);
+            feng3d.watcher.unwatch(editorAsset, "showFloder", this.showFloderChanged, this);
         }
 
         dataChanged()
@@ -38,15 +38,15 @@ namespace editor
 
             if (this.data)
             {
-                var folder = <feng3d.FolderAsset>this.data.feng3dAssets;
+                var folder = <feng3d.FolderAsset>this.data.asset;
                 drag.register(this, (dragsource) =>
                 {
-                    dragsource.assetsFiles = [this.data];
-                }, ["assetsFiles"], (dragdata) =>
+                    dragsource.assetNodes = [this.data];
+                }, ["assetNodes"], (dragdata) =>
                     {
-                        dragdata.assetsFiles.forEach(v =>
+                        dragdata.assetNodes.forEach(v =>
                         {
-                            editorRS.moveAssets(v.feng3dAssets, folder, (err) =>
+                            editorRS.moveAsset(v.asset, folder, (err) =>
                             {
                                 if (!err)
                                 {
@@ -67,22 +67,22 @@ namespace editor
 
         private showFloderChanged()
         {
-            this.selected = this.data ? editorAssets.showFloder == this.data : false;
+            this.selected = this.data ? editorAsset.showFloder == this.data : false;
         }
 
         private onclick()
         {
-            editorAssets.showFloder = this.data;
+            editorAsset.showFloder = this.data;
         }
 
         private onrightclick(e)
         {
             if (this.data.parent != null)
             {
-                editorAssets.popupmenu(this.data);
+                editorAsset.popupmenu(this.data);
             } else
             {
-                editorAssets.popupmenu(this.data);
+                editorAsset.popupmenu(this.data);
             }
         }
     }

@@ -1,6 +1,6 @@
 namespace editor
 {
-    export interface AssetsFileEventMap extends TreeNodeMap
+    export interface AssetNodeEventMap extends TreeNodeMap
     {
         /**
          * 加载完成
@@ -8,17 +8,19 @@ namespace editor
         loaded
     }
 
-    export interface AssetsNode
+    export interface AssetNode
     {
-        once<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof AssetsFileEventMap>(type: K, data?: AssetsFileEventMap[K], bubbles?: boolean): feng3d.Event<AssetsFileEventMap[K]>;
-        has<K extends keyof AssetsFileEventMap>(type: K): boolean;
-        on<K extends keyof AssetsFileEventMap>(type: K, listener: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
-        off<K extends keyof AssetsFileEventMap>(type?: K, listener?: (event: feng3d.Event<AssetsFileEventMap[K]>) => any, thisObject?: any);
+        once<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof AssetNodeEventMap>(type: K, data?: AssetNodeEventMap[K], bubbles?: boolean): feng3d.Event<AssetNodeEventMap[K]>;
+        has<K extends keyof AssetNodeEventMap>(type: K): boolean;
+        on<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
+        off<K extends keyof AssetNodeEventMap>(type?: K, listener?: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any);
     }
 
-
-    export class AssetsNode extends TreeNode
+    /**
+     * 资源树结点
+     */
+    export class AssetNode extends TreeNode
     {
         /**
          * 是否文件夹
@@ -36,11 +38,11 @@ namespace editor
         label: string;
 
         @feng3d.serialize
-        children: AssetsNode[] = [];
+        children: AssetNode[] = [];
 
-        parent: AssetsNode;
+        parent: AssetNode;
 
-        feng3dAssets: feng3d.FileAsset;
+        asset: feng3d.FileAsset;
 
         /**
          * 是否已加载
@@ -55,15 +57,15 @@ namespace editor
         /**
          * 构建
          * 
-         * @param feng3dAssets 资源
+         * @param asset 资源
          */
-        constructor(feng3dAssets: feng3d.FileAsset)
+        constructor(asset: feng3d.FileAsset)
         {
             super();
 
-            this.feng3dAssets = feng3dAssets;
-            this.isDirectory = feng3dAssets.assetType == feng3d.AssetExtension.folder;
-            this.label = feng3dAssets.name;
+            this.asset = asset;
+            this.isDirectory = asset.assetType == feng3d.AssetExtension.folder;
+            this.label = asset.name;
             // 更新图标
             if (this.isDirectory)
             {
@@ -74,7 +76,7 @@ namespace editor
                 this.image = "file_png";
             }
 
-            feng3dAssets.readThumbnail(editorRS.fs, (err, image) =>
+            asset.readThumbnail(editorRS.fs, (err, image) =>
             {
                 if (image)
                 {
@@ -107,7 +109,7 @@ namespace editor
 
             this.isLoading = true;
 
-            editorRS.readAssets(this.feng3dAssets.assetsId, (err, assets: feng3d.FileAsset) =>
+            editorRS.readAsset(this.asset.assetId, (err, asset: feng3d.FileAsset) =>
             {
                 feng3d.assert(!err);
 
@@ -125,41 +127,41 @@ namespace editor
          */
         updateImage()
         {
-            if (this.feng3dAssets instanceof feng3d.TextureAsset)
+            if (this.asset instanceof feng3d.TextureAsset)
             {
-                var texture = this.feng3dAssets.data;
+                var texture = this.asset.data;
 
                 this.image = texture.dataURL;
 
                 feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
-                    editorRS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
+                    editorRS.writeAssetIcon(this.asset.assetId, image);
                 });
 
-            } else if (this.feng3dAssets instanceof feng3d.TextureCubeAsset)
+            } else if (this.asset instanceof feng3d.TextureCubeAsset)
             {
-                var textureCube = this.feng3dAssets.data;
+                var textureCube = this.asset.data;
                 textureCube.onLoadCompleted(() =>
                 {
                     this.image = feng3dScreenShot.drawTextureCube(textureCube);
                 });
-            } else if (this.feng3dAssets instanceof feng3d.MaterialAsset)
+            } else if (this.asset instanceof feng3d.MaterialAsset)
             {
-                var mat = this.feng3dAssets;
+                var mat = this.asset;
                 mat.data.onLoadCompleted(() =>
                 {
                     this.image = feng3dScreenShot.drawMaterial(mat.data).toDataURL();
                     feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                     {
-                        editorRS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
+                        editorRS.writeAssetIcon(this.asset.assetId, image);
                     });
                 });
-            } else if (this.feng3dAssets instanceof feng3d.GeometryAsset)
+            } else if (this.asset instanceof feng3d.GeometryAsset)
             {
-                this.image = feng3dScreenShot.drawGeometry(<any>this.feng3dAssets.data).toDataURL();
-            } else if (this.feng3dAssets instanceof feng3d.GameObjectAsset)
+                this.image = feng3dScreenShot.drawGeometry(<any>this.asset.data).toDataURL();
+            } else if (this.asset instanceof feng3d.GameObjectAsset)
             {
-                var gameObject = this.feng3dAssets.data;
+                var gameObject = this.asset.data;
                 gameObject.onLoadCompleted(() =>
                 {
                     this.image = feng3dScreenShot.drawGameObject(gameObject).toDataURL();
@@ -178,7 +180,7 @@ namespace editor
             });
             this.remove();
 
-            editorAssets.deleteAssets(this);
+            editorAsset.deleteAsset(this);
         }
 
         /**
@@ -188,7 +190,7 @@ namespace editor
          */
         getFolderList(includeClose = false)
         {
-            var folders: AssetsNode[] = [];
+            var folders: AssetNode[] = [];
             if (this.isDirectory)
             {
                 folders.push(this);
@@ -209,7 +211,7 @@ namespace editor
          */
         getFileList()
         {
-            var files: AssetsNode[] = [];
+            var files: AssetNode[] = [];
             files.push(this);
             this.children.forEach(v =>
             {
@@ -228,7 +230,7 @@ namespace editor
 
             var zip = new JSZip();
 
-            var path = this.feng3dAssets.assetsPath;
+            var path = this.asset.assetPath;
             if (!feng3d.pathUtils.isDirectory(path))
                 path = feng3d.pathUtils.getParentPath(path);
 

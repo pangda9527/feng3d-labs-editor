@@ -3,7 +3,7 @@ namespace editor
     export interface EditorUI
     {
         stage: egret.Stage;
-        assetsview: AssetsView;
+        assetview: AssetView;
         mainview: MainView;
         tooltipLayer: eui.UILayer;
         popupLayer: eui.UILayer;

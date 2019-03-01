@@ -33,7 +33,7 @@ namespace editor
             label: "保存场景", click: () =>
             {
                 var gameobject = hierarchy.rootnode.gameobject;
-                editorAssets.saveObject(gameobject);
+                editorAsset.saveObject(gameobject);
             }
         },
         {
@@ -44,14 +44,14 @@ namespace editor
                     editorRS.importProject(filelist.item(0), () =>
                     {
                         console.log("导入项目完成");
-                        editorAssets.initproject(() =>
+                        editorAsset.initproject(() =>
                         {
-                            editorAssets.runProjectScript(() =>
+                            editorAsset.runProjectScript(() =>
                             {
-                                editorAssets.readScene("default.scene.json", (err, scene) =>
+                                editorAsset.readScene("default.scene.json", (err, scene) =>
                                 {
                                     engine.scene = scene;
-                                    editorui.assetsview.invalidateAssetstree();
+                                    editorui.assetview.invalidateAssettree();
                                     console.log("导入项目完成!");
                                 });
                             });
@@ -142,13 +142,13 @@ namespace editor
             label: "清空项目",
             click: () =>
             {
-                editorAssets.rootFile.remove();
-                editorAssets.initproject(() =>
+                editorAsset.rootFile.remove();
+                editorAsset.initproject(() =>
                 {
-                    editorAssets.runProjectScript(() =>
+                    editorAsset.runProjectScript(() =>
                     {
                         engine.scene = creatNewScene()
-                        editorui.assetsview.invalidateAssetstree();
+                        editorui.assetview.invalidateAssettree();
                         console.log("清空项目完成!");
                     });
                 });
@@ -352,7 +352,7 @@ namespace editor
      */
     function openDownloadProject(projectname: string, callback?: () => void)
     {
-        editorAssets.rootFile.delete();
+        editorAsset.rootFile.delete();
         downloadProject(projectname, callback);
     }
 
@@ -367,14 +367,14 @@ namespace editor
         {
             editorRS.importProject(<any>content, () =>
             {
-                editorAssets.initproject(() =>
+                editorAsset.initproject(() =>
                 {
-                    editorAssets.runProjectScript(() =>
+                    editorAsset.runProjectScript(() =>
                     {
-                        editorAssets.readScene("default.scene.json", (err, scene) =>
+                        editorAsset.readScene("default.scene.json", (err, scene) =>
                         {
                             engine.scene = scene;
-                            editorui.assetsview.invalidateAssetstree();
+                            editorui.assetview.invalidateAssettree();
                             console.log(`${projectname} 项目下载完成!`);
                             callback && callback();
                         });
