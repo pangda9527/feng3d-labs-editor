@@ -12,9 +12,9 @@ namespace editor
     {
         tslibs: { path: string, code: string }[];
         // ts 列表
-        private tslist: feng3d.ScriptFile[] = [];
+        private tslist: feng3d.ScriptAsset[] = [];
 
-        _script: feng3d.StringFile;
+        _script: feng3d.StringAsset;
 
         constructor()
         {
@@ -27,7 +27,7 @@ namespace editor
             });
         }
 
-        edit(script: feng3d.StringFile)
+        edit(script: feng3d.StringAsset)
         {
             this._script = script;
             if (codeeditoWin) codeeditoWin.close();
@@ -132,7 +132,7 @@ namespace editor
         /**
          * ts 文件排序
          */
-        private tssort(filelist: feng3d.ScriptFile[])
+        private tssort(filelist: feng3d.ScriptAsset[])
         {
             //按继承排序
             for (let i = 0; i < filelist.length; i++)

@@ -5832,7 +5832,7 @@ var editor;
                 }
                 else if (param.accepttype == "audio") {
                     var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
-                    var audioFiles = editor.editorAssets.getAssetsByType(feng3d.AudioFile);
+                    var audioFiles = editor.editorAssets.getAssetsByType(feng3d.AudioAsset);
                     audioFiles.forEach(function (item) {
                         menus.push({
                             label: item.label, click: function () {
@@ -5843,7 +5843,7 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "file_script") {
-                    var scriptFiles = feng3d.rs.getAssetsByType(feng3d.ScriptFile);
+                    var scriptFiles = feng3d.rs.getAssetsByType(feng3d.ScriptAsset);
                     var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
                     scriptFiles.forEach(function (element) {
                         menus.push({
@@ -5856,7 +5856,7 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "material") {
-                    var materials = feng3d.rs.getAssetsByType(feng3d.MaterialFile);
+                    var materials = feng3d.rs.getAssetsByType(feng3d.MaterialAsset);
                     var menus = [];
                     materials.forEach(function (element) {
                         menus.push({
@@ -5935,7 +5935,7 @@ var editor;
         OAVTexture2D.prototype.ontxtClick = function () {
             var _this = this;
             var menus = [];
-            var texture2ds = feng3d.rs.getAssetsByType(feng3d.TextureFile);
+            var texture2ds = feng3d.rs.getAssetsByType(feng3d.TextureAsset);
             texture2ds.forEach(function (texture2d) {
                 menus.push({
                     label: texture2d.name, click: function () {
@@ -6618,7 +6618,7 @@ var editor;
             var tslist = [];
             for (var key in files) {
                 var file = files[key].feng3dAssets;
-                if (file instanceof feng3d.ScriptFile) {
+                if (file instanceof feng3d.ScriptAsset) {
                     tslist.push(file);
                 }
             }
@@ -6668,45 +6668,45 @@ var editor;
                     submenu: [
                         {
                             label: "文件夹", click: function () {
-                                _this.createAssets(assetsFile, feng3d.Feng3dFolder, { name: "NewFolder" });
+                                _this.createAssets(assetsFile, feng3d.FolderAsset, { name: "NewFolder" });
                             }
                         },
                         {
                             label: "脚本", click: function () {
                                 var fileName = editor.editorRS.getValidChildName(folder, "NewScript");
-                                _this.createAssets(assetsFile, feng3d.ScriptFile, { name: fileName, textContent: editor.assetsFileTemplates.getNewScript(fileName) });
+                                _this.createAssets(assetsFile, feng3d.ScriptAsset, { name: fileName, textContent: editor.assetsFileTemplates.getNewScript(fileName) });
                             }
                         },
                         {
                             label: "着色器", click: function () {
                                 var fileName = editor.editorRS.getValidChildName(folder, "NewShader");
-                                _this.createAssets(assetsFile, feng3d.ShaderFile, { name: fileName, textContent: editor.assetsFileTemplates.getNewShader(fileName) });
+                                _this.createAssets(assetsFile, feng3d.ShaderAsset, { name: fileName, textContent: editor.assetsFileTemplates.getNewShader(fileName) });
                             }
                         },
                         {
                             label: "js", click: function () {
-                                _this.createAssets(assetsFile, feng3d.JSFile, { name: "NewJs" });
+                                _this.createAssets(assetsFile, feng3d.JSAsset, { name: "NewJs" });
                             }
                         },
                         {
                             label: "Json", click: function () {
-                                _this.createAssets(assetsFile, feng3d.JsonFile, { name: "New Json" });
+                                _this.createAssets(assetsFile, feng3d.JsonAsset, { name: "New Json" });
                             }
                         },
                         {
                             label: "文本", click: function () {
-                                _this.createAssets(assetsFile, feng3d.TextFile, { name: "New Text" });
+                                _this.createAssets(assetsFile, feng3d.TextAsset, { name: "New Text" });
                             }
                         },
                         { type: "separator" },
                         {
                             label: "立方体贴图", click: function () {
-                                _this.createAssets(assetsFile, feng3d.TextureCubeFile, { name: "new TextureCube.json" });
+                                _this.createAssets(assetsFile, feng3d.TextureCubeAsset, { name: "new TextureCube.json" });
                             }
                         },
                         {
                             label: "材质", click: function () {
-                                _this.createAssets(assetsFile, feng3d.MaterialFile, { name: "New Material" });
+                                _this.createAssets(assetsFile, feng3d.MaterialAsset, { name: "New Material" });
                             }
                         },
                         {
@@ -6714,42 +6714,42 @@ var editor;
                             submenu: [
                                 {
                                     label: "平面", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New PlaneGeometry", data: new feng3d.PlaneGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryAsset, { name: "New PlaneGeometry", data: new feng3d.PlaneGeometry() });
                                     }
                                 },
                                 {
                                     label: "立方体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CubeGeometry", data: new feng3d.CubeGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryAsset, { name: "New CubeGeometry", data: new feng3d.CubeGeometry() });
                                     }
                                 },
                                 {
                                     label: "球体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New SphereGeometry", data: new feng3d.SphereGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryAsset, { name: "New SphereGeometry", data: new feng3d.SphereGeometry() });
                                     }
                                 },
                                 {
                                     label: "胶囊体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CapsuleGeometry", data: new feng3d.CapsuleGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryAsset, { name: "New CapsuleGeometry", data: new feng3d.CapsuleGeometry() });
                                     }
                                 },
                                 {
                                     label: "圆柱体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CylinderGeometry", data: new feng3d.CylinderGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryAsset, { name: "New CylinderGeometry", data: new feng3d.CylinderGeometry() });
                                     }
                                 },
                                 {
                                     label: "圆锥体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New ConeGeometry", data: new feng3d.ConeGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryAsset, { name: "New ConeGeometry", data: new feng3d.ConeGeometry() });
                                     }
                                 },
                                 {
                                     label: "圆环", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New TorusGeometry", data: new feng3d.TorusGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryAsset, { name: "New TorusGeometry", data: new feng3d.TorusGeometry() });
                                     }
                                 },
                                 {
                                     label: "地形", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New TerrainGeometry", data: new feng3d.TerrainGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryAsset, { name: "New TerrainGeometry", data: new feng3d.TerrainGeometry() });
                                     }
                                 },
                             ],
@@ -6771,7 +6771,7 @@ var editor;
                 menuconfig.push({ type: "separator" });
             }
             // 使用编辑器打开
-            if (assetsFile.feng3dAssets instanceof feng3d.StringFile) {
+            if (assetsFile.feng3dAssets instanceof feng3d.StringAsset) {
                 menuconfig.push({
                     label: "编辑", click: function () {
                         editor.scriptCompiler.edit(assetsFile.feng3dAssets);
@@ -6851,11 +6851,11 @@ var editor;
                 };
                 if (feng3d.regExps.image.test(file.name)) {
                     feng3d.dataTransform.arrayBufferToImage(result, function (img) {
-                        _this.createAssets(showFloder, feng3d.TextureFile, { name: file.name, image: img }, createAssetsCallback);
+                        _this.createAssets(showFloder, feng3d.TextureAsset, { name: file.name, image: img }, createAssetsCallback);
                     });
                 }
                 else {
-                    _this.createAssets(showFloder, feng3d.ArrayBufferFile, { name: file.name, arraybuffer: result }, createAssetsCallback);
+                    _this.createAssets(showFloder, feng3d.ArrayBufferAsset, { name: file.name, arraybuffer: result }, createAssetsCallback);
                 }
             }, false);
             reader.readAsArrayBuffer(file);
@@ -6886,7 +6886,7 @@ var editor;
          * @param assetsFile 文件
          */
         EditorAssets.prototype.parserMenu = function (menuconfig, assetsFile) {
-            if (assetsFile.feng3dAssets instanceof feng3d.Feng3dFile) {
+            if (assetsFile.feng3dAssets instanceof feng3d.FileAsset) {
                 var filePath = assetsFile.feng3dAssets.assetsPath;
                 var extensions = feng3d.pathUtils.getExtension(filePath);
                 switch (extensions) {
@@ -7146,20 +7146,20 @@ var editor;
          */
         AssetsNode.prototype.updateImage = function () {
             var _this = this;
-            if (this.feng3dAssets instanceof feng3d.TextureFile) {
+            if (this.feng3dAssets instanceof feng3d.TextureAsset) {
                 var texture = this.feng3dAssets.data;
                 this.image = texture.dataURL;
                 feng3d.dataTransform.dataURLToImage(this.image, function (image) {
                     editor.editorRS.writeAssetsIcon(_this.feng3dAssets.assetsId, image);
                 });
             }
-            else if (this.feng3dAssets instanceof feng3d.TextureCubeFile) {
+            else if (this.feng3dAssets instanceof feng3d.TextureCubeAsset) {
                 var textureCube = this.feng3dAssets.data;
                 textureCube.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawTextureCube(textureCube);
                 });
             }
-            else if (this.feng3dAssets instanceof feng3d.MaterialFile) {
+            else if (this.feng3dAssets instanceof feng3d.MaterialAsset) {
                 var mat = this.feng3dAssets;
                 mat.data.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawMaterial(mat.data).toDataURL();
@@ -7168,10 +7168,10 @@ var editor;
                     });
                 });
             }
-            else if (this.feng3dAssets instanceof feng3d.GeometryFile) {
+            else if (this.feng3dAssets instanceof feng3d.GeometryAsset) {
                 this.image = editor.feng3dScreenShot.drawGeometry(this.feng3dAssets.data).toDataURL();
             }
-            else if (this.feng3dAssets instanceof feng3d.GameObjectFile) {
+            else if (this.feng3dAssets instanceof feng3d.GameObjectAsset) {
                 var gameObject = this.feng3dAssets.data;
                 gameObject.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawGameObject(gameObject).toDataURL();

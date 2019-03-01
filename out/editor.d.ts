@@ -239,7 +239,7 @@ declare namespace editor {
         /**
          * 脚本路径
          */
-        file_script?: feng3d.ScriptFile;
+        file_script?: feng3d.ScriptAsset;
         /**
          * 文件
          */
@@ -247,7 +247,7 @@ declare namespace editor {
         /**
          * 声音路径
          */
-        audio?: feng3d.AudioFile;
+        audio?: feng3d.AudioAsset;
         /**
          * 纹理
          */
@@ -1767,7 +1767,7 @@ declare namespace editor {
         /**
          * 获取脚本列表
          */
-        getScripts(): feng3d.ScriptFile[];
+        getScripts(): feng3d.ScriptAsset[];
         /**
          * 获取指定类型资源
          * @param type 资源类型
@@ -3280,11 +3280,11 @@ declare namespace editor {
             code: string;
         }[];
         private tslist;
-        _script: feng3d.StringFile;
+        _script: feng3d.StringAsset;
         constructor();
-        edit(script: feng3d.StringFile): void;
+        edit(script: feng3d.StringAsset): void;
         compile(callback?: (result: string) => void): any;
-        getScripts(): feng3d.ScriptFile[];
+        getScripts(): feng3d.ScriptAsset[];
         private transpileModule;
         /**
          * ts 文件排序

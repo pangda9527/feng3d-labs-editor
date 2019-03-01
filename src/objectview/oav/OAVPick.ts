@@ -88,7 +88,7 @@ namespace editor
                 {
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
 
-                    var audioFiles = editorAssets.getAssetsByType(feng3d.AudioFile);
+                    var audioFiles = editorAssets.getAssetsByType(feng3d.AudioAsset);
                     audioFiles.forEach(item =>
                     {
                         menus.push({
@@ -101,7 +101,7 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "file_script")
                 {
-                    var scriptFiles = feng3d.rs.getAssetsByType(feng3d.ScriptFile);
+                    var scriptFiles = feng3d.rs.getAssetsByType(feng3d.ScriptAsset);
 
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
                     scriptFiles.forEach(element =>
@@ -117,7 +117,7 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "material")
                 {
-                    var materials = feng3d.rs.getAssetsByType(feng3d.MaterialFile);
+                    var materials = feng3d.rs.getAssetsByType(feng3d.MaterialAsset);
                     var menus: MenuItem[] = [];
                     materials.forEach(element =>
                     {

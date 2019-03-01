@@ -38,7 +38,7 @@ namespace editor
         private ontxtClick()
         {
             var menus: MenuItem[] = [];
-            var texture2ds = feng3d.rs.getAssetsByType(feng3d.TextureFile);
+            var texture2ds = feng3d.rs.getAssetsByType(feng3d.TextureAsset);
             texture2ds.forEach(texture2d =>
             {
                 menus.push({

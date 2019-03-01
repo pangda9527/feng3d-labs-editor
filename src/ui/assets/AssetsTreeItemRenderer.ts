@@ -38,7 +38,7 @@ namespace editor
 
             if (this.data)
             {
-                var folder = <feng3d.Feng3dFolder>this.data.feng3dAssets;
+                var folder = <feng3d.FolderAsset>this.data.feng3dAssets;
                 drag.register(this, (dragsource) =>
                 {
                     dragsource.assetsFiles = [this.data];

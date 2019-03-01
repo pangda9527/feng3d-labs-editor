@@ -125,7 +125,7 @@ namespace editor
          */
         updateImage()
         {
-            if (this.feng3dAssets instanceof feng3d.TextureFile)
+            if (this.feng3dAssets instanceof feng3d.TextureAsset)
             {
                 var texture = this.feng3dAssets.data;
 
@@ -136,14 +136,14 @@ namespace editor
                     editorRS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
                 });
 
-            } else if (this.feng3dAssets instanceof feng3d.TextureCubeFile)
+            } else if (this.feng3dAssets instanceof feng3d.TextureCubeAsset)
             {
                 var textureCube = this.feng3dAssets.data;
                 textureCube.onLoadCompleted(() =>
                 {
                     this.image = feng3dScreenShot.drawTextureCube(textureCube);
                 });
-            } else if (this.feng3dAssets instanceof feng3d.MaterialFile)
+            } else if (this.feng3dAssets instanceof feng3d.MaterialAsset)
             {
                 var mat = this.feng3dAssets;
                 mat.data.onLoadCompleted(() =>
@@ -154,10 +154,10 @@ namespace editor
                         editorRS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
                     });
                 });
-            } else if (this.feng3dAssets instanceof feng3d.GeometryFile)
+            } else if (this.feng3dAssets instanceof feng3d.GeometryAsset)
             {
                 this.image = feng3dScreenShot.drawGeometry(<any>this.feng3dAssets.data).toDataURL();
-            } else if (this.feng3dAssets instanceof feng3d.GameObjectFile)
+            } else if (this.feng3dAssets instanceof feng3d.GameObjectAsset)
             {
                 var gameObject = this.feng3dAssets.data;
                 gameObject.onLoadCompleted(() =>
