@@ -21,12 +21,6 @@ namespace editor
     export class AssetsNode extends TreeNode
     {
         /**
-         * 编号
-         */
-        get id() { return this._id; }
-        private _id: string;
-
-        /**
          * 是否文件夹
          */
         isDirectory: boolean;
@@ -46,10 +40,7 @@ namespace editor
 
         parent: AssetsNode;
 
-        get feng3dAssets()
-        {
-            return editorFS.idMap[this._id];
-        }
+        feng3dAssets: feng3d.Feng3dAssets;
 
         /**
          * 是否已加载
@@ -64,17 +55,15 @@ namespace editor
         /**
          * 构建
          * 
-         * @param id 编号
+         * @param feng3dAssets 资源
          */
-        constructor(id: string)
+        constructor(feng3dAssets: feng3d.Feng3dAssets)
         {
             super();
 
-            var item = editorFS.idMap[id];
-
-            this._id = id;
-            this.isDirectory = item.assetType == feng3d.AssetExtension.folder;
-            this.label = feng3d.pathUtils.getName(item.assetsPath);
+            this.feng3dAssets = feng3dAssets;
+            this.isDirectory = feng3dAssets.assetType == feng3d.AssetExtension.folder;
+            this.label = feng3dAssets.name;
             // 更新图标
             if (this.isDirectory)
             {
@@ -84,7 +73,8 @@ namespace editor
             {
                 this.image = "file_png";
             }
-            editorFS.readAssetsIcon(id, (err, image) =>
+
+            feng3dAssets.readThumbnail(editorFS.fs, (err, image) =>
             {
                 if (image)
                 {
@@ -117,7 +107,7 @@ namespace editor
 
             this.isLoading = true;
 
-            editorFS.readAssets(this.id, (err, assets: feng3d.Feng3dAssets) =>
+            editorFS.readAssets(this.feng3dAssets.assetsId, (err, assets: feng3d.Feng3dAssets) =>
             {
                 feng3d.assert(!err);
 
@@ -143,7 +133,7 @@ namespace editor
 
                 feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
-                    editorFS.writeAssetsIcon(this.id, image);
+                    editorFS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
                 });
 
             } else if (this.feng3dAssets instanceof feng3d.TextureCube)
@@ -156,12 +146,12 @@ namespace editor
             } else if (this.feng3dAssets instanceof feng3d.MaterialFile)
             {
                 var mat = this.feng3dAssets;
-                mat.material.onLoadCompleted(() =>
+                mat.data.onLoadCompleted(() =>
                 {
-                    this.image = feng3dScreenShot.drawMaterial(mat.material).toDataURL();
+                    this.image = feng3dScreenShot.drawMaterial(mat.data).toDataURL();
                     feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                     {
-                        editorFS.writeAssetsIcon(this.id, image);
+                        editorFS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
                     });
                 });
             } else if (this.feng3dAssets instanceof feng3d.Geometry)
@@ -227,47 +217,6 @@ namespace editor
                 files = files.concat(cfiles);
             });
             return files;
-        }
-
-        /**
-         * 获取新子文件名称
-         * 
-         * @param childName 基础名称
-         */
-        getNewChildFileName(childName: string)
-        {
-            var childrenNames = this.children.map(v =>
-            {
-                return v.feng3dAssets.name + v.feng3dAssets.extenson;
-            });
-            if (childrenNames.indexOf(childName) == -1) return childName;
-
-            var baseName = feng3d.pathUtils.getName(childName);
-            var extension = feng3d.pathUtils.getExtension(childName);
-            if (extension.length > 0) extension = "." + extension;
-
-            var i = 1;
-            var newName = baseName + extension;
-            while (childrenNames.indexOf(newName) != -1)
-            {
-                newName = baseName + i + extension;
-                i++;
-            }
-
-            return newName;
-        }
-
-        /**
-         * 获取新子文件路径
-         * 
-         * @param basename 基础名称
-         */
-        getNewChildPath(basename: string)
-        {
-            var newName = this.getNewChildFileName(basename);
-            var filepath = this.feng3dAssets.assetsPath;
-            var path = feng3d.pathUtils.getChildFilePath(filepath, newName);
-            return path;
         }
 
         /**

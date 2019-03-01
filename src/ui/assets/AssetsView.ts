@@ -144,7 +144,7 @@ namespace editor
             {
                 if (textFlow.length > 0)
                     textFlow.unshift({ text: " > " });
-                textFlow.unshift({ text: floder.label, style: { "href": `event:${floder.id}` } });
+                textFlow.unshift({ text: floder.label, style: { "href": `event:${floder.feng3dAssets.assetsId}` } });
                 floder = floder.parent;
             }
             while (floder)

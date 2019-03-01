@@ -6,9 +6,10 @@ var fstype = GetQueryString("fstype");
 
 if (fstype == "indexedDB")
 {
+    feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
     feng3d.fs = feng3d.indexedDBFS;
     feng3d.rs = new feng3d.ReadRS(feng3d.indexedDBFS);
-    feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
+    feng3d.rs.init();
 }
 
 feng3d.fs.readString("project.js", (err, content) =>

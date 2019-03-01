@@ -125,7 +125,7 @@ namespace editor
                             label: element.name,
                             click: () =>
                             {
-                                this.attributeValue = element.material;
+                                this.attributeValue = element.data;
                             }
                         });
                     });

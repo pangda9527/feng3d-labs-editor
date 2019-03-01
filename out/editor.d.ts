@@ -1843,11 +1843,6 @@ declare namespace editor {
     }
     class AssetsNode extends TreeNode {
         /**
-         * 编号
-         */
-        readonly id: string;
-        private _id;
-        /**
          * 是否文件夹
          */
         isDirectory: boolean;
@@ -1861,7 +1856,7 @@ declare namespace editor {
         label: string;
         children: AssetsNode[];
         parent: AssetsNode;
-        readonly feng3dAssets: feng3d.Feng3dAssets;
+        feng3dAssets: feng3d.Feng3dAssets;
         /**
          * 是否已加载
          */
@@ -1873,9 +1868,9 @@ declare namespace editor {
         /**
          * 构建
          *
-         * @param id 编号
+         * @param feng3dAssets 资源
          */
-        constructor(id: string);
+        constructor(feng3dAssets: feng3d.Feng3dAssets);
         /**
          * 加载
          *
@@ -1900,18 +1895,6 @@ declare namespace editor {
          * 获取文件列表
          */
         getFileList(): AssetsNode[];
-        /**
-         * 获取新子文件名称
-         *
-         * @param childName 基础名称
-         */
-        getNewChildFileName(childName: string): string;
-        /**
-         * 获取新子文件路径
-         *
-         * @param basename 基础名称
-         */
-        getNewChildPath(basename: string): string;
         /**
          * 导出
          */

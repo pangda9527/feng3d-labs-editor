@@ -33,9 +33,9 @@ namespace editor
         {
             editorFS.init(() =>
             {
-                Object.keys(editorFS.idMap).map(assetsId =>
+                editorFS.getAllAssets().map(asset =>
                 {
-                    return this._assetsIDMap[assetsId] = new AssetsNode(assetsId);
+                    return this._assetsIDMap[asset.assetsId] = new AssetsNode(asset);
                 }).forEach(element =>
                 {
                     if (element.feng3dAssets.parentAsset)
@@ -83,16 +83,16 @@ namespace editor
          */
         deleteAssets(assetsFile: AssetsNode, callback?: (err: Error) => void)
         {
-            editorFS.deleteAssets(assetsFile.id, (err) =>
+            editorFS.deleteAssets(assetsFile.feng3dAssets.assetsId, (err) =>
             {
                 if (err)
                 {
                     callback && callback(err);
                     return;
                 }
-                delete this._assetsIDMap[assetsFile.id];
+                delete this._assetsIDMap[assetsFile.feng3dAssets.assetsId];
 
-                feng3d.feng3dDispatcher.dispatch("assets.deletefile", { id: assetsFile.id });
+                feng3d.feng3dDispatcher.dispatch("assets.deletefile", { id: assetsFile.feng3dAssets.assetsId });
 
                 callback && callback(err);
             });
@@ -108,7 +108,7 @@ namespace editor
         {
             editorFS.writeAssets(assetsFile.feng3dAssets, (err) =>
             {
-                feng3d.assert(!err, `资源 ${assetsFile.id} 保存失败！`);
+                feng3d.assert(!err, `资源 ${assetsFile.feng3dAssets.assetsId} 保存失败！`);
                 callback && callback();
             });
         }
@@ -153,11 +153,11 @@ namespace editor
             {
                 if (asset)
                 {
-                    var assetsFile = new AssetsNode(asset.assetsId);
+                    var assetsFile = new AssetsNode(asset);
 
                     assetsFile.isLoaded = true;
 
-                    this._assetsIDMap[assetsFile.id] = assetsFile;
+                    this._assetsIDMap[assetsFile.feng3dAssets.assetsId] = assetsFile;
 
                     parentAssets.addChild(assetsFile);
 
