@@ -6566,8 +6566,6 @@ var editor;
                 });
                 _this.rootFile = _this._assetsIDMap[editor.editorFS.root.assetsId];
                 _this.showFloder = _this.rootFile;
-                _this.rootFile.on("added", function () { _this.saveProject(); });
-                _this.rootFile.on("removed", function () { _this.saveProject(); });
                 _this.rootFile.isOpen = true;
                 callback();
             });
@@ -6614,16 +6612,8 @@ var editor;
                 }
                 delete _this._assetsIDMap[assetsFile.id];
                 feng3d.feng3dDispatcher.dispatch("assets.deletefile", { id: assetsFile.id });
-                _this.saveProject();
                 callback && callback(err);
             });
-        };
-        /**
-         * 保存项目
-         * @param callback 完成回调
-         */
-        EditorAssets.prototype.saveProject = function (callback) {
-            editor.editorFS.save(callback);
         };
         /**
          * 保存资源
@@ -6670,7 +6660,6 @@ var editor;
             var assetsFile = new editor.AssetsNode(feng3dFolder.assetsId);
             assetsFile.isLoaded = true;
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            this.saveProject();
             parentAssets.addChild(assetsFile);
             return assetsFile;
         };
@@ -6683,7 +6672,6 @@ var editor;
             var assetsFile = new editor.AssetsNode(feng3dAssets.assetsId);
             assetsFile.isLoaded = true;
             this._assetsIDMap[assetsFile.id] = assetsFile;
-            this.saveProject();
             parentAssets.addChild(assetsFile);
             return assetsFile;
         };

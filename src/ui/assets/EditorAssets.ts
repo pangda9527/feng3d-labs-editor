@@ -57,8 +57,6 @@ namespace editor
 
                 this.rootFile = this._assetsIDMap[editorFS.root.assetsId];
                 this.showFloder = this.rootFile;
-                this.rootFile.on("added", () => { this.saveProject() });
-                this.rootFile.on("removed", () => { this.saveProject() });
                 this.rootFile.isOpen = true;
                 callback();
             });
@@ -119,19 +117,8 @@ namespace editor
 
                 feng3d.feng3dDispatcher.dispatch("assets.deletefile", { id: assetsFile.id });
 
-                this.saveProject();
-
                 callback && callback(err);
             });
-        }
-
-        /**
-         * 保存项目
-         * @param callback 完成回调
-         */
-        saveProject(callback?: (err: Error) => void)
-        {
-            editorFS.save(callback);
         }
 
         /**
@@ -192,7 +179,6 @@ namespace editor
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
 
-            this.saveProject();
             parentAssets.addChild(assetsFile);
             return assetsFile;
         }
@@ -210,7 +196,6 @@ namespace editor
 
             this._assetsIDMap[assetsFile.id] = assetsFile;
 
-            this.saveProject();
             parentAssets.addChild(assetsFile);
             return assetsFile;
         }

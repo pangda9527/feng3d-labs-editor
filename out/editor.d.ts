@@ -1764,11 +1764,6 @@ declare namespace editor {
          */
         deleteAssets(assetsFile: AssetsNode, callback?: (err: Error) => void): void;
         /**
-         * 保存项目
-         * @param callback 完成回调
-         */
-        saveProject(callback?: (err: Error) => void): void;
-        /**
          * 保存资源
          *
          * @param assetsFile 资源
