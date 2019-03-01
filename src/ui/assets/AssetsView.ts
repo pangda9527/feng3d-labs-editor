@@ -209,8 +209,7 @@ namespace editor
             if (selectedAssetsFile.length > 0)
                 this.filepathLabel.text = selectedAssetsFile.map(v =>
                 {
-                    var vpath = editorFS.getPath(v.id);
-                    return feng3d.pathUtils.getNameWithExtension(vpath);
+                    return v.feng3dAssets.name + v.feng3dAssets.extenson;
                 }).join(",");
             else
                 this.filepathLabel.text = "";

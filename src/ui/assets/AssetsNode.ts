@@ -238,9 +238,7 @@ namespace editor
         {
             var childrenNames = this.children.map(v =>
             {
-                var filepath = editorFS.getPath(v.id);
-                var filename = feng3d.pathUtils.getNameWithExtension(filepath);
-                return filename;
+                return v.feng3dAssets.name + v.feng3dAssets.extenson;
             });
             if (childrenNames.indexOf(childName) == -1) return childName;
 
@@ -267,32 +265,9 @@ namespace editor
         getNewChildPath(basename: string)
         {
             var newName = this.getNewChildFileName(basename);
-            var filepath = editorFS.getPath(this.id);
+            var filepath = this.feng3dAssets.assetsPath;
             var path = feng3d.pathUtils.getChildFilePath(filepath, newName);
             return path;
-        }
-
-        /**
-         * 新增文件从ArrayBuffer
-         * 
-         * @param filename 新增文件名称
-         * @param arraybuffer 文件数据
-         * @param callback 完成回调
-         */
-        addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override = false, callback?: (e: Error, file: AssetsNode) => void)
-        {
-            var feng3dFile = Object.setValue(new feng3d.ArrayBufferFile(), { name: filename, arraybuffer: arraybuffer });
-
-            var path = this.getNewChildPath(filename);
-
-            feng3d.error(`未实现`);
-
-            // assets.writeAssets(feng3dFile);
-            editorFS.fs.writeArrayBuffer(path, arraybuffer, err =>
-            {
-                var assetsFile = editorAssets.createAssets(this, filename, feng3dFile);
-                callback(err, assetsFile);
-            });
         }
 
         /**
@@ -300,9 +275,11 @@ namespace editor
          */
         export()
         {
+            feng3d.error("未实现");
+
             var zip = new JSZip();
 
-            var path = editorFS.getPath(this.id);
+            var path = this.feng3dAssets.assetsPath;
             if (!feng3d.pathUtils.isDirectory(path))
                 path = feng3d.pathUtils.getParentPath(path);
 

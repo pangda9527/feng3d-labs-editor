@@ -1780,17 +1780,11 @@ declare namespace editor {
          */
         getAssetsByType<T extends feng3d.Feng3dAssets>(type: feng3d.Constructor<T>): AssetsNode[];
         /**
-         * 新增文件夹
-         *
-         * @param folderName 文件夹名称
-         */
-        createFolder(parentAssets: AssetsNode, feng3dFolder: feng3d.Feng3dFolder): AssetsNode;
-        /**
          * 新增资源
          *
          * @param feng3dAssets
          */
-        createAssets(parentAssets: AssetsNode, fileName: string, feng3dAssets: feng3d.Feng3dAssets): AssetsNode;
+        createAssets<T extends feng3d.Feng3dAssets>(parentAssets: AssetsNode, cls: new () => T, value?: gPartial<T>, callback?: (err: Error, asset: AssetsNode) => void): void;
         /**
          * 弹出文件菜单
          */
@@ -1924,14 +1918,6 @@ declare namespace editor {
          * @param basename 基础名称
          */
         getNewChildPath(basename: string): string;
-        /**
-         * 新增文件从ArrayBuffer
-         *
-         * @param filename 新增文件名称
-         * @param arraybuffer 文件数据
-         * @param callback 完成回调
-         */
-        addfileFromArrayBuffer(filename: string, arraybuffer: ArrayBuffer, override?: boolean, callback?: (e: Error, file: AssetsNode) => void): void;
         /**
          * 导出
          */
