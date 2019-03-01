@@ -16,7 +16,8 @@ namespace editor
 
         initView()
         {
-            feng3d.watcher.watch(this.space, this._attributeName, this.updateView, this);
+            if (this._attributeViewInfo.editable)
+                feng3d.watcher.watch(this.space, this._attributeName, this.updateView, this);
         }
 
         dispose()

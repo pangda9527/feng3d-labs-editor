@@ -241,49 +241,49 @@ namespace editor
                                     {
                                         label: "平面", click: () =>
                                         {
-                                            // this.createAssets(assetsFile, "New PlaneGeometry.json", new feng3d.PlaneGeometry());
+                                            this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New PlaneGeometry", geometry: new feng3d.PlaneGeometry() });
                                         }
                                     },
                                     {
                                         label: "立方体", click: () =>
                                         {
-                                            // editorData.selectObject(this.createAssets(assetsFile, "New CubeGeometry.json", new feng3d.CubeGeometry()));
+                                            this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CubeGeometry", geometry: new feng3d.CubeGeometry() });
                                         }
                                     },
                                     {
                                         label: "球体", click: () =>
                                         {
-                                            // editorData.selectObject(this.createAssets(assetsFile, "New SphereGeometry.json", new feng3d.SphereGeometry()));
+                                            this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New SphereGeometry", geometry: new feng3d.SphereGeometry() });
                                         }
                                     },
                                     {
                                         label: "胶囊体", click: () =>
                                         {
-                                            // editorData.selectObject(this.createAssets(assetsFile, "New CapsuleGeometry.json", new feng3d.CapsuleGeometry()));
+                                            this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CapsuleGeometry", geometry: new feng3d.CapsuleGeometry() });
                                         }
                                     },
                                     {
                                         label: "圆柱体", click: () =>
                                         {
-                                            // editorData.selectObject(this.createAssets(assetsFile, "New CylinderGeometry.json", new feng3d.CylinderGeometry()));
+                                            this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CylinderGeometry", geometry: new feng3d.CylinderGeometry() });
                                         }
                                     },
                                     {
                                         label: "圆锥体", click: () =>
                                         {
-                                            // editorData.selectObject(this.createAssets(assetsFile, "New ConeGeometry.json", new feng3d.ConeGeometry()));
+                                            this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New ConeGeometry", geometry: new feng3d.ConeGeometry() });
                                         }
                                     },
                                     {
                                         label: "圆环", click: () =>
                                         {
-                                            // editorData.selectObject(this.createAssets(assetsFile, "New TorusGeometry.json", new feng3d.TorusGeometry()));
+                                            this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New TorusGeometry", geometry: new feng3d.TorusGeometry() });
                                         }
                                     },
                                     {
                                         label: "地形", click: () =>
                                         {
-                                            // editorData.selectObject(this.createAssets(assetsFile, "New TerrainGeometry.json", new feng3d.TerrainGeometry()));
+                                            this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New TerrainGeometry", geometry: new feng3d.TerrainGeometry() });
                                         }
                                     },
                                 ],
