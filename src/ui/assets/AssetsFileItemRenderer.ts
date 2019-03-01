@@ -89,28 +89,28 @@ namespace editor
                         switch (extension)
                         {
                             case feng3d.AssetExtension.gameobject:
-                                dragsource.file_gameobject = feng3d.serialization.clone(<feng3d.GameObject>this.data.feng3dAssets);
+                                dragsource.file_gameobject = feng3d.serialization.clone(<feng3d.GameObject>this.data.feng3dAssets.data);
                                 break;
                             case feng3d.AssetExtension.script:
-                                dragsource.file_script = <any>this.data.feng3dAssets;
+                                dragsource.file_script = <any>this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.anim:
-                                dragsource.animationclip = <any>this.data.feng3dAssets;
+                                dragsource.animationclip = <any>this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.material:
-                                dragsource.material = <any>this.data.feng3dAssets;
+                                dragsource.material = <any>this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.texturecube:
-                                dragsource.texturecube = <any>this.data.feng3dAssets;
+                                dragsource.texturecube = <any>this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.geometry:
-                                dragsource.geometry = <any>this.data.feng3dAssets;
+                                dragsource.geometry = <any>this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.texture:
-                                dragsource.texture2d = <any>this.data.feng3dAssets;
+                                dragsource.texture2d = <any>this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.audio:
-                                dragsource.audio = <any>this.data.feng3dAssets;
+                                dragsource.audio = <any>this.data.feng3dAssets.data;
                                 break;
                         }
                         if (editorData.selectedAssetsFile.indexOf(this.data) != -1)

@@ -341,7 +341,7 @@ namespace editor
          * @param object 对象
          * @param callback 
          */
-        saveObject(object: feng3d.FileAsset, callback?: (file: AssetsNode) => void)
+        saveObject(object: feng3d.AssetData, callback?: (file: AssetsNode) => void)
         {
             feng3d.error(`未实现`);
 

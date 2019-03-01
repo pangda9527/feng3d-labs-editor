@@ -5309,7 +5309,7 @@ var editor;
             var index = this.btns.indexOf(e.currentTarget);
             if (index != -1) {
                 var textureCube = this.space;
-                var texture2ds = feng3d.rs.getAssetsByType(feng3d.UrlImageTexture2D);
+                var texture2ds = feng3d.rs.getAssetDatasByType(feng3d.UrlImageTexture2D);
                 var menus = [{
                         label: "None", click: function () {
                             textureCube[propertys[index]] = "";
@@ -5808,7 +5808,7 @@ var editor;
             if (param.accepttype) {
                 if (param.accepttype == "texture2d") {
                     var menus = [];
-                    var texture2ds = editor.editorRS.getAssetsByType(feng3d.UrlImageTexture2D);
+                    var texture2ds = editor.editorRS.getAssetDatasByType(feng3d.Texture2D);
                     texture2ds.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
@@ -5820,7 +5820,7 @@ var editor;
                 }
                 else if (param.accepttype == "texturecube") {
                     var menus = [];
-                    var textureCubes = editor.editorRS.getAssetsByType(feng3d.TextureCube);
+                    var textureCubes = editor.editorRS.getAssetDatasByType(feng3d.TextureCube);
                     textureCubes.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
@@ -5843,7 +5843,7 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "file_script") {
-                    var scriptFiles = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
+                    var scriptFiles = editor.editorRS.getAssetDatasByType(feng3d.ScriptAsset);
                     var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
                     scriptFiles.forEach(function (element) {
                         menus.push({
@@ -5856,20 +5856,20 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "material") {
-                    var materials = editor.editorRS.getAssetsByType(feng3d.MaterialAsset);
+                    var assets = editor.editorRS.getAssetDatasByType(feng3d.Material);
                     var menus = [];
-                    materials.forEach(function (element) {
+                    assets.forEach(function (element) {
                         menus.push({
                             label: element.name,
                             click: function () {
-                                _this.attributeValue = element.data;
+                                _this.attributeValue = element;
                             }
                         });
                     });
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "geometry") {
-                    var geometrys = editor.editorRS.getAssetsByType(feng3d.Geometry);
+                    var geometrys = editor.editorRS.getAssetDatasByType(feng3d.Geometry);
                     var menus = [];
                     geometrys.forEach(function (element) {
                         menus.push({
@@ -5935,11 +5935,11 @@ var editor;
         OAVTexture2D.prototype.ontxtClick = function () {
             var _this = this;
             var menus = [];
-            var texture2ds = feng3d.rs.getAssetsByType(feng3d.TextureAsset);
+            var texture2ds = feng3d.rs.getAssetDatasByType(feng3d.Texture2D);
             texture2ds.forEach(function (texture2d) {
                 menus.push({
                     label: texture2d.name, click: function () {
-                        _this.attributeValue = texture2d.data;
+                        _this.attributeValue = texture2d;
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     }
                 });
@@ -6971,28 +6971,28 @@ var editor;
                         var extension = _this.data.feng3dAssets.assetType;
                         switch (extension) {
                             case feng3d.AssetExtension.gameobject:
-                                dragsource.file_gameobject = feng3d.serialization.clone(_this.data.feng3dAssets);
+                                dragsource.file_gameobject = feng3d.serialization.clone(_this.data.feng3dAssets.data);
                                 break;
                             case feng3d.AssetExtension.script:
-                                dragsource.file_script = _this.data.feng3dAssets;
+                                dragsource.file_script = _this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.anim:
-                                dragsource.animationclip = _this.data.feng3dAssets;
+                                dragsource.animationclip = _this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.material:
-                                dragsource.material = _this.data.feng3dAssets;
+                                dragsource.material = _this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.texturecube:
-                                dragsource.texturecube = _this.data.feng3dAssets;
+                                dragsource.texturecube = _this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.geometry:
-                                dragsource.geometry = _this.data.feng3dAssets;
+                                dragsource.geometry = _this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.texture:
-                                dragsource.texture2d = _this.data.feng3dAssets;
+                                dragsource.texture2d = _this.data.feng3dAssets.data;
                                 break;
                             case feng3d.AssetExtension.audio:
-                                dragsource.audio = _this.data.feng3dAssets;
+                                dragsource.audio = _this.data.feng3dAssets.data;
                                 break;
                         }
                         if (editor.editorData.selectedAssetsFile.indexOf(_this.data) != -1) {

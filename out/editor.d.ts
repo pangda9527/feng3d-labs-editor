@@ -1780,7 +1780,7 @@ declare namespace editor {
          * @param object 对象
          * @param callback
          */
-        saveObject(object: feng3d.FileAsset, callback?: (file: AssetsNode) => void): void;
+        saveObject(object: feng3d.AssetData, callback?: (file: AssetsNode) => void): void;
         /**
          *
          * @param files 需要导入的文件列表
