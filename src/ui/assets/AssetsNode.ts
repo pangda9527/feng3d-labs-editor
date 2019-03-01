@@ -74,7 +74,7 @@ namespace editor
                 this.image = "file_png";
             }
 
-            feng3dAssets.readThumbnail(editorFS.fs, (err, image) =>
+            feng3dAssets.readThumbnail(editorRS.fs, (err, image) =>
             {
                 if (image)
                 {
@@ -107,7 +107,7 @@ namespace editor
 
             this.isLoading = true;
 
-            editorFS.readAssets(this.feng3dAssets.assetsId, (err, assets: feng3d.Feng3dAssets) =>
+            editorRS.readAssets(this.feng3dAssets.assetsId, (err, assets: feng3d.Feng3dAssets) =>
             {
                 feng3d.assert(!err);
 
@@ -133,7 +133,7 @@ namespace editor
 
                 feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
-                    editorFS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
+                    editorRS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
                 });
 
             } else if (this.feng3dAssets instanceof feng3d.TextureCubeFile)
@@ -151,7 +151,7 @@ namespace editor
                     this.image = feng3dScreenShot.drawMaterial(mat.data).toDataURL();
                     feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                     {
-                        editorFS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
+                        editorRS.writeAssetsIcon(this.feng3dAssets.assetsId, image);
                     });
                 });
             } else if (this.feng3dAssets instanceof feng3d.GeometryFile)
@@ -233,7 +233,7 @@ namespace editor
                 path = feng3d.pathUtils.getParentPath(path);
 
             var filename = this.label;
-            editorFS.fs.getAllfilepathInFolder(path, (err, filepaths) =>
+            editorRS.fs.getAllfilepathInFolder(path, (err, filepaths) =>
             {
                 readfiles();
                 function readfiles()
@@ -241,7 +241,7 @@ namespace editor
                     if (filepaths.length > 0)
                     {
                         var filepath = filepaths.shift();
-                        editorFS.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        editorRS.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                         {
                             //处理文件夹
                             data && zip.file(filepath, data);

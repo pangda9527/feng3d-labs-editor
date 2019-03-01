@@ -4,7 +4,7 @@ namespace editor
     {
         load(url: string, completed?: (gameobject: feng3d.GameObject) => void)
         {
-            editorFS.fs.readArrayBuffer(url, (err, data) =>
+            editorRS.fs.readArrayBuffer(url, (err, data) =>
             {
                 load(data, (gameobject) =>
                 {

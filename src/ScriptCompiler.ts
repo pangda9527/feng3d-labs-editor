@@ -50,7 +50,7 @@ namespace editor
 
                 callback && callback(outputStr);
 
-                editorFS.fs.writeString("project.js", outputStr);
+                editorRS.fs.writeString("project.js", outputStr);
 
                 editorAssets.runProjectScript(() =>
                 {

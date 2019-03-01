@@ -108,20 +108,20 @@ namespace editor
 				case this.playBtn:
 					editorui.inspectorView.saveShowData(() =>
 					{
-						editorFS.fs.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
+						editorRS.fs.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
 						{
 							if (err)
 							{
 								feng3d.warn(err);
 								return;
 							}
-							if (editorFS.fs.type == feng3d.FSType.indexedDB)
+							if (editorRS.fs.type == feng3d.FSType.indexedDB)
 							{
 								if (runwin) runwin.close();
 								runwin = window.open(`run.html?fstype=${feng3d.fs.type}&project=${editorcache.projectname}`);
 								return;
 							}
-							editorFS.fs.getAbsolutePath("index.html", (err, path) =>
+							editorRS.fs.getAbsolutePath("index.html", (err, path) =>
 							{
 								if (err)
 								{

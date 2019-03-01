@@ -46,7 +46,7 @@ namespace editor
                     {
                         dragdata.assetsFiles.forEach(v =>
                         {
-                            editorFS.moveAssets(v.feng3dAssets, folder, (err) =>
+                            editorRS.moveAssets(v.feng3dAssets, folder, (err) =>
                             {
                                 if (!err)
                                 {

@@ -155,7 +155,7 @@ namespace editor
          */
         getDirectoryListing(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            editorFS.fs.readdir(this._path, (err, files) =>
+            editorRS.fs.readdir(this._path, (err, files) =>
             {
                 if (err)
                 {
@@ -176,7 +176,7 @@ namespace editor
          */
         createDirectory(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            editorFS.fs.mkdir(this._path, (err) =>
+            editorRS.fs.mkdir(this._path, (err) =>
             {
                 if (err)
                 {
@@ -220,7 +220,7 @@ namespace editor
                 return;
             }
 
-            editorFS.fs.writeArrayBuffer(this._path, content, (err) =>
+            editorRS.fs.writeArrayBuffer(this._path, content, (err) =>
             {
                 if (err)
                 {
@@ -246,7 +246,7 @@ namespace editor
         {
             var oldPath = this._path;
             var newPath = this.location ? (this.location + "/" + newName) : newName;
-            editorFS.fs.rename(oldPath, newPath, (err) =>
+            editorRS.fs.rename(oldPath, newPath, (err) =>
             {
                 if (err)
                 {
@@ -270,7 +270,7 @@ namespace editor
          */
         move(newPath: string, onComplete: Function, onError: Function, thisPtr: any): void
         {
-            editorFS.fs.move(this._path, newPath, (err) =>
+            editorRS.fs.move(this._path, newPath, (err) =>
             {
                 if (err)
                 {
@@ -293,7 +293,7 @@ namespace editor
          */
         delete(onComplete: Function, onError: Function, thisPtr: any): void
         {
-            editorFS.fs.delete(this._path, (err) =>
+            editorRS.fs.delete(this._path, (err) =>
             {
                 if (err)
                 {
@@ -322,7 +322,7 @@ namespace editor
          */
         private updateStats(path: string, callback: () => void, onComplete?: Function, onError?: Function)
         {
-            editorFS.fs.exists(path, (exists) =>
+            editorRS.fs.exists(path, (exists) =>
             {
                 if (!exists)
                 {

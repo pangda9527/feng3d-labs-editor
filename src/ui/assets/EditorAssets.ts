@@ -31,9 +31,9 @@ namespace editor
          */
         initproject(callback: () => void)
         {
-            editorFS.init(() =>
+            editorRS.init(() =>
             {
-                editorFS.getAllAssets().map(asset =>
+                editorRS.getAllAssets().map(asset =>
                 {
                     return this._assetsIDMap[asset.assetsId] = new AssetsNode(asset);
                 }).forEach(element =>
@@ -45,7 +45,7 @@ namespace editor
                     }
                 });
 
-                this.rootFile = this._assetsIDMap[editorFS.root.assetsId];
+                this.rootFile = this._assetsIDMap[editorRS.root.assetsId];
                 this.showFloder = this.rootFile;
                 this.rootFile.isOpen = true;
                 callback();
@@ -54,7 +54,7 @@ namespace editor
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
-            editorFS.fs.readObject(path, (err, object: feng3d.GameObject) =>
+            editorRS.fs.readObject(path, (err, object: feng3d.GameObject) =>
             {
                 if (err)
                 {
@@ -83,7 +83,7 @@ namespace editor
          */
         deleteAssets(assetsFile: AssetsNode, callback?: (err: Error) => void)
         {
-            editorFS.deleteAssets(assetsFile.feng3dAssets.assetsId, (err) =>
+            editorRS.deleteAssets(assetsFile.feng3dAssets.assetsId, (err) =>
             {
                 if (err)
                 {
@@ -106,7 +106,7 @@ namespace editor
          */
         saveAssets(assetsFile: AssetsNode, callback?: () => void)
         {
-            editorFS.writeAssets(assetsFile.feng3dAssets, (err) =>
+            editorRS.writeAssets(assetsFile.feng3dAssets, (err) =>
             {
                 feng3d.assert(!err, `资源 ${assetsFile.feng3dAssets.assetsId} 保存失败！`);
                 callback && callback();
@@ -149,7 +149,7 @@ namespace editor
         createAssets<T extends feng3d.Feng3dAssets>(parentAssets: AssetsNode, cls: new () => T, value?: gPartial<T>, callback?: (err: Error, asset: AssetsNode) => void)
         {
             var folder = <feng3d.Feng3dFolder>parentAssets.feng3dAssets;
-            editorFS.createAsset(cls, value, folder, (err, asset) =>
+            editorRS.createAsset(cls, value, folder, (err, asset) =>
             {
                 if (asset)
                 {
@@ -193,14 +193,14 @@ namespace editor
                             {
                                 label: "脚本", click: () =>
                                 {
-                                    var fileName = editorFS.getValidChildName(folder, "NewScript");
+                                    var fileName = editorRS.getValidChildName(folder, "NewScript");
                                     this.createAssets(assetsFile, feng3d.ScriptFile, { name: fileName, textContent: assetsFileTemplates.getNewScript(fileName) });
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
-                                    var fileName = editorFS.getValidChildName(folder, "NewShader");
+                                    var fileName = editorRS.getValidChildName(folder, "NewShader");
                                     this.createAssets(assetsFile, feng3d.ShaderFile, { name: fileName, textContent: assetsFileTemplates.getNewShader(fileName) });
                                 }
                             },
@@ -294,7 +294,7 @@ namespace editor
                     {
                         label: "导入资源", click: () =>
                         {
-                            editorFS.selectFile((fileList: FileList) =>
+                            editorRS.selectFile((fileList: FileList) =>
                             {
                                 var files = [];
                                 for (let i = 0; i < fileList.length; i++)
@@ -426,7 +426,7 @@ namespace editor
 
         runProjectScript(callback?: () => void)
         {
-            editorFS.fs.readString("project.js", (err, content) =>
+            editorRS.fs.readString("project.js", (err, content) =>
             {
                 if (content != this._preProjectJsContent)
                 {

@@ -80,7 +80,7 @@ namespace editor
 					var feng3dAssets = feng3d.rs.getAssets(this._viewData.assetsId);
 					if (feng3dAssets)
 					{
-						editorFS.writeAssets(feng3dAssets, (err) =>
+						editorRS.writeAssets(feng3dAssets, (err) =>
 						{
 							feng3d.assert(!err, `资源 ${feng3dAssets.assetsId} 保存失败！`);
 							callback && callback();

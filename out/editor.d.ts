@@ -153,13 +153,13 @@ declare function require(module: string): any;
 declare var __dirname: string;
 declare namespace editor {
     /**
-     * 编辑器文件系统
+     * 编辑器资源系统
      */
-    var editorFS: EditorFS;
+    var editorRS: EditorRS;
     /**
-     * 编辑器文件系统
+     * 编辑器资源系统
      */
-    class EditorFS extends feng3d.ReadWriteRS {
+    class EditorRS extends feng3d.ReadWriteRS {
         /**
          * 是否存在指定项目
          * @param projectname 项目名称

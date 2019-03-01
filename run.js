@@ -9,33 +9,37 @@ if (fstype == "indexedDB")
     feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
     feng3d.fs = feng3d.indexedDBFS;
     feng3d.rs = new feng3d.ReadRS(feng3d.indexedDBFS);
-    feng3d.rs.init();
 }
 
-feng3d.fs.readString("project.js", (err, content) =>
+// 初始化资源系统
+feng3d.rs.init(() =>
 {
-    //
-    var windowEval = eval.bind(window);
-    // 运行project.js
-    windowEval(content);
-
-    // 加载并初始化场景
-    feng3d.fs.readObject("default.scene.json", (err, scene) =>
+    // 读取项目脚本
+    feng3d.fs.readString("project.js", (err, content) =>
     {
-        if (scene.getComponent(feng3d.Scene3D))
-            view3D.scene = scene.getComponent(feng3d.Scene3D);
+        //
+        var windowEval = eval.bind(window);
+        // 运行project.js
+        windowEval(content);
 
-        var cameras = view3D.root.getComponentsInChildren(feng3d.Camera);
-        if (cameras.length > 0)
+        // 加载并初始化场景
+        feng3d.fs.readObject("default.scene.json", (err, scene) =>
         {
-            view3D.camera = cameras[0];
-        } else
-        {
-            var camera = view3D.camera;
-            camera.transform.z = -10;
-            camera.transform.lookAt(new feng3d.Vector3D());
-            //
-        }
+            if (scene.getComponent(feng3d.Scene3D))
+                view3D.scene = scene.getComponent(feng3d.Scene3D);
+
+            var cameras = view3D.root.getComponentsInChildren(feng3d.Camera);
+            if (cameras.length > 0)
+            {
+                view3D.camera = cameras[0];
+            } else
+            {
+                var camera = view3D.camera;
+                camera.transform.z = -10;
+                camera.transform.lookAt(new feng3d.Vector3D());
+                //
+            }
+        });
     });
 });
 
