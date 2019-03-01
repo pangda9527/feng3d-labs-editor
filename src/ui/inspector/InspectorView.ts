@@ -77,7 +77,7 @@ namespace editor
 			{
 				if (this._viewData.assetsId)
 				{
-					var feng3dAssets = feng3d.Feng3dAssets.getAssets(this._viewData.assetsId);
+					var feng3dAssets = feng3d.rs.getAssets(this._viewData.assetsId);
 					if (feng3dAssets)
 					{
 						editorFS.writeAssets(feng3dAssets, (err) =>

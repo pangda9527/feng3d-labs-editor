@@ -83,7 +83,7 @@ namespace editor
 			if (index != -1)
 			{
 				var textureCube: feng3d.TextureCube = this.space;
-				var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.UrlImageTexture2D);
+				var texture2ds = feng3d.rs.getAssetsByType(feng3d.UrlImageTexture2D);
 				var menus: MenuItem[] = [{
 					label: `None`, click: () =>
 					{

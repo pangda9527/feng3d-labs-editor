@@ -5309,7 +5309,7 @@ var editor;
             var index = this.btns.indexOf(e.currentTarget);
             if (index != -1) {
                 var textureCube = this.space;
-                var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.UrlImageTexture2D);
+                var texture2ds = feng3d.rs.getAssetsByType(feng3d.UrlImageTexture2D);
                 var menus = [{
                         label: "None", click: function () {
                             textureCube[propertys[index]] = "";
@@ -5808,7 +5808,7 @@ var editor;
             if (param.accepttype) {
                 if (param.accepttype == "texture2d") {
                     var menus = [];
-                    var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.UrlImageTexture2D);
+                    var texture2ds = feng3d.rs.getAssetsByType(feng3d.UrlImageTexture2D);
                     texture2ds.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
@@ -5820,7 +5820,7 @@ var editor;
                 }
                 else if (param.accepttype == "texturecube") {
                     var menus = [];
-                    var textureCubes = feng3d.Feng3dAssets.getAssetsByType(feng3d.TextureCube);
+                    var textureCubes = feng3d.rs.getAssetsByType(feng3d.TextureCube);
                     textureCubes.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
@@ -5843,7 +5843,7 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "file_script") {
-                    var scriptFiles = feng3d.Feng3dAssets.getAssetsByType(feng3d.ScriptFile);
+                    var scriptFiles = feng3d.rs.getAssetsByType(feng3d.ScriptFile);
                     var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
                     scriptFiles.forEach(function (element) {
                         menus.push({
@@ -5856,20 +5856,20 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "material") {
-                    var materials = feng3d.Feng3dAssets.getAssetsByType(feng3d.Material);
+                    var materials = feng3d.rs.getAssetsByType(feng3d.MaterialFile);
                     var menus = [];
                     materials.forEach(function (element) {
                         menus.push({
                             label: element.name,
                             click: function () {
-                                _this.attributeValue = element;
+                                _this.attributeValue = element.material;
                             }
                         });
                     });
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "geometry") {
-                    var geometrys = feng3d.Feng3dAssets.getAssetsByType(feng3d.Geometry);
+                    var geometrys = feng3d.rs.getAssetsByType(feng3d.Geometry);
                     var menus = [];
                     geometrys.forEach(function (element) {
                         menus.push({
@@ -5935,7 +5935,7 @@ var editor;
         OAVTexture2D.prototype.ontxtClick = function () {
             var _this = this;
             var menus = [];
-            var texture2ds = feng3d.Feng3dAssets.getAssetsByType(feng3d.Texture2D);
+            var texture2ds = feng3d.rs.getAssetsByType(feng3d.Texture2D);
             texture2ds.forEach(function (texture2d) {
                 menus.push({
                     label: texture2d.name, click: function () {
@@ -6280,7 +6280,7 @@ var editor;
         InspectorView.prototype.saveShowData = function (callback) {
             if (this._dataChanged) {
                 if (this._viewData.assetsId) {
-                    var feng3dAssets = feng3d.Feng3dAssets.getAssets(this._viewData.assetsId);
+                    var feng3dAssets = feng3d.rs.getAssets(this._viewData.assetsId);
                     if (feng3dAssets) {
                         editor.editorFS.writeAssets(feng3dAssets, function (err) {
                             feng3d.assert(!err, "\u8D44\u6E90 " + feng3dAssets.assetsId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
