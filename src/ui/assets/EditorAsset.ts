@@ -459,7 +459,7 @@ namespace editor
             var data = e.data;
             if (data instanceof feng3d.FileAsset)
             {
-                this.saveObject(data);
+                this.saveObject(data.data);
             }
         }
     }

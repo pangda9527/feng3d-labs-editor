@@ -101,7 +101,7 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "file_script")
                 {
-                    var scriptFiles = editorRS.getAssetDatasByType(feng3d.ScriptAsset);
+                    var scriptFiles = editorRS.getAssetsByType(feng3d.ScriptAsset);
 
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
                     scriptFiles.forEach(element =>

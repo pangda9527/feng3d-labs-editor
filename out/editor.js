@@ -5843,7 +5843,7 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "file_script") {
-                    var scriptFiles = editor.editorRS.getAssetDatasByType(feng3d.ScriptAsset);
+                    var scriptFiles = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
                     var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
                     scriptFiles.forEach(function (element) {
                         menus.push({
@@ -6895,7 +6895,7 @@ var editor;
         EditorAsset.prototype.onParsed = function (e) {
             var data = e.data;
             if (data instanceof feng3d.FileAsset) {
-                this.saveObject(data);
+                this.saveObject(data.data);
             }
         };
         __decorate([
