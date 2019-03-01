@@ -5935,11 +5935,11 @@ var editor;
         OAVTexture2D.prototype.ontxtClick = function () {
             var _this = this;
             var menus = [];
-            var texture2ds = feng3d.rs.getAssetsByType(feng3d.Texture2D);
+            var texture2ds = feng3d.rs.getAssetsByType(feng3d.TextureFile);
             texture2ds.forEach(function (texture2d) {
                 menus.push({
                     label: texture2d.name, click: function () {
-                        _this.attributeValue = texture2d;
+                        _this.attributeValue = texture2d.data;
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     }
                 });
@@ -6714,42 +6714,42 @@ var editor;
                             submenu: [
                                 {
                                     label: "平面", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New PlaneGeometry", geometry: new feng3d.PlaneGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New PlaneGeometry", data: new feng3d.PlaneGeometry() });
                                     }
                                 },
                                 {
                                     label: "立方体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CubeGeometry", geometry: new feng3d.CubeGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CubeGeometry", data: new feng3d.CubeGeometry() });
                                     }
                                 },
                                 {
                                     label: "球体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New SphereGeometry", geometry: new feng3d.SphereGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New SphereGeometry", data: new feng3d.SphereGeometry() });
                                     }
                                 },
                                 {
                                     label: "胶囊体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CapsuleGeometry", geometry: new feng3d.CapsuleGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CapsuleGeometry", data: new feng3d.CapsuleGeometry() });
                                     }
                                 },
                                 {
                                     label: "圆柱体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CylinderGeometry", geometry: new feng3d.CylinderGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New CylinderGeometry", data: new feng3d.CylinderGeometry() });
                                     }
                                 },
                                 {
                                     label: "圆锥体", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New ConeGeometry", geometry: new feng3d.ConeGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New ConeGeometry", data: new feng3d.ConeGeometry() });
                                     }
                                 },
                                 {
                                     label: "圆环", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New TorusGeometry", geometry: new feng3d.TorusGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New TorusGeometry", data: new feng3d.TorusGeometry() });
                                     }
                                 },
                                 {
                                     label: "地形", click: function () {
-                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New TerrainGeometry", geometry: new feng3d.TerrainGeometry() });
+                                        _this.createAssets(assetsFile, feng3d.GeometryFile, { name: "New TerrainGeometry", data: new feng3d.TerrainGeometry() });
                                     }
                                 },
                             ],
@@ -7147,14 +7147,14 @@ var editor;
         AssetsNode.prototype.updateImage = function () {
             var _this = this;
             if (this.feng3dAssets instanceof feng3d.TextureFile) {
-                var texture = this.feng3dAssets.texture;
+                var texture = this.feng3dAssets.data;
                 this.image = texture.dataURL;
                 feng3d.dataTransform.dataURLToImage(this.image, function (image) {
                     editor.editorFS.writeAssetsIcon(_this.feng3dAssets.assetsId, image);
                 });
             }
-            else if (this.feng3dAssets instanceof feng3d.TextureCube) {
-                var textureCube = this.feng3dAssets;
+            else if (this.feng3dAssets instanceof feng3d.TextureCubeFile) {
+                var textureCube = this.feng3dAssets.data;
                 textureCube.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawTextureCube(textureCube);
                 });
@@ -7168,11 +7168,11 @@ var editor;
                     });
                 });
             }
-            else if (this.feng3dAssets instanceof feng3d.Geometry) {
-                this.image = editor.feng3dScreenShot.drawGeometry(this.feng3dAssets).toDataURL();
+            else if (this.feng3dAssets instanceof feng3d.GeometryFile) {
+                this.image = editor.feng3dScreenShot.drawGeometry(this.feng3dAssets.data).toDataURL();
             }
-            else if (this.feng3dAssets instanceof feng3d.GameObject) {
-                var gameObject = this.feng3dAssets;
+            else if (this.feng3dAssets instanceof feng3d.GameObjectFile) {
+                var gameObject = this.feng3dAssets.data;
                 gameObject.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawGameObject(gameObject).toDataURL();
                 });

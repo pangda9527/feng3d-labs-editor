@@ -38,13 +38,13 @@ namespace editor
         private ontxtClick()
         {
             var menus: MenuItem[] = [];
-            var texture2ds = feng3d.rs.getAssetsByType(feng3d.Texture2D);
+            var texture2ds = feng3d.rs.getAssetsByType(feng3d.TextureFile);
             texture2ds.forEach(texture2d =>
             {
                 menus.push({
                     label: texture2d.name, click: () =>
                     {
-                        this.attributeValue = texture2d;
+                        this.attributeValue = texture2d.data;
                         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                     }
                 });
