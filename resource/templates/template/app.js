@@ -2,6 +2,8 @@
 
 var view3D = new feng3d.Engine();
 
+feng3d.rs
+
 feng3d.loader.loadText("default.scene.json", (content) =>
 {
     var json = JSON.parse(content);

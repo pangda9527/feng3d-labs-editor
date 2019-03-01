@@ -595,12 +595,12 @@ var editor;
     }
     if (typeof require == "undefined") {
         feng3d.fs = feng3d.indexedDBFS;
-        feng3d.rs = editor.editorFS = new EditorFS(feng3d.indexedDBFS);
+        feng3d.rs = editor.editorFS = new EditorFS();
     }
     else {
         var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
         feng3d.fs = nativeFS;
-        feng3d.rs = editor.editorFS = new EditorFS(nativeFS);
+        feng3d.rs = editor.editorFS = new EditorFS();
     }
     //
     var isSelectFile = false;
