@@ -40,7 +40,7 @@ namespace editor
 
         parent: AssetsNode;
 
-        feng3dAssets: feng3d.Feng3dAssets;
+        feng3dAssets: feng3d.FileAsset;
 
         /**
          * 是否已加载
@@ -57,7 +57,7 @@ namespace editor
          * 
          * @param feng3dAssets 资源
          */
-        constructor(feng3dAssets: feng3d.Feng3dAssets)
+        constructor(feng3dAssets: feng3d.FileAsset)
         {
             super();
 
@@ -107,7 +107,7 @@ namespace editor
 
             this.isLoading = true;
 
-            editorRS.readAssets(this.feng3dAssets.assetsId, (err, assets: feng3d.Feng3dAssets) =>
+            editorRS.readAssets(this.feng3dAssets.assetsId, (err, assets: feng3d.FileAsset) =>
             {
                 feng3d.assert(!err);
 

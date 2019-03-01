@@ -118,7 +118,7 @@ namespace editor
          * 
          * @param feng3dAssets 
          */
-        createAssets<T extends feng3d.Feng3dAssets>(parentAssets: AssetsNode, cls: new () => T, value?: gPartial<T>, callback?: (err: Error, asset: AssetsNode) => void)
+        createAssets<T extends feng3d.FileAsset>(parentAssets: AssetsNode, cls: new () => T, value?: gPartial<T>, callback?: (err: Error, asset: AssetsNode) => void)
         {
             var folder = <feng3d.FolderAsset>parentAssets.feng3dAssets;
             editorRS.createAsset(cls, value, folder, (err, asset) =>
@@ -341,7 +341,7 @@ namespace editor
          * @param object 对象
          * @param callback 
          */
-        saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsNode) => void)
+        saveObject(object: feng3d.FileAsset, callback?: (file: AssetsNode) => void)
         {
             feng3d.error(`未实现`);
 
@@ -457,7 +457,7 @@ namespace editor
         private onParsed(e: feng3d.Event<any>)
         {
             var data = e.data;
-            if (data instanceof feng3d.Feng3dAssets)
+            if (data instanceof feng3d.FileAsset)
             {
                 this.saveObject(data);
             }

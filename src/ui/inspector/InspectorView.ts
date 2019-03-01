@@ -154,7 +154,7 @@ namespace editor
 		private onValueChanged(e: feng3d.ObjectViewEvent)
 		{
 			this._dataChanged = true;
-			if (this._viewData instanceof feng3d.Feng3dAssets)
+			if (this._viewData instanceof feng3d.FileAsset)
 			{
 				if (this._viewData.assetsId)
 				{

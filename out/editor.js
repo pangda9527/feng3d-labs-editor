@@ -6333,7 +6333,7 @@ var editor;
         };
         InspectorView.prototype.onValueChanged = function (e) {
             this._dataChanged = true;
-            if (this._viewData instanceof feng3d.Feng3dAssets) {
+            if (this._viewData instanceof feng3d.FileAsset) {
                 if (this._viewData.assetsId) {
                     var assetsFile = editor.editorAssets.getAssetsByID(this._viewData.assetsId);
                     assetsFile && assetsFile.updateImage();
@@ -6894,7 +6894,7 @@ var editor;
         };
         EditorAssets.prototype.onParsed = function (e) {
             var data = e.data;
-            if (data instanceof feng3d.Feng3dAssets) {
+            if (data instanceof feng3d.FileAsset) {
                 this.saveObject(data);
             }
         };

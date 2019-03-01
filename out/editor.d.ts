@@ -1769,7 +1769,7 @@ declare namespace editor {
          *
          * @param feng3dAssets
          */
-        createAssets<T extends feng3d.Feng3dAssets>(parentAssets: AssetsNode, cls: new () => T, value?: gPartial<T>, callback?: (err: Error, asset: AssetsNode) => void): void;
+        createAssets<T extends feng3d.FileAsset>(parentAssets: AssetsNode, cls: new () => T, value?: gPartial<T>, callback?: (err: Error, asset: AssetsNode) => void): void;
         /**
          * 弹出文件菜单
          */
@@ -1780,7 +1780,7 @@ declare namespace editor {
          * @param object 对象
          * @param callback
          */
-        saveObject(object: feng3d.Feng3dAssets, callback?: (file: AssetsNode) => void): void;
+        saveObject(object: feng3d.FileAsset, callback?: (file: AssetsNode) => void): void;
         /**
          *
          * @param files 需要导入的文件列表
@@ -1847,7 +1847,7 @@ declare namespace editor {
         label: string;
         children: AssetsNode[];
         parent: AssetsNode;
-        feng3dAssets: feng3d.Feng3dAssets;
+        feng3dAssets: feng3d.FileAsset;
         /**
          * 是否已加载
          */
@@ -1861,7 +1861,7 @@ declare namespace editor {
          *
          * @param feng3dAssets 资源
          */
-        constructor(feng3dAssets: feng3d.Feng3dAssets);
+        constructor(feng3dAssets: feng3d.FileAsset);
         /**
          * 加载
          *
