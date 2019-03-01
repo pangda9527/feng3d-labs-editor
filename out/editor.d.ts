@@ -1765,15 +1765,6 @@ declare namespace editor {
          */
         saveAssets(assetsFile: AssetsNode, callback?: () => void): void;
         /**
-         * 获取脚本列表
-         */
-        getScripts(): feng3d.ScriptAsset[];
-        /**
-         * 获取指定类型资源
-         * @param type 资源类型
-         */
-        getAssetsByType<T extends feng3d.Feng3dAssets>(type: feng3d.Constructor<T>): AssetsNode[];
-        /**
          * 新增资源
          *
          * @param feng3dAssets

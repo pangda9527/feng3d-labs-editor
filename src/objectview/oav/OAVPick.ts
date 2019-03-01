@@ -58,7 +58,7 @@ namespace editor
                 if (param.accepttype == "texture2d")
                 {
                     var menus: MenuItem[] = [];
-                    var texture2ds = feng3d.rs.getAssetsByType(feng3d.UrlImageTexture2D);
+                    var texture2ds = editorRS.getAssetsByType(feng3d.UrlImageTexture2D);
                     texture2ds.forEach(item =>
                     {
                         menus.push({
@@ -73,7 +73,7 @@ namespace editor
                 else if (param.accepttype == "texturecube")
                 {
                     var menus: MenuItem[] = [];
-                    var textureCubes = feng3d.rs.getAssetsByType(feng3d.TextureCube);
+                    var textureCubes = editorRS.getAssetsByType(feng3d.TextureCube);
                     textureCubes.forEach(item =>
                     {
                         menus.push({
@@ -88,20 +88,20 @@ namespace editor
                 {
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
 
-                    var audioFiles = editorAssets.getAssetsByType(feng3d.AudioAsset);
+                    var audioFiles = editorRS.getAssetsByType(feng3d.AudioAsset);
                     audioFiles.forEach(item =>
                     {
                         menus.push({
-                            label: item.label, click: () =>
+                            label: item.name, click: () =>
                             {
-                                this.attributeValue = item.feng3dAssets.assetsPath;
+                                this.attributeValue = item.assetsPath;
                             }
                         });
                     }, []);
                     menu.popup(menus);
                 } else if (param.accepttype == "file_script")
                 {
-                    var scriptFiles = feng3d.rs.getAssetsByType(feng3d.ScriptAsset);
+                    var scriptFiles = editorRS.getAssetsByType(feng3d.ScriptAsset);
 
                     var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
                     scriptFiles.forEach(element =>
@@ -117,7 +117,7 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "material")
                 {
-                    var materials = feng3d.rs.getAssetsByType(feng3d.MaterialAsset);
+                    var materials = editorRS.getAssetsByType(feng3d.MaterialAsset);
                     var menus: MenuItem[] = [];
                     materials.forEach(element =>
                     {
@@ -132,7 +132,7 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "geometry")
                 {
-                    var geometrys = feng3d.rs.getAssetsByType(feng3d.Geometry);
+                    var geometrys = editorRS.getAssetsByType(feng3d.Geometry);
                     var menus: MenuItem[] = [];
                     geometrys.forEach(element =>
                     {

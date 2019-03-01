@@ -114,34 +114,6 @@ namespace editor
         }
 
         /**
-         * 获取脚本列表
-         */
-        getScripts()
-        {
-            var files = this._assetsIDMap;
-            var tslist: feng3d.ScriptAsset[] = [];
-            for (const key in files)
-            {
-                var file = files[key].feng3dAssets;
-                if (file instanceof feng3d.ScriptAsset)
-                {
-                    tslist.push(file);
-                }
-            }
-            return tslist;
-        }
-
-        /**
-         * 获取指定类型资源
-         * @param type 资源类型
-         */
-        getAssetsByType<T extends feng3d.Feng3dAssets>(type: feng3d.Constructor<T>)
-        {
-            var assetsFiles = Object.keys(this._assetsIDMap).map(key => this._assetsIDMap[key]).filter(element => element.feng3dAssets instanceof type);
-            return assetsFiles;
-        }
-
-        /**
          * 新增资源
          * 
          * @param feng3dAssets 

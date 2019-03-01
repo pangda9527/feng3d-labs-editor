@@ -68,7 +68,7 @@ namespace editor
 
         getScripts()
         {
-            var tslist = editorAssets.getScripts();
+            var tslist = editorRS.getAssetsByType(feng3d.ScriptAsset);
 
             this.tssort(tslist);
 

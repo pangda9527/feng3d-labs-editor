@@ -79,22 +79,22 @@ function autoCompile()
 
 function getModel(file)
 {
-    if (file instanceof feng3d.JsonFile)
+    if (file instanceof feng3d.JsonAsset)
         return "json";
-    if (file instanceof feng3d.JSFile)
+    if (file instanceof feng3d.JSAsset)
         return "javascript";
-    if (file instanceof feng3d.ScriptFile)
+    if (file instanceof feng3d.ScriptAsset)
         return "typescript";
-    if (file instanceof feng3d.ShaderFile)
+    if (file instanceof feng3d.ShaderAsset)
         return "typescript";
-    if (file instanceof feng3d.StringFile)
+    if (file instanceof feng3d.StringAsset)
         return "text";
     return "text";
 }
 
 function codeEditor(file)
 {
-    if (!(file instanceof feng3d.StringFile)) return;
+    if (!(file instanceof feng3d.StringAsset)) return;
 
     var model = getModel(file);
     var oldModel = monacoEditor.getModel();
@@ -103,7 +103,7 @@ function codeEditor(file)
     if (oldModel) oldModel.dispose();
 
     // monacoEditor.setValue(code);
-    if (file instanceof feng3d.ScriptFile)
+    if (file instanceof feng3d.ScriptAsset)
     {
         var tslibs = editor.scriptCompiler.tslibs;
         var tslist = editor.scriptCompiler.getScripts();
@@ -126,7 +126,7 @@ function codeEditor(file)
         {
             if (err) console.warn(err);
             logLabel.textContent = "自动保存完成！";
-            if (file instanceof feng3d.ScriptFile)
+            if (file instanceof feng3d.ScriptAsset)
             {
                 if (watchCB.checked)
                 {

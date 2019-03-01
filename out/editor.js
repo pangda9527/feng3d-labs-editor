@@ -5808,7 +5808,7 @@ var editor;
             if (param.accepttype) {
                 if (param.accepttype == "texture2d") {
                     var menus = [];
-                    var texture2ds = feng3d.rs.getAssetsByType(feng3d.UrlImageTexture2D);
+                    var texture2ds = editor.editorRS.getAssetsByType(feng3d.UrlImageTexture2D);
                     texture2ds.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
@@ -5820,7 +5820,7 @@ var editor;
                 }
                 else if (param.accepttype == "texturecube") {
                     var menus = [];
-                    var textureCubes = feng3d.rs.getAssetsByType(feng3d.TextureCube);
+                    var textureCubes = editor.editorRS.getAssetsByType(feng3d.TextureCube);
                     textureCubes.forEach(function (item) {
                         menus.push({
                             label: item.name, click: function () {
@@ -5832,18 +5832,18 @@ var editor;
                 }
                 else if (param.accepttype == "audio") {
                     var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
-                    var audioFiles = editor.editorAssets.getAssetsByType(feng3d.AudioAsset);
+                    var audioFiles = editor.editorRS.getAssetsByType(feng3d.AudioAsset);
                     audioFiles.forEach(function (item) {
                         menus.push({
-                            label: item.label, click: function () {
-                                _this.attributeValue = item.feng3dAssets.assetsPath;
+                            label: item.name, click: function () {
+                                _this.attributeValue = item.assetsPath;
                             }
                         });
                     }, []);
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "file_script") {
-                    var scriptFiles = feng3d.rs.getAssetsByType(feng3d.ScriptAsset);
+                    var scriptFiles = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
                     var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
                     scriptFiles.forEach(function (element) {
                         menus.push({
@@ -5856,7 +5856,7 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "material") {
-                    var materials = feng3d.rs.getAssetsByType(feng3d.MaterialAsset);
+                    var materials = editor.editorRS.getAssetsByType(feng3d.MaterialAsset);
                     var menus = [];
                     materials.forEach(function (element) {
                         menus.push({
@@ -5869,7 +5869,7 @@ var editor;
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "geometry") {
-                    var geometrys = feng3d.rs.getAssetsByType(feng3d.Geometry);
+                    var geometrys = editor.editorRS.getAssetsByType(feng3d.Geometry);
                     var menus = [];
                     geometrys.forEach(function (element) {
                         menus.push({
@@ -6609,29 +6609,6 @@ var editor;
                 feng3d.assert(!err, "\u8D44\u6E90 " + assetsFile.feng3dAssets.assetsId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
             });
-        };
-        /**
-         * 获取脚本列表
-         */
-        EditorAssets.prototype.getScripts = function () {
-            var files = this._assetsIDMap;
-            var tslist = [];
-            for (var key in files) {
-                var file = files[key].feng3dAssets;
-                if (file instanceof feng3d.ScriptAsset) {
-                    tslist.push(file);
-                }
-            }
-            return tslist;
-        };
-        /**
-         * 获取指定类型资源
-         * @param type 资源类型
-         */
-        EditorAssets.prototype.getAssetsByType = function (type) {
-            var _this = this;
-            var assetsFiles = Object.keys(this._assetsIDMap).map(function (key) { return _this._assetsIDMap[key]; }).filter(function (element) { return element.feng3dAssets instanceof type; });
-            return assetsFiles;
         };
         /**
          * 新增资源
@@ -13538,7 +13515,7 @@ var editor;
             callback && callback("");
         };
         ScriptCompiler.prototype.getScripts = function () {
-            var tslist = editor.editorAssets.getScripts();
+            var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
             this.tssort(tslist);
             return tslist;
         };
