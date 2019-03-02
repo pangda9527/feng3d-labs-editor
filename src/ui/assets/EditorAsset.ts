@@ -382,15 +382,21 @@ namespace editor
                     this.inputFiles(files, callback, assetNodes);
                 };
 
+                var fileName = file.name;
+                var lastIndex = fileName.lastIndexOf(".");
+                if (lastIndex != -1)
+                {
+                    fileName = fileName.substring(0, lastIndex);
+                }
                 if (feng3d.regExps.image.test(file.name))
                 {
                     feng3d.dataTransform.arrayBufferToImage(result, (img) =>
                     {
-                        this.createAsset(showFloder, feng3d.TextureAsset, { name: file.name, image: img }, createAssetCallback);
+                        this.createAsset(showFloder, feng3d.TextureAsset, { name: fileName, image: img }, createAssetCallback);
                     });
                 } else
                 {
-                    this.createAsset(showFloder, feng3d.ArrayBufferAsset, { name: file.name, arraybuffer: result }, createAssetCallback);
+                    this.createAsset(showFloder, feng3d.ArrayBufferAsset, { name: fileName, arraybuffer: result }, createAssetCallback);
                 }
             }, false);
             reader.readAsArrayBuffer(file);
