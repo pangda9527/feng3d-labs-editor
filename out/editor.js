@@ -7067,7 +7067,7 @@ var editor;
             else {
                 _this.image = "file_png";
             }
-            asset.readThumbnail(editor.editorRS.fs, function (err, image) {
+            asset.readThumbnail(function (err, image) {
                 if (image) {
                     _this.image = feng3d.dataTransform.imageToDataURL(image);
                 }

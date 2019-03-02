@@ -76,7 +76,7 @@ namespace editor
                 this.image = "file_png";
             }
 
-            asset.readThumbnail(editorRS.fs, (err, image) =>
+            asset.readThumbnail((err, image) =>
             {
                 if (image)
                 {
