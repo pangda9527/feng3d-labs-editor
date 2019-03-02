@@ -528,25 +528,6 @@ var editor;
                 }
             });
         };
-        /**
-         * 写资源缩略图标
-         *
-         * @param assetId 资源编号
-         * @param image 资源缩略图标
-         * @param callback 完成回调
-         */
-        EditorRS.prototype.writeAssetIcon = function (assetId, image, callback) {
-            this.fs.writeImage("assetIcon/" + assetId + ".png", image, callback);
-        };
-        /**
-         * 读取资源缩略图标
-         *
-         * @param assetId 资源编号
-         * @param callback 完成回调
-         */
-        EditorRS.prototype.readAssetIcon = function (assetId, callback) {
-            this.fs.readImage("assetIcon/" + assetId + ".png", callback);
-        };
         return EditorRS;
     }(feng3d.ReadWriteRS));
     editor.EditorRS = EditorRS;
@@ -7130,13 +7111,16 @@ var editor;
                 var texture = this.asset.data;
                 this.image = texture.dataURL;
                 feng3d.dataTransform.dataURLToImage(this.image, function (image) {
-                    editor.editorRS.writeAssetIcon(_this.asset.assetId, image);
+                    _this.asset.writeThumbnail(image);
                 });
             }
             else if (this.asset instanceof feng3d.TextureCubeAsset) {
                 var textureCube = this.asset.data;
                 textureCube.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawTextureCube(textureCube);
+                    feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
+                        _this.asset.writeThumbnail(image);
+                    });
                 });
             }
             else if (this.asset instanceof feng3d.MaterialAsset) {
@@ -7144,17 +7128,23 @@ var editor;
                 mat.data.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawMaterial(mat.data).toDataURL();
                     feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
-                        editor.editorRS.writeAssetIcon(_this.asset.assetId, image);
+                        _this.asset.writeThumbnail(image);
                     });
                 });
             }
             else if (this.asset instanceof feng3d.GeometryAsset) {
                 this.image = editor.feng3dScreenShot.drawGeometry(this.asset.data).toDataURL();
+                feng3d.dataTransform.dataURLToImage(this.image, function (image) {
+                    _this.asset.writeThumbnail(image);
+                });
             }
             else if (this.asset instanceof feng3d.GameObjectAsset) {
                 var gameObject = this.asset.data;
                 gameObject.onLoadCompleted(function () {
                     _this.image = editor.feng3dScreenShot.drawGameObject(gameObject).toDataURL();
+                    feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
+                        _this.asset.writeThumbnail(image);
+                    });
                 });
             }
         };

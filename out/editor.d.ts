@@ -191,21 +191,6 @@ declare namespace editor {
          * 导入项目
          */
         importProject(file: File, callback: () => void): void;
-        /**
-         * 写资源缩略图标
-         *
-         * @param assetId 资源编号
-         * @param image 资源缩略图标
-         * @param callback 完成回调
-         */
-        writeAssetIcon(assetId: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
-        /**
-         * 读取资源缩略图标
-         *
-         * @param assetId 资源编号
-         * @param callback 完成回调
-         */
-        readAssetIcon(assetId: string, callback?: (err: Error, image: HTMLImageElement) => void): void;
     }
 }
 declare namespace editor {

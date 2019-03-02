@@ -135,7 +135,7 @@ namespace editor
 
                 feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
-                    editorRS.writeAssetIcon(this.asset.assetId, image);
+                    this.asset.writeThumbnail(image);
                 });
 
             } else if (this.asset instanceof feng3d.TextureCubeAsset)
@@ -144,6 +144,11 @@ namespace editor
                 textureCube.onLoadCompleted(() =>
                 {
                     this.image = feng3dScreenShot.drawTextureCube(textureCube);
+
+                    feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+                    {
+                        this.asset.writeThumbnail(image);
+                    });
                 });
             } else if (this.asset instanceof feng3d.MaterialAsset)
             {
@@ -153,18 +158,27 @@ namespace editor
                     this.image = feng3dScreenShot.drawMaterial(mat.data).toDataURL();
                     feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                     {
-                        editorRS.writeAssetIcon(this.asset.assetId, image);
+                        this.asset.writeThumbnail(image);
                     });
                 });
             } else if (this.asset instanceof feng3d.GeometryAsset)
             {
                 this.image = feng3dScreenShot.drawGeometry(<any>this.asset.data).toDataURL();
+
+                feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+                {
+                    this.asset.writeThumbnail(image);
+                });
             } else if (this.asset instanceof feng3d.GameObjectAsset)
             {
                 var gameObject = this.asset.data;
                 gameObject.onLoadCompleted(() =>
                 {
                     this.image = feng3dScreenShot.drawGameObject(gameObject).toDataURL();
+                    feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+                    {
+                        this.asset.writeThumbnail(image);
+                    });
                 });
             }
         }

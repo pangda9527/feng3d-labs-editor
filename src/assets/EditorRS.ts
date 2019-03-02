@@ -237,29 +237,6 @@ namespace editor
                 }
             });
         }
-
-        /**
-         * 写资源缩略图标
-         * 
-         * @param assetId 资源编号
-         * @param image 资源缩略图标
-         * @param callback 完成回调
-         */
-        writeAssetIcon(assetId: string, image: HTMLImageElement, callback?: (err: Error) => void)
-        {
-            this.fs.writeImage("assetIcon/" + assetId + ".png", image, callback);
-        }
-
-        /**
-         * 读取资源缩略图标
-         * 
-         * @param assetId 资源编号
-         * @param callback 完成回调
-         */
-        readAssetIcon(assetId: string, callback?: (err: Error, image: HTMLImageElement) => void)
-        {
-            this.fs.readImage("assetIcon/" + assetId + ".png", callback);
-        }
     }
 
     /**
