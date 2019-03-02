@@ -1754,7 +1754,7 @@ declare namespace editor {
          *
          * @param feng3dAssets
          */
-        createAsset<T extends feng3d.FileAsset>(folderNode: AssetNode, cls: new (rs: feng3d.ReadWriteRS) => T, value?: gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void): void;
+        createAsset<T extends feng3d.FileAsset>(folderNode: AssetNode, cls: new () => T, value?: gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void): void;
         /**
          * 弹出文件菜单
          */
