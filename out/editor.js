@@ -6970,28 +6970,28 @@ var editor;
                     editor.drag.register(this, function (dragsource) {
                         var extension = _this.data.asset.assetType;
                         switch (extension) {
-                            case feng3d.AssetExtension.gameobject:
+                            case feng3d.AssetType.gameobject:
                                 dragsource.file_gameobject = feng3d.serialization.clone(_this.data.asset.data);
                                 break;
-                            case feng3d.AssetExtension.script:
+                            case feng3d.AssetType.script:
                                 dragsource.file_script = _this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.anim:
+                            case feng3d.AssetType.anim:
                                 dragsource.animationclip = _this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.material:
+                            case feng3d.AssetType.material:
                                 dragsource.material = _this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.texturecube:
+                            case feng3d.AssetType.texturecube:
                                 dragsource.texturecube = _this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.geometry:
+                            case feng3d.AssetType.geometry:
                                 dragsource.geometry = _this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.texture:
+                            case feng3d.AssetType.texture:
                                 dragsource.texture2d = _this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.audio:
+                            case feng3d.AssetType.audio:
                                 dragsource.audio = _this.data.asset.data;
                                 break;
                         }
@@ -7078,7 +7078,7 @@ var editor;
              */
             _this.isLoaded = false;
             _this.asset = asset;
-            _this.isDirectory = asset.assetType == feng3d.AssetExtension.folder;
+            _this.isDirectory = asset.assetType == feng3d.AssetType.folder;
             _this.label = asset.name;
             // 更新图标
             if (_this.isDirectory) {

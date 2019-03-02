@@ -88,28 +88,28 @@ namespace editor
                         var extension = this.data.asset.assetType;
                         switch (extension)
                         {
-                            case feng3d.AssetExtension.gameobject:
+                            case feng3d.AssetType.gameobject:
                                 dragsource.file_gameobject = feng3d.serialization.clone(<feng3d.GameObject>this.data.asset.data);
                                 break;
-                            case feng3d.AssetExtension.script:
+                            case feng3d.AssetType.script:
                                 dragsource.file_script = <any>this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.anim:
+                            case feng3d.AssetType.anim:
                                 dragsource.animationclip = <any>this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.material:
+                            case feng3d.AssetType.material:
                                 dragsource.material = <any>this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.texturecube:
+                            case feng3d.AssetType.texturecube:
                                 dragsource.texturecube = <any>this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.geometry:
+                            case feng3d.AssetType.geometry:
                                 dragsource.geometry = <any>this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.texture:
+                            case feng3d.AssetType.texture:
                                 dragsource.texture2d = <any>this.data.asset.data;
                                 break;
-                            case feng3d.AssetExtension.audio:
+                            case feng3d.AssetType.audio:
                                 dragsource.audio = <any>this.data.asset.data;
                                 break;
                         }

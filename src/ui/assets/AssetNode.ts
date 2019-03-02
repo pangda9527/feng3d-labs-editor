@@ -64,7 +64,7 @@ namespace editor
             super();
 
             this.asset = asset;
-            this.isDirectory = asset.assetType == feng3d.AssetExtension.folder;
+            this.isDirectory = asset.assetType == feng3d.AssetType.folder;
             this.label = asset.name;
             // 更新图标
             if (this.isDirectory)
