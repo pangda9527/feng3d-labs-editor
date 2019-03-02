@@ -109,7 +109,7 @@ namespace editor
 
             this.isLoading = true;
 
-            editorRS.readAsset(this.asset.assetId, (err, asset: feng3d.FileAsset) =>
+            editorRS.readAsset(this.asset.assetId, (err, asset) =>
             {
                 feng3d.assert(!err);
 
