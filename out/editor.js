@@ -6658,12 +6658,12 @@ var editor;
                         { type: "separator" },
                         {
                             label: "立方体贴图", click: function () {
-                                _this.createAsset(assetNode, feng3d.TextureCubeAsset, { name: "new TextureCube" });
+                                _this.createAsset(assetNode, feng3d.TextureCubeAsset, { name: "new TextureCube", data: new feng3d.TextureCube() });
                             }
                         },
                         {
                             label: "材质", click: function () {
-                                _this.createAsset(assetNode, feng3d.MaterialAsset, { name: "New Material" });
+                                _this.createAsset(assetNode, feng3d.MaterialAsset, { name: "New Material", data: new feng3d.Material() });
                             }
                         },
                         {
