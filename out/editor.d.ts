@@ -2678,7 +2678,7 @@ declare namespace editor {
         /**
          * 转换为DataURL
          */
-        toDataURL(): string;
+        toDataURL(width?: number, height?: number): string;
         updateCameraPosition(): void;
         private currentObject;
         private materialObject;

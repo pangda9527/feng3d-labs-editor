@@ -198,7 +198,7 @@ namespace editor
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    this.createAsset(assetNode, feng3d.TextureCubeAsset, { name: "new TextureCube.json" });
+                                    this.createAsset(assetNode, feng3d.TextureCubeAsset, { name: "new TextureCube" });
                                 }
                             },
                             {

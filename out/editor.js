@@ -6081,7 +6081,7 @@ var editor;
         OAVFeng3dPreView.prototype.onDrawObject = function () {
             this.cameraRotation && (editor.feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
             editor.feng3dScreenShot.updateCameraPosition();
-            this.image.source = editor.feng3dScreenShot.toDataURL();
+            this.image.source = editor.feng3dScreenShot.toDataURL(this.width, this.height);
         };
         OAVFeng3dPreView.prototype.onMouseUp = function () {
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
@@ -6092,7 +6092,6 @@ var editor;
         OAVFeng3dPreView.prototype.onResize = function () {
             this.height = this.width;
             this.image.width = this.image.height = this.width;
-            editor.feng3dScreenShot.engine.setSize(this.width, this.height);
         };
         OAVFeng3dPreView = __decorate([
             feng3d.OAVComponent()
@@ -6659,7 +6658,7 @@ var editor;
                         { type: "separator" },
                         {
                             label: "立方体贴图", click: function () {
-                                _this.createAsset(assetNode, feng3d.TextureCubeAsset, { name: "new TextureCube.json" });
+                                _this.createAsset(assetNode, feng3d.TextureCubeAsset, { name: "new TextureCube" });
                             }
                         },
                         {
@@ -10497,7 +10496,10 @@ var editor;
         /**
          * 转换为DataURL
          */
-        Feng3dScreenShot.prototype.toDataURL = function () {
+        Feng3dScreenShot.prototype.toDataURL = function (width, height) {
+            if (width === void 0) { width = 64; }
+            if (height === void 0) { height = 64; }
+            this.engine.setSize(width, height);
             this.engine.render();
             var dataUrl = this.engine.canvas.toDataURL();
             return dataUrl;

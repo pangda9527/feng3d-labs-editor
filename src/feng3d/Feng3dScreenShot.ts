@@ -171,8 +171,9 @@ namespace editor
         /**
          * 转换为DataURL
          */
-        toDataURL()
+        toDataURL(width = 64, height = 64)
         {
+            this.engine.setSize(width, height);
             this.engine.render();
             var dataUrl = this.engine.canvas.toDataURL();
             return dataUrl;

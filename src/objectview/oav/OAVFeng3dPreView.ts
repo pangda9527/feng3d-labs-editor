@@ -69,7 +69,7 @@ namespace editor
         {
             this.cameraRotation && (feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
             feng3dScreenShot.updateCameraPosition();
-            this.image.source = feng3dScreenShot.toDataURL();
+            this.image.source = feng3dScreenShot.toDataURL(this.width, this.height);
         }
 
         private onMouseUp()
@@ -86,7 +86,6 @@ namespace editor
         {
             this.height = this.width;
             this.image.width = this.image.height = this.width;
-            feng3dScreenShot.engine.setSize(this.width, this.height);
         }
     }
 }
