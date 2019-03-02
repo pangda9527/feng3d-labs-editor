@@ -6568,7 +6568,7 @@ var editor;
          */
         EditorAsset.prototype.deleteAsset = function (assetNode, callback) {
             var _this = this;
-            editor.editorRS.deleteAsset(assetNode.asset.assetId, function (err) {
+            editor.editorRS.deleteAsset(assetNode.asset, function (err) {
                 if (err) {
                     callback && callback(err);
                     return;

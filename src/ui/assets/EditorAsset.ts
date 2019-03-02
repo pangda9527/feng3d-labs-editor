@@ -83,7 +83,7 @@ namespace editor
          */
         deleteAsset(assetNode: AssetNode, callback?: (err: Error) => void)
         {
-            editorRS.deleteAsset(assetNode.asset.assetId, (err) =>
+            editorRS.deleteAsset(assetNode.asset, (err) =>
             {
                 if (err)
                 {
