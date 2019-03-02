@@ -118,7 +118,7 @@ namespace editor
          * 
          * @param feng3dAssets 
          */
-        createAsset<T extends feng3d.FileAsset>(folderNode: AssetNode, cls: new () => T, value?: gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void)
+        createAsset<T extends feng3d.FileAsset>(folderNode: AssetNode, cls: new (rs: feng3d.ReadWriteRS) => T, value?: gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void)
         {
             var folder = <feng3d.FolderAsset>folderNode.asset;
             editorRS.createAsset(cls, value, folder, (err, asset) =>
