@@ -83,7 +83,7 @@ namespace editor
 			if (index != -1)
 			{
 				var textureCube: feng3d.TextureCube = this.space;
-				var texture2ds = feng3d.rs.getAssetDatasByType(feng3d.UrlImageTexture2D);
+				var texture2ds = feng3d.rs.getAssetDatasByType(feng3d.Texture2D);
 				var menus: MenuItem[] = [{
 					label: `None`, click: () =>
 					{
@@ -97,7 +97,7 @@ namespace editor
 					menus.push({
 						label: d.name, click: () =>
 						{
-							textureCube[propertys[index]] = d.url;
+							textureCube[propertys[index]] = d;
 							this.updateImage(index);
 							this.dispatchValueChange(index);
 						}

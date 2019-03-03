@@ -314,7 +314,7 @@ namespace editor
                     }
                 });
             }
-            if (assetNode.asset instanceof feng3d.UrlImageTexture2D)
+            if (assetNode.asset instanceof feng3d.Texture2D)
             {
                 menuconfig.push({
                     label: "去除背景色", click: () =>

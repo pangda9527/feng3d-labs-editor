@@ -5290,7 +5290,7 @@ var editor;
             var index = this.btns.indexOf(e.currentTarget);
             if (index != -1) {
                 var textureCube = this.space;
-                var texture2ds = feng3d.rs.getAssetDatasByType(feng3d.UrlImageTexture2D);
+                var texture2ds = feng3d.rs.getAssetDatasByType(feng3d.Texture2D);
                 var menus = [{
                         label: "None", click: function () {
                             textureCube[propertys[index]] = "";
@@ -5301,7 +5301,7 @@ var editor;
                 texture2ds.forEach(function (d) {
                     menus.push({
                         label: d.name, click: function () {
-                            textureCube[propertys[index]] = d.url;
+                            textureCube[propertys[index]] = d;
                             _this.updateImage(index);
                             _this.dispatchValueChange(index);
                         }
@@ -6751,7 +6751,7 @@ var editor;
                     }
                 });
             }
-            if (assetNode.asset instanceof feng3d.UrlImageTexture2D) {
+            if (assetNode.asset instanceof feng3d.Texture2D) {
                 menuconfig.push({
                     label: "去除背景色", click: function () {
                         var image = assetNode.asset["image"];
