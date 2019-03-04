@@ -13550,8 +13550,8 @@ var editor;
                 tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
             this.tslist.forEach(function (item) {
-                fileNames.push(item.assetId + ".ts");
-                tsSourceMap[item.assetId + ".ts"] = ts.createSourceFile(item.assetId + ".ts", item.textContent, options.target || ts.ScriptTarget.ES5);
+                fileNames.push(item.assetPath);
+                tsSourceMap[item.assetPath] = ts.createSourceFile(item.assetPath, item.textContent, options.target || ts.ScriptTarget.ES5);
             });
             // Output
             var outputs = [];
