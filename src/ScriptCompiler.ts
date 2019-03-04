@@ -34,36 +34,33 @@ namespace editor
             codeeditoWin = window.open(`codeeditor.html`);
         }
 
-        compile(callback?: (result: string) => void)
+        compile(callback?: (output: { name: string; text: string; }[]) => void)
         {
             this.tslist = this.getScripts();
 
             try
             {
                 var output = this.transpileModule();
-                var outputStr = output.reduce((prev, item) =>
+
+                output.forEach(v =>
                 {
-                    return prev + item.text;
-                }, "");
+                    editorRS.fs.writeString(v.name, v.text);
+                });
 
-                outputStr += `\n//# sourceURL=project.js`;
-
-                callback && callback(outputStr);
-
-                editorRS.fs.writeString("project.js", outputStr);
+                callback && callback(output);
 
                 editorAsset.runProjectScript(() =>
                 {
                     feng3d.feng3dDispatcher.dispatch("asset.scriptChanged");
                 });
 
-                return outputStr;
+                return output;
             }
             catch (e)
             {
                 console.log("Error from compilation: " + e + "  " + (e.stack || ""));
             }
-            callback && callback("");
+            callback && callback(null);
         }
 
         getScripts()
@@ -80,8 +77,8 @@ namespace editor
             var options = {
                 // module: ts.ModuleKind.AMD,
                 target: ts.ScriptTarget.ES5,
-                noLib: true,
-                noResolve: true,
+                noImplicitAny: false,
+                sourceMap: true,
                 suppressOutputPathCheck: true,
                 outFile: "project.js",
             };
@@ -101,7 +98,7 @@ namespace editor
             })
 
             // Output
-            var outputs = [];
+            var outputs: { name: string, text: string }[] = [];
             var program = ts.createProgram(fileNames, options, {
                 getSourceFile: function (fileName)
                 {

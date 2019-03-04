@@ -13515,21 +13515,19 @@ var editor;
             this.tslist = this.getScripts();
             try {
                 var output = this.transpileModule();
-                var outputStr = output.reduce(function (prev, item) {
-                    return prev + item.text;
-                }, "");
-                outputStr += "\n//# sourceURL=project.js";
-                callback && callback(outputStr);
-                editor.editorRS.fs.writeString("project.js", outputStr);
+                output.forEach(function (v) {
+                    editor.editorRS.fs.writeString(v.name, v.text);
+                });
+                callback && callback(output);
                 editor.editorAsset.runProjectScript(function () {
                     feng3d.feng3dDispatcher.dispatch("asset.scriptChanged");
                 });
-                return outputStr;
+                return output;
             }
             catch (e) {
                 console.log("Error from compilation: " + e + "  " + (e.stack || ""));
             }
-            callback && callback("");
+            callback && callback(null);
         };
         ScriptCompiler.prototype.getScripts = function () {
             var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
@@ -13540,8 +13538,8 @@ var editor;
             var options = {
                 // module: ts.ModuleKind.AMD,
                 target: ts.ScriptTarget.ES5,
-                noLib: true,
-                noResolve: true,
+                noImplicitAny: false,
+                sourceMap: true,
                 suppressOutputPathCheck: true,
                 outFile: "project.js",
             };

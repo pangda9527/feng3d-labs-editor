@@ -3262,7 +3262,13 @@ declare namespace editor {
         _script: feng3d.StringAsset;
         constructor();
         edit(script: feng3d.StringAsset): void;
-        compile(callback?: (result: string) => void): any;
+        compile(callback?: (output: {
+            name: string;
+            text: string;
+        }[]) => void): {
+            name: string;
+            text: string;
+        }[];
         getScripts(): feng3d.ScriptAsset[];
         private transpileModule;
         /**
@@ -3294,3 +3300,4 @@ declare namespace editor {
         private _onAddToStage;
     }
 }
+//# sourceMappingURL=editor.d.ts.map
