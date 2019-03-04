@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "outFile": "project.js"
+  },
+  "files": [
+    "libs/feng3d.d.ts",
+  ]
+}

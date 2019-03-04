@@ -106,6 +106,7 @@ namespace editor
                     ["resource/template/app.js", "app.js"],
                     ["resource/template/index.html", "index.html"],
                     ["resource/template/project.js", "project.js"],
+                    ["resource/template/tsconfig.json", "tsconfig.json"],
                     ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
                     ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
                 ];
