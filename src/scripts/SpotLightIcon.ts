@@ -15,7 +15,7 @@ namespace editor
         initicon()
         {
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
-                name: "Icon", components: [
+                name: "SpotLightIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
                         __class__: "feng3d.MeshModel", material: {

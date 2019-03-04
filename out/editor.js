@@ -12237,7 +12237,7 @@ var editor;
         };
         PointLightIcon.prototype.initicon = function () {
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
-                name: "Icon", components: [
+                name: "PointLightIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
                         __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
@@ -12448,7 +12448,7 @@ var editor;
         };
         SpotLightIcon.prototype.initicon = function () {
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
-                name: "Icon", components: [
+                name: "SpotLightIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
                         __class__: "feng3d.MeshModel", material: {
