@@ -24,13 +24,13 @@ namespace editor
             var linesize = 10;
 
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
-                name: "Icon", components: [{ __class__: "feng3d.BillboardComponent", camera: editorCamera },
+                name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: editorCamera },
                 {
                     __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
                     material: {
                         __class__: "feng3d.Material",
                         shaderName: "texture",
-                        uniforms: { s_texture: { __class__: "feng3d.UrlImageTexture2D", url: editorData.getEditorAssetPath("assets/3d/icons/sun.png"), format: feng3d.TextureFormat.RGBA, premulAlpha: true, }, }, renderParams: { enableBlend: true }
+                        uniforms: { s_texture: { __class__: "feng3d.Texture2D", source: { url: editorData.getEditorAssetPath("assets/3d/icons/sun.png") }, format: feng3d.TextureFormat.RGBA, premulAlpha: true, }, }, renderParams: { enableBlend: true }
                     },
                 },],
             });

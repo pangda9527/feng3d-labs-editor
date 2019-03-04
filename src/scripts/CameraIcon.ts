@@ -15,7 +15,7 @@ namespace editor
         initicon()
         {
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
-                name: "Icon", components: [
+                name: "CameraIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
                         __class__: "feng3d.MeshModel", material: {
@@ -23,8 +23,8 @@ namespace editor
                             shaderName: "texture",
                             uniforms: {
                                 s_texture: {
-                                    __class__: "feng3d.UrlImageTexture2D",
-                                    url: editorData.getEditorAssetPath("assets/3d/icons/camera.png"),
+                                    __class__: "feng3d.Texture2D",
+                                    source: { url: editorData.getEditorAssetPath("assets/3d/icons/camera.png") },
                                     format: feng3d.TextureFormat.RGBA,
                                     // premulAlpha: true,
                                 }

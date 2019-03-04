@@ -43,7 +43,7 @@ namespace editor
         //  * 绘制贴图
         //  * @param texture 贴图
         //  */
-        // drawTexture(texture: feng3d.UrlImageTexture2D, width?: number, height?: number)
+        // drawTexture(texture: feng3d.Texture2D, width?: number, height?: number)
         // {
         //     var image: ImageData | HTMLImageElement = <any>texture.activePixels;
 

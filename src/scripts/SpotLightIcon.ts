@@ -23,8 +23,8 @@ namespace editor
                             shaderName: "texture",
                             uniforms: {
                                 s_texture: {
-                                    __class__: "feng3d.UrlImageTexture2D",
-                                    url: editorData.getEditorAssetPath("assets/3d/icons/spot.png"),
+                                    __class__: "feng3d.Texture2D",
+                                    source: { url: editorData.getEditorAssetPath("assets/3d/icons/spot.png") },
                                     format: feng3d.TextureFormat.RGBA,
                                     premulAlpha: true,
                                 }

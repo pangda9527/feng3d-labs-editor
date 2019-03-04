@@ -10380,7 +10380,7 @@ var editor;
         //  * 绘制贴图
         //  * @param texture 贴图
         //  */
-        // drawTexture(texture: feng3d.UrlImageTexture2D, width?: number, height?: number)
+        // drawTexture(texture: feng3d.Texture2D, width?: number, height?: number)
         // {
         //     var image: ImageData | HTMLImageElement = <any>texture.activePixels;
         //     var w = width || (image && image.width) || 64;
@@ -12138,13 +12138,13 @@ var editor;
         DirectionLightIcon.prototype.initicon = function () {
             var linesize = 10;
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
-                name: "Icon", components: [{ __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
+                name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
                         __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
                         material: {
                             __class__: "feng3d.Material",
                             shaderName: "texture",
-                            uniforms: { s_texture: { __class__: "feng3d.UrlImageTexture2D", url: editor.editorData.getEditorAssetPath("assets/3d/icons/sun.png"), format: feng3d.TextureFormat.RGBA, premulAlpha: true, }, }, renderParams: { enableBlend: true }
+                            uniforms: { s_texture: { __class__: "feng3d.Texture2D", source: { url: editor.editorData.getEditorAssetPath("assets/3d/icons/sun.png") }, format: feng3d.TextureFormat.RGBA, premulAlpha: true, }, }, renderParams: { enableBlend: true }
                         },
                     },],
             });
@@ -12246,8 +12246,8 @@ var editor;
                             shaderName: "texture",
                             uniforms: {
                                 s_texture: {
-                                    __class__: "feng3d.UrlImageTexture2D",
-                                    url: editor.editorData.getEditorAssetPath("assets/3d/icons/light.png"),
+                                    __class__: "feng3d.Texture2D",
+                                    source: { url: editor.editorData.getEditorAssetPath("assets/3d/icons/light.png") },
                                     format: feng3d.TextureFormat.RGBA,
                                     premulAlpha: true,
                                 },
@@ -12456,8 +12456,8 @@ var editor;
                             shaderName: "texture",
                             uniforms: {
                                 s_texture: {
-                                    __class__: "feng3d.UrlImageTexture2D",
-                                    url: editor.editorData.getEditorAssetPath("assets/3d/icons/spot.png"),
+                                    __class__: "feng3d.Texture2D",
+                                    source: { url: editor.editorData.getEditorAssetPath("assets/3d/icons/spot.png") },
                                     format: feng3d.TextureFormat.RGBA,
                                     premulAlpha: true,
                                 }
@@ -12601,7 +12601,7 @@ var editor;
         };
         CameraIcon.prototype.initicon = function () {
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
-                name: "Icon", components: [
+                name: "CameraIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
                     {
                         __class__: "feng3d.MeshModel", material: {
@@ -12609,8 +12609,8 @@ var editor;
                             shaderName: "texture",
                             uniforms: {
                                 s_texture: {
-                                    __class__: "feng3d.UrlImageTexture2D",
-                                    url: editor.editorData.getEditorAssetPath("assets/3d/icons/camera.png"),
+                                    __class__: "feng3d.Texture2D",
+                                    source: { url: editor.editorData.getEditorAssetPath("assets/3d/icons/camera.png") },
                                     format: feng3d.TextureFormat.RGBA,
                                 }
                             },
