@@ -50,7 +50,6 @@ namespace editor
 
         private init()
         {
-
             document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorcache.projectname;
 
             this.initMainView()

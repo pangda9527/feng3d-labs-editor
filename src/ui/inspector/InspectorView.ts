@@ -18,6 +18,7 @@ namespace editor
 
 		showData(data: any, removeBack = false)
 		{
+			if (this._viewData == data) return;
 			if (this._viewData)
 			{
 				this.saveShowData();

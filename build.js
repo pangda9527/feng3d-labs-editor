@@ -4,7 +4,7 @@ var process = require('child_process');
 var fs = require("fs");
 var path = require("path");
 
-// watchcopyDir("../feng3d/out", "libs");
+watchcopyDir("../feng3d/out", "resource/template/libs");
 
 /**
  * Watch for changes in TypeScript

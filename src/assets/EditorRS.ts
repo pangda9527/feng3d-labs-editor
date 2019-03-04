@@ -102,60 +102,64 @@ namespace editor
         {
             editorRS.initproject(projectname, () =>
             {
-                //
-                var zip = new JSZip();
-                var request = new XMLHttpRequest();
-                request.open('Get', editorData.getEditorAssetPath("templates/template.zip"), true);
-                request.responseType = "arraybuffer";
-                request.onload = (ev) =>
+                var urls = [
+                    ["resource/template/app.js", "app.js"],
+                    ["resource/template/index.html", "index.html"],
+                    ["resource/template/project.js", "project.js"],
+                    ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+                    ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ];
+                var index = 0;
+                var loadUrls = () =>
                 {
-                    zip.loadAsync(request.response).then(() =>
+                    if (index >= urls.length) { callback(); return; }
+                    feng3d.loader.loadText(urls[index][0], (content) =>
                     {
-                        var filepaths = Object.keys(zip.files);
-                        filepaths.sort();
+                        this.fs.writeString(urls[index][1], content, (err) =>
+                        {
+                            if (err) feng3d.warn(err);
+                            index++;
+                            loadUrls();
+                        });
 
-                        readfiles(zip, filepaths, callback)
-                    });
-                };
-                request.onerror = (ev) =>
-                {
-                    feng3d.error(request.responseURL + "不存在，无法初始化项目！");
+                    }, null, (e) =>
+                        {
+                            feng3d.warn(e);
+                            index++;
+                            loadUrls();
+                        });
                 }
-                request.send();
+                loadUrls();
             });
         }
 
         upgradeProject(callback: () => void)
         {
-            //
-            var zip = new JSZip();
-            var request = new XMLHttpRequest();
-            request.open('Get', editorData.getEditorAssetPath("templates/template.zip"), true);
-            request.responseType = "arraybuffer";
-            request.onload = (ev) =>
+            var urls = [
+                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+            ];
+            var index = 0;
+            var loadUrls = () =>
             {
-                zip.loadAsync(request.response).then(() =>
+                if (index >= urls.length) { callback(); return; }
+                feng3d.loader.loadText(urls[index][0], (content) =>
                 {
-                    var filepaths = Object.keys(zip.files);
-                    filepaths = filepaths.filter((item) =>
+                    this.fs.writeString(urls[index][1], content, (err) =>
                     {
-                        if (item.indexOf("project.js") != -1)
-                            return false;
-                        if (item.indexOf("default.scene.json") != -1)
-                            return false;
-                        return true;
+                        if (err) feng3d.warn(err);
+                        index++;
+                        loadUrls();
                     });
-                    filepaths.sort();
 
-                    readfiles(zip, filepaths, callback)
-
-                });
-            };
-            request.onerror = (ev) =>
-            {
-                feng3d.error(request.responseURL + "不存在，无法初始化项目！");
+                }, null, (e) =>
+                    {
+                        feng3d.warn(e);
+                        index++;
+                        loadUrls();
+                    });
             }
-            request.send();
+            loadUrls();
         }
 
         selectFile(callback: (file: FileList) => void)

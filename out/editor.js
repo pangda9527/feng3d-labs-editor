@@ -424,49 +424,63 @@ var editor;
          * 创建项目
          */
         EditorRS.prototype.createproject = function (projectname, callback) {
+            var _this = this;
             editor.editorRS.initproject(projectname, function () {
-                //
-                var zip = new JSZip();
-                var request = new XMLHttpRequest();
-                request.open('Get', editor.editorData.getEditorAssetPath("templates/template.zip"), true);
-                request.responseType = "arraybuffer";
-                request.onload = function (ev) {
-                    zip.loadAsync(request.response).then(function () {
-                        var filepaths = Object.keys(zip.files);
-                        filepaths.sort();
-                        readfiles(zip, filepaths, callback);
+                var urls = [
+                    ["resource/template/app.js", "app.js"],
+                    ["resource/template/index.html", "index.html"],
+                    ["resource/template/project.js", "project.js"],
+                    ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+                    ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ];
+                var index = 0;
+                var loadUrls = function () {
+                    if (index >= urls.length) {
+                        callback();
+                        return;
+                    }
+                    feng3d.loader.loadText(urls[index][0], function (content) {
+                        _this.fs.writeString(urls[index][1], content, function (err) {
+                            if (err)
+                                feng3d.warn(err);
+                            index++;
+                            loadUrls();
+                        });
+                    }, null, function (e) {
+                        feng3d.warn(e);
+                        index++;
+                        loadUrls();
                     });
                 };
-                request.onerror = function (ev) {
-                    feng3d.error(request.responseURL + "不存在，无法初始化项目！");
-                };
-                request.send();
+                loadUrls();
             });
         };
         EditorRS.prototype.upgradeProject = function (callback) {
-            //
-            var zip = new JSZip();
-            var request = new XMLHttpRequest();
-            request.open('Get', editor.editorData.getEditorAssetPath("templates/template.zip"), true);
-            request.responseType = "arraybuffer";
-            request.onload = function (ev) {
-                zip.loadAsync(request.response).then(function () {
-                    var filepaths = Object.keys(zip.files);
-                    filepaths = filepaths.filter(function (item) {
-                        if (item.indexOf("project.js") != -1)
-                            return false;
-                        if (item.indexOf("default.scene.json") != -1)
-                            return false;
-                        return true;
+            var _this = this;
+            var urls = [
+                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+            ];
+            var index = 0;
+            var loadUrls = function () {
+                if (index >= urls.length) {
+                    callback();
+                    return;
+                }
+                feng3d.loader.loadText(urls[index][0], function (content) {
+                    _this.fs.writeString(urls[index][1], content, function (err) {
+                        if (err)
+                            feng3d.warn(err);
+                        index++;
+                        loadUrls();
                     });
-                    filepaths.sort();
-                    readfiles(zip, filepaths, callback);
+                }, null, function (e) {
+                    feng3d.warn(e);
+                    index++;
+                    loadUrls();
                 });
             };
-            request.onerror = function (ev) {
-                feng3d.error(request.responseURL + "不存在，无法初始化项目！");
-            };
-            request.send();
+            loadUrls();
         };
         EditorRS.prototype.selectFile = function (callback) {
             selectFileCallback = callback;
@@ -6213,6 +6227,8 @@ var editor;
         }
         InspectorView.prototype.showData = function (data, removeBack) {
             if (removeBack === void 0) { removeBack = false; }
+            if (this._viewData == data)
+                return;
             if (this._viewData) {
                 this.saveShowData();
                 this._viewDataList.push(this._viewData);
