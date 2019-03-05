@@ -31,30 +31,6 @@ var NativeFS = /** @class */ (function () {
         configurable: true
     });
     /**
-     * 读取文件
-     * @param path 路径
-     * @param callback 读取完成回调 当err不为null时表示读取失败
-     */
-    NativeFS.prototype.readFile = function (path, callback) {
-        if (path.charAt(path.length - 1) == "/") {
-            callback(null, null);
-            return;
-        }
-        this.getAbsolutePath(path, function (err, absolutePath) {
-            fs.open(absolutePath, "r", function (err, fd) {
-                if (err) {
-                    callback(err, null);
-                    return;
-                }
-                fs.readFile(absolutePath, function (err, data) {
-                    fs.close(fd, function (err) {
-                        callback(err, data.buffer);
-                    });
-                });
-            });
-        });
-    };
-    /**
      * 文件是否存在
      * @param path 文件路径
      * @param callback 回调函数
@@ -97,25 +73,59 @@ var NativeFS = /** @class */ (function () {
         });
     };
     /**
+     * 读取文件
+     * @param path 路径
+     * @param callback 读取完成回调 当err不为null时表示读取失败
+     */
+    NativeFS.prototype.readFile = function (path, callback) {
+        if (path.charAt(path.length - 1) == "/") {
+            callback(null, null);
+            return;
+        }
+        this.getAbsolutePath(path, function (err, absolutePath) {
+            fs.open(absolutePath, "r", function (err, fd) {
+                if (err) {
+                    callback(err, null);
+                    return;
+                }
+                fs.readFile(absolutePath, function (err, data) {
+                    fs.close(fd, function (err) {
+                        callback(err, data.buffer);
+                    });
+                });
+            });
+        });
+    };
+    /**
      * 删除文件
      * @param path 文件路径
      * @param callback 回调函数
      */
     NativeFS.prototype.deleteFile = function (path, callback) {
         this.getAbsolutePath(path, function (err, absolutePath) {
-            if (absolutePath.charAt(absolutePath.length - 1) == "/")
-                fs.rmdir(absolutePath, callback);
-            else
-                fs.unlink(absolutePath, callback);
+            fs.stat(absolutePath, function (err, stats) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+                ;
+                if (stats.isDirectory) {
+                    fs.rmdir(absolutePath, callback);
+                }
+                else {
+                    fs.unlink(absolutePath, callback);
+                }
+            });
         });
     };
     /**
-     * 写(新建)文件
+     * 写ArrayBuffer(新建)文件
+     *
      * @param path 文件路径
      * @param data 文件数据
      * @param callback 回调函数
      */
-    NativeFS.prototype.writeFile = function (path, data, callback) {
+    NativeFS.prototype.writeArrayBuffer = function (path, data, callback) {
         this.getAbsolutePath(path, function (err, absolutePath) {
             var buffer = new Buffer(data);
             fs.open(absolutePath, "w", function (err, fd) {
@@ -124,7 +134,30 @@ var NativeFS = /** @class */ (function () {
                     return;
                 }
                 fs.writeFile(absolutePath, buffer, "binary", function (err) {
-                    fs.close(fd, callback);
+                    fs.close(fd, function (err) {
+                        callback && callback(err);
+                    });
+                });
+            });
+        });
+    };
+    /**
+     * 写字符串到(新建)文件
+     * @param path 文件路径
+     * @param str 文件数据
+     * @param callback 回调函数
+     */
+    NativeFS.prototype.writeString = function (path, str, callback) {
+        this.getAbsolutePath(path, function (err, absolutePath) {
+            fs.open(absolutePath, "w", function (err, fd) {
+                if (err) {
+                    callback && callback(err);
+                    return;
+                }
+                fs.writeFile(absolutePath, str, "utf8", function (err) {
+                    fs.close(fd, function (err) {
+                        callback && callback(err);
+                    });
                 });
             });
         });

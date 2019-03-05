@@ -27,42 +27,6 @@ export class NativeFS implements feng3d.ReadWriteFS
      */
     projectname = "testproject";
 
-    constructor()
-    {
-    }
-
-    /**
-     * 读取文件
-     * @param path 路径
-     * @param callback 读取完成回调 当err不为null时表示读取失败
-     */
-    readFile(path: string, callback: (err: Error, data: ArrayBuffer) => void)
-    {
-        if (path.charAt(path.length - 1) == "/")
-        {
-            callback(null, null);
-            return;
-        }
-        this.getAbsolutePath(path, (err, absolutePath) =>
-        {
-            fs.open(absolutePath, "r", (err, fd) =>
-            {
-                if (err)
-                {
-                    callback(err, null);
-                    return;
-                }
-                fs.readFile(absolutePath, (err, data) =>
-                {
-                    fs.close(fd, (err) =>
-                    {
-                        callback(err, data.buffer);
-                    });
-                });
-            });
-        });
-    }
-
     /**
      * 文件是否存在
      * @param path 文件路径
@@ -118,6 +82,38 @@ export class NativeFS implements feng3d.ReadWriteFS
     }
 
     /**
+     * 读取文件
+     * @param path 路径
+     * @param callback 读取完成回调 当err不为null时表示读取失败
+     */
+    readFile(path: string, callback: (err: Error, data: ArrayBuffer) => void)
+    {
+        if (path.charAt(path.length - 1) == "/")
+        {
+            callback(null, null);
+            return;
+        }
+        this.getAbsolutePath(path, (err, absolutePath) =>
+        {
+            fs.open(absolutePath, "r", (err, fd) =>
+            {
+                if (err)
+                {
+                    callback(err, null);
+                    return;
+                }
+                fs.readFile(absolutePath, (err, data) =>
+                {
+                    fs.close(fd, (err) =>
+                    {
+                        callback(err, data.buffer);
+                    });
+                });
+            });
+        });
+    }
+
+    /**
      * 删除文件
      * @param path 文件路径
      * @param callback 回调函数
@@ -126,20 +122,28 @@ export class NativeFS implements feng3d.ReadWriteFS
     {
         this.getAbsolutePath(path, (err, absolutePath) =>
         {
-            if (absolutePath.charAt(absolutePath.length - 1) == "/")
-                fs.rmdir(absolutePath, callback);
-            else
-                fs.unlink(absolutePath, callback);
+            fs.stat(absolutePath, (err, stats) =>
+            {
+                if (err) { callback(err); return; };
+                if (stats.isDirectory)
+                {
+                    fs.rmdir(absolutePath, callback);
+                } else
+                {
+                    fs.unlink(absolutePath, callback);
+                }
+            });
         });
     }
 
     /**
-     * 写(新建)文件
+     * 写ArrayBuffer(新建)文件
+     * 
      * @param path 文件路径
      * @param data 文件数据
      * @param callback 回调函数
      */
-    writeFile(path: string, data: ArrayBuffer, callback: (err: Error) => void): void
+    writeArrayBuffer(path: string, data: ArrayBuffer, callback?: (err: Error) => void): void
     {
         this.getAbsolutePath(path, (err, absolutePath) =>
         {
@@ -153,11 +157,67 @@ export class NativeFS implements feng3d.ReadWriteFS
                 }
                 fs.writeFile(absolutePath, buffer, "binary", (err) =>
                 {
-                    fs.close(fd, callback);
+                    fs.close(fd, (err) =>
+                    {
+                        callback && callback(err);
+                    });
                 });
             });
         });
     }
+
+    /**
+     * 写字符串到(新建)文件
+     * @param path 文件路径
+     * @param str 文件数据
+     * @param callback 回调函数
+     */
+    writeString(path: string, str: string, callback?: (err: Error) => void)
+    {
+        this.getAbsolutePath(path, (err, absolutePath) =>
+        {
+            fs.open(absolutePath, "w", (err, fd) =>
+            {
+                if (err)
+                {
+                    callback && callback(err);
+                    return;
+                }
+                fs.writeFile(absolutePath, str, "utf8", (err) =>
+                {
+                    fs.close(fd, (err) =>
+                    {
+                        callback && callback(err);
+                    });
+                });
+            });
+        });
+    }
+
+    /**
+     * 写Object到(新建)文件
+     * 
+     * @param path 文件路径
+     * @param object 文件数据
+     * @param callback 回调函数
+     */
+    writeObject: (path: string, object: Object, callback?: (err: Error) => void) => void;
+
+    /**
+     * 写图片
+     * @param path 图片路径
+     * @param image 图片
+     * @param callback 回调函数
+     */
+    writeImage: (path: string, image: HTMLImageElement, callback?: (err: Error) => void) => void;
+
+    /**
+     * 复制文件
+     * @param src    源路径
+     * @param dest    目标路径
+     * @param callback 回调函数
+     */
+    copyFile: (src: string, dest: string, callback?: (err: Error) => void) => void;
 
     /**
      * 获取项目列表

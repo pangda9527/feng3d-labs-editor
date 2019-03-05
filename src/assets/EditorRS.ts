@@ -306,7 +306,7 @@ namespace editor
     feng3d.rs = editorRS = new EditorRS();
     // } else
     // {
-    //     var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
+    //     var nativeFS = require(__dirname + "/native/NativeFS.js").nativeFS;
     //     feng3d.fs = nativeFS;
     //     feng3d.rs = editorRS = new EditorRS();
     // }
