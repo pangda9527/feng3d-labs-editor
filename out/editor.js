@@ -589,15 +589,16 @@ var editor;
             callback();
         }
     }
-    if (typeof require == "undefined") {
-        feng3d.fs = feng3d.indexedDBFS;
-        feng3d.rs = editor.editorRS = new EditorRS();
-    }
-    else {
-        var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
-        feng3d.fs = nativeFS;
-        feng3d.rs = editor.editorRS = new EditorRS();
-    }
+    // if (typeof require == "undefined")
+    // {
+    feng3d.fs = feng3d.indexedDBFS;
+    feng3d.rs = editor.editorRS = new EditorRS();
+    // } else
+    // {
+    //     var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;
+    //     feng3d.fs = nativeFS;
+    //     feng3d.rs = editorRS = new EditorRS();
+    // }
     //
     var isSelectFile = false;
     var fileInput = document.createElement('input');

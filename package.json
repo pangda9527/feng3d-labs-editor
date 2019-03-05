@@ -4,8 +4,7 @@
   "description": "feng3d引擎编辑器\r 编辑器UI基于[egret](https://www.egret.com/)开发。",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "package": "electron-packager ./ --platform=win32 --arch=x64 --electron-version=2.0.1 --icon=./favicon.ico"
+    "start": "electron ."
   },
   "repository": {
     "type": "git",
@@ -18,8 +17,7 @@
   "author": "feng",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^2.0.1",
-    "electron-packager": "^12.1.0"
+    "electron": "^2.0.1"
   },
   "dependencies": {}
 }
