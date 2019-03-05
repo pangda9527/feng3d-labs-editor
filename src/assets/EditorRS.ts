@@ -1,4 +1,5 @@
-declare function require(module: string): any;
+interface NodeRequire { }
+declare var require: NodeRequire;
 declare var __dirname: string;
 
 namespace editor
@@ -301,8 +302,8 @@ namespace editor
 
     // if (typeof require == "undefined")
     // {
-        feng3d.fs = feng3d.indexedDBFS;
-        feng3d.rs = editorRS = new EditorRS();
+    feng3d.fs = feng3d.indexedDBFS;
+    feng3d.rs = editorRS = new EditorRS();
     // } else
     // {
     //     var nativeFS = require(__dirname + "/io/NativeFS.js").nativeFS;

@@ -149,7 +149,9 @@ declare namespace editor {
         private updateStats;
     }
 }
-declare function require(module: string): any;
+interface NodeRequire {
+}
+declare var require: NodeRequire;
 declare var __dirname: string;
 declare namespace editor {
     /**
