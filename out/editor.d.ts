@@ -1,5 +1,20 @@
 /// <reference path="../libs/monaco-editor/monaco.d.ts" />
 declare namespace editor {
+    var giteeOauth: GiteeOauth;
+    /**
+     * gitee 认证授权
+     */
+    class GiteeOauth {
+        /**
+         * 认证授权
+         *
+         * @param callback 完成回调
+         */
+        oauth(callback?: () => void): void;
+        getUser(): void;
+    }
+}
+declare namespace editor {
     /**
      * Created by 黑暗之神KDS on 2017/2/17.
      */

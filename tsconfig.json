@@ -21,6 +21,8 @@
         "libs/jszip.d.ts",
         "libs/FileSaver.d.ts",
         //
+        "src/oauth/GiteeOauth.ts",
+        //
         "src/assets/FileObject.ts",
         "src/assets/NativeFS.ts",
         "src/assets/EditorRS.ts",
