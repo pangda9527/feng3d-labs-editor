@@ -1,16 +1,13 @@
 "use strict";
 
-var electron = require("electron");
-var app = electron.app;
-var BrowserWindow = electron.BrowserWindow;
-var mainWindow = null;
+const { app, BrowserWindow } = require('electron')
 
 app.commandLine.appendSwitch('enable-unsafe-es3-apis');
 app.on("ready", function ()
 {
     //ico--package
     //webPreferences:Settings of web page’s features
-    mainWindow = new BrowserWindow({
+    var mainWindow = new BrowserWindow({
         webPreferences: {
             nodeIntegration: true,
             webSecurity: true
