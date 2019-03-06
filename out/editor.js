@@ -346,6 +346,140 @@ var editor;
 var editor;
 (function (editor) {
     /**
+     * 本地文件系统
+     */
+    var NativeFS = /** @class */ (function (_super) {
+        __extends(NativeFS, _super);
+        function NativeFS(fs) {
+            var _this = _super.call(this) || this;
+            /**
+             * 工作空间路径，工作空间内存放所有编辑器项目
+             */
+            _this.workspace = "c:/editorworkspace/";
+            /**
+             * 项目名称
+             */
+            _this.projectname = "testproject";
+            /**
+             * 文件系统类型
+             */
+            _this.type = feng3d.FSType.native;
+            _this.fs = fs;
+            return _this;
+        }
+        /**
+         * 读取文件为ArrayBuffer
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        NativeFS.prototype.readArrayBuffer = function (path, callback) {
+        };
+        /**
+         * 读取文件为字符串
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        NativeFS.prototype.readString = function (path, callback) {
+        };
+        /**
+         * 读取文件为Object
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        NativeFS.prototype.readObject = function (path, callback) {
+        };
+        /**
+         * 加载图片
+         * @param path 图片路径
+         * @param callback 加载完成回调
+         */
+        NativeFS.prototype.readImage = function (path, callback) {
+        };
+        /**
+         * 获取文件绝对路径
+         * @param path （相对）路径
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.getAbsolutePath = function (path, callback) {
+        };
+        /**
+         * 文件是否存在
+         * @param path 文件路径
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.exists = function (path, callback) {
+            this.fs.exists(path, callback);
+        };
+        /**
+         * 读取文件夹中文件列表
+         *
+         * @param path 路径
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.readdir = function (path, callback) {
+            this.fs;
+        };
+        /**
+         * 新建文件夹
+         * @param path 文件夹路径
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.mkdir = function (path, callback) {
+        };
+        /**
+         * 删除文件
+         * @param path 文件路径
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.deleteFile = function (path, callback) {
+        };
+        /**
+         * 写ArrayBuffer(新建)文件
+         * @param path 文件路径
+         * @param arraybuffer 文件数据
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.writeArrayBuffer = function (path, arraybuffer, callback) {
+        };
+        /**
+         * 写字符串到(新建)文件
+         * @param path 文件路径
+         * @param str 文件数据
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.writeString = function (path, str, callback) {
+        };
+        /**
+         * 写Object到(新建)文件
+         * @param path 文件路径
+         * @param object 文件数据
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.writeObject = function (path, object, callback) {
+        };
+        /**
+         * 写图片
+         * @param path 图片路径
+         * @param image 图片
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.writeImage = function (path, image, callback) {
+        };
+        /**
+         * 复制文件
+         * @param src    源路径
+         * @param dest    目标路径
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.copyFile = function (src, dest, callback) {
+        };
+        return NativeFS;
+    }(feng3d.ReadWriteFS));
+    editor.NativeFS = NativeFS;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
      * 编辑器资源系统
      */
     var EditorRS = /** @class */ (function (_super) {

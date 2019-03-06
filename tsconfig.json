@@ -9,7 +9,7 @@
         "outFile": "out/editor.js"
     },
     "files": [
-        "feng3d/out/feng3d.d.ts", //debug
+        "feng3d/out/feng3d.d.ts",
         //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
@@ -22,6 +22,7 @@
         "libs/FileSaver.d.ts",
         //
         "src/assets/FileObject.ts",
+        "src/assets/NativeFS.ts",
         "src/assets/EditorRS.ts",
         //
         "src/caches/Editorcache.ts",
