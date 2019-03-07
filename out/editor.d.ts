@@ -11,6 +11,7 @@ declare namespace editor {
          * @param callback 完成回调
          */
         oauth(callback?: () => void): void;
+        getAccessToken(): void;
         getUser(): void;
     }
 }
