@@ -1,10 +1,4 @@
-/// <reference path="../libs/monaco-editor/monaco.d.ts" />
 /// <reference path="../libs/typescriptServices.d.ts" />
-
-// 参考 https://microsoft.github.io/monaco-editor/api/index.html
-
-// 解决monaco-editor在electron下运行问题
-// https://github.com/Microsoft/monaco-editor-samples/blob/master/electron-amd/electron-index.html
 namespace editor
 {
     export var scriptCompiler: ScriptCompiler;

@@ -1,4 +1,3 @@
-/// <reference path="../libs/monaco-editor/monaco.d.ts" />
 /// <reference path="../libs/typescriptServices.d.ts" />
 declare namespace editor {
     var giteeOauth: GiteeOauth;
