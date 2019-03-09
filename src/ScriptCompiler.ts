@@ -20,7 +20,7 @@ namespace editor
         {
             this.tslibs = [];
             feng3d.loadjs.load({
-                paths: ["../feng3d/out/feng3d.d.ts"], onitemload: (url, content) =>
+                paths: ["feng3d/out/feng3d.d.ts"], onitemload: (url, content) =>
                 {
                     this.tslibs.push({ path: url, code: content });
                 },
@@ -176,11 +176,10 @@ script.onload = () =>
     var amdRequire = window["require"];
     window["require"] = nodeRequire;
 
-    //
     amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-    amdRequire(['vs/language/typescript/lib/typescriptServices'], () =>
+    amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function ()
     {
-
+        ts;
     });
 }
 document.body.appendChild(script);

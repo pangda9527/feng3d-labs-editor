@@ -13748,7 +13748,7 @@ var editor;
             this.tslist = [];
             this.tslibs = [];
             feng3d.loadjs.load({
-                paths: ["../feng3d/out/feng3d.d.ts"], onitemload: function (url, content) {
+                paths: ["feng3d/out/feng3d.d.ts"], onitemload: function (url, content) {
                     _this.tslibs.push({ path: url, code: content });
                 },
             });
@@ -13864,9 +13864,9 @@ script.onload = function () {
     // Save Monaco's amd require and restore Node's require
     var amdRequire = window["require"];
     window["require"] = nodeRequire;
-    //
     amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-    amdRequire(['vs/language/typescript/lib/typescriptServices'], function () {
+    amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function () {
+        ts;
     });
 };
 document.body.appendChild(script);
