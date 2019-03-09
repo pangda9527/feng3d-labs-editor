@@ -793,49 +793,6 @@ var editor;
         return EditorRS;
     }(feng3d.ReadWriteRS));
     editor.EditorRS = EditorRS;
-    /**
-     * 读取zip中所有文件到 fs
-     */
-    function readfiles(zip, filepaths, callback) {
-        if (filepaths.length > 0) {
-            var filepath = filepaths.shift();
-            var file = zip.files[filepath];
-            if (file.dir) {
-                editor.editorRS.fs.mkdir(filepath, function (err) {
-                    readfiles(zip, filepaths, callback);
-                });
-            }
-            else {
-                if (feng3d.regExps.image.test(filepath)) {
-                    file.async("arraybuffer").then(function (data) {
-                        editor.editorRS.fs.writeArrayBuffer(filepath, data, function (err) {
-                            if (err)
-                                console.log(err);
-                            readfiles(zip, filepaths, callback);
-                        });
-                    }, function (reason) {
-                        console.warn(reason);
-                        readfiles(zip, filepaths, callback);
-                    });
-                }
-                else {
-                    file.async("string").then(function (data) {
-                        editor.editorRS.fs.writeString(filepath, data, function (err) {
-                            if (err)
-                                console.log(err);
-                            readfiles(zip, filepaths, callback);
-                        });
-                    }, function (reason) {
-                        console.warn(reason);
-                        readfiles(zip, filepaths, callback);
-                    });
-                }
-            }
-        }
-        else {
-            callback();
-        }
-    }
     // if (typeof require == "undefined")
     // {
     feng3d.fs = feng3d.indexedDBFS;

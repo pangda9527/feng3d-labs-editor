@@ -9,8 +9,6 @@ loadjs([
     isdebug ? "libs/modules/eui/eui.js" : "libs/modules/eui/eui.min.js",
     isdebug ? "libs/modules/tween/tween.js" : "libs/modules/tween/tween.min.js",
     //
-    isdebug ? `libs/jszip.js` : "libs/jszip.min.js",
-    isdebug ? `libs/FileSaver.js` : `libs/FileSaver.min.js`,
     `out/editor.js`,
 ], loadComplete);
 

@@ -245,61 +245,6 @@ namespace editor
         }
     }
 
-    /**
-     * 读取zip中所有文件到 fs
-     */
-    function readfiles(zip: JSZip, filepaths: string[], callback: () => void)
-    {
-        if (filepaths.length > 0)
-        {
-            var filepath = filepaths.shift();
-            var file = zip.files[filepath];
-            if (file.dir)
-            {
-                editorRS.fs.mkdir(filepath, (err) =>
-                {
-                    readfiles(zip, filepaths, callback);
-                });
-            } else
-            {
-                if (feng3d.regExps.image.test(filepath))
-                {
-                    file.async("arraybuffer").then((data) =>
-                    {
-                        editorRS.fs.writeArrayBuffer(filepath, data, (err: Error) =>
-                        {
-                            if (err)
-                                console.log(err);
-                            readfiles(zip, filepaths, callback)
-                        });
-                    }, (reason) =>
-                        {
-                            console.warn(reason);
-                            readfiles(zip, filepaths, callback);
-                        });
-                } else
-                {
-                    file.async("string").then((data) =>
-                    {
-                        editorRS.fs.writeString(filepath, data, (err: Error) =>
-                        {
-                            if (err)
-                                console.log(err);
-                            readfiles(zip, filepaths, callback)
-                        });
-                    }, (reason) =>
-                        {
-                            console.warn(reason);
-                            readfiles(zip, filepaths, callback);
-                        });
-                }
-            }
-        } else
-        {
-            callback();
-        }
-    }
-
     // if (typeof require == "undefined")
     // {
     feng3d.fs = feng3d.indexedDBFS;
