@@ -12,10 +12,11 @@ namespace editor
 
     interface APP
     {
-        code?: string;
         client_id: string;
         client_secret: string;
         redirect_uri: string;
+        code?: string;
+        access_token?: string;
     }
 
     var apps: APP[] = [{
@@ -139,7 +140,7 @@ namespace editor
                     // callbackFn(path, result, ev.defaultPrevented, request.responseText);
                 }
             };
-            request.open('Get', `https://gitee.com/api/v5/user?access_token=${oauthCode}`, true);
+            request.open('Get', `https://gitee.com/api/v5/user?access_token=${currentAPP.access_token}`, true);
             request.send();
         }
 

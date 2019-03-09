@@ -14,7 +14,7 @@ var monacoEditor
 
 //
 amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], () =>
+amdRequire(['vs/editor/editor.main'], () =>
 {
     // 设置ts编译选项
     monaco.languages.typescript.typescriptDefaults.setCompilerOptions({

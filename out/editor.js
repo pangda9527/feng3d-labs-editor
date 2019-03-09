@@ -122,7 +122,7 @@ var editor;
                     // callbackFn(path, result, ev.defaultPrevented, request.responseText);
                 }
             };
-            request.open('Get', "https://gitee.com/api/v5/user?access_token=" + oauthCode, true);
+            request.open('Get', "https://gitee.com/api/v5/user?access_token=" + currentAPP.access_token, true);
             request.send();
         };
         return GiteeOauth;
@@ -13736,6 +13736,7 @@ var shortcutConfig = [
     { key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
 ];
 /// <reference path="../libs/monaco-editor/monaco.d.ts" />
+/// <reference path="../libs/typescriptServices.d.ts" />
 // 参考 https://microsoft.github.io/monaco-editor/api/index.html
 // 解决monaco-editor在electron下运行问题
 // https://github.com/Microsoft/monaco-editor-samples/blob/master/electron-amd/electron-index.html
@@ -13854,22 +13855,6 @@ var editor;
     editor.scriptCompiler = new ScriptCompiler();
 })(editor || (editor = {}));
 var codeeditoWin;
-var ts;
-// Monaco uses a custom amd loader that overrides node's require.
-// Keep a reference to node's require so we can restore it after executing the amd loader file.
-var nodeRequire = window["require"];
-var script = document.createElement("script");
-script.src = "libs/monaco-editor/min/vs/loader.js";
-script.onload = function () {
-    // Save Monaco's amd require and restore Node's require
-    var amdRequire = window["require"];
-    window["require"] = nodeRequire;
-    amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-    amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function () {
-        ts;
-    });
-};
-document.body.appendChild(script);
 var editor;
 (function (editor) {
     /**
@@ -13884,7 +13869,7 @@ var editor;
         __extends(Editor, _super);
         function Editor() {
             var _this = _super.call(this) || this;
-            editor.giteeOauth.oauth();
+            // giteeOauth.oauth();
             var mainui = new editor.MainUI(function () {
                 editor.editorui.stage = _this.stage;
                 //

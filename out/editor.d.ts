@@ -1,4 +1,5 @@
 /// <reference path="../libs/monaco-editor/monaco.d.ts" />
+/// <reference path="../libs/typescriptServices.d.ts" />
 declare namespace editor {
     var giteeOauth: GiteeOauth;
     /**
@@ -3459,9 +3460,6 @@ declare namespace editor {
     }
 }
 declare var codeeditoWin: Window;
-declare var ts: any;
-declare var nodeRequire: any;
-declare var script: HTMLScriptElement;
 declare namespace editor {
     var editorData: EditorData;
     /**

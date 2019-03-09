@@ -1,4 +1,5 @@
 /// <reference path="../libs/monaco-editor/monaco.d.ts" />
+/// <reference path="../libs/typescriptServices.d.ts" />
 
 // 参考 https://microsoft.github.io/monaco-editor/api/index.html
 
@@ -74,7 +75,7 @@ namespace editor
 
         private transpileModule()
         {
-            var options = {
+            var options: ts.CompilerOptions = {
                 // module: ts.ModuleKind.AMD,
                 target: ts.ScriptTarget.ES5,
                 noImplicitAny: false,
@@ -161,25 +162,3 @@ namespace editor
 }
 
 var codeeditoWin: Window;
-
-var ts;
-
-// Monaco uses a custom amd loader that overrides node's require.
-// Keep a reference to node's require so we can restore it after executing the amd loader file.
-var nodeRequire = window["require"];
-
-var script = document.createElement("script");
-script.src = "libs/monaco-editor/min/vs/loader.js";
-script.onload = () =>
-{
-    // Save Monaco's amd require and restore Node's require
-    var amdRequire = window["require"];
-    window["require"] = nodeRequire;
-
-    amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-    amdRequire(['vs/editor/editor.main', 'vs/language/typescript/lib/typescriptServices'], function ()
-    {
-        ts;
-    });
-}
-document.body.appendChild(script);

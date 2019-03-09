@@ -20,7 +20,7 @@ namespace editor
         constructor()
         {
             super();
-            giteeOauth.oauth();
+            // giteeOauth.oauth();
 
             var mainui = new MainUI(() =>
             {
