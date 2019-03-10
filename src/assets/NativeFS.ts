@@ -36,9 +36,8 @@ namespace editor
          */
         readArrayBuffer(path: string, callback: (err: Error, arraybuffer: ArrayBuffer) => void)
         {
-            // var realPath = 
-
-            // this.fs.readFile()
+            var realPath = this.getAbsolutePath(path);
+            this.fs.readFile(realPath, callback);
         }
 
         /**
@@ -48,7 +47,14 @@ namespace editor
          */
         readString(path: string, callback: (err: Error, str: string) => void)
         {
-
+            this.readArrayBuffer(path, (err, data) =>
+            {
+                if (err) { callback(err, null); return; }
+                feng3d.dataTransform.arrayBufferToString(data, (content) =>
+                {
+                    callback(null, content);
+                });
+            });
         }
 
         /**
@@ -58,7 +64,15 @@ namespace editor
          */
         readObject(path: string, callback: (err: Error, object: Object) => void)
         {
-
+            this.readArrayBuffer(path, (err, buffer) =>
+            {
+                if (err) { callback(err, null); return; }
+                feng3d.dataTransform.arrayBufferToObject(buffer, (content) =>
+                {
+                    var object = feng3d.serialization.deserialize(content);
+                    callback(null, object);
+                });
+            });
         }
 
         /**
@@ -68,7 +82,14 @@ namespace editor
          */
         readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void)
         {
-
+            this.readArrayBuffer(path, (err, buffer) =>
+            {
+                if (err) { callback(err, null); return; }
+                feng3d.dataTransform.arrayBufferToImage(buffer, (image) =>
+                {
+                    callback(null, image);
+                });
+            });
         }
 
         /**
@@ -89,6 +110,18 @@ namespace editor
         {
             var realPath = this.getAbsolutePath(path);
             this.fs.exists(realPath, callback);
+        }
+
+        /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        isDirectory(path: string, callback: (result: boolean) => void)
+        {
+            var realPath = this.getAbsolutePath(path);
+            this.fs.isDirectory(realPath, callback);
         }
 
         /**
@@ -122,7 +155,16 @@ namespace editor
         deleteFile(path: string, callback?: (err: Error) => void)
         {
             var realPath = this.getAbsolutePath(path);
-            this.isDir
+            this.isDirectory(path, result =>
+            {
+                if (result)
+                {
+                    this.fs.rmdir(realPath, callback);
+                } else
+                {
+                    this.fs.deleteFile(realPath, callback);
+                }
+            });
         }
 
         /**
@@ -133,7 +175,8 @@ namespace editor
          */
         writeArrayBuffer(path: string, arraybuffer: ArrayBuffer, callback?: (err: Error) => void)
         {
-
+            var realPath = this.getAbsolutePath(path);
+            this.fs.writeFile(realPath, arraybuffer, callback);
         }
 
         /**
@@ -144,7 +187,8 @@ namespace editor
          */
         writeString(path: string, str: string, callback?: (err: Error) => void)
         {
-
+            var buffer = feng3d.dataTransform.stringToArrayBuffer(str);
+            this.writeArrayBuffer(path, buffer, callback);
         }
 
         /**
@@ -155,7 +199,9 @@ namespace editor
          */
         writeObject(path: string, object: Object, callback?: (err: Error) => void)
         {
-
+            var obj = feng3d.serialization.serialize(object);
+            var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1')
+            this.writeString(path, str, callback);
         }
 
         /**
@@ -166,7 +212,10 @@ namespace editor
          */
         writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void)
         {
-
+            feng3d.dataTransform.imageToArrayBuffer(image, (buffer) =>
+            {
+                this.writeArrayBuffer(path, buffer, callback);
+            });
         }
 
         /**
@@ -177,7 +226,11 @@ namespace editor
          */
         copyFile(src: string, dest: string, callback?: (err: Error) => void)
         {
-
+            this.readArrayBuffer(src, (err, buffer) =>
+            {
+                if (err) { callback && callback(err); return; }
+                this.writeArrayBuffer(dest, buffer, callback);
+            });
         }
     }
 

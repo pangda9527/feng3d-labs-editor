@@ -23,7 +23,7 @@ namespace editor
 
         save()
         {
-            localStorage.setItem("feng3d-editor", JSON.stringify(this));
+            localStorage.setItem("feng3d-editor", JSON.stringify(this, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1'));
         }
     }
 

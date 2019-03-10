@@ -486,8 +486,8 @@ var editor;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         NativeFS.prototype.readArrayBuffer = function (path, callback) {
-            // var realPath = 
-            // this.fs.readFile()
+            var realPath = this.getAbsolutePath(path);
+            this.fs.readFile(realPath, callback);
         };
         /**
          * 读取文件为字符串
@@ -495,6 +495,15 @@ var editor;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         NativeFS.prototype.readString = function (path, callback) {
+            this.readArrayBuffer(path, function (err, data) {
+                if (err) {
+                    callback(err, null);
+                    return;
+                }
+                feng3d.dataTransform.arrayBufferToString(data, function (content) {
+                    callback(null, content);
+                });
+            });
         };
         /**
          * 读取文件为Object
@@ -502,6 +511,16 @@ var editor;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         NativeFS.prototype.readObject = function (path, callback) {
+            this.readArrayBuffer(path, function (err, buffer) {
+                if (err) {
+                    callback(err, null);
+                    return;
+                }
+                feng3d.dataTransform.arrayBufferToObject(buffer, function (content) {
+                    var object = feng3d.serialization.deserialize(content);
+                    callback(null, object);
+                });
+            });
         };
         /**
          * 加载图片
@@ -509,6 +528,15 @@ var editor;
          * @param callback 加载完成回调
          */
         NativeFS.prototype.readImage = function (path, callback) {
+            this.readArrayBuffer(path, function (err, buffer) {
+                if (err) {
+                    callback(err, null);
+                    return;
+                }
+                feng3d.dataTransform.arrayBufferToImage(buffer, function (image) {
+                    callback(null, image);
+                });
+            });
         };
         /**
          * 获取文件绝对路径
@@ -525,6 +553,16 @@ var editor;
         NativeFS.prototype.exists = function (path, callback) {
             var realPath = this.getAbsolutePath(path);
             this.fs.exists(realPath, callback);
+        };
+        /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        NativeFS.prototype.isDirectory = function (path, callback) {
+            var realPath = this.getAbsolutePath(path);
+            this.fs.isDirectory(realPath, callback);
         };
         /**
          * 读取文件夹中文件列表
@@ -551,8 +589,16 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.deleteFile = function (path, callback) {
+            var _this = this;
             var realPath = this.getAbsolutePath(path);
-            this.isDir;
+            this.isDirectory(path, function (result) {
+                if (result) {
+                    _this.fs.rmdir(realPath, callback);
+                }
+                else {
+                    _this.fs.deleteFile(realPath, callback);
+                }
+            });
         };
         /**
          * 写ArrayBuffer(新建)文件
@@ -561,6 +607,8 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.writeArrayBuffer = function (path, arraybuffer, callback) {
+            var realPath = this.getAbsolutePath(path);
+            this.fs.writeFile(realPath, arraybuffer, callback);
         };
         /**
          * 写字符串到(新建)文件
@@ -569,6 +617,8 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.writeString = function (path, str, callback) {
+            var buffer = feng3d.dataTransform.stringToArrayBuffer(str);
+            this.writeArrayBuffer(path, buffer, callback);
         };
         /**
          * 写Object到(新建)文件
@@ -577,6 +627,9 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.writeObject = function (path, object, callback) {
+            var obj = feng3d.serialization.serialize(object);
+            var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+            this.writeString(path, str, callback);
         };
         /**
          * 写图片
@@ -585,6 +638,10 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.writeImage = function (path, image, callback) {
+            var _this = this;
+            feng3d.dataTransform.imageToArrayBuffer(image, function (buffer) {
+                _this.writeArrayBuffer(path, buffer, callback);
+            });
         };
         /**
          * 复制文件
@@ -593,6 +650,14 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.copyFile = function (src, dest, callback) {
+            var _this = this;
+            this.readArrayBuffer(src, function (err, buffer) {
+                if (err) {
+                    callback && callback(err);
+                    return;
+                }
+                _this.writeArrayBuffer(dest, buffer, callback);
+            });
         };
         return NativeFS;
     }(feng3d.ReadWriteFS));
@@ -845,7 +910,7 @@ var editor;
             }
         }
         EditorCache.prototype.save = function () {
-            localStorage.setItem("feng3d-editor", JSON.stringify(this));
+            localStorage.setItem("feng3d-editor", JSON.stringify(this, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1'));
         };
         return EditorCache;
     }());

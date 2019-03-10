@@ -220,6 +220,13 @@ declare namespace editor {
          */
         exists(path: string, callback: (exists: boolean) => void): void;
         /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        isDirectory(path: string, callback: (result: boolean) => void): void;
+        /**
          * 读取文件夹中文件列表
          *
          * @param path 路径
