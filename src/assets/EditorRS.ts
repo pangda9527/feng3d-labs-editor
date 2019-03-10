@@ -22,41 +22,11 @@ namespace editor
          */
         hasProject(projectname: string, callback: (has: boolean) => void)
         {
-            var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBFS)
+            this.fs.getProjectList((err, projects) =>
             {
-                feng3d._indexedDB.hasObjectStore(readWriteFS.DBname, projectname, callback);
-            } else if (readWriteFS["getProjectList"] != null)
-            {
-                readWriteFS["getProjectList"]((err: Error, projects: string[]) =>
-                {
-                    if (err)
-                        throw err;
-                    callback(projects.indexOf(projectname) != -1);
-                });
-            } else
-            {
-                throw "未完成 hasProject 功能！";
-            }
-        }
-
-        /**
-         * 获取项目列表
-         * @param callback 回调函数
-         */
-        getProjectList(callback: (err: Error, projects: string[]) => void)
-        {
-            var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBFS)
-            {
-                feng3d._indexedDB.getObjectStoreNames(readWriteFS.DBname, callback)
-            } else if (readWriteFS["getProjectList"] != null)
-            {
-                readWriteFS["getProjectList"](callback);
-            } else
-            {
-                throw "未完成 hasProject 功能！";
-            }
+                if (err) throw err;
+                callback(projects.indexOf(projectname) != -1);
+            });
         }
 
         /**
@@ -89,7 +59,6 @@ namespace editor
                         feng3d.error(err);
                     callback();
                 });
-
             } else
             {
                 throw "未完成 hasProject 功能！";
@@ -245,16 +214,16 @@ namespace editor
         }
     }
 
-    // if (typeof require == "undefined")
-    // {
-    feng3d.fs = feng3d.indexedDBFS;
-    feng3d.rs = editorRS = new EditorRS();
-    // } else
-    // {
-    //     var nativeFS = require(__dirname + "/native/NativeFS.js").nativeFS;
-    //     feng3d.fs = nativeFS;
-    //     feng3d.rs = editorRS = new EditorRS();
-    // }
+    if (typeof require == "undefined")
+    {
+        feng3d.fs = feng3d.indexedDBFS;
+        feng3d.rs = editorRS = new EditorRS();
+    } else
+    {
+        var nativeFS = require(__dirname + "/native/NativeFSBase.js").nativeFS;
+        feng3d.fs = new NativeFS(nativeFS);
+        feng3d.rs = editorRS = new EditorRS();
+    }
 
     //
     var isSelectFile = false;

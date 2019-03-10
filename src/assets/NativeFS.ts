@@ -232,6 +232,16 @@ namespace editor
                 this.writeArrayBuffer(dest, buffer, callback);
             });
         }
+
+        /**
+         * 获取项目列表
+         * 
+         * @param callback 完成回调
+         */
+        getProjectList(callback: (err: Error, projects: string[]) => void)
+        {
+            this.fs.readdir(this.workspace, callback);
+        }
     }
 
     /**

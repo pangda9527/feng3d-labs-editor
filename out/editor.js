@@ -659,6 +659,14 @@ var editor;
                 _this.writeArrayBuffer(dest, buffer, callback);
             });
         };
+        /**
+         * 获取项目列表
+         *
+         * @param callback 完成回调
+         */
+        NativeFS.prototype.getProjectList = function (callback) {
+            this.fs.readdir(this.workspace, callback);
+        };
         return NativeFS;
     }(feng3d.ReadWriteFS));
     editor.NativeFS = NativeFS;
@@ -679,36 +687,11 @@ var editor;
          * @param callback 回调函数
          */
         EditorRS.prototype.hasProject = function (projectname, callback) {
-            var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBFS) {
-                feng3d._indexedDB.hasObjectStore(readWriteFS.DBname, projectname, callback);
-            }
-            else if (readWriteFS["getProjectList"] != null) {
-                readWriteFS["getProjectList"](function (err, projects) {
-                    if (err)
-                        throw err;
-                    callback(projects.indexOf(projectname) != -1);
-                });
-            }
-            else {
-                throw "未完成 hasProject 功能！";
-            }
-        };
-        /**
-         * 获取项目列表
-         * @param callback 回调函数
-         */
-        EditorRS.prototype.getProjectList = function (callback) {
-            var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBFS) {
-                feng3d._indexedDB.getObjectStoreNames(readWriteFS.DBname, callback);
-            }
-            else if (readWriteFS["getProjectList"] != null) {
-                readWriteFS["getProjectList"](callback);
-            }
-            else {
-                throw "未完成 hasProject 功能！";
-            }
+            this.fs.getProjectList(function (err, projects) {
+                if (err)
+                    throw err;
+                callback(projects.indexOf(projectname) != -1);
+            });
         };
         /**
          * 初始化项目
@@ -866,16 +849,15 @@ var editor;
         return EditorRS;
     }(feng3d.ReadWriteRS));
     editor.EditorRS = EditorRS;
-    // if (typeof require == "undefined")
-    // {
-    feng3d.fs = feng3d.indexedDBFS;
-    feng3d.rs = editor.editorRS = new EditorRS();
-    // } else
-    // {
-    //     var nativeFS = require(__dirname + "/native/NativeFS.js").nativeFS;
-    //     feng3d.fs = nativeFS;
-    //     feng3d.rs = editorRS = new EditorRS();
-    // }
+    if (typeof require == "undefined") {
+        feng3d.fs = feng3d.indexedDBFS;
+        feng3d.rs = editor.editorRS = new EditorRS();
+    }
+    else {
+        var nativeFS = require(__dirname + "/native/NativeFSBase.js").nativeFS;
+        feng3d.fs = new editor.NativeFS(nativeFS);
+        feng3d.rs = editor.editorRS = new EditorRS();
+    }
     //
     var isSelectFile = false;
     var fileInput = document.createElement('input');
