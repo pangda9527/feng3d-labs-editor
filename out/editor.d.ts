@@ -211,9 +211,8 @@ declare namespace editor {
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
-         * @param callback 回调函数
          */
-        getAbsolutePath(path: string, callback: (err: Error, absolutePath: string) => void): void;
+        getAbsolutePath(path: string): string;
         /**
          * 文件是否存在
          * @param path 文件路径
@@ -318,6 +317,13 @@ declare namespace editor {
          * @param callback 完成回调
          */
         rmdir(path: string, callback: (err: Error) => void): void;
+        /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        isDirectory(path: string, callback: (result: boolean) => void): void;
         /**
          * 写ArrayBuffer(新建)文件
          *

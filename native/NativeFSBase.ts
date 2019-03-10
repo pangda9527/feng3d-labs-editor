@@ -1,10 +1,5 @@
 import * as fs from 'fs';
 
-interface A
-{
-    
-}
-
 /**
  * Native文件系统
  */
@@ -22,7 +17,8 @@ export class NativeFSBase
      */
     exists(path: string, callback: (exists: boolean) => void): void
     {
-        fs.exists(path, callback);
+        var exists = fs.existsSync(path);
+        callback(exists);
     }
 
     /**
@@ -76,6 +72,18 @@ export class NativeFSBase
     rmdir(path: string, callback: (err: Error) => void)
     {
         fs.rmdir(path, callback);
+    }
+
+    /**
+     * 是否为文件夹
+     * 
+     * @param path 文件路径
+     * @param callback 完成回调
+     */
+    isDirectory(path: string, callback: (result: boolean) => void)
+    {
+        var stats = fs.statSync(path);
+        callback(stats && stats.isDirectory());
     }
 
     /**

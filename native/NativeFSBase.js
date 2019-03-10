@@ -20,7 +20,8 @@ var NativeFSBase = /** @class */ (function () {
      * @param callback 回调函数
      */
     NativeFSBase.prototype.exists = function (path, callback) {
-        fs.exists(path, callback);
+        var exists = fs.existsSync(path);
+        callback(exists);
     };
     /**
      * 读取文件夹中文件列表
@@ -64,6 +65,16 @@ var NativeFSBase = /** @class */ (function () {
      */
     NativeFSBase.prototype.rmdir = function (path, callback) {
         fs.rmdir(path, callback);
+    };
+    /**
+     * 是否为文件夹
+     *
+     * @param path 文件路径
+     * @param callback 完成回调
+     */
+    NativeFSBase.prototype.isDirectory = function (path, callback) {
+        var stats = fs.statSync(path);
+        callback(stats && stats.isDirectory());
     };
     /**
      * 写ArrayBuffer(新建)文件

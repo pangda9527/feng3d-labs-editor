@@ -121,16 +121,9 @@ namespace editor
 								runwin = window.open(`run.html?fstype=${feng3d.fs.type}&project=${editorcache.projectname}`);
 								return;
 							}
-							editorRS.fs.getAbsolutePath("index.html", (err, path) =>
-							{
-								if (err)
-								{
-									feng3d.warn(err);
-									return;
-								}
-								if (runwin) runwin.close();
-								runwin = window.open(path);
-							});
+							var path = editorRS.fs.getAbsolutePath("index.html");
+							if (runwin) runwin.close();
+							runwin = window.open(path);
 						});
 					});
 					break;

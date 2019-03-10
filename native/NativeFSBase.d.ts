@@ -46,6 +46,13 @@ export declare class NativeFSBase {
      */
     rmdir(path: string, callback: (err: Error) => void): void;
     /**
+     * 是否为文件夹
+     *
+     * @param path 文件路径
+     * @param callback 完成回调
+     */
+    isDirectory(path: string, callback: (result: boolean) => void): void;
+    /**
      * 写ArrayBuffer(新建)文件
      *
      * @param path 文件路径

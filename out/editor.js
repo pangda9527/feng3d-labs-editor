@@ -486,6 +486,8 @@ var editor;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         NativeFS.prototype.readArrayBuffer = function (path, callback) {
+            // var realPath = 
+            // this.fs.readFile()
         };
         /**
          * 读取文件为字符串
@@ -511,9 +513,9 @@ var editor;
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
-         * @param callback 回调函数
          */
-        NativeFS.prototype.getAbsolutePath = function (path, callback) {
+        NativeFS.prototype.getAbsolutePath = function (path) {
+            return this.workspace + this.projectname + "/" + path;
         };
         /**
          * 文件是否存在
@@ -521,7 +523,8 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.exists = function (path, callback) {
-            this.fs.exists(path, callback);
+            var realPath = this.getAbsolutePath(path);
+            this.fs.exists(realPath, callback);
         };
         /**
          * 读取文件夹中文件列表
@@ -530,7 +533,8 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.readdir = function (path, callback) {
-            this.fs;
+            var realPath = this.getAbsolutePath(path);
+            this.fs.readdir(realPath, callback);
         };
         /**
          * 新建文件夹
@@ -538,6 +542,8 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.mkdir = function (path, callback) {
+            var realPath = this.getAbsolutePath(path);
+            this.fs.mkdir(realPath, callback);
         };
         /**
          * 删除文件
@@ -545,6 +551,8 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.deleteFile = function (path, callback) {
+            var realPath = this.getAbsolutePath(path);
+            this.isDir;
         };
         /**
          * 写ArrayBuffer(新建)文件
@@ -7859,15 +7867,10 @@ var editor;
                                 editor.runwin = window.open("run.html?fstype=" + feng3d.fs.type + "&project=" + editor.editorcache.projectname);
                                 return;
                             }
-                            editor.editorRS.fs.getAbsolutePath("index.html", function (err, path) {
-                                if (err) {
-                                    feng3d.warn(err);
-                                    return;
-                                }
-                                if (editor.runwin)
-                                    editor.runwin.close();
-                                editor.runwin = window.open(path);
-                            });
+                            var path = editor.editorRS.fs.getAbsolutePath("index.html");
+                            if (editor.runwin)
+                                editor.runwin.close();
+                            editor.runwin = window.open(path);
                         });
                     });
                     break;
