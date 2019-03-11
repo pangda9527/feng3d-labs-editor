@@ -286,6 +286,12 @@ declare namespace editor {
          * @param callback 完成回调
          */
         getProjectList(callback: (err: Error, projects: string[]) => void): void;
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        initproject(projectname: string, callback: (err: Error) => void): void;
     }
     /**
      * Native文件系统
@@ -360,18 +366,6 @@ declare namespace editor {
      * 编辑器资源系统
      */
     class EditorRS extends feng3d.ReadWriteRS {
-        /**
-         * 是否存在指定项目
-         * @param projectname 项目名称
-         * @param callback 回调函数
-         */
-        hasProject(projectname: string, callback: (has: boolean) => void): void;
-        /**
-         * 初始化项目
-         * @param projectname 项目名称
-         * @param callback 回调函数
-         */
-        initproject(projectname: string, callback: () => void): void;
         /**
          * 创建项目
          */
@@ -2156,7 +2150,6 @@ declare namespace editor {
         private onComplete;
         private onAddedToStage;
         private onRemovedFromStage;
-        private onMainMenu;
         private onHelpButtonClick;
         private onButtonClick;
         private updateview;
@@ -2751,6 +2744,12 @@ declare namespace editor {
          */
         getNode(gameObject: feng3d.GameObject): HierarchyNode;
         delete(gameobject: feng3d.GameObject): void;
+        /**
+         * 添加游戏对象到层级树
+         *
+         * @param gameobject 游戏对象
+         */
+        addGameObject(gameobject: feng3d.GameObject): void;
         addGameoObjectFromAsset(gameobject: feng3d.GameObject, parent?: feng3d.GameObject): void;
         private _selectedGameObjects;
         private rootGameObjectChanged;
@@ -3388,16 +3387,28 @@ declare namespace editor {
     var threejsLoader: ThreejsLoader;
 }
 declare namespace editor {
-    var mainMenu: MenuItem[];
     /**
-     * 层级界面创建3D对象列表数据
+     * 菜单配置
      */
-    var createObjectConfig: MenuItem[];
+    var menuConfig: MenuConfig;
     /**
-     * 获取创建游戏对象组件菜单
-     * @param gameobject 游戏对象
+     * 菜单配置
      */
-    function getCreateComponentMenu(gameobject: feng3d.GameObject): MenuItem[];
+    class MenuConfig {
+        /**
+         * 主菜单
+         */
+        getMainMenu(): MenuItem[];
+        /**
+         * 层级界面创建3D对象列表数据
+         */
+        getCreateObjectMenu(): MenuItem[];
+        /**
+         * 获取创建游戏对象组件菜单
+         * @param gameobject 游戏对象
+         */
+        getCreateComponentMenu(gameobject: feng3d.GameObject): MenuItem[];
+    }
 }
 declare namespace editor {
 }

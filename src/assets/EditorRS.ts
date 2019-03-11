@@ -14,63 +14,12 @@ namespace editor
      */
     export class EditorRS extends feng3d.ReadWriteRS
     {
-
-        /**
-         * 是否存在指定项目
-         * @param projectname 项目名称
-         * @param callback 回调函数
-         */
-        hasProject(projectname: string, callback: (has: boolean) => void)
-        {
-            this.fs.getProjectList((err, projects) =>
-            {
-                if (err) throw err;
-                callback(projects.indexOf(projectname) != -1);
-            });
-        }
-
-        /**
-         * 初始化项目
-         * @param projectname 项目名称
-         * @param callback 回调函数
-         */
-        initproject(projectname: string, callback: () => void)
-        {
-            var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBFS)
-            {
-                feng3d._indexedDB.createObjectStore(readWriteFS.DBname, projectname, (err) =>
-                {
-                    if (err)
-                    {
-                        feng3d.warn(err);
-                        return;
-                    }
-                    readWriteFS.projectname = projectname;
-                    // todo 启动监听 ts代码变化自动编译
-                    callback();
-                });
-            } else if (readWriteFS.type == feng3d.FSType.native)
-            {
-                readWriteFS.projectname = projectname;
-                readWriteFS.mkdir("", (err) =>
-                {
-                    if (err)
-                        feng3d.error(err);
-                    callback();
-                });
-            } else
-            {
-                throw "未完成 hasProject 功能！";
-            }
-        }
-
         /**
          * 创建项目
          */
         createproject(projectname: string, callback: () => void)
         {
-            editorRS.initproject(projectname, () =>
+            this.fs.initproject(projectname, () =>
             {
                 var urls = [
                     ["resource/template/app.js", "app.js"],
@@ -145,7 +94,7 @@ namespace editor
         exportProject(callback: (err: Error, data: Blob) => void)
         {
             var zip = new JSZip();
-            editorRS.fs.getAllfilepathInFolder("", (err, filepaths) =>
+            this.fs.getAllfilepathInFolder("", (err, filepaths) =>
             {
                 readfiles();
                 function readfiles()
@@ -153,7 +102,7 @@ namespace editor
                     if (filepaths.length > 0)
                     {
                         var filepath = filepaths.shift();
-                        editorRS.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        this.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                         {
                             //处理文件夹
                             data && zip.file(filepath, data);
@@ -169,6 +118,7 @@ namespace editor
                 }
             });
         }
+
         /**
          * 导入项目
          */
@@ -189,7 +139,7 @@ namespace editor
                         var filepath = filepaths.shift();
                         if (value.files[filepath].dir)
                         {
-                            editorRS.fs.mkdir(filepath, (err) =>
+                            this.fs.mkdir(filepath, (err) =>
                             {
                                 writeFiles();
                             });
@@ -197,7 +147,7 @@ namespace editor
                         {
                             zip.file(filepath).async("arraybuffer").then((data) =>
                             {
-                                editorRS.fs.writeArrayBuffer(filepath, data, (err) =>
+                                this.fs.writeArrayBuffer(filepath, data, (err) =>
                                 {
                                     writeFiles();
                                 });

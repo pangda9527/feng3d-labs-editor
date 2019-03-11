@@ -65,13 +65,13 @@ namespace editor
             feng3d.shortcut.dispatch("lookToSelectedGameObject");
         }
 
-        private onrightclick(e)
+        private onrightclick()
         {
-            var menuconfig: MenuItem[] = [];
+            var menus: MenuItem[] = [];
             //scene3d无法删除
             if (this.data.gameobject.scene.gameObject != this.data.gameobject)
             {
-                menuconfig.push(
+                menus.push(
                     {
                         label: "删除", click: () =>
                         {
@@ -81,10 +81,10 @@ namespace editor
                 );
             }
 
-            menuconfig = menuconfig.concat({ type: 'separator' }, createObjectConfig);
+            menus = menus.concat({ type: 'separator' }, menuConfig.getCreateObjectMenu());
 
-            if (menuconfig.length > 0)
-                menu.popup(menuconfig);
+            if (menus.length > 0)
+                menu.popup(menus);
         }
     }
 }

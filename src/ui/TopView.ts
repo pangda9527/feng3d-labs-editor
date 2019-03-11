@@ -73,11 +73,6 @@ namespace editor
 			runwin = null;
 		}
 
-		private onMainMenu(item: { label: string; command: string; })
-		{
-			feng3d.feng3dDispatcher.dispatch(<any>item.command);
-		}
-
 		private onHelpButtonClick()
 		{
 			window.open("http://feng3d.com");
@@ -88,7 +83,7 @@ namespace editor
 			switch (event.currentTarget)
 			{
 				case this.mainButton:
-					menu.popup(mainMenu);
+					menu.popup(menuConfig.getMainMenu());
 					break;
 				case this.moveButton:
 					editorData.toolType = MRSToolType.MOVE;

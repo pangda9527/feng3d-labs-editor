@@ -42,6 +42,21 @@ namespace editor
             }
         }
 
+        /**
+         * 添加游戏对象到层级树
+         * 
+         * @param gameobject 游戏对象
+         */
+        addGameObject(gameobject: feng3d.GameObject)
+        {
+            var selectedNode = this.getSelectedNode();
+            if (selectedNode)
+                selectedNode.gameobject.addChild(gameobject);
+            else
+                this.rootnode.gameobject.addChild(gameobject);
+            editorData.selectObject(gameobject);
+        }
+
         addGameoObjectFromAsset(gameobject: feng3d.GameObject, parent?: feng3d.GameObject)
         {
             gameobject = feng3d.serialization.clone(gameobject);

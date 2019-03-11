@@ -37,6 +37,8 @@ namespace editor
                 this.stage.addChild(popupLayer);
                 editorui.popupLayer = popupLayer;
 
+                editorcache.projectname = editorcache.projectname || "newproject";
+
                 this.initproject(() =>
                 {
                     setTimeout(() =>
@@ -90,18 +92,16 @@ namespace editor
 
         private initproject(callback: () => void)
         {
-            editorcache.projectname = editorcache.projectname || "newproject";
-
-            editorRS.hasProject(editorcache.projectname, (has) =>
+            editorRS.fs.hasProject(editorcache.projectname, (has) =>
             {
                 if (has)
                 {
-                    editorRS.initproject(editorcache.projectname, callback);
+                    editorRS.fs.initproject(editorcache.projectname, callback);
                 } else
                 {
                     editorRS.createproject(editorcache.projectname, () =>
                     {
-                        editorRS.initproject(editorcache.projectname, callback);
+                        editorRS.fs.initproject(editorcache.projectname, callback);
                     });
                 }
             });

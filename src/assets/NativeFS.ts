@@ -9,7 +9,7 @@ namespace editor
         /**
          * 工作空间路径，工作空间内存放所有编辑器项目
          */
-        workspace = "c:/editorworkspace/";
+        workspace = "c:/editorworkspace";
 
         /**
          * 项目名称
@@ -98,7 +98,7 @@ namespace editor
          */
         getAbsolutePath(path: string)
         {
-            return this.workspace + this.projectname + "/" + path;
+            return this.workspace + "/" + this.projectname + "/" + path;
         }
 
         /**
@@ -241,6 +241,17 @@ namespace editor
         getProjectList(callback: (err: Error, projects: string[]) => void)
         {
             this.fs.readdir(this.workspace, callback);
+        }
+
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        initproject(projectname: string, callback: (err: Error) => void)
+        {
+            this.projectname = projectname;
+            this.fs.mkdir(this.workspace + "/" + this.projectname, callback);
         }
     }
 

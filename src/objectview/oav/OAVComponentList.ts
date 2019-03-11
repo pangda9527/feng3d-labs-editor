@@ -17,7 +17,7 @@ namespace editor
 
 		private onAddComponentButtonClick()
 		{
-			menu.popup(getCreateComponentMenu(this.space));
+			menu.popup(menuConfig.getCreateComponentMenu(this.space));
 		}
 
 		get space()

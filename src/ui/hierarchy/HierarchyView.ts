@@ -101,7 +101,7 @@ namespace editor
 			if (e.target == this.list)
 			{
 				editorData.selectObject(null);
-				menu.popup(createObjectConfig, { mousex: feng3d.windowEventProxy.clientX, mousey: feng3d.windowEventProxy.clientY });
+				menu.popup(menuConfig.getCreateObjectMenu(), { mousex: feng3d.windowEventProxy.clientX, mousey: feng3d.windowEventProxy.clientY });
 			}
 		}
 	}

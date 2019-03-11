@@ -468,7 +468,7 @@ var editor;
             /**
              * 工作空间路径，工作空间内存放所有编辑器项目
              */
-            _this.workspace = "c:/editorworkspace/";
+            _this.workspace = "c:/editorworkspace";
             /**
              * 项目名称
              */
@@ -543,7 +543,7 @@ var editor;
          * @param path （相对）路径
          */
         NativeFS.prototype.getAbsolutePath = function (path) {
-            return this.workspace + this.projectname + "/" + path;
+            return this.workspace + "/" + this.projectname + "/" + path;
         };
         /**
          * 文件是否存在
@@ -667,6 +667,15 @@ var editor;
         NativeFS.prototype.getProjectList = function (callback) {
             this.fs.readdir(this.workspace, callback);
         };
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        NativeFS.prototype.initproject = function (projectname, callback) {
+            this.projectname = projectname;
+            this.fs.mkdir(this.workspace + "/" + this.projectname, callback);
+        };
         return NativeFS;
     }(feng3d.ReadWriteFS));
     editor.NativeFS = NativeFS;
@@ -682,53 +691,11 @@ var editor;
             return _super !== null && _super.apply(this, arguments) || this;
         }
         /**
-         * 是否存在指定项目
-         * @param projectname 项目名称
-         * @param callback 回调函数
-         */
-        EditorRS.prototype.hasProject = function (projectname, callback) {
-            this.fs.getProjectList(function (err, projects) {
-                if (err)
-                    throw err;
-                callback(projects.indexOf(projectname) != -1);
-            });
-        };
-        /**
-         * 初始化项目
-         * @param projectname 项目名称
-         * @param callback 回调函数
-         */
-        EditorRS.prototype.initproject = function (projectname, callback) {
-            var readWriteFS = this.fs;
-            if (readWriteFS instanceof feng3d.IndexedDBFS) {
-                feng3d._indexedDB.createObjectStore(readWriteFS.DBname, projectname, function (err) {
-                    if (err) {
-                        feng3d.warn(err);
-                        return;
-                    }
-                    readWriteFS.projectname = projectname;
-                    // todo 启动监听 ts代码变化自动编译
-                    callback();
-                });
-            }
-            else if (readWriteFS.type == feng3d.FSType.native) {
-                readWriteFS.projectname = projectname;
-                readWriteFS.mkdir("", function (err) {
-                    if (err)
-                        feng3d.error(err);
-                    callback();
-                });
-            }
-            else {
-                throw "未完成 hasProject 功能！";
-            }
-        };
-        /**
          * 创建项目
          */
         EditorRS.prototype.createproject = function (projectname, callback) {
             var _this = this;
-            editor.editorRS.initproject(projectname, function () {
+            this.fs.initproject(projectname, function () {
                 var urls = [
                     ["resource/template/app.js", "app.js"],
                     ["resource/template/index.html", "index.html"],
@@ -795,12 +762,12 @@ var editor;
          */
         EditorRS.prototype.exportProject = function (callback) {
             var zip = new JSZip();
-            editor.editorRS.fs.getAllfilepathInFolder("", function (err, filepaths) {
+            this.fs.getAllfilepathInFolder("", function (err, filepaths) {
                 readfiles();
                 function readfiles() {
                     if (filepaths.length > 0) {
                         var filepath = filepaths.shift();
-                        editor.editorRS.fs.readArrayBuffer(filepath, function (err, data) {
+                        this.fs.readArrayBuffer(filepath, function (err, data) {
                             //处理文件夹
                             data && zip.file(filepath, data);
                             readfiles();
@@ -824,16 +791,17 @@ var editor;
                 filepaths.sort();
                 writeFiles();
                 function writeFiles() {
+                    var _this = this;
                     if (filepaths.length > 0) {
                         var filepath = filepaths.shift();
                         if (value.files[filepath].dir) {
-                            editor.editorRS.fs.mkdir(filepath, function (err) {
+                            this.fs.mkdir(filepath, function (err) {
                                 writeFiles();
                             });
                         }
                         else {
                             zip.file(filepath).async("arraybuffer").then(function (data) {
-                                editor.editorRS.fs.writeArrayBuffer(filepath, data, function (err) {
+                                _this.fs.writeArrayBuffer(filepath, data, function (err) {
                                     writeFiles();
                                 });
                             }, function (reason) {
@@ -5639,7 +5607,7 @@ var editor;
             return _this;
         }
         OAVComponentList.prototype.onAddComponentButtonClick = function () {
-            editor.menu.popup(editor.getCreateComponentMenu(this.space));
+            editor.menu.popup(editor.menuConfig.getCreateComponentMenu(this.space));
         };
         Object.defineProperty(OAVComponentList.prototype, "space", {
             get: function () {
@@ -6693,20 +6661,20 @@ var editor;
         HierarchyTreeItemRenderer.prototype.onDoubleClick = function () {
             feng3d.shortcut.dispatch("lookToSelectedGameObject");
         };
-        HierarchyTreeItemRenderer.prototype.onrightclick = function (e) {
+        HierarchyTreeItemRenderer.prototype.onrightclick = function () {
             var _this = this;
-            var menuconfig = [];
+            var menus = [];
             //scene3d无法删除
             if (this.data.gameobject.scene.gameObject != this.data.gameobject) {
-                menuconfig.push({
+                menus.push({
                     label: "删除", click: function () {
                         _this.data.gameobject.parent.removeChild(_this.data.gameobject);
                     }
                 });
             }
-            menuconfig = menuconfig.concat({ type: 'separator' }, editor.createObjectConfig);
-            if (menuconfig.length > 0)
-                editor.menu.popup(menuconfig);
+            menus = menus.concat({ type: 'separator' }, editor.menuConfig.getCreateObjectMenu());
+            if (menus.length > 0)
+                editor.menu.popup(menus);
         };
         return HierarchyTreeItemRenderer;
     }(editor.TreeItemRenderer));
@@ -6778,7 +6746,7 @@ var editor;
         HierarchyView.prototype.onListRightClick = function (e) {
             if (e.target == this.list) {
                 editor.editorData.selectObject(null);
-                editor.menu.popup(editor.createObjectConfig, { mousex: feng3d.windowEventProxy.clientX, mousey: feng3d.windowEventProxy.clientY });
+                editor.menu.popup(editor.menuConfig.getCreateObjectMenu(), { mousex: feng3d.windowEventProxy.clientX, mousey: feng3d.windowEventProxy.clientY });
             }
         };
         return HierarchyView;
@@ -7875,16 +7843,13 @@ var editor;
                 editor.runwin.close();
             editor.runwin = null;
         };
-        TopView.prototype.onMainMenu = function (item) {
-            feng3d.feng3dDispatcher.dispatch(item.command);
-        };
         TopView.prototype.onHelpButtonClick = function () {
             window.open("http://feng3d.com");
         };
         TopView.prototype.onButtonClick = function (event) {
             switch (event.currentTarget) {
                 case this.mainButton:
-                    editor.menu.popup(editor.mainMenu);
+                    editor.menu.popup(editor.menuConfig.getMainMenu());
                     break;
                 case this.moveButton:
                     editor.editorData.toolType = editor.MRSToolType.MOVE;
@@ -10032,6 +9997,19 @@ var editor;
                 node.destroy();
                 nodeMap.delete(gameobject);
             }
+        };
+        /**
+         * 添加游戏对象到层级树
+         *
+         * @param gameobject 游戏对象
+         */
+        Hierarchy.prototype.addGameObject = function (gameobject) {
+            var selectedNode = this.getSelectedNode();
+            if (selectedNode)
+                selectedNode.gameobject.addChild(gameobject);
+            else
+                this.rootnode.gameobject.addChild(gameobject);
+            editor.editorData.selectObject(gameobject);
         };
         Hierarchy.prototype.addGameoObjectFromAsset = function (gameobject, parent) {
             gameobject = feng3d.serialization.clone(gameobject);
@@ -13344,303 +13322,313 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    editor.mainMenu = [
-        {
-            label: "新建项目", click: function () {
-                editor.popupview.popupObject({ newprojectname: "newproject" }, function (data) {
-                    if (data.newprojectname && data.newprojectname.length > 0) {
-                        editor.editorcache.projectname = data.newprojectname;
-                        window.location.reload();
+    /**
+     * 菜单配置
+     */
+    var MenuConfig = /** @class */ (function () {
+        function MenuConfig() {
+        }
+        /**
+         * 主菜单
+         */
+        MenuConfig.prototype.getMainMenu = function () {
+            var mainMenu = [
+                {
+                    label: "新建项目", click: function () {
+                        editor.popupview.popupObject({ newprojectname: "newproject" }, function (data) {
+                            if (data.newprojectname && data.newprojectname.length > 0) {
+                                editor.editorcache.projectname = data.newprojectname;
+                                window.location.reload();
+                            }
+                        });
                     }
-                });
-            }
-        },
-        {
-            label: "打开项目",
-            submenu: getProjectsMenu(),
-            click: function () {
-                editor.popupview.popupObject({ newprojectname: "newproject" }, function (data) {
-                    if (data.newprojectname && data.newprojectname.length > 0) {
-                        editor.editorcache.projectname = data.newprojectname;
-                        window.location.reload();
+                },
+                {
+                    label: "打开项目",
+                    submenu: getProjectsMenu(),
+                    click: function () {
+                        editor.popupview.popupObject({ newprojectname: "newproject" }, function (data) {
+                            if (data.newprojectname && data.newprojectname.length > 0) {
+                                editor.editorcache.projectname = data.newprojectname;
+                                window.location.reload();
+                            }
+                        });
                     }
-                });
-            }
-        },
-        {
-            label: "保存场景", click: function () {
-                var gameobject = editor.hierarchy.rootnode.gameobject;
-                editor.editorAsset.saveObject(gameobject);
-            }
-        },
-        {
-            label: "导入项目", click: function () {
-                editor.editorRS.selectFile(function (filelist) {
-                    editor.editorRS.importProject(filelist.item(0), function () {
-                        console.log("导入项目完成");
-                        editor.editorAsset.initproject(function () {
-                            editor.editorAsset.runProjectScript(function () {
-                                editor.editorAsset.readScene("default.scene.json", function (err, scene) {
-                                    editor.engine.scene = scene;
-                                    editor.editorui.assetview.invalidateAssettree();
-                                    console.log("导入项目完成!");
+                },
+                {
+                    label: "保存场景", click: function () {
+                        var gameobject = editor.hierarchy.rootnode.gameobject;
+                        editor.editorAsset.saveObject(gameobject);
+                    }
+                },
+                {
+                    label: "导入项目", click: function () {
+                        editor.editorRS.selectFile(function (filelist) {
+                            editor.editorRS.importProject(filelist.item(0), function () {
+                                console.log("导入项目完成");
+                                editor.editorAsset.initproject(function () {
+                                    editor.editorAsset.runProjectScript(function () {
+                                        editor.editorAsset.readScene("default.scene.json", function (err, scene) {
+                                            editor.engine.scene = scene;
+                                            editor.editorui.assetview.invalidateAssettree();
+                                            console.log("导入项目完成!");
+                                        });
+                                    });
                                 });
                             });
                         });
-                    });
-                });
-            }
-        },
-        {
-            label: "导出项目", click: function () {
-                editor.editorRS.exportProject(function (err, content) {
-                    // see FileSaver.js
-                    saveAs(content, editor.editorcache.projectname + ".feng3d.zip");
-                });
-            }
-        },
-        {
-            label: "打开网络项目",
-            submenu: [
+                    }
+                },
                 {
-                    label: "地形", click: function () {
-                        openDownloadProject("terrain.feng3d.zip");
+                    label: "导出项目", click: function () {
+                        editor.editorRS.exportProject(function (err, content) {
+                            // see FileSaver.js
+                            saveAs(content, editor.editorcache.projectname + ".feng3d.zip");
+                        });
+                    }
+                },
+                {
+                    label: "打开网络项目",
+                    submenu: [
+                        {
+                            label: "地形", click: function () {
+                                openDownloadProject("terrain.feng3d.zip");
+                            },
+                        },
+                        {
+                            label: "自定义材质", click: function () {
+                                openDownloadProject("customshader.feng3d.zip");
+                            },
+                        },
+                        {
+                            label: "水", click: function () {
+                                openDownloadProject("water.feng3d.zip");
+                            },
+                        },
+                        {
+                            label: "灯光", click: function () {
+                                openDownloadProject("light.feng3d.zip");
+                            },
+                        },
+                    ],
+                },
+                {
+                    label: "下载网络项目",
+                    submenu: [
+                        {
+                            label: "地形", click: function () {
+                                downloadProject("terrain.feng3d.zip");
+                            },
+                        },
+                        {
+                            label: "自定义材质", click: function () {
+                                downloadProject("customshader.feng3d.zip");
+                            },
+                        },
+                        {
+                            label: "水", click: function () {
+                                downloadProject("water.feng3d.zip");
+                            },
+                        },
+                        {
+                            label: "灯光", click: function () {
+                                downloadProject("light.feng3d.zip");
+                            },
+                        },
+                    ],
+                },
+                {
+                    label: "升级项目",
+                    click: function () {
+                        editor.editorRS.upgradeProject(function () {
+                            alert("升级完成！");
+                        });
                     },
                 },
                 {
-                    label: "自定义材质", click: function () {
-                        openDownloadProject("customshader.feng3d.zip");
+                    label: "清空项目",
+                    click: function () {
+                        editor.editorAsset.rootFile.remove();
+                        editor.editorAsset.initproject(function () {
+                            editor.editorAsset.runProjectScript(function () {
+                                editor.engine.scene = editor.creatNewScene();
+                                editor.editorui.assetview.invalidateAssettree();
+                                console.log("清空项目完成!");
+                            });
+                        });
                     },
+                }
+            ];
+            return mainMenu;
+        };
+        /**
+         * 层级界面创建3D对象列表数据
+         */
+        MenuConfig.prototype.getCreateObjectMenu = function () {
+            var menu = [
+                //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
+                {
+                    label: "游戏对象", click: function () {
+                        editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createGameObject());
+                    }
+                },
+                { type: "separator" },
+                {
+                    label: "3D对象",
+                    submenu: [
+                        {
+                            label: "平面", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createPlane());
+                            }
+                        },
+                        {
+                            label: "立方体", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCube());
+                            }
+                        },
+                        {
+                            label: "球体", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createSphere());
+                            }
+                        },
+                        {
+                            label: "胶囊体", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCapsule());
+                            }
+                        },
+                        {
+                            label: "圆柱体", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCylinder());
+                            }
+                        },
+                        {
+                            label: "圆锥体", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCone());
+                            }
+                        },
+                        {
+                            label: "圆环", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createTorus());
+                            }
+                        },
+                        {
+                            label: "地形", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createTerrain());
+                            }
+                        },
+                        {
+                            label: "水", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createWater());
+                            }
+                        },
+                    ],
                 },
                 {
-                    label: "水", click: function () {
-                        openDownloadProject("water.feng3d.zip");
-                    },
+                    label: "光源",
+                    submenu: [
+                        {
+                            label: "点光源", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createPointLight());
+                            }
+                        },
+                        {
+                            label: "方向光源", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createDirectionalLight());
+                            }
+                        },
+                        {
+                            label: "聚光灯", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createSpotLight());
+                            }
+                        },
+                    ],
                 },
                 {
-                    label: "灯光", click: function () {
-                        openDownloadProject("light.feng3d.zip");
-                    },
-                },
-            ],
-        },
-        {
-            label: "下载网络项目",
-            submenu: [
-                {
-                    label: "地形", click: function () {
-                        downloadProject("terrain.feng3d.zip");
-                    },
-                },
-                {
-                    label: "自定义材质", click: function () {
-                        downloadProject("customshader.feng3d.zip");
-                    },
-                },
-                {
-                    label: "水", click: function () {
-                        downloadProject("water.feng3d.zip");
-                    },
-                },
-                {
-                    label: "灯光", click: function () {
-                        downloadProject("light.feng3d.zip");
-                    },
-                },
-            ],
-        },
-        {
-            label: "升级项目",
-            click: function () {
-                editor.editorRS.upgradeProject(function () {
-                    alert("升级完成！");
-                });
-            },
-        },
-        {
-            label: "清空项目",
-            click: function () {
-                editor.editorAsset.rootFile.remove();
-                editor.editorAsset.initproject(function () {
-                    editor.editorAsset.runProjectScript(function () {
-                        editor.engine.scene = editor.creatNewScene();
-                        editor.editorui.assetview.invalidateAssettree();
-                        console.log("清空项目完成!");
-                    });
-                });
-            },
-        }
-    ];
-    /**
-     * 层级界面创建3D对象列表数据
-     */
-    editor.createObjectConfig = [
-        //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
-        {
-            label: "游戏对象", click: function () {
-                addToHierarchy(feng3d.gameObjectFactory.createGameObject());
-            }
-        },
-        { type: "separator" },
-        {
-            label: "3D对象",
-            submenu: [
-                {
-                    label: "平面", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createPlane());
+                    label: "粒子系统", click: function () {
+                        editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createParticle());
                     }
                 },
                 {
-                    label: "立方体", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createCube());
+                    label: "摄像机", click: function () {
+                        editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCamera());
                     }
+                },
+            ];
+            return menu;
+        };
+        /**
+         * 获取创建游戏对象组件菜单
+         * @param gameobject 游戏对象
+         */
+        MenuConfig.prototype.getCreateComponentMenu = function (gameobject) {
+            var menu = [
+                //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
+                {
+                    label: "SkyBox",
+                    click: function () { gameobject.addComponent(feng3d.SkyBox); }
                 },
                 {
-                    label: "球体", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createSphere());
-                    }
+                    label: "Animator",
+                    submenu: [
+                        { label: "ParticleSystem", click: function () { gameobject.addComponent(feng3d.ParticleSystem); } },
+                        { label: "Animation", click: function () { gameobject.addComponent(feng3d.Animation); } },
+                    ]
                 },
                 {
-                    label: "胶囊体", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createCapsule());
-                    }
+                    label: "Rendering",
+                    submenu: [
+                        { label: "Camera", click: function () { gameobject.addComponent(feng3d.Camera); } },
+                        { label: "PointLight", click: function () { gameobject.addComponent(feng3d.PointLight); } },
+                        { label: "DirectionalLight", click: function () { gameobject.addComponent(feng3d.DirectionalLight); } },
+                        { label: "OutLineComponent", click: function () { gameobject.addComponent(feng3d.OutLineComponent); } },
+                        { label: "CartoonComponent", click: function () { gameobject.addComponent(feng3d.CartoonComponent); } },
+                    ]
                 },
                 {
-                    label: "圆柱体", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createCylinder());
-                    }
+                    label: "Controller",
+                    submenu: [
+                        { label: "FPSController", click: function () { gameobject.addComponent(feng3d.FPSController); } },
+                    ]
                 },
                 {
-                    label: "圆锥体", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createCone());
-                    }
+                    label: "Layout",
+                    submenu: [
+                        { label: "HoldSizeComponent", click: function () { gameobject.addComponent(feng3d.HoldSizeComponent); } },
+                        { label: "BillboardComponent", click: function () { gameobject.addComponent(feng3d.BillboardComponent); } },
+                    ]
                 },
                 {
-                    label: "圆环", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createTorus());
-                    }
+                    label: "Audio",
+                    submenu: [
+                        { label: "AudioListener", click: function () { gameobject.addComponent(feng3d.AudioListener); } },
+                        { label: "AudioSource", click: function () { gameobject.addComponent(feng3d.AudioSource); } },
+                    ]
                 },
                 {
-                    label: "地形", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createTerrain());
-                    }
+                    label: "Navigation",
+                    submenu: [
+                        { label: "Navigation", click: function () { gameobject.addComponent(editor.Navigation); } },
+                    ]
                 },
                 {
-                    label: "水", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createWater());
-                    }
-                },
-            ],
-        },
-        {
-            label: "光源",
-            submenu: [
-                {
-                    label: "点光源", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createPointLight());
-                    }
+                    label: "Graphics",
+                    submenu: [
+                        { label: "Water", click: function () { gameobject.addComponent(feng3d.Water); } },
+                    ]
                 },
                 {
-                    label: "方向光源", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createDirectionalLight());
-                    }
+                    label: "Script",
+                    submenu: [
+                        { label: "Script", click: function () { gameobject.addComponent(feng3d.ScriptComponent); } },
+                    ]
                 },
-                {
-                    label: "聚光灯", click: function () {
-                        addToHierarchy(feng3d.gameObjectFactory.createSpotLight());
-                    }
-                },
-            ],
-        },
-        {
-            label: "粒子系统", click: function () {
-                addToHierarchy(feng3d.gameObjectFactory.createParticle());
-            }
-        },
-        {
-            label: "摄像机", click: function () {
-                addToHierarchy(feng3d.gameObjectFactory.createCamera());
-            }
-        },
-    ];
-    function addToHierarchy(gameobject) {
-        var selectedNode = editor.hierarchy.getSelectedNode();
-        if (selectedNode)
-            selectedNode.gameobject.addChild(gameobject);
-        else
-            editor.hierarchy.rootnode.gameobject.addChild(gameobject);
-        editor.editorData.selectObject(gameobject);
-    }
-    /**
-     * 获取创建游戏对象组件菜单
-     * @param gameobject 游戏对象
-     */
-    function getCreateComponentMenu(gameobject) {
-        var menu = [
-            //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
-            {
-                label: "SkyBox",
-                click: function () { gameobject.addComponent(feng3d.SkyBox); }
-            },
-            {
-                label: "Animator",
-                submenu: [
-                    { label: "ParticleSystem", click: function () { gameobject.addComponent(feng3d.ParticleSystem); } },
-                    { label: "Animation", click: function () { gameobject.addComponent(feng3d.Animation); } },
-                ]
-            },
-            {
-                label: "Rendering",
-                submenu: [
-                    { label: "Camera", click: function () { gameobject.addComponent(feng3d.Camera); } },
-                    { label: "PointLight", click: function () { gameobject.addComponent(feng3d.PointLight); } },
-                    { label: "DirectionalLight", click: function () { gameobject.addComponent(feng3d.DirectionalLight); } },
-                    { label: "OutLineComponent", click: function () { gameobject.addComponent(feng3d.OutLineComponent); } },
-                    { label: "CartoonComponent", click: function () { gameobject.addComponent(feng3d.CartoonComponent); } },
-                ]
-            },
-            {
-                label: "Controller",
-                submenu: [
-                    { label: "FPSController", click: function () { gameobject.addComponent(feng3d.FPSController); } },
-                ]
-            },
-            {
-                label: "Layout",
-                submenu: [
-                    { label: "HoldSizeComponent", click: function () { gameobject.addComponent(feng3d.HoldSizeComponent); } },
-                    { label: "BillboardComponent", click: function () { gameobject.addComponent(feng3d.BillboardComponent); } },
-                ]
-            },
-            {
-                label: "Audio",
-                submenu: [
-                    { label: "AudioListener", click: function () { gameobject.addComponent(feng3d.AudioListener); } },
-                    { label: "AudioSource", click: function () { gameobject.addComponent(feng3d.AudioSource); } },
-                ]
-            },
-            {
-                label: "Navigation",
-                submenu: [
-                    { label: "Navigation", click: function () { gameobject.addComponent(editor.Navigation); } },
-                ]
-            },
-            {
-                label: "Graphics",
-                submenu: [
-                    { label: "Water", click: function () { gameobject.addComponent(feng3d.Water); } },
-                ]
-            },
-            {
-                label: "Script",
-                submenu: [
-                    { label: "Script", click: function () { gameobject.addComponent(feng3d.ScriptComponent); } },
-                ]
-            },
-        ];
-        return menu;
-    }
-    editor.getCreateComponentMenu = getCreateComponentMenu;
+            ];
+            return menu;
+        };
+        return MenuConfig;
+    }());
+    editor.MenuConfig = MenuConfig;
+    editor.menuConfig = new MenuConfig();
     /**
      * 下载项目
      * @param projectname
@@ -13675,7 +13663,7 @@ var editor;
      */
     function getProjectsMenu() {
         var projects = [];
-        editor.editorRS.getProjectList(function (err, ps) {
+        editor.editorRS.fs.getProjectList(function (err, ps) {
             ps.forEach(function (element) {
                 projects.push({
                     label: element, click: function () {
@@ -13885,6 +13873,7 @@ var editor;
                 popupLayer.touchEnabled = false;
                 _this.stage.addChild(popupLayer);
                 editor.editorui.popupLayer = popupLayer;
+                editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
                 _this.initproject(function () {
                     setTimeout(function () {
                         _this.init();
@@ -13922,14 +13911,13 @@ var editor;
             this.mainView.height = this.stage.stageHeight;
         };
         Editor.prototype.initproject = function (callback) {
-            editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
-            editor.editorRS.hasProject(editor.editorcache.projectname, function (has) {
+            editor.editorRS.fs.hasProject(editor.editorcache.projectname, function (has) {
                 if (has) {
-                    editor.editorRS.initproject(editor.editorcache.projectname, callback);
+                    editor.editorRS.fs.initproject(editor.editorcache.projectname, callback);
                 }
                 else {
                     editor.editorRS.createproject(editor.editorcache.projectname, function () {
-                        editor.editorRS.initproject(editor.editorcache.projectname, callback);
+                        editor.editorRS.fs.initproject(editor.editorcache.projectname, callback);
                     });
                 }
             });
