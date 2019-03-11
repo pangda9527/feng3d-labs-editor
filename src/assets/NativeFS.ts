@@ -9,12 +9,12 @@ namespace editor
         /**
          * 工作空间路径，工作空间内存放所有编辑器项目
          */
-        workspace = "c:/editorworkspace";
+        workspace: string;
 
         /**
          * 项目名称
          */
-        projectname = "testproject";
+        projectname: string;
 
         /**
          * 文件系统类型
@@ -98,6 +98,10 @@ namespace editor
          */
         getAbsolutePath(path: string)
         {
+            if (!this.workspace || !this.projectname)
+            {
+                throw `请先使用 initproject 初始化项目`;
+            }
             return this.workspace + "/" + this.projectname + "/" + path;
         }
 
@@ -176,7 +180,7 @@ namespace editor
         writeArrayBuffer(path: string, arraybuffer: ArrayBuffer, callback?: (err: Error) => void)
         {
             var realPath = this.getAbsolutePath(path);
-            this.fs.writeFile(realPath, arraybuffer, callback);
+            this.fs.writeFile(realPath, arraybuffer, err => { callback && callback(err); });
         }
 
         /**
@@ -240,6 +244,7 @@ namespace editor
          */
         getProjectList(callback: (err: Error, projects: string[]) => void)
         {
+            if (!this.workspace) { callback(null, []); return; }
             this.fs.readdir(this.workspace, callback);
         }
 
@@ -250,69 +255,29 @@ namespace editor
          */
         initproject(projectname: string, callback: (err: Error) => void)
         {
-            this.projectname = projectname;
-            this.fs.mkdir(this.workspace + "/" + this.projectname, callback);
+            this.selectWorkspace(() =>
+            {
+                this.projectname = projectname;
+                this.fs.mkdir(this.workspace + "/" + this.projectname, callback);
+            });
         }
-    }
 
-    /**
-     * Native文件系统
-     */
-    interface NativeFSBase
-    {
         /**
-         * 文件是否存在
-         * @param path 文件路径
-         * @param callback 回调函数
-         */
-        exists(path: string, callback: (exists: boolean) => void): void;
-        /**
-         * 读取文件夹中文件列表
-         * @param path 路径
-         * @param callback 回调函数
-         */
-        readdir(path: string, callback: (err: Error, files: string[]) => void): void;
-        /**
-         * 新建文件夹
-         *
-         * @param path 文件夹路径
-         * @param callback 回调函数
-         */
-        mkdir(path: string, callback: (err: Error) => void): void;
-        /**
-         * 读取文件
-         * @param path 路径
-         * @param callback 读取完成回调 当err不为null时表示读取失败
-         */
-        readFile(path: string, callback: (err: Error, data: ArrayBuffer) => void): void;
-        /**
-         * 删除文件
-         *
-         * @param path 文件路径
+         * 选择工作空间
+         * 
          * @param callback 完成回调
          */
-        deleteFile(path: string, callback: (err: Error) => void): void;
-        /**
-         * 删除文件夹
-         *
-         * @param path 文件夹路径
-         * @param callback 完成回调
-         */
-        rmdir(path: string, callback: (err: Error) => void): void;
-        /**
-         * 是否为文件夹
-         *
-         * @param path 文件路径
-         * @param callback 完成回调
-         */
-        isDirectory(path: string, callback: (result: boolean) => void): void;
-        /**
-         * 写ArrayBuffer(新建)文件
-         *
-         * @param path 文件路径
-         * @param data 文件数据
-         * @param callback 回调函数
-         */
-        writeFile(path: string, data: ArrayBuffer, callback: (err: Error) => void): void;
+        private selectWorkspace(callback: (err?: Error) => void)
+        {
+            this.fs.exists(editorcache.native_workspacce, exists =>
+            {
+                if (exists) { callback(); return; }
+                nativeAPI.selectDirectoryDialog((event, path) =>
+                {
+                    this.workspace = path;
+                    callback(null);
+                });
+            });
+        }
     }
 }

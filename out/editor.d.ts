@@ -15,6 +15,94 @@ declare namespace editor {
         getUser(): void;
     }
 }
+interface NodeRequire {
+}
+declare var require: NodeRequire;
+declare var __dirname: string;
+declare namespace editor {
+    /**
+     * 本地文件系统
+     */
+    var nativeFS: NativeFSBase;
+    /**
+     * 本地API
+     */
+    var nativeAPI: NativeAPI;
+    /**
+     * 是否支持本地API
+     */
+    var supportNative: boolean;
+    /**
+     * 本地API
+     */
+    interface NativeAPI {
+        /**
+         * 选择文件夹对话框
+         *
+         * @param callback 完成回调
+         */
+        selectDirectoryDialog(callback: (event: Event, path: string) => void): void;
+    }
+    /**
+     * Native文件系统
+     */
+    interface NativeFSBase {
+        /**
+         * 文件是否存在
+         * @param path 文件路径
+         * @param callback 回调函数
+         */
+        exists(path: string, callback: (exists: boolean) => void): void;
+        /**
+         * 读取文件夹中文件列表
+         * @param path 路径
+         * @param callback 回调函数
+         */
+        readdir(path: string, callback: (err: Error, files: string[]) => void): void;
+        /**
+         * 新建文件夹
+         *
+         * @param path 文件夹路径
+         * @param callback 回调函数
+         */
+        mkdir(path: string, callback: (err: Error) => void): void;
+        /**
+         * 读取文件
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        readFile(path: string, callback: (err: Error, data: ArrayBuffer) => void): void;
+        /**
+         * 删除文件
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        deleteFile(path: string, callback: (err: Error) => void): void;
+        /**
+         * 删除文件夹
+         *
+         * @param path 文件夹路径
+         * @param callback 完成回调
+         */
+        rmdir(path: string, callback: (err: Error) => void): void;
+        /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        isDirectory(path: string, callback: (result: boolean) => void): void;
+        /**
+         * 写ArrayBuffer(新建)文件
+         *
+         * @param path 文件路径
+         * @param data 文件数据
+         * @param callback 回调函数
+         */
+        writeFile(path: string, data: ArrayBuffer, callback: (err: Error) => void): void;
+    }
+}
 declare namespace editor {
     /**
      * Created by 黑暗之神KDS on 2017/2/17.
@@ -292,71 +380,14 @@ declare namespace editor {
          * @param callback 回调函数
          */
         initproject(projectname: string, callback: (err: Error) => void): void;
-    }
-    /**
-     * Native文件系统
-     */
-    interface NativeFSBase {
         /**
-         * 文件是否存在
-         * @param path 文件路径
-         * @param callback 回调函数
-         */
-        exists(path: string, callback: (exists: boolean) => void): void;
-        /**
-         * 读取文件夹中文件列表
-         * @param path 路径
-         * @param callback 回调函数
-         */
-        readdir(path: string, callback: (err: Error, files: string[]) => void): void;
-        /**
-         * 新建文件夹
+         * 选择工作空间
          *
-         * @param path 文件夹路径
-         * @param callback 回调函数
-         */
-        mkdir(path: string, callback: (err: Error) => void): void;
-        /**
-         * 读取文件
-         * @param path 路径
-         * @param callback 读取完成回调 当err不为null时表示读取失败
-         */
-        readFile(path: string, callback: (err: Error, data: ArrayBuffer) => void): void;
-        /**
-         * 删除文件
-         *
-         * @param path 文件路径
          * @param callback 完成回调
          */
-        deleteFile(path: string, callback: (err: Error) => void): void;
-        /**
-         * 删除文件夹
-         *
-         * @param path 文件夹路径
-         * @param callback 完成回调
-         */
-        rmdir(path: string, callback: (err: Error) => void): void;
-        /**
-         * 是否为文件夹
-         *
-         * @param path 文件路径
-         * @param callback 完成回调
-         */
-        isDirectory(path: string, callback: (result: boolean) => void): void;
-        /**
-         * 写ArrayBuffer(新建)文件
-         *
-         * @param path 文件路径
-         * @param data 文件数据
-         * @param callback 回调函数
-         */
-        writeFile(path: string, data: ArrayBuffer, callback: (err: Error) => void): void;
+        private selectWorkspace;
     }
 }
-interface NodeRequire {
-}
-declare var require: NodeRequire;
-declare var __dirname: string;
 declare namespace editor {
     /**
      * 编辑器资源系统
@@ -367,9 +398,15 @@ declare namespace editor {
      */
     class EditorRS extends feng3d.ReadWriteRS {
         /**
+         * 初始化项目
+         *
+         * @param callback 完成回调
+         */
+        initproject(callback: (err?: Error) => void): void;
+        /**
          * 创建项目
          */
-        createproject(projectname: string, callback: () => void): void;
+        private createproject;
         upgradeProject(callback: () => void): void;
         selectFile(callback: (file: FileList) => void): void;
         /**
@@ -388,6 +425,10 @@ declare namespace editor {
          * 保存最后一次打开的项目路径
          */
         projectname: string;
+        /**
+         * 本地文件系统工作空间
+         */
+        native_workspacce: string;
         constructor();
         save(): void;
     }
@@ -3499,7 +3540,6 @@ declare namespace editor {
         private init;
         private initMainView;
         private onresize;
-        private initproject;
         private _onAddToStage;
     }
 }

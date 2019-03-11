@@ -1,7 +1,3 @@
-interface NodeRequire { }
-declare var require: NodeRequire;
-declare var __dirname: string;
-
 namespace editor
 {
     /**
@@ -15,42 +11,57 @@ namespace editor
     export class EditorRS extends feng3d.ReadWriteRS
     {
         /**
+         * 初始化项目
+         * 
+         * @param callback 完成回调
+         */
+        initproject(callback: (err?: Error) => void)
+        {
+            this.fs.hasProject(editorcache.projectname, (has) =>
+            {
+                this.fs.initproject(editorcache.projectname, (err: Error) =>
+                {
+                    if (err) { callback(err); return; }
+                    if (has) { callback(); return; }
+                    this.createproject(callback);
+                });
+            });
+        }
+
+        /**
          * 创建项目
          */
-        createproject(projectname: string, callback: () => void)
+        private createproject(callback: (err?: Error) => void)
         {
-            this.fs.initproject(projectname, (err: Error) =>
+            var urls = [
+                ["resource/template/app.js", "app.js"],
+                ["resource/template/index.html", "index.html"],
+                ["resource/template/project.js", "project.js"],
+                ["resource/template/tsconfig.json", "tsconfig.json"],
+                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+            ];
+            var index = 0;
+            var loadUrls = () =>
             {
-                var urls = [
-                    ["resource/template/app.js", "app.js"],
-                    ["resource/template/index.html", "index.html"],
-                    ["resource/template/project.js", "project.js"],
-                    ["resource/template/tsconfig.json", "tsconfig.json"],
-                    ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
-                    ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
-                ];
-                var index = 0;
-                var loadUrls = () =>
+                if (index >= urls.length) { callback(); return; }
+                feng3d.loader.loadText(urls[index][0], (content) =>
                 {
-                    if (index >= urls.length) { callback(); return; }
-                    feng3d.loader.loadText(urls[index][0], (content) =>
+                    this.fs.writeString(urls[index][1], content, (err) =>
                     {
-                        this.fs.writeString(urls[index][1], content, (err) =>
-                        {
-                            if (err) feng3d.warn(err);
-                            index++;
-                            loadUrls();
-                        });
+                        if (err) feng3d.warn(err);
+                        index++;
+                        loadUrls();
+                    });
 
-                    }, null, (e) =>
-                        {
-                            feng3d.warn(e);
-                            index++;
-                            loadUrls();
-                        });
-                }
-                loadUrls();
-            });
+                }, null, (e) =>
+                    {
+                        feng3d.warn(e);
+                        index++;
+                        loadUrls();
+                    });
+            }
+            loadUrls();
         }
 
         upgradeProject(callback: () => void)
@@ -164,14 +175,13 @@ namespace editor
         }
     }
 
-    if (typeof require == "undefined")
+    if (supportNative)
     {
-        feng3d.fs = feng3d.indexedDBFS;
+        feng3d.fs = new NativeFS(nativeFS);
         feng3d.rs = editorRS = new EditorRS();
     } else
     {
-        var nativeFS = require(__dirname + "/native/NativeFSBase.js").nativeFS;
-        feng3d.fs = new NativeFS(nativeFS);
+        feng3d.fs = feng3d.indexedDBFS;
         feng3d.rs = editorRS = new EditorRS();
     }
 

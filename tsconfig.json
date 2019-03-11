@@ -23,6 +23,7 @@
         //
         "src/oauth/GiteeOauth.ts",
         //
+        "src/assets/NativeRequire.ts",
         "src/assets/FileObject.ts",
         "src/assets/NativeFS.ts",
         "src/assets/EditorRS.ts",

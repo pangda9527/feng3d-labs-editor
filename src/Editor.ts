@@ -39,7 +39,7 @@ namespace editor
 
                 editorcache.projectname = editorcache.projectname || "newproject";
 
-                this.initproject(() =>
+                editorRS.initproject(() =>
                 {
                     setTimeout(() =>
                     {
@@ -88,23 +88,6 @@ namespace editor
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
             this.mainView.width = this.stage.stageWidth;
             this.mainView.height = this.stage.stageHeight;
-        }
-
-        private initproject(callback: (err: Error) => void)
-        {
-            editorRS.fs.hasProject(editorcache.projectname, (has) =>
-            {
-                if (has)
-                {
-                    editorRS.fs.initproject(editorcache.projectname, callback);
-                } else
-                {
-                    editorRS.createproject(editorcache.projectname, () =>
-                    {
-                        editorRS.fs.initproject(editorcache.projectname, callback);
-                    });
-                }
-            });
         }
 
         private _onAddToStage()

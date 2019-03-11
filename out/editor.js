@@ -133,6 +133,17 @@ var editor;
 var editor;
 (function (editor) {
     /**
+     * 是否支持本地API
+     */
+    editor.supportNative = !(typeof require == "undefined");
+    if (editor.supportNative) {
+        editor.nativeFS = require(__dirname + "/native/NativeFSBase.js").nativeFS;
+        editor.nativeAPI = require(__dirname + "/native/electron_renderer.js");
+    }
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
      * Created by 黑暗之神KDS on 2017/2/17.
      */
     /**
@@ -466,14 +477,6 @@ var editor;
         function NativeFS(fs) {
             var _this = _super.call(this) || this;
             /**
-             * 工作空间路径，工作空间内存放所有编辑器项目
-             */
-            _this.workspace = "c:/editorworkspace";
-            /**
-             * 项目名称
-             */
-            _this.projectname = "testproject";
-            /**
              * 文件系统类型
              */
             _this.type = feng3d.FSType.native;
@@ -543,6 +546,9 @@ var editor;
          * @param path （相对）路径
          */
         NativeFS.prototype.getAbsolutePath = function (path) {
+            if (!this.workspace || !this.projectname) {
+                throw "\u8BF7\u5148\u4F7F\u7528 initproject \u521D\u59CB\u5316\u9879\u76EE";
+            }
             return this.workspace + "/" + this.projectname + "/" + path;
         };
         /**
@@ -608,7 +614,7 @@ var editor;
          */
         NativeFS.prototype.writeArrayBuffer = function (path, arraybuffer, callback) {
             var realPath = this.getAbsolutePath(path);
-            this.fs.writeFile(realPath, arraybuffer, callback);
+            this.fs.writeFile(realPath, arraybuffer, function (err) { callback && callback(err); });
         };
         /**
          * 写字符串到(新建)文件
@@ -665,6 +671,10 @@ var editor;
          * @param callback 完成回调
          */
         NativeFS.prototype.getProjectList = function (callback) {
+            if (!this.workspace) {
+                callback(null, []);
+                return;
+            }
             this.fs.readdir(this.workspace, callback);
         };
         /**
@@ -673,8 +683,29 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.initproject = function (projectname, callback) {
-            this.projectname = projectname;
-            this.fs.mkdir(this.workspace + "/" + this.projectname, callback);
+            var _this = this;
+            this.selectWorkspace(function () {
+                _this.projectname = projectname;
+                _this.fs.mkdir(_this.workspace + "/" + _this.projectname, callback);
+            });
+        };
+        /**
+         * 选择工作空间
+         *
+         * @param callback 完成回调
+         */
+        NativeFS.prototype.selectWorkspace = function (callback) {
+            var _this = this;
+            this.fs.exists(editor.editorcache.native_workspacce, function (exists) {
+                if (exists) {
+                    callback();
+                    return;
+                }
+                editor.nativeAPI.selectDirectoryDialog(function (event, path) {
+                    _this.workspace = path;
+                    callback(null);
+                });
+            });
         };
         return NativeFS;
     }(feng3d.ReadWriteFS));
@@ -691,40 +722,59 @@ var editor;
             return _super !== null && _super.apply(this, arguments) || this;
         }
         /**
-         * 创建项目
+         * 初始化项目
+         *
+         * @param callback 完成回调
          */
-        EditorRS.prototype.createproject = function (projectname, callback) {
+        EditorRS.prototype.initproject = function (callback) {
             var _this = this;
-            this.fs.initproject(projectname, function (err) {
-                var urls = [
-                    ["resource/template/app.js", "app.js"],
-                    ["resource/template/index.html", "index.html"],
-                    ["resource/template/project.js", "project.js"],
-                    ["resource/template/tsconfig.json", "tsconfig.json"],
-                    ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
-                    ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
-                ];
-                var index = 0;
-                var loadUrls = function () {
-                    if (index >= urls.length) {
+            this.fs.hasProject(editor.editorcache.projectname, function (has) {
+                _this.fs.initproject(editor.editorcache.projectname, function (err) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+                    if (has) {
                         callback();
                         return;
                     }
-                    feng3d.loader.loadText(urls[index][0], function (content) {
-                        _this.fs.writeString(urls[index][1], content, function (err) {
-                            if (err)
-                                feng3d.warn(err);
-                            index++;
-                            loadUrls();
-                        });
-                    }, null, function (e) {
-                        feng3d.warn(e);
+                    _this.createproject(callback);
+                });
+            });
+        };
+        /**
+         * 创建项目
+         */
+        EditorRS.prototype.createproject = function (callback) {
+            var _this = this;
+            var urls = [
+                ["resource/template/app.js", "app.js"],
+                ["resource/template/index.html", "index.html"],
+                ["resource/template/project.js", "project.js"],
+                ["resource/template/tsconfig.json", "tsconfig.json"],
+                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+            ];
+            var index = 0;
+            var loadUrls = function () {
+                if (index >= urls.length) {
+                    callback();
+                    return;
+                }
+                feng3d.loader.loadText(urls[index][0], function (content) {
+                    _this.fs.writeString(urls[index][1], content, function (err) {
+                        if (err)
+                            feng3d.warn(err);
                         index++;
                         loadUrls();
                     });
-                };
-                loadUrls();
-            });
+                }, null, function (e) {
+                    feng3d.warn(e);
+                    index++;
+                    loadUrls();
+                });
+            };
+            loadUrls();
         };
         EditorRS.prototype.upgradeProject = function (callback) {
             var _this = this;
@@ -817,13 +867,12 @@ var editor;
         return EditorRS;
     }(feng3d.ReadWriteRS));
     editor.EditorRS = EditorRS;
-    if (typeof require == "undefined") {
-        feng3d.fs = feng3d.indexedDBFS;
+    if (editor.supportNative) {
+        feng3d.fs = new editor.NativeFS(editor.nativeFS);
         feng3d.rs = editor.editorRS = new EditorRS();
     }
     else {
-        var nativeFS = require(__dirname + "/native/NativeFSBase.js").nativeFS;
-        feng3d.fs = new editor.NativeFS(nativeFS);
+        feng3d.fs = feng3d.indexedDBFS;
         feng3d.rs = editor.editorRS = new EditorRS();
     }
     //
@@ -13874,7 +13923,7 @@ var editor;
                 _this.stage.addChild(popupLayer);
                 editor.editorui.popupLayer = popupLayer;
                 editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
-                _this.initproject(function () {
+                editor.editorRS.initproject(function () {
                     setTimeout(function () {
                         _this.init();
                     }, 1);
@@ -13909,18 +13958,6 @@ var editor;
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
             this.mainView.width = this.stage.stageWidth;
             this.mainView.height = this.stage.stageHeight;
-        };
-        Editor.prototype.initproject = function (callback) {
-            editor.editorRS.fs.hasProject(editor.editorcache.projectname, function (has) {
-                if (has) {
-                    editor.editorRS.fs.initproject(editor.editorcache.projectname, callback);
-                }
-                else {
-                    editor.editorRS.createproject(editor.editorcache.projectname, function () {
-                        editor.editorRS.fs.initproject(editor.editorcache.projectname, callback);
-                    });
-                }
-            });
         };
         Editor.prototype._onAddToStage = function () {
             editor.editorData.stage = this.stage;

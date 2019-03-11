@@ -2,6 +2,8 @@
 
 const { app, BrowserWindow } = require('electron')
 
+require("./native/electron_main.js")
+
 app.commandLine.appendSwitch('enable-unsafe-es3-apis');
 app.on("ready", function ()
 {

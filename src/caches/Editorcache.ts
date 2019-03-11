@@ -7,6 +7,11 @@ namespace editor
          */
         projectname: string;
 
+        /**
+         * 本地文件系统工作空间
+         */
+        native_workspacce: string;
+
         constructor()
         {
             var value = localStorage.getItem("feng3d-editor");
