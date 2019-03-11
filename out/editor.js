@@ -596,6 +596,7 @@ var editor;
          */
         NativeFS.prototype.deleteFile = function (path, callback) {
             var _this = this;
+            callback = callback || (function () { });
             var realPath = this.getAbsolutePath(path);
             this.isDirectory(path, function (result) {
                 if (result) {
@@ -764,12 +765,12 @@ var editor;
                 feng3d.loader.loadText(urls[index][0], function (content) {
                     _this.fs.writeString(urls[index][1], content, function (err) {
                         if (err)
-                            feng3d.warn(err);
+                            throw err;
                         index++;
                         loadUrls();
                     });
                 }, null, function (e) {
-                    feng3d.warn(e);
+                    throw e;
                     index++;
                     loadUrls();
                 });

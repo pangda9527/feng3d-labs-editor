@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * Native文件系统
@@ -17,8 +18,12 @@ export class NativeFSBase
      */
     exists(path: string, callback: (exists: boolean) => void): void
     {
-        var exists = fs.existsSync(path);
-        callback(exists);
+        if (!path) { callback(false); return; }
+
+        fs.stat(path, (err, stats) =>
+        {
+            callback(!!stats);
+        });
     }
 
     /**
@@ -34,12 +39,31 @@ export class NativeFSBase
     /**
      * 新建文件夹
      * 
-     * @param path 文件夹路径
+     * 如果父文件夹不存在则新建
+     * 
+     * @param p 文件夹路径
      * @param callback 回调函数
      */
-    mkdir(path: string, callback: (err: Error) => void): void
+    mkdir(p: string, callback: (err: Error) => void): void
     {
-        fs.mkdir(path, callback);
+        var dirPath = path.dirname(p);
+        this.exists(dirPath, exists =>
+        {
+            if (!exists)
+            {
+                this.mkdir(dirPath, err =>
+                {
+                    if (err) { callback(err); return; }
+                    this.mkdir(p, callback);
+                });
+                return;
+            }
+            fs.exists(p, exists =>
+            {
+                if (exists) { callback(null); return; }
+                fs.mkdir(p, callback);
+            });
+        });
     }
 
     /**
@@ -82,21 +106,38 @@ export class NativeFSBase
      */
     isDirectory(path: string, callback: (result: boolean) => void)
     {
-        var stats = fs.statSync(path);
-        callback(stats && stats.isDirectory());
+        fs.stat(path, (err, stats) =>
+        {
+            callback(stats && stats.isDirectory());
+        });
     }
 
     /**
      * 写ArrayBuffer(新建)文件
      * 
-     * @param path 文件路径
+     * 如果所在文件夹不存时新建文件夹
+     * 
+     * @param filePath 文件路径
      * @param data 文件数据
      * @param callback 回调函数
      */
-    writeFile(path: string, data: ArrayBuffer, callback: (err: Error) => void): void
+    writeFile(filePath: string, data: ArrayBuffer, callback: (err: Error) => void): void
     {
-        var buffer = new Buffer(data);
-        fs.writeFile(path, buffer, "binary", callback);
+        var dirPath = path.dirname(filePath);
+        this.exists(dirPath, exists =>
+        {
+            if (!exists)
+            {
+                this.mkdir(dirPath, err =>
+                {
+                    if (err) { callback(err); return; }
+                    this.writeFile(filePath, data, callback);
+                });
+                return;
+            }
+            var buffer = new Buffer(data);
+            fs.writeFile(filePath, buffer, "binary", callback);
+        });
     }
 }
 nativeFS = new NativeFSBase();

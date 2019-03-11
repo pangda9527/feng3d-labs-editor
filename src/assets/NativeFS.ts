@@ -158,6 +158,7 @@ namespace editor
          */
         deleteFile(path: string, callback?: (err: Error) => void)
         {
+            callback = callback || (() => { });
             var realPath = this.getAbsolutePath(path);
             this.isDirectory(path, result =>
             {

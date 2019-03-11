@@ -49,14 +49,14 @@ namespace editor
                 {
                     this.fs.writeString(urls[index][1], content, (err) =>
                     {
-                        if (err) feng3d.warn(err);
+                        if (err) throw err;
                         index++;
                         loadUrls();
                     });
 
                 }, null, (e) =>
                     {
-                        feng3d.warn(e);
+                        throw e;
                         index++;
                         loadUrls();
                     });

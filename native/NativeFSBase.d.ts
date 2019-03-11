@@ -21,10 +21,12 @@ export declare class NativeFSBase {
     /**
      * 新建文件夹
      *
-     * @param path 文件夹路径
+     * 如果父文件夹不存在则新建
+     *
+     * @param p 文件夹路径
      * @param callback 回调函数
      */
-    mkdir(path: string, callback: (err: Error) => void): void;
+    mkdir(p: string, callback: (err: Error) => void): void;
     /**
      * 读取文件
      * @param path 路径
@@ -55,9 +57,11 @@ export declare class NativeFSBase {
     /**
      * 写ArrayBuffer(新建)文件
      *
-     * @param path 文件路径
+     * 如果所在文件夹不存时新建文件夹
+     *
+     * @param filePath 文件路径
      * @param data 文件数据
      * @param callback 回调函数
      */
-    writeFile(path: string, data: ArrayBuffer, callback: (err: Error) => void): void;
+    writeFile(filePath: string, data: ArrayBuffer, callback: (err: Error) => void): void;
 }
