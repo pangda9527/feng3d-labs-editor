@@ -695,7 +695,7 @@ var editor;
          */
         EditorRS.prototype.createproject = function (projectname, callback) {
             var _this = this;
-            this.fs.initproject(projectname, function () {
+            this.fs.initproject(projectname, function (err) {
                 var urls = [
                     ["resource/template/app.js", "app.js"],
                     ["resource/template/index.html", "index.html"],

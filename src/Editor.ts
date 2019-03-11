@@ -90,7 +90,7 @@ namespace editor
             this.mainView.height = this.stage.stageHeight;
         }
 
-        private initproject(callback: () => void)
+        private initproject(callback: (err: Error) => void)
         {
             editorRS.fs.hasProject(editorcache.projectname, (has) =>
             {

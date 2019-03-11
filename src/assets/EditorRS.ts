@@ -19,7 +19,7 @@ namespace editor
          */
         createproject(projectname: string, callback: () => void)
         {
-            this.fs.initproject(projectname, () =>
+            this.fs.initproject(projectname, (err: Error) =>
             {
                 var urls = [
                     ["resource/template/app.js", "app.js"],
