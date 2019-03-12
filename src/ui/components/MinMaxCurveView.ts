@@ -103,7 +103,7 @@ namespace editor
                     {
                         this.minMaxCurve.mode = v;
                         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-                    }, { width: 210 });
+                    });
                     break;
                 case this.curveGroup:
                     minMaxCurveEditor = minMaxCurveEditor || new editor.MinMaxCurveEditor();

@@ -321,11 +321,11 @@ namespace editor
                 {
                     label: "Rendering",
                     submenu: [
+                        { label: "CartoonComponent", click: () => { gameobject.addComponent(feng3d.CartoonComponent); } },
                         { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
                         { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
                         { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
                         { label: "OutLineComponent", click: () => { gameobject.addComponent(feng3d.OutLineComponent); } },
-                        { label: "CartoonComponent", click: () => { gameobject.addComponent(feng3d.CartoonComponent); } },
                         // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
                     ]
                 },

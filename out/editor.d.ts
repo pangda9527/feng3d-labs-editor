@@ -714,21 +714,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class MenuItemRenderer extends eui.ItemRenderer {
-        data: MenuItem;
-        menuUI: MenuUI;
-        selectedRect: eui.Rect;
-        protected dataChanged(): void;
-        constructor();
-        private onComplete;
-        private onAddedToStage;
-        private onRemovedFromStage;
-        private updateView;
-        private onItemMouseDown;
-        private onItemMouseOver;
-        private onItemMouseOut;
-        private onsubMenuUIRemovedFromeStage;
-    }
 }
 declare namespace editor {
     interface TreeNodeMap {
@@ -883,18 +868,49 @@ declare namespace editor {
          * 子菜单
          */
         submenu?: MenuItem[];
+        /**
+         * 是否启用，禁用时显示灰色
+         */
+        enable?: boolean;
+        /**
+         * 是否显示，默认显示
+         */
+        show?: boolean;
     };
     class Menu {
-        popup(menu: MenuItem[], parm?: {
-            mousex?: number;
-            mousey?: number;
-            width?: number;
-        }): void;
-        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void, parm?: {
-            mousex?: number;
-            mousey?: number;
-            width?: number;
-        }): void;
+        /**
+         * 弹出菜单
+         *
+         *
+         * @param menu 菜单数据
+         *
+         * @returns
+该功能存在一个暂时无法解决的bug
+```
+[{
+    label: "Rendering",
+    submenu: [
+        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
+        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
+        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
+    ]
+}]
+```
+如上代码中 ``` "Camera" ``` 比 ``` "DirectionalLight" ``` 要短时会出现子菜单盖住父菜单情况，代码需要修改如下才能规避该情况
+```
+[{
+    label: "Rendering",
+    submenu: [
+        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
+        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
+        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
+    ]
+}]
+```
+         *
+         */
+        popup(menu: MenuItem[]): void;
+        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void): void;
     }
     class MenuUI extends eui.List {
         subMenuUI: MenuUI;
@@ -902,16 +918,27 @@ declare namespace editor {
         private parentMenuUI;
         readonly topMenu: MenuUI;
         constructor();
-        static create(menu: MenuItem[], parm?: {
-            mousex?: number;
-            mousey?: number;
-            width?: number;
-        }): MenuUI;
+        static create(menu: MenuItem[], menuItemRendererRect?: egret.Rectangle): MenuUI;
         private onComplete;
         private onAddedToStage;
         private onRemovedFromStage;
         private updateView;
         remove(): void;
+    }
+    class MenuItemRenderer extends eui.ItemRenderer {
+        data: MenuItem;
+        menuUI: MenuUI;
+        selectedRect: eui.Rect;
+        protected dataChanged(): void;
+        constructor();
+        private onComplete;
+        private onAddedToStage;
+        private onRemovedFromStage;
+        private updateView;
+        private onItemMouseDown;
+        private onItemMouseOver;
+        private onItemMouseOut;
+        private onsubMenuUIRemovedFromeStage;
     }
 }
 declare namespace editor {

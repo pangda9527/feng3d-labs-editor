@@ -199,8 +199,7 @@ namespace editor
 					}
 				});
 			}
-
-			menu.popup(menus, { mousex: this.stage.stageWidth - 150 });
+			menu.popup(menus);
 		}
 
 		private onHelpBtnClick()

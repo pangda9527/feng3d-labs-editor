@@ -2162,88 +2162,6 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var MenuItemRenderer = /** @class */ (function (_super) {
-        __extends(MenuItemRenderer, _super);
-        function MenuItemRenderer() {
-            var _this = _super.call(this) || this;
-            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
-            _this.skinName = "MenuItemRender";
-            return _this;
-        }
-        MenuItemRenderer.prototype.dataChanged = function () {
-            _super.prototype.dataChanged.call(this);
-            this.updateView();
-        };
-        MenuItemRenderer.prototype.onComplete = function () {
-            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-            if (this.stage) {
-                this.onAddedToStage();
-            }
-        };
-        MenuItemRenderer.prototype.onAddedToStage = function () {
-            this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
-            this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
-            this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
-            this.menuUI = this.parent;
-            this.updateView();
-        };
-        MenuItemRenderer.prototype.onRemovedFromStage = function () {
-            this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
-            this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
-            this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
-            this.menuUI = null;
-        };
-        MenuItemRenderer.prototype.updateView = function () {
-            if (!this.data)
-                return;
-            this.touchEnabled = true;
-            this.touchChildren = true;
-            if (this.data.type == 'separator') {
-                this.skin.currentState = "separator";
-                this.touchEnabled = false;
-                this.touchChildren = false;
-            }
-            else if (this.data.submenu) {
-                this.skin.currentState = "sub";
-            }
-            else {
-                this.skin.currentState = "normal";
-            }
-            this.selectedRect.visible = false;
-        };
-        MenuItemRenderer.prototype.onItemMouseDown = function (event) {
-            this.data.click && this.data.click();
-            this.menuUI.topMenu.remove();
-        };
-        MenuItemRenderer.prototype.onItemMouseOver = function () {
-            if (this.data.submenu) {
-                var rect = this.getTransformedBounds(this.stage);
-                if (rect.right + 300 > this.stage.stageWidth)
-                    rect.x -= rect.width + 150;
-                this.menuUI.subMenuUI = editor.MenuUI.create(this.data.submenu, { mousex: rect.right, mousey: rect.top });
-                this.menuUI.subMenuUI.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
-            }
-            else {
-                this.menuUI.subMenuUI = null;
-            }
-            this.selectedRect.visible = true;
-        };
-        MenuItemRenderer.prototype.onItemMouseOut = function () {
-            if (!this.menuUI.subMenuUI)
-                this.selectedRect.visible = false;
-        };
-        MenuItemRenderer.prototype.onsubMenuUIRemovedFromeStage = function (e) {
-            var current = e.currentTarget;
-            current.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
-            this.selectedRect.visible = false;
-        };
-        return MenuItemRenderer;
-    }(eui.ItemRenderer));
-    editor.MenuItemRenderer = MenuItemRenderer;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
     var TreeNode = /** @class */ (function (_super) {
         __extends(TreeNode, _super);
         function TreeNode(obj) {
@@ -2608,7 +2526,7 @@ var editor;
                     }
                 });
             }
-            editor.menu.popup(menus, { mousex: this.stage.stageWidth - 150 });
+            editor.menu.popup(menus);
         };
         ComponentView.prototype.onHelpBtnClick = function () {
             window.open("http://feng3d.gitee.io/#/script");
@@ -2681,11 +2599,42 @@ var editor;
     var Menu = /** @class */ (function () {
         function Menu() {
         }
-        Menu.prototype.popup = function (menu, parm) {
-            var menuUI = MenuUI.create(menu, parm);
+        /**
+         * 弹出菜单
+         *
+         *
+         * @param menu 菜单数据
+         *
+         * @returns
+该功能存在一个暂时无法解决的bug
+```
+[{
+    label: "Rendering",
+    submenu: [
+        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
+        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
+        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
+    ]
+}]
+```
+如上代码中 ``` "Camera" ``` 比 ``` "DirectionalLight" ``` 要短时会出现子菜单盖住父菜单情况，代码需要修改如下才能规避该情况
+```
+[{
+    label: "Rendering",
+    submenu: [
+        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
+        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
+        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
+    ]
+}]
+```
+         *
+         */
+        Menu.prototype.popup = function (menu) {
+            var menuUI = MenuUI.create(menu);
             editor.maskview.mask(menuUI);
         };
-        Menu.prototype.popupEnum = function (enumDefinition, currentValue, selectCallBack, parm) {
+        Menu.prototype.popupEnum = function (enumDefinition, currentValue, selectCallBack) {
             var menu = [];
             for (var key in enumDefinition) {
                 if (enumDefinition.hasOwnProperty(key)) {
@@ -2699,7 +2648,7 @@ var editor;
                     }
                 }
             }
-            this.popup(menu, parm);
+            this.popup(menu);
         };
         return Menu;
     }());
@@ -2710,7 +2659,7 @@ var editor;
         __extends(MenuUI, _super);
         function MenuUI() {
             var _this = _super.call(this) || this;
-            _this.itemRenderer = editor.MenuItemRenderer;
+            _this.itemRenderer = MenuItemRenderer;
             _this.onComplete();
             return _this;
         }
@@ -2736,22 +2685,28 @@ var editor;
             enumerable: true,
             configurable: true
         });
-        MenuUI.create = function (menu, parm) {
+        MenuUI.create = function (menu, menuItemRendererRect) {
+            if (menuItemRendererRect === void 0) { menuItemRendererRect = null; }
             var menuUI = new MenuUI();
             var dataProvider = new eui.ArrayCollection();
             dataProvider.replaceAll(menu);
             menuUI.dataProvider = dataProvider;
             editor.editorui.popupLayer.addChild(menuUI);
-            // parm = Object.assign({ width: 150 }, parm);
-            parm = parm || {};
-            if (parm.width !== undefined)
-                menuUI.width = parm.width;
-            menuUI.x = parm.mousex || feng3d.windowEventProxy.clientX;
-            menuUI.y = parm.mousey || feng3d.windowEventProxy.clientY;
-            if (menuUI.x + menuUI.width > editor.editorui.popupLayer.stage.stageWidth)
-                menuUI.x -= menuUI.width;
+            if (!menuItemRendererRect) {
+                menuUI.x = feng3d.windowEventProxy.clientX;
+                menuUI.y = feng3d.windowEventProxy.clientY;
+                if (menuUI.x + menuUI.width > editor.editorui.popupLayer.stage.stageWidth - 10)
+                    menuUI.x = editor.editorui.popupLayer.stage.stageWidth - menuUI.width - 10;
+            }
+            else {
+                menuUI.x = menuItemRendererRect.right;
+                menuUI.y = menuItemRendererRect.top;
+                if (menuUI.x + menuUI.width > editor.editorui.popupLayer.stage.stageWidth) {
+                    menuUI.x = menuItemRendererRect.left - menuUI.width;
+                }
+            }
             if (menuUI.y + menuUI.height > editor.editorui.popupLayer.stage.stageHeight)
-                menuUI.y -= menuUI.height;
+                menuUI.y = editor.editorui.popupLayer.stage.stageHeight - menuUI.height;
             return menuUI;
         };
         MenuUI.prototype.onComplete = function () {
@@ -2776,6 +2731,83 @@ var editor;
         return MenuUI;
     }(eui.List));
     editor.MenuUI = MenuUI;
+    var MenuItemRenderer = /** @class */ (function (_super) {
+        __extends(MenuItemRenderer, _super);
+        function MenuItemRenderer() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "MenuItemRender";
+            return _this;
+        }
+        MenuItemRenderer.prototype.dataChanged = function () {
+            _super.prototype.dataChanged.call(this);
+            this.updateView();
+        };
+        MenuItemRenderer.prototype.onComplete = function () {
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            if (this.stage) {
+                this.onAddedToStage();
+            }
+        };
+        MenuItemRenderer.prototype.onAddedToStage = function () {
+            this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
+            this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
+            this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
+            this.menuUI = this.parent;
+            this.updateView();
+        };
+        MenuItemRenderer.prototype.onRemovedFromStage = function () {
+            this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
+            this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
+            this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
+            this.menuUI = null;
+        };
+        MenuItemRenderer.prototype.updateView = function () {
+            if (!this.data)
+                return;
+            this.touchEnabled = true;
+            this.touchChildren = true;
+            if (this.data.type == 'separator') {
+                this.skin.currentState = "separator";
+                this.touchEnabled = false;
+                this.touchChildren = false;
+            }
+            else if (this.data.submenu) {
+                this.skin.currentState = "sub";
+            }
+            else {
+                this.skin.currentState = "normal";
+            }
+            this.selectedRect.visible = false;
+        };
+        MenuItemRenderer.prototype.onItemMouseDown = function (event) {
+            this.data.click && this.data.click();
+            this.menuUI.topMenu.remove();
+        };
+        MenuItemRenderer.prototype.onItemMouseOver = function () {
+            if (this.data.submenu) {
+                var rect = this.getTransformedBounds(this.stage);
+                this.menuUI.subMenuUI = MenuUI.create(this.data.submenu, rect);
+                this.menuUI.subMenuUI.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
+            }
+            else {
+                this.menuUI.subMenuUI = null;
+            }
+            this.selectedRect.visible = true;
+        };
+        MenuItemRenderer.prototype.onItemMouseOut = function () {
+            if (!this.menuUI.subMenuUI)
+                this.selectedRect.visible = false;
+        };
+        MenuItemRenderer.prototype.onsubMenuUIRemovedFromeStage = function (e) {
+            var current = e.currentTarget;
+            current.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
+            this.selectedRect.visible = false;
+        };
+        return MenuItemRenderer;
+    }(eui.ItemRenderer));
+    editor.MenuItemRenderer = MenuItemRenderer;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -3234,7 +3266,7 @@ var editor;
                     editor.menu.popupEnum(feng3d.MinMaxCurveMode, this.minMaxCurve.mode, function (v) {
                         _this.minMaxCurve.mode = v;
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
-                    }, { width: 210 });
+                    });
                     break;
                 case this.curveGroup:
                     editor.minMaxCurveEditor = editor.minMaxCurveEditor || new editor.MinMaxCurveEditor();
@@ -3909,7 +3941,7 @@ var editor;
                     editor.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
                         _this.minMaxGradient.mode = v;
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
-                    }, { width: 210 });
+                    });
                     break;
             }
             if (view) {
@@ -6795,7 +6827,7 @@ var editor;
         HierarchyView.prototype.onListRightClick = function (e) {
             if (e.target == this.list) {
                 editor.editorData.selectObject(null);
-                editor.menu.popup(editor.menuConfig.getCreateObjectMenu(), { mousex: feng3d.windowEventProxy.clientX, mousey: feng3d.windowEventProxy.clientY });
+                editor.menu.popup(editor.menuConfig.getCreateObjectMenu());
             }
         };
         return HierarchyView;
@@ -13644,11 +13676,11 @@ var editor;
                 {
                     label: "Rendering",
                     submenu: [
+                        { label: "CartoonComponent", click: function () { gameobject.addComponent(feng3d.CartoonComponent); } },
                         { label: "Camera", click: function () { gameobject.addComponent(feng3d.Camera); } },
                         { label: "PointLight", click: function () { gameobject.addComponent(feng3d.PointLight); } },
                         { label: "DirectionalLight", click: function () { gameobject.addComponent(feng3d.DirectionalLight); } },
                         { label: "OutLineComponent", click: function () { gameobject.addComponent(feng3d.OutLineComponent); } },
-                        { label: "CartoonComponent", click: function () { gameobject.addComponent(feng3d.CartoonComponent); } },
                     ]
                 },
                 {

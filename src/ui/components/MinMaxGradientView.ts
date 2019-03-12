@@ -162,7 +162,7 @@ namespace editor
                     {
                         this.minMaxGradient.mode = v;
                         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-                    }, { width: 210 });
+                    });
                     break;
             }
             if (view)
