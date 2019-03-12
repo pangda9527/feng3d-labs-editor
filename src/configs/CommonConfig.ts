@@ -30,8 +30,22 @@ namespace editor
                     }
                 },
                 {
-                    label: "打开项目",
-                    submenu: getProjectsMenu(),
+                    label: "打开最近的项目",
+                    submenu: editorcache.lastProjects.map(element =>
+                    {
+                        var menuItem: MenuItem =
+                        {
+                            label: element, click: () =>
+                            {
+                                if (editorcache.projectname != element)
+                                {
+                                    editorcache.projectname = element;
+                                    window.location.reload();
+                                }
+                            }
+                        };
+                        return menuItem;
+                    }),
                     click: () =>
                     {
                         popupview.popupObject({ newprojectname: "newproject" }, (data) =>
@@ -396,30 +410,5 @@ namespace editor
                 });
             });
         });
-    }
-
-    /**
-     * 获取项目菜单
-     */
-    function getProjectsMenu()
-    {
-        var projects: MenuItem[] = [];
-
-        editorRS.fs.getProjectList((err, ps) =>
-        {
-            ps.forEach(element =>
-            {
-                projects.push(
-                    {
-                        label: element, click: () =>
-                        {
-                            editorcache.projectname = element;
-                            window.location.reload();
-                        }
-                    });
-            });
-        });
-
-        return projects;
     }
 }

@@ -8,9 +8,20 @@ namespace editor
         projectname: string;
 
         /**
-         * 本地文件系统工作空间
+         * 最近的项目列表
          */
-        native_workspacce: string;
+        lastProjects: string[] = [];
+
+        /**
+         * 设置最近打开的项目
+         */
+        setLastProject(projectname: string)
+        {
+            var index = this.lastProjects.indexOf(projectname);
+            if (index != -1)
+                this.lastProjects.splice(index, 1);
+            this.lastProjects.unshift(projectname);
+        }
 
         constructor()
         {

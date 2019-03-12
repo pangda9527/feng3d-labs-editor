@@ -546,10 +546,10 @@ var editor;
          * @param path （相对）路径
          */
         NativeFS.prototype.getAbsolutePath = function (path) {
-            if (!this.workspace || !this.projectname) {
+            if (!this.projectname) {
                 throw "\u8BF7\u5148\u4F7F\u7528 initproject \u521D\u59CB\u5316\u9879\u76EE";
             }
-            return this.workspace + "/" + this.projectname + "/" + path;
+            return this.projectname + "/" + path;
         };
         /**
          * 文件是否存在
@@ -667,16 +667,12 @@ var editor;
             });
         };
         /**
-         * 获取项目列表
-         *
-         * @param callback 完成回调
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
          */
-        NativeFS.prototype.getProjectList = function (callback) {
-            if (!this.workspace) {
-                callback(null, []);
-                return;
-            }
-            this.fs.readdir(this.workspace, callback);
+        NativeFS.prototype.hasProject = function (projectname, callback) {
+            this.fs.exists(projectname, callback);
         };
         /**
          * 初始化项目
@@ -685,26 +681,14 @@ var editor;
          */
         NativeFS.prototype.initproject = function (projectname, callback) {
             var _this = this;
-            this.selectWorkspace(function () {
-                _this.projectname = projectname;
-                _this.fs.mkdir(_this.workspace + "/" + _this.projectname, callback);
-            });
-        };
-        /**
-         * 选择工作空间
-         *
-         * @param callback 完成回调
-         */
-        NativeFS.prototype.selectWorkspace = function (callback) {
-            var _this = this;
-            this.fs.exists(editor.editorcache.native_workspacce, function (exists) {
+            this.fs.exists(editor.editorcache.projectname, function (exists) {
                 if (exists) {
-                    _this.workspace = editor.editorcache.native_workspacce;
+                    _this.projectname = editor.editorcache.projectname;
                     callback();
                     return;
                 }
                 editor.nativeAPI.selectDirectoryDialog(function (event, path) {
-                    editor.editorcache.native_workspacce = _this.workspace = path;
+                    editor.editorcache.projectname = _this.projectname = path;
                     callback();
                 });
             });
@@ -900,6 +884,10 @@ var editor;
 (function (editor) {
     var EditorCache = /** @class */ (function () {
         function EditorCache() {
+            /**
+             * 最近的项目列表
+             */
+            this.lastProjects = [];
             var value = localStorage.getItem("feng3d-editor");
             if (!value)
                 return;
@@ -910,6 +898,15 @@ var editor;
                 }
             }
         }
+        /**
+         * 设置最近打开的项目
+         */
+        EditorCache.prototype.setLastProject = function (projectname) {
+            var index = this.lastProjects.indexOf(projectname);
+            if (index != -1)
+                this.lastProjects.splice(index, 1);
+            this.lastProjects.unshift(projectname);
+        };
         EditorCache.prototype.save = function () {
             localStorage.setItem("feng3d-editor", JSON.stringify(this, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1'));
         };
@@ -2745,7 +2742,8 @@ var editor;
             dataProvider.replaceAll(menu);
             menuUI.dataProvider = dataProvider;
             editor.editorui.popupLayer.addChild(menuUI);
-            parm = Object.assign({ width: 150 }, parm);
+            // parm = Object.assign({ width: 150 }, parm);
+            parm = parm || {};
             if (parm.width !== undefined)
                 menuUI.width = parm.width;
             menuUI.x = parm.mousex || feng3d.windowEventProxy.clientX;
@@ -13403,8 +13401,18 @@ var editor;
                     }
                 },
                 {
-                    label: "打开项目",
-                    submenu: getProjectsMenu(),
+                    label: "打开最近的项目",
+                    submenu: editor.editorcache.lastProjects.map(function (element) {
+                        var menuItem = {
+                            label: element, click: function () {
+                                if (editor.editorcache.projectname != element) {
+                                    editor.editorcache.projectname = element;
+                                    window.location.reload();
+                                }
+                            }
+                        };
+                        return menuItem;
+                    }),
                     click: function () {
                         editor.popupview.popupObject({ newprojectname: "newproject" }, function (data) {
                             if (data.newprojectname && data.newprojectname.length > 0) {
@@ -13717,23 +13725,6 @@ var editor;
             });
         });
     }
-    /**
-     * 获取项目菜单
-     */
-    function getProjectsMenu() {
-        var projects = [];
-        editor.editorRS.fs.getProjectList(function (err, ps) {
-            ps.forEach(function (element) {
-                projects.push({
-                    label: element, click: function () {
-                        editor.editorcache.projectname = element;
-                        window.location.reload();
-                    }
-                });
-            });
-        });
-        return projects;
-    }
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -13945,6 +13936,7 @@ var editor;
         }
         Editor.prototype.init = function () {
             document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editor.editorcache.projectname;
+            editor.editorcache.setLastProject(editor.editorcache.projectname);
             this.initMainView();
             //初始化feng3d
             new editor.Main3D();

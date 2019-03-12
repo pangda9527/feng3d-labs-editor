@@ -5,14 +5,8 @@ namespace editor
      */
     export class NativeFS extends feng3d.ReadWriteFS
     {
-
         /**
-         * 工作空间路径，工作空间内存放所有编辑器项目
-         */
-        workspace: string;
-
-        /**
-         * 项目名称
+         * 项目路径
          */
         projectname: string;
 
@@ -98,11 +92,11 @@ namespace editor
          */
         getAbsolutePath(path: string)
         {
-            if (!this.workspace || !this.projectname)
+            if (!this.projectname)
             {
                 throw `请先使用 initproject 初始化项目`;
             }
-            return this.workspace + "/" + this.projectname + "/" + path;
+            return this.projectname + "/" + path;
         }
 
         /**
@@ -237,50 +231,33 @@ namespace editor
                 this.writeArrayBuffer(dest, buffer, callback);
             });
         }
-
         /**
-         * 获取项目列表
-         * 
-         * @param callback 完成回调
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
          */
-        getProjectList(callback: (err: Error, projects: string[]) => void)
+        hasProject(projectname: string, callback: (has: boolean) => void)
         {
-            if (!this.workspace) { callback(null, []); return; }
-            this.fs.readdir(this.workspace, callback);
+            this.fs.exists(projectname, callback);
         }
-
         /**
          * 初始化项目
          * @param projectname 项目名称
          * @param callback 回调函数
          */
-        initproject(projectname: string, callback: (err: Error) => void)
+        initproject(projectname: string, callback: (err?: Error) => void)
         {
-            this.selectWorkspace(() =>
-            {
-                this.projectname = projectname;
-                this.fs.mkdir(this.workspace + "/" + this.projectname, callback);
-            });
-        }
-
-        /**
-         * 选择工作空间
-         * 
-         * @param callback 完成回调
-         */
-        private selectWorkspace(callback: (err?: Error) => void)
-        {
-            this.fs.exists(editorcache.native_workspacce, exists =>
+            this.fs.exists(editorcache.projectname, exists =>
             {
                 if (exists)
                 {
-                    this.workspace = editorcache.native_workspacce;
+                    this.projectname = editorcache.projectname;
                     callback();
                     return;
                 }
                 nativeAPI.selectDirectoryDialog((event, path) =>
                 {
-                    editorcache.native_workspacce = this.workspace = path;
+                    editorcache.projectname = this.projectname = path;
                     callback();
                 });
             });

@@ -55,6 +55,8 @@ namespace editor
         {
             document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorcache.projectname;
 
+            editorcache.setLastProject(editorcache.projectname);
+
             this.initMainView()
 
             //初始化feng3d

@@ -95,7 +95,8 @@ namespace editor
             menuUI.dataProvider = dataProvider;
             editorui.popupLayer.addChild(menuUI);
 
-            parm = Object.assign({ width: 150 }, parm);
+            // parm = Object.assign({ width: 150 }, parm);
+            parm = parm || {};
 
             if (parm.width !== undefined)
                 menuUI.width = parm.width;

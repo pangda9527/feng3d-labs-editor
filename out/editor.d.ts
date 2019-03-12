@@ -265,11 +265,7 @@ declare namespace editor {
      */
     class NativeFS extends feng3d.ReadWriteFS {
         /**
-         * 工作空间路径，工作空间内存放所有编辑器项目
-         */
-        workspace: string;
-        /**
-         * 项目名称
+         * 项目路径
          */
         projectname: string;
         /**
@@ -375,23 +371,17 @@ declare namespace editor {
          */
         copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
         /**
-         * 获取项目列表
-         *
-         * @param callback 完成回调
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
          */
-        getProjectList(callback: (err: Error, projects: string[]) => void): void;
+        hasProject(projectname: string, callback: (has: boolean) => void): void;
         /**
          * 初始化项目
          * @param projectname 项目名称
          * @param callback 回调函数
          */
-        initproject(projectname: string, callback: (err: Error) => void): void;
-        /**
-         * 选择工作空间
-         *
-         * @param callback 完成回调
-         */
-        private selectWorkspace;
+        initproject(projectname: string, callback: (err?: Error) => void): void;
     }
 }
 declare namespace editor {
@@ -432,9 +422,13 @@ declare namespace editor {
          */
         projectname: string;
         /**
-         * 本地文件系统工作空间
+         * 最近的项目列表
          */
-        native_workspacce: string;
+        lastProjects: string[];
+        /**
+         * 设置最近打开的项目
+         */
+        setLastProject(projectname: string): void;
         constructor();
         save(): void;
     }
