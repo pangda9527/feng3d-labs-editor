@@ -135,7 +135,7 @@ var editor;
     /**
      * 是否支持本地API
      */
-    editor.supportNative = !(typeof require == "undefined");
+    editor.supportNative = !(typeof __dirname == "undefined");
     if (editor.supportNative) {
         editor.nativeFS = require(__dirname + "/native/NativeFSBase.js").nativeFS;
         editor.nativeAPI = require(__dirname + "/native/electron_renderer.js");
@@ -699,12 +699,13 @@ var editor;
             var _this = this;
             this.fs.exists(editor.editorcache.native_workspacce, function (exists) {
                 if (exists) {
+                    _this.workspace = editor.editorcache.native_workspacce;
                     callback();
                     return;
                 }
                 editor.nativeAPI.selectDirectoryDialog(function (event, path) {
-                    _this.workspace = path;
-                    callback(null);
+                    editor.editorcache.native_workspacce = _this.workspace = path;
+                    callback();
                 });
             });
         };

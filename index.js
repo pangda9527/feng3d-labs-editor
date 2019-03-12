@@ -1,7 +1,6 @@
 var isdebug = true;
 
 loadjs([
-    `feng3d/out/feng3d.js`,
     //
     isdebug ? "libs/modules/egret/egret.js" : "libs/modules/egret/egret.min.js",
     isdebug ? "libs/modules/egret/egret.web.js" : "libs/modules/egret/egret.web.min.js",
@@ -9,6 +8,7 @@ loadjs([
     isdebug ? "libs/modules/eui/eui.js" : "libs/modules/eui/eui.min.js",
     isdebug ? "libs/modules/tween/tween.js" : "libs/modules/tween/tween.min.js",
     //
+    `feng3d/out/feng3d.js`,
     `out/editor.js`,
 ], loadComplete);
 

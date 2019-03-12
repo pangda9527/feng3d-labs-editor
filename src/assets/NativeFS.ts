@@ -272,11 +272,16 @@ namespace editor
         {
             this.fs.exists(editorcache.native_workspacce, exists =>
             {
-                if (exists) { callback(); return; }
+                if (exists)
+                {
+                    this.workspace = editorcache.native_workspacce;
+                    callback();
+                    return;
+                }
                 nativeAPI.selectDirectoryDialog((event, path) =>
                 {
-                    this.workspace = path;
-                    callback(null);
+                    editorcache.native_workspacce = this.workspace = path;
+                    callback();
                 });
             });
         }

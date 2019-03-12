@@ -17,7 +17,7 @@ namespace editor
     /**
      * 是否支持本地API
      */
-    export var supportNative = !(typeof require == "undefined");
+    export var supportNative = !(typeof __dirname == "undefined");
 
     if (supportNative)
     {
