@@ -531,14 +531,21 @@ var editor;
          * @param callback 加载完成回调
          */
         NativeFS.prototype.readImage = function (path, callback) {
-            this.readArrayBuffer(path, function (err, buffer) {
-                if (err) {
-                    callback(err, null);
-                    return;
+            var _this = this;
+            this.exists(path, function (exists) {
+                if (exists) {
+                    var img = new Image();
+                    img.onload = function () {
+                        callback(null, img);
+                    };
+                    img.onerror = function (evt) {
+                        callback(new Error("\u52A0\u8F7D\u56FE\u7247" + path + "\u5931\u8D25"), null);
+                    };
+                    img.src = _this.getAbsolutePath(path);
                 }
-                feng3d.dataTransform.arrayBufferToImage(buffer, function (image) {
-                    callback(null, image);
-                });
+                else {
+                    callback(new Error("\u56FE\u7247\u8D44\u6E90 " + path + " \u4E0D\u5B58\u5728"), null);
+                }
             });
         };
         /**

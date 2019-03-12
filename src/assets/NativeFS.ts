@@ -76,14 +76,26 @@ namespace editor
          */
         readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void)
         {
-            this.readArrayBuffer(path, (err, buffer) =>
+            this.exists(path, exists =>
             {
-                if (err) { callback(err, null); return; }
-                feng3d.dataTransform.arrayBufferToImage(buffer, (image) =>
+                if (exists)
                 {
-                    callback(null, image);
-                });
+                    var img = new Image();
+                    img.onload = function ()
+                    {
+                        callback(null, img);
+                    };
+                    img.onerror = (evt) =>
+                    {
+                        callback(new Error(`加载图片${path}失败`), null);
+                    }
+                    img.src = this.getAbsolutePath(path);
+                } else
+                {
+                    callback(new Error(`图片资源 ${path} 不存在`), null);
+                }
             });
+
         }
 
         /**
