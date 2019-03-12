@@ -48,6 +48,12 @@ declare namespace editor {
          * @param fullPath 完整路径
          */
         showFileInExplorer(fullPath: string): void;
+        /**
+         * 使用 VSCode 打开项目
+         *
+         * @param  projectPath 项目路径
+         */
+        vscodeOpenProject(projectPath: string): void;
     }
     /**
      * Native文件系统
@@ -911,34 +917,6 @@ declare namespace editor {
          */
         popup(menu: MenuItem[]): void;
         popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void): void;
-    }
-    class MenuUI extends eui.List {
-        subMenuUI: MenuUI;
-        private _subMenuUI;
-        private parentMenuUI;
-        readonly topMenu: MenuUI;
-        constructor();
-        static create(menu: MenuItem[], menuItemRendererRect?: egret.Rectangle): MenuUI;
-        private onComplete;
-        private onAddedToStage;
-        private onRemovedFromStage;
-        private updateView;
-        remove(): void;
-    }
-    class MenuItemRenderer extends eui.ItemRenderer {
-        data: MenuItem;
-        menuUI: MenuUI;
-        selectedRect: eui.Rect;
-        protected dataChanged(): void;
-        constructor();
-        private onComplete;
-        private onAddedToStage;
-        private onRemovedFromStage;
-        private updateView;
-        private onItemMouseDown;
-        private onItemMouseOver;
-        private onItemMouseOut;
-        private onsubMenuUIRemovedFromeStage;
     }
 }
 declare namespace editor {

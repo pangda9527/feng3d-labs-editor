@@ -96,7 +96,7 @@ namespace editor
 
     menu = new Menu();
 
-    export class MenuUI extends eui.List
+    class MenuUI extends eui.List
     {
         get subMenuUI()
         {
@@ -191,7 +191,7 @@ namespace editor
         }
     }
 
-    export class MenuItemRenderer extends eui.ItemRenderer
+    class MenuItemRenderer extends eui.ItemRenderer
     {
         data: MenuItem;
         menuUI: MenuUI;

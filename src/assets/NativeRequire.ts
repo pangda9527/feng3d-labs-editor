@@ -43,6 +43,13 @@ namespace editor
          * @param fullPath 完整路径
          */
         showFileInExplorer(fullPath: string): void;
+
+        /**
+         * 使用 VSCode 打开项目
+         * 
+         * @param  projectPath 项目路径
+         */
+        vscodeOpenProject(projectPath: string): void;
     }
 
     /**

@@ -2737,7 +2737,6 @@ var editor;
         };
         return MenuUI;
     }(eui.List));
-    editor.MenuUI = MenuUI;
     var MenuItemRenderer = /** @class */ (function (_super) {
         __extends(MenuItemRenderer, _super);
         function MenuItemRenderer() {
@@ -2814,7 +2813,6 @@ var editor;
         };
         return MenuItemRenderer;
     }(eui.ItemRenderer));
-    editor.MenuItemRenderer = MenuItemRenderer;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -7062,6 +7060,10 @@ var editor;
                     label: "在资源管理器中显示", click: function () {
                         var fullpath = editor.editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
                         editor.nativeAPI.showFileInExplorer(fullpath);
+                    }
+                }, {
+                    label: "使用VSCode打开项目", click: function () {
+                        editor.nativeAPI.vscodeOpenProject(editor.editorRS.fs.projectname);
                     }
                 });
             }

@@ -287,7 +287,13 @@ namespace editor
                         var fullpath = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
                         nativeAPI.showFileInExplorer(fullpath);
                     }
-                });
+                }, {
+                        label: "使用VSCode打开项目", click: () =>
+                        {
+                            nativeAPI.vscodeOpenProject(editorRS.fs.projectname);
+                        }
+                    },
+                );
             }
 
             if (menuconfig.length > 0)
