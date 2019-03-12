@@ -278,6 +278,18 @@ namespace editor
                         }
                     });
             }
+
+            if (nativeAPI)
+            {
+                menuconfig.push({
+                    label: "在资源管理器中显示", click: () =>
+                    {
+                        var fullpath = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
+                        nativeAPI.showFileInExplorer(fullpath);
+                    }
+                });
+            }
+
             if (menuconfig.length > 0)
             {
                 menuconfig.push({ type: "separator" });

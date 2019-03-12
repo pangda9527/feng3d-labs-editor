@@ -42,6 +42,12 @@ declare namespace editor {
          * @param callback 完成回调
          */
         selectDirectoryDialog(callback: (event: Event, path: string) => void): void;
+        /**
+         * 在资源管理器中显示
+         *
+         * @param fullPath 完整路径
+         */
+        showFileInExplorer(fullPath: string): void;
     }
     /**
      * Native文件系统

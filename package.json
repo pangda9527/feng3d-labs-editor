@@ -17,8 +17,7 @@
   "author": "feng",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^4.0.7",
-    "typescript": "^3.3.3333"
+    "electron": "^4.0.7"
   },
   "dependencies": {}
 }

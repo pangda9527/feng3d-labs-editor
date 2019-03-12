@@ -7019,6 +7019,14 @@ var editor;
                     }
                 });
             }
+            if (editor.nativeAPI) {
+                menuconfig.push({
+                    label: "在资源管理器中显示", click: function () {
+                        var fullpath = editor.editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
+                        editor.nativeAPI.showFileInExplorer(fullpath);
+                    }
+                });
+            }
             if (menuconfig.length > 0) {
                 menuconfig.push({ type: "separator" });
             }
