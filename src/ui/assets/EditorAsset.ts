@@ -307,7 +307,16 @@ namespace editor
                 menuconfig.push({
                     label: "编辑", click: () =>
                     {
-                        scriptCompiler.edit(<feng3d.StringAsset>assetNode.asset);
+                        if (nativeAPI)
+                        {
+                            // 使用本地 VSCode 打开
+                            var path = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
+                            nativeAPI.vscodeOpenProject(path);
+                        } else
+                        {
+                            scriptCompiler.edit(<feng3d.StringAsset>assetNode.asset);
+                        }
+
                     }
                 });
             }

@@ -34,6 +34,7 @@ namespace editor
         private createproject(callback: (err?: Error) => void)
         {
             var urls = [
+                ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
                 ["resource/template/app.js", "app.js"],
                 ["resource/template/index.html", "index.html"],
                 ["resource/template/project.js", "project.js"],

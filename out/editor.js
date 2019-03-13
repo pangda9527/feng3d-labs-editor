@@ -741,6 +741,7 @@ var editor;
         EditorRS.prototype.createproject = function (callback) {
             var _this = this;
             var urls = [
+                ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
                 ["resource/template/app.js", "app.js"],
                 ["resource/template/index.html", "index.html"],
                 ["resource/template/project.js", "project.js"],
@@ -7074,7 +7075,14 @@ var editor;
             if (assetNode.asset instanceof feng3d.StringAsset) {
                 menuconfig.push({
                     label: "编辑", click: function () {
-                        editor.scriptCompiler.edit(assetNode.asset);
+                        if (editor.nativeAPI) {
+                            // 使用本地 VSCode 打开
+                            var path = editor.editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
+                            editor.nativeAPI.vscodeOpenProject(path);
+                        }
+                        else {
+                            editor.scriptCompiler.edit(assetNode.asset);
+                        }
                     }
                 });
             }
