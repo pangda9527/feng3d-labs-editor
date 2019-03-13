@@ -14010,7 +14010,7 @@ var editor;
             return _this;
         }
         Editor.prototype.init = function () {
-            document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editor.editorcache.projectname;
+            document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editor.editorcache.projectname;
             editor.editorcache.setLastProject(editor.editorcache.projectname);
             this.initMainView();
             //初始化feng3d
