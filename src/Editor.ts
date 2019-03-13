@@ -53,7 +53,7 @@ namespace editor
 
         private init()
         {
-            document.head.getElementsByTagName("title")[0].innerText = "editor -- " + editorcache.projectname;
+            document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editorcache.projectname;
 
             editorcache.setLastProject(editorcache.projectname);
 

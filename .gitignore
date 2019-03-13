@@ -1,4 +1,5 @@
 /node_modules
 /feng3d-editor-win32-x64
 /release
-/electron/resources/app.asar
+/publish/electron/resources/app.asar
+/publish/bin
