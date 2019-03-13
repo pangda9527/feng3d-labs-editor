@@ -53,7 +53,7 @@ declare namespace editor {
          *
          * @param  projectPath 项目路径
          */
-        vscodeOpenProject(projectPath: string): void;
+        openWithVSCode(projectPath: string, callback: (err: Error) => void): void;
     }
     /**
      * Native文件系统

@@ -7064,7 +7064,10 @@ var editor;
                     }
                 }, {
                     label: "使用VSCode打开项目", click: function () {
-                        editor.nativeAPI.vscodeOpenProject(editor.editorRS.fs.projectname);
+                        editor.nativeAPI.openWithVSCode(editor.editorRS.fs.projectname, function (err) {
+                            if (err)
+                                throw err;
+                        });
                     }
                 });
             }
@@ -7078,7 +7081,14 @@ var editor;
                         if (editor.nativeAPI) {
                             // 使用本地 VSCode 打开
                             var path = editor.editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
-                            editor.nativeAPI.vscodeOpenProject(path);
+                            editor.nativeAPI.openWithVSCode(editor.editorRS.fs.projectname, function (err) {
+                                if (err)
+                                    throw err;
+                                editor.nativeAPI.openWithVSCode(path, function (err) {
+                                    if (err)
+                                        throw err;
+                                });
+                            });
                         }
                         else {
                             editor.scriptCompiler.edit(assetNode.asset);

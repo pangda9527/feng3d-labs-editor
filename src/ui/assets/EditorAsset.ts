@@ -290,7 +290,10 @@ namespace editor
                 }, {
                         label: "使用VSCode打开项目", click: () =>
                         {
-                            nativeAPI.vscodeOpenProject(editorRS.fs.projectname);
+                            nativeAPI.openWithVSCode(editorRS.fs.projectname, (err) =>
+                            {
+                                if (err) throw err;
+                            });
                         }
                     },
                 );
@@ -311,7 +314,15 @@ namespace editor
                         {
                             // 使用本地 VSCode 打开
                             var path = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
-                            nativeAPI.vscodeOpenProject(path);
+                            nativeAPI.openWithVSCode(editorRS.fs.projectname, (err) =>
+                            {
+                                if (err) throw err;
+                                nativeAPI.openWithVSCode(path, (err) =>
+                                {
+                                    if (err) throw err;
+                                });
+                            });
+
                         } else
                         {
                             scriptCompiler.edit(<feng3d.StringAsset>assetNode.asset);

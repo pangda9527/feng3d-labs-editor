@@ -25,16 +25,25 @@ function showFileInExplorer(fullPath)
 }
 
 /**
- * 使用 VSCode 打开项目
+ * 使用 VSCode 打开项目（文件）
  * 
- * @param {string} projectPath 项目路径
+ * @param {string} projectPath 项目（文件）路径
  */
-function vscodeOpenProject(projectPath)
+function openWithVSCode(projectPath, callback)
 {
-    process.exec('code ' + projectPath);
+    process.exec(`code "${projectPath}"`, function (error, stdout, stderr)
+    {
+        if (error !== null)
+        {
+            console.log('exec error: ' + error);
+        }
+        console.log(stdout)
+        console.log(stderr)
+        callback(error);
+    });
 }
 
 
 exports.selectDirectoryDialog = selectDirectoryDialog;
 exports.showFileInExplorer = showFileInExplorer;
-exports.vscodeOpenProject = vscodeOpenProject;
+exports.openWithVSCode = openWithVSCode;
