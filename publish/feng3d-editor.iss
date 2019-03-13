@@ -24,7 +24,6 @@ DisableProgramGroupPage=yes
 OutputDir=C:\workspace\typescript\feng3d\editor\publish\bin
 OutputBaseFilename=feng3d-editor
 SetupIconFile=C:\workspace\typescript\feng3d\editor\publish\favicon.ico
-Password=123456
 Compression=lzma
 SolidCompression=yes
 
