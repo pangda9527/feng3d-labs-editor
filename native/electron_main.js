@@ -1,4 +1,4 @@
-const { ipcMain, dialog } = require('electron')
+const { ipcMain, dialog, WebContents } = require('electron')
 
 ipcMain.on('open-file-dialog', (event) =>
 {
@@ -8,4 +8,10 @@ ipcMain.on('open-file-dialog', (event) =>
         {
             event.sender.send('selected-directory', files[0])
         });
-})
+});
+
+ipcMain.on('openDevTools', (event) =>
+{
+    if (event && event.sender)
+        event.sender.openDevTools();
+});

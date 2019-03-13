@@ -54,6 +54,10 @@ declare namespace editor {
          * @param  projectPath 项目路径
          */
         openWithVSCode(projectPath: string, callback: (err: Error) => void): void;
+        /**
+         * 打开开发者工具
+         */
+        openDevTools(): void;
     }
     /**
      * Native文件系统
@@ -509,6 +513,7 @@ declare namespace editor {
         private onMouseRotateScene;
         private onLookToSelectedGameObject;
         private onMouseWheelMoveSceneCamera;
+        private onOpenDevTools;
     }
     class SceneControlConfig {
         mouseWheelMoveStep: number;

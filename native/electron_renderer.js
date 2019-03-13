@@ -21,7 +21,15 @@ function selectDirectoryDialog(callback)
  */
 function showFileInExplorer(fullPath)
 {
-    shell.showItemInFolder(fullPath)
+    shell.showItemInFolder(fullPath);
+}
+
+/**
+ * 打开开发者工具
+ */
+function openDevTools()
+{
+    ipcRenderer.send(`openDevTools`);
 }
 
 /**
@@ -47,3 +55,4 @@ function openWithVSCode(projectPath, callback)
 exports.selectDirectoryDialog = selectDirectoryDialog;
 exports.showFileInExplorer = showFileInExplorer;
 exports.openWithVSCode = openWithVSCode;
+exports.openDevTools = openDevTools;

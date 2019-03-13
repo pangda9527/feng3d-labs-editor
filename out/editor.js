@@ -1076,6 +1076,8 @@ var editor;
             feng3d.shortcut.on("areaSelectStart", this.onAreaSelectStart, this);
             feng3d.shortcut.on("areaSelect", this.onAreaSelect, this);
             feng3d.shortcut.on("areaSelectEnd", this.onAreaSelectEnd, this);
+            //
+            feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
         }
         Editorshortcut.prototype.onAreaSelectStart = function () {
             this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -1263,6 +1265,10 @@ var editor;
             var distance = -feng3d.windowEventProxy.deltaY * editor.sceneControlConfig.mouseWheelMoveStep * editor.sceneControlConfig.lookDistance / 10;
             editor.editorCamera.transform.localToWorldMatrix = editor.editorCamera.transform.localToWorldMatrix.moveForward(distance);
             editor.sceneControlConfig.lookDistance -= distance;
+        };
+        Editorshortcut.prototype.onOpenDevTools = function () {
+            if (editor.nativeAPI)
+                editor.nativeAPI.openDevTools();
         };
         return Editorshortcut;
     }());
@@ -13583,8 +13589,16 @@ var editor;
                             });
                         });
                     },
-                }
+                },
             ];
+            if (editor.nativeAPI) {
+                mainMenu.push({
+                    label: "打开开发者工具",
+                    click: function () {
+                        editor.nativeAPI.openDevTools();
+                    },
+                });
+            }
             return mainMenu;
         };
         /**
@@ -13838,6 +13852,8 @@ var shortcutConfig = [
     { key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D" },
     { key: "mousemove", command: "areaSelect", when: "areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
     { key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
+    //
+    { key: "f12", command: "openDevTools", stateCommand: "", when: "" },
 ];
 /// <reference path="../libs/typescriptServices.d.ts" />
 var editor;

@@ -17,7 +17,9 @@
   "author": "feng",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^4.0.7"
+    "asar": "^1.0.0",
+    "electron": "^4.0.7",
+    "fs-extra": "^7.0.1"
   },
   "dependencies": {}
 }

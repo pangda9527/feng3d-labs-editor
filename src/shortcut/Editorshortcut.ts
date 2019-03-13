@@ -34,6 +34,8 @@ namespace editor
             feng3d.shortcut.on("areaSelectStart", this.onAreaSelectStart, this);
             feng3d.shortcut.on("areaSelect", this.onAreaSelect, this);
             feng3d.shortcut.on("areaSelectEnd", this.onAreaSelectEnd, this);
+            //
+            feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
         }
 
         private areaSelectStartPosition: feng3d.Vector2;
@@ -280,6 +282,11 @@ namespace editor
             var distance = -feng3d.windowEventProxy.deltaY * sceneControlConfig.mouseWheelMoveStep * sceneControlConfig.lookDistance / 10;
             editorCamera.transform.localToWorldMatrix = editorCamera.transform.localToWorldMatrix.moveForward(distance);
             sceneControlConfig.lookDistance -= distance;
+        }
+
+        private onOpenDevTools()
+        {
+            if (nativeAPI) nativeAPI.openDevTools();
         }
     }
 

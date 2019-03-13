@@ -182,8 +182,18 @@ namespace editor
                             });
                         });
                     },
-                }
+                },
             ];
+            if (nativeAPI)
+            {
+                mainMenu.push({
+                    label: "打开开发者工具",
+                    click: () =>
+                    {
+                        nativeAPI.openDevTools();
+                    },
+                });
+            }
             return mainMenu;
         }
 

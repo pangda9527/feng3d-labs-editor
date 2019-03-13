@@ -34,6 +34,8 @@ var shortcutConfig = [ //
 	{ key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D" },
 	{ key: "mousemove", command: "areaSelect", when: "areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
 	{ key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
+	//
+	{ key: "f12", command: "openDevTools", stateCommand: "", when: "" },
 
 	// 可用命令
 	// - fpsViewStart						启动fps浏览场景
