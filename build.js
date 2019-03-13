@@ -11,7 +11,6 @@ watchcopyDir("../feng3d/out", "resource/template/libs");
  */
 watchProject([
     __dirname,
-    __dirname + "/native",
 ]);
 
 function watchcopyDir(srcdir, destdir)
