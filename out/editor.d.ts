@@ -925,6 +925,13 @@ declare namespace editor {
          * @param menuItem 菜单数据
          */
         private handleShow;
+        /**
+         * 弹出枚举选择菜单
+         *
+         * @param enumDefinition 枚举定义
+         * @param currentValue 当前枚举值
+         * @param selectCallBack 选择回调
+         */
         popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void): void;
     }
 }

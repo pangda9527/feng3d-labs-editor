@@ -83,12 +83,11 @@ namespace editor
             {
                 var submenu = menuItem.submenu.filter(v => v.show != false);
 
-                var length = submenu.length;
-                for (let i = length - 1; i >= 0; i--)
+                for (let i = submenu.length - 1; i >= 0; i--)
                 {
                     if (submenu[i].type == 'separator')
                     {
-                        if (i == 0 || i == length - 1)
+                        if (i == 0 || i == submenu.length - 1)
                         {
                             submenu.splice(i, 1);
                         } else if (submenu[i - 1].type == 'separator')
@@ -103,7 +102,14 @@ namespace editor
             return menuItem;
         }
 
-        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v) => void)
+        /**
+         * 弹出枚举选择菜单
+         * 
+         * @param enumDefinition 枚举定义
+         * @param currentValue 当前枚举值
+         * @param selectCallBack 选择回调
+         */
+        popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void)
         {
             var menu: MenuItem[] = [];
             for (const key in enumDefinition)
