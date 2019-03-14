@@ -725,8 +725,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-}
-declare namespace editor {
     interface TreeNodeMap {
         added: TreeNode;
         removed: TreeNode;

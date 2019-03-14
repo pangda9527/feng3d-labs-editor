@@ -197,6 +197,8 @@ namespace editor
         menuUI: MenuUI;
 
         public selectedRect: eui.Rect;
+        public label: eui.Label;
+        public subSign: eui.Label;
 
         protected dataChanged()
         {
@@ -254,19 +256,20 @@ namespace editor
                 this.touchEnabled = false;
                 this.touchChildren = false;
             }
-            else if (this.data.submenu)
-            {
-                this.skin.currentState = "sub";
-            }
             else
             {
+                this.subSign.visible = !!this.data.submenu
                 this.skin.currentState = "normal";
             }
+            this.subSign.textColor = this.label.textColor = this.data.enable != false ? 0x000000 : 0x6E6E6E;
+
             this.selectedRect.visible = false;
         }
 
         private onItemMouseDown(event: egret.TouchEvent): void
         {
+            if (this.data.enable == false) return;
+
             this.data.click && this.data.click();
             this.menuUI.topMenu.remove();
         }
@@ -275,14 +278,17 @@ namespace editor
         {
             if (this.data.submenu)
             {
-                var rect = this.getTransformedBounds(this.stage);
-                this.menuUI.subMenuUI = MenuUI.create(this.data.submenu, rect);
-                this.menuUI.subMenuUI.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
+                if (this.data.enable != false)
+                {
+                    var rect = this.getTransformedBounds(this.stage);
+                    this.menuUI.subMenuUI = MenuUI.create(this.data.submenu, rect);
+                    this.menuUI.subMenuUI.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
+                }
             } else
             {
                 this.menuUI.subMenuUI = null;
             }
-            this.selectedRect.visible = true;
+            this.selectedRect.visible = this.data.enable != false;
         }
 
         private onItemMouseOut()
