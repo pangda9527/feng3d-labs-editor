@@ -148,13 +148,13 @@ namespace editor
          */
         popupmenu(assetNode: AssetNode)
         {
-            var menuconfig: MenuItem[] = [];
             var folder = <feng3d.FolderAsset>assetNode.asset;
-            if (assetNode.isDirectory)
-            {
-                menuconfig.push(
+
+            var menuconfig: MenuItem[] =
+                [
                     {
                         label: "新建",
+                        show: assetNode.isDirectory,
                         submenu: [
                             {
                                 label: "文件夹", click: () =>
@@ -275,86 +275,61 @@ namespace editor
                                 }
                                 this.inputFiles(files);
                             });
-                        }
-                    });
-            }
-
-            if (nativeAPI)
-            {
-                menuconfig.push({
-                    label: "在资源管理器中显示", click: () =>
+                        }, show: assetNode.isDirectory,
+                    },
                     {
-                        var fullpath = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
-                        nativeAPI.showFileInExplorer(fullpath);
-                    }
-                }, {
+                        label: "在资源管理器中显示", click: () =>
+                        {
+                            var fullpath = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
+                            nativeAPI.showFileInExplorer(fullpath);
+                        }, show: !!nativeAPI,
+                    }, {
                         label: "使用VSCode打开项目", click: () =>
                         {
                             nativeAPI.openWithVSCode(editorRS.fs.projectname, (err) =>
                             {
                                 if (err) throw err;
                             });
-                        }
+                        }, show: !!nativeAPI,
                     },
-                );
-            }
-
-            if (menuconfig.length > 0)
-            {
-                menuconfig.push({ type: "separator" });
-            }
-
-            // 使用编辑器打开
-            if (assetNode.asset instanceof feng3d.StringAsset)
-            {
-                menuconfig.push({
-                    label: "编辑", click: () =>
+                    { type: "separator" },
                     {
-                        if (nativeAPI)
+                        label: "编辑", click: () =>
                         {
-                            // 使用本地 VSCode 打开
-                            var path = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
-                            nativeAPI.openWithVSCode(editorRS.fs.projectname, (err) =>
+                            if (nativeAPI)
                             {
-                                if (err) throw err;
-                                nativeAPI.openWithVSCode(path, (err) =>
+                                // 使用本地 VSCode 打开
+                                var path = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
+                                nativeAPI.openWithVSCode(editorRS.fs.projectname, (err) =>
                                 {
                                     if (err) throw err;
+                                    nativeAPI.openWithVSCode(path, (err) =>
+                                    {
+                                        if (err) throw err;
+                                    });
                                 });
-                            });
-
-                        } else
-                        {
-                            scriptCompiler.edit(<feng3d.StringAsset>assetNode.asset);
-                        }
-
-                    }
-                });
-            }
+                            } else
+                            {
+                                scriptCompiler.edit(<feng3d.StringAsset>assetNode.asset);
+                            }
+                        }, show: assetNode.asset instanceof feng3d.StringAsset,
+                    },
+                ];
 
             // 解析菜单
             this.parserMenu(menuconfig, assetNode);
-            if (!assetNode.isDirectory)
-            {
-                menuconfig.push({
+            menuconfig.push(
+                {
                     label: "导出", click: () =>
                     {
                         assetNode.export();
-                    }
-                });
-            }
-            if (assetNode != this.rootFile && assetNode != this.showFloder)
-            {
-                menuconfig.push({
+                    }, show: !assetNode.isDirectory,
+                }, {
                     label: "删除", click: () =>
                     {
                         assetNode.delete();
-                    }
-                });
-            }
-            if (assetNode.asset instanceof feng3d.Texture2D)
-            {
-                menuconfig.push({
+                    }, show: assetNode != this.rootFile && assetNode != this.showFloder,
+                }, {
                     label: "去除背景色", click: () =>
                     {
                         var image: HTMLImageElement = assetNode.asset["image"];
@@ -366,10 +341,9 @@ namespace editor
                             assetNode.asset["image"] = img;
                             this.saveAsset(assetNode);
                         });
-
-                    }
-                })
-            }
+                    }, show: assetNode.asset.data instanceof feng3d.Texture2D,
+                },
+            );
             menu.popup(menuconfig);
         }
 
