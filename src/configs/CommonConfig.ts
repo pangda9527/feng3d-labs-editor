@@ -27,7 +27,7 @@ namespace editor
                                 window.location.reload();
                             }
                         });
-                    }, enable: false,
+                    },
                 },
                 {
                     label: "打开最近的项目",

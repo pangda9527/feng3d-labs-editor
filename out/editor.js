@@ -2660,10 +2660,9 @@ var editor;
             var _this = this;
             if (menuItem.submenu) {
                 var submenu = menuItem.submenu.filter(function (v) { return v.show != false; });
-                var length = submenu.length;
-                for (var i = length - 1; i >= 0; i--) {
+                for (var i = submenu.length - 1; i >= 0; i--) {
                     if (submenu[i].type == 'separator') {
-                        if (i == 0 || i == length - 1) {
+                        if (i == 0 || i == submenu.length - 1) {
                             submenu.splice(i, 1);
                         }
                         else if (submenu[i - 1].type == 'separator') {
@@ -2676,6 +2675,13 @@ var editor;
             }
             return menuItem;
         };
+        /**
+         * 弹出枚举选择菜单
+         *
+         * @param enumDefinition 枚举定义
+         * @param currentValue 当前枚举值
+         * @param selectCallBack 选择回调
+         */
         Menu.prototype.popupEnum = function (enumDefinition, currentValue, selectCallBack) {
             var menu = [];
             for (var key in enumDefinition) {
@@ -13494,7 +13500,7 @@ var editor;
                                 window.location.reload();
                             }
                         });
-                    }, enable: false,
+                    },
                 },
                 {
                     label: "打开最近的项目",
