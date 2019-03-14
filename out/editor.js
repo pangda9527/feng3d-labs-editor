@@ -6992,11 +6992,11 @@ var editor;
          */
         EditorAsset.prototype.popupmenu = function (assetNode) {
             var _this = this;
-            var menuconfig = [];
             var folder = assetNode.asset;
-            if (assetNode.isDirectory) {
-                menuconfig.push({
+            var menuconfig = [
+                {
                     label: "新建",
+                    show: assetNode.isDirectory,
                     submenu: [
                         {
                             label: "文件夹", click: function () {
@@ -7087,7 +7087,9 @@ var editor;
                             ],
                         },
                     ]
-                }, { type: "separator" }, {
+                },
+                { type: "separator" },
+                {
                     label: "导入资源", click: function () {
                         editor.editorRS.selectFile(function (fileList) {
                             var files = [];
@@ -7096,30 +7098,23 @@ var editor;
                             }
                             _this.inputFiles(files);
                         });
-                    }
-                });
-            }
-            if (editor.nativeAPI) {
-                menuconfig.push({
+                    }, show: assetNode.isDirectory,
+                },
+                {
                     label: "在资源管理器中显示", click: function () {
                         var fullpath = editor.editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
                         editor.nativeAPI.showFileInExplorer(fullpath);
-                    }
+                    }, show: !!editor.nativeAPI,
                 }, {
                     label: "使用VSCode打开项目", click: function () {
                         editor.nativeAPI.openWithVSCode(editor.editorRS.fs.projectname, function (err) {
                             if (err)
                                 throw err;
                         });
-                    }
-                });
-            }
-            if (menuconfig.length > 0) {
-                menuconfig.push({ type: "separator" });
-            }
-            // 使用编辑器打开
-            if (assetNode.asset instanceof feng3d.StringAsset) {
-                menuconfig.push({
+                    }, show: !!editor.nativeAPI,
+                },
+                { type: "separator" },
+                {
                     label: "编辑", click: function () {
                         if (editor.nativeAPI) {
                             // 使用本地 VSCode 打开
@@ -7136,39 +7131,31 @@ var editor;
                         else {
                             editor.scriptCompiler.edit(assetNode.asset);
                         }
-                    }
-                });
-            }
+                    }, show: assetNode.asset instanceof feng3d.StringAsset,
+                },
+            ];
             // 解析菜单
             this.parserMenu(menuconfig, assetNode);
-            if (!assetNode.isDirectory) {
-                menuconfig.push({
-                    label: "导出", click: function () {
-                        assetNode.export();
-                    }
-                });
-            }
-            if (assetNode != this.rootFile && assetNode != this.showFloder) {
-                menuconfig.push({
-                    label: "删除", click: function () {
-                        assetNode.delete();
-                    }
-                });
-            }
-            if (assetNode.asset instanceof feng3d.Texture2D) {
-                menuconfig.push({
-                    label: "去除背景色", click: function () {
-                        var image = assetNode.asset["image"];
-                        var imageUtil = new feng3d.ImageUtil().fromImage(image);
-                        var backColor = new feng3d.Color4(222 / 255, 222 / 255, 222 / 255);
-                        imageUtil.clearBackColor(backColor);
-                        feng3d.dataTransform.imagedataToImage(imageUtil.imageData, function (img) {
-                            assetNode.asset["image"] = img;
-                            _this.saveAsset(assetNode);
-                        });
-                    }
-                });
-            }
+            menuconfig.push({
+                label: "导出", click: function () {
+                    assetNode.export();
+                }, show: !assetNode.isDirectory,
+            }, {
+                label: "删除", click: function () {
+                    assetNode.delete();
+                }, show: assetNode != this.rootFile && assetNode != this.showFloder,
+            }, {
+                label: "去除背景色", click: function () {
+                    var image = assetNode.asset["image"];
+                    var imageUtil = new feng3d.ImageUtil().fromImage(image);
+                    var backColor = new feng3d.Color4(222 / 255, 222 / 255, 222 / 255);
+                    imageUtil.clearBackColor(backColor);
+                    feng3d.dataTransform.imagedataToImage(imageUtil.imageData, function (img) {
+                        assetNode.asset["image"] = img;
+                        _this.saveAsset(assetNode);
+                    });
+                }, show: assetNode.asset.data instanceof feng3d.Texture2D,
+            });
             editor.menu.popup(menuconfig);
         };
         /**
@@ -13627,15 +13614,13 @@ var editor;
                         });
                     },
                 },
-            ];
-            if (editor.nativeAPI) {
-                mainMenu.push({
+                {
                     label: "打开开发者工具",
                     click: function () {
                         editor.nativeAPI.openDevTools();
-                    },
-                });
-            }
+                    }, show: !!editor.nativeAPI,
+                }
+            ];
             return mainMenu;
         };
         /**
