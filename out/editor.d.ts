@@ -891,7 +891,7 @@ declare namespace editor {
          * 弹出菜单
          *
          *
-         * @param menu 菜单数据
+         * @param menuItems 菜单数据
          *
          * @returns
 该功能存在一个暂时无法解决的bug
@@ -918,7 +918,13 @@ declare namespace editor {
 ```
          *
          */
-        popup(menu: MenuItem[]): void;
+        popup(menuItems: MenuItem[]): void;
+        /**
+         * 处理菜单中 show==false的菜单项
+         *
+         * @param menuItem 菜单数据
+         */
+        private handleShow;
         popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void): void;
     }
 }
