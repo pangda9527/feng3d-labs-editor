@@ -146,7 +146,7 @@ namespace editor
 			var editable = true;
 			if (showdata instanceof feng3d.Feng3dObject) editable = !Boolean(showdata.hideFlags & feng3d.HideFlags.NotEditable);
 			this._view = feng3d.objectview.getObjectView(showdata, { editable: editable });
-			this._view.percentWidth = 100;
+			// this._view.percentWidth = 100;
 			this.group.addChild(this._view);
 			this.group.scrollV = 0;
 			this._view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
