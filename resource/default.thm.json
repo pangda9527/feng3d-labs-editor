@@ -109,6 +109,7 @@
         "resource/custom_skins/AssetFileItemRenderer.exml",
         "resource/custom_skins/AssetView.exml",
         "resource/custom_skins/NavigationView.exml",
+        "resource/custom_skins/ShortCutSetting.exml",
         "resource/custom_skins/MainView.exml"
     ]
 }

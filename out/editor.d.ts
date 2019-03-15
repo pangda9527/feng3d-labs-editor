@@ -524,6 +524,20 @@ declare namespace editor {
     var sceneControlConfig: SceneControlConfig;
 }
 declare namespace editor {
+    /**
+     * 快捷键设置界面
+     */
+    class ShortCutSetting extends eui.Component {
+        lab: eui.Label;
+        rect: eui.Rect;
+        constructor();
+        private onComplete;
+        private onAddedToStage;
+        private onRemovedFromStage;
+        static readonly instance: any;
+    }
+}
+declare namespace editor {
     class Feng3dView extends eui.Component implements eui.UIComponent {
         backRect: eui.Rect;
         private canvas;
