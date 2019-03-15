@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="ShortCutSetting" width="400" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+	<e:Label id="titleLabel" size="12" bold="true" textColor="0x000000" touchEnabled="false" left="5" right="5" text="标题" top="5"/>
+	<e:TextInput id="text" width="100%" scaleX="1" scaleY="1" y="25" prompt="在此键入搜索按键绑定"/>
+</e:Skin>

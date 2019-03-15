@@ -1291,6 +1291,43 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    /**
+     * 快捷键设置界面
+     */
+    var ShortCutSetting = /** @class */ (function (_super) {
+        __extends(ShortCutSetting, _super);
+        function ShortCutSetting() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "ShortCutSetting";
+            return _this;
+        }
+        ShortCutSetting.prototype.onComplete = function () {
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            if (this.stage) {
+                this.onAddedToStage();
+            }
+        };
+        ShortCutSetting.prototype.onAddedToStage = function () {
+            console.log("onAddedToStage");
+        };
+        ShortCutSetting.prototype.onRemovedFromStage = function () {
+            console.log("onRemovedFromStage");
+        };
+        Object.defineProperty(ShortCutSetting, "instance", {
+            get: function () {
+                return this["_instance"] = this["_instance"] || new ShortCutSetting();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return ShortCutSetting;
+    }(eui.Component));
+    editor.ShortCutSetting = ShortCutSetting;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var Feng3dView = /** @class */ (function (_super) {
         __extends(Feng3dView, _super);
         function Feng3dView() {
@@ -13633,7 +13670,7 @@ var editor;
                         {
                             label: "快捷方式",
                             click: function () {
-                                alert("\u663E\u793A\u5FEB\u6377\u65B9\u5F0F\u754C\u9762");
+                                editor.popupview.popupView(editor.ShortCutSetting.instance);
                             },
                         },
                     ],

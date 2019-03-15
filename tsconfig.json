@@ -33,6 +33,7 @@
         "src/ui/drag/Drag.ts",
         //
         "src/shortcut/Editorshortcut.ts",
+        "src/shortcut/ShortCutSetting.ts",
         //
         "src/ui/Feng3dView.ts",
         "src/ui/CameraPreview.ts",

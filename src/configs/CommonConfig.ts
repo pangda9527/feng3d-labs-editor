@@ -198,7 +198,7 @@ namespace editor
                             label: "快捷方式",
                             click: () =>
                             {
-                                alert(`显示快捷方式界面`)
+                                popupview.popupView(ShortCutSetting.instance);
                             },
                         },
                     ],
