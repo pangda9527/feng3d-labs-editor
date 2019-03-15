@@ -1078,6 +1078,7 @@ var editor;
             feng3d.shortcut.on("areaSelectEnd", this.onAreaSelectEnd, this);
             //
             feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
+            feng3d.shortcut.on("refreshWindow", this.onRefreshWindow, this);
         }
         Editorshortcut.prototype.onAreaSelectStart = function () {
             this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -1269,6 +1270,9 @@ var editor;
         Editorshortcut.prototype.onOpenDevTools = function () {
             if (editor.nativeAPI)
                 editor.nativeAPI.openDevTools();
+        };
+        Editorshortcut.prototype.onRefreshWindow = function () {
+            window.location.reload();
         };
         return Editorshortcut;
     }());
@@ -13876,6 +13880,7 @@ var shortcutConfig = [
     { key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
     //
     { key: "f12", command: "openDevTools", stateCommand: "", when: "" },
+    { key: "f5", command: "refreshWindow", stateCommand: "", when: "" },
 ];
 /// <reference path="../libs/typescriptServices.d.ts" />
 var editor;

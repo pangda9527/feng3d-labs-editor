@@ -36,6 +36,7 @@ var shortcutConfig = [ //
 	{ key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
 	//
 	{ key: "f12", command: "openDevTools", stateCommand: "", when: "" },
+	{ key: "f5", command: "refreshWindow", stateCommand: "", when: "" },
 
 	// 可用命令
 	// - fpsViewStart						启动fps浏览场景

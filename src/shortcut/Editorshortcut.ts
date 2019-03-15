@@ -36,6 +36,7 @@ namespace editor
             feng3d.shortcut.on("areaSelectEnd", this.onAreaSelectEnd, this);
             //
             feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
+            feng3d.shortcut.on("refreshWindow", this.onRefreshWindow, this);
         }
 
         private areaSelectStartPosition: feng3d.Vector2;
@@ -287,6 +288,11 @@ namespace editor
         private onOpenDevTools()
         {
             if (nativeAPI) nativeAPI.openDevTools();
+        }
+
+        private onRefreshWindow()
+        {
+            window.location.reload();
         }
     }
 
