@@ -85,6 +85,8 @@ namespace editor
         {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 
+            feng3d.shortcut.activityState("disableScroll");
+
             //
             this.mouseDownPosition = mousePos;
             this.mouseDownValue = this.space[this.attribute];
@@ -103,6 +105,8 @@ namespace editor
         {
             feng3d.windowEventProxy.off("mousemove", this.onStageMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onStageMouseUp, this);
+
+            feng3d.shortcut.deactivityState("disableScroll");
         }
 
         protected ontxtfocusin()

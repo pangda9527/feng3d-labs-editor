@@ -82,9 +82,12 @@ namespace egret
         }
 
         // 阻止拖拽滚动面板
-        eui.Scroller.prototype["onTouchBeginCapture"] = function ()
+        var oldonTouchMove = eui.Scroller.prototype["onTouchMove"];
+        eui.Scroller.prototype["onTouchMove"] = function (event)
         {
-
+            if (feng3d.shortcut.getState("disableScroll"))
+                return;
+            oldonTouchMove.call(this, event);
         }
 
         function onMouseWheel(event: WheelEvent)

@@ -1049,6 +1049,15 @@ var editor;
         });
     }
 })(editor || (editor = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * (快捷键)状态列表
+     */
+    feng3d.shortCutStates = {
+        disableScroll: "禁止滚动"
+    };
+})(feng3d || (feng3d = {}));
 var editor;
 (function (editor) {
     var Editorshortcut = /** @class */ (function () {
@@ -4624,6 +4633,7 @@ var editor;
         };
         NumberTextInputBinder.prototype.onMouseDown = function (e) {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            feng3d.shortcut.activityState("disableScroll");
             //
             this.mouseDownPosition = mousePos;
             this.mouseDownValue = this.space[this.attribute];
@@ -4637,6 +4647,7 @@ var editor;
         NumberTextInputBinder.prototype.onStageMouseUp = function () {
             feng3d.windowEventProxy.off("mousemove", this.onStageMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onStageMouseUp, this);
+            feng3d.shortcut.deactivityState("disableScroll");
         };
         NumberTextInputBinder.prototype.ontxtfocusin = function () {
             _super.prototype.ontxtfocusin.call(this);
@@ -12369,7 +12380,11 @@ var egret;
             feng3d.windowEventProxy.off("wheel", onMouseWheel, this);
         };
         // 阻止拖拽滚动面板
-        eui.Scroller.prototype["onTouchBeginCapture"] = function () {
+        var oldonTouchMove = eui.Scroller.prototype["onTouchMove"];
+        eui.Scroller.prototype["onTouchMove"] = function (event) {
+            if (feng3d.shortcut.getState("disableScroll"))
+                return;
+            oldonTouchMove.call(this, event);
         };
         function onMouseWheel(event) {
             var scroller = this;
