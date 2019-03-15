@@ -183,12 +183,25 @@ namespace editor
                         });
                     },
                 },
+                { type: "separator" },
                 {
                     label: "打开开发者工具",
                     click: () =>
                     {
                         nativeAPI.openDevTools();
                     }, show: !!nativeAPI,
+                },
+                {
+                    label: "首选项",
+                    submenu: [
+                        {
+                            label: "快捷方式",
+                            click: () =>
+                            {
+                                alert(`显示快捷方式界面`)
+                            },
+                        },
+                    ],
                 }
             ];
 

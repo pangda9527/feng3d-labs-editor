@@ -2834,8 +2834,10 @@ var editor;
         MenuItemRenderer.prototype.onItemMouseDown = function (event) {
             if (this.data.enable == false)
                 return;
-            this.data.click && this.data.click();
-            this.menuUI.topMenu.remove();
+            if (this.data.click) {
+                this.data.click();
+                this.menuUI.topMenu.remove();
+            }
         };
         MenuItemRenderer.prototype.onItemMouseOver = function () {
             if (this.data.submenu) {
@@ -13618,11 +13620,23 @@ var editor;
                         });
                     },
                 },
+                { type: "separator" },
                 {
                     label: "打开开发者工具",
                     click: function () {
                         editor.nativeAPI.openDevTools();
                     }, show: !!editor.nativeAPI,
+                },
+                {
+                    label: "首选项",
+                    submenu: [
+                        {
+                            label: "快捷方式",
+                            click: function () {
+                                alert("\u663E\u793A\u5FEB\u6377\u65B9\u5F0F\u754C\u9762");
+                            },
+                        },
+                    ],
                 }
             ];
             return mainMenu;
