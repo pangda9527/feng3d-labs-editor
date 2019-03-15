@@ -514,6 +514,7 @@ declare namespace editor {
         private onLookToSelectedGameObject;
         private onMouseWheelMoveSceneCamera;
         private onOpenDevTools;
+        private onRefreshWindow;
     }
     class SceneControlConfig {
         mouseWheelMoveStep: number;
