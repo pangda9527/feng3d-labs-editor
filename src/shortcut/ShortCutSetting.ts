@@ -5,8 +5,8 @@ namespace editor
      */
     export class ShortCutSetting extends eui.Component
     {
-        public lab: eui.Label;
-        public rect: eui.Rect;
+        public searchTxt: eui.TextInput;
+        public list: eui.List;
 
         constructor()
         {
@@ -17,9 +17,9 @@ namespace editor
 
         private onComplete(): void
         {
-
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
             if (this.stage)
             {
                 this.onAddedToStage();
@@ -28,12 +28,33 @@ namespace editor
 
         private onAddedToStage()
         {
-            console.log(`onAddedToStage`)
+            this.searchTxt.addEventListener(egret.Event.CHANGE, this.updateView, this);
+            this.updateView();
         }
 
         private onRemovedFromStage()
         {
-            console.log(`onRemovedFromStage`)
+            this.searchTxt.removeEventListener(egret.Event.CHANGE, this.updateView, this);
+        }
+
+        private updateView()
+        {
+            var text = this.searchTxt.text;
+            var reg = new RegExp(text, "i");
+
+            var data = shortcutConfig.filter(v =>
+            {
+                for (const key in v)
+                {
+                    if (key.charAt(0) != "_")
+                    {
+                        if (typeof v[key] == "string" && v[key].search(reg) != -1)
+                            return true;
+                    }
+                }
+                return false;
+            })
+            this.list.dataProvider = new eui.ArrayCollection(data);
         }
 
         static get instance()

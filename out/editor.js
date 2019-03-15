@@ -1310,10 +1310,25 @@ var editor;
             }
         };
         ShortCutSetting.prototype.onAddedToStage = function () {
-            console.log("onAddedToStage");
+            this.searchTxt.addEventListener(egret.Event.CHANGE, this.updateView, this);
+            this.updateView();
         };
         ShortCutSetting.prototype.onRemovedFromStage = function () {
-            console.log("onRemovedFromStage");
+            this.searchTxt.removeEventListener(egret.Event.CHANGE, this.updateView, this);
+        };
+        ShortCutSetting.prototype.updateView = function () {
+            var text = this.searchTxt.text;
+            var reg = new RegExp(text, "i");
+            var data = shortcutConfig.filter(function (v) {
+                for (var key in v) {
+                    if (key.charAt(0) != "_") {
+                        if (typeof v[key] == "string" && v[key].search(reg) != -1)
+                            return true;
+                    }
+                }
+                return false;
+            });
+            this.list.dataProvider = new eui.ArrayCollection(data);
         };
         Object.defineProperty(ShortCutSetting, "instance", {
             get: function () {

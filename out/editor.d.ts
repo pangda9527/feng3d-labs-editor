@@ -528,12 +528,13 @@ declare namespace editor {
      * 快捷键设置界面
      */
     class ShortCutSetting extends eui.Component {
-        lab: eui.Label;
-        rect: eui.Rect;
+        searchTxt: eui.TextInput;
+        list: eui.List;
         constructor();
         private onComplete;
         private onAddedToStage;
         private onRemovedFromStage;
+        private updateView;
         static readonly instance: any;
     }
 }
