@@ -14,9 +14,13 @@ namespace editor
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "InspectorViewSkin";
+
+			feng3d.feng3dDispatcher.on("inspector.update", this.updateView, this);
+			feng3d.feng3dDispatcher.on("inspector.showData", this.onShowData, this);
+			feng3d.feng3dDispatcher.on("inspector.saveShowData", this.onSaveShowData, this);
 		}
 
-		showData(data: any, removeBack = false)
+		private showData(data: any, removeBack = false)
 		{
 			if (this._viewData == data) return;
 			if (this._viewData)
@@ -33,7 +37,17 @@ namespace editor
 			this.updateView();
 		}
 
-		updateView()
+		private onShowData(event: feng3d.Event<any>)
+		{
+			this.showData(event.data);
+		}
+
+		private onSaveShowData(event: feng3d.Event<() => void>)
+		{
+			this.saveShowData(event.data);
+		}
+
+		private updateView()
 		{
 			this.typeLab.text = `Inspector`;
 			this.backButton.visible = this._viewDataList.length > 0;
@@ -72,7 +86,7 @@ namespace editor
 		/**
 		 * 保存显示数据
 		 */
-		saveShowData(callback?: () => void)
+		private saveShowData(callback?: () => void)
 		{
 			if (this._dataChanged)
 			{
@@ -109,8 +123,6 @@ namespace editor
 		{
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
 			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-
-			editorui.inspectorView = this;
 
 			if (this.stage)
 			{

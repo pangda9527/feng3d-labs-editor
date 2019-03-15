@@ -5523,7 +5523,7 @@ var editor;
             }
         };
         OAVDefault.prototype.onDoubleClick = function () {
-            editor.editorui.inspectorView.showData(this.attributeValue);
+            feng3d.feng3dDispatcher.dispatch("inspector.showData", this.attributeValue);
         };
         OAVDefault.prototype.onTextChange = function () {
             if (this._textfocusintxt) {
@@ -6522,7 +6522,7 @@ var editor;
         };
         OAVPick.prototype.onDoubleClick = function () {
             if (this.attributeValue && typeof this.attributeValue == "object")
-                editor.editorui.inspectorView.showData(this.attributeValue);
+                feng3d.feng3dDispatcher.dispatch("inspector.showData", this.attributeValue);
         };
         OAVPick = __decorate([
             feng3d.OAVComponent()
@@ -6577,7 +6577,7 @@ var editor;
         };
         OAVTexture2D.prototype.onDoubleClick = function () {
             if (this.attributeValue && typeof this.attributeValue == "object")
-                editor.editorui.inspectorView.showData(this.attributeValue);
+                feng3d.feng3dDispatcher.dispatch("inspector.showData", this.attributeValue);
         };
         OAVTexture2D = __decorate([
             feng3d.OAVComponent()
@@ -6850,6 +6850,9 @@ var editor;
             _this._dataChanged = false;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "InspectorViewSkin";
+            feng3d.feng3dDispatcher.on("inspector.update", _this.updateView, _this);
+            feng3d.feng3dDispatcher.on("inspector.showData", _this.onShowData, _this);
+            feng3d.feng3dDispatcher.on("inspector.saveShowData", _this.onSaveShowData, _this);
             return _this;
         }
         InspectorView.prototype.showData = function (data, removeBack) {
@@ -6866,6 +6869,12 @@ var editor;
             //
             this._viewData = data;
             this.updateView();
+        };
+        InspectorView.prototype.onShowData = function (event) {
+            this.showData(event.data);
+        };
+        InspectorView.prototype.onSaveShowData = function (event) {
+            this.saveShowData(event.data);
         };
         InspectorView.prototype.updateView = function () {
             var _this = this;
@@ -6923,7 +6932,6 @@ var editor;
         InspectorView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-            editor.editorui.inspectorView = this;
             if (this.stage) {
                 this.onAddedToStage();
             }
@@ -7491,7 +7499,7 @@ var editor;
                         // 运行project.js
                         windowEval(content);
                         // 刷新属性界面（界面中可能有脚本）
-                        editor.editorui.inspectorView.updateView();
+                        feng3d.feng3dDispatcher.dispatch("inspector.update");
                     }
                     catch (error) {
                         feng3d.warn(error);
@@ -8281,7 +8289,7 @@ var editor;
                     editor.editorData.isBaryCenter = !editor.editorData.isBaryCenter;
                     break;
                 case this.playBtn:
-                    editor.editorui.inspectorView.saveShowData(function () {
+                    feng3d.feng3dDispatcher.dispatch("inspector.saveShowData", function () {
                         editor.editorRS.fs.writeObject("default.scene.json", editor.engine.scene.gameObject, function (err) {
                             if (err) {
                                 feng3d.warn(err);
