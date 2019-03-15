@@ -9,7 +9,6 @@
         "outFile": "out/editor.js"
     },
     "files": [
-        "feng3d/out/feng3d.d.ts",
         //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
@@ -20,6 +19,15 @@
         //
         "libs/jszip.d.ts",
         "libs/FileSaver.d.ts",
+        //
+        "feng3d/out/feng3d.d.ts",
+        // 扩展 feng3d
+        "src/polyfill/feng3d/ClassUtils.ts",
+        "src/polyfill/feng3d/ShortCut.ts",
+        // 扩展 egret
+        "src/polyfill/egret/MouseEvent.ts",
+        "src/polyfill/egret/TextField.ts",
+        "src/polyfill/egret/Scroller.ts",
         //
         "src/oauth/GiteeOauth.ts",
         //
@@ -154,9 +162,6 @@
         "src/navigation/NavigationProcess.ts",
         //
         "src/recastnavigation/Recastnavigation.ts",
-        //
-        "src/global/EgretExtend.ts",
-        "src/global/EgretMouseEventExtends.ts",
         //
         "src/scripts/EditorScript.ts",
         "src/scripts/MouseRayTestScript.ts",
