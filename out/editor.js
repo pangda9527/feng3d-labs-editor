@@ -17,6 +17,219 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var feng3d;
+(function (feng3d) {
+    document.body.oncontextmenu = function () { return false; };
+    //给反射添加查找的空间
+    feng3d.classUtils.addClassNameSpace("editor");
+    feng3d.classUtils.addClassNameSpace("egret");
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * (快捷键)状态列表
+     */
+    feng3d.shortCutStates = {
+        disableScroll: "禁止滚动"
+    };
+})(feng3d || (feng3d = {}));
+var egret;
+(function (egret) {
+    egret.MouseEvent = egret.TouchEvent;
+    (function () {
+        //映射事件名称
+        egret.MouseEvent.MOUSE_DOWN = "mousedown";
+        egret.MouseEvent.MIDDLE_MOUSE_DOWN = "middlemousedown";
+        egret.MouseEvent.MOUSE_UP = "mouseup";
+        egret.MouseEvent.MIDDLE_MOUSE_UP = "middlemouseup";
+        egret.MouseEvent.RIGHT_MOUSE_UP = "rightmouseup";
+        egret.MouseEvent.MOUSE_MOVE = "mousemove";
+        egret.MouseEvent.CLICK = "click";
+        egret.MouseEvent.MIDDLE_Click = "middleclick";
+        egret.MouseEvent.MOUSE_OUT = "mouseout";
+        egret.MouseEvent.RIGHT_MOUSE_DOWN = "rightmousedown";
+        egret.MouseEvent.RIGHT_CLICK = "rightclick";
+        egret.MouseEvent.DOUBLE_CLICK = "dblclick";
+        //
+    })();
+    var overDisplayObject;
+    egret.mouseEventEnvironment = function () {
+        var webTouchHandler;
+        var canvas;
+        var touch;
+        // 鼠标按下时选中对象
+        var mousedownObject;
+        // /**
+        //  * 鼠标按下的按钮编号
+        //  */
+        // var mousedownButton: number;
+        webTouchHandler = getWebTouchHandler();
+        canvas = webTouchHandler.canvas;
+        touch = webTouchHandler.touch;
+        webTouchHandler.canvas.addEventListener("mousemove", onMouseMove);
+        feng3d.windowEventProxy.on("mousedown", function (e) {
+            var location = webTouchHandler.getLocation(e);
+            var x = location.x;
+            var y = location.y;
+            var target = touch["findTarget"](x, y);
+            // mousedownButton = e.button;
+            mousedownObject = target;
+            if (e.button == 0) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_DOWN, true, true, x, y);
+            }
+            else if (e.button == 1) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MIDDLE_MOUSE_DOWN, true, true, x, y);
+            }
+            else if (e.button == 2) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_MOUSE_DOWN, true, true, x, y);
+            }
+        });
+        feng3d.windowEventProxy.on("mouseup", function (e) {
+            //右键按下
+            var location = webTouchHandler.getLocation(e);
+            var x = location.x;
+            var y = location.y;
+            var target = touch["findTarget"](x, y);
+            if (e.button == 0) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_UP, true, true, x, y);
+                if (mousedownObject == target) {
+                    egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.CLICK, true, true, x, y);
+                }
+            }
+            else if (e.button == 1) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MIDDLE_MOUSE_UP, true, true, x, y);
+                if (mousedownObject == target) {
+                    egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MIDDLE_Click, true, true, x, y);
+                }
+            }
+            else if (e.button == 2) {
+                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_MOUSE_UP, true, true, x, y);
+                if (mousedownObject == target) {
+                    egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_CLICK, true, true, x, y);
+                }
+            }
+            mousedownObject = null;
+        });
+        feng3d.windowEventProxy.on("dblclick", function (e) {
+            var location = webTouchHandler.getLocation(e);
+            var x = location.x;
+            var y = location.y;
+            var target = touch["findTarget"](x, y);
+            egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.DOUBLE_CLICK, true, true, x, y);
+        });
+        // 调试，查看鼠标下的对象
+        feng3d.windowEventProxy.on("keyup", function (e) {
+            if (e.key == "p") {
+                var location = webTouchHandler.getLocation(e);
+                var target = touch["findTarget"](location.x, location.y);
+                var arr = [target];
+                while (target.parent) {
+                    target = target.parent;
+                    arr.push(target);
+                }
+                window["earr"] = arr;
+                console.log(arr);
+            }
+        });
+        function onMouseMove(event) {
+            var location = webTouchHandler.getLocation(event);
+            var x = location.x;
+            var y = location.y;
+            var target = touch["findTarget"](x, y);
+            egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_MOVE, true, true, x, y);
+            if (target == overDisplayObject)
+                return;
+            var preOverDisplayObject = overDisplayObject;
+            overDisplayObject = target;
+            if (preOverDisplayObject) {
+                egret.TouchEvent.dispatchTouchEvent(preOverDisplayObject, egret.MouseEvent.MOUSE_OUT, true, true, x, y);
+            }
+            if (overDisplayObject) {
+                egret.TouchEvent.dispatchTouchEvent(overDisplayObject, egret.MouseEvent.MOUSE_OVER, true, true, x, y);
+            }
+        }
+        function getWebTouchHandler() {
+            var list = document.querySelectorAll(".egret-player");
+            var length = list.length;
+            var player = null;
+            for (var i = 0; i < length; i++) {
+                var container = list[i];
+                player = container["egret-player"];
+                if (player)
+                    break;
+            }
+            return player.webTouchHandler;
+        }
+    };
+})(egret || (egret = {}));
+var egret;
+(function (egret) {
+    //调整默认字体大小
+    egret.TextField.default_size = 12;
+    // 扩展焦点在文本中时 禁止出发快捷键
+    var oldfocusHandler = egret.InputController.prototype["focusHandler"];
+    egret.InputController.prototype["focusHandler"] = function (event) {
+        oldfocusHandler.call(this, event);
+        feng3d.shortcut.enable = !this._isFocus;
+    };
+    var oldblurHandler = egret.InputController.prototype["blurHandler"];
+    egret.InputController.prototype["blurHandler"] = function (event) {
+        oldblurHandler.call(this, event);
+        feng3d.shortcut.enable = !this._isFocus;
+    };
+    //     // 扩展 TextInput , 焦点在文本中时，延缓外部通过text属性赋值到失去焦点时生效
+    //     var descriptor = Object.getOwnPropertyDescriptor(eui.TextInput.prototype, "text");
+    //     var oldTextSet = descriptor.set;
+    //     descriptor.set = function (value)
+    //     {
+    //         if (this["isFocus"])
+    //         {
+    //             this["__temp_value__"] = value;
+    //         }
+    //         else
+    //         {
+    //             oldTextSet.call(this, value);
+    //         }
+    //     }
+    //     Object.defineProperty(eui.TextInput.prototype, "text", descriptor);
+    //     var oldFocusOutHandler = eui.TextInput.prototype["focusOutHandler"];
+    //     eui.TextInput.prototype["focusOutHandler"] = function (event)
+    //     {
+    //         oldFocusOutHandler.call(this, event);
+    //         if (this["__temp_value__"] != undefined)
+    //         {
+    //             this["text"] = this["__temp_value__"];
+    //             delete this["__temp_value__"];
+    //         }
+    //     }
+})(egret || (egret = {}));
+var egret;
+(function (egret) {
+    // 扩展 Scroller 组件，添加鼠标滚轮事件
+    var oldOnAddToStage = eui.Scroller.prototype.$onAddToStage;
+    eui.Scroller.prototype.$onAddToStage = function (stage, nestLevel) {
+        oldOnAddToStage.call(this, stage, nestLevel);
+        feng3d.windowEventProxy.on("wheel", onMouseWheel, this);
+    };
+    var oldOnRemoveFromStage = eui.Scroller.prototype.$onRemoveFromStage;
+    eui.Scroller.prototype.$onRemoveFromStage = function () {
+        oldOnRemoveFromStage.call(this);
+        feng3d.windowEventProxy.off("wheel", onMouseWheel, this);
+    };
+    // 阻止拖拽滚动面板
+    var oldonTouchMove = eui.Scroller.prototype["onTouchMove"];
+    eui.Scroller.prototype["onTouchMove"] = function (event) {
+        if (feng3d.shortcut.getState("disableScroll"))
+            return;
+        oldonTouchMove.call(this, event);
+    };
+    function onMouseWheel(event) {
+        var scroller = this;
+        if (scroller.hitTestPoint(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY)) {
+            scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV + event.deltaY * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
+        }
+    }
+})(egret || (egret = {}));
 var editor;
 (function (editor) {
     /**
@@ -1049,15 +1262,6 @@ var editor;
         });
     }
 })(editor || (editor = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * (快捷键)状态列表
-     */
-    feng3d.shortCutStates = {
-        disableScroll: "禁止滚动"
-    };
-})(feng3d || (feng3d = {}));
 var editor;
 (function (editor) {
     var Editorshortcut = /** @class */ (function () {
@@ -12310,214 +12514,6 @@ var editor;
         VoxelFlag[VoxelFlag["IsContour"] = 4] = "IsContour";
     })(VoxelFlag = editor.VoxelFlag || (editor.VoxelFlag = {}));
 })(editor || (editor = {}));
-var egret;
-(function (egret) {
-    (function () {
-        document.body.oncontextmenu = function () { return false; };
-        //给反射添加查找的空间
-        feng3d.classUtils.addClassNameSpace("editor");
-        feng3d.classUtils.addClassNameSpace("egret");
-    })();
-    //-----------------------------------------------------------
-    (function () {
-        //调整默认字体大小
-        egret.TextField.default_size = 12;
-        // 扩展焦点在文本中时 禁止出发快捷键
-        var oldfocusHandler = egret.InputController.prototype["focusHandler"];
-        egret.InputController.prototype["focusHandler"] = function (event) {
-            oldfocusHandler.call(this, event);
-            feng3d.shortcut.enable = !this._isFocus;
-        };
-        var oldblurHandler = egret.InputController.prototype["blurHandler"];
-        egret.InputController.prototype["blurHandler"] = function (event) {
-            oldblurHandler.call(this, event);
-            feng3d.shortcut.enable = !this._isFocus;
-        };
-    })();
-    // (() =>
-    // {
-    //     // 扩展 TextInput , 焦点在文本中时，延缓外部通过text属性赋值到失去焦点时生效
-    //     var descriptor = Object.getOwnPropertyDescriptor(eui.TextInput.prototype, "text");
-    //     var oldTextSet = descriptor.set;
-    //     descriptor.set = function (value)
-    //     {
-    //         if (this["isFocus"])
-    //         {
-    //             this["__temp_value__"] = value;
-    //         }
-    //         else
-    //         {
-    //             oldTextSet.call(this, value);
-    //         }
-    //     }
-    //     Object.defineProperty(eui.TextInput.prototype, "text", descriptor);
-    //     var oldFocusOutHandler = eui.TextInput.prototype["focusOutHandler"];
-    //     eui.TextInput.prototype["focusOutHandler"] = function (event)
-    //     {
-    //         oldFocusOutHandler.call(this, event);
-    //         if (this["__temp_value__"] != undefined)
-    //         {
-    //             this["text"] = this["__temp_value__"];
-    //             delete this["__temp_value__"];
-    //         }
-    //     }
-    // })();
-    // 扩展 Scroller 组件，添加鼠标滚轮事件
-    (function () {
-        var oldOnAddToStage = eui.Scroller.prototype.$onAddToStage;
-        eui.Scroller.prototype.$onAddToStage = function (stage, nestLevel) {
-            oldOnAddToStage.call(this, stage, nestLevel);
-            feng3d.windowEventProxy.on("wheel", onMouseWheel, this);
-        };
-        var oldOnRemoveFromStage = eui.Scroller.prototype.$onRemoveFromStage;
-        eui.Scroller.prototype.$onRemoveFromStage = function () {
-            oldOnRemoveFromStage.call(this);
-            feng3d.windowEventProxy.off("wheel", onMouseWheel, this);
-        };
-        // 阻止拖拽滚动面板
-        var oldonTouchMove = eui.Scroller.prototype["onTouchMove"];
-        eui.Scroller.prototype["onTouchMove"] = function (event) {
-            if (feng3d.shortcut.getState("disableScroll"))
-                return;
-            oldonTouchMove.call(this, event);
-        };
-        function onMouseWheel(event) {
-            var scroller = this;
-            if (scroller.hitTestPoint(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY)) {
-                scroller.viewport.scrollV = feng3d.FMath.clamp(scroller.viewport.scrollV + event.deltaY * 0.3, 0, scroller.viewport.contentHeight - scroller.height);
-            }
-        }
-    })();
-})(egret || (egret = {}));
-var egret;
-(function (egret) {
-    egret.MouseEvent = egret.TouchEvent;
-    (function () {
-        //映射事件名称
-        egret.MouseEvent.MOUSE_DOWN = "mousedown";
-        egret.MouseEvent.MIDDLE_MOUSE_DOWN = "middlemousedown";
-        egret.MouseEvent.MOUSE_UP = "mouseup";
-        egret.MouseEvent.MIDDLE_MOUSE_UP = "middlemouseup";
-        egret.MouseEvent.RIGHT_MOUSE_UP = "rightmouseup";
-        egret.MouseEvent.MOUSE_MOVE = "mousemove";
-        egret.MouseEvent.CLICK = "click";
-        egret.MouseEvent.MIDDLE_Click = "middleclick";
-        egret.MouseEvent.MOUSE_OUT = "mouseout";
-        egret.MouseEvent.RIGHT_MOUSE_DOWN = "rightmousedown";
-        egret.MouseEvent.RIGHT_CLICK = "rightclick";
-        egret.MouseEvent.DOUBLE_CLICK = "dblclick";
-        //
-    })();
-    var overDisplayObject;
-    egret.mouseEventEnvironment = function () {
-        var webTouchHandler;
-        var canvas;
-        var touch;
-        // 鼠标按下时选中对象
-        var mousedownObject;
-        // /**
-        //  * 鼠标按下的按钮编号
-        //  */
-        // var mousedownButton: number;
-        webTouchHandler = getWebTouchHandler();
-        canvas = webTouchHandler.canvas;
-        touch = webTouchHandler.touch;
-        webTouchHandler.canvas.addEventListener("mousemove", onMouseMove);
-        feng3d.windowEventProxy.on("mousedown", function (e) {
-            var location = webTouchHandler.getLocation(e);
-            var x = location.x;
-            var y = location.y;
-            var target = touch["findTarget"](x, y);
-            // mousedownButton = e.button;
-            mousedownObject = target;
-            if (e.button == 0) {
-                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_DOWN, true, true, x, y);
-            }
-            else if (e.button == 1) {
-                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MIDDLE_MOUSE_DOWN, true, true, x, y);
-            }
-            else if (e.button == 2) {
-                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_MOUSE_DOWN, true, true, x, y);
-            }
-        });
-        feng3d.windowEventProxy.on("mouseup", function (e) {
-            //右键按下
-            var location = webTouchHandler.getLocation(e);
-            var x = location.x;
-            var y = location.y;
-            var target = touch["findTarget"](x, y);
-            if (e.button == 0) {
-                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_UP, true, true, x, y);
-                if (mousedownObject == target) {
-                    egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.CLICK, true, true, x, y);
-                }
-            }
-            else if (e.button == 1) {
-                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MIDDLE_MOUSE_UP, true, true, x, y);
-                if (mousedownObject == target) {
-                    egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MIDDLE_Click, true, true, x, y);
-                }
-            }
-            else if (e.button == 2) {
-                egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_MOUSE_UP, true, true, x, y);
-                if (mousedownObject == target) {
-                    egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_CLICK, true, true, x, y);
-                }
-            }
-            mousedownObject = null;
-        });
-        feng3d.windowEventProxy.on("dblclick", function (e) {
-            var location = webTouchHandler.getLocation(e);
-            var x = location.x;
-            var y = location.y;
-            var target = touch["findTarget"](x, y);
-            egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.DOUBLE_CLICK, true, true, x, y);
-        });
-        // 调试，查看鼠标下的对象
-        feng3d.windowEventProxy.on("keyup", function (e) {
-            if (e.key == "p") {
-                var location = webTouchHandler.getLocation(e);
-                var target = touch["findTarget"](location.x, location.y);
-                var arr = [target];
-                while (target.parent) {
-                    target = target.parent;
-                    arr.push(target);
-                }
-                window["earr"] = arr;
-                console.log(arr);
-            }
-        });
-        function onMouseMove(event) {
-            var location = webTouchHandler.getLocation(event);
-            var x = location.x;
-            var y = location.y;
-            var target = touch["findTarget"](x, y);
-            egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_MOVE, true, true, x, y);
-            if (target == overDisplayObject)
-                return;
-            var preOverDisplayObject = overDisplayObject;
-            overDisplayObject = target;
-            if (preOverDisplayObject) {
-                egret.TouchEvent.dispatchTouchEvent(preOverDisplayObject, egret.MouseEvent.MOUSE_OUT, true, true, x, y);
-            }
-            if (overDisplayObject) {
-                egret.TouchEvent.dispatchTouchEvent(overDisplayObject, egret.MouseEvent.MOUSE_OVER, true, true, x, y);
-            }
-        }
-        function getWebTouchHandler() {
-            var list = document.querySelectorAll(".egret-player");
-            var length = list.length;
-            var player = null;
-            for (var i = 0; i < length; i++) {
-                var container = list[i];
-                player = container["egret-player"];
-                if (player)
-                    break;
-            }
-            return player.webTouchHandler;
-        }
-    };
-})(egret || (egret = {}));
 var editor;
 (function (editor) {
     /**

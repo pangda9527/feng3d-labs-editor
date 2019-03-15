@@ -1,6 +1,8 @@
 namespace egret
 {
-    // 扩展鼠标事件，增加鼠标 按下、弹起、移动、点击、移入、移出、右击、双击事件
+    /**
+     * 扩展鼠标事件，增加鼠标 按下、弹起、移动、点击、移入、移出、右击、双击事件
+     */
     export type MouseEvent = egret.TouchEvent;
     export var MouseEvent: {
         prototype: TouchEvent;
