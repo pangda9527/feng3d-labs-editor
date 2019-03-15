@@ -101,7 +101,7 @@ namespace editor
 					editorData.isBaryCenter = !editorData.isBaryCenter;
 					break;
 				case this.playBtn:
-					editorui.inspectorView.saveShowData(() =>
+					feng3d.feng3dDispatcher.dispatch("inspector.saveShowData", () =>
 					{
 						editorRS.fs.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
 						{

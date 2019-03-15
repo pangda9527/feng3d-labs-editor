@@ -18,6 +18,44 @@ declare namespace feng3d {
         getState<K extends keyof ShortCutStates>(state: K): boolean;
     }
 }
+declare namespace feng3d {
+    interface Feng3dEventMap {
+        "editor.selectedObjectsChanged": any;
+        "editor.isBaryCenterChanged": any;
+        "editor.isWoldCoordinateChanged": any;
+        "editor.toolTypeChanged": any;
+        "editor.allLoaded": any;
+        /**
+         * 资源显示文件夹发生变化
+         */
+        "asset.showFloderChanged": {
+            oldpath: string;
+            newpath: string;
+        };
+        /**
+         * 删除文件
+         */
+        "asset.deletefile": {
+            id: string;
+        };
+        /**
+         * 更新属性面板（检查器）
+         */
+        "inspector.update": undefined;
+        /**
+         * 属性面板（检查器）显示数据
+         */
+        "inspector.showData": any;
+        /**
+         * 保存属性面板（检查器）数据
+         */
+        "inspector.saveShowData": () => void;
+        /**
+         * 旋转场景摄像机
+         */
+        editorCameraRotate: Vector3;
+    }
+}
 declare namespace egret {
     /**
      * 扩展鼠标事件，增加鼠标 按下、弹起、移动、点击、移入、移出、右击、双击事件
@@ -1974,12 +2012,14 @@ declare namespace editor {
         backButton: eui.Button;
         group: eui.Group;
         constructor();
-        showData(data: any, removeBack?: boolean): void;
-        updateView(): void;
+        private showData;
+        private onShowData;
+        private onSaveShowData;
+        private updateView;
         /**
          * 保存显示数据
          */
-        saveShowData(callback?: () => void): void;
+        private saveShowData;
         private _view;
         private _viewData;
         private _viewDataList;
@@ -2393,10 +2433,6 @@ declare namespace editor {
         mainview: MainView;
         tooltipLayer: eui.UILayer;
         popupLayer: eui.UILayer;
-        /**
-         * 属性面板
-         */
-        inspectorView: InspectorView;
         /**
          * 3D视图
          */
@@ -3532,32 +3568,6 @@ declare var shortcutConfig: ({
     when: string;
     command?: undefined;
 })[];
-declare namespace feng3d {
-    interface Feng3dEventMap {
-        "editor.selectedObjectsChanged": any;
-        "editor.isBaryCenterChanged": any;
-        "editor.isWoldCoordinateChanged": any;
-        "editor.toolTypeChanged": any;
-        "editor.allLoaded": any;
-        /**
-         * 资源显示文件夹发生变化
-         */
-        "asset.showFloderChanged": {
-            oldpath: string;
-            newpath: string;
-        };
-        /**
-         * 删除文件
-         */
-        "asset.deletefile": {
-            id: string;
-        };
-        /**
-         * 旋转场景摄像机
-         */
-        editorCameraRotate: feng3d.Vector3;
-    }
-}
 declare namespace editor {
     var scriptCompiler: ScriptCompiler;
     class ScriptCompiler {

@@ -24,6 +24,7 @@
         // 扩展 feng3d
         "src/polyfill/feng3d/ClassUtils.ts",
         "src/polyfill/feng3d/ShortCut.ts",
+        "src/polyfill/feng3d/Feng3dDispatcher.ts",
         // 扩展 egret
         "src/polyfill/egret/MouseEvent.ts",
         "src/polyfill/egret/TextField.ts",
@@ -175,7 +176,6 @@
         "src/configs/CommonConfig.ts",
         "src/configs/ObjectViewConfig.ts",
         "src/configs/ShortcutConfig.ts",
-        "src/global/EditorEvent.ts",
         //
         "src/ScriptCompiler.ts",
         "src/Editor.ts"

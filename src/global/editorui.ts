@@ -9,11 +9,6 @@ namespace editor
         popupLayer: eui.UILayer;
 
         /**
-         * 属性面板
-         */
-        inspectorView: InspectorView;
-
-        /**
          * 3D视图
          */
         feng3dView: Feng3dView;

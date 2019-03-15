@@ -427,7 +427,8 @@ namespace editor
                         // 运行project.js
                         windowEval(content);
                         // 刷新属性界面（界面中可能有脚本）
-                        editorui.inspectorView.updateView();
+                        feng3d.feng3dDispatcher.dispatch("inspector.update");
+
                     } catch (error)
                     {
                         feng3d.warn(error);
