@@ -1365,8 +1365,8 @@ var editor;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.canvas = document.getElementById("glcanvas");
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.backRect.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
-            feng3d.windowEventProxy.on("mousemove", this.onGlobalMouseMove, this);
+            this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+            this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             this.onResize();
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 if (dragdata.file_gameobject) {
@@ -1384,19 +1384,14 @@ var editor;
             _super.prototype.$onRemoveFromStage.call(this);
             this.canvas = null;
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.backRect.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
-            feng3d.windowEventProxy.off("mousemove", this.onGlobalMouseMove, this);
+            this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+            this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             editor.drag.unregister(this);
         };
-        Feng3dView.prototype.onMouseMove = function () {
+        Feng3dView.prototype.onMouseOver = function () {
             feng3d.shortcut.activityState("mouseInView3D");
-            this.inMouseMove = true;
         };
-        Feng3dView.prototype.onGlobalMouseMove = function () {
-            if (this.inMouseMove) {
-                this.inMouseMove = false;
-                return;
-            }
+        Feng3dView.prototype.onMouseOut = function () {
             feng3d.shortcut.deactivityState("mouseInView3D");
         };
         Feng3dView.prototype.onResize = function () {
@@ -6750,7 +6745,7 @@ var editor;
             if (showdata instanceof feng3d.Feng3dObject)
                 editable = !Boolean(showdata.hideFlags & feng3d.HideFlags.NotEditable);
             this._view = feng3d.objectview.getObjectView(showdata, { editable: editable });
-            this._view.percentWidth = 100;
+            // this._view.percentWidth = 100;
             this.group.addChild(this._view);
             this.group.scrollV = 0;
             this._view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
@@ -9675,7 +9670,7 @@ var editor;
             this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
         };
         MTool.prototype.onItemMouseDown = function (event) {
-            if (!editor.engine.mouseinview)
+            if (!feng3d.shortcut.keyState.getKeyState("mouseInView3D"))
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
@@ -9805,7 +9800,7 @@ var editor;
             this.toolModel.cameraAxis.off("mousedown", this.onItemMouseDown, this);
         };
         RTool.prototype.onItemMouseDown = function (event) {
-            if (!editor.engine.mouseinview)
+            if (!feng3d.shortcut.keyState.getKeyState("mouseInView3D"))
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
@@ -9959,7 +9954,7 @@ var editor;
             this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
         };
         STool.prototype.onItemMouseDown = function (event) {
-            if (!editor.engine.mouseinview)
+            if (!feng3d.shortcut.keyState.getKeyState("mouseInView3D"))
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
