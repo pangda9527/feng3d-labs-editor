@@ -9670,7 +9670,7 @@ var editor;
             this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
         };
         MTool.prototype.onItemMouseDown = function (event) {
-            if (!feng3d.shortcut.keyState.getKeyState("mouseInView3D"))
+            if (!feng3d.shortcut.getState("mouseInView3D"))
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
@@ -9800,7 +9800,7 @@ var editor;
             this.toolModel.cameraAxis.off("mousedown", this.onItemMouseDown, this);
         };
         RTool.prototype.onItemMouseDown = function (event) {
-            if (!feng3d.shortcut.keyState.getKeyState("mouseInView3D"))
+            if (!feng3d.shortcut.getState("mouseInView3D"))
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
@@ -9954,7 +9954,7 @@ var editor;
             this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
         };
         STool.prototype.onItemMouseDown = function (event) {
-            if (!feng3d.shortcut.keyState.getKeyState("mouseInView3D"))
+            if (!feng3d.shortcut.getState("mouseInView3D"))
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;

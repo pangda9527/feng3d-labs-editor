@@ -49,7 +49,7 @@ namespace editor
 
         protected onItemMouseDown(event: feng3d.Event<any>)
         {
-            if (!feng3d.shortcut.keyState.getKeyState("mouseInView3D")) return;
+            if (!feng3d.shortcut.getState("mouseInView3D")) return;
 
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
