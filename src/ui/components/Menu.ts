@@ -309,8 +309,11 @@ namespace editor
         {
             if (this.data.enable == false) return;
 
-            this.data.click && this.data.click();
-            this.menuUI.topMenu.remove();
+            if (this.data.click)
+            {
+                this.data.click();
+                this.menuUI.topMenu.remove();
+            }
         }
 
         private onItemMouseOver()
