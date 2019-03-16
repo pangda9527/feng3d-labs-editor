@@ -5,37 +5,61 @@ namespace editor
 
     export class ScriptCompiler
     {
-        tslibs: { path: string, code: string }[];
-        // ts 列表
-        private tslist: feng3d.ScriptAsset[] = [];
-
-        _script: feng3d.StringAsset;
-
         constructor()
         {
-            this.tslibs = [];
+            feng3d.dispatcher.on("script.compile", this.onScriptCompile, this);
+            feng3d.dispatcher.on("script.gettslibs", this.onGettsLibs, this);
+        }
+
+        private onGettsLibs(e: feng3d.Event<{
+            callback: (tslibs: {
+                path: string;
+                code: string;
+            }[]) => void;
+        }>)
+        {
+            this.loadtslibs(e.data.callback);
+        }
+
+        /**
+         * 加载 tslibs
+         * 
+         * @param callback 完成回调
+         */
+        private loadtslibs(callback: (tslibs: { path: string, code: string }[]) => void)
+        {
+            var tslibs = [];
             feng3d.loadjs.load({
                 paths: ["feng3d/out/feng3d.d.ts"], onitemload: (url, content) =>
                 {
-                    this.tslibs.push({ path: url, code: content });
+                    tslibs.push({ path: url, code: content });
+                }, success: () =>
+                {
+                    callback(tslibs)
                 },
             });
         }
 
-        edit(script: feng3d.StringAsset)
+        private onScriptCompile(e: feng3d.Event<{ onComplete?: () => void; }>)
         {
-            this._script = script;
-            if (codeeditoWin) codeeditoWin.close();
-            codeeditoWin = window.open(`codeeditor.html`);
+            this.loadtslibs((tslibs) =>
+            {
+                var tslist = editorRS.getAssetsByType(feng3d.ScriptAsset);
+
+                this.compile(tslibs, tslist, e.data && e.data.onComplete);
+            });
         }
 
-        compile(callback?: (output: { name: string; text: string; }[]) => void)
+        private compile(tslibs: {
+            path: string;
+            code: string;
+        }[],
+            tslist: feng3d.ScriptAsset[],
+            callback?: (output: { name: string; text: string; }[]) => void)
         {
-            this.tslist = this.getScripts();
-
             try
             {
-                var output = this.transpileModule();
+                var output = this.transpileModule(tslibs, tslist);
 
                 output.forEach(v =>
                 {
@@ -58,13 +82,10 @@ namespace editor
             callback && callback(null);
         }
 
-        getScripts()
-        {
-            var tslist = editorRS.getAssetsByType(feng3d.ScriptAsset);
-            return tslist;
-        }
-
-        private transpileModule()
+        private transpileModule(tslibs: {
+            path: string;
+            code: string;
+        }[], tslist: feng3d.ScriptAsset[])
         {
             var options: ts.CompilerOptions = {
                 // module: ts.ModuleKind.AMD,
@@ -77,13 +98,13 @@ namespace editor
 
             var tsSourceMap: { [filepath: string]: ts.SourceFile } = {};
             var fileNames: string[] = [];
-            this.tslibs.forEach(item =>
+            tslibs.forEach(item =>
             {
                 fileNames.push(item.path);
                 tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
 
-            this.tslist.forEach((item) =>
+            tslist.forEach((item) =>
             {
                 fileNames.push(item.assetPath);
                 tsSourceMap[item.assetPath] = ts.createSourceFile(item.assetPath, item.textContent, options.target || ts.ScriptTarget.ES5);
@@ -135,7 +156,4 @@ namespace editor
 
     }
     scriptCompiler = new ScriptCompiler();
-
 }
-
-var codeeditoWin: Window;

@@ -310,7 +310,13 @@ namespace editor
                                 });
                             } else
                             {
-                                scriptCompiler.edit(<feng3d.StringAsset>assetNode.asset);
+                                if (codeeditoWin) codeeditoWin.close();
+                                codeeditoWin = window.open(`codeeditor.html`);
+                                var script = <feng3d.StringAsset>assetNode.asset;
+                                codeeditoWin.onload = () =>
+                                {
+                                    feng3d.dispatcher.dispatch("codeeditor.openScript", script);
+                                };
                             }
                         }, show: assetNode.asset instanceof feng3d.StringAsset,
                     },
@@ -485,3 +491,5 @@ namespace editor
 
     editorAsset = new EditorAsset();
 }
+
+var codeeditoWin: Window;

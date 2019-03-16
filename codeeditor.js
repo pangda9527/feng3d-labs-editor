@@ -10,43 +10,70 @@
 window.feng3d = window.opener.feng3d;
 window.editor = window.opener.editor;
 
-var monacoEditor
-
-//
-amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
-amdRequire(['vs/editor/editor.main'], () =>
+feng3d.dispatcher.on("codeeditor.openScript", (e) =>
 {
-    // 设置ts编译选项
-    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-        allowNonTsExtensions: true,
-        module: monaco.languages.typescript.ModuleKind.AMD,
-        noResolve: true,
-        suppressOutputPathCheck: true,
-        skipLibCheck: true,
-        skipDefaultLibCheck: true,
-        target: monaco.languages.typescript.ScriptTarget.ES5,
-        noImplicitAny: false,
-        strictNullChecks: false,
-        noImplicitThis: false,
-        noImplicitReturns: false,
-        experimentalDecorators: true,
-        noUnusedLocals: false,
-        noUnusedParameters: false,
-    });
+    initMonaco(() =>
+    {
+        if (!monacoEditor)
+        {
+            monacoEditor = monaco.editor.create(document.getElementById('container'), {
+                model: null,
+                formatOnType: true,
+            });
+            window.onresize = function ()
+            {
+                monacoEditor.layout();
+            };
+        }
 
-    //
-    monacoEditor = monaco.editor.create(document.getElementById('container'), {
-        model: null,
-        formatOnType: true,
-    });
+        feng3d.dispatcher.dispatch("script.gettslibs", {
+            callback: (tslibs) =>
+            {
+                codeEditor(tslibs, e.data);
+            }
+        });
 
-    codeEditor(editor.scriptCompiler._script);
+    });
 });
 
-window.onresize = function ()
+var isInitMonaco = false;
+
+//
+var monacoEditor;
+
+/**
+ * 初始化 Monaco
+ */
+function initMonaco(callback)
 {
-    monacoEditor.layout();
-};
+    if (isInitMonaco) { callback(); return; }
+
+    //
+    amdRequire.config({ paths: { 'vs': 'libs/monaco-editor/min/vs' } });
+    amdRequire(['vs/editor/editor.main'], () =>
+    {
+        // 设置ts编译选项
+        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+            allowNonTsExtensions: true,
+            module: monaco.languages.typescript.ModuleKind.AMD,
+            noResolve: true,
+            suppressOutputPathCheck: true,
+            skipLibCheck: true,
+            skipDefaultLibCheck: true,
+            target: monaco.languages.typescript.ScriptTarget.ES5,
+            noImplicitAny: false,
+            strictNullChecks: false,
+            noImplicitThis: false,
+            noImplicitReturns: false,
+            experimentalDecorators: true,
+            noUnusedLocals: false,
+            noUnusedParameters: false,
+        });
+
+        isInitMonaco = true;
+        callback();
+    });
+}
 
 var compileButton = document.getElementById("compile");
 var watchCB = document.getElementById("watch");
@@ -92,7 +119,7 @@ function getModel(file)
     return "text";
 }
 
-function codeEditor(file)
+function codeEditor(tslibs, file)
 {
     if (!(file instanceof feng3d.StringAsset)) return;
 
@@ -105,15 +132,14 @@ function codeEditor(file)
     // monacoEditor.setValue(code);
     if (file instanceof feng3d.ScriptAsset)
     {
-        var tslibs = editor.scriptCompiler.tslibs;
-        var tslist = editor.scriptCompiler.getScripts();
+        var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
         tslibs.forEach(v =>
         {
             monaco.languages.typescript.typescriptDefaults.addExtraLib(v.code, v.path);
         });
         tslist.forEach(v =>
         {
-            if (v != file) monaco.languages.typescript.typescriptDefaults.addExtraLib(v.textContent, v.assetsId + ".ts");
+            if (v != file) monaco.languages.typescript.typescriptDefaults.addExtraLib(v.textContent, v.assetPath);
         });
         logLabel.textContent = "初次编译中。。。。";
         triggerCompile();
@@ -138,8 +164,14 @@ function codeEditor(file)
 };
 
 // ------------ Compilation logic
-function triggerCompile()
+function triggerCompile(callback)
 {
-    logLabel.textContent = "编码中。。。。";
-    editor.scriptCompiler.compile();
+    logLabel.textContent = "正在编译。。。。";
+    feng3d.dispatcher.dispatch("script.compile", {
+        onComplete: () =>
+        {
+            logLabel.textContent = "完成编译。。。。";
+            callback && callback();
+        }
+    });
 }

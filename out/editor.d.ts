@@ -73,6 +73,25 @@ declare namespace feng3d {
          * 旋转场景摄像机
          */
         editorCameraRotate: Vector3;
+        /**
+         * 使用编辑器打开脚本
+         */
+        "codeeditor.openScript": feng3d.StringAsset;
+        /**
+         * 脚本编译
+         */
+        "script.compile": {
+            onComplete?: () => void;
+        };
+        /**
+         * 获取项目依赖库 定义
+         */
+        "script.gettslibs": {
+            callback: (tslibs: {
+                path: string;
+                code: string;
+            }[]) => void;
+        };
     }
 }
 declare namespace egret {
@@ -2173,6 +2192,7 @@ declare namespace editor {
         private onParsed;
     }
 }
+declare var codeeditoWin: Window;
 declare namespace editor {
     class AssetFileItemRenderer extends eui.ItemRenderer {
         icon: eui.Image;
@@ -3597,27 +3617,20 @@ declare namespace ts {
 declare namespace editor {
     var scriptCompiler: ScriptCompiler;
     class ScriptCompiler {
-        tslibs: {
-            path: string;
-            code: string;
-        }[];
-        private tslist;
-        _script: feng3d.StringAsset;
         constructor();
-        edit(script: feng3d.StringAsset): void;
-        compile(callback?: (output: {
-            name: string;
-            text: string;
-        }[]) => void): {
-            name: string;
-            text: string;
-        }[];
-        getScripts(): feng3d.ScriptAsset[];
+        private onGettsLibs;
+        /**
+         * 加载 tslibs
+         *
+         * @param callback 完成回调
+         */
+        private loadtslibs;
+        private onScriptCompile;
+        private compile;
         private transpileModule;
         private createProgram;
     }
 }
-declare var codeeditoWin: Window;
 declare namespace editor {
     var editorData: EditorData;
     /**
