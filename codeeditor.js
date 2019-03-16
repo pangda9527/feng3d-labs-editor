@@ -74,7 +74,7 @@ function autoCompile()
             logLabel.textContent = "自动编译中。。。。";
             triggerCompile();
         }
-    }, 1000);
+    }, 5000);
 }
 
 function getModel(file)

@@ -15,6 +15,8 @@ declare namespace ts {
         callerList?: string[];
         delayInitializerList?: Expression[];
     }
+    function getClassExtendsHeritageElement(node: ClassDeclaration | ClassExpression | InterfaceDeclaration): ExpressionWithTypeArguments | undefined;
+    function getHeritageClause(clauses: NodeArray<HeritageClause> | undefined, kind: SyntaxKind): HeritageClause | undefined;
 }
 declare namespace feng3d {
 }
@@ -3612,10 +3614,7 @@ declare namespace editor {
         }[];
         getScripts(): feng3d.ScriptAsset[];
         private transpileModule;
-        /**
-         * ts 文件排序
-         */
-        private tssort;
+        private createProgram;
     }
 }
 declare var codeeditoWin: Window;

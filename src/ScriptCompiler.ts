@@ -61,9 +61,6 @@ namespace editor
         getScripts()
         {
             var tslist = editorRS.getAssetsByType(feng3d.ScriptAsset);
-
-            this.tssort(tslist);
-
             return tslist;
         }
 
@@ -78,7 +75,7 @@ namespace editor
                 outFile: "project.js",
             };
 
-            var tsSourceMap = {};
+            var tsSourceMap: { [filepath: string]: ts.SourceFile } = {};
             var fileNames: string[] = [];
             this.tslibs.forEach(item =>
             {
@@ -94,7 +91,25 @@ namespace editor
 
             // Output
             var outputs: { name: string, text: string }[] = [];
-            var program = ts.createProgram(fileNames, options, {
+            // 排序
+            var program = this.createProgram(fileNames, options, tsSourceMap, outputs);
+            var result = ts.reorderSourceFiles(program);
+            console.log(`ts 排序结果`);
+            console.log(result);
+            if (result.circularReferences.length > 0)
+            {
+                console.warn(`出现循环引用`);
+                return;
+            }
+            // 编译
+            var program = this.createProgram(result.sortedFileNames, options, tsSourceMap, outputs);
+            program.emit();
+            return outputs;
+        }
+
+        private createProgram(fileNames: string[], options: ts.CompilerOptions, tsSourceMap: {}, outputs: { name: string; text: string; }[])
+        {
+            return ts.createProgram(fileNames, options, {
                 getSourceFile: function (fileName)
                 {
                     return tsSourceMap[fileName];
@@ -116,38 +131,6 @@ namespace editor
                 directoryExists: function () { return true; },
                 getDirectories: function () { return []; }
             });
-            // Emit
-            program.emit();
-            return outputs;
-        }
-
-        /**
-         * ts 文件排序
-         */
-        private tssort(filelist: feng3d.ScriptAsset[])
-        {
-            //按继承排序
-            for (let i = 0; i < filelist.length; i++)
-            {
-                var item = filelist[i];
-                var newpos = i;
-                if (item.parentScriptName)
-                {
-                    for (let j = i + 1; j < filelist.length; j++)
-                    {
-                        var itemk = filelist[j];
-                        if (itemk.scriptName == item.parentScriptName && newpos < j)
-                        {
-                            newpos = j;
-                        }
-                    }
-                }
-                if (newpos > i)
-                {
-                    filelist[i] = null;
-                    filelist.splice(newpos + 1, 0, item);
-                }
-            }
         }
 
     }

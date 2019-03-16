@@ -24,4 +24,17 @@ namespace ts
         delayInitializerList?: Expression[];
     }
 
+    export declare function getClassExtendsHeritageElement(node: ClassDeclaration | ClassExpression | InterfaceDeclaration): ExpressionWithTypeArguments | undefined;
+    export declare function getHeritageClause(clauses: NodeArray<HeritageClause> | undefined, kind: SyntaxKind): HeritageClause | undefined;
+
+    if (!ts.getClassExtendsHeritageElement)
+    {
+        ts.getClassExtendsHeritageElement = function (node: ClassLikeDeclaration | InterfaceDeclaration)
+        {
+            const heritageClause = ts.getHeritageClause(node.heritageClauses, SyntaxKind.ExtendsKeyword);
+            return heritageClause && heritageClause.types.length > 0 ? heritageClause.types[0] : undefined;
+        }
+    }
+
+
 }
