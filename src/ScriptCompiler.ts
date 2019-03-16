@@ -46,7 +46,7 @@ namespace editor
 
                 editorAsset.runProjectScript(() =>
                 {
-                    feng3d.feng3dDispatcher.dispatch("asset.scriptChanged");
+                    feng3d.dispatcher.dispatch("asset.scriptChanged");
                 });
 
                 return output;

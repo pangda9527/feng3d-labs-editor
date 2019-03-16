@@ -22,7 +22,7 @@ namespace editor
         initView()
         {
             this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-            feng3d.feng3dDispatcher.on("asset.shaderChanged", this.onShaderComboBoxChange, this);
+            feng3d.dispatcher.on("asset.shaderChanged", this.onShaderComboBoxChange, this);
 
             this.shaderComboBox.touchChildren = this.shaderComboBox.touchEnabled = this._attributeViewInfo.editable;
         }
@@ -30,7 +30,7 @@ namespace editor
         dispose()
         {
             this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-            feng3d.feng3dDispatcher.off("asset.shaderChanged", this.onShaderComboBoxChange, this);
+            feng3d.dispatcher.off("asset.shaderChanged", this.onShaderComboBoxChange, this);
         }
 
         updateView()

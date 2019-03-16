@@ -19,7 +19,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface Feng3dEventMap {
+    interface GlobalEvents {
         "editor.selectedObjectsChanged": any;
         "editor.isBaryCenterChanged": any;
         "editor.isWoldCoordinateChanged": any;

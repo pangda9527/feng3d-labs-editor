@@ -22,7 +22,7 @@ namespace editor
 
         constructor()
         {
-            feng3d.feng3dDispatcher.on("asset.parsed", this.onParsed, this);
+            feng3d.dispatcher.on("asset.parsed", this.onParsed, this);
         }
 
         /**
@@ -92,7 +92,7 @@ namespace editor
                 }
                 delete this._assetIDMap[assetNode.asset.assetId];
 
-                feng3d.feng3dDispatcher.dispatch("asset.deletefile", { id: assetNode.asset.assetId });
+                feng3d.dispatcher.dispatch("asset.deletefile", { id: assetNode.asset.assetId });
 
                 callback && callback(err);
             });
@@ -427,7 +427,7 @@ namespace editor
                         // 运行project.js
                         windowEval(content);
                         // 刷新属性界面（界面中可能有脚本）
-                        feng3d.feng3dDispatcher.dispatch("inspector.update");
+                        feng3d.dispatcher.dispatch("inspector.update");
 
                     } catch (error)
                     {
@@ -470,7 +470,7 @@ namespace editor
         private showFloderChanged(property, oldValue, newValue)
         {
             this.showFloder.openParents();
-            feng3d.feng3dDispatcher.dispatch("asset.showFloderChanged", { oldpath: oldValue, newpath: newValue });
+            feng3d.dispatcher.dispatch("asset.showFloderChanged", { oldpath: oldValue, newpath: newValue });
         }
 
         private onParsed(e: feng3d.Event<any>)

@@ -187,7 +187,7 @@ namespace editor
                     var result = cameraTargetMatrix3D.decompose()[1];
                     result.scaleNumber(180 / Math.PI);
 
-                    feng3d.feng3dDispatcher.dispatch("editorCameraRotate", result);
+                    feng3d.dispatcher.dispatch("editorCameraRotate", result);
                 }
             }
         }

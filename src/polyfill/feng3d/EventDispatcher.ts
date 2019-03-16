@@ -1,6 +1,6 @@
 namespace feng3d
 {
-    export interface Feng3dEventMap
+    export interface GlobalEvents
     {
         "editor.selectedObjectsChanged"
         "editor.isBaryCenterChanged"

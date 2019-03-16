@@ -52,7 +52,7 @@ namespace editor
             this._selectedAssetFileInvalid = true;
             this._transformGameObjectInvalid = true;
             this._transformBoxInvalid = true;
-            feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
+            feng3d.dispatcher.dispatch("editor.selectedObjectsChanged");
         }
 
         /**
@@ -73,7 +73,7 @@ namespace editor
             this._selectedAssetFileInvalid = true;
             this._transformGameObjectInvalid = true;
             this._transformBoxInvalid = true;
-            feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
+            feng3d.dispatcher.dispatch("editor.selectedObjectsChanged");
         }
 
         /**
@@ -95,7 +95,7 @@ namespace editor
             this._selectedAssetFileInvalid = true;
             this._transformGameObjectInvalid = true;
             this._transformBoxInvalid = true;
-            feng3d.feng3dDispatcher.dispatch("editor.selectedObjectsChanged");
+            feng3d.dispatcher.dispatch("editor.selectedObjectsChanged");
         }
 
 
@@ -111,7 +111,7 @@ namespace editor
         {
             if (this._toolType == v) return;
             this._toolType = v;
-            feng3d.feng3dDispatcher.dispatch("editor.toolTypeChanged");
+            feng3d.dispatcher.dispatch("editor.toolTypeChanged");
         }
 
         private _toolType = MRSToolType.MOVE;
@@ -148,7 +148,7 @@ namespace editor
             if (this._isBaryCenter == v) return;
             this._isBaryCenter = v;
             this._transformBoxInvalid = true;
-            feng3d.feng3dDispatcher.dispatch("editor.isBaryCenterChanged");
+            feng3d.dispatcher.dispatch("editor.isBaryCenterChanged");
         }
         private _isBaryCenter = true;
 
@@ -163,7 +163,7 @@ namespace editor
         {
             if (this._isWoldCoordinate == v) return;
             this._isWoldCoordinate = v;
-            feng3d.feng3dDispatcher.dispatch("editor.isWoldCoordinateChanged");
+            feng3d.dispatcher.dispatch("editor.isWoldCoordinateChanged");
         }
         private _isWoldCoordinate = false;
 

@@ -48,7 +48,7 @@ namespace editor
 			this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-			feng3d.feng3dDispatcher.on("editor.toolTypeChanged", this.updateview, this);
+			feng3d.dispatcher.on("editor.toolTypeChanged", this.updateview, this);
 
 			this.updateview();
 		}
@@ -67,7 +67,7 @@ namespace editor
 			this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-			feng3d.feng3dDispatcher.off("editor.toolTypeChanged", this.updateview, this);
+			feng3d.dispatcher.off("editor.toolTypeChanged", this.updateview, this);
 
 			if (runwin) runwin.close();
 			runwin = null;
@@ -101,7 +101,7 @@ namespace editor
 					editorData.isBaryCenter = !editorData.isBaryCenter;
 					break;
 				case this.playBtn:
-					feng3d.feng3dDispatcher.dispatch("inspector.saveShowData", () =>
+					feng3d.dispatcher.dispatch("inspector.saveShowData", () =>
 					{
 						editorRS.fs.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
 						{
