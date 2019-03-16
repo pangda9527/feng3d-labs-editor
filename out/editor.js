@@ -7415,7 +7415,13 @@ var editor;
                             });
                         }
                         else {
-                            editor.scriptCompiler.edit(assetNode.asset);
+                            if (codeeditoWin)
+                                codeeditoWin.close();
+                            codeeditoWin = window.open("codeeditor.html");
+                            var script = assetNode.asset;
+                            codeeditoWin.onload = function () {
+                                feng3d.dispatcher.dispatch("codeeditor.openScript", script);
+                            };
                         }
                     }, show: assetNode.asset instanceof feng3d.StringAsset,
                 },
@@ -7568,6 +7574,7 @@ var editor;
     editor.EditorAsset = EditorAsset;
     editor.editorAsset = new EditorAsset();
 })(editor || (editor = {}));
+var codeeditoWin;
 var editor;
 (function (editor) {
     var AssetFileItemRenderer = /** @class */ (function (_super) {
@@ -14704,26 +14711,37 @@ var editor;
 (function (editor) {
     var ScriptCompiler = /** @class */ (function () {
         function ScriptCompiler() {
-            var _this = this;
-            // ts 列表
-            this.tslist = [];
-            this.tslibs = [];
+            feng3d.dispatcher.on("script.compile", this.onScriptCompile, this);
+            feng3d.dispatcher.on("script.gettslibs", this.onGettsLibs, this);
+        }
+        ScriptCompiler.prototype.onGettsLibs = function (e) {
+            this.loadtslibs(e.data.callback);
+        };
+        /**
+         * 加载 tslibs
+         *
+         * @param callback 完成回调
+         */
+        ScriptCompiler.prototype.loadtslibs = function (callback) {
+            var tslibs = [];
             feng3d.loadjs.load({
                 paths: ["feng3d/out/feng3d.d.ts"], onitemload: function (url, content) {
-                    _this.tslibs.push({ path: url, code: content });
+                    tslibs.push({ path: url, code: content });
+                }, success: function () {
+                    callback(tslibs);
                 },
             });
-        }
-        ScriptCompiler.prototype.edit = function (script) {
-            this._script = script;
-            if (codeeditoWin)
-                codeeditoWin.close();
-            codeeditoWin = window.open("codeeditor.html");
         };
-        ScriptCompiler.prototype.compile = function (callback) {
-            this.tslist = this.getScripts();
+        ScriptCompiler.prototype.onScriptCompile = function (e) {
+            var _this = this;
+            this.loadtslibs(function (tslibs) {
+                var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
+                _this.compile(tslibs, tslist, e.data && e.data.onComplete);
+            });
+        };
+        ScriptCompiler.prototype.compile = function (tslibs, tslist, callback) {
             try {
-                var output = this.transpileModule();
+                var output = this.transpileModule(tslibs, tslist);
                 output.forEach(function (v) {
                     editor.editorRS.fs.writeString(v.name, v.text);
                 });
@@ -14738,11 +14756,7 @@ var editor;
             }
             callback && callback(null);
         };
-        ScriptCompiler.prototype.getScripts = function () {
-            var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
-            return tslist;
-        };
-        ScriptCompiler.prototype.transpileModule = function () {
+        ScriptCompiler.prototype.transpileModule = function (tslibs, tslist) {
             var options = {
                 // module: ts.ModuleKind.AMD,
                 target: ts.ScriptTarget.ES5,
@@ -14753,11 +14767,11 @@ var editor;
             };
             var tsSourceMap = {};
             var fileNames = [];
-            this.tslibs.forEach(function (item) {
+            tslibs.forEach(function (item) {
                 fileNames.push(item.path);
                 tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
-            this.tslist.forEach(function (item) {
+            tslist.forEach(function (item) {
                 fileNames.push(item.assetPath);
                 tsSourceMap[item.assetPath] = ts.createSourceFile(item.assetPath, item.textContent, options.target || ts.ScriptTarget.ES5);
             });
@@ -14803,7 +14817,6 @@ var editor;
     editor.ScriptCompiler = ScriptCompiler;
     editor.scriptCompiler = new ScriptCompiler();
 })(editor || (editor = {}));
-var codeeditoWin;
 var editor;
 (function (editor) {
     /**
