@@ -31,6 +31,8 @@
         "src/polyfill/egret/MouseEvent.ts",
         "src/polyfill/egret/TextField.ts",
         "src/polyfill/egret/Scroller.ts",
+        // 扩展 json ，支持注释
+        "src/polyfill/json/json.ts",
         //
         "src/oauth/GiteeOauth.ts",
         //

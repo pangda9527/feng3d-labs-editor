@@ -166,14 +166,20 @@ namespace editor
                                 label: "脚本", click: () =>
                                 {
                                     var fileName = editorRS.getValidChildName(folder, "NewScript");
-                                    this.createAsset(assetNode, feng3d.ScriptAsset, { name: fileName, textContent: assetFileTemplates.getNewScript(fileName) });
+                                    this.createAsset(assetNode, feng3d.ScriptAsset, { name: fileName, textContent: assetFileTemplates.getNewScript(fileName) }, () =>
+                                    {
+                                        feng3d.dispatcher.dispatch("script.compile");
+                                    });
                                 }
                             },
                             {
                                 label: "着色器", click: () =>
                                 {
                                     var fileName = editorRS.getValidChildName(folder, "NewShader");
-                                    this.createAsset(assetNode, feng3d.ShaderAsset, { name: fileName, textContent: assetFileTemplates.getNewShader(fileName) });
+                                    this.createAsset(assetNode, feng3d.ShaderAsset, { name: fileName, textContent: assetFileTemplates.getNewShader(fileName) }, () =>
+                                    {
+                                        feng3d.dispatcher.dispatch("script.compile");
+                                    });
                                 }
                             },
                             {

@@ -28,15 +28,26 @@ namespace editor
          */
         private loadtslibs(callback: (tslibs: { path: string, code: string }[]) => void)
         {
-            var tslibs = [];
-            feng3d.loadjs.load({
-                paths: ["feng3d/out/feng3d.d.ts"], onitemload: (url, content) =>
+            // 加载 ts 配置
+            editorRS.fs.readString("tsconfig.json", (err, str) =>
+            {
+                if (err) { throw err; return; }
+
+                var obj = json.parse(str);
+                console.log(obj);
+
+                var files: string[] = obj.files;
+                editorRS.fs.readStrings(obj.files, (strs) =>
                 {
-                    tslibs.push({ path: url, code: content });
-                }, success: () =>
-                {
+                    var tslibs = files.map((f, i) =>
+                    {
+                        let str = strs[i]; if (typeof str == "string") return { path: f, code: str };
+                        feng3d.warn(`没有找到文件 ${f}`);
+                        return null;
+                    }).filter(v => !!v);
+
                     callback(tslibs)
-                },
+                });
             });
         }
 
