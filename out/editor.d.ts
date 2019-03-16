@@ -1,4 +1,21 @@
 /// <reference path="../libs/typescriptServices.d.ts" />
+declare namespace ts {
+    function hasModifier(node: Node, flags: ModifierFlags): boolean;
+    function getAllAccessorDeclarations(declarations: NodeArray<Declaration>, accessor: AccessorDeclaration): any;
+    function getClassExtendsHeritageElement(node: ClassDeclaration | ClassExpression | InterfaceDeclaration): ExpressionWithTypeArguments | undefined;
+    function getDeclarationOfKind<T extends Declaration>(symbol: Symbol, kind: T["kind"]): T | undefined;
+    function getTextOfPropertyName(name: PropertyName): __String;
+    interface Statement extends Node {
+        transformFlags: any;
+    }
+    enum TransformFlags {
+        ContainsDecorators
+    }
+    interface VariableDeclaration extends NamedDeclaration {
+        callerList?: string[];
+        delayInitializerList?: Expression[];
+    }
+}
 declare namespace feng3d {
 }
 declare namespace feng3d {
@@ -3568,6 +3585,13 @@ declare var shortcutConfig: ({
     when: string;
     command?: undefined;
 })[];
+declare namespace ts {
+    interface SortingResult {
+        sortedFileNames: string[];
+        circularReferences: string[];
+    }
+    function reorderSourceFiles(program: Program): SortingResult;
+}
 declare namespace editor {
     var scriptCompiler: ScriptCompiler;
     class ScriptCompiler {
