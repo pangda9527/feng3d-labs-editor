@@ -11,7 +11,7 @@ namespace editor
 
         constructor()
         {
-            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
+            feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
         }
 
         /**

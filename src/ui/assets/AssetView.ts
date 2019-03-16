@@ -72,7 +72,7 @@ namespace editor
             this.floderpathTxt.touchEnabled = true;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
-            feng3d.feng3dDispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.dispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         }
 
         $onRemoveFromStage()
@@ -90,7 +90,7 @@ namespace editor
 
             feng3d.watcher.unwatch(editorAsset, "showFloder", this.updateShowFloder, this);
 
-            feng3d.feng3dDispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.dispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
 
             //
             drag.unregister(this.filelistgroup);
