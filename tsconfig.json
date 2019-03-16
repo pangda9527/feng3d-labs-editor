@@ -179,7 +179,7 @@
         "src/configs/ObjectViewConfig.ts",
         "src/configs/ShortcutConfig.ts",
         //
-        "src/sorting.ts",
+        "src/polyfill/typescript/typescriptSorting.ts",
         "src/ScriptCompiler.ts",
         "src/Editor.ts"
     ]
