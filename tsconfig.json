@@ -21,6 +21,8 @@
         "libs/FileSaver.d.ts",
         //
         "feng3d/out/feng3d.d.ts",
+        //
+        "src/polyfill/typescript/typescriptServices.ts",
         // 扩展 feng3d
         "src/polyfill/feng3d/ClassUtils.ts",
         "src/polyfill/feng3d/ShortCut.ts",
@@ -177,6 +179,7 @@
         "src/configs/ObjectViewConfig.ts",
         "src/configs/ShortcutConfig.ts",
         //
+        "src/sorting.ts",
         "src/ScriptCompiler.ts",
         "src/Editor.ts"
     ]
