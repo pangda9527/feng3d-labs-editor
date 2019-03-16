@@ -20,6 +20,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 /// <reference path="../../../libs/typescriptServices.d.ts" />
 var ts;
 (function (ts) {
+    if (!ts.getClassExtendsHeritageElement) {
+        ts.getClassExtendsHeritageElement = function (node) {
+            var heritageClause = ts.getHeritageClause(node.heritageClauses, ts.SyntaxKind.ExtendsKeyword);
+            return heritageClause && heritageClause.types.length > 0 ? heritageClause.types[0] : undefined;
+        };
+    }
 })(ts || (ts = {}));
 var feng3d;
 (function (feng3d) {
@@ -14734,7 +14740,6 @@ var editor;
         };
         ScriptCompiler.prototype.getScripts = function () {
             var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
-            this.tssort(tslist);
             return tslist;
         };
         ScriptCompiler.prototype.transpileModule = function () {
@@ -14758,7 +14763,22 @@ var editor;
             });
             // Output
             var outputs = [];
-            var program = ts.createProgram(fileNames, options, {
+            // 排序
+            var program = this.createProgram(fileNames, options, tsSourceMap, outputs);
+            var result = ts.reorderSourceFiles(program);
+            console.log("ts \u6392\u5E8F\u7ED3\u679C");
+            console.log(result);
+            if (result.circularReferences.length > 0) {
+                console.warn("\u51FA\u73B0\u5FAA\u73AF\u5F15\u7528");
+                return;
+            }
+            // 编译
+            var program = this.createProgram(result.sortedFileNames, options, tsSourceMap, outputs);
+            program.emit();
+            return outputs;
+        };
+        ScriptCompiler.prototype.createProgram = function (fileNames, options, tsSourceMap, outputs) {
+            return ts.createProgram(fileNames, options, {
                 getSourceFile: function (fileName) {
                     return tsSourceMap[fileName];
                 },
@@ -14777,31 +14797,6 @@ var editor;
                 directoryExists: function () { return true; },
                 getDirectories: function () { return []; }
             });
-            // Emit
-            program.emit();
-            return outputs;
-        };
-        /**
-         * ts 文件排序
-         */
-        ScriptCompiler.prototype.tssort = function (filelist) {
-            //按继承排序
-            for (var i = 0; i < filelist.length; i++) {
-                var item = filelist[i];
-                var newpos = i;
-                if (item.parentScriptName) {
-                    for (var j = i + 1; j < filelist.length; j++) {
-                        var itemk = filelist[j];
-                        if (itemk.scriptName == item.parentScriptName && newpos < j) {
-                            newpos = j;
-                        }
-                    }
-                }
-                if (newpos > i) {
-                    filelist[i] = null;
-                    filelist.splice(newpos + 1, 0, item);
-                }
-            }
         };
         return ScriptCompiler;
     }());
