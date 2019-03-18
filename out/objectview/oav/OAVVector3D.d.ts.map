@@ -1,0 +1,1 @@
+{"version":3,"file":"OAVVector3D.d.ts","sourceRoot":"","sources":["../../../src/objectview/oav/OAVVector3D.ts"],"names":[],"mappings":"AAAA,kBAAU,MAAM,CAChB;IACC,MACa,WAAY,SAAQ,OAAO;QAEvC,QAAQ,EAAE,GAAG,CAAC,KAAK,CAAC;QACpB,YAAY,EAAE,MAAM,CAAC,YAAY,CAAC;oBAEtB,iBAAiB,EAAE,MAAM,CAAC,iBAAiB;QAMvD,QAAQ;QAMR,OAAO;KAKP;CACD"}

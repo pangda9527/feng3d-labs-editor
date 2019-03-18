@@ -1,0 +1,1 @@
+{"version":3,"file":"GiteeOauth.d.ts","sourceRoot":"","sources":["../../src/oauth/GiteeOauth.ts"],"names":[],"mappings":"AAAA,eAAO,IAAI,UAAU,EAAE,UAAU,CAAC;AAqDlC;;GAEG;AACH,qBAAa,UAAU;IAEnB;;;;OAIG;IACH,KAAK,CAAC,QAAQ,CAAC,EAAE,MAAM,IAAI;IA0B3B,cAAc;IAuBd,OAAO;CAgCV"}

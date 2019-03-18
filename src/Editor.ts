@@ -1,100 +1,103 @@
-namespace editor
+import { MainUI } from "./ui/MainUI";
+import { editorui } from "./global/editorui";
+import { MainView } from "./ui/MainView";
+import { editorcache } from "./caches/Editorcache";
+import { editorRS } from "./assets/EditorRS";
+import { Main3D } from "./feng3d/Main3D";
+import { Editorshortcut } from "./shortcut/Editorshortcut";
+import { editorData } from "./global/EditorData";
+
+/**
+ * feng3d的版本号
+ */
+export var revision: string = "2018.08.22";
+
+feng3d.log(`editor version ${revision}`)
+
+/**
+ * 编辑器
+ */
+export class Editor extends eui.UILayer
 {
-    //
-    export var editorData: EditorData;
+    private mainView: MainView;
 
-    /**
-     * feng3d的版本号
-     */
-    export var revision: string = "2018.08.22";
-
-    feng3d.log(`editor version ${revision}`)
-
-    /**
-     * 编辑器
-     */
-    export class Editor extends eui.UILayer
+    constructor()
     {
-        private mainView: MainView;
+        super();
+        // giteeOauth.oauth();
 
-        constructor()
+        var mainui = new MainUI(() =>
         {
-            super();
-            // giteeOauth.oauth();
+            editorui.stage = this.stage;
 
-            var mainui = new MainUI(() =>
+            //
+            var tooltipLayer = new eui.UILayer();
+            tooltipLayer.touchEnabled = false;
+            this.stage.addChild(tooltipLayer);
+            editorui.tooltipLayer = tooltipLayer;
+            //
+            var popupLayer = new eui.UILayer();
+            popupLayer.touchEnabled = false;
+            this.stage.addChild(popupLayer);
+            editorui.popupLayer = popupLayer;
+
+            editorcache.projectname = editorcache.projectname || "newproject";
+
+            editorRS.initproject(() =>
             {
-                editorui.stage = this.stage;
-
-                //
-                var tooltipLayer = new eui.UILayer();
-                tooltipLayer.touchEnabled = false;
-                this.stage.addChild(tooltipLayer);
-                editorui.tooltipLayer = tooltipLayer;
-                //
-                var popupLayer = new eui.UILayer();
-                popupLayer.touchEnabled = false;
-                this.stage.addChild(popupLayer);
-                editorui.popupLayer = popupLayer;
-
-                editorcache.projectname = editorcache.projectname || "newproject";
-
-                editorRS.initproject(() =>
+                setTimeout(() =>
                 {
-                    setTimeout(() =>
-                    {
-                        this.init();
-                    }, 1);
-                });
-                this.removeChild(mainui);
+                    this.init();
+                }, 1);
             });
-            this.addChild(mainui);
-        }
+            this.removeChild(mainui);
+        });
+        this.addChild(mainui);
+    }
 
-        private init()
-        {
-            document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editorcache.projectname;
+    private init()
+    {
+        document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editorcache.projectname;
 
-            editorcache.setLastProject(editorcache.projectname);
+        editorcache.setLastProject(editorcache.projectname);
 
-            this.initMainView()
+        this.initMainView()
 
-            //初始化feng3d
-            new Main3D();
+        //初始化feng3d
+        new Main3D();
 
-            feng3d.shortcut.addShortCuts(shortcutConfig);
+        feng3d.shortcut.addShortCuts(shortcutConfig);
 
-            new Editorshortcut();
+        new Editorshortcut();
 
-            this.once(egret.Event.ENTER_FRAME, function ()
-            {
-                //
-                egret.mouseEventEnvironment();
-            }, this);
-
-            this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
-        }
-
-        private initMainView()
+        this.once(egret.Event.ENTER_FRAME, function ()
         {
             //
-            this.mainView = new MainView();
-            this.stage.addChildAt(this.mainView, 1);
-            this.onresize();
-            window.onresize = this.onresize.bind(this);
-            editorui.mainview = this.mainView;
-        }
+            egret.mouseEventEnvironment();
+        }, this);
 
-        private onresize()
-        {
-            this.stage.setContentSize(window.innerWidth, window.innerHeight);
-            this.mainView.width = this.stage.stageWidth;
-            this.mainView.height = this.stage.stageHeight;
-        }
+        this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
+    }
 
-        private _onAddToStage()
-        {
-            editorData.stage = this.stage;
-        }
+    private initMainView()
+    {
+        //
+        this.mainView = new MainView();
+        this.stage.addChildAt(this.mainView, 1);
+        this.onresize();
+        window.onresize = this.onresize.bind(this);
+        editorui.mainview = this.mainView;
+    }
+
+    private onresize()
+    {
+        this.stage.setContentSize(window.innerWidth, window.innerHeight);
+        this.mainView.width = this.stage.stageWidth;
+        this.mainView.height = this.stage.stageHeight;
+    }
+
+    private _onAddToStage()
+    {
+        editorData.stage = this.stage;
     }
 }

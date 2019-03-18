@@ -1,316 +1,315 @@
-namespace editor
+import { editorData } from "../../global/EditorData";
+
+export var mrsToolTarget: MRSToolTarget;
+
+export class MRSToolTarget
 {
-    export var mrsToolTarget: MRSToolTarget;
+    //
+    private _controllerTargets: feng3d.Transform[];
+    private _startScaleVec: feng3d.Vector3[] = [];
+    private _controllerTool: feng3d.Transform;
+    private _startTransformDic: Map<feng3d.Transform, TransformData>;
 
-    export class MRSToolTarget
+    private _position = new feng3d.Vector3();
+    private _rotation = new feng3d.Vector3();
+
+    get controllerTool()
     {
+        return this._controllerTool;
+    }
+
+    set controllerTool(value)
+    {
+        this._controllerTool = value;
+        if (this._controllerTool)
+        {
+            this._controllerTool.position = this._position;
+            this._controllerTool.rotation = this._rotation;
+        }
+    }
+
+    set controllerTargets(value: feng3d.Transform[])
+    {
+        this._controllerTargets = value;
+        this.updateControllerImage();
+    }
+
+    constructor()
+    {
+        feng3d.dispatcher.on("editor.isWoldCoordinateChanged", this.updateControllerImage, this);
+        feng3d.dispatcher.on("editor.isBaryCenterChanged", this.updateControllerImage, this);
         //
-        private _controllerTargets: feng3d.Transform[];
-        private _startScaleVec: feng3d.Vector3[] = [];
-        private _controllerTool: feng3d.Transform;
-        private _startTransformDic: Map<feng3d.Transform, TransformData>;
+        feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+    }
 
-        private _position = new feng3d.Vector3();
-        private _rotation = new feng3d.Vector3();
-
-        get controllerTool()
+    private onSelectedGameObjectChange()
+    {
+        //筛选出 工具控制的对象
+        var transforms = <feng3d.Transform[]>editorData.selectedGameObjects.reduce((result, item) =>
         {
-            return this._controllerTool;
+            result.push(item.transform);
+            return result;
+        }, []);
+        if (transforms.length > 0)
+        {
+            this.controllerTargets = transforms;
         }
-
-        set controllerTool(value)
+        else
         {
-            this._controllerTool = value;
-            if (this._controllerTool)
+            this.controllerTargets = null;
+        }
+    }
+
+    private updateControllerImage()
+    {
+        if (!this._controllerTargets || this._controllerTargets.length == 0)
+            return;
+
+        var transform = this._controllerTargets[this._controllerTargets.length - 1];
+        var position = new feng3d.Vector3();
+        if (editorData.isBaryCenter)
+        {
+            position.copy(transform.scenePosition);
+        } else
+        {
+            for (var i = 0; i < this._controllerTargets.length; i++)
             {
-                this._controllerTool.position = this._position;
-                this._controllerTool.rotation = this._rotation;
+                position.add(this._controllerTargets[i].scenePosition);
             }
+            position.scaleNumber(1 / this._controllerTargets.length);
         }
-
-        set controllerTargets(value: feng3d.Transform[])
+        var rotation = new feng3d.Vector3();
+        if (!editorData.isWoldCoordinate)
         {
-            this._controllerTargets = value;
-            this.updateControllerImage();
+            rotation = this._controllerTargets[0].rotation;
         }
-
-        constructor()
+        this._position = position;
+        this._rotation = rotation;
+        if (this._controllerTool)
         {
-            feng3d.dispatcher.on("editor.isWoldCoordinateChanged", this.updateControllerImage, this);
-            feng3d.dispatcher.on("editor.isBaryCenterChanged", this.updateControllerImage, this);
-            //
-            feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+            this._controllerTool.position = position;
+            this._controllerTool.rotation = rotation;
         }
+    }
 
-        private onSelectedGameObjectChange()
+    /**
+     * 开始移动
+     */
+    startTranslation()
+    {
+        this._startTransformDic = new Map<feng3d.Transform, TransformData>();
+        var objects = this._controllerTargets.concat();
+        objects.push(this._controllerTool);
+        for (var i = 0; i < objects.length; i++)
         {
-            //筛选出 工具控制的对象
-            var transforms = <feng3d.Transform[]>editorData.selectedGameObjects.reduce((result, item) =>
-            {
-                result.push(item.transform);
-                return result;
-            }, []);
-            if (transforms.length > 0)
-            {
-                this.controllerTargets = transforms;
-            }
-            else
-            {
-                this.controllerTargets = null;
-            }
+            var transform = objects[i];
+            this._startTransformDic.set(transform, this.getTransformData(transform));
         }
+    }
 
-        private updateControllerImage()
+    translation(addPos: feng3d.Vector3)
+    {
+        if (!this._controllerTargets)
+            return;
+        var objects = this._controllerTargets.concat();
+        objects.push(this._controllerTool);
+        for (var i = 0; i < objects.length; i++)
         {
-            if (!this._controllerTargets || this._controllerTargets.length == 0)
-                return;
-
-            var transform = this._controllerTargets[this._controllerTargets.length - 1];
-            var position = new feng3d.Vector3();
-            if (editorData.isBaryCenter)
-            {
-                position.copy(transform.scenePosition);
-            } else
-            {
-                for (var i = 0; i < this._controllerTargets.length; i++)
-                {
-                    position.add(this._controllerTargets[i].scenePosition);
-                }
-                position.scaleNumber(1 / this._controllerTargets.length);
-            }
-            var rotation = new feng3d.Vector3();
-            if (!editorData.isWoldCoordinate)
-            {
-                rotation = this._controllerTargets[0].rotation;
-            }
-            this._position = position;
-            this._rotation = rotation;
-            if (this._controllerTool)
-            {
-                this._controllerTool.position = position;
-                this._controllerTool.rotation = rotation;
-            }
+            var gameobject = objects[i];
+            var transform = this._startTransformDic.get(gameobject);
+            var localMove = addPos.clone();
+            if (gameobject.parent)
+                localMove = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localMove);
+            gameobject.position = transform.position.addTo(localMove);
         }
+    }
 
-        /**
-         * 开始移动
-         */
-        startTranslation()
+    stopTranslation()
+    {
+        this._startTransformDic = null;
+    }
+
+    startRotate()
+    {
+        this._startTransformDic = new Map<feng3d.Transform, TransformData>();
+        var objects = this._controllerTargets.concat();
+        objects.push(this._controllerTool);
+        for (var i = 0; i < objects.length; i++)
         {
-            this._startTransformDic = new Map<feng3d.Transform, TransformData>();
-            var objects = this._controllerTargets.concat();
-            objects.push(this._controllerTool);
-            for (var i = 0; i < objects.length; i++)
-            {
-                var transform = objects[i];
-                this._startTransformDic.set(transform, this.getTransformData(transform));
-            }
+            var transform = objects[i];
+            this._startTransformDic.set(transform, this.getTransformData(transform));
         }
+    }
 
-        translation(addPos: feng3d.Vector3)
+    /**
+     * 绕指定轴旋转
+     * @param angle 旋转角度
+     * @param normal 旋转轴
+     */
+    rotate1(angle: number, normal: feng3d.Vector3)
+    {
+        var objects = this._controllerTargets.concat();
+        objects.push(this._controllerTool);
+        var localnormal: feng3d.Vector3;
+        var gameobject = objects[0];
+        if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
         {
-            if (!this._controllerTargets)
-                return;
-            var objects = this._controllerTargets.concat();
-            objects.push(this._controllerTool);
-            for (var i = 0; i < objects.length; i++)
-            {
-                var gameobject = objects[i];
-                var transform = this._startTransformDic.get(gameobject);
-                var localMove = addPos.clone();
-                if (gameobject.parent)
-                    localMove = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localMove);
-                gameobject.position = transform.position.addTo(localMove);
-            }
+            if (gameobject.parent)
+                localnormal = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal);
         }
-
-        stopTranslation()
+        for (var i = 0; i < objects.length; i++)
         {
-            this._startTransformDic = null;
-        }
-
-        startRotate()
-        {
-            this._startTransformDic = new Map<feng3d.Transform, TransformData>();
-            var objects = this._controllerTargets.concat();
-            objects.push(this._controllerTool);
-            for (var i = 0; i < objects.length; i++)
-            {
-                var transform = objects[i];
-                this._startTransformDic.set(transform, this.getTransformData(transform));
-            }
-        }
-
-        /**
-         * 绕指定轴旋转
-         * @param angle 旋转角度
-         * @param normal 旋转轴
-         */
-        rotate1(angle: number, normal: feng3d.Vector3)
-        {
-            var objects = this._controllerTargets.concat();
-            objects.push(this._controllerTool);
-            var localnormal: feng3d.Vector3;
-            var gameobject = objects[0];
+            gameobject = objects[i];
+            var tempTransform = this._startTransformDic.get(gameobject);
             if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
             {
-                if (gameobject.parent)
-                    localnormal = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal);
-            }
-            for (var i = 0; i < objects.length; i++)
+                gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
+            } else
             {
-                gameobject = objects[i];
-                var tempTransform = this._startTransformDic.get(gameobject);
-                if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
+                localnormal = normal.clone();
+                if (gameobject.parent)
+                    localnormal = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal);
+                if (editorData.isBaryCenter)
                 {
                     gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                 } else
                 {
-                    localnormal = normal.clone();
+                    var localPivotPoint = this._position;
                     if (gameobject.parent)
-                        localnormal = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal);
-                    if (editorData.isBaryCenter)
-                    {
-                        gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
-                    } else
-                    {
-                        var localPivotPoint = this._position;
-                        if (gameobject.parent)
-                            localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
-                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).position;
-                        gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
-                    }
+                        localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
+                    gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).position;
+                    gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                 }
             }
         }
+    }
 
-        /**
-         * 按指定角旋转
-         * @param angle1 第一方向旋转角度
-         * @param normal1 第一方向旋转轴
-         * @param angle2 第二方向旋转角度
-         * @param normal2 第二方向旋转轴
-         */
-        rotate2(angle1: number, normal1: feng3d.Vector3, angle2: number, normal2: feng3d.Vector3)
+    /**
+     * 按指定角旋转
+     * @param angle1 第一方向旋转角度
+     * @param normal1 第一方向旋转轴
+     * @param angle2 第二方向旋转角度
+     * @param normal2 第二方向旋转轴
+     */
+    rotate2(angle1: number, normal1: feng3d.Vector3, angle2: number, normal2: feng3d.Vector3)
+    {
+        var objects = this._controllerTargets.concat();
+        objects.push(this._controllerTool);
+        var gameobject = objects[0];
+        if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
         {
-            var objects = this._controllerTargets.concat();
-            objects.push(this._controllerTool);
-            var gameobject = objects[0];
+            if (gameobject.parent)
+            {
+                normal1 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal1);
+                normal2 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal2);
+            }
+        }
+        for (var i = 0; i < objects.length; i++)
+        {
+            gameobject = objects[i];
+            var tempsceneTransform = this._startTransformDic.get(gameobject);
+            var tempPosition = tempsceneTransform.position.clone();
+            var tempRotation = tempsceneTransform.rotation.clone();
             if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
             {
+                tempRotation = this.rotateRotation(tempRotation, normal2, angle2);
+                gameobject.rotation = this.rotateRotation(tempRotation, normal1, angle1);
+            } else
+            {
+                var localnormal1 = normal1.clone();
+                var localnormal2 = normal2.clone();
                 if (gameobject.parent)
                 {
-                    normal1 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal1);
-                    normal2 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal2);
+                    localnormal1 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal1);
+                    localnormal2 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal2);
                 }
-            }
-            for (var i = 0; i < objects.length; i++)
-            {
-                gameobject = objects[i];
-                var tempsceneTransform = this._startTransformDic.get(gameobject);
-                var tempPosition = tempsceneTransform.position.clone();
-                var tempRotation = tempsceneTransform.rotation.clone();
-                if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
+                if (editorData.isBaryCenter)
                 {
-                    tempRotation = this.rotateRotation(tempRotation, normal2, angle2);
-                    gameobject.rotation = this.rotateRotation(tempRotation, normal1, angle1);
+                    tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
+                    gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
                 } else
                 {
-                    var localnormal1 = normal1.clone();
-                    var localnormal2 = normal2.clone();
+                    var localPivotPoint = this._position;
                     if (gameobject.parent)
-                    {
-                        localnormal1 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal1);
-                        localnormal2 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal2);
-                    }
-                    if (editorData.isBaryCenter)
-                    {
-                        tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
-                        gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
-                    } else
-                    {
-                        var localPivotPoint = this._position;
-                        if (gameobject.parent)
-                            localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
-                        //
-                        tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).position;
-                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).position;
+                        localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
+                    //
+                    tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).position;
+                    gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).position;
 
-                        tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
-                        gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
-                    }
+                    tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
+                    gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
                 }
             }
         }
-
-        stopRote()
-        {
-            this._startTransformDic = null;
-        }
-
-        startScale()
-        {
-            for (var i = 0; i < this._controllerTargets.length; i++)
-            {
-                this._startScaleVec[i] = this._controllerTargets[i].scale.clone();
-            }
-        }
-
-        doScale(scale: feng3d.Vector3)
-        {
-            feng3d.debuger && feng3d.assert(!!scale.length);
-            for (var i = 0; i < this._controllerTargets.length; i++)
-            {
-                var result = this._startScaleVec[i].multiplyTo(scale);
-                this._controllerTargets[i].sx = result.x;
-                this._controllerTargets[i].sy = result.y;
-                this._controllerTargets[i].sz = result.z;
-            }
-        }
-
-        stopScale()
-        {
-            this._startScaleVec.length = 0;
-        }
-
-        private getTransformData(transform: feng3d.Transform)
-        {
-            return { position: transform.position.clone(), rotation: transform.rotation.clone(), scale: transform.scale.clone() };
-        }
-
-        private rotateRotation(rotation: feng3d.Vector3, axis: feng3d.Vector3, angle)
-        {
-            var rotationmatrix3d = new feng3d.Matrix4x4();
-            rotationmatrix3d.appendRotation(feng3d.Vector3.X_AXIS, rotation.x);
-            rotationmatrix3d.appendRotation(feng3d.Vector3.Y_AXIS, rotation.y);
-            rotationmatrix3d.appendRotation(feng3d.Vector3.Z_AXIS, rotation.z);
-            rotationmatrix3d.appendRotation(axis, angle);
-            var newrotation = rotationmatrix3d.decompose()[1];
-            newrotation.scaleNumber(180 / Math.PI);
-            var v = Math.round((newrotation.x - rotation.x) / 180);
-            if (v % 2 != 0)
-            {
-                newrotation.x += 180;
-                newrotation.y = 180 - newrotation.y;
-                newrotation.z += 180;
-            }
-
-            function toround(a: number, b: number, c: number = 360)
-            {
-                return Math.round((b - a) / c) * c + a;
-            }
-
-            newrotation.x = toround(newrotation.x, rotation.x);
-            newrotation.y = toround(newrotation.y, rotation.y);
-            newrotation.z = toround(newrotation.z, rotation.z);
-            return newrotation;
-        }
     }
 
-    interface TransformData
+    stopRote()
     {
-        position: feng3d.Vector3, rotation: feng3d.Vector3, scale: feng3d.Vector3
+        this._startTransformDic = null;
     }
 
-    mrsToolTarget = new MRSToolTarget();
+    startScale()
+    {
+        for (var i = 0; i < this._controllerTargets.length; i++)
+        {
+            this._startScaleVec[i] = this._controllerTargets[i].scale.clone();
+        }
+    }
+
+    doScale(scale: feng3d.Vector3)
+    {
+        feng3d.debuger && feng3d.assert(!!scale.length);
+        for (var i = 0; i < this._controllerTargets.length; i++)
+        {
+            var result = this._startScaleVec[i].multiplyTo(scale);
+            this._controllerTargets[i].sx = result.x;
+            this._controllerTargets[i].sy = result.y;
+            this._controllerTargets[i].sz = result.z;
+        }
+    }
+
+    stopScale()
+    {
+        this._startScaleVec.length = 0;
+    }
+
+    private getTransformData(transform: feng3d.Transform)
+    {
+        return { position: transform.position.clone(), rotation: transform.rotation.clone(), scale: transform.scale.clone() };
+    }
+
+    private rotateRotation(rotation: feng3d.Vector3, axis: feng3d.Vector3, angle)
+    {
+        var rotationmatrix3d = new feng3d.Matrix4x4();
+        rotationmatrix3d.appendRotation(feng3d.Vector3.X_AXIS, rotation.x);
+        rotationmatrix3d.appendRotation(feng3d.Vector3.Y_AXIS, rotation.y);
+        rotationmatrix3d.appendRotation(feng3d.Vector3.Z_AXIS, rotation.z);
+        rotationmatrix3d.appendRotation(axis, angle);
+        var newrotation = rotationmatrix3d.decompose()[1];
+        newrotation.scaleNumber(180 / Math.PI);
+        var v = Math.round((newrotation.x - rotation.x) / 180);
+        if (v % 2 != 0)
+        {
+            newrotation.x += 180;
+            newrotation.y = 180 - newrotation.y;
+            newrotation.z += 180;
+        }
+
+        function toround(a: number, b: number, c: number = 360)
+        {
+            return Math.round((b - a) / c) * c + a;
+        }
+
+        newrotation.x = toround(newrotation.x, rotation.x);
+        newrotation.y = toround(newrotation.y, rotation.y);
+        newrotation.z = toround(newrotation.z, rotation.z);
+        return newrotation;
+    }
 }
+
+interface TransformData
+{
+    position: feng3d.Vector3, rotation: feng3d.Vector3, scale: feng3d.Vector3
+}
+
+mrsToolTarget = new MRSToolTarget();

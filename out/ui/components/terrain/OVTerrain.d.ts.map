@@ -1,0 +1,1 @@
+{"version":3,"file":"OVTerrain.d.ts","sourceRoot":"","sources":["../../../../src/ui/components/terrain/OVTerrain.ts"],"names":[],"mappings":"AAAA,kBAAU,MAAM,CAChB;IACI,MACa,SAAU,SAAQ,WAAY,YAAW,MAAM,CAAC,WAAW;QAEpE,KAAK,EAAE,MAAM,CAAC;QACd,OAAO,CAAC,eAAe,CAAwB;oBAEnC,cAAc,EAAE,MAAM,CAAC,cAAc;QAOjD,gBAAgB,CAAC,aAAa,EAAE,MAAM;QAKtC,YAAY,CAAC,SAAS,EAAE,MAAM;KAKjC;CACJ"}

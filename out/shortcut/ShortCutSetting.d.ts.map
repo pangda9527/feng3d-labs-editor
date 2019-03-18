@@ -1,0 +1,1 @@
+{"version":3,"file":"ShortCutSetting.d.ts","sourceRoot":"","sources":["../../src/shortcut/ShortCutSetting.ts"],"names":[],"mappings":"AAAA;;GAEG;AACH,qBAAa,eAAgB,SAAQ,GAAG,CAAC,SAAS;IAEvC,SAAS,EAAE,GAAG,CAAC,SAAS,CAAC;IACzB,IAAI,EAAE,GAAG,CAAC,IAAI,CAAC;;IAStB,OAAO,CAAC,UAAU;IAWlB,OAAO,CAAC,cAAc;IAMtB,OAAO,CAAC,kBAAkB;IAK1B,OAAO,CAAC,UAAU;oBAoBP,QAAQ;CAItB"}

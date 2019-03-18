@@ -1,61 +1,61 @@
-namespace editor
+import { EditorScript } from "./EditorScript";
+import { engine } from "../feng3d/Main3D";
+
+export class MouseRayTestScript extends EditorScript
 {
-    export class MouseRayTestScript extends EditorScript
+    init(gameObject: feng3d.GameObject)
     {
-        init(gameObject: feng3d.GameObject)
+        super.init(gameObject);
+
+        feng3d.windowEventProxy.on("click", this.onclick, this);
+    }
+
+    private onclick()
+    {
+        var gameobject = Object.setValue(new feng3d.GameObject(), { name: "test" });
+        var model = gameobject.addComponent(feng3d.Model);
+        model.material = new feng3d.Material();
+        model.geometry = Object.setValue(new feng3d.SphereGeometry(), { radius: 10 });
+        gameobject.mouseEnabled = false;
+
+        var mouseRay3D = engine.camera.getMouseRay3D();
+
+        this.gameObject.addChild(gameobject);
+
+        var position = mouseRay3D.position.clone();
+        var direction = mouseRay3D.direction.clone();
+        position = gameobject.transform.inverseTransformPoint(position);
+        direction = gameobject.transform.inverseTransformDirection(direction);
+        gameobject.transform.position = position;
+
+        var num = 1000;
+        var translate = () =>
         {
-            super.init(gameObject);
-
-            feng3d.windowEventProxy.on("click", this.onclick, this);
-        }
-
-        private onclick()
-        {
-            var gameobject = Object.setValue(new feng3d.GameObject(), { name: "test" });
-            var model = gameobject.addComponent(feng3d.Model);
-            model.material = new feng3d.Material();
-            model.geometry = Object.setValue(new feng3d.SphereGeometry(), { radius: 10 });
-            gameobject.mouseEnabled = false;
-
-            var mouseRay3D = engine.camera.getMouseRay3D();
-
-            this.gameObject.addChild(gameobject);
-
-            var position = mouseRay3D.position.clone();
-            var direction = mouseRay3D.direction.clone();
-            position = gameobject.transform.inverseTransformPoint(position);
-            direction = gameobject.transform.inverseTransformDirection(direction);
-            gameobject.transform.position = position;
-
-            var num = 1000;
-            var translate = () =>
+            gameobject.transform.translate(direction, 15);
+            if (num > 0)
             {
-                gameobject.transform.translate(direction, 15);
-                if (num > 0)
+                setTimeout(function ()
                 {
-                    setTimeout(function ()
-                    {
-                        translate();
-                    }, 1000 / 60);
-                } else
-                {
-                    gameobject.remove();
-                }
-                num--;
+                    translate();
+                }, 1000 / 60);
+            } else
+            {
+                gameobject.remove();
             }
-            translate();
+            num--;
         }
+        translate();
+    }
 
-        update()
-        {
-        }
+    update()
+    {
+    }
 
-        /**
-         * 销毁
-         */
-        dispose()
-        {
-            feng3d.windowEventProxy.off("click", this.onclick, this);
-        }
+    /**
+     * 销毁
+     */
+    dispose()
+    {
+        feng3d.windowEventProxy.off("click", this.onclick, this);
     }
 }

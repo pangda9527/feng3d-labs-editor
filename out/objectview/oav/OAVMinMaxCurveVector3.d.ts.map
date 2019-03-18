@@ -1,0 +1,1 @@
+{"version":3,"file":"OAVMinMaxCurveVector3.d.ts","sourceRoot":"","sources":["../../../src/objectview/oav/OAVMinMaxCurveVector3.ts"],"names":[],"mappings":"AAAA,kBAAU,MAAM,CAChB;IACI,MACa,qBAAsB,SAAQ,OAAO;QAEvC,QAAQ,EAAE,GAAG,CAAC,KAAK,CAAC;QACpB,sBAAsB,EAAE,MAAM,CAAC,sBAAsB,CAAC;oBAEjD,iBAAiB,EAAE,MAAM,CAAC,iBAAiB;QAOvD,QAAQ;QAYR,OAAO;QAQP,UAAU;QAKV,OAAO,CAAC,QAAQ;KAInB;CACJ"}

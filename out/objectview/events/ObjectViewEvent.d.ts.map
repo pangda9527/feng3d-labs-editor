@@ -1,0 +1,1 @@
+{"version":3,"file":"ObjectViewEvent.d.ts","sourceRoot":"","sources":["../../../src/objectview/events/ObjectViewEvent.ts"],"names":[],"mappings":"AAAA,kBAAU,MAAM,CAChB;IAEC,MAAa,eAAgB,SAAQ,KAAK,CAAC,KAAK;QAE/C,MAAM,CAAC,YAAY,SAAiB;QACpC,KAAK,EAAE,GAAG,CAAC;QACX,aAAa,EAAE,MAAM,CAAC;KACtB;CACD"}
