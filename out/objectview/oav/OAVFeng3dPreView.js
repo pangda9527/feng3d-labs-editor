@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./OAVBase", "../../feng3d/Feng3dScreenShot"], function (require, exports, OAVBase_1, Feng3dScreenShot_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var OAVFeng3dPreView = /** @class */ (function (_super) {
         __extends(OAVFeng3dPreView, _super);
         function OAVFeng3dPreView(attributeViewInfo) {
@@ -29,15 +30,15 @@ var editor;
         }
         OAVFeng3dPreView.prototype.initView = function () {
             if (this.space instanceof feng3d.GameObject) {
-                feng3dScreenShot.drawGameObject(this.space);
+                Feng3dScreenShot_1.feng3dScreenShot.drawGameObject(this.space);
             }
             else if (this.space instanceof feng3d.Geometry) {
-                feng3dScreenShot.drawGeometry(this.space);
+                Feng3dScreenShot_1.feng3dScreenShot.drawGeometry(this.space);
             }
             else if (this.space instanceof feng3d.Material) {
-                feng3dScreenShot.drawMaterial(this.space);
+                Feng3dScreenShot_1.feng3dScreenShot.drawMaterial(this.space);
             }
-            this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
+            this.cameraRotation = Feng3dScreenShot_1.feng3dScreenShot.camera.transform.rotation.clone();
             this.onResize();
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             //
@@ -58,17 +59,17 @@ var editor;
         };
         OAVFeng3dPreView.prototype.onMouseMove = function () {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var X_AXIS = feng3dScreenShot.camera.transform.rightVector;
-            var Y_AXIS = feng3dScreenShot.camera.transform.upVector;
-            feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
-            feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
-            this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
+            var X_AXIS = Feng3dScreenShot_1.feng3dScreenShot.camera.transform.rightVector;
+            var Y_AXIS = Feng3dScreenShot_1.feng3dScreenShot.camera.transform.upVector;
+            Feng3dScreenShot_1.feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
+            Feng3dScreenShot_1.feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
+            this.cameraRotation = Feng3dScreenShot_1.feng3dScreenShot.camera.transform.rotation.clone();
             this.preMousePos = mousePos;
         };
         OAVFeng3dPreView.prototype.onDrawObject = function () {
-            this.cameraRotation && (feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
-            feng3dScreenShot.updateCameraPosition();
-            this.image.source = feng3dScreenShot.toDataURL(this.width, this.height);
+            this.cameraRotation && (Feng3dScreenShot_1.feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
+            Feng3dScreenShot_1.feng3dScreenShot.updateCameraPosition();
+            this.image.source = Feng3dScreenShot_1.feng3dScreenShot.toDataURL(this.width, this.height);
         };
         OAVFeng3dPreView.prototype.onMouseUp = function () {
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
@@ -84,7 +85,7 @@ var editor;
             feng3d.OAVComponent()
         ], OAVFeng3dPreView);
         return OAVFeng3dPreView;
-    }(OAVBase));
-    editor.OAVFeng3dPreView = OAVFeng3dPreView;
-})(editor || (editor = {}));
+    }(OAVBase_1.OAVBase));
+    exports.OAVFeng3dPreView = OAVFeng3dPreView;
+});
 //# sourceMappingURL=OAVFeng3dPreView.js.map

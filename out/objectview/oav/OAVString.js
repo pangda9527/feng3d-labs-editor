@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./OAVBase", "../../ui/components/binders/TextInputBinder"], function (require, exports, OAVBase_1, TextInputBinder_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var OAVString = /** @class */ (function (_super) {
         __extends(OAVString, _super);
         function OAVString(attributeViewInfo) {
@@ -27,13 +28,13 @@ var editor;
             return _this;
         }
         OAVString.prototype.initView = function () {
-            this.addBinder(new TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput, editable: this._attributeViewInfo.editable, }));
+            this.addBinder(new TextInputBinder_1.TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput, editable: this._attributeViewInfo.editable, }));
         };
         OAVString = __decorate([
             feng3d.OAVComponent()
         ], OAVString);
         return OAVString;
-    }(OAVBase));
-    editor.OAVString = OAVString;
-})(editor || (editor = {}));
+    }(OAVBase_1.OAVBase));
+    exports.OAVString = OAVString;
+});
 //# sourceMappingURL=OAVString.js.map

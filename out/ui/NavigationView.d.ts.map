@@ -1,1 +1,1 @@
-{"version":3,"file":"NavigationView.d.ts","sourceRoot":"","sources":["../../src/ui/NavigationView.ts"],"names":[],"mappings":"AAAA,kBAAU,MAAM,CAChB;IACI,MAAa,cAAe,SAAQ,GAAG,CAAC,SAAS;;QAU7C,OAAO,CAAC,UAAU;QAWlB,OAAO,CAAC,cAAc;QAItB,OAAO,CAAC,kBAAkB;KAG7B;CACJ"}
+{"version":3,"file":"NavigationView.d.ts","sourceRoot":"","sources":["../../src/ui/NavigationView.ts"],"names":[],"mappings":"AAAA,qBAAa,cAAe,SAAQ,GAAG,CAAC,SAAS;;IAU7C,OAAO,CAAC,UAAU;IAWlB,OAAO,CAAC,cAAc;IAItB,OAAO,CAAC,kBAAkB;CAG7B"}

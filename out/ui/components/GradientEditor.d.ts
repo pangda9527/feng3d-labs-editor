@@ -1,5 +1,5 @@
 import { ComboBox } from "./ComboBox";
-export declare var gradientEditor: GradientEditor;
+import { ColorPicker } from "./ColorPicker";
 export declare class GradientEditor extends eui.Component {
     gradient: feng3d.Gradient;
     modeCB: ComboBox;
@@ -8,7 +8,7 @@ export declare class GradientEditor extends eui.Component {
     colorImage: eui.Image;
     colorLineGroup: eui.Group;
     colorGroup: eui.Group;
-    colorPicker: editor.ColorPicker;
+    colorPicker: ColorPicker;
     alphaGroup: eui.Group;
     alphaLabel: eui.Label;
     alphaSlide: eui.HSlider;
@@ -39,4 +39,5 @@ export declare class GradientEditor extends eui.Component {
     private _onAlphaColorMouseMove;
     private _onAlphaColorMouseUp;
 }
+export declare var gradientEditor: GradientEditor;
 //# sourceMappingURL=GradientEditor.d.ts.map

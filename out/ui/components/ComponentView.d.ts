@@ -1,7 +1,8 @@
+import { Accordion } from "./Accordion";
 export declare class ComponentView extends eui.Component {
     component: feng3d.Components;
     componentView: feng3d.IObjectView;
-    accordion: editor.Accordion;
+    accordion: Accordion;
     enabledCB: eui.CheckBox;
     componentIcon: eui.Image;
     helpBtn: eui.Button;

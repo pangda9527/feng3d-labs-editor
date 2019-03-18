@@ -11,8 +11,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var editor;
-(function (editor) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var Accordion = /** @class */ (function (_super) {
         __extends(Accordion, _super);
         function Accordion() {
@@ -65,6 +66,6 @@ var editor;
         };
         return Accordion;
     }(eui.Component));
-    editor.Accordion = Accordion;
-})(editor || (editor = {}));
+    exports.Accordion = Accordion;
+});
 //# sourceMappingURL=Accordion.js.map

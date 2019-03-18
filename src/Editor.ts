@@ -101,3 +101,5 @@ export class Editor extends eui.UILayer
         editorData.stage = this.stage;
     }
 }
+
+window["Editor"] = Editor;

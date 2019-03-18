@@ -12,7 +12,7 @@ export declare class MRSToolBase extends feng3d.Component {
     protected onRemovedFromScene(): void;
     protected onItemMouseDown(event: feng3d.Event<any>): void;
     protected toolModel: feng3d.Component;
-    selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateRotationAxis | CoordinateRotationFreeAxis | CoordinateScaleCube;
+    selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis | CoordinateRotationFreeAxis;
     protected updateToolModel(): void;
     protected onMouseDown(): void;
     protected onMouseUp(): void;

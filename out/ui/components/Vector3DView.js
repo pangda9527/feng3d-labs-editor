@@ -11,8 +11,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var editor;
-(function (editor) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var Vector3DView = /** @class */ (function (_super) {
         __extends(Vector3DView, _super);
         function Vector3DView() {
@@ -118,6 +119,6 @@ var editor;
         };
         return Vector3DView;
     }(eui.Component));
-    editor.Vector3DView = Vector3DView;
-})(editor || (editor = {}));
+    exports.Vector3DView = Vector3DView;
+});
 //# sourceMappingURL=Vector3DView.js.map

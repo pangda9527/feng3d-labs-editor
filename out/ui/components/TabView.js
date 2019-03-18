@@ -24,4 +24,5 @@ var TabView = /** @class */ (function (_super) {
     };
     return TabView;
 }(eui.Component));
+window["TabView"] = TabView;
 //# sourceMappingURL=TabView.js.map

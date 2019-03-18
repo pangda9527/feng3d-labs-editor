@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./TerrainView"], function (require, exports, TerrainView_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var OVTerrain = /** @class */ (function (_super) {
         __extends(OVTerrain, _super);
         function OVTerrain(objectViewInfo) {
@@ -37,7 +38,7 @@ var editor;
             feng3d.OVComponent()
         ], OVTerrain);
         return OVTerrain;
-    }(editor.TerrainView));
-    editor.OVTerrain = OVTerrain;
-})(editor || (editor = {}));
+    }(TerrainView_1.TerrainView));
+    exports.OVTerrain = OVTerrain;
+});
 //# sourceMappingURL=OVTerrain.js.map

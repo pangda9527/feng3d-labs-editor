@@ -11,8 +11,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var editor;
-(function (editor) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var SplitGroupState;
     (function (SplitGroupState) {
         /**
@@ -203,6 +204,6 @@ var editor;
         };
         return SplitGroup;
     }(eui.Group));
-    editor.SplitGroup = SplitGroup;
-})(editor || (editor = {}));
+    exports.SplitGroup = SplitGroup;
+});
 //# sourceMappingURL=SplitGroup.js.map

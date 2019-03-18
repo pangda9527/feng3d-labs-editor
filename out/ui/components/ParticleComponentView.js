@@ -11,8 +11,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var editor;
-(function (editor) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var ParticleComponentView = /** @class */ (function (_super) {
         __extends(ParticleComponentView, _super);
         /**
@@ -61,6 +62,6 @@ var editor;
         };
         return ParticleComponentView;
     }(eui.Component));
-    editor.ParticleComponentView = ParticleComponentView;
-})(editor || (editor = {}));
+    exports.ParticleComponentView = ParticleComponentView;
+});
 //# sourceMappingURL=ParticleComponentView.js.map

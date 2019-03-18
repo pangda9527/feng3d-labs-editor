@@ -1,7 +1,8 @@
 import { OAVBase } from "./OAVBase";
+import { Accordion } from "../../ui/components/Accordion";
 export declare class OAVAccordionObjectView extends OAVBase {
     componentView: feng3d.IObjectView;
-    accordion: editor.Accordion;
+    accordion: Accordion;
     enabledCB: eui.CheckBox;
     /**
      * 对象界面数据

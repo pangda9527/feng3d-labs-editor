@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var MinMaxCurveVector3View = /** @class */ (function (_super) {
         __extends(MinMaxCurveVector3View, _super);
         function MinMaxCurveVector3View() {
@@ -57,6 +58,6 @@ var editor;
         ], MinMaxCurveVector3View.prototype, "minMaxCurveVector3", void 0);
         return MinMaxCurveVector3View;
     }(eui.Component));
-    editor.MinMaxCurveVector3View = MinMaxCurveVector3View;
-})(editor || (editor = {}));
+    exports.MinMaxCurveVector3View = MinMaxCurveVector3View;
+});
 //# sourceMappingURL=MinMaxCurveVector3View.js.map

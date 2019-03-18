@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./binders/NumberTextInputBinder"], function (require, exports, NumberTextInputBinder_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var MinMaxCurveEditor = /** @class */ (function (_super) {
         __extends(MinMaxCurveEditor, _super);
         function MinMaxCurveEditor() {
@@ -52,7 +53,7 @@ var editor;
             feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
             this.sampleImages.forEach(function (v) { return v.addEventListener(egret.MouseEvent.CLICK, _this.onSampleClick, _this); });
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
-            this.addBinder(new NumberTextInputBinder().init({
+            this.addBinder(new NumberTextInputBinder_1.NumberTextInputBinder().init({
                 space: this.minMaxCurve, attribute: "curveMultiplier", textInput: this.multiplierInput, editable: true,
                 controller: null,
             }));
@@ -385,7 +386,7 @@ var editor;
         ], MinMaxCurveEditor.prototype, "minMaxCurve", void 0);
         return MinMaxCurveEditor;
     }(eui.Component));
-    editor.MinMaxCurveEditor = MinMaxCurveEditor;
+    exports.MinMaxCurveEditor = MinMaxCurveEditor;
     var particleCurves = [
         Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
         Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
@@ -473,5 +474,6 @@ var editor;
             curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
     ];
-})(editor || (editor = {}));
+    exports.minMaxCurveEditor = new MinMaxCurveEditor();
+});
 //# sourceMappingURL=MinMaxCurveEditor.js.map

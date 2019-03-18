@@ -44,3 +44,5 @@ export class OAVMinMaxCurve extends OAVBase
 
     }
 }
+
+window["OAVMinMaxCurve"] = OAVMinMaxCurve;

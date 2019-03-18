@@ -18,5 +18,4 @@ export declare class TopView extends eui.Component implements eui.UIComponent {
     private onButtonClick;
     private updateview;
 }
-export declare var runwin: Window;
 //# sourceMappingURL=TopView.d.ts.map
