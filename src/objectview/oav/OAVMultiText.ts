@@ -1,32 +1,33 @@
-import { OAVBase } from "./OAVBase";
-
-/**
- * 默认对象属性界面
- */
-@feng3d.OAVComponent()
-export class OAVMultiText extends OAVBase
+namespace editor
 {
-    public txtLab: eui.Label;
-
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+	/**
+	 * 默认对象属性界面
+	 */
+    @feng3d.OAVComponent()
+    export class OAVMultiText extends OAVBase
     {
-        super(attributeViewInfo);
-        this.skinName = "OAVMultiText";
-    }
+        public txtLab: eui.Label;
 
-    initView()
-    {
-        if (this._attributeViewInfo.editable)
-            feng3d.watcher.watch(this.space, this._attributeName, this.updateView, this);
-    }
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+        {
+            super(attributeViewInfo);
+            this.skinName = "OAVMultiText";
+        }
 
-    dispose()
-    {
-        feng3d.watcher.unwatch(this.space, this._attributeName, this.updateView, this);
-    }
+        initView()
+        {
+            if (this._attributeViewInfo.editable)
+                feng3d.watcher.watch(this.space, this._attributeName, this.updateView, this);
+        }
 
-    updateView()
-    {
-        this.txtLab.text = this.attributeValue;
+        dispose()
+        {
+            feng3d.watcher.unwatch(this.space, this._attributeName, this.updateView, this);
+        }
+
+        updateView()
+        {
+            this.txtLab.text = this.attributeValue;
+        }
     }
 }

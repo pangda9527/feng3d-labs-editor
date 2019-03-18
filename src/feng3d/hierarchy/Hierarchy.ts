@@ -1,175 +1,175 @@
-import { HierarchyNode } from "./HierarchyNode";
-import { editorData } from "../../global/EditorData";
-
-export var hierarchy: Hierarchy;
-
-export class Hierarchy
+namespace editor
 {
-    rootnode: HierarchyNode;
+    export var hierarchy: Hierarchy;
 
-    @feng3d.watch("rootGameObjectChanged")
-    rootGameObject: feng3d.GameObject;
-
-    constructor()
+    export class Hierarchy
     {
-        feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
-    }
+        rootnode: HierarchyNode;
 
-    /**
-     * 获取选中结点
-     */
-    getSelectedNode()
-    {
-        var node = editorData.selectedGameObjects.reduce((pv: HierarchyNode, cv) => { pv = pv || this.getNode(cv); return pv; }, null);
-        return node;
-    }
+        @feng3d.watch("rootGameObjectChanged")
+        rootGameObject: feng3d.GameObject;
 
-    /**
-     * 获取结点
-     */
-    getNode(gameObject: feng3d.GameObject)
-    {
-        var node = nodeMap.get(gameObject);
-        return node;
-    }
-
-    delete(gameobject: feng3d.GameObject)
-    {
-        var node = nodeMap.get(gameobject);
-        if (node)
+        constructor()
         {
-            node.destroy();
-            nodeMap.delete(gameobject);
+            feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
         }
-    }
 
-    /**
-     * 添加游戏对象到层级树
-     * 
-     * @param gameobject 游戏对象
-     */
-    addGameObject(gameobject: feng3d.GameObject)
-    {
-        var selectedNode = this.getSelectedNode();
-        if (selectedNode)
-            selectedNode.gameobject.addChild(gameobject);
-        else
-            this.rootnode.gameobject.addChild(gameobject);
-        editorData.selectObject(gameobject);
-    }
-
-    addGameoObjectFromAsset(gameobject: feng3d.GameObject, parent?: feng3d.GameObject)
-    {
-        gameobject = feng3d.serialization.clone(gameobject);
-
-        if (parent)
-            parent.addChild(gameobject);
-        else
-            this.rootnode.gameobject.addChild(gameobject);
-        editorData.selectObject(gameobject);
-    }
-
-    private _selectedGameObjects: feng3d.GameObject[] = [];
-
-    private rootGameObjectChanged(property, oldValue: feng3d.GameObject, newValue: feng3d.GameObject)
-    {
-        if (oldValue)
+        /**
+         * 获取选中结点
+         */
+        getSelectedNode()
         {
-            oldValue.off("addChild", this.ongameobjectadded, this);
-            oldValue.off("removeChild", this.ongameobjectremoved, this);
+            var node = editorData.selectedGameObjects.reduce((pv: HierarchyNode, cv) => { pv = pv || this.getNode(cv); return pv; }, null);
+            return node;
         }
-        if (newValue)
-        {
-            this.init(newValue);
-            newValue.on("addChild", this.ongameobjectadded, this);
-            newValue.on("removeChild", this.ongameobjectremoved, this);
-        }
-    }
 
-    private onSelectedGameObjectChanged()
-    {
-        this._selectedGameObjects.forEach(element =>
+        /**
+         * 获取结点
+         */
+        getNode(gameObject: feng3d.GameObject)
         {
-            var node = this.getNode(element);
+            var node = nodeMap.get(gameObject);
+            return node;
+        }
+
+        delete(gameobject: feng3d.GameObject)
+        {
+            var node = nodeMap.get(gameobject);
             if (node)
-                node.selected = false;
+            {
+                node.destroy();
+                nodeMap.delete(gameobject);
+            }
+        }
+
+        /**
+         * 添加游戏对象到层级树
+         * 
+         * @param gameobject 游戏对象
+         */
+        addGameObject(gameobject: feng3d.GameObject)
+        {
+            var selectedNode = this.getSelectedNode();
+            if (selectedNode)
+                selectedNode.gameobject.addChild(gameobject);
             else
-                debugger; // 为什么为空，是否被允许？
-        });
-        this._selectedGameObjects = editorData.selectedGameObjects.concat();
-        this._selectedGameObjects.forEach(element =>
+                this.rootnode.gameobject.addChild(gameobject);
+            editorData.selectObject(gameobject);
+        }
+
+        addGameoObjectFromAsset(gameobject: feng3d.GameObject, parent?: feng3d.GameObject)
         {
-            var node = this.getNode(element);
-            node.selected = true;
-            node.openParents();
-        });
-    }
+            gameobject = feng3d.serialization.clone(gameobject);
 
-    private ongameobjectadded(event: feng3d.Event<feng3d.GameObject>)
-    {
-        this.add(event.data);
-    }
+            if (parent)
+                parent.addChild(gameobject);
+            else
+                this.rootnode.gameobject.addChild(gameobject);
+            editorData.selectObject(gameobject);
+        }
 
-    private ongameobjectremoved(event: feng3d.Event<feng3d.GameObject>)
-    {
-        var node = nodeMap.get(event.data);
-        this.remove(node);
-    }
+        private _selectedGameObjects: feng3d.GameObject[] = [];
 
-    private init(gameobject: feng3d.GameObject)
-    {
-        if (this.rootnode)
-            this.rootnode.destroy();
-
-        nodeMap.clear();
-
-        var node = new HierarchyNode({ gameobject: gameobject });
-        nodeMap.set(gameobject, node);
-        node.isOpen = true;
-
-        this.rootnode = node;
-        gameobject.children.forEach(element =>
+        private rootGameObjectChanged(property, oldValue: feng3d.GameObject, newValue: feng3d.GameObject)
         {
-            this.add(element);
-        });
-    }
+            if (oldValue)
+            {
+                oldValue.off("addChild", this.ongameobjectadded, this);
+                oldValue.off("removeChild", this.ongameobjectremoved, this);
+            }
+            if (newValue)
+            {
+                this.init(newValue);
+                newValue.on("addChild", this.ongameobjectadded, this);
+                newValue.on("removeChild", this.ongameobjectremoved, this);
+            }
+        }
 
-    private add(gameobject: feng3d.GameObject)
-    {
-        if (gameobject.hideFlags & feng3d.HideFlags.HideInHierarchy)
-            return;
-        var node = nodeMap.get(gameobject);
-        if (node)
+        private onSelectedGameObjectChanged()
         {
+            this._selectedGameObjects.forEach(element =>
+            {
+                var node = this.getNode(element);
+                if (node)
+                    node.selected = false;
+                else
+                    debugger; // 为什么为空，是否被允许？
+            });
+            this._selectedGameObjects = editorData.selectedGameObjects.concat();
+            this._selectedGameObjects.forEach(element =>
+            {
+                var node = this.getNode(element);
+                node.selected = true;
+                node.openParents();
+            });
+        }
+
+        private ongameobjectadded(event: feng3d.Event<feng3d.GameObject>)
+        {
+            this.add(event.data);
+        }
+
+        private ongameobjectremoved(event: feng3d.Event<feng3d.GameObject>)
+        {
+            var node = nodeMap.get(event.data);
+            this.remove(node);
+        }
+
+        private init(gameobject: feng3d.GameObject)
+        {
+            if (this.rootnode)
+                this.rootnode.destroy();
+
+            nodeMap.clear();
+
+            var node = new HierarchyNode({ gameobject: gameobject });
+            nodeMap.set(gameobject, node);
+            node.isOpen = true;
+
+            this.rootnode = node;
+            gameobject.children.forEach(element =>
+            {
+                this.add(element);
+            });
+        }
+
+        private add(gameobject: feng3d.GameObject)
+        {
+            if (gameobject.hideFlags & feng3d.HideFlags.HideInHierarchy)
+                return;
+            var node = nodeMap.get(gameobject);
+            if (node)
+            {
+                node.remove();
+            }
+            var parentnode = nodeMap.get(gameobject.parent);
+            if (parentnode)
+            {
+                if (!node)
+                {
+                    node = new HierarchyNode({ gameobject: gameobject });
+                    nodeMap.set(gameobject, node);
+                }
+                parentnode.addChild(node);
+            }
+            gameobject.children.forEach(element =>
+            {
+                this.add(element);
+            });
+            return node;
+        }
+
+        private remove(node: HierarchyNode)
+        {
+            if (!node) return;
+            node.children.forEach(element =>
+            {
+                this.remove(element);
+            });
             node.remove();
         }
-        var parentnode = nodeMap.get(gameobject.parent);
-        if (parentnode)
-        {
-            if (!node)
-            {
-                node = new HierarchyNode({ gameobject: gameobject });
-                nodeMap.set(gameobject, node);
-            }
-            parentnode.addChild(node);
-        }
-        gameobject.children.forEach(element =>
-        {
-            this.add(element);
-        });
-        return node;
     }
+    var nodeMap = new Map<feng3d.GameObject, HierarchyNode>();
 
-    private remove(node: HierarchyNode)
-    {
-        if (!node) return;
-        node.children.forEach(element =>
-        {
-            this.remove(element);
-        });
-        node.remove();
-    }
+    hierarchy = new Hierarchy();
 }
-var nodeMap = new Map<feng3d.GameObject, HierarchyNode>();
-
-hierarchy = new Hierarchy();

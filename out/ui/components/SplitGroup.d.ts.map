@@ -1,1 +1,0 @@
-{"version":3,"file":"SplitGroup.d.ts","sourceRoot":"","sources":["../../../src/ui/components/SplitGroup.ts"],"names":[],"mappings":"AAqEA;;;GAGG;AACH,qBAAa,UAAW,SAAQ,GAAG,CAAC,KAAK;;IAOrC,aAAa,CAAC,KAAK,EAAE,KAAK,CAAC,KAAK,EAAE,SAAS,EAAE,MAAM;IASnD,kBAAkB;IASlB,OAAO,CAAC,WAAW;IA0DnB,OAAO,CAAC,UAAU;IA6ClB,OAAO,CAAC,WAAW;IAoBnB,OAAO,CAAC,SAAS;CAQpB"}

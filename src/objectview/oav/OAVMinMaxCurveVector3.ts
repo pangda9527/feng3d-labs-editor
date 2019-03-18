@@ -1,46 +1,46 @@
-import { OAVBase } from "./OAVBase";
-import { MinMaxCurveVector3View } from "../../ui/components/MinMaxCurveVector3View";
-
-@feng3d.OAVComponent()
-export class OAVMinMaxCurveVector3 extends OAVBase
+namespace editor
 {
-    public labelLab: eui.Label;
-    public minMaxCurveVector3View: MinMaxCurveVector3View;
-
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    @feng3d.OAVComponent()
+    export class OAVMinMaxCurveVector3 extends OAVBase
     {
-        super(attributeViewInfo);
+        public labelLab: eui.Label;
+        public minMaxCurveVector3View: editor.MinMaxCurveVector3View;
 
-        this.skinName = "OAVMinMaxCurveVector3";
-    }
-
-    initView()
-    {
-        if (this._attributeViewInfo.editable)
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
-            this.minMaxCurveVector3View.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            super(attributeViewInfo);
+
+            this.skinName = "OAVMinMaxCurveVector3";
         }
 
-        this.minMaxCurveVector3View.minMaxCurveVector3 = this.attributeValue;
-
-        this.minMaxCurveVector3View.touchEnabled = this.minMaxCurveVector3View.touchChildren = this._attributeViewInfo.editable;
-    }
-
-    dispose()
-    {
-        if (this._attributeViewInfo.editable)
+        initView()
         {
-            this.minMaxCurveVector3View.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+            if (this._attributeViewInfo.editable)
+            {
+                this.minMaxCurveVector3View.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
+
+            this.minMaxCurveVector3View.minMaxCurveVector3 = this.attributeValue;
+
+            this.minMaxCurveVector3View.touchEnabled = this.minMaxCurveVector3View.touchChildren = this._attributeViewInfo.editable;
         }
-    }
 
-    updateView()
-    {
+        dispose()
+        {
+            if (this._attributeViewInfo.editable)
+            {
+                this.minMaxCurveVector3View.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
+        }
 
-    }
+        updateView()
+        {
 
-    private onChange()
-    {
+        }
 
+        private onChange()
+        {
+
+        }
     }
 }

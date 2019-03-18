@@ -1,1 +1,0 @@
-{"version":3,"file":"OAVNumber.d.ts","sourceRoot":"","sources":["../../../src/objectview/oav/OAVNumber.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAC;AAGpC;;GAEG;AACH,qBACa,SAAU,SAAQ,OAAO;IAE9B,QAAQ,EAAE,GAAG,CAAC,KAAK,CAAC;IACpB,IAAI,EAAE,GAAG,CAAC,SAAS,CAAC;gBAEf,iBAAiB,EAAE,MAAM,CAAC,iBAAiB;IAOvD,QAAQ;CASR"}

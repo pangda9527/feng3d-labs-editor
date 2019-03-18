@@ -24,7 +24,7 @@
 			<e:Group id="controllerGroup" width="100%" x="525" y="216">
 				<e:Group id="colorGroup" x="0" y="0">
 					<e:Label text="Color:" size="12" y="2" x="0" textColor="0x000000" verticalAlign="middle" multiline="false" scaleX="1" scaleY="1"/>
-					<ColorPicker id="colorPicker" width="80" height="20" x="463" y="293"/>
+					<editor:ColorPicker id="colorPicker" width="80" height="20" x="463" y="293"/>
 					<e:layout>
 						<e:HorizontalLayout verticalAlign="middle" gap="1"/>
 					</e:layout>

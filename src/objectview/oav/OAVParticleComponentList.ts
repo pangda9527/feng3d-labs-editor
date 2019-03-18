@@ -1,100 +1,100 @@
-import { OAVBase } from "./OAVBase";
-import { ParticleComponentView } from "../../ui/components/ParticleComponentView";
-
-@feng3d.OAVComponent()
-export class OAVParticleComponentList extends OAVBase
+namespace editor
 {
-    protected _space: feng3d.ParticleSystem;
-
-    //
-    group: eui.Group;
-
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    @feng3d.OAVComponent()
+    export class OAVParticleComponentList extends OAVBase
     {
-        super(attributeViewInfo);
-        this.skinName = "OAVParticleComponentList";
-    }
+        protected _space: feng3d.ParticleSystem;
 
-    get space()
-    {
-        return this._space;
-    }
+        //
+        group: eui.Group;
 
-    set space(value)
-    {
-        this._space = value;
-        this.dispose();
-        this.initView();
-    }
-
-    get attributeName(): string
-    {
-        return this._attributeName;
-    }
-
-    get attributeValue(): Object
-    {
-        return this._space[this._attributeName];
-    }
-
-    set attributeValue(value: Object)
-    {
-        if (this._space[this._attributeName] != value)
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
-            this._space[this._attributeName] = value;
+            super(attributeViewInfo);
+            this.skinName = "OAVParticleComponentList";
         }
-        this.updateView();
-    }
 
-    initView(): void
-    {
-        (<eui.VerticalLayout>this.group.layout).gap = -1;
-
-        var components = <any>this.attributeValue;
-        for (var i = 0; i < components.length; i++)
+        get space()
         {
-            this.addComponentView(components[i]);
+            return this._space;
         }
-    }
 
-    dispose()
-    {
-        var components = <any>this.attributeValue;
-        for (var i = 0; i < components.length; i++)
+        set space(value)
         {
-            this.removedComponentView(components[i]);
+            this._space = value;
+            this.dispose();
+            this.initView();
         }
-    }
 
-    /**
-     * 更新界面
-     */
-    updateView(): void
-    {
-        for (var i = 0, n = this.group.numChildren; i < n; i++)
+        get attributeName(): string
         {
-            var child = this.group.getChildAt(i)
-            if (child instanceof ParticleComponentView)
-                child.updateView();
+            return this._attributeName;
         }
-    }
 
-    private addComponentView(component: feng3d.ParticleModule)
-    {
-        var o: Object;
-        var displayObject = new ParticleComponentView(component);
-        displayObject.percentWidth = 100;
-        this.group.addChild(displayObject);
-    }
-
-    private removedComponentView(component: feng3d.ParticleModule)
-    {
-        for (var i = this.group.numChildren - 1; i >= 0; i--)
+        get attributeValue(): Object
         {
-            var displayObject = this.group.getChildAt(i);
-            if (displayObject instanceof ParticleComponentView && displayObject.component == component)
+            return this._space[this._attributeName];
+        }
+
+        set attributeValue(value: Object)
+        {
+            if (this._space[this._attributeName] != value)
             {
-                this.group.removeChild(displayObject);
+                this._space[this._attributeName] = value;
+            }
+            this.updateView();
+        }
+
+        initView(): void
+        {
+            (<eui.VerticalLayout>this.group.layout).gap = -1;
+
+            var components = <any>this.attributeValue;
+            for (var i = 0; i < components.length; i++)
+            {
+                this.addComponentView(components[i]);
+            }
+        }
+
+        dispose()
+        {
+            var components = <any>this.attributeValue;
+            for (var i = 0; i < components.length; i++)
+            {
+                this.removedComponentView(components[i]);
+            }
+        }
+
+		/**
+		 * 更新界面
+		 */
+        updateView(): void
+        {
+            for (var i = 0, n = this.group.numChildren; i < n; i++)
+            {
+                var child = this.group.getChildAt(i)
+                if (child instanceof ParticleComponentView)
+                    child.updateView();
+            }
+        }
+
+        private addComponentView(component: feng3d.ParticleModule)
+        {
+            var o: Object;
+            var displayObject = new ParticleComponentView(component);
+            displayObject.percentWidth = 100;
+            this.group.addChild(displayObject);
+        }
+
+        private removedComponentView(component: feng3d.ParticleModule)
+        {
+            for (var i = this.group.numChildren - 1; i >= 0; i--)
+            {
+                var displayObject = this.group.getChildAt(i);
+                if (displayObject instanceof ParticleComponentView && displayObject.component == component)
+                {
+                    this.group.removeChild(displayObject);
+                }
             }
         }
     }

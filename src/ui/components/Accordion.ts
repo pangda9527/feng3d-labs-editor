@@ -1,73 +1,76 @@
-export class Accordion extends eui.Component implements eui.UIComponent
+namespace editor
 {
-	public titleGroup: eui.Group;
-	public titleLabel: eui.Label;
-	public contentGroup: eui.Group;
-
-	/**
-	 * 标签名称
-	 */
-	titleName = "";
-
-	private components: eui.Component[] = [];
-
-	constructor()
+	export class Accordion extends eui.Component implements eui.UIComponent
 	{
-		super();
-		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "Accordion";
-	}
+		public titleGroup: eui.Group;
+		public titleLabel: eui.Label;
+		public contentGroup: eui.Group;
 
-	addContent(component: eui.Component)
-	{
-		if (!this.contentGroup)
-			this.components.push(component);
-		else
-			this.contentGroup.addChild(component);
-	}
+		/**
+		 * 标签名称
+		 */
+		titleName = "";
 
-	removeContent(component: eui.Component)
-	{
-		var index = this.components ? this.components.indexOf(component) : -1;
-		if (index != -1)
-			this.components.splice(index, 1);
-		else
-			component.parent && component.parent.removeChild(component);
-	}
+		private components: eui.Component[] = [];
 
-	protected onComplete()
-	{
-		this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-		this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-
-		if (this.stage)
+		constructor()
 		{
-			this.onAddedToStage();
+			super();
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.skinName = "Accordion";
 		}
-	}
 
-	protected onAddedToStage()
-	{
-		this.titleGroup.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
-		this.titleLabel.text = this.titleName;
-		if (this.components)
+		addContent(component: eui.Component)
 		{
-			for (var i = 0; i < this.components.length; i++)
+			if (!this.contentGroup)
+				this.components.push(component);
+			else
+				this.contentGroup.addChild(component);
+		}
+
+		removeContent(component: eui.Component)
+		{
+			var index = this.components ? this.components.indexOf(component) : -1;
+			if (index != -1)
+				this.components.splice(index, 1);
+			else
+				component.parent && component.parent.removeChild(component);
+		}
+
+		protected onComplete()
+		{
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+			if (this.stage)
 			{
-				this.contentGroup.addChild(this.components[i]);
+				this.onAddedToStage();
 			}
-			this.components = null;
-			delete this.components;
 		}
-	}
 
-	protected onRemovedFromStage()
-	{
-		this.titleGroup.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
-	}
+		protected onAddedToStage()
+		{
+			this.titleGroup.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+			this.titleLabel.text = this.titleName;
+			if (this.components)
+			{
+				for (var i = 0; i < this.components.length; i++)
+				{
+					this.contentGroup.addChild(this.components[i]);
+				}
+				this.components = null;
+				delete this.components;
+			}
+		}
 
-	private onTitleButtonClick()
-	{
-		this.currentState = this.currentState == "hide" ? "show" : "hide";
+		protected onRemovedFromStage()
+		{
+			this.titleGroup.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+		}
+
+		private onTitleButtonClick()
+		{
+			this.currentState = this.currentState == "hide" ? "show" : "hide";
+		}
 	}
 }

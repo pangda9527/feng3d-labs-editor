@@ -1,146 +1,149 @@
-export interface TreeNodeMap
+namespace editor
 {
-	added: TreeNode;
-	removed: TreeNode;
-	openChanged: TreeNode;
-}
-
-export interface TreeNode
-{
-	once<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => void, thisObject?: any, priority?: number): void;
-	dispatch<K extends keyof TreeNodeMap>(type: K, data?: TreeNodeMap[K], bubbles?: boolean): feng3d.Event<TreeNodeMap[K]>;
-	has<K extends keyof TreeNodeMap>(type: K): boolean;
-	on<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
-	off<K extends keyof TreeNodeMap>(type?: K, listener?: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any);
-}
-
-export class TreeNode extends feng3d.EventDispatcher
-{
-	/**
-	 * 标签
-	 */
-	label = "";
-	/**
-	 * 目录深度
-	 */
-	get depth()
+	export interface TreeNodeMap
 	{
-		var d = 0;
-		var p = this.parent;
-		while (p)
-		{
-			d++;
-			p = p.parent;
-		}
-		return d;
-	}
-	/**
-	 * 是否打开
-	 */
-	@feng3d.watch("openChanged")
-	isOpen = false;
-
-	/**
-	 * 是否选中
-	 */
-	selected = false;
-	/** 
-	 * 父结点
-	 */
-	parent: TreeNode = null;
-	/**
-	 * 子结点列表
-	 */
-	children: TreeNode[];
-
-	constructor(obj?: gPartial<TreeNode>)
-	{
-		super();
-		if (obj)
-		{
-			Object.assign(this, obj);
-		}
+		added: TreeNode;
+		removed: TreeNode;
+		openChanged: TreeNode;
 	}
 
-	/**
-	 * 销毁
-	 */
-	destroy()
+	export interface TreeNode
 	{
-		if (this.children)
+		once<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => void, thisObject?: any, priority?: number): void;
+		dispatch<K extends keyof TreeNodeMap>(type: K, data?: TreeNodeMap[K], bubbles?: boolean): feng3d.Event<TreeNodeMap[K]>;
+		has<K extends keyof TreeNodeMap>(type: K): boolean;
+		on<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
+		off<K extends keyof TreeNodeMap>(type?: K, listener?: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any);
+	}
+
+	export class TreeNode extends feng3d.EventDispatcher
+	{
+		/**
+		 * 标签
+		 */
+		label = "";
+		/**
+         * 目录深度
+         */
+		get depth()
 		{
-			this.children.concat().forEach(element =>
+			var d = 0;
+			var p = this.parent;
+			while (p)
 			{
-				element.destroy();
-			});
+				d++;
+				p = p.parent;
+			}
+			return d;
 		}
-		this.remove();
+		/**
+		 * 是否打开
+		 */
+		@feng3d.watch("openChanged")
+		isOpen = false;
 
-		this.parent = null;
-		this.children = null;
-	}
+		/**
+		 * 是否选中
+		 */
+		selected = false;
+        /** 
+         * 父结点
+         */
+		parent: TreeNode = null;
+        /**
+         * 子结点列表
+         */
+		children: TreeNode[];
 
-	/**
-	 * 判断是否包含结点
-	 */
-	contain(node: TreeNode)
-	{
-		while (node)
+		constructor(obj?: gPartial<TreeNode>)
 		{
-			if (node == this) return true;
-			node = node.parent;
+			super();
+			if (obj)
+			{
+				Object.assign(this, obj);
+			}
 		}
-		return false;
-	}
 
-	addChild(node: TreeNode)
-	{
-		node.remove();
-
-		feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
-
-		if (this.children.indexOf(node) == -1) this.children.push(node);
-		node.parent = this;
-
-		this.dispatch("added", node, true);
-	}
-
-	remove()
-	{
-		if (this.parent)
+		/**
+         * 销毁
+         */
+		destroy()
 		{
-			var index = this.parent.children.indexOf(this);
-			if (index != -1) this.parent.children.splice(index, 1);
-			this.dispatch("removed", this, true);
+			if (this.children)
+			{
+				this.children.concat().forEach(element =>
+				{
+					element.destroy();
+				});
+			}
+			this.remove();
+
 			this.parent = null;
+			this.children = null;
 		}
-	}
 
-	getShowNodes()
-	{
-		var nodes: TreeNode[] = [this];
-		if (this.isOpen)
+		/**
+         * 判断是否包含结点
+         */
+		contain(node: TreeNode)
 		{
-			this.children.forEach(element =>
+			while (node)
 			{
-				nodes = nodes.concat(element.getShowNodes());
-			});
+				if (node == this) return true;
+				node = node.parent;
+			}
+			return false;
 		}
-		return nodes;
-	}
 
-	openParents()
-	{
-		var p = this.parent;
-		while (p)
+		addChild(node: TreeNode)
 		{
-			p.isOpen = true;
-			p = p.parent;
-		}
-	}
+			node.remove();
 
-	private openChanged()
-	{
-		this.dispatch("openChanged", null, true);
+			feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
+
+			if (this.children.indexOf(node) == -1) this.children.push(node);
+			node.parent = this;
+
+			this.dispatch("added", node, true);
+		}
+
+		remove()
+		{
+			if (this.parent)
+			{
+				var index = this.parent.children.indexOf(this);
+				if (index != -1) this.parent.children.splice(index, 1);
+				this.dispatch("removed", this, true);
+				this.parent = null;
+			}
+		}
+
+		getShowNodes()
+		{
+			var nodes: TreeNode[] = [this];
+			if (this.isOpen)
+			{
+				this.children.forEach(element =>
+				{
+					nodes = nodes.concat(element.getShowNodes());
+				});
+			}
+			return nodes;
+		}
+
+		openParents()
+		{
+			var p = this.parent;
+			while (p)
+			{
+				p.isOpen = true;
+				p = p.parent;
+			}
+		}
+
+		private openChanged()
+		{
+			this.dispatch("openChanged", null, true);
+		}
 	}
 }

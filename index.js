@@ -9,6 +9,7 @@ loadjs([
     isdebug ? "libs/modules/tween/tween.js" : "libs/modules/tween/tween.min.js",
     //
     `feng3d/out/feng3d.js`,
+    `out/editor.js`,
 ], loadComplete);
 
 function loadjs(path, onload, onerror)
@@ -61,16 +62,5 @@ function loadComplete()
      * "antialias": //WebGL模式下是否开启抗锯齿，true:开启，false:关闭，默认为false
      * }
      **/
-
-    require({
-        baseUrl: "./"
-    },
-        ["out/editor"],
-        function ()
-        {
-            egret.runEgret({ renderMode: "webgl", audioType: 0 });
-        }
-    );
-
-
+    egret.runEgret({ renderMode: "webgl", audioType: 0 });
 }

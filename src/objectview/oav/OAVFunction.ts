@@ -1,34 +1,35 @@
-import { OAVBase } from "./OAVBase";
-
-@feng3d.OAVComponent()
-export class OAVFunction extends OAVBase
+namespace editor
 {
-    public labelLab: eui.Label;
-    public button: eui.Button;
-
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    @feng3d.OAVComponent()
+    export class OAVFunction extends OAVBase
     {
-        super(attributeViewInfo);
-        this.skinName = "OAVFunction";
-    }
+        public labelLab: eui.Label;
+        public button: eui.Button;
 
-    initView()
-    {
-        this.button.addEventListener(egret.MouseEvent.CLICK, this.click, this);
-    }
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+        {
+            super(attributeViewInfo);
+            this.skinName = "OAVFunction";
+        }
 
-    dispose()
-    {
-        this.button.removeEventListener(egret.MouseEvent.CLICK, this.click, this);
-    }
+        initView()
+        {
+            this.button.addEventListener(egret.MouseEvent.CLICK, this.click, this);
+        }
 
-    updateView()
-    {
+        dispose()
+        {
+            this.button.removeEventListener(egret.MouseEvent.CLICK, this.click, this);
+        }
 
-    }
+        updateView()
+        {
 
-    protected click(event: egret.Event)
-    {
-        this._space[this._attributeName]();
+        }
+
+        protected click(event: egret.Event)
+        {
+            this._space[this._attributeName]();
+        }
     }
 }

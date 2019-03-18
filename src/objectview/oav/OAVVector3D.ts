@@ -1,27 +1,27 @@
-import { OAVBase } from "./OAVBase";
-import { Vector3DView } from "../../ui/components/Vector3DView";
-
-@feng3d.OAVComponent()
-export class OAVVector3D extends OAVBase
+namespace editor
 {
-	labelLab: eui.Label;
-	vector3DView: Vector3DView;
-
-	constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+	@feng3d.OAVComponent()
+	export class OAVVector3D extends OAVBase
 	{
-		super(attributeViewInfo);
-		this.skinName = "OAVVector3DSkin";
-	}
+		labelLab: eui.Label;
+		vector3DView: editor.Vector3DView;
 
-	initView()
-	{
-		this.vector3DView.vm = <any>this.attributeValue;
-		eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
-	}
+		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+		{
+			super(attributeViewInfo);
+			this.skinName = "OAVVector3DSkin";
+		}
 
-	dispose()
-	{
-		// this.vector3DView.vm = <any>this.attributeValue;
-		// eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
+		initView()
+		{
+			this.vector3DView.vm = <any>this.attributeValue;
+			eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
+		}
+
+		dispose()
+		{
+			// this.vector3DView.vm = <any>this.attributeValue;
+			// eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
+		}
 	}
 }

@@ -1,55 +1,56 @@
-import { MinMaxCurveView } from "./MinMaxCurveView";
-
-export class MinMaxCurveVector3View extends eui.Component
+namespace editor
 {
-    @feng3d.watch("_onMinMaxCurveVector3Changed")
-    minMaxCurveVector3 = new feng3d.MinMaxCurveVector3();
-
-    public xMinMaxCurveView: MinMaxCurveView;
-    public yMinMaxCurveView: MinMaxCurveView;
-    public zMinMaxCurveView: MinMaxCurveView;
-
-    constructor()
+    export class MinMaxCurveVector3View extends eui.Component
     {
-        super();
-        this.skinName = "MinMaxCurveVector3View";
-    }
+        @feng3d.watch("_onMinMaxCurveVector3Changed")
+        minMaxCurveVector3 = new feng3d.MinMaxCurveVector3();
 
-    $onAddToStage(stage: egret.Stage, nestLevel: number)
-    {
-        super.$onAddToStage(stage, nestLevel);
+        public xMinMaxCurveView: editor.MinMaxCurveView;
+        public yMinMaxCurveView: editor.MinMaxCurveView;
+        public zMinMaxCurveView: editor.MinMaxCurveView;
 
-        this.xMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
-        this.yMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
-        this.zMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
+        constructor()
+        {
+            super();
+            this.skinName = "MinMaxCurveVector3View";
+        }
 
-    }
+        $onAddToStage(stage: egret.Stage, nestLevel: number)
+        {
+            super.$onAddToStage(stage, nestLevel);
 
-    $onRemoveFromStage()
-    {
-        this.xMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
-        this.yMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
-        this.zMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
+            this.xMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
+            this.yMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
+            this.zMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
 
-        super.$onRemoveFromStage()
-    }
+        }
 
-    updateView()
-    {
-        if (!this.stage) return;
+        $onRemoveFromStage()
+        {
+            this.xMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
+            this.yMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
+            this.zMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
 
-        this.xMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.xCurve;
-        this.yMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.yCurve;
-        this.zMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.zCurve;
-    }
+            super.$onRemoveFromStage()
+        }
 
-    private _onMinMaxCurveVector3Changed()
-    {
-        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-    }
+        updateView()
+        {
+            if (!this.stage) return;
 
-    private _onchanged()
-    {
-        this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+            this.xMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.xCurve;
+            this.yMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.yCurve;
+            this.zMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.zCurve;
+        }
+
+        private _onMinMaxCurveVector3Changed()
+        {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        }
+
+        private _onchanged()
+        {
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+        }
     }
 }

@@ -1,75 +1,76 @@
-import { Accordion } from "./Accordion";
-
-export class ParticleComponentView extends eui.Component
+namespace editor
 {
-	component: feng3d.ParticleModule;
-	componentView: feng3d.IObjectView;
-
-	//
-	public accordion: Accordion;
-
-	//
-	public enabledCB: eui.CheckBox;
-
-	/**
-	 * 对象界面数据
-	 */
-	constructor(component: feng3d.ParticleModule)
+	export class ParticleComponentView extends eui.Component
 	{
-		super();
-		this.component = component;
+		component: feng3d.ParticleModule;
+		componentView: feng3d.IObjectView;
 
-		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "ParticleComponentView";
-	}
+		//
+		public accordion: editor.Accordion;
 
-	/**
-	 * 更新界面
-	 */
-	updateView(): void
-	{
-		this.updateEnableCB();
-		if (this.componentView)
-			this.componentView.updateView();
-	}
+		//
+		public enabledCB: eui.CheckBox;
 
-	private onComplete()
-	{
-		var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
-		this.accordion.titleName = componentName;
-		this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
-		this.accordion.addContent(this.componentView);
+		/**
+		 * 对象界面数据
+		 */
+		constructor(component: feng3d.ParticleModule)
+		{
+			super();
+			this.component = component;
 
-		this.enabledCB = this.accordion["enabledCB"];
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.skinName = "ParticleComponentView";
+		}
 
-		this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
-		this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+		/**
+		 * 更新界面
+		 */
+		updateView(): void
+		{
+			this.updateEnableCB();
+			if (this.componentView)
+				this.componentView.updateView();
+		}
 
-		if (this.stage)
-			this.onAddToStage();
-	}
+		private onComplete()
+		{
+			var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
+			this.accordion.titleName = componentName;
+			this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
+			this.accordion.addContent(this.componentView);
 
-	private onAddToStage()
-	{
-		this.updateView();
+			this.enabledCB = this.accordion["enabledCB"];
 
-		this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-		feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
-	}
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
-	private onRemovedFromStage()
-	{
-		this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-		feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
-	}
+			if (this.stage)
+				this.onAddToStage();
+		}
 
-	private updateEnableCB()
-	{
-		this.enabledCB.selected = this.component.enabled;
-	}
+		private onAddToStage()
+		{
+			this.updateView();
 
-	private onEnableCBChange()
-	{
-		this.component.enabled = this.enabledCB.selected;
+			this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+			feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+		}
+
+		private onRemovedFromStage()
+		{
+			this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
+			feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+		}
+
+		private updateEnableCB()
+		{
+			this.enabledCB.selected = this.component.enabled;
+		}
+
+		private onEnableCBChange()
+		{
+			this.component.enabled = this.enabledCB.selected;
+		}
 	}
 }

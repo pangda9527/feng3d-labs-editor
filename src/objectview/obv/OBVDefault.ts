@@ -1,131 +1,134 @@
-/**
- * 默认对象属性块界面
- */
-@feng3d.OBVComponent()
-export class OBVDefault extends eui.Component implements feng3d.IObjectBlockView
+namespace editor
 {
-	private _space: Object;
-	private _blockName: string;
-
-	private attributeViews: feng3d.IObjectAttributeView[];
-	private itemList: feng3d.AttributeViewInfo[];
-
-	group: eui.Group;
-	titleGroup: eui.Group;
-	titleButton: eui.Button;
-	contentGroup: eui.Group;
-
-	border: eui.Rect;
-
-	objectView: feng3d.IObjectView;
-
 	/**
-	 * @inheritDoc
+	 * 默认对象属性块界面
 	 */
-	constructor(blockViewInfo: feng3d.BlockViewInfo)
+	@feng3d.OBVComponent()
+	export class OBVDefault extends eui.Component implements feng3d.IObjectBlockView
 	{
-		super();
+		private _space: Object;
+		private _blockName: string;
 
-		this._space = blockViewInfo.owner;
-		this._blockName = blockViewInfo.name;
-		this.itemList = blockViewInfo.itemList;
-		this.skinName = "OBVDefault";
-	}
+		private attributeViews: feng3d.IObjectAttributeView[];
+		private itemList: feng3d.AttributeViewInfo[];
 
-	$onAddToStage(stage: egret.Stage, nestLevel: number)
-	{
-		super.$onAddToStage(stage, nestLevel);
+		group: eui.Group;
+		titleGroup: eui.Group;
+		titleButton: eui.Button;
+		contentGroup: eui.Group;
 
-		this.initView();
-		this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
-	}
+		border: eui.Rect;
 
-	$onRemoveFromStage()
-	{
-		super.$onRemoveFromStage();
+		objectView: feng3d.IObjectView;
 
-		this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
-		this.dispose();
-	}
-
-	initView(): void
-	{
-		if (this._blockName != null && this._blockName.length > 0)
+		/**
+		 * @inheritDoc
+		 */
+		constructor(blockViewInfo: feng3d.BlockViewInfo)
 		{
-			this.addChildAt(this.border, 0);
-			this.group.addChildAt(this.titleGroup, 0);
-		} else
-		{
-			this.removeChild(this.border);
-			this.group.removeChild(this.titleGroup);
+			super();
+
+			this._space = blockViewInfo.owner;
+			this._blockName = blockViewInfo.name;
+			this.itemList = blockViewInfo.itemList;
+			this.skinName = "OBVDefault";
 		}
 
-		this.attributeViews = [];
-		var objectAttributeInfos = this.itemList;
-		for (var i = 0; i < objectAttributeInfos.length; i++)
+		$onAddToStage(stage: egret.Stage, nestLevel: number)
 		{
-			var displayObject = feng3d.objectview.getAttributeView(objectAttributeInfos[i]);
-			displayObject.percentWidth = 100;
-			displayObject.objectView = this.objectView;
-			displayObject.objectBlockView = this;
-			this.contentGroup.addChild(displayObject);
-			this.attributeViews.push(<any>displayObject);
+			super.$onAddToStage(stage, nestLevel);
+
+			this.initView();
+			this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
 		}
-	}
 
-	dispose()
-	{
-		for (var i = 0; i < this.attributeViews.length; i++)
+		$onRemoveFromStage()
 		{
-			var displayObject = this.attributeViews[i];
-			displayObject.objectView = null;
-			displayObject.objectBlockView = null;
-			this.contentGroup.removeChild(displayObject);
+			super.$onRemoveFromStage();
+
+			this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+			this.dispose();
 		}
-		this.attributeViews.length = 0;
-	}
 
-	get space(): Object
-	{
-		return this._space;
-	}
-
-	set space(value: Object)
-	{
-		this._space = value;
-		for (var i = 0; i < this.attributeViews.length; i++)
+		initView(): void
 		{
-			this.attributeViews[i].space = this._space;
-		}
-	}
-
-	get blockName(): string
-	{
-		return this._blockName;
-	}
-
-	updateView(): void
-	{
-		for (var i = 0; i < this.attributeViews.length; i++)
-		{
-			this.attributeViews[i].updateView();
-		}
-	}
-
-	getAttributeView(attributeName: String)
-	{
-		for (var i = 0; i < this.attributeViews.length; i++)
-		{
-			if (this.attributeViews[i].attributeName == attributeName)
+			if (this._blockName != null && this._blockName.length > 0)
 			{
-				return this.attributeViews[i];
+				this.addChildAt(this.border, 0);
+				this.group.addChildAt(this.titleGroup, 0);
+			} else
+			{
+				this.removeChild(this.border);
+				this.group.removeChild(this.titleGroup);
+			}
+
+			this.attributeViews = [];
+			var objectAttributeInfos = this.itemList;
+			for (var i = 0; i < objectAttributeInfos.length; i++)
+			{
+				var displayObject = feng3d.objectview.getAttributeView(objectAttributeInfos[i]);
+				displayObject.percentWidth = 100;
+				displayObject.objectView = this.objectView;
+				displayObject.objectBlockView = this;
+				this.contentGroup.addChild(displayObject);
+				this.attributeViews.push(<any>displayObject);
 			}
 		}
-		return null;
-	}
 
-	private onTitleButtonClick()
-	{
-		this.currentState = this.currentState == "hide" ? "show" : "hide";
+		dispose()
+		{
+			for (var i = 0; i < this.attributeViews.length; i++)
+			{
+				var displayObject = this.attributeViews[i];
+				displayObject.objectView = null;
+				displayObject.objectBlockView = null;
+				this.contentGroup.removeChild(displayObject);
+			}
+			this.attributeViews.length = 0;
+		}
+
+		get space(): Object
+		{
+			return this._space;
+		}
+
+		set space(value: Object)
+		{
+			this._space = value;
+			for (var i = 0; i < this.attributeViews.length; i++)
+			{
+				this.attributeViews[i].space = this._space;
+			}
+		}
+
+		get blockName(): string
+		{
+			return this._blockName;
+		}
+
+		updateView(): void
+		{
+			for (var i = 0; i < this.attributeViews.length; i++)
+			{
+				this.attributeViews[i].updateView();
+			}
+		}
+
+		getAttributeView(attributeName: String)
+		{
+			for (var i = 0; i < this.attributeViews.length; i++)
+			{
+				if (this.attributeViews[i].attributeName == attributeName)
+				{
+					return this.attributeViews[i];
+				}
+			}
+			return null;
+		}
+
+		private onTitleButtonClick()
+		{
+			this.currentState = this.currentState == "hide" ? "show" : "hide";
+		}
 	}
 }

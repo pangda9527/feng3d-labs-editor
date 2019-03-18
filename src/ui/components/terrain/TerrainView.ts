@@ -1,27 +1,32 @@
-export class TerrainView extends eui.Component
+namespace editor
 {
-    public constructor()
+    export class TerrainView extends eui.Component
     {
-        super();
-        this.skinName = "TerrainView";
-    }
+        public constructor()
+        {
+            super();
+            this.skinName = "TerrainView";
+        }
 
-    $onAddToStage(stage: egret.Stage, nestLevel: number)
-    {
-        super.$onAddToStage(stage, nestLevel);
+        $onAddToStage(stage: egret.Stage, nestLevel: number)
+        {
+            super.$onAddToStage(stage, nestLevel);
 
-        this.updateView();
-    }
+            this.updateView();
+        }
 
-    $onRemoveFromStage()
-    {
+        $onRemoveFromStage()
+        {
 
-        super.$onRemoveFromStage()
-    }
+            super.$onRemoveFromStage()
+        }
 
-    updateView()
-    {
-        if (!this.stage) return;
+        updateView()
+        {
+            if (!this.stage) return;
+
+        }
+
 
     }
 }

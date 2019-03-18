@@ -1,1 +1,0 @@
-{"version":3,"file":"CommonConfig.d.ts","sourceRoot":"","sources":["../../src/configs/CommonConfig.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,uBAAuB,CAAC;AAYjD;;GAEG;AACH,eAAO,IAAI,UAAU,EAAE,UAAU,CAAC;AAElC;;GAEG;AACH,qBAAa,UAAU;IAEnB;;OAEG;IACH,WAAW;IAmMX;;OAEG;IACH,mBAAmB;IA6GnB;;;OAGG;IACH,sBAAsB,CAAC,UAAU,EAAE,MAAM,CAAC,UAAU;CAoEvD"}

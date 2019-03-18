@@ -1,196 +1,197 @@
-import { AssetNode } from "../assets/AssetNode";
-
-export var drag: Drag;
-
-export class Drag
+namespace editor
 {
-	register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragData)[], onDragDrop?: (dragSource: DragData) => void)
-	{
-		this.unregister(displayObject);
-		registers.push({ displayObject: displayObject, setdargSource: setdargSource, accepttypes: accepttypes, onDragDrop: onDragDrop });
+	export var drag: Drag;
 
-		if (setdargSource)
-			displayObject.addEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null, false, 1000);
-	}
-	unregister(displayObject: egret.DisplayObject)
+	export class Drag
 	{
-		for (var i = registers.length - 1; i >= 0; i--)
+		register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragData)[], onDragDrop?: (dragSource: DragData) => void)
+		{
+			this.unregister(displayObject);
+			registers.push({ displayObject: displayObject, setdargSource: setdargSource, accepttypes: accepttypes, onDragDrop: onDragDrop });
+
+			if (setdargSource)
+				displayObject.addEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null, false, 1000);
+		}
+		unregister(displayObject: egret.DisplayObject)
+		{
+			for (var i = registers.length - 1; i >= 0; i--)
+			{
+				if (registers[i].displayObject == displayObject)
+				{
+					registers.splice(i, 1);
+				}
+			}
+			displayObject.removeEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null);
+		}
+		/** 当拖拽过程中拖拽数据发生变化时调用该方法刷新可接受对象列表 */
+		refreshAcceptables()
+		{
+			//获取可接受数据的对象列表
+			acceptableitems = registers.reduce((value: DragItem[], item) =>
+			{
+				if (item != dragitem && acceptData(item, dragSource))
+				{
+					value.push(item);
+				}
+				return value;
+			}, []);
+		}
+	};
+
+	drag = new Drag();
+
+	/**
+	 * 拖拽数据
+	 */
+	export interface DragData
+	{
+		gameobject?: feng3d.GameObject;
+		animationclip?: feng3d.AnimationClip;
+		material?: feng3d.Material;
+		geometry?: feng3d.Geometry;
+		//
+		file_gameobject?: feng3d.GameObject;
+		/**
+		 * 脚本路径
+		 */
+		file_script?: feng3d.ScriptAsset;
+		/**
+		 * 文件
+		 */
+		assetNodes?: AssetNode[];
+		/**
+		 * 声音路径
+		 */
+		audio?: feng3d.AudioAsset;
+		/**
+		 * 纹理
+		 */
+		texture2d?: feng3d.Texture2D;
+		/**
+		 * 立方体纹理
+		 */
+		texturecube?: feng3d.TextureCube;
+	}
+
+	interface DragItem
+	{
+		displayObject: egret.DisplayObject,
+		setdargSource: (dragSource: DragData) => void,
+		accepttypes: (keyof DragData)[],
+		onDragDrop?: (dragSource: DragData) => void
+	}
+
+	var stage: egret.Stage;
+	var registers: DragItem[] = [];
+	/**
+	 * 对象与触发接受拖拽的对象列表
+	 */
+	var accepters = new Map<egret.DisplayObject, number>();
+	/**
+	 * 被拖拽数据
+	 */
+	var dragSource: DragData;
+	/**
+	 * 被拖拽对象
+	 */
+	var dragitem: DragItem;
+	/**
+	 * 可接受拖拽数据对象列表
+	 */
+	var acceptableitems: DragItem[];
+
+	function getitem(displayObject: egret.DisplayObject)
+	{
+		for (var i = 0; i < registers.length; i++)
 		{
 			if (registers[i].displayObject == displayObject)
-			{
-				registers.splice(i, 1);
-			}
+				return registers[i];
 		}
-		displayObject.removeEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null);
+		return null;
 	}
-	/** 当拖拽过程中拖拽数据发生变化时调用该方法刷新可接受对象列表 */
-	refreshAcceptables()
+
+	/**
+	 * 判断是否接受数据
+	 * @param item 
+	 * @param dragSource 
+	 */
+	function acceptData(item: DragItem, dragSource: DragData)
 	{
-		//获取可接受数据的对象列表
-		acceptableitems = registers.reduce((value: DragItem[], item) =>
+		var hasdata = item.accepttypes.reduce((prevalue, accepttype) => { return prevalue || !!dragSource[accepttype]; }, false)
+		return hasdata;
+	}
+
+	function onItemMouseDown(event: egret.TouchEvent): void
+	{
+		if (dragitem)
+			return;
+		dragitem = getitem(event.currentTarget);
+
+		if (!dragitem.setdargSource)
 		{
-			if (item != dragitem && acceptData(item, dragSource))
-			{
-				value.push(item);
-			}
-			return value;
-		}, []);
+			dragitem = null;
+			return;
+		}
+
+		if (dragitem)
+		{
+			stage = dragitem.displayObject.stage;
+			stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
+			stage.addEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
+		}
 	}
-};
 
-drag = new Drag();
-
-/**
- * 拖拽数据
- */
-export interface DragData
-{
-	gameobject?: feng3d.GameObject;
-	animationclip?: feng3d.AnimationClip;
-	material?: feng3d.Material;
-	geometry?: feng3d.Geometry;
-	//
-	file_gameobject?: feng3d.GameObject;
-	/**
-	 * 脚本路径
-	 */
-	file_script?: feng3d.ScriptAsset;
-	/**
-	 * 文件
-	 */
-	assetNodes?: AssetNode[];
-	/**
-	 * 声音路径
-	 */
-	audio?: feng3d.AudioAsset;
-	/**
-	 * 纹理
-	 */
-	texture2d?: feng3d.Texture2D;
-	/**
-	 * 立方体纹理
-	 */
-	texturecube?: feng3d.TextureCube;
-}
-
-interface DragItem
-{
-	displayObject: egret.DisplayObject,
-	setdargSource: (dragSource: DragData) => void,
-	accepttypes: (keyof DragData)[],
-	onDragDrop?: (dragSource: DragData) => void
-}
-
-var stage: egret.Stage;
-var registers: DragItem[] = [];
-/**
- * 对象与触发接受拖拽的对象列表
- */
-var accepters = new Map<egret.DisplayObject, number>();
-/**
- * 被拖拽数据
- */
-var dragSource: DragData;
-/**
- * 被拖拽对象
- */
-var dragitem: DragItem;
-/**
- * 可接受拖拽数据对象列表
- */
-var acceptableitems: DragItem[];
-
-function getitem(displayObject: egret.DisplayObject)
-{
-	for (var i = 0; i < registers.length; i++)
+	function onMouseUp(event: egret.MouseEvent)
 	{
-		if (registers[i].displayObject == displayObject)
-			return registers[i];
-	}
-	return null;
-}
+		stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
+		stage.removeEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
 
-/**
- * 判断是否接受数据
- * @param item 
- * @param dragSource 
- */
-function acceptData(item: DragItem, dragSource: DragData)
-{
-	var hasdata = item.accepttypes.reduce((prevalue, accepttype) => { return prevalue || !!dragSource[accepttype]; }, false)
-	return hasdata;
-}
+		acceptableitems = null;
 
-function onItemMouseDown(event: egret.TouchEvent): void
-{
-	if (dragitem)
-		return;
-	dragitem = getitem(event.currentTarget);
+		accepters.getKeys().forEach(element =>
+		{
+			element.alpha = accepters.get(element);
+			var accepteritem = getitem(element);
+			accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
+		});
 
-	if (!dragitem.setdargSource)
-	{
+		accepters.clear();
+
 		dragitem = null;
-		return;
 	}
 
-	if (dragitem)
+	function onMouseMove(event: egret.MouseEvent)
 	{
-		stage = dragitem.displayObject.stage;
-		stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
-		stage.addEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
-	}
-}
-
-function onMouseUp(event: egret.MouseEvent)
-{
-	stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
-	stage.removeEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
-
-	acceptableitems = null;
-
-	accepters.getKeys().forEach(element =>
-	{
-		element.alpha = accepters.get(element);
-		var accepteritem = getitem(element);
-		accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
-	});
-
-	accepters.clear();
-
-	dragitem = null;
-}
-
-function onMouseMove(event: egret.MouseEvent)
-{
-	if (!acceptableitems)
-	{
-		//获取拖拽数据
-		dragSource = {};
-		dragitem.setdargSource(dragSource);
-
-		//获取可接受数据的对象列表
-		acceptableitems = registers.reduce((value: DragItem[], item) =>
+		if (!acceptableitems)
 		{
-			if (item != dragitem && acceptData(item, dragSource))
+			//获取拖拽数据
+			dragSource = {};
+			dragitem.setdargSource(dragSource);
+
+			//获取可接受数据的对象列表
+			acceptableitems = registers.reduce((value: DragItem[], item) =>
 			{
-				value.push(item);
-			}
-			return value;
-		}, []);
-	}
-
-	accepters.getKeys().forEach(element =>
-	{
-		element.alpha = accepters.get(element);
-	});
-	accepters.clear();
-
-	acceptableitems.forEach(element =>
-	{
-		if (element.displayObject.getTransformedBounds(stage).contains(event.stageX, event.stageY))
-		{
-			accepters.set(element.displayObject, element.displayObject.alpha);
-			element.displayObject.alpha = 0.5;
+				if (item != dragitem && acceptData(item, dragSource))
+				{
+					value.push(item);
+				}
+				return value;
+			}, []);
 		}
-	});
+
+		accepters.getKeys().forEach(element =>
+		{
+			element.alpha = accepters.get(element);
+		});
+		accepters.clear();
+
+		acceptableitems.forEach(element =>
+		{
+			if (element.displayObject.getTransformedBounds(stage).contains(event.stageX, event.stageY))
+			{
+				accepters.set(element.displayObject, element.displayObject.alpha);
+				element.displayObject.alpha = 0.5;
+			}
+		});
+	}
 }

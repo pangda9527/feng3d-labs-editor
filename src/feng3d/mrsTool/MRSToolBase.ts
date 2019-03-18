@@ -1,131 +1,128 @@
-import { CoordinateAxis, CoordinatePlane, CoordinateCube } from "./models/MToolModel";
-import { CoordinateScaleCube } from "./models/SToolModel";
-import { CoordinateRotationAxis, CoordinateRotationFreeAxis } from "./models/RToolModel";
-import { editorCamera } from "../Main3D";
-import { mrsToolTarget } from "./MRSToolTarget";
-
-export class MRSToolBase extends feng3d.Component
+namespace editor
 {
-    private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis | CoordinateRotationFreeAxis;
-    //
-    private _toolModel: feng3d.Component;
-
-    protected ismouseDown = false;
-
-    //平移平面，该平面处于场景空间，用于计算位移量
-    protected movePlane3D: feng3d.Plane3D;
-    protected startSceneTransform: feng3d.Matrix4x4;
-
-    init(gameObject: feng3d.GameObject)
+    export class MRSToolBase extends feng3d.Component
     {
-        super.init(gameObject);
-        var holdSizeComponent = this.gameObject.addComponent(feng3d.HoldSizeComponent);
-        holdSizeComponent.holdSize = 1;
-        holdSizeComponent.camera = editorCamera;
+        private _selectedItem: CoordinateAxis | CoordinatePlane | CoordinateCube | CoordinateScaleCube | CoordinateRotationAxis | CoordinateRotationFreeAxis;
         //
-        this.on("addedToScene", this.onAddedToScene, this);
-        this.on("removedFromScene", this.onRemovedFromScene, this);
-    }
+        private _toolModel: feng3d.Component;
 
-    protected onAddedToScene()
-    {
-        mrsToolTarget.controllerTool = this.transform;
-        //
-        feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
-        feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+        protected ismouseDown = false;
 
-        feng3d.ticker.onframe(this.updateToolModel, this);
-    }
+        //平移平面，该平面处于场景空间，用于计算位移量
+        protected movePlane3D: feng3d.Plane3D;
+        protected startSceneTransform: feng3d.Matrix4x4;
 
-    protected onRemovedFromScene()
-    {
-        mrsToolTarget.controllerTool = null;
-        //
-        feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
-        feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
-
-        feng3d.ticker.offframe(this.updateToolModel, this);
-    }
-
-    protected onItemMouseDown(event: feng3d.Event<any>)
-    {
-        feng3d.shortcut.activityState("inTransforming");
-    }
-
-    protected get toolModel()
-    {
-        return this._toolModel;
-    }
-
-    protected set toolModel(value)
-    {
-        if (this._toolModel)
-            this.gameObject.removeChild(this._toolModel.gameObject);
-        this._toolModel = value;;
-        if (this._toolModel)
+        init(gameObject: feng3d.GameObject)
         {
-            this.gameObject.addChild(this._toolModel.gameObject);
+            super.init(gameObject);
+            var holdSizeComponent = this.gameObject.addComponent(feng3d.HoldSizeComponent);
+            holdSizeComponent.holdSize = 1;
+            holdSizeComponent.camera = editorCamera;
+            //
+            this.on("addedToScene", this.onAddedToScene, this);
+            this.on("removedFromScene", this.onRemovedFromScene, this);
         }
-    }
 
-    get selectedItem()
-    {
-        return this._selectedItem;
-    }
-
-    set selectedItem(value)
-    {
-        if (this._selectedItem == value)
-            return;
-        if (this._selectedItem)
-            this._selectedItem.selected = false;
-        this._selectedItem = value;
-        if (this._selectedItem)
-            this._selectedItem.selected = true;
-    }
-
-    protected updateToolModel()
-    {
-
-    }
-
-    protected onMouseDown()
-    {
-        this.selectedItem = null;
-        this.ismouseDown = true;
-    }
-
-    protected onMouseUp()
-    {
-        this.ismouseDown = false;
-        this.movePlane3D = null;
-        this.startSceneTransform = null;
-
-        feng3d.ticker.nextframe(() =>
+        protected onAddedToScene()
         {
-            feng3d.shortcut.deactivityState("inTransforming");
-        });
-    }
+            mrsToolTarget.controllerTool = this.transform;
+            //
+            feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
 
-    /**
-     * 获取鼠标射线与移动平面的交点（模型空间）
-     */
-    protected getLocalMousePlaneCross()
-    {
-        //射线与平面交点
-        var crossPos = this.getMousePlaneCross();
-        //把交点从世界转换为模型空间
-        var inverseGlobalMatrix3D = this.startSceneTransform.clone();
-        inverseGlobalMatrix3D.invert();
-        crossPos = inverseGlobalMatrix3D.transformVector(crossPos);
-        return crossPos;
-    }
+            feng3d.ticker.onframe(this.updateToolModel, this);
+        }
 
-    protected getMousePlaneCross()
-    {
-        var line3D = editorCamera.getMouseRay3D();
-        //射线与平面交点
-        var crossPos = <feng3d.Vector3>this.movePlane3D.intersectWithLine3D(line3D);
-        return crossPos;
+        protected onRemovedFromScene()
+        {
+            mrsToolTarget.controllerTool = null;
+            //
+            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
+
+            feng3d.ticker.offframe(this.updateToolModel, this);
+        }
+
+        protected onItemMouseDown(event: feng3d.Event<any>)
+        {
+            feng3d.shortcut.activityState("inTransforming");
+        }
+
+        protected get toolModel()
+        {
+            return this._toolModel;
+        }
+
+        protected set toolModel(value)
+        {
+            if (this._toolModel)
+                this.gameObject.removeChild(this._toolModel.gameObject);
+            this._toolModel = value;;
+            if (this._toolModel)
+            {
+                this.gameObject.addChild(this._toolModel.gameObject);
+            }
+        }
+
+        get selectedItem()
+        {
+            return this._selectedItem;
+        }
+
+        set selectedItem(value)
+        {
+            if (this._selectedItem == value)
+                return;
+            if (this._selectedItem)
+                this._selectedItem.selected = false;
+            this._selectedItem = value;
+            if (this._selectedItem)
+                this._selectedItem.selected = true;
+        }
+
+        protected updateToolModel()
+        {
+
+        }
+
+        protected onMouseDown()
+        {
+            this.selectedItem = null;
+            this.ismouseDown = true;
+        }
+
+        protected onMouseUp()
+        {
+            this.ismouseDown = false;
+            this.movePlane3D = null;
+            this.startSceneTransform = null;
+
+            feng3d.ticker.nextframe(() =>
+            {
+                feng3d.shortcut.deactivityState("inTransforming");
+            });
+        }
+
+        /**
+         * 获取鼠标射线与移动平面的交点（模型空间）
+         */
+        protected getLocalMousePlaneCross()
+        {
+            //射线与平面交点
+            var crossPos = this.getMousePlaneCross();
+            //把交点从世界转换为模型空间
+            var inverseGlobalMatrix3D = this.startSceneTransform.clone();
+            inverseGlobalMatrix3D.invert();
+            crossPos = inverseGlobalMatrix3D.transformVector(crossPos);
+            return crossPos;
+        }
+
+        protected getMousePlaneCross()
+        {
+            var line3D = editorCamera.getMouseRay3D();
+            //射线与平面交点
+            var crossPos = <feng3d.Vector3>this.movePlane3D.intersectWithLine3D(line3D);
+            return crossPos;
+        }
     }
 }
