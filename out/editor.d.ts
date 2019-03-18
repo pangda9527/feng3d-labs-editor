@@ -3832,6 +3832,7 @@ declare namespace ts {
 declare namespace editor {
     var scriptCompiler: ScriptCompiler;
     class ScriptCompiler {
+        private tsconfig;
         constructor();
         private onGettsLibs;
         /**
@@ -3840,6 +3841,7 @@ declare namespace editor {
          * @param callback 完成回调
          */
         private loadtslibs;
+        private onFileChanged;
         private onScriptCompile;
         private compile;
         private transpileModule;

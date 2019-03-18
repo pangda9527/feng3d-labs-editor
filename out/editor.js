@@ -1804,6 +1804,7 @@ var editor;
                     _this.fs.deleteFile(realPath, callback);
                 }
             });
+            feng3d.dispatcher.dispatch("fs.delete", path);
         };
         /**
          * 写ArrayBuffer(新建)文件
@@ -1814,6 +1815,7 @@ var editor;
         NativeFS.prototype.writeArrayBuffer = function (path, arraybuffer, callback) {
             var realPath = this.getAbsolutePath(path);
             this.fs.writeFile(realPath, arraybuffer, function (err) { callback && callback(err); });
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 写字符串到(新建)文件
@@ -1824,6 +1826,7 @@ var editor;
         NativeFS.prototype.writeString = function (path, str, callback) {
             var buffer = feng3d.dataTransform.stringToArrayBuffer(str);
             this.writeArrayBuffer(path, buffer, callback);
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 写Object到(新建)文件
@@ -1835,6 +1838,7 @@ var editor;
             var obj = feng3d.serialization.serialize(object);
             var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
             this.writeString(path, str, callback);
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 写图片
@@ -1847,6 +1851,7 @@ var editor;
             feng3d.dataTransform.imageToArrayBuffer(image, function (buffer) {
                 _this.writeArrayBuffer(path, buffer, callback);
             });
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 复制文件
@@ -15685,6 +15690,8 @@ var editor;
         function ScriptCompiler() {
             feng3d.dispatcher.on("script.compile", this.onScriptCompile, this);
             feng3d.dispatcher.on("script.gettslibs", this.onGettsLibs, this);
+            feng3d.dispatcher.on("fs.delete", this.onFileChanged, this);
+            feng3d.dispatcher.on("fs.write", this.onFileChanged, this);
         }
         ScriptCompiler.prototype.onGettsLibs = function (e) {
             this.loadtslibs(e.data.callback);
@@ -15695,16 +15702,23 @@ var editor;
          * @param callback 完成回调
          */
         ScriptCompiler.prototype.loadtslibs = function (callback) {
+            var _this = this;
             // 加载 ts 配置
             editor.editorRS.fs.readString("tsconfig.json", function (err, str) {
                 if (err) {
                     throw err;
                     return;
                 }
-                var obj = json.parse(str);
-                console.log(obj);
-                var files = obj.files;
-                editor.editorRS.fs.readStrings(obj.files, function (strs) {
+                _this.tsconfig = json.parse(str);
+                console.log(_this.tsconfig);
+                var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
+                var files = _this.tsconfig.files;
+                files = files.filter(function (v) { return v.indexOf("Assets") != 0; });
+                files = files.concat(tslist.map(function (v) { return v.assetPath; }));
+                //
+                tslist.map(function (v) { return { path: v.assetPath, code: v.textContent }; });
+                var files = files;
+                editor.editorRS.fs.readStrings(files, function (strs) {
                     var tslibs = files.map(function (f, i) {
                         var str = strs[i];
                         if (typeof str == "string")
@@ -15716,16 +15730,20 @@ var editor;
                 });
             });
         };
+        ScriptCompiler.prototype.onFileChanged = function (e) {
+            if (e.data.substr(-3) == ".ts") {
+                feng3d.ticker.once(2000, this.onScriptCompile, this);
+            }
+        };
         ScriptCompiler.prototype.onScriptCompile = function (e) {
             var _this = this;
             this.loadtslibs(function (tslibs) {
-                var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
-                _this.compile(tslibs, tslist, e.data && e.data.onComplete);
+                _this.compile(tslibs, e && e.data && e.data.onComplete);
             });
         };
-        ScriptCompiler.prototype.compile = function (tslibs, tslist, callback) {
+        ScriptCompiler.prototype.compile = function (tslibs, callback) {
             try {
-                var output = this.transpileModule(tslibs, tslist);
+                var output = this.transpileModule(tslibs);
                 output.forEach(function (v) {
                     editor.editorRS.fs.writeString(v.name, v.text);
                 });
@@ -15740,7 +15758,7 @@ var editor;
             }
             callback && callback(null);
         };
-        ScriptCompiler.prototype.transpileModule = function (tslibs, tslist) {
+        ScriptCompiler.prototype.transpileModule = function (tslibs) {
             var options = {
                 // module: ts.ModuleKind.AMD,
                 target: ts.ScriptTarget.ES5,
@@ -15755,10 +15773,6 @@ var editor;
                 fileNames.push(item.path);
                 tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
-            tslist.forEach(function (item) {
-                fileNames.push(item.assetPath);
-                tsSourceMap[item.assetPath] = ts.createSourceFile(item.assetPath, item.textContent, options.target || ts.ScriptTarget.ES5);
-            });
             // Output
             var outputs = [];
             // 排序
@@ -15770,6 +15784,8 @@ var editor;
                 console.warn("\u51FA\u73B0\u5FAA\u73AF\u5F15\u7528");
                 return;
             }
+            this.tsconfig.files = result.sortedFileNames;
+            editor.editorRS.fs.writeObject("tsconfig.json", this.tsconfig);
             // 编译
             var program = this.createProgram(result.sortedFileNames, options, tsSourceMap, outputs);
             program.emit();
