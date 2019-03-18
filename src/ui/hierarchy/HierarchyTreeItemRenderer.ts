@@ -1,90 +1,95 @@
-namespace editor
+import { TreeItemRenderer } from "../components/TreeItemRenderer";
+import { HierarchyNode } from "../../feng3d/hierarchy/HierarchyNode";
+import { drag, DragData } from "../drag/Drag";
+import { hierarchy } from "../../feng3d/hierarchy/Hierarchy";
+import { editorData } from "../../global/EditorData";
+import { MenuItem, menu } from "../components/Menu";
+import { menuConfig } from "../../configs/CommonConfig";
+
+export class HierarchyTreeItemRenderer extends TreeItemRenderer
 {
-    export class HierarchyTreeItemRenderer extends TreeItemRenderer
+    data: HierarchyNode;
+
+    constructor()
     {
-        data: HierarchyNode;
+        super();
+        this.skinName = "HierarchyTreeItemRenderer";
+    }
 
-        constructor()
+    $onAddToStage(stage: egret.Stage, nestLevel: number)
+    {
+        super.$onAddToStage(stage, nestLevel);
+
+        drag.register(this, this.setdargSource.bind(this), ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
         {
-            super();
-            this.skinName = "HierarchyTreeItemRenderer";
-        }
-
-        $onAddToStage(stage: egret.Stage, nestLevel: number)
-        {
-            super.$onAddToStage(stage, nestLevel);
-
-            drag.register(this, this.setdargSource.bind(this), ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
+            if (dragdata.gameobject)
             {
-                if (dragdata.gameobject)
+                if (!dragdata.gameobject.contains(this.data.gameobject))
                 {
-                    if (!dragdata.gameobject.contains(this.data.gameobject))
-                    {
-                        var localToWorldMatrix = dragdata.gameobject.transform.localToWorldMatrix
-                        this.data.gameobject.addChild(dragdata.gameobject);
-                        dragdata.gameobject.transform.localToWorldMatrix = localToWorldMatrix;
-                    }
+                    var localToWorldMatrix = dragdata.gameobject.transform.localToWorldMatrix
+                    this.data.gameobject.addChild(dragdata.gameobject);
+                    dragdata.gameobject.transform.localToWorldMatrix = localToWorldMatrix;
                 }
-                if (dragdata.file_gameobject)
-                {
-                    hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, this.data.gameobject);
-                }
-                if (dragdata.file_script)
-                {
-                    this.data.gameobject.addScript(dragdata.file_script.scriptName);
-                }
-            });
-            //
-            this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-        }
-
-        $onRemoveFromStage()
-        {
-            drag.unregister(this);
-
-            super.$onRemoveFromStage();
-            this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-        }
-
-        private setdargSource(dragSource: DragData)
-        {
-            dragSource.gameobject = this.data.gameobject;
-        }
-
-        private onclick()
-        {
-            editorData.selectObject(this.data.gameobject);
-        }
-
-        private onDoubleClick()
-        {
-            feng3d.shortcut.dispatch("lookToSelectedGameObject");
-        }
-
-        private onrightclick()
-        {
-            var menus: MenuItem[] = [];
-            //scene3d无法删除
-            if (this.data.gameobject.scene.gameObject != this.data.gameobject)
-            {
-                menus.push(
-                    {
-                        label: "删除", click: () =>
-                        {
-                            this.data.gameobject.parent.removeChild(this.data.gameobject);
-                        }
-                    }
-                );
             }
+            if (dragdata.file_gameobject)
+            {
+                hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, this.data.gameobject);
+            }
+            if (dragdata.file_script)
+            {
+                this.data.gameobject.addScript(dragdata.file_script.scriptName);
+            }
+        });
+        //
+        this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+        this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+    }
 
-            menus = menus.concat({ type: 'separator' }, menuConfig.getCreateObjectMenu());
+    $onRemoveFromStage()
+    {
+        drag.unregister(this);
 
-            if (menus.length > 0)
-                menu.popup(menus);
+        super.$onRemoveFromStage();
+        this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+        this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+    }
+
+    private setdargSource(dragSource: DragData)
+    {
+        dragSource.gameobject = this.data.gameobject;
+    }
+
+    private onclick()
+    {
+        editorData.selectObject(this.data.gameobject);
+    }
+
+    private onDoubleClick()
+    {
+        feng3d.shortcut.dispatch("lookToSelectedGameObject");
+    }
+
+    private onrightclick()
+    {
+        var menus: MenuItem[] = [];
+        //scene3d无法删除
+        if (this.data.gameobject.scene.gameObject != this.data.gameobject)
+        {
+            menus.push(
+                {
+                    label: "删除", click: () =>
+                    {
+                        this.data.gameobject.parent.removeChild(this.data.gameobject);
+                    }
+                }
+            );
         }
+
+        menus = menus.concat({ type: 'separator' }, menuConfig.getCreateObjectMenu());
+
+        if (menus.length > 0)
+            menu.popup(menus);
     }
 }

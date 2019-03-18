@@ -1,0 +1,1 @@
+{"version":3,"file":"TipString.d.ts","sourceRoot":"","sources":["../../../../src/ui/components/tipviews/TipString.ts"],"names":[],"mappings":"AAAA;;GAEG;AACH,qBAAa,SAAU,SAAQ,GAAG,CAAC,SAAU,YAAW,GAAG,CAAC,WAAW;IAE5D,MAAM,EAAE,GAAG,CAAC,KAAK,CAAC;;IAUzB,KAAK,SAAM;IAEX,aAAa,CAAC,KAAK,EAAE,KAAK,CAAC,KAAK,EAAE,SAAS,EAAE,MAAM;IAOnD,kBAAkB;IAMlB,OAAO,CAAC,YAAY;CAOvB"}

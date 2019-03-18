@@ -1,277 +1,279 @@
-namespace editor
-{
-    export interface AssetNodeEventMap extends TreeNodeMap
-    {
-        /**
-         * 加载完成
-         */
-        loaded
-    }
+import { TreeNodeMap, TreeNode } from "../components/TreeNode";
+import { editorRS } from "../../assets/EditorRS";
+import { feng3dScreenShot } from "../../feng3d/Feng3dScreenShot";
+import { editorAsset } from "./EditorAsset";
 
-    export interface AssetNode
+export interface AssetNodeEventMap extends TreeNodeMap
+{
+    /**
+     * 加载完成
+     */
+    loaded
+}
+
+export interface AssetNode
+{
+    once<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => void, thisObject?: any, priority?: number): void;
+    dispatch<K extends keyof AssetNodeEventMap>(type: K, data?: AssetNodeEventMap[K], bubbles?: boolean): feng3d.Event<AssetNodeEventMap[K]>;
+    has<K extends keyof AssetNodeEventMap>(type: K): boolean;
+    on<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
+    off<K extends keyof AssetNodeEventMap>(type?: K, listener?: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any);
+}
+
+/**
+ * 资源树结点
+ */
+export class AssetNode extends TreeNode
+{
+    /**
+     * 是否文件夹
+     */
+    isDirectory: boolean;
+
+    /**
+     * 图标名称或者路径
+     */
+    image: string;
+
+    /**
+     * 显示标签
+     */
+    label: string;
+
+    @feng3d.serialize
+    children: AssetNode[] = [];
+
+    parent: AssetNode;
+
+    asset: feng3d.FileAsset;
+
+    /**
+     * 是否已加载
+     */
+    isLoaded = false;
+
+    /**
+     * 是否加载中
+     */
+    private isLoading: boolean;
+
+    /**
+     * 构建
+     * 
+     * @param asset 资源
+     */
+    constructor(asset: feng3d.FileAsset)
     {
-        once<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof AssetNodeEventMap>(type: K, data?: AssetNodeEventMap[K], bubbles?: boolean): feng3d.Event<AssetNodeEventMap[K]>;
-        has<K extends keyof AssetNodeEventMap>(type: K): boolean;
-        on<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
-        off<K extends keyof AssetNodeEventMap>(type?: K, listener?: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any);
+        super();
+
+        this.asset = asset;
+        this.isDirectory = asset.assetType == feng3d.AssetType.folder;
+        this.label = asset.name;
+        // 更新图标
+        if (this.isDirectory)
+        {
+            this.image = "folder_png";
+        }
+        else
+        {
+            this.image = "file_png";
+        }
+
+        asset.readThumbnail((err, image) =>
+        {
+            if (image)
+            {
+                this.image = feng3d.dataTransform.imageToDataURL(image);
+            } else
+            {
+                this.updateImage();
+            }
+        });
     }
 
     /**
-     * 资源树结点
+     * 加载
+     * 
+     * @param callback 加载完成回调
      */
-    export class AssetNode extends TreeNode
+    load(callback?: () => void)
     {
-        /**
-         * 是否文件夹
-         */
-        isDirectory: boolean;
-
-        /**
-         * 图标名称或者路径
-         */
-        image: string;
-
-        /**
-         * 显示标签
-         */
-        label: string;
-
-        @feng3d.serialize
-        children: AssetNode[] = [];
-
-        parent: AssetNode;
-
-        asset: feng3d.FileAsset;
-
-        /**
-         * 是否已加载
-         */
-        isLoaded = false;
-
-        /**
-         * 是否加载中
-         */
-        private isLoading: boolean;
-
-        /**
-         * 构建
-         * 
-         * @param asset 资源
-         */
-        constructor(asset: feng3d.FileAsset)
+        if (this.isLoaded)
         {
-            super();
-
-            this.asset = asset;
-            this.isDirectory = asset.assetType == feng3d.AssetType.folder;
-            this.label = asset.name;
-            // 更新图标
-            if (this.isDirectory)
-            {
-                this.image = "folder_png";
-            }
-            else
-            {
-                this.image = "file_png";
-            }
-
-            asset.readThumbnail((err, image) =>
-            {
-                if (image)
-                {
-                    this.image = feng3d.dataTransform.imageToDataURL(image);
-                } else
-                {
-                    this.updateImage();
-                }
-            });
+            callback && callback();
+            return;
         }
 
-        /**
-         * 加载
-         * 
-         * @param callback 加载完成回调
-         */
-        load(callback?: () => void)
+        if (this.isLoading)
         {
-            if (this.isLoaded)
-            {
-                callback && callback();
-                return;
-            }
-
-            if (this.isLoading)
-            {
-                callback && this.on("loaded", callback);
-                return;
-            }
-
-            this.isLoading = true;
-
-            editorRS.readAsset(this.asset.assetId, (err, asset) =>
-            {
-                feng3d.assert(!err);
-
-                this.isLoading = false;
-                this.isLoaded = true;
-
-                callback && callback();
-
-                this.dispatch("loaded", this);
-            });
+            callback && this.on("loaded", callback);
+            return;
         }
 
-        /**
-         * 更新缩略图
-         */
-        updateImage()
-        {
-            if (this.asset instanceof feng3d.TextureAsset)
-            {
-                var texture = this.asset.data;
+        this.isLoading = true;
 
-                this.image = texture.dataURL;
+        editorRS.readAsset(this.asset.assetId, (err, asset) =>
+        {
+            feng3d.assert(!err);
+
+            this.isLoading = false;
+            this.isLoaded = true;
+
+            callback && callback();
+
+            this.dispatch("loaded", this);
+        });
+    }
+
+    /**
+     * 更新缩略图
+     */
+    updateImage()
+    {
+        if (this.asset instanceof feng3d.TextureAsset)
+        {
+            var texture = this.asset.data;
+
+            this.image = texture.dataURL;
+
+            feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+            {
+                this.asset.writeThumbnail(image);
+            });
+
+        } else if (this.asset instanceof feng3d.TextureCubeAsset)
+        {
+            var textureCube = this.asset.data;
+            textureCube.onLoadCompleted(() =>
+            {
+                this.image = feng3dScreenShot.drawTextureCube(textureCube);
 
                 feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
                     this.asset.writeThumbnail(image);
                 });
-
-            } else if (this.asset instanceof feng3d.TextureCubeAsset)
+            });
+        } else if (this.asset instanceof feng3d.MaterialAsset)
+        {
+            var mat = this.asset;
+            mat.data.onLoadCompleted(() =>
             {
-                var textureCube = this.asset.data;
-                textureCube.onLoadCompleted(() =>
-                {
-                    this.image = feng3dScreenShot.drawTextureCube(textureCube);
-
-                    feng3d.dataTransform.dataURLToImage(this.image, (image) =>
-                    {
-                        this.asset.writeThumbnail(image);
-                    });
-                });
-            } else if (this.asset instanceof feng3d.MaterialAsset)
-            {
-                var mat = this.asset;
-                mat.data.onLoadCompleted(() =>
-                {
-                    this.image = feng3dScreenShot.drawMaterial(mat.data).toDataURL();
-                    feng3d.dataTransform.dataURLToImage(this.image, (image) =>
-                    {
-                        this.asset.writeThumbnail(image);
-                    });
-                });
-            } else if (this.asset instanceof feng3d.GeometryAsset)
-            {
-                this.image = feng3dScreenShot.drawGeometry(<any>this.asset.data).toDataURL();
-
+                this.image = feng3dScreenShot.drawMaterial(mat.data).toDataURL();
                 feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
                     this.asset.writeThumbnail(image);
                 });
-            } else if (this.asset instanceof feng3d.GameObjectAsset)
-            {
-                var gameObject = this.asset.data;
-                gameObject.onLoadCompleted(() =>
-                {
-                    this.image = feng3dScreenShot.drawGameObject(gameObject).toDataURL();
-                    feng3d.dataTransform.dataURLToImage(this.image, (image) =>
-                    {
-                        this.asset.writeThumbnail(image);
-                    });
-                });
-            }
-        }
-
-        /**
-         * 删除
-         */
-        delete()
-        {
-            this.children.forEach(element =>
-            {
-                element.delete();
             });
-            this.remove();
-
-            editorAsset.deleteAsset(this);
-        }
-
-        /**
-         * 获取文件夹列表
-         * 
-         * @param includeClose 是否包含关闭的文件夹
-         */
-        getFolderList(includeClose = false)
+        } else if (this.asset instanceof feng3d.GeometryAsset)
         {
-            var folders: AssetNode[] = [];
-            if (this.isDirectory)
+            this.image = feng3dScreenShot.drawGeometry(<any>this.asset.data).toDataURL();
+
+            feng3d.dataTransform.dataURLToImage(this.image, (image) =>
             {
-                folders.push(this);
-            }
-            if (this.isOpen || includeClose)
+                this.asset.writeThumbnail(image);
+            });
+        } else if (this.asset instanceof feng3d.GameObjectAsset)
+        {
+            var gameObject = this.asset.data;
+            gameObject.onLoadCompleted(() =>
             {
-                this.children.forEach(v =>
+                this.image = feng3dScreenShot.drawGameObject(gameObject).toDataURL();
+                feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
-                    var cfolders = v.getFolderList();
-                    folders = folders.concat(cfolders);
+                    this.asset.writeThumbnail(image);
                 });
-            }
-            return folders;
+            });
         }
+    }
 
-        /**
-         * 获取文件列表
-         */
-        getFileList()
+    /**
+     * 删除
+     */
+    delete()
+    {
+        this.children.forEach(element =>
         {
-            var files: AssetNode[] = [];
-            files.push(this);
+            element.delete();
+        });
+        this.remove();
+
+        editorAsset.deleteAsset(this);
+    }
+
+    /**
+     * 获取文件夹列表
+     * 
+     * @param includeClose 是否包含关闭的文件夹
+     */
+    getFolderList(includeClose = false)
+    {
+        var folders: AssetNode[] = [];
+        if (this.isDirectory)
+        {
+            folders.push(this);
+        }
+        if (this.isOpen || includeClose)
+        {
             this.children.forEach(v =>
             {
-                var cfiles = v.getFileList();
-                files = files.concat(cfiles);
+                var cfolders = v.getFolderList();
+                folders = folders.concat(cfolders);
             });
-            return files;
         }
+        return folders;
+    }
 
-        /**
-         * 导出
-         */
-        export()
+    /**
+     * 获取文件列表
+     */
+    getFileList()
+    {
+        var files: AssetNode[] = [];
+        files.push(this);
+        this.children.forEach(v =>
         {
-            feng3d.error("未实现");
+            var cfiles = v.getFileList();
+            files = files.concat(cfiles);
+        });
+        return files;
+    }
 
-            var zip = new JSZip();
+    /**
+     * 导出
+     */
+    export()
+    {
+        feng3d.error("未实现");
 
-            var path = this.asset.assetPath;
-            if (!feng3d.pathUtils.isDirectory(path))
-                path = feng3d.pathUtils.getParentPath(path);
+        var zip = new JSZip();
 
-            var filename = this.label;
-            editorRS.fs.getAllfilepathInFolder(path, (err, filepaths) =>
+        var path = this.asset.assetPath;
+        if (!feng3d.pathUtils.isDirectory(path))
+            path = feng3d.pathUtils.getParentPath(path);
+
+        var filename = this.label;
+        editorRS.fs.getAllfilepathInFolder(path, (err, filepaths) =>
+        {
+            readfiles();
+            function readfiles()
             {
-                readfiles();
-                function readfiles()
+                if (filepaths.length > 0)
                 {
-                    if (filepaths.length > 0)
+                    var filepath = filepaths.shift();
+                    editorRS.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                     {
-                        var filepath = filepaths.shift();
-                        editorRS.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
-                        {
-                            //处理文件夹
-                            data && zip.file(filepath, data);
-                            readfiles();
-                        });
-                    } else
+                        //处理文件夹
+                        data && zip.file(filepath, data);
+                        readfiles();
+                    });
+                } else
+                {
+                    zip.generateAsync({ type: "blob" }).then(function (content)
                     {
-                        zip.generateAsync({ type: "blob" }).then(function (content)
-                        {
-                            saveAs(content, `${filename}.zip`);
-                        });
-                    }
+                        saveAs(content, `${filename}.zip`);
+                    });
                 }
-            });
-        }
+            }
+        });
     }
 }

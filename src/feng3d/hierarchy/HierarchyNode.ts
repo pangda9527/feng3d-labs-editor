@@ -1,45 +1,44 @@
-namespace editor
+import { TreeNode } from "../../ui/components/TreeNode";
+
+export class HierarchyNode extends TreeNode
 {
-    export class HierarchyNode extends TreeNode
+    isOpen = false;
+
+    /**
+     * 游戏对象
+     */
+    gameobject: feng3d.GameObject;
+    /** 
+     * 父结点
+     */
+    parent: HierarchyNode = null;
+    /**
+     * 子结点列表
+     */
+    children: HierarchyNode[] = [];
+
+    constructor(obj: gPartial<HierarchyNode>)
     {
-        isOpen = false;
+        super(obj);
 
-        /**
-         * 游戏对象
-         */
-        gameobject: feng3d.GameObject;
-        /** 
-         * 父结点
-         */
-        parent: HierarchyNode = null;
-        /**
-         * 子结点列表
-         */
-        children: HierarchyNode[] = [];
+        feng3d.watcher.watch(this.gameobject, "name", this.update, this);
 
-        constructor(obj: gPartial<HierarchyNode>)
-        {
-            super(obj);
+        this.update();
+    }
 
-            feng3d.watcher.watch(this.gameobject, "name", this.update, this);
+    /**
+     * 销毁
+     */
+    destroy()
+    {
+        feng3d.watcher.unwatch(this.gameobject, "name", this.update, this);
 
-            this.update();
-        }
+        this.gameobject = null;
+        super.destroy();
+    }
 
-        /**
-         * 销毁
-         */
-        destroy()
-        {
-            feng3d.watcher.unwatch(this.gameobject, "name", this.update, this);
-
-            this.gameobject = null;
-            super.destroy();
-        }
-
-        private update()
-        {
-            this.label = this.gameobject.name;
-        }
+    private update()
+    {
+        this.label = this.gameobject.name;
     }
 }

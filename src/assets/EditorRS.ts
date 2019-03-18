@@ -1,210 +1,211 @@
-namespace editor
+import { editorcache } from "../caches/Editorcache";
+import { supportNative, nativeFS } from "./NativeRequire";
+import { NativeFS } from "./NativeFS";
+
+/**
+ * 编辑器资源系统
+ */
+export var editorRS: EditorRS;
+
+/**
+ * 编辑器资源系统
+ */
+export class EditorRS extends feng3d.ReadWriteRS
 {
     /**
-     * 编辑器资源系统
+     * 初始化项目
+     * 
+     * @param callback 完成回调
      */
-    export var editorRS: EditorRS;
+    initproject(callback: (err?: Error) => void)
+    {
+        this.fs.hasProject(editorcache.projectname, (has) =>
+        {
+            this.fs.initproject(editorcache.projectname, (err: Error) =>
+            {
+                if (err) { callback(err); return; }
+                if (has) { callback(); return; }
+                this.createproject(callback);
+            });
+        });
+    }
 
     /**
-     * 编辑器资源系统
+     * 创建项目
      */
-    export class EditorRS extends feng3d.ReadWriteRS
+    private createproject(callback: (err?: Error) => void)
     {
-        /**
-         * 初始化项目
-         * 
-         * @param callback 完成回调
-         */
-        initproject(callback: (err?: Error) => void)
+        var urls = [
+            ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
+            ["resource/template/app.js", "app.js"],
+            ["resource/template/index.html", "index.html"],
+            ["resource/template/project.js", "project.js"],
+            ["resource/template/tsconfig.json", "tsconfig.json"],
+            ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+            ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+        ];
+        var index = 0;
+        var loadUrls = () =>
         {
-            this.fs.hasProject(editorcache.projectname, (has) =>
+            if (index >= urls.length) { callback(); return; }
+            feng3d.loader.loadText(urls[index][0], (content) =>
             {
-                this.fs.initproject(editorcache.projectname, (err: Error) =>
+                this.fs.writeString(urls[index][1], content, (err) =>
                 {
-                    if (err) { callback(err); return; }
-                    if (has) { callback(); return; }
-                    this.createproject(callback);
+                    if (err) throw err;
+                    index++;
+                    loadUrls();
                 });
-            });
-        }
 
-        /**
-         * 创建项目
-         */
-        private createproject(callback: (err?: Error) => void)
-        {
-            var urls = [
-                ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
-                ["resource/template/app.js", "app.js"],
-                ["resource/template/index.html", "index.html"],
-                ["resource/template/project.js", "project.js"],
-                ["resource/template/tsconfig.json", "tsconfig.json"],
-                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
-                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
-            ];
-            var index = 0;
-            var loadUrls = () =>
-            {
-                if (index >= urls.length) { callback(); return; }
-                feng3d.loader.loadText(urls[index][0], (content) =>
+            }, null, (e) =>
                 {
-                    this.fs.writeString(urls[index][1], content, (err) =>
-                    {
-                        if (err) throw err;
-                        index++;
-                        loadUrls();
-                    });
+                    throw e;
+                    index++;
+                    loadUrls();
+                });
+        }
+        loadUrls();
+    }
 
-                }, null, (e) =>
+    upgradeProject(callback: () => void)
+    {
+        var urls = [
+            ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+            ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+        ];
+        var index = 0;
+        var loadUrls = () =>
+        {
+            if (index >= urls.length) { callback(); return; }
+            feng3d.loader.loadText(urls[index][0], (content) =>
+            {
+                this.fs.writeString(urls[index][1], content, (err) =>
+                {
+                    if (err) feng3d.warn(err);
+                    index++;
+                    loadUrls();
+                });
+
+            }, null, (e) =>
+                {
+                    feng3d.warn(e);
+                    index++;
+                    loadUrls();
+                });
+        }
+        loadUrls();
+    }
+
+    selectFile(callback: (file: FileList) => void)
+    {
+        selectFileCallback = callback;
+        isSelectFile = true;
+    }
+
+    /**
+     * 导出项目
+     */
+    exportProject(callback: (err: Error, data: Blob) => void)
+    {
+        var zip = new JSZip();
+        this.fs.getAllfilepathInFolder("", (err, filepaths) =>
+        {
+            readfiles();
+            function readfiles()
+            {
+                if (filepaths.length > 0)
+                {
+                    var filepath = filepaths.shift();
+                    this.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
                     {
-                        throw e;
-                        index++;
-                        loadUrls();
+                        //处理文件夹
+                        data && zip.file(filepath, data);
+                        readfiles();
                     });
+                } else
+                {
+                    zip.generateAsync({ type: "blob" }).then(function (content)
+                    {
+                        callback(null, content);
+                    });
+                }
             }
-            loadUrls();
-        }
+        });
+    }
 
-        upgradeProject(callback: () => void)
+    /**
+     * 导入项目
+     */
+    importProject(file: File, callback: () => void)
+    {
+        var zip = new JSZip();
+        zip.loadAsync(file).then((value) =>
         {
-            var urls = [
-                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
-                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
-            ];
-            var index = 0;
-            var loadUrls = () =>
+            var filepaths = Object.keys(value.files);
+            filepaths.sort();
+
+            writeFiles();
+
+            function writeFiles()
             {
-                if (index >= urls.length) { callback(); return; }
-                feng3d.loader.loadText(urls[index][0], (content) =>
+                if (filepaths.length > 0)
                 {
-                    this.fs.writeString(urls[index][1], content, (err) =>
+                    var filepath = filepaths.shift();
+                    if (value.files[filepath].dir)
                     {
-                        if (err) feng3d.warn(err);
-                        index++;
-                        loadUrls();
-                    });
-
-                }, null, (e) =>
-                    {
-                        feng3d.warn(e);
-                        index++;
-                        loadUrls();
-                    });
-            }
-            loadUrls();
-        }
-
-        selectFile(callback: (file: FileList) => void)
-        {
-            selectFileCallback = callback;
-            isSelectFile = true;
-        }
-
-        /**
-         * 导出项目
-         */
-        exportProject(callback: (err: Error, data: Blob) => void)
-        {
-            var zip = new JSZip();
-            this.fs.getAllfilepathInFolder("", (err, filepaths) =>
-            {
-                readfiles();
-                function readfiles()
-                {
-                    if (filepaths.length > 0)
-                    {
-                        var filepath = filepaths.shift();
-                        this.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        this.fs.mkdir(filepath, (err) =>
                         {
-                            //处理文件夹
-                            data && zip.file(filepath, data);
-                            readfiles();
+                            writeFiles();
                         });
                     } else
                     {
-                        zip.generateAsync({ type: "blob" }).then(function (content)
+                        zip.file(filepath).async("arraybuffer").then((data) =>
                         {
-                            callback(null, content);
-                        });
-                    }
-                }
-            });
-        }
-
-        /**
-         * 导入项目
-         */
-        importProject(file: File, callback: () => void)
-        {
-            var zip = new JSZip();
-            zip.loadAsync(file).then((value) =>
-            {
-                var filepaths = Object.keys(value.files);
-                filepaths.sort();
-
-                writeFiles();
-
-                function writeFiles()
-                {
-                    if (filepaths.length > 0)
-                    {
-                        var filepath = filepaths.shift();
-                        if (value.files[filepath].dir)
-                        {
-                            this.fs.mkdir(filepath, (err) =>
+                            this.fs.writeArrayBuffer(filepath, data, (err) =>
                             {
                                 writeFiles();
                             });
-                        } else
-                        {
-                            zip.file(filepath).async("arraybuffer").then((data) =>
+                        }, (reason) =>
                             {
-                                this.fs.writeArrayBuffer(filepath, data, (err) =>
-                                {
-                                    writeFiles();
-                                });
-                            }, (reason) =>
-                                {
-                                });
-                        }
-                    } else
-                    {
-                        callback();
+                            });
                     }
+                } else
+                {
+                    callback();
                 }
-            });
-        }
+            }
+        });
     }
-
-    if (supportNative)
-    {
-        feng3d.fs = new NativeFS(nativeFS);
-        feng3d.rs = editorRS = new EditorRS();
-    } else
-    {
-        feng3d.fs = feng3d.indexedDBFS;
-        feng3d.rs = editorRS = new EditorRS();
-    }
-
-    //
-    var isSelectFile = false;
-    var fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.multiple = true;
-    fileInput.style.display = "none";
-    fileInput.addEventListener('change', function (event)
-    {
-        selectFileCallback && selectFileCallback(fileInput.files);
-        selectFileCallback = null;
-        fileInput.value = null;
-    });
-    // document.body.appendChild(fileInput);
-    window.addEventListener("click", () =>
-    {
-        if (isSelectFile)
-            fileInput.click();
-        isSelectFile = false;
-    });
-
-    var selectFileCallback: (file: FileList) => void;
 }
+
+if (supportNative)
+{
+    feng3d.fs = new NativeFS(nativeFS);
+    feng3d.rs = editorRS = new EditorRS();
+} else
+{
+    feng3d.fs = feng3d.indexedDBFS;
+    feng3d.rs = editorRS = new EditorRS();
+}
+
+//
+var isSelectFile = false;
+var fileInput = document.createElement('input');
+fileInput.type = 'file';
+fileInput.multiple = true;
+fileInput.style.display = "none";
+fileInput.addEventListener('change', function (event)
+{
+    selectFileCallback && selectFileCallback(fileInput.files);
+    selectFileCallback = null;
+    fileInput.value = null;
+});
+// document.body.appendChild(fileInput);
+window.addEventListener("click", () =>
+{
+    if (isSelectFile)
+        fileInput.click();
+    isSelectFile = false;
+});
+
+var selectFileCallback: (file: FileList) => void;

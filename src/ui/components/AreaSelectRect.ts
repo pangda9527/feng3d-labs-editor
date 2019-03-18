@@ -1,40 +1,39 @@
-namespace editor
+import { editorui } from "../../global/editorui";
+
+export var areaSelectRect: AreaSelectRect;
+
+/**
+ * 区域选择框
+ */
+export class AreaSelectRect extends eui.Rect
 {
-    export var areaSelectRect: AreaSelectRect;
+    fillAlpha = 0.5
+    fillColor = 0x8888ff;
 
     /**
-     * 区域选择框
+     * 显示
+     * @param start 起始位置
+     * @param end 结束位置
      */
-    export class AreaSelectRect extends eui.Rect
+    show(start: { x: number, y: number }, end: { x: number, y: number })
     {
-        fillAlpha = 0.5
-        fillColor = 0x8888ff;
-
-        /**
-         * 显示
-         * @param start 起始位置
-         * @param end 结束位置
-         */
-        show(start: { x: number, y: number }, end: { x: number, y: number })
-        {
-            var minX = Math.min(start.x, end.x);
-            var maxX = Math.max(start.x, end.x);
-            var minY = Math.min(start.y, end.y);
-            var maxY = Math.max(start.y, end.y);
-            this.x = minX;
-            this.y = minY;
-            this.width = maxX - minX;
-            this.height = maxY - minY;
-            editorui.popupLayer.addChild(this);
-        }
-
-        /**
-         * 隐藏
-         */
-        hide()
-        {
-            this.parent && this.parent.removeChild(this);
-        }
+        var minX = Math.min(start.x, end.x);
+        var maxX = Math.max(start.x, end.x);
+        var minY = Math.min(start.y, end.y);
+        var maxY = Math.max(start.y, end.y);
+        this.x = minX;
+        this.y = minY;
+        this.width = maxX - minX;
+        this.height = maxY - minY;
+        editorui.popupLayer.addChild(this);
     }
-    areaSelectRect = new AreaSelectRect();
+
+    /**
+     * 隐藏
+     */
+    hide()
+    {
+        this.parent && this.parent.removeChild(this);
+    }
 }
+areaSelectRect = new AreaSelectRect();

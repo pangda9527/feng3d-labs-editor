@@ -1,7 +1,10 @@
+import { editorui } from "../../global/editorui";
+import { maskview } from "./Maskview";
+
 /**
  * 下拉列表
  */
-class ComboBox extends eui.Component implements eui.UIComponent
+export class ComboBox extends eui.Component implements eui.UIComponent
 {
 	public label: eui.Label;
 	public list: eui.List
@@ -84,8 +87,8 @@ class ComboBox extends eui.Component implements eui.UIComponent
 		this.list.y = rect.bottom;
 		this.list.selectedIndex = this.dataProvider.indexOf(this.data);
 
-		editor.editorui.popupLayer.addChild(this.list);
-		editor.maskview.mask(this.list);
+		editorui.popupLayer.addChild(this.list);
+		maskview.mask(this.list);
 	}
 
 	private onlistChange()

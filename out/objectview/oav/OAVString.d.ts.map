@@ -1,0 +1,1 @@
+{"version":3,"file":"OAVString.d.ts","sourceRoot":"","sources":["../../../src/objectview/oav/OAVString.ts"],"names":[],"mappings":"AAAA,kBAAU,MAAM,CAChB;IACI,MACa,SAAU,SAAQ,OAAO;QAE3B,QAAQ,EAAE,GAAG,CAAC,SAAS,CAAC;oBAEnB,iBAAiB,EAAE,MAAM,CAAC,iBAAiB;QAMvD,QAAQ;KAMX;CACJ"}

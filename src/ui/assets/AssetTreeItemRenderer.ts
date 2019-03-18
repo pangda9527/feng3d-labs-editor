@@ -1,89 +1,92 @@
-namespace editor
+import { editorAsset } from "./EditorAsset";
+import { editorRS } from "../../assets/EditorRS";
+import { TreeItemRenderer } from "../components/TreeItemRenderer";
+import { AssetNode } from "./AssetNode";
+import { drag } from "../drag/Drag";
+
+export class AssetTreeItemRenderer extends TreeItemRenderer
 {
-    export class AssetTreeItemRenderer extends TreeItemRenderer
+    public contentGroup: eui.Group;
+    public disclosureButton: eui.ToggleButton;
+
+    data: AssetNode;
+
+    constructor()
     {
-        public contentGroup: eui.Group;
-        public disclosureButton: eui.ToggleButton;
+        super();
+        this.skinName = "AssetTreeItemRenderer";
+    }
 
-        data: AssetNode;
+    $onAddToStage(stage: egret.Stage, nestLevel: number)
+    {
+        super.$onAddToStage(stage, nestLevel);
+        this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-        constructor()
+        feng3d.watcher.watch(editorAsset, "showFloder", this.showFloderChanged, this);
+        this.showFloderChanged();
+    }
+
+    $onRemoveFromStage()
+    {
+        super.$onRemoveFromStage();
+        this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+
+        feng3d.watcher.unwatch(editorAsset, "showFloder", this.showFloderChanged, this);
+    }
+
+    dataChanged()
+    {
+        super.dataChanged();
+
+        if (this.data)
         {
-            super();
-            this.skinName = "AssetTreeItemRenderer";
-        }
-
-        $onAddToStage(stage: egret.Stage, nestLevel: number)
-        {
-            super.$onAddToStage(stage, nestLevel);
-            this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-
-            feng3d.watcher.watch(editorAsset, "showFloder", this.showFloderChanged, this);
-            this.showFloderChanged();
-        }
-
-        $onRemoveFromStage()
-        {
-            super.$onRemoveFromStage();
-            this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-
-            feng3d.watcher.unwatch(editorAsset, "showFloder", this.showFloderChanged, this);
-        }
-
-        dataChanged()
-        {
-            super.dataChanged();
-
-            if (this.data)
+            var folder = <feng3d.FolderAsset>this.data.asset;
+            drag.register(this, (dragsource) =>
             {
-                var folder = <feng3d.FolderAsset>this.data.asset;
-                drag.register(this, (dragsource) =>
+                dragsource.assetNodes = [this.data];
+            }, ["assetNodes"], (dragdata) =>
                 {
-                    dragsource.assetNodes = [this.data];
-                }, ["assetNodes"], (dragdata) =>
+                    dragdata.assetNodes.forEach(v =>
                     {
-                        dragdata.assetNodes.forEach(v =>
+                        editorRS.moveAsset(v.asset, folder, (err) =>
                         {
-                            editorRS.moveAsset(v.asset, folder, (err) =>
+                            if (!err)
                             {
-                                if (!err)
-                                {
-                                    this.data.addChild(v);
-                                } else
-                                {
-                                    alert(err.message);
-                                }
-                            });
+                                this.data.addChild(v);
+                            } else
+                            {
+                                alert(err.message);
+                            }
                         });
                     });
-            } else
-            {
-                drag.unregister(this);
-            }
-            this.showFloderChanged();
-        }
-
-        private showFloderChanged()
+                });
+        } else
         {
-            this.selected = this.data ? editorAsset.showFloder == this.data : false;
+            drag.unregister(this);
         }
+        this.showFloderChanged();
+    }
 
-        private onclick()
-        {
-            editorAsset.showFloder = this.data;
-        }
+    private showFloderChanged()
+    {
+        this.selected = this.data ? editorAsset.showFloder == this.data : false;
+    }
 
-        private onrightclick(e)
+    private onclick()
+    {
+        editorAsset.showFloder = this.data;
+    }
+
+    private onrightclick(e)
+    {
+        if (this.data.parent != null)
         {
-            if (this.data.parent != null)
-            {
-                editorAsset.popupmenu(this.data);
-            } else
-            {
-                editorAsset.popupmenu(this.data);
-            }
+            editorAsset.popupmenu(this.data);
+        } else
+        {
+            editorAsset.popupmenu(this.data);
         }
     }
 }
