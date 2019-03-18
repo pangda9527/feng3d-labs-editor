@@ -5,10 +5,15 @@ namespace editor
 
     export class ScriptCompiler
     {
+        private tsconfig: { files: string[] };
+
         constructor()
         {
             feng3d.dispatcher.on("script.compile", this.onScriptCompile, this);
             feng3d.dispatcher.on("script.gettslibs", this.onGettsLibs, this);
+
+            feng3d.dispatcher.on("fs.delete", this.onFileChanged, this);
+            feng3d.dispatcher.on("fs.write", this.onFileChanged, this);
         }
 
         private onGettsLibs(e: feng3d.Event<{
@@ -33,11 +38,18 @@ namespace editor
             {
                 if (err) { throw err; return; }
 
-                var obj = json.parse(str);
-                console.log(obj);
+                this.tsconfig = json.parse(str);
+                console.log(this.tsconfig);
 
-                var files: string[] = obj.files;
-                editorRS.fs.readStrings(obj.files, (strs) =>
+                var tslist = editorRS.getAssetsByType(feng3d.ScriptAsset);
+                var files: string[] = this.tsconfig.files;
+                files = files.filter(v => v.indexOf("Assets") != 0);
+                files = files.concat(tslist.map(v => v.assetPath));
+                //
+                tslist.map(v => { return { path: v.assetPath, code: v.textContent } });
+
+                var files: string[] = files;
+                editorRS.fs.readStrings(files, (strs) =>
                 {
                     var tslibs = files.map((f, i) =>
                     {
@@ -51,13 +63,19 @@ namespace editor
             });
         }
 
-        private onScriptCompile(e: feng3d.Event<{ onComplete?: () => void; }>)
+        private onFileChanged(e: feng3d.Event<string>)
+        {
+            if (e.data.substr(-3) == ".ts")
+            {
+                feng3d.ticker.once(2000, <any>this.onScriptCompile, this);
+            }
+        }
+
+        private onScriptCompile(e?: feng3d.Event<{ onComplete?: () => void; }>)
         {
             this.loadtslibs((tslibs) =>
             {
-                var tslist = editorRS.getAssetsByType(feng3d.ScriptAsset);
-
-                this.compile(tslibs, tslist, e.data && e.data.onComplete);
+                this.compile(tslibs, e && e.data && e.data.onComplete);
             });
         }
 
@@ -65,12 +83,11 @@ namespace editor
             path: string;
             code: string;
         }[],
-            tslist: feng3d.ScriptAsset[],
             callback?: (output: { name: string; text: string; }[]) => void)
         {
             try
             {
-                var output = this.transpileModule(tslibs, tslist);
+                var output = this.transpileModule(tslibs);
 
                 output.forEach(v =>
                 {
@@ -96,7 +113,7 @@ namespace editor
         private transpileModule(tslibs: {
             path: string;
             code: string;
-        }[], tslist: feng3d.ScriptAsset[])
+        }[])
         {
             var options: ts.CompilerOptions = {
                 // module: ts.ModuleKind.AMD,
@@ -115,12 +132,6 @@ namespace editor
                 tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
 
-            tslist.forEach((item) =>
-            {
-                fileNames.push(item.assetPath);
-                tsSourceMap[item.assetPath] = ts.createSourceFile(item.assetPath, item.textContent, options.target || ts.ScriptTarget.ES5);
-            })
-
             // Output
             var outputs: { name: string, text: string }[] = [];
             // 排序
@@ -133,6 +144,9 @@ namespace editor
                 console.warn(`出现循环引用`);
                 return;
             }
+            this.tsconfig.files = result.sortedFileNames;
+            editorRS.fs.writeObject("tsconfig.json", this.tsconfig);
+
             // 编译
             var program = this.createProgram(result.sortedFileNames, options, tsSourceMap, outputs);
             program.emit();
