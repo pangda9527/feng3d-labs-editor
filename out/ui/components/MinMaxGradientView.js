@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./ColorPickerView", "./GradientEditor", "./Menu", "./Popupview"], function (require, exports, ColorPickerView_1, GradientEditor_1, Menu_1, Popupview_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * 最大最小颜色渐变界面
      */
@@ -108,24 +109,24 @@ var editor;
                     this.activeColorGroup = this.colorGroup0;
                     switch (this.minMaxGradient.mode) {
                         case feng3d.MinMaxGradientMode.Color:
-                            view = editor.colorPickerView = editor.colorPickerView || new editor.ColorPickerView();
-                            editor.colorPickerView.color = this.minMaxGradient.color;
+                            view = ColorPickerView_1.colorPickerView;
+                            ColorPickerView_1.colorPickerView.color = this.minMaxGradient.color;
                             break;
                         case feng3d.MinMaxGradientMode.Gradient:
-                            view = gradientEditor = gradientEditor || new editor.GradientEditor();
-                            gradientEditor.gradient = this.minMaxGradient.gradient;
+                            view = GradientEditor_1.gradientEditor;
+                            GradientEditor_1.gradientEditor.gradient = this.minMaxGradient.gradient;
                             break;
                         case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
-                            view = editor.colorPickerView = editor.colorPickerView || new editor.ColorPickerView();
-                            editor.colorPickerView.color = this.minMaxGradient.color;
+                            view = ColorPickerView_1.colorPickerView;
+                            ColorPickerView_1.colorPickerView.color = this.minMaxGradient.color;
                             break;
                         case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
-                            view = gradientEditor = gradientEditor || new editor.GradientEditor();
-                            gradientEditor.gradient = this.minMaxGradient.gradient;
+                            view = GradientEditor_1.gradientEditor;
+                            GradientEditor_1.gradientEditor.gradient = this.minMaxGradient.gradient;
                             break;
                         case feng3d.MinMaxGradientMode.RandomColor:
-                            view = gradientEditor = gradientEditor || new editor.GradientEditor();
-                            gradientEditor.gradient = this.minMaxGradient.gradient;
+                            view = GradientEditor_1.gradientEditor;
+                            GradientEditor_1.gradientEditor.gradient = this.minMaxGradient.gradient;
                             break;
                     }
                     break;
@@ -133,17 +134,17 @@ var editor;
                     this.activeColorGroup = this.colorGroup1;
                     switch (this.minMaxGradient.mode) {
                         case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
-                            view = editor.colorPickerView = editor.colorPickerView || new editor.ColorPickerView();
-                            editor.colorPickerView.color = this.minMaxGradient.color1;
+                            view = ColorPickerView_1.colorPickerView;
+                            ColorPickerView_1.colorPickerView.color = this.minMaxGradient.color1;
                             break;
                         case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
-                            view = gradientEditor = gradientEditor || new editor.GradientEditor();
-                            gradientEditor.gradient = this.minMaxGradient.gradient1;
+                            view = GradientEditor_1.gradientEditor;
+                            GradientEditor_1.gradientEditor.gradient = this.minMaxGradient.gradient1;
                             break;
                     }
                     break;
                 case this.modeBtn:
-                    menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
+                    Menu_1.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
                         _this.minMaxGradient.mode = v;
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     });
@@ -154,7 +155,7 @@ var editor;
                 pos.x = pos.x - 318;
                 view.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                 //
-                popupview.popupView(view, function () {
+                Popupview_1.popupview.popupView(view, function () {
                     view.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
                     _this.activeColorGroup = null;
                 }, pos.x, pos.y);
@@ -164,29 +165,29 @@ var editor;
             if (this.activeColorGroup == this.colorGroup0) {
                 switch (this.minMaxGradient.mode) {
                     case feng3d.MinMaxGradientMode.Color:
-                        this.minMaxGradient.color = editor.colorPickerView.color.clone();
+                        this.minMaxGradient.color = ColorPickerView_1.colorPickerView.color.clone();
                         break;
                     case feng3d.MinMaxGradientMode.Gradient:
-                        this.minMaxGradient.gradient = gradientEditor.gradient;
+                        this.minMaxGradient.gradient = GradientEditor_1.gradientEditor.gradient;
                         break;
                     case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
-                        this.minMaxGradient.color = editor.colorPickerView.color.clone();
+                        this.minMaxGradient.color = ColorPickerView_1.colorPickerView.color.clone();
                         break;
                     case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
-                        this.minMaxGradient.gradient = gradientEditor.gradient;
+                        this.minMaxGradient.gradient = GradientEditor_1.gradientEditor.gradient;
                         break;
                     case feng3d.MinMaxGradientMode.RandomColor:
-                        this.minMaxGradient.gradient = gradientEditor.gradient;
+                        this.minMaxGradient.gradient = GradientEditor_1.gradientEditor.gradient;
                         break;
                 }
             }
             else if (this.activeColorGroup == this.colorGroup1) {
                 switch (this.minMaxGradient.mode) {
                     case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
-                        this.minMaxGradient.color1 = editor.colorPickerView.color.clone();
+                        this.minMaxGradient.color1 = ColorPickerView_1.colorPickerView.color.clone();
                         break;
                     case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
-                        this.minMaxGradient.gradient1 = gradientEditor.gradient;
+                        this.minMaxGradient.gradient1 = GradientEditor_1.gradientEditor.gradient;
                         break;
                 }
             }
@@ -234,15 +235,15 @@ var editor;
                     }
                 });
             }
-            menu.popup(menus);
+            Menu_1.menu.popup(menus);
         };
         __decorate([
             feng3d.watch("_onMinMaxGradientChanged")
         ], MinMaxGradientView.prototype, "minMaxGradient", void 0);
         return MinMaxGradientView;
     }(eui.Component));
-    editor.MinMaxGradientView = MinMaxGradientView;
+    exports.MinMaxGradientView = MinMaxGradientView;
     var copyGradient;
     var copyColor;
-})(editor || (editor = {}));
+});
 //# sourceMappingURL=MinMaxGradientView.js.map

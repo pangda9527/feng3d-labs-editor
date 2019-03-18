@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./OAVBase"], function (require, exports, OAVBase_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * 默认对象属性界面
      */
@@ -43,7 +44,7 @@ var editor;
             feng3d.OAVComponent()
         ], OAVMultiText);
         return OAVMultiText;
-    }(OAVBase));
-    editor.OAVMultiText = OAVMultiText;
-})(editor || (editor = {}));
+    }(OAVBase_1.OAVBase));
+    exports.OAVMultiText = OAVMultiText;
+});
 //# sourceMappingURL=OAVMultiText.js.map

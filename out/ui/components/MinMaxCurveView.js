@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./binders/NumberTextInputBinder", "./Menu", "./MinMaxCurveEditor", "./Popupview"], function (require, exports, NumberTextInputBinder_1, Menu_1, MinMaxCurveEditor_1, Popupview_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * 最大最小曲线界面
      */
@@ -49,18 +50,18 @@ var editor;
             this.randomBetweenTwoConstantsGroup.visible = false;
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant) {
                 this.constantGroup.visible = true;
-                this.addBinder(new NumberTextInputBinder().init({
+                this.addBinder(new NumberTextInputBinder_1.NumberTextInputBinder().init({
                     space: this.minMaxCurve, attribute: "constant", textInput: this.constantTextInput, editable: true,
                     controller: null,
                 }));
             }
             else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants) {
                 this.randomBetweenTwoConstantsGroup.visible = true;
-                this.addBinder(new NumberTextInputBinder().init({
+                this.addBinder(new NumberTextInputBinder_1.NumberTextInputBinder().init({
                     space: this.minMaxCurve, attribute: "constant", textInput: this.minValueTextInput, editable: true,
                     controller: null,
                 }));
-                this.addBinder(new NumberTextInputBinder().init({
+                this.addBinder(new NumberTextInputBinder_1.NumberTextInputBinder().init({
                     space: this.minMaxCurve, attribute: "constant1", textInput: this.maxValueTextInput, editable: true,
                     controller: null,
                 }));
@@ -87,20 +88,19 @@ var editor;
             var _this = this;
             switch (e.currentTarget) {
                 case this.modeBtn:
-                    menu.popupEnum(feng3d.MinMaxCurveMode, this.minMaxCurve.mode, function (v) {
+                    Menu_1.menu.popupEnum(feng3d.MinMaxCurveMode, this.minMaxCurve.mode, function (v) {
                         _this.minMaxCurve.mode = v;
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     });
                     break;
                 case this.curveGroup:
-                    editor.minMaxCurveEditor = editor.minMaxCurveEditor || new editor.MinMaxCurveEditor();
-                    editor.minMaxCurveEditor.minMaxCurve = this.minMaxCurve;
+                    MinMaxCurveEditor_1.minMaxCurveEditor.minMaxCurve = this.minMaxCurve;
                     var pos = this.localToGlobal(0, 0);
                     pos.x = pos.x - 318;
-                    editor.minMaxCurveEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                    MinMaxCurveEditor_1.minMaxCurveEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                     //
-                    popupview.popupView(editor.minMaxCurveEditor, function () {
-                        editor.minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                    Popupview_1.popupview.popupView(MinMaxCurveEditor_1.minMaxCurveEditor, function () {
+                        MinMaxCurveEditor_1.minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
                     }, pos.x, pos.y);
                     break;
             }
@@ -127,14 +127,14 @@ var editor;
                     }
                 });
             }
-            menu.popup(menus);
+            Menu_1.menu.popup(menus);
         };
         __decorate([
             feng3d.watch("_onMinMaxCurveChanged")
         ], MinMaxCurveView.prototype, "minMaxCurve", void 0);
         return MinMaxCurveView;
     }(eui.Component));
-    editor.MinMaxCurveView = MinMaxCurveView;
+    exports.MinMaxCurveView = MinMaxCurveView;
     var copyCurve;
-})(editor || (editor = {}));
+});
 //# sourceMappingURL=MinMaxCurveView.js.map

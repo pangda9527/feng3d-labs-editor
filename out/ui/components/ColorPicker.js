@@ -11,8 +11,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var editor;
-(function (editor) {
+define(["require", "exports", "./ColorPickerView", "./Popupview"], function (require, exports, ColorPickerView_1, Popupview_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var ColorPicker = /** @class */ (function (_super) {
         __extends(ColorPicker, _super);
         function ColorPicker() {
@@ -55,24 +56,22 @@ var editor;
         };
         ColorPicker.prototype.onClick = function () {
             var _this = this;
-            if (!editor.colorPickerView)
-                editor.colorPickerView = new editor.ColorPickerView();
-            editor.colorPickerView.color = this.value;
+            ColorPickerView_1.colorPickerView.color = this.value;
             var pos = this.localToGlobal(0, 0);
             // pos.x = pos.x - colorPickerView.width;
             pos.x = pos.x - 318;
-            editor.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+            ColorPickerView_1.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
             //
-            popupview.popupView(editor.colorPickerView, function () {
-                editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+            Popupview_1.popupview.popupView(ColorPickerView_1.colorPickerView, function () {
+                ColorPickerView_1.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
             }, pos.x, pos.y);
         };
         ColorPicker.prototype.onPickerViewChanged = function () {
-            this.value = editor.colorPickerView.color;
+            this.value = ColorPickerView_1.colorPickerView.color;
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         };
         return ColorPicker;
     }(eui.Component));
-    editor.ColorPicker = ColorPicker;
-})(editor || (editor = {}));
+    exports.ColorPicker = ColorPicker;
+});
 //# sourceMappingURL=ColorPicker.js.map

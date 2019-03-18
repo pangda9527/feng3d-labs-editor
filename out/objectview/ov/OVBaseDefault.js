@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * 默认基础对象界面
      */
@@ -75,6 +76,6 @@ var editor;
         ], OVBaseDefault);
         return OVBaseDefault;
     }(eui.Component));
-    editor.OVBaseDefault = OVBaseDefault;
-})(editor || (editor = {}));
+    exports.OVBaseDefault = OVBaseDefault;
+});
 //# sourceMappingURL=OVBaseDefault.js.map

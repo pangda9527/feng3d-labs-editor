@@ -1,4 +1,3 @@
-"use strict";
 //////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
@@ -27,35 +26,38 @@
 //  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //////////////////////////////////////////////////////////////////////////////////////
-Object.defineProperty(exports, "__esModule", { value: true });
-var AssetAdapter = /** @class */ (function () {
-    function AssetAdapter() {
-    }
-    /**
-     * @language zh_CN
-     * 解析素材
-     * @param source 待解析的新素材标识符
-     * @param compFunc 解析完成回调函数，示例：callBack(content:any,source:string):void;
-     * @param thisObject callBack的 this 引用
-     */
-    AssetAdapter.prototype.getAsset = function (source, compFunc, thisObject) {
-        function onGetRes(data) {
-            compFunc.call(thisObject, data, source);
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AssetAdapter = /** @class */ (function () {
+        function AssetAdapter() {
         }
-        if (RES.hasRes(source)) {
-            var data = RES.getRes(source);
-            if (data) {
-                onGetRes(data);
+        /**
+         * @language zh_CN
+         * 解析素材
+         * @param source 待解析的新素材标识符
+         * @param compFunc 解析完成回调函数，示例：callBack(content:any,source:string):void;
+         * @param thisObject callBack的 this 引用
+         */
+        AssetAdapter.prototype.getAsset = function (source, compFunc, thisObject) {
+            function onGetRes(data) {
+                compFunc.call(thisObject, data, source);
+            }
+            if (RES.hasRes(source)) {
+                var data = RES.getRes(source);
+                if (data) {
+                    onGetRes(data);
+                }
+                else {
+                    RES.getResAsync(source, onGetRes, this);
+                }
             }
             else {
-                RES.getResAsync(source, onGetRes, this);
+                RES.getResByUrl(source, onGetRes, this, RES.ResourceItem.TYPE_IMAGE);
             }
-        }
-        else {
-            RES.getResByUrl(source, onGetRes, this, RES.ResourceItem.TYPE_IMAGE);
-        }
-    };
-    return AssetAdapter;
-}());
-exports.AssetAdapter = AssetAdapter;
+        };
+        return AssetAdapter;
+    }());
+    exports.AssetAdapter = AssetAdapter;
+});
 //# sourceMappingURL=AssetAdapter.js.map

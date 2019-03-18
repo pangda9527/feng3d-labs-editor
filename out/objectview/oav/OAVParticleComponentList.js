@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./OAVBase", "../../ui/components/ParticleComponentView"], function (require, exports, OAVBase_1, ParticleComponentView_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var OAVParticleComponentList = /** @class */ (function (_super) {
         __extends(OAVParticleComponentList, _super);
         function OAVParticleComponentList(attributeViewInfo) {
@@ -77,20 +78,20 @@ var editor;
         OAVParticleComponentList.prototype.updateView = function () {
             for (var i = 0, n = this.group.numChildren; i < n; i++) {
                 var child = this.group.getChildAt(i);
-                if (child instanceof editor.ParticleComponentView)
+                if (child instanceof ParticleComponentView_1.ParticleComponentView)
                     child.updateView();
             }
         };
         OAVParticleComponentList.prototype.addComponentView = function (component) {
             var o;
-            var displayObject = new editor.ParticleComponentView(component);
+            var displayObject = new ParticleComponentView_1.ParticleComponentView(component);
             displayObject.percentWidth = 100;
             this.group.addChild(displayObject);
         };
         OAVParticleComponentList.prototype.removedComponentView = function (component) {
             for (var i = this.group.numChildren - 1; i >= 0; i--) {
                 var displayObject = this.group.getChildAt(i);
-                if (displayObject instanceof editor.ParticleComponentView && displayObject.component == component) {
+                if (displayObject instanceof ParticleComponentView_1.ParticleComponentView && displayObject.component == component) {
                     this.group.removeChild(displayObject);
                 }
             }
@@ -99,7 +100,7 @@ var editor;
             feng3d.OAVComponent()
         ], OAVParticleComponentList);
         return OAVParticleComponentList;
-    }(OAVBase));
-    editor.OAVParticleComponentList = OAVParticleComponentList;
-})(editor || (editor = {}));
+    }(OAVBase_1.OAVBase));
+    exports.OAVParticleComponentList = OAVParticleComponentList;
+});
 //# sourceMappingURL=OAVParticleComponentList.js.map

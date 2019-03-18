@@ -1,0 +1,1 @@
+{"version":3,"file":"ObjectView.d.ts","sourceRoot":"","sources":["../../../src/polyfill/feng3d/ObjectView.ts"],"names":[],"mappings":"AAAA,kBAAU,MAAM,CAChB;IACI,UAAiB,WAAY,SAAQ,GAAG,CAAC,SAAS;KAAI;IACtD,UAAiB,gBAAiB,SAAQ,GAAG,CAAC,SAAS;KAAI;IAC3D,UAAiB,oBAAqB,SAAQ,GAAG,CAAC,SAAS;KAAI;CAClE"}

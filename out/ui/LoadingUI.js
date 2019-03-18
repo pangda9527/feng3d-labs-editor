@@ -1,4 +1,3 @@
-"use strict";
 //////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
@@ -40,26 +39,29 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
-var LoadingUI = /** @class */ (function (_super) {
-    __extends(LoadingUI, _super);
-    function LoadingUI() {
-        var _this = _super.call(this) || this;
-        _this.createView();
-        return _this;
-    }
-    LoadingUI.prototype.createView = function () {
-        this.textField = new egret.TextField();
-        this.addChild(this.textField);
-        this.textField.y = 300;
-        this.textField.width = 480;
-        this.textField.height = 100;
-        this.textField.textAlign = "center";
-    };
-    LoadingUI.prototype.setProgress = function (current, total) {
-        this.textField.text = "Loading..." + current + "/" + total;
-    };
-    return LoadingUI;
-}(egret.Sprite));
-exports.LoadingUI = LoadingUI;
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var LoadingUI = /** @class */ (function (_super) {
+        __extends(LoadingUI, _super);
+        function LoadingUI() {
+            var _this = _super.call(this) || this;
+            _this.createView();
+            return _this;
+        }
+        LoadingUI.prototype.createView = function () {
+            this.textField = new egret.TextField();
+            this.addChild(this.textField);
+            this.textField.y = 300;
+            this.textField.width = 480;
+            this.textField.height = 100;
+            this.textField.textAlign = "center";
+        };
+        LoadingUI.prototype.setProgress = function (current, total) {
+            this.textField.text = "Loading..." + current + "/" + total;
+        };
+        return LoadingUI;
+    }(egret.Sprite));
+    exports.LoadingUI = LoadingUI;
+});
 //# sourceMappingURL=LoadingUI.js.map

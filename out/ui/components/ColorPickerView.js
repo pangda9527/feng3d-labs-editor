@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var colors = [0xff0000, 0xffff00, 0x00ff00, 0x00ffff, 0x0000ff, 0xff00ff, 0xff0000];
     /**
      */
@@ -198,7 +199,7 @@ var editor;
         ], ColorPickerView.prototype, "color", void 0);
         return ColorPickerView;
     }(eui.Component));
-    editor.ColorPickerView = ColorPickerView;
+    exports.ColorPickerView = ColorPickerView;
     /**
      * 获取颜色的基色以及颜色拾取矩形所在位置
      * @param color 查找颜色
@@ -303,5 +304,6 @@ var editor;
         }
         return colors1[0];
     }
-})(editor || (editor = {}));
+    exports.colorPickerView = new ColorPickerView();
+});
 //# sourceMappingURL=ColorPickerView.js.map

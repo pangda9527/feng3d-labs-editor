@@ -11,8 +11,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var editor;
-(function (editor) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var TerrainView = /** @class */ (function (_super) {
         __extends(TerrainView, _super);
         function TerrainView() {
@@ -33,6 +34,6 @@ var editor;
         };
         return TerrainView;
     }(eui.Component));
-    editor.TerrainView = TerrainView;
-})(editor || (editor = {}));
+    exports.TerrainView = TerrainView;
+});
 //# sourceMappingURL=TerrainView.js.map

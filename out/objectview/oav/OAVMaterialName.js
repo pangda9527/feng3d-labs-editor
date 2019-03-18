@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./OAVBase"], function (require, exports, OAVBase_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var OAVMaterialName = /** @class */ (function (_super) {
         __extends(OAVMaterialName, _super);
         function OAVMaterialName(attributeViewInfo) {
@@ -57,7 +58,7 @@ var editor;
             feng3d.OAVComponent()
         ], OAVMaterialName);
         return OAVMaterialName;
-    }(OAVBase));
-    editor.OAVMaterialName = OAVMaterialName;
-})(editor || (editor = {}));
+    }(OAVBase_1.OAVBase));
+    exports.OAVMaterialName = OAVMaterialName;
+});
 //# sourceMappingURL=OAVMaterialName.js.map

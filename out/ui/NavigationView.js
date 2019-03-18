@@ -11,8 +11,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var editor;
-(function (editor) {
+define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var NavigationView = /** @class */ (function (_super) {
         __extends(NavigationView, _super);
         function NavigationView() {
@@ -34,6 +35,6 @@ var editor;
         };
         return NavigationView;
     }(eui.Component));
-    editor.NavigationView = NavigationView;
-})(editor || (editor = {}));
+    exports.NavigationView = NavigationView;
+});
 //# sourceMappingURL=NavigationView.js.map

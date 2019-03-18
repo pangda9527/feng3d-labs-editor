@@ -1,10 +1,4 @@
-export interface Component {
-    addBinder(...binders: UIBinder[]): void;
-}
-export interface UIBinder {
-    init(v: Partial<this>): this;
-    dispose(): void;
-}
+import { UIBinder } from "../../../polyfill/egret/Component";
 export interface TextInputBinderEventMap {
     valueChanged: any;
 }

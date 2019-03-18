@@ -17,8 +17,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var editor;
-(function (editor) {
+define(["require", "exports", "./OAVBase", "../../ui/components/binders/NumberTextInputBinder"], function (require, exports, OAVBase_1, NumberTextInputBinder_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * 默认对象属性界面
      */
@@ -31,7 +32,7 @@ var editor;
         }
         OAVNumber.prototype.initView = function () {
             _super.prototype.initView.call(this);
-            this.addBinder(new NumberTextInputBinder().init({
+            this.addBinder(new NumberTextInputBinder_1.NumberTextInputBinder().init({
                 space: this.space, attribute: this._attributeName, textInput: this.text, editable: this._attributeViewInfo.editable,
                 controller: this.labelLab,
             }));
@@ -40,7 +41,7 @@ var editor;
             feng3d.OAVComponent()
         ], OAVNumber);
         return OAVNumber;
-    }(OAVBase));
-    editor.OAVNumber = OAVNumber;
-})(editor || (editor = {}));
+    }(OAVBase_1.OAVBase));
+    exports.OAVNumber = OAVNumber;
+});
 //# sourceMappingURL=OAVNumber.js.map
