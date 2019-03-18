@@ -1,46 +1,46 @@
-import { OAVBase } from "./OAVBase";
-import { MinMaxGradientView } from "../../ui/components/MinMaxGradientView";
-
-@feng3d.OAVComponent()
-export class OAVMinMaxGradient extends OAVBase
+namespace editor
 {
-    public labelLab: eui.Label;
-    public minMaxGradientView: MinMaxGradientView;
-
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    @feng3d.OAVComponent()
+    export class OAVMinMaxGradient extends OAVBase
     {
-        super(attributeViewInfo);
+        public labelLab: eui.Label;
+        public minMaxGradientView: editor.MinMaxGradientView;
 
-        this.skinName = "OAVMinMaxGradient";
-    }
-
-    initView()
-    {
-        if (this._attributeViewInfo.editable)
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
-            this.minMaxGradientView.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            super(attributeViewInfo);
+
+            this.skinName = "OAVMinMaxGradient";
         }
 
-        this.minMaxGradientView.minMaxGradient = this.attributeValue;
-
-        this.minMaxGradientView.touchEnabled = this.minMaxGradientView.touchChildren = this._attributeViewInfo.editable;
-    }
-
-    dispose()
-    {
-        if (this._attributeViewInfo.editable)
+        initView()
         {
-            this.minMaxGradientView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+            if (this._attributeViewInfo.editable)
+            {
+                this.minMaxGradientView.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
+
+            this.minMaxGradientView.minMaxGradient = this.attributeValue;
+
+            this.minMaxGradientView.touchEnabled = this.minMaxGradientView.touchChildren = this._attributeViewInfo.editable;
         }
-    }
 
-    updateView()
-    {
+        dispose()
+        {
+            if (this._attributeViewInfo.editable)
+            {
+                this.minMaxGradientView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
+        }
 
-    }
+        updateView()
+        {
 
-    private onChange()
-    {
+        }
 
+        private onChange()
+        {
+
+        }
     }
 }

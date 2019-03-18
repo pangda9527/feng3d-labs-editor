@@ -1,28 +1,30 @@
-export var assetFileTemplates: AssetFileTemplates;
-
-export class AssetFileTemplates
+namespace editor
 {
-    /**
-     * 
-     * @param scriptName 脚本名称（类名）
-     */
-    getNewScript(scriptName)
-    {
-        return scriptTemplate.replace("NewScript", scriptName);
-    }
-    /**
-     * 
-     * @param shadername shader名称
-     */
-    getNewShader(shadername: string)
-    {
-        return shaderTemplate.replace(new RegExp("NewShader", "g"), shadername);
-    }
-}
+    export var assetFileTemplates: AssetFileTemplates;
 
-assetFileTemplates = new AssetFileTemplates();
+    export class AssetFileTemplates
+    {
+        /**
+         * 
+         * @param scriptName 脚本名称（类名）
+         */
+        getNewScript(scriptName)
+        {
+            return scriptTemplate.replace("NewScript", scriptName);
+        }
+        /**
+         * 
+         * @param shadername shader名称
+         */
+        getNewShader(shadername: string)
+        {
+            return shaderTemplate.replace(new RegExp("NewShader", "g"), shadername);
+        }
+    }
 
-var scriptTemplate = `
+    assetFileTemplates = new AssetFileTemplates();
+
+    var scriptTemplate = `
 class NewScript extends feng3d.Script
 {
 
@@ -58,7 +60,7 @@ class NewScript extends feng3d.Script
     }
 }`;
 
-var shaderTemplate = `
+    var shaderTemplate = `
 class NewShaderUniforms
 {
     /** 
@@ -106,3 +108,4 @@ interface MaterialRawMap
 {
     NewShader: gPartial<NewShaderMaterial>;
 }`;
+}

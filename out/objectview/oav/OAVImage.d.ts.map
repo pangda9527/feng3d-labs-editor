@@ -1,1 +1,0 @@
-{"version":3,"file":"OAVImage.d.ts","sourceRoot":"","sources":["../../../src/objectview/oav/OAVImage.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAC;AAEpC,qBACa,QAAS,SAAQ,OAAO;IAE7B,KAAK,EAAE,GAAG,CAAC,KAAK,CAAC;gBAEZ,iBAAiB,EAAE,MAAM,CAAC,iBAAiB;IAOvD,QAAQ;IAQR,OAAO;IAIP,UAAU;IAIV,QAAQ;CAMR"}

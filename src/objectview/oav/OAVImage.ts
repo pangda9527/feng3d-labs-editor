@@ -1,37 +1,38 @@
-import { OAVBase } from "./OAVBase";
-
-@feng3d.OAVComponent()
-export class OAVImage extends OAVBase
+namespace editor
 {
-	public image: eui.Image;
-
-	constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+	@feng3d.OAVComponent()
+	export class OAVImage extends OAVBase
 	{
-		super(attributeViewInfo);
-		this.skinName = "OAVImage";
-		this.alpha = 1;
-	}
+		public image: eui.Image;
 
-	initView()
-	{
-		var texture: feng3d.Texture2D = this.space;
-		this.image.source = texture.dataURL;
+		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+		{
+			super(attributeViewInfo);
+			this.skinName = "OAVImage";
+			this.alpha = 1;
+		}
 
-		this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-	}
+		initView()
+		{
+			var texture: feng3d.Texture2D = this.space;
+			this.image.source = texture.dataURL;
 
-	dispose()
-	{
-	}
+			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+		}
 
-	updateView()
-	{
-	}
+		dispose()
+		{
+		}
 
-	onResize()
-	{
-		this.image.width = this.width;
-		this.image.height = this.width;
-		this.height = this.width;
+		updateView()
+		{
+		}
+
+		onResize()
+		{
+			this.image.width = this.width;
+			this.image.height = this.width;
+			this.height = this.width;
+		}
 	}
 }

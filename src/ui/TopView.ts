@@ -1,154 +1,145 @@
-import { menu } from "./components/Menu";
-import { menuConfig } from "../configs/CommonConfig";
-import { editorData, MRSToolType } from "../global/EditorData";
-import { editorRS } from "../assets/EditorRS";
-import { engine } from "../feng3d/Main3D";
-import { editorcache } from "../caches/Editorcache";
-
-export class TopView extends eui.Component implements eui.UIComponent
+namespace editor
 {
-	public topGroup: eui.Group;
-	public mainButton: eui.Button;
-	public moveButton: eui.ToggleButton;
-	public rotateButton: eui.ToggleButton;
-	public scaleButton: eui.ToggleButton;
-	public worldButton: eui.ToggleButton;
-	public centerButton: eui.ToggleButton;
-	public helpButton: eui.Button;
-	public settingButton: eui.Button;
-	public qrcodeButton: eui.Button;
-	public playBtn: eui.Button;
-
-	constructor()
+	export class TopView extends eui.Component implements eui.UIComponent
 	{
-		super();
+		public topGroup: eui.Group;
+		public mainButton: eui.Button;
+		public moveButton: eui.ToggleButton;
+		public rotateButton: eui.ToggleButton;
+		public scaleButton: eui.ToggleButton;
+		public worldButton: eui.ToggleButton;
+		public centerButton: eui.ToggleButton;
+		public helpButton: eui.Button;
+		public settingButton: eui.Button;
+		public qrcodeButton: eui.Button;
+		public playBtn: eui.Button;
 
-		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "TopView";
-	}
-
-	private onComplete(): void
-	{
-		this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-		this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-
-		if (this.stage)
+		constructor()
 		{
-			this.onAddedToStage();
+			super();
+
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.skinName = "TopView";
 		}
-	}
 
-
-	private onAddedToStage()
-	{
-		this.mainButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.moveButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.rotateButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.scaleButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.worldButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.centerButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.playBtn.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-
-		this.helpButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
-		this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
-		this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-
-		feng3d.dispatcher.on("editor.toolTypeChanged", this.updateview, this);
-
-		this.updateview();
-	}
-
-	private onRemovedFromStage()
-	{
-		this.mainButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.moveButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.rotateButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.scaleButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.worldButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.centerButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-		this.playBtn.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-
-		this.helpButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
-		this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
-		this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
-
-		feng3d.dispatcher.off("editor.toolTypeChanged", this.updateview, this);
-
-		if (runwin) runwin.close();
-		runwin = null;
-	}
-
-	private onHelpButtonClick()
-	{
-		window.open("http://feng3d.com");
-	}
-
-	private onButtonClick(event: egret.TouchEvent)
-	{
-		switch (event.currentTarget)
+		private onComplete(): void
 		{
-			case this.mainButton:
-				menu.popup(menuConfig.getMainMenu());
-				break;
-			case this.moveButton:
-				editorData.toolType = MRSToolType.MOVE;
-				break;
-			case this.rotateButton:
-				editorData.toolType = MRSToolType.ROTATION;
-				break;
-			case this.scaleButton:
-				editorData.toolType = MRSToolType.SCALE;
-				break;
-			case this.worldButton:
-				editorData.isWoldCoordinate = !editorData.isWoldCoordinate;
-				break;
-			case this.centerButton:
-				editorData.isBaryCenter = !editorData.isBaryCenter;
-				break;
-			case this.playBtn:
-				feng3d.dispatcher.dispatch("inspector.saveShowData", () =>
-				{
-					editorRS.fs.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+			if (this.stage)
+			{
+				this.onAddedToStage();
+			}
+		}
+
+
+		private onAddedToStage()
+		{
+			this.mainButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.moveButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.rotateButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.scaleButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.worldButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.centerButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.playBtn.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+
+			this.helpButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+
+			feng3d.dispatcher.on("editor.toolTypeChanged", this.updateview, this);
+
+			this.updateview();
+		}
+
+		private onRemovedFromStage()
+		{
+			this.mainButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.moveButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.rotateButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.scaleButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.worldButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.centerButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+			this.playBtn.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+
+			this.helpButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
+			this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
+
+			feng3d.dispatcher.off("editor.toolTypeChanged", this.updateview, this);
+
+			if (runwin) runwin.close();
+			runwin = null;
+		}
+
+		private onHelpButtonClick()
+		{
+			window.open("http://feng3d.com");
+		}
+
+		private onButtonClick(event: egret.TouchEvent)
+		{
+			switch (event.currentTarget)
+			{
+				case this.mainButton:
+					menu.popup(menuConfig.getMainMenu());
+					break;
+				case this.moveButton:
+					editorData.toolType = MRSToolType.MOVE;
+					break;
+				case this.rotateButton:
+					editorData.toolType = MRSToolType.ROTATION;
+					break;
+				case this.scaleButton:
+					editorData.toolType = MRSToolType.SCALE;
+					break;
+				case this.worldButton:
+					editorData.isWoldCoordinate = !editorData.isWoldCoordinate;
+					break;
+				case this.centerButton:
+					editorData.isBaryCenter = !editorData.isBaryCenter;
+					break;
+				case this.playBtn:
+					feng3d.dispatcher.dispatch("inspector.saveShowData", () =>
 					{
-						if (err)
+						editorRS.fs.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
 						{
-							feng3d.warn(err);
-							return;
-						}
-						if (editorRS.fs.type == feng3d.FSType.indexedDB)
-						{
+							if (err)
+							{
+								feng3d.warn(err);
+								return;
+							}
+							if (editorRS.fs.type == feng3d.FSType.indexedDB)
+							{
+								if (runwin) runwin.close();
+								runwin = window.open(`run.html?fstype=${feng3d.fs.type}&project=${editorcache.projectname}`);
+								return;
+							}
+							var path = editorRS.fs.getAbsolutePath("index.html");
 							if (runwin) runwin.close();
-							runwin = window.open(`run.html?fstype=${feng3d.fs.type}&project=${editorcache.projectname}`);
-							return;
-						}
-						var path = editorRS.fs.getAbsolutePath("index.html");
-						if (runwin) runwin.close();
-						runwin = window.open(path);
+							runwin = window.open(path);
+						});
 					});
-				});
-				break;
-			case this.qrcodeButton:
-				setTimeout(() =>
-				{
-					$('#output').show();
-				}, 10);
-				break;
+					break;
+				case this.qrcodeButton:
+					setTimeout(() =>
+					{
+						$('#output').show();
+					}, 10);
+					break;
+			}
+		}
+
+		private updateview()
+		{
+			this.moveButton.selected = editorData.toolType == MRSToolType.MOVE;
+			this.rotateButton.selected = editorData.toolType == MRSToolType.ROTATION;
+			this.scaleButton.selected = editorData.toolType == MRSToolType.SCALE;
+			this.worldButton.selected = !editorData.isWoldCoordinate;
+			this.centerButton.selected = editorData.isBaryCenter;
 		}
 	}
-
-	private updateview()
-	{
-		this.moveButton.selected = editorData.toolType == MRSToolType.MOVE;
-		this.rotateButton.selected = editorData.toolType == MRSToolType.ROTATION;
-		this.scaleButton.selected = editorData.toolType == MRSToolType.SCALE;
-		this.worldButton.selected = !editorData.isWoldCoordinate;
-		this.centerButton.selected = editorData.isBaryCenter;
-	}
+	// 运行窗口
+	export var runwin: Window;
 }
-// 运行窗口
-var runwin: Window;
-
-window.addEventListener("beforeunload", () =>
-{
-	if (runwin) runwin.close();
-});

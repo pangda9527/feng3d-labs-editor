@@ -1,48 +1,46 @@
-import { OAVBase } from "./OAVBase";
-import { MinMaxCurveView } from "../../ui/components/MinMaxCurveView";
-
-@feng3d.OAVComponent()
-export class OAVMinMaxCurve extends OAVBase
+namespace editor
 {
-    public labelLab: eui.Label;
-    public minMaxCurveView: MinMaxCurveView;
-
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    @feng3d.OAVComponent()
+    export class OAVMinMaxCurve extends OAVBase
     {
-        super(attributeViewInfo);
+        public labelLab: eui.Label;
+        public minMaxCurveView: editor.MinMaxCurveView;
 
-        this.skinName = "OAVMinMaxCurve";
-    }
-
-    initView()
-    {
-        if (this._attributeViewInfo.editable)
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
-            this.minMaxCurveView.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            super(attributeViewInfo);
+
+            this.skinName = "OAVMinMaxCurve";
         }
 
-        this.minMaxCurveView.minMaxCurve = this.attributeValue;
-
-        this.minMaxCurveView.touchEnabled = this.minMaxCurveView.touchChildren = this._attributeViewInfo.editable;
-    }
-
-    dispose()
-    {
-        if (this._attributeViewInfo.editable)
+        initView()
         {
-            this.minMaxCurveView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+            if (this._attributeViewInfo.editable)
+            {
+                this.minMaxCurveView.addEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
+
+            this.minMaxCurveView.minMaxCurve = this.attributeValue;
+
+            this.minMaxCurveView.touchEnabled = this.minMaxCurveView.touchChildren = this._attributeViewInfo.editable;
         }
-    }
 
-    updateView()
-    {
+        dispose()
+        {
+            if (this._attributeViewInfo.editable)
+            {
+                this.minMaxCurveView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
+            }
+        }
 
-    }
+        updateView()
+        {
 
-    private onChange()
-    {
+        }
 
+        private onChange()
+        {
+
+        }
     }
 }
-
-window["OAVMinMaxCurve"] = OAVMinMaxCurve;

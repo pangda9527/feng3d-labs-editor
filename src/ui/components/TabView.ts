@@ -1,20 +1,17 @@
-class TabView extends eui.Component implements eui.UIComponent
-{
-	public constructor()
-	{
+class TabView extends eui.Component implements  eui.UIComponent {
+	public constructor() {
 		super();
 	}
 
-	protected partAdded(partName: string, instance: any): void
+	protected partAdded(partName:string,instance:any):void
 	{
-		super.partAdded(partName, instance);
+		super.partAdded(partName,instance);
 	}
 
 
-	protected childrenCreated(): void
+	protected childrenCreated():void
 	{
 		super.childrenCreated();
 	}
-
+	
 }
-window["TabView"] = TabView;

@@ -1,1 +1,0 @@
-{"version":3,"file":"ClassUtils.js","sourceRoot":"","sources":["../../../src/polyfill/feng3d/ClassUtils.ts"],"names":[],"mappings":"AAAA,IAAU,MAAM,CAOf;AAPD,WAAU,MAAM;IAEZ,QAAQ,CAAC,IAAI,CAAC,aAAa,GAAG,cAAc,OAAO,KAAK,CAAC,CAAC,CAAC,CAAA;IAE3D,YAAY;IACZ,OAAA,UAAU,CAAC,iBAAiB,CAAC,QAAQ,CAAC,CAAC;IACvC,OAAA,UAAU,CAAC,iBAAiB,CAAC,OAAO,CAAC,CAAC;AAC1C,CAAC,EAPS,MAAM,KAAN,MAAM,QAOf"}

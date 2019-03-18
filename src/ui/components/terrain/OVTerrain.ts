@@ -1,26 +1,27 @@
-import { TerrainView } from "./TerrainView";
-
-@feng3d.OVComponent()
-export class OVTerrain extends TerrainView implements feng3d.IObjectView
+namespace editor
 {
-    space: Object;
-    private _objectViewInfo: feng3d.ObjectViewInfo;
-
-    constructor(objectViewInfo: feng3d.ObjectViewInfo)
+    @feng3d.OVComponent()
+    export class OVTerrain extends TerrainView implements feng3d.IObjectView
     {
-        super();
-        this._objectViewInfo = objectViewInfo;
-        this.space = <any>objectViewInfo.owner;
-    }
+        space: Object;
+        private _objectViewInfo: feng3d.ObjectViewInfo;
 
-    getAttributeView(attributeName: String)
-    {
-        return null;
-    }
+        constructor(objectViewInfo: feng3d.ObjectViewInfo)
+        {
+            super();
+            this._objectViewInfo = objectViewInfo;
+            this.space = <any>objectViewInfo.owner;
+        }
 
-    getblockView(blockName: String)
-    {
-        return null;
-    }
+        getAttributeView(attributeName: String)
+        {
+            return null;
+        }
 
+        getblockView(blockName: String)
+        {
+            return null;
+        }
+
+    }
 }

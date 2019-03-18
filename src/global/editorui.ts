@@ -1,19 +1,18 @@
-import { AssetView } from "../ui/assets/AssetView";
-import { MainView } from "../ui/MainView";
-import { Feng3dView } from "../ui/Feng3dView";
-
-export interface EditorUI
+namespace editor
 {
-    stage: egret.Stage;
-    assetview: AssetView;
-    mainview: MainView;
-    tooltipLayer: eui.UILayer;
-    popupLayer: eui.UILayer;
+    export interface EditorUI
+    {
+        stage: egret.Stage;
+        assetview: AssetView;
+        mainview: MainView;
+        tooltipLayer: eui.UILayer;
+        popupLayer: eui.UILayer;
 
-    /**
-     * 3D视图
-     */
-    feng3dView: Feng3dView;
+        /**
+         * 3D视图
+         */
+        feng3dView: Feng3dView;
+    }
+
+    export var editorui: EditorUI = <any>{};
 }
-
-export var editorui: EditorUI = <any>{};

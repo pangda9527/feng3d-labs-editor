@@ -1,91 +1,91 @@
-import { OAVBase } from "./OAVBase";
-import { feng3dScreenShot } from "../../feng3d/Feng3dScreenShot";
-
-@feng3d.OAVComponent()
-export class OAVFeng3dPreView extends OAVBase
+namespace editor
 {
-    public image: eui.Image;
-
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    @feng3d.OAVComponent()
+    export class OAVFeng3dPreView extends OAVBase
     {
-        super(attributeViewInfo);
-        this.skinName = "OAVFeng3dPreView";
-        this.alpha = 1;
-    }
+        public image: eui.Image;
 
-    initView()
-    {
-        if (this.space instanceof feng3d.GameObject)
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
-            feng3dScreenShot.drawGameObject(this.space);
-        } else if (this.space instanceof feng3d.Geometry)
-        {
-            feng3dScreenShot.drawGeometry(<any>this.space);
-        } else if (this.space instanceof feng3d.Material)
-        {
-            feng3dScreenShot.drawMaterial(this.space);
+            super(attributeViewInfo);
+            this.skinName = "OAVFeng3dPreView";
+            this.alpha = 1;
         }
-        this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
-        this.onResize();
-        this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-        //
-        feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
 
-        feng3d.ticker.on(100, this.onDrawObject, this);
-    }
-
-    dispose()
-    {
-        feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
-        feng3d.ticker.off(100, this.onDrawObject, this);
-    }
-
-    private preMousePos: feng3d.Vector2;
-    private onMouseDown()
-    {
-        this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-        var s = this.localToGlobal(0, 0);
-        if (new feng3d.Rectangle(s.x, s.y, this.width, this.height).containsPoint(this.preMousePos))
+        initView()
         {
-            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-            feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+            if (this.space instanceof feng3d.GameObject)
+            {
+                feng3dScreenShot.drawGameObject(this.space);
+            } else if (this.space instanceof feng3d.Geometry)
+            {
+                feng3dScreenShot.drawGeometry(<any>this.space);
+            } else if (this.space instanceof feng3d.Material)
+            {
+                feng3dScreenShot.drawMaterial(this.space);
+            }
+            this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
+            this.onResize();
+            this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+            //
+            feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+
+            feng3d.ticker.on(100, this.onDrawObject, this);
         }
-    }
 
-    private onMouseMove()
-    {
-        var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        dispose()
+        {
+            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            feng3d.ticker.off(100, this.onDrawObject, this);
+        }
 
-        var X_AXIS = feng3dScreenShot.camera.transform.rightVector;
-        var Y_AXIS = feng3dScreenShot.camera.transform.upVector;
-        feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
-        feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
-        this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
+        private preMousePos: feng3d.Vector2;
+        private onMouseDown()
+        {
+            this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var s = this.localToGlobal(0, 0);
+            if (new feng3d.Rectangle(s.x, s.y, this.width, this.height).containsPoint(this.preMousePos))
+            {
+                feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+                feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+            }
+        }
 
-        this.preMousePos = mousePos;
-    }
+        private onMouseMove()
+        {
+            var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 
-    private cameraRotation: feng3d.Vector3;
-    private onDrawObject()
-    {
-        this.cameraRotation && (feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
-        feng3dScreenShot.updateCameraPosition();
-        this.image.source = feng3dScreenShot.toDataURL(this.width, this.height);
-    }
+            var X_AXIS = feng3dScreenShot.camera.transform.rightVector;
+            var Y_AXIS = feng3dScreenShot.camera.transform.upVector;
+            feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
+            feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
+            this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
 
-    private onMouseUp()
-    {
-        feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-        feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
-    }
+            this.preMousePos = mousePos;
+        }
 
-    updateView()
-    {
-    }
+        private cameraRotation: feng3d.Vector3;
+        private onDrawObject()
+        {
+            this.cameraRotation && (feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
+            feng3dScreenShot.updateCameraPosition();
+            this.image.source = feng3dScreenShot.toDataURL(this.width, this.height);
+        }
 
-    onResize()
-    {
-        this.height = this.width;
-        this.image.width = this.image.height = this.width;
+        private onMouseUp()
+        {
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
+        }
+
+        updateView()
+        {
+        }
+
+        onResize()
+        {
+            this.height = this.width;
+            this.image.width = this.image.height = this.width;
+        }
     }
 }

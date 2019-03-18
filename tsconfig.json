@@ -1,14 +1,12 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "module": "amd",
         "noImplicitAny": false,
         "sourceMap": true,
         "declarationMap": true,
         "declaration": true,
         "experimentalDecorators": true,
-        // "outFile": "out/editor.js"
-        "outDir": "out",
+        "outFile": "out/editor.js"
     },
     "files": [
         //
@@ -27,12 +25,10 @@
         "src/polyfill/typescript/typescriptServices.ts",
         // 扩展 feng3d
         "src/polyfill/feng3d/ClassUtils.ts",
-        "src/polyfill/feng3d/ObjectView.ts",
         "src/polyfill/feng3d/ShortCut.ts",
         "src/polyfill/feng3d/EventDispatcher.ts",
         // 扩展 egret
         "src/polyfill/egret/MouseEvent.ts",
-        "src/polyfill/egret/Component.ts",
         "src/polyfill/egret/TextField.ts",
         "src/polyfill/egret/Scroller.ts",
         // 扩展 json ，支持注释
@@ -187,6 +183,6 @@
         //
         "src/polyfill/typescript/typescriptSorting.ts",
         "src/ScriptCompiler.ts",
-        "src/Editor.ts",
+        "src/Editor.ts"
     ]
 }
