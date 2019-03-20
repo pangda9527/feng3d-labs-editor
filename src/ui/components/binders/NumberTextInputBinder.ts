@@ -20,7 +20,7 @@ namespace editor
         /**
          * 控制器
          */
-        controller: egret.Sprite;
+        controller: egret.DisplayObject;
 
         /**
          * 最小值

@@ -101,7 +101,7 @@ namespace editor
 					editorData.isBaryCenter = !editorData.isBaryCenter;
 					break;
 				case this.playBtn:
-					feng3d.dispatcher.dispatch("inspector.saveShowData", () =>
+					var e = feng3d.dispatcher.dispatch("inspector.saveShowData", () =>
 					{
 						editorRS.fs.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
 						{
@@ -121,6 +121,7 @@ namespace editor
 							runwin = window.open(path);
 						});
 					});
+					var a = e;
 					break;
 				case this.qrcodeButton:
 					setTimeout(() =>
