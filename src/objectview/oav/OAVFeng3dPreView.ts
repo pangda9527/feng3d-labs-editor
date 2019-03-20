@@ -31,12 +31,16 @@ namespace editor
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
 
             feng3d.ticker.on(100, this.onDrawObject, this);
+
+            MouseOnDisableScroll.register(this);
         }
 
         dispose()
         {
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.ticker.off(100, this.onDrawObject, this);
+
+            MouseOnDisableScroll.unRegister(this);
         }
 
         private preMousePos: feng3d.Vector2;

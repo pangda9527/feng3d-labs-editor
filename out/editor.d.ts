@@ -987,8 +987,9 @@ declare class TabViewButton extends eui.Button implements eui.UIComponent {
 }
 declare class TabView extends eui.Component implements eui.UIComponent {
     constructor();
-    protected partAdded(partName: string, instance: any): void;
-    protected childrenCreated(): void;
+    private onComplete;
+    private onAddedToStage;
+    private onRemovedFromStage;
 }
 declare namespace editor {
     var maskview: Maskview;
@@ -1675,7 +1676,7 @@ declare namespace editor {
         /**
          * 控制器
          */
-        controller: egret.DisplayObject;
+        controller: egret.Sprite;
         /**
          * 最小值
          */
@@ -1706,6 +1707,14 @@ declare namespace editor {
         dispose(): void;
         protected updateView(): void;
         private _onSliderChanged;
+    }
+}
+declare namespace editor {
+    class MouseOnDisableScroll {
+        static register(sprite: egret.DisplayObject): void;
+        static unRegister(sprite: egret.DisplayObject): void;
+        private static onMouseDown;
+        private static onStageMouseUp;
     }
 }
 declare namespace editor {
