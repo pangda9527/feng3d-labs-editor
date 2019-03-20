@@ -3080,13 +3080,21 @@ var TabViewButton = /** @class */ (function (_super) {
 var TabView = /** @class */ (function (_super) {
     __extends(TabView, _super);
     function TabView() {
-        return _super.call(this) || this;
+        var _this = _super.call(this) || this;
+        _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+        _this.skinName = "TabViewSkin";
+        return _this;
     }
-    TabView.prototype.partAdded = function (partName, instance) {
-        _super.prototype.partAdded.call(this, partName, instance);
+    TabView.prototype.onComplete = function () {
+        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+        this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+        if (this.stage) {
+            this.onAddedToStage();
+        }
     };
-    TabView.prototype.childrenCreated = function () {
-        _super.prototype.childrenCreated.call(this);
+    TabView.prototype.onAddedToStage = function () {
+    };
+    TabView.prototype.onRemovedFromStage = function () {
     };
     return TabView;
 }(eui.Component));
@@ -5795,12 +5803,14 @@ var editor;
             if (this.editable) {
                 // feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
                 this.controller && this.controller.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+                editor.MouseOnDisableScroll.register(this.controller);
             }
         };
         NumberTextInputBinder.prototype.dispose = function () {
             _super.prototype.dispose.call(this);
             // feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             this.controller && this.controller.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            editor.MouseOnDisableScroll.unRegister(this.controller);
         };
         NumberTextInputBinder.prototype.onValueChanged = function () {
             var value = this.space[this.attribute];
@@ -5815,7 +5825,6 @@ var editor;
         };
         NumberTextInputBinder.prototype.onMouseDown = function (e) {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            feng3d.shortcut.activityState("disableScroll");
             //
             this.mouseDownPosition = mousePos;
             this.mouseDownValue = this.space[this.attribute];
@@ -5829,7 +5838,6 @@ var editor;
         NumberTextInputBinder.prototype.onStageMouseUp = function () {
             feng3d.windowEventProxy.off("mousemove", this.onStageMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onStageMouseUp, this);
-            feng3d.shortcut.deactivityState("disableScroll");
         };
         NumberTextInputBinder.prototype.ontxtfocusin = function () {
             _super.prototype.ontxtfocusin.call(this);
@@ -5882,6 +5890,34 @@ var editor;
         return NumberSliderTextInputBinder;
     }(editor.NumberTextInputBinder));
     editor.NumberSliderTextInputBinder = NumberSliderTextInputBinder;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    var MouseOnDisableScroll = /** @class */ (function () {
+        function MouseOnDisableScroll() {
+        }
+        MouseOnDisableScroll.register = function (sprite) {
+            if (!sprite)
+                return;
+            sprite.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+        };
+        MouseOnDisableScroll.unRegister = function (sprite) {
+            if (!sprite)
+                return;
+            sprite.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+        };
+        MouseOnDisableScroll.onMouseDown = function (e) {
+            feng3d.shortcut.activityState("disableScroll");
+            //
+            feng3d.windowEventProxy.on("mouseup", this.onStageMouseUp, this);
+        };
+        MouseOnDisableScroll.onStageMouseUp = function () {
+            feng3d.windowEventProxy.off("mouseup", this.onStageMouseUp, this);
+            feng3d.shortcut.deactivityState("disableScroll");
+        };
+        return MouseOnDisableScroll;
+    }());
+    editor.MouseOnDisableScroll = MouseOnDisableScroll;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -7680,10 +7716,12 @@ var editor;
             //
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.ticker.on(100, this.onDrawObject, this);
+            editor.MouseOnDisableScroll.register(this);
         };
         OAVFeng3dPreView.prototype.dispose = function () {
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.ticker.off(100, this.onDrawObject, this);
+            editor.MouseOnDisableScroll.unRegister(this);
         };
         OAVFeng3dPreView.prototype.onMouseDown = function () {
             this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -7833,9 +7871,6 @@ var editor;
             _this._dataChanged = false;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "InspectorViewSkin";
-            feng3d.dispatcher.on("inspector.update", _this.updateView, _this);
-            feng3d.dispatcher.on("inspector.showData", _this.onShowData, _this);
-            feng3d.dispatcher.on("inspector.saveShowData", _this.onSaveShowData, _this);
             return _this;
         }
         InspectorView.prototype.showData = function (data, removeBack) {
@@ -7923,10 +7958,18 @@ var editor;
             this.backButton.visible = this._viewDataList.length > 0;
             this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
             feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+            //
+            feng3d.dispatcher.on("inspector.update", this.updateView, this);
+            feng3d.dispatcher.on("inspector.showData", this.onShowData, this);
+            feng3d.dispatcher.on("inspector.saveShowData", this.onSaveShowData, this);
         };
         InspectorView.prototype.onRemovedFromStage = function () {
             this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
             feng3d.dispatcher.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+            //
+            feng3d.dispatcher.off("inspector.update", this.updateView, this);
+            feng3d.dispatcher.off("inspector.showData", this.onShowData, this);
+            feng3d.dispatcher.off("inspector.saveShowData", this.onSaveShowData, this);
         };
         InspectorView.prototype.onSelectedObjectsChanged = function () {
             var data = editor.inspectorMultiObject.convertInspectorObject(editor.editorData.selectedObjects);

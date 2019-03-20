@@ -14,10 +14,6 @@ namespace editor
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "InspectorViewSkin";
-
-			feng3d.dispatcher.on("inspector.update", this.updateView, this);
-			feng3d.dispatcher.on("inspector.showData", this.onShowData, this);
-			feng3d.dispatcher.on("inspector.saveShowData", this.onSaveShowData, this);
 		}
 
 		private showData(data: any, removeBack = false)
@@ -136,12 +132,20 @@ namespace editor
 
 			this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
 			feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+			//
+			feng3d.dispatcher.on("inspector.update", this.updateView, this);
+			feng3d.dispatcher.on("inspector.showData", this.onShowData, this);
+			feng3d.dispatcher.on("inspector.saveShowData", this.onSaveShowData, this);
 		}
 
 		private onRemovedFromStage()
 		{
 			this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
 			feng3d.dispatcher.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+			//
+			feng3d.dispatcher.off("inspector.update", this.updateView, this);
+			feng3d.dispatcher.off("inspector.showData", this.onShowData, this);
+			feng3d.dispatcher.off("inspector.saveShowData", this.onSaveShowData, this);
 		}
 
 		private onSelectedObjectsChanged()
