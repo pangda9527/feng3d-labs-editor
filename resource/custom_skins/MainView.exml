@@ -20,7 +20,7 @@
 					<e:VerticalLayout gap="4" />
 				</e:layout>
 			</editor:SplitGroup>
-			<ns1:TabView x="100" y="100" height="100%"/>
+			<ns1:TabView x="100" y="100" height="100%" width="250"/>
 
 			<e:layout>
 				<e:HorizontalLayout gap="4" />

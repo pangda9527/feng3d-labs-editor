@@ -9326,7 +9326,7 @@ var editor;
                     editor.editorData.isBaryCenter = !editor.editorData.isBaryCenter;
                     break;
                 case this.playBtn:
-                    feng3d.dispatcher.dispatch("inspector.saveShowData", function () {
+                    var e = feng3d.dispatcher.dispatch("inspector.saveShowData", function () {
                         editor.editorRS.fs.writeObject("default.scene.json", editor.engine.scene.gameObject, function (err) {
                             if (err) {
                                 feng3d.warn(err);
@@ -9344,6 +9344,7 @@ var editor;
                             editor.runwin = window.open(path);
                         });
                     });
+                    var a = e;
                     break;
                 case this.qrcodeButton:
                     setTimeout(function () {
