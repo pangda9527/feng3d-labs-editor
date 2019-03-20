@@ -1,17 +1,29 @@
-class TabView extends eui.Component implements  eui.UIComponent {
-	public constructor() {
+class TabView extends eui.Component implements eui.UIComponent
+{
+	constructor()
+	{
 		super();
+
+		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+		this.skinName = "TabViewSkin";
 	}
 
-	protected partAdded(partName:string,instance:any):void
+	private onComplete(): void
 	{
-		super.partAdded(partName,instance);
+		this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+		this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+		if (this.stage)
+		{
+			this.onAddedToStage();
+		}
 	}
 
-
-	protected childrenCreated():void
+	private onAddedToStage()
 	{
-		super.childrenCreated();
 	}
-	
+
+	private onRemovedFromStage()
+	{
+	}
 }

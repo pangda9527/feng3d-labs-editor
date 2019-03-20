@@ -147,5 +147,16 @@
     "path": "ui\\components\\TabView.ts",
     "class": "TabView",
     "parentPath": ""
+  },
+  "1699b95b76c": {
+    "backgroundType": "null",
+    "backgroundX": 0,
+    "backgroundY": 0,
+    "backgroundWidth": -1,
+    "backgroundHeight": -1,
+    "useBgImage": true,
+    "useBgColor": true,
+    "backgroundAlpha": 100,
+    "bindingDataTestObj": []
   }
 }

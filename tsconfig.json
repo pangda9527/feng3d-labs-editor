@@ -80,6 +80,7 @@
         "src/ui/components/binders/TextInputBinder.ts",
         "src/ui/components/binders/NumberTextInputBinder.ts",
         "src/ui/components/binders/NumberSliderTextInputBinder.ts",
+        "src/ui/components/tools/MouseOnDisableScroll.ts",
         //
         "src/ui/components/terrain/TerrainView.ts",
         "src/ui/components/terrain/OVTerrain.ts",
