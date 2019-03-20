@@ -5,7 +5,7 @@ namespace editor
 
     export class ScriptCompiler
     {
-        private tsconfig: { files: string[] };
+        private tsconfig: { compilerOptions: ts.CompilerOptions, files: string[] };
 
         constructor()
         {
@@ -16,12 +16,7 @@ namespace editor
             feng3d.dispatcher.on("fs.write", this.onFileChanged, this);
         }
 
-        private onGettsLibs(e: feng3d.Event<{
-            callback: (tslibs: {
-                path: string;
-                code: string;
-            }[]) => void;
-        }>)
+        private onGettsLibs(e: feng3d.Event<{ callback: (tslibs: { path: string; code: string; }[]) => void; }>)
         {
             this.loadtslibs(e.data.callback);
         }
@@ -46,9 +41,6 @@ namespace editor
                 files = files.filter(v => v.indexOf("Assets") != 0);
                 files = files.concat(tslist.map(v => v.assetPath));
                 //
-                tslist.map(v => { return { path: v.assetPath, code: v.textContent } });
-
-                var files: string[] = files;
                 editorRS.fs.readStrings(files, (strs) =>
                 {
                     var tslibs = files.map((f, i) =>
@@ -57,7 +49,6 @@ namespace editor
                         feng3d.warn(`没有找到文件 ${f}`);
                         return null;
                     }).filter(v => !!v);
-
                     callback(tslibs)
                 });
             });
@@ -79,11 +70,7 @@ namespace editor
             });
         }
 
-        private compile(tslibs: {
-            path: string;
-            code: string;
-        }[],
-            callback?: (output: { name: string; text: string; }[]) => void)
+        private compile(tslibs: { path: string; code: string; }[], callback?: (output: { name: string; text: string; }[]) => void)
         {
             try
             {
@@ -110,32 +97,20 @@ namespace editor
             callback && callback(null);
         }
 
-        private transpileModule(tslibs: {
-            path: string;
-            code: string;
-        }[])
+        private transpileModule(tslibs: { path: string; code: string; }[])
         {
-            var options: ts.CompilerOptions = {
-                // module: ts.ModuleKind.AMD,
-                target: ts.ScriptTarget.ES5,
-                noImplicitAny: false,
-                sourceMap: true,
-                suppressOutputPathCheck: true,
-                outFile: "project.js",
-            };
-
             var tsSourceMap: { [filepath: string]: ts.SourceFile } = {};
             var fileNames: string[] = [];
             tslibs.forEach(item =>
             {
                 fileNames.push(item.path);
-                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
+                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, this.tsconfig.compilerOptions.target || ts.ScriptTarget.ES5);
             });
 
             // Output
             var outputs: { name: string, text: string }[] = [];
             // 排序
-            var program = this.createProgram(fileNames, options, tsSourceMap, outputs);
+            var program = this.createProgram(fileNames, this.tsconfig.compilerOptions, tsSourceMap, outputs);
             var result = ts.reorderSourceFiles(program);
             console.log(`ts 排序结果`);
             console.log(result);
@@ -146,9 +121,8 @@ namespace editor
             }
             this.tsconfig.files = result.sortedFileNames;
             editorRS.fs.writeObject("tsconfig.json", this.tsconfig);
-
             // 编译
-            var program = this.createProgram(result.sortedFileNames, options, tsSourceMap, outputs);
+            var program = this.createProgram(result.sortedFileNames, this.tsconfig.compilerOptions, tsSourceMap, outputs);
             program.emit();
             return outputs;
         }

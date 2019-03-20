@@ -15716,8 +15716,6 @@ var editor;
                 files = files.filter(function (v) { return v.indexOf("Assets") != 0; });
                 files = files.concat(tslist.map(function (v) { return v.assetPath; }));
                 //
-                tslist.map(function (v) { return { path: v.assetPath, code: v.textContent }; });
-                var files = files;
                 editor.editorRS.fs.readStrings(files, function (strs) {
                     var tslibs = files.map(function (f, i) {
                         var str = strs[i];
@@ -15759,24 +15757,17 @@ var editor;
             callback && callback(null);
         };
         ScriptCompiler.prototype.transpileModule = function (tslibs) {
-            var options = {
-                // module: ts.ModuleKind.AMD,
-                target: ts.ScriptTarget.ES5,
-                noImplicitAny: false,
-                sourceMap: true,
-                suppressOutputPathCheck: true,
-                outFile: "project.js",
-            };
+            var _this = this;
             var tsSourceMap = {};
             var fileNames = [];
             tslibs.forEach(function (item) {
                 fileNames.push(item.path);
-                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
+                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, _this.tsconfig.compilerOptions.target || ts.ScriptTarget.ES5);
             });
             // Output
             var outputs = [];
             // 排序
-            var program = this.createProgram(fileNames, options, tsSourceMap, outputs);
+            var program = this.createProgram(fileNames, this.tsconfig.compilerOptions, tsSourceMap, outputs);
             var result = ts.reorderSourceFiles(program);
             console.log("ts \u6392\u5E8F\u7ED3\u679C");
             console.log(result);
@@ -15787,7 +15778,7 @@ var editor;
             this.tsconfig.files = result.sortedFileNames;
             editor.editorRS.fs.writeObject("tsconfig.json", this.tsconfig);
             // 编译
-            var program = this.createProgram(result.sortedFileNames, options, tsSourceMap, outputs);
+            var program = this.createProgram(result.sortedFileNames, this.tsconfig.compilerOptions, tsSourceMap, outputs);
             program.emit();
             return outputs;
         };
