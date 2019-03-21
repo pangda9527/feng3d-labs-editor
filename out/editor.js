@@ -14741,6 +14741,12 @@ var editor;
                             },
                         },
                     ],
+                },
+                {
+                    label: "编译脚本",
+                    click: function () {
+                        feng3d.dispatcher.dispatch("script.compile");
+                    },
                 }
             ];
             return mainMenu;
@@ -15783,35 +15789,43 @@ var editor;
                 _this.compile(tslibs, e && e.data && e.data.onComplete);
             });
         };
+        ScriptCompiler.prototype.getOptions = function () {
+            var targetMap = {
+                'es3': ts.ScriptTarget.ES3, 'es5': ts.ScriptTarget.ES5, 'es2015': ts.ScriptTarget.ES2015, 'es2016': ts.ScriptTarget.ES2016, 'es2017': ts.ScriptTarget.ES2017, 'es2018': ts.ScriptTarget.ES2018
+            };
+            var options = JSON.parse(JSON.stringify(this.tsconfig.compilerOptions));
+            if (targetMap[options.target])
+                options.target = targetMap[options.target];
+            return options;
+        };
         ScriptCompiler.prototype.compile = function (tslibs, callback) {
             try {
                 var output = this.transpileModule(tslibs);
                 output.forEach(function (v) {
                     editor.editorRS.fs.writeString(v.name, v.text);
                 });
-                callback && callback(output);
                 editor.editorAsset.runProjectScript(function () {
                     feng3d.dispatcher.dispatch("asset.scriptChanged");
                 });
-                return output;
             }
             catch (e) {
                 console.log("Error from compilation: " + e + "  " + (e.stack || ""));
             }
             callback && callback(null);
+            alert("\u7F16\u8BD1\u5B8C\u6210\uFF01");
         };
         ScriptCompiler.prototype.transpileModule = function (tslibs) {
-            var _this = this;
+            var options = this.getOptions();
             var tsSourceMap = {};
             var fileNames = [];
             tslibs.forEach(function (item) {
                 fileNames.push(item.path);
-                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, _this.tsconfig.compilerOptions.target || ts.ScriptTarget.ES5);
+                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
             // Output
             var outputs = [];
             // 排序
-            var program = this.createProgram(fileNames, this.tsconfig.compilerOptions, tsSourceMap, outputs);
+            var program = this.createProgram(fileNames, options, tsSourceMap, outputs);
             var result = ts.reorderSourceFiles(program);
             console.log("ts \u6392\u5E8F\u7ED3\u679C");
             console.log(result);
@@ -15822,7 +15836,7 @@ var editor;
             this.tsconfig.files = result.sortedFileNames;
             editor.editorRS.fs.writeObject("tsconfig.json", this.tsconfig);
             // 编译
-            var program = this.createProgram(result.sortedFileNames, this.tsconfig.compilerOptions, tsSourceMap, outputs);
+            var program = this.createProgram(result.sortedFileNames, options, tsSourceMap, outputs);
             program.emit();
             return outputs;
         };

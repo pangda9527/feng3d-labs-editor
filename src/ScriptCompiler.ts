@@ -70,6 +70,16 @@ namespace editor
             });
         }
 
+        private getOptions()
+        {
+            var targetMap = {
+                'es3': ts.ScriptTarget.ES3, 'es5': ts.ScriptTarget.ES5, 'es2015': ts.ScriptTarget.ES2015, 'es2016': ts.ScriptTarget.ES2016, 'es2017': ts.ScriptTarget.ES2017, 'es2018': ts.ScriptTarget.ES2018
+            };
+            var options: ts.CompilerOptions = JSON.parse(JSON.stringify(this.tsconfig.compilerOptions));
+            if (targetMap[options.target]) options.target = targetMap[options.target];
+            return options;
+        }
+
         private compile(tslibs: { path: string; code: string; }[], callback?: (output: { name: string; text: string; }[]) => void)
         {
             try
@@ -81,36 +91,35 @@ namespace editor
                     editorRS.fs.writeString(v.name, v.text);
                 });
 
-                callback && callback(output);
-
                 editorAsset.runProjectScript(() =>
                 {
                     feng3d.dispatcher.dispatch("asset.scriptChanged");
                 });
-
-                return output;
             }
             catch (e)
             {
                 console.log("Error from compilation: " + e + "  " + (e.stack || ""));
             }
             callback && callback(null);
+
+            alert(`编译完成！`)
         }
 
         private transpileModule(tslibs: { path: string; code: string; }[])
         {
+            var options = this.getOptions();
             var tsSourceMap: { [filepath: string]: ts.SourceFile } = {};
             var fileNames: string[] = [];
             tslibs.forEach(item =>
             {
                 fileNames.push(item.path);
-                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, this.tsconfig.compilerOptions.target || ts.ScriptTarget.ES5);
+                tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
 
             // Output
             var outputs: { name: string, text: string }[] = [];
             // 排序
-            var program = this.createProgram(fileNames, this.tsconfig.compilerOptions, tsSourceMap, outputs);
+            var program = this.createProgram(fileNames, options, tsSourceMap, outputs);
             var result = ts.reorderSourceFiles(program);
             console.log(`ts 排序结果`);
             console.log(result);
@@ -122,7 +131,7 @@ namespace editor
             this.tsconfig.files = result.sortedFileNames;
             editorRS.fs.writeObject("tsconfig.json", this.tsconfig);
             // 编译
-            var program = this.createProgram(result.sortedFileNames, this.tsconfig.compilerOptions, tsSourceMap, outputs);
+            var program = this.createProgram(result.sortedFileNames, options, tsSourceMap, outputs);
             program.emit();
             return outputs;
         }

@@ -202,6 +202,13 @@ namespace editor
                             },
                         },
                     ],
+                },
+                {
+                    label: "编译脚本",
+                    click: () =>
+                    {
+                        feng3d.dispatcher.dispatch("script.compile");
+                    },
                 }
             ];
 
