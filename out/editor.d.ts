@@ -3852,6 +3852,7 @@ declare namespace editor {
         private loadtslibs;
         private onFileChanged;
         private onScriptCompile;
+        private getOptions;
         private compile;
         private transpileModule;
         private createProgram;
