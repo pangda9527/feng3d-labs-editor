@@ -1,30 +1,32 @@
 # editor
 feng3d引擎编辑器
-    
-    http://feng3d.gitee.io/editor/
 
-## 运行项目
+## 文档
+    http://feng3d.com
 
-1. 安装npm依赖
+## 在线版本
+    http://feng3d.com/editor/index.html
 
-    `cnpm install`
+## 本地版本
+    https://github.com/feng3d-labs/editor/releases
 
-1. 编译项目
+## 使用npm安装
+```
+npm install feng3d-editor
+```
+### 运行项目
 
-    `ctrl+shift+B`
-    
-1. 运行项目
-
-    有两种方式运行该项目
-        
-    * 网页方式
-        
-        * 开启http服务器（比如http-server，使用cnpm install -g http-server安装，http-server命令开启）浏览http://localhost:8080/
-        * 按F5键启动chrome浏览http://localhost:8080/（如果需要使用chrome进行调试，请安装VSCode插件Debugger for Chrome已经参考相关文档，不过我经历过多次无法正常调试的情况，目前只能估计插件版本问题）
-
-    * 本地应用方式
-
-        `npm start`
+在 launch.json 中添加一下配置，选择 Electron Main 执行。
+```
+{
+    "type": "node",
+    "request": "launch",
+    "name": "Electron Main",
+    "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+    "program": "${workspaceFolder}/node_modules/feng3d-editor/main.js"
+}
+```
+![](resource/readme.png)
 
 ## 交流
 QQ群：519732759

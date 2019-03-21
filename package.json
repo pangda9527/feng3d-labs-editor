@@ -1,6 +1,6 @@
 {
   "name": "feng3d-editor",
-  "version": "2019.3.21",
+  "version": "2019.3.21a",
   "description": "feng3d引擎编辑器\r 编辑器UI基于[egret](https://www.egret.com/)开发。",
   "main": "main.js",
   "scripts": {
