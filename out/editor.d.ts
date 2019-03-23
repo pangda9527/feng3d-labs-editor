@@ -1313,8 +1313,17 @@ declare namespace editor {
      * 用于显示提示信息，例如屏幕中间的上浮信息
      */
     class Message {
+        private _messages;
+        private _showMessageIndex;
+        private _messageLabelPool;
+        /**
+         * 显示间隔
+         */
+        private interval;
         constructor();
-        private onMessage;
+        private _onMessage;
+        private _getMessageItem;
+        private _showMessage;
     }
 }
 declare namespace editor {
@@ -2712,6 +2721,7 @@ declare namespace editor {
         mainview: MainView;
         tooltipLayer: eui.UILayer;
         popupLayer: eui.UILayer;
+        messageLayer: eui.UILayer;
         /**
          * 3D视图
          */

@@ -28,6 +28,9 @@ namespace editor
             editorui.stage = this.stage;
 
             //
+            modules.message = new Message();
+
+            //
             feng3d.task.series([
                 this.initEgret.bind(this),
                 editorRS.initproject.bind(editorRS),
@@ -60,7 +63,12 @@ namespace editor
                 popupLayer.touchEnabled = false;
                 this.stage.addChild(popupLayer);
                 editorui.popupLayer = popupLayer;
-
+                //
+                var messageLayer = new eui.UILayer();
+                messageLayer.touchEnabled = false;
+                this.stage.addChild(messageLayer);
+                editorui.messageLayer = messageLayer;
+                //
                 editorcache.projectname = editorcache.projectname || "newproject";
 
                 this.removeChild(mainui);

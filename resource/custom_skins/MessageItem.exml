@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="MessageItem" xmlns:e="http://ns.egret.com/eui">
+	<e:Label text="Labelsdsdssd" x="0" y="0"/>
+</e:Skin>

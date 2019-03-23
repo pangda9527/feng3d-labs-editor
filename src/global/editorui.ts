@@ -8,6 +8,8 @@ namespace editor
         tooltipLayer: eui.UILayer;
         popupLayer: eui.UILayer;
 
+        messageLayer: eui.UILayer;
+
         /**
          * 3D视图
          */

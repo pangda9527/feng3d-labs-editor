@@ -4126,10 +4126,47 @@ var editor;
      */
     var Message = /** @class */ (function () {
         function Message() {
-            feng3d.dispatcher.on("message", this.onMessage, this);
+            this._messages = [];
+            this._showMessageIndex = 0;
+            this._messageLabelPool = [];
+            /**
+             * 显示间隔
+             */
+            this.interval = 100;
+            feng3d.dispatcher.on("message", this._onMessage, this);
         }
-        Message.prototype.onMessage = function (event) {
-            console.log(event.data);
+        Message.prototype._onMessage = function (event) {
+            this._messages.push(event.data);
+            feng3d.ticker.on(this.interval, this._showMessage, this);
+        };
+        Message.prototype._getMessageItem = function (message) {
+            var label = this._messageLabelPool.pop();
+            if (!label) {
+                label = new eui.Label();
+            }
+            label.size = 30;
+            label.alpha = 1;
+            label.text = message;
+            return label;
+        };
+        Message.prototype._showMessage = function () {
+            var _this = this;
+            if (this._showMessageIndex >= this._messages.length) {
+                this._showMessageIndex = 0;
+                this._messages = [];
+                return;
+            }
+            var message = this._messages[this._showMessageIndex++];
+            var showItem = this._getMessageItem(message);
+            //
+            showItem.x = (editor.editorui.stage.stageWidth - showItem.width) / 2;
+            showItem.y = (editor.editorui.stage.stageHeight - showItem.height) / 2;
+            editor.editorui.messageLayer.addChild(showItem);
+            //
+            egret.Tween.get(showItem).to({ y: showItem.y - 100, alpha: 0 }, 1000, egret.Ease.sineIn).call(function () {
+                editor.editorui.messageLayer.removeChild(showItem);
+                _this._messageLabelPool.push(showItem);
+            });
         };
         return Message;
     }());
@@ -15839,7 +15876,7 @@ var editor;
                 console.log("Error from compilation: " + e + "  " + (e.stack || ""));
             }
             callback && callback(null);
-            alert("\u7F16\u8BD1\u5B8C\u6210\uFF01");
+            feng3d.dispatcher.dispatch("message", "\u7F16\u8BD1\u5B8C\u6210\uFF01");
         };
         ScriptCompiler.prototype.transpileModule = function (tslibs) {
             var options = this.getOptions();
@@ -15929,6 +15966,8 @@ var editor;
         Editor.prototype.onAddedToStage = function () {
             editor.editorui.stage = this.stage;
             //
+            editor.modules.message = new editor.Message();
+            //
             feng3d.task.series([
                 this.initEgret.bind(this),
                 editor.editorRS.initproject.bind(editor.editorRS),
@@ -15958,6 +15997,12 @@ var editor;
                 popupLayer.touchEnabled = false;
                 _this.stage.addChild(popupLayer);
                 editor.editorui.popupLayer = popupLayer;
+                //
+                var messageLayer = new eui.UILayer();
+                messageLayer.touchEnabled = false;
+                _this.stage.addChild(messageLayer);
+                editor.editorui.messageLayer = messageLayer;
+                //
                 editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
                 _this.removeChild(mainui);
                 callback();

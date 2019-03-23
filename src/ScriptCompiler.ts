@@ -102,7 +102,7 @@ namespace editor
             }
             callback && callback(null);
 
-            alert(`编译完成！`)
+            feng3d.dispatcher.dispatch("message", `编译完成！`)
         }
 
         private transpileModule(tslibs: { path: string; code: string; }[])
