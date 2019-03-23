@@ -22,10 +22,33 @@ namespace editor
             super();
             // giteeOauth.oauth();
 
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+        }
+
+        private onAddedToStage()
+        {
+            editorui.stage = this.stage;
+
+            //
+            feng3d.task.series([
+                this.initEgret.bind(this),
+                this.initProject.bind(this),
+            ])(() =>
+            {
+                this.init();
+                console.log(`初始化完成。`);
+            });
+        }
+
+        /**
+         * 初始化 Egret
+         * 
+         * @param callback 完成回调
+         */
+        private initEgret(callback: () => void)
+        {
             var mainui = new MainUI(() =>
             {
-                editorui.stage = this.stage;
-
                 //
                 var tooltipLayer = new eui.UILayer();
                 tooltipLayer.touchEnabled = false;
@@ -39,16 +62,25 @@ namespace editor
 
                 editorcache.projectname = editorcache.projectname || "newproject";
 
-                editorRS.initproject(() =>
-                {
-                    setTimeout(() =>
-                    {
-                        this.init();
-                    }, 1);
-                });
-                this.removeChild(mainui);
+                callback();
             });
             this.addChild(mainui);
+        }
+
+        /**
+         * 初始化项目
+         * 
+         * @param callback 完成回调
+         */
+        private initProject(callback: () => void)
+        {
+            editorRS.initproject(() =>
+            {
+                setTimeout(() =>
+                {
+                    callback();
+                }, 1);
+            });
         }
 
         private init()
@@ -71,8 +103,6 @@ namespace editor
                 //
                 egret.mouseEventEnvironment();
             }, this);
-
-            this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
         }
 
         private initMainView()
@@ -90,11 +120,6 @@ namespace editor
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
             this.mainView.width = this.stage.stageWidth;
             this.mainView.height = this.stage.stageHeight;
-        }
-
-        private _onAddToStage()
-        {
-            editorData.stage = this.stage;
         }
     }
 }

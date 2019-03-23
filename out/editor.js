@@ -15881,8 +15881,29 @@ var editor;
         function Editor() {
             var _this = _super.call(this) || this;
             // giteeOauth.oauth();
+            _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddedToStage, _this);
+            return _this;
+        }
+        Editor.prototype.onAddedToStage = function () {
+            var _this = this;
+            editor.editorui.stage = this.stage;
+            //
+            feng3d.task.series([
+                this.initEgret.bind(this),
+                this.initProject.bind(this),
+            ])(function () {
+                _this.init();
+                console.log("\u521D\u59CB\u5316\u5B8C\u6210\u3002");
+            });
+        };
+        /**
+         * 初始化 Egret
+         *
+         * @param callback 完成回调
+         */
+        Editor.prototype.initEgret = function (callback) {
+            var _this = this;
             var mainui = new editor.MainUI(function () {
-                editor.editorui.stage = _this.stage;
                 //
                 var tooltipLayer = new eui.UILayer();
                 tooltipLayer.touchEnabled = false;
@@ -15894,16 +15915,22 @@ var editor;
                 _this.stage.addChild(popupLayer);
                 editor.editorui.popupLayer = popupLayer;
                 editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
-                editor.editorRS.initproject(function () {
-                    setTimeout(function () {
-                        _this.init();
-                    }, 1);
-                });
-                _this.removeChild(mainui);
+                callback();
             });
-            _this.addChild(mainui);
-            return _this;
-        }
+            this.addChild(mainui);
+        };
+        /**
+         * 初始化项目
+         *
+         * @param callback 完成回调
+         */
+        Editor.prototype.initProject = function (callback) {
+            editor.editorRS.initproject(function () {
+                setTimeout(function () {
+                    callback();
+                }, 1);
+            });
+        };
         Editor.prototype.init = function () {
             document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editor.editorcache.projectname;
             editor.editorcache.setLastProject(editor.editorcache.projectname);
@@ -15916,7 +15943,6 @@ var editor;
                 //
                 egret.mouseEventEnvironment();
             }, this);
-            this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
         };
         Editor.prototype.initMainView = function () {
             //
@@ -15930,9 +15956,6 @@ var editor;
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
             this.mainView.width = this.stage.stageWidth;
             this.mainView.height = this.stage.stageHeight;
-        };
-        Editor.prototype._onAddToStage = function () {
-            editor.editorData.stage = this.stage;
         };
         return Editor;
     }(eui.UILayer));
