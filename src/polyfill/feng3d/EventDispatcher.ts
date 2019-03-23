@@ -51,5 +51,10 @@ namespace feng3d
          * 获取项目依赖库 定义
          */
         "script.gettslibs": { callback: (tslibs: { path: string, code: string }[]) => void }
+
+        /**
+         * 提示信息
+         */
+        "message": string;
     }
 }

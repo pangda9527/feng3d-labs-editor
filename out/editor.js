@@ -4117,6 +4117,24 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    /**
+     * 消息模块
+     *
+     * 用于显示提示信息，例如屏幕中间的上浮信息
+     */
+    var Message = /** @class */ (function () {
+        function Message() {
+            feng3d.dispatcher.on("message", this.onMessage, this);
+        }
+        Message.prototype.onMessage = function (event) {
+            console.log(event.data);
+        };
+        return Message;
+    }());
+    editor.Message = Message;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var ToolTip = /** @class */ (function () {
         function ToolTip() {
             /**
@@ -15865,6 +15883,21 @@ var editor;
     }());
     editor.ScriptCompiler = ScriptCompiler;
     editor.scriptCompiler = new ScriptCompiler();
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * 模块
+     *
+     * 用于管理功能模块
+     */
+    var Modules = /** @class */ (function () {
+        function Modules() {
+        }
+        return Modules;
+    }());
+    editor.Modules = Modules;
+    editor.modules = new Modules();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

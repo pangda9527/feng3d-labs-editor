@@ -66,6 +66,7 @@
         "src/ui/components/ComponentView.ts",
         "src/ui/components/ParticleComponentView.ts",
         "src/ui/components/Menu.ts",
+        "src/ui/components/Message.ts",
         "src/ui/components/ToolTip.ts",
         "src/ui/components/ColorPickerView.ts",
         "src/ui/components/AreaSelectRect.ts",
@@ -184,6 +185,7 @@
         //
         "src/polyfill/typescript/typescriptSorting.ts",
         "src/ScriptCompiler.ts",
+        "src/Modules.ts",
         "src/Editor.ts"
     ]
 }

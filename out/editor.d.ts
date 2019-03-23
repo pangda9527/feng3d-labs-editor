@@ -92,6 +92,10 @@ declare namespace feng3d {
                 code: string;
             }[]) => void;
         };
+        /**
+         * 提示信息
+         */
+        "message": string;
     }
 }
 declare namespace egret {
@@ -1300,6 +1304,17 @@ declare namespace editor {
          * @param selectCallBack 选择回调
          */
         popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void): void;
+    }
+}
+declare namespace editor {
+    /**
+     * 消息模块
+     *
+     * 用于显示提示信息，例如屏幕中间的上浮信息
+     */
+    class Message {
+        constructor();
+        private onMessage;
     }
 }
 declare namespace editor {
@@ -3856,6 +3871,17 @@ declare namespace editor {
         private compile;
         private transpileModule;
         private createProgram;
+    }
+}
+declare namespace editor {
+    var modules: Modules;
+    /**
+     * 模块
+     *
+     * 用于管理功能模块
+     */
+    class Modules {
+        message: Message;
     }
 }
 declare namespace editor {
