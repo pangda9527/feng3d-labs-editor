@@ -121,14 +121,16 @@ namespace editor
                     var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
                     if (preElement instanceof eui.Group)
                     {
-                        preElement.setContentSize(preElementWidth, splitdragData.preElementRect.height);
+                        // preElement.setContentSize(preElementWidth, splitdragData.preElementRect.height);
+                        preElement.width = preElementWidth;
                     } else
                     {
                         preElement.width = preElementWidth;
                     }
                     if (nextElement instanceof eui.Group)
                     {
-                        nextElement.setContentSize(nextElementWidth, nextElement.contentHeight);
+                        // nextElement.setContentSize(nextElementWidth, nextElement.contentHeight);
+                        nextElement.width = nextElementWidth;
                     } else
                     {
                         nextElement.width = nextElementWidth;
@@ -140,14 +142,16 @@ namespace editor
                     var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
                     if (preElement instanceof eui.Group)
                     {
-                        preElement.setContentSize(splitdragData.preElementRect.width, preElementHeight);
+                        // preElement.setContentSize(splitdragData.preElementRect.width, preElementHeight);
+                        preElement.height = preElementHeight;
                     } else
                     {
                         preElement.height = preElementHeight;
                     }
                     if (nextElement instanceof eui.Group)
                     {
-                        nextElement.setContentSize(splitdragData.nextElementRect.width, nextElementHeight);
+                        // nextElement.setContentSize(splitdragData.nextElementRect.width, nextElementHeight);
+                        nextElement.height = nextElementHeight;
                     } else
                     {
                         nextElement.height = nextElementHeight;

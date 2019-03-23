@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <e:Skin class="TabViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:editor="editor.*">
+	<w:Config id="169ab55b10d"/>
 	<e:Rect height="20" fillColor="0xa2a2a2" left="0" right="0"/>
 	<e:Group id="tabGroup" scaleX="1" scaleY="1" height="20" left="0" right="0">
 		<e:layout>

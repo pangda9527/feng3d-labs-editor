@@ -2975,13 +2975,15 @@ var editor;
                     var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
                     var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
                     if (preElement instanceof eui.Group) {
-                        preElement.setContentSize(preElementWidth, splitdragData.preElementRect.height);
+                        // preElement.setContentSize(preElementWidth, splitdragData.preElementRect.height);
+                        preElement.width = preElementWidth;
                     }
                     else {
                         preElement.width = preElementWidth;
                     }
                     if (nextElement instanceof eui.Group) {
-                        nextElement.setContentSize(nextElementWidth, nextElement.contentHeight);
+                        // nextElement.setContentSize(nextElementWidth, nextElement.contentHeight);
+                        nextElement.width = nextElementWidth;
                     }
                     else {
                         nextElement.width = nextElementWidth;
@@ -2992,13 +2994,15 @@ var editor;
                     var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
                     var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
                     if (preElement instanceof eui.Group) {
-                        preElement.setContentSize(splitdragData.preElementRect.width, preElementHeight);
+                        // preElement.setContentSize(splitdragData.preElementRect.width, preElementHeight);
+                        preElement.height = preElementHeight;
                     }
                     else {
                         preElement.height = preElementHeight;
                     }
                     if (nextElement instanceof eui.Group) {
-                        nextElement.setContentSize(splitdragData.nextElementRect.width, nextElementHeight);
+                        // nextElement.setContentSize(splitdragData.nextElementRect.width, nextElementHeight);
+                        nextElement.height = nextElementHeight;
                     }
                     else {
                         nextElement.height = nextElementHeight;
@@ -3118,7 +3122,29 @@ var editor;
         __extends(TabView, _super);
         function TabView() {
             var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            return _this;
+        }
+        TabView.prototype.onComplete = function () {
+            var moduleviews = [];
+            for (var i = this.numChildren - 1; i >= 0; i--) {
+                var child = this.getChildAt(i);
+                moduleviews.push(child);
+                this.removeChildAt(i);
+            }
+            moduleviews = moduleviews.reverse();
             //
+            this._tabViewInstance = new TabViewInstance(moduleviews);
+            this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
+            this.addChild(this._tabViewInstance);
+        };
+        return TabView;
+    }(eui.Group));
+    editor.TabView = TabView;
+    var TabViewInstance = /** @class */ (function (_super) {
+        __extends(TabViewInstance, _super);
+        function TabViewInstance(moduleviews) {
+            var _this = _super.call(this) || this;
             /**
              * 按钮池
              */
@@ -3131,11 +3157,12 @@ var editor;
              * 模块界面列表
              */
             _this._moduleViews = [];
+            _this._moduleViews = moduleviews;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "TabViewSkin";
             return _this;
         }
-        TabView.prototype.onComplete = function () {
+        TabViewInstance.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this._onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             // 获取按钮列表
@@ -3174,14 +3201,14 @@ var editor;
                 this._onAddedToStage();
             }
         };
-        TabView.prototype._onAddedToStage = function () {
+        TabViewInstance.prototype._onAddedToStage = function () {
             var _this = this;
             this._tabButtons.forEach(function (v) {
                 v.addEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
             });
             this._invalidateView();
         };
-        TabView.prototype.onRemovedFromStage = function () {
+        TabViewInstance.prototype.onRemovedFromStage = function () {
             var _this = this;
             this._tabButtons.forEach(function (v) {
                 v.removeEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
@@ -3190,13 +3217,13 @@ var editor;
         /**
          * 界面显示失效
          */
-        TabView.prototype._invalidateView = function () {
+        TabViewInstance.prototype._invalidateView = function () {
             this.once(egret.Event.ENTER_FRAME, this._updateView, this);
         };
         /**
          * 更新界面
          */
-        TabView.prototype._updateView = function () {
+        TabViewInstance.prototype._updateView = function () {
             // 控制按钮状态
             for (var i = 0; i < this._moduleViews.length; i++) {
                 var tabButton = this._tabButtons[i];
@@ -3222,16 +3249,16 @@ var editor;
          *
          * @param e
          */
-        TabView.prototype._onTabButtonClick = function (e) {
+        TabViewInstance.prototype._onTabButtonClick = function (e) {
             var index = this._tabButtons.indexOf(e.currentTarget);
             if (index != -1 && this._tabButtons[index].moduleName != this._showModule) {
                 this._showModule = this._tabButtons[index].moduleName;
                 this._invalidateView();
             }
         };
-        return TabView;
+        return TabViewInstance;
     }(eui.Component));
-    editor.TabView = TabView;
+    editor.TabViewInstance = TabViewInstance;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

@@ -1012,7 +1012,12 @@ declare namespace editor {
     /**
      * Tab 界面
      */
-    class TabView extends eui.Component {
+    class TabView extends eui.Group {
+        private _tabViewInstance;
+        constructor();
+        private onComplete;
+    }
+    class TabViewInstance extends eui.Component {
         tabGroup: eui.Group;
         contentGroup: eui.Group;
         /**
@@ -1031,7 +1036,7 @@ declare namespace editor {
          * 显示模块
          */
         private _showModule;
-        constructor();
+        constructor(moduleviews: ModuleView[]);
         private onComplete;
         private _onAddedToStage;
         private onRemovedFromStage;

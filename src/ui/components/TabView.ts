@@ -11,11 +11,40 @@ namespace editor
 	/**
 	 * Tab 界面
 	 */
-	export class TabView extends eui.Component
+	export class TabView extends eui.Group
 	{
+		//
+		private _tabViewInstance: TabViewInstance;
+
+		constructor()
+		{
+			super();
+
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+		}
+
+		private onComplete(): void
+		{
+			var moduleviews: ModuleView[] = [];
+			for (let i = this.numChildren - 1; i >= 0; i--)
+			{
+				let child = this.getChildAt(i);
+				moduleviews.push(<any>child);
+				this.removeChildAt(i);
+			}
+			moduleviews = moduleviews.reverse();
+			//
+			this._tabViewInstance = new TabViewInstance(moduleviews);
+			this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
+			this.addChild(this._tabViewInstance);
+		}
+	}
+
+	export class TabViewInstance extends eui.Component
+	{
+
 		public tabGroup: eui.Group;
 		public contentGroup: eui.Group;
-		//
 		/**
 		 * 按钮池
 		 */
@@ -33,10 +62,11 @@ namespace editor
 		 */
 		private _showModule: string;
 
-		constructor()
+		constructor(moduleviews: ModuleView[])
 		{
 			super();
 
+			this._moduleViews = moduleviews;
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "TabViewSkin";
 		}
@@ -77,6 +107,7 @@ namespace editor
 				if (!tabButton) tabButton = new TabViewButton();
 				this._tabButtons.push(tabButton);
 			}
+
 			//
 			if (this.stage)
 			{
@@ -151,5 +182,6 @@ namespace editor
 				this._invalidateView();
 			}
 		}
+
 	}
 }
