@@ -2250,6 +2250,8 @@ var editor;
     var Editorshortcut = /** @class */ (function () {
         function Editorshortcut() {
             this.selectedObjectsHistory = [];
+            // 初始化快捷键
+            feng3d.shortcut.addShortCuts(shortcutConfig);
             //监听命令
             feng3d.shortcut.on("deleteSeletedGameObject", this.onDeleteSeletedGameObject, this);
             //
@@ -9407,8 +9409,15 @@ var editor;
             }
         };
         MainView.prototype.onAddedToStage = function () {
+            window.addEventListener("resize", this.onresize.bind(this));
+            this.onresize();
         };
         MainView.prototype.onRemovedFromStage = function () {
+            window.removeEventListener("resize", this.onresize.bind(this));
+        };
+        MainView.prototype.onresize = function () {
+            editor.editorui.mainview.width = this.stage.stageWidth;
+            editor.editorui.mainview.height = this.stage.stageHeight;
         };
         return MainView;
     }(eui.Component));
@@ -15885,16 +15894,18 @@ var editor;
             return _this;
         }
         Editor.prototype.onAddedToStage = function () {
-            var _this = this;
             editor.editorui.stage = this.stage;
             //
             feng3d.task.series([
                 this.initEgret.bind(this),
-                this.initProject.bind(this),
+                editor.editorRS.initproject.bind(editor.editorRS),
+                this.init.bind(this),
             ])(function () {
-                _this.init();
                 console.log("\u521D\u59CB\u5316\u5B8C\u6210\u3002");
             });
+            //
+            window.onresize = this.onresize.bind(this);
+            this.onresize();
         };
         /**
          * 初始化 Egret
@@ -15915,47 +15926,31 @@ var editor;
                 _this.stage.addChild(popupLayer);
                 editor.editorui.popupLayer = popupLayer;
                 editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
+                _this.removeChild(mainui);
                 callback();
             });
             this.addChild(mainui);
         };
-        /**
-         * 初始化项目
-         *
-         * @param callback 完成回调
-         */
-        Editor.prototype.initProject = function (callback) {
-            editor.editorRS.initproject(function () {
-                setTimeout(function () {
-                    callback();
-                }, 1);
-            });
-        };
-        Editor.prototype.init = function () {
+        Editor.prototype.init = function (callback) {
             document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editor.editorcache.projectname;
             editor.editorcache.setLastProject(editor.editorcache.projectname);
             this.initMainView();
             //初始化feng3d
             new editor.Main3D();
-            feng3d.shortcut.addShortCuts(shortcutConfig);
             new editor.Editorshortcut();
-            this.once(egret.Event.ENTER_FRAME, function () {
-                //
-                egret.mouseEventEnvironment();
-            }, this);
+            egret.mouseEventEnvironment();
+            callback();
         };
         Editor.prototype.initMainView = function () {
             //
-            this.mainView = new editor.MainView();
-            this.stage.addChildAt(this.mainView, 1);
-            this.onresize();
+            var mainView = new editor.MainView();
+            editor.editorui.mainview = mainView;
+            this.stage.addChildAt(mainView, 1);
             window.onresize = this.onresize.bind(this);
-            editor.editorui.mainview = this.mainView;
+            this.onresize();
         };
         Editor.prototype.onresize = function () {
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
-            this.mainView.width = this.stage.stageWidth;
-            this.mainView.height = this.stage.stageHeight;
         };
         return Editor;
     }(eui.UILayer));

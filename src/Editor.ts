@@ -15,8 +15,6 @@ namespace editor
      */
     export class Editor extends eui.UILayer
     {
-        private mainView: MainView;
-
         constructor()
         {
             super();
@@ -32,12 +30,15 @@ namespace editor
             //
             feng3d.task.series([
                 this.initEgret.bind(this),
-                this.initProject.bind(this),
+                editorRS.initproject.bind(editorRS),
+                this.init.bind(this),
             ])(() =>
             {
-                this.init();
                 console.log(`初始化完成。`);
             });
+            //
+            window.onresize = this.onresize.bind(this);
+            this.onresize();
         }
 
         /**
@@ -62,28 +63,13 @@ namespace editor
 
                 editorcache.projectname = editorcache.projectname || "newproject";
 
+                this.removeChild(mainui);
                 callback();
             });
             this.addChild(mainui);
         }
 
-        /**
-         * 初始化项目
-         * 
-         * @param callback 完成回调
-         */
-        private initProject(callback: () => void)
-        {
-            editorRS.initproject(() =>
-            {
-                setTimeout(() =>
-                {
-                    callback();
-                }, 1);
-            });
-        }
-
-        private init()
+        private init(callback: () => void)
         {
             document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editorcache.projectname;
 
@@ -94,32 +80,26 @@ namespace editor
             //初始化feng3d
             new Main3D();
 
-            feng3d.shortcut.addShortCuts(shortcutConfig);
-
             new Editorshortcut();
 
-            this.once(egret.Event.ENTER_FRAME, function ()
-            {
-                //
-                egret.mouseEventEnvironment();
-            }, this);
+            egret.mouseEventEnvironment();
+
+            callback();
         }
 
         private initMainView()
         {
             //
-            this.mainView = new MainView();
-            this.stage.addChildAt(this.mainView, 1);
-            this.onresize();
+            var mainView = new MainView();
+            editorui.mainview = mainView;
+            this.stage.addChildAt(mainView, 1);
             window.onresize = this.onresize.bind(this);
-            editorui.mainview = this.mainView;
+            this.onresize();
         }
 
         private onresize()
         {
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
-            this.mainView.width = this.stage.stageWidth;
-            this.mainView.height = this.stage.stageHeight;
         }
     }
 }

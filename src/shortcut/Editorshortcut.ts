@@ -12,6 +12,9 @@ namespace editor
 
         constructor()
         {
+            // 初始化快捷键
+            feng3d.shortcut.addShortCuts(shortcutConfig);
+
             //监听命令
             feng3d.shortcut.on("deleteSeletedGameObject", this.onDeleteSeletedGameObject, this);
             //

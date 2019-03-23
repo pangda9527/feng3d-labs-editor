@@ -23,10 +23,19 @@ namespace editor
 
 		private onAddedToStage()
 		{
+			window.addEventListener("resize", this.onresize.bind(this));
+			this.onresize();
 		}
 
 		private onRemovedFromStage()
 		{
+			window.removeEventListener("resize", this.onresize.bind(this));
+		}
+
+		private onresize()
+		{
+			editorui.mainview.width = this.stage.stageWidth;
+			editorui.mainview.height = this.stage.stageHeight;
 		}
 	}
 }

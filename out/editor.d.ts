@@ -2610,6 +2610,7 @@ declare namespace editor {
         private onComplete;
         private onAddedToStage;
         private onRemovedFromStage;
+        private onresize;
     }
 }
 declare namespace editor {
@@ -3864,7 +3865,6 @@ declare namespace editor {
      * 编辑器
      */
     class Editor extends eui.UILayer {
-        private mainView;
         constructor();
         private onAddedToStage;
         /**
@@ -3873,12 +3873,6 @@ declare namespace editor {
          * @param callback 完成回调
          */
         private initEgret;
-        /**
-         * 初始化项目
-         *
-         * @param callback 完成回调
-         */
-        private initProject;
         private init;
         private initMainView;
         private onresize;
