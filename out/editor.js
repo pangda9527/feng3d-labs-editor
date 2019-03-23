@@ -2799,78 +2799,82 @@ function lostFocus(display) {
     }
     defaultTextFiled.setFocus();
 }
-/**
- * 重命名组件
- */
-var RenameTextInput = /** @class */ (function (_super) {
-    __extends(RenameTextInput, _super);
-    function RenameTextInput() {
-        var _this = _super.call(this) || this;
-        _this.skinName = "RenameTextInputSkin";
-        return _this;
-    }
-    Object.defineProperty(RenameTextInput.prototype, "text", {
-        /**
-         * 显示文本
-         */
-        get: function () {
-            return this.nameLabel.text;
-        },
-        set: function (v) {
-            this.nameLabel.text = v;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(RenameTextInput.prototype, "textAlign", {
-        get: function () {
-            return this.nameLabel.textAlign;
-        },
-        set: function (v) {
-            this.nameeditTxt.textDisplay.textAlign = this.nameLabel.textAlign = v;
-        },
-        enumerable: true,
-        configurable: true
-    });
+var editor;
+(function (editor) {
     /**
-     * 启动编辑
+     * 重命名组件
      */
-    RenameTextInput.prototype.edit = function (callback) {
-        this.callback = callback;
-        this.textAlign = this.textAlign;
-        this.nameeditTxt.text = this.nameLabel.text;
-        this.nameLabel.visible = false;
-        this.nameeditTxt.visible = true;
-        this.nameeditTxt.textDisplay.setFocus();
-        //
-        this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
-        feng3d.windowEventProxy.on("keyup", this.onnameeditChanged, this);
-    };
-    /**
-     * 取消编辑
-     */
-    RenameTextInput.prototype.cancelEdit = function () {
-        this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
-        feng3d.windowEventProxy.off("keyup", this.onnameeditChanged, this);
-        //
-        this.nameeditTxt.visible = false;
-        this.nameLabel.visible = true;
-        if (this.nameLabel.text == this.nameeditTxt.text)
-            return;
-        this.nameLabel.text = this.nameeditTxt.text;
-        this.callback && this.callback();
-        this.callback = null;
-        this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-    };
-    RenameTextInput.prototype.onnameeditChanged = function () {
-        if (feng3d.windowEventProxy.key == "Enter" || feng3d.windowEventProxy.key == "Escape") {
-            //拾取焦点
-            var inputUtils = this.nameeditTxt.textDisplay["inputUtils"];
-            inputUtils["onStageDownHandler"](new egret.Event(""));
+    var RenameTextInput = /** @class */ (function (_super) {
+        __extends(RenameTextInput, _super);
+        function RenameTextInput() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "RenameTextInputSkin";
+            return _this;
         }
-    };
-    return RenameTextInput;
-}(eui.Component));
+        Object.defineProperty(RenameTextInput.prototype, "text", {
+            /**
+             * 显示文本
+             */
+            get: function () {
+                return this.nameLabel.text;
+            },
+            set: function (v) {
+                this.nameLabel.text = v;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RenameTextInput.prototype, "textAlign", {
+            get: function () {
+                return this.nameLabel.textAlign;
+            },
+            set: function (v) {
+                this.nameeditTxt.textDisplay.textAlign = this.nameLabel.textAlign = v;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 启动编辑
+         */
+        RenameTextInput.prototype.edit = function (callback) {
+            this.callback = callback;
+            this.textAlign = this.textAlign;
+            this.nameeditTxt.text = this.nameLabel.text;
+            this.nameLabel.visible = false;
+            this.nameeditTxt.visible = true;
+            this.nameeditTxt.textDisplay.setFocus();
+            //
+            this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
+            feng3d.windowEventProxy.on("keyup", this.onnameeditChanged, this);
+        };
+        /**
+         * 取消编辑
+         */
+        RenameTextInput.prototype.cancelEdit = function () {
+            this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
+            feng3d.windowEventProxy.off("keyup", this.onnameeditChanged, this);
+            //
+            this.nameeditTxt.visible = false;
+            this.nameLabel.visible = true;
+            if (this.nameLabel.text == this.nameeditTxt.text)
+                return;
+            this.nameLabel.text = this.nameeditTxt.text;
+            this.callback && this.callback();
+            this.callback = null;
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+        };
+        RenameTextInput.prototype.onnameeditChanged = function () {
+            if (feng3d.windowEventProxy.key == "Enter" || feng3d.windowEventProxy.key == "Escape") {
+                //拾取焦点
+                var inputUtils = this.nameeditTxt.textDisplay["inputUtils"];
+                inputUtils["onStageDownHandler"](new egret.Event(""));
+            }
+        };
+        return RenameTextInput;
+    }(eui.Component));
+    editor.RenameTextInput = RenameTextInput;
+})(editor || (editor = {}));
 var editor;
 (function (editor) {
     var SplitGroupState;
@@ -3321,83 +3325,87 @@ var editor;
     ;
     editor.popupview = new Popupview();
 })(editor || (editor = {}));
-/**
- * 下拉列表
- */
-var ComboBox = /** @class */ (function (_super) {
-    __extends(ComboBox, _super);
-    function ComboBox() {
-        var _this = _super.call(this) || this;
-        /**
-         * 数据
-         */
-        _this.dataProvider = [];
-        _this.skinName = "ComboBoxSkin";
-        return _this;
-    }
-    Object.defineProperty(ComboBox.prototype, "data", {
-        /**
-         * 选中数据
-         */
-        get: function () {
-            return this._data;
-        },
-        set: function (v) {
-            this._data = v;
-            if (this.label) {
-                if (this._data)
-                    this.label.text = this._data.label;
-                else
-                    this.label.text = "";
-            }
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ComboBox.prototype.$onAddToStage = function (stage, nestLevel) {
-        _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-        this.init();
-        this.updateview();
-        this.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-        this.list.addEventListener(egret.Event.CHANGE, this.onlistChange, this);
-    };
-    ComboBox.prototype.$onRemoveFromStage = function () {
-        _super.prototype.$onRemoveFromStage.call(this);
-        this.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-        this.list.removeEventListener(egret.Event.CHANGE, this.onlistChange, this);
-    };
-    ComboBox.prototype.init = function () {
-        this.list = new eui.List();
-        this.list.itemRenderer = eui.ItemRenderer;
-    };
-    ComboBox.prototype.updateview = function () {
-        if (this.data == null && this.dataProvider != null)
-            this.data = this.dataProvider[0];
-        if (this.data)
-            this.label.text = this.data.label;
-        else
-            this.label.text = "";
-    };
-    ComboBox.prototype.onClick = function () {
-        if (!this.dataProvider)
-            return;
-        this.list.dataProvider = new eui.ArrayCollection(this.dataProvider);
-        var rect = this.getTransformedBounds(this.stage);
-        this.list.x = rect.left;
-        this.list.y = rect.bottom;
-        this.list.selectedIndex = this.dataProvider.indexOf(this.data);
-        editor.editorui.popupLayer.addChild(this.list);
-        editor.maskview.mask(this.list);
-    };
-    ComboBox.prototype.onlistChange = function () {
-        this.data = this.list.selectedItem;
-        this.updateview();
-        if (this.list.parent)
-            this.list.parent.removeChild(this.list);
-        this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-    };
-    return ComboBox;
-}(eui.Component));
+var editor;
+(function (editor) {
+    /**
+     * 下拉列表
+     */
+    var ComboBox = /** @class */ (function (_super) {
+        __extends(ComboBox, _super);
+        function ComboBox() {
+            var _this = _super.call(this) || this;
+            /**
+             * 数据
+             */
+            _this.dataProvider = [];
+            _this.skinName = "ComboBoxSkin";
+            return _this;
+        }
+        Object.defineProperty(ComboBox.prototype, "data", {
+            /**
+             * 选中数据
+             */
+            get: function () {
+                return this._data;
+            },
+            set: function (v) {
+                this._data = v;
+                if (this.label) {
+                    if (this._data)
+                        this.label.text = this._data.label;
+                    else
+                        this.label.text = "";
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ComboBox.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            this.init();
+            this.updateview();
+            this.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.list.addEventListener(egret.Event.CHANGE, this.onlistChange, this);
+        };
+        ComboBox.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
+            this.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+            this.list.removeEventListener(egret.Event.CHANGE, this.onlistChange, this);
+        };
+        ComboBox.prototype.init = function () {
+            this.list = new eui.List();
+            this.list.itemRenderer = eui.ItemRenderer;
+        };
+        ComboBox.prototype.updateview = function () {
+            if (this.data == null && this.dataProvider != null)
+                this.data = this.dataProvider[0];
+            if (this.data)
+                this.label.text = this.data.label;
+            else
+                this.label.text = "";
+        };
+        ComboBox.prototype.onClick = function () {
+            if (!this.dataProvider)
+                return;
+            this.list.dataProvider = new eui.ArrayCollection(this.dataProvider);
+            var rect = this.getTransformedBounds(this.stage);
+            this.list.x = rect.left;
+            this.list.y = rect.bottom;
+            this.list.selectedIndex = this.dataProvider.indexOf(this.data);
+            editor.editorui.popupLayer.addChild(this.list);
+            editor.maskview.mask(this.list);
+        };
+        ComboBox.prototype.onlistChange = function () {
+            this.data = this.list.selectedItem;
+            this.updateview();
+            if (this.list.parent)
+                this.list.parent.removeChild(this.list);
+            this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+        };
+        return ComboBox;
+    }(eui.Component));
+    editor.ComboBox = ComboBox;
+})(editor || (editor = {}));
 var editor;
 (function (editor) {
     var Accordion = /** @class */ (function (_super) {

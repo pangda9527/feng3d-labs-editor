@@ -4,7 +4,7 @@
     <e:Group minWidth="300" left="10" top="10" bottom="10" right="10" width="430">
         <e:Group width="100%" scaleX="1" scaleY="1" x="0" y="0">
             <e:Label text="Mode:" size="12" y="0" x="0" textColor="0x000000" verticalAlign="middle" multiline="false" />
-            <ns1:ComboBox id="modeCB" scaleX="1" scaleY="1" />
+            <editor:ComboBox id="modeCB" scaleX="1" scaleY="1" />
             <e:layout>
                 <e:HorizontalLayout horizontalAlign="right" verticalAlign="middle" />
             </e:layout>

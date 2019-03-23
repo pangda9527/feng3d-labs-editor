@@ -946,28 +946,30 @@ declare namespace editor {
 }
 declare var defaultTextFiled: egret.TextField;
 declare function lostFocus(display: egret.DisplayObject): void;
-/**
- * 重命名组件
- */
-declare class RenameTextInput extends eui.Component implements eui.UIComponent {
-    nameeditTxt: eui.TextInput;
-    nameLabel: eui.Label;
-    callback: () => void;
+declare namespace editor {
     /**
-     * 显示文本
+     * 重命名组件
      */
-    text: string;
-    textAlign: string;
-    constructor();
-    /**
-     * 启动编辑
-     */
-    edit(callback?: () => void): void;
-    /**
-     * 取消编辑
-     */
-    cancelEdit(): void;
-    private onnameeditChanged;
+    class RenameTextInput extends eui.Component implements eui.UIComponent {
+        nameeditTxt: eui.TextInput;
+        nameLabel: eui.Label;
+        callback: () => void;
+        /**
+         * 显示文本
+         */
+        text: string;
+        textAlign: string;
+        constructor();
+        /**
+         * 启动编辑
+         */
+        edit(callback?: () => void): void;
+        /**
+         * 取消编辑
+         */
+        cancelEdit(): void;
+        private onnameeditChanged;
+    }
 }
 declare namespace editor {
     /**
@@ -1068,37 +1070,39 @@ declare namespace editor {
         popupView(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number): void;
     }
 }
-/**
- * 下拉列表
- */
-declare class ComboBox extends eui.Component implements eui.UIComponent {
-    label: eui.Label;
-    list: eui.List;
+declare namespace editor {
     /**
-     * 数据
+     * 下拉列表
      */
-    dataProvider: {
-        label: string;
-        value: any;
-    }[];
-    /**
-     * 选中数据
-     */
-    data: {
-        label: string;
-        value: any;
-    };
-    _data: {
-        label: string;
-        value: any;
-    };
-    constructor();
-    $onAddToStage(stage: egret.Stage, nestLevel: number): void;
-    $onRemoveFromStage(): void;
-    private init;
-    private updateview;
-    private onClick;
-    private onlistChange;
+    class ComboBox extends eui.Component implements eui.UIComponent {
+        label: eui.Label;
+        list: eui.List;
+        /**
+         * 数据
+         */
+        dataProvider: {
+            label: string;
+            value: any;
+        }[];
+        /**
+         * 选中数据
+         */
+        data: {
+            label: string;
+            value: any;
+        };
+        _data: {
+            label: string;
+            value: any;
+        };
+        constructor();
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        private init;
+        private updateview;
+        private onClick;
+        private onlistChange;
+    }
 }
 declare namespace editor {
     class Accordion extends eui.Component implements eui.UIComponent {

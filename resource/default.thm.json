@@ -29,10 +29,11 @@
         "editor.MinMaxGradientView": "resource/custom_skins/MinMaxGradientView.exml",
         "editor.MinMaxCurveView": "resource/custom_skins/MinMaxCurveView.exml",
         "editor.MinMaxCurveVector3View": "resource/custom_skins/MinMaxCurveVector3View.exml",
-        "RenameTextInput": "resource/eui_skins/RenameTextInput.exml",
-        "ComboBox": "resource/eui_skins/ComboBox.exml",
+        "editor.RenameTextInput": "resource/custom_skins/RenameTextInput.exml",
+        "editor.ComboBox": "resource/custom_skins/ComboBox.exml",
         "editor.TabViewButton": "resource/custom_skins/TabViewButton.exml",
-        "editor.TabView": "resource/custom_skins/TabView.exml"
+        "editor.TabView": "resource/custom_skins/TabView.exml",
+        "tt": "resource/eui_skins/tt.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [
@@ -50,8 +51,8 @@
         "resource/eui_skins/ToggleSwitchSkin.exml",
         "resource/eui_skins/VScrollBarSkin.exml",
         "resource/eui_skins/VSliderSkin.exml",
-        "resource/eui_skins/RenameTextInput.exml",
-        "resource/eui_skins/ComboBox.exml",
+        "resource/custom_skins/RenameTextInput.exml",
+        "resource/custom_skins/ComboBox.exml",
         "resource/custom_skins/TabViewButton.exml",
         "resource/custom_skins/TabView.exml",
         "resource/custom_skins/ColorPickerView.exml",
