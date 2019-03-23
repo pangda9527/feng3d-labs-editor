@@ -19,12 +19,12 @@ namespace editor
 		constructor()
 		{
 			super();
-
-			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 		}
 
-		private onComplete(): void
+		protected childrenCreated(): void
 		{
+			super.childrenCreated();
+
 			var moduleviews: ModuleView[] = [];
 			for (let i = this.numChildren - 1; i >= 0; i--)
 			{

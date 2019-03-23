@@ -1,6 +1,6 @@
 namespace editor
 {
-    export class AssetView extends eui.Component implements eui.UIComponent
+    export class AssetView extends eui.Component implements ModuleView
     {
         public assetTreeScroller: eui.Scroller;
         public assetTreeList: eui.List;
@@ -20,11 +20,20 @@ namespace editor
         private fileDrag: FileDrag;
         private _areaSelectRect: AreaSelectRect;
 
+		/**
+		 * 模块名称
+		 */
+        moduleName: string;
+
         constructor()
         {
             super();
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "AssetView";
+
+            //
+            this.moduleName = "Asset";
+
             editorui.assetview = this;
             //
             this._areaSelectRect = new AreaSelectRect();

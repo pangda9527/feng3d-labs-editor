@@ -2520,8 +2520,12 @@ var editor;
         function Feng3dView() {
             var _this = _super.call(this) || this;
             _this.skinName = "Feng3dViewSkin";
+            //
             feng3d.Stats.init(document.getElementById("stats"));
             editor.editorui.feng3dView = _this;
+            //
+            _this.moduleName = "Feng3dView";
+            //
             _this._areaSelectRect = new editor.AreaSelectRect();
             //
             feng3d.shortcut.on("areaSelectStart", _this._onAreaSelectStart, _this);
@@ -3101,7 +3105,7 @@ var editor;
         });
         TabViewButton.prototype.childrenCreated = function () {
             _super.prototype.childrenCreated.call(this);
-            this._moduleName = this.label;
+            this._invalidateView();
         };
         TabViewButton.prototype._invalidateView = function () {
             this.once(egret.Event.ENTER_FRAME, this._updateView, this);
@@ -3121,11 +3125,10 @@ var editor;
     var TabView = /** @class */ (function (_super) {
         __extends(TabView, _super);
         function TabView() {
-            var _this = _super.call(this) || this;
-            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
-            return _this;
+            return _super.call(this) || this;
         }
-        TabView.prototype.onComplete = function () {
+        TabView.prototype.childrenCreated = function () {
+            _super.prototype.childrenCreated.call(this);
             var moduleviews = [];
             for (var i = this.numChildren - 1; i >= 0; i--) {
                 var child = this.getChildAt(i);
@@ -8341,6 +8344,7 @@ var editor;
             var _this = _super.call(this) || this;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "HierarchyViewSkin";
+            _this.moduleName = "Hierarchy";
             return _this;
         }
         HierarchyView.prototype.onComplete = function () {
@@ -9229,6 +9233,8 @@ var editor;
             _this._assettreeInvalid = true;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "AssetView";
+            //
+            _this.moduleName = "Asset";
             editor.editorui.assetview = _this;
             //
             _this._areaSelectRect = new editor.AreaSelectRect();

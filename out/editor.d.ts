@@ -890,10 +890,14 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class Feng3dView extends eui.Component {
+    class Feng3dView extends eui.Component implements ModuleView {
         private _canvas;
         private _areaSelectStartPosition;
         private _areaSelectRect;
+        /**
+         * 模块名称
+         */
+        moduleName: string;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -1015,7 +1019,7 @@ declare namespace editor {
     class TabView extends eui.Group {
         private _tabViewInstance;
         constructor();
-        private onComplete;
+        protected childrenCreated(): void;
     }
     class TabViewInstance extends eui.Component {
         tabGroup: eui.Group;
@@ -2406,10 +2410,14 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class HierarchyView extends eui.Component implements eui.UIComponent {
+    class HierarchyView extends eui.Component implements ModuleView {
         hierachyScroller: eui.Scroller;
         list: eui.List;
         private listData;
+        /**
+         * 模块名称
+         */
+        moduleName: string;
         constructor();
         private onComplete;
         private onAddedToStage;
@@ -2611,7 +2619,7 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class AssetView extends eui.Component implements eui.UIComponent {
+    class AssetView extends eui.Component implements ModuleView {
         assetTreeScroller: eui.Scroller;
         assetTreeList: eui.List;
         floderpathTxt: eui.Label;
@@ -2626,6 +2634,10 @@ declare namespace editor {
         private filelistData;
         private fileDrag;
         private _areaSelectRect;
+        /**
+         * 模块名称
+         */
+        moduleName: string;
         constructor();
         private onComplete;
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;

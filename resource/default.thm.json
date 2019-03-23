@@ -32,8 +32,7 @@
         "editor.RenameTextInput": "resource/custom_skins/RenameTextInput.exml",
         "editor.ComboBox": "resource/custom_skins/ComboBox.exml",
         "editor.TabViewButton": "resource/custom_skins/TabViewButton.exml",
-        "editor.TabView": "resource/custom_skins/TabView.exml",
-        "tt": "resource/eui_skins/tt.exml"
+        "editor.TabView": "resource/custom_skins/TabView.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [

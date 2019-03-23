@@ -28,7 +28,7 @@ namespace editor
 		protected childrenCreated(): void
 		{
 			super.childrenCreated();
-			this._moduleName = this.label;
+			this._invalidateView();
 		}
 
 		private _invalidateView()

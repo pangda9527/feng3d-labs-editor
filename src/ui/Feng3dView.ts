@@ -1,18 +1,26 @@
 namespace editor
 {
-	export class Feng3dView extends eui.Component
+	export class Feng3dView extends eui.Component implements ModuleView
 	{
 		private _canvas: HTMLElement;
 		private _areaSelectStartPosition: feng3d.Vector2;
 		private _areaSelectRect: AreaSelectRect;
 
+		/**
+		 * 模块名称
+		 */
+		moduleName: string;
+
 		constructor()
 		{
 			super();
 			this.skinName = "Feng3dViewSkin";
+			//
 			feng3d.Stats.init(document.getElementById("stats"));
 			editorui.feng3dView = this;
-
+			//
+			this.moduleName = "Feng3dView";
+			//
 			this._areaSelectRect = new AreaSelectRect();
 			//
 			feng3d.shortcut.on("areaSelectStart", this._onAreaSelectStart, this);

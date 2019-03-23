@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="TabViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:editor="editor.*">
+<e:Skin class="TabViewSkin" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:editor="editor.*" width="200" height="400">
 	<w:Config id="169ab55b10d"/>
 	<e:Rect height="20" fillColor="0xa2a2a2" left="0" right="0"/>
 	<e:Group id="tabGroup" scaleX="1" scaleY="1" height="20" left="0" right="0">
 		<e:layout>
 		<e:HorizontalLayout verticalAlign="bottom"/>
 		</e:layout>
-		<editor:TabViewButton x="270" y="110" label="Inspector" icon="InspectorIcon_png"/>
-		<editor:TabViewButton x="280" y="120" currentState="selected" label="Navigation" icon="NavigationIcon_png"/>
+
+
 	</e:Group>
 	<e:Group id="contentGroup" left="0" right="0" top="20" bottom="0">
-		<editor:InspectorView left="0" top="0" right="0" bottom="0"/>
-		<editor:NavigationView left="0" top="0" right="0" bottom="0" visible="false"/>
+
+
 	</e:Group>
 
 </e:Skin>

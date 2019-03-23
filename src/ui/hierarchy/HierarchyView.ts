@@ -1,17 +1,23 @@
 namespace editor
 {
-	export class HierarchyView extends eui.Component implements eui.UIComponent
+	export class HierarchyView extends eui.Component implements ModuleView
 	{
 		public hierachyScroller: eui.Scroller;
 		public list: eui.List;
 
 		private listData: eui.ArrayCollection;
 
+		/**
+		 * 模块名称
+		 */
+		moduleName: string;
+
 		constructor()
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "HierarchyViewSkin";
+			this.moduleName = "Hierarchy";
 		}
 
 		private onComplete(): void
