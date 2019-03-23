@@ -3065,42 +3065,170 @@ var editor;
     }(eui.Group));
     editor.SplitGroup = SplitGroup;
 })(editor || (editor = {}));
-var TabViewButton = /** @class */ (function (_super) {
-    __extends(TabViewButton, _super);
-    function TabViewButton() {
-        var _this = _super.call(this) || this;
-        _this.skinName = "TabViewButtonSkin";
-        return _this;
-    }
-    TabViewButton.prototype.partAdded = function (partName, instance) {
-        _super.prototype.partAdded.call(this, partName, instance);
-    };
-    TabViewButton.prototype.childrenCreated = function () {
-        _super.prototype.childrenCreated.call(this);
-    };
-    return TabViewButton;
-}(eui.Button));
-var TabView = /** @class */ (function (_super) {
-    __extends(TabView, _super);
-    function TabView() {
-        var _this = _super.call(this) || this;
-        _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
-        _this.skinName = "TabViewSkin";
-        return _this;
-    }
-    TabView.prototype.onComplete = function () {
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-        this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-        if (this.stage) {
-            this.onAddedToStage();
+var editor;
+(function (editor) {
+    /**
+     * TabView 按钮
+     */
+    var TabViewButton = /** @class */ (function (_super) {
+        __extends(TabViewButton, _super);
+        function TabViewButton() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "TabViewButtonSkin";
+            return _this;
         }
-    };
-    TabView.prototype.onAddedToStage = function () {
-    };
-    TabView.prototype.onRemovedFromStage = function () {
-    };
-    return TabView;
-}(eui.Component));
+        Object.defineProperty(TabViewButton.prototype, "moduleName", {
+            /**
+             * 模块名称
+             */
+            get: function () {
+                return this._moduleName;
+            },
+            set: function (value) {
+                this._moduleName = value;
+                this._invalidateView();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TabViewButton.prototype.childrenCreated = function () {
+            _super.prototype.childrenCreated.call(this);
+            this._moduleName = this.label;
+        };
+        TabViewButton.prototype._invalidateView = function () {
+            this.once(egret.Event.ENTER_FRAME, this._updateView, this);
+        };
+        TabViewButton.prototype._updateView = function () {
+            this.label = this._moduleName;
+        };
+        return TabViewButton;
+    }(eui.Button));
+    editor.TabViewButton = TabViewButton;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * Tab 界面
+     */
+    var TabView = /** @class */ (function (_super) {
+        __extends(TabView, _super);
+        function TabView() {
+            var _this = _super.call(this) || this;
+            //
+            /**
+             * 按钮池
+             */
+            _this._tabViewButtonPool = [];
+            /**
+             * 模块按钮列表
+             */
+            _this._tabButtons = [];
+            /**
+             * 模块界面列表
+             */
+            _this._moduleViews = [];
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "TabViewSkin";
+            return _this;
+        }
+        TabView.prototype.onComplete = function () {
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this._onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            // 获取按钮列表
+            for (var i = this.tabGroup.numChildren - 1; i >= 0; i--) {
+                var child = this.tabGroup.getChildAt(i);
+                if (child instanceof editor.TabViewButton) {
+                    this._tabViewButtonPool.push(child);
+                    this.tabGroup.removeChildAt(i);
+                }
+            }
+            // 获取模块列表
+            for (var i = this.contentGroup.numChildren - 1; i >= 0; i--) {
+                var child = this.contentGroup.getChildAt(i);
+                if (child.parent)
+                    child.parent.removeChildAt(i);
+                //
+                var moduleView = child;
+                this._moduleViews.push(moduleView);
+                if (moduleView.visible && !this._showModule)
+                    this._showModule = moduleView.moduleName;
+                moduleView.visible = true;
+            }
+            this._moduleViews = this._moduleViews.reverse();
+            // 设置默认显示模块名称
+            if (this._showModule == undefined)
+                this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
+            // 初始化按钮
+            for (var i = 0; i < this._moduleViews.length; i++) {
+                var tabButton = this._tabViewButtonPool.pop();
+                if (!tabButton)
+                    tabButton = new editor.TabViewButton();
+                this._tabButtons.push(tabButton);
+            }
+            //
+            if (this.stage) {
+                this._onAddedToStage();
+            }
+        };
+        TabView.prototype._onAddedToStage = function () {
+            var _this = this;
+            this._tabButtons.forEach(function (v) {
+                v.addEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
+            });
+            this._invalidateView();
+        };
+        TabView.prototype.onRemovedFromStage = function () {
+            var _this = this;
+            this._tabButtons.forEach(function (v) {
+                v.removeEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
+            });
+        };
+        /**
+         * 界面显示失效
+         */
+        TabView.prototype._invalidateView = function () {
+            this.once(egret.Event.ENTER_FRAME, this._updateView, this);
+        };
+        /**
+         * 更新界面
+         */
+        TabView.prototype._updateView = function () {
+            // 控制按钮状态
+            for (var i = 0; i < this._moduleViews.length; i++) {
+                var tabButton = this._tabButtons[i];
+                tabButton.moduleName = this._moduleViews[i].moduleName;
+                tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
+                this.tabGroup.addChild(tabButton);
+            }
+            // 保留显示模块，移除其它模块
+            for (var i = 0; i < this._moduleViews.length; i++) {
+                var moduleView = this._moduleViews[i];
+                if (moduleView.moduleName == this._showModule) {
+                    if (!moduleView.parent)
+                        this.contentGroup.addChild(moduleView);
+                }
+                else {
+                    if (moduleView.parent)
+                        moduleView.parent.removeChild(moduleView);
+                }
+            }
+        };
+        /**
+         * 点击按钮事件
+         *
+         * @param e
+         */
+        TabView.prototype._onTabButtonClick = function (e) {
+            var index = this._tabButtons.indexOf(e.currentTarget);
+            if (index != -1 && this._tabButtons[index].moduleName != this._showModule) {
+                this._showModule = this._tabButtons[index].moduleName;
+                this._invalidateView();
+            }
+        };
+        return TabView;
+    }(eui.Component));
+    editor.TabView = TabView;
+})(editor || (editor = {}));
 var editor;
 (function (editor) {
     var Maskview = /** @class */ (function () {
@@ -7928,6 +8056,7 @@ var editor;
             _this._dataChanged = false;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "InspectorViewSkin";
+            _this.moduleName = "Inspector";
             return _this;
         }
         InspectorView.prototype.showData = function (data, removeBack) {
@@ -9432,6 +9561,7 @@ var editor;
             var _this = _super.call(this) || this;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "NavigationView";
+            _this.moduleName = "Navigation";
             return _this;
         }
         NavigationView.prototype.onComplete = function () {

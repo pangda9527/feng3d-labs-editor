@@ -5,11 +5,12 @@
 		<e:layout>
 		<e:HorizontalLayout verticalAlign="bottom"/>
 		</e:layout>
-		<ns1:TabViewButton x="270" y="110" label="Inspector" icon="InspectorIcon_png"/>
-		<ns1:TabViewButton x="280" y="120" currentState="selected" label="Navigation" icon="NavigationIcon_png"/>
+		<editor:TabViewButton x="270" y="110" label="Inspector" icon="InspectorIcon_png"/>
+		<editor:TabViewButton x="280" y="120" currentState="selected" label="Navigation" icon="NavigationIcon_png"/>
 	</e:Group>
 	<e:Group id="contentGroup" left="0" right="0" top="20" bottom="0">
 		<editor:InspectorView left="0" top="0" right="0" bottom="0"/>
+		<editor:NavigationView left="0" top="0" right="0" bottom="0" visible="false"/>
 	</e:Group>
 
 </e:Skin>

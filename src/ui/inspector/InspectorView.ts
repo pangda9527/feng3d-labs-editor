@@ -3,17 +3,20 @@ namespace editor
 	/**
      * 属性面板（检查器）
      */
-	export class InspectorView extends eui.Component implements eui.UIComponent
+	export class InspectorView extends eui.Component implements ModuleView
 	{
 		public typeLab: eui.Label;
 		public backButton: eui.Button;
 		public group: eui.Group;
+
+		moduleName: string;
 
 		constructor()
 		{
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "InspectorViewSkin";
+			this.moduleName = "Inspector";
 		}
 
 		private showData(data: any, removeBack = false)

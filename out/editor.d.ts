@@ -984,16 +984,70 @@ declare namespace editor {
         private onMouseUp;
     }
 }
-declare class TabViewButton extends eui.Button implements eui.UIComponent {
-    constructor();
-    protected partAdded(partName: string, instance: any): void;
-    protected childrenCreated(): void;
+declare namespace editor {
+    /**
+     * TabView 按钮
+     */
+    class TabViewButton extends eui.Button {
+        /**
+         * 模块名称
+         */
+        moduleName: string;
+        private _moduleName;
+        constructor();
+        protected childrenCreated(): void;
+        private _invalidateView;
+        private _updateView;
+    }
 }
-declare class TabView extends eui.Component implements eui.UIComponent {
-    constructor();
-    private onComplete;
-    private onAddedToStage;
-    private onRemovedFromStage;
+declare namespace editor {
+    interface ModuleView extends eui.Component {
+        /**
+         * 模块名称
+         */
+        moduleName: string;
+    }
+    /**
+     * Tab 界面
+     */
+    class TabView extends eui.Component {
+        tabGroup: eui.Group;
+        contentGroup: eui.Group;
+        /**
+         * 按钮池
+         */
+        private _tabViewButtonPool;
+        /**
+         * 模块按钮列表
+         */
+        private _tabButtons;
+        /**
+         * 模块界面列表
+         */
+        private _moduleViews;
+        /**
+         * 显示模块
+         */
+        private _showModule;
+        constructor();
+        private onComplete;
+        private _onAddedToStage;
+        private onRemovedFromStage;
+        /**
+         * 界面显示失效
+         */
+        private _invalidateView;
+        /**
+         * 更新界面
+         */
+        private _updateView;
+        /**
+         * 点击按钮事件
+         *
+         * @param e
+         */
+        private _onTabButtonClick;
+    }
 }
 declare namespace editor {
     var maskview: Maskview;
@@ -2292,10 +2346,11 @@ declare namespace editor {
     /**
      * 属性面板（检查器）
      */
-    class InspectorView extends eui.Component implements eui.UIComponent {
+    class InspectorView extends eui.Component implements ModuleView {
         typeLab: eui.Label;
         backButton: eui.Button;
         group: eui.Group;
+        moduleName: string;
         constructor();
         private showData;
         private onShowData;
@@ -2621,7 +2676,8 @@ declare namespace editor {
     var runwin: Window;
 }
 declare namespace editor {
-    class NavigationView extends eui.Component {
+    class NavigationView extends eui.Component implements ModuleView {
+        moduleName: string;
         constructor();
         private onComplete;
         private onAddedToStage;

@@ -1,13 +1,16 @@
 namespace editor
 {
-    export class NavigationView extends eui.Component
+    export class NavigationView extends eui.Component implements ModuleView
     {
+        moduleName: string;
+
         constructor()
         {
             super();
 
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "NavigationView";
+            this.moduleName = "Navigation";
         }
 
         private onComplete(): void
