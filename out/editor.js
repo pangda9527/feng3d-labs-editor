@@ -2271,35 +2271,9 @@ var editor;
             feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
-            feng3d.shortcut.on("areaSelectStart", this.onAreaSelectStart, this);
-            feng3d.shortcut.on("areaSelect", this.onAreaSelect, this);
-            feng3d.shortcut.on("areaSelectEnd", this.onAreaSelectEnd, this);
-            //
             feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
             feng3d.shortcut.on("refreshWindow", this.onRefreshWindow, this);
         }
-        Editorshortcut.prototype.onAreaSelectStart = function () {
-            this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-        };
-        Editorshortcut.prototype.onAreaSelect = function () {
-            var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var lt = editor.editorui.feng3dView.localToGlobal(0, 0);
-            var rb = editor.editorui.feng3dView.localToGlobal(editor.editorui.feng3dView.width, editor.editorui.feng3dView.height);
-            var rectangle = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
-            //
-            areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
-            //
-            editor.areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
-            //
-            var gs = editor.engine.getObjectsInGlobalArea(this.areaSelectStartPosition, areaSelectEndPosition);
-            var gs0 = gs.filter(function (g) {
-                return !!editor.hierarchy.getNode(g);
-            });
-            editor.editorData.selectMultiObject(gs0);
-        };
-        Editorshortcut.prototype.onAreaSelectEnd = function () {
-            editor.areaSelectRect.hide();
-        };
         Editorshortcut.prototype.onGameobjectMoveTool = function () {
             editor.editorData.toolType = editor.MRSToolType.MOVE;
         };
@@ -2548,13 +2522,18 @@ var editor;
             _this.skinName = "Feng3dViewSkin";
             feng3d.Stats.init(document.getElementById("stats"));
             editor.editorui.feng3dView = _this;
+            _this._areaSelectRect = new editor.AreaSelectRect();
+            //
+            feng3d.shortcut.on("areaSelectStart", _this._onAreaSelectStart, _this);
+            feng3d.shortcut.on("areaSelect", _this._onAreaSelect, _this);
+            feng3d.shortcut.on("areaSelectEnd", _this._onAreaSelectEnd, _this);
             return _this;
         }
         Feng3dView.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            this.canvas = document.getElementById("glcanvas");
+            this._canvas = document.getElementById("glcanvas");
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+            this.addEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             this.onResize();
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
@@ -2571,13 +2550,35 @@ var editor;
         };
         Feng3dView.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
-            this.canvas = null;
+            this._canvas = null;
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
-            this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+            this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             editor.drag.unregister(this);
         };
-        Feng3dView.prototype.onMouseOver = function () {
+        Feng3dView.prototype._onAreaSelectStart = function () {
+            this._areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        };
+        Feng3dView.prototype._onAreaSelect = function () {
+            var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var lt = editor.editorui.feng3dView.localToGlobal(0, 0);
+            var rb = editor.editorui.feng3dView.localToGlobal(editor.editorui.feng3dView.width, editor.editorui.feng3dView.height);
+            var rectangle = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+            //
+            areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
+            //
+            this._areaSelectRect.show(this._areaSelectStartPosition, areaSelectEndPosition);
+            //
+            var gs = editor.engine.getObjectsInGlobalArea(this._areaSelectStartPosition, areaSelectEndPosition);
+            var gs0 = gs.filter(function (g) {
+                return !!editor.hierarchy.getNode(g);
+            });
+            editor.editorData.selectMultiObject(gs0);
+        };
+        Feng3dView.prototype._onAreaSelectEnd = function () {
+            this._areaSelectRect.hide();
+        };
+        Feng3dView.prototype._onMouseOver = function () {
             feng3d.shortcut.activityState("mouseInView3D");
         };
         Feng3dView.prototype.onMouseOut = function () {
@@ -2589,7 +2590,7 @@ var editor;
             var lt = this.localToGlobal(0, 0);
             var rb = this.localToGlobal(this.width, this.height);
             var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
-            var style = this.canvas.style;
+            var style = this._canvas.style;
             style.position = "absolute";
             style.left = bound.x + "px";
             style.top = bound.y + "px";
@@ -4132,12 +4133,12 @@ var editor;
             /**
              * 显示间隔
              */
-            this.interval = 100;
+            this._interval = 400;
             feng3d.dispatcher.on("message", this._onMessage, this);
         }
         Message.prototype._onMessage = function (event) {
             this._messages.push(event.data);
-            feng3d.ticker.on(this.interval, this._showMessage, this);
+            feng3d.ticker.on(this._interval, this._showMessage, this);
         };
         Message.prototype._getMessageItem = function (message) {
             var label = this._messageLabelPool.pop();
@@ -4160,10 +4161,10 @@ var editor;
             var showItem = this._getMessageItem(message);
             //
             showItem.x = (editor.editorui.stage.stageWidth - showItem.width) / 2;
-            showItem.y = (editor.editorui.stage.stageHeight - showItem.height) / 2;
+            showItem.y = (editor.editorui.stage.stageHeight - showItem.height) / 4;
             editor.editorui.messageLayer.addChild(showItem);
             //
-            egret.Tween.get(showItem).to({ y: showItem.y - 100, alpha: 0 }, 1000, egret.Ease.sineIn).call(function () {
+            egret.Tween.get(showItem).to({ y: (editor.editorui.stage.stageHeight - showItem.height) / 8, alpha: 0 }, 1000, egret.Ease.sineIn).call(function () {
                 editor.editorui.messageLayer.removeChild(showItem);
                 _this._messageLabelPool.push(showItem);
             });
@@ -4554,7 +4555,6 @@ var editor;
         return AreaSelectRect;
     }(eui.Rect));
     editor.AreaSelectRect = AreaSelectRect;
-    editor.areaSelectRect = new AreaSelectRect();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -9066,6 +9066,9 @@ var editor;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "AssetView";
             editor.editorui.assetview = _this;
+            //
+            _this._areaSelectRect = new editor.AreaSelectRect();
+            //
             _this.fileDrag = new FileDrag(_this);
             return _this;
         }
@@ -9228,7 +9231,7 @@ var editor;
             //
             areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
             //
-            editor.areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
+            this._areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
             //
             var min = this.areaSelectStartPosition.clone().min(areaSelectEndPosition);
             var max = this.areaSelectStartPosition.clone().max(areaSelectEndPosition);
@@ -9242,7 +9245,7 @@ var editor;
             editor.editorData.selectMultiObject(datas);
         };
         AssetView.prototype.onMouseUp = function () {
-            editor.areaSelectRect.hide();
+            this._areaSelectRect.hide();
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         };

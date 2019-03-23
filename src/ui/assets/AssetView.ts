@@ -18,6 +18,7 @@ namespace editor
         private filelistData: eui.ArrayCollection;
 
         private fileDrag: FileDrag;
+        private _areaSelectRect: AreaSelectRect;
 
         constructor()
         {
@@ -25,7 +26,9 @@ namespace editor
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "AssetView";
             editorui.assetview = this;
-
+            //
+            this._areaSelectRect = new AreaSelectRect();
+            //
             this.fileDrag = new FileDrag(this);
         }
 
@@ -253,7 +256,7 @@ namespace editor
             //
             areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
             //
-            areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
+            this._areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
             //
             var min = this.areaSelectStartPosition.clone().min(areaSelectEndPosition);
             var max = this.areaSelectStartPosition.clone().max(areaSelectEndPosition);
@@ -270,7 +273,7 @@ namespace editor
 
         private onMouseUp()
         {
-            areaSelectRect.hide();
+            this._areaSelectRect.hide();
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         }

@@ -1,9 +1,10 @@
 namespace editor
 {
-	export class Feng3dView extends eui.Component implements eui.UIComponent
+	export class Feng3dView extends eui.Component
 	{
-		public backRect: eui.Rect;
-		private canvas: HTMLElement;
+		private _canvas: HTMLElement;
+		private _areaSelectStartPosition: feng3d.Vector2;
+		private _areaSelectRect: AreaSelectRect;
 
 		constructor()
 		{
@@ -11,16 +12,22 @@ namespace editor
 			this.skinName = "Feng3dViewSkin";
 			feng3d.Stats.init(document.getElementById("stats"));
 			editorui.feng3dView = this;
+
+			this._areaSelectRect = new AreaSelectRect();
+			//
+			feng3d.shortcut.on("areaSelectStart", this._onAreaSelectStart, this);
+			feng3d.shortcut.on("areaSelect", this._onAreaSelect, this);
+			feng3d.shortcut.on("areaSelectEnd", this._onAreaSelectEnd, this);
 		}
 
 		$onAddToStage(stage: egret.Stage, nestLevel: number)
 		{
 			super.$onAddToStage(stage, nestLevel);
 
-			this.canvas = document.getElementById("glcanvas");
+			this._canvas = document.getElementById("glcanvas");
 			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
 
-			this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+			this.addEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
 			this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
 
 			this.onResize();
@@ -46,16 +53,46 @@ namespace editor
 		{
 			super.$onRemoveFromStage()
 
-			this.canvas = null;
+			this._canvas = null;
 			this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
 
-			this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+			this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
 			this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
 
 			drag.unregister(this);
 		}
 
-		private onMouseOver()
+		private _onAreaSelectStart()
+		{
+			this._areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+		}
+
+		private _onAreaSelect()
+		{
+			var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+
+			var lt = editorui.feng3dView.localToGlobal(0, 0);
+			var rb = editorui.feng3dView.localToGlobal(editorui.feng3dView.width, editorui.feng3dView.height);
+			var rectangle = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+			//
+			areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
+			//
+			this._areaSelectRect.show(this._areaSelectStartPosition, areaSelectEndPosition);
+			//
+			var gs = engine.getObjectsInGlobalArea(this._areaSelectStartPosition, areaSelectEndPosition);
+			var gs0 = gs.filter(g =>
+			{
+				return !!hierarchy.getNode(g);
+			});
+			editorData.selectMultiObject(gs0);
+		}
+
+		private _onAreaSelectEnd()
+		{
+			this._areaSelectRect.hide();
+		}
+
+		private _onMouseOver()
 		{
 			feng3d.shortcut.activityState("mouseInView3D");
 		}
@@ -74,7 +111,7 @@ namespace editor
 			var rb = this.localToGlobal(this.width, this.height);
 			var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
 
-			var style = this.canvas.style;
+			var style = this._canvas.style;
 			style.position = "absolute";
 			style.left = bound.x + "px";
 			style.top = bound.y + "px";

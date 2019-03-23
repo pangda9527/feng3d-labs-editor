@@ -34,43 +34,8 @@ namespace editor
             feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
-            feng3d.shortcut.on("areaSelectStart", this.onAreaSelectStart, this);
-            feng3d.shortcut.on("areaSelect", this.onAreaSelect, this);
-            feng3d.shortcut.on("areaSelectEnd", this.onAreaSelectEnd, this);
-            //
             feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
             feng3d.shortcut.on("refreshWindow", this.onRefreshWindow, this);
-        }
-
-        private areaSelectStartPosition: feng3d.Vector2;
-        private onAreaSelectStart()
-        {
-            this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-        }
-
-        private onAreaSelect()
-        {
-            var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-
-            var lt = editorui.feng3dView.localToGlobal(0, 0);
-            var rb = editorui.feng3dView.localToGlobal(editorui.feng3dView.width, editorui.feng3dView.height);
-            var rectangle = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
-            //
-            areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
-            //
-            areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
-            //
-            var gs = engine.getObjectsInGlobalArea(this.areaSelectStartPosition, areaSelectEndPosition);
-            var gs0 = gs.filter(g =>
-            {
-                return !!hierarchy.getNode(g);
-            });
-            editorData.selectMultiObject(gs0);
-        }
-
-        private onAreaSelectEnd()
-        {
-            areaSelectRect.hide();
         }
 
         private onGameobjectMoveTool()

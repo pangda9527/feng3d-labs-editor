@@ -848,10 +848,6 @@ declare namespace editor {
         private rotateSceneCameraGlobalMatrix3D;
         private rotateSceneMousePoint;
         constructor();
-        private areaSelectStartPosition;
-        private onAreaSelectStart;
-        private onAreaSelect;
-        private onAreaSelectEnd;
         private onGameobjectMoveTool;
         private onGameobjectRotationTool;
         private onGameobjectScaleTool;
@@ -894,13 +890,17 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class Feng3dView extends eui.Component implements eui.UIComponent {
-        backRect: eui.Rect;
-        private canvas;
+    class Feng3dView extends eui.Component {
+        private _canvas;
+        private _areaSelectStartPosition;
+        private _areaSelectRect;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
-        private onMouseOver;
+        private _onAreaSelectStart;
+        private _onAreaSelect;
+        private _onAreaSelectEnd;
+        private _onMouseOver;
         private onMouseOut;
         private onResize;
     }
@@ -1319,7 +1319,7 @@ declare namespace editor {
         /**
          * 显示间隔
          */
-        private interval;
+        private _interval;
         constructor();
         private _onMessage;
         private _getMessageItem;
@@ -1388,7 +1388,6 @@ declare namespace editor {
     var colorPickerView: ColorPickerView;
 }
 declare namespace editor {
-    var areaSelectRect: AreaSelectRect;
     /**
      * 区域选择框
      */
@@ -2562,6 +2561,7 @@ declare namespace editor {
         private listData;
         private filelistData;
         private fileDrag;
+        private _areaSelectRect;
         constructor();
         private onComplete;
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;

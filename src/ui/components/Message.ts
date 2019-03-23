@@ -13,7 +13,7 @@ namespace editor
         /**
          * 显示间隔
          */
-        private interval = 100;
+        private _interval = 400;
 
         constructor()
         {
@@ -23,7 +23,7 @@ namespace editor
         private _onMessage(event: feng3d.Event<string>)
         {
             this._messages.push(event.data);
-            feng3d.ticker.on(this.interval, this._showMessage, this);
+            feng3d.ticker.on(this._interval, this._showMessage, this);
         }
 
         private _getMessageItem(message: string)
@@ -52,10 +52,10 @@ namespace editor
 
             //
             showItem.x = (editorui.stage.stageWidth - showItem.width) / 2;
-            showItem.y = (editorui.stage.stageHeight - showItem.height) / 2;
+            showItem.y = (editorui.stage.stageHeight - showItem.height) / 4;
             editorui.messageLayer.addChild(showItem);
             //
-            egret.Tween.get(showItem).to({ y: showItem.y - 100, alpha: 0 }, 1000, egret.Ease.sineIn).call(() =>
+            egret.Tween.get(showItem).to({ y: (editorui.stage.stageHeight - showItem.height) / 8, alpha: 0 }, 1000, egret.Ease.sineIn).call(() =>
             {
                 editorui.messageLayer.removeChild(showItem);
                 this._messageLabelPool.push(showItem);

@@ -1,7 +1,5 @@
 namespace editor
 {
-    export var areaSelectRect: AreaSelectRect;
-
     /**
      * 区域选择框
      */
@@ -36,5 +34,4 @@ namespace editor
             this.parent && this.parent.removeChild(this);
         }
     }
-    areaSelectRect = new AreaSelectRect();
 }
