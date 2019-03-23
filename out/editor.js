@@ -3150,7 +3150,7 @@ var editor;
                 //
                 var moduleView = child;
                 this._moduleViews.push(moduleView);
-                if (moduleView.visible && !this._showModule)
+                if (moduleView.visible)
                     this._showModule = moduleView.moduleName;
                 moduleView.visible = true;
             }

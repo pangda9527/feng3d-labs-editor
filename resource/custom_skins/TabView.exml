@@ -10,7 +10,7 @@
 	</e:Group>
 	<e:Group id="contentGroup" left="0" right="0" top="20" bottom="0">
 		<editor:InspectorView left="0" top="0" right="0" bottom="0"/>
-		<editor:NavigationView left="0" top="0" right="0" bottom="0" visible="false"/>
+		<editor:NavigationView left="0" top="0" right="0" bottom="0"/>
 	</e:Group>
 
 </e:Skin>

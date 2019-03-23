@@ -64,7 +64,7 @@ namespace editor
 				//
 				let moduleView: ModuleView = <any>child;
 				this._moduleViews.push(moduleView);
-				if (moduleView.visible && !this._showModule) this._showModule = moduleView.moduleName;
+				if (moduleView.visible) this._showModule = moduleView.moduleName;
 				moduleView.visible = true;
 			}
 			this._moduleViews = this._moduleViews.reverse();
