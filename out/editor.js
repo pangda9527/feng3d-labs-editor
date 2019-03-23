@@ -2524,7 +2524,7 @@ var editor;
             feng3d.Stats.init(document.getElementById("stats"));
             editor.editorui.feng3dView = _this;
             //
-            _this.moduleName = "Feng3dView";
+            _this.moduleName = "Scene";
             //
             _this._areaSelectRect = new editor.AreaSelectRect();
             //
@@ -3112,6 +3112,7 @@ var editor;
         };
         TabViewButton.prototype._updateView = function () {
             this.label = this._moduleName;
+            this.iconDisplay.source = this._moduleName + "Icon_png";
         };
         return TabViewButton;
     }(eui.Button));
@@ -9234,7 +9235,7 @@ var editor;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "AssetView";
             //
-            _this.moduleName = "Asset";
+            _this.moduleName = "Project";
             editor.editorui.assetview = _this;
             //
             _this._areaSelectRect = new editor.AreaSelectRect();

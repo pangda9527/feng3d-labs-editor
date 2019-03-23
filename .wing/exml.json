@@ -1,15 +1,4 @@
 {
-  "15a5ffac1ae": {
-    "path": "..\\resource\\view\\TTT.ts",
-    "class": "TTT",
-    "parentPath": ""
-  },
-  "15a5ffee890": {
-    "path": "ui\\view\\CustomView.ts",
-    "class": "CustomView",
-    "parentPath": "",
-    "bindingDataTestObj": []
-  },
   "global": {
     "globalBindingDataTestObj": [],
     "globalAutoLayerMarkEnable": true,
@@ -28,13 +17,6 @@
   },
   "15a64cb93c1": {
     "bindingDataTestObj": []
-  },
-  "15a6521014b": {
-    "path": "ui\\customcomponents\\Transform.ts",
-    "class": "Transform",
-    "parentPath": "",
-    "bindingDataTestObj": [],
-    "guideLinesEnabled": false
   },
   "15a6adcd3c5": {
     "path": "ui\\components\\Vector3DView.ts",
@@ -90,11 +72,6 @@
     "class": "Tree",
     "parentPath": ""
   },
-  "15ab2b4214e": {
-    "path": "ui\\components\\Tree.ts",
-    "class": "Tree",
-    "parentPath": ""
-  },
   "1630b9a091e": {
     "path": "ui\\components\\RenameTextInput.ts",
     "class": "RenameTextInput",
@@ -123,21 +100,6 @@
     "useBgColor": true,
     "backgroundAlpha": 100
   },
-  "16782c3372e": {
-    "path": "ui\\components\\TabViewTabButton.ts",
-    "class": "TabViewTabButton",
-    "parentPath": "resource/eui_skins/ButtonSkin.exml"
-  },
-  "16782d01fa2": {
-    "path": "ui\\components\\TTT.ts",
-    "class": "TTT",
-    "parentPath": ""
-  },
-  "16782e1caa6": {
-    "path": "ui\\components\\editor.TabViewButton.ts",
-    "class": "editor.TabViewButton",
-    "parentPath": "resource/eui_skins/ButtonSkin.exml"
-  },
   "16782e280f9": {
     "path": "ui\\components\\TabViewButton.ts",
     "class": "TabViewButton",
@@ -158,11 +120,6 @@
     "useBgColor": true,
     "backgroundAlpha": 100,
     "bindingDataTestObj": []
-  },
-  "169ab4df081": {
-    "path": "..\\resource\\custom_skins\\tt.ts",
-    "class": "tt",
-    "parentPath": "resource/eui_skins/PanelSkin.exml"
   },
   "169ab55b10d": {
     "bindingDataTestObj": []

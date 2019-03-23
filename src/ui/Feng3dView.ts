@@ -19,7 +19,7 @@ namespace editor
 			feng3d.Stats.init(document.getElementById("stats"));
 			editorui.feng3dView = this;
 			//
-			this.moduleName = "Feng3dView";
+			this.moduleName = "Scene";
 			//
 			this._areaSelectRect = new AreaSelectRect();
 			//

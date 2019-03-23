@@ -32,7 +32,7 @@ namespace editor
             this.skinName = "AssetView";
 
             //
-            this.moduleName = "Asset";
+            this.moduleName = "Project";
 
             editorui.assetview = this;
             //

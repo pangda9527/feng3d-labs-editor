@@ -5,6 +5,9 @@ namespace editor
 	 */
 	export class TabViewButton extends eui.Button
 	{
+		public iconDisplay: eui.Image;
+		public labelDisplay: eui.Label;
+
 		/**
 		 * 模块名称
 		 */
@@ -39,6 +42,8 @@ namespace editor
 		private _updateView()
 		{
 			this.label = this._moduleName;
+
+			this.iconDisplay.source = `${this._moduleName}Icon_png`;
 		}
 
 	}

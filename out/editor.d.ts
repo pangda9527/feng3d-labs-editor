@@ -995,6 +995,8 @@ declare namespace editor {
      * TabView 按钮
      */
     class TabViewButton extends eui.Button {
+        iconDisplay: eui.Image;
+        labelDisplay: eui.Label;
         /**
          * 模块名称
          */
