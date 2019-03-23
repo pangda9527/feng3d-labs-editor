@@ -2625,6 +2625,7 @@ declare namespace editor {
         private onComplete;
         private onAddedToStage;
         private onRemovedFromStage;
+        private onresize;
     }
 }
 declare namespace editor {
@@ -2744,10 +2745,6 @@ declare namespace editor {
      * 编辑器数据
      */
     class EditorData {
-        /**
-         * 2D UI舞台
-         */
-        stage: egret.Stage;
         /**
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
@@ -3894,12 +3891,17 @@ declare namespace editor {
      * 编辑器
      */
     class Editor extends eui.UILayer {
-        private mainView;
         constructor();
+        private onAddedToStage;
+        /**
+         * 初始化 Egret
+         *
+         * @param callback 完成回调
+         */
+        private initEgret;
         private init;
         private initMainView;
         private onresize;
-        private _onAddToStage;
     }
 }
 //# sourceMappingURL=editor.d.ts.map

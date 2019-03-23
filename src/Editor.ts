@@ -15,17 +15,41 @@ namespace editor
      */
     export class Editor extends eui.UILayer
     {
-        private mainView: MainView;
-
         constructor()
         {
             super();
             // giteeOauth.oauth();
 
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+        }
+
+        private onAddedToStage()
+        {
+            editorui.stage = this.stage;
+
+            //
+            feng3d.task.series([
+                this.initEgret.bind(this),
+                editorRS.initproject.bind(editorRS),
+                this.init.bind(this),
+            ])(() =>
+            {
+                console.log(`初始化完成。`);
+            });
+            //
+            window.onresize = this.onresize.bind(this);
+            this.onresize();
+        }
+
+        /**
+         * 初始化 Egret
+         * 
+         * @param callback 完成回调
+         */
+        private initEgret(callback: () => void)
+        {
             var mainui = new MainUI(() =>
             {
-                editorui.stage = this.stage;
-
                 //
                 var tooltipLayer = new eui.UILayer();
                 tooltipLayer.touchEnabled = false;
@@ -39,19 +63,13 @@ namespace editor
 
                 editorcache.projectname = editorcache.projectname || "newproject";
 
-                editorRS.initproject(() =>
-                {
-                    setTimeout(() =>
-                    {
-                        this.init();
-                    }, 1);
-                });
                 this.removeChild(mainui);
+                callback();
             });
             this.addChild(mainui);
         }
 
-        private init()
+        private init(callback: () => void)
         {
             document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editorcache.projectname;
 
@@ -62,39 +80,26 @@ namespace editor
             //初始化feng3d
             new Main3D();
 
-            feng3d.shortcut.addShortCuts(shortcutConfig);
-
             new Editorshortcut();
 
-            this.once(egret.Event.ENTER_FRAME, function ()
-            {
-                //
-                egret.mouseEventEnvironment();
-            }, this);
+            egret.mouseEventEnvironment();
 
-            this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
+            callback();
         }
 
         private initMainView()
         {
             //
-            this.mainView = new MainView();
-            this.stage.addChildAt(this.mainView, 1);
-            this.onresize();
+            var mainView = new MainView();
+            editorui.mainview = mainView;
+            this.stage.addChildAt(mainView, 1);
             window.onresize = this.onresize.bind(this);
-            editorui.mainview = this.mainView;
+            this.onresize();
         }
 
         private onresize()
         {
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
-            this.mainView.width = this.stage.stageWidth;
-            this.mainView.height = this.stage.stageHeight;
-        }
-
-        private _onAddToStage()
-        {
-            editorData.stage = this.stage;
         }
     }
 }

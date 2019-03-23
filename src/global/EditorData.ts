@@ -31,11 +31,6 @@ namespace editor
     export class EditorData
     {
         /**
-         * 2D UI舞台
-         */
-        stage: egret.Stage;
-
-        /**
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
          */

@@ -2250,6 +2250,8 @@ var editor;
     var Editorshortcut = /** @class */ (function () {
         function Editorshortcut() {
             this.selectedObjectsHistory = [];
+            // 初始化快捷键
+            feng3d.shortcut.addShortCuts(shortcutConfig);
             //监听命令
             feng3d.shortcut.on("deleteSeletedGameObject", this.onDeleteSeletedGameObject, this);
             //
@@ -9425,8 +9427,15 @@ var editor;
             }
         };
         MainView.prototype.onAddedToStage = function () {
+            window.addEventListener("resize", this.onresize.bind(this));
+            this.onresize();
         };
         MainView.prototype.onRemovedFromStage = function () {
+            window.removeEventListener("resize", this.onresize.bind(this));
+        };
+        MainView.prototype.onresize = function () {
+            editor.editorui.mainview.width = this.stage.stageWidth;
+            editor.editorui.mainview.height = this.stage.stageHeight;
         };
         return MainView;
     }(eui.Component));
@@ -15914,8 +15923,31 @@ var editor;
         function Editor() {
             var _this = _super.call(this) || this;
             // giteeOauth.oauth();
+            _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddedToStage, _this);
+            return _this;
+        }
+        Editor.prototype.onAddedToStage = function () {
+            editor.editorui.stage = this.stage;
+            //
+            feng3d.task.series([
+                this.initEgret.bind(this),
+                editor.editorRS.initproject.bind(editor.editorRS),
+                this.init.bind(this),
+            ])(function () {
+                console.log("\u521D\u59CB\u5316\u5B8C\u6210\u3002");
+            });
+            //
+            window.onresize = this.onresize.bind(this);
+            this.onresize();
+        };
+        /**
+         * 初始化 Egret
+         *
+         * @param callback 完成回调
+         */
+        Editor.prototype.initEgret = function (callback) {
+            var _this = this;
             var mainui = new editor.MainUI(function () {
-                editor.editorui.stage = _this.stage;
                 //
                 var tooltipLayer = new eui.UILayer();
                 tooltipLayer.touchEnabled = false;
@@ -15927,45 +15959,31 @@ var editor;
                 _this.stage.addChild(popupLayer);
                 editor.editorui.popupLayer = popupLayer;
                 editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
-                editor.editorRS.initproject(function () {
-                    setTimeout(function () {
-                        _this.init();
-                    }, 1);
-                });
                 _this.removeChild(mainui);
+                callback();
             });
-            _this.addChild(mainui);
-            return _this;
-        }
-        Editor.prototype.init = function () {
+            this.addChild(mainui);
+        };
+        Editor.prototype.init = function (callback) {
             document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editor.editorcache.projectname;
             editor.editorcache.setLastProject(editor.editorcache.projectname);
             this.initMainView();
             //初始化feng3d
             new editor.Main3D();
-            feng3d.shortcut.addShortCuts(shortcutConfig);
             new editor.Editorshortcut();
-            this.once(egret.Event.ENTER_FRAME, function () {
-                //
-                egret.mouseEventEnvironment();
-            }, this);
-            this.once(egret.Event.ADDED_TO_STAGE, this._onAddToStage, this);
+            egret.mouseEventEnvironment();
+            callback();
         };
         Editor.prototype.initMainView = function () {
             //
-            this.mainView = new editor.MainView();
-            this.stage.addChildAt(this.mainView, 1);
-            this.onresize();
+            var mainView = new editor.MainView();
+            editor.editorui.mainview = mainView;
+            this.stage.addChildAt(mainView, 1);
             window.onresize = this.onresize.bind(this);
-            editor.editorui.mainview = this.mainView;
+            this.onresize();
         };
         Editor.prototype.onresize = function () {
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
-            this.mainView.width = this.stage.stageWidth;
-            this.mainView.height = this.stage.stageHeight;
-        };
-        Editor.prototype._onAddToStage = function () {
-            editor.editorData.stage = this.stage;
         };
         return Editor;
     }(eui.UILayer));
