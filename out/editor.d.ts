@@ -26,6 +26,7 @@ declare namespace feng3d {
      */
     var shortCutStates: {
         disableScroll: string;
+        splitGroupDraging: string;
     };
     /**
      * (快捷键)状态列表

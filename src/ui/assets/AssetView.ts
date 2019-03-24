@@ -251,6 +251,7 @@ namespace editor
         private onMouseDown(e: egret.MouseEvent)
         {
             if (e.target != this.filelist) return;
+            if (feng3d.shortcut.getState("splitGroupDraging")) return;
 
             this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);

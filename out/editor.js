@@ -40,7 +40,8 @@ var feng3d;
      * (快捷键)状态列表
      */
     feng3d.shortCutStates = {
-        disableScroll: "禁止滚动"
+        disableScroll: "禁止滚动",
+        splitGroupDraging: "正在拖拽分割界面",
     };
 })(feng3d || (feng3d = {}));
 var egret;
@@ -2926,6 +2927,7 @@ var editor;
         SplitdragData.prototype.updatecursor = function () {
             if (this._splitGroupState == SplitGroupState.default) {
                 egretDiv.style.cursor = "auto";
+                feng3d.shortcut.deactivityState("splitGroupDraging");
             }
             else {
                 if (this._layouttype == 1) {
@@ -2934,6 +2936,7 @@ var editor;
                 else if (this._layouttype == 2) {
                     egretDiv.style.cursor = "n-resize";
                 }
+                feng3d.shortcut.activityState("splitGroupDraging");
             }
         };
         return SplitdragData;
@@ -9391,6 +9394,8 @@ var editor;
         AssetView.prototype.onMouseDown = function (e) {
             if (e.target != this.filelist)
                 return;
+            if (feng3d.shortcut.getState("splitGroupDraging"))
+                return;
             this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
@@ -15238,7 +15243,7 @@ var shortcutConfig = [
     { key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal+mouseInView3D" },
     { key: "mousemove", stateCommand: "!selecting", when: "selecting" },
     { key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "mouseInView3D+selecting" },
-    { key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D" },
+    { key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D+!splitGroupDraging" },
     { key: "mousemove", command: "areaSelect", when: "areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
     { key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
     //

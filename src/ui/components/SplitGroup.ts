@@ -45,6 +45,7 @@ namespace editor
             if (this._splitGroupState == SplitGroupState.default)
             {
                 egretDiv.style.cursor = "auto";
+                feng3d.shortcut.deactivityState("splitGroupDraging");
             } else
             {
                 if (this._layouttype == 1)
@@ -54,6 +55,7 @@ namespace editor
                 {
                     egretDiv.style.cursor = "n-resize";
                 }
+                feng3d.shortcut.activityState("splitGroupDraging");
             }
         }
 
@@ -212,15 +214,15 @@ namespace editor
                 splitdragData.splitGroupState = SplitGroupState.draging;
                 splitdragData.dragingMousePoint = new feng3d.Vector2(e.stageX, e.stageY);
                 //
-                var preElement = splitdragData.preElement;
-                var nextElement = splitdragData.nextElement;
+                var preElement = <eui.Group>splitdragData.preElement;
+                var nextElement = <eui.Group>splitdragData.nextElement;
                 var preElementRect = splitdragData.preElementRect = preElement.getTransformedBounds(this.stage);
                 var nextElementRect = splitdragData.nextElementRect = nextElement.getTransformedBounds(this.stage);
                 //
-                var minX = preElementRect.left + ((<any>preElement).minWidth ? (<any>preElement).minWidth : 10);
-                var maxX = nextElementRect.right - ((<any>nextElement).minWidth ? (<any>nextElement).minWidth : 10);
-                var minY = preElementRect.top + ((<any>preElement).minHeight ? (<any>preElement).minHeight : 10);
-                var maxY = nextElementRect.bottom - ((<any>nextElement).minHeight ? (<any>nextElement).minHeight : 10);
+                var minX = preElementRect.left + (preElement.minWidth ? preElement.minWidth : 10);
+                var maxX = nextElementRect.right - (nextElement.minWidth ? nextElement.minWidth : 10);
+                var minY = preElementRect.top + (preElement.minHeight ? preElement.minHeight : 10);
+                var maxY = nextElementRect.bottom - (nextElement.minHeight ? nextElement.minHeight : 10);
                 splitdragData.dragRect = new egret.Rectangle(minX, minY, maxX - minX, maxY - minY);
             }
         }
