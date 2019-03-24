@@ -2533,8 +2533,9 @@ var editor;
                     feng3d.error("\u65E0\u6CD5\u83B7\u53D6\u6A21\u5757 " + moduleName + " \u754C\u9762\u7C7B\u5B9A\u4E49");
                     return;
                 }
-                moduleview = new cls();
+                this.moduleViewMap[moduleName] = moduleview = new cls();
             }
+            return moduleview;
         };
         /**
          * 模块界面类定义

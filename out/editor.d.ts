@@ -903,7 +903,7 @@ declare namespace editor {
      */
     class Modules {
         message: Message;
-        getModuleView(moduleName: string): void;
+        getModuleView(moduleName: string): ModuleView;
         private moduleViewMap;
         /**
          * 模块界面类定义
