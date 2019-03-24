@@ -2709,6 +2709,19 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    /**
+     * 主分割界面
+     *
+     * 用于管理分割界面，以及处理界面布局
+     */
+    class MainSplitView extends eui.Component implements eui.UIComponent {
+        constructor();
+        protected childrenCreated(): void;
+        private onAddedToStage;
+        private onRemovedFromStage;
+    }
+}
+declare namespace editor {
     class MainView extends eui.Component implements eui.UIComponent {
         constructor();
         private onComplete;

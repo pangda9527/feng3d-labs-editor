@@ -9628,6 +9628,36 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    /**
+     * 主分割界面
+     *
+     * 用于管理分割界面，以及处理界面布局
+     */
+    var MainSplitView = /** @class */ (function (_super) {
+        __extends(MainSplitView, _super);
+        function MainSplitView() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "MainSplitView";
+            return _this;
+        }
+        MainSplitView.prototype.childrenCreated = function () {
+            _super.prototype.childrenCreated.call(this);
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            if (this.stage) {
+                this.onAddedToStage();
+            }
+        };
+        MainSplitView.prototype.onAddedToStage = function () {
+        };
+        MainSplitView.prototype.onRemovedFromStage = function () {
+        };
+        return MainSplitView;
+    }(eui.Component));
+    editor.MainSplitView = MainSplitView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var MainView = /** @class */ (function (_super) {
         __extends(MainView, _super);
         function MainView() {
@@ -16158,6 +16188,8 @@ var editor;
             //
             window.onresize = this.onresize.bind(this);
             this.onresize();
+            // 移除无效入口类显示对象
+            this.parent && this.parent.removeChild(this);
         };
         /**
          * 初始化 Egret

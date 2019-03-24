@@ -42,6 +42,8 @@ namespace editor
             //
             window.onresize = this.onresize.bind(this);
             this.onresize();
+            // 移除无效入口类显示对象
+            this.parent && this.parent.removeChild(this);
         }
 
         /**

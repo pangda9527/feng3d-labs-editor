@@ -22,7 +22,6 @@
         "editor.HierarchyView": "resource/custom_skins/HierarchyView.exml",
         "editor.AssetView": "resource/custom_skins/AssetView.exml",
         "editor.NavigationView": "resource/custom_skins/NavigationView.exml",
-        "editor.MainView": "resource/custom_skins/MainView.exml",
         "editor.BooleanAttrView": "resource/custom_skins/BooleanAttrView.exml",
         "editor.HierarchyTreeItemRenderer": "resource/custom_skins/HierarchyTreeItemRenderer.exml",
         "editor.Accordion": "resource/custom_skins/Accordion.exml",
@@ -32,7 +31,9 @@
         "editor.RenameTextInput": "resource/custom_skins/RenameTextInput.exml",
         "editor.ComboBox": "resource/custom_skins/ComboBox.exml",
         "editor.TabViewButton": "resource/custom_skins/TabViewButton.exml",
-        "editor.TabView": "resource/custom_skins/TabView.exml"
+        "editor.TabView": "resource/custom_skins/TabView.exml",
+        "editor.MainSplitView": "resource/custom_skins/MainSplitView.exml",
+        "editor.MainView": "resource/custom_skins/MainView.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [
@@ -111,6 +112,7 @@
         "resource/custom_skins/NavigationView.exml",
         "resource/custom_skins/ShortCutSetting.exml",
         "resource/custom_skins/ShortCutSettingItemRenderer.exml",
+        "resource/custom_skins/MainSplitView.exml",
         "resource/custom_skins/MainView.exml"
     ]
 }

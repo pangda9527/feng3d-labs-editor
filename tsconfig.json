@@ -135,6 +135,7 @@
         //
         "src/ui/TopView.ts",
         "src/ui/NavigationView.ts",
+        "src/ui/MainSplitView.ts",
         "src/ui/MainView.ts",
         //
         "src/ui/AssetAdapter.ts",
