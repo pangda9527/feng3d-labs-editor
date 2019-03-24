@@ -2952,17 +2952,54 @@ var editor;
         function SplitGroup() {
             return _super.call(this) || this;
         }
+        Object.defineProperty(SplitGroup.prototype, "layouttype", {
+            /**
+             * 布局类型
+             */
+            get: function () {
+                if (!this._layouttype)
+                    return this._layouttype;
+                if (this.layout instanceof eui.HorizontalLayout) {
+                    this._layouttype = 1;
+                }
+                else if (this.layout instanceof eui.VerticalLayout) {
+                    this._layouttype = 2;
+                }
+                return this._layouttype;
+            },
+            set: function (value) {
+                var oldLayouttype = this.layouttype;
+                if (oldLayouttype == value)
+                    return;
+                this._layouttype = value;
+                this._invalidateView();
+            },
+            enumerable: true,
+            configurable: true
+        });
         SplitGroup.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             this.addEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
+            this._invalidateView();
         };
         SplitGroup.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
+        };
+        /**
+         * 界面显示失效
+         */
+        SplitGroup.prototype._invalidateView = function () {
+            this.once(egret.Event.ENTER_FRAME, this._updateView, this);
+        };
+        /**
+         * 更新界面
+         */
+        SplitGroup.prototype._updateView = function () {
         };
         SplitGroup.prototype.onMouseMove = function (e) {
             if (splitdragData.splitGroupState == SplitGroupState.default) {
@@ -3021,13 +3058,7 @@ var editor;
             splitdragData.splitGroupState = SplitGroupState.default;
             if (this.numElements < 2)
                 return;
-            var layouttype = 0;
-            if (this.layout instanceof eui.HorizontalLayout) {
-                layouttype = 1;
-            }
-            else if (this.layout instanceof eui.VerticalLayout) {
-                layouttype = 2;
-            }
+            var layouttype = this.layouttype;
             if (layouttype == 0)
                 return;
             for (var i = 0; i < this.numElements - 1; i++) {
@@ -9671,6 +9702,7 @@ var editor;
             _super.prototype.childrenCreated.call(this);
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            this._saveViewLayout();
             if (this.stage) {
                 this.onAddedToStage();
             }
@@ -9678,6 +9710,10 @@ var editor;
         MainSplitView.prototype.onAddedToStage = function () {
         };
         MainSplitView.prototype.onRemovedFromStage = function () {
+        };
+        MainSplitView.prototype._saveViewLayout = function () {
+            var sp = this.getChildAt(0);
+            sp.numChildren;
         };
         return MainSplitView;
     }(eui.Component));

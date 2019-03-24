@@ -986,9 +986,22 @@ declare namespace editor {
      * 注：不支持 SplitGroup 中两个对象都是Group，不支持两个对象都使用百分比宽高
      */
     class SplitGroup extends eui.Group {
+        /**
+         * 布局类型
+         */
+        layouttype: number;
+        private _layouttype;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
+        /**
+         * 界面显示失效
+         */
+        private _invalidateView;
+        /**
+         * 更新界面
+         */
+        private _updateView;
         private onMouseMove;
         private _findSplit;
         private onMouseDown;
@@ -2729,6 +2742,7 @@ declare namespace editor {
         protected childrenCreated(): void;
         private onAddedToStage;
         private onRemovedFromStage;
+        private _saveViewLayout;
     }
 }
 declare namespace editor {
