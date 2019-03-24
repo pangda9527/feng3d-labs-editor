@@ -40,12 +40,51 @@ namespace editor
 
         private _saveViewLayout()
         {
-            var sp = <SplitGroup>this.getChildAt(0);
+            var sp = this.getChildAt(0);
 
-            sp.numChildren;
+            var data = this._getData(sp);
+            console.log(data);
+        }
 
-
-
+        private _getData(sp: egret.DisplayObject)
+        {
+            let data: any = {};
+            data.x = sp.x;
+            data.y = sp.y;
+            data.width = sp.width;
+            data.height = sp.height;
+            data.type = egret.getQualifiedClassName(sp);
+            if (sp instanceof eui.Group || sp instanceof eui.Component)
+            {
+                data.percentWidth = sp.percentWidth;
+                data.percentHeight = sp.percentHeight;
+                data.top = sp.top;
+                data.bottom = sp.bottom;
+                data.left = sp.left;
+                data.right = sp.right;
+            }
+            if (sp instanceof SplitGroup)
+            {
+                if (sp.layout instanceof eui.HorizontalLayout)
+                {
+                    data.layout = "HorizontalLayout";
+                } else if (sp.layout instanceof eui.VerticalLayout)
+                {
+                    data.layout = "VerticalLayout";
+                }
+                var children = [];
+                for (let i = 0; i < sp.numChildren; i++)
+                {
+                    const element = sp.getChildAt(i);
+                    children[i] = this._getData(element);
+                }
+                data.children = children;
+            }
+            if (sp instanceof TabView)
+            {
+                data.modules = sp.getModuleNames();
+            }
+            return data;
         }
     }
 
@@ -61,7 +100,7 @@ namespace editor
     {
         type: "SplitGroup";
 
-        
+
 
         children: [ViewLayout, ViewLayout];
     }

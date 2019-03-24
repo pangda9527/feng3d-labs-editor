@@ -3093,6 +3093,12 @@ var editor;
             this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
             this.addChild(this._tabViewInstance);
         };
+        /**
+         * 获取模块名称列表
+         */
+        TabView.prototype.getModuleNames = function () {
+            return this._tabViewInstance.getModuleNames();
+        };
         return TabView;
     }(eui.Group));
     editor.TabView = TabView;
@@ -3117,6 +3123,13 @@ var editor;
             _this.skinName = "TabViewSkin";
             return _this;
         }
+        /**
+         * 获取模块名称列表
+         */
+        TabViewInstance.prototype.getModuleNames = function () {
+            var moduleNames = this._moduleViews.map(function (v) { return v.moduleName; });
+            return moduleNames;
+        };
         TabViewInstance.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this._onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
@@ -9630,7 +9643,42 @@ var editor;
         };
         MainSplitView.prototype._saveViewLayout = function () {
             var sp = this.getChildAt(0);
-            sp.numChildren;
+            var data = this._getData(sp);
+            console.log(data);
+        };
+        MainSplitView.prototype._getData = function (sp) {
+            var data = {};
+            data.x = sp.x;
+            data.y = sp.y;
+            data.width = sp.width;
+            data.height = sp.height;
+            data.type = egret.getQualifiedClassName(sp);
+            if (sp instanceof eui.Group || sp instanceof eui.Component) {
+                data.percentWidth = sp.percentWidth;
+                data.percentHeight = sp.percentHeight;
+                data.top = sp.top;
+                data.bottom = sp.bottom;
+                data.left = sp.left;
+                data.right = sp.right;
+            }
+            if (sp instanceof editor.SplitGroup) {
+                if (sp.layout instanceof eui.HorizontalLayout) {
+                    data.layout = "HorizontalLayout";
+                }
+                else if (sp.layout instanceof eui.VerticalLayout) {
+                    data.layout = "VerticalLayout";
+                }
+                var children = [];
+                for (var i = 0; i < sp.numChildren; i++) {
+                    var element = sp.getChildAt(i);
+                    children[i] = this._getData(element);
+                }
+                data.children = children;
+            }
+            if (sp instanceof editor.TabView) {
+                data.modules = sp.getModuleNames();
+            }
+            return data;
         };
         return MainSplitView;
     }(eui.Component));

@@ -38,6 +38,14 @@ namespace editor
 			this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
 			this.addChild(this._tabViewInstance);
 		}
+
+		/**
+		 * 获取模块名称列表
+		 */
+		getModuleNames()
+		{
+			return this._tabViewInstance.getModuleNames();
+		}
 	}
 
 	export class TabViewInstance extends eui.Component
@@ -61,6 +69,15 @@ namespace editor
 		 * 显示模块
 		 */
 		private _showModule: string;
+
+		/**
+		 * 获取模块名称列表
+		 */
+		getModuleNames()
+		{
+			var moduleNames = this._moduleViews.map(v => v.moduleName);
+			return moduleNames;
+		}
 
 		constructor(moduleviews: ModuleView[])
 		{
