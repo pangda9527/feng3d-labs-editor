@@ -981,6 +981,10 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    enum SplitLayout {
+        HorizontalLayout = 0,
+        VerticalLayout = 1
+    }
     /**
      * 分割组，提供鼠标拖拽改变组内对象分割尺寸
      * 注：不支持 SplitGroup 中两个对象都是Group，不支持两个对象都使用百分比宽高
@@ -989,7 +993,7 @@ declare namespace editor {
         /**
          * 布局类型
          */
-        layouttype: number;
+        layouttype: SplitLayout;
         private _layouttype;
         /**
          * 分割子对象列表
