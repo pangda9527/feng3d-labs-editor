@@ -3072,39 +3072,15 @@ var editor;
                 var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, stageX));
                 var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
                 var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
-                if (preElement instanceof eui.Group) {
-                    // preElement.setContentSize(preElementWidth, splitdragData.preElementRect.height);
-                    preElement.width = preElementWidth;
-                }
-                else {
-                    preElement.width = preElementWidth;
-                }
-                if (nextElement instanceof eui.Group) {
-                    // nextElement.setContentSize(nextElementWidth, nextElement.contentHeight);
-                    nextElement.width = nextElementWidth;
-                }
-                else {
-                    nextElement.width = nextElementWidth;
-                }
+                preElement.width = preElementWidth;
+                nextElement.width = nextElementWidth;
             }
             else {
                 var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, stageY));
                 var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
                 var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
-                if (preElement instanceof eui.Group) {
-                    // preElement.setContentSize(splitdragData.preElementRect.width, preElementHeight);
-                    preElement.height = preElementHeight;
-                }
-                else {
-                    preElement.height = preElementHeight;
-                }
-                if (nextElement instanceof eui.Group) {
-                    // nextElement.setContentSize(splitdragData.nextElementRect.width, nextElementHeight);
-                    nextElement.height = nextElementHeight;
-                }
-                else {
-                    nextElement.height = nextElementHeight;
-                }
+                preElement.height = preElementHeight;
+                nextElement.height = nextElementHeight;
             }
         };
         /**
