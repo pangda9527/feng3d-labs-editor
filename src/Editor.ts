@@ -38,12 +38,9 @@ namespace editor
             ])(() =>
             {
                 console.log(`初始化完成。`);
+                // 移除无效入口类显示对象
+                this.parent && this.parent.removeChild(this);
             });
-            //
-            window.onresize = this.onresize.bind(this);
-            this.onresize();
-            // 移除无效入口类显示对象
-            this.parent && this.parent.removeChild(this);
         }
 
         /**
@@ -73,10 +70,10 @@ namespace editor
                 //
                 editorcache.projectname = editorcache.projectname || "newproject";
 
-                this.removeChild(mainui);
+                editorui.stage.removeChild(mainui);
                 callback();
             });
-            this.addChild(mainui);
+            editorui.stage.addChild(mainui);
         }
 
         private init(callback: () => void)
@@ -103,13 +100,6 @@ namespace editor
             var mainView = new MainView();
             editorui.mainview = mainView;
             this.stage.addChildAt(mainView, 1);
-            window.onresize = this.onresize.bind(this);
-            this.onresize();
-        }
-
-        private onresize()
-        {
-            this.stage.setContentSize(window.innerWidth, window.innerHeight);
         }
     }
 }

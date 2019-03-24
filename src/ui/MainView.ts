@@ -34,6 +34,8 @@ namespace editor
 
 		private onresize()
 		{
+			this.stage.setContentSize(window.innerWidth, window.innerHeight);
+			
 			editorui.mainview.width = this.stage.stageWidth;
 			editorui.mainview.height = this.stage.stageHeight;
 		}

@@ -97,6 +97,10 @@ declare namespace feng3d {
          * 提示信息
          */
         "message": string;
+        /**
+         * 错误信息
+         */
+        "message.error": string;
     }
 }
 declare namespace egret {
@@ -1392,6 +1396,7 @@ declare namespace editor {
         private _interval;
         constructor();
         private _onMessage;
+        private _onErrorMessage;
         private _getMessageItem;
         private _showMessage;
     }
@@ -1803,6 +1808,11 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    /**
+     * 给显示对象注册禁止 Scroll 滚动功能
+     *
+     * 当鼠标在指定对象上按下时禁止滚动，鼠标弹起后取消禁止滚动
+     */
     class MouseOnDisableScroll {
         static register(sprite: egret.DisplayObject): void;
         static unRegister(sprite: egret.DisplayObject): void;
@@ -4004,7 +4014,6 @@ declare namespace editor {
         private initEgret;
         private init;
         private initMainView;
-        private onresize;
     }
 }
 //# sourceMappingURL=editor.d.ts.map

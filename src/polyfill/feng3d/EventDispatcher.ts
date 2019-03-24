@@ -56,5 +56,11 @@ namespace feng3d
          * 提示信息
          */
         "message": string;
+        
+        /**
+         * 错误信息
+         */
+        "message.error": string;
+
     }
 }

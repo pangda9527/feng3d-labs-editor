@@ -1,5 +1,10 @@
 namespace editor
 {
+    /**
+     * 给显示对象注册禁止 Scroll 滚动功能
+     * 
+     * 当鼠标在指定对象上按下时禁止滚动，鼠标弹起后取消禁止滚动
+     */
     export class MouseOnDisableScroll
     {
         static register(sprite: egret.DisplayObject)

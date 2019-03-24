@@ -34,6 +34,7 @@ namespace editor
                     this.data.gameobject.addScript(dragdata.file_script.scriptName);
                 }
             });
+            MouseOnDisableScroll.register(this);
             //
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
@@ -43,6 +44,7 @@ namespace editor
         $onRemoveFromStage()
         {
             drag.unregister(this);
+            MouseOnDisableScroll.unRegister(this);
 
             super.$onRemoveFromStage();
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);

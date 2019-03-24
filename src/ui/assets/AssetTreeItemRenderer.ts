@@ -19,6 +19,8 @@ namespace editor
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
+            MouseOnDisableScroll.register(this);
+
             feng3d.watcher.watch(editorAsset, "showFloder", this.showFloderChanged, this);
             this.showFloderChanged();
         }
@@ -28,6 +30,8 @@ namespace editor
             super.$onRemoveFromStage();
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+
+            MouseOnDisableScroll.unRegister(this);
 
             feng3d.watcher.unwatch(editorAsset, "showFloder", this.showFloderChanged, this);
         }
@@ -53,7 +57,7 @@ namespace editor
                                     this.data.addChild(v);
                                 } else
                                 {
-                                    alert(err.message);
+                                    feng3d.dispatcher.dispatch("message.error", err.message);
                                 }
                             });
                         });

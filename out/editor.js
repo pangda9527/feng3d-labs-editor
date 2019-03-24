@@ -4290,6 +4290,11 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var MessageType;
+    (function (MessageType) {
+        MessageType[MessageType["Normal"] = 0] = "Normal";
+        MessageType[MessageType["Error"] = 1] = "Error";
+    })(MessageType || (MessageType = {}));
     /**
      * 消息模块
      *
@@ -4305,9 +4310,14 @@ var editor;
              */
             this._interval = 400;
             feng3d.dispatcher.on("message", this._onMessage, this);
+            feng3d.dispatcher.on("message.error", this._onErrorMessage, this);
         }
         Message.prototype._onMessage = function (event) {
-            this._messages.push(event.data);
+            this._messages.push([MessageType.Normal, event.data]);
+            feng3d.ticker.on(this._interval, this._showMessage, this);
+        };
+        Message.prototype._onErrorMessage = function (event) {
+            this._messages.push([MessageType.Error, event.data]);
             feng3d.ticker.on(this._interval, this._showMessage, this);
         };
         Message.prototype._getMessageItem = function (message) {
@@ -4317,7 +4327,15 @@ var editor;
             }
             label.size = 30;
             label.alpha = 1;
-            label.text = message;
+            label.text = message[1];
+            switch (message[0]) {
+                case MessageType.Error:
+                    label.textColor = 0xff0000;
+                    break;
+                default:
+                    label.textColor = 0xffffff;
+                    break;
+            }
             return label;
         };
         Message.prototype._showMessage = function () {
@@ -6120,6 +6138,11 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    /**
+     * 给显示对象注册禁止 Scroll 滚动功能
+     *
+     * 当鼠标在指定对象上按下时禁止滚动，鼠标弹起后取消禁止滚动
+     */
     var MouseOnDisableScroll = /** @class */ (function () {
         function MouseOnDisableScroll() {
         }
@@ -8300,6 +8323,7 @@ var editor;
                     _this.data.gameobject.addScript(dragdata.file_script.scriptName);
                 }
             });
+            editor.MouseOnDisableScroll.register(this);
             //
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
@@ -8307,6 +8331,7 @@ var editor;
         };
         HierarchyTreeItemRenderer.prototype.$onRemoveFromStage = function () {
             editor.drag.unregister(this);
+            editor.MouseOnDisableScroll.unRegister(this);
             _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
@@ -9175,6 +9200,7 @@ var editor;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            editor.MouseOnDisableScroll.register(this);
             feng3d.watcher.watch(editor.editorAsset, "showFloder", this.showFloderChanged, this);
             this.showFloderChanged();
         };
@@ -9182,6 +9208,7 @@ var editor;
             _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+            editor.MouseOnDisableScroll.unRegister(this);
             feng3d.watcher.unwatch(editor.editorAsset, "showFloder", this.showFloderChanged, this);
         };
         AssetTreeItemRenderer.prototype.dataChanged = function () {
@@ -9198,7 +9225,7 @@ var editor;
                                 _this.data.addChild(v);
                             }
                             else {
-                                alert(err.message);
+                                feng3d.dispatcher.dispatch("message.error", err.message);
                             }
                         });
                     });
@@ -9681,6 +9708,7 @@ var editor;
             window.removeEventListener("resize", this.onresize.bind(this));
         };
         MainView.prototype.onresize = function () {
+            this.stage.setContentSize(window.innerWidth, window.innerHeight);
             editor.editorui.mainview.width = this.stage.stageWidth;
             editor.editorui.mainview.height = this.stage.stageHeight;
         };
@@ -16174,6 +16202,7 @@ var editor;
             return _this;
         }
         Editor.prototype.onAddedToStage = function () {
+            var _this = this;
             editor.editorui.stage = this.stage;
             //
             editor.modules.message = new editor.Message();
@@ -16184,12 +16213,9 @@ var editor;
                 this.init.bind(this),
             ])(function () {
                 console.log("\u521D\u59CB\u5316\u5B8C\u6210\u3002");
+                // 移除无效入口类显示对象
+                _this.parent && _this.parent.removeChild(_this);
             });
-            //
-            window.onresize = this.onresize.bind(this);
-            this.onresize();
-            // 移除无效入口类显示对象
-            this.parent && this.parent.removeChild(this);
         };
         /**
          * 初始化 Egret
@@ -16216,10 +16242,10 @@ var editor;
                 editor.editorui.messageLayer = messageLayer;
                 //
                 editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
-                _this.removeChild(mainui);
+                editor.editorui.stage.removeChild(mainui);
                 callback();
             });
-            this.addChild(mainui);
+            editor.editorui.stage.addChild(mainui);
         };
         Editor.prototype.init = function (callback) {
             document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editor.editorcache.projectname;
@@ -16236,11 +16262,6 @@ var editor;
             var mainView = new editor.MainView();
             editor.editorui.mainview = mainView;
             this.stage.addChildAt(mainView, 1);
-            window.onresize = this.onresize.bind(this);
-            this.onresize();
-        };
-        Editor.prototype.onresize = function () {
-            this.stage.setContentSize(window.innerWidth, window.innerHeight);
         };
         return Editor;
     }(eui.UILayer));

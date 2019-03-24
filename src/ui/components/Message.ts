@@ -1,5 +1,10 @@
 namespace editor
 {
+    enum MessageType
+    {
+        Normal,
+        Error,
+    }
     /**
      * 消息模块
      * 
@@ -7,7 +12,7 @@ namespace editor
      */
     export class Message
     {
-        private _messages: string[] = [];
+        private _messages: [MessageType, string][] = [];
         private _showMessageIndex = 0;
         private _messageLabelPool: eui.Label[] = [];
         /**
@@ -18,15 +23,22 @@ namespace editor
         constructor()
         {
             feng3d.dispatcher.on("message", this._onMessage, this);
+            feng3d.dispatcher.on("message.error", this._onErrorMessage, this);
         }
 
         private _onMessage(event: feng3d.Event<string>)
         {
-            this._messages.push(event.data);
+            this._messages.push([MessageType.Normal, event.data]);
             feng3d.ticker.on(this._interval, this._showMessage, this);
         }
 
-        private _getMessageItem(message: string)
+        private _onErrorMessage(event: feng3d.Event<string>)
+        {
+            this._messages.push([MessageType.Error, event.data]);
+            feng3d.ticker.on(this._interval, this._showMessage, this);
+        }
+
+        private _getMessageItem(message: [MessageType, string])
         {
             var label = this._messageLabelPool.pop();
             if (!label)
@@ -35,7 +47,16 @@ namespace editor
             }
             label.size = 30;
             label.alpha = 1;
-            label.text = message;
+            label.text = message[1];
+            switch (message[0])
+            {
+                case MessageType.Error:
+                    label.textColor = 0xff0000;
+                    break;
+                default:
+                    label.textColor = 0xffffff;
+                    break;
+            }
             return label;
         }
 
