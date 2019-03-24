@@ -2905,11 +2905,6 @@ var editor;
     }());
     var egretDiv = document.getElementsByClassName("egret-player")[0];
     var splitdragData = new SplitdragData();
-    var SplitLayout;
-    (function (SplitLayout) {
-        SplitLayout[SplitLayout["HorizontalLayout"] = 0] = "HorizontalLayout";
-        SplitLayout[SplitLayout["VerticalLayout"] = 1] = "VerticalLayout";
-    })(SplitLayout || (SplitLayout = {}));
     /**
      * 分割组，提供鼠标拖拽改变组内对象分割尺寸
      * 注：不支持 SplitGroup 中两个对象都是Group，不支持两个对象都使用百分比宽高
@@ -2917,99 +2912,23 @@ var editor;
     var SplitGroup = /** @class */ (function (_super) {
         __extends(SplitGroup, _super);
         function SplitGroup() {
-            var _this = _super.call(this) || this;
-            /**
-             * 分割百分比
-             */
-            _this._splitPercents = [];
-            return _this;
+            return _super.call(this) || this;
         }
-        Object.defineProperty(SplitGroup.prototype, "layouttype", {
-            /**
-             * 布局类型
-             */
-            get: function () {
-                if (this._layouttype != undefined)
-                    return this._layouttype;
-                if (this.layout instanceof eui.HorizontalLayout) {
-                    this._layouttype = SplitLayout.HorizontalLayout;
-                }
-                else if (this.layout instanceof eui.VerticalLayout) {
-                    this._layouttype = SplitLayout.VerticalLayout;
-                }
-                return this._layouttype;
-            },
-            set: function (value) {
-                var oldLayouttype = this.layouttype;
-                if (oldLayouttype == value)
-                    return;
-                this._layouttype = value;
-                this._invalidateView();
-            },
-            enumerable: true,
-            configurable: true
-        });
         SplitGroup.prototype.childrenCreated = function () {
             _super.prototype.childrenCreated.call(this);
-            this._initView();
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
         };
-        /**
-         * 初始化界面
-         */
-        SplitGroup.prototype._initView = function () {
-            var layouttype = this.layouttype;
-            // 筛选出应用于分割的子对象
-            this._splitChildren = this.$children.filter(function (v) { return true; });
-            // 计算子对象尺寸
-            var childrenSizes = this._splitChildren.map(function (v) {
-                if (layouttype == SplitLayout.HorizontalLayout)
-                    return v.width;
-                return v.height;
-            });
-            // 计算总量
-            var total = childrenSizes.reduce(function (pv, cv) { return pv + cv; }, 0);
-            // 计算分割比例
-            this._splitPercents = childrenSizes.map(function (v) { return v / total * 100; });
-        };
         SplitGroup.prototype.onAddedToStage = function () {
             this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-            this._invalidateView();
         };
         SplitGroup.prototype.onRemovedFromStage = function () {
             this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-        };
-        /**
-         * 界面显示失效
-         */
-        SplitGroup.prototype._invalidateView = function () {
-            this.once(egret.Event.ENTER_FRAME, this._updateView, this);
-        };
-        /**
-         * 更新界面
-         */
-        SplitGroup.prototype._updateView = function () {
-            // let layout = this.layouttype;
-            // for (let i = 0; i < this._splitChildren.length; i++)
-            // {
-            //     let child = this._splitChildren[i];
-            //     let size = this._splitPercents[i];
-            //     if (layout == SplitLayout.HorizontalLayout)
-            //     {
-            //         child.percentHeight = 100;
-            //         child.percentWidth = size;
-            //     } else
-            //     {
-            //         child.percentWidth = 100;
-            //         child.percentHeight = size;
-            //     }
-            // }
         };
         SplitGroup.prototype.onMouseMove = function (e) {
             if (splitdragData.splitGroupState == SplitGroupState.default) {
@@ -3026,13 +2945,12 @@ var editor;
             splitdragData.splitGroupState = SplitGroupState.default;
             egretDiv.style.cursor = "auto";
             feng3d.shortcut.deactivityState("splitGroupDraging");
-            var layouttype = this.layouttype;
             for (var i = 0; i < this.numElements - 1; i++) {
                 var element = this.getElementAt(i);
                 var elementRect = element.getTransformedBounds(this.stage);
                 var elementRectRight = new feng3d.Rectangle(elementRect.right - 3, elementRect.top, 6, elementRect.height);
                 var elementRectBotton = new feng3d.Rectangle(elementRect.left, elementRect.bottom - 3, elementRect.width, 6);
-                if (layouttype == SplitLayout.HorizontalLayout && elementRectRight.contains(stageX, stageY)) {
+                if (this.layout instanceof eui.HorizontalLayout && elementRectRight.contains(stageX, stageY)) {
                     splitdragData.splitGroupState = SplitGroupState.onSplit;
                     egretDiv.style.cursor = "e-resize";
                     feng3d.shortcut.activityState("splitGroupDraging");
@@ -3042,7 +2960,7 @@ var editor;
                     splitdragData.nextElement = this.getElementAt(i + 1);
                     break;
                 }
-                else if (layouttype == SplitLayout.VerticalLayout && elementRectBotton.contains(stageX, stageY)) {
+                else if (this.layout instanceof eui.VerticalLayout && elementRectBotton.contains(stageX, stageY)) {
                     splitdragData.splitGroupState = SplitGroupState.onSplit;
                     egretDiv.style.cursor = "n-resize";
                     feng3d.shortcut.activityState("splitGroupDraging");
@@ -3082,14 +3000,14 @@ var editor;
             var nextElement = splitdragData.nextElement;
             var stageX = feng3d.windowEventProxy.clientX;
             var stageY = feng3d.windowEventProxy.clientY;
-            if (this.layouttype == SplitLayout.HorizontalLayout) {
+            if (this.layout instanceof eui.HorizontalLayout) {
                 var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, stageX));
                 var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
                 var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
                 preElement.percentWidth = preElementWidth / this.width * 100;
                 nextElement.percentWidth = nextElementWidth / this.width * 100;
             }
-            else {
+            else if (this.layout instanceof eui.VerticalLayout) {
                 var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, stageY));
                 var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
                 var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);

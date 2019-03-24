@@ -981,44 +981,15 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    enum SplitLayout {
-        HorizontalLayout = 0,
-        VerticalLayout = 1
-    }
     /**
      * 分割组，提供鼠标拖拽改变组内对象分割尺寸
      * 注：不支持 SplitGroup 中两个对象都是Group，不支持两个对象都使用百分比宽高
      */
     class SplitGroup extends eui.Group {
-        /**
-         * 布局类型
-         */
-        layouttype: SplitLayout;
-        private _layouttype;
-        /**
-         * 分割子对象列表
-         */
-        private _splitChildren;
-        /**
-         * 分割百分比
-         */
-        private _splitPercents;
         constructor();
         protected childrenCreated(): void;
-        /**
-         * 初始化界面
-         */
-        private _initView;
         private onAddedToStage;
         private onRemovedFromStage;
-        /**
-         * 界面显示失效
-         */
-        private _invalidateView;
-        /**
-         * 更新界面
-         */
-        private _updateView;
         private onMouseMove;
         private _findSplit;
         private onMouseDown;
