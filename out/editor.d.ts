@@ -1005,7 +1005,14 @@ declare namespace editor {
         private onMouseMove;
         private _findSplit;
         private onMouseDown;
-        private onMouseUp;
+        /**
+         * 拖拽分割
+         */
+        private onDragMouseMove;
+        /**
+         * 停止拖拽
+         */
+        private onDragMouseUp;
     }
 }
 declare namespace editor {

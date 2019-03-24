@@ -2957,7 +2957,7 @@ var editor;
              * 布局类型
              */
             get: function () {
-                if (!this._layouttype)
+                if (!!this._layouttype)
                     return this._layouttype;
                 if (this.layout instanceof eui.HorizontalLayout) {
                     this._layouttype = 1;
@@ -2981,14 +2981,12 @@ var editor;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-            this.addEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
             this._invalidateView();
         };
         SplitGroup.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-            this.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
         };
         /**
          * 界面显示失效
@@ -3010,48 +3008,6 @@ var editor;
                 return;
             if (splitdragData.splitGroupState == SplitGroupState.onSplit) {
                 this._findSplit(e.stageX, e.stageY);
-            }
-            else if (splitdragData.splitGroupState == SplitGroupState.draging) {
-                var preElement = splitdragData.preElement;
-                var nextElement = splitdragData.nextElement;
-                if (splitdragData.layouttype == 1) {
-                    var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, e.stageX));
-                    var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
-                    var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
-                    if (preElement instanceof eui.Group) {
-                        // preElement.setContentSize(preElementWidth, splitdragData.preElementRect.height);
-                        preElement.width = preElementWidth;
-                    }
-                    else {
-                        preElement.width = preElementWidth;
-                    }
-                    if (nextElement instanceof eui.Group) {
-                        // nextElement.setContentSize(nextElementWidth, nextElement.contentHeight);
-                        nextElement.width = nextElementWidth;
-                    }
-                    else {
-                        nextElement.width = nextElementWidth;
-                    }
-                }
-                else {
-                    var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, e.stageY));
-                    var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
-                    var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
-                    if (preElement instanceof eui.Group) {
-                        // preElement.setContentSize(splitdragData.preElementRect.width, preElementHeight);
-                        preElement.height = preElementHeight;
-                    }
-                    else {
-                        preElement.height = preElementHeight;
-                    }
-                    if (nextElement instanceof eui.Group) {
-                        // nextElement.setContentSize(splitdragData.nextElementRect.width, nextElementHeight);
-                        nextElement.height = nextElementHeight;
-                    }
-                    else {
-                        nextElement.height = nextElementHeight;
-                    }
-                }
             }
         };
         SplitGroup.prototype._findSplit = function (stageX, stageY) {
@@ -3099,13 +3055,66 @@ var editor;
                 var minY = preElementRect.top + (preElement.minHeight ? preElement.minHeight : 10);
                 var maxY = nextElementRect.bottom - (nextElement.minHeight ? nextElement.minHeight : 10);
                 splitdragData.dragRect = new egret.Rectangle(minX, minY, maxX - minX, maxY - minY);
+                // 拖拽分割
+                feng3d.windowEventProxy.on("mousemove", this.onDragMouseMove, this);
+                feng3d.windowEventProxy.on("mouseup", this.onDragMouseUp, this);
             }
         };
-        SplitGroup.prototype.onMouseUp = function (e) {
-            if (splitdragData.splitGroupState == SplitGroupState.draging) {
-                splitdragData.splitGroupState = SplitGroupState.default;
-                splitdragData.dragingMousePoint = null;
+        /**
+         * 拖拽分割
+         */
+        SplitGroup.prototype.onDragMouseMove = function () {
+            var preElement = splitdragData.preElement;
+            var nextElement = splitdragData.nextElement;
+            var stageX = feng3d.windowEventProxy.clientX;
+            var stageY = feng3d.windowEventProxy.clientY;
+            if (splitdragData.layouttype == 1) {
+                var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, stageX));
+                var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
+                var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
+                if (preElement instanceof eui.Group) {
+                    // preElement.setContentSize(preElementWidth, splitdragData.preElementRect.height);
+                    preElement.width = preElementWidth;
+                }
+                else {
+                    preElement.width = preElementWidth;
+                }
+                if (nextElement instanceof eui.Group) {
+                    // nextElement.setContentSize(nextElementWidth, nextElement.contentHeight);
+                    nextElement.width = nextElementWidth;
+                }
+                else {
+                    nextElement.width = nextElementWidth;
+                }
             }
+            else {
+                var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, stageY));
+                var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
+                var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
+                if (preElement instanceof eui.Group) {
+                    // preElement.setContentSize(splitdragData.preElementRect.width, preElementHeight);
+                    preElement.height = preElementHeight;
+                }
+                else {
+                    preElement.height = preElementHeight;
+                }
+                if (nextElement instanceof eui.Group) {
+                    // nextElement.setContentSize(splitdragData.nextElementRect.width, nextElementHeight);
+                    nextElement.height = nextElementHeight;
+                }
+                else {
+                    nextElement.height = nextElementHeight;
+                }
+            }
+        };
+        /**
+         * 停止拖拽
+         */
+        SplitGroup.prototype.onDragMouseUp = function () {
+            splitdragData.splitGroupState = SplitGroupState.default;
+            splitdragData.dragingMousePoint = null;
+            feng3d.windowEventProxy.off("mousemove", this.onDragMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onDragMouseUp, this);
         };
         return SplitGroup;
     }(eui.Group));
