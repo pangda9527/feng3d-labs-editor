@@ -48,6 +48,8 @@
         "src/shortcut/Editorshortcut.ts",
         "src/shortcut/ShortCutSetting.ts",
         //
+        "src/Modules.ts",
+        //
         "src/ui/Feng3dView.ts",
         "src/ui/CameraPreview.ts",
         "src/ui/ParticleEffectController.ts",
@@ -186,7 +188,6 @@
         //
         "src/polyfill/typescript/typescriptSorting.ts",
         "src/ScriptCompiler.ts",
-        "src/Modules.ts",
         "src/Editor.ts"
     ]
 }

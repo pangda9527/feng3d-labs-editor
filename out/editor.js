@@ -2516,6 +2516,37 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    /**
+     * 模块
+     *
+     * 用于管理功能模块
+     */
+    var Modules = /** @class */ (function () {
+        function Modules() {
+            this.moduleViewMap = {};
+        }
+        Modules.prototype.getModuleView = function (moduleName) {
+            var moduleview = this.moduleViewMap[moduleName];
+            if (!moduleview) {
+                var cls = Modules.moduleViewCls[moduleName];
+                if (!cls) {
+                    feng3d.error("\u65E0\u6CD5\u83B7\u53D6\u6A21\u5757 " + moduleName + " \u754C\u9762\u7C7B\u5B9A\u4E49");
+                    return;
+                }
+                moduleview = new cls();
+            }
+        };
+        /**
+         * 模块界面类定义
+         */
+        Modules.moduleViewCls = {};
+        return Modules;
+    }());
+    editor.Modules = Modules;
+    editor.modules = new Modules();
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var Feng3dView = /** @class */ (function (_super) {
         __extends(Feng3dView, _super);
         function Feng3dView() {
@@ -8334,7 +8365,7 @@ var editor;
             var _this = _super.call(this) || this;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "HierarchyViewSkin";
-            _this.moduleName = "Hierarchy";
+            _this.moduleName = HierarchyView.moduleName;
             return _this;
         }
         HierarchyView.prototype.onComplete = function () {
@@ -8396,9 +8427,14 @@ var editor;
                 editor.menu.popup(editor.menuConfig.getCreateObjectMenu());
             }
         };
+        /**
+         * 模块名称
+         */
+        HierarchyView.moduleName = "Hierarchy";
         return HierarchyView;
     }(eui.Component));
     editor.HierarchyView = HierarchyView;
+    editor.Modules.moduleViewCls[HierarchyView.moduleName] = HierarchyView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -16168,21 +16204,6 @@ var editor;
     }());
     editor.ScriptCompiler = ScriptCompiler;
     editor.scriptCompiler = new ScriptCompiler();
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    /**
-     * 模块
-     *
-     * 用于管理功能模块
-     */
-    var Modules = /** @class */ (function () {
-        function Modules() {
-        }
-        return Modules;
-    }());
-    editor.Modules = Modules;
-    editor.modules = new Modules();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

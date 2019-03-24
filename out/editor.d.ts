@@ -895,6 +895,25 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    var modules: Modules;
+    /**
+     * 模块
+     *
+     * 用于管理功能模块
+     */
+    class Modules {
+        message: Message;
+        getModuleView(moduleName: string): void;
+        private moduleViewMap;
+        /**
+         * 模块界面类定义
+         */
+        static moduleViewCls: {
+            [name: string]: feng3d.Constructor<ModuleView>;
+        };
+    }
+}
+declare namespace editor {
     class Feng3dView extends eui.Component implements ModuleView {
         private _canvas;
         private _areaSelectStartPosition;
@@ -2440,6 +2459,10 @@ declare namespace editor {
 }
 declare namespace editor {
     class HierarchyView extends eui.Component implements ModuleView {
+        /**
+         * 模块名称
+         */
+        static moduleName: string;
         hierachyScroller: eui.Scroller;
         list: eui.List;
         private listData;
@@ -3999,17 +4022,6 @@ declare namespace editor {
         private compile;
         private transpileModule;
         private createProgram;
-    }
-}
-declare namespace editor {
-    var modules: Modules;
-    /**
-     * 模块
-     *
-     * 用于管理功能模块
-     */
-    class Modules {
-        message: Message;
     }
 }
 declare namespace editor {
