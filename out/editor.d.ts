@@ -991,9 +991,22 @@ declare namespace editor {
          */
         layouttype: number;
         private _layouttype;
+        /**
+         * 分割子对象列表
+         */
+        private _splitChildren;
+        /**
+         * 分割百分比
+         */
+        private _splitPercents;
         constructor();
-        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
-        $onRemoveFromStage(): void;
+        protected childrenCreated(): void;
+        /**
+         * 初始化界面
+         */
+        private _initView;
+        private onAddedToStage;
+        private onRemovedFromStage;
         /**
          * 界面显示失效
          */

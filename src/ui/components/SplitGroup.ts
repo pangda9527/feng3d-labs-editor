@@ -71,6 +71,17 @@ namespace editor
     var egretDiv = <HTMLDivElement>document.getElementsByClassName("egret-player")[0];
     var splitdragData = new SplitdragData();
 
+    interface SplitItem extends eui.Component
+    {
+
+    }
+
+    enum SplitLayout
+    {
+        HorizontalLayout,
+        VerticalLayout
+    }
+
     /**
      * 分割组，提供鼠标拖拽改变组内对象分割尺寸
      * 注：不支持 SplitGroup 中两个对象都是Group，不支持两个对象都使用百分比宽高
@@ -80,21 +91,21 @@ namespace editor
         /**
          * 布局类型
          */
-        public get layouttype(): number
+        public get layouttype()
         {
-            if (!!this._layouttype) return this._layouttype;
+            if (this._layouttype != undefined) return this._layouttype;
 
             if (this.layout instanceof eui.HorizontalLayout)
             {
-                this._layouttype = 1;
+                this._layouttype = SplitLayout.HorizontalLayout;
             } else if (this.layout instanceof eui.VerticalLayout)
             {
-                this._layouttype = 2;
+                this._layouttype = SplitLayout.VerticalLayout;
             }
 
             return this._layouttype;
         }
-        public set layouttype(value: number)
+        public set layouttype(value: SplitLayout)
         {
             var oldLayouttype = this.layouttype;
             if (oldLayouttype == value) return;
@@ -102,26 +113,69 @@ namespace editor
 
             this._invalidateView()
         }
-        private _layouttype: number;
+        private _layouttype: SplitLayout;
+
+        /**
+         * 分割子对象列表
+         */
+        private _splitChildren: SplitItem[];
+        /**
+         * 分割百分比
+         */
+        private _splitPercents: number[] = [];
 
         constructor()
         {
             super();
         }
 
-        $onAddToStage(stage: egret.Stage, nestLevel: number)
+        protected childrenCreated(): void
         {
-            super.$onAddToStage(stage, nestLevel);
+            super.childrenCreated();
 
+            this._initView();
+
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+            if (this.stage)
+            {
+                this.onAddedToStage();
+            }
+        }
+
+        /**
+         * 初始化界面
+         */
+        private _initView()
+        {
+            var layouttype = this.layouttype;
+
+            // 筛选出应用于分割的子对象
+            this._splitChildren = <any>this.$children.filter(v => true);
+            // 计算子对象尺寸
+            var childrenSizes = this._splitChildren.map(v =>
+            {
+                if (layouttype == SplitLayout.HorizontalLayout)
+                    return v.width;
+                return v.height;
+            })
+            // 计算总量
+            var total = childrenSizes.reduce((pv, cv) => pv + cv, 0)
+            // 计算分割比例
+            this._splitPercents = childrenSizes.map(v => v / total * 100);
+        }
+
+        private onAddedToStage()
+        {
             this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
 
             this._invalidateView();
         }
 
-        $onRemoveFromStage()
+        private onRemovedFromStage()
         {
-            super.$onRemoveFromStage()
 
             this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
@@ -140,7 +194,22 @@ namespace editor
 		 */
         private _updateView()
         {
+            let layout = this.layouttype;
 
+            for (let i = 0; i < this._splitChildren.length; i++)
+            {
+                let child = this._splitChildren[i];
+                let size = this._splitPercents[i];
+                if (layout == SplitLayout.HorizontalLayout)
+                {
+                    child.percentHeight = 100;
+                    child.percentWidth = size;
+                } else
+                {
+                    child.percentWidth = 100;
+                    child.percentHeight = size;
+                }
+            }
         }
 
         private onMouseMove(e: egret.MouseEvent)
@@ -237,15 +306,19 @@ namespace editor
                 var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, stageX));
                 var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
                 var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
-                preElement.width = preElementWidth;
-                nextElement.width = nextElementWidth;
+
+                
+
+                (<eui.Component>preElement).percentWidth = preElementWidth / this.width * 100;
+                (<eui.Component>nextElement).percentWidth = nextElementWidth / this.width * 100;
             } else
             {
                 var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, stageY));
                 var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
                 var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
-                preElement.height = preElementHeight;
-                nextElement.height = nextElementHeight;
+
+                (<eui.Component>preElement).percentHeight = preElementHeight / this.height * 100;
+                (<eui.Component>nextElement).percentHeight = nextElementHeight / this.height * 100;
             }
         }
 

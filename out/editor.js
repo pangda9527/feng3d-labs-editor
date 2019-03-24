@@ -2950,7 +2950,12 @@ var editor;
     var SplitGroup = /** @class */ (function (_super) {
         __extends(SplitGroup, _super);
         function SplitGroup() {
-            return _super.call(this) || this;
+            var _this = _super.call(this) || this;
+            /**
+             * 分割百分比
+             */
+            _this._splitPercents = [];
+            return _this;
         }
         Object.defineProperty(SplitGroup.prototype, "layouttype", {
             /**
@@ -2977,14 +2982,32 @@ var editor;
             enumerable: true,
             configurable: true
         });
-        SplitGroup.prototype.$onAddToStage = function (stage, nestLevel) {
-            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+        SplitGroup.prototype.childrenCreated = function () {
+            _super.prototype.childrenCreated.call(this);
+            this._initView();
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            if (this.stage) {
+                this.onAddedToStage();
+            }
+        };
+        /**
+         * 初始化界面
+         */
+        SplitGroup.prototype._initView = function () {
+            this._childrenPercents = [];
+            var layouttype = this.layouttype;
+            this._splitChildren = this.$children.filter(function (v) { return true; });
+            for (var i = 0; i < this.numChildren; i++) {
+                this.getChildAt(i);
+            }
+        };
+        SplitGroup.prototype.onAddedToStage = function () {
             this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             this._invalidateView();
         };
-        SplitGroup.prototype.$onRemoveFromStage = function () {
-            _super.prototype.$onRemoveFromStage.call(this);
+        SplitGroup.prototype.onRemovedFromStage = function () {
             this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         };
@@ -3072,15 +3095,15 @@ var editor;
                 var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, stageX));
                 var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
                 var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
-                preElement.width = preElementWidth;
-                nextElement.width = nextElementWidth;
+                preElement.percentWidth = preElementWidth / this.width * 100;
+                nextElement.percentWidth = nextElementWidth / this.width * 100;
             }
             else {
                 var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, stageY));
                 var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
                 var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
-                preElement.height = preElementHeight;
-                nextElement.height = nextElementHeight;
+                preElement.percentHeight = preElementHeight / this.height * 100;
+                nextElement.percentHeight = nextElementHeight / this.height * 100;
             }
         };
         /**
