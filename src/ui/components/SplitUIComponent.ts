@@ -71,6 +71,8 @@ namespace editor
      */
     class SplitManager
     {
+        isdebug = false;
+
         /**
          * 状态
          */
@@ -111,15 +113,22 @@ namespace editor
             //
             let checkItems = this.getAllCheckItems();
 
-            var s: egret.Sprite = this["a"] = this["a"] || new egret.Sprite();
-            editorui.tooltipLayer.addChild(s);
-            s.graphics.clear();
-            s.graphics.beginFill(0xff0000);
-            checkItems.forEach(v =>
+            if (this.isdebug)
             {
-                s.graphics.drawRect(v.rect.x, v.rect.y, v.rect.width, v.rect.height);
-            });
-            s.graphics.endFill();
+                let s: egret.Sprite = this["a"] = this["a"] || new egret.Sprite();
+                editorui.tooltipLayer.addChild(s);
+                s.graphics.clear();
+                s.graphics.beginFill(0xff0000);
+                checkItems.forEach(v =>
+                {
+                    s.graphics.drawRect(v.rect.x, v.rect.y, v.rect.width, v.rect.height);
+                });
+                s.graphics.endFill();
+            } else
+            {
+                let s: egret.Sprite = this["a"];
+                if (s && s.parent) s.parent.removeChild(s);
+            }
 
             checkItems.reverse();
             let result = checkItems.filter(v => { return v.rect.contains(e.stageX, e.stageY); });
@@ -153,7 +162,7 @@ namespace editor
                 {
                     if (ci == 0) return pv0;
                     var item: CheckItem = { splitGroup: cv, index: ci - 1, rect: null };
-                    var elementRect = cv.$children[ci - 1].getTransformedBounds(cv.stage);
+                    var elementRect = getGlobalBounds(cv.$children[ci - 1]);
                     if (cv.layout instanceof eui.HorizontalLayout)
                     {
                         item.rect = new feng3d.Rectangle(elementRect.right - 3, elementRect.top, 6, elementRect.height);
@@ -184,8 +193,9 @@ namespace editor
             //
             var preElement = <eui.Group>this.preElement;
             var nextElement = <eui.Group>this.nextElement;
-            var preElementRect = this.preElementRect = preElement.getTransformedBounds(checkItem.splitGroup.stage);
-            var nextElementRect = this.nextElementRect = nextElement.getTransformedBounds(checkItem.splitGroup.stage);
+            var preElementRect = this.preElementRect = getGlobalBounds(preElement);
+            var nextElementRect = this.nextElementRect = getGlobalBounds(nextElement);
+            //
             //
             var minX = preElementRect.left + (preElement.minWidth ? preElement.minWidth : 10);
             var maxX = nextElementRect.right - (nextElement.minWidth ? nextElement.minWidth : 10);
@@ -238,6 +248,13 @@ namespace editor
             feng3d.windowEventProxy.off("mousemove", this.onDragMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onDragMouseUp, this);
         }
+    }
+
+    function getGlobalBounds(displayObject: egret.DisplayObject)
+    {
+        var min = displayObject.localToGlobal();
+        var max = displayObject.localToGlobal(displayObject.width, displayObject.height);
+        return new egret.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
     }
 
     var splitManager = new SplitManager();

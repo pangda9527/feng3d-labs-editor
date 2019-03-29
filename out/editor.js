@@ -2983,6 +2983,7 @@ var editor;
      */
     var SplitManager = /** @class */ (function () {
         function SplitManager() {
+            this.isdebug = false;
             /**
              * 状态
              */
@@ -3009,14 +3010,21 @@ var editor;
                 return;
             //
             var checkItems = this.getAllCheckItems();
-            var s = this["a"] = this["a"] || new egret.Sprite();
-            editor.editorui.tooltipLayer.addChild(s);
-            s.graphics.clear();
-            s.graphics.beginFill(0xff0000);
-            checkItems.forEach(function (v) {
-                s.graphics.drawRect(v.rect.x, v.rect.y, v.rect.width, v.rect.height);
-            });
-            s.graphics.endFill();
+            if (this.isdebug) {
+                var s_1 = this["a"] = this["a"] || new egret.Sprite();
+                editor.editorui.tooltipLayer.addChild(s_1);
+                s_1.graphics.clear();
+                s_1.graphics.beginFill(0xff0000);
+                checkItems.forEach(function (v) {
+                    s_1.graphics.drawRect(v.rect.x, v.rect.y, v.rect.width, v.rect.height);
+                });
+                s_1.graphics.endFill();
+            }
+            else {
+                var s = this["a"];
+                if (s && s.parent)
+                    s.parent.removeChild(s);
+            }
             checkItems.reverse();
             var result = checkItems.filter(function (v) { return v.rect.contains(e.stageX, e.stageY); });
             var checkItem = result[0];
@@ -3045,7 +3053,7 @@ var editor;
                     if (ci == 0)
                         return pv0;
                     var item = { splitGroup: cv, index: ci - 1, rect: null };
-                    var elementRect = cv.$children[ci - 1].getTransformedBounds(cv.stage);
+                    var elementRect = getGlobalBounds(cv.$children[ci - 1]);
                     if (cv.layout instanceof eui.HorizontalLayout) {
                         item.rect = new feng3d.Rectangle(elementRect.right - 3, elementRect.top, 6, elementRect.height);
                     }
@@ -3071,8 +3079,9 @@ var editor;
             //
             var preElement = this.preElement;
             var nextElement = this.nextElement;
-            var preElementRect = this.preElementRect = preElement.getTransformedBounds(checkItem.splitGroup.stage);
-            var nextElementRect = this.nextElementRect = nextElement.getTransformedBounds(checkItem.splitGroup.stage);
+            var preElementRect = this.preElementRect = getGlobalBounds(preElement);
+            var nextElementRect = this.nextElementRect = getGlobalBounds(nextElement);
+            //
             //
             var minX = preElementRect.left + (preElement.minWidth ? preElement.minWidth : 10);
             var maxX = nextElementRect.right - (nextElement.minWidth ? nextElement.minWidth : 10);
@@ -3116,6 +3125,11 @@ var editor;
         };
         return SplitManager;
     }());
+    function getGlobalBounds(displayObject) {
+        var min = displayObject.localToGlobal();
+        var max = displayObject.localToGlobal(displayObject.width, displayObject.height);
+        return new egret.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
+    }
     var splitManager = new SplitManager();
 })(editor || (editor = {}));
 var editor;
