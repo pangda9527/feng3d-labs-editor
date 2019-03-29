@@ -2963,11 +2963,6 @@ var editor;
         return SplitUIComponent;
     }());
     editor.SplitUIComponent = SplitUIComponent;
-    var Layout;
-    (function (Layout) {
-        Layout[Layout["HorizontalLayout"] = 0] = "HorizontalLayout";
-        Layout[Layout["VerticalLayout"] = 1] = "VerticalLayout";
-    })(Layout || (Layout = {}));
     var SplitGroupState;
     (function (SplitGroupState) {
         /**
@@ -3014,6 +3009,14 @@ var editor;
                 return;
             //
             var checkItems = this.getAllCheckItems();
+            var s = this["a"] = this["a"] || new egret.Sprite();
+            editor.editorui.tooltipLayer.addChild(s);
+            s.graphics.clear();
+            s.graphics.beginFill(0xff0000);
+            checkItems.forEach(function (v) {
+                s.graphics.drawRect(v.rect.x, v.rect.y, v.rect.width, v.rect.height);
+            });
+            s.graphics.endFill();
             checkItems.reverse();
             var result = checkItems.filter(function (v) { return v.rect.contains(e.stageX, e.stageY); });
             var checkItem = result[0];
@@ -3038,13 +3041,12 @@ var editor;
         };
         SplitManager.prototype.getAllCheckItems = function () {
             var checkItems = this.splitGroups.reduce(function (pv, cv) {
-                var layout = cv.layout instanceof eui.HorizontalLayout ? Layout.HorizontalLayout : Layout.VerticalLayout;
                 cv.$children.reduce(function (pv0, cv0, ci) {
                     if (ci == 0)
                         return pv0;
-                    var item = { splitGroup: cv, index: ci - 1, layout: layout, rect: null };
+                    var item = { splitGroup: cv, index: ci - 1, rect: null };
                     var elementRect = cv.$children[ci - 1].getTransformedBounds(cv.stage);
-                    if (layout == Layout.HorizontalLayout) {
+                    if (cv.layout instanceof eui.HorizontalLayout) {
                         item.rect = new feng3d.Rectangle(elementRect.right - 3, elementRect.top, 6, elementRect.height);
                     }
                     else {

@@ -43,12 +43,6 @@ namespace editor
         }
     }
 
-    enum Layout
-    {
-        HorizontalLayout,
-        VerticalLayout,
-    }
-
     enum SplitGroupState
     {
         /**
@@ -69,7 +63,6 @@ namespace editor
     {
         splitGroup: SplitGroup;
         index: number;
-        layout: Layout;
         rect: feng3d.Rectangle;
     }
 
@@ -117,6 +110,17 @@ namespace editor
             if (this.state == SplitGroupState.draging) return;
             //
             let checkItems = this.getAllCheckItems();
+
+            var s: egret.Sprite = this["a"] = this["a"] || new egret.Sprite();
+            editorui.tooltipLayer.addChild(s);
+            s.graphics.clear();
+            s.graphics.beginFill(0xff0000);
+            checkItems.forEach(v =>
+            {
+                s.graphics.drawRect(v.rect.x, v.rect.y, v.rect.width, v.rect.height);
+            });
+            s.graphics.endFill();
+
             checkItems.reverse();
             let result = checkItems.filter(v => { return v.rect.contains(e.stageX, e.stageY); });
             var checkItem = result[0];
@@ -145,13 +149,12 @@ namespace editor
         {
             var checkItems: CheckItem[] = this.splitGroups.reduce((pv, cv) =>
             {
-                var layout = cv.layout instanceof eui.HorizontalLayout ? Layout.HorizontalLayout : Layout.VerticalLayout;
                 cv.$children.reduce((pv0, cv0, ci) =>
                 {
                     if (ci == 0) return pv0;
-                    var item: CheckItem = { splitGroup: cv, index: ci - 1, layout: layout, rect: null };
+                    var item: CheckItem = { splitGroup: cv, index: ci - 1, rect: null };
                     var elementRect = cv.$children[ci - 1].getTransformedBounds(cv.stage);
-                    if (layout == Layout.HorizontalLayout)
+                    if (cv.layout instanceof eui.HorizontalLayout)
                     {
                         item.rect = new feng3d.Rectangle(elementRect.right - 3, elementRect.top, 6, elementRect.height);
                     } else
