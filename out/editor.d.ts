@@ -1011,15 +1011,6 @@ declare namespace editor {
         private onRemovedFromStage;
         private onMouseMove;
         private _findSplit;
-        private onMouseDown;
-        /**
-         * 拖拽分割
-         */
-        private onDragMouseMove;
-        /**
-         * 停止拖拽
-         */
-        private onDragMouseUp;
     }
 }
 declare namespace editor {

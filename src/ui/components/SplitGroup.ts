@@ -20,13 +20,101 @@ namespace editor
     {
         splitGroupState = SplitGroupState.default;
 
-        splitGroup: SplitGroup;
+        private _splitGroup: SplitGroup;
+        public get splitGroup(): SplitGroup
+        {
+            return this._splitGroup;
+        }
+        public set splitGroup(value: SplitGroup)
+        {
+            if (this._splitGroup == value) return;
+
+            if (this._splitGroup)
+            {
+                //
+                feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+            }
+
+            this._splitGroup = value;
+
+            if (this._splitGroup)
+            {
+                feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+            }
+        }
         preElement: egret.DisplayObject;
         nextElement: egret.DisplayObject;
         preElementRect: egret.Rectangle;
         nextElementRect: egret.Rectangle;
         dragRect: egret.Rectangle;
         dragingMousePoint: feng3d.Vector2;
+
+        private onMouseDown(e: egret.MouseEvent)
+        {
+            if (this.splitGroupState == SplitGroupState.onSplit)
+            {
+                this.splitGroupState = SplitGroupState.draging;
+                this.dragingMousePoint = new feng3d.Vector2(e.stageX, e.stageY);
+                //
+                var preElement = <eui.Group>this.preElement;
+                var nextElement = <eui.Group>this.nextElement;
+                var preElementRect = this.preElementRect = preElement.getTransformedBounds(this._splitGroup.stage);
+                var nextElementRect = this.nextElementRect = nextElement.getTransformedBounds(this._splitGroup.stage);
+                //
+                var minX = preElementRect.left + (preElement.minWidth ? preElement.minWidth : 10);
+                var maxX = nextElementRect.right - (nextElement.minWidth ? nextElement.minWidth : 10);
+                var minY = preElementRect.top + (preElement.minHeight ? preElement.minHeight : 10);
+                var maxY = nextElementRect.bottom - (nextElement.minHeight ? nextElement.minHeight : 10);
+                this.dragRect = new egret.Rectangle(minX, minY, maxX - minX, maxY - minY);
+
+                // 拖拽分割
+                feng3d.windowEventProxy.on("mousemove", this.onDragMouseMove, this);
+                feng3d.windowEventProxy.on("mouseup", this.onDragMouseUp, this);
+            }
+        }
+
+        /**
+         * 拖拽分割
+         */
+        private onDragMouseMove()
+        {
+            var preElement = this.preElement;
+            var nextElement = this.nextElement;
+
+            var stageX = feng3d.windowEventProxy.clientX;
+            var stageY = feng3d.windowEventProxy.clientY;
+
+            if (this._splitGroup.layout instanceof eui.HorizontalLayout)
+            {
+                var layerX = Math.max(this.dragRect.left, Math.min(this.dragRect.right, stageX));
+                var preElementWidth = this.preElementRect.width + (layerX - this.dragingMousePoint.x);
+                var nextElementWidth = this.nextElementRect.width - (layerX - this.dragingMousePoint.x);
+
+                (<eui.Component>preElement).percentWidth = preElementWidth / this._splitGroup.width * 100;
+                (<eui.Component>nextElement).percentWidth = nextElementWidth / this._splitGroup.width * 100;
+            } else if (this._splitGroup.layout instanceof eui.VerticalLayout)
+            {
+                var layerY = Math.max(this.dragRect.top, Math.min(this.dragRect.bottom, stageY));
+                var preElementHeight = this.preElementRect.height + (layerY - this.dragingMousePoint.y);
+                var nextElementHeight = this.nextElementRect.height - (layerY - this.dragingMousePoint.y);
+
+                (<eui.Component>preElement).percentHeight = preElementHeight / this._splitGroup.height * 100;
+                (<eui.Component>nextElement).percentHeight = nextElementHeight / this._splitGroup.height * 100;
+            }
+        }
+
+        /**
+         * 停止拖拽
+         */
+        private onDragMouseUp()
+        {
+            this.splitGroupState = SplitGroupState.default;
+            this.dragingMousePoint = null;
+            this.splitGroup = null;
+
+            feng3d.windowEventProxy.off("mousemove", this.onDragMouseMove, this);
+            feng3d.windowEventProxy.off("mouseup", this.onDragMouseUp, this);
+        }
     }
 
     var egretDiv = <HTMLDivElement>document.getElementsByClassName("egret-player")[0];
@@ -59,14 +147,11 @@ namespace editor
         private onAddedToStage()
         {
             this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
-            this.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         }
 
         private onRemovedFromStage()
         {
-
             this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
-            this.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         }
 
         private onMouseMove(e: egret.MouseEvent)
@@ -90,6 +175,7 @@ namespace editor
             egretDiv.style.cursor = "auto";
             feng3d.shortcut.deactivityState("splitGroupDraging");
 
+            var index = -1;
             for (let i = 0; i < this.numElements - 1; i++)
             {
                 var element = this.getElementAt(i);
@@ -98,92 +184,30 @@ namespace editor
                 var elementRectBotton = new feng3d.Rectangle(elementRect.left, elementRect.bottom - 3, elementRect.width, 6);
                 if (this.layout instanceof eui.HorizontalLayout && elementRectRight.contains(stageX, stageY))
                 {
-                    splitdragData.splitGroupState = SplitGroupState.onSplit;
-                    egretDiv.style.cursor = "e-resize";
-                    feng3d.shortcut.activityState("splitGroupDraging");
-                    //
-                    splitdragData.splitGroup = this;
-                    splitdragData.preElement = this.getElementAt(i);
-                    splitdragData.nextElement = this.getElementAt(i + 1);
+                    index = i;
                     break;
                 } else if (this.layout instanceof eui.VerticalLayout && elementRectBotton.contains(stageX, stageY))
                 {
-                    splitdragData.splitGroupState = SplitGroupState.onSplit;
-                    egretDiv.style.cursor = "n-resize";
-                    feng3d.shortcut.activityState("splitGroupDraging");
-                    //
-                    splitdragData.splitGroup = this;
-                    splitdragData.preElement = this.getElementAt(i);
-                    splitdragData.nextElement = this.getElementAt(i + 1);
+                    index = i;
                     break;
                 }
             }
-        }
-
-        private onMouseDown(e: egret.MouseEvent)
-        {
-            if (splitdragData.splitGroupState == SplitGroupState.onSplit)
+            if (index != -1)
             {
-                splitdragData.splitGroupState = SplitGroupState.draging;
-                splitdragData.dragingMousePoint = new feng3d.Vector2(e.stageX, e.stageY);
+                splitdragData.splitGroupState = SplitGroupState.onSplit;
+                feng3d.shortcut.activityState("splitGroupDraging");
                 //
-                var preElement = <eui.Group>splitdragData.preElement;
-                var nextElement = <eui.Group>splitdragData.nextElement;
-                var preElementRect = splitdragData.preElementRect = preElement.getTransformedBounds(this.stage);
-                var nextElementRect = splitdragData.nextElementRect = nextElement.getTransformedBounds(this.stage);
+                splitdragData.splitGroup = this;
+                splitdragData.preElement = this.getElementAt(index);
+                splitdragData.nextElement = this.getElementAt(index + 1);
                 //
-                var minX = preElementRect.left + (preElement.minWidth ? preElement.minWidth : 10);
-                var maxX = nextElementRect.right - (nextElement.minWidth ? nextElement.minWidth : 10);
-                var minY = preElementRect.top + (preElement.minHeight ? preElement.minHeight : 10);
-                var maxY = nextElementRect.bottom - (nextElement.minHeight ? nextElement.minHeight : 10);
-                splitdragData.dragRect = new egret.Rectangle(minX, minY, maxX - minX, maxY - minY);
-
-                // 拖拽分割
-                feng3d.windowEventProxy.on("mousemove", this.onDragMouseMove, this);
-                feng3d.windowEventProxy.on("mouseup", this.onDragMouseUp, this);
-            }
-        }
-
-        /**
-         * 拖拽分割
-         */
-        private onDragMouseMove()
-        {
-            var preElement = splitdragData.preElement;
-            var nextElement = splitdragData.nextElement;
-
-            var stageX = feng3d.windowEventProxy.clientX;
-            var stageY = feng3d.windowEventProxy.clientY;
-
-            if (this.layout instanceof eui.HorizontalLayout)
+                egretDiv.style.cursor = this.layout instanceof eui.HorizontalLayout ? "e-resize" : "n-resize";
+            } else
             {
-                var layerX = Math.max(splitdragData.dragRect.left, Math.min(splitdragData.dragRect.right, stageX));
-                var preElementWidth = splitdragData.preElementRect.width + (layerX - splitdragData.dragingMousePoint.x);
-                var nextElementWidth = splitdragData.nextElementRect.width - (layerX - splitdragData.dragingMousePoint.x);
-
-                (<eui.Component>preElement).percentWidth = preElementWidth / this.width * 100;
-                (<eui.Component>nextElement).percentWidth = nextElementWidth / this.width * 100;
-            } else if (this.layout instanceof eui.VerticalLayout)
-            {
-                var layerY = Math.max(splitdragData.dragRect.top, Math.min(splitdragData.dragRect.bottom, stageY));
-                var preElementHeight = splitdragData.preElementRect.height + (layerY - splitdragData.dragingMousePoint.y);
-                var nextElementHeight = splitdragData.nextElementRect.height - (layerY - splitdragData.dragingMousePoint.y);
-
-                (<eui.Component>preElement).percentHeight = preElementHeight / this.height * 100;
-                (<eui.Component>nextElement).percentHeight = nextElementHeight / this.height * 100;
+                splitdragData.splitGroup = null;
+                //
+                egretDiv.style.cursor = "auto";
             }
-        }
-
-        /**
-         * 停止拖拽
-         */
-        private onDragMouseUp()
-        {
-            splitdragData.splitGroupState = SplitGroupState.default;
-            splitdragData.dragingMousePoint = null;
-
-            feng3d.windowEventProxy.off("mousemove", this.onDragMouseMove, this);
-            feng3d.windowEventProxy.off("mouseup", this.onDragMouseUp, this);
         }
     }
 }
