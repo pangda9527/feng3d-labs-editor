@@ -3014,6 +3014,7 @@ var editor;
                 return;
             //
             var checkItems = this.getAllCheckItems();
+            checkItems.reverse();
             var result = checkItems.filter(function (v) { return v.rect.contains(e.stageX, e.stageY); });
             var checkItem = result[0];
             if (checkItem) {
@@ -3058,7 +3059,12 @@ var editor;
         };
         SplitManager.prototype.onMouseDown = function (e) {
             this.state = SplitGroupState.draging;
+            // 拖拽分割
+            feng3d.windowEventProxy.on("mousemove", this.onDragMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onDragMouseUp, this);
             var checkItem = this.checkItem;
+            if (!checkItem)
+                return;
             this.dragingMousePoint = new feng3d.Vector2(e.stageX, e.stageY);
             //
             var preElement = this.preElement;
@@ -3071,9 +3077,6 @@ var editor;
             var minY = preElementRect.top + (preElement.minHeight ? preElement.minHeight : 10);
             var maxY = nextElementRect.bottom - (nextElement.minHeight ? nextElement.minHeight : 10);
             this.dragRect = new egret.Rectangle(minX, minY, maxX - minX, maxY - minY);
-            // 拖拽分割
-            feng3d.windowEventProxy.on("mousemove", this.onDragMouseMove, this);
-            feng3d.windowEventProxy.on("mouseup", this.onDragMouseUp, this);
         };
         /**
          * 拖拽分割

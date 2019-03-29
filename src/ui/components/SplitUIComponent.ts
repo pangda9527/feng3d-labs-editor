@@ -117,6 +117,7 @@ namespace editor
             if (this.state == SplitGroupState.draging) return;
             //
             let checkItems = this.getAllCheckItems();
+            checkItems.reverse();
             let result = checkItems.filter(v => { return v.rect.contains(e.stageX, e.stageY); });
             var checkItem = result[0];
             if (checkItem)
@@ -169,7 +170,12 @@ namespace editor
         {
             this.state = SplitGroupState.draging;
 
+            // 拖拽分割
+            feng3d.windowEventProxy.on("mousemove", this.onDragMouseMove, this);
+            feng3d.windowEventProxy.on("mouseup", this.onDragMouseUp, this);
+
             var checkItem = this.checkItem;
+            if (!checkItem) return;
 
             this.dragingMousePoint = new feng3d.Vector2(e.stageX, e.stageY);
             //
@@ -183,10 +189,6 @@ namespace editor
             var minY = preElementRect.top + (preElement.minHeight ? preElement.minHeight : 10);
             var maxY = nextElementRect.bottom - (nextElement.minHeight ? nextElement.minHeight : 10);
             this.dragRect = new egret.Rectangle(minX, minY, maxX - minX, maxY - minY);
-
-            // 拖拽分割
-            feng3d.windowEventProxy.on("mousemove", this.onDragMouseMove, this);
-            feng3d.windowEventProxy.on("mouseup", this.onDragMouseUp, this);
         }
 
         /**

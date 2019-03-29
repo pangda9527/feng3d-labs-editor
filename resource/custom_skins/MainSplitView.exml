@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <e:Skin class="MainSplitView" xmlns:e="http://ns.egret.com/eui" xmlns:editor="editor.*">
 	<editor:SplitGroup left="0" top="0" right="0" bottom="0">
-		<editor:SplitGroup x="0" y="0" width="100%" height="100%" minWidth="200">
-		<editor:SplitGroup x="0" y="0" height="100%" width="100%" anchorOffsetY="0" minHeight="150">
-			<editor:TabView x="519" y="377" height="100%" width="200">
-			<editor:HierarchyView minWidth="150" skinName="HierarchyViewSkin" scaleX="1" scaleY="1" left="0" top="0" right="0" bottom="0"/>
-			</editor:TabView>
-			<editor:TabView x="529" y="387" height="100%" width="100%">
-			<editor:Feng3dView minWidth="100" minHeight="100" skinName="Feng3dViewSkin" scaleX="1" scaleY="1" left="0" top="0" right="0" bottom="0"/>
+		<editor:SplitGroup x="0" y="0" width="100%" height="100%">
+			<editor:SplitGroup x="0" y="0" height="100%" width="100%" anchorOffsetY="0">
+				<editor:TabView x="519" y="377" height="100%" width="200">
+					<editor:HierarchyView skinName="HierarchyViewSkin" scaleX="1" scaleY="1" left="0" top="0" right="0"
+					                      bottom="0" />
+				</editor:TabView>
+				<editor:TabView x="529" y="387" height="100%" width="100%">
+					<editor:Feng3dView minWidth="100" minHeight="100" skinName="Feng3dViewSkin" scaleX="1" scaleY="1" left="0" top="0"
+					                   right="0" bottom="0" />
+				</editor:TabView>
+				<editor:layout>
+					<e:HorizontalLayout gap="4" />
+				</editor:layout>
+			</editor:SplitGroup>
+			<editor:TabView x="509" y="367" height="250" width="100%">
+				<editor:AssetView scaleX="1" scaleY="1" minHeight="100" skinName="AssetView" left="0" top="0" bottom="0" right="0" />
 			</editor:TabView>
 			<editor:layout>
-			<e:HorizontalLayout gap="4"/>
+				<e:VerticalLayout gap="4" />
 			</editor:layout>
 		</editor:SplitGroup>
-		<editor:TabView x="509" y="367" height="250" width="100%">
-			<editor:AssetView scaleX="1" scaleY="1" minHeight="100" skinName="AssetView" left="0" top="0" bottom="0" right="0"/>
-		</editor:TabView>
-		<editor:layout>
-			<e:VerticalLayout gap="4"/>
-		</editor:layout>
-		</editor:SplitGroup>
 		<editor:TabView x="100" y="100" height="100%" width="250">
-		<editor:NavigationView top="0" left="0" bottom="0" right="0"/>
-		<editor:InspectorView top="0" left="0" bottom="0" right="0"/>
+			<editor:NavigationView top="0" left="0" bottom="0" right="0" />
+			<editor:InspectorView top="0" left="0" bottom="0" right="0" />
 		</editor:TabView>
 		<editor:layout>
-		<e:HorizontalLayout gap="4"/>
+			<e:HorizontalLayout gap="4" />
 		</editor:layout>
 	</editor:SplitGroup>
 </e:Skin>
