@@ -1006,11 +1006,21 @@ declare namespace editor {
      */
     class SplitGroup extends eui.Group {
         constructor();
-        protected childrenCreated(): void;
+    }
+}
+declare namespace editor {
+    /**
+     * 可拆分UI组件
+     */
+    class SplitUIComponent {
+        private splitGroup;
+        init(splitGroup: SplitGroup): void;
+        /**
+         * 销毁
+         */
+        dispose(): void;
         private onAddedToStage;
         private onRemovedFromStage;
-        private onMouseMove;
-        private _findSplit;
     }
 }
 declare namespace editor {

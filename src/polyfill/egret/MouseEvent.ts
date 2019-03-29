@@ -192,4 +192,5 @@ namespace egret
             return player.webTouchHandler;
         }
     };
+    
 }
