@@ -8140,11 +8140,13 @@ var editor;
         };
         InspectorView.prototype.updateView = function () {
             var _this = this;
-            this.typeLab.text = "Inspector";
+            this.typeLab.text = "";
             this.backButton.visible = this._viewDataList.length > 0;
             if (this._view && this._view.parent) {
                 this._view.parent.removeChild(this._view);
             }
+            if (this.emptyLabel.parent)
+                this.emptyLabel.parent.removeChild(this.emptyLabel);
             if (this._viewData) {
                 if (this._viewData instanceof editor.AssetNode) {
                     if (this._viewData.isDirectory)
@@ -8166,6 +8168,9 @@ var editor;
                 else {
                     this.updateShowData(this._viewData);
                 }
+            }
+            else {
+                this.group.addChild(this.emptyLabel);
             }
         };
         /**
@@ -8220,7 +8225,7 @@ var editor;
             this.showData(data, true);
         };
         InspectorView.prototype.updateShowData = function (showdata) {
-            this.typeLab.text = "Inspector - " + showdata.constructor["name"];
+            this.typeLab.text = "" + showdata.constructor["name"];
             if (this._view)
                 this._view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
             var editable = true;

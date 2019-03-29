@@ -2411,6 +2411,7 @@ declare namespace editor {
         typeLab: eui.Label;
         backButton: eui.Button;
         group: eui.Group;
+        emptyLabel: eui.Label;
         moduleName: string;
         constructor();
         private showData;
