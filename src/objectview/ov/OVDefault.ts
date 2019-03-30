@@ -35,8 +35,7 @@ namespace editor
 		{
 			super.$onAddToStage(stage, nestLevel);
 			//
-			this.initview();
-			this.updateView();
+			this.invalidateView();
 		}
 
 		$onRemoveFromStage()
@@ -47,6 +46,7 @@ namespace editor
 
 		initview()
 		{
+			if (this.blockViews) return;
 			this.blockViews = [];
 			var objectBlockInfos = this._objectViewInfo.objectBlockInfos;
 			for (var i = 0; i < objectBlockInfos.length; i++)
@@ -80,8 +80,12 @@ namespace editor
 		{
 			this._space = value;
 			this.dispose();
-			this.initview();
-			this.updateView();
+			this.invalidateView();
+		}
+
+		private invalidateView()
+		{
+			this.once(egret.Event.ENTER_FRAME, this.updateView, this);
 		}
 
 		/**
@@ -90,6 +94,8 @@ namespace editor
 		updateView(): void
 		{
 			if (!this.stage) return;
+
+			this.initview();
 
 			for (var i = 0; i < this.blockViews.length; i++)
 			{

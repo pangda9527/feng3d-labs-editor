@@ -1099,6 +1099,8 @@ declare namespace editor {
         protected childrenCreated(): void;
         private onComplete;
         private _onAddedToStage;
+        private addModule;
+        private removeModule;
         private onRemovedFromStage;
         /**
          * 界面显示失效
@@ -1931,6 +1933,7 @@ declare namespace editor {
         initview(): void;
         dispose(): void;
         space: Object;
+        private invalidateView;
         /**
          * 更新界面
          */

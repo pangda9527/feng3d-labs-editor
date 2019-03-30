@@ -167,6 +167,10 @@ namespace editor
 						this._moduleViews.push(result);
 						this._invalidateView();
 					}
+				} else
+				{
+					let moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
+					this.addModule(moduleView);
 				}
 			});
 			drag.register(this.contentGroup, null, ["moduleView"], (dragSource) =>
@@ -174,6 +178,25 @@ namespace editor
 
 			});
 			this._invalidateView()
+		}
+
+		private addModule(moduleView: ModuleView)
+		{
+			this._moduleViews.push(moduleView);
+			this._showModule = moduleView.moduleName;
+			this._invalidateView();
+		}
+
+		private removeModule(moduleName: string)
+		{
+			let moduleView = this._moduleViews.filter(v => v.moduleName == moduleName)[0];
+			var index = this._moduleViews.indexOf(moduleView);
+			feng3d.assert(index != -1);
+			this._moduleViews.splice(index, 1);
+
+			this._invalidateView();
+
+			return moduleView;
 		}
 
 		private onRemovedFromStage()
@@ -201,12 +224,12 @@ namespace editor
 
 			var buttonNum = this._tabButtons.length;
 			var viewNum = this._moduleViews.length;
-			for (let i = 0, max = Math.max(buttonNum, viewNum); i < max; i++)
+			for (var i = 0, max = Math.max(buttonNum, viewNum); i < max; i++)
 			{
 				if (i >= buttonNum)
 				{
 					//
-					let tabButton = this._tabViewButtonPool.pop();
+					var tabButton = this._tabViewButtonPool.pop();
 					if (!tabButton) tabButton = new TabViewButton();
 					tabButton.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
 					//
@@ -218,7 +241,8 @@ namespace editor
 				}
 				if (i >= viewNum)
 				{
-					let tabButton = this._tabButtons[i];
+					var tabButton = this._tabButtons[i];
+					tabButton.parent && tabButton.parent.removeChild(tabButton);
 					this._tabViewButtonPool.push(tabButton);
 					tabButton.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
 					//
@@ -226,8 +250,8 @@ namespace editor
 				}
 				if (i < viewNum)
 				{
-					let tabButton = this._tabButtons[i];
-					let moduleView = this._moduleViews[i];
+					var tabButton = this._tabButtons[i];
+					var moduleView = this._moduleViews[i];
 					//
 					tabButton.moduleName = moduleView.moduleName;
 					tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
@@ -235,7 +259,7 @@ namespace editor
 					//
 					if (moduleView.moduleName == this._showModule)
 					{
-						if (!moduleView.parent) this.contentGroup.addChild(moduleView);
+						this.contentGroup.addChild(moduleView);
 					} else
 					{
 						if (moduleView.parent) moduleView.parent.removeChild(moduleView);

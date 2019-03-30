@@ -3302,10 +3302,27 @@ var editor;
                         _this._invalidateView();
                     }
                 }
+                else {
+                    var moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
+                    _this.addModule(moduleView);
+                }
             });
             editor.drag.register(this.contentGroup, null, ["moduleView"], function (dragSource) {
             });
             this._invalidateView();
+        };
+        TabView.prototype.addModule = function (moduleView) {
+            this._moduleViews.push(moduleView);
+            this._showModule = moduleView.moduleName;
+            this._invalidateView();
+        };
+        TabView.prototype.removeModule = function (moduleName) {
+            var moduleView = this._moduleViews.filter(function (v) { return v.moduleName == moduleName; })[0];
+            var index = this._moduleViews.indexOf(moduleView);
+            feng3d.assert(index != -1);
+            this._moduleViews.splice(index, 1);
+            this._invalidateView();
+            return moduleView;
         };
         TabView.prototype.onRemovedFromStage = function () {
             editor.drag.unregister(this.tabGroup);
@@ -3328,47 +3345,43 @@ var editor;
                 this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
             var buttonNum = this._tabButtons.length;
             var viewNum = this._moduleViews.length;
-            var _loop_1 = function (i, max) {
+            for (var i = 0, max = Math.max(buttonNum, viewNum); i < max; i++) {
                 if (i >= buttonNum) {
                     //
-                    var tabButton_1 = this_1._tabViewButtonPool.pop();
-                    if (!tabButton_1)
-                        tabButton_1 = new editor.TabViewButton();
-                    tabButton_1.addEventListener(egret.MouseEvent.CLICK, this_1._onTabButtonClick, this_1);
+                    var tabButton = this._tabViewButtonPool.pop();
+                    if (!tabButton)
+                        tabButton = new editor.TabViewButton();
+                    tabButton.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
                     //
-                    editor.drag.register(tabButton_1, function (dragSource) {
-                        dragSource.moduleView = { tabView: _this, moduleName: tabButton_1.moduleName };
+                    editor.drag.register(tabButton, function (dragSource) {
+                        dragSource.moduleView = { tabView: _this, moduleName: tabButton.moduleName };
                     }, []);
-                    this_1._tabButtons.push(tabButton_1);
+                    this._tabButtons.push(tabButton);
                 }
                 if (i >= viewNum) {
-                    var tabButton = this_1._tabButtons[i];
-                    this_1._tabViewButtonPool.push(tabButton);
-                    tabButton.removeEventListener(egret.MouseEvent.CLICK, this_1._onTabButtonClick, this_1);
+                    var tabButton = this._tabButtons[i];
+                    tabButton.parent && tabButton.parent.removeChild(tabButton);
+                    this._tabViewButtonPool.push(tabButton);
+                    tabButton.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
                     //
                     editor.drag.unregister(tabButton);
                 }
                 if (i < viewNum) {
-                    var tabButton = this_1._tabButtons[i];
-                    var moduleView = this_1._moduleViews[i];
+                    var tabButton = this._tabButtons[i];
+                    var moduleView = this._moduleViews[i];
                     //
                     tabButton.moduleName = moduleView.moduleName;
-                    tabButton.currentState = tabButton.moduleName == this_1._showModule ? "selected" : "up";
-                    this_1.tabGroup.addChild(tabButton);
+                    tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
+                    this.tabGroup.addChild(tabButton);
                     //
-                    if (moduleView.moduleName == this_1._showModule) {
-                        if (!moduleView.parent)
-                            this_1.contentGroup.addChild(moduleView);
+                    if (moduleView.moduleName == this._showModule) {
+                        this.contentGroup.addChild(moduleView);
                     }
                     else {
                         if (moduleView.parent)
                             moduleView.parent.removeChild(moduleView);
                     }
                 }
-            };
-            var this_1 = this;
-            for (var i = 0, max = Math.max(buttonNum, viewNum); i < max; i++) {
-                _loop_1(i, max);
             }
             this._tabButtons.length = viewNum;
         };
@@ -6426,14 +6439,15 @@ var editor;
         OVDefault.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             //
-            this.initview();
-            this.updateView();
+            this.invalidateView();
         };
         OVDefault.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
             this.dispose();
         };
         OVDefault.prototype.initview = function () {
+            if (this.blockViews)
+                return;
             this.blockViews = [];
             var objectBlockInfos = this._objectViewInfo.objectBlockInfos;
             for (var i = 0; i < objectBlockInfos.length; i++) {
@@ -6461,18 +6475,21 @@ var editor;
             set: function (value) {
                 this._space = value;
                 this.dispose();
-                this.initview();
-                this.updateView();
+                this.invalidateView();
             },
             enumerable: true,
             configurable: true
         });
+        OVDefault.prototype.invalidateView = function () {
+            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+        };
         /**
          * 更新界面
          */
         OVDefault.prototype.updateView = function () {
             if (!this.stage)
                 return;
+            this.initview();
             for (var i = 0; i < this.blockViews.length; i++) {
                 this.blockViews[i].updateView();
             }
