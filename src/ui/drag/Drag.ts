@@ -191,7 +191,10 @@ namespace editor
 
 		acceptableitems.forEach(element =>
 		{
-			if (element.displayObject.getTransformedBounds(stage).contains(event.stageX, event.stageY))
+			var min = element.displayObject.localToGlobal(0, 0);
+			var max = element.displayObject.localToGlobal(element.displayObject.width, element.displayObject.height);
+			var rect = new feng3d.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
+			if (rect.contains(event.stageX, event.stageY))
 			{
 				accepters.set(element.displayObject, element.displayObject.alpha);
 				element.displayObject.alpha = 0.5;

@@ -41,9 +41,9 @@ namespace editor
         {
             if (editorcache.viewLayout)
             {
-                this.removeChildAt(0);
-                var sp: SplitGroup = <any>this._createViews(editorcache.viewLayout);
-                this.addChild(sp);
+                // this.removeChildAt(0);
+                // var sp: SplitGroup = <any>this._createViews(editorcache.viewLayout);
+                // this.addChild(sp);
             } else
             {
                 this._saveViewLayout();

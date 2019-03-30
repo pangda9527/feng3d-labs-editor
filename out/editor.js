@@ -2244,7 +2244,10 @@ var editor;
         });
         accepters.clear();
         acceptableitems.forEach(function (element) {
-            if (element.displayObject.getTransformedBounds(stage).contains(event.stageX, event.stageY)) {
+            var min = element.displayObject.localToGlobal(0, 0);
+            var max = element.displayObject.localToGlobal(element.displayObject.width, element.displayObject.height);
+            var rect = new feng3d.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
+            if (rect.contains(event.stageX, event.stageY)) {
                 accepters.set(element.displayObject, element.displayObject.alpha);
                 element.displayObject.alpha = 0.5;
             }
@@ -9848,9 +9851,9 @@ var editor;
         };
         MainSplitView.prototype._initViewLayout = function () {
             if (editor.editorcache.viewLayout) {
-                this.removeChildAt(0);
-                var sp = this._createViews(editor.editorcache.viewLayout);
-                this.addChild(sp);
+                // this.removeChildAt(0);
+                // var sp: SplitGroup = <any>this._createViews(editorcache.viewLayout);
+                // this.addChild(sp);
             }
             else {
                 this._saveViewLayout();
