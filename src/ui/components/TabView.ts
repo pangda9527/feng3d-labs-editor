@@ -199,43 +199,50 @@ namespace editor
 			// 设置默认显示模块名称
 			if (moduleNames.indexOf(this._showModule) == -1) this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
 
-			//
-			this._tabButtons.forEach(v =>
+			var buttonNum = this._tabButtons.length;
+			var viewNum = this._moduleViews.length;
+			for (let i = 0, max = Math.max(buttonNum, viewNum); i < max; i++)
 			{
-				v.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
-				drag.unregister(v);
-				v.parent && v.parent.removeChild(v);
-				this._tabViewButtonPool.push(v);
-			});
-			this._tabButtons.length = 0;
-
-			// 控制按钮状态
-			this._moduleViews.forEach(moduleView =>
-			{
-				//
-				let tabButton = this._tabViewButtonPool.pop();
-				if (!tabButton) tabButton = new TabViewButton();
-				tabButton.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
-				//
-				drag.register(tabButton, (dragSource) =>
+				if (i >= buttonNum)
 				{
-					dragSource.moduleView = { tabView: <any>this, moduleName: moduleView.moduleName };
-				}, []);
-
-				this._tabButtons.push(tabButton);
-				//
-				tabButton.moduleName = moduleView.moduleName;
-				tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
-				this.tabGroup.addChild(tabButton);
-				//
-				if (moduleView.moduleName == this._showModule)
-				{
-					if (!moduleView.parent) this.contentGroup.addChild(moduleView);
-				} else
-				{
-					if (moduleView.parent) moduleView.parent.removeChild(moduleView);
+					//
+					let tabButton = this._tabViewButtonPool.pop();
+					if (!tabButton) tabButton = new TabViewButton();
+					tabButton.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
+					//
+					drag.register(tabButton, (dragSource) =>
+					{
+						dragSource.moduleView = { tabView: <any>this, moduleName: tabButton.moduleName };
+					}, []);
+					this._tabButtons.push(tabButton);
 				}
-			});
+				if (i >= viewNum)
+				{
+					let tabButton = this._tabButtons[i];
+					this._tabViewButtonPool.push(tabButton);
+					tabButton.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
+					//
+					drag.unregister(tabButton);
+				}
+				if (i < viewNum)
+				{
+					let tabButton = this._tabButtons[i];
+					let moduleView = this._moduleViews[i];
+					//
+					tabButton.moduleName = moduleView.moduleName;
+					tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
+					this.tabGroup.addChild(tabButton);
+					//
+					if (moduleView.moduleName == this._showModule)
+					{
+						if (!moduleView.parent) this.contentGroup.addChild(moduleView);
+					} else
+					{
+						if (moduleView.parent) moduleView.parent.removeChild(moduleView);
+					}
+				}
+			}
+			this._tabButtons.length = viewNum;
 		}
 
 		/**

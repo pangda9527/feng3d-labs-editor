@@ -3326,40 +3326,51 @@ var editor;
             // 设置默认显示模块名称
             if (moduleNames.indexOf(this._showModule) == -1)
                 this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
-            //
-            this._tabButtons.forEach(function (v) {
-                v.removeEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
-                editor.drag.unregister(v);
-                v.parent && v.parent.removeChild(v);
-                _this._tabViewButtonPool.push(v);
-            });
-            this._tabButtons.length = 0;
-            // 控制按钮状态
-            this._moduleViews.forEach(function (moduleView) {
-                //
-                var tabButton = _this._tabViewButtonPool.pop();
-                if (!tabButton)
-                    tabButton = new editor.TabViewButton();
-                tabButton.addEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
-                //
-                editor.drag.register(tabButton, function (dragSource) {
-                    dragSource.moduleView = { tabView: _this, moduleName: moduleView.moduleName };
-                }, []);
-                _this._tabButtons.push(tabButton);
-                //
-                tabButton.moduleName = moduleView.moduleName;
-                tabButton.currentState = tabButton.moduleName == _this._showModule ? "selected" : "up";
-                _this.tabGroup.addChild(tabButton);
-                //
-                if (moduleView.moduleName == _this._showModule) {
-                    if (!moduleView.parent)
-                        _this.contentGroup.addChild(moduleView);
+            var buttonNum = this._tabButtons.length;
+            var viewNum = this._moduleViews.length;
+            var _loop_1 = function (i, max) {
+                if (i >= buttonNum) {
+                    //
+                    var tabButton_1 = this_1._tabViewButtonPool.pop();
+                    if (!tabButton_1)
+                        tabButton_1 = new editor.TabViewButton();
+                    tabButton_1.addEventListener(egret.MouseEvent.CLICK, this_1._onTabButtonClick, this_1);
+                    //
+                    editor.drag.register(tabButton_1, function (dragSource) {
+                        dragSource.moduleView = { tabView: _this, moduleName: tabButton_1.moduleName };
+                    }, []);
+                    this_1._tabButtons.push(tabButton_1);
                 }
-                else {
-                    if (moduleView.parent)
-                        moduleView.parent.removeChild(moduleView);
+                if (i >= viewNum) {
+                    var tabButton = this_1._tabButtons[i];
+                    this_1._tabViewButtonPool.push(tabButton);
+                    tabButton.removeEventListener(egret.MouseEvent.CLICK, this_1._onTabButtonClick, this_1);
+                    //
+                    editor.drag.unregister(tabButton);
                 }
-            });
+                if (i < viewNum) {
+                    var tabButton = this_1._tabButtons[i];
+                    var moduleView = this_1._moduleViews[i];
+                    //
+                    tabButton.moduleName = moduleView.moduleName;
+                    tabButton.currentState = tabButton.moduleName == this_1._showModule ? "selected" : "up";
+                    this_1.tabGroup.addChild(tabButton);
+                    //
+                    if (moduleView.moduleName == this_1._showModule) {
+                        if (!moduleView.parent)
+                            this_1.contentGroup.addChild(moduleView);
+                    }
+                    else {
+                        if (moduleView.parent)
+                            moduleView.parent.removeChild(moduleView);
+                    }
+                }
+            };
+            var this_1 = this;
+            for (var i = 0, max = Math.max(buttonNum, viewNum); i < max; i++) {
+                _loop_1(i, max);
+            }
+            this._tabButtons.length = viewNum;
         };
         /**
          * 点击按钮事件
