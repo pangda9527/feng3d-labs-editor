@@ -2557,7 +2557,7 @@ var editor;
             feng3d.Stats.init(document.getElementById("stats"));
             editor.editorui.feng3dView = _this;
             //
-            _this.moduleName = "Scene";
+            _this.moduleName = Feng3dView.moduleName;
             //
             _this._areaSelectRect = new editor.AreaSelectRect();
             //
@@ -2637,6 +2637,7 @@ var editor;
             feng3d.Stats.instance.dom.style.left = bound.x + "px";
             feng3d.Stats.instance.dom.style.top = bound.y + "px";
         };
+        Feng3dView.moduleName = "Scene";
         return Feng3dView;
     }(eui.Component));
     editor.Feng3dView = Feng3dView;
@@ -3122,6 +3123,7 @@ var editor;
             this.checkItem = null;
             feng3d.windowEventProxy.off("mousemove", this.onDragMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onDragMouseUp, this);
+            feng3d.dispatcher.dispatch("viewLayout.changed");
         };
         return SplitManager;
     }());
@@ -3196,12 +3198,22 @@ var editor;
             this._tabViewInstance = new TabViewInstance(moduleviews);
             this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
             this.addChild(this._tabViewInstance);
+            if (this._moduleNames) {
+                this._tabViewInstance.setModuleNames(this._moduleNames);
+                this._moduleNames = null;
+            }
         };
         /**
          * 获取模块名称列表
          */
         TabView.prototype.getModuleNames = function () {
             return this._tabViewInstance.getModuleNames();
+        };
+        TabView.prototype.setModuleNames = function (moduleNames) {
+            if (this._tabViewInstance)
+                this._tabViewInstance.setModuleNames(moduleNames);
+            else
+                this._moduleNames = moduleNames;
         };
         return TabView;
     }(eui.Group));
@@ -3233,6 +3245,41 @@ var editor;
         TabViewInstance.prototype.getModuleNames = function () {
             var moduleNames = this._moduleViews.map(function (v) { return v.moduleName; });
             return moduleNames;
+        };
+        TabViewInstance.prototype.setModuleNames = function (moduleNames) {
+            var _this = this;
+            // 移除所有模块界面
+            this._moduleViews.concat().forEach(function (v) {
+                v.parent && v.parent.removeChild(v);
+            });
+            //
+            this._moduleViews = [];
+            moduleNames.forEach(function (v) {
+                var moduleView;
+                switch (v) {
+                    case editor.HierarchyView.moduleName:
+                        moduleView = new editor.HierarchyView();
+                        break;
+                    case editor.InspectorView.moduleName:
+                        moduleView = new editor.InspectorView();
+                        break;
+                    case editor.AssetView.moduleName:
+                        moduleView = new editor.AssetView();
+                        break;
+                    case editor.Feng3dView.moduleName:
+                        moduleView = new editor.Feng3dView();
+                        break;
+                    default:
+                        break;
+                }
+                if (moduleView) {
+                    moduleView.top = moduleView.bottom = moduleView.left = moduleView.right = 0;
+                    _this._moduleViews.push(moduleView);
+                }
+                else {
+                    console.warn("\u6CA1\u6709\u627E\u5230\u5BF9\u5E94\u6A21\u5757\u754C\u9762 " + v);
+                }
+            });
         };
         TabViewInstance.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this._onAddedToStage, this);
@@ -8186,7 +8233,7 @@ var editor;
             _this._dataChanged = false;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "InspectorViewSkin";
-            _this.moduleName = "Inspector";
+            _this.moduleName = InspectorView.moduleName;
             return _this;
         }
         InspectorView.prototype.showData = function (data, removeBack) {
@@ -8325,6 +8372,7 @@ var editor;
             this._viewData = this._viewDataList.pop();
             this.updateView();
         };
+        InspectorView.moduleName = "Inspector";
         return InspectorView;
     }(eui.Component));
     editor.InspectorView = InspectorView;
@@ -9340,7 +9388,7 @@ var editor;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "AssetView";
             //
-            _this.moduleName = "Project";
+            _this.moduleName = AssetView.moduleName;
             editor.editorui.assetview = _this;
             //
             _this._areaSelectRect = new editor.AreaSelectRect();
@@ -9527,6 +9575,7 @@ var editor;
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         };
+        AssetView.moduleName = "Project";
         return AssetView;
     }(eui.Component));
     editor.AssetView = AssetView;
@@ -9746,18 +9795,31 @@ var editor;
             _super.prototype.childrenCreated.call(this);
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-            this._saveViewLayout();
             if (this.stage) {
                 this.onAddedToStage();
             }
         };
         MainSplitView.prototype.onAddedToStage = function () {
+            feng3d.dispatcher.on("viewLayout.changed", this._saveViewLayout, this);
+            this._initViewLayout();
         };
         MainSplitView.prototype.onRemovedFromStage = function () {
+            feng3d.dispatcher.off("viewLayout.changed", this._saveViewLayout, this);
+        };
+        MainSplitView.prototype._initViewLayout = function () {
+            if (editor.editorcache.viewLayout) {
+                this.removeChildAt(0);
+                var sp = this._createViews(editor.editorcache.viewLayout);
+                this.addChild(sp);
+            }
+            else {
+                this._saveViewLayout();
+            }
         };
         MainSplitView.prototype._saveViewLayout = function () {
             var sp = this.getChildAt(0);
             var data = this._getData(sp);
+            editor.editorcache.viewLayout = data;
             console.log(data);
         };
         MainSplitView.prototype._getData = function (sp) {
@@ -9766,7 +9828,6 @@ var editor;
             data.y = sp.y;
             data.width = sp.width;
             data.height = sp.height;
-            data.type = egret.getQualifiedClassName(sp);
             if (sp instanceof eui.Group || sp instanceof eui.Component) {
                 data.percentWidth = sp.percentWidth;
                 data.percentHeight = sp.percentHeight;
@@ -9776,6 +9837,7 @@ var editor;
                 data.right = sp.right;
             }
             if (sp instanceof editor.SplitGroup) {
+                data.type = "SplitGroup";
                 if (sp.layout instanceof eui.HorizontalLayout) {
                     data.layout = "HorizontalLayout";
                 }
@@ -9790,9 +9852,32 @@ var editor;
                 data.children = children;
             }
             if (sp instanceof editor.TabView) {
+                data.type = "TabView";
                 data.modules = sp.getModuleNames();
             }
             return data;
+        };
+        MainSplitView.prototype._createViews = function (data) {
+            var displayObject;
+            if (data.type == "SplitGroup") {
+                var splitGroup = displayObject = new editor.SplitGroup();
+                if (data.layout == "HorizontalLayout") {
+                    splitGroup.layout = new eui.HorizontalLayout();
+                }
+                else if (data.layout == "VerticalLayout") {
+                    splitGroup.layout = new eui.VerticalLayout();
+                }
+                var children = data.children;
+                for (var i = 0; i < children.length; i++) {
+                    var child = this._createViews(children[i]);
+                    splitGroup.addChild(child);
+                }
+            }
+            else if (data.type == "TabView") {
+                var tabView = displayObject = new editor.TabView();
+                tabView.setModuleNames(data.modules);
+            }
+            return displayObject;
         };
         return MainSplitView;
     }(eui.Component));

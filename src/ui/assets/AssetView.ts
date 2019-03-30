@@ -24,6 +24,7 @@ namespace editor
 		 * 模块名称
 		 */
         moduleName: string;
+        static moduleName = "Project";
 
         constructor()
         {
@@ -32,7 +33,7 @@ namespace editor
             this.skinName = "AssetView";
 
             //
-            this.moduleName = "Project";
+            this.moduleName = AssetView.moduleName;
 
             editorui.assetview = this;
             //

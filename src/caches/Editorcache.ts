@@ -13,6 +13,11 @@ namespace editor
         lastProjects: string[] = [];
 
         /**
+         * 界面布局数据
+         */
+        viewLayout: Object;
+
+        /**
          * 设置最近打开的项目
          */
         setLastProject(projectname: string)

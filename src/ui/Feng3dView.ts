@@ -10,6 +10,7 @@ namespace editor
 		 * 模块名称
 		 */
 		moduleName: string;
+		static moduleName = "Scene";
 
 		constructor()
 		{
@@ -19,7 +20,7 @@ namespace editor
 			feng3d.Stats.init(document.getElementById("stats"));
 			editorui.feng3dView = this;
 			//
-			this.moduleName = "Scene";
+			this.moduleName = Feng3dView.moduleName;
 			//
 			this._areaSelectRect = new AreaSelectRect();
 			//

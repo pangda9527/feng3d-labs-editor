@@ -37,7 +37,15 @@ namespace editor
 			this._tabViewInstance = new TabViewInstance(moduleviews);
 			this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
 			this.addChild(this._tabViewInstance);
+			if (this._moduleNames)
+			{
+				this._tabViewInstance.setModuleNames(this._moduleNames);
+				this._moduleNames = null;
+			}
 		}
+
+		// temp
+		private _moduleNames: string[];
 
 		/**
 		 * 获取模块名称列表
@@ -45,6 +53,14 @@ namespace editor
 		getModuleNames()
 		{
 			return this._tabViewInstance.getModuleNames();
+		}
+
+		setModuleNames(moduleNames: string[])
+		{
+			if (this._tabViewInstance)
+				this._tabViewInstance.setModuleNames(moduleNames);
+			else
+				this._moduleNames = moduleNames;
 		}
 	}
 
@@ -77,6 +93,46 @@ namespace editor
 		{
 			var moduleNames = this._moduleViews.map(v => v.moduleName);
 			return moduleNames;
+		}
+
+		setModuleNames(moduleNames: string[])
+		{
+			// 移除所有模块界面
+			this._moduleViews.concat().forEach(v =>
+			{
+				v.parent && v.parent.removeChild(v);
+			});
+			//
+			this._moduleViews = [];
+			moduleNames.forEach(v =>
+			{
+				var moduleView: ModuleView;
+				switch (v)
+				{
+					case HierarchyView.moduleName:
+						moduleView = new HierarchyView();
+						break;
+					case InspectorView.moduleName:
+						moduleView = new InspectorView();
+						break;
+					case AssetView.moduleName:
+						moduleView = new AssetView();
+						break;
+					case Feng3dView.moduleName:
+						moduleView = new Feng3dView();
+						break;
+					default:
+						break;
+				}
+				if (moduleView)
+				{
+					moduleView.top = moduleView.bottom = moduleView.left = moduleView.right = 0;
+					this._moduleViews.push(moduleView);
+				} else
+				{
+					console.warn(`没有找到对应模块界面 ${v}`);
+				}
+			});
 		}
 
 		constructor(moduleviews: ModuleView[])

@@ -101,6 +101,10 @@ declare namespace feng3d {
          * 错误信息
          */
         "message.error": string;
+        /**
+         * 界面布局发生变化
+         */
+        "viewLayout.changed": string;
     }
 }
 declare namespace egret {
@@ -796,6 +800,10 @@ declare namespace editor {
          */
         lastProjects: string[];
         /**
+         * 界面布局数据
+         */
+        viewLayout: Object;
+        /**
          * 设置最近打开的项目
          */
         setLastProject(projectname: string): void;
@@ -922,6 +930,7 @@ declare namespace editor {
          * 模块名称
          */
         moduleName: string;
+        static moduleName: string;
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
@@ -1055,10 +1064,12 @@ declare namespace editor {
         private _tabViewInstance;
         constructor();
         protected childrenCreated(): void;
+        private _moduleNames;
         /**
          * 获取模块名称列表
          */
         getModuleNames(): string[];
+        setModuleNames(moduleNames: string[]): void;
     }
     class TabViewInstance extends eui.Component {
         tabGroup: eui.Group;
@@ -1083,6 +1094,7 @@ declare namespace editor {
          * 获取模块名称列表
          */
         getModuleNames(): string[];
+        setModuleNames(moduleNames: string[]): void;
         constructor(moduleviews: ModuleView[]);
         private onComplete;
         private _onAddedToStage;
@@ -2409,6 +2421,7 @@ declare namespace editor {
      * 属性面板（检查器）
      */
     class InspectorView extends eui.Component implements ModuleView {
+        static moduleName: string;
         typeLab: eui.Label;
         backButton: eui.Button;
         group: eui.Group;
@@ -2692,6 +2705,7 @@ declare namespace editor {
          * 模块名称
          */
         moduleName: string;
+        static moduleName: string;
         constructor();
         private onComplete;
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
@@ -2770,8 +2784,10 @@ declare namespace editor {
         protected childrenCreated(): void;
         private onAddedToStage;
         private onRemovedFromStage;
+        private _initViewLayout;
         private _saveViewLayout;
         private _getData;
+        private _createViews;
     }
 }
 declare namespace editor {

@@ -56,11 +56,16 @@ namespace feng3d
          * 提示信息
          */
         "message": string;
-        
+
         /**
          * 错误信息
          */
         "message.error": string;
+
+        /**
+         * 界面布局发生变化
+         */
+        "viewLayout.changed": string;
 
     }
 }

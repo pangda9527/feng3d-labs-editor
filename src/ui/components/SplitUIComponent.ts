@@ -247,6 +247,8 @@ namespace editor
 
             feng3d.windowEventProxy.off("mousemove", this.onDragMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onDragMouseUp, this);
+
+            feng3d.dispatcher.dispatch("viewLayout.changed");
         }
     }
 

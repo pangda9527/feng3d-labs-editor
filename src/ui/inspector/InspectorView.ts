@@ -5,6 +5,8 @@ namespace editor
      */
 	export class InspectorView extends eui.Component implements ModuleView
 	{
+		static moduleName = "Inspector";
+
 		public typeLab: eui.Label;
 		public backButton: eui.Button;
 		public group: eui.Group;
@@ -17,7 +19,7 @@ namespace editor
 			super();
 			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
 			this.skinName = "InspectorViewSkin";
-			this.moduleName = "Inspector";
+			this.moduleName = InspectorView.moduleName;
 		}
 
 		private showData(data: any, removeBack = false)
