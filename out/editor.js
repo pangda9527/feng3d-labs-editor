@@ -9822,7 +9822,7 @@ var editor;
         MainSplitView.prototype._saveViewLayout = function () {
             var sp = this.getChildAt(0);
             var data = this._getData(sp);
-            // editorcache.viewLayout = data;
+            editor.editorcache.viewLayout = data;
             console.log(data);
         };
         MainSplitView.prototype._getData = function (sp) {
@@ -9865,10 +9865,12 @@ var editor;
             if (data.type == "SplitGroup") {
                 var splitGroup = displayObject = new editor.SplitGroup();
                 if (data.layout == "HorizontalLayout") {
-                    splitGroup.layout = new eui.HorizontalLayout();
+                    var horizontalLayout = splitGroup.layout = new eui.HorizontalLayout();
+                    horizontalLayout.gap = 4;
                 }
                 else if (data.layout == "VerticalLayout") {
-                    splitGroup.layout = new eui.VerticalLayout();
+                    var verticalLayout = splitGroup.layout = new eui.VerticalLayout();
+                    verticalLayout.gap = 4;
                 }
                 var children = data.children;
                 for (var i = 0; i < children.length; i++) {
@@ -9881,6 +9883,19 @@ var editor;
                 tabView.setModuleNames(data.modules);
             }
             if (displayObject instanceof eui.Group || displayObject instanceof eui.Component) {
+                if (data.percentWidth == null)
+                    data.percentWidth = NaN;
+                if (data.percentHeight == null)
+                    data.percentHeight = NaN;
+                if (data.top == null)
+                    data.top = NaN;
+                if (data.bottom == null)
+                    data.bottom = NaN;
+                if (data.left == null)
+                    data.left = NaN;
+                if (data.right == null)
+                    data.right = NaN;
+                //
                 displayObject.percentWidth = data.percentWidth;
                 displayObject.percentHeight = data.percentHeight;
                 displayObject.top = data.top;

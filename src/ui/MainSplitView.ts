@@ -42,16 +42,12 @@ namespace editor
             if (editorcache.viewLayout)
             {
                 this.removeChildAt(0);
-
                 var sp: SplitGroup = <any>this._createViews(editorcache.viewLayout);
-
                 this.addChild(sp);
-
             } else
             {
                 this._saveViewLayout();
             }
-
         }
 
         private _saveViewLayout()
@@ -60,7 +56,7 @@ namespace editor
 
             var data = this._getData(sp);
 
-            // editorcache.viewLayout = data;
+            editorcache.viewLayout = data;
 
             console.log(data);
         }
@@ -116,10 +112,12 @@ namespace editor
                 var splitGroup = displayObject = new SplitGroup();
                 if (data.layout == "HorizontalLayout")
                 {
-                    splitGroup.layout = new eui.HorizontalLayout();
+                    let horizontalLayout = splitGroup.layout = new eui.HorizontalLayout();
+                    horizontalLayout.gap = 4;
                 } else if (data.layout == "VerticalLayout")
                 {
-                    splitGroup.layout = new eui.VerticalLayout();
+                    let verticalLayout = splitGroup.layout = new eui.VerticalLayout();
+                    verticalLayout.gap = 4;
                 }
                 var children = data.children;
                 for (let i = 0; i < children.length; i++)
@@ -134,6 +132,13 @@ namespace editor
             }
             if (displayObject instanceof eui.Group || displayObject instanceof eui.Component)
             {
+                if (data.percentWidth == null) data.percentWidth = NaN;
+                if (data.percentHeight == null) data.percentHeight = NaN;
+                if (data.top == null) data.top = NaN;
+                if (data.bottom == null) data.bottom = NaN;
+                if (data.left == null) data.left = NaN;
+                if (data.right == null) data.right = NaN;
+                //
                 displayObject.percentWidth = data.percentWidth;
                 displayObject.percentHeight = data.percentHeight;
                 displayObject.top = data.top;
@@ -148,7 +153,6 @@ namespace editor
 
             return displayObject;
         }
-
     }
 
     interface ViewLayout
