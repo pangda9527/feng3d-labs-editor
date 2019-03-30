@@ -1109,7 +1109,7 @@ declare namespace editor {
         /**
          * 显示模块
          */
-        private _showModule;
+        private _showModuleIndex;
         private tabGroup;
         private contentGroup;
         /**

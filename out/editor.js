@@ -3222,6 +3222,10 @@ var editor;
              * 模块界面列表
              */
             _this._moduleViews = [];
+            /**
+             * 显示模块
+             */
+            _this._showModuleIndex = -1;
             return _this;
         }
         /**
@@ -3257,10 +3261,10 @@ var editor;
             this.$children.forEach(function (v) {
                 _this._moduleViews.push(v);
             });
-            this._moduleViews.forEach(function (v) {
+            this._moduleViews.forEach(function (v, index) {
                 v.parent && v.parent.removeChild(v);
-                if (_this._showModule == null && v.visible)
-                    _this._showModule = v.moduleName;
+                if (_this._showModuleIndex == null && v.visible)
+                    _this._showModuleIndex = index;
                 v.visible = true;
             });
             //
@@ -3372,7 +3376,7 @@ var editor;
         };
         TabView.prototype.addModule = function (moduleView) {
             this._moduleViews.push(moduleView);
-            this._showModule = moduleView.moduleName;
+            this._showModuleIndex = this._moduleViews.length - 1;
             this._invalidateView();
         };
         TabView.prototype.removeModule = function (moduleName) {
@@ -3448,8 +3452,7 @@ var editor;
             var _this = this;
             var moduleNames = this._moduleViews.map(function (v) { return v.moduleName; });
             // 设置默认显示模块名称
-            if (moduleNames.indexOf(this._showModule) == -1)
-                this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
+            this._showModuleIndex = feng3d.FMath.clamp(this._showModuleIndex, 0, this._moduleViews.length - 1);
             this._tabButtons.forEach(function (v) {
                 v.removeEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
                 //
@@ -3476,13 +3479,14 @@ var editor;
                     var moduleView = this._moduleViews[i];
                     //
                     tabButton.moduleName = moduleView.moduleName;
-                    tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
                     this.tabGroup.addChild(tabButton);
                     //
-                    if (moduleView.moduleName == this._showModule) {
+                    if (i == this._showModuleIndex) {
+                        tabButton.currentState = "selected";
                         this.contentGroup.addChild(moduleView);
                     }
                     else {
+                        tabButton.currentState = "up";
                         if (moduleView.parent)
                             moduleView.parent.removeChild(moduleView);
                     }
@@ -3504,8 +3508,8 @@ var editor;
          */
         TabView.prototype._onTabButtonClick = function (e) {
             var index = this._tabButtons.indexOf(e.currentTarget);
-            if (index != -1 && this._tabButtons[index].moduleName != this._showModule) {
-                this._showModule = this._tabButtons[index].moduleName;
+            if (index != this._showModuleIndex) {
+                this._showModuleIndex = index;
                 this._invalidateView();
             }
         };
@@ -15657,7 +15661,7 @@ var editor;
 var editor;
 (function (editor) {
     editor.viewLayoutConfig = {
-        default: { "x": 0, "y": 0, "width": 1440, "height": 712, "percentWidth": null, "percentHeight": null, "top": 0, "bottom": 0, "left": 0, "right": 0, "type": "SplitGroup", "layout": "HorizontalLayout", "children": [{ "x": 0, "y": 0, "width": 1184, "height": 712, "percentWidth": 82.08333333333333, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "SplitGroup", "layout": "VerticalLayout", "children": [{ "x": 0, "y": 0, "width": 1184, "height": 458, "percentWidth": 100, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "SplitGroup", "layout": "HorizontalLayout", "children": [{ "x": 0, "y": 0, "width": 200, "height": 458, "percentWidth": null, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "TabView", "modules": ["Hierarchy"] }, { "x": 204, "y": 0, "width": 980, "height": 458, "percentWidth": 100, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "TabView", "modules": ["Scene"] }] }, { "x": 0, "y": 462, "width": 1184, "height": 250, "percentWidth": 100, "percentHeight": null, "top": null, "bottom": null, "left": null, "right": null, "type": "TabView", "modules": ["Project"] }] }, { "x": 1188, "y": 0, "width": 252, "height": 712, "percentWidth": 17.63888888888889, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "TabView", "modules": ["Inspector", "Navigation"] }] }
+        default: { "x": 0, "y": 0, "width": 1440, "height": 712, "percentWidth": null, "percentHeight": null, "top": 0, "bottom": 0, "left": 0, "right": 0, "type": "SplitGroup", "layout": "HorizontalLayout", "children": [{ "x": 0, "y": 0, "width": 1184, "height": 712, "percentWidth": 82.08333333333333, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "SplitGroup", "layout": "VerticalLayout", "children": [{ "x": 0, "y": 0, "width": 1184, "height": 458, "percentWidth": 100, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "SplitGroup", "layout": "HorizontalLayout", "children": [{ "x": 0, "y": 0, "width": 200, "height": 458, "percentWidth": null, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "TabView", "modules": ["Hierarchy"] }, { "x": 204, "y": 0, "width": 980, "height": 458, "percentWidth": 100, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "TabView", "modules": ["Scene"] }] }, { "x": 0, "y": 462, "width": 1184, "height": 250, "percentWidth": 100, "percentHeight": null, "top": null, "bottom": null, "left": null, "right": null, "type": "TabView", "modules": ["Project"] }] }, { "x": 1188, "y": 0, "width": 252, "height": 712, "percentWidth": 17.63888888888889, "percentHeight": 100, "top": null, "bottom": null, "left": null, "right": null, "type": "TabView", "modules": ["Inspector"] }] }
     };
 })(editor || (editor = {}));
 var editor;

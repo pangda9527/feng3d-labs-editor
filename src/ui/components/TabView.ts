@@ -39,7 +39,7 @@ namespace editor
 		/**
 		 * 显示模块
 		 */
-		private _showModule: string;
+		private _showModuleIndex = -1;
 
 		//
 		private tabGroup: eui.Group;
@@ -91,10 +91,10 @@ namespace editor
 			{
 				this._moduleViews.push(<any>v);
 			});
-			this._moduleViews.forEach(v =>
+			this._moduleViews.forEach((v, index) =>
 			{
 				v.parent && v.parent.removeChild(v);
-				if (this._showModule == null && v.visible) this._showModule = v.moduleName;
+				if (this._showModuleIndex == null && v.visible) this._showModuleIndex = index;
 				v.visible = true;
 			});
 			//
@@ -226,7 +226,7 @@ namespace editor
 		private addModule(moduleView: ModuleView)
 		{
 			this._moduleViews.push(moduleView);
-			this._showModule = moduleView.moduleName;
+			this._showModuleIndex = this._moduleViews.length - 1;
 			this._invalidateView();
 		}
 
@@ -320,7 +320,7 @@ namespace editor
 		{
 			var moduleNames = this._moduleViews.map(v => v.moduleName);
 			// 设置默认显示模块名称
-			if (moduleNames.indexOf(this._showModule) == -1) this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
+			this._showModuleIndex = feng3d.FMath.clamp(this._showModuleIndex, 0, this._moduleViews.length - 1);
 
 			this._tabButtons.forEach(v =>
 			{
@@ -352,14 +352,15 @@ namespace editor
 					var moduleView = this._moduleViews[i];
 					//
 					tabButton.moduleName = moduleView.moduleName;
-					tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
 					this.tabGroup.addChild(tabButton);
 					//
-					if (moduleView.moduleName == this._showModule)
+					if (i == this._showModuleIndex)
 					{
+						tabButton.currentState = "selected";
 						this.contentGroup.addChild(moduleView);
 					} else
 					{
+						tabButton.currentState = "up";
 						if (moduleView.parent) moduleView.parent.removeChild(moduleView);
 					}
 				}
@@ -384,9 +385,9 @@ namespace editor
 		private _onTabButtonClick(e: egret.Event)
 		{
 			var index = this._tabButtons.indexOf(e.currentTarget);
-			if (index != -1 && this._tabButtons[index].moduleName != this._showModule)
+			if (index != this._showModuleIndex)
 			{
-				this._showModule = this._tabButtons[index].moduleName;
+				this._showModuleIndex = index;
 				this._invalidateView();
 			}
 		}
