@@ -102,14 +102,17 @@ namespace editor
 		{
 			super.childrenCreated();
 
-			var moduleviews: ModuleView[] = [];
-			for (let i = this.numChildren - 1; i >= 0; i--)
+			//
+			this.$children.forEach(v =>
 			{
-				let child = this.getChildAt(i);
-				moduleviews.push(<any>child);
-				this.removeChildAt(i);
-			}
-			moduleviews = moduleviews.reverse();
+				this._moduleViews.push(<any>v);
+			});
+			this._moduleViews.forEach(v =>
+			{
+				v.parent && v.parent.removeChild(v);
+				if (this._showModule == null && v.visible) this._showModule = v.moduleName;
+				v.visible = true;
+			});
 			//
 			this._tabViewInstance = new TabViewUI();
 			this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
@@ -135,18 +138,6 @@ namespace editor
 					this._tabViewInstance.tabGroup.removeChildAt(i);
 				}
 			}
-			// 获取模块列表
-			for (let i = this._tabViewInstance.contentGroup.numChildren - 1; i >= 0; i--)
-			{
-				let child = this._tabViewInstance.contentGroup.getChildAt(i);
-				if (child.parent) child.parent.removeChildAt(i);
-				//
-				let moduleView: ModuleView = <any>child;
-				this._moduleViews.push(moduleView);
-				if (moduleView.visible) this._showModule = moduleView.moduleName;
-				moduleView.visible = true;
-			}
-			this._moduleViews = this._moduleViews.reverse();
 			//
 			if (this.stage)
 			{

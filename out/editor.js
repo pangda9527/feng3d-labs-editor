@@ -3244,14 +3244,18 @@ var editor;
             });
         };
         TabView.prototype.childrenCreated = function () {
+            var _this = this;
             _super.prototype.childrenCreated.call(this);
-            var moduleviews = [];
-            for (var i = this.numChildren - 1; i >= 0; i--) {
-                var child = this.getChildAt(i);
-                moduleviews.push(child);
-                this.removeChildAt(i);
-            }
-            moduleviews = moduleviews.reverse();
+            //
+            this.$children.forEach(function (v) {
+                _this._moduleViews.push(v);
+            });
+            this._moduleViews.forEach(function (v) {
+                v.parent && v.parent.removeChild(v);
+                if (_this._showModule == null && v.visible)
+                    _this._showModule = v.moduleName;
+                v.visible = true;
+            });
             //
             this._tabViewInstance = new TabViewUI();
             this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
@@ -3271,19 +3275,6 @@ var editor;
                     this._tabViewInstance.tabGroup.removeChildAt(i);
                 }
             }
-            // 获取模块列表
-            for (var i = this._tabViewInstance.contentGroup.numChildren - 1; i >= 0; i--) {
-                var child = this._tabViewInstance.contentGroup.getChildAt(i);
-                if (child.parent)
-                    child.parent.removeChildAt(i);
-                //
-                var moduleView = child;
-                this._moduleViews.push(moduleView);
-                if (moduleView.visible)
-                    this._showModule = moduleView.moduleName;
-                moduleView.visible = true;
-            }
-            this._moduleViews = this._moduleViews.reverse();
             //
             if (this.stage) {
                 this._onAddedToStage();
