@@ -4104,7 +4104,7 @@ declare namespace editor {
                 "y": number;
                 "width": number;
                 "height": number;
-                "percentWidth": any;
+                "percentWidth": number;
                 "percentHeight": number;
                 "top": any;
                 "bottom": any;

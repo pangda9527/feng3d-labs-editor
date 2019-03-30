@@ -152,6 +152,7 @@ namespace editor
 					let moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
 					this.addModule(moduleView);
 				}
+				feng3d.dispatcher.dispatch("viewLayout.changed");
 			});
 			drag.register(this.contentGroup, null, ["moduleView"], (dragSource) =>
 			{
@@ -172,6 +173,7 @@ namespace editor
 				{
 					this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
 				}
+				feng3d.dispatcher.dispatch("viewLayout.changed");
 			});
 			this._invalidateView()
 		}
