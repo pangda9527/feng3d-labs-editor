@@ -2569,15 +2569,15 @@ var editor;
             feng3d.shortcut.on("areaSelectStart", _this._onAreaSelectStart, _this);
             feng3d.shortcut.on("areaSelect", _this._onAreaSelect, _this);
             feng3d.shortcut.on("areaSelectEnd", _this._onAreaSelectEnd, _this);
+            _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddedToStage, _this);
+            _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this.onRemoveFromStage, _this);
             return _this;
         }
-        Feng3dView.prototype.$onAddToStage = function (stage, nestLevel) {
-            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+        Feng3dView.prototype.onAddedToStage = function () {
             this._canvas = document.getElementById("glcanvas");
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
-            this.onResize();
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 if (dragdata.file_gameobject) {
                     editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, editor.hierarchy.rootnode.gameobject);
@@ -2589,14 +2589,15 @@ var editor;
                     gameobject.addScript(dragdata.file_script.scriptName);
                 }
             });
+            this.once(egret.Event.ENTER_FRAME, this.onResize, this);
         };
-        Feng3dView.prototype.$onRemoveFromStage = function () {
-            _super.prototype.$onRemoveFromStage.call(this);
-            this._canvas = null;
+        Feng3dView.prototype.onRemoveFromStage = function () {
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             editor.drag.unregister(this);
+            this._canvas.style.display = "none";
+            this._canvas = null;
         };
         Feng3dView.prototype._onAreaSelectStart = function () {
             this._areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -2627,8 +2628,9 @@ var editor;
             feng3d.shortcut.deactivityState("mouseInView3D");
         };
         Feng3dView.prototype.onResize = function () {
-            if (!this.stage)
+            if (!this._canvas)
                 return;
+            this._canvas.style.display = "";
             var lt = this.localToGlobal(0, 0);
             var rb = this.localToGlobal(this.width, this.height);
             var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);

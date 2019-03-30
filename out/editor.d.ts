@@ -933,8 +933,8 @@ declare namespace editor {
         moduleName: string;
         static moduleName: string;
         constructor();
-        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
-        $onRemoveFromStage(): void;
+        private onAddedToStage;
+        private onRemoveFromStage;
         private _onAreaSelectStart;
         private _onAreaSelect;
         private _onAreaSelectEnd;

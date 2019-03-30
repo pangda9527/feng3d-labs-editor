@@ -27,19 +27,18 @@ namespace editor
 			feng3d.shortcut.on("areaSelectStart", this._onAreaSelectStart, this);
 			feng3d.shortcut.on("areaSelect", this._onAreaSelect, this);
 			feng3d.shortcut.on("areaSelectEnd", this._onAreaSelectEnd, this);
+
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveFromStage, this);
 		}
 
-		$onAddToStage(stage: egret.Stage, nestLevel: number)
+		private onAddedToStage()
 		{
-			super.$onAddToStage(stage, nestLevel);
-
 			this._canvas = document.getElementById("glcanvas");
 			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
 
 			this.addEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
 			this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
-
-			this.onResize();
 
 			drag.register(this, null, ["file_gameobject", "file_script"], (dragdata) =>
 			{
@@ -56,19 +55,21 @@ namespace editor
 					gameobject.addScript(dragdata.file_script.scriptName);
 				}
 			});
+
+			this.once(egret.Event.ENTER_FRAME, this.onResize, this);
 		}
 
-		$onRemoveFromStage()
+		private onRemoveFromStage()
 		{
-			super.$onRemoveFromStage()
-
-			this._canvas = null;
 			this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
 
 			this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
 			this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
 
 			drag.unregister(this);
+
+			this._canvas.style.display = "none";
+			this._canvas = null;
 		}
 
 		private _onAreaSelectStart()
@@ -113,8 +114,9 @@ namespace editor
 
 		private onResize()
 		{
-			if (!this.stage)
-				return;
+			if (!this._canvas) return;
+
+			this._canvas.style.display = "";
 
 			var lt = this.localToGlobal(0, 0);
 			var rb = this.localToGlobal(this.width, this.height);
