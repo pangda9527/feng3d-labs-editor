@@ -110,6 +110,8 @@ namespace editor
         private onPick(e: egret.MouseEvent)
         {
             if (this.state == SplitGroupState.draging) return;
+            if (feng3d.shortcut.getState(feng3d.shortCutStates.draging)) return;
+
             //
             let checkItems = this.getAllCheckItems();
 

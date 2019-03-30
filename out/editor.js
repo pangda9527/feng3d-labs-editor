@@ -42,6 +42,7 @@ var feng3d;
     feng3d.shortCutStates = {
         disableScroll: "禁止滚动",
         splitGroupDraging: "正在拖拽分割界面",
+        draging: "正在拖拽中"
     };
 })(feng3d || (feng3d = {}));
 var egret;
@@ -2207,6 +2208,8 @@ var editor;
             stage = dragitem.displayObject.stage;
             stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
             stage.addEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
+            //
+            feng3d.shortcut.activityState(feng3d.shortCutStates.draging);
         }
     }
     function onMouseUp(event) {
@@ -2220,6 +2223,8 @@ var editor;
         });
         accepters.clear();
         dragitem = null;
+        //
+        feng3d.shortcut.deactivityState(feng3d.shortCutStates.draging);
     }
     function onMouseMove(event) {
         if (!acceptableitems) {
@@ -3009,6 +3014,8 @@ var editor;
         SplitManager.prototype.onPick = function (e) {
             if (this.state == SplitGroupState.draging)
                 return;
+            if (feng3d.shortcut.getState(feng3d.shortCutStates.draging))
+                return;
             //
             var checkItems = this.getAllCheckItems();
             if (this.isdebug) {
@@ -3267,12 +3274,15 @@ var editor;
         TabView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this._onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            //
+            this.tabGroup = this._tabViewInstance.tabGroup;
+            this.contentGroup = this._tabViewInstance.contentGroup;
             // 获取按钮列表
-            for (var i = this._tabViewInstance.tabGroup.numChildren - 1; i >= 0; i--) {
-                var child = this._tabViewInstance.tabGroup.getChildAt(i);
+            for (var i = this.tabGroup.numChildren - 1; i >= 0; i--) {
+                var child = this.tabGroup.getChildAt(i);
                 if (child instanceof editor.TabViewButton) {
                     this._tabViewButtonPool.push(child);
-                    this._tabViewInstance.tabGroup.removeChildAt(i);
+                    this.tabGroup.removeChildAt(i);
                 }
             }
             //
@@ -3281,9 +3291,25 @@ var editor;
             }
         };
         TabView.prototype._onAddedToStage = function () {
+            var _this = this;
+            editor.drag.register(this.tabGroup, null, ["moduleView"], function (dragSource) {
+                if (dragSource.moduleView.tabView == _this) {
+                    var result = _this._moduleViews.filter(function (v) { return v.moduleName == dragSource.moduleView.moduleName; })[0];
+                    if (result) {
+                        var index = _this._moduleViews.indexOf(result);
+                        _this._moduleViews.splice(index, 1);
+                        _this._moduleViews.push(result);
+                        _this._invalidateView();
+                    }
+                }
+            });
+            editor.drag.register(this.contentGroup, null, ["moduleView"], function (dragSource) {
+            });
             this._invalidateView();
         };
         TabView.prototype.onRemovedFromStage = function () {
+            editor.drag.unregister(this.tabGroup);
+            editor.drag.unregister(this.contentGroup);
         };
         /**
          * 界面显示失效
@@ -3323,11 +3349,11 @@ var editor;
                 //
                 tabButton.moduleName = moduleView.moduleName;
                 tabButton.currentState = tabButton.moduleName == _this._showModule ? "selected" : "up";
-                _this._tabViewInstance.tabGroup.addChild(tabButton);
+                _this.tabGroup.addChild(tabButton);
                 //
                 if (moduleView.moduleName == _this._showModule) {
                     if (!moduleView.parent)
-                        _this._tabViewInstance.contentGroup.addChild(moduleView);
+                        _this.contentGroup.addChild(moduleView);
                 }
                 else {
                     if (moduleView.parent)

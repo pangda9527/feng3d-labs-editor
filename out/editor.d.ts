@@ -27,6 +27,7 @@ declare namespace feng3d {
     var shortCutStates: {
         disableScroll: string;
         splitGroupDraging: string;
+        draging: string;
     };
     /**
      * (快捷键)状态列表
@@ -1087,6 +1088,8 @@ declare namespace editor {
          * 显示模块
          */
         private _showModule;
+        private tabGroup;
+        private contentGroup;
         /**
          * 获取模块名称列表
          */

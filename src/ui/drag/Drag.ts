@@ -138,6 +138,8 @@ namespace editor
 			stage = dragitem.displayObject.stage;
 			stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
 			stage.addEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
+			//
+			feng3d.shortcut.activityState(feng3d.shortCutStates.draging);
 		}
 	}
 
@@ -158,6 +160,8 @@ namespace editor
 		accepters.clear();
 
 		dragitem = null;
+		//
+		feng3d.shortcut.deactivityState(feng3d.shortCutStates.draging);
 	}
 
 	function onMouseMove(event: egret.MouseEvent)

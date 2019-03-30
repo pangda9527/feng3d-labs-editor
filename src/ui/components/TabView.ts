@@ -41,6 +41,10 @@ namespace editor
 		 */
 		private _showModule: string;
 
+		//
+		private tabGroup: eui.Group;
+		private contentGroup: eui.Group;
+
 		/**
 		 * 获取模块名称列表
 		 */
@@ -128,14 +132,18 @@ namespace editor
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this._onAddedToStage, this);
 			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
+			//
+			this.tabGroup = this._tabViewInstance.tabGroup;
+			this.contentGroup = this._tabViewInstance.contentGroup;
+
 			// 获取按钮列表
-			for (let i = this._tabViewInstance.tabGroup.numChildren - 1; i >= 0; i--)
+			for (let i = this.tabGroup.numChildren - 1; i >= 0; i--)
 			{
-				let child = this._tabViewInstance.tabGroup.getChildAt(i);
+				let child = this.tabGroup.getChildAt(i);
 				if (child instanceof TabViewButton)
 				{
 					this._tabViewButtonPool.push(child);
-					this._tabViewInstance.tabGroup.removeChildAt(i);
+					this.tabGroup.removeChildAt(i);
 				}
 			}
 			//
@@ -147,11 +155,31 @@ namespace editor
 
 		private _onAddedToStage()
 		{
+			drag.register(this.tabGroup, null, ["moduleView"], (dragSource) =>
+			{
+				if (dragSource.moduleView.tabView == this)
+				{
+					let result = this._moduleViews.filter(v => v.moduleName == dragSource.moduleView.moduleName)[0];
+					if (result)
+					{
+						let index = this._moduleViews.indexOf(result);
+						this._moduleViews.splice(index, 1);
+						this._moduleViews.push(result);
+						this._invalidateView();
+					}
+				}
+			});
+			drag.register(this.contentGroup, null, ["moduleView"], (dragSource) =>
+			{
+
+			});
 			this._invalidateView()
 		}
 
 		private onRemovedFromStage()
 		{
+			drag.unregister(this.tabGroup);
+			drag.unregister(this.contentGroup);
 		}
 
 		/**
@@ -198,11 +226,11 @@ namespace editor
 				//
 				tabButton.moduleName = moduleView.moduleName;
 				tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
-				this._tabViewInstance.tabGroup.addChild(tabButton);
+				this.tabGroup.addChild(tabButton);
 				//
 				if (moduleView.moduleName == this._showModule)
 				{
-					if (!moduleView.parent) this._tabViewInstance.contentGroup.addChild(moduleView);
+					if (!moduleView.parent) this.contentGroup.addChild(moduleView);
 				} else
 				{
 					if (moduleView.parent) moduleView.parent.removeChild(moduleView);
