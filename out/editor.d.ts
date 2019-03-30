@@ -1112,9 +1112,11 @@ declare namespace editor {
         protected childrenCreated(): void;
         private onComplete;
         private _onAddedToStage;
+        private addModuleToLeft;
         private addModule;
         private removeModule;
         private adjust;
+        private copyLayoutInfo;
         private onRemovedFromStage;
         /**
          * 界面显示失效

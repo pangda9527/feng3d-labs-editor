@@ -3317,8 +3317,31 @@ var editor;
                 }
             });
             editor.drag.register(this.contentGroup, null, ["moduleView"], function (dragSource) {
+                var moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
+                _this.addModuleToLeft(moduleView);
             });
             this._invalidateView();
+        };
+        TabView.prototype.addModuleToLeft = function (moduleView) {
+            var splitGroup = new editor.SplitGroup();
+            var layout = splitGroup.layout = new eui.HorizontalLayout();
+            layout.gap = 2;
+            this.copyLayoutInfo(this, splitGroup);
+            //
+            var tabView = new TabView();
+            tabView.addModule(moduleView);
+            tabView.percentHeight = 100;
+            tabView.percentWidth = 30;
+            this.percentHeight = 100;
+            this.percentWidth = 70;
+            //
+            var parent = this.parent;
+            var index = parent.getChildIndex(this);
+            parent.removeChildAt(index);
+            //
+            splitGroup.addChild(tabView);
+            splitGroup.addChild(this);
+            parent.addChildAt(splitGroup, index);
         };
         TabView.prototype.addModule = function (moduleView) {
             this._moduleViews.push(moduleView);
@@ -3356,16 +3379,7 @@ var editor;
                 }
                 else if (view.numChildren == 1) {
                     var child = view.getChildAt(0);
-                    child.x = view.x;
-                    child.y = view.y;
-                    child.width = view.width;
-                    child.height = view.height;
-                    child.top = view.top;
-                    child.bottom = view.bottom;
-                    child.left = view.left;
-                    child.right = view.right;
-                    child.percentWidth = view.percentWidth;
-                    child.percentHeight = view.percentHeight;
+                    this.copyLayoutInfo(view, child);
                     //
                     var index = parent.getChildIndex(view);
                     parent.removeChildAt(index);
@@ -3377,6 +3391,18 @@ var editor;
                     feng3d.assert(false);
                 }
             }
+        };
+        TabView.prototype.copyLayoutInfo = function (src, dest) {
+            dest.x = src.x;
+            dest.y = src.y;
+            dest.width = src.width;
+            dest.height = src.height;
+            dest.top = src.top;
+            dest.bottom = src.bottom;
+            dest.left = src.left;
+            dest.right = src.right;
+            dest.percentWidth = src.percentWidth;
+            dest.percentHeight = src.percentHeight;
         };
         TabView.prototype.onRemovedFromStage = function () {
             editor.drag.unregister(this.tabGroup);

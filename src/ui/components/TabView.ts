@@ -175,9 +175,33 @@ namespace editor
 			});
 			drag.register(this.contentGroup, null, ["moduleView"], (dragSource) =>
 			{
-
+				let moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
+				this.addModuleToLeft(moduleView);
 			});
 			this._invalidateView()
+		}
+
+		private addModuleToLeft(moduleView: ModuleView)
+		{
+			var splitGroup = new SplitGroup();
+			var layout = splitGroup.layout = new eui.HorizontalLayout();
+			layout.gap = 2;
+			this.copyLayoutInfo(this, splitGroup);
+			//
+			var tabView = new TabView();
+			tabView.addModule(moduleView);
+			tabView.percentHeight = 100;
+			tabView.percentWidth = 30;
+			this.percentHeight = 100;
+			this.percentWidth = 70;
+			//
+			var parent = this.parent;
+			var index = parent.getChildIndex(this);
+			parent.removeChildAt(index);
+			//
+			splitGroup.addChild(tabView);
+			splitGroup.addChild(this);
+			parent.addChildAt(splitGroup, index);
 		}
 
 		private addModule(moduleView: ModuleView)
@@ -228,16 +252,7 @@ namespace editor
 				else if (view.numChildren == 1)
 				{
 					var child = <eui.Component>view.getChildAt(0);
-					child.x = view.x;
-					child.y = view.y;
-					child.width = view.width;
-					child.height = view.height;
-					child.top = view.top;
-					child.bottom = view.bottom;
-					child.left = view.left;
-					child.right = view.right;
-					child.percentWidth = view.percentWidth;
-					child.percentHeight = view.percentHeight;
+					this.copyLayoutInfo(view, child);
 					//
 					var index = parent.getChildIndex(view);
 					parent.removeChildAt(index);
@@ -249,6 +264,20 @@ namespace editor
 					feng3d.assert(false);
 				}
 			}
+		}
+
+		private copyLayoutInfo(src: eui.Component | eui.Group, dest: eui.Component | eui.Group)
+		{
+			dest.x = src.x;
+			dest.y = src.y;
+			dest.width = src.width;
+			dest.height = src.height;
+			dest.top = src.top;
+			dest.bottom = src.bottom;
+			dest.left = src.left;
+			dest.right = src.right;
+			dest.percentWidth = src.percentWidth;
+			dest.percentHeight = src.percentHeight;
 		}
 
 		private onRemovedFromStage()
