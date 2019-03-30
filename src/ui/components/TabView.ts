@@ -176,31 +176,53 @@ namespace editor
 			drag.register(this.contentGroup, null, ["moduleView"], (dragSource) =>
 			{
 				let moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
-				this.addModuleToLeft(moduleView);
+				this.addModuleToLeft(moduleView, 6);
 			});
 			this._invalidateView()
 		}
 
-		private addModuleToLeft(moduleView: ModuleView)
+		private addModuleToLeft(moduleView: ModuleView, dir = 4)
 		{
-			var splitGroup = new SplitGroup();
-			var layout = splitGroup.layout = new eui.HorizontalLayout();
-			layout.gap = 2;
-			this.copyLayoutInfo(this, splitGroup);
 			//
 			var tabView = new TabView();
 			tabView.addModule(moduleView);
-			tabView.percentHeight = 100;
-			tabView.percentWidth = 30;
-			this.percentHeight = 100;
-			this.percentWidth = 70;
+			//
+			var splitGroup = new SplitGroup();
+			this.copyLayoutInfo(this, splitGroup);
+			if (dir == 4 || dir == 6)
+			{
+				var layout = splitGroup.layout = new eui.HorizontalLayout();
+				layout.gap = 2;
+				//
+				tabView.percentHeight = 100;
+				tabView.percentWidth = 30;
+				this.percentHeight = 100;
+				this.percentWidth = 70;
+			} else if (dir == 8 || dir == 2)
+			{
+				var layout1 = splitGroup.layout = new eui.VerticalLayout();
+				layout1.gap = 2;
+				//
+				tabView.percentHeight = 30;
+				tabView.percentWidth = 100;
+				this.percentHeight = 70;
+				this.percentWidth = 100;
+			}
 			//
 			var parent = this.parent;
 			var index = parent.getChildIndex(this);
 			parent.removeChildAt(index);
 			//
-			splitGroup.addChild(tabView);
-			splitGroup.addChild(this);
+			if (dir == 4 || dir == 8)
+			{
+				splitGroup.addChild(tabView);
+				splitGroup.addChild(this);
+			} else if (dir == 2 || dir == 6)
+			{
+				splitGroup.addChild(this);
+				splitGroup.addChild(tabView);
+			}
+			//
 			parent.addChildAt(splitGroup, index);
 		}
 
