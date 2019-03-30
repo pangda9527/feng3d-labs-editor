@@ -148,6 +148,8 @@ var egret;
             var x = location.x;
             var y = location.y;
             var target = touch["findTarget"](x, y);
+            target.stage.stageX = x;
+            target.stage.stageY = y;
             egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.MOUSE_MOVE, true, true, x, y);
             if (target == overDisplayObject)
                 return;
@@ -3317,8 +3319,21 @@ var editor;
                 }
             });
             editor.drag.register(this.contentGroup, null, ["moduleView"], function (dragSource) {
+                if (dragSource.moduleView.tabView == _this && _this._moduleViews.length == 1)
+                    return;
                 var moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
-                _this.addModuleToLeft(moduleView, 6);
+                var rect = _this.getGlobalBounds();
+                var center = rect.center;
+                var mouse = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
+                var sub = mouse.sub(center);
+                sub.x = sub.x / rect.width;
+                sub.y = sub.y / rect.height;
+                if (sub.x * sub.x > sub.y * sub.y) {
+                    _this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
+                }
+                else {
+                    _this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
+                }
             });
             this._invalidateView();
         };
@@ -9950,9 +9965,9 @@ var editor;
         };
         MainSplitView.prototype._initViewLayout = function () {
             if (editor.editorcache.viewLayout) {
-                // this.removeChildAt(0);
-                // var sp: SplitGroup = <any>this._createViews(editorcache.viewLayout);
-                // this.addChild(sp);
+                this.removeChildAt(0);
+                var sp = this._createViews(editor.editorcache.viewLayout);
+                this.addChild(sp);
             }
             else {
                 this._saveViewLayout();

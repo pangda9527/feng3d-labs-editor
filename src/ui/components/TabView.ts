@@ -175,8 +175,23 @@ namespace editor
 			});
 			drag.register(this.contentGroup, null, ["moduleView"], (dragSource) =>
 			{
+				if (dragSource.moduleView.tabView == this && this._moduleViews.length == 1) return;
+
 				let moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
-				this.addModuleToLeft(moduleView, 6);
+
+				var rect = this.getGlobalBounds();
+				var center = rect.center;
+				var mouse = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
+				var sub = mouse.sub(center);
+				sub.x = sub.x / rect.width;
+				sub.y = sub.y / rect.height;
+				if (sub.x * sub.x > sub.y * sub.y)
+				{
+					this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
+				} else
+				{
+					this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
+				}
 			});
 			this._invalidateView()
 		}

@@ -109,6 +109,10 @@ declare namespace feng3d {
     }
 }
 declare namespace egret {
+    interface Stage {
+        stageX: number;
+        stageY: number;
+    }
     /**
      * 扩展鼠标事件，增加鼠标 按下、弹起、移动、点击、移入、移出、右击、双击事件
      */

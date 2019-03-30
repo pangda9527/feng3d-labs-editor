@@ -1,5 +1,11 @@
 namespace egret
 {
+    export interface Stage
+    {
+        stageX: number;
+        stageY: number;
+    }
+
     /**
      * 扩展鼠标事件，增加鼠标 按下、弹起、移动、点击、移入、移出、右击、双击事件
      */
@@ -162,6 +168,8 @@ namespace egret
             var y = location.y;
 
             var target: egret.DisplayObject = touch["findTarget"](x, y);
+            target.stage.stageX = x;
+            target.stage.stageY = y;
             egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MOUSE_MOVE, true, true, x, y);
             if (target == overDisplayObject)
                 return;
@@ -192,5 +200,5 @@ namespace egret
             return player.webTouchHandler;
         }
     };
-    
+
 }
