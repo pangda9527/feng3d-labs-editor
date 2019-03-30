@@ -3183,44 +3183,6 @@ var editor;
     var TabView = /** @class */ (function (_super) {
         __extends(TabView, _super);
         function TabView() {
-            return _super.call(this) || this;
-        }
-        TabView.prototype.childrenCreated = function () {
-            _super.prototype.childrenCreated.call(this);
-            var moduleviews = [];
-            for (var i = this.numChildren - 1; i >= 0; i--) {
-                var child = this.getChildAt(i);
-                moduleviews.push(child);
-                this.removeChildAt(i);
-            }
-            moduleviews = moduleviews.reverse();
-            //
-            this._tabViewInstance = new TabViewInstance(moduleviews);
-            this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
-            this.addChild(this._tabViewInstance);
-            if (this._moduleNames) {
-                this._tabViewInstance.setModuleNames(this._moduleNames);
-                this._moduleNames = null;
-            }
-        };
-        /**
-         * 获取模块名称列表
-         */
-        TabView.prototype.getModuleNames = function () {
-            return this._tabViewInstance.getModuleNames();
-        };
-        TabView.prototype.setModuleNames = function (moduleNames) {
-            if (this._tabViewInstance)
-                this._tabViewInstance.setModuleNames(moduleNames);
-            else
-                this._moduleNames = moduleNames;
-        };
-        return TabView;
-    }(eui.Group));
-    editor.TabView = TabView;
-    var TabViewInstance = /** @class */ (function (_super) {
-        __extends(TabViewInstance, _super);
-        function TabViewInstance(moduleviews) {
             var _this = _super.call(this) || this;
             /**
              * 按钮池
@@ -3234,19 +3196,16 @@ var editor;
              * 模块界面列表
              */
             _this._moduleViews = [];
-            _this._moduleViews = moduleviews;
-            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
-            _this.skinName = "TabViewSkin";
             return _this;
         }
         /**
          * 获取模块名称列表
          */
-        TabViewInstance.prototype.getModuleNames = function () {
+        TabView.prototype.getModuleNames = function () {
             var moduleNames = this._moduleViews.map(function (v) { return v.moduleName; });
             return moduleNames;
         };
-        TabViewInstance.prototype.setModuleNames = function (moduleNames) {
+        TabView.prototype.setModuleNames = function (moduleNames) {
             var _this = this;
             // 移除所有模块界面
             this._moduleViews.concat().forEach(function (v) {
@@ -3284,20 +3243,37 @@ var editor;
                 }
             });
         };
-        TabViewInstance.prototype.onComplete = function () {
+        TabView.prototype.childrenCreated = function () {
+            _super.prototype.childrenCreated.call(this);
+            var moduleviews = [];
+            for (var i = this.numChildren - 1; i >= 0; i--) {
+                var child = this.getChildAt(i);
+                moduleviews.push(child);
+                this.removeChildAt(i);
+            }
+            moduleviews = moduleviews.reverse();
+            //
+            this._tabViewInstance = new TabViewUI();
+            this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
+            this.addChild(this._tabViewInstance);
+            //
+            // this._tabViewInstance.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+            this.onComplete();
+        };
+        TabView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this._onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             // 获取按钮列表
-            for (var i = this.tabGroup.numChildren - 1; i >= 0; i--) {
-                var child = this.tabGroup.getChildAt(i);
+            for (var i = this._tabViewInstance.tabGroup.numChildren - 1; i >= 0; i--) {
+                var child = this._tabViewInstance.tabGroup.getChildAt(i);
                 if (child instanceof editor.TabViewButton) {
                     this._tabViewButtonPool.push(child);
-                    this.tabGroup.removeChildAt(i);
+                    this._tabViewInstance.tabGroup.removeChildAt(i);
                 }
             }
             // 获取模块列表
-            for (var i = this.contentGroup.numChildren - 1; i >= 0; i--) {
-                var child = this.contentGroup.getChildAt(i);
+            for (var i = this._tabViewInstance.contentGroup.numChildren - 1; i >= 0; i--) {
+                var child = this._tabViewInstance.contentGroup.getChildAt(i);
                 if (child.parent)
                     child.parent.removeChildAt(i);
                 //
@@ -3313,21 +3289,21 @@ var editor;
                 this._onAddedToStage();
             }
         };
-        TabViewInstance.prototype._onAddedToStage = function () {
+        TabView.prototype._onAddedToStage = function () {
             this._invalidateView();
         };
-        TabViewInstance.prototype.onRemovedFromStage = function () {
+        TabView.prototype.onRemovedFromStage = function () {
         };
         /**
          * 界面显示失效
          */
-        TabViewInstance.prototype._invalidateView = function () {
+        TabView.prototype._invalidateView = function () {
             this.once(egret.Event.ENTER_FRAME, this._updateView, this);
         };
         /**
          * 更新界面
          */
-        TabViewInstance.prototype._updateView = function () {
+        TabView.prototype._updateView = function () {
             var _this = this;
             var moduleNames = this._moduleViews.map(function (v) { return v.moduleName; });
             // 设置默认显示模块名称
@@ -3356,11 +3332,11 @@ var editor;
                 //
                 tabButton.moduleName = moduleView.moduleName;
                 tabButton.currentState = tabButton.moduleName == _this._showModule ? "selected" : "up";
-                _this.tabGroup.addChild(tabButton);
+                _this._tabViewInstance.tabGroup.addChild(tabButton);
                 //
                 if (moduleView.moduleName == _this._showModule) {
                     if (!moduleView.parent)
-                        _this.contentGroup.addChild(moduleView);
+                        _this._tabViewInstance.contentGroup.addChild(moduleView);
                 }
                 else {
                     if (moduleView.parent)
@@ -3373,16 +3349,25 @@ var editor;
          *
          * @param e
          */
-        TabViewInstance.prototype._onTabButtonClick = function (e) {
+        TabView.prototype._onTabButtonClick = function (e) {
             var index = this._tabButtons.indexOf(e.currentTarget);
             if (index != -1 && this._tabButtons[index].moduleName != this._showModule) {
                 this._showModule = this._tabButtons[index].moduleName;
                 this._invalidateView();
             }
         };
-        return TabViewInstance;
+        return TabView;
+    }(eui.Group));
+    editor.TabView = TabView;
+    var TabViewUI = /** @class */ (function (_super) {
+        __extends(TabViewUI, _super);
+        function TabViewUI() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "TabViewSkin";
+            return _this;
+        }
+        return TabViewUI;
     }(eui.Component));
-    editor.TabViewInstance = TabViewInstance;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -8335,6 +8320,8 @@ var editor;
             feng3d.dispatcher.on("inspector.update", this.updateView, this);
             feng3d.dispatcher.on("inspector.showData", this.onShowData, this);
             feng3d.dispatcher.on("inspector.saveShowData", this.onSaveShowData, this);
+            //
+            this.updateView();
         };
         InspectorView.prototype.onRemovedFromStage = function () {
             this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);

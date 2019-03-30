@@ -22,61 +22,8 @@ namespace editor
 	export class TabView extends eui.Group
 	{
 		//
-		private _tabViewInstance: TabViewInstance;
+		private _tabViewInstance: TabViewUI;
 
-		constructor()
-		{
-			super();
-		}
-
-		protected childrenCreated(): void
-		{
-			super.childrenCreated();
-
-			var moduleviews: ModuleView[] = [];
-			for (let i = this.numChildren - 1; i >= 0; i--)
-			{
-				let child = this.getChildAt(i);
-				moduleviews.push(<any>child);
-				this.removeChildAt(i);
-			}
-			moduleviews = moduleviews.reverse();
-			//
-			this._tabViewInstance = new TabViewInstance(moduleviews);
-			this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
-			this.addChild(this._tabViewInstance);
-			if (this._moduleNames)
-			{
-				this._tabViewInstance.setModuleNames(this._moduleNames);
-				this._moduleNames = null;
-			}
-		}
-
-		// temp
-		private _moduleNames: string[];
-
-		/**
-		 * 获取模块名称列表
-		 */
-		getModuleNames()
-		{
-			return this._tabViewInstance.getModuleNames();
-		}
-
-		setModuleNames(moduleNames: string[])
-		{
-			if (this._tabViewInstance)
-				this._tabViewInstance.setModuleNames(moduleNames);
-			else
-				this._moduleNames = moduleNames;
-		}
-	}
-
-	export class TabViewInstance extends eui.Component
-	{
-
-		public tabGroup: eui.Group;
-		public contentGroup: eui.Group;
 		/**
 		 * 按钮池
 		 */
@@ -146,13 +93,31 @@ namespace editor
 			});
 		}
 
-		constructor(moduleviews: ModuleView[])
+		constructor()
 		{
 			super();
+		}
 
-			this._moduleViews = moduleviews;
-			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-			this.skinName = "TabViewSkin";
+		protected childrenCreated(): void
+		{
+			super.childrenCreated();
+
+			var moduleviews: ModuleView[] = [];
+			for (let i = this.numChildren - 1; i >= 0; i--)
+			{
+				let child = this.getChildAt(i);
+				moduleviews.push(<any>child);
+				this.removeChildAt(i);
+			}
+			moduleviews = moduleviews.reverse();
+			//
+			this._tabViewInstance = new TabViewUI();
+			this._tabViewInstance.left = this._tabViewInstance.right = this._tabViewInstance.top = this._tabViewInstance.bottom = 0;
+			this.addChild(this._tabViewInstance);
+			//
+			// this._tabViewInstance.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+
+			this.onComplete();
 		}
 
 		private onComplete(): void
@@ -161,19 +126,19 @@ namespace editor
 			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
 			// 获取按钮列表
-			for (let i = this.tabGroup.numChildren - 1; i >= 0; i--)
+			for (let i = this._tabViewInstance.tabGroup.numChildren - 1; i >= 0; i--)
 			{
-				let child = this.tabGroup.getChildAt(i);
+				let child = this._tabViewInstance.tabGroup.getChildAt(i);
 				if (child instanceof TabViewButton)
 				{
 					this._tabViewButtonPool.push(child);
-					this.tabGroup.removeChildAt(i);
+					this._tabViewInstance.tabGroup.removeChildAt(i);
 				}
 			}
 			// 获取模块列表
-			for (let i = this.contentGroup.numChildren - 1; i >= 0; i--)
+			for (let i = this._tabViewInstance.contentGroup.numChildren - 1; i >= 0; i--)
 			{
-				let child = this.contentGroup.getChildAt(i);
+				let child = this._tabViewInstance.contentGroup.getChildAt(i);
 				if (child.parent) child.parent.removeChildAt(i);
 				//
 				let moduleView: ModuleView = <any>child;
@@ -242,11 +207,11 @@ namespace editor
 				//
 				tabButton.moduleName = moduleView.moduleName;
 				tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
-				this.tabGroup.addChild(tabButton);
+				this._tabViewInstance.tabGroup.addChild(tabButton);
 				//
 				if (moduleView.moduleName == this._showModule)
 				{
-					if (!moduleView.parent) this.contentGroup.addChild(moduleView);
+					if (!moduleView.parent) this._tabViewInstance.contentGroup.addChild(moduleView);
 				} else
 				{
 					if (moduleView.parent) moduleView.parent.removeChild(moduleView);
@@ -268,6 +233,17 @@ namespace editor
 				this._invalidateView();
 			}
 		}
+	}
 
+	class TabViewUI extends eui.Component
+	{
+		public tabGroup: eui.Group;
+		public contentGroup: eui.Group;
+
+		constructor()
+		{
+			super();
+			this.skinName = "TabViewSkin";
+		}
 	}
 }

@@ -1071,18 +1071,6 @@ declare namespace editor {
      */
     class TabView extends eui.Group {
         private _tabViewInstance;
-        constructor();
-        protected childrenCreated(): void;
-        private _moduleNames;
-        /**
-         * 获取模块名称列表
-         */
-        getModuleNames(): string[];
-        setModuleNames(moduleNames: string[]): void;
-    }
-    class TabViewInstance extends eui.Component {
-        tabGroup: eui.Group;
-        contentGroup: eui.Group;
         /**
          * 按钮池
          */
@@ -1104,7 +1092,8 @@ declare namespace editor {
          */
         getModuleNames(): string[];
         setModuleNames(moduleNames: string[]): void;
-        constructor(moduleviews: ModuleView[]);
+        constructor();
+        protected childrenCreated(): void;
         private onComplete;
         private _onAddedToStage;
         private onRemovedFromStage;

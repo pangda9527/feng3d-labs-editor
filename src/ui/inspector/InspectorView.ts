@@ -147,6 +147,9 @@ namespace editor
 			feng3d.dispatcher.on("inspector.update", this.updateView, this);
 			feng3d.dispatcher.on("inspector.showData", this.onShowData, this);
 			feng3d.dispatcher.on("inspector.saveShowData", this.onSaveShowData, this);
+
+			//
+			this.updateView();
 		}
 
 		private onRemovedFromStage()
