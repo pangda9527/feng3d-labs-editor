@@ -3336,34 +3336,37 @@ var editor;
             //
             this._tabButtons.forEach(function (v) {
                 v.removeEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
+                editor.drag.unregister(v);
                 v.parent && v.parent.removeChild(v);
                 _this._tabViewButtonPool.push(v);
             });
             this._tabButtons.length = 0;
             // 控制按钮状态
-            for (var i = 0; i < this._moduleViews.length; i++) {
-                var tabButton = this._tabViewButtonPool.pop();
+            this._moduleViews.forEach(function (moduleView) {
+                //
+                var tabButton = _this._tabViewButtonPool.pop();
                 if (!tabButton)
                     tabButton = new editor.TabViewButton();
-                tabButton.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
-                this._tabButtons.push(tabButton);
+                tabButton.addEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
                 //
-                tabButton.moduleName = this._moduleViews[i].moduleName;
-                tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
-                this.tabGroup.addChild(tabButton);
-            }
-            // 保留显示模块，移除其它模块
-            for (var i = 0; i < this._moduleViews.length; i++) {
-                var moduleView = this._moduleViews[i];
-                if (moduleView.moduleName == this._showModule) {
+                editor.drag.register(tabButton, function (dragSource) {
+                    dragSource.moduleView = { tabView: _this, moduleName: moduleView.moduleName };
+                }, []);
+                _this._tabButtons.push(tabButton);
+                //
+                tabButton.moduleName = moduleView.moduleName;
+                tabButton.currentState = tabButton.moduleName == _this._showModule ? "selected" : "up";
+                _this.tabGroup.addChild(tabButton);
+                //
+                if (moduleView.moduleName == _this._showModule) {
                     if (!moduleView.parent)
-                        this.contentGroup.addChild(moduleView);
+                        _this.contentGroup.addChild(moduleView);
                 }
                 else {
                     if (moduleView.parent)
                         moduleView.parent.removeChild(moduleView);
                 }
-            }
+            });
         };
         /**
          * 点击按钮事件

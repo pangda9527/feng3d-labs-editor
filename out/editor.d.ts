@@ -1058,6 +1058,15 @@ declare namespace editor {
         moduleName: string;
     }
     /**
+     * 拖拽数据
+     */
+    interface DragData {
+        moduleView: {
+            tabView: TabView;
+            moduleName: string;
+        };
+    }
+    /**
      * Tab 界面
      */
     class TabView extends eui.Group {

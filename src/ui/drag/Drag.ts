@@ -165,7 +165,7 @@ namespace editor
 		if (!acceptableitems)
 		{
 			//获取拖拽数据
-			dragSource = {};
+			dragSource = <any>{};
 			dragitem.setdargSource(dragSource);
 
 			//获取可接受数据的对象列表
