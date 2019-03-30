@@ -194,9 +194,61 @@ namespace editor
 			feng3d.assert(index != -1);
 			this._moduleViews.splice(index, 1);
 
-			this._invalidateView();
+			this.adjust(this);
 
+			this._invalidateView();
 			return moduleView;
+		}
+
+		private adjust(view: egret.DisplayObject)
+		{
+			var parent = view.parent;
+			if (view instanceof TabView)
+			{
+				// 当模块全被移除时移除 TabView
+				if (view._moduleViews.length == 0)
+				{
+					this.remove();
+					this.adjust(parent);
+				}
+			} else if (view instanceof SplitGroup)
+			{
+				if (view.numChildren > 1)
+				{
+					if (view.layout instanceof eui.HorizontalLayout)
+					{
+						var total = view.$children.reduce((pv, cv) => { return pv + cv.width; }, 0);
+						view.$children.forEach((v: eui.Component) => { v.percentWidth = v.width / total * 100; });
+					} else if (view.layout instanceof eui.VerticalLayout)
+					{
+						var total = view.$children.reduce((pv, cv) => { return pv + cv.height; }, 0);
+						view.$children.forEach((v: eui.Component) => { v.percentHeight = v.height / total * 100; });
+					}
+				}
+				else if (view.numChildren == 1)
+				{
+					var child = <eui.Component>view.getChildAt(0);
+					child.x = view.x;
+					child.y = view.y;
+					child.width = view.width;
+					child.height = view.height;
+					child.top = view.top;
+					child.bottom = view.bottom;
+					child.left = view.left;
+					child.right = view.right;
+					child.percentWidth = view.percentWidth;
+					child.percentHeight = view.percentHeight;
+					//
+					var index = parent.getChildIndex(view);
+					parent.removeChildAt(index);
+					parent.addChildAt(child, index);
+					//
+					this.adjust(parent);
+				} else
+				{
+					feng3d.assert(false);
+				}
+			}
 		}
 
 		private onRemovedFromStage()
@@ -222,6 +274,13 @@ namespace editor
 			// 设置默认显示模块名称
 			if (moduleNames.indexOf(this._showModule) == -1) this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
 
+			this._tabButtons.forEach(v =>
+			{
+				v.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
+				//
+				drag.unregister(v);
+			});
+			//
 			var buttonNum = this._tabButtons.length;
 			var viewNum = this._moduleViews.length;
 			for (var i = 0, max = Math.max(buttonNum, viewNum); i < max; i++)
@@ -231,12 +290,6 @@ namespace editor
 					//
 					var tabButton = this._tabViewButtonPool.pop();
 					if (!tabButton) tabButton = new TabViewButton();
-					tabButton.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
-					//
-					drag.register(tabButton, (dragSource) =>
-					{
-						dragSource.moduleView = { tabView: <any>this, moduleName: tabButton.moduleName };
-					}, []);
 					this._tabButtons.push(tabButton);
 				}
 				if (i >= viewNum)
@@ -244,9 +297,6 @@ namespace editor
 					var tabButton = this._tabButtons[i];
 					tabButton.parent && tabButton.parent.removeChild(tabButton);
 					this._tabViewButtonPool.push(tabButton);
-					tabButton.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
-					//
-					drag.unregister(tabButton);
 				}
 				if (i < viewNum)
 				{
@@ -267,6 +317,15 @@ namespace editor
 				}
 			}
 			this._tabButtons.length = viewNum;
+			this._tabButtons.forEach(v =>
+			{
+				v.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
+				//
+				drag.register(v, (dragSource) =>
+				{
+					dragSource.moduleView = { tabView: <any>this, moduleName: v.moduleName };
+				}, []);
+			});
 		}
 
 		/**

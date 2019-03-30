@@ -154,6 +154,10 @@ declare namespace egret {
          * @param resultRect {Rectangle} 可选参数，传入用于保存结果的Rectangle对象，避免重复创建对象。
          */
         getGlobalBounds(resultRect?: feng3d.Rectangle): feng3d.Rectangle;
+        /**
+         * 把自身从父对象中移除 this.parent && this.parent.removeChild(this);
+         */
+        remove(): void;
     }
 }
 declare namespace egret {
@@ -1110,6 +1114,7 @@ declare namespace editor {
         private _onAddedToStage;
         private addModule;
         private removeModule;
+        private adjust;
         private onRemovedFromStage;
         /**
          * 界面显示失效

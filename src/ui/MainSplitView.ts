@@ -58,7 +58,7 @@ namespace editor
 
             editorcache.viewLayout = data;
 
-            console.log(data);
+            // console.log(data);
         }
 
         private _getData(sp: egret.DisplayObject)
