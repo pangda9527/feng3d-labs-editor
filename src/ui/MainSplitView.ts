@@ -113,11 +113,11 @@ namespace editor
                 if (data.layout == "HorizontalLayout")
                 {
                     let horizontalLayout = splitGroup.layout = new eui.HorizontalLayout();
-                    horizontalLayout.gap = 4;
+                    horizontalLayout.gap = 2;
                 } else if (data.layout == "VerticalLayout")
                 {
                     let verticalLayout = splitGroup.layout = new eui.VerticalLayout();
-                    verticalLayout.gap = 4;
+                    verticalLayout.gap = 2;
                 }
                 var children = data.children;
                 for (let i = 0; i < children.length; i++)

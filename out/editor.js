@@ -9847,11 +9847,11 @@ var editor;
                 var splitGroup = displayObject = new editor.SplitGroup();
                 if (data.layout == "HorizontalLayout") {
                     var horizontalLayout = splitGroup.layout = new eui.HorizontalLayout();
-                    horizontalLayout.gap = 4;
+                    horizontalLayout.gap = 2;
                 }
                 else if (data.layout == "VerticalLayout") {
                     var verticalLayout = splitGroup.layout = new eui.VerticalLayout();
-                    verticalLayout.gap = 4;
+                    verticalLayout.gap = 2;
                 }
                 var children = data.children;
                 for (var i = 0; i < children.length; i++) {

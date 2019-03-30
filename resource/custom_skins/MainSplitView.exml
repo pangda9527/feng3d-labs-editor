@@ -23,8 +23,9 @@
 			</editor:layout>
 		</editor:SplitGroup>
 		<editor:TabView x="100" y="100" height="100%" width="250">
+			<editor:InspectorView top="0" left="0" bottom="0" right="0"/>
 			<editor:NavigationView top="0" left="0" bottom="0" right="0" />
-			<editor:InspectorView top="0" left="0" bottom="0" right="0" />
+
 		</editor:TabView>
 		<editor:layout>
 			<e:HorizontalLayout gap="4" />
