@@ -148,6 +148,15 @@ declare namespace egret {
 declare namespace egret {
 }
 declare namespace egret {
+    interface DisplayObject {
+        /**
+         * 获取显示对象的全局测量边界
+         * @param resultRect {Rectangle} 可选参数，传入用于保存结果的Rectangle对象，避免重复创建对象。
+         */
+        getGlobalBounds(resultRect?: feng3d.Rectangle): feng3d.Rectangle;
+    }
+}
+declare namespace egret {
 }
 declare namespace json {
     const enum ScanError {

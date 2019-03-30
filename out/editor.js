@@ -217,6 +217,20 @@ var egret;
 })(egret || (egret = {}));
 var egret;
 (function (egret) {
+    // 注 使用 DisplayObject.prototype.getTransformedBounds 计算全局测量边界存在bug，因此扩展 getGlobalBounds 用于代替使用
+    egret.DisplayObject.prototype["getGlobalBounds"] = function (resultRect) {
+        var min = this.localToGlobal(0, 0);
+        var max = this.localToGlobal(this.width, this.height);
+        resultRect = resultRect || new feng3d.Rectangle();
+        resultRect.x = min.x;
+        resultRect.y = min.y;
+        resultRect.width = max.x - min.x;
+        resultRect.height = max.y - min.y;
+        return resultRect;
+    };
+})(egret || (egret = {}));
+var egret;
+(function (egret) {
     // 扩展 Scroller 组件，添加鼠标滚轮事件
     var oldOnAddToStage = eui.Scroller.prototype.$onAddToStage;
     eui.Scroller.prototype.$onAddToStage = function (stage, nestLevel) {
@@ -2244,9 +2258,7 @@ var editor;
         });
         accepters.clear();
         acceptableitems.forEach(function (element) {
-            var min = element.displayObject.localToGlobal(0, 0);
-            var max = element.displayObject.localToGlobal(element.displayObject.width, element.displayObject.height);
-            var rect = new feng3d.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
+            var rect = element.displayObject.getGlobalBounds();
             if (rect.contains(event.stageX, event.stageY)) {
                 accepters.set(element.displayObject, element.displayObject.alpha);
                 element.displayObject.alpha = 0.5;
@@ -2607,9 +2619,7 @@ var editor;
         };
         Feng3dView.prototype._onAreaSelect = function () {
             var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var lt = editor.editorui.feng3dView.localToGlobal(0, 0);
-            var rb = editor.editorui.feng3dView.localToGlobal(editor.editorui.feng3dView.width, editor.editorui.feng3dView.height);
-            var rectangle = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+            var rectangle = editor.editorui.feng3dView.getGlobalBounds();
             //
             areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
             //
@@ -2634,9 +2644,7 @@ var editor;
             if (!this._canvas)
                 return;
             this._canvas.style.display = "";
-            var lt = this.localToGlobal(0, 0);
-            var rb = this.localToGlobal(this.width, this.height);
-            var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+            var bound = this.getGlobalBounds();
             var style = this._canvas.style;
             style.position = "absolute";
             style.left = bound.x + "px";
@@ -2706,9 +2714,7 @@ var editor;
         CameraPreview.prototype.onResize = function () {
             if (!this.stage)
                 return;
-            var lt = this.group.localToGlobal(0, 0);
-            var rb = this.group.localToGlobal(this.group.width, this.group.height);
-            var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+            var bound = this.group.getGlobalBounds();
             var style = this.canvas.style;
             style.position = "absolute";
             style.left = bound.x + "px";
@@ -3066,7 +3072,7 @@ var editor;
                     if (ci == 0)
                         return pv0;
                     var item = { splitGroup: cv, index: ci - 1, rect: null };
-                    var elementRect = getGlobalBounds(cv.$children[ci - 1]);
+                    var elementRect = cv.$children[ci - 1].getGlobalBounds();
                     if (cv.layout instanceof eui.HorizontalLayout) {
                         item.rect = new feng3d.Rectangle(elementRect.right - 3, elementRect.top, 6, elementRect.height);
                     }
@@ -3092,15 +3098,15 @@ var editor;
             //
             var preElement = this.preElement;
             var nextElement = this.nextElement;
-            var preElementRect = this.preElementRect = getGlobalBounds(preElement);
-            var nextElementRect = this.nextElementRect = getGlobalBounds(nextElement);
+            var preElementRect = this.preElementRect = preElement.getGlobalBounds();
+            var nextElementRect = this.nextElementRect = nextElement.getGlobalBounds();
             //
             //
             var minX = preElementRect.left + (preElement.minWidth ? preElement.minWidth : 10);
             var maxX = nextElementRect.right - (nextElement.minWidth ? nextElement.minWidth : 10);
             var minY = preElementRect.top + (preElement.minHeight ? preElement.minHeight : 10);
             var maxY = nextElementRect.bottom - (nextElement.minHeight ? nextElement.minHeight : 10);
-            this.dragRect = new egret.Rectangle(minX, minY, maxX - minX, maxY - minY);
+            this.dragRect = new feng3d.Rectangle(minX, minY, maxX - minX, maxY - minY);
         };
         /**
          * 拖拽分割
@@ -3139,11 +3145,6 @@ var editor;
         };
         return SplitManager;
     }());
-    function getGlobalBounds(displayObject) {
-        var min = displayObject.localToGlobal();
-        var max = displayObject.localToGlobal(displayObject.width, displayObject.height);
-        return new egret.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
-    }
     var splitManager = new SplitManager();
 })(editor || (editor = {}));
 var editor;
@@ -8127,8 +8128,8 @@ var editor;
         };
         OAVFeng3dPreView.prototype.onMouseDown = function () {
             this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var s = this.localToGlobal(0, 0);
-            if (new feng3d.Rectangle(s.x, s.y, this.width, this.height).containsPoint(this.preMousePos)) {
+            var rect = this.getGlobalBounds();
+            if (rect.contains(this.preMousePos.x, this.preMousePos.y)) {
                 feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
                 feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
             }
@@ -9594,8 +9595,7 @@ var editor;
         };
         AssetView.prototype.onMouseMove = function () {
             var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var p = this.filelist.localToGlobal(0, 0);
-            var rectangle = new feng3d.Rectangle(p.x, p.y, this.filelist.width, this.filelist.height);
+            var rectangle = this.filelist.getGlobalBounds();
             //
             areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
             //
@@ -9606,8 +9606,7 @@ var editor;
             var areaRect = new feng3d.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
             //
             var datas = this.filelist.$indexToRenderer.filter(function (v) {
-                var p = v.localToGlobal(0, 0);
-                var rectangle = new feng3d.Rectangle(p.x, p.y, v.width, v.height);
+                var rectangle = v.getGlobalBounds();
                 return areaRect.intersects(rectangle);
             }).map(function (v) { return v.data; });
             editor.editorData.selectMultiObject(datas);

@@ -262,8 +262,7 @@ namespace editor
         private onMouseMove()
         {
             var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var p = this.filelist.localToGlobal(0, 0);
-            var rectangle = new feng3d.Rectangle(p.x, p.y, this.filelist.width, this.filelist.height);
+            var rectangle = this.filelist.getGlobalBounds();
             //
             areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
             //
@@ -275,8 +274,7 @@ namespace editor
             //
             var datas = this.filelist.$indexToRenderer.filter(v =>
             {
-                var p = v.localToGlobal(0, 0);
-                var rectangle = new feng3d.Rectangle(p.x, p.y, v.width, v.height);
+                var rectangle = v.getGlobalBounds();
                 return areaRect.intersects(rectangle);
             }).map(v => v.data);
             editorData.selectMultiObject(datas);

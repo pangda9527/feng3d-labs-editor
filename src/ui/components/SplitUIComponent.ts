@@ -81,9 +81,9 @@ namespace editor
         checkItem: CheckItem;
         preElement: egret.DisplayObject;
         nextElement: egret.DisplayObject;
-        preElementRect: egret.Rectangle;
-        nextElementRect: egret.Rectangle;
-        dragRect: egret.Rectangle;
+        preElementRect: feng3d.Rectangle;
+        nextElementRect: feng3d.Rectangle;
+        dragRect: feng3d.Rectangle;
         dragingMousePoint: feng3d.Vector2;
         //
         private splitGroups: SplitGroup[] = [];
@@ -164,7 +164,7 @@ namespace editor
                 {
                     if (ci == 0) return pv0;
                     var item: CheckItem = { splitGroup: cv, index: ci - 1, rect: null };
-                    var elementRect = getGlobalBounds(cv.$children[ci - 1]);
+                    var elementRect = cv.$children[ci - 1].getGlobalBounds();
                     if (cv.layout instanceof eui.HorizontalLayout)
                     {
                         item.rect = new feng3d.Rectangle(elementRect.right - 3, elementRect.top, 6, elementRect.height);
@@ -195,15 +195,15 @@ namespace editor
             //
             var preElement = <eui.Group>this.preElement;
             var nextElement = <eui.Group>this.nextElement;
-            var preElementRect = this.preElementRect = getGlobalBounds(preElement);
-            var nextElementRect = this.nextElementRect = getGlobalBounds(nextElement);
+            var preElementRect = this.preElementRect = preElement.getGlobalBounds();
+            var nextElementRect = this.nextElementRect = nextElement.getGlobalBounds();
             //
             //
             var minX = preElementRect.left + (preElement.minWidth ? preElement.minWidth : 10);
             var maxX = nextElementRect.right - (nextElement.minWidth ? nextElement.minWidth : 10);
             var minY = preElementRect.top + (preElement.minHeight ? preElement.minHeight : 10);
             var maxY = nextElementRect.bottom - (nextElement.minHeight ? nextElement.minHeight : 10);
-            this.dragRect = new egret.Rectangle(minX, minY, maxX - minX, maxY - minY);
+            this.dragRect = new feng3d.Rectangle(minX, minY, maxX - minX, maxY - minY);
         }
 
         /**
@@ -252,13 +252,6 @@ namespace editor
 
             feng3d.dispatcher.dispatch("viewLayout.changed");
         }
-    }
-
-    function getGlobalBounds(displayObject: egret.DisplayObject)
-    {
-        var min = displayObject.localToGlobal();
-        var max = displayObject.localToGlobal(displayObject.width, displayObject.height);
-        return new egret.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
     }
 
     var splitManager = new SplitManager();

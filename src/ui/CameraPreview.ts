@@ -68,9 +68,7 @@ namespace editor
             if (!this.stage)
                 return;
 
-            var lt = this.group.localToGlobal(0, 0);
-            var rb = this.group.localToGlobal(this.group.width, this.group.height);
-            var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+            var bound = this.group.getGlobalBounds();
 
             var style = this.canvas.style;
             style.position = "absolute";

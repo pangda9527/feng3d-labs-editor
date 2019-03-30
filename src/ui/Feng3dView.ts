@@ -81,9 +81,7 @@ namespace editor
 		{
 			var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 
-			var lt = editorui.feng3dView.localToGlobal(0, 0);
-			var rb = editorui.feng3dView.localToGlobal(editorui.feng3dView.width, editorui.feng3dView.height);
-			var rectangle = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+			var rectangle = editorui.feng3dView.getGlobalBounds();
 			//
 			areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
 			//
@@ -118,9 +116,7 @@ namespace editor
 
 			this._canvas.style.display = "";
 
-			var lt = this.localToGlobal(0, 0);
-			var rb = this.localToGlobal(this.width, this.height);
-			var bound = new feng3d.Rectangle(lt.x, lt.y, rb.x - lt.x, rb.y - lt.y);
+			var bound = this.getGlobalBounds();
 
 			var style = this._canvas.style;
 			style.position = "absolute";

@@ -47,8 +47,8 @@ namespace editor
         private onMouseDown()
         {
             this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var s = this.localToGlobal(0, 0);
-            if (new feng3d.Rectangle(s.x, s.y, this.width, this.height).containsPoint(this.preMousePos))
+            var rect = this.getGlobalBounds();
+            if (rect.contains(this.preMousePos.x, this.preMousePos.y))
             {
                 feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
                 feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);

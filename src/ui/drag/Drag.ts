@@ -191,9 +191,7 @@ namespace editor
 
 		acceptableitems.forEach(element =>
 		{
-			var min = element.displayObject.localToGlobal(0, 0);
-			var max = element.displayObject.localToGlobal(element.displayObject.width, element.displayObject.height);
-			var rect = new feng3d.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
+			var rect = element.displayObject.getGlobalBounds();
 			if (rect.contains(event.stageX, event.stageY))
 			{
 				accepters.set(element.displayObject, element.displayObject.alpha);
