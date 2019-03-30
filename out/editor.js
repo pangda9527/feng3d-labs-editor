@@ -3269,6 +3269,9 @@ var editor;
                     case editor.Feng3dView.moduleName:
                         moduleView = new editor.Feng3dView();
                         break;
+                    case editor.NavigationView.moduleName:
+                        moduleView = new editor.NavigationView();
+                        break;
                     default:
                         break;
                 }
@@ -3305,33 +3308,15 @@ var editor;
                 moduleView.visible = true;
             }
             this._moduleViews = this._moduleViews.reverse();
-            // 设置默认显示模块名称
-            if (this._showModule == undefined)
-                this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
-            // 初始化按钮
-            for (var i = 0; i < this._moduleViews.length; i++) {
-                var tabButton = this._tabViewButtonPool.pop();
-                if (!tabButton)
-                    tabButton = new editor.TabViewButton();
-                this._tabButtons.push(tabButton);
-            }
             //
             if (this.stage) {
                 this._onAddedToStage();
             }
         };
         TabViewInstance.prototype._onAddedToStage = function () {
-            var _this = this;
-            this._tabButtons.forEach(function (v) {
-                v.addEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
-            });
             this._invalidateView();
         };
         TabViewInstance.prototype.onRemovedFromStage = function () {
-            var _this = this;
-            this._tabButtons.forEach(function (v) {
-                v.removeEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
-            });
         };
         /**
          * 界面显示失效
@@ -3343,9 +3328,26 @@ var editor;
          * 更新界面
          */
         TabViewInstance.prototype._updateView = function () {
+            var _this = this;
+            var moduleNames = this._moduleViews.map(function (v) { return v.moduleName; });
+            // 设置默认显示模块名称
+            if (moduleNames.indexOf(this._showModule) == -1)
+                this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
+            //
+            this._tabButtons.forEach(function (v) {
+                v.removeEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
+                v.parent && v.parent.removeChild(v);
+                _this._tabViewButtonPool.push(v);
+            });
+            this._tabButtons.length = 0;
             // 控制按钮状态
             for (var i = 0; i < this._moduleViews.length; i++) {
-                var tabButton = this._tabButtons[i];
+                var tabButton = this._tabViewButtonPool.pop();
+                if (!tabButton)
+                    tabButton = new editor.TabViewButton();
+                tabButton.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
+                this._tabButtons.push(tabButton);
+                //
                 tabButton.moduleName = this._moduleViews[i].moduleName;
                 tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
                 this.tabGroup.addChild(tabButton);
@@ -9759,7 +9761,7 @@ var editor;
             var _this = _super.call(this) || this;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
             _this.skinName = "NavigationView";
-            _this.moduleName = "Navigation";
+            _this.moduleName = NavigationView.moduleName;
             return _this;
         }
         NavigationView.prototype.onComplete = function () {
@@ -9773,6 +9775,7 @@ var editor;
         };
         NavigationView.prototype.onRemovedFromStage = function () {
         };
+        NavigationView.moduleName = "Navigation";
         return NavigationView;
     }(eui.Component));
     editor.NavigationView = NavigationView;
@@ -9819,7 +9822,7 @@ var editor;
         MainSplitView.prototype._saveViewLayout = function () {
             var sp = this.getChildAt(0);
             var data = this._getData(sp);
-            editor.editorcache.viewLayout = data;
+            // editorcache.viewLayout = data;
             console.log(data);
         };
         MainSplitView.prototype._getData = function (sp) {
@@ -9877,6 +9880,18 @@ var editor;
                 var tabView = displayObject = new editor.TabView();
                 tabView.setModuleNames(data.modules);
             }
+            if (displayObject instanceof eui.Group || displayObject instanceof eui.Component) {
+                displayObject.percentWidth = data.percentWidth;
+                displayObject.percentHeight = data.percentHeight;
+                displayObject.top = data.top;
+                displayObject.bottom = data.bottom;
+                displayObject.left = data.left;
+                displayObject.right = data.right;
+            }
+            displayObject.x = data.x;
+            displayObject.y = data.y;
+            displayObject.width = data.width;
+            displayObject.height = data.height;
             return displayObject;
         };
         return MainSplitView;

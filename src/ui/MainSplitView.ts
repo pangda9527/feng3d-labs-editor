@@ -43,7 +43,8 @@ namespace editor
             {
                 this.removeChildAt(0);
 
-                var sp = this._createViews(editorcache.viewLayout);
+                var sp: SplitGroup = <any>this._createViews(editorcache.viewLayout);
+
                 this.addChild(sp);
 
             } else
@@ -59,7 +60,7 @@ namespace editor
 
             var data = this._getData(sp);
 
-            editorcache.viewLayout = data;
+            // editorcache.viewLayout = data;
 
             console.log(data);
         }
@@ -130,8 +131,20 @@ namespace editor
             {
                 var tabView = displayObject = new TabView();
                 tabView.setModuleNames(data.modules);
-
             }
+            if (displayObject instanceof eui.Group || displayObject instanceof eui.Component)
+            {
+                displayObject.percentWidth = data.percentWidth;
+                displayObject.percentHeight = data.percentHeight;
+                displayObject.top = data.top;
+                displayObject.bottom = data.bottom;
+                displayObject.left = data.left;
+                displayObject.right = data.right;
+            }
+            displayObject.x = data.x;
+            displayObject.y = data.y;
+            displayObject.width = data.width;
+            displayObject.height = data.height;
 
             return displayObject;
         }

@@ -2767,6 +2767,7 @@ declare namespace editor {
 declare namespace editor {
     class NavigationView extends eui.Component implements ModuleView {
         moduleName: string;
+        static moduleName: string;
         constructor();
         private onComplete;
         private onAddedToStage;

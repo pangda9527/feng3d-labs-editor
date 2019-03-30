@@ -121,6 +121,9 @@ namespace editor
 					case Feng3dView.moduleName:
 						moduleView = new Feng3dView();
 						break;
+					case NavigationView.moduleName:
+						moduleView = new NavigationView();
+						break;
 					default:
 						break;
 				}
@@ -171,16 +174,6 @@ namespace editor
 				moduleView.visible = true;
 			}
 			this._moduleViews = this._moduleViews.reverse();
-			// 设置默认显示模块名称
-			if (this._showModule == undefined) this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
-			// 初始化按钮
-			for (let i = 0; i < this._moduleViews.length; i++)
-			{
-				let tabButton = this._tabViewButtonPool.pop();
-				if (!tabButton) tabButton = new TabViewButton();
-				this._tabButtons.push(tabButton);
-			}
-
 			//
 			if (this.stage)
 			{
@@ -190,20 +183,11 @@ namespace editor
 
 		private _onAddedToStage()
 		{
-			this._tabButtons.forEach(v =>
-			{
-				v.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
-			});
-
 			this._invalidateView()
 		}
 
 		private onRemovedFromStage()
 		{
-			this._tabButtons.forEach(v =>
-			{
-				v.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
-			});
 		}
 
 		/**
@@ -219,10 +203,27 @@ namespace editor
 		 */
 		private _updateView()
 		{
+			var moduleNames = this._moduleViews.map(v => v.moduleName);
+			// 设置默认显示模块名称
+			if (moduleNames.indexOf(this._showModule) == -1) this._showModule = (this._moduleViews[0] && this._moduleViews[0].moduleName);
+
+			//
+			this._tabButtons.forEach(v =>
+			{
+				v.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
+				v.parent && v.parent.removeChild(v);
+				this._tabViewButtonPool.push(v);
+			});
+			this._tabButtons.length = 0;
+
 			// 控制按钮状态
 			for (let i = 0; i < this._moduleViews.length; i++)
 			{
-				let tabButton = this._tabButtons[i];
+				let tabButton = this._tabViewButtonPool.pop();
+				if (!tabButton) tabButton = new TabViewButton();
+				tabButton.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
+				this._tabButtons.push(tabButton);
+				//
 				tabButton.moduleName = this._moduleViews[i].moduleName;
 				tabButton.currentState = tabButton.moduleName == this._showModule ? "selected" : "up";
 				this.tabGroup.addChild(tabButton);
