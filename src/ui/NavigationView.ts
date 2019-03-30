@@ -33,4 +33,6 @@ namespace editor
         {
         }
     }
+
+    Modules.moduleViewCls[NavigationView.moduleName] = NavigationView;
 }

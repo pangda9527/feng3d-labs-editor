@@ -934,6 +934,7 @@ declare namespace editor {
     class Modules {
         message: Message;
         getModuleView(moduleName: string): ModuleView;
+        recycleModuleView(moduleView: ModuleView): void;
         private moduleViewMap;
         /**
          * 模块界面类定义
@@ -2816,6 +2817,7 @@ declare namespace editor {
         private _initViewLayout;
         private _saveViewLayout;
         private _resetLayout;
+        private _resolve;
         private _getData;
         private _createViews;
     }

@@ -204,4 +204,6 @@ namespace editor
 			this.updateView();
 		}
 	}
+
+	Modules.moduleViewCls[InspectorView.moduleName] = InspectorView;
 }

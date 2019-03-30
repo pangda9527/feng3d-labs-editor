@@ -65,27 +65,7 @@ namespace editor
 			this._moduleViews = [];
 			moduleNames.forEach(v =>
 			{
-				var moduleView: ModuleView;
-				switch (v)
-				{
-					case HierarchyView.moduleName:
-						moduleView = new HierarchyView();
-						break;
-					case InspectorView.moduleName:
-						moduleView = new InspectorView();
-						break;
-					case AssetView.moduleName:
-						moduleView = new AssetView();
-						break;
-					case Feng3dView.moduleName:
-						moduleView = new Feng3dView();
-						break;
-					case NavigationView.moduleName:
-						moduleView = new NavigationView();
-						break;
-					default:
-						break;
-				}
+				var moduleView: ModuleView = modules.getModuleView(v);
 				if (moduleView)
 				{
 					moduleView.top = moduleView.bottom = moduleView.left = moduleView.right = 0;

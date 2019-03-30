@@ -337,4 +337,6 @@ namespace editor
             }
         }
     }
+
+    Modules.moduleViewCls[AssetView.moduleName] = AssetView;
 }

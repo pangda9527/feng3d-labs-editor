@@ -43,7 +43,9 @@ namespace editor
         {
             if (editorcache.viewLayout)
             {
-                this.removeChildAt(0);
+                var child = this.removeChildAt(0);
+                this._resolve(child);
+                //
                 var sp: SplitGroup = <any>this._createViews(editorcache.viewLayout);
                 this.addChild(sp);
             } else
@@ -67,6 +69,21 @@ namespace editor
         {
             editorcache.viewLayout = viewLayoutConfig.default;
             this._initViewLayout();
+        }
+
+        private _resolve(sp: egret.DisplayObject)
+        {
+            if (sp instanceof SplitGroup)
+            {
+                sp.$children.forEach(v => this._resolve(v));
+            }
+            if (sp instanceof TabView)
+            {
+                sp["_moduleViews"].forEach(v =>
+                {
+                    modules.recycleModuleView(v);
+                });
+            }
         }
 
         private _getData(sp: egret.DisplayObject)

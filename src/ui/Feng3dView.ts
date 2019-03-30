@@ -133,4 +133,6 @@ namespace editor
 			feng3d.Stats.instance.dom.style.top = bound.y + "px";
 		}
 	}
+
+	Modules.moduleViewCls[Feng3dView.moduleName] = Feng3dView;
 }

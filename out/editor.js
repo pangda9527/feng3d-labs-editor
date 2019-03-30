@@ -2551,16 +2551,21 @@ var editor;
             this.moduleViewMap = {};
         }
         Modules.prototype.getModuleView = function (moduleName) {
-            var moduleview = this.moduleViewMap[moduleName];
+            this.moduleViewMap[moduleName] = this.moduleViewMap[moduleName] || [];
+            var moduleview = this.moduleViewMap[moduleName].pop();
             if (!moduleview) {
                 var cls = Modules.moduleViewCls[moduleName];
                 if (!cls) {
                     feng3d.error("\u65E0\u6CD5\u83B7\u53D6\u6A21\u5757 " + moduleName + " \u754C\u9762\u7C7B\u5B9A\u4E49");
                     return;
                 }
-                this.moduleViewMap[moduleName] = moduleview = new cls();
+                moduleview = new cls();
             }
             return moduleview;
+        };
+        Modules.prototype.recycleModuleView = function (moduleView) {
+            this.moduleViewMap[moduleView.moduleName] = this.moduleViewMap[moduleView.moduleName] || [];
+            this.moduleViewMap[moduleView.moduleName].push(moduleView);
         };
         /**
          * 模块界面类定义
@@ -2666,6 +2671,7 @@ var editor;
         return Feng3dView;
     }(eui.Component));
     editor.Feng3dView = Feng3dView;
+    editor.Modules.moduleViewCls[Feng3dView.moduleName] = Feng3dView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -3234,26 +3240,7 @@ var editor;
             //
             this._moduleViews = [];
             moduleNames.forEach(function (v) {
-                var moduleView;
-                switch (v) {
-                    case editor.HierarchyView.moduleName:
-                        moduleView = new editor.HierarchyView();
-                        break;
-                    case editor.InspectorView.moduleName:
-                        moduleView = new editor.InspectorView();
-                        break;
-                    case editor.AssetView.moduleName:
-                        moduleView = new editor.AssetView();
-                        break;
-                    case editor.Feng3dView.moduleName:
-                        moduleView = new editor.Feng3dView();
-                        break;
-                    case editor.NavigationView.moduleName:
-                        moduleView = new editor.NavigationView();
-                        break;
-                    default:
-                        break;
-                }
+                var moduleView = editor.modules.getModuleView(v);
                 if (moduleView) {
                     moduleView.top = moduleView.bottom = moduleView.left = moduleView.right = 0;
                     _this._moduleViews.push(moduleView);
@@ -8536,6 +8523,7 @@ var editor;
         return InspectorView;
     }(eui.Component));
     editor.InspectorView = InspectorView;
+    editor.Modules.moduleViewCls[InspectorView.moduleName] = InspectorView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -9773,6 +9761,7 @@ var editor;
         }
         return FileDrag;
     }());
+    editor.Modules.moduleViewCls[AssetView.moduleName] = AssetView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -9935,6 +9924,7 @@ var editor;
         return NavigationView;
     }(eui.Component));
     editor.NavigationView = NavigationView;
+    editor.Modules.moduleViewCls[NavigationView.moduleName] = NavigationView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -9969,7 +9959,9 @@ var editor;
         };
         MainSplitView.prototype._initViewLayout = function () {
             if (editor.editorcache.viewLayout) {
-                this.removeChildAt(0);
+                var child = this.removeChildAt(0);
+                this._resolve(child);
+                //
                 var sp = this._createViews(editor.editorcache.viewLayout);
                 this.addChild(sp);
             }
@@ -9986,6 +9978,17 @@ var editor;
         MainSplitView.prototype._resetLayout = function () {
             editor.editorcache.viewLayout = editor.viewLayoutConfig.default;
             this._initViewLayout();
+        };
+        MainSplitView.prototype._resolve = function (sp) {
+            var _this = this;
+            if (sp instanceof editor.SplitGroup) {
+                sp.$children.forEach(function (v) { return _this._resolve(v); });
+            }
+            if (sp instanceof editor.TabView) {
+                sp["_moduleViews"].forEach(function (v) {
+                    editor.modules.recycleModuleView(v);
+                });
+            }
         };
         MainSplitView.prototype._getData = function (sp) {
             var data = {};
