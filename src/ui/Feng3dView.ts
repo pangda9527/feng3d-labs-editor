@@ -68,8 +68,11 @@ namespace editor
 
 			drag.unregister(this);
 
-			this._canvas.style.display = "none";
-			this._canvas = null;
+			if (this._canvas)
+			{
+				this._canvas.style.display = "none";
+				this._canvas = null;
+			}
 		}
 
 		private _onAreaSelectStart()

@@ -106,6 +106,10 @@ declare namespace feng3d {
          * 界面布局发生变化
          */
         "viewLayout.changed": string;
+        /**
+         * 还原默认窗口布局
+         */
+        "viewLayout.reset": string;
     }
 }
 declare namespace egret {
@@ -2811,6 +2815,7 @@ declare namespace editor {
         private onRemovedFromStage;
         private _initViewLayout;
         private _saveViewLayout;
+        private _resetLayout;
         private _getData;
         private _createViews;
     }
@@ -4018,6 +4023,98 @@ declare namespace editor {
          */
         getCreateComponentMenu(gameobject: feng3d.GameObject): MenuItem[];
     }
+}
+declare namespace editor {
+    var viewLayoutConfig: {
+        default: {
+            "x": number;
+            "y": number;
+            "width": number;
+            "height": number;
+            "percentWidth": any;
+            "percentHeight": any;
+            "top": number;
+            "bottom": number;
+            "left": number;
+            "right": number;
+            "type": string;
+            "layout": string;
+            "children": ({
+                "x": number;
+                "y": number;
+                "width": number;
+                "height": number;
+                "percentWidth": number;
+                "percentHeight": number;
+                "top": any;
+                "bottom": any;
+                "left": any;
+                "right": any;
+                "type": string;
+                "layout": string;
+                "children": ({
+                    "x": number;
+                    "y": number;
+                    "width": number;
+                    "height": number;
+                    "percentWidth": number;
+                    "percentHeight": number;
+                    "top": any;
+                    "bottom": any;
+                    "left": any;
+                    "right": any;
+                    "type": string;
+                    "layout": string;
+                    "children": {
+                        "x": number;
+                        "y": number;
+                        "width": number;
+                        "height": number;
+                        "percentWidth": number;
+                        "percentHeight": number;
+                        "top": any;
+                        "bottom": any;
+                        "left": any;
+                        "right": any;
+                        "type": string;
+                        "modules": string[];
+                    }[];
+                    "modules"?: undefined;
+                } | {
+                    "x": number;
+                    "y": number;
+                    "width": number;
+                    "height": number;
+                    "percentWidth": number;
+                    "percentHeight": any;
+                    "top": any;
+                    "bottom": any;
+                    "left": any;
+                    "right": any;
+                    "type": string;
+                    "modules": string[];
+                    "layout"?: undefined;
+                    "children"?: undefined;
+                })[];
+                "modules"?: undefined;
+            } | {
+                "x": number;
+                "y": number;
+                "width": number;
+                "height": number;
+                "percentWidth": any;
+                "percentHeight": number;
+                "top": any;
+                "bottom": any;
+                "left": any;
+                "right": any;
+                "type": string;
+                "modules": string[];
+                "layout"?: undefined;
+                "children"?: undefined;
+            })[];
+        };
+    };
 }
 declare namespace editor {
 }

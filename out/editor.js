@@ -2616,8 +2616,10 @@ var editor;
             this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             editor.drag.unregister(this);
-            this._canvas.style.display = "none";
-            this._canvas = null;
+            if (this._canvas) {
+                this._canvas.style.display = "none";
+                this._canvas = null;
+            }
         };
         Feng3dView.prototype._onAreaSelectStart = function () {
             this._areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -9958,10 +9960,12 @@ var editor;
         };
         MainSplitView.prototype.onAddedToStage = function () {
             feng3d.dispatcher.on("viewLayout.changed", this._saveViewLayout, this);
+            feng3d.dispatcher.on("viewLayout.reset", this._resetLayout, this);
             this._initViewLayout();
         };
         MainSplitView.prototype.onRemovedFromStage = function () {
             feng3d.dispatcher.off("viewLayout.changed", this._saveViewLayout, this);
+            feng3d.dispatcher.off("viewLayout.reset", this._resetLayout, this);
         };
         MainSplitView.prototype._initViewLayout = function () {
             if (editor.editorcache.viewLayout) {
@@ -9978,6 +9982,10 @@ var editor;
             var data = this._getData(sp);
             editor.editorcache.viewLayout = data;
             // console.log(data);
+        };
+        MainSplitView.prototype._resetLayout = function () {
+            editor.editorcache.viewLayout = editor.viewLayoutConfig.default;
+            this._initViewLayout();
         };
         MainSplitView.prototype._getData = function (sp) {
             var data = {};
@@ -15433,6 +15441,12 @@ var editor;
                     click: function () {
                         feng3d.dispatcher.dispatch("script.compile");
                     },
+                },
+                {
+                    label: "还原默认窗口布局",
+                    click: function () {
+                        feng3d.dispatcher.dispatch("viewLayout.reset");
+                    },
                 }
             ];
             return mainMenu;
@@ -15634,6 +15648,124 @@ var editor;
             });
         });
     }
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    editor.viewLayoutConfig = {
+        default: {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 712,
+            "percentWidth": null,
+            "percentHeight": null,
+            "top": 0,
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+            "type": "SplitGroup",
+            "layout": "HorizontalLayout",
+            "children": [
+                {
+                    "x": 0,
+                    "y": 0,
+                    "width": 1186,
+                    "height": 712,
+                    "percentWidth": 100,
+                    "percentHeight": 100,
+                    "top": null,
+                    "bottom": null,
+                    "left": null,
+                    "right": null,
+                    "type": "SplitGroup",
+                    "layout": "VerticalLayout",
+                    "children": [
+                        {
+                            "x": 0,
+                            "y": 0,
+                            "width": 1186,
+                            "height": 458,
+                            "percentWidth": 100,
+                            "percentHeight": 100,
+                            "top": null,
+                            "bottom": null,
+                            "left": null,
+                            "right": null,
+                            "type": "SplitGroup",
+                            "layout": "HorizontalLayout",
+                            "children": [
+                                {
+                                    "x": 0,
+                                    "y": 0,
+                                    "width": 234,
+                                    "height": 458,
+                                    "percentWidth": 19.73018549747049,
+                                    "percentHeight": 100,
+                                    "top": null,
+                                    "bottom": null,
+                                    "left": null,
+                                    "right": null,
+                                    "type": "TabView",
+                                    "modules": [
+                                        "Hierarchy"
+                                    ]
+                                },
+                                {
+                                    "x": 238,
+                                    "y": 0,
+                                    "width": 948,
+                                    "height": 458,
+                                    "percentWidth": 79.93254637436762,
+                                    "percentHeight": 100,
+                                    "top": null,
+                                    "bottom": null,
+                                    "left": null,
+                                    "right": null,
+                                    "type": "TabView",
+                                    "modules": [
+                                        "Scene"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "x": 0,
+                            "y": 462,
+                            "width": 1186,
+                            "height": 250,
+                            "percentWidth": 100,
+                            "percentHeight": null,
+                            "top": null,
+                            "bottom": null,
+                            "left": null,
+                            "right": null,
+                            "type": "TabView",
+                            "modules": [
+                                "Project"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "x": 1190,
+                    "y": 0,
+                    "width": 250,
+                    "height": 712,
+                    "percentWidth": null,
+                    "percentHeight": 100,
+                    "top": null,
+                    "bottom": null,
+                    "left": null,
+                    "right": null,
+                    "type": "TabView",
+                    "modules": [
+                        "Navigation",
+                        "Inspector"
+                    ]
+                }
+            ]
+        }
+    };
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

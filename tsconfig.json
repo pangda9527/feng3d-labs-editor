@@ -185,6 +185,7 @@
         "src/loaders/threejsLoader.ts",
         //configs
         "src/configs/CommonConfig.ts",
+        "src/configs/ViewLayoutConfig.ts",
         "src/configs/ObjectViewConfig.ts",
         "src/configs/ShortcutConfig.ts",
         //

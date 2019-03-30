@@ -67,5 +67,10 @@ namespace feng3d
          */
         "viewLayout.changed": string;
 
+        /**
+         * 还原默认窗口布局
+         */
+        "viewLayout.reset": string;
+
     }
 }

@@ -29,12 +29,14 @@ namespace editor
         private onAddedToStage()
         {
             feng3d.dispatcher.on("viewLayout.changed", this._saveViewLayout, this);
+            feng3d.dispatcher.on("viewLayout.reset", this._resetLayout, this);
             this._initViewLayout();
         }
 
         private onRemovedFromStage()
         {
             feng3d.dispatcher.off("viewLayout.changed", this._saveViewLayout, this);
+            feng3d.dispatcher.off("viewLayout.reset", this._resetLayout, this);
         }
 
         private _initViewLayout()
@@ -59,6 +61,12 @@ namespace editor
             editorcache.viewLayout = data;
 
             // console.log(data);
+        }
+
+        private _resetLayout()
+        {
+            editorcache.viewLayout = viewLayoutConfig.default;
+            this._initViewLayout();
         }
 
         private _getData(sp: egret.DisplayObject)

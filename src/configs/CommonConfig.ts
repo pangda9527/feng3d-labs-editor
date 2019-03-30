@@ -209,6 +209,13 @@ namespace editor
                     {
                         feng3d.dispatcher.dispatch("script.compile");
                     },
+                },
+                {
+                    label: "还原默认窗口布局",
+                    click: () =>
+                    {
+                        feng3d.dispatcher.dispatch("viewLayout.reset");
+                    },
                 }
             ];
 
