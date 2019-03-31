@@ -1,6 +1,5 @@
 namespace editor
 {
-    export var editorCamera: feng3d.Camera;
     export var editorComponent: EditorComponent;
 
     export class EditorEngine extends feng3d.Engine
@@ -26,8 +25,6 @@ namespace editor
                 }
             }
             if (editorComponent) editorComponent.scene = this.scene;
-
-            this.camera = editorCamera;
 
             super.render();
 
@@ -59,18 +56,7 @@ namespace editor
         private init()
         {
             //
-            editorCamera = Object.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
-            editorCamera.lens.far = 5000;
-            editorCamera.transform.x = 5;
-            editorCamera.transform.y = 3;
-            editorCamera.transform.z = 5;
-            editorCamera.transform.lookAt(new feng3d.Vector3());
-            //
-            editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
-            //
             editorData.editorScene = this.initEditorScene();
-            //
-            feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             //
             editorAsset.runProjectScript(() =>
             {
@@ -110,47 +96,6 @@ namespace editor
                 scene.gameObject.addChild(trident);
             });
             return scene;
-        }
-
-        private onEditorCameraRotate(e: feng3d.Event<feng3d.Vector3>)
-        {
-            var resultRotation = e.data;
-            var camera = editorCamera;
-            var forward = camera.transform.forwardVector;
-            var lookDistance: number;
-            if (editorData.selectedGameObjects.length > 0)
-            {
-                //计算观察距离
-                var selectedObj = editorData.selectedGameObjects[0];
-                var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
-                lookDistance = Math.max(0, forward.dot(lookray));
-            } else
-            {
-                lookDistance = sceneControlConfig.lookDistance;
-            }
-            //旋转中心
-            var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
-            //计算目标四元素旋转
-            var targetQuat = new feng3d.Quaternion();
-            resultRotation.scaleNumber(feng3d.FMath.DEG2RAD);
-            targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
-            //
-            var sourceQuat = new feng3d.Quaternion();
-            sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.FMath.DEG2RAD, camera.transform.ry * feng3d.FMath.DEG2RAD, camera.transform.rz * feng3d.FMath.DEG2RAD)
-            var rate = { rate: 0.0 };
-            egret.Tween.get(rate, {
-                onChange: () =>
-                {
-                    var cameraQuat = new feng3d.Quaternion();
-                    cameraQuat.slerp(sourceQuat, targetQuat, rate.rate);
-                    camera.transform.orientation = cameraQuat;
-                    //
-                    var translation = camera.transform.forwardVector;
-                    translation.negate();
-                    translation.scaleNumber(lookDistance);
-                    camera.transform.position = rotateCenter.addTo(translation);
-                },
-            }).to({ rate: 1 }, 300, egret.Ease.sineIn);
         }
     }
 

@@ -898,16 +898,7 @@ declare namespace editor {
         private onGameobjectMoveTool;
         private onGameobjectRotationTool;
         private onGameobjectScaleTool;
-        private onSceneCameraForwardBackMouseMoveStart;
-        private onSceneCameraForwardBackMouseMove;
         private onDeleteSeletedGameObject;
-        private onDragSceneStart;
-        private onDragScene;
-        private onFpsViewStart;
-        private onFpsViewStop;
-        private updateFpsView;
-        private onLookToSelectedGameObject;
-        private onMouseWheelMoveSceneCamera;
         private onOpenDevTools;
         private onRefreshWindow;
     }
@@ -962,6 +953,7 @@ declare namespace editor {
         private _areaSelectStartPosition;
         private _areaSelectRect;
         private engine;
+        private editorCamera;
         private selectedObjectsHistory;
         private rotateSceneCenter;
         private rotateSceneCameraGlobalMatrix3D;
@@ -987,6 +979,16 @@ declare namespace editor {
         private onSelectGameObject;
         private onMouseRotateSceneStart;
         private onMouseRotateScene;
+        private onEditorCameraRotate;
+        private onSceneCameraForwardBackMouseMoveStart;
+        private onSceneCameraForwardBackMouseMove;
+        private onDragSceneStart;
+        private onDragScene;
+        private onFpsViewStart;
+        private onFpsViewStop;
+        private updateFpsView;
+        private onLookToSelectedGameObject;
+        private onMouseWheelMoveSceneCamera;
     }
 }
 declare namespace editor {
@@ -3519,7 +3521,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    var editorCamera: feng3d.Camera;
     var editorComponent: EditorComponent;
     class EditorEngine extends feng3d.Engine {
         wireframeColor: feng3d.Color4;
@@ -3538,7 +3539,6 @@ declare namespace editor {
          * 初始化编辑器场景
          */
         private initEditorScene;
-        private onEditorCameraRotate;
     }
     function creatNewScene(): feng3d.Scene3D;
 }

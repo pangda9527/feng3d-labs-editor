@@ -9,10 +9,14 @@ namespace editor
 		private _areaSelectStartPosition: feng3d.Vector2;
 		private _areaSelectRect: AreaSelectRect;
 		private engine: EditorEngine;
+		private editorCamera: feng3d.Camera;
 		private selectedObjectsHistory: feng3d.GameObject[] = [];
 		private rotateSceneCenter: feng3d.Vector3;
 		private rotateSceneCameraGlobalMatrix3D: feng3d.Matrix4x4;
 		private rotateSceneMousePoint: feng3d.Vector2;
+		private preMousePoint: feng3d.Vector2;
+		private dragSceneMousePoint: feng3d.Vector2;
+		private dragSceneCameraGlobalMatrix3D: feng3d.Matrix4x4;
 
 		/**
 		 * 模块名称
@@ -49,9 +53,19 @@ namespace editor
 			//
 			if (!this._canvas)
 			{
+				//
+				var editorCamera = this.editorCamera = Object.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
+				editorCamera.lens.far = 5000;
+				editorCamera.transform.x = 5;
+				editorCamera.transform.y = 3;
+				editorCamera.transform.z = 5;
+				editorCamera.transform.lookAt(new feng3d.Vector3());
+				//
+				editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
+				//
 				this._canvas = document.createElement("canvas");
 				(<any>document.getElementById("app")).append(this._canvas);
-				this.engine = new EditorEngine(this._canvas);
+				this.engine = new EditorEngine(this._canvas, null, editorCamera);
 			}
 
 			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
@@ -66,6 +80,17 @@ namespace editor
 			feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
 			feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
 			feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
+			feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
+			//
+			feng3d.shortcut.on("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
+			feng3d.shortcut.on("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
+			//
+			feng3d.shortcut.on("lookToSelectedGameObject", this.onLookToSelectedGameObject, this);
+			feng3d.shortcut.on("dragSceneStart", this.onDragSceneStart, this);
+			feng3d.shortcut.on("dragScene", this.onDragScene, this);
+			feng3d.shortcut.on("fpsViewStart", this.onFpsViewStart, this);
+			feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
+			feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
 
 			drag.register(this, null, ["file_gameobject", "file_script"], (dragdata) =>
 			{
@@ -100,6 +125,17 @@ namespace editor
 			feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
 			feng3d.shortcut.off("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
 			feng3d.shortcut.off("mouseRotateScene", this.onMouseRotateScene, this);
+			feng3d.dispatcher.off("editorCameraRotate", this.onEditorCameraRotate, this);
+			//
+			feng3d.shortcut.off("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
+			feng3d.shortcut.off("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
+			//
+			feng3d.shortcut.off("lookToSelectedGameObject", this.onLookToSelectedGameObject, this);
+			feng3d.shortcut.off("dragSceneStart", this.onDragSceneStart, this);
+			feng3d.shortcut.off("dragScene", this.onDragScene, this);
+			feng3d.shortcut.off("fpsViewStart", this.onFpsViewStart, this);
+			feng3d.shortcut.off("fpsViewStop", this.onFpsViewStop, this);
+			feng3d.shortcut.off("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
 
 			drag.unregister(this);
 
@@ -224,7 +260,7 @@ namespace editor
 		private onMouseRotateSceneStart()
 		{
 			this.rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-			this.rotateSceneCameraGlobalMatrix3D = editorCamera.transform.localToWorldMatrix.clone();
+			this.rotateSceneCameraGlobalMatrix3D = this.editorCamera.transform.localToWorldMatrix.clone();
 			this.rotateSceneCenter = null;
 			//获取第一个 游戏对象
 			var transformBox = editorData.transformBox;
@@ -241,6 +277,8 @@ namespace editor
 
 		private onMouseRotateScene()
 		{
+			if (!this.inView) return;
+
 			var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
 			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			var view3DRect = this.engine.viewRect;
@@ -249,9 +287,147 @@ namespace editor
 			globalMatrix3D.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
 			var rotateAxisX = globalMatrix3D.right;
 			globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
-			editorCamera.transform.localToWorldMatrix = globalMatrix3D;
+			this.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
 		}
 
+		private onEditorCameraRotate(e: feng3d.Event<feng3d.Vector3>)
+		{
+			var resultRotation = e.data;
+			var camera = this.editorCamera;
+			var forward = camera.transform.forwardVector;
+			var lookDistance: number;
+			if (editorData.selectedGameObjects.length > 0)
+			{
+				//计算观察距离
+				var selectedObj = editorData.selectedGameObjects[0];
+				var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
+				lookDistance = Math.max(0, forward.dot(lookray));
+			} else
+			{
+				lookDistance = sceneControlConfig.lookDistance;
+			}
+			//旋转中心
+			var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
+			//计算目标四元素旋转
+			var targetQuat = new feng3d.Quaternion();
+			resultRotation.scaleNumber(feng3d.FMath.DEG2RAD);
+			targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
+			//
+			var sourceQuat = new feng3d.Quaternion();
+			sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.FMath.DEG2RAD, camera.transform.ry * feng3d.FMath.DEG2RAD, camera.transform.rz * feng3d.FMath.DEG2RAD)
+			var rate = { rate: 0.0 };
+			egret.Tween.get(rate, {
+				onChange: () =>
+				{
+					var cameraQuat = new feng3d.Quaternion();
+					cameraQuat.slerp(sourceQuat, targetQuat, rate.rate);
+					camera.transform.orientation = cameraQuat;
+					//
+					var translation = camera.transform.forwardVector;
+					translation.negate();
+					translation.scaleNumber(lookDistance);
+					camera.transform.position = rotateCenter.addTo(translation);
+				},
+			}).to({ rate: 1 }, 300, egret.Ease.sineIn);
+		}
+
+		private onSceneCameraForwardBackMouseMoveStart()
+		{
+			this.preMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+		}
+
+		private onSceneCameraForwardBackMouseMove()
+		{
+			var currentMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+			var moveDistance = (currentMousePoint.x + currentMousePoint.y - this.preMousePoint.x - this.preMousePoint.y) * sceneControlConfig.sceneCameraForwardBackwardStep;
+			sceneControlConfig.lookDistance -= moveDistance;
+
+			var forward = this.editorCamera.transform.localToWorldMatrix.forward;
+			var camerascenePosition = this.editorCamera.transform.scenePosition;
+			var newCamerascenePosition = new feng3d.Vector3(
+				forward.x * moveDistance + camerascenePosition.x,
+				forward.y * moveDistance + camerascenePosition.y,
+				forward.z * moveDistance + camerascenePosition.z);
+			var newCameraPosition = this.editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
+			this.editorCamera.transform.position = newCameraPosition;
+
+			this.preMousePoint = currentMousePoint;
+		}
+
+		private onDragSceneStart()
+		{
+			this.dragSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+			this.dragSceneCameraGlobalMatrix3D = this.editorCamera.transform.localToWorldMatrix.clone();
+		}
+
+		private onDragScene()
+		{
+			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+			var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
+			var scale = this.editorCamera.getScaleByDepth(sceneControlConfig.lookDistance);
+			var up = this.dragSceneCameraGlobalMatrix3D.up;
+			var right = this.dragSceneCameraGlobalMatrix3D.right;
+			up.scaleNumber(addPoint.y * scale);
+			right.scaleNumber(-addPoint.x * scale);
+			var globalMatrix3D = this.dragSceneCameraGlobalMatrix3D.clone();
+			globalMatrix3D.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
+			this.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
+		}
+
+		private onFpsViewStart()
+		{
+			var fpsController: feng3d.FPSController = this.editorCamera.getComponent(feng3d.FPSController)
+			fpsController.onMousedown();
+			feng3d.ticker.onframe(this.updateFpsView)
+		}
+
+		private onFpsViewStop()
+		{
+			var fpsController = this.editorCamera.getComponent(feng3d.FPSController)
+			fpsController.onMouseup();
+			feng3d.ticker.offframe(this.updateFpsView)
+		}
+
+		private updateFpsView()
+		{
+			var fpsController = this.editorCamera.getComponent(feng3d.FPSController)
+			fpsController.update();
+		}
+
+		private onLookToSelectedGameObject()
+		{
+			var transformBox = editorData.transformBox;
+			if (transformBox)
+			{
+				var scenePosition = transformBox.getCenter();
+				var size = transformBox.getSize().length;
+				size = Math.max(size, 1);
+				var lookDistance = size;
+				var lens = this.editorCamera.lens;
+				if (lens instanceof feng3d.PerspectiveLens)
+				{
+					lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
+				}
+				//
+				sceneControlConfig.lookDistance = lookDistance;
+				var lookPos = this.editorCamera.transform.localToWorldMatrix.forward;
+				lookPos.scaleNumber(-lookDistance);
+				lookPos.add(scenePosition);
+				var localLookPos = lookPos.clone();
+				if (this.editorCamera.transform.parent)
+				{
+					localLookPos = this.editorCamera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
+				}
+				egret.Tween.get(this.editorCamera.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
+			}
+		}
+
+		private onMouseWheelMoveSceneCamera()
+		{
+			var distance = -feng3d.windowEventProxy.deltaY * sceneControlConfig.mouseWheelMoveStep * sceneControlConfig.lookDistance / 10;
+			this.editorCamera.transform.localToWorldMatrix = this.editorCamera.transform.localToWorldMatrix.moveForward(distance);
+			sceneControlConfig.lookDistance -= distance;
+		}
 	}
 
 	Modules.moduleViewCls[SceneView.moduleName] = SceneView;

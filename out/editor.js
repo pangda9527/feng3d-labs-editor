@@ -2333,15 +2333,6 @@ var editor;
             feng3d.shortcut.on("gameobjectMoveTool", this.onGameobjectMoveTool, this);
             feng3d.shortcut.on("gameobjectRotationTool", this.onGameobjectRotationTool, this);
             feng3d.shortcut.on("gameobjectScaleTool", this.onGameobjectScaleTool, this);
-            feng3d.shortcut.on("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
-            feng3d.shortcut.on("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
-            //
-            feng3d.shortcut.on("lookToSelectedGameObject", this.onLookToSelectedGameObject, this);
-            feng3d.shortcut.on("dragSceneStart", this.onDragSceneStart, this);
-            feng3d.shortcut.on("dragScene", this.onDragScene, this);
-            feng3d.shortcut.on("fpsViewStart", this.onFpsViewStart, this);
-            feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
-            feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
             feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
             feng3d.shortcut.on("refreshWindow", this.onRefreshWindow, this);
@@ -2354,20 +2345,6 @@ var editor;
         };
         Editorshortcut.prototype.onGameobjectScaleTool = function () {
             editor.editorData.toolType = editor.MRSToolType.SCALE;
-        };
-        Editorshortcut.prototype.onSceneCameraForwardBackMouseMoveStart = function () {
-            this.preMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-        };
-        Editorshortcut.prototype.onSceneCameraForwardBackMouseMove = function () {
-            var currentMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var moveDistance = (currentMousePoint.x + currentMousePoint.y - this.preMousePoint.x - this.preMousePoint.y) * editor.sceneControlConfig.sceneCameraForwardBackwardStep;
-            editor.sceneControlConfig.lookDistance -= moveDistance;
-            var forward = editor.editorCamera.transform.localToWorldMatrix.forward;
-            var camerascenePosition = editor.editorCamera.transform.scenePosition;
-            var newCamerascenePosition = new feng3d.Vector3(forward.x * moveDistance + camerascenePosition.x, forward.y * moveDistance + camerascenePosition.y, forward.z * moveDistance + camerascenePosition.z);
-            var newCameraPosition = editor.editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
-            editor.editorCamera.transform.position = newCameraPosition;
-            this.preMousePoint = currentMousePoint;
         };
         Editorshortcut.prototype.onDeleteSeletedGameObject = function () {
             var selectedObject = editor.editorData.selectedObjects;
@@ -2383,64 +2360,6 @@ var editor;
                 }
             });
             editor.editorData.clearSelectedObjects();
-        };
-        Editorshortcut.prototype.onDragSceneStart = function () {
-            this.dragSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            this.dragSceneCameraGlobalMatrix3D = editor.editorCamera.transform.localToWorldMatrix.clone();
-        };
-        Editorshortcut.prototype.onDragScene = function () {
-            var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
-            var scale = editor.editorCamera.getScaleByDepth(editor.sceneControlConfig.lookDistance);
-            var up = this.dragSceneCameraGlobalMatrix3D.up;
-            var right = this.dragSceneCameraGlobalMatrix3D.right;
-            up.scaleNumber(addPoint.y * scale);
-            right.scaleNumber(-addPoint.x * scale);
-            var globalMatrix3D = this.dragSceneCameraGlobalMatrix3D.clone();
-            globalMatrix3D.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
-            editor.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
-        };
-        Editorshortcut.prototype.onFpsViewStart = function () {
-            var fpsController = editor.editorCamera.getComponent(feng3d.FPSController);
-            fpsController.onMousedown();
-            feng3d.ticker.onframe(this.updateFpsView);
-        };
-        Editorshortcut.prototype.onFpsViewStop = function () {
-            var fpsController = editor.editorCamera.getComponent(feng3d.FPSController);
-            fpsController.onMouseup();
-            feng3d.ticker.offframe(this.updateFpsView);
-        };
-        Editorshortcut.prototype.updateFpsView = function () {
-            var fpsController = editor.editorCamera.getComponent(feng3d.FPSController);
-            fpsController.update();
-        };
-        Editorshortcut.prototype.onLookToSelectedGameObject = function () {
-            var transformBox = editor.editorData.transformBox;
-            if (transformBox) {
-                var scenePosition = transformBox.getCenter();
-                var size = transformBox.getSize().length;
-                size = Math.max(size, 1);
-                var lookDistance = size;
-                var lens = editor.editorCamera.lens;
-                if (lens instanceof feng3d.PerspectiveLens) {
-                    lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
-                }
-                //
-                editor.sceneControlConfig.lookDistance = lookDistance;
-                var lookPos = editor.editorCamera.transform.localToWorldMatrix.forward;
-                lookPos.scaleNumber(-lookDistance);
-                lookPos.add(scenePosition);
-                var localLookPos = lookPos.clone();
-                if (editor.editorCamera.transform.parent) {
-                    localLookPos = editor.editorCamera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
-                }
-                egret.Tween.get(editor.editorCamera.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
-            }
-        };
-        Editorshortcut.prototype.onMouseWheelMoveSceneCamera = function () {
-            var distance = -feng3d.windowEventProxy.deltaY * editor.sceneControlConfig.mouseWheelMoveStep * editor.sceneControlConfig.lookDistance / 10;
-            editor.editorCamera.transform.localToWorldMatrix = editor.editorCamera.transform.localToWorldMatrix.moveForward(distance);
-            editor.sceneControlConfig.lookDistance -= distance;
         };
         Editorshortcut.prototype.onOpenDevTools = function () {
             if (editor.nativeAPI)
@@ -2590,9 +2509,19 @@ var editor;
             var _this = this;
             //
             if (!this._canvas) {
+                //
+                var editorCamera = this.editorCamera = Object.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
+                editorCamera.lens.far = 5000;
+                editorCamera.transform.x = 5;
+                editorCamera.transform.y = 3;
+                editorCamera.transform.z = 5;
+                editorCamera.transform.lookAt(new feng3d.Vector3());
+                //
+                editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
+                //
                 this._canvas = document.createElement("canvas");
                 document.getElementById("app").append(this._canvas);
-                this.engine = new editor.EditorEngine(this._canvas);
+                this.engine = new editor.EditorEngine(this._canvas, null, editorCamera);
             }
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
@@ -2604,6 +2533,7 @@ var editor;
             feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
             feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
             feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
+            feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 if (dragdata.file_gameobject) {
                     editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, editor.hierarchy.rootnode.gameobject);
@@ -2628,6 +2558,7 @@ var editor;
             feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
             feng3d.shortcut.off("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
             feng3d.shortcut.off("mouseRotateScene", this.onMouseRotateScene, this);
+            feng3d.dispatcher.off("editorCameraRotate", this.onEditorCameraRotate, this);
             editor.drag.unregister(this);
             if (this._canvas) {
                 this._canvas.style.display = "none";
@@ -2722,7 +2653,7 @@ var editor;
         };
         SceneView.prototype.onMouseRotateSceneStart = function () {
             this.rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            this.rotateSceneCameraGlobalMatrix3D = editor.editorCamera.transform.localToWorldMatrix.clone();
+            this.rotateSceneCameraGlobalMatrix3D = this.editorCamera.transform.localToWorldMatrix.clone();
             this.rotateSceneCenter = null;
             //获取第一个 游戏对象
             var transformBox = editor.editorData.transformBox;
@@ -2736,6 +2667,8 @@ var editor;
             }
         };
         SceneView.prototype.onMouseRotateScene = function () {
+            if (!this.inView)
+                return;
             var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
             var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var view3DRect = this.engine.viewRect;
@@ -2744,7 +2677,116 @@ var editor;
             globalMatrix3D.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
             var rotateAxisX = globalMatrix3D.right;
             globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
-            editor.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
+            this.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
+        };
+        SceneView.prototype.onEditorCameraRotate = function (e) {
+            var resultRotation = e.data;
+            var camera = this.editorCamera;
+            var forward = camera.transform.forwardVector;
+            var lookDistance;
+            if (editor.editorData.selectedGameObjects.length > 0) {
+                //计算观察距离
+                var selectedObj = editor.editorData.selectedGameObjects[0];
+                var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
+                lookDistance = Math.max(0, forward.dot(lookray));
+            }
+            else {
+                lookDistance = editor.sceneControlConfig.lookDistance;
+            }
+            //旋转中心
+            var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
+            //计算目标四元素旋转
+            var targetQuat = new feng3d.Quaternion();
+            resultRotation.scaleNumber(feng3d.FMath.DEG2RAD);
+            targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
+            //
+            var sourceQuat = new feng3d.Quaternion();
+            sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.FMath.DEG2RAD, camera.transform.ry * feng3d.FMath.DEG2RAD, camera.transform.rz * feng3d.FMath.DEG2RAD);
+            var rate = { rate: 0.0 };
+            egret.Tween.get(rate, {
+                onChange: function () {
+                    var cameraQuat = new feng3d.Quaternion();
+                    cameraQuat.slerp(sourceQuat, targetQuat, rate.rate);
+                    camera.transform.orientation = cameraQuat;
+                    //
+                    var translation = camera.transform.forwardVector;
+                    translation.negate();
+                    translation.scaleNumber(lookDistance);
+                    camera.transform.position = rotateCenter.addTo(translation);
+                },
+            }).to({ rate: 1 }, 300, egret.Ease.sineIn);
+        };
+        SceneView.prototype.onSceneCameraForwardBackMouseMoveStart = function () {
+            this.preMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        };
+        SceneView.prototype.onSceneCameraForwardBackMouseMove = function () {
+            var currentMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var moveDistance = (currentMousePoint.x + currentMousePoint.y - this.preMousePoint.x - this.preMousePoint.y) * editor.sceneControlConfig.sceneCameraForwardBackwardStep;
+            editor.sceneControlConfig.lookDistance -= moveDistance;
+            var forward = editorCamera.transform.localToWorldMatrix.forward;
+            var camerascenePosition = editorCamera.transform.scenePosition;
+            var newCamerascenePosition = new feng3d.Vector3(forward.x * moveDistance + camerascenePosition.x, forward.y * moveDistance + camerascenePosition.y, forward.z * moveDistance + camerascenePosition.z);
+            var newCameraPosition = editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
+            editorCamera.transform.position = newCameraPosition;
+            this.preMousePoint = currentMousePoint;
+        };
+        SceneView.prototype.onDragSceneStart = function () {
+            this.dragSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            this.dragSceneCameraGlobalMatrix3D = editorCamera.transform.localToWorldMatrix.clone();
+        };
+        SceneView.prototype.onDragScene = function () {
+            var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
+            var scale = editorCamera.getScaleByDepth(editor.sceneControlConfig.lookDistance);
+            var up = this.dragSceneCameraGlobalMatrix3D.up;
+            var right = this.dragSceneCameraGlobalMatrix3D.right;
+            up.scaleNumber(addPoint.y * scale);
+            right.scaleNumber(-addPoint.x * scale);
+            var globalMatrix3D = this.dragSceneCameraGlobalMatrix3D.clone();
+            globalMatrix3D.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
+            editorCamera.transform.localToWorldMatrix = globalMatrix3D;
+        };
+        SceneView.prototype.onFpsViewStart = function () {
+            var fpsController = editorCamera.getComponent(feng3d.FPSController);
+            fpsController.onMousedown();
+            feng3d.ticker.onframe(this.updateFpsView);
+        };
+        SceneView.prototype.onFpsViewStop = function () {
+            var fpsController = editorCamera.getComponent(feng3d.FPSController);
+            fpsController.onMouseup();
+            feng3d.ticker.offframe(this.updateFpsView);
+        };
+        SceneView.prototype.updateFpsView = function () {
+            var fpsController = editorCamera.getComponent(feng3d.FPSController);
+            fpsController.update();
+        };
+        SceneView.prototype.onLookToSelectedGameObject = function () {
+            var transformBox = editor.editorData.transformBox;
+            if (transformBox) {
+                var scenePosition = transformBox.getCenter();
+                var size = transformBox.getSize().length;
+                size = Math.max(size, 1);
+                var lookDistance = size;
+                var lens = editorCamera.lens;
+                if (lens instanceof feng3d.PerspectiveLens) {
+                    lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
+                }
+                //
+                editor.sceneControlConfig.lookDistance = lookDistance;
+                var lookPos = editorCamera.transform.localToWorldMatrix.forward;
+                lookPos.scaleNumber(-lookDistance);
+                lookPos.add(scenePosition);
+                var localLookPos = lookPos.clone();
+                if (editorCamera.transform.parent) {
+                    localLookPos = editorCamera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
+                }
+                egret.Tween.get(editorCamera.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
+            }
+        };
+        SceneView.prototype.onMouseWheelMoveSceneCamera = function () {
+            var distance = -feng3d.windowEventProxy.deltaY * editor.sceneControlConfig.mouseWheelMoveStep * editor.sceneControlConfig.lookDistance / 10;
+            editorCamera.transform.localToWorldMatrix = editorCamera.transform.localToWorldMatrix.moveForward(distance);
+            editor.sceneControlConfig.lookDistance -= distance;
         };
         SceneView.moduleName = "Scene";
         return SceneView;
@@ -11780,7 +11822,7 @@ var editor;
             _super.prototype.init.call(this, gameObject);
             var holdSizeComponent = this.gameObject.addComponent(feng3d.HoldSizeComponent);
             holdSizeComponent.holdSize = 1;
-            holdSizeComponent.camera = editor.editorCamera;
+            holdSizeComponent.camera = editorCamera;
             //
             this.on("addedToScene", this.onAddedToScene, this);
             this.on("removedFromScene", this.onRemovedFromScene, this);
@@ -11931,7 +11973,7 @@ var editor;
             var oy = py.subTo(po);
             var oz = pz.subTo(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix;
+            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new feng3d.Plane3D();
             //
@@ -12003,7 +12045,7 @@ var editor;
             //鼠标按下时不更新
             if (this.ismouseDown)
                 return;
-            var cameraPos = editor.editorCamera.transform.scenePosition;
+            var cameraPos = editorCamera.transform.scenePosition;
             var localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformVector(cameraPos);
             this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
             this.toolModel.xyPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;
@@ -12057,7 +12099,7 @@ var editor;
             var yDir = globalMatrix3D.up;
             var zDir = globalMatrix3D.forward;
             //摄像机前方方向
-            var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix;
+            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.position;
             this.movePlane3D = new feng3d.Plane3D();
@@ -12124,7 +12166,7 @@ var editor;
                 case this.toolModel.freeAxis:
                     var endPoint = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
                     var offset = endPoint.subTo(this.startMousePos);
-                    var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix;
+                    var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
                     editor.mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
@@ -12146,7 +12188,7 @@ var editor;
             this.startSceneTransform = null;
         };
         RTool.prototype.updateToolModel = function () {
-            var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix.clone();
+            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix.clone();
             var cameraDir = cameraSceneTransform.forward;
             cameraDir.negate();
             //
@@ -12215,7 +12257,7 @@ var editor;
             var oy = py.subTo(po);
             var oz = pz.subTo(po);
             //摄像机前方方向
-            var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix;
+            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new feng3d.Plane3D();
             switch (event.currentTarget) {
@@ -12603,7 +12645,7 @@ var editor;
                 var rect = new feng3d.Rectangle(0, 0, editor.editorui.stage.stageWidth, editor.editorui.stage.stageHeight);
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
-                var rotation = editor.editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleNumber(180 / Math.PI);
+                var rotation = editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleNumber(180 / Math.PI);
                 rotationToolModel.transform.rotation = rotation;
                 //隐藏角度
                 var visibleAngle = Math.cos(15 * feng3d.FMath.DEG2RAD);
@@ -12739,14 +12781,14 @@ var editor;
             groundGridObject.mouseEnabled = false;
             gameObject.addChild(groundGridObject);
             var __this = this;
-            editor.editorCamera.transform.on("transformChanged", update, this);
+            editorCamera.transform.on("transformChanged", update, this);
             var model = groundGridObject.addComponent(feng3d.Model);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             var material = model.material = Object.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.renderParams.enableBlend = true;
             update();
             function update() {
-                var cameraGlobalPosition = editor.editorCamera.transform.scenePosition;
+                var cameraGlobalPosition = editorCamera.transform.scenePosition;
                 var level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
                 var step = Math.pow(10, level - 1);
                 var startX = Math.round(cameraGlobalPosition.x / (10 * step)) * 10 * step;
@@ -12803,7 +12845,6 @@ var editor;
             }
             if (editor.editorComponent)
                 editor.editorComponent.scene = this.scene;
-            this.camera = editor.editorCamera;
             _super.prototype.render.call(this);
             if (!this.scene)
                 return;
@@ -12829,18 +12870,7 @@ var editor;
         }
         Main3D.prototype.init = function () {
             //
-            editor.editorCamera = Object.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
-            editor.editorCamera.lens.far = 5000;
-            editor.editorCamera.transform.x = 5;
-            editor.editorCamera.transform.y = 3;
-            editor.editorCamera.transform.z = 5;
-            editor.editorCamera.transform.lookAt(new feng3d.Vector3());
-            //
-            editor.editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
-            //
             editor.editorData.editorScene = this.initEditorScene();
-            //
-            feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             //
             editor.editorAsset.runProjectScript(function () {
                 editor.editorAsset.readScene("default.scene.json", function (err, scene) {
@@ -12872,43 +12902,6 @@ var editor;
                 scene.gameObject.addChild(trident);
             });
             return scene;
-        };
-        Main3D.prototype.onEditorCameraRotate = function (e) {
-            var resultRotation = e.data;
-            var camera = editor.editorCamera;
-            var forward = camera.transform.forwardVector;
-            var lookDistance;
-            if (editor.editorData.selectedGameObjects.length > 0) {
-                //计算观察距离
-                var selectedObj = editor.editorData.selectedGameObjects[0];
-                var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
-                lookDistance = Math.max(0, forward.dot(lookray));
-            }
-            else {
-                lookDistance = editor.sceneControlConfig.lookDistance;
-            }
-            //旋转中心
-            var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
-            //计算目标四元素旋转
-            var targetQuat = new feng3d.Quaternion();
-            resultRotation.scaleNumber(feng3d.FMath.DEG2RAD);
-            targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
-            //
-            var sourceQuat = new feng3d.Quaternion();
-            sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.FMath.DEG2RAD, camera.transform.ry * feng3d.FMath.DEG2RAD, camera.transform.rz * feng3d.FMath.DEG2RAD);
-            var rate = { rate: 0.0 };
-            egret.Tween.get(rate, {
-                onChange: function () {
-                    var cameraQuat = new feng3d.Quaternion();
-                    cameraQuat.slerp(sourceQuat, targetQuat, rate.rate);
-                    camera.transform.orientation = cameraQuat;
-                    //
-                    var translation = camera.transform.forwardVector;
-                    translation.negate();
-                    translation.scaleNumber(lookDistance);
-                    camera.transform.position = rotateCenter.addTo(translation);
-                },
-            }).to({ rate: 1 }, 300, egret.Ease.sineIn);
         };
         return Main3D;
     }());
@@ -14640,7 +14633,7 @@ var editor;
         DirectionLightIcon.prototype.initicon = function () {
             var linesize = 10;
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
-                name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
+                name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
                         __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
                         material: {
@@ -14673,7 +14666,7 @@ var editor;
             }
             var lightLines = this._lightLines = Object.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
-                components: [{ __class__: "feng3d.HoldSizeComponent", camera: editor.editorCamera, holdSize: 1 },
+                components: [{ __class__: "feng3d.HoldSizeComponent", camera: editorCamera, holdSize: 1 },
                     {
                         __class__: "feng3d.MeshModel",
                         material: { __class__: "feng3d.Material", shaderName: "segment", uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 163 / 255, g: 162 / 255, b: 107 / 255 } }, renderParams: { renderMode: feng3d.RenderMode.LINES } },
@@ -14740,7 +14733,7 @@ var editor;
         PointLightIcon.prototype.initicon = function () {
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
                 name: "PointLightIcon", components: [
-                    { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
+                    { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
                         __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
                         material: {
@@ -14811,7 +14804,7 @@ var editor;
                     new feng3d.Vector3(this.light.range, this.light.range, this.light.range);
             if (editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1) {
                 //
-                var camerapos = this.gameObject.transform.inverseTransformPoint(editor.editorCamera.gameObject.transform.scenePosition);
+                var camerapos = this.gameObject.transform.inverseTransformPoint(editorCamera.gameObject.transform.scenePosition);
                 //
                 var segments = [];
                 var alpha = 1;
@@ -14951,7 +14944,7 @@ var editor;
         SpotLightIcon.prototype.initicon = function () {
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
                 name: "SpotLightIcon", components: [
-                    { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
+                    { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
                         __class__: "feng3d.MeshModel", material: {
                             __class__: "feng3d.Material",
@@ -15104,7 +15097,7 @@ var editor;
         CameraIcon.prototype.initicon = function () {
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
                 name: "CameraIcon", components: [
-                    { __class__: "feng3d.BillboardComponent", camera: editor.editorCamera },
+                    { __class__: "feng3d.BillboardComponent", camera: editorCamera },
                     {
                         __class__: "feng3d.MeshModel", material: {
                             __class__: "feng3d.Material",
