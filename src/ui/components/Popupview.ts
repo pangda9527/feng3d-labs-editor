@@ -5,6 +5,20 @@ namespace editor
      */
     export var popupview: Popupview;
 
+    export interface PopupviewParam<T>
+    {
+        x?: number;
+        y?: number;
+        width?: number;
+        height?: number;
+        /**
+         * 默认为true
+         */
+        mode?: boolean;
+
+        closecallback?: (object: T) => void;
+    }
+
     /**
      * 弹出一个objectview界面，点击其它区域关闭界面，并且调用关闭回调
      */
@@ -15,53 +29,51 @@ namespace editor
          * 
          * @param object 
          * @param closecallback 
-         * @param x 
-         * @param y 
-         * @param width 
-         * @param height 
+         * @param param 
          */
-        popupObject<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number)
+        popupObject<T>(object: T, param: PopupviewParam<T> = {})
         {
             var view: eui.Component = feng3d.objectview.getObjectView(object);
-            var background = new eui.Rect(width || 300, height || 300, 0xf0f0f0);
+            var background = new eui.Rect(param.width || 300, param.height || 300, 0xf0f0f0);
             view.addChildAt(background, 0);
 
             //
-            this.popupView(view, () =>
+            if (param.closecallback)
             {
-                closecallback && closecallback(object);
-            }, x, y, width, height);
+                var closecallback = param.closecallback;
+                param.closecallback = () =>
+                {
+                    closecallback && closecallback(object);
+                }
+            }
+            this.popupView(view, param);
         }
 
         /**
          * 弹出一个界面
          * 
          * @param view 
-         * @param closecallback 
-         * @param x 
-         * @param y 
-         * @param width 
-         * @param height 
+         * @param param
          */
-        popupView(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number)
+        popupView(view: eui.Component, param: PopupviewParam<any> = {})
         {
             editorui.popupLayer.addChild(view);
 
-            if (width !== undefined)
-                view.width = width;
+            if (param.width !== undefined)
+                view.width = param.width;
 
-            if (height !== undefined)
-                view.height = height;
+            if (param.height !== undefined)
+                view.height = param.height;
 
             var x0 = (editorui.stage.stageWidth - view.width) / 2;
             var y0 = (editorui.stage.stageHeight - view.height) / 2;
-            if (x !== undefined)
+            if (param.x !== undefined)
             {
-                x0 = x;
+                x0 = param.x;
             }
-            if (y !== undefined)
+            if (param.y !== undefined)
             {
-                y0 = y;
+                y0 = param.y;
             }
 
             x0 = feng3d.FMath.clamp(x0, 0, editorui.popupLayer.stage.stageWidth - view.width);
@@ -70,12 +82,12 @@ namespace editor
             view.x = x0;
             view.y = y0;
 
-            if (closecallback)
+            if (param.closecallback)
             {
-                view.addEventListener(egret.Event.REMOVED_FROM_STAGE, closecallback, null);
+                view.addEventListener(egret.Event.REMOVED_FROM_STAGE, param.closecallback, null);
             }
 
-            maskview.mask(view);
+            if (param.mode != false) maskview.mask(view);
         }
 
         /**
@@ -83,23 +95,25 @@ namespace editor
          * 
          * @param object 
          * @param closecallback 
-         * @param x 
-         * @param y 
-         * @param width 
-         * @param height 
+         * @param param
          */
-        popupObjectWindow<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number)
+        popupObjectWindow<T>(object: T, param: PopupviewParam<T> = {})
         {
             var view: eui.Component = feng3d.objectview.getObjectView(object);
 
-            var panel = new WindowView();
-            panel.addChild(view);
+            var window = new WindowView();
+            window.contenGroup.addChild(view);
 
             //
-            this.popupView(panel, () =>
+            if (param.closecallback)
             {
-                closecallback && closecallback(object);
-            }, x, y, width, height);
+                var closecallback = param.closecallback;
+                param.closecallback = () =>
+                {
+                    closecallback && closecallback(object);
+                }
+            }
+            this.popupView(window, param);
         }
 
         /**
@@ -107,21 +121,15 @@ namespace editor
          * 
          * @param view 
          * @param closecallback 
-         * @param x 
-         * @param y 
-         * @param width 
-         * @param height 
+         * @param param
          */
-        popupViewWindow(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number)
+        popupViewWindow(view: eui.Component, param: PopupviewParam<any> = {})
         {
-            var panel = new WindowView();
-            panel.addChild(view);
+            var window = new WindowView();
+            window.contenGroup.addChild(view);
 
             //
-            this.popupView(panel, () =>
-            {
-                closecallback && closecallback();
-            }, x, y, width, height);
+            this.popupView(window, param);
         }
     };
 

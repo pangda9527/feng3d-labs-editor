@@ -171,11 +171,13 @@ namespace editor
                 pos.x = pos.x - 318;
                 view.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                 //
-                popupview.popupView(view, () =>
-                {
-                    view.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                    this.activeColorGroup = null;
-                }, pos.x, pos.y);
+                popupview.popupView(view, {
+                    x: pos.x, y: pos.y, closecallback: () =>
+                    {
+                        view.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                        this.activeColorGroup = null;
+                    },
+                });
             }
         }
 

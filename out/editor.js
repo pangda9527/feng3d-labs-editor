@@ -3042,6 +3042,8 @@ var editor;
                 return;
             if (feng3d.shortcut.getState(feng3d.shortCutStates.draging))
                 return;
+            if (feng3d.shortcut.getState("inModal"))
+                return;
             //
             var checkItems = this.getAllCheckItems();
             if (this.isdebug) {
@@ -3629,89 +3631,87 @@ var editor;
          *
          * @param object
          * @param closecallback
-         * @param x
-         * @param y
-         * @param width
-         * @param height
+         * @param param
          */
-        Popupview.prototype.popupObject = function (object, closecallback, x, y, width, height) {
+        Popupview.prototype.popupObject = function (object, param) {
+            if (param === void 0) { param = {}; }
             var view = feng3d.objectview.getObjectView(object);
-            var background = new eui.Rect(width || 300, height || 300, 0xf0f0f0);
+            var background = new eui.Rect(param.width || 300, param.height || 300, 0xf0f0f0);
             view.addChildAt(background, 0);
             //
-            this.popupView(view, function () {
-                closecallback && closecallback(object);
-            }, x, y, width, height);
+            if (param.closecallback) {
+                var closecallback = param.closecallback;
+                param.closecallback = function () {
+                    closecallback && closecallback(object);
+                };
+            }
+            this.popupView(view, param);
         };
         /**
          * 弹出一个界面
          *
          * @param view
-         * @param closecallback
-         * @param x
-         * @param y
-         * @param width
-         * @param height
+         * @param param
          */
-        Popupview.prototype.popupView = function (view, closecallback, x, y, width, height) {
+        Popupview.prototype.popupView = function (view, param) {
+            if (param === void 0) { param = {}; }
             editor.editorui.popupLayer.addChild(view);
-            if (width !== undefined)
-                view.width = width;
-            if (height !== undefined)
-                view.height = height;
+            if (param.width !== undefined)
+                view.width = param.width;
+            if (param.height !== undefined)
+                view.height = param.height;
             var x0 = (editor.editorui.stage.stageWidth - view.width) / 2;
             var y0 = (editor.editorui.stage.stageHeight - view.height) / 2;
-            if (x !== undefined) {
-                x0 = x;
+            if (param.x !== undefined) {
+                x0 = param.x;
             }
-            if (y !== undefined) {
-                y0 = y;
+            if (param.y !== undefined) {
+                y0 = param.y;
             }
             x0 = feng3d.FMath.clamp(x0, 0, editor.editorui.popupLayer.stage.stageWidth - view.width);
             y0 = feng3d.FMath.clamp(y0, 0, editor.editorui.popupLayer.stage.stageHeight - view.height);
             view.x = x0;
             view.y = y0;
-            if (closecallback) {
-                view.addEventListener(egret.Event.REMOVED_FROM_STAGE, closecallback, null);
+            if (param.closecallback) {
+                view.addEventListener(egret.Event.REMOVED_FROM_STAGE, param.closecallback, null);
             }
-            editor.maskview.mask(view);
+            if (param.mode != false)
+                editor.maskview.mask(view);
         };
         /**
          * 弹出一个包含objectview的窗口
          *
          * @param object
          * @param closecallback
-         * @param x
-         * @param y
-         * @param width
-         * @param height
+         * @param param
          */
-        Popupview.prototype.popupObjectWindow = function (object, closecallback, x, y, width, height) {
+        Popupview.prototype.popupObjectWindow = function (object, param) {
+            if (param === void 0) { param = {}; }
             var view = feng3d.objectview.getObjectView(object);
-            var panel = new editor.WindowView();
-            panel.addChild(view);
+            var window = new editor.WindowView();
+            window.contenGroup.addChild(view);
             //
-            this.popupView(panel, function () {
-                closecallback && closecallback(object);
-            }, x, y, width, height);
+            if (param.closecallback) {
+                var closecallback = param.closecallback;
+                param.closecallback = function () {
+                    closecallback && closecallback(object);
+                };
+            }
+            this.popupView(window, param);
         };
         /**
          * 弹出一个包含给出界面的窗口
          *
          * @param view
          * @param closecallback
-         * @param x
-         * @param y
-         * @param width
-         * @param height
+         * @param param
          */
-        Popupview.prototype.popupViewWindow = function (view, closecallback, x, y, width, height) {
-            var panel = new editor.WindowView();
-            panel.addChild(view);
+        Popupview.prototype.popupViewWindow = function (view, param) {
+            if (param === void 0) { param = {}; }
+            var window = new editor.WindowView();
+            window.contenGroup.addChild(view);
             //
-            this.popupView(panel, function () {
-                closecallback && closecallback();
-            }, x, y, width, height);
+            this.popupView(window, param);
         };
         return Popupview;
     }());
@@ -3908,9 +3908,12 @@ var editor;
             pos.x = pos.x - 318;
             editor.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
             //
-            editor.popupview.popupView(editor.colorPickerView, function () {
-                editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
-            }, pos.x, pos.y);
+            editor.popupview.popupView(editor.colorPickerView, {
+                x: pos.x, y: pos.y,
+                closecallback: function () {
+                    editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                }
+            });
         };
         ColorPicker.prototype.onPickerViewChanged = function () {
             this.value = editor.colorPickerView.color;
@@ -5186,9 +5189,11 @@ var editor;
                     pos.x = pos.x - 318;
                     editor.minMaxCurveEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                     //
-                    editor.popupview.popupView(editor.minMaxCurveEditor, function () {
-                        editor.minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
-                    }, pos.x, pos.y);
+                    editor.popupview.popupView(editor.minMaxCurveEditor, {
+                        x: pos.x, y: pos.y, closecallback: function () {
+                            editor.minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                        }
+                    });
                     break;
             }
         };
@@ -5860,10 +5865,12 @@ var editor;
                 pos.x = pos.x - 318;
                 view.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                 //
-                editor.popupview.popupView(view, function () {
-                    view.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
-                    _this.activeColorGroup = null;
-                }, pos.x, pos.y);
+                editor.popupview.popupView(view, {
+                    x: pos.x, y: pos.y, closecallback: function () {
+                        view.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                        _this.activeColorGroup = null;
+                    },
+                });
             }
         };
         MinMaxGradientView.prototype.onPickerViewChanged = function () {
@@ -15405,10 +15412,12 @@ var editor;
             var mainMenu = [
                 {
                     label: "新建项目", click: function () {
-                        editor.popupview.popupObject({ newprojectname: "newproject" }, function (data) {
-                            if (data.newprojectname && data.newprojectname.length > 0) {
-                                editor.editorcache.projectname = data.newprojectname;
-                                window.location.reload();
+                        editor.popupview.popupObject({ newprojectname: "newproject" }, {
+                            closecallback: function (data) {
+                                if (data.newprojectname && data.newprojectname.length > 0) {
+                                    editor.editorcache.projectname = data.newprojectname;
+                                    window.location.reload();
+                                }
                             }
                         });
                     },
@@ -15427,10 +15436,12 @@ var editor;
                         return menuItem;
                     }),
                     click: function () {
-                        editor.popupview.popupObject({ newprojectname: "newproject" }, function (data) {
-                            if (data.newprojectname && data.newprojectname.length > 0) {
-                                editor.editorcache.projectname = data.newprojectname;
-                                window.location.reload();
+                        editor.popupview.popupObject({ newprojectname: "newproject" }, {
+                            closecallback: function (data) {
+                                if (data.newprojectname && data.newprojectname.length > 0) {
+                                    editor.editorcache.projectname = data.newprojectname;
+                                    window.location.reload();
+                                }
                             }
                         });
                     }

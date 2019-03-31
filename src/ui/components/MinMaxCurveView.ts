@@ -113,10 +113,12 @@ namespace editor
                     pos.x = pos.x - 318;
                     minMaxCurveEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                     //
-                    popupview.popupView(minMaxCurveEditor, () =>
-                    {
-                        minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                    }, pos.x, pos.y);
+                    popupview.popupView(minMaxCurveEditor, {
+                        x: pos.x, y: pos.y, closecallback: () =>
+                        {
+                            minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                        }
+                    });
                     break;
             }
         }

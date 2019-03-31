@@ -111,6 +111,7 @@ namespace editor
         {
             if (this.state == SplitGroupState.draging) return;
             if (feng3d.shortcut.getState(feng3d.shortCutStates.draging)) return;
+            if (feng3d.shortcut.getState("inModal")) return;
 
             //
             let checkItems = this.getAllCheckItems();

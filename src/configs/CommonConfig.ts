@@ -19,12 +19,14 @@ namespace editor
                 {
                     label: "新建项目", click: () =>
                     {
-                        popupview.popupObject({ newprojectname: "newproject" }, (data) =>
-                        {
-                            if (data.newprojectname && data.newprojectname.length > 0)
+                        popupview.popupObject({ newprojectname: "newproject" }, {
+                            closecallback: (data) =>
                             {
-                                editorcache.projectname = data.newprojectname;
-                                window.location.reload();
+                                if (data.newprojectname && data.newprojectname.length > 0)
+                                {
+                                    editorcache.projectname = data.newprojectname;
+                                    window.location.reload();
+                                }
                             }
                         });
                     },
@@ -48,12 +50,14 @@ namespace editor
                     }),
                     click: () =>
                     {
-                        popupview.popupObject({ newprojectname: "newproject" }, (data) =>
-                        {
-                            if (data.newprojectname && data.newprojectname.length > 0)
+                        popupview.popupObject({ newprojectname: "newproject" }, {
+                            closecallback: (data) =>
                             {
-                                editorcache.projectname = data.newprojectname;
-                                window.location.reload();
+                                if (data.newprojectname && data.newprojectname.length > 0)
+                                {
+                                    editorcache.projectname = data.newprojectname;
+                                    window.location.reload();
+                                }
                             }
                         });
                     }

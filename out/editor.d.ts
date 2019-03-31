@@ -1132,6 +1132,10 @@ declare namespace editor {
 }
 declare namespace editor {
     class WindowView extends eui.Panel {
+        moveArea: eui.Group;
+        titleDisplay: eui.Label;
+        closeButton: eui.Button;
+        contenGroup: eui.Group;
         constructor();
     }
 }
@@ -1149,6 +1153,17 @@ declare namespace editor {
      * 弹出一个objectview界面，点击其它区域关闭界面，并且调用关闭回调
      */
     var popupview: Popupview;
+    interface PopupviewParam<T> {
+        x?: number;
+        y?: number;
+        width?: number;
+        height?: number;
+        /**
+         * 默认为true
+         */
+        mode?: boolean;
+        closecallback?: (object: T) => void;
+    }
     /**
      * 弹出一个objectview界面，点击其它区域关闭界面，并且调用关闭回调
      */
@@ -1158,45 +1173,32 @@ declare namespace editor {
          *
          * @param object
          * @param closecallback
-         * @param x
-         * @param y
-         * @param width
-         * @param height
+         * @param param
          */
-        popupObject<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number): void;
+        popupObject<T>(object: T, param?: PopupviewParam<T>): void;
         /**
          * 弹出一个界面
          *
          * @param view
-         * @param closecallback
-         * @param x
-         * @param y
-         * @param width
-         * @param height
+         * @param param
          */
-        popupView(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number): void;
+        popupView(view: eui.Component, param?: PopupviewParam<any>): void;
         /**
          * 弹出一个包含objectview的窗口
          *
          * @param object
          * @param closecallback
-         * @param x
-         * @param y
-         * @param width
-         * @param height
+         * @param param
          */
-        popupObjectWindow<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number): void;
+        popupObjectWindow<T>(object: T, param?: PopupviewParam<T>): void;
         /**
          * 弹出一个包含给出界面的窗口
          *
          * @param view
          * @param closecallback
-         * @param x
-         * @param y
-         * @param width
-         * @param height
+         * @param param
          */
-        popupViewWindow(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number): void;
+        popupViewWindow(view: eui.Component, param?: PopupviewParam<any>): void;
     }
 }
 declare namespace editor {
