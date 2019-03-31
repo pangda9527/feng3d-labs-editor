@@ -58,6 +58,7 @@
         "src/ui/components/SplitGroup.ts",
         "src/ui/components/SplitUIComponent.ts",
         "src/ui/components/TabView.ts",
+        "src/ui/components/WindowView.ts",
         "src/ui/components/Maskview.ts",
         "src/ui/components/Popupview.ts",
         "src/ui/components/ComboBox.ts",

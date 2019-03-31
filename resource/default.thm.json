@@ -54,6 +54,7 @@
         "resource/custom_skins/ComboBox.exml",
         "resource/custom_skins/TabViewButton.exml",
         "resource/custom_skins/TabView.exml",
+        "resource/custom_skins/WindowView.exml",
         "resource/custom_skins/ColorPickerView.exml",
         "resource/custom_skins/TipString.exml",
         "resource/custom_skins/ParticleEffectController.exml",

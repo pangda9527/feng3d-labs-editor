@@ -3557,11 +3557,26 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var WindowView = /** @class */ (function (_super) {
+        __extends(WindowView, _super);
+        function WindowView() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "WindowView";
+            return _this;
+        }
+        return WindowView;
+    }(eui.Panel));
+    editor.WindowView = WindowView;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * 在界面后面添加一层透明界面，当点击到透明界面时关闭界面。
+     */
     var Maskview = /** @class */ (function () {
         function Maskview() {
         }
-        Maskview.prototype.mask = function (displayObject, onMaskClick) {
-            if (onMaskClick === void 0) { onMaskClick = null; }
+        Maskview.prototype.mask = function (displayObject) {
             var maskReck = new eui.Rect();
             maskReck.alpha = 0;
             if (displayObject.stage) {
@@ -3583,7 +3598,6 @@ var editor;
             function removeDisplayObject() {
                 if (displayObject.parent)
                     displayObject.parent.removeChild(displayObject);
-                onMaskClick && onMaskClick();
             }
             function onRemoveFromStage() {
                 maskReck.removeEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
@@ -3610,6 +3624,16 @@ var editor;
     var Popupview = /** @class */ (function () {
         function Popupview() {
         }
+        /**
+         * 弹出一个 objectview
+         *
+         * @param object
+         * @param closecallback
+         * @param x
+         * @param y
+         * @param width
+         * @param height
+         */
         Popupview.prototype.popupObject = function (object, closecallback, x, y, width, height) {
             var view = feng3d.objectview.getObjectView(object);
             var background = new eui.Rect(width || 300, height || 300, 0xf0f0f0);
@@ -3619,6 +3643,16 @@ var editor;
                 closecallback && closecallback(object);
             }, x, y, width, height);
         };
+        /**
+         * 弹出一个界面
+         *
+         * @param view
+         * @param closecallback
+         * @param x
+         * @param y
+         * @param width
+         * @param height
+         */
         Popupview.prototype.popupView = function (view, closecallback, x, y, width, height) {
             editor.editorui.popupLayer.addChild(view);
             if (width !== undefined)
@@ -3637,9 +3671,47 @@ var editor;
             y0 = feng3d.FMath.clamp(y0, 0, editor.editorui.popupLayer.stage.stageHeight - view.height);
             view.x = x0;
             view.y = y0;
-            editor.maskview.mask(view, function () {
+            if (closecallback) {
+                view.addEventListener(egret.Event.REMOVED_FROM_STAGE, closecallback, null);
+            }
+            editor.maskview.mask(view);
+        };
+        /**
+         * 弹出一个包含objectview的窗口
+         *
+         * @param object
+         * @param closecallback
+         * @param x
+         * @param y
+         * @param width
+         * @param height
+         */
+        Popupview.prototype.popupObjectWindow = function (object, closecallback, x, y, width, height) {
+            var view = feng3d.objectview.getObjectView(object);
+            var panel = new editor.WindowView();
+            panel.addChild(view);
+            //
+            this.popupView(panel, function () {
+                closecallback && closecallback(object);
+            }, x, y, width, height);
+        };
+        /**
+         * 弹出一个包含给出界面的窗口
+         *
+         * @param view
+         * @param closecallback
+         * @param x
+         * @param y
+         * @param width
+         * @param height
+         */
+        Popupview.prototype.popupViewWindow = function (view, closecallback, x, y, width, height) {
+            var panel = new editor.WindowView();
+            panel.addChild(view);
+            //
+            this.popupView(panel, function () {
                 closecallback && closecallback();
-            });
+            }, x, y, width, height);
         };
         return Popupview;
     }());

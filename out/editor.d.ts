@@ -1131,9 +1131,17 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    class WindowView extends eui.Panel {
+        constructor();
+    }
+}
+declare namespace editor {
     var maskview: Maskview;
+    /**
+     * 在界面后面添加一层透明界面，当点击到透明界面时关闭界面。
+     */
     class Maskview {
-        mask(displayObject: egret.DisplayObject, onMaskClick?: () => void): void;
+        mask(displayObject: egret.DisplayObject): void;
     }
 }
 declare namespace editor {
@@ -1145,8 +1153,50 @@ declare namespace editor {
      * 弹出一个objectview界面，点击其它区域关闭界面，并且调用关闭回调
      */
     class Popupview {
+        /**
+         * 弹出一个 objectview
+         *
+         * @param object
+         * @param closecallback
+         * @param x
+         * @param y
+         * @param width
+         * @param height
+         */
         popupObject<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number): void;
+        /**
+         * 弹出一个界面
+         *
+         * @param view
+         * @param closecallback
+         * @param x
+         * @param y
+         * @param width
+         * @param height
+         */
         popupView(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number): void;
+        /**
+         * 弹出一个包含objectview的窗口
+         *
+         * @param object
+         * @param closecallback
+         * @param x
+         * @param y
+         * @param width
+         * @param height
+         */
+        popupObjectWindow<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number): void;
+        /**
+         * 弹出一个包含给出界面的窗口
+         *
+         * @param view
+         * @param closecallback
+         * @param x
+         * @param y
+         * @param width
+         * @param height
+         */
+        popupViewWindow(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number): void;
     }
 }
 declare namespace editor {

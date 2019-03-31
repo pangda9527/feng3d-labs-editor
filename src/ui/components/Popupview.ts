@@ -10,7 +10,16 @@ namespace editor
      */
     export class Popupview
     {
-
+        /**
+         * 弹出一个 objectview
+         * 
+         * @param object 
+         * @param closecallback 
+         * @param x 
+         * @param y 
+         * @param width 
+         * @param height 
+         */
         popupObject<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number)
         {
             var view: eui.Component = feng3d.objectview.getObjectView(object);
@@ -24,6 +33,16 @@ namespace editor
             }, x, y, width, height);
         }
 
+        /**
+         * 弹出一个界面
+         * 
+         * @param view 
+         * @param closecallback 
+         * @param x 
+         * @param y 
+         * @param width 
+         * @param height 
+         */
         popupView(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number)
         {
             editorui.popupLayer.addChild(view);
@@ -51,10 +70,58 @@ namespace editor
             view.x = x0;
             view.y = y0;
 
-            maskview.mask(view, () =>
+            if (closecallback)
+            {
+                view.addEventListener(egret.Event.REMOVED_FROM_STAGE, closecallback, null);
+            }
+
+            maskview.mask(view);
+        }
+
+        /**
+         * 弹出一个包含objectview的窗口
+         * 
+         * @param object 
+         * @param closecallback 
+         * @param x 
+         * @param y 
+         * @param width 
+         * @param height 
+         */
+        popupObjectWindow<T>(object: T, closecallback?: (object: T) => void, x?: number, y?: number, width?: number, height?: number)
+        {
+            var view: eui.Component = feng3d.objectview.getObjectView(object);
+
+            var panel = new WindowView();
+            panel.addChild(view);
+
+            //
+            this.popupView(panel, () =>
+            {
+                closecallback && closecallback(object);
+            }, x, y, width, height);
+        }
+
+        /**
+         * 弹出一个包含给出界面的窗口
+         * 
+         * @param view 
+         * @param closecallback 
+         * @param x 
+         * @param y 
+         * @param width 
+         * @param height 
+         */
+        popupViewWindow(view: eui.Component, closecallback?: () => void, x?: number, y?: number, width?: number, height?: number)
+        {
+            var panel = new WindowView();
+            panel.addChild(view);
+
+            //
+            this.popupView(panel, () =>
             {
                 closecallback && closecallback();
-            });
+            }, x, y, width, height);
         }
     };
 

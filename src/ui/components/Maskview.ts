@@ -2,9 +2,12 @@ namespace editor
 {
     export var maskview: Maskview;
 
+    /**
+     * 在界面后面添加一层透明界面，当点击到透明界面时关闭界面。
+     */
     export class Maskview
     {
-        mask(displayObject: egret.DisplayObject, onMaskClick: () => void = null)
+        mask(displayObject: egret.DisplayObject)
         {
             var maskReck = new eui.Rect();
             maskReck.alpha = 0;
@@ -33,8 +36,6 @@ namespace editor
             {
                 if (displayObject.parent)
                     displayObject.parent.removeChild(displayObject);
-
-                onMaskClick && onMaskClick();
             }
 
             function onRemoveFromStage()
