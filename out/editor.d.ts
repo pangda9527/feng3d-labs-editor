@@ -3512,12 +3512,8 @@ declare namespace editor {
 declare namespace editor {
     var engine: feng3d.Engine;
     var editorCamera: feng3d.Camera;
-    var gameScene: feng3d.Scene3D;
     var editorComponent: EditorComponent;
     class EditorEngine extends feng3d.Engine {
-        scene: feng3d.Scene3D;
-        readonly camera: feng3d.Camera;
-        private _scene;
         wireframeColor: feng3d.Color4;
         /**
          * 绘制场景

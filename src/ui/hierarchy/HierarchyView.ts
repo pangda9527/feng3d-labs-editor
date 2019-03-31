@@ -66,6 +66,7 @@ namespace editor
 		{
 			this.offRootNode(oldvalue);
 			this.onRootNode(hierarchy.rootnode);
+			this.invalidHierarchy();
 		}
 
 		private onRootNode(node: HierarchyNode)
@@ -95,6 +96,7 @@ namespace editor
 
 		private updateHierarchyTree()
 		{
+			if (!hierarchy.rootnode) return;
 			var nodes = hierarchy.rootnode.getShowNodes();
 			this.listData.replaceAll(nodes);
 		}

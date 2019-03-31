@@ -8926,6 +8926,7 @@ var editor;
         HierarchyView.prototype.onRootNodeChanged = function (host, property, oldvalue) {
             this.offRootNode(oldvalue);
             this.onRootNode(editor.hierarchy.rootnode);
+            this.invalidHierarchy();
         };
         HierarchyView.prototype.onRootNode = function (node) {
             if (node) {
@@ -8945,6 +8946,8 @@ var editor;
             feng3d.ticker.nextframe(this.updateHierarchyTree, this);
         };
         HierarchyView.prototype.updateHierarchyTree = function () {
+            if (!editor.hierarchy.rootnode)
+                return;
             var nodes = editor.hierarchy.rootnode.getShowNodes();
             this.listData.replaceAll(nodes);
         };
@@ -12750,36 +12753,23 @@ var editor;
             _this.wireframeColor = new feng3d.Color4(125 / 255, 176 / 255, 250 / 255);
             return _this;
         }
-        Object.defineProperty(EditorEngine.prototype, "scene", {
-            get: function () {
-                return this._scene;
-            },
-            set: function (value) {
-                if (this._scene) {
-                    this._scene.runEnvironment = feng3d.RunEnvironment.feng3d;
-                }
-                this._scene = value;
-                if (this._scene) {
-                    this._scene.runEnvironment = feng3d.RunEnvironment.editor;
-                    editor.hierarchy.rootGameObject = this._scene.gameObject;
-                }
-                editor.editorComponent.scene = this._scene;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(EditorEngine.prototype, "camera", {
-            get: function () {
-                return editor.editorCamera;
-            },
-            enumerable: true,
-            configurable: true
-        });
         /**
          * 绘制场景
          */
         EditorEngine.prototype.render = function () {
             var _this = this;
+            if (editor.editorData.gameScene != this.scene) {
+                if (this.scene) {
+                    this.scene.runEnvironment = feng3d.RunEnvironment.feng3d;
+                }
+                this.scene = editor.editorData.gameScene;
+                if (this.scene) {
+                    this.scene.runEnvironment = feng3d.RunEnvironment.editor;
+                    editor.hierarchy.rootGameObject = this.scene.gameObject;
+                }
+                editor.editorComponent.scene = this.scene;
+            }
+            this.camera = editor.editorCamera;
             _super.prototype.render.call(this);
             editor.editorData.editorScene.update();
             feng3d.forwardRenderer.draw(this.gl, editor.editorData.editorScene, this.camera);
@@ -12822,9 +12812,9 @@ var editor;
             editor.editorAsset.runProjectScript(function () {
                 editor.editorAsset.readScene("default.scene.json", function (err, scene) {
                     if (err)
-                        editor.engine.scene = creatNewScene();
+                        editor.editorData.gameScene = creatNewScene();
                     else
-                        editor.engine.scene = scene;
+                        editor.editorData.gameScene = scene;
                 });
             });
             window.addEventListener("beforeunload", function () {
@@ -12926,6 +12916,8 @@ var editor;
             },
             set: function (v) {
                 var _this = this;
+                if (this._scene == v)
+                    return;
                 if (this._scene) {
                     this.scene.off("addComponent", this.onAddComponent, this);
                     this.scene.off("removeComponent", this.onRemoveComponent, this);

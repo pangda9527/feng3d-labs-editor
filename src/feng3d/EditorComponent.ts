@@ -11,6 +11,8 @@ namespace editor
         }
         set scene(v)
         {
+            if (this._scene == v) return;
+
             if (this._scene)
             {
                 this.scene.off("addComponent", this.onAddComponent, this);

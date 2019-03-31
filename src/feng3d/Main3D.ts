@@ -2,35 +2,10 @@ namespace editor
 {
     export var engine: feng3d.Engine;
     export var editorCamera: feng3d.Camera;
-    export var gameScene: feng3d.Scene3D;
     export var editorComponent: EditorComponent;
 
     export class EditorEngine extends feng3d.Engine
     {
-        get scene()
-        {
-            return this._scene;
-        }
-        set scene(value)
-        {
-            if (this._scene)
-            {
-                this._scene.runEnvironment = feng3d.RunEnvironment.feng3d;
-            }
-            this._scene = value;
-            if (this._scene)
-            {
-                this._scene.runEnvironment = feng3d.RunEnvironment.editor;
-                hierarchy.rootGameObject = this._scene.gameObject;
-            }
-            editorComponent.scene = this._scene;
-        }
-        get camera()
-        {
-            return editorCamera;
-        }
-        private _scene: feng3d.Scene3D;
-
         wireframeColor = new feng3d.Color4(125 / 255, 176 / 255, 250 / 255);
 
         /**
@@ -38,6 +13,23 @@ namespace editor
          */
         render()
         {
+            if (editorData.gameScene != this.scene)
+            {
+                if (this.scene)
+                {
+                    this.scene.runEnvironment = feng3d.RunEnvironment.feng3d;
+                }
+                this.scene = editorData.gameScene;
+                if (this.scene)
+                {
+                    this.scene.runEnvironment = feng3d.RunEnvironment.editor;
+                    hierarchy.rootGameObject = this.scene.gameObject;
+                }
+                editorComponent.scene = this.scene;
+            }
+
+            this.camera = editorCamera;
+
             super.render();
 
             editorData.editorScene.update();
@@ -87,9 +79,9 @@ namespace editor
                 editorAsset.readScene("default.scene.json", (err, scene) =>
                 {
                     if (err)
-                        engine.scene = creatNewScene();
+                        editorData.gameScene = creatNewScene();
                     else
-                        engine.scene = scene;
+                        editorData.gameScene = scene;
                 });
             });
 
