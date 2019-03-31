@@ -142,7 +142,8 @@ namespace editor
 
             function newEngine()
             {
-                var canvas = <HTMLCanvasElement>document.getElementById("sceneRotateToolCanvas");;
+                var canvas = document.createElement("canvas");
+                (<any>document.getElementById("SceneRotateToolLayer")).append(canvas);
                 // can
                 canvas.width = 80;
                 canvas.height = 80;

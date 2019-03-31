@@ -11955,11 +11955,7 @@ var editor;
             return crossPos;
         };
         MRSToolBase.prototype.getMousePlaneCross = function () {
-            var result = [];
-            feng3d.dispatcher.dispatch("engine.getMouseRay3D", result);
-            if (result.length == 0)
-                return;
-            var line3D = result[0];
+            var line3D = this.gameObject.scene.mouseRay3D;
             //射线与平面交点
             var crossPos = this.movePlane3D.intersectWithLine3D(line3D);
             return crossPos;
@@ -12797,8 +12793,8 @@ var editor;
                 }
             });
             function newEngine() {
-                var canvas = document.getElementById("sceneRotateToolCanvas");
-                ;
+                var canvas = document.createElement("canvas");
+                document.getElementById("SceneRotateToolLayer").append(canvas);
                 // can
                 canvas.width = 80;
                 canvas.height = 80;
@@ -12952,6 +12948,8 @@ var editor;
                 editor.editorComponent.scene = this.scene;
             _super.prototype.render.call(this);
             if (this.editorScene) {
+                // 设置鼠标射线
+                this.editorScene.mouseRay3D = this.getMouseRay3D();
                 this.editorScene.update();
                 feng3d.forwardRenderer.draw(this.gl, this.editorScene, this.camera);
                 var selectedObject = this.mouse3DManager.pick(this, this.editorScene, this.camera);
@@ -14680,11 +14678,7 @@ var editor;
             feng3d.windowEventProxy.on("click", this.onclick, this);
         };
         MouseRayTestScript.prototype.onclick = function () {
-            var result = [];
-            feng3d.dispatcher.dispatch("engine.getMouseRay3D", result);
-            if (result.length == 0)
-                return;
-            var mouseRay3D = result[0];
+            var mouseRay3D = this.gameObject.scene.mouseRay3D;
             var gameobject = Object.setValue(new feng3d.GameObject(), { name: "test" });
             var model = gameobject.addComponent(feng3d.Model);
             model.material = new feng3d.Material();

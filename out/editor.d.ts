@@ -110,10 +110,6 @@ declare namespace feng3d {
          * 还原默认窗口布局
          */
         "viewLayout.reset": Object;
-        /**
-         * 获取鼠标射线
-         */
-        "engine.getMouseRay3D": feng3d.Ray3D[];
     }
 }
 declare namespace egret {

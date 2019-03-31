@@ -35,6 +35,9 @@ namespace editor
 
             if (this.editorScene)
             {
+                // 设置鼠标射线
+                this.editorScene.mouseRay3D = this.getMouseRay3D();
+
                 this.editorScene.update();
                 feng3d.forwardRenderer.draw(this.gl, this.editorScene, this.camera);
                 var selectedObject = this.mouse3DManager.pick(this, this.editorScene, this.camera);

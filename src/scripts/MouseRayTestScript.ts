@@ -11,10 +11,7 @@ namespace editor
 
         private onclick()
         {
-            var result: feng3d.Ray3D[] = [];
-            feng3d.dispatcher.dispatch("engine.getMouseRay3D", result);
-            if (result.length == 0) return;
-            var mouseRay3D = result[0];
+            var mouseRay3D = this.gameObject.scene.mouseRay3D;
 
             var gameobject = Object.setValue(new feng3d.GameObject(), { name: "test" });
             var model = gameobject.addComponent(feng3d.Model);
