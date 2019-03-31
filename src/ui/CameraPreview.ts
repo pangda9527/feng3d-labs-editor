@@ -34,11 +34,6 @@ namespace editor
         {
             super();
             this.skinName = "CameraPreview";
-            //
-            var canvas = this.canvas = <HTMLCanvasElement>document.getElementById("cameraPreviewCanvas");;
-            this.previewEngine = new feng3d.Engine(canvas);
-            this.previewEngine.mouse3DManager.mouseInput.enable = false;
-            this.previewEngine.stop();
         }
 
         $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -50,6 +45,14 @@ namespace editor
         private initView()
         {
             if (this.saveParent) return;
+
+            //
+            var canvas = this.canvas = document.createElement("canvas");
+            (<any>document.getElementById("CameraPreviewLayer")).append(canvas);
+            this.previewEngine = new feng3d.Engine(canvas);
+            this.previewEngine.mouse3DManager.mouseInput.enable = false;
+            this.previewEngine.stop();
+            //
             this.saveParent = this.parent;
             feng3d.ticker.nextframe(() =>
             {
@@ -67,6 +70,8 @@ namespace editor
         {
             if (!this.stage)
                 return;
+
+            this.height = this.width * 3 / 5;
 
             var bound = this.group.getGlobalBounds();
 

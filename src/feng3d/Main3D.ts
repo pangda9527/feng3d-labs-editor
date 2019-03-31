@@ -25,12 +25,14 @@ namespace editor
                     this.scene.runEnvironment = feng3d.RunEnvironment.editor;
                     hierarchy.rootGameObject = this.scene.gameObject;
                 }
-                editorComponent.scene = this.scene;
             }
+            if (editorComponent) editorComponent.scene = this.scene;
 
             this.camera = editorCamera;
 
             super.render();
+
+            if (!this.scene) return;
 
             editorData.editorScene.update();
             feng3d.forwardRenderer.draw(this.gl, editorData.editorScene, this.camera);

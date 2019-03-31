@@ -6,7 +6,8 @@
 	<title>feng3d-editor</title>
 	<meta http-equiv="Access-Control-Allow-Origin" content="*" />
 	<meta name="renderer" content="webkit">
-	<meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="full-screen" content="true" />
 	<meta name="screen-orientation" content="portrait" />
@@ -50,24 +51,24 @@
 		});
 	</script>
 
-	<div id="app"></div>
+	<div id="app" style="position: absolute;">
+		<canvas id="glcanvas" width="640" height="480" style="position: absolute;">
+			Your browser doesn't appear to support the HTML5
+			<code>&lt;canvas&gt;</code> element.
+		</canvas>
+		<div id="stats"></div>
+		<canvas id="sceneRotateToolCanvas" width="80" height="80" style="position: absolute;">
+			Your browser doesn't appear to support the HTML5
+			<code>&lt;canvas&gt;</code> element.
+		</canvas>
 	</div>
-	<canvas id="glcanvas" width="640" height="480" style="position: absolute;">
-		Your browser doesn't appear to support the HTML5
-		<code>&lt;canvas&gt;</code> element.
-	</canvas>
-	<div id="stats"></div>
-	<canvas id="sceneRotateToolCanvas" width="80" height="80" style="position: absolute;">
-		Your browser doesn't appear to support the HTML5
-		<code>&lt;canvas&gt;</code> element.
-	</canvas>
-	<canvas id="cameraPreviewCanvas" width="80" height="80" style="position: absolute;">
-		Your browser doesn't appear to support the HTML5
-		<code>&lt;canvas&gt;</code> element.
-	</canvas>
-	<div id="egretDiv" style="margin: auto;width: 100%;height: 100%;" class="egret-player" data-entry-class="editor.Editor"
-	 data-orientation="auto" data-scale-mode="noScale" data-frame-rate="30" data-content-width="100%" data-content-height="100%"
-	 data-show-paint-rect="false" data-multi-fingered="2" data-show-fps="false" data-show-log="false" data-show-fps-style="x:0,y:0,size:12,textColor:0xffffff,bgAlpha:0.9">
+	<div id="egretDiv" style="margin: auto;width: 100%;height: 100%;" class="egret-player"
+		data-entry-class="editor.Editor" data-orientation="auto" data-scale-mode="noScale" data-frame-rate="30"
+		data-content-width="100%" data-content-height="100%" data-show-paint-rect="false" data-multi-fingered="2"
+		data-show-fps="false" data-show-log="false"
+		data-show-fps-style="x:0,y:0,size:12,textColor:0xffffff,bgAlpha:0.9">
+	</div>
+	<div id="CameraPreviewLayer" style="position: absolute;">
 	</div>
 	<div id="output" style="position: absolute;display: none;top: 10px; right: 10px;"></div>
 </body>

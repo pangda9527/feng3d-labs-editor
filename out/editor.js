@@ -2325,7 +2325,6 @@ var editor;
 (function (editor) {
     var Editorshortcut = /** @class */ (function () {
         function Editorshortcut() {
-            this.selectedObjectsHistory = [];
             // 初始化快捷键
             feng3d.shortcut.addShortCuts(shortcutConfig);
             //监听命令
@@ -2334,7 +2333,6 @@ var editor;
             feng3d.shortcut.on("gameobjectMoveTool", this.onGameobjectMoveTool, this);
             feng3d.shortcut.on("gameobjectRotationTool", this.onGameobjectRotationTool, this);
             feng3d.shortcut.on("gameobjectScaleTool", this.onGameobjectScaleTool, this);
-            feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
             feng3d.shortcut.on("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
             feng3d.shortcut.on("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
             //
@@ -2372,49 +2370,6 @@ var editor;
             var newCameraPosition = editor.editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
             editor.editorCamera.transform.position = newCameraPosition;
             this.preMousePoint = currentMousePoint;
-        };
-        Editorshortcut.prototype.onSelectGameObject = function () {
-            var gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorData.editorScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
-            if (gameObjects.length > 0)
-                return;
-            //
-            gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorData.gameScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
-            if (gameObjects.length == 0) {
-                editor.editorData.clearSelectedObjects();
-                return;
-            }
-            //
-            gameObjects = gameObjects.reduce(function (pv, gameObject) {
-                var node = editor.hierarchy.getNode(gameObject);
-                while (!node && gameObject.parent) {
-                    gameObject = gameObject.parent;
-                    node = editor.hierarchy.getNode(gameObject);
-                }
-                if (gameObject != gameObject.scene.gameObject) {
-                    pv.push(gameObject);
-                }
-                return pv;
-            }, []);
-            //
-            if (gameObjects.length > 0) {
-                var selectedObjectsHistory = this.selectedObjectsHistory;
-                var gameObject = gameObjects.reduce(function (pv, cv) {
-                    if (pv)
-                        return pv;
-                    if (selectedObjectsHistory.indexOf(cv) == -1)
-                        pv = cv;
-                    return pv;
-                }, null);
-                if (!gameObject) {
-                    selectedObjectsHistory.length = 0;
-                    gameObject = gameObjects[0];
-                }
-                editor.editorData.selectObject(gameObject);
-                selectedObjectsHistory.push(gameObject);
-            }
-            else {
-                editor.editorData.clearSelectedObjects();
-            }
         };
         Editorshortcut.prototype.onDeleteSeletedGameObject = function () {
             var selectedObject = editor.editorData.selectedObjects;
@@ -2635,6 +2590,7 @@ var editor;
         __extends(SceneView, _super);
         function SceneView() {
             var _this = _super.call(this) || this;
+            _this.selectedObjectsHistory = [];
             _this.skinName = "SceneView";
             //
             feng3d.Stats.init(document.getElementById("stats"));
@@ -2642,25 +2598,44 @@ var editor;
             _this.moduleName = SceneView.moduleName;
             //
             _this._areaSelectRect = new editor.AreaSelectRect();
-            //
-            feng3d.shortcut.on("areaSelectStart", _this._onAreaSelectStart, _this);
-            feng3d.shortcut.on("areaSelect", _this._onAreaSelect, _this);
-            feng3d.shortcut.on("areaSelectEnd", _this._onAreaSelectEnd, _this);
             _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddedToStage, _this);
             _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this.onRemoveFromStage, _this);
             return _this;
         }
+        Object.defineProperty(SceneView.prototype, "inView", {
+            /**
+             * 鼠标是否在界面中
+             */
+            get: function () {
+                if (!this.stage)
+                    return false;
+                return this.getGlobalBounds().contains(this.stage.stageX, this.stage.stageY);
+            },
+            enumerable: true,
+            configurable: true
+        });
         SceneView.prototype.onAddedToStage = function () {
-            this._canvas = document.getElementById("glcanvas");
+            var _this = this;
+            //
+            if (!this._canvas) {
+                this._canvas = document.createElement("canvas");
+                document.getElementById("app").append(this._canvas);
+                this.engine = new editor.EditorEngine(this._canvas);
+            }
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+            //
+            feng3d.shortcut.on("areaSelectStart", this._onAreaSelectStart, this);
+            feng3d.shortcut.on("areaSelect", this._onAreaSelect, this);
+            feng3d.shortcut.on("areaSelectEnd", this._onAreaSelectEnd, this);
+            feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 if (dragdata.file_gameobject) {
                     editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, editor.hierarchy.rootnode.gameobject);
                 }
                 if (dragdata.file_script) {
-                    var gameobject = editor.engine.mouse3DManager.selectedGameObject;
+                    var gameobject = _this.engine.mouse3DManager.selectedGameObject;
                     if (!gameobject || !gameobject.scene)
                         gameobject = editor.hierarchy.rootnode.gameobject;
                     gameobject.addScript(dragdata.file_script.scriptName);
@@ -2672,6 +2647,11 @@ var editor;
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+            //
+            feng3d.shortcut.off("areaSelectStart", this._onAreaSelectStart, this);
+            feng3d.shortcut.off("areaSelect", this._onAreaSelect, this);
+            feng3d.shortcut.off("areaSelectEnd", this._onAreaSelectEnd, this);
+            feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
             editor.drag.unregister(this);
             if (this._canvas) {
                 this._canvas.style.display = "none";
@@ -2689,7 +2669,7 @@ var editor;
             //
             this._areaSelectRect.show(this._areaSelectStartPosition, areaSelectEndPosition);
             //
-            var gs = editor.engine.getObjectsInGlobalArea(this._areaSelectStartPosition, areaSelectEndPosition);
+            var gs = this.engine.getObjectsInGlobalArea(this._areaSelectStartPosition, areaSelectEndPosition);
             var gs0 = gs.filter(function (g) {
                 return !!editor.hierarchy.getNode(g);
             });
@@ -2719,6 +2699,51 @@ var editor;
             feng3d.Stats.instance.dom.style.left = bound.x + "px";
             feng3d.Stats.instance.dom.style.top = bound.y + "px";
         };
+        SceneView.prototype.onSelectGameObject = function () {
+            if (!this.inView)
+                return;
+            var gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorData.editorScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
+            if (gameObjects.length > 0)
+                return;
+            //
+            gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorData.gameScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
+            if (gameObjects.length == 0) {
+                editor.editorData.clearSelectedObjects();
+                return;
+            }
+            //
+            gameObjects = gameObjects.reduce(function (pv, gameObject) {
+                var node = editor.hierarchy.getNode(gameObject);
+                while (!node && gameObject.parent) {
+                    gameObject = gameObject.parent;
+                    node = editor.hierarchy.getNode(gameObject);
+                }
+                if (gameObject != gameObject.scene.gameObject) {
+                    pv.push(gameObject);
+                }
+                return pv;
+            }, []);
+            //
+            if (gameObjects.length > 0) {
+                var selectedObjectsHistory = this.selectedObjectsHistory;
+                var gameObject = gameObjects.reduce(function (pv, cv) {
+                    if (pv)
+                        return pv;
+                    if (selectedObjectsHistory.indexOf(cv) == -1)
+                        pv = cv;
+                    return pv;
+                }, null);
+                if (!gameObject) {
+                    selectedObjectsHistory.length = 0;
+                    gameObject = gameObjects[0];
+                }
+                editor.editorData.selectObject(gameObject);
+                selectedObjectsHistory.push(gameObject);
+            }
+            else {
+                editor.editorData.clearSelectedObjects();
+            }
+        };
         SceneView.moduleName = "Scene";
         return SceneView;
     }(eui.Component));
@@ -2732,12 +2757,6 @@ var editor;
         function CameraPreview() {
             var _this = _super.call(this) || this;
             _this.skinName = "CameraPreview";
-            //
-            var canvas = _this.canvas = document.getElementById("cameraPreviewCanvas");
-            ;
-            _this.previewEngine = new feng3d.Engine(canvas);
-            _this.previewEngine.mouse3DManager.mouseInput.enable = false;
-            _this.previewEngine.stop();
             return _this;
         }
         Object.defineProperty(CameraPreview.prototype, "camera", {
@@ -2767,6 +2786,13 @@ var editor;
             var _this = this;
             if (this.saveParent)
                 return;
+            //
+            var canvas = this.canvas = document.createElement("canvas");
+            document.getElementById("CameraPreviewLayer").append(canvas);
+            this.previewEngine = new feng3d.Engine(canvas);
+            this.previewEngine.mouse3DManager.mouseInput.enable = false;
+            this.previewEngine.stop();
+            //
             this.saveParent = this.parent;
             feng3d.ticker.nextframe(function () {
                 _this.parent.removeChild(_this);
@@ -2779,6 +2805,7 @@ var editor;
         CameraPreview.prototype.onResize = function () {
             if (!this.stage)
                 return;
+            this.height = this.width * 3 / 5;
             var bound = this.group.getGlobalBounds();
             var style = this.canvas.style;
             style.position = "absolute";
@@ -12766,10 +12793,13 @@ var editor;
                     this.scene.runEnvironment = feng3d.RunEnvironment.editor;
                     editor.hierarchy.rootGameObject = this.scene.gameObject;
                 }
-                editor.editorComponent.scene = this.scene;
             }
+            if (editor.editorComponent)
+                editor.editorComponent.scene = this.scene;
             this.camera = editor.editorCamera;
             _super.prototype.render.call(this);
+            if (!this.scene)
+                return;
             editor.editorData.editorScene.update();
             feng3d.forwardRenderer.draw(this.gl, editor.editorData.editorScene, this.camera);
             var selectedObject = this.mouse3DManager.pick(editor.editorData.editorScene, this.camera);

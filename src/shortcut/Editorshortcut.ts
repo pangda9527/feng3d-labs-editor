@@ -3,7 +3,6 @@ namespace editor
     export class Editorshortcut
     {
         private preMousePoint: feng3d.Vector2;
-        private selectedObjectsHistory: feng3d.GameObject[] = [];
         private dragSceneMousePoint: feng3d.Vector2;
         private dragSceneCameraGlobalMatrix3D: feng3d.Matrix4x4;
         private rotateSceneCenter: feng3d.Vector3;
@@ -21,7 +20,6 @@ namespace editor
             feng3d.shortcut.on("gameobjectMoveTool", this.onGameobjectMoveTool, this);
             feng3d.shortcut.on("gameobjectRotationTool", this.onGameobjectRotationTool, this);
             feng3d.shortcut.on("gameobjectScaleTool", this.onGameobjectScaleTool, this);
-            feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
             feng3d.shortcut.on("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
             feng3d.shortcut.on("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
             //
@@ -74,57 +72,6 @@ namespace editor
             editorCamera.transform.position = newCameraPosition;
 
             this.preMousePoint = currentMousePoint;
-        }
-
-        private onSelectGameObject()
-        {
-            var gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), editorData.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
-            if (gameObjects.length > 0)
-                return;
-            //
-            gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
-            if (gameObjects.length == 0)
-            {
-                editorData.clearSelectedObjects();
-                return;
-            }
-            //
-            gameObjects = gameObjects.reduce((pv: feng3d.GameObject[], gameObject) =>
-            {
-                var node = hierarchy.getNode(gameObject);
-                while (!node && gameObject.parent)
-                {
-                    gameObject = gameObject.parent;
-                    node = hierarchy.getNode(gameObject);
-                }
-                if (gameObject != gameObject.scene.gameObject)
-                {
-                    pv.push(gameObject);
-                }
-                return pv;
-            }, []);
-            //
-            if (gameObjects.length > 0)
-            {
-                var selectedObjectsHistory = this.selectedObjectsHistory;
-                var gameObject = gameObjects.reduce((pv, cv) =>
-                {
-                    if (pv) return pv;
-                    if (selectedObjectsHistory.indexOf(cv) == -1) pv = cv;
-                    return pv;
-                }, null);
-                if (!gameObject)
-                {
-                    selectedObjectsHistory.length = 0;
-                    gameObject = gameObjects[0];
-                }
-                editorData.selectObject(gameObject);
-                selectedObjectsHistory.push(gameObject);
-            }
-            else
-            {
-                editorData.clearSelectedObjects();
-            }
         }
 
         private onDeleteSeletedGameObject()

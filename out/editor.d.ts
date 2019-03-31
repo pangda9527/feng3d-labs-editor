@@ -888,7 +888,6 @@ declare namespace editor {
 declare namespace editor {
     class Editorshortcut {
         private preMousePoint;
-        private selectedObjectsHistory;
         private dragSceneMousePoint;
         private dragSceneCameraGlobalMatrix3D;
         private rotateSceneCenter;
@@ -900,7 +899,6 @@ declare namespace editor {
         private onGameobjectScaleTool;
         private onSceneCameraForwardBackMouseMoveStart;
         private onSceneCameraForwardBackMouseMove;
-        private onSelectGameObject;
         private onDeleteSeletedGameObject;
         private onDragSceneStart;
         private onDragScene;
@@ -964,11 +962,17 @@ declare namespace editor {
         private _canvas;
         private _areaSelectStartPosition;
         private _areaSelectRect;
+        private engine;
+        private selectedObjectsHistory;
         /**
          * 模块名称
          */
         moduleName: string;
         static moduleName: string;
+        /**
+         * 鼠标是否在界面中
+         */
+        private readonly inView;
         constructor();
         private onAddedToStage;
         private onRemoveFromStage;
@@ -978,6 +982,7 @@ declare namespace editor {
         private _onMouseOver;
         private onMouseOut;
         private onResize;
+        private onSelectGameObject;
     }
 }
 declare namespace editor {
