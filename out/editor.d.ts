@@ -2936,6 +2936,14 @@ declare namespace editor {
      */
     class EditorData {
         /**
+         * 游戏运行时的场景
+         */
+        gameScene: feng3d.Scene3D;
+        /**
+         * 编辑器场景，用于显示只在编辑器中存在的游戏对象，例如灯光Icon，对象操作工具等显示。
+         */
+        editorScene: feng3d.Scene3D;
+        /**
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
          */
@@ -3427,7 +3435,7 @@ declare namespace editor {
 declare namespace editor {
     var engine: feng3d.Engine;
     var editorCamera: feng3d.Camera;
-    var editorScene: feng3d.Scene3D;
+    var gameScene: feng3d.Scene3D;
     var editorComponent: EditorComponent;
     class EditorEngine extends feng3d.Engine {
         scene: feng3d.Scene3D;
@@ -3445,6 +3453,10 @@ declare namespace editor {
     class Main3D {
         constructor();
         private init;
+        /**
+         * 初始化编辑器场景
+         */
+        private initEditorScene;
         private onEditorCameraRotate;
     }
     function creatNewScene(): feng3d.Scene3D;

@@ -78,7 +78,7 @@ namespace editor
 
         private onSelectGameObject()
         {
-            var gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+            var gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), editorData.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
             if (gameObjects.length > 0)
                 return;
             //

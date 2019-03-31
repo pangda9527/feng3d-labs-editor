@@ -2324,7 +2324,7 @@ var editor;
             this.preMousePoint = currentMousePoint;
         };
         Editorshortcut.prototype.onSelectGameObject = function () {
-            var gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
+            var gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorData.editorScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
             if (gameObjects.length > 0)
                 return;
             //
@@ -12558,9 +12558,9 @@ var editor;
         EditorEngine.prototype.render = function () {
             var _this = this;
             _super.prototype.render.call(this);
-            editor.editorScene.update();
-            feng3d.forwardRenderer.draw(this.gl, editor.editorScene, this.camera);
-            var selectedObject = this.mouse3DManager.pick(editor.editorScene, this.camera);
+            editor.editorData.editorScene.update();
+            feng3d.forwardRenderer.draw(this.gl, editor.editorData.editorScene, this.camera);
+            var selectedObject = this.mouse3DManager.pick(editor.editorData.editorScene, this.camera);
             if (selectedObject)
                 this.selectedObject = selectedObject;
             editor.editorData.selectedGameObjects.forEach(function (element) {
@@ -12589,19 +12589,7 @@ var editor;
             //
             editor.editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
-            editor.editorScene = Object.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
-            editor.editorScene.runEnvironment = feng3d.RunEnvironment.all;
-            //
-            editor.editorScene.gameObject.addComponent(editor.SceneRotateTool);
-            //
-            //初始化模块
-            editor.editorScene.gameObject.addComponent(editor.GroundGrid);
-            editor.editorScene.gameObject.addComponent(editor.MRSTool);
-            editor.editorComponent = editor.editorScene.gameObject.addComponent(editor.EditorComponent);
-            feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), function (content) {
-                var trident = feng3d.serialization.deserialize(JSON.parse(content));
-                editor.editorScene.gameObject.addChild(trident);
-            });
+            editor.editorData.editorScene = this.initEditorScene();
             //
             feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             //
@@ -12619,6 +12607,25 @@ var editor;
             window.addEventListener("beforeunload", function () {
                 editor.editorRS.fs.writeObject("default.scene.json", editor.engine.scene.gameObject);
             });
+        };
+        /**
+         * 初始化编辑器场景
+         */
+        Main3D.prototype.initEditorScene = function () {
+            var scene = Object.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
+            scene.runEnvironment = feng3d.RunEnvironment.all;
+            //
+            scene.gameObject.addComponent(editor.SceneRotateTool);
+            //
+            //初始化模块
+            scene.gameObject.addComponent(editor.GroundGrid);
+            scene.gameObject.addComponent(editor.MRSTool);
+            editor.editorComponent = scene.gameObject.addComponent(editor.EditorComponent);
+            feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), function (content) {
+                var trident = feng3d.serialization.deserialize(JSON.parse(content));
+                scene.gameObject.addChild(trident);
+            });
+            return scene;
         };
         Main3D.prototype.onEditorCameraRotate = function (e) {
             var resultRotation = e.data;

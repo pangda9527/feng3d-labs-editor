@@ -2,7 +2,7 @@ namespace editor
 {
     export var engine: feng3d.Engine;
     export var editorCamera: feng3d.Camera;
-    export var editorScene: feng3d.Scene3D;
+    export var gameScene: feng3d.Scene3D;
     export var editorComponent: EditorComponent;
 
     export class EditorEngine extends feng3d.Engine
@@ -40,9 +40,9 @@ namespace editor
         {
             super.render();
 
-            editorScene.update();
-            feng3d.forwardRenderer.draw(this.gl, editorScene, this.camera);
-            var selectedObject = this.mouse3DManager.pick(editorScene, this.camera);
+            editorData.editorScene.update();
+            feng3d.forwardRenderer.draw(this.gl, editorData.editorScene, this.camera);
+            var selectedObject = this.mouse3DManager.pick(editorData.editorScene, this.camera);
             if (selectedObject) this.selectedObject = selectedObject;
 
             editorData.selectedGameObjects.forEach(element =>
@@ -75,22 +75,7 @@ namespace editor
             //
             editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
             //
-            editorScene = Object.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
-            editorScene.runEnvironment = feng3d.RunEnvironment.all;
-            //
-            editorScene.gameObject.addComponent(SceneRotateTool);
-            //
-            //初始化模块
-            editorScene.gameObject.addComponent(GroundGrid);
-            editorScene.gameObject.addComponent(MRSTool);
-            editorComponent = editorScene.gameObject.addComponent(EditorComponent);
-
-            feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
-            {
-                var trident: feng3d.GameObject = feng3d.serialization.deserialize(JSON.parse(content));
-                editorScene.gameObject.addChild(trident);
-            });
-
+            editorData.editorScene = this.initEditorScene();
             //
             feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             //
@@ -112,6 +97,29 @@ namespace editor
             {
                 editorRS.fs.writeObject("default.scene.json", engine.scene.gameObject);
             });
+        }
+
+        /**
+         * 初始化编辑器场景
+         */
+        private initEditorScene()
+        {
+            var scene = Object.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
+            scene.runEnvironment = feng3d.RunEnvironment.all;
+            //
+            scene.gameObject.addComponent(SceneRotateTool);
+            //
+            //初始化模块
+            scene.gameObject.addComponent(GroundGrid);
+            scene.gameObject.addComponent(MRSTool);
+            editorComponent = scene.gameObject.addComponent(EditorComponent);
+
+            feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
+            {
+                var trident: feng3d.GameObject = feng3d.serialization.deserialize(JSON.parse(content));
+                scene.gameObject.addChild(trident);
+            });
+            return scene;
         }
 
         private onEditorCameraRotate(e: feng3d.Event<feng3d.Vector3>)
