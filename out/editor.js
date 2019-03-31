@@ -3588,9 +3588,79 @@ var editor;
         __extends(WindowView, _super);
         function WindowView() {
             var _this = _super.call(this) || this;
+            _this.boundDragInfo = { type: -1, startX: 0, startY: 0, stage: null, rect: new feng3d.Rectangle(), draging: false };
             _this.skinName = "WindowView";
+            _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddedToStage, _this);
+            _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this.onRemoveFromStage, _this);
             return _this;
         }
+        WindowView.prototype.onAddedToStage = function () {
+            this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+        };
+        WindowView.prototype.onRemoveFromStage = function () {
+            this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+        };
+        WindowView.prototype.onMouseMove = function (e) {
+            if (this.boundDragInfo.draging)
+                return;
+            var rect = this.getGlobalBounds();
+            var size = 4;
+            var leftRect = new feng3d.Rectangle(rect.x, rect.y, size, rect.height);
+            var rightRect = new feng3d.Rectangle(rect.right - size, rect.y, size, rect.height);
+            var bottomRect = new feng3d.Rectangle(rect.x, rect.bottom - size, rect.width, size);
+            this.boundDragInfo.type = -1;
+            if (leftRect.contains(e.stageX, e.stageY)) {
+                this.boundDragInfo.type = 4;
+            }
+            else if (rightRect.contains(e.stageX, e.stageY)) {
+                this.boundDragInfo.type = 6;
+            }
+            else if (bottomRect.contains(e.stageX, e.stageY)) {
+                this.boundDragInfo.type = 2;
+            }
+            if (this.boundDragInfo.type != -1) {
+                this.stage.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+                document.body.style.cursor = this.boundDragInfo.type == 2 ? "n-resize" : "e-resize";
+            }
+            else {
+                document.body.style.cursor = "auto";
+                this.stage.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            }
+        };
+        WindowView.prototype.onMouseDown = function (e) {
+            this.boundDragInfo.draging = true;
+            this.boundDragInfo.startX = e.stageX;
+            this.boundDragInfo.startY = e.stageY;
+            this.boundDragInfo.stage = this.stage;
+            this.boundDragInfo.rect = new feng3d.Rectangle(this.x, this.y, this.width, this.height);
+            feng3d.windowEventProxy.on("mousemove", this.onBoundDrag, this);
+            feng3d.windowEventProxy.on("mouseup", this.onBoundDragEnd, this);
+        };
+        WindowView.prototype.onBoundDrag = function () {
+            var offsetX = this.boundDragInfo.stage.stageX - this.boundDragInfo.startX;
+            var offsetY = this.boundDragInfo.stage.stageY - this.boundDragInfo.startY;
+            if (this.boundDragInfo.type == 4) {
+                if (offsetX < this.boundDragInfo.rect.width) {
+                    this.x = this.boundDragInfo.rect.x + offsetX;
+                    this.width = this.boundDragInfo.rect.width - offsetX;
+                }
+            }
+            else if (this.boundDragInfo.type == 6) {
+                if (-offsetX < this.boundDragInfo.rect.width) {
+                    this.width = this.boundDragInfo.rect.width + offsetX;
+                }
+            }
+            else if (this.boundDragInfo.type == 2) {
+                if (-offsetY + 20 < this.boundDragInfo.rect.height) {
+                    this.height = this.boundDragInfo.rect.height + offsetY;
+                }
+            }
+        };
+        WindowView.prototype.onBoundDragEnd = function () {
+            this.boundDragInfo.draging = false;
+            feng3d.windowEventProxy.off("mousemove", this.onBoundDrag, this);
+            feng3d.windowEventProxy.off("mouseup", this.onBoundDragEnd, this);
+        };
         return WindowView;
     }(eui.Panel));
     editor.WindowView = WindowView;

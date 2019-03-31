@@ -1137,6 +1137,13 @@ declare namespace editor {
         closeButton: eui.Button;
         contenGroup: eui.Group;
         constructor();
+        private onAddedToStage;
+        private onRemoveFromStage;
+        private boundDragInfo;
+        private onMouseMove;
+        private onMouseDown;
+        private onBoundDrag;
+        private onBoundDragEnd;
     }
 }
 declare namespace editor {
