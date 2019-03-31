@@ -30,7 +30,6 @@
         "editor.MinMaxCurveVector3View": "resource/custom_skins/MinMaxCurveVector3View.exml",
         "editor.RenameTextInput": "resource/custom_skins/RenameTextInput.exml",
         "editor.ComboBox": "resource/custom_skins/ComboBox.exml",
-        "editor.TabViewButton": "resource/custom_skins/TabViewButton.exml",
         "editor.TabView": "resource/custom_skins/TabView.exml",
         "editor.MainSplitView": "resource/custom_skins/MainSplitView.exml",
         "editor.MainView": "resource/custom_skins/MainView.exml"

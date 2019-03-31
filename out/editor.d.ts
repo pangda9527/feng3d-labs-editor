@@ -1056,22 +1056,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    /**
-     * TabView 按钮
-     */
-    class TabViewButton extends eui.Button {
-        iconDisplay: eui.Image;
-        labelDisplay: eui.Label;
-        /**
-         * 模块名称
-         */
-        moduleName: string;
-        private _moduleName;
-        constructor();
-        protected childrenCreated(): void;
-        private _invalidateView;
-        private _updateView;
-    }
 }
 declare namespace editor {
     interface ModuleView extends eui.Component {

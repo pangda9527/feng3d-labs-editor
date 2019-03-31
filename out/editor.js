@@ -3163,47 +3163,6 @@ var editor;
 var editor;
 (function (editor) {
     /**
-     * TabView 按钮
-     */
-    var TabViewButton = /** @class */ (function (_super) {
-        __extends(TabViewButton, _super);
-        function TabViewButton() {
-            var _this = _super.call(this) || this;
-            _this.skinName = "TabViewButtonSkin";
-            return _this;
-        }
-        Object.defineProperty(TabViewButton.prototype, "moduleName", {
-            /**
-             * 模块名称
-             */
-            get: function () {
-                return this._moduleName;
-            },
-            set: function (value) {
-                this._moduleName = value;
-                this._invalidateView();
-            },
-            enumerable: true,
-            configurable: true
-        });
-        TabViewButton.prototype.childrenCreated = function () {
-            _super.prototype.childrenCreated.call(this);
-            this._invalidateView();
-        };
-        TabViewButton.prototype._invalidateView = function () {
-            this.once(egret.Event.ENTER_FRAME, this._updateView, this);
-        };
-        TabViewButton.prototype._updateView = function () {
-            this.label = this._moduleName;
-            this.iconDisplay.source = this._moduleName + "Icon_png";
-        };
-        return TabViewButton;
-    }(eui.Button));
-    editor.TabViewButton = TabViewButton;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
-    /**
      * Tab 界面
      */
     var TabView = /** @class */ (function (_super) {
@@ -3284,7 +3243,7 @@ var editor;
             // 获取按钮列表
             for (var i = this.tabGroup.numChildren - 1; i >= 0; i--) {
                 var child = this.tabGroup.getChildAt(i);
-                if (child instanceof editor.TabViewButton) {
+                if (child instanceof TabViewButton) {
                     this._tabViewButtonPool.push(child);
                     this.tabGroup.removeChildAt(i);
                 }
@@ -3466,7 +3425,7 @@ var editor;
                     //
                     var tabButton = this._tabViewButtonPool.pop();
                     if (!tabButton)
-                        tabButton = new editor.TabViewButton();
+                        tabButton = new TabViewButton();
                     this._tabButtons.push(tabButton);
                 }
                 if (i >= viewNum) {
@@ -3516,6 +3475,43 @@ var editor;
         return TabView;
     }(eui.Group));
     editor.TabView = TabView;
+    /**
+     * TabView 按钮
+     */
+    var TabViewButton = /** @class */ (function (_super) {
+        __extends(TabViewButton, _super);
+        function TabViewButton() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "TabViewButtonSkin";
+            return _this;
+        }
+        Object.defineProperty(TabViewButton.prototype, "moduleName", {
+            /**
+             * 模块名称
+             */
+            get: function () {
+                return this._moduleName;
+            },
+            set: function (value) {
+                this._moduleName = value;
+                this._invalidateView();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TabViewButton.prototype.childrenCreated = function () {
+            _super.prototype.childrenCreated.call(this);
+            this._invalidateView();
+        };
+        TabViewButton.prototype._invalidateView = function () {
+            this.once(egret.Event.ENTER_FRAME, this._updateView, this);
+        };
+        TabViewButton.prototype._updateView = function () {
+            this.label = this._moduleName;
+            this.iconDisplay.source = this._moduleName + "Icon_png";
+        };
+        return TabViewButton;
+    }(eui.Button));
     var TabViewUI = /** @class */ (function (_super) {
         __extends(TabViewUI, _super);
         function TabViewUI() {

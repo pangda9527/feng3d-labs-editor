@@ -57,7 +57,6 @@
         "src/ui/components/RenameTextInput.ts",
         "src/ui/components/SplitGroup.ts",
         "src/ui/components/SplitUIComponent.ts",
-        "src/ui/components/TabViewButton.ts",
         "src/ui/components/TabView.ts",
         "src/ui/components/Maskview.ts",
         "src/ui/components/Popupview.ts",
