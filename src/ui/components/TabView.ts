@@ -293,6 +293,9 @@ namespace editor
 					feng3d.assert(false);
 				}
 			}
+			// 找到对象所属窗口，删除空窗口
+			var windowView = WindowView.getWindow(parent);
+			if (windowView && windowView.contenGroup.numChildren == 0) windowView.remove();
 		}
 
 		private copyLayoutInfo(src: eui.Component | eui.Group, dest: eui.Component | eui.Group)

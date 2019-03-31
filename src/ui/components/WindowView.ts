@@ -2,6 +2,26 @@ namespace editor
 {
     export class WindowView extends eui.Panel
     {
+        /**
+         * 获取所属窗口
+         * 
+         * @param view 窗口中的 contenGroup
+         */
+        static getWindow(contenGroup: egret.DisplayObject)
+        {
+            var p = contenGroup.parent;
+            while (p && !(p instanceof WindowView))
+            {
+                p = p.parent;
+            }
+            var windowView = <WindowView>p;
+            if (windowView && windowView.contenGroup == contenGroup)
+            {
+                return windowView;
+            }
+            return null;
+        }
+
         public moveArea: eui.Group;
         public titleDisplay: eui.Label;
         public closeButton: eui.Button;

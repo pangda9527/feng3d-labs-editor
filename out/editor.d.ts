@@ -1144,6 +1144,12 @@ declare namespace editor {
 }
 declare namespace editor {
     class WindowView extends eui.Panel {
+        /**
+         * 获取所属窗口
+         *
+         * @param view 窗口中的 contenGroup
+         */
+        static getWindow(contenGroup: egret.DisplayObject): WindowView;
         moveArea: eui.Group;
         titleDisplay: eui.Label;
         closeButton: eui.Button;

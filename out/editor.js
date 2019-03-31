@@ -3442,6 +3442,10 @@ var editor;
                     feng3d.assert(false);
                 }
             }
+            // 找到对象所属窗口，删除空窗口
+            var windowView = editor.WindowView.getWindow(parent);
+            if (windowView && windowView.contenGroup.numChildren == 0)
+                windowView.remove();
         };
         TabView.prototype.copyLayoutInfo = function (src, dest) {
             dest.x = src.x;
@@ -3620,6 +3624,22 @@ var editor;
             _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this.onRemoveFromStage, _this);
             return _this;
         }
+        /**
+         * 获取所属窗口
+         *
+         * @param view 窗口中的 contenGroup
+         */
+        WindowView.getWindow = function (contenGroup) {
+            var p = contenGroup.parent;
+            while (p && !(p instanceof WindowView)) {
+                p = p.parent;
+            }
+            var windowView = p;
+            if (windowView && windowView.contenGroup == contenGroup) {
+                return windowView;
+            }
+            return null;
+        };
         WindowView.prototype.onAddedToStage = function () {
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
