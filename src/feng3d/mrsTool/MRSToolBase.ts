@@ -12,12 +12,15 @@ namespace editor
         protected movePlane3D: feng3d.Plane3D;
         protected startSceneTransform: feng3d.Matrix4x4;
 
+        get editorCamera() { return this._editorCamera; }
+        set editorCamera(v) { this._editorCamera = v; this.invalidate(); }
+        private _editorCamera: feng3d.Camera;
+
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
             var holdSizeComponent = this.gameObject.addComponent(feng3d.HoldSizeComponent);
             holdSizeComponent.holdSize = 1;
-            holdSizeComponent.camera = editorCamera;
             //
             this.on("addedToScene", this.onAddedToScene, this);
             this.on("removedFromScene", this.onRemovedFromScene, this);
@@ -41,6 +44,17 @@ namespace editor
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
 
             feng3d.ticker.offframe(this.updateToolModel, this);
+        }
+
+        private invalidate()
+        {
+            feng3d.ticker.nextframe(this.update, this);
+        }
+
+        private update()
+        {
+            var holdSizeComponent = this.gameObject.getComponent(feng3d.HoldSizeComponent);
+            holdSizeComponent.camera = this._editorCamera;
         }
 
         protected onItemMouseDown(event: feng3d.Event<any>)

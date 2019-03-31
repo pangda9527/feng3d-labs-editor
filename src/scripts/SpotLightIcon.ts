@@ -5,6 +5,10 @@ namespace editor
         @feng3d.watch("onLightChanged")
         light: feng3d.SpotLight;
 
+        get editorCamera() { return this._editorCamera; }
+        set editorCamera(v) { this._editorCamera = v; this.initicon(); }
+        private _editorCamera: feng3d.Camera;
+
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
@@ -14,9 +18,11 @@ namespace editor
 
         initicon()
         {
+            if (!this._editorCamera) return;
+
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
                 name: "SpotLightIcon", components: [
-                    { __class__: "feng3d.BillboardComponent", camera: editorCamera },
+                    { __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
                         __class__: "feng3d.MeshModel", material: {
                             __class__: "feng3d.Material",

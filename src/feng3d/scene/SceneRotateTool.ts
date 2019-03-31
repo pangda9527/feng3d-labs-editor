@@ -4,9 +4,20 @@ namespace editor
 {
     export class SceneRotateTool extends feng3d.Component
     {
+        get engine() { return this._engine; }
+        set engine(v) { this._engine = v; this.load(); }
+        private _engine: EditorEngine;
+
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
+
+            this.load();
+        }
+
+        private load()
+        {
+            if (!this.engine) return;
 
             feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
             {
@@ -47,13 +58,11 @@ namespace editor
 
             feng3d.ticker.onframe(() =>
             {
-                // var rect = engine.canvas.getBoundingClientRect();
-
-                var rect = new feng3d.Rectangle(0, 0, editorui.stage.stageWidth, editorui.stage.stageHeight);
+                var rect = this.engine.canvas.getBoundingClientRect();
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
 
-                var rotation = editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleNumber(180 / Math.PI);
+                var rotation = this.engine.camera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleNumber(180 / Math.PI);
                 rotationToolModel.transform.rotation = rotation;
 
                 //隐藏角度

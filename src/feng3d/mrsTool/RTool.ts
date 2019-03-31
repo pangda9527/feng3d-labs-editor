@@ -39,8 +39,9 @@ namespace editor
         protected onItemMouseDown(event: feng3d.Event<any>)
         {
             if (!feng3d.shortcut.getState("mouseInView3D")) return;
-            if (feng3d.shortcut.keyState.getKeyState("alt"))
-                return;
+            if (feng3d.shortcut.keyState.getKeyState("alt")) return;
+            if (!this.editorCamera) return;
+
             super.onItemMouseDown(event);
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
@@ -50,7 +51,7 @@ namespace editor
             var yDir = globalMatrix3D.up;
             var zDir = globalMatrix3D.forward;
             //摄像机前方方向
-            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
+            var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.position;
             this.movePlane3D = new feng3d.Plane3D();
@@ -90,6 +91,8 @@ namespace editor
 
         private onMouseMove()
         {
+            if (!this.editorCamera) return;
+
             switch (this.selectedItem)
             {
                 case this.toolModel.xAxis:
@@ -122,7 +125,7 @@ namespace editor
                 case this.toolModel.freeAxis:
                     var endPoint = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
                     var offset = endPoint.subTo(this.startMousePos);
-                    var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
+                    var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
                     mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
@@ -151,7 +154,9 @@ namespace editor
 
         protected updateToolModel()
         {
-            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix.clone();
+            if (!this.editorCamera) return;
+
+            var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix.clone();
             var cameraDir = cameraSceneTransform.forward;
             cameraDir.negate();
             //

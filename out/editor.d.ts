@@ -891,9 +891,6 @@ declare namespace editor {
 }
 declare namespace editor {
     class Editorshortcut {
-        private preMousePoint;
-        private dragSceneMousePoint;
-        private dragSceneCameraGlobalMatrix3D;
         constructor();
         private onGameobjectMoveTool;
         private onGameobjectRotationTool;
@@ -958,6 +955,9 @@ declare namespace editor {
         private rotateSceneCenter;
         private rotateSceneCameraGlobalMatrix3D;
         private rotateSceneMousePoint;
+        private preMousePoint;
+        private dragSceneMousePoint;
+        private dragSceneCameraGlobalMatrix3D;
         /**
          * 模块名称
          */
@@ -3028,10 +3028,6 @@ declare namespace editor {
          */
         gameScene: feng3d.Scene3D;
         /**
-         * 编辑器场景，用于显示只在编辑器中存在的游戏对象，例如灯光Icon，对象操作工具等显示。
-         */
-        editorScene: feng3d.Scene3D;
-        /**
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
          */
@@ -3334,9 +3330,13 @@ declare namespace editor {
         protected ismouseDown: boolean;
         protected movePlane3D: feng3d.Plane3D;
         protected startSceneTransform: feng3d.Matrix4x4;
+        editorCamera: feng3d.Camera;
+        private _editorCamera;
         init(gameObject: feng3d.GameObject): void;
         protected onAddedToScene(): void;
         protected onRemovedFromScene(): void;
+        private invalidate;
+        private update;
         protected onItemMouseDown(event: feng3d.Event<any>): void;
         protected toolModel: feng3d.Component;
         selectedItem: CoordinateAxis | CoordinatePlane | CoordinateRotationFreeAxis | CoordinateRotationAxis | CoordinateCube | CoordinateScaleCube;
@@ -3433,8 +3433,12 @@ declare namespace editor {
         private sTool;
         private _currentTool;
         private mrsToolObject;
+        editorCamera: feng3d.Camera;
+        private _editorCamera;
         init(gameObject: feng3d.GameObject): void;
         dispose(): void;
+        private invalidate;
+        private update;
         private onSelectedGameObjectChange;
         private onToolTypeChange;
         private currentTool;
@@ -3502,7 +3506,10 @@ declare namespace feng3d {
 }
 declare namespace editor {
     class SceneRotateTool extends feng3d.Component {
+        engine: EditorEngine;
+        private _engine;
         init(gameObject: feng3d.GameObject): void;
+        private load;
         private onLoaded;
     }
 }
@@ -3517,13 +3524,21 @@ declare namespace editor {
      */
     class GroundGrid extends feng3d.Component {
         private num;
+        editorCamera: feng3d.Camera;
+        private _editorCamera;
+        private segmentGeometry;
         init(gameObject: feng3d.GameObject): void;
+        update(): void;
     }
 }
 declare namespace editor {
     var editorComponent: EditorComponent;
     class EditorEngine extends feng3d.Engine {
         wireframeColor: feng3d.Color4;
+        /**
+         * 编辑器场景，用于显示只在编辑器中存在的游戏对象，例如灯光Icon，对象操作工具等显示。
+         */
+        editorScene: feng3d.Scene3D;
         /**
          * 绘制场景
          */
@@ -3535,10 +3550,6 @@ declare namespace editor {
     class Main3D {
         constructor();
         private init;
-        /**
-         * 初始化编辑器场景
-         */
-        private initEditorScene;
     }
     function creatNewScene(): feng3d.Scene3D;
 }
@@ -3551,6 +3562,8 @@ declare namespace editor {
     class EditorComponent extends feng3d.Component {
         scene: feng3d.Scene3D;
         private _scene;
+        editorCamera: feng3d.Camera;
+        private _editorCamera;
         init(gameobject: feng3d.GameObject): void;
         /**
          * 销毁
@@ -3560,6 +3573,7 @@ declare namespace editor {
         private onRemoveChild;
         private onAddComponent;
         private onRemoveComponent;
+        private update;
         private addComponent;
         private removeComponent;
         private directionLightIconMap;
@@ -4008,6 +4022,8 @@ declare namespace editor {
     class DirectionLightIcon extends EditorScript {
         __class__: "editor.DirectionLightIcon";
         light: feng3d.DirectionalLight;
+        editorCamera: feng3d.Camera;
+        private _editorCamera;
         init(gameObject: feng3d.GameObject): void;
         initicon(): void;
         update(): void;
@@ -4023,6 +4039,8 @@ declare namespace editor {
 declare namespace editor {
     class PointLightIcon extends EditorScript {
         light: feng3d.PointLight;
+        editorCamera: feng3d.Camera;
+        private _editorCamera;
         init(gameObject: feng3d.GameObject): void;
         initicon(): void;
         update(): void;
@@ -4041,6 +4059,8 @@ declare namespace editor {
 declare namespace editor {
     class SpotLightIcon extends EditorScript {
         light: feng3d.SpotLight;
+        editorCamera: feng3d.Camera;
+        private _editorCamera;
         init(gameObject: feng3d.GameObject): void;
         initicon(): void;
         update(): void;
@@ -4059,6 +4079,8 @@ declare namespace editor {
 declare namespace editor {
     class CameraIcon extends EditorScript {
         camera: feng3d.Camera;
+        editorCamera: feng3d.Camera;
+        private _editorCamera;
         init(gameObject: feng3d.GameObject): void;
         initicon(): void;
         update(): void;

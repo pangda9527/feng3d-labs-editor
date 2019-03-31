@@ -5,6 +5,10 @@ namespace editor
         @feng3d.watch("onLightChanged")
         light: feng3d.PointLight;
 
+        get editorCamera() { return this._editorCamera; }
+        set editorCamera(v) { this._editorCamera = v; this.initicon(); }
+        private _editorCamera: feng3d.Camera;
+
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
@@ -14,9 +18,11 @@ namespace editor
 
         initicon()
         {
+            if (!this._editorCamera) return;
+
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
                 name: "PointLightIcon", components: [
-                    { __class__: "feng3d.BillboardComponent", camera: editorCamera },
+                    { __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
                         __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
                         material: {
@@ -83,6 +89,7 @@ namespace editor
         update()
         {
             if (!this.light) return;
+            if (!this.editorCamera) return;
 
             (<feng3d.TextureUniforms>this._textureMaterial.uniforms).u_color = this.light.color.toColor4();
             this._lightLines.transform.scale =
@@ -92,7 +99,7 @@ namespace editor
             if (editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1)
             {
                 //
-                var camerapos = this.gameObject.transform.inverseTransformPoint(editorCamera.gameObject.transform.scenePosition);
+                var camerapos = this.gameObject.transform.inverseTransformPoint(this.editorCamera.gameObject.transform.scenePosition);
                 //
                 var segments: feng3d.Segment[] = [];
                 var alpha = 1;

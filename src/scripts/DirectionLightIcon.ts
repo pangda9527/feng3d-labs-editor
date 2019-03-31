@@ -12,6 +12,10 @@ namespace editor
         @feng3d.watch("onLightChanged")
         light: feng3d.DirectionalLight;
 
+        get editorCamera() { return this._editorCamera; }
+        set editorCamera(v) { this._editorCamera = v; this.initicon(); }
+        private _editorCamera: feng3d.Camera;
+
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
@@ -21,10 +25,12 @@ namespace editor
 
         initicon()
         {
+            if (!this._editorCamera) return;
+
             var linesize = 10;
 
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
-                name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: editorCamera },
+                name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                 {
                     __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
                     material: {
@@ -60,7 +66,7 @@ namespace editor
             }
             var lightLines = this._lightLines = Object.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
-                components: [{ __class__: "feng3d.HoldSizeComponent", camera: editorCamera, holdSize: 1 },
+                components: [{ __class__: "feng3d.HoldSizeComponent", camera: this.editorCamera, holdSize: 1 },
                 {
                     __class__: "feng3d.MeshModel",
                     material: { __class__: "feng3d.Material", shaderName: "segment", uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 163 / 255, g: 162 / 255, b: 107 / 255 } }, renderParams: { renderMode: feng3d.RenderMode.LINES } },

@@ -31,6 +31,10 @@ namespace editor
 
         private mrsToolObject: feng3d.GameObject;
 
+        get editorCamera() { return this._editorCamera; }
+        set editorCamera(v) { this._editorCamera = v; this.invalidate(); }
+        private _editorCamera: feng3d.Camera;
+
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
@@ -69,6 +73,18 @@ namespace editor
             feng3d.dispatcher.off("editor.toolTypeChanged", this.onToolTypeChange, this);
 
             super.dispose();
+        }
+
+        private invalidate()
+        {
+            feng3d.ticker.nextframe(this.update, this);
+        }
+
+        private update()
+        {
+            this.mTool.editorCamera = this._editorCamera;
+            this.rTool.editorCamera = this._editorCamera;
+            this.sTool.editorCamera = this._editorCamera;
         }
 
         private onSelectedGameObjectChange()

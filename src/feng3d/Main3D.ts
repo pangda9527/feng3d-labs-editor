@@ -7,6 +7,11 @@ namespace editor
         wireframeColor = new feng3d.Color4(125 / 255, 176 / 255, 250 / 255);
 
         /**
+         * 编辑器场景，用于显示只在编辑器中存在的游戏对象，例如灯光Icon，对象操作工具等显示。
+         */
+        editorScene: feng3d.Scene3D;
+
+        /**
          * 绘制场景
          */
         render()
@@ -28,18 +33,21 @@ namespace editor
 
             super.render();
 
-            if (!this.scene) return;
-
-            editorData.editorScene.update();
-            feng3d.forwardRenderer.draw(this.gl, editorData.editorScene, this.camera);
-            var selectedObject = this.mouse3DManager.pick(this, editorData.editorScene, this.camera);
-            if (selectedObject) this.selectedObject = selectedObject;
-
-            editorData.selectedGameObjects.forEach(element =>
+            if (this.editorScene)
             {
-                if (element.getComponent(feng3d.Model) && !element.getComponent(feng3d.ParticleSystem))
-                    feng3d.wireframeRenderer.drawGameObject(this.gl, element, this.scene, this.camera, this.wireframeColor);
-            });
+                this.editorScene.update();
+                feng3d.forwardRenderer.draw(this.gl, this.editorScene, this.camera);
+                var selectedObject = this.mouse3DManager.pick(this, this.editorScene, this.camera);
+                if (selectedObject) this.selectedObject = selectedObject;
+            }
+            if (this.scene)
+            {
+                editorData.selectedGameObjects.forEach(element =>
+                {
+                    if (element.getComponent(feng3d.Model) && !element.getComponent(feng3d.ParticleSystem))
+                        feng3d.wireframeRenderer.drawGameObject(this.gl, element, this.scene, this.camera, this.wireframeColor);
+                });
+            }
         }
     }
 
@@ -56,8 +64,6 @@ namespace editor
         private init()
         {
             //
-            editorData.editorScene = this.initEditorScene();
-            //
             editorAsset.runProjectScript(() =>
             {
                 editorAsset.readScene("default.scene.json", (err, scene) =>
@@ -73,29 +79,6 @@ namespace editor
             {
                 editorRS.fs.writeObject("default.scene.json", editorData.gameScene.gameObject);
             });
-        }
-
-        /**
-         * 初始化编辑器场景
-         */
-        private initEditorScene()
-        {
-            var scene = Object.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
-            scene.runEnvironment = feng3d.RunEnvironment.all;
-            //
-            scene.gameObject.addComponent(SceneRotateTool);
-            //
-            //初始化模块
-            scene.gameObject.addComponent(GroundGrid);
-            scene.gameObject.addComponent(MRSTool);
-            editorComponent = scene.gameObject.addComponent(EditorComponent);
-
-            feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
-            {
-                var trident: feng3d.GameObject = feng3d.serialization.deserialize(JSON.parse(content));
-                scene.gameObject.addChild(trident);
-            });
-            return scene;
         }
     }
 

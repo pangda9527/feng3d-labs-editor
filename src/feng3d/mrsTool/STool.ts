@@ -41,8 +41,9 @@ namespace editor
         protected onItemMouseDown(event: feng3d.Event<any>)
         {
             if (!feng3d.shortcut.getState("mouseInView3D")) return;
-            if (feng3d.shortcut.keyState.getKeyState("alt"))
-                return;
+            if (feng3d.shortcut.keyState.getKeyState("alt")) return;
+            if (!this.editorCamera) return;
+
             super.onItemMouseDown(event);
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
@@ -56,7 +57,7 @@ namespace editor
             var oy = py.subTo(po);
             var oz = pz.subTo(po);
             //摄像机前方方向
-            var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
+            var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             this.movePlane3D = new feng3d.Plane3D();
             switch (event.currentTarget)
