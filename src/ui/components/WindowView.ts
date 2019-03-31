@@ -18,44 +18,46 @@ namespace editor
 
         private onAddedToStage()
         {
-            this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         }
 
         private onRemoveFromStage()
         {
-            this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
         }
 
         private boundDragInfo = { type: -1, startX: 0, startY: 0, stage: null, rect: new feng3d.Rectangle(), draging: false };
-        private onMouseMove(e: egret.MouseEvent)
+        private onMouseMove()
         {
             if (this.boundDragInfo.draging) return;
 
             var rect = this.getGlobalBounds();
 
+            var stageX = this.stage.stageX;
+            var stageY = this.stage.stageY;
             var size = 4;
 
             var leftRect = new feng3d.Rectangle(rect.x, rect.y, size, rect.height);
             var rightRect = new feng3d.Rectangle(rect.right - size, rect.y, size, rect.height);
             var bottomRect = new feng3d.Rectangle(rect.x, rect.bottom - size, rect.width, size);
             this.boundDragInfo.type = -1;
-            if (leftRect.contains(e.stageX, e.stageY))
+            if (leftRect.contains(stageX, stageY))
             {
                 this.boundDragInfo.type = 4;
-            } else if (rightRect.contains(e.stageX, e.stageY))
+            } else if (rightRect.contains(stageX, stageY))
             {
                 this.boundDragInfo.type = 6;
-            } else if (bottomRect.contains(e.stageX, e.stageY))
+            } else if (bottomRect.contains(stageX, stageY))
             {
                 this.boundDragInfo.type = 2;
             }
             if (this.boundDragInfo.type != -1)
             {
                 this.stage.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-                document.body.style.cursor = this.boundDragInfo.type == 2 ? "n-resize" : "e-resize";
+                cursor.add(this, this.boundDragInfo.type == 2 ? "n-resize" : "e-resize");
             } else
             {
-                document.body.style.cursor = "auto";
+                cursor.clear(this);
                 this.stage.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             }
         }

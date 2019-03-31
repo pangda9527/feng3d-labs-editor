@@ -874,6 +874,18 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    class Cursor {
+        private o;
+        add(id: any, value: "e-resize" | "n-resize"): void;
+        clear(id: any): void;
+        private update;
+    }
+    /**
+     * 鼠标光标管理
+     */
+    var cursor: Cursor;
+}
+declare namespace editor {
     class Editorshortcut {
         private preMousePoint;
         private selectedObjectsHistory;

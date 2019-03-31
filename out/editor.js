@@ -2298,6 +2298,31 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    var Cursor = /** @class */ (function () {
+        function Cursor() {
+            this.o = new Map();
+        }
+        Cursor.prototype.add = function (id, value) {
+            this.o.set(id, value);
+            this.update();
+        };
+        Cursor.prototype.clear = function (id) {
+            this.o.delete(id);
+            this.update();
+        };
+        Cursor.prototype.update = function () {
+            var v = this.o.getValues().reverse()[0];
+            document.body.style.cursor = v || "auto";
+        };
+        return Cursor;
+    }());
+    /**
+     * 鼠标光标管理
+     */
+    editor.cursor = new Cursor();
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     var Editorshortcut = /** @class */ (function () {
         function Editorshortcut() {
             this.selectedObjectsHistory = [];
@@ -3095,7 +3120,7 @@ var editor;
                 //
                 this.preElement = checkItem.splitGroup.getElementAt(checkItem.index);
                 this.nextElement = checkItem.splitGroup.getElementAt(checkItem.index + 1);
-                document.body.style.cursor = checkItem.splitGroup.layout instanceof eui.HorizontalLayout ? "e-resize" : "n-resize";
+                editor.cursor.add(this, checkItem.splitGroup.layout instanceof eui.HorizontalLayout ? "e-resize" : "n-resize");
                 //
                 editor.editorui.stage.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             }
@@ -3103,6 +3128,7 @@ var editor;
                 splitManager.state = SplitGroupState.default;
                 feng3d.shortcut.deactivityState("splitGroupDraging");
                 document.body.style.cursor = "auto";
+                editor.cursor.clear(this);
                 //
                 editor.editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             }
@@ -3595,35 +3621,37 @@ var editor;
             return _this;
         }
         WindowView.prototype.onAddedToStage = function () {
-            this.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
         WindowView.prototype.onRemoveFromStage = function () {
-            this.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
         };
-        WindowView.prototype.onMouseMove = function (e) {
+        WindowView.prototype.onMouseMove = function () {
             if (this.boundDragInfo.draging)
                 return;
             var rect = this.getGlobalBounds();
+            var stageX = this.stage.stageX;
+            var stageY = this.stage.stageY;
             var size = 4;
             var leftRect = new feng3d.Rectangle(rect.x, rect.y, size, rect.height);
             var rightRect = new feng3d.Rectangle(rect.right - size, rect.y, size, rect.height);
             var bottomRect = new feng3d.Rectangle(rect.x, rect.bottom - size, rect.width, size);
             this.boundDragInfo.type = -1;
-            if (leftRect.contains(e.stageX, e.stageY)) {
+            if (leftRect.contains(stageX, stageY)) {
                 this.boundDragInfo.type = 4;
             }
-            else if (rightRect.contains(e.stageX, e.stageY)) {
+            else if (rightRect.contains(stageX, stageY)) {
                 this.boundDragInfo.type = 6;
             }
-            else if (bottomRect.contains(e.stageX, e.stageY)) {
+            else if (bottomRect.contains(stageX, stageY)) {
                 this.boundDragInfo.type = 2;
             }
             if (this.boundDragInfo.type != -1) {
                 this.stage.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-                document.body.style.cursor = this.boundDragInfo.type == 2 ? "n-resize" : "e-resize";
+                editor.cursor.add(this, this.boundDragInfo.type == 2 ? "n-resize" : "e-resize");
             }
             else {
-                document.body.style.cursor = "auto";
+                editor.cursor.clear(this);
                 this.stage.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             }
         };

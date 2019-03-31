@@ -143,7 +143,8 @@ namespace editor
                 //
                 this.preElement = checkItem.splitGroup.getElementAt(checkItem.index);
                 this.nextElement = checkItem.splitGroup.getElementAt(checkItem.index + 1);
-                document.body.style.cursor = checkItem.splitGroup.layout instanceof eui.HorizontalLayout ? "e-resize" : "n-resize";
+                cursor.add(this, checkItem.splitGroup.layout instanceof eui.HorizontalLayout ? "e-resize" : "n-resize");
+
                 //
                 editorui.stage.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             } else
@@ -151,6 +152,7 @@ namespace editor
                 splitManager.state = SplitGroupState.default;
                 feng3d.shortcut.deactivityState("splitGroupDraging");
                 document.body.style.cursor = "auto";
+                cursor.clear(this);
                 //
                 editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             }

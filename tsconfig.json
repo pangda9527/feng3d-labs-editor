@@ -45,6 +45,7 @@
         "src/caches/Editorcache.ts",
         //
         "src/ui/drag/Drag.ts",
+        "src/ui/drag/Cursor.ts",
         //
         "src/shortcut/Editorshortcut.ts",
         "src/shortcut/ShortCutSetting.ts",
