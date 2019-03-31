@@ -81,7 +81,7 @@ namespace editor
             this.startPlanePos = this.getMousePlaneCross();
             this.stepPlaneCross = this.startPlanePos.clone();
             //
-            this.startMousePos = engine.mousePos.clone();
+            this.startMousePos = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
             this.startSceneTransform = globalMatrix3D.clone();
             mrsToolTarget.startRotate();
             //
@@ -120,7 +120,7 @@ namespace editor
                     }
                     break;
                 case this.toolModel.freeAxis:
-                    var endPoint = engine.mousePos.clone();
+                    var endPoint = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
                     var offset = endPoint.subTo(this.startMousePos);
                     var cameraSceneTransform = editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;

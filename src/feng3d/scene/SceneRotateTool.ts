@@ -47,7 +47,9 @@ namespace editor
 
             feng3d.ticker.onframe(() =>
             {
-                var rect = engine.canvas.getBoundingClientRect();
+                // var rect = engine.canvas.getBoundingClientRect();
+
+                var rect = new feng3d.Rectangle(0, 0, editorui.stage.stageWidth, editorui.stage.stageHeight);
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
 

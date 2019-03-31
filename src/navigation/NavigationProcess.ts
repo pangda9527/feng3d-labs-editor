@@ -644,7 +644,9 @@ var debugPoint: feng3d.GameObject;
 
 function createSegment()
 {
-    var parentobject = editor.engine.root.find("editorObject") || editor.engine.root;
+    throw `未实现`;
+    // var parentobject = editor.engine.root.find("editorObject") || editor.engine.root;
+    var parentobject;
     if (!debugSegment)
     {
         debugSegment = Object.setValue(new feng3d.GameObject(), { name: "segment" });

@@ -119,7 +119,11 @@ namespace editor
 
         protected getMousePlaneCross()
         {
-            var line3D = editorCamera.getMouseRay3D();
+            var result: feng3d.Ray3D[] = [];
+            feng3d.dispatcher.dispatch("engine.getMouseRay3D", result);
+            if (result.length == 0) return;
+
+            var line3D = result[0];
             //射线与平面交点
             var crossPos = <feng3d.Vector3>this.movePlane3D.intersectWithLine3D(line3D);
             return crossPos;

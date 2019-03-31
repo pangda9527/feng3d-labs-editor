@@ -10,6 +10,9 @@ namespace editor
 		private _areaSelectRect: AreaSelectRect;
 		private engine: EditorEngine;
 		private selectedObjectsHistory: feng3d.GameObject[] = [];
+		private rotateSceneCenter: feng3d.Vector3;
+		private rotateSceneCameraGlobalMatrix3D: feng3d.Matrix4x4;
+		private rotateSceneMousePoint: feng3d.Vector2;
 
 		/**
 		 * 模块名称
@@ -61,6 +64,8 @@ namespace editor
 			feng3d.shortcut.on("areaSelect", this._onAreaSelect, this);
 			feng3d.shortcut.on("areaSelectEnd", this._onAreaSelectEnd, this);
 			feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
+			feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+			feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
 
 			drag.register(this, null, ["file_gameobject", "file_script"], (dragdata) =>
 			{
@@ -93,6 +98,8 @@ namespace editor
 			feng3d.shortcut.off("areaSelect", this._onAreaSelect, this);
 			feng3d.shortcut.off("areaSelectEnd", this._onAreaSelectEnd, this);
 			feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
+			feng3d.shortcut.off("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+			feng3d.shortcut.off("mouseRotateScene", this.onMouseRotateScene, this);
 
 			drag.unregister(this);
 
@@ -165,11 +172,11 @@ namespace editor
 		{
 			if (!this.inView) return;
 
-			var gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), editorData.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+			var gameObjects = feng3d.raycaster.pickAll(this.engine.getMouseRay3D(), editorData.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
 			if (gameObjects.length > 0)
 				return;
 			//
-			gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+			gameObjects = feng3d.raycaster.pickAll(this.engine.getMouseRay3D(), editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
 			if (gameObjects.length == 0)
 			{
 				editorData.clearSelectedObjects();
@@ -212,6 +219,37 @@ namespace editor
 			{
 				editorData.clearSelectedObjects();
 			}
+		}
+
+		private onMouseRotateSceneStart()
+		{
+			this.rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+			this.rotateSceneCameraGlobalMatrix3D = editorCamera.transform.localToWorldMatrix.clone();
+			this.rotateSceneCenter = null;
+			//获取第一个 游戏对象
+			var transformBox = editorData.transformBox;
+			if (transformBox)
+			{
+				this.rotateSceneCenter = transformBox.getCenter();
+			} else
+			{
+				this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
+				this.rotateSceneCenter.scaleNumber(sceneControlConfig.lookDistance);
+				this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.position);
+			}
+		}
+
+		private onMouseRotateScene()
+		{
+			var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
+			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+			var view3DRect = this.engine.viewRect;
+			var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
+			var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
+			globalMatrix3D.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
+			var rotateAxisX = globalMatrix3D.right;
+			globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
+			editorCamera.transform.localToWorldMatrix = globalMatrix3D;
 		}
 
 	}

@@ -1,6 +1,5 @@
 namespace editor
 {
-    export var engine: feng3d.Engine;
     export var editorCamera: feng3d.Camera;
     export var editorComponent: EditorComponent;
 
@@ -36,7 +35,7 @@ namespace editor
 
             editorData.editorScene.update();
             feng3d.forwardRenderer.draw(this.gl, editorData.editorScene, this.camera);
-            var selectedObject = this.mouse3DManager.pick(editorData.editorScene, this.camera);
+            var selectedObject = this.mouse3DManager.pick(this, editorData.editorScene, this.camera);
             if (selectedObject) this.selectedObject = selectedObject;
 
             editorData.selectedGameObjects.forEach(element =>
@@ -72,9 +71,6 @@ namespace editor
             editorData.editorScene = this.initEditorScene();
             //
             feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
-            //
-            var canvas = <HTMLCanvasElement>document.getElementById("glcanvas");
-            engine = new EditorEngine(canvas, null, editorCamera);
             //
             editorAsset.runProjectScript(() =>
             {

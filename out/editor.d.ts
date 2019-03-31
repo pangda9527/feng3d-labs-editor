@@ -110,6 +110,10 @@ declare namespace feng3d {
          * 还原默认窗口布局
          */
         "viewLayout.reset": Object;
+        /**
+         * 获取鼠标射线
+         */
+        "engine.getMouseRay3D": feng3d.Ray3D[];
     }
 }
 declare namespace egret {
@@ -890,9 +894,6 @@ declare namespace editor {
         private preMousePoint;
         private dragSceneMousePoint;
         private dragSceneCameraGlobalMatrix3D;
-        private rotateSceneCenter;
-        private rotateSceneCameraGlobalMatrix3D;
-        private rotateSceneMousePoint;
         constructor();
         private onGameobjectMoveTool;
         private onGameobjectRotationTool;
@@ -905,8 +906,6 @@ declare namespace editor {
         private onFpsViewStart;
         private onFpsViewStop;
         private updateFpsView;
-        private onMouseRotateSceneStart;
-        private onMouseRotateScene;
         private onLookToSelectedGameObject;
         private onMouseWheelMoveSceneCamera;
         private onOpenDevTools;
@@ -964,6 +963,9 @@ declare namespace editor {
         private _areaSelectRect;
         private engine;
         private selectedObjectsHistory;
+        private rotateSceneCenter;
+        private rotateSceneCameraGlobalMatrix3D;
+        private rotateSceneMousePoint;
         /**
          * 模块名称
          */
@@ -983,6 +985,8 @@ declare namespace editor {
         private onMouseOut;
         private onResize;
         private onSelectGameObject;
+        private onMouseRotateSceneStart;
+        private onMouseRotateScene;
     }
 }
 declare namespace editor {
@@ -3515,7 +3519,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    var engine: feng3d.Engine;
     var editorCamera: feng3d.Camera;
     var editorComponent: EditorComponent;
     class EditorEngine extends feng3d.Engine {

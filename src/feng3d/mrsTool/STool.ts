@@ -78,7 +78,7 @@ namespace editor
                     break;
                 case this.toolModel.oCube:
                     this.selectedItem = this.toolModel.oCube;
-                    this.startMousePos = engine.mousePos.clone();
+                    this.startMousePos = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
                     this.changeXYZ.init(1, 1, 1);
                     break;
             }
@@ -96,10 +96,10 @@ namespace editor
             var addScale = new feng3d.Vector3();
             if (this.selectedItem == this.toolModel.oCube)
             {
-                var currentMouse = engine.mousePos;
+                var currentMouse = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
                 var distance = currentMouse.x - currentMouse.y - this.startMousePos.x + this.startMousePos.y;
                 addPos.init(distance, distance, distance);
-                var scale = 1 + (addPos.x + addPos.y) / (engine.viewRect.height);
+                var scale = 1 + (addPos.x + addPos.y) / editorui.stage.stageHeight;
                 addScale.init(scale, scale, scale);
             } else
             {

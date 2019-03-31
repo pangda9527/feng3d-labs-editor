@@ -11,14 +11,16 @@ namespace editor
 
         private onclick()
         {
+            var result: feng3d.Ray3D[] = [];
+            feng3d.dispatcher.dispatch("engine.getMouseRay3D", result);
+            if (result.length == 0) return;
+            var mouseRay3D = result[0];
+
             var gameobject = Object.setValue(new feng3d.GameObject(), { name: "test" });
             var model = gameobject.addComponent(feng3d.Model);
             model.material = new feng3d.Material();
             model.geometry = Object.setValue(new feng3d.SphereGeometry(), { radius: 10 });
             gameobject.mouseEnabled = false;
-
-            var mouseRay3D = engine.camera.getMouseRay3D();
-
             this.gameObject.addChild(gameobject);
 
             var position = mouseRay3D.position.clone();

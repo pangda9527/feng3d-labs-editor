@@ -72,5 +72,10 @@ namespace feng3d
          */
         "viewLayout.reset": Object;
 
+        /**
+         * 获取鼠标射线
+         */
+        "engine.getMouseRay3D": feng3d.Ray3D[]
+
     }
 }

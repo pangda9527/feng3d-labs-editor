@@ -5,9 +5,6 @@ namespace editor
         private preMousePoint: feng3d.Vector2;
         private dragSceneMousePoint: feng3d.Vector2;
         private dragSceneCameraGlobalMatrix3D: feng3d.Matrix4x4;
-        private rotateSceneCenter: feng3d.Vector3;
-        private rotateSceneCameraGlobalMatrix3D: feng3d.Matrix4x4;
-        private rotateSceneMousePoint: feng3d.Vector2;
 
         constructor()
         {
@@ -28,8 +25,6 @@ namespace editor
             feng3d.shortcut.on("dragScene", this.onDragScene, this);
             feng3d.shortcut.on("fpsViewStart", this.onFpsViewStart, this);
             feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
-            feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
-            feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
             feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
@@ -132,37 +127,6 @@ namespace editor
         {
             var fpsController = editorCamera.getComponent(feng3d.FPSController)
             fpsController.update();
-        }
-
-        private onMouseRotateSceneStart()
-        {
-            this.rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            this.rotateSceneCameraGlobalMatrix3D = editorCamera.transform.localToWorldMatrix.clone();
-            this.rotateSceneCenter = null;
-            //获取第一个 游戏对象
-            var transformBox = editorData.transformBox;
-            if (transformBox)
-            {
-                this.rotateSceneCenter = transformBox.getCenter();
-            } else
-            {
-                this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
-                this.rotateSceneCenter.scaleNumber(sceneControlConfig.lookDistance);
-                this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.position);
-            }
-        }
-
-        private onMouseRotateScene()
-        {
-            var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
-            var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var view3DRect = engine.viewRect;
-            var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
-            var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
-            globalMatrix3D.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
-            var rotateAxisX = globalMatrix3D.right;
-            globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
-            editorCamera.transform.localToWorldMatrix = globalMatrix3D;
         }
 
         private onLookToSelectedGameObject()

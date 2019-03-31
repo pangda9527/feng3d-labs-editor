@@ -27,9 +27,9 @@ var shortcutConfig = [ //
 
 	{ key: "del", command: "deleteSeletedGameObject", when: "" },
 
-	{ key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal+mouseInView3D" },
+	{ key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal" },
 	{ key: "mousemove", stateCommand: "!selecting", when: "selecting" },
-	{ key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "mouseInView3D+selecting" },
+	{ key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "selecting" },
 
 	{ key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D+!splitGroupDraging" },
 	{ key: "mousemove", command: "areaSelect", when: "areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },

@@ -2341,8 +2341,6 @@ var editor;
             feng3d.shortcut.on("dragScene", this.onDragScene, this);
             feng3d.shortcut.on("fpsViewStart", this.onFpsViewStart, this);
             feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
-            feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
-            feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             //
             feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
@@ -2415,32 +2413,6 @@ var editor;
         Editorshortcut.prototype.updateFpsView = function () {
             var fpsController = editor.editorCamera.getComponent(feng3d.FPSController);
             fpsController.update();
-        };
-        Editorshortcut.prototype.onMouseRotateSceneStart = function () {
-            this.rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            this.rotateSceneCameraGlobalMatrix3D = editor.editorCamera.transform.localToWorldMatrix.clone();
-            this.rotateSceneCenter = null;
-            //获取第一个 游戏对象
-            var transformBox = editor.editorData.transformBox;
-            if (transformBox) {
-                this.rotateSceneCenter = transformBox.getCenter();
-            }
-            else {
-                this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
-                this.rotateSceneCenter.scaleNumber(editor.sceneControlConfig.lookDistance);
-                this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.position);
-            }
-        };
-        Editorshortcut.prototype.onMouseRotateScene = function () {
-            var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
-            var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var view3DRect = editor.engine.viewRect;
-            var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
-            var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
-            globalMatrix3D.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
-            var rotateAxisX = globalMatrix3D.right;
-            globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
-            editor.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
         };
         Editorshortcut.prototype.onLookToSelectedGameObject = function () {
             var transformBox = editor.editorData.transformBox;
@@ -2630,6 +2602,8 @@ var editor;
             feng3d.shortcut.on("areaSelect", this._onAreaSelect, this);
             feng3d.shortcut.on("areaSelectEnd", this._onAreaSelectEnd, this);
             feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
+            feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+            feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 if (dragdata.file_gameobject) {
                     editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, editor.hierarchy.rootnode.gameobject);
@@ -2652,6 +2626,8 @@ var editor;
             feng3d.shortcut.off("areaSelect", this._onAreaSelect, this);
             feng3d.shortcut.off("areaSelectEnd", this._onAreaSelectEnd, this);
             feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
+            feng3d.shortcut.off("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
+            feng3d.shortcut.off("mouseRotateScene", this.onMouseRotateScene, this);
             editor.drag.unregister(this);
             if (this._canvas) {
                 this._canvas.style.display = "none";
@@ -2702,11 +2678,11 @@ var editor;
         SceneView.prototype.onSelectGameObject = function () {
             if (!this.inView)
                 return;
-            var gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorData.editorScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
+            var gameObjects = feng3d.raycaster.pickAll(this.engine.getMouseRay3D(), editor.editorData.editorScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
             if (gameObjects.length > 0)
                 return;
             //
-            gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorData.gameScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
+            gameObjects = feng3d.raycaster.pickAll(this.engine.getMouseRay3D(), editor.editorData.gameScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
             if (gameObjects.length == 0) {
                 editor.editorData.clearSelectedObjects();
                 return;
@@ -2743,6 +2719,32 @@ var editor;
             else {
                 editor.editorData.clearSelectedObjects();
             }
+        };
+        SceneView.prototype.onMouseRotateSceneStart = function () {
+            this.rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            this.rotateSceneCameraGlobalMatrix3D = editor.editorCamera.transform.localToWorldMatrix.clone();
+            this.rotateSceneCenter = null;
+            //获取第一个 游戏对象
+            var transformBox = editor.editorData.transformBox;
+            if (transformBox) {
+                this.rotateSceneCenter = transformBox.getCenter();
+            }
+            else {
+                this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
+                this.rotateSceneCenter.scaleNumber(editor.sceneControlConfig.lookDistance);
+                this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.position);
+            }
+        };
+        SceneView.prototype.onMouseRotateScene = function () {
+            var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
+            var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+            var view3DRect = this.engine.viewRect;
+            var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
+            var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
+            globalMatrix3D.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
+            var rotateAxisX = globalMatrix3D.right;
+            globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
+            editor.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
         };
         SceneView.moduleName = "Scene";
         return SceneView;
@@ -11859,7 +11861,11 @@ var editor;
             return crossPos;
         };
         MRSToolBase.prototype.getMousePlaneCross = function () {
-            var line3D = editor.editorCamera.getMouseRay3D();
+            var result = [];
+            feng3d.dispatcher.dispatch("engine.getMouseRay3D", result);
+            if (result.length == 0)
+                return;
+            var line3D = result[0];
             //射线与平面交点
             var crossPos = this.movePlane3D.intersectWithLine3D(line3D);
             return crossPos;
@@ -12081,7 +12087,7 @@ var editor;
             this.startPlanePos = this.getMousePlaneCross();
             this.stepPlaneCross = this.startPlanePos.clone();
             //
-            this.startMousePos = editor.engine.mousePos.clone();
+            this.startMousePos = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
             this.startSceneTransform = globalMatrix3D.clone();
             editor.mrsToolTarget.startRotate();
             //
@@ -12116,7 +12122,7 @@ var editor;
                     }
                     break;
                 case this.toolModel.freeAxis:
-                    var endPoint = editor.engine.mousePos.clone();
+                    var endPoint = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
                     var offset = endPoint.subTo(this.startMousePos);
                     var cameraSceneTransform = editor.editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
@@ -12230,7 +12236,7 @@ var editor;
                     break;
                 case this.toolModel.oCube:
                     this.selectedItem = this.toolModel.oCube;
-                    this.startMousePos = editor.engine.mousePos.clone();
+                    this.startMousePos = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
                     this.changeXYZ.init(1, 1, 1);
                     break;
             }
@@ -12244,10 +12250,10 @@ var editor;
             var addPos = new feng3d.Vector3();
             var addScale = new feng3d.Vector3();
             if (this.selectedItem == this.toolModel.oCube) {
-                var currentMouse = editor.engine.mousePos;
+                var currentMouse = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
                 var distance = currentMouse.x - currentMouse.y - this.startMousePos.x + this.startMousePos.y;
                 addPos.init(distance, distance, distance);
-                var scale = 1 + (addPos.x + addPos.y) / (editor.engine.viewRect.height);
+                var scale = 1 + (addPos.x + addPos.y) / editor.editorui.stage.stageHeight;
                 addScale.init(scale, scale, scale);
             }
             else {
@@ -12593,7 +12599,8 @@ var editor;
             });
             var arrowsArr = [arrowsX, arrowsY, arrowsZ, arrowsNX, arrowsNY, arrowsNZ];
             feng3d.ticker.onframe(function () {
-                var rect = editor.engine.canvas.getBoundingClientRect();
+                // var rect = engine.canvas.getBoundingClientRect();
+                var rect = new feng3d.Rectangle(0, 0, editor.editorui.stage.stageWidth, editor.editorui.stage.stageHeight);
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
                 var rotation = editor.editorCamera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleNumber(180 / Math.PI);
@@ -12802,7 +12809,7 @@ var editor;
                 return;
             editor.editorData.editorScene.update();
             feng3d.forwardRenderer.draw(this.gl, editor.editorData.editorScene, this.camera);
-            var selectedObject = this.mouse3DManager.pick(editor.editorData.editorScene, this.camera);
+            var selectedObject = this.mouse3DManager.pick(this, editor.editorData.editorScene, this.camera);
             if (selectedObject)
                 this.selectedObject = selectedObject;
             editor.editorData.selectedGameObjects.forEach(function (element) {
@@ -12834,9 +12841,6 @@ var editor;
             editor.editorData.editorScene = this.initEditorScene();
             //
             feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
-            //
-            var canvas = document.getElementById("glcanvas");
-            editor.engine = new EditorEngine(canvas, null, editor.editorCamera);
             //
             editor.editorAsset.runProjectScript(function () {
                 editor.editorAsset.readScene("default.scene.json", function (err, scene) {
@@ -14323,7 +14327,9 @@ var debugSegment;
 var pointGeometry;
 var debugPoint;
 function createSegment() {
-    var parentobject = editor.engine.root.find("editorObject") || editor.engine.root;
+    throw "\u672A\u5B9E\u73B0";
+    // var parentobject = editor.engine.root.find("editorObject") || editor.engine.root;
+    var parentobject;
     if (!debugSegment) {
         debugSegment = Object.setValue(new feng3d.GameObject(), { name: "segment" });
         debugSegment.mouseEnabled = false;
@@ -14574,12 +14580,16 @@ var editor;
             feng3d.windowEventProxy.on("click", this.onclick, this);
         };
         MouseRayTestScript.prototype.onclick = function () {
+            var result = [];
+            feng3d.dispatcher.dispatch("engine.getMouseRay3D", result);
+            if (result.length == 0)
+                return;
+            var mouseRay3D = result[0];
             var gameobject = Object.setValue(new feng3d.GameObject(), { name: "test" });
             var model = gameobject.addComponent(feng3d.Model);
             model.material = new feng3d.Material();
             model.geometry = Object.setValue(new feng3d.SphereGeometry(), { radius: 10 });
             gameobject.mouseEnabled = false;
-            var mouseRay3D = editor.engine.camera.getMouseRay3D();
             this.gameObject.addChild(gameobject);
             var position = mouseRay3D.position.clone();
             var direction = mouseRay3D.direction.clone();
@@ -16026,9 +16036,9 @@ var shortcutConfig = [
     { key: "e", command: "gameobjectRotationTool", when: "!fpsViewing" },
     { key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
     { key: "del", command: "deleteSeletedGameObject", when: "" },
-    { key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal+mouseInView3D" },
+    { key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal" },
     { key: "mousemove", stateCommand: "!selecting", when: "selecting" },
-    { key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "mouseInView3D+selecting" },
+    { key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "selecting" },
     { key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D+!splitGroupDraging" },
     { key: "mousemove", command: "areaSelect", when: "areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
     { key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
