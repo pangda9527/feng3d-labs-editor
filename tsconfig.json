@@ -51,7 +51,7 @@
         //
         "src/Modules.ts",
         //
-        "src/ui/Feng3dView.ts",
+        "src/ui/SceneView.ts",
         "src/ui/CameraPreview.ts",
         "src/ui/ParticleEffectController.ts",
         "src/ui/components/RenameTextInput.ts",
@@ -133,7 +133,7 @@
         "src/ui/assets/AssetFileItemRenderer.ts",
         "src/ui/assets/AssetNode.ts",
         "src/ui/assets/AssetTreeItemRenderer.ts",
-        "src/ui/assets/AssetView.ts",
+        "src/ui/assets/ProjectView.ts",
         "src/ui/assets/AssetFileTemplates.ts",
         //
         "src/ui/TopView.ts",

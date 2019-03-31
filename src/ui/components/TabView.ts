@@ -419,7 +419,7 @@ namespace editor
 				{ type: "separator" },
 				{
 					label: "Add Tab",
-					submenu: [Feng3dView.moduleName, InspectorView.moduleName, HierarchyView.moduleName, AssetView.moduleName,].map(v =>
+					submenu: [SceneView.moduleName, InspectorView.moduleName, HierarchyView.moduleName, ProjectView.moduleName,].map(v =>
 					{
 						var item = {
 							label: v,

@@ -2578,16 +2578,18 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var Feng3dView = /** @class */ (function (_super) {
-        __extends(Feng3dView, _super);
-        function Feng3dView() {
+    /**
+     * 场景视图
+     */
+    var SceneView = /** @class */ (function (_super) {
+        __extends(SceneView, _super);
+        function SceneView() {
             var _this = _super.call(this) || this;
-            _this.skinName = "Feng3dViewSkin";
+            _this.skinName = "SceneView";
             //
             feng3d.Stats.init(document.getElementById("stats"));
-            editor.editorui.feng3dView = _this;
             //
-            _this.moduleName = Feng3dView.moduleName;
+            _this.moduleName = SceneView.moduleName;
             //
             _this._areaSelectRect = new editor.AreaSelectRect();
             //
@@ -2598,7 +2600,7 @@ var editor;
             _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this.onRemoveFromStage, _this);
             return _this;
         }
-        Feng3dView.prototype.onAddedToStage = function () {
+        SceneView.prototype.onAddedToStage = function () {
             this._canvas = document.getElementById("glcanvas");
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
@@ -2616,7 +2618,7 @@ var editor;
             });
             this.once(egret.Event.ENTER_FRAME, this.onResize, this);
         };
-        Feng3dView.prototype.onRemoveFromStage = function () {
+        SceneView.prototype.onRemoveFromStage = function () {
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
@@ -2626,12 +2628,12 @@ var editor;
                 this._canvas = null;
             }
         };
-        Feng3dView.prototype._onAreaSelectStart = function () {
+        SceneView.prototype._onAreaSelectStart = function () {
             this._areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
         };
-        Feng3dView.prototype._onAreaSelect = function () {
+        SceneView.prototype._onAreaSelect = function () {
             var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            var rectangle = editor.editorui.feng3dView.getGlobalBounds();
+            var rectangle = this.getGlobalBounds();
             //
             areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
             //
@@ -2643,16 +2645,16 @@ var editor;
             });
             editor.editorData.selectMultiObject(gs0);
         };
-        Feng3dView.prototype._onAreaSelectEnd = function () {
+        SceneView.prototype._onAreaSelectEnd = function () {
             this._areaSelectRect.hide();
         };
-        Feng3dView.prototype._onMouseOver = function () {
+        SceneView.prototype._onMouseOver = function () {
             feng3d.shortcut.activityState("mouseInView3D");
         };
-        Feng3dView.prototype.onMouseOut = function () {
+        SceneView.prototype.onMouseOut = function () {
             feng3d.shortcut.deactivityState("mouseInView3D");
         };
-        Feng3dView.prototype.onResize = function () {
+        SceneView.prototype.onResize = function () {
             if (!this._canvas)
                 return;
             this._canvas.style.display = "";
@@ -2667,11 +2669,11 @@ var editor;
             feng3d.Stats.instance.dom.style.left = bound.x + "px";
             feng3d.Stats.instance.dom.style.top = bound.y + "px";
         };
-        Feng3dView.moduleName = "Scene";
-        return Feng3dView;
+        SceneView.moduleName = "Scene";
+        return SceneView;
     }(eui.Component));
-    editor.Feng3dView = Feng3dView;
-    editor.Modules.moduleViewCls[Feng3dView.moduleName] = Feng3dView;
+    editor.SceneView = SceneView;
+    editor.Modules.moduleViewCls[SceneView.moduleName] = SceneView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -3493,7 +3495,7 @@ var editor;
                 { type: "separator" },
                 {
                     label: "Add Tab",
-                    submenu: [editor.Feng3dView.moduleName, editor.InspectorView.moduleName, editor.HierarchyView.moduleName, editor.AssetView.moduleName,].map(function (v) {
+                    submenu: [editor.SceneView.moduleName, editor.InspectorView.moduleName, editor.HierarchyView.moduleName, editor.ProjectView.moduleName,].map(function (v) {
                         var item = {
                             label: v,
                             click: function () { _this.addModuleByName(v); },
@@ -9560,16 +9562,19 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var AssetView = /** @class */ (function (_super) {
-        __extends(AssetView, _super);
-        function AssetView() {
+    /**
+     * 项目模块视图
+     */
+    var ProjectView = /** @class */ (function (_super) {
+        __extends(ProjectView, _super);
+        function ProjectView() {
             var _this = _super.call(this) || this;
             //
             _this._assettreeInvalid = true;
             _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
-            _this.skinName = "AssetView";
+            _this.skinName = "ProjectView";
             //
-            _this.moduleName = AssetView.moduleName;
+            _this.moduleName = ProjectView.moduleName;
             editor.editorui.assetview = _this;
             //
             _this._areaSelectRect = new editor.AreaSelectRect();
@@ -9577,7 +9582,7 @@ var editor;
             _this.fileDrag = new FileDrag(_this);
             return _this;
         }
-        AssetView.prototype.onComplete = function () {
+        ProjectView.prototype.onComplete = function () {
             this.assetTreeList.itemRenderer = editor.AssetTreeItemRenderer;
             this.filelist.itemRenderer = editor.AssetFileItemRenderer;
             this.floderScroller.viewport = this.filelist;
@@ -9585,7 +9590,7 @@ var editor;
             this.listData = this.assetTreeList.dataProvider = new eui.ArrayCollection();
             this.filelistData = this.filelist.dataProvider = new eui.ArrayCollection();
         };
-        AssetView.prototype.$onAddToStage = function (stage, nestLevel) {
+        ProjectView.prototype.$onAddToStage = function (stage, nestLevel) {
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.excludeTxt.text = "";
             this.filepathLabel.text = "";
@@ -9608,7 +9613,7 @@ var editor;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.dispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         };
-        AssetView.prototype.$onRemoveFromStage = function () {
+        ProjectView.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
             this.filelist.removeEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
             this.filelist.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
@@ -9622,7 +9627,7 @@ var editor;
             editor.drag.unregister(this.filelistgroup);
             this.fileDrag.removeEventListener();
         };
-        AssetView.prototype.initlist = function () {
+        ProjectView.prototype.initlist = function () {
             var _this = this;
             editor.editorAsset.initproject(function () {
                 _this.invalidateAssettree();
@@ -9632,22 +9637,22 @@ var editor;
                 feng3d.watcher.watch(editor.editorAsset, "showFloder", _this.updateShowFloder, _this);
             });
         };
-        AssetView.prototype.update = function () {
+        ProjectView.prototype.update = function () {
             if (this._assettreeInvalid) {
                 this.updateAssetTree();
                 this.updateShowFloder();
                 this._assettreeInvalid = false;
             }
         };
-        AssetView.prototype.invalidateAssettree = function () {
+        ProjectView.prototype.invalidateAssettree = function () {
             this._assettreeInvalid = true;
             feng3d.ticker.nextframe(this.update, this);
         };
-        AssetView.prototype.updateAssetTree = function () {
+        ProjectView.prototype.updateAssetTree = function () {
             var folders = editor.editorAsset.rootFile.getFolderList();
             this.listData.replaceAll(folders);
         };
-        AssetView.prototype.updateShowFloder = function (host, property, oldvalue) {
+        ProjectView.prototype.updateShowFloder = function (host, property, oldvalue) {
             var _this = this;
             var floder = editor.editorAsset.showFloder;
             if (!floder)
@@ -9698,10 +9703,10 @@ var editor;
             this.filelist.scrollV = 0;
             this.selectedfilechanged();
         };
-        AssetView.prototype.onfilter = function () {
+        ProjectView.prototype.onfilter = function () {
             this.updateShowFloder();
         };
-        AssetView.prototype.selectedfilechanged = function () {
+        ProjectView.prototype.selectedfilechanged = function () {
             var selectedAssetFile = editor.editorData.selectedAssetNodes;
             if (selectedAssetFile.length > 0)
                 this.filepathLabel.text = selectedAssetFile.map(function (v) {
@@ -9710,19 +9715,19 @@ var editor;
             else
                 this.filepathLabel.text = "";
         };
-        AssetView.prototype.onfilelistclick = function (e) {
+        ProjectView.prototype.onfilelistclick = function (e) {
             if (e.target == this.filelist) {
                 editor.editorData.clearSelectedObjects();
             }
         };
-        AssetView.prototype.onfilelistrightclick = function (e) {
+        ProjectView.prototype.onfilelistrightclick = function (e) {
             editor.editorData.clearSelectedObjects();
             editor.editorAsset.popupmenu(editor.editorAsset.showFloder);
         };
-        AssetView.prototype.onfloderpathTxtLink = function (evt) {
+        ProjectView.prototype.onfloderpathTxtLink = function (evt) {
             editor.editorAsset.showFloder = editor.editorAsset.getAssetByID(evt.text);
         };
-        AssetView.prototype.onMouseDown = function (e) {
+        ProjectView.prototype.onMouseDown = function (e) {
             if (e.target != this.filelist)
                 return;
             if (feng3d.shortcut.getState("splitGroupDraging"))
@@ -9731,7 +9736,7 @@ var editor;
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
         };
-        AssetView.prototype.onMouseMove = function () {
+        ProjectView.prototype.onMouseMove = function () {
             var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var rectangle = this.filelist.getGlobalBounds();
             //
@@ -9749,15 +9754,15 @@ var editor;
             }).map(function (v) { return v.data; });
             editor.editorData.selectMultiObject(datas);
         };
-        AssetView.prototype.onMouseUp = function () {
+        ProjectView.prototype.onMouseUp = function () {
             this._areaSelectRect.hide();
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
         };
-        AssetView.moduleName = "Project";
-        return AssetView;
+        ProjectView.moduleName = "Project";
+        return ProjectView;
     }(eui.Component));
-    editor.AssetView = AssetView;
+    editor.ProjectView = ProjectView;
     var FileDrag = /** @class */ (function () {
         function FileDrag(displayobject) {
             this.addEventListener = function () {
@@ -9794,7 +9799,7 @@ var editor;
         }
         return FileDrag;
     }());
-    editor.Modules.moduleViewCls[AssetView.moduleName] = AssetView;
+    editor.Modules.moduleViewCls[ProjectView.moduleName] = ProjectView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {

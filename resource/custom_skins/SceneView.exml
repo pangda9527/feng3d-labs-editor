@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="Feng3dViewSkin" width="400" height="300" xmlns:e="http://ns.egret.com/eui"
+<e:Skin class="SceneView" width="400" height="300" xmlns:e="http://ns.egret.com/eui"
         xmlns:w="http://ns.egret.com/wing" xmlns:editor="editor.*">
 	<w:Config id="15a7d5dea78"></w:Config>
 	<e:Rect id="backRect" width="100%" height="100%" strokeWeight="1" fillAlpha="0"/>

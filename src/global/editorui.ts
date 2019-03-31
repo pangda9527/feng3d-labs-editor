@@ -3,17 +3,12 @@ namespace editor
     export interface EditorUI
     {
         stage: egret.Stage;
-        assetview: AssetView;
+        assetview: ProjectView;
         mainview: MainView;
         tooltipLayer: eui.UILayer;
         popupLayer: eui.UILayer;
 
         messageLayer: eui.UILayer;
-
-        /**
-         * 3D视图
-         */
-        feng3dView: Feng3dView;
     }
 
     export var editorui: EditorUI = <any>{};

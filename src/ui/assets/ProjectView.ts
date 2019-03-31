@@ -1,6 +1,9 @@
 namespace editor
 {
-    export class AssetView extends eui.Component implements ModuleView
+    /**
+     * 项目模块视图
+     */
+    export class ProjectView extends eui.Component implements ModuleView
     {
         public assetTreeScroller: eui.Scroller;
         public assetTreeList: eui.List;
@@ -30,10 +33,10 @@ namespace editor
         {
             super();
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "AssetView";
+            this.skinName = "ProjectView";
 
             //
-            this.moduleName = AssetView.moduleName;
+            this.moduleName = ProjectView.moduleName;
 
             editorui.assetview = this;
             //
@@ -338,5 +341,5 @@ namespace editor
         }
     }
 
-    Modules.moduleViewCls[AssetView.moduleName] = AssetView;
+    Modules.moduleViewCls[ProjectView.moduleName] = ProjectView;
 }

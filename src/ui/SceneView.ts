@@ -1,6 +1,9 @@
 namespace editor
 {
-	export class Feng3dView extends eui.Component implements ModuleView
+	/**
+	 * 场景视图
+	 */
+	export class SceneView extends eui.Component implements ModuleView
 	{
 		private _canvas: HTMLElement;
 		private _areaSelectStartPosition: feng3d.Vector2;
@@ -15,12 +18,11 @@ namespace editor
 		constructor()
 		{
 			super();
-			this.skinName = "Feng3dViewSkin";
+			this.skinName = "SceneView";
 			//
 			feng3d.Stats.init(document.getElementById("stats"));
-			editorui.feng3dView = this;
 			//
-			this.moduleName = Feng3dView.moduleName;
+			this.moduleName = SceneView.moduleName;
 			//
 			this._areaSelectRect = new AreaSelectRect();
 			//
@@ -84,7 +86,7 @@ namespace editor
 		{
 			var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 
-			var rectangle = editorui.feng3dView.getGlobalBounds();
+			var rectangle = this.getGlobalBounds();
 			//
 			areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
 			//
@@ -134,5 +136,5 @@ namespace editor
 		}
 	}
 
-	Modules.moduleViewCls[Feng3dView.moduleName] = Feng3dView;
+	Modules.moduleViewCls[SceneView.moduleName] = SceneView;
 }

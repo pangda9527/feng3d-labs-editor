@@ -945,7 +945,10 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class Feng3dView extends eui.Component implements ModuleView {
+    /**
+     * 场景视图
+     */
+    class SceneView extends eui.Component implements ModuleView {
         private _canvas;
         private _areaSelectStartPosition;
         private _areaSelectRect;
@@ -2699,7 +2702,10 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class AssetView extends eui.Component implements ModuleView {
+    /**
+     * 项目模块视图
+     */
+    class ProjectView extends eui.Component implements ModuleView {
         assetTreeScroller: eui.Scroller;
         assetTreeList: eui.List;
         floderpathTxt: eui.Label;
@@ -2895,15 +2901,11 @@ declare namespace editor {
 declare namespace editor {
     interface EditorUI {
         stage: egret.Stage;
-        assetview: AssetView;
+        assetview: ProjectView;
         mainview: MainView;
         tooltipLayer: eui.UILayer;
         popupLayer: eui.UILayer;
         messageLayer: eui.UILayer;
-        /**
-         * 3D视图
-         */
-        feng3dView: Feng3dView;
     }
     var editorui: EditorUI;
 }
