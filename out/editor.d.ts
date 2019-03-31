@@ -1198,7 +1198,7 @@ declare namespace editor {
          * @param closecallback
          * @param param
          */
-        popupViewWindow(view: eui.Component, param?: PopupviewParam<any>): void;
+        popupViewWindow(view: egret.DisplayObject, param?: PopupviewParam<any>): void;
     }
 }
 declare namespace editor {
@@ -4065,6 +4065,7 @@ declare namespace editor {
          * 主菜单
          */
         getMainMenu(): MenuItem[];
+        private getWindowSubMenus;
         /**
          * 层级界面创建3D对象列表数据
          */

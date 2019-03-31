@@ -216,6 +216,18 @@ namespace editor
                 },
                 {
                     label: "Window",
+                    submenu: this.getWindowSubMenus(),
+                },
+            ];
+
+            return mainMenu;
+        }
+
+        private getWindowSubMenus()
+        {
+            var menus: MenuItem[] = [
+                {
+                    label: "Layouts",
                     submenu: Object.keys(viewLayoutConfig).map(v =>
                     {
                         return {
@@ -229,7 +241,21 @@ namespace editor
                 },
             ];
 
-            return mainMenu;
+            [SceneView.moduleName, InspectorView.moduleName, HierarchyView.moduleName, ProjectView.moduleName,].forEach(v =>
+            {
+                menus.push({
+                    label: v,
+                    click: () =>
+                    {
+                        var tabview = new TabView();
+                        tabview.setModuleNames([v]);
+                        tabview.left = tabview.right = tabview.top = tabview.bottom = 0;
+                        popupview.popupViewWindow(tabview, { mode: false });
+                    },
+                });
+            })
+
+            return menus;
         }
 
         /**

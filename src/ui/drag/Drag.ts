@@ -86,7 +86,8 @@ namespace editor
 	/**
 	 * 对象与触发接受拖拽的对象列表
 	 */
-	var accepters = new Map<egret.DisplayObject, number>();
+	var accepter: egret.DisplayObject;
+	var accepterAlpha: number;
 	/**
 	 * 被拖拽数据
 	 */
@@ -150,15 +151,13 @@ namespace editor
 
 		acceptableitems = null;
 
-		accepters.getKeys().forEach(element =>
+		if (accepter)
 		{
-			element.alpha = accepters.get(element);
-			var accepteritem = getitem(element);
+			accepter.alpha = accepterAlpha;
+			var accepteritem = getitem(accepter);
 			accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
-		});
-
-		accepters.clear();
-
+		}
+		accepter = null;
 		dragitem = null;
 		//
 		feng3d.shortcut.deactivityState(feng3d.shortCutStates.draging);
@@ -175,28 +174,57 @@ namespace editor
 			//获取可接受数据的对象列表
 			acceptableitems = registers.reduce((value: DragItem[], item) =>
 			{
-				if (item != dragitem && acceptData(item, dragSource))
+				if (item != dragitem && acceptData(item, dragSource) && item.displayObject.stage)
 				{
+					item["hierarchyValue"] = getHierarchyValue(item.displayObject);
 					value.push(item);
 				}
 				return value;
 			}, []);
+
+			// 根据层级排序
+			acceptableitems.sort((a, b) =>
+			{
+				var ah: number[] = a["hierarchyValue"];
+				var bh: number[] = b["hierarchyValue"];
+				for (let i = 0, num = Math.min(ah.length, bh.length); i < num; i++)
+				{
+					if (ah[i] != bh[i]) return ah[i] - bh[i];
+				}
+				return ah.length - bh.length;
+			});
+			acceptableitems.reverse();
 		}
 
-		accepters.getKeys().forEach(element =>
+		if (accepter)
 		{
-			element.alpha = accepters.get(element);
-		});
-		accepters.clear();
+			accepter.alpha = accepterAlpha;
+			accepter = null;
+		}
 
-		acceptableitems.forEach(element =>
+		//
+		for (let i = 0; i < acceptableitems.length; i++)
 		{
+			const element = acceptableitems[i];
 			var rect = element.displayObject.getGlobalBounds();
 			if (rect.contains(event.stageX, event.stageY))
 			{
-				accepters.set(element.displayObject, element.displayObject.alpha);
+				accepter = element.displayObject;
+				accepterAlpha = element.displayObject.alpha;
 				element.displayObject.alpha = 0.5;
+				break;
 			}
-		});
+		}
+	}
+
+	function getHierarchyValue(displayObject: egret.DisplayObject)
+	{
+		var hierarchys = [];
+		if (displayObject.parent)
+		{
+			hierarchys.unshift(displayObject.parent.getChildIndex(displayObject));
+			displayObject = displayObject.parent;
+		}
+		return hierarchy;
 	}
 }

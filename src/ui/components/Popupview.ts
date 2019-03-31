@@ -103,6 +103,7 @@ namespace editor
 
             var window = new WindowView();
             window.contenGroup.addChild(view);
+            window.title = `${object.constructor["name"]}`;
 
             //
             if (param.closecallback)
@@ -123,11 +124,10 @@ namespace editor
          * @param closecallback 
          * @param param
          */
-        popupViewWindow(view: eui.Component, param: PopupviewParam<any> = {})
+        popupViewWindow(view: egret.DisplayObject, param: PopupviewParam<any> = {})
         {
             var window = new WindowView();
             window.contenGroup.addChild(view);
-
             //
             this.popupView(window, param);
         }

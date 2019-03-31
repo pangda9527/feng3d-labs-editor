@@ -2186,7 +2186,8 @@ var editor;
     /**
      * 对象与触发接受拖拽的对象列表
      */
-    var accepters = new Map();
+    var accepter;
+    var accepterAlpha;
     /**
      * 被拖拽数据
      */
@@ -2235,12 +2236,12 @@ var editor;
         stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
         stage.removeEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
         acceptableitems = null;
-        accepters.getKeys().forEach(function (element) {
-            element.alpha = accepters.get(element);
-            var accepteritem = getitem(element);
+        if (accepter) {
+            accepter.alpha = accepterAlpha;
+            var accepteritem = getitem(accepter);
             accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
-        });
-        accepters.clear();
+        }
+        accepter = null;
         dragitem = null;
         //
         feng3d.shortcut.deactivityState(feng3d.shortCutStates.draging);
@@ -2252,23 +2253,47 @@ var editor;
             dragitem.setdargSource(dragSource);
             //获取可接受数据的对象列表
             acceptableitems = registers.reduce(function (value, item) {
-                if (item != dragitem && acceptData(item, dragSource)) {
+                if (item != dragitem && acceptData(item, dragSource) && item.displayObject.stage) {
+                    item["hierarchyValue"] = getHierarchyValue(item.displayObject);
                     value.push(item);
                 }
                 return value;
             }, []);
+            // 根据层级排序
+            acceptableitems.sort(function (a, b) {
+                var ah = a["hierarchyValue"];
+                var bh = b["hierarchyValue"];
+                for (var i = 0, num = Math.min(ah.length, bh.length); i < num; i++) {
+                    if (ah[i] != bh[i])
+                        return ah[i] - bh[i];
+                }
+                return ah.length - bh.length;
+            });
+            acceptableitems.reverse();
         }
-        accepters.getKeys().forEach(function (element) {
-            element.alpha = accepters.get(element);
-        });
-        accepters.clear();
-        acceptableitems.forEach(function (element) {
+        if (accepter) {
+            accepter.alpha = accepterAlpha;
+            accepter = null;
+        }
+        //
+        for (var i = 0; i < acceptableitems.length; i++) {
+            var element = acceptableitems[i];
             var rect = element.displayObject.getGlobalBounds();
             if (rect.contains(event.stageX, event.stageY)) {
-                accepters.set(element.displayObject, element.displayObject.alpha);
+                accepter = element.displayObject;
+                accepterAlpha = element.displayObject.alpha;
                 element.displayObject.alpha = 0.5;
+                break;
             }
-        });
+        }
+    }
+    function getHierarchyValue(displayObject) {
+        var hierarchys = [];
+        if (displayObject.parent) {
+            hierarchys.unshift(displayObject.parent.getChildIndex(displayObject));
+            displayObject = displayObject.parent;
+        }
+        return editor.hierarchy;
     }
 })(editor || (editor = {}));
 var editor;
@@ -3690,6 +3715,7 @@ var editor;
             var view = feng3d.objectview.getObjectView(object);
             var window = new editor.WindowView();
             window.contenGroup.addChild(view);
+            window.title = "" + object.constructor["name"];
             //
             if (param.closecallback) {
                 var closecallback = param.closecallback;
@@ -15575,6 +15601,15 @@ var editor;
                 },
                 {
                     label: "Window",
+                    submenu: this.getWindowSubMenus(),
+                },
+            ];
+            return mainMenu;
+        };
+        MenuConfig.prototype.getWindowSubMenus = function () {
+            var menus = [
+                {
+                    label: "Layouts",
                     submenu: Object.keys(editor.viewLayoutConfig).map(function (v) {
                         return {
                             label: v,
@@ -15585,7 +15620,18 @@ var editor;
                     }),
                 },
             ];
-            return mainMenu;
+            [editor.SceneView.moduleName, editor.InspectorView.moduleName, editor.HierarchyView.moduleName, editor.ProjectView.moduleName,].forEach(function (v) {
+                menus.push({
+                    label: v,
+                    click: function () {
+                        var tabview = new editor.TabView();
+                        tabview.setModuleNames([v]);
+                        tabview.left = tabview.right = tabview.top = tabview.bottom = 0;
+                        editor.popupview.popupViewWindow(tabview, { mode: false });
+                    },
+                });
+            });
+            return menus;
         };
         /**
          * 层级界面创建3D对象列表数据
