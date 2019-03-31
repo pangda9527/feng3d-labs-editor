@@ -109,7 +109,7 @@ declare namespace feng3d {
         /**
          * 还原默认窗口布局
          */
-        "viewLayout.reset": string;
+        "viewLayout.reset": Object;
     }
 }
 declare namespace egret {
@@ -4028,7 +4028,7 @@ declare namespace editor {
 }
 declare namespace editor {
     var viewLayoutConfig: {
-        default: {
+        Default: {
             "x": number;
             "y": number;
             "width": number;
@@ -4097,6 +4097,182 @@ declare namespace editor {
                     "modules": string[];
                     "layout"?: undefined;
                     "children"?: undefined;
+                })[];
+                "modules"?: undefined;
+            } | {
+                "x": number;
+                "y": number;
+                "width": number;
+                "height": number;
+                "percentWidth": number;
+                "percentHeight": number;
+                "top": any;
+                "bottom": any;
+                "left": any;
+                "right": any;
+                "type": string;
+                "modules": string[];
+                "layout"?: undefined;
+                "children"?: undefined;
+            })[];
+        };
+        Tall: {
+            "x": number;
+            "y": number;
+            "width": number;
+            "height": number;
+            "percentWidth": any;
+            "percentHeight": any;
+            "top": number;
+            "bottom": number;
+            "left": number;
+            "right": number;
+            "type": string;
+            "layout": string;
+            "children": ({
+                "x": number;
+                "y": number;
+                "width": number;
+                "height": number;
+                "percentWidth": number;
+                "percentHeight": number;
+                "top": any;
+                "bottom": any;
+                "left": any;
+                "right": any;
+                "type": string;
+                "layout": string;
+                "children": ({
+                    "x": number;
+                    "y": number;
+                    "width": number;
+                    "height": number;
+                    "percentWidth": number;
+                    "percentHeight": number;
+                    "top": any;
+                    "bottom": any;
+                    "left": any;
+                    "right": any;
+                    "type": string;
+                    "modules": string[];
+                    "layout"?: undefined;
+                    "children"?: undefined;
+                } | {
+                    "x": number;
+                    "y": number;
+                    "width": number;
+                    "height": number;
+                    "percentWidth": number;
+                    "percentHeight": number;
+                    "top": any;
+                    "bottom": any;
+                    "left": any;
+                    "right": any;
+                    "type": string;
+                    "layout": string;
+                    "children": {
+                        "x": number;
+                        "y": number;
+                        "width": number;
+                        "height": number;
+                        "percentWidth": number;
+                        "percentHeight": number;
+                        "top": any;
+                        "bottom": any;
+                        "left": any;
+                        "right": any;
+                        "type": string;
+                        "modules": string[];
+                    }[];
+                    "modules"?: undefined;
+                })[];
+                "modules"?: undefined;
+            } | {
+                "x": number;
+                "y": number;
+                "width": number;
+                "height": number;
+                "percentWidth": number;
+                "percentHeight": number;
+                "top": any;
+                "bottom": any;
+                "left": any;
+                "right": any;
+                "type": string;
+                "modules": string[];
+                "layout"?: undefined;
+                "children"?: undefined;
+            })[];
+        };
+        Wide: {
+            "x": number;
+            "y": number;
+            "width": number;
+            "height": number;
+            "percentWidth": any;
+            "percentHeight": any;
+            "top": number;
+            "bottom": number;
+            "left": number;
+            "right": number;
+            "type": string;
+            "layout": string;
+            "children": ({
+                "x": number;
+                "y": number;
+                "width": number;
+                "height": number;
+                "percentWidth": number;
+                "percentHeight": number;
+                "top": any;
+                "bottom": any;
+                "left": any;
+                "right": any;
+                "type": string;
+                "layout": string;
+                "children": ({
+                    "x": number;
+                    "y": number;
+                    "width": number;
+                    "height": number;
+                    "percentWidth": number;
+                    "percentHeight": number;
+                    "top": any;
+                    "bottom": any;
+                    "left": any;
+                    "right": any;
+                    "type": string;
+                    "modules": string[];
+                    "layout"?: undefined;
+                    "children"?: undefined;
+                } | {
+                    "x": number;
+                    "y": number;
+                    "width": number;
+                    "height": number;
+                    "percentWidth": number;
+                    "percentHeight": number;
+                    "top": any;
+                    "bottom": any;
+                    "left": any;
+                    "right": any;
+                    "type": string;
+                    "layout": string;
+                    "children": {
+                        "x": number;
+                        "y": number;
+                        "width": number;
+                        "height": number;
+                        "percentWidth": number;
+                        "percentHeight": number;
+                        "top": any;
+                        "bottom": any;
+                        "left": any;
+                        "right": any;
+                        "type": string;
+                        "modules": string[];
+                    }[];
+                    "modules"?: undefined;
                 })[];
                 "modules"?: undefined;
             } | {

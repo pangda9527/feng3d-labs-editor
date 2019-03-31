@@ -211,12 +211,31 @@ namespace editor
                     },
                 },
                 {
-                    label: "还原默认窗口布局",
-                    click: () =>
-                    {
-                        feng3d.dispatcher.dispatch("viewLayout.reset");
-                    },
-                }
+                    label: "Window",
+                    submenu: [
+                        {
+                            label: "Default",
+                            click: () =>
+                            {
+                                feng3d.dispatcher.dispatch("viewLayout.reset", viewLayoutConfig.Default);
+                            },
+                        },
+                        {
+                            label: "Tall",
+                            click: () =>
+                            {
+                                feng3d.dispatcher.dispatch("viewLayout.reset", viewLayoutConfig.Tall);
+                            },
+                        },
+                        {
+                            label: "Wide",
+                            click: () =>
+                            {
+                                feng3d.dispatcher.dispatch("viewLayout.reset", viewLayoutConfig.Wide);
+                            },
+                        },
+                    ],
+                },
             ];
 
             return mainMenu;

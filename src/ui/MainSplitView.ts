@@ -65,9 +65,9 @@ namespace editor
             // console.log(data);
         }
 
-        private _resetLayout()
+        private _resetLayout(event: feng3d.Event<Object>)
         {
-            editorcache.viewLayout = viewLayoutConfig.default;
+            editorcache.viewLayout = event.data || viewLayoutConfig.Default;
             this._initViewLayout();
         }
 

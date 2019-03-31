@@ -70,7 +70,7 @@ namespace feng3d
         /**
          * 还原默认窗口布局
          */
-        "viewLayout.reset": string;
+        "viewLayout.reset": Object;
 
     }
 }
