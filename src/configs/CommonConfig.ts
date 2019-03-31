@@ -212,29 +212,16 @@ namespace editor
                 },
                 {
                     label: "Window",
-                    submenu: [
-                        {
-                            label: "Default",
+                    submenu: Object.keys(viewLayoutConfig).map(v =>
+                    {
+                        return {
+                            label: v,
                             click: () =>
                             {
-                                feng3d.dispatcher.dispatch("viewLayout.reset", viewLayoutConfig.Default);
+                                feng3d.dispatcher.dispatch("viewLayout.reset", viewLayoutConfig[v]);
                             },
-                        },
-                        {
-                            label: "Tall",
-                            click: () =>
-                            {
-                                feng3d.dispatcher.dispatch("viewLayout.reset", viewLayoutConfig.Tall);
-                            },
-                        },
-                        {
-                            label: "Wide",
-                            click: () =>
-                            {
-                                feng3d.dispatcher.dispatch("viewLayout.reset", viewLayoutConfig.Wide);
-                            },
-                        },
-                    ],
+                        };
+                    }),
                 },
             ];
 
