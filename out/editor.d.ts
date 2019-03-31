@@ -975,7 +975,6 @@ declare namespace editor {
         private onSelectGameObject;
         private onMouseRotateSceneStart;
         private onMouseRotateScene;
-        private onEditorCameraRotate;
         private onSceneCameraForwardBackMouseMoveStart;
         private onSceneCameraForwardBackMouseMove;
         private onDragSceneStart;
@@ -3504,9 +3503,20 @@ declare namespace editor {
     class SceneRotateTool extends feng3d.Component {
         engine: EditorEngine;
         private _engine;
+        private arrowsX;
+        private arrowsNX;
+        private arrowsY;
+        private arrowsNY;
+        private arrowsZ;
+        private arrowsNZ;
         init(gameObject: feng3d.GameObject): void;
+        private isload;
         private load;
         private onLoaded;
+        private newEngine;
+        private onclick;
+        private clickItem;
+        private onEditorCameraRotate;
     }
 }
 declare namespace feng3d {

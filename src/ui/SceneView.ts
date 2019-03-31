@@ -101,7 +101,6 @@ namespace editor
 			feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
 			feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
 			feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
-			feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
 			//
 			feng3d.shortcut.on("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
 			feng3d.shortcut.on("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
@@ -146,7 +145,6 @@ namespace editor
 			feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
 			feng3d.shortcut.off("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
 			feng3d.shortcut.off("mouseRotateScene", this.onMouseRotateScene, this);
-			feng3d.dispatcher.off("editorCameraRotate", this.onEditorCameraRotate, this);
 			//
 			feng3d.shortcut.off("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
 			feng3d.shortcut.off("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
@@ -309,47 +307,6 @@ namespace editor
 			var rotateAxisX = globalMatrix3D.right;
 			globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
 			this.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
-		}
-
-		private onEditorCameraRotate(e: feng3d.Event<feng3d.Vector3>)
-		{
-			var resultRotation = e.data;
-			var camera = this.editorCamera;
-			var forward = camera.transform.forwardVector;
-			var lookDistance: number;
-			if (editorData.selectedGameObjects.length > 0)
-			{
-				//计算观察距离
-				var selectedObj = editorData.selectedGameObjects[0];
-				var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
-				lookDistance = Math.max(0, forward.dot(lookray));
-			} else
-			{
-				lookDistance = sceneControlConfig.lookDistance;
-			}
-			//旋转中心
-			var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
-			//计算目标四元素旋转
-			var targetQuat = new feng3d.Quaternion();
-			resultRotation.scaleNumber(feng3d.FMath.DEG2RAD);
-			targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
-			//
-			var sourceQuat = new feng3d.Quaternion();
-			sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.FMath.DEG2RAD, camera.transform.ry * feng3d.FMath.DEG2RAD, camera.transform.rz * feng3d.FMath.DEG2RAD)
-			var rate = { rate: 0.0 };
-			egret.Tween.get(rate, {
-				onChange: () =>
-				{
-					var cameraQuat = new feng3d.Quaternion();
-					cameraQuat.slerp(sourceQuat, targetQuat, rate.rate);
-					camera.transform.orientation = cameraQuat;
-					//
-					var translation = camera.transform.forwardVector;
-					translation.negate();
-					translation.scaleNumber(lookDistance);
-					camera.transform.position = rotateCenter.addTo(translation);
-				},
-			}).to({ rate: 1 }, 300, egret.Ease.sineIn);
 		}
 
 		private onSceneCameraForwardBackMouseMoveStart()

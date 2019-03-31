@@ -2553,7 +2553,6 @@ var editor;
             feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
             feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
             feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
-            feng3d.dispatcher.on("editorCameraRotate", this.onEditorCameraRotate, this);
             //
             feng3d.shortcut.on("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
             feng3d.shortcut.on("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
@@ -2588,7 +2587,6 @@ var editor;
             feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
             feng3d.shortcut.off("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
             feng3d.shortcut.off("mouseRotateScene", this.onMouseRotateScene, this);
-            feng3d.dispatcher.off("editorCameraRotate", this.onEditorCameraRotate, this);
             //
             feng3d.shortcut.off("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
             feng3d.shortcut.off("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
@@ -2718,43 +2716,6 @@ var editor;
             var rotateAxisX = globalMatrix3D.right;
             globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
             this.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
-        };
-        SceneView.prototype.onEditorCameraRotate = function (e) {
-            var resultRotation = e.data;
-            var camera = this.editorCamera;
-            var forward = camera.transform.forwardVector;
-            var lookDistance;
-            if (editor.editorData.selectedGameObjects.length > 0) {
-                //计算观察距离
-                var selectedObj = editor.editorData.selectedGameObjects[0];
-                var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
-                lookDistance = Math.max(0, forward.dot(lookray));
-            }
-            else {
-                lookDistance = editor.sceneControlConfig.lookDistance;
-            }
-            //旋转中心
-            var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
-            //计算目标四元素旋转
-            var targetQuat = new feng3d.Quaternion();
-            resultRotation.scaleNumber(feng3d.FMath.DEG2RAD);
-            targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
-            //
-            var sourceQuat = new feng3d.Quaternion();
-            sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.FMath.DEG2RAD, camera.transform.ry * feng3d.FMath.DEG2RAD, camera.transform.rz * feng3d.FMath.DEG2RAD);
-            var rate = { rate: 0.0 };
-            egret.Tween.get(rate, {
-                onChange: function () {
-                    var cameraQuat = new feng3d.Quaternion();
-                    cameraQuat.slerp(sourceQuat, targetQuat, rate.rate);
-                    camera.transform.orientation = cameraQuat;
-                    //
-                    var translation = camera.transform.forwardVector;
-                    translation.negate();
-                    translation.scaleNumber(lookDistance);
-                    camera.transform.position = rotateCenter.addTo(translation);
-                },
-            }).to({ rate: 1 }, 300, egret.Ease.sineIn);
         };
         SceneView.prototype.onSceneCameraForwardBackMouseMoveStart = function () {
             this.preMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -12680,7 +12641,9 @@ var editor;
     var SceneRotateTool = /** @class */ (function (_super) {
         __extends(SceneRotateTool, _super);
         function SceneRotateTool() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isload = false;
+            return _this;
         }
         Object.defineProperty(SceneRotateTool.prototype, "engine", {
             get: function () { return this._engine; },
@@ -12696,6 +12659,9 @@ var editor;
             var _this = this;
             if (!this.engine)
                 return;
+            if (this.isload)
+                return;
+            this.isload = true;
             feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), function (content) {
                 var rotationToolModel = feng3d.serialization.deserialize(JSON.parse(content));
                 _this.onLoaded(rotationToolModel);
@@ -12703,19 +12669,19 @@ var editor;
         };
         SceneRotateTool.prototype.onLoaded = function (rotationToolModel) {
             var _this = this;
-            var arrowsX = rotationToolModel.find("arrowsX");
-            var arrowsY = rotationToolModel.find("arrowsY");
-            var arrowsZ = rotationToolModel.find("arrowsZ");
-            var arrowsNX = rotationToolModel.find("arrowsNX");
-            var arrowsNY = rotationToolModel.find("arrowsNY");
-            var arrowsNZ = rotationToolModel.find("arrowsNZ");
+            var arrowsX = this.arrowsX = rotationToolModel.find("arrowsX");
+            var arrowsY = this.arrowsY = rotationToolModel.find("arrowsY");
+            var arrowsZ = this.arrowsZ = rotationToolModel.find("arrowsZ");
+            var arrowsNX = this.arrowsNX = rotationToolModel.find("arrowsNX");
+            var arrowsNY = this.arrowsNY = rotationToolModel.find("arrowsNY");
+            var arrowsNZ = this.arrowsNZ = rotationToolModel.find("arrowsNZ");
             var planeX = rotationToolModel.find("planeX");
             var planeY = rotationToolModel.find("planeY");
             var planeZ = rotationToolModel.find("planeZ");
             var planeNX = rotationToolModel.find("planeNX");
             var planeNY = rotationToolModel.find("planeNY");
             var planeNZ = rotationToolModel.find("planeNZ");
-            var _a = newEngine(), toolEngine = _a.toolEngine, canvas = _a.canvas;
+            var _a = this.newEngine(), toolEngine = _a.toolEngine, canvas = _a.canvas;
             toolEngine.root.addChild(rotationToolModel);
             rotationToolModel.transform.sx = 0.01;
             rotationToolModel.transform.sy = 0.01;
@@ -12723,7 +12689,7 @@ var editor;
             rotationToolModel.transform.z = 0.80;
             var arr = [arrowsX, arrowsY, arrowsZ, arrowsNX, arrowsNY, arrowsNZ, planeX, planeY, planeZ, planeNX, planeNY, planeNZ];
             arr.forEach(function (element) {
-                element.on("click", onclick);
+                element.on("click", _this.onclick, _this);
             });
             var arrowsArr = [arrowsX, arrowsY, arrowsZ, arrowsNX, arrowsNY, arrowsNZ];
             feng3d.ticker.onframe(function () {
@@ -12761,88 +12727,126 @@ var editor;
                     editor.menu.popup([
                         {
                             label: "左视图", click: function () {
-                                clickItem(arrowsX);
+                                _this.clickItem(arrowsX);
                             }
                         },
                         {
                             label: "右视图", click: function () {
-                                clickItem(arrowsNX);
+                                _this.clickItem(arrowsNX);
                             }
                         },
                         {
                             label: "顶视图", click: function () {
-                                clickItem(arrowsY);
+                                _this.clickItem(arrowsY);
                             }
                         },
                         {
                             label: "底视图", click: function () {
-                                clickItem(arrowsNY);
+                                _this.clickItem(arrowsNY);
                             }
                         },
                         {
                             label: "前视图", click: function () {
-                                clickItem(arrowsZ);
+                                _this.clickItem(arrowsZ);
                             }
                         },
                         {
                             label: "后视图", click: function () {
-                                clickItem(arrowsNZ);
+                                _this.clickItem(arrowsNZ);
                             }
                         },
                     ]);
                 }
             });
-            function newEngine() {
-                var canvas = document.createElement("canvas");
-                document.getElementById("SceneRotateToolLayer").append(canvas);
-                // can
-                canvas.width = 80;
-                canvas.height = 80;
-                var toolEngine = new feng3d.Engine(canvas);
-                toolEngine.scene.background.a = 0.0;
-                toolEngine.scene.ambientColor.setTo(0.2, 0.2, 0.2);
-                toolEngine.root.addChild(feng3d.gameObjectFactory.createPointLight());
-                return { toolEngine: toolEngine, canvas: canvas };
+        };
+        SceneRotateTool.prototype.newEngine = function () {
+            var canvas = document.createElement("canvas");
+            document.getElementById("SceneRotateToolLayer").append(canvas);
+            canvas.style.position = "absolute";
+            canvas.width = 80;
+            canvas.height = 80;
+            // 
+            var toolEngine = new feng3d.Engine(canvas);
+            toolEngine.scene.background.a = 0.0;
+            toolEngine.scene.ambientColor.setTo(0.2, 0.2, 0.2);
+            toolEngine.root.addChild(feng3d.gameObjectFactory.createPointLight());
+            return { toolEngine: toolEngine, canvas: canvas };
+        };
+        SceneRotateTool.prototype.onclick = function (e) {
+            this.clickItem(e.currentTarget);
+        };
+        SceneRotateTool.prototype.clickItem = function (item) {
+            var front_view = new feng3d.Vector3(0, 0, 0); //前视图
+            var back_view = new feng3d.Vector3(0, 180, 0); //后视图
+            var right_view = new feng3d.Vector3(0, -90, 0); //右视图
+            var left_view = new feng3d.Vector3(0, 90, 0); //左视图
+            var top_view = new feng3d.Vector3(-90, 0, 180); //顶视图
+            var bottom_view = new feng3d.Vector3(-90, 180, 0); //底视图
+            var rotation;
+            switch (item) {
+                case this.arrowsX:
+                    rotation = left_view;
+                    break;
+                case this.arrowsNX:
+                    rotation = right_view;
+                    break;
+                case this.arrowsY:
+                    rotation = top_view;
+                    break;
+                case this.arrowsNY:
+                    rotation = bottom_view;
+                    break;
+                case this.arrowsZ:
+                    rotation = back_view;
+                    break;
+                case this.arrowsNZ:
+                    rotation = front_view;
+                    break;
             }
-            function onclick(e) {
-                clickItem(e.currentTarget);
+            if (rotation) {
+                var cameraTargetMatrix3D = feng3d.Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
+                cameraTargetMatrix3D.invert();
+                var result = cameraTargetMatrix3D.decompose()[1];
+                result.scaleNumber(180 / Math.PI);
+                feng3d.dispatcher.dispatch("editorCameraRotate", result);
+                this.onEditorCameraRotate(result);
             }
-            function clickItem(item) {
-                var front_view = new feng3d.Vector3(0, 0, 0); //前视图
-                var back_view = new feng3d.Vector3(0, 180, 0); //后视图
-                var right_view = new feng3d.Vector3(0, -90, 0); //右视图
-                var left_view = new feng3d.Vector3(0, 90, 0); //左视图
-                var top_view = new feng3d.Vector3(-90, 0, 180); //顶视图
-                var bottom_view = new feng3d.Vector3(-90, 180, 0); //底视图
-                var rotation;
-                switch (item) {
-                    case arrowsX:
-                        rotation = left_view;
-                        break;
-                    case arrowsNX:
-                        rotation = right_view;
-                        break;
-                    case arrowsY:
-                        rotation = top_view;
-                        break;
-                    case arrowsNY:
-                        rotation = bottom_view;
-                        break;
-                    case arrowsZ:
-                        rotation = back_view;
-                        break;
-                    case arrowsNZ:
-                        rotation = front_view;
-                        break;
-                }
-                if (rotation) {
-                    var cameraTargetMatrix3D = feng3d.Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
-                    cameraTargetMatrix3D.invert();
-                    var result = cameraTargetMatrix3D.decompose()[1];
-                    result.scaleNumber(180 / Math.PI);
-                    feng3d.dispatcher.dispatch("editorCameraRotate", result);
-                }
+        };
+        SceneRotateTool.prototype.onEditorCameraRotate = function (resultRotation) {
+            var camera = this.engine.camera;
+            var forward = camera.transform.forwardVector;
+            var lookDistance;
+            if (editor.editorData.selectedGameObjects.length > 0) {
+                //计算观察距离
+                var selectedObj = editor.editorData.selectedGameObjects[0];
+                var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
+                lookDistance = Math.max(0, forward.dot(lookray));
             }
+            else {
+                lookDistance = editor.sceneControlConfig.lookDistance;
+            }
+            //旋转中心
+            var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
+            //计算目标四元素旋转
+            var targetQuat = new feng3d.Quaternion();
+            resultRotation.scaleNumber(feng3d.FMath.DEG2RAD);
+            targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
+            //
+            var sourceQuat = new feng3d.Quaternion();
+            sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.FMath.DEG2RAD, camera.transform.ry * feng3d.FMath.DEG2RAD, camera.transform.rz * feng3d.FMath.DEG2RAD);
+            var rate = { rate: 0.0 };
+            egret.Tween.get(rate, {
+                onChange: function () {
+                    var cameraQuat = new feng3d.Quaternion();
+                    cameraQuat.slerp(sourceQuat, targetQuat, rate.rate);
+                    camera.transform.orientation = cameraQuat;
+                    //
+                    var translation = camera.transform.forwardVector;
+                    translation.negate();
+                    translation.scaleNumber(lookDistance);
+                    camera.transform.position = rotateCenter.addTo(translation);
+                },
+            }).to({ rate: 1 }, 300, egret.Ease.sineIn);
         };
         return SceneRotateTool;
     }(feng3d.Component));
