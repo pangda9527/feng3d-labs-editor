@@ -8,8 +8,6 @@ namespace editor
         {
             super.init(gameObject);
 
-            var thisObj = this;
-
             feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
             {
                 var rotationToolModel = feng3d.serialization.deserialize(JSON.parse(content));

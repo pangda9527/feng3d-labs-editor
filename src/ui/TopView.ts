@@ -103,7 +103,7 @@ namespace editor
 				case this.playBtn:
 					var e = feng3d.dispatcher.dispatch("inspector.saveShowData", () =>
 					{
-						editorRS.fs.writeObject("default.scene.json", engine.scene.gameObject, (err) =>
+						editorRS.fs.writeObject("default.scene.json", editorData.gameScene.gameObject, (err) =>
 						{
 							if (err)
 							{

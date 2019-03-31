@@ -2378,7 +2378,7 @@ var editor;
             if (gameObjects.length > 0)
                 return;
             //
-            gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.engine.scene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
+            gameObjects = feng3d.raycaster.pickAll(editor.editorCamera.getMouseRay3D(), editor.editorData.gameScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
             if (gameObjects.length == 0) {
                 editor.editorData.clearSelectedObjects();
                 return;
@@ -2804,8 +2804,8 @@ var editor;
             this.parent && this.parent.removeChild(this);
         };
         CameraPreview.prototype.onframe = function () {
-            if (this.previewEngine.scene != editor.engine.scene) {
-                this.previewEngine.scene = editor.engine.scene;
+            if (this.previewEngine.scene != editor.editorData.gameScene) {
+                this.previewEngine.scene = editor.editorData.gameScene;
             }
             this.previewEngine.render();
         };
@@ -9491,7 +9491,7 @@ var editor;
             else if (this.data.asset instanceof feng3d.GameObject) {
                 var scene = this.data.asset.getComponent(feng3d.Scene3D);
                 if (scene) {
-                    editor.engine.scene = scene;
+                    editor.editorData.gameScene = scene;
                 }
             }
         };
@@ -10125,7 +10125,7 @@ var editor;
                     break;
                 case this.playBtn:
                     var e = feng3d.dispatcher.dispatch("inspector.saveShowData", function () {
-                        editor.editorRS.fs.writeObject("default.scene.json", editor.engine.scene.gameObject, function (err) {
+                        editor.editorRS.fs.writeObject("default.scene.json", editor.editorData.gameScene.gameObject, function (err) {
                             if (err) {
                                 feng3d.warn(err);
                                 return;
@@ -12536,7 +12536,6 @@ var editor;
         SceneRotateTool.prototype.init = function (gameObject) {
             var _this = this;
             _super.prototype.init.call(this, gameObject);
-            var thisObj = this;
             feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), function (content) {
                 var rotationToolModel = feng3d.serialization.deserialize(JSON.parse(content));
                 _this.onLoaded(rotationToolModel);
@@ -12818,7 +12817,7 @@ var editor;
                 });
             });
             window.addEventListener("beforeunload", function () {
-                editor.editorRS.fs.writeObject("default.scene.json", editor.engine.scene.gameObject);
+                editor.editorRS.fs.writeObject("default.scene.json", editor.editorData.gameScene.gameObject);
             });
         };
         /**
@@ -15596,7 +15595,7 @@ var editor;
                                 editor.editorAsset.initproject(function () {
                                     editor.editorAsset.runProjectScript(function () {
                                         editor.editorAsset.readScene("default.scene.json", function (err, scene) {
-                                            editor.engine.scene = scene;
+                                            editor.editorData.gameScene = scene;
                                             editor.editorui.assetview.invalidateAssettree();
                                             console.log("导入项目完成!");
                                         });
@@ -15678,7 +15677,7 @@ var editor;
                         editor.editorAsset.rootFile.remove();
                         editor.editorAsset.initproject(function () {
                             editor.editorAsset.runProjectScript(function () {
-                                editor.engine.scene = editor.creatNewScene();
+                                editor.editorData.gameScene = editor.creatNewScene();
                                 editor.editorui.assetview.invalidateAssettree();
                                 console.log("清空项目完成!");
                             });
@@ -15930,7 +15929,7 @@ var editor;
                 editor.editorAsset.initproject(function () {
                     editor.editorAsset.runProjectScript(function () {
                         editor.editorAsset.readScene("default.scene.json", function (err, scene) {
-                            editor.engine.scene = scene;
+                            editor.editorData.gameScene = scene;
                             editor.editorui.assetview.invalidateAssettree();
                             console.log(projectname + " \u9879\u76EE\u4E0B\u8F7D\u5B8C\u6210!");
                             callback && callback();

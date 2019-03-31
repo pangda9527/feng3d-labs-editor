@@ -139,7 +139,7 @@ namespace editor
                 var scene = this.data.asset.getComponent(feng3d.Scene3D);
                 if (scene)
                 {
-                    engine.scene = scene;
+                    editorData.gameScene = scene;
                 }
             }
         }

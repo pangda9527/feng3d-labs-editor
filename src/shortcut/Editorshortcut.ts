@@ -82,7 +82,7 @@ namespace editor
             if (gameObjects.length > 0)
                 return;
             //
-            gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), engine.scene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+            gameObjects = feng3d.raycaster.pickAll(editorCamera.getMouseRay3D(), editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
             if (gameObjects.length == 0)
             {
                 editorData.clearSelectedObjects();

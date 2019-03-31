@@ -87,7 +87,7 @@ namespace editor
 
             window.addEventListener("beforeunload", () =>
             {
-                editorRS.fs.writeObject("default.scene.json", engine.scene.gameObject);
+                editorRS.fs.writeObject("default.scene.json", editorData.gameScene.gameObject);
             });
         }
 

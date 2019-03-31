@@ -83,7 +83,7 @@ namespace editor
                                     {
                                         editorAsset.readScene("default.scene.json", (err, scene) =>
                                         {
-                                            engine.scene = scene;
+                                            editorData.gameScene = scene;
                                             editorui.assetview.invalidateAssettree();
                                             console.log("导入项目完成!");
                                         });
@@ -180,7 +180,7 @@ namespace editor
                         {
                             editorAsset.runProjectScript(() =>
                             {
-                                engine.scene = creatNewScene()
+                                editorData.gameScene = creatNewScene()
                                 editorui.assetview.invalidateAssettree();
                                 console.log("清空项目完成!");
                             });
@@ -472,7 +472,7 @@ namespace editor
                     {
                         editorAsset.readScene("default.scene.json", (err, scene) =>
                         {
-                            engine.scene = scene;
+                            editorData.gameScene = scene;
                             editorui.assetview.invalidateAssettree();
                             console.log(`${projectname} 项目下载完成!`);
                             callback && callback();

@@ -101,9 +101,9 @@ namespace editor
 
         private onframe()
         {
-            if (this.previewEngine.scene != engine.scene)
+            if (this.previewEngine.scene != editorData.gameScene)
             {
-                this.previewEngine.scene = engine.scene;
+                this.previewEngine.scene = editorData.gameScene;
             }
             this.previewEngine.render();
         }
