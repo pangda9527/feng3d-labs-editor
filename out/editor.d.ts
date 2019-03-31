@@ -1056,8 +1056,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-}
-declare namespace editor {
     interface ModuleView extends eui.Component {
         /**
          * 模块名称
@@ -1106,6 +1104,7 @@ declare namespace editor {
         private onComplete;
         private _onAddedToStage;
         private addModuleToLeft;
+        private addModuleByName;
         private addModule;
         private removeModule;
         private adjust;
@@ -1125,6 +1124,7 @@ declare namespace editor {
          * @param e
          */
         private _onTabButtonClick;
+        private onTabButtonRightClick;
     }
 }
 declare namespace editor {

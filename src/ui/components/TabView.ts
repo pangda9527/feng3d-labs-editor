@@ -65,16 +65,9 @@ namespace editor
 			this._moduleViews = [];
 			moduleNames.forEach(v =>
 			{
-				var moduleView: ModuleView = modules.getModuleView(v);
-				if (moduleView)
-				{
-					moduleView.top = moduleView.bottom = moduleView.left = moduleView.right = 0;
-					this._moduleViews.push(moduleView);
-				} else
-				{
-					console.warn(`没有找到对应模块界面 ${v}`);
-				}
+				this.addModuleByName(v);
 			});
+			this._showModuleIndex = 0;
 		}
 
 		constructor()
@@ -223,6 +216,23 @@ namespace editor
 			parent.addChildAt(splitGroup, index);
 		}
 
+		private addModuleByName(moduleName: string)
+		{
+			var moduleView: ModuleView = modules.getModuleView(moduleName);
+			if (moduleView)
+			{
+				moduleView.top = moduleView.bottom = moduleView.left = moduleView.right = 0;
+				this._moduleViews.push(moduleView);
+
+				this._showModuleIndex = this._moduleViews.length - 1;
+				this._invalidateView();
+			} else
+			{
+				console.warn(`没有找到对应模块界面 ${moduleName}`);
+			}
+
+		}
+
 		private addModule(moduleView: ModuleView)
 		{
 			this._moduleViews.push(moduleView);
@@ -325,6 +335,7 @@ namespace editor
 			this._tabButtons.forEach(v =>
 			{
 				v.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
+				v.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onTabButtonRightClick, this);
 				//
 				drag.unregister(v);
 			});
@@ -374,6 +385,7 @@ namespace editor
 				{
 					dragSource.moduleView = { tabView: <any>this, moduleName: v.moduleName };
 				}, []);
+				v.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onTabButtonRightClick, this);
 			});
 		}
 
@@ -390,6 +402,34 @@ namespace editor
 				this._showModuleIndex = index;
 				this._invalidateView();
 			}
+		}
+
+		private onTabButtonRightClick(e: egret.Event)
+		{
+			var tabButton = <TabViewButton>e.currentTarget;
+
+			menu.popup([
+				{
+					label: "Close Tab", click: () =>
+					{
+						var moduleView = this.removeModule(tabButton.moduleName);
+						modules.recycleModuleView(moduleView);
+					}
+				},
+				{ type: "separator" },
+				{
+					label: "Add Tab",
+					submenu: [Feng3dView.moduleName, InspectorView.moduleName, HierarchyView.moduleName, AssetView.moduleName,].map(v =>
+					{
+						var item = {
+							label: v,
+							click: () => { this.addModuleByName(v); },
+						};
+						return item;
+					}),
+				},
+			]);
+
 		}
 	}
 

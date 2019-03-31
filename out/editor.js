@@ -3203,15 +3203,9 @@ var editor;
             //
             this._moduleViews = [];
             moduleNames.forEach(function (v) {
-                var moduleView = editor.modules.getModuleView(v);
-                if (moduleView) {
-                    moduleView.top = moduleView.bottom = moduleView.left = moduleView.right = 0;
-                    _this._moduleViews.push(moduleView);
-                }
-                else {
-                    console.warn("\u6CA1\u6709\u627E\u5230\u5BF9\u5E94\u6A21\u5757\u754C\u9762 " + v);
-                }
+                _this.addModuleByName(v);
             });
+            this._showModuleIndex = 0;
         };
         TabView.prototype.childrenCreated = function () {
             var _this = this;
@@ -3333,6 +3327,18 @@ var editor;
             //
             parent.addChildAt(splitGroup, index);
         };
+        TabView.prototype.addModuleByName = function (moduleName) {
+            var moduleView = editor.modules.getModuleView(moduleName);
+            if (moduleView) {
+                moduleView.top = moduleView.bottom = moduleView.left = moduleView.right = 0;
+                this._moduleViews.push(moduleView);
+                this._showModuleIndex = this._moduleViews.length - 1;
+                this._invalidateView();
+            }
+            else {
+                console.warn("\u6CA1\u6709\u627E\u5230\u5BF9\u5E94\u6A21\u5757\u754C\u9762 " + moduleName);
+            }
+        };
         TabView.prototype.addModule = function (moduleView) {
             this._moduleViews.push(moduleView);
             this._showModuleIndex = this._moduleViews.length - 1;
@@ -3414,6 +3420,7 @@ var editor;
             this._showModuleIndex = feng3d.FMath.clamp(this._showModuleIndex, 0, this._moduleViews.length - 1);
             this._tabButtons.forEach(function (v) {
                 v.removeEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
+                v.removeEventListener(egret.MouseEvent.RIGHT_CLICK, _this.onTabButtonRightClick, _this);
                 //
                 editor.drag.unregister(v);
             });
@@ -3458,6 +3465,7 @@ var editor;
                 editor.drag.register(v, function (dragSource) {
                     dragSource.moduleView = { tabView: _this, moduleName: v.moduleName };
                 }, []);
+                v.addEventListener(egret.MouseEvent.RIGHT_CLICK, _this.onTabButtonRightClick, _this);
             });
         };
         /**
@@ -3471,6 +3479,29 @@ var editor;
                 this._showModuleIndex = index;
                 this._invalidateView();
             }
+        };
+        TabView.prototype.onTabButtonRightClick = function (e) {
+            var _this = this;
+            var tabButton = e.currentTarget;
+            editor.menu.popup([
+                {
+                    label: "Close Tab", click: function () {
+                        var moduleView = _this.removeModule(tabButton.moduleName);
+                        editor.modules.recycleModuleView(moduleView);
+                    }
+                },
+                { type: "separator" },
+                {
+                    label: "Add Tab",
+                    submenu: [editor.Feng3dView.moduleName, editor.InspectorView.moduleName, editor.HierarchyView.moduleName, editor.AssetView.moduleName,].map(function (v) {
+                        var item = {
+                            label: v,
+                            click: function () { _this.addModuleByName(v); },
+                        };
+                        return item;
+                    }),
+                },
+            ]);
         };
         return TabView;
     }(eui.Group));
