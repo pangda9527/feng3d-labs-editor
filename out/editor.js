@@ -13011,6 +13011,8 @@ var editor;
                 this.editorComponent.editorCamera = this.camera;
             }
             _super.prototype.render.call(this);
+            if (this.contextLost)
+                return;
             if (this.editorScene) {
                 // 设置鼠标射线
                 this.editorScene.mouseRay3D = this.getMouseRay3D();

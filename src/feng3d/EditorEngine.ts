@@ -37,6 +37,8 @@ namespace editor
 
             super.render();
 
+            if (this.contextLost) return;
+
             if (this.editorScene)
             {
                 // 设置鼠标射线
