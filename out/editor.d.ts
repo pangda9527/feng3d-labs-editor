@@ -3541,18 +3541,20 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    var editorComponent: EditorComponent;
     class EditorEngine extends feng3d.Engine {
         wireframeColor: feng3d.Color4;
         /**
          * 编辑器场景，用于显示只在编辑器中存在的游戏对象，例如灯光Icon，对象操作工具等显示。
          */
         editorScene: feng3d.Scene3D;
+        editorComponent: EditorComponent;
         /**
          * 绘制场景
          */
         render(): void;
     }
+}
+declare namespace editor {
     /**
     * 编辑器3D入口
     */

@@ -79,8 +79,7 @@ namespace editor
 				groundGrid.editorCamera = editorCamera;
 				var mrsTool = editorScene.gameObject.addComponent(MRSTool);
 				mrsTool.editorCamera = editorCamera;
-				editorComponent = editorScene.gameObject.addComponent(EditorComponent);
-				editorComponent.editorCamera = editorCamera;
+				this.engine.editorComponent = editorScene.gameObject.addComponent(EditorComponent);
 				//
 				feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
 				{

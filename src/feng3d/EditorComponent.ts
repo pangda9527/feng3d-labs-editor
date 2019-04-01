@@ -41,7 +41,7 @@ namespace editor
         private _scene: feng3d.Scene3D
 
         get editorCamera() { return this._editorCamera; }
-        set editorCamera(v) { this._editorCamera = v; this.update(); }
+        set editorCamera(v) { if (this._editorCamera == v) return; this._editorCamera = v; this.update(); }
         private _editorCamera: feng3d.Camera;
 
         init(gameobject: feng3d.GameObject)

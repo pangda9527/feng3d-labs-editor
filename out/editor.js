@@ -2535,8 +2535,7 @@ var editor;
                 groundGrid.editorCamera = editorCamera;
                 var mrsTool = editorScene.gameObject.addComponent(editor.MRSTool);
                 mrsTool.editorCamera = editorCamera;
-                editor.editorComponent = editorScene.gameObject.addComponent(editor.EditorComponent);
-                editor.editorComponent.editorCamera = editorCamera;
+                this.engine.editorComponent = editorScene.gameObject.addComponent(editor.EditorComponent);
                 //
                 feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), function (content) {
                     var trident = feng3d.serialization.deserialize(JSON.parse(content));
@@ -12989,12 +12988,15 @@ var editor;
                     editor.hierarchy.rootGameObject = this.scene.gameObject;
                 }
             }
-            if (editor.editorComponent)
-                editor.editorComponent.scene = this.scene;
+            if (this.editorComponent) {
+                this.editorComponent.scene = this.scene;
+                this.editorComponent.editorCamera = this.camera;
+            }
             _super.prototype.render.call(this);
             if (this.editorScene) {
                 // 设置鼠标射线
                 this.editorScene.mouseRay3D = this.getMouseRay3D();
+                this.editorScene.camera = this.camera;
                 this.editorScene.update();
                 feng3d.forwardRenderer.draw(this.gl, this.editorScene, this.camera);
                 var selectedObject = this.mouse3DManager.pick(this, this.editorScene, this.camera);
@@ -13011,6 +13013,9 @@ var editor;
         return EditorEngine;
     }(feng3d.Engine));
     editor.EditorEngine = EditorEngine;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     /**
     * 编辑器3D入口
     */
@@ -13096,7 +13101,8 @@ var editor;
         });
         Object.defineProperty(EditorComponent.prototype, "editorCamera", {
             get: function () { return this._editorCamera; },
-            set: function (v) { this._editorCamera = v; this.update(); },
+            set: function (v) { if (this._editorCamera == v)
+                return; this._editorCamera = v; this.update(); },
             enumerable: true,
             configurable: true
         });
@@ -14785,7 +14791,7 @@ var editor;
         DirectionLightIcon.prototype.initicon = function () {
             if (!this._editorCamera)
                 return;
-            var linesize = 10;
+            var linesize = 20;
             var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
                 name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
@@ -14820,7 +14826,7 @@ var editor;
             }
             var lightLines = this._lightLines = Object.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
-                components: [{ __class__: "feng3d.HoldSizeComponent", camera: this.editorCamera, holdSize: 1 },
+                components: [{ __class__: "feng3d.HoldSizeComponent", camera: this.editorCamera, holdSize: 0.005 },
                     {
                         __class__: "feng3d.MeshModel",
                         material: { __class__: "feng3d.Material", shaderName: "segment", uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 163 / 255, g: 162 / 255, b: 107 / 255 } }, renderParams: { renderMode: feng3d.RenderMode.LINES } },
