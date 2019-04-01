@@ -975,10 +975,13 @@ declare namespace editor {
         private onSelectGameObject;
         private onMouseRotateSceneStart;
         private onMouseRotateScene;
+        private onMouseRotateSceneEnd;
         private onSceneCameraForwardBackMouseMoveStart;
         private onSceneCameraForwardBackMouseMove;
+        private onSceneCameraForwardBackMouseMoveEnd;
         private onDragSceneStart;
         private onDragScene;
+        private onDragSceneEnd;
         private onFpsViewStart;
         private onFpsViewStop;
         private updateFpsView;

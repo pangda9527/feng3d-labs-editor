@@ -20,7 +20,7 @@ namespace editor
         {
             super.init(gameObject);
             var holdSizeComponent = this.gameObject.addComponent(feng3d.HoldSizeComponent);
-            holdSizeComponent.holdSize = 1;
+            holdSizeComponent.holdSize = 0.005;
             //
             this.on("addedToScene", this.onAddedToScene, this);
             this.on("removedFromScene", this.onRemovedFromScene, this);
