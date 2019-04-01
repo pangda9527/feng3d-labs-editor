@@ -11043,8 +11043,8 @@ var editor;
             this._startScaleVec = [];
             this._position = new feng3d.Vector3();
             this._rotation = new feng3d.Vector3();
-            feng3d.dispatcher.on("editor.isWoldCoordinateChanged", this.updateControllerImage, this);
-            feng3d.dispatcher.on("editor.isBaryCenterChanged", this.updateControllerImage, this);
+            feng3d.dispatcher.on("editor.isWoldCoordinateChanged", this.invalidateControllerImage, this);
+            feng3d.dispatcher.on("editor.isBaryCenterChanged", this.invalidateControllerImage, this);
             //
             feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
         }
@@ -11064,8 +11064,19 @@ var editor;
         });
         Object.defineProperty(MRSToolTarget.prototype, "controllerTargets", {
             set: function (value) {
+                var _this = this;
+                if (this._controllerTargets) {
+                    this._controllerTargets.forEach(function (v) {
+                        v.off("scenetransformChanged", _this.invalidateControllerImage, _this);
+                    });
+                }
                 this._controllerTargets = value;
-                this.updateControllerImage();
+                if (this._controllerTargets) {
+                    this._controllerTargets.forEach(function (v) {
+                        v.on("scenetransformChanged", _this.invalidateControllerImage, _this);
+                    });
+                }
+                this.invalidateControllerImage();
             },
             enumerable: true,
             configurable: true
@@ -11082,6 +11093,9 @@ var editor;
             else {
                 this.controllerTargets = null;
             }
+        };
+        MRSToolTarget.prototype.invalidateControllerImage = function () {
+            feng3d.ticker.nextframe(this.updateControllerImage, this);
         };
         MRSToolTarget.prototype.updateControllerImage = function () {
             if (!this._controllerTargets || this._controllerTargets.length == 0)
@@ -11282,7 +11296,6 @@ var editor;
         return MRSToolTarget;
     }());
     editor.MRSToolTarget = MRSToolTarget;
-    editor.mrsToolTarget = new MRSToolTarget();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -11874,14 +11887,14 @@ var editor;
             this.on("removedFromScene", this.onRemovedFromScene, this);
         };
         MRSToolBase.prototype.onAddedToScene = function () {
-            editor.mrsToolTarget.controllerTool = this.transform;
+            this.mrsToolTarget.controllerTool = this.transform;
             //
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
             feng3d.ticker.onframe(this.updateToolModel, this);
         };
         MRSToolBase.prototype.onRemovedFromScene = function () {
-            editor.mrsToolTarget.controllerTool = null;
+            this.mrsToolTarget.controllerTool = null;
             //
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
@@ -12069,7 +12082,7 @@ var editor;
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
             this.startPos = this.toolModel.transform.position;
-            editor.mrsToolTarget.startTranslation();
+            this.mrsToolTarget.startTranslation();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
@@ -12082,12 +12095,12 @@ var editor;
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
             var sceneAddpos = sceneTransform.position.subTo(this.startSceneTransform.position);
-            editor.mrsToolTarget.translation(sceneAddpos);
+            this.mrsToolTarget.translation(sceneAddpos);
         };
         MTool.prototype.onMouseUp = function () {
             _super.prototype.onMouseUp.call(this);
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-            editor.mrsToolTarget.stopTranslation();
+            this.mrsToolTarget.stopTranslation();
             this.startPos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
@@ -12186,7 +12199,7 @@ var editor;
             //
             this.startMousePos = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
             this.startSceneTransform = globalMatrix3D.clone();
-            editor.mrsToolTarget.startRotate();
+            this.mrsToolTarget.startRotate();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
@@ -12212,9 +12225,9 @@ var editor;
                     sign = sign > 0 ? 1 : -1;
                     angle = angle * sign;
                     //
-                    editor.mrsToolTarget.rotate1(angle, this.movePlane3D.getNormal());
+                    this.mrsToolTarget.rotate1(angle, this.movePlane3D.getNormal());
                     this.stepPlaneCross.copy(planeCross);
-                    editor.mrsToolTarget.startRotate();
+                    this.mrsToolTarget.startRotate();
                     //绘制扇形区域
                     if (this.selectedItem instanceof editor.CoordinateRotationAxis) {
                         this.selectedItem.showSector(this.startPlanePos, planeCross);
@@ -12226,10 +12239,10 @@ var editor;
                     var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
-                    editor.mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
+                    this.mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
                     //
                     this.startMousePos = endPoint;
-                    editor.mrsToolTarget.startRotate();
+                    this.mrsToolTarget.startRotate();
                     break;
             }
         };
@@ -12239,7 +12252,7 @@ var editor;
             if (this.selectedItem instanceof editor.CoordinateRotationAxis) {
                 this.selectedItem.hideSector();
             }
-            editor.mrsToolTarget.stopRote();
+            this.mrsToolTarget.stopRote();
             this.startMousePos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
@@ -12345,7 +12358,7 @@ var editor;
             }
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
-            editor.mrsToolTarget.startScale();
+            this.mrsToolTarget.startScale();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
@@ -12375,7 +12388,7 @@ var editor;
                 addScale.y += 1;
                 addScale.z += 1;
             }
-            editor.mrsToolTarget.doScale(addScale);
+            this.mrsToolTarget.doScale(addScale);
             //
             this.toolModel.xCube.scaleValue = addScale.x;
             this.toolModel.yCube.scaleValue = addScale.y;
@@ -12384,7 +12397,7 @@ var editor;
         STool.prototype.onMouseUp = function () {
             _super.prototype.onMouseUp.call(this);
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-            editor.mrsToolTarget.stopScale();
+            this.mrsToolTarget.stopScale();
             this.startPlanePos = null;
             this.startSceneTransform = null;
             //
@@ -12415,7 +12428,9 @@ var editor;
     var MRSTool = /** @class */ (function (_super) {
         __extends(MRSTool, _super);
         function MRSTool() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mrsToolTarget = new editor.MRSToolTarget();
+            return _this;
         }
         Object.defineProperty(MRSTool.prototype, "editorCamera", {
             get: function () { return this._editorCamera; },
@@ -12429,6 +12444,9 @@ var editor;
             this.mTool = Object.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(editor.MTool);
             this.rTool = Object.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(editor.RTool);
             this.sTool = Object.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(editor.STool);
+            this.mTool.mrsToolTarget = this.mrsToolTarget;
+            this.rTool.mrsToolTarget = this.mrsToolTarget;
+            this.sTool.mrsToolTarget = this.mrsToolTarget;
             setAwaysVisible(this.mTool);
             setAwaysVisible(this.rTool);
             setAwaysVisible(this.sTool);

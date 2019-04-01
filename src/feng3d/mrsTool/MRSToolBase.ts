@@ -16,6 +16,8 @@ namespace editor
         set editorCamera(v) { this._editorCamera = v; this.invalidate(); }
         private _editorCamera: feng3d.Camera;
 
+        mrsToolTarget: MRSToolTarget;
+
         init(gameObject: feng3d.GameObject)
         {
             super.init(gameObject);
@@ -28,7 +30,7 @@ namespace editor
 
         protected onAddedToScene()
         {
-            mrsToolTarget.controllerTool = this.transform;
+            this.mrsToolTarget.controllerTool = this.transform;
             //
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
@@ -38,7 +40,7 @@ namespace editor
 
         protected onRemovedFromScene()
         {
-            mrsToolTarget.controllerTool = null;
+            this.mrsToolTarget.controllerTool = null;
             //
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);

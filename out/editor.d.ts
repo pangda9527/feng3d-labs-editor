@@ -3088,7 +3088,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    var mrsToolTarget: MRSToolTarget;
     class MRSToolTarget {
         private _controllerTargets;
         private _startScaleVec;
@@ -3100,6 +3099,7 @@ declare namespace editor {
         controllerTargets: feng3d.Transform[];
         constructor();
         private onSelectedGameObjectChange;
+        private invalidateControllerImage;
         private updateControllerImage;
         /**
          * 开始移动
@@ -3330,6 +3330,7 @@ declare namespace editor {
         protected startSceneTransform: feng3d.Matrix4x4;
         editorCamera: feng3d.Camera;
         private _editorCamera;
+        mrsToolTarget: MRSToolTarget;
         init(gameObject: feng3d.GameObject): void;
         protected onAddedToScene(): void;
         protected onRemovedFromScene(): void;
@@ -3431,6 +3432,7 @@ declare namespace editor {
         private sTool;
         private _currentTool;
         private mrsToolObject;
+        private mrsToolTarget;
         editorCamera: feng3d.Camera;
         private _editorCamera;
         init(gameObject: feng3d.GameObject): void;

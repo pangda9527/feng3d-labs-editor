@@ -86,7 +86,7 @@ namespace editor
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
 
-            mrsToolTarget.startScale();
+            this.mrsToolTarget.startScale();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         }
@@ -122,7 +122,7 @@ namespace editor
                 addScale.y += 1;
                 addScale.z += 1;
             }
-            mrsToolTarget.doScale(addScale);
+            this.mrsToolTarget.doScale(addScale);
             //
             this.toolModel.xCube.scaleValue = addScale.x;
             this.toolModel.yCube.scaleValue = addScale.y;
@@ -134,7 +134,7 @@ namespace editor
             super.onMouseUp()
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
 
-            mrsToolTarget.stopScale();
+            this.mrsToolTarget.stopScale();
             this.startPlanePos = null;
             this.startSceneTransform = null;
             //
