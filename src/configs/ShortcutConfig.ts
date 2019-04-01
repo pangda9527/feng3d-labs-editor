@@ -10,7 +10,7 @@ var shortcutConfig = [ //
 	{ key: "mousemove", command: "sceneCameraForwardBackMouseMove", when: "sceneCameraForwardBackMouseMoving" },
 	{ key: "rightmouseup", stateCommand: "!sceneCameraForwardBackMouseMoving", when: "sceneCameraForwardBackMouseMoving" },
 
-	{ key: "rightmousedown", command: "fpsViewStart", stateCommand: "fpsViewing", when: "mouseInView3D+!sceneCameraForwardBackMouseMoving" },
+	{ key: "rightmousedown", command: "fpsViewStart", stateCommand: "fpsViewing", when: "!sceneCameraForwardBackMouseMoving" },
 	{ key: "rightmouseup", command: "fpsViewStop", stateCommand: "!fpsViewing", when: "fpsViewing" },
 	{ key: "mousemove", command: "mouseRotateScene", when: "mouseRotateSceneing" },
 	{ key: "mouseup", stateCommand: "!mouseRotateSceneing", when: "mouseRotateSceneing" },

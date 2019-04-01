@@ -27,7 +27,7 @@ namespace editor
 		/**
 		 * 鼠标是否在界面中
 		 */
-		private get inView()
+		private get mouseInView()
 		{
 			if (!this.stage) return false;
 			return this.getGlobalBounds().contains(this.stage.stageX, this.stage.stageY);
@@ -225,7 +225,7 @@ namespace editor
 
 		private onSelectGameObject()
 		{
-			if (!this.inView) return;
+			if (!this.mouseInView) return;
 
 			var gameObjects = feng3d.raycaster.pickAll(this.engine.getMouseRay3D(), this.engine.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
 			if (gameObjects.length > 0)
@@ -278,6 +278,8 @@ namespace editor
 
 		private onMouseRotateSceneStart()
 		{
+			if (!this.mouseInView) return;
+
 			this.rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			this.rotateSceneCameraGlobalMatrix3D = this.editorCamera.transform.localToWorldMatrix.clone();
 			this.rotateSceneCenter = null;
@@ -296,7 +298,7 @@ namespace editor
 
 		private onMouseRotateScene()
 		{
-			if (!this.inView) return;
+			if (!this.mouseInView) return;
 
 			var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
 			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -311,11 +313,15 @@ namespace editor
 
 		private onSceneCameraForwardBackMouseMoveStart()
 		{
+			if (!this.mouseInView) return;
+
 			this.preMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 		}
 
 		private onSceneCameraForwardBackMouseMove()
 		{
+			if (!this.mouseInView) return;
+
 			var currentMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			var moveDistance = (currentMousePoint.x + currentMousePoint.y - this.preMousePoint.x - this.preMousePoint.y) * sceneControlConfig.sceneCameraForwardBackwardStep;
 			sceneControlConfig.lookDistance -= moveDistance;
@@ -334,12 +340,16 @@ namespace editor
 
 		private onDragSceneStart()
 		{
+			if (!this.mouseInView) return;
+
 			this.dragSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			this.dragSceneCameraGlobalMatrix3D = this.editorCamera.transform.localToWorldMatrix.clone();
 		}
 
 		private onDragScene()
 		{
+			if (!this.mouseInView) return;
+
 			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
 			var scale = this.editorCamera.getScaleByDepth(sceneControlConfig.lookDistance);
@@ -354,6 +364,8 @@ namespace editor
 
 		private onFpsViewStart()
 		{
+			if (!this.mouseInView) return;
+
 			var fpsController: feng3d.FPSController = this.editorCamera.getComponent(feng3d.FPSController)
 			fpsController.onMousedown();
 			feng3d.ticker.onframe(this.updateFpsView, this);
@@ -374,6 +386,8 @@ namespace editor
 
 		private onLookToSelectedGameObject()
 		{
+			if (!this.mouseInView) return;
+
 			var transformBox = editorData.transformBox;
 			if (transformBox)
 			{
@@ -402,6 +416,8 @@ namespace editor
 
 		private onMouseWheelMoveSceneCamera()
 		{
+			if (!this.mouseInView) return;
+
 			var distance = -feng3d.windowEventProxy.deltaY * sceneControlConfig.mouseWheelMoveStep * sceneControlConfig.lookDistance / 10;
 			this.editorCamera.transform.localToWorldMatrix = this.editorCamera.transform.localToWorldMatrix.moveForward(distance);
 			sceneControlConfig.lookDistance -= distance;

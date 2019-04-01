@@ -962,7 +962,7 @@ declare namespace editor {
         /**
          * 鼠标是否在界面中
          */
-        private readonly inView;
+        private readonly mouseInView;
         constructor();
         private onAddedToStage;
         private onRemoveFromStage;
