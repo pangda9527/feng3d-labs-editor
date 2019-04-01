@@ -3490,7 +3490,7 @@ var editor;
         TabView.prototype.removeModule = function (moduleName) {
             var moduleView = this._moduleViews.filter(function (v) { return v.moduleName == moduleName; })[0];
             var index = this._moduleViews.indexOf(moduleView);
-            feng3d.assert(index != -1);
+            feng3d.debuger && feng3d.assert(index != -1);
             this._moduleViews.splice(index, 1);
             this.adjust(this);
             this._invalidateView();
@@ -3527,7 +3527,7 @@ var editor;
                     this.adjust(parent);
                 }
                 else {
-                    feng3d.assert(false);
+                    feng3d.debuger && feng3d.assert(false);
                 }
             }
             // 找到对象所属窗口，删除空窗口
@@ -4266,7 +4266,7 @@ var editor;
         };
         TreeNode.prototype.addChild = function (node) {
             node.remove();
-            feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
+            feng3d.debuger && feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
             if (this.children.indexOf(node) == -1)
                 this.children.push(node);
             node.parent = this;
@@ -8768,7 +8768,7 @@ var editor;
                         if (!this._viewData.isLoaded) {
                             var viewData = this._viewData;
                             viewData.load(function () {
-                                feng3d.assert(!!viewData.asset);
+                                feng3d.debuger && feng3d.assert(!!viewData.asset);
                                 if (viewData == _this._viewData)
                                     _this.updateShowData(viewData.asset);
                             });
@@ -8792,7 +8792,7 @@ var editor;
                     var feng3dAsset = feng3d.rs.getAsset(this._viewData.assetId);
                     if (feng3dAsset) {
                         editor.editorRS.writeAsset(feng3dAsset, function (err) {
-                            feng3d.assert(!err, "\u8D44\u6E90 " + feng3dAsset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                            feng3d.debuger && feng3d.assert(!err, "\u8D44\u6E90 " + feng3dAsset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                             callback && callback();
                         });
                     }
@@ -9137,7 +9137,7 @@ var editor;
          */
         EditorAsset.prototype.saveAsset = function (assetNode, callback) {
             editor.editorRS.writeAsset(assetNode.asset, function (err) {
-                feng3d.assert(!err, "\u8D44\u6E90 " + assetNode.asset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                feng3d.debuger && feng3d.assert(!err, "\u8D44\u6E90 " + assetNode.asset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
             });
         };
@@ -9524,7 +9524,7 @@ var editor;
                     if (!this.data.isLoaded) {
                         var data = this.data;
                         data.load(function () {
-                            feng3d.assert(data.isLoaded);
+                            feng3d.debuger && feng3d.assert(data.isLoaded);
                             if (data == _this.data)
                                 _this.dataChanged();
                         });
@@ -9677,7 +9677,7 @@ var editor;
             }
             this.isLoading = true;
             editor.editorRS.readAsset(this.asset.assetId, function (err, asset) {
-                feng3d.assert(!err);
+                feng3d.debuger && feng3d.assert(!err);
                 _this.isLoading = false;
                 _this.isLoaded = true;
                 callback && callback();
@@ -14335,7 +14335,7 @@ var navigation;
         NavigationData.prototype.init = function (geometry) {
             var positions = geometry.positions;
             var indices = geometry.indices;
-            feng3d.assert(indices.length % 3 == 0);
+            feng3d.debuger && feng3d.assert(indices.length % 3 == 0);
             var pointmap = this.pointmap = new Map();
             var linemap = this.linemap = new Map();
             var trianglemap = this.trianglemap = new Map();
@@ -15472,7 +15472,7 @@ var editor;
                     var skinnedModel = gameobject.addComponent(feng3d.SkinnedModel);
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
-                    feng3d.assert(object3d.bindMode == "attached");
+                    feng3d.debuger && feng3d.assert(object3d.bindMode == "attached");
                     skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
                         skinnedModel.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();

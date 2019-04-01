@@ -510,7 +510,7 @@ namespace navigation
             var positions = geometry.positions;
             var indices = geometry.indices;
 
-            feng3d.assert(indices.length % 3 == 0);
+            feng3d.debuger && feng3d.assert(indices.length % 3 == 0);
             var pointmap = this.pointmap = new Map<number, Point>();
             var linemap = this.linemap = new Map<number, Line>();
             var trianglemap = this.trianglemap = new Map<number, Triangle>();

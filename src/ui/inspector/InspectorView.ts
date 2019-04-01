@@ -74,7 +74,7 @@ namespace editor
 							var viewData = this._viewData;
 							viewData.load(() =>
 							{
-								feng3d.assert(!!viewData.asset);
+								feng3d.debuger && feng3d.assert(!!viewData.asset);
 								if (viewData == this._viewData)
 									this.updateShowData(viewData.asset);
 							});
@@ -104,7 +104,7 @@ namespace editor
 					{
 						editorRS.writeAsset(feng3dAsset, (err) =>
 						{
-							feng3d.assert(!err, `资源 ${feng3dAsset.assetId} 保存失败！`);
+							feng3d.debuger && feng3d.assert(!err, `资源 ${feng3dAsset.assetId} 保存失败！`);
 							callback && callback();
 						});
 					}
