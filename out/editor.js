@@ -2604,9 +2604,13 @@ var editor;
             }
         };
         SceneView.prototype._onAreaSelectStart = function () {
+            if (!this.mouseInView)
+                return;
             this._areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
         };
         SceneView.prototype._onAreaSelect = function () {
+            if (!this._areaSelectStartPosition)
+                return;
             var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var rectangle = this.getGlobalBounds();
             //
@@ -2621,6 +2625,7 @@ var editor;
             editor.editorData.selectMultiObject(gs0);
         };
         SceneView.prototype._onAreaSelectEnd = function () {
+            this._areaSelectStartPosition = null;
             this._areaSelectRect.hide();
         };
         SceneView.prototype._onMouseOver = function () {
@@ -2748,7 +2753,7 @@ var editor;
                 return;
             var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
-            var scale = this.editorCamera.getScaleByDepth(editor.sceneControlConfig.lookDistance);
+            var scale = this.editorCamera.getScaleByDepth(editor.sceneControlConfig.lookDistance).y;
             var up = this.dragSceneCameraGlobalMatrix3D.up;
             var right = this.dragSceneCameraGlobalMatrix3D.right;
             up.scaleNumber(addPoint.y * scale);

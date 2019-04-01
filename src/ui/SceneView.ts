@@ -167,11 +167,14 @@ namespace editor
 
 		private _onAreaSelectStart()
 		{
+			if (!this.mouseInView) return;
 			this._areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 		}
 
 		private _onAreaSelect()
 		{
+			if (!this._areaSelectStartPosition) return;
+
 			var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 
 			var rectangle = this.getGlobalBounds();
@@ -190,6 +193,7 @@ namespace editor
 
 		private _onAreaSelectEnd()
 		{
+			this._areaSelectStartPosition = null;
 			this._areaSelectRect.hide();
 		}
 
@@ -352,7 +356,7 @@ namespace editor
 
 			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
-			var scale = this.editorCamera.getScaleByDepth(sceneControlConfig.lookDistance);
+			var scale = this.editorCamera.getScaleByDepth(sceneControlConfig.lookDistance).y;
 			var up = this.dragSceneCameraGlobalMatrix3D.up;
 			var right = this.dragSceneCameraGlobalMatrix3D.right;
 			up.scaleNumber(addPoint.y * scale);
