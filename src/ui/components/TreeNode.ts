@@ -45,6 +45,7 @@ namespace editor
 		/**
 		 * 是否选中
 		 */
+		@feng3d.watch("selectedChanged")
 		selected = false;
         /** 
          * 父结点
@@ -144,6 +145,11 @@ namespace editor
 		private openChanged()
 		{
 			this.dispatch("openChanged", null, true);
+		}
+
+		private selectedChanged()
+		{
+			this.openParents();
 		}
 	}
 }

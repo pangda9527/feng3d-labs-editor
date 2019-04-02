@@ -50,11 +50,14 @@ namespace editor
                     var localToWorldMatrix = v.transform.localToWorldMatrix
                     this.gameobject.addChild(v);
                     v.transform.localToWorldMatrix = localToWorldMatrix;
+                    //
+                    hierarchy.getNode(v).openParents();
                 }
             });
             dragdata.getDragData("file_gameobject").forEach(v =>
             {
                 hierarchy.addGameoObjectFromAsset(v, this.gameobject);
+                hierarchy.getNode(v).openParents();
             });
             dragdata.getDragData("file_script").forEach(v =>
             {

@@ -2272,9 +2272,11 @@ var editor;
         stage.removeEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
         acceptableitems = null;
         if (accepter) {
-            accepter.alpha = accepterAlpha;
             var accepteritem = getitem(accepter);
-            accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
+            if (accepter != dragitem.displayObject) {
+                accepter.alpha = accepterAlpha;
+                accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
+            }
         }
         accepter = null;
         dragitem = null;
@@ -2288,7 +2290,7 @@ var editor;
             dragitem.setdargSource(dragSource);
             //获取可接受数据的对象列表
             acceptableitems = registers.reduce(function (value, item) {
-                if (item != dragitem && acceptData(item, dragSource) && item.displayObject.stage) {
+                if (acceptData(item, dragSource) && item.displayObject.stage) {
                     item["hierarchyValue"] = getHierarchyValue(item.displayObject);
                     value.push(item);
                 }
@@ -2307,7 +2309,9 @@ var editor;
             acceptableitems.reverse();
         }
         if (accepter) {
-            accepter.alpha = accepterAlpha;
+            if (dragitem.displayObject != accepter) {
+                accepter.alpha = accepterAlpha;
+            }
             accepter = null;
         }
         //
@@ -2316,8 +2320,10 @@ var editor;
             var rect = element.displayObject.getGlobalBounds();
             if (rect.contains(event.stageX, event.stageY)) {
                 accepter = element.displayObject;
-                accepterAlpha = element.displayObject.alpha;
-                element.displayObject.alpha = 0.5;
+                if (dragitem.displayObject != accepter) {
+                    accepterAlpha = element.displayObject.alpha;
+                    element.displayObject.alpha = 0.5;
+                }
                 break;
             }
         }
@@ -4368,9 +4374,15 @@ var editor;
         TreeNode.prototype.openChanged = function () {
             this.dispatch("openChanged", null, true);
         };
+        TreeNode.prototype.selectedChanged = function () {
+            this.openParents();
+        };
         __decorate([
             feng3d.watch("openChanged")
         ], TreeNode.prototype, "isOpen", void 0);
+        __decorate([
+            feng3d.watch("selectedChanged")
+        ], TreeNode.prototype, "selected", void 0);
         return TreeNode;
     }(feng3d.EventDispatcher));
     editor.TreeNode = TreeNode;
@@ -12598,10 +12610,13 @@ var editor;
                     var localToWorldMatrix = v.transform.localToWorldMatrix;
                     _this.gameobject.addChild(v);
                     v.transform.localToWorldMatrix = localToWorldMatrix;
+                    //
+                    editor.hierarchy.getNode(v).openParents();
                 }
             });
             dragdata.getDragData("file_gameobject").forEach(function (v) {
                 editor.hierarchy.addGameoObjectFromAsset(v, _this.gameobject);
+                editor.hierarchy.getNode(v).openParents();
             });
             dragdata.getDragData("file_script").forEach(function (v) {
                 _this.gameobject.addScript(v.scriptName);
@@ -12696,7 +12711,6 @@ var editor;
             this._selectedGameObjects.forEach(function (element) {
                 var node = _this.getNode(element);
                 node.selected = true;
-                node.openParents();
             });
         };
         Hierarchy.prototype.ongameobjectadded = function (event) {

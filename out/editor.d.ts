@@ -1396,6 +1396,7 @@ declare namespace editor {
         getShowNodes(): TreeNode[];
         openParents(): void;
         private openChanged;
+        private selectedChanged;
     }
 }
 declare namespace editor {

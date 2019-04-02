@@ -198,9 +198,12 @@ namespace editor
 
 		if (accepter)
 		{
-			accepter.alpha = accepterAlpha;
 			var accepteritem = getitem(accepter);
-			accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
+			if (accepter != dragitem.displayObject)
+			{
+				accepter.alpha = accepterAlpha;
+				accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
+			}
 		}
 		accepter = null;
 		dragitem = null;
@@ -219,7 +222,7 @@ namespace editor
 			//获取可接受数据的对象列表
 			acceptableitems = registers.reduce((value: DragItem[], item) =>
 			{
-				if (item != dragitem && acceptData(item, dragSource) && item.displayObject.stage)
+				if (acceptData(item, dragSource) && item.displayObject.stage)
 				{
 					item["hierarchyValue"] = getHierarchyValue(item.displayObject);
 					value.push(item);
@@ -243,7 +246,11 @@ namespace editor
 
 		if (accepter)
 		{
-			accepter.alpha = accepterAlpha;
+			if (dragitem.displayObject != accepter)
+			{
+				accepter.alpha = accepterAlpha;
+			}
+
 			accepter = null;
 		}
 
@@ -255,8 +262,11 @@ namespace editor
 			if (rect.contains(event.stageX, event.stageY))
 			{
 				accepter = element.displayObject;
-				accepterAlpha = element.displayObject.alpha;
-				element.displayObject.alpha = 0.5;
+				if (dragitem.displayObject != accepter)
+				{
+					accepterAlpha = element.displayObject.alpha;
+					element.displayObject.alpha = 0.5;
+				}
 				break;
 			}
 		}
