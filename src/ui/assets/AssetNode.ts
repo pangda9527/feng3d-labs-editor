@@ -236,6 +236,41 @@ namespace editor
         }
 
         /**
+         * 提供拖拽数据
+         * 
+         * @param dragSource 
+         */
+        setdargSource(dragSource: DragData)
+        {
+            dragSource.addDragData("assetNodes", this);
+        }
+
+        /**
+         * 接受拖拽数据
+         * 
+         * @param dragdata 
+         */
+        acceptDragDrop(dragdata: DragData)
+        {
+            if (!(this.asset instanceof feng3d.FolderAsset)) return;
+            var folder = this.asset;
+
+            dragdata.getDragData("assetNodes").forEach(v =>
+            {
+                editorRS.moveAsset(v.asset, folder, (err) =>
+                {
+                    if (!err)
+                    {
+                        this.addChild(v);
+                    } else
+                    {
+                        feng3d.dispatcher.dispatch("message.error", err.message);
+                    }
+                });
+            });
+        }
+
+        /**
          * 导出
          */
         export()

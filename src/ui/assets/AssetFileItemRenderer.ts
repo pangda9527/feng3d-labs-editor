@@ -46,28 +46,10 @@ namespace editor
                     var folder = <feng3d.FolderAsset>this.data.asset;
                     drag.register(this, (dragsource) =>
                     {
-                        if (editorData.selectedAssetNodes.indexOf(this.data) != -1)
-                        {
-                            dragsource.assetNodes = editorData.selectedAssetNodes.concat();
-                        } else
-                        {
-                            dragsource.assetNodes = [this.data];
-                        }
+                        this.data.setdargSource(dragsource);
                     }, ["assetNodes"], (dragdata) =>
                         {
-                            dragdata.assetNodes.forEach(v =>
-                            {
-                                editorRS.moveAsset(v.asset, folder, (err) =>
-                                {
-                                    if (!err)
-                                    {
-                                        this.data.addChild(v);
-                                    } else
-                                    {
-                                        alert(err.message);
-                                    }
-                                });
-                            });
+                            this.data.acceptDragDrop(dragdata);
                         });
                 }
                 else
@@ -89,37 +71,31 @@ namespace editor
                         switch (extension)
                         {
                             case feng3d.AssetType.gameobject:
-                                dragsource.file_gameobject = feng3d.serialization.clone(<feng3d.GameObject>this.data.asset.data);
+                                dragsource.addDragData("file_gameobject", feng3d.serialization.clone(<feng3d.GameObject>this.data.asset.data));
                                 break;
                             case feng3d.AssetType.script:
-                                dragsource.file_script = <any>this.data.asset.data;
+                                dragsource.addDragData("file_script", <any>this.data.asset.data);
                                 break;
                             case feng3d.AssetType.anim:
-                                dragsource.animationclip = <any>this.data.asset.data;
+                                dragsource.addDragData("animationclip", <any>this.data.asset.data);
                                 break;
                             case feng3d.AssetType.material:
-                                dragsource.material = <any>this.data.asset.data;
+                                dragsource.addDragData("material", <any>this.data.asset.data);
                                 break;
                             case feng3d.AssetType.texturecube:
-                                dragsource.texturecube = <any>this.data.asset.data;
+                                dragsource.addDragData("texturecube", <any>this.data.asset.data);
                                 break;
                             case feng3d.AssetType.geometry:
-                                dragsource.geometry = <any>this.data.asset.data;
+                                dragsource.addDragData("geometry", <any>this.data.asset.data);
                                 break;
                             case feng3d.AssetType.texture:
-                                dragsource.texture2d = <any>this.data.asset.data;
+                                dragsource.addDragData("texture2d", <any>this.data.asset.data);
                                 break;
                             case feng3d.AssetType.audio:
-                                dragsource.audio = <any>this.data.asset.data;
+                                dragsource.addDragData("audio", <any>this.data.asset.data);
                                 break;
                         }
-                        if (editorData.selectedAssetNodes.indexOf(this.data) != -1)
-                        {
-                            dragsource.assetNodes = editorData.selectedAssetNodes.concat();
-                        } else
-                        {
-                            dragsource.assetNodes = [this.data];
-                        }
+                        dragsource.addDragData("assetNodes", this.data);
                     }, []);
                 }
             } else

@@ -42,25 +42,12 @@ namespace editor
 
             if (this.data)
             {
-                var folder = <feng3d.FolderAsset>this.data.asset;
                 drag.register(this, (dragsource) =>
                 {
-                    dragsource.assetNodes = [this.data];
+                    this.data.setdargSource(dragsource);
                 }, ["assetNodes"], (dragdata) =>
                     {
-                        dragdata.assetNodes.forEach(v =>
-                        {
-                            editorRS.moveAsset(v.asset, folder, (err) =>
-                            {
-                                if (!err)
-                                {
-                                    this.data.addChild(v);
-                                } else
-                                {
-                                    feng3d.dispatcher.dispatch("message.error", err.message);
-                                }
-                            });
-                        });
+                        this.data.acceptDragDrop(dragdata);
                     });
             } else
             {

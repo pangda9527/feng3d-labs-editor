@@ -837,40 +837,66 @@ declare namespace editor {
 declare namespace editor {
     var drag: Drag;
     class Drag {
-        register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragData)[], onDragDrop?: (dragSource: DragData) => void): void;
+        register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragDataMap)[], onDragDrop?: (dragSource: DragData) => void): void;
         unregister(displayObject: egret.DisplayObject): void;
         /** 当拖拽过程中拖拽数据发生变化时调用该方法刷新可接受对象列表 */
         refreshAcceptables(): void;
     }
+    interface DragDataItem<K extends keyof DragDataMap> {
+        datatype: K;
+        value: DragDataMap[K];
+    }
+    class DragData {
+        private datas;
+        /**
+         * 添加拖拽数据
+         *
+         * @param datatype
+         * @param value
+         */
+        addDragData<K extends keyof DragDataMap>(datatype: K, value: DragDataMap[K]): void;
+        /**
+         * 获取拖拽数据列表
+         *
+         * @param datatype
+         */
+        getDragData<K extends keyof DragDataMap>(datatype: K): DragDataMap[K][];
+        /**
+         * 是否拥有指定类型数据
+         *
+         * @param datatype
+         */
+        hasDragData<K extends keyof DragDataMap>(datatype: K): boolean;
+    }
     /**
      * 拖拽数据
      */
-    interface DragData {
-        gameobject?: feng3d.GameObject;
-        animationclip?: feng3d.AnimationClip;
-        material?: feng3d.Material;
-        geometry?: feng3d.Geometry;
-        file_gameobject?: feng3d.GameObject;
+    interface DragDataMap {
+        gameobject: feng3d.GameObject;
+        animationclip: feng3d.AnimationClip;
+        material: feng3d.Material;
+        geometry: feng3d.Geometry;
+        file_gameobject: feng3d.GameObject;
         /**
          * 脚本路径
          */
-        file_script?: feng3d.ScriptAsset;
+        file_script: feng3d.ScriptAsset;
         /**
          * 文件
          */
-        assetNodes?: AssetNode[];
+        assetNodes: AssetNode;
         /**
          * 声音路径
          */
-        audio?: feng3d.AudioAsset;
+        audio: feng3d.AudioAsset;
         /**
          * 纹理
          */
-        texture2d?: feng3d.Texture2D;
+        texture2d: feng3d.Texture2D;
         /**
          * 立方体纹理
          */
-        texturecube?: feng3d.TextureCube;
+        texturecube: feng3d.TextureCube;
     }
 }
 declare namespace editor {
@@ -1089,7 +1115,7 @@ declare namespace editor {
     /**
      * 拖拽数据
      */
-    interface DragData {
+    interface DragDataMap {
         moduleView: {
             tabView: TabView;
             moduleName: string;
@@ -2154,7 +2180,7 @@ declare namespace editor {
         text: eui.TextInput;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         dragparam: {
-            accepttype: keyof DragData;
+            accepttype: keyof DragDataMap;
             datatype: string;
         };
         initView(): void;
@@ -2568,7 +2594,6 @@ declare namespace editor {
         constructor();
         $onAddToStage(stage: egret.Stage, nestLevel: number): void;
         $onRemoveFromStage(): void;
-        private setdargSource;
         private onclick;
         private onDoubleClick;
         private onrightclick;
@@ -2767,6 +2792,18 @@ declare namespace editor {
          * 获取文件列表
          */
         getFileList(): AssetNode[];
+        /**
+         * 提供拖拽数据
+         *
+         * @param dragSource
+         */
+        setdargSource(dragSource: DragData): void;
+        /**
+         * 接受拖拽数据
+         *
+         * @param dragdata
+         */
+        acceptDragDrop(dragdata: DragData): void;
         /**
          * 导出
          */
@@ -3460,6 +3497,18 @@ declare namespace editor {
          */
         children: HierarchyNode[];
         constructor(obj: gPartial<HierarchyNode>);
+        /**
+         * 提供拖拽数据
+         *
+         * @param dragSource
+         */
+        setdargSource(dragSource: DragData): void;
+        /**
+         * 接受拖拽数据
+         *
+         * @param dragdata
+         */
+        acceptDragDrop(dragdata: DragData): void;
         /**
          * 销毁
          */

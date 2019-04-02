@@ -25,16 +25,16 @@ namespace editor
             {
                 this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
 
-                var param: { accepttype: keyof DragData; datatype: string; } = <any>this._attributeViewInfo.componentParam;
+                var param: { accepttype: keyof DragDataMap; datatype: string; } = <any>this._attributeViewInfo.componentParam;
                 drag.register(this,
                     (dragsource) =>
                     {
-                        if (param.datatype) dragsource[param.datatype] = this.attributeValue;
+                        if (param.datatype) dragsource.addDragData(<any>param.datatype, this.attributeValue);
                     },
                     [param.accepttype],
                     (dragSource) =>
                     {
-                        this.attributeValue = dragSource[param.accepttype];
+                        this.attributeValue = dragSource.getDragData(param.accepttype)[0];
                     });
             }
 
@@ -52,7 +52,7 @@ namespace editor
 
         private onPickBtnClick()
         {
-            var param: { accepttype: keyof DragData; datatype: string; } = <any>this._attributeViewInfo.componentParam;
+            var param: { accepttype: keyof DragDataMap; datatype: string; } = <any>this._attributeViewInfo.componentParam;
             if (param.accepttype)
             {
                 if (param.accepttype == "texture2d")

@@ -27,6 +27,46 @@ namespace editor
         }
 
         /**
+         * 提供拖拽数据
+         * 
+         * @param dragSource 
+         */
+        setdargSource(dragSource: DragData)
+        {
+            dragSource.addDragData("gameobject", this.gameobject);
+        }
+
+        /**
+         * 接受拖拽数据
+         * 
+         * @param dragdata 
+         */
+        acceptDragDrop(dragdata: DragData)
+        {
+            dragdata.getDragData("gameobject").forEach(v =>
+            {
+                if (!v.contains(this.gameobject))
+                {
+                    if (this.gameobject != v.parent)
+                    {
+                        var localToWorldMatrix = v.transform.localToWorldMatrix
+                        this.gameobject.addChild(v);
+                        v.transform.localToWorldMatrix = localToWorldMatrix;
+                    }
+                }
+            });
+            dragdata.getDragData("file_gameobject").forEach(v =>
+            {
+                hierarchy.addGameoObjectFromAsset(v, this.gameobject);
+            });
+            dragdata.getDragData("file_script").forEach(v =>
+            {
+                this.gameobject.addScript(v.scriptName);
+            })
+
+        }
+
+        /**
          * 销毁
          */
         destroy()

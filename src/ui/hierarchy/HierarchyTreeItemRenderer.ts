@@ -14,26 +14,13 @@ namespace editor
         {
             super.$onAddToStage(stage, nestLevel);
 
-            drag.register(this, this.setdargSource.bind(this), ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
+            drag.register(this, (dragSource: DragData) =>
             {
-                if (dragdata.gameobject)
+                this.data.setdargSource(dragSource)
+            }, ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
                 {
-                    if (!dragdata.gameobject.contains(this.data.gameobject))
-                    {
-                        var localToWorldMatrix = dragdata.gameobject.transform.localToWorldMatrix
-                        this.data.gameobject.addChild(dragdata.gameobject);
-                        dragdata.gameobject.transform.localToWorldMatrix = localToWorldMatrix;
-                    }
-                }
-                if (dragdata.file_gameobject)
-                {
-                    hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, this.data.gameobject);
-                }
-                if (dragdata.file_script)
-                {
-                    this.data.gameobject.addScript(dragdata.file_script.scriptName);
-                }
-            });
+                    this.data.acceptDragDrop(dragdata);
+                });
             MouseOnDisableScroll.register(this);
             //
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
@@ -50,11 +37,6 @@ namespace editor
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-        }
-
-        private setdargSource(dragSource: DragData)
-        {
-            dragSource.gameobject = this.data.gameobject;
         }
 
         private onclick()

@@ -2181,6 +2181,41 @@ var editor;
     editor.Drag = Drag;
     ;
     editor.drag = new Drag();
+    var DragData = /** @class */ (function () {
+        function DragData() {
+            this.datas = [];
+        }
+        /**
+         * 添加拖拽数据
+         *
+         * @param datatype
+         * @param value
+         */
+        DragData.prototype.addDragData = function (datatype, value) {
+            var item = { datatype: datatype, value: value };
+            this.datas.push(item);
+        };
+        /**
+         * 获取拖拽数据列表
+         *
+         * @param datatype
+         */
+        DragData.prototype.getDragData = function (datatype) {
+            var data = this.datas.filter(function (v) { return v.datatype == datatype; }).map(function (v) { return v.value; });
+            return data;
+        };
+        /**
+         * 是否拥有指定类型数据
+         *
+         * @param datatype
+         */
+        DragData.prototype.hasDragData = function (datatype) {
+            var data = this.datas.filter(function (v) { return v.datatype == datatype; }).map(function (v) { return v.value; });
+            return data.length > 0;
+        };
+        return DragData;
+    }());
+    editor.DragData = DragData;
     var stage;
     var registers = [];
     /**
@@ -2213,7 +2248,7 @@ var editor;
      * @param dragSource
      */
     function acceptData(item, dragSource) {
-        var hasdata = item.accepttypes.reduce(function (prevalue, accepttype) { return prevalue || !!dragSource[accepttype]; }, false);
+        var hasdata = item.accepttypes.reduce(function (prevalue, accepttype) { return prevalue || dragSource.hasDragData(accepttype); }, false);
         return hasdata;
     }
     function onItemMouseDown(event) {
@@ -2249,7 +2284,7 @@ var editor;
     function onMouseMove(event) {
         if (!acceptableitems) {
             //获取拖拽数据
-            dragSource = {};
+            dragSource = new DragData();
             dragitem.setdargSource(dragSource);
             //获取可接受数据的对象列表
             acceptableitems = registers.reduce(function (value, item) {
@@ -2287,6 +2322,11 @@ var editor;
             }
         }
     }
+    /**
+     * 获取显示对象的层级
+     *
+     * @param displayObject
+     */
     function getHierarchyValue(displayObject) {
         var hierarchys = [];
         if (displayObject.parent) {
@@ -2569,15 +2609,15 @@ var editor;
             feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
-                if (dragdata.file_gameobject) {
-                    editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, editor.hierarchy.rootnode.gameobject);
-                }
-                if (dragdata.file_script) {
+                dragdata.getDragData("file_gameobject").forEach(function (v) {
+                    editor.hierarchy.addGameoObjectFromAsset(v, editor.hierarchy.rootnode.gameobject);
+                });
+                dragdata.getDragData("file_script").forEach(function (v) {
                     var gameobject = _this.engine.mouse3DManager.selectedGameObject;
                     if (!gameobject || !gameobject.scene)
                         gameobject = editor.hierarchy.rootnode.gameobject;
-                    gameobject.addScript(dragdata.file_script.scriptName);
-                }
+                    gameobject.addScript(v.scriptName);
+                });
             });
             this.once(egret.Event.ENTER_FRAME, this.onResize, this);
         };
@@ -3417,38 +3457,42 @@ var editor;
         TabView.prototype._onAddedToStage = function () {
             var _this = this;
             editor.drag.register(this.tabGroup, null, ["moduleView"], function (dragSource) {
-                if (dragSource.moduleView.tabView == _this) {
-                    var result = _this._moduleViews.filter(function (v) { return v.moduleName == dragSource.moduleView.moduleName; })[0];
-                    if (result) {
-                        var index = _this._moduleViews.indexOf(result);
-                        _this._moduleViews.splice(index, 1);
-                        _this._moduleViews.push(result);
-                        _this._invalidateView();
+                dragSource.getDragData("moduleView").forEach(function (v) {
+                    if (v.tabView == _this) {
+                        var result = _this._moduleViews.filter(function (v) { return v.moduleName == v.moduleName; })[0];
+                        if (result) {
+                            var index = _this._moduleViews.indexOf(result);
+                            _this._moduleViews.splice(index, 1);
+                            _this._moduleViews.push(result);
+                            _this._invalidateView();
+                        }
                     }
-                }
-                else {
-                    var moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
-                    _this.addModule(moduleView);
-                }
-                feng3d.dispatcher.dispatch("viewLayout.changed");
+                    else {
+                        var moduleView = v.tabView.removeModule(v.moduleName);
+                        _this.addModule(moduleView);
+                    }
+                    feng3d.dispatcher.dispatch("viewLayout.changed");
+                });
             });
             editor.drag.register(this.contentGroup, null, ["moduleView"], function (dragSource) {
-                if (dragSource.moduleView.tabView == _this && _this._moduleViews.length == 1)
-                    return;
-                var moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
-                var rect = _this.getGlobalBounds();
-                var center = rect.center;
-                var mouse = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
-                var sub = mouse.sub(center);
-                sub.x = sub.x / rect.width;
-                sub.y = sub.y / rect.height;
-                if (sub.x * sub.x > sub.y * sub.y) {
-                    _this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
-                }
-                else {
-                    _this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
-                }
-                feng3d.dispatcher.dispatch("viewLayout.changed");
+                dragSource.getDragData("moduleView").forEach(function (v) {
+                    if (v.tabView == _this && _this._moduleViews.length == 1)
+                        return;
+                    var moduleView = v.tabView.removeModule(v.moduleName);
+                    var rect = _this.getGlobalBounds();
+                    var center = rect.center;
+                    var mouse = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
+                    var sub = mouse.sub(center);
+                    sub.x = sub.x / rect.width;
+                    sub.y = sub.y / rect.height;
+                    if (sub.x * sub.x > sub.y * sub.y) {
+                        _this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
+                    }
+                    else {
+                        _this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
+                    }
+                    feng3d.dispatcher.dispatch("viewLayout.changed");
+                });
             });
             this._invalidateView();
         };
@@ -3634,7 +3678,7 @@ var editor;
                 v.addEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
                 //
                 editor.drag.register(v, function (dragSource) {
-                    dragSource.moduleView = { tabView: _this, moduleName: v.moduleName };
+                    dragSource.addDragData("moduleView", { tabView: _this, moduleName: v.moduleName });
                 }, []);
                 v.addEventListener(egret.MouseEvent.RIGHT_CLICK, _this.onTabButtonRightClick, _this);
             });
@@ -7945,9 +7989,9 @@ var editor;
             this.space.on("addComponent", this.onAddCompont, this);
             this.space.on("removeComponent", this.onRemoveComponent, this);
             editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
-                if (dragdata.file_script) {
-                    _this.space.addScript(dragdata.file_script.scriptName);
-                }
+                dragdata.getDragData("file_script").forEach(function (v) {
+                    _this.space.addScript(v.scriptName);
+                });
             });
             this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
         };
@@ -8307,9 +8351,9 @@ var editor;
                 var param = this._attributeViewInfo.componentParam;
                 editor.drag.register(this, function (dragsource) {
                     if (param.datatype)
-                        dragsource[param.datatype] = _this.attributeValue;
+                        dragsource.addDragData(param.datatype, _this.attributeValue);
                 }, [param.accepttype], function (dragSource) {
-                    _this.attributeValue = dragSource[param.accepttype];
+                    _this.attributeValue = dragSource.getDragData(param.accepttype)[0];
                 });
             }
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
@@ -8944,20 +8988,10 @@ var editor;
         HierarchyTreeItemRenderer.prototype.$onAddToStage = function (stage, nestLevel) {
             var _this = this;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            editor.drag.register(this, this.setdargSource.bind(this), ["gameobject", "file_gameobject", "file_script"], function (dragdata) {
-                if (dragdata.gameobject) {
-                    if (!dragdata.gameobject.contains(_this.data.gameobject)) {
-                        var localToWorldMatrix = dragdata.gameobject.transform.localToWorldMatrix;
-                        _this.data.gameobject.addChild(dragdata.gameobject);
-                        dragdata.gameobject.transform.localToWorldMatrix = localToWorldMatrix;
-                    }
-                }
-                if (dragdata.file_gameobject) {
-                    editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, _this.data.gameobject);
-                }
-                if (dragdata.file_script) {
-                    _this.data.gameobject.addScript(dragdata.file_script.scriptName);
-                }
+            editor.drag.register(this, function (dragSource) {
+                _this.data.setdargSource(dragSource);
+            }, ["gameobject", "file_gameobject", "file_script"], function (dragdata) {
+                _this.data.acceptDragDrop(dragdata);
             });
             editor.MouseOnDisableScroll.register(this);
             //
@@ -8972,9 +9006,6 @@ var editor;
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-        };
-        HierarchyTreeItemRenderer.prototype.setdargSource = function (dragSource) {
-            dragSource.gameobject = this.data.gameobject;
         };
         HierarchyTreeItemRenderer.prototype.onclick = function () {
             editor.editorData.selectObject(this.data.gameobject);
@@ -9023,6 +9054,9 @@ var editor;
             }
         };
         HierarchyView.prototype.onAddedToStage = function () {
+            editor.drag.register(this.list, null, ["gameobject", "file_gameobject", "file_script"], function (dragdata) {
+                editor.hierarchy.rootnode.acceptDragDrop(dragdata);
+            });
             this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
             this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
             feng3d.watcher.watch(editor.hierarchy, "rootnode", this.onRootNodeChanged, this);
@@ -9030,6 +9064,7 @@ var editor;
             this.invalidHierarchy();
         };
         HierarchyView.prototype.onRemovedFromStage = function () {
+            editor.drag.unregister(this.list);
             this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
             this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
             feng3d.watcher.unwatch(editor.hierarchy, "rootnode", this.onRootNodeChanged, this);
@@ -9525,23 +9560,9 @@ var editor;
                 if (this.data.isDirectory) {
                     var folder = this.data.asset;
                     editor.drag.register(this, function (dragsource) {
-                        if (editor.editorData.selectedAssetNodes.indexOf(_this.data) != -1) {
-                            dragsource.assetNodes = editor.editorData.selectedAssetNodes.concat();
-                        }
-                        else {
-                            dragsource.assetNodes = [_this.data];
-                        }
+                        _this.data.setdargSource(dragsource);
                     }, ["assetNodes"], function (dragdata) {
-                        dragdata.assetNodes.forEach(function (v) {
-                            editor.editorRS.moveAsset(v.asset, folder, function (err) {
-                                if (!err) {
-                                    _this.data.addChild(v);
-                                }
-                                else {
-                                    alert(err.message);
-                                }
-                            });
-                        });
+                        _this.data.acceptDragDrop(dragdata);
                     });
                 }
                 else {
@@ -9558,36 +9579,31 @@ var editor;
                         var extension = _this.data.asset.assetType;
                         switch (extension) {
                             case feng3d.AssetType.gameobject:
-                                dragsource.file_gameobject = feng3d.serialization.clone(_this.data.asset.data);
+                                dragsource.addDragData("file_gameobject", feng3d.serialization.clone(_this.data.asset.data));
                                 break;
                             case feng3d.AssetType.script:
-                                dragsource.file_script = _this.data.asset.data;
+                                dragsource.addDragData("file_script", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.anim:
-                                dragsource.animationclip = _this.data.asset.data;
+                                dragsource.addDragData("animationclip", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.material:
-                                dragsource.material = _this.data.asset.data;
+                                dragsource.addDragData("material", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.texturecube:
-                                dragsource.texturecube = _this.data.asset.data;
+                                dragsource.addDragData("texturecube", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.geometry:
-                                dragsource.geometry = _this.data.asset.data;
+                                dragsource.addDragData("geometry", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.texture:
-                                dragsource.texture2d = _this.data.asset.data;
+                                dragsource.addDragData("texture2d", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.audio:
-                                dragsource.audio = _this.data.asset.data;
+                                dragsource.addDragData("audio", _this.data.asset.data);
                                 break;
                         }
-                        if (editor.editorData.selectedAssetNodes.indexOf(_this.data) != -1) {
-                            dragsource.assetNodes = editor.editorData.selectedAssetNodes.concat();
-                        }
-                        else {
-                            dragsource.assetNodes = [_this.data];
-                        }
+                        dragsource.addDragData("assetNodes", _this.data);
                     }, []);
                 }
             }
@@ -9796,6 +9812,35 @@ var editor;
             return files;
         };
         /**
+         * 提供拖拽数据
+         *
+         * @param dragSource
+         */
+        AssetNode.prototype.setdargSource = function (dragSource) {
+            dragSource.addDragData("assetNodes", this);
+        };
+        /**
+         * 接受拖拽数据
+         *
+         * @param dragdata
+         */
+        AssetNode.prototype.acceptDragDrop = function (dragdata) {
+            var _this = this;
+            if (!(this.asset instanceof feng3d.FolderAsset))
+                return;
+            var folder = this.asset;
+            dragdata.getDragData("assetNodes").forEach(function (v) {
+                editor.editorRS.moveAsset(v.asset, folder, function (err) {
+                    if (!err) {
+                        _this.addChild(v);
+                    }
+                    else {
+                        feng3d.dispatcher.dispatch("message.error", err.message);
+                    }
+                });
+            });
+        };
+        /**
          * 导出
          */
         AssetNode.prototype.export = function () {
@@ -9859,20 +9904,10 @@ var editor;
             var _this = this;
             _super.prototype.dataChanged.call(this);
             if (this.data) {
-                var folder = this.data.asset;
                 editor.drag.register(this, function (dragsource) {
-                    dragsource.assetNodes = [_this.data];
+                    _this.data.setdargSource(dragsource);
                 }, ["assetNodes"], function (dragdata) {
-                    dragdata.assetNodes.forEach(function (v) {
-                        editor.editorRS.moveAsset(v.asset, folder, function (err) {
-                            if (!err) {
-                                _this.data.addChild(v);
-                            }
-                            else {
-                                feng3d.dispatcher.dispatch("message.error", err.message);
-                            }
-                        });
-                    });
+                    _this.data.acceptDragDrop(dragdata);
                 });
             }
             else {
@@ -9934,10 +9969,10 @@ var editor;
             this.filepathLabel.text = "";
             //
             editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject"], function (dragSource) {
-                if (dragSource.gameobject) {
-                    var gameobject = feng3d.serialization.clone(dragSource.gameobject);
+                dragSource.getDragData("gameobject").forEach(function (v) {
+                    var gameobject = feng3d.serialization.clone(v);
                     editor.editorAsset.saveObject(gameobject);
-                }
+                });
             });
             this.initlist();
             //
@@ -12543,6 +12578,37 @@ var editor;
             _this.update();
             return _this;
         }
+        /**
+         * 提供拖拽数据
+         *
+         * @param dragSource
+         */
+        HierarchyNode.prototype.setdargSource = function (dragSource) {
+            dragSource.addDragData("gameobject", this.gameobject);
+        };
+        /**
+         * 接受拖拽数据
+         *
+         * @param dragdata
+         */
+        HierarchyNode.prototype.acceptDragDrop = function (dragdata) {
+            var _this = this;
+            dragdata.getDragData("gameobject").forEach(function (v) {
+                if (!v.contains(_this.gameobject)) {
+                    if (_this.gameobject != v.parent) {
+                        var localToWorldMatrix = v.transform.localToWorldMatrix;
+                        _this.gameobject.addChild(v);
+                        v.transform.localToWorldMatrix = localToWorldMatrix;
+                    }
+                }
+            });
+            dragdata.getDragData("file_gameobject").forEach(function (v) {
+                editor.hierarchy.addGameoObjectFromAsset(v, _this.gameobject);
+            });
+            dragdata.getDragData("file_script").forEach(function (v) {
+                _this.gameobject.addScript(v.scriptName);
+            });
+        };
         /**
          * 销毁
          */

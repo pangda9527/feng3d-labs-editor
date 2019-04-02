@@ -119,18 +119,17 @@ namespace editor
 
 			drag.register(this, null, ["file_gameobject", "file_script"], (dragdata) =>
 			{
-				if (dragdata.file_gameobject)
+				dragdata.getDragData("file_gameobject").forEach(v =>
 				{
-					hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, hierarchy.rootnode.gameobject);
-				}
-				if (dragdata.file_script)
+					hierarchy.addGameoObjectFromAsset(v, hierarchy.rootnode.gameobject);
+				});
+				dragdata.getDragData("file_script").forEach(v =>
 				{
 					var gameobject = this.engine.mouse3DManager.selectedGameObject;
 					if (!gameobject || !gameobject.scene)
 						gameobject = hierarchy.rootnode.gameobject;
-
-					gameobject.addScript(dragdata.file_script.scriptName);
-				}
+					gameobject.addScript(v.scriptName);
+				});
 			});
 
 			this.once(egret.Event.ENTER_FRAME, this.onResize, this);
