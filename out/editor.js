@@ -6630,7 +6630,7 @@ var editor;
             Object.assign(this, v);
             //
             this.initView();
-            this.updateView();
+            this.invalidateView();
             //
             return this;
         };
@@ -6658,9 +6658,10 @@ var editor;
             objectViewEvent.attributeValue = this.space[this.attribute];
             this.textInput.dispatchEvent(objectViewEvent);
             this.dispatch("valueChanged");
-            this.updateView();
+            this.invalidateView();
         };
         TextInputBinder.prototype.updateView = function () {
+            console.log("updateView");
             if (!this._textfocusintxt) {
                 this.textInput.text = this.toText.call(this, this.space[this.attribute]);
             }
@@ -6673,7 +6674,10 @@ var editor;
         };
         TextInputBinder.prototype.ontxtfocusout = function () {
             this._textfocusintxt = false;
-            this.updateView();
+            this.invalidateView();
+        };
+        TextInputBinder.prototype.invalidateView = function () {
+            feng3d.ticker.nextframe(this.updateView, this);
         };
         return TextInputBinder;
     }(feng3d.EventDispatcher));
@@ -6778,6 +6782,7 @@ var editor;
             else if (event.key == "ArrowDown") {
                 this.space[this.attribute] -= this.step;
             }
+            this.invalidateView();
         };
         return NumberTextInputBinder;
     }(editor.TextInputBinder));
@@ -7079,73 +7084,22 @@ var editor;
             this._space.on("transformChanged", this.updateView, this);
             //
             this.updateView();
-            [this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach(function (item) {
-                _this.addItemEventListener(item);
+            ["x", "y", "z", "sx", "sy", "sz"].forEach(function (v) {
+                _this.addBinder(new editor.NumberTextInputBinder().init({
+                    space: _this.space, attribute: v, textInput: _this[v + "TextInput"], editable: true,
+                    controller: _this[v + "Label"],
+                }));
+            });
+            ["rx", "ry", "rz"].forEach(function (v) {
+                _this.addBinder(new editor.NumberTextInputBinder().init({
+                    space: _this.space, attribute: v, textInput: _this[v + "TextInput"], editable: true,
+                    controller: _this[v + "Label"], step: 0.1,
+                }));
             });
         };
         OVTransform.prototype.onRemovedFromStage = function () {
-            var _this = this;
             this._space.off("transformChanged", this.updateView, this);
             //
-            [this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach(function (item) {
-                _this.removeItemEventListener(item);
-            });
-        };
-        OVTransform.prototype.addItemEventListener = function (input) {
-            input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-        };
-        OVTransform.prototype.removeItemEventListener = function (input) {
-            input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-        };
-        OVTransform.prototype.ontxtfocusin = function () {
-            this._textfocusintxt = true;
-        };
-        OVTransform.prototype.ontxtfocusout = function () {
-            this._textfocusintxt = false;
-            this.updateView();
-        };
-        OVTransform.prototype.onTextChange = function (event) {
-            if (!this._textfocusintxt)
-                return;
-            var transfrom = this.space;
-            var value = 0;
-            if (event.currentTarget.text != undefined) {
-                value = Number(event.currentTarget.text);
-                value = isNaN(value) ? 0 : value;
-            }
-            switch (event.currentTarget) {
-                case this.xTextInput:
-                    transfrom.x = value;
-                    break;
-                case this.yTextInput:
-                    transfrom.y = value;
-                    break;
-                case this.zTextInput:
-                    transfrom.z = value;
-                    break;
-                case this.rxTextInput:
-                    transfrom.rx = value;
-                    break;
-                case this.ryTextInput:
-                    transfrom.ry = value;
-                    break;
-                case this.rzTextInput:
-                    transfrom.rz = value;
-                    break;
-                case this.sxTextInput:
-                    transfrom.sx = value ? value : 1;
-                    break;
-                case this.syTextInput:
-                    transfrom.sy = value ? value : 1;
-                    break;
-                case this.szTextInput:
-                    transfrom.sz = value ? value : 1;
-                    break;
-            }
         };
         Object.defineProperty(OVTransform.prototype, "space", {
             get: function () {
@@ -7172,20 +7126,18 @@ var editor;
          * 更新界面
          */
         OVTransform.prototype.updateView = function () {
-            if (this._textfocusintxt)
-                return;
             var transfrom = this.space;
             if (!transfrom)
                 return;
-            this.xTextInput.text = "" + transfrom.x;
-            this.yTextInput.text = "" + transfrom.y;
-            this.zTextInput.text = "" + transfrom.z;
-            this.rxTextInput.text = "" + transfrom.rx;
-            this.ryTextInput.text = "" + transfrom.ry;
-            this.rzTextInput.text = "" + transfrom.rz;
-            this.sxTextInput.text = "" + transfrom.sx;
-            this.syTextInput.text = "" + transfrom.sy;
-            this.szTextInput.text = "" + transfrom.sz;
+            // this.xTextInput.text = "" + transfrom.x;
+            // this.yTextInput.text = "" + transfrom.y;
+            // this.zTextInput.text = "" + transfrom.z;
+            // this.rxTextInput.text = "" + transfrom.rx;
+            // this.ryTextInput.text = "" + transfrom.ry;
+            // this.rzTextInput.text = "" + transfrom.rz;
+            // this.sxTextInput.text = "" + transfrom.sx;
+            // this.syTextInput.text = "" + transfrom.sy;
+            // this.szTextInput.text = "" + transfrom.sz;
         };
         OVTransform = __decorate([
             feng3d.OVComponent()

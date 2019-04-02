@@ -4,15 +4,25 @@ namespace editor
 	export class OVTransform extends eui.Component implements feng3d.IObjectView
 	{
 		//
+		public xLabel: eui.Label;
 		public xTextInput: eui.TextInput;
+		public yLabel: eui.Label;
 		public yTextInput: eui.TextInput;
+		public zLabel: eui.Label;
 		public zTextInput: eui.TextInput;
+		public rxLabel: eui.Label;
 		public rxTextInput: eui.TextInput;
+		public ryLabel: eui.Label;
 		public ryTextInput: eui.TextInput;
+		public rzLabel: eui.Label;
 		public rzTextInput: eui.TextInput;
+		public sxLabel: eui.Label;
 		public sxTextInput: eui.TextInput;
+		public syLabel: eui.Label;
 		public syTextInput: eui.TextInput;
+		public szLabel: eui.Label;
 		public szTextInput: eui.TextInput;
+
 		//
 		private _space: feng3d.Transform;
 		private _objectViewInfo: feng3d.ObjectViewInfo;
@@ -46,90 +56,30 @@ namespace editor
 			//
 			this.updateView();
 
-			[this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach((item) =>
+			["x", "y", "z", "sx", "sy", "sz"].forEach(v =>
 			{
-				this.addItemEventListener(item);
+				this.addBinder(new NumberTextInputBinder().init({
+					space: this.space, attribute: v, textInput: this[v + "TextInput"], editable: true,
+					controller: this[v + "Label"],
+				}));
 			});
+			["rx", "ry", "rz"].forEach(v =>
+			{
+				this.addBinder(new NumberTextInputBinder().init({
+					space: this.space, attribute: v, textInput: this[v + "TextInput"], editable: true,
+					controller: this[v + "Label"], step: 0.1,
+				}));
+			});
+
+
 		}
 
 		private onRemovedFromStage()
 		{
 			this._space.off("transformChanged", this.updateView, this);
 			//
-			[this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach((item) =>
-			{
-				this.removeItemEventListener(item);
-			});
 		}
 
-		private addItemEventListener(input: eui.TextInput)
-		{
-			input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-			input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-		}
-
-		private removeItemEventListener(input: eui.TextInput)
-		{
-			input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-			input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-			input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-		}
-
-		private _textfocusintxt: boolean;
-		private ontxtfocusin()
-		{
-			this._textfocusintxt = true;
-		}
-
-		private ontxtfocusout()
-		{
-			this._textfocusintxt = false;
-			this.updateView();
-		}
-
-		private onTextChange(event: egret.Event)
-		{
-			if (!this._textfocusintxt) return;
-
-			var transfrom: feng3d.Transform = <any>this.space;
-			var value = 0;
-			if (event.currentTarget.text != undefined)
-			{
-				value = Number(event.currentTarget.text);
-				value = isNaN(value) ? 0 : value;
-			}
-			switch (event.currentTarget)
-			{
-				case this.xTextInput:
-					transfrom.x = value;
-					break;
-				case this.yTextInput:
-					transfrom.y = value;
-					break;
-				case this.zTextInput:
-					transfrom.z = value;
-					break;
-				case this.rxTextInput:
-					transfrom.rx = value;
-					break;
-				case this.ryTextInput:
-					transfrom.ry = value;
-					break;
-				case this.rzTextInput:
-					transfrom.rz = value;
-					break;
-				case this.sxTextInput:
-					transfrom.sx = value ? value : 1;
-					break;
-				case this.syTextInput:
-					transfrom.sy = value ? value : 1;
-					break;
-				case this.szTextInput:
-					transfrom.sz = value ? value : 1;
-					break;
-			}
-		}
 		get space()
 		{
 			return this._space;
@@ -159,19 +109,18 @@ namespace editor
 		 */
 		updateView(): void
 		{
-			if (this._textfocusintxt) return;
 			var transfrom: feng3d.Transform = <any>this.space;
 			if (!transfrom)
 				return;
-			this.xTextInput.text = "" + transfrom.x;
-			this.yTextInput.text = "" + transfrom.y;
-			this.zTextInput.text = "" + transfrom.z;
-			this.rxTextInput.text = "" + transfrom.rx;
-			this.ryTextInput.text = "" + transfrom.ry;
-			this.rzTextInput.text = "" + transfrom.rz;
-			this.sxTextInput.text = "" + transfrom.sx;
-			this.syTextInput.text = "" + transfrom.sy;
-			this.szTextInput.text = "" + transfrom.sz;
+			// this.xTextInput.text = "" + transfrom.x;
+			// this.yTextInput.text = "" + transfrom.y;
+			// this.zTextInput.text = "" + transfrom.z;
+			// this.rxTextInput.text = "" + transfrom.rx;
+			// this.ryTextInput.text = "" + transfrom.ry;
+			// this.rzTextInput.text = "" + transfrom.rz;
+			// this.sxTextInput.text = "" + transfrom.sx;
+			// this.syTextInput.text = "" + transfrom.sy;
+			// this.szTextInput.text = "" + transfrom.sz;
 		}
 	}
 }

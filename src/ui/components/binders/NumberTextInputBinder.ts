@@ -128,6 +128,7 @@ namespace editor
             {
                 this.space[this.attribute] -= this.step;
             }
+            this.invalidateView();
         }
     }
 }

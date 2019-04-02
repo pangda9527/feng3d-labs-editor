@@ -1931,6 +1931,7 @@ declare namespace editor {
         private _textfocusintxt;
         protected ontxtfocusin(): void;
         protected ontxtfocusout(): void;
+        protected invalidateView(): void;
     }
 }
 declare namespace editor {
@@ -2069,14 +2070,23 @@ declare namespace editor {
 }
 declare namespace editor {
     class OVTransform extends eui.Component implements feng3d.IObjectView {
+        xLabel: eui.Label;
         xTextInput: eui.TextInput;
+        yLabel: eui.Label;
         yTextInput: eui.TextInput;
+        zLabel: eui.Label;
         zTextInput: eui.TextInput;
+        rxLabel: eui.Label;
         rxTextInput: eui.TextInput;
+        ryLabel: eui.Label;
         ryTextInput: eui.TextInput;
+        rzLabel: eui.Label;
         rzTextInput: eui.TextInput;
+        sxLabel: eui.Label;
         sxTextInput: eui.TextInput;
+        syLabel: eui.Label;
         syTextInput: eui.TextInput;
+        szLabel: eui.Label;
         szTextInput: eui.TextInput;
         private _space;
         private _objectViewInfo;
@@ -2084,12 +2094,6 @@ declare namespace editor {
         private onComplete;
         private onAddedToStage;
         private onRemovedFromStage;
-        private addItemEventListener;
-        private removeItemEventListener;
-        private _textfocusintxt;
-        private ontxtfocusin;
-        private ontxtfocusout;
-        private onTextChange;
         space: feng3d.Transform;
         getAttributeView(attributeName: String): any;
         getblockView(blockName: String): any;
