@@ -12595,11 +12595,9 @@ var editor;
             var _this = this;
             dragdata.getDragData("gameobject").forEach(function (v) {
                 if (!v.contains(_this.gameobject)) {
-                    if (_this.gameobject != v.parent) {
-                        var localToWorldMatrix = v.transform.localToWorldMatrix;
-                        _this.gameobject.addChild(v);
-                        v.transform.localToWorldMatrix = localToWorldMatrix;
-                    }
+                    var localToWorldMatrix = v.transform.localToWorldMatrix;
+                    _this.gameobject.addChild(v);
+                    v.transform.localToWorldMatrix = localToWorldMatrix;
                 }
             });
             dragdata.getDragData("file_gameobject").forEach(function (v) {

@@ -47,12 +47,9 @@ namespace editor
             {
                 if (!v.contains(this.gameobject))
                 {
-                    if (this.gameobject != v.parent)
-                    {
-                        var localToWorldMatrix = v.transform.localToWorldMatrix
-                        this.gameobject.addChild(v);
-                        v.transform.localToWorldMatrix = localToWorldMatrix;
-                    }
+                    var localToWorldMatrix = v.transform.localToWorldMatrix
+                    this.gameobject.addChild(v);
+                    v.transform.localToWorldMatrix = localToWorldMatrix;
                 }
             });
             dragdata.getDragData("file_gameobject").forEach(v =>
