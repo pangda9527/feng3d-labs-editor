@@ -1,6 +1,5 @@
 var isdebug = true;
 
-
 var result = [
     isdebug ? "libs/modules/egret/egret.js" : "libs/modules/egret/egret.min.js",
     isdebug ? "libs/modules/egret/egret.web.js" : "libs/modules/egret/egret.web.min.js",
@@ -86,13 +85,28 @@ function xhrTsconfig(url, callback)
         }).join(""));
         if (obj.compilerOptions.outDir)
         {
-            obj.files.forEach(v => result.push(root + "/" + obj.compilerOptions.outDir + "/" + v));
+            var files = obj.files.filter(v => v.indexOf(".d.ts") == -1);
+
+            var sameStr = files[0];
+            files.forEach(v => { sameStr = getSameStr(sameStr, v) });
+            files = files.map(v => v.substr(sameStr.length).replace(".ts", ".js"));
+            files.forEach(v => result.push(root + "/" + obj.compilerOptions.outDir + "/" + v));
         } else if (obj.compilerOptions.outFile)
         {
             result.push(root + "/" + obj.compilerOptions.outFile);
         }
         callback && callback();
     });
+}
+
+function getSameStr(a, b)
+{
+    var len = Math.min(a.length, b.length);
+    for (var i = 0; i < len; i++)
+    {
+        if (a.charAt(i) != b.charAt(i)) return a.substr(0, i);
+    }
+    return a.substr(0, len);
 }
 
 function xhr(url, complete, error)

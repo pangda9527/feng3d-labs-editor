@@ -6,8 +6,8 @@
         "declarationMap": true,
         "declaration": true,
         "experimentalDecorators": true,
-        "outFile": "out/editor.js"
-        // "outDir": "debug"
+        // "outFile": "out/editor.js"
+        "outDir": "debug"
     },
     "files": [
         //
