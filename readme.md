@@ -4,6 +4,9 @@ feng3d引擎编辑器
 ## 文档
     http://feng3d.com
 
+## Issues
+    https://github.com/feng3d-labs/editor/issues
+
 ## 在线版本
     http://feng3d.com/editor/index.html
 
