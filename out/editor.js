@@ -6661,7 +6661,6 @@ var editor;
             this.invalidateView();
         };
         TextInputBinder.prototype.updateView = function () {
-            console.log("updateView");
             if (!this._textfocusintxt) {
                 this.textInput.text = this.toText.call(this, this.space[this.attribute]);
             }
@@ -7129,15 +7128,6 @@ var editor;
             var transfrom = this.space;
             if (!transfrom)
                 return;
-            // this.xTextInput.text = "" + transfrom.x;
-            // this.yTextInput.text = "" + transfrom.y;
-            // this.zTextInput.text = "" + transfrom.z;
-            // this.rxTextInput.text = "" + transfrom.rx;
-            // this.ryTextInput.text = "" + transfrom.ry;
-            // this.rzTextInput.text = "" + transfrom.rz;
-            // this.sxTextInput.text = "" + transfrom.sx;
-            // this.syTextInput.text = "" + transfrom.sy;
-            // this.szTextInput.text = "" + transfrom.sz;
         };
         OVTransform = __decorate([
             feng3d.OVComponent()
