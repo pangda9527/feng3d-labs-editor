@@ -123,7 +123,6 @@ namespace editor
 
         protected updateView()
         {
-            console.log(`updateView`);
             if (!this._textfocusintxt)
             {
                 this.textInput.text = this.toText.call(this, this.space[this.attribute]);
