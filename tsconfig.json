@@ -9,6 +9,9 @@
         // "outFile": "out/editor.js"
         "outDir": "debug"
     },
+    "include": [
+        "feng3d/debug/**/*.ts"
+    ],
     "files": [
         //
         "libs/modules/egret/egret.d.ts",
@@ -21,7 +24,7 @@
         "libs/jszip.d.ts",
         "libs/FileSaver.d.ts",
         //
-        "feng3d/out/feng3d.d.ts",
+        // "feng3d/out/feng3d.d.ts",
         //
         "src/polyfill/typescript/typescriptServices.ts",
         // 扩展 feng3d
