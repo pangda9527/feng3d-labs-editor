@@ -90,10 +90,19 @@ function xhrTsconfig(url, callback)
             var sameStr = files[0];
             files.forEach(v => { sameStr = getSameStr(sameStr, v) });
             files = files.map(v => v.substr(sameStr.length).replace(".ts", ".js"));
-            files.forEach(v => result.push(root + "/" + obj.compilerOptions.outDir + "/" + v));
+            files.forEach(v =>
+            {
+                if (root.length == "")
+                    result.push(obj.compilerOptions.outDir + "/" + v)
+                else
+                    result.push(root + "/" + obj.compilerOptions.outDir + "/" + v)
+            });
         } else if (obj.compilerOptions.outFile)
         {
-            result.push(root + "/" + obj.compilerOptions.outFile);
+            if (root.length == "")
+                result.push(obj.compilerOptions.outFile);
+            else
+                result.push(root + "/" + obj.compilerOptions.outFile);
         }
         callback && callback();
     });
