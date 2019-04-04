@@ -3,3 +3,4 @@
 /release
 /publish/electron/resources/app.asar
 /publish/bin
+/debug

@@ -59,22 +59,18 @@ namespace editor
 
 		private updateImage(i: number)
 		{
-			var textureCube: feng3d.TextureCube = this.space;
-			const imagePath = textureCube[propertys[i]];
 			const image = this.images[i];
-			if (imagePath)
+			var textureCube: feng3d.TextureCube = this.space;
+			textureCube.getTextureImage(feng3d.TextureCube.ImageNames[i], (img) =>
 			{
-				editorRS.fs.readArrayBuffer(imagePath, (err, data) =>
+				if (img)
 				{
-					feng3d.dataTransform.arrayBufferToDataURL(data, (dataurl) =>
-					{
-						image.source = dataurl;
-					});
-				});
-			} else
-			{
-				image.source = null;
-			}
+					image.source = feng3d.dataTransform.imageToDataURL(img);
+				} else
+				{
+					image.source = null;
+				}
+			});
 		}
 
 		private onImageClick(e: egret.MouseEvent)
@@ -87,7 +83,7 @@ namespace editor
 				var menus: MenuItem[] = [{
 					label: `None`, click: () =>
 					{
-						textureCube[propertys[index]] = "";
+						textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], null);
 						this.updateImage(index);
 						this.dispatchValueChange(index);
 					}
@@ -97,7 +93,7 @@ namespace editor
 					menus.push({
 						label: d.name, click: () =>
 						{
-							textureCube[propertys[index]] = d;
+							textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], d);
 							this.updateImage(index);
 							this.dispatchValueChange(index);
 						}

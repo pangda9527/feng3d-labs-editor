@@ -16,7 +16,7 @@ namespace editor
 			this.skinName = "OAVDefault";
 		}
 
-		set dragparam(param: { accepttype: keyof DragData; datatype: string; })
+		set dragparam(param: { accepttype: keyof DragDataMap; datatype: string; })
 		{
 			if (param)
 			{

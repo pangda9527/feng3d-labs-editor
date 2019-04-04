@@ -30,6 +30,7 @@ namespace editor
         private _currentTool: MRSToolBase;
 
         private mrsToolObject: feng3d.GameObject;
+        private mrsToolTarget = new MRSToolTarget();
 
         get editorCamera() { return this._editorCamera; }
         set editorCamera(v) { this._editorCamera = v; this.invalidate(); }
@@ -44,6 +45,11 @@ namespace editor
             this.mTool = Object.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(MTool);
             this.rTool = Object.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(RTool);
             this.sTool = Object.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(STool);
+
+            this.mTool.mrsToolTarget = this.mrsToolTarget;
+            this.rTool.mrsToolTarget = this.mrsToolTarget;
+            this.sTool.mrsToolTarget = this.mrsToolTarget;
+
             setAwaysVisible(this.mTool);
             setAwaysVisible(this.rTool);
             setAwaysVisible(this.sTool);

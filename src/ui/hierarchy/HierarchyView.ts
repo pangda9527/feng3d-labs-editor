@@ -44,6 +44,11 @@ namespace editor
 
 		private onAddedToStage()
 		{
+			drag.register(this.list, null, ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
+			{
+				hierarchy.rootnode.acceptDragDrop(dragdata);
+			});
+
 			this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 			this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
@@ -55,6 +60,8 @@ namespace editor
 
 		private onRemovedFromStage()
 		{
+			drag.unregister(this.list);
+
 			this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 			this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 

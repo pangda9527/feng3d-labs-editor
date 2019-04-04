@@ -65,10 +65,10 @@ namespace editor
 
 			drag.register(this.addComponentButton, null, ["file_script"], (dragdata) =>
 			{
-				if (dragdata.file_script)
+				dragdata.getDragData("file_script").forEach(v =>
 				{
-					this.space.addScript(dragdata.file_script.scriptName);
-				}
+					this.space.addScript(v.scriptName);
+				});
 			});
 
 			this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);

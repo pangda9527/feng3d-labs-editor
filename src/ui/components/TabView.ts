@@ -11,7 +11,7 @@ namespace editor
 	/**
 	 * 拖拽数据
 	 */
-	export interface DragData
+	export interface DragDataMap
 	{
 		moduleView: { tabView: TabView, moduleName: string };
 	}
@@ -130,43 +130,51 @@ namespace editor
 		{
 			drag.register(this.tabGroup, null, ["moduleView"], (dragSource) =>
 			{
-				if (dragSource.moduleView.tabView == this)
+				dragSource.getDragData("moduleView").forEach(v =>
 				{
-					let result = this._moduleViews.filter(v => v.moduleName == dragSource.moduleView.moduleName)[0];
-					if (result)
+					if (v.tabView == this)
 					{
-						let index = this._moduleViews.indexOf(result);
-						this._moduleViews.splice(index, 1);
-						this._moduleViews.push(result);
-						this._invalidateView();
+						let result = this._moduleViews.filter(v => v.moduleName == v.moduleName)[0];
+						if (result)
+						{
+							let index = this._moduleViews.indexOf(result);
+							this._moduleViews.splice(index, 1);
+							this._moduleViews.push(result);
+							this._invalidateView();
+						}
+					} else
+					{
+						let moduleView = v.tabView.removeModule(v.moduleName);
+						this.addModule(moduleView);
 					}
-				} else
-				{
-					let moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
-					this.addModule(moduleView);
-				}
-				feng3d.dispatcher.dispatch("viewLayout.changed");
+					feng3d.dispatcher.dispatch("viewLayout.changed");
+				});
+
 			});
 			drag.register(this.contentGroup, null, ["moduleView"], (dragSource) =>
 			{
-				if (dragSource.moduleView.tabView == this && this._moduleViews.length == 1) return;
-
-				let moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
-
-				var rect = this.getGlobalBounds();
-				var center = rect.center;
-				var mouse = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
-				var sub = mouse.sub(center);
-				sub.x = sub.x / rect.width;
-				sub.y = sub.y / rect.height;
-				if (sub.x * sub.x > sub.y * sub.y)
+				dragSource.getDragData("moduleView").forEach(v =>
 				{
-					this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
-				} else
-				{
-					this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
-				}
-				feng3d.dispatcher.dispatch("viewLayout.changed");
+					if (v.tabView == this && this._moduleViews.length == 1) return;
+
+					let moduleView = v.tabView.removeModule(v.moduleName);
+
+					var rect = this.getGlobalBounds();
+					var center = rect.center;
+					var mouse = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
+					var sub = mouse.sub(center);
+					sub.x = sub.x / rect.width;
+					sub.y = sub.y / rect.height;
+					if (sub.x * sub.x > sub.y * sub.y)
+					{
+						this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
+					} else
+					{
+						this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
+					}
+					feng3d.dispatcher.dispatch("viewLayout.changed");
+				});
+
 			});
 			this._invalidateView()
 		}
@@ -244,7 +252,7 @@ namespace editor
 		{
 			let moduleView = this._moduleViews.filter(v => v.moduleName == moduleName)[0];
 			var index = this._moduleViews.indexOf(moduleView);
-			feng3d.assert(index != -1);
+			feng3d.debuger && feng3d.assert(index != -1);
 			this._moduleViews.splice(index, 1);
 
 			this.adjust(this);
@@ -290,7 +298,7 @@ namespace editor
 					this.adjust(parent);
 				} else
 				{
-					feng3d.assert(false);
+					feng3d.debuger && feng3d.assert(false);
 				}
 			}
 			// 找到对象所属窗口，删除空窗口
@@ -386,7 +394,7 @@ namespace editor
 				//
 				drag.register(v, (dragSource) =>
 				{
-					dragSource.moduleView = { tabView: <any>this, moduleName: v.moduleName };
+					dragSource.addDragData("moduleView", { tabView: <any>this, moduleName: v.moduleName });
 				}, []);
 				v.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onTabButtonRightClick, this);
 			});

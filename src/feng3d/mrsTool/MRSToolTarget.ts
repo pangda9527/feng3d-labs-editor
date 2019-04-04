@@ -1,7 +1,5 @@
 namespace editor
 {
-    export var mrsToolTarget: MRSToolTarget;
-
     export class MRSToolTarget
     {
         //
@@ -30,14 +28,28 @@ namespace editor
 
         set controllerTargets(value: feng3d.Transform[])
         {
+            if (this._controllerTargets)
+            {
+                this._controllerTargets.forEach(v =>
+                {
+                    v.off("scenetransformChanged", this.invalidateControllerImage, this);
+                });
+            }
             this._controllerTargets = value;
-            this.updateControllerImage();
+            if (this._controllerTargets)
+            {
+                this._controllerTargets.forEach(v =>
+                {
+                    v.on("scenetransformChanged", this.invalidateControllerImage, this);
+                });
+            }
+            this.invalidateControllerImage();
         }
 
         constructor()
         {
-            feng3d.dispatcher.on("editor.isWoldCoordinateChanged", this.updateControllerImage, this);
-            feng3d.dispatcher.on("editor.isBaryCenterChanged", this.updateControllerImage, this);
+            feng3d.dispatcher.on("editor.isWoldCoordinateChanged", this.invalidateControllerImage, this);
+            feng3d.dispatcher.on("editor.isBaryCenterChanged", this.invalidateControllerImage, this);
             //
             feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
         }
@@ -58,6 +70,11 @@ namespace editor
             {
                 this.controllerTargets = null;
             }
+        }
+
+        private invalidateControllerImage()
+        {
+            feng3d.ticker.nextframe(this.updateControllerImage, this);
         }
 
         private updateControllerImage()
@@ -311,6 +328,4 @@ namespace editor
     {
         position: feng3d.Vector3, rotation: feng3d.Vector3, scale: feng3d.Vector3
     }
-
-    mrsToolTarget = new MRSToolTarget();
 }

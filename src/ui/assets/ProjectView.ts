@@ -67,11 +67,11 @@ namespace editor
             //
             drag.register(this.filelistgroup, (dragsource) => { }, ["gameobject"], (dragSource) =>
             {
-                if (dragSource.gameobject)
+                dragSource.getDragData("gameobject").forEach(v =>
                 {
-                    var gameobject = feng3d.serialization.clone(dragSource.gameobject);
+                    var gameobject = feng3d.serialization.clone(v);
                     editorAsset.saveObject(gameobject);
-                }
+                });
             });
 
             this.initlist();

@@ -80,7 +80,7 @@ namespace editor
 
             //
             this.initView();
-            this.updateView();
+            this.invalidateView();
             //
             return this;
         }
@@ -118,7 +118,7 @@ namespace editor
 
             this.dispatch("valueChanged");
 
-            this.updateView();
+            this.invalidateView();
         }
 
         protected updateView()
@@ -143,7 +143,12 @@ namespace editor
         protected ontxtfocusout()
         {
             this._textfocusintxt = false;
-            this.updateView();
+            this.invalidateView();
+        }
+
+        protected invalidateView()
+        {
+            feng3d.ticker.nextframe(this.updateView, this);
         }
     }
 }

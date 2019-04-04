@@ -4,7 +4,7 @@ namespace editor
 
 	export class Drag
 	{
-		register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragData)[], onDragDrop?: (dragSource: DragData) => void)
+		register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragDataMap)[], onDragDrop?: (dragSource: DragData) => void)
 		{
 			this.unregister(displayObject);
 			registers.push({ displayObject: displayObject, setdargSource: setdargSource, accepttypes: accepttypes, onDragDrop: onDragDrop });
@@ -40,44 +40,89 @@ namespace editor
 
 	drag = new Drag();
 
+	export interface DragDataItem<K extends keyof DragDataMap>
+	{
+		datatype: K;
+		value: DragDataMap[K];
+	}
+
+	export class DragData
+	{
+		private datas: DragDataItem<any>[] = [];
+
+		/**
+		 * 添加拖拽数据
+		 * 
+		 * @param datatype 
+		 * @param value 
+		 */
+		addDragData<K extends keyof DragDataMap>(datatype: K, value: DragDataMap[K])
+		{
+			var item = { datatype: datatype, value: value };
+			this.datas.push(item)
+		}
+
+		/**
+		 * 获取拖拽数据列表
+		 * 
+		 * @param datatype 
+		 */
+		getDragData<K extends keyof DragDataMap>(datatype: K)
+		{
+			var data: DragDataMap[K][] = this.datas.filter(v => v.datatype == datatype).map(v => v.value);
+			return data;
+		}
+
+		/**
+		 * 是否拥有指定类型数据
+		 * 
+		 * @param datatype 
+		 */
+		hasDragData<K extends keyof DragDataMap>(datatype: K)
+		{
+			var data: DragDataMap[K][] = this.datas.filter(v => v.datatype == datatype).map(v => v.value);
+			return data.length > 0;
+		}
+	}
+
 	/**
 	 * 拖拽数据
 	 */
-	export interface DragData
+	export interface DragDataMap
 	{
-		gameobject?: feng3d.GameObject;
-		animationclip?: feng3d.AnimationClip;
-		material?: feng3d.Material;
-		geometry?: feng3d.Geometry;
+		gameobject: feng3d.GameObject;
+		animationclip: feng3d.AnimationClip;
+		material: feng3d.Material;
+		geometry: feng3d.Geometry;
 		//
-		file_gameobject?: feng3d.GameObject;
+		file_gameobject: feng3d.GameObject;
 		/**
 		 * 脚本路径
 		 */
-		file_script?: feng3d.ScriptAsset;
+		file_script: feng3d.ScriptAsset;
 		/**
 		 * 文件
 		 */
-		assetNodes?: AssetNode[];
+		assetNodes: AssetNode;
 		/**
 		 * 声音路径
 		 */
-		audio?: feng3d.AudioAsset;
+		audio: feng3d.AudioAsset;
 		/**
 		 * 纹理
 		 */
-		texture2d?: feng3d.Texture2D;
+		texture2d: feng3d.Texture2D;
 		/**
 		 * 立方体纹理
 		 */
-		texturecube?: feng3d.TextureCube;
+		texturecube: feng3d.TextureCube;
 	}
 
 	interface DragItem
 	{
 		displayObject: egret.DisplayObject,
 		setdargSource: (dragSource: DragData) => void,
-		accepttypes: (keyof DragData)[],
+		accepttypes: (keyof DragDataMap)[],
 		onDragDrop?: (dragSource: DragData) => void
 	}
 
@@ -118,7 +163,7 @@ namespace editor
 	 */
 	function acceptData(item: DragItem, dragSource: DragData)
 	{
-		var hasdata = item.accepttypes.reduce((prevalue, accepttype) => { return prevalue || !!dragSource[accepttype]; }, false)
+		var hasdata = item.accepttypes.reduce((prevalue, accepttype) => { return prevalue || dragSource.hasDragData(accepttype); }, false)
 		return hasdata;
 	}
 
@@ -153,9 +198,12 @@ namespace editor
 
 		if (accepter)
 		{
-			accepter.alpha = accepterAlpha;
 			var accepteritem = getitem(accepter);
-			accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
+			if (accepter != dragitem.displayObject)
+			{
+				accepter.alpha = accepterAlpha;
+				accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
+			}
 		}
 		accepter = null;
 		dragitem = null;
@@ -168,13 +216,13 @@ namespace editor
 		if (!acceptableitems)
 		{
 			//获取拖拽数据
-			dragSource = <any>{};
+			dragSource = new DragData();
 			dragitem.setdargSource(dragSource);
 
 			//获取可接受数据的对象列表
 			acceptableitems = registers.reduce((value: DragItem[], item) =>
 			{
-				if (item != dragitem && acceptData(item, dragSource) && item.displayObject.stage)
+				if (acceptData(item, dragSource) && item.displayObject.stage)
 				{
 					item["hierarchyValue"] = getHierarchyValue(item.displayObject);
 					value.push(item);
@@ -198,7 +246,11 @@ namespace editor
 
 		if (accepter)
 		{
-			accepter.alpha = accepterAlpha;
+			if (dragitem.displayObject != accepter)
+			{
+				accepter.alpha = accepterAlpha;
+			}
+
 			accepter = null;
 		}
 
@@ -210,13 +262,21 @@ namespace editor
 			if (rect.contains(event.stageX, event.stageY))
 			{
 				accepter = element.displayObject;
-				accepterAlpha = element.displayObject.alpha;
-				element.displayObject.alpha = 0.5;
+				if (dragitem.displayObject != accepter)
+				{
+					accepterAlpha = element.displayObject.alpha;
+					element.displayObject.alpha = 0.5;
+				}
 				break;
 			}
 		}
 	}
 
+	/**
+	 * 获取显示对象的层级
+	 * 
+	 * @param displayObject 
+	 */
 	function getHierarchyValue(displayObject: egret.DisplayObject)
 	{
 		var hierarchys = [];

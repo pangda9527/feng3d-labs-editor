@@ -6,8 +6,12 @@
         "declarationMap": true,
         "declaration": true,
         "experimentalDecorators": true,
-        "outFile": "out/editor.js"
+        // "outFile": "out/editor.js"
+        "outDir": "debug"
     },
+    "include": [
+        "feng3d/debug/**/*.ts"
+    ],
     "files": [
         //
         "libs/modules/egret/egret.d.ts",
@@ -20,7 +24,7 @@
         "libs/jszip.d.ts",
         "libs/FileSaver.d.ts",
         //
-        "feng3d/out/feng3d.d.ts",
+        // "feng3d/out/feng3d.d.ts",
         //
         "src/polyfill/typescript/typescriptServices.ts",
         // 扩展 feng3d
@@ -166,6 +170,7 @@
         "src/feng3d/hierarchy/Hierarchy.ts",
         "src/feng3d/scene/SceneRotateTool.ts",
         "src/feng3d/GroundGrid.ts",
+        "src/feng3d/EditorEngine.ts",
         "src/feng3d/Main3D.ts",
         "src/feng3d/EditorComponent.ts",
         "src/feng3d/Feng3dScreenShot.ts",

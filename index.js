@@ -1,16 +1,20 @@
 var isdebug = true;
 
-loadjs([
-    //
+var result = [
     isdebug ? "libs/modules/egret/egret.js" : "libs/modules/egret/egret.min.js",
     isdebug ? "libs/modules/egret/egret.web.js" : "libs/modules/egret/egret.web.min.js",
     isdebug ? "libs/modules/res/res.js" : "libs/modules/res/res.min.js",
     isdebug ? "libs/modules/eui/eui.js" : "libs/modules/eui/eui.min.js",
     isdebug ? "libs/modules/tween/tween.js" : "libs/modules/tween/tween.min.js",
-    //
-    `feng3d/out/feng3d.js`,
-    `out/editor.js`,
-], loadComplete);
+];
+
+xhrTsconfig("feng3d/tsconfig.json", () =>
+{
+    xhrTsconfig("tsconfig.json", () =>
+    {
+        loadjs(result, loadComplete);
+    });
+});
 
 function loadjs(path, onload, onerror)
 {
@@ -63,4 +67,76 @@ function loadComplete()
      * }
      **/
     egret.runEgret({ renderMode: "webgl", audioType: 0 });
+}
+
+function xhrTsconfig(url, callback)
+{
+    var ps = url.split("/");
+    ps.pop();
+    var root = ps.join("/");
+    xhr(url, (xhr) =>
+    {
+        var obj = JSON.parse(xhr.responseText.split("\n").map(v =>
+        {
+            var index = v.indexOf("//");
+            if (index > 0)
+                v = v.substr(0, index);
+            return v;
+        }).join(""));
+        if (obj.compilerOptions.outDir)
+        {
+            var files = obj.files.filter(v => v.indexOf(".d.ts") == -1);
+
+            var sameStr = files[0];
+            files.forEach(v => { sameStr = getSameStr(sameStr, v) });
+            files = files.map(v => v.substr(sameStr.length).replace(".ts", ".js"));
+            files.forEach(v =>
+            {
+                if (root.length == "")
+                    result.push(obj.compilerOptions.outDir + "/" + v)
+                else
+                    result.push(root + "/" + obj.compilerOptions.outDir + "/" + v)
+            });
+        } else if (obj.compilerOptions.outFile)
+        {
+            if (root.length == "")
+                result.push(obj.compilerOptions.outFile);
+            else
+                result.push(root + "/" + obj.compilerOptions.outFile);
+        }
+        callback && callback();
+    });
+}
+
+function getSameStr(a, b)
+{
+    var len = Math.min(a.length, b.length);
+    for (var i = 0; i < len; i++)
+    {
+        if (a.charAt(i) != b.charAt(i)) return a.substr(0, i);
+    }
+    return a.substr(0, len);
+}
+
+function xhr(url, complete, error)
+{
+    var req = new XMLHttpRequest();
+    req.onreadystatechange = function ()
+    {
+        if (req.readyState === 4)
+        {
+            if ((req.status >= 200 && req.status < 300) || req.status === 1223)
+            {
+                complete(req);
+            }
+            else
+            {
+                error && error(req);
+            }
+            req.onreadystatechange = function () { };
+        }
+    };
+    req.open("GET", url, true);
+    req.responseType = "";
+    req.send(null);
 }

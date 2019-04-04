@@ -100,7 +100,6 @@ namespace editor
             {
                 var node = this.getNode(element);
                 node.selected = true;
-                node.openParents();
             });
         }
 

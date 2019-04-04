@@ -45,6 +45,7 @@ namespace editor
 		/**
 		 * 是否选中
 		 */
+		@feng3d.watch("selectedChanged")
 		selected = false;
         /** 
          * 父结点
@@ -99,7 +100,7 @@ namespace editor
 		{
 			node.remove();
 
-			feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
+			feng3d.debuger && feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
 
 			if (this.children.indexOf(node) == -1) this.children.push(node);
 			node.parent = this;
@@ -144,6 +145,11 @@ namespace editor
 		private openChanged()
 		{
 			this.dispatch("openChanged", null, true);
+		}
+
+		private selectedChanged()
+		{
+			this.openParents();
 		}
 	}
 }
