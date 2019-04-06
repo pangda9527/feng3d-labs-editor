@@ -226,7 +226,7 @@ namespace editor
             if (selectedAssetFile.length > 0)
                 this.filepathLabel.text = selectedAssetFile.map(v =>
                 {
-                    return v.asset.name + v.asset.extenson;
+                    return v.asset.fileName + v.asset.extenson;
                 }).join(",");
             else
                 this.filepathLabel.text = "";
