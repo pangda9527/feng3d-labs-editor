@@ -56,6 +56,7 @@ namespace editor
 
         private onFileChanged(e: feng3d.Event<string>)
         {
+            if (!e.data) return;
             if (e.data.substr(-3) == ".ts")
             {
                 feng3d.ticker.once(2000, <any>this.onScriptCompile, this);

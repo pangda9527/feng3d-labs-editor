@@ -65,7 +65,7 @@ namespace editor
 
             this.asset = asset;
             this.isDirectory = asset.assetType == feng3d.AssetType.folder;
-            this.label = asset.name;
+            this.label = asset.fileName;
             // 更新图标
             if (this.isDirectory)
             {

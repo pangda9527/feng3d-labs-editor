@@ -79,11 +79,12 @@ namespace editor
             //
             this.fileDrag.addEventListener();
 
-            this.filelist.addEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
-            this.filelist.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
+            this.filelist.addEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
+            this.filelist.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.filelist.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            MouseOnDisableScroll.register(this.filelist);
 
             this.floderpathTxt.touchEnabled = true;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
@@ -95,17 +96,17 @@ namespace editor
         {
             super.$onRemoveFromStage();
 
-            this.filelist.removeEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
-            this.filelist.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
-
+            this.filelist.removeEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
+            this.filelist.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.filelist.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
 
-            this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
+            MouseOnDisableScroll.register(this.filelist);
 
             feng3d.watcher.unwatch(editorAsset, "showFloder", this.updateShowFloder, this);
 
+            this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.dispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
 
             //
@@ -225,7 +226,7 @@ namespace editor
             if (selectedAssetFile.length > 0)
                 this.filepathLabel.text = selectedAssetFile.map(v =>
                 {
-                    return v.asset.name + v.asset.extenson;
+                    return v.asset.fileName + v.asset.extenson;
                 }).join(",");
             else
                 this.filepathLabel.text = "";

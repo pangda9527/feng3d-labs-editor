@@ -92,7 +92,7 @@ namespace editor
                     audioFiles.forEach(item =>
                     {
                         menus.push({
-                            label: item.name, click: () =>
+                            label: item.fileName, click: () =>
                             {
                                 this.attributeValue = item.assetPath;
                             }
