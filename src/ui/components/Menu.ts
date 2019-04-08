@@ -68,8 +68,9 @@ namespace editor
         {
             var menuItem = this.handleShow({ submenu: menuItems });
             if (menuItem.submenu.length == 0) return;
-            var menuUI = MenuUI.create(menuItem.submenu);
+            var menuUI = MenuUI.create(menuItem.submenu, null);
             maskview.mask(menuUI);
+            return menuUI;
         }
 
         /**
@@ -77,7 +78,7 @@ namespace editor
          * 
          * @param menuItem 菜单数据
          */
-        private handleShow(menuItem: MenuItem)
+        handleShow(menuItem: MenuItem)
         {
             if (menuItem.submenu)
             {

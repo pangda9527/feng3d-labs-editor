@@ -17,206 +17,233 @@ namespace editor
         {
             var mainMenu: MenuItem[] = [
                 {
-                    label: "新建项目", click: () =>
-                    {
-                        popupview.popupObject({ newprojectname: "newproject" }, {
-                            closecallback: (data) =>
-                            {
-                                if (data.newprojectname && data.newprojectname.length > 0)
-                                {
-                                    editorcache.projectname = data.newprojectname;
-                                    window.location.reload();
-                                }
-                            }
-                        });
-                    },
-                },
-                {
-                    label: "打开最近的项目",
-                    submenu: editorcache.lastProjects.map(element =>
-                    {
-                        var menuItem: MenuItem =
+                    label: "文件",
+                    submenu: [
                         {
-                            label: element, click: () =>
+                            label: "新建项目", click: () =>
                             {
-                                if (editorcache.projectname != element)
-                                {
-                                    editorcache.projectname = element;
-                                    window.location.reload();
-                                }
-                            }
-                        };
-                        return menuItem;
-                    }),
-                    click: () =>
-                    {
-                        popupview.popupObject({ newprojectname: "newproject" }, {
-                            closecallback: (data) =>
-                            {
-                                if (data.newprojectname && data.newprojectname.length > 0)
-                                {
-                                    editorcache.projectname = data.newprojectname;
-                                    window.location.reload();
-                                }
-                            }
-                        });
-                    }
-                },
-                {
-                    label: "保存场景", click: () =>
-                    {
-                        var gameobject = hierarchy.rootnode.gameobject;
-                        editorAsset.saveObject(gameobject);
-                    }
-                },
-                {
-                    label: "导入项目", click: () =>
-                    {
-                        editorRS.selectFile((filelist) =>
+                                popupview.popupObject({ newprojectname: "newproject" }, {
+                                    closecallback: (data) =>
+                                    {
+                                        if (data.newprojectname && data.newprojectname.length > 0)
+                                        {
+                                            editorcache.projectname = data.newprojectname;
+                                            window.location.reload();
+                                        }
+                                    }
+                                });
+                            },
+                        },
                         {
-                            editorRS.importProject(filelist.item(0), () =>
+                            label: "打开最近的项目",
+                            submenu: editorcache.lastProjects.map(element =>
                             {
-                                console.log("导入项目完成");
+                                var menuItem: MenuItem =
+                                {
+                                    label: element, click: () =>
+                                    {
+                                        if (editorcache.projectname != element)
+                                        {
+                                            editorcache.projectname = element;
+                                            window.location.reload();
+                                        }
+                                    }
+                                };
+                                return menuItem;
+                            }),
+                            click: () =>
+                            {
+                                popupview.popupObject({ newprojectname: "newproject" }, {
+                                    closecallback: (data) =>
+                                    {
+                                        if (data.newprojectname && data.newprojectname.length > 0)
+                                        {
+                                            editorcache.projectname = data.newprojectname;
+                                            window.location.reload();
+                                        }
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            label: "保存场景", click: () =>
+                            {
+                                var gameobject = hierarchy.rootnode.gameobject;
+                                editorAsset.saveObject(gameobject);
+                            }
+                        },
+                        {
+                            label: "导入项目", click: () =>
+                            {
+                                editorRS.selectFile((filelist) =>
+                                {
+                                    editorRS.importProject(filelist.item(0), () =>
+                                    {
+                                        console.log("导入项目完成");
+                                        editorAsset.initproject(() =>
+                                        {
+                                            editorAsset.runProjectScript(() =>
+                                            {
+                                                editorAsset.readScene("default.scene.json", (err, scene) =>
+                                                {
+                                                    editorData.gameScene = scene;
+                                                    editorui.assetview.invalidateAssettree();
+                                                    console.log("导入项目完成!");
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            }
+                        },
+                        {
+                            label: "导出项目", click: () =>
+                            {
+                                editorRS.exportProject(function (err, content)
+                                {
+                                    // see FileSaver.js
+                                    saveAs(content, `${editorcache.projectname}.feng3d.zip`);
+                                });
+                            }
+                        },
+                        {
+                            label: "打开网络项目",
+                            submenu: [
+                                {
+                                    label: "地形", click: () =>
+                                    {
+                                        openDownloadProject("terrain.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "自定义材质", click: () =>
+                                    {
+                                        openDownloadProject("customshader.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "水", click: () =>
+                                    {
+                                        openDownloadProject("water.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "灯光", click: () =>
+                                    {
+                                        openDownloadProject("light.feng3d.zip");
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            label: "下载网络项目",
+                            submenu: [
+                                {
+                                    label: "地形", click: () =>
+                                    {
+                                        downloadProject("terrain.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "自定义材质", click: () =>
+                                    {
+                                        downloadProject("customshader.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "水", click: () =>
+                                    {
+                                        downloadProject("water.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "灯光", click: () =>
+                                    {
+                                        downloadProject("light.feng3d.zip");
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            label: "升级项目",
+                            click: () =>
+                            {
+                                editorRS.upgradeProject(() =>
+                                {
+                                    alert("升级完成！");
+                                });
+                            },
+                        },
+                        {
+                            label: "清空项目",
+                            click: () =>
+                            {
+                                editorAsset.rootFile.remove();
                                 editorAsset.initproject(() =>
                                 {
                                     editorAsset.runProjectScript(() =>
                                     {
-                                        editorAsset.readScene("default.scene.json", (err, scene) =>
-                                        {
-                                            editorData.gameScene = scene;
-                                            editorui.assetview.invalidateAssettree();
-                                            console.log("导入项目完成!");
-                                        });
+                                        editorData.gameScene = creatNewScene()
+                                        editorui.assetview.invalidateAssettree();
+                                        console.log("清空项目完成!");
                                     });
                                 });
-                            });
-                        });
-                    }
-                },
-                {
-                    label: "导出项目", click: () =>
-                    {
-                        editorRS.exportProject(function (err, content)
-                        {
-                            // see FileSaver.js
-                            saveAs(content, `${editorcache.projectname}.feng3d.zip`);
-                        });
-                    }
-                },
-                {
-                    label: "打开网络项目",
-                    submenu: [
-                        {
-                            label: "地形", click: () =>
-                            {
-                                openDownloadProject("terrain.feng3d.zip");
                             },
                         },
                         {
-                            label: "自定义材质", click: () =>
-                            {
-                                openDownloadProject("customshader.feng3d.zip");
-                            },
-                        },
-                        {
-                            label: "水", click: () =>
-                            {
-                                openDownloadProject("water.feng3d.zip");
-                            },
-                        },
-                        {
-                            label: "灯光", click: () =>
-                            {
-                                openDownloadProject("light.feng3d.zip");
-                            },
+                            label: "首选项",
+                            submenu: [
+                                {
+                                    label: "快捷方式",
+                                    click: () =>
+                                    {
+                                        popupview.popupView(ShortCutSetting.instance);
+                                    },
+                                },
+                            ],
                         },
                     ],
-                },
-                {
-                    label: "下载网络项目",
-                    submenu: [
-                        {
-                            label: "地形", click: () =>
-                            {
-                                downloadProject("terrain.feng3d.zip");
-                            },
-                        },
-                        {
-                            label: "自定义材质", click: () =>
-                            {
-                                downloadProject("customshader.feng3d.zip");
-                            },
-                        },
-                        {
-                            label: "水", click: () =>
-                            {
-                                downloadProject("water.feng3d.zip");
-                            },
-                        },
-                        {
-                            label: "灯光", click: () =>
-                            {
-                                downloadProject("light.feng3d.zip");
-                            },
-                        },
-                    ],
-                },
-                {
-                    label: "升级项目",
-                    click: () =>
-                    {
-                        editorRS.upgradeProject(() =>
-                        {
-                            alert("升级完成！");
-                        });
-                    },
-                },
-                {
-                    label: "清空项目",
-                    click: () =>
-                    {
-                        editorAsset.rootFile.remove();
-                        editorAsset.initproject(() =>
-                        {
-                            editorAsset.runProjectScript(() =>
-                            {
-                                editorData.gameScene = creatNewScene()
-                                editorui.assetview.invalidateAssettree();
-                                console.log("清空项目完成!");
-                            });
-                        });
-                    },
                 },
                 { type: "separator" },
                 {
-                    label: "打开开发者工具",
-                    click: () =>
+                    label: "调试",
+                    submenu: [{
+                        label: "打开开发者工具",
+                        click: () =>
+                        {
+                            nativeAPI.openDevTools();
+                        }, show: !!nativeAPI,
+                    },
                     {
-                        nativeAPI.openDevTools();
-                    }, show: !!nativeAPI,
+                        label: "编译脚本",
+                        click: () =>
+                        {
+                            feng3d.dispatcher.dispatch("script.compile");
+                        },
+                    },],
                 },
                 {
-                    label: "首选项",
+                    label: "窗口",
+                    submenu: this.getWindowSubMenus(),
+                },
+                {
+                    label: "帮助",
                     submenu: [
                         {
-                            label: "快捷方式",
+                            label: "问题",
                             click: () =>
                             {
-                                popupview.popupView(ShortCutSetting.instance);
+                                window.open("https://github.com/feng3d-labs/editor/issues");
+                            },
+                        },
+                        {
+                            label: "文档",
+                            click: () =>
+                            {
+                                window.open("http://feng3d.com");
                             },
                         },
                     ],
-                },
-                {
-                    label: "编译脚本",
-                    click: () =>
-                    {
-                        feng3d.dispatcher.dispatch("script.compile");
-                    },
-                },
-                {
-                    label: "Window",
-                    submenu: this.getWindowSubMenus(),
                 },
             ];
 

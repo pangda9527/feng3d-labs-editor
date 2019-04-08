@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="TopMenuItemRender" currentState="normal" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" states="normal"         height="20" minWidth="40">
+	<e:Rect id="selectedRect" width="100%" height="100%" includeIn="normal" fillColor="0xcce8ff"/>
+	<e:Label id="label" text="{data.label}" size="12" includeIn="normal" verticalAlign="middle" multiline="false" textColor="0x000000" verticalCenter="0" left="2" right="2" textAlign="center"/>
+</e:Skin>

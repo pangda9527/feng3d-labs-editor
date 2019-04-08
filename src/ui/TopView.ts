@@ -2,17 +2,21 @@ namespace editor
 {
 	export class TopView extends eui.Component implements eui.UIComponent
 	{
-		public topGroup: eui.Group;
 		public mainButton: eui.Button;
+		public menuList: eui.List;
+		public labelLab: eui.Label;
+		public topGroup: eui.Group;
 		public moveButton: eui.ToggleButton;
 		public rotateButton: eui.ToggleButton;
 		public scaleButton: eui.ToggleButton;
-		public worldButton: eui.ToggleButton;
 		public centerButton: eui.ToggleButton;
+		public worldButton: eui.ToggleButton;
 		public helpButton: eui.Button;
-		public settingButton: eui.Button;
 		public qrcodeButton: eui.Button;
+		public settingButton: eui.Button;
+		public stopBtn: eui.Button;
 		public playBtn: eui.Button;
+		public nextframeBtn: eui.Button;
 
 		constructor()
 		{
@@ -33,7 +37,6 @@ namespace editor
 			}
 		}
 
-
 		private onAddedToStage()
 		{
 			this.mainButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
@@ -50,6 +53,16 @@ namespace editor
 
 			feng3d.dispatcher.on("editor.toolTypeChanged", this.updateview, this);
 
+			//
+			var menuItems = menuConfig.getMainMenu();
+			var menuItem = menu.handleShow({ submenu: menuItems });
+			menuItems = menuItem.submenu;
+			menuItems = menuItems.filter(v => v.type != "separator");
+			var dataProvider = new eui.ArrayCollection();
+			dataProvider.replaceAll(menuItems);
+			//
+			this.menuList.itemRenderer = TopMenuItemRenderer;
+			this.menuList.dataProvider = dataProvider;
 			this.updateview();
 		}
 
@@ -141,6 +154,117 @@ namespace editor
 			this.centerButton.selected = editorData.isBaryCenter;
 		}
 	}
+
+	var showMenuItem: { menu: egret.DisplayObject, item: TopMenuItemRenderer };
+	var items: { item: TopMenuItemRenderer; rect: feng3d.Rectangle; }[]
+
+	export class TopMenuItemRenderer extends eui.ItemRenderer
+	{
+		data: MenuItem;
+
+		public selectedRect: eui.Rect;
+		public label: eui.Label;
+
+		protected dataChanged()
+		{
+			super.dataChanged();
+			this.updateView();
+		}
+
+		constructor()
+		{
+			super();
+			this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+			this.skinName = "TopMenuItemRender";
+		}
+
+		private onComplete(): void
+		{
+			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+			this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+
+			if (this.stage)
+			{
+				this.onAddedToStage();
+			}
+		}
+
+		private onAddedToStage()
+		{
+			this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
+
+			this.updateView();
+		}
+
+		private onRemovedFromStage()
+		{
+			this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
+		}
+
+		private updateView()
+		{
+			if (!this.data)
+				return;
+			this.touchEnabled = true;
+			this.touchChildren = true;
+			this.skin.currentState = "normal";
+			this.selectedRect.visible = false;
+		}
+
+		private onItemMouseDown(event: egret.TouchEvent): void
+		{
+			if (showMenuItem) return;
+
+			var list = this.parent;
+			feng3d.debuger && feng3d.assert(list instanceof eui.List);
+			items = list.$children.filter(v => v instanceof TopMenuItemRenderer).map((v: TopMenuItemRenderer) => { return { item: v, rect: v.getGlobalBounds() }; });
+
+			showMenu(this);
+
+			feng3d.windowEventProxy.on("mousemove", onMenuMouseMove);
+		}
+	}
+
+	function showMenu(item: TopMenuItemRenderer)
+	{
+		removeMenu();
+
+		//
+		var rect = item.getTransformedBounds(item.stage);
+		var menuView = menu.popup(item.data.submenu);
+		menuView.x = rect.x;
+		menuView.y = rect.bottom;
+		menuView.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromeStage, null);
+		showMenuItem = { menu: menuView, item: item };
+	}
+
+	function onMenuMouseMove()
+	{
+		var p = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+		var overitem = items.filter(v => v.rect.contains(p.x, p.y))[0];
+		if (!overitem) return;
+		if (showMenuItem.item == overitem.item) return;
+
+		showMenu(overitem.item);
+	}
+
+	function removeMenu()
+	{
+		if (showMenuItem)
+		{
+			showMenuItem.menu.removeEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromeStage, null);
+			showMenuItem.menu.remove()
+		};
+		showMenuItem = null;
+	}
+
+	function onRemoveFromeStage()
+	{
+		removeMenu();
+
+		feng3d.windowEventProxy.off("mousemove", onMenuMouseMove);
+	}
+
 	// 运行窗口
 	export var runwin: Window;
 }
