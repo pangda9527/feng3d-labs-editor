@@ -2,7 +2,6 @@ namespace editor
 {
 	export class TopView extends eui.Component implements eui.UIComponent
 	{
-		public mainButton: eui.Button;
 		public menuList: eui.List;
 		public labelLab: eui.Label;
 		public topGroup: eui.Group;
@@ -39,7 +38,6 @@ namespace editor
 
 		private onAddedToStage()
 		{
-			this.mainButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.moveButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.rotateButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.scaleButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
@@ -68,7 +66,6 @@ namespace editor
 
 		private onRemovedFromStage()
 		{
-			this.mainButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.moveButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.rotateButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 			this.scaleButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
@@ -95,9 +92,6 @@ namespace editor
 		{
 			switch (event.currentTarget)
 			{
-				case this.mainButton:
-					menu.popup(menuConfig.getMainMenu());
-					break;
 				case this.moveButton:
 					editorData.toolType = MRSToolType.MOVE;
 					break;
@@ -147,6 +141,7 @@ namespace editor
 
 		private updateview()
 		{
+			this.labelLab.text = editorcache.projectname;
 			this.moveButton.selected = editorData.toolType == MRSToolType.MOVE;
 			this.rotateButton.selected = editorData.toolType == MRSToolType.ROTATION;
 			this.scaleButton.selected = editorData.toolType == MRSToolType.SCALE;
