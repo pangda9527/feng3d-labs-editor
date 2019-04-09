@@ -138,7 +138,7 @@ namespace editor
             var menus: MenuItem[] = [{
                 label: "Copy", click: () =>
                 {
-                    copyCurve = Object.deepClone(this.minMaxCurve);
+                    copyCurve = feng3d.serialization.clone(this.minMaxCurve);
                 }
             }];
             if (copyCurve && this.minMaxCurve.mode == copyCurve.mode && copyCurve.between0And1 == this.minMaxCurve.between0And1)

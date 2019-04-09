@@ -233,13 +233,13 @@ namespace editor
                         if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                             copyColor = this.minMaxGradient.color.clone();
                         else
-                            copyGradient = Object.deepClone(this.minMaxGradient.gradient);
+                            copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradient);
                     } else if (target == this.colorGroup1)
                     {
                         if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                             copyColor = this.minMaxGradient.color1.clone();
                         else
-                            copyGradient = Object.deepClone(this.minMaxGradient.gradient1);
+                            copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradient1);
                     }
                 }
             }];
