@@ -2514,7 +2514,7 @@ var editor;
                 document.getElementById("app").append(this._canvas);
                 this.engine = new editor.EditorEngine(this._canvas);
                 //
-                var editorCamera = this.editorCamera = Object.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
+                var editorCamera = this.editorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
                 editorCamera.lens.far = 5000;
                 editorCamera.transform.x = 5;
                 editorCamera.transform.y = 3;
@@ -2523,7 +2523,7 @@ var editor;
                 editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
                 this.engine.camera = editorCamera;
                 //
-                var editorScene = Object.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene3D);
+                var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene3D);
                 editorScene.runEnvironment = feng3d.RunEnvironment.all;
                 this.engine.editorScene = editorScene;
                 //
@@ -5445,7 +5445,7 @@ var editor;
             if (copyCurve && this.minMaxCurve.mode == copyCurve.mode && copyCurve.between0And1 == this.minMaxCurve.between0And1) {
                 menus.push({
                     label: "Paste", click: function () {
-                        Object.setValue(_this.minMaxCurve, copyCurve);
+                        feng3d.serialization.setValue(_this.minMaxCurve, copyCurve);
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                         _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
                     }
@@ -5583,11 +5583,11 @@ var editor;
                     var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
                     if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
                         var curve = this.minMaxCurve.curve;
-                        Object.setValue(curve, curves[i]);
+                        feng3d.serialization.setValue(curve, curves[i]);
                     }
                     else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
-                        Object.setValue(this.minMaxCurve.curve, doubleCurves[i].curveMin);
-                        Object.setValue(this.minMaxCurve.curve1, doubleCurves[i].curveMax);
+                        feng3d.serialization.setValue(this.minMaxCurve.curve, doubleCurves[i].curveMin);
+                        feng3d.serialization.setValue(this.minMaxCurve.curve1, doubleCurves[i].curveMax);
                     }
                     this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                     this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
@@ -5831,90 +5831,90 @@ var editor;
     }(eui.Component));
     editor.MinMaxCurveEditor = MinMaxCurveEditor;
     var particleCurves = [
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
     ];
     var particleCurvesSingend = [
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
-        Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
+        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
     ];
     var particleDoubleCurves = [{
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
     ];
     var particleDoubleCurvesSingend = [
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: -1, tangent: 0 }, { time: 1, value: -1, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: -1, tangent: 0 }, { time: 1, value: -1, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
         {
-            curveMin: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-            curveMax: Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
         },
     ];
 })(editor || (editor = {}));
@@ -6166,13 +6166,13 @@ var editor;
                             if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                                 _this.minMaxGradient.color.copy(copyColor);
                             else
-                                Object.setValue(_this.minMaxGradient.gradient, copyGradient);
+                                feng3d.serialization.setValue(_this.minMaxGradient.gradient, copyGradient);
                         }
                         else if (target == _this.colorGroup1) {
                             if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                                 _this.minMaxGradient.color1.copy(copyColor);
                             else
-                                Object.setValue(_this.minMaxGradient.gradient1, copyGradient);
+                                feng3d.serialization.setValue(_this.minMaxGradient.gradient1, copyGradient);
                         }
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                         _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
@@ -11276,35 +11276,35 @@ var editor;
             this.initModels();
         };
         MToolModel.prototype.initModels = function () {
-            this.xAxis = Object.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent(CoordinateAxis);
+            this.xAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent(CoordinateAxis);
             this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.transform.rz = -90;
             this.gameObject.addChild(this.xAxis.gameObject);
-            this.yAxis = Object.setValue(new feng3d.GameObject(), { name: "yAxis" }).addComponent(CoordinateAxis);
+            this.yAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yAxis" }).addComponent(CoordinateAxis);
             this.yAxis.color.setTo(0, 1, 0, 1);
             this.gameObject.addChild(this.yAxis.gameObject);
-            this.zAxis = Object.setValue(new feng3d.GameObject(), { name: "zAxis" }).addComponent(CoordinateAxis);
+            this.zAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zAxis" }).addComponent(CoordinateAxis);
             this.zAxis.color.setTo(0, 0, 1, 1);
             this.zAxis.transform.rx = 90;
             this.gameObject.addChild(this.zAxis.gameObject);
-            this.yzPlane = Object.setValue(new feng3d.GameObject(), { name: "yzPlane" }).addComponent(CoordinatePlane);
+            this.yzPlane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yzPlane" }).addComponent(CoordinatePlane);
             this.yzPlane.color.setTo(1, 0, 0, 0.2);
             this.yzPlane.selectedColor.setTo(1, 0, 0, 0.5);
             this.yzPlane.borderColor.setTo(1, 0, 0, 1);
             this.yzPlane.transform.rz = 90;
             this.gameObject.addChild(this.yzPlane.gameObject);
-            this.xzPlane = Object.setValue(new feng3d.GameObject(), { name: "xzPlane" }).addComponent(CoordinatePlane);
+            this.xzPlane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xzPlane" }).addComponent(CoordinatePlane);
             this.xzPlane.color.setTo(0, 1, 0, 0.2);
             this.xzPlane.selectedColor.setTo(0, 1, 0, 0.5);
             this.xzPlane.borderColor.setTo(0, 1, 0, 1);
             this.gameObject.addChild(this.xzPlane.gameObject);
-            this.xyPlane = Object.setValue(new feng3d.GameObject(), { name: "xyPlane" }).addComponent(CoordinatePlane);
+            this.xyPlane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xyPlane" }).addComponent(CoordinatePlane);
             this.xyPlane.color.setTo(0, 0, 1, 0.2);
             this.xyPlane.selectedColor.setTo(0, 0, 1, 0.5);
             this.xyPlane.borderColor.setTo(0, 0, 1, 1);
             this.xyPlane.transform.rx = -90;
             this.gameObject.addChild(this.xyPlane.gameObject);
-            this.oCube = Object.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
+            this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
             this.gameObject.addChild(this.oCube.gameObject);
         };
         return MToolModel;
@@ -11327,19 +11327,19 @@ var editor;
             var model = xLine.addComponent(feng3d.Model);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             segmentGeometry.segments.push({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
-            this.segmentMaterial = model.material = Object.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
+            this.segmentMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
             this.gameObject.addChild(xLine);
             //
             this.xArrow = new feng3d.GameObject();
             model = this.xArrow.addComponent(feng3d.Model);
-            model.geometry = Object.setValue(new feng3d.ConeGeometry(), { bottomRadius: 5, height: 18 });
-            this.material = model.material = Object.setValue(new feng3d.Material(), { shaderName: "color" });
+            model.geometry = feng3d.serialization.setValue(new feng3d.ConeGeometry(), { bottomRadius: 5, height: 18 });
+            this.material = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
             this.material.renderParams.enableBlend = true;
             this.xArrow.transform.y = this.length;
             this.gameObject.addChild(this.xArrow);
-            var mouseHit = Object.setValue(new feng3d.GameObject(), { name: "hitCoordinateAxis" });
+            var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hitCoordinateAxis" });
             model = mouseHit.addComponent(feng3d.Model);
-            model.geometry = Object.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length });
+            model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length });
             //model.material = materialFactory.create("color");
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
@@ -11378,8 +11378,8 @@ var editor;
             //
             this.oCube = new feng3d.GameObject();
             var model = this.oCube.addComponent(feng3d.Model);
-            model.geometry = Object.setValue(new feng3d.CubeGeometry(), { width: 8, height: 8, depth: 8 });
-            this.colorMaterial = model.material = Object.setValue(new feng3d.Material(), { shaderName: "color" });
+            model.geometry = feng3d.serialization.setValue(new feng3d.CubeGeometry(), { width: 8, height: 8, depth: 8 });
+            this.colorMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
             this.colorMaterial.renderParams.enableBlend = true;
             this.oCube.mouseEnabled = true;
             this.gameObject.addChild(this.oCube);
@@ -11418,19 +11418,19 @@ var editor;
         });
         CoordinatePlane.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
-            var plane = Object.setValue(new feng3d.GameObject(), { name: "plane" });
+            var plane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "plane" });
             var model = plane.addComponent(feng3d.Model);
             plane.transform.x = plane.transform.z = this._width / 2;
-            model.geometry = Object.setValue(new feng3d.PlaneGeometry(), { width: this._width, height: this._width });
-            this.colorMaterial = model.material = Object.setValue(new feng3d.Material(), { shaderName: "color" });
+            model.geometry = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { width: this._width, height: this._width });
+            this.colorMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
             this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
             this.colorMaterial.renderParams.enableBlend = true;
             plane.mouseEnabled = true;
             this.gameObject.addChild(plane);
-            var border = Object.setValue(new feng3d.GameObject(), { name: "border" });
+            var border = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "border" });
             model = border.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            var material = model.material = Object.setValue(new feng3d.Material(), {
+            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
             });
@@ -11475,26 +11475,26 @@ var editor;
             this.initModels();
         };
         RToolModel.prototype.initModels = function () {
-            this.xAxis = Object.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent(CoordinateRotationAxis);
+            this.xAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent(CoordinateRotationAxis);
             this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.update();
             this.xAxis.transform.ry = 90;
             this.gameObject.addChild(this.xAxis.gameObject);
-            this.yAxis = Object.setValue(new feng3d.GameObject(), { name: "yAxis" }).addComponent(CoordinateRotationAxis);
+            this.yAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yAxis" }).addComponent(CoordinateRotationAxis);
             this.yAxis.color.setTo(0, 1, 0);
             this.yAxis.update();
             this.yAxis.transform.rx = 90;
             this.gameObject.addChild(this.yAxis.gameObject);
-            this.zAxis = Object.setValue(new feng3d.GameObject(), { name: "zAxis" }).addComponent(CoordinateRotationAxis);
+            this.zAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zAxis" }).addComponent(CoordinateRotationAxis);
             this.zAxis.color.setTo(0, 0, 1);
             this.zAxis.update();
             this.gameObject.addChild(this.zAxis.gameObject);
-            this.cameraAxis = Object.setValue(new feng3d.GameObject(), { name: "cameraAxis" }).addComponent(CoordinateRotationAxis);
+            this.cameraAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "cameraAxis" }).addComponent(CoordinateRotationAxis);
             this.cameraAxis.radius = 88;
             this.cameraAxis.color.setTo(1, 1, 1);
             this.cameraAxis.update();
             this.gameObject.addChild(this.cameraAxis.gameObject);
-            this.freeAxis = Object.setValue(new feng3d.GameObject(), { name: "freeAxis" }).addComponent(CoordinateRotationFreeAxis);
+            this.freeAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "freeAxis" }).addComponent(CoordinateRotationFreeAxis);
             this.freeAxis.color.setTo(1, 1, 1);
             this.freeAxis.update();
             this.gameObject.addChild(this.freeAxis.gameObject);
@@ -11521,17 +11521,17 @@ var editor;
         CoordinateRotationAxis.prototype.initModels = function () {
             var border = new feng3d.GameObject();
             var model = border.addComponent(feng3d.Model);
-            var material = model.material = Object.setValue(new feng3d.Material(), {
+            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
             });
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
-            this.sector = Object.setValue(new feng3d.GameObject(), { name: "sector" }).addComponent(SectorGameObject);
-            var mouseHit = Object.setValue(new feng3d.GameObject(), { name: "hit" });
+            this.sector = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "sector" }).addComponent(SectorGameObject);
+            var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hit" });
             model = mouseHit.addComponent(feng3d.Model);
-            this.torusGeometry = model.geometry = Object.setValue(new feng3d.TorusGeometry(), { radius: this.radius, tubeRadius: 2 });
+            this.torusGeometry = model.geometry = feng3d.serialization.setValue(new feng3d.TorusGeometry(), { radius: this.radius, tubeRadius: 2 });
             model.material = new feng3d.Material();
             mouseHit.transform.rx = 90;
             mouseHit.visible = false;
@@ -11618,12 +11618,12 @@ var editor;
             this.gameObject.name = "sector";
             var model = this.gameObject.addComponent(feng3d.Model);
             this.geometry = model.geometry = new feng3d.CustomGeometry();
-            model.material = Object.setValue(new feng3d.Material(), { shaderName: "color", uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
+            model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color", uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
             model.material.renderParams.enableBlend = true;
             model.material.renderParams.cullFace = feng3d.CullFace.NONE;
-            var border = Object.setValue(new feng3d.GameObject(), { name: "border" });
+            var border = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "border" });
             model = border.addComponent(feng3d.Model);
-            var material = model.material = Object.setValue(new feng3d.Material(), {
+            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
             });
@@ -11691,16 +11691,16 @@ var editor;
             this.initModels();
         };
         CoordinateRotationFreeAxis.prototype.initModels = function () {
-            var border = Object.setValue(new feng3d.GameObject(), { name: "border" });
+            var border = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "border" });
             var model = border.addComponent(feng3d.Model);
-            var material = model.material = Object.setValue(new feng3d.Material(), {
+            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) }
             });
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
-            this.sector = Object.setValue(new feng3d.GameObject(), { name: "sector" }).addComponent(SectorGameObject);
+            this.sector = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "sector" }).addComponent(SectorGameObject);
             this.sector.update(0, 360);
             this.sector.gameObject.visible = false;
             this.sector.gameObject.mouseEnabled = true;
@@ -11748,21 +11748,21 @@ var editor;
             this.initModels();
         };
         SToolModel.prototype.initModels = function () {
-            this.xCube = Object.setValue(new feng3d.GameObject(), { name: "xCube" }).addComponent(CoordinateScaleCube);
+            this.xCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xCube" }).addComponent(CoordinateScaleCube);
             this.xCube.color.setTo(1, 0, 0, 1);
             this.xCube.update();
             this.xCube.transform.rz = -90;
             this.gameObject.addChild(this.xCube.gameObject);
-            this.yCube = Object.setValue(new feng3d.GameObject(), { name: "yCube" }).addComponent(CoordinateScaleCube);
+            this.yCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yCube" }).addComponent(CoordinateScaleCube);
             this.yCube.color.setTo(0, 1, 0, 1);
             this.yCube.update();
             this.gameObject.addChild(this.yCube.gameObject);
-            this.zCube = Object.setValue(new feng3d.GameObject(), { name: "zCube" }).addComponent(CoordinateScaleCube);
+            this.zCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zCube" }).addComponent(CoordinateScaleCube);
             this.zCube.color.setTo(0, 0, 1, 1);
             this.zCube.update();
             this.zCube.transform.rx = 90;
             this.gameObject.addChild(this.zCube.gameObject);
-            this.oCube = Object.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(editor.CoordinateCube);
+            this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(editor.CoordinateCube);
             this.oCube.gameObject.transform.scale = new feng3d.Vector3(1.2, 1.2, 1.2);
             this.gameObject.addChild(this.oCube.gameObject);
         };
@@ -11786,18 +11786,18 @@ var editor;
             _super.prototype.init.call(this, gameObject);
             var xLine = new feng3d.GameObject();
             var model = xLine.addComponent(feng3d.Model);
-            var material = model.material = Object.setValue(new feng3d.Material(), {
+            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
             });
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(xLine);
-            this.coordinateCube = Object.setValue(new feng3d.GameObject(), { name: "coordinateCube" }).addComponent(editor.CoordinateCube);
+            this.coordinateCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "coordinateCube" }).addComponent(editor.CoordinateCube);
             this.gameObject.addChild(this.coordinateCube.gameObject);
-            var mouseHit = Object.setValue(new feng3d.GameObject(), { name: "hit" });
+            var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hit" });
             model = mouseHit.addComponent(feng3d.Model);
-            model.geometry = Object.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length - 4 });
+            model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length - 4 });
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;
@@ -12401,10 +12401,10 @@ var editor;
         });
         MRSTool.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
-            this.mrsToolObject = Object.setValue(new feng3d.GameObject(), { name: "MRSTool" });
-            this.mTool = Object.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(editor.MTool);
-            this.rTool = Object.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(editor.RTool);
-            this.sTool = Object.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(editor.STool);
+            this.mrsToolObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MRSTool" });
+            this.mTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(editor.MTool);
+            this.rTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(editor.RTool);
+            this.sTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(editor.STool);
             setAwaysVisible(this.mTool);
             setAwaysVisible(this.rTool);
             setAwaysVisible(this.sTool);
@@ -12899,12 +12899,12 @@ var editor;
         });
         GroundGrid.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
-            var groundGridObject = Object.setValue(new feng3d.GameObject(), { name: "GroundGrid" });
+            var groundGridObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "GroundGrid" });
             groundGridObject.mouseEnabled = false;
             gameObject.addChild(groundGridObject);
             var model = groundGridObject.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            var material = model.material = Object.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.renderParams.enableBlend = true;
         };
         GroundGrid.prototype.update = function () {
@@ -13011,14 +13011,14 @@ var editor;
     }());
     editor.Main3D = Main3D;
     function creatNewScene() {
-        var scene = Object.setValue(new feng3d.GameObject(), { name: "Untitled" }).addComponent(feng3d.Scene3D);
+        var scene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "Untitled" }).addComponent(feng3d.Scene3D);
         scene.background.setTo(0.408, 0.38, 0.357);
         scene.ambientColor.setTo(0.4, 0.4, 0.4);
         var camera = feng3d.gameObjectFactory.createCamera("Main Camera");
         camera.addComponent(feng3d.AudioListener);
         camera.transform.position = new feng3d.Vector3(0, 1, -10);
         scene.gameObject.addChild(camera);
-        var directionalLight = Object.setValue(new feng3d.GameObject(), { name: "DirectionalLight" });
+        var directionalLight = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "DirectionalLight" });
         directionalLight.addComponent(feng3d.DirectionalLight).shadowType = feng3d.ShadowType.Hard_Shadows;
         directionalLight.transform.rx = 50;
         directionalLight.transform.ry = -30;
@@ -13122,41 +13122,41 @@ var editor;
         };
         EditorComponent.prototype.addComponent = function (component) {
             if (component instanceof feng3d.DirectionalLight) {
-                var directionLightIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "DirectionLightIcon", }).addComponent(editor.DirectionLightIcon), { light: component, editorCamera: this.editorCamera });
+                var directionLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "DirectionLightIcon", }).addComponent(editor.DirectionLightIcon), { light: component, editorCamera: this.editorCamera });
                 this.gameObject.addChild(directionLightIcon.gameObject);
                 this.directionLightIconMap.set(component, directionLightIcon);
             }
             else if (component instanceof feng3d.PointLight) {
-                var pointLightIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "PointLightIcon" }).addComponent(editor.PointLightIcon), { light: component, editorCamera: this.editorCamera });
+                var pointLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "PointLightIcon" }).addComponent(editor.PointLightIcon), { light: component, editorCamera: this.editorCamera });
                 this.gameObject.addChild(pointLightIcon.gameObject);
                 this.pointLightIconMap.set(component, pointLightIcon);
             }
             else if (component instanceof feng3d.SpotLight) {
-                var spotLightIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "SpotLightIcon" }).addComponent(editor.SpotLightIcon), { light: component, editorCamera: this.editorCamera });
+                var spotLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "SpotLightIcon" }).addComponent(editor.SpotLightIcon), { light: component, editorCamera: this.editorCamera });
                 this.gameObject.addChild(spotLightIcon.gameObject);
                 this.spotLightIconMap.set(component, spotLightIcon);
             }
             else if (component instanceof feng3d.Camera) {
-                var cameraIcon = Object.setValue(Object.setValue(new feng3d.GameObject(), { name: "CameraIcon" }).addComponent(editor.CameraIcon), { camera: component, editorCamera: this.editorCamera });
+                var cameraIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "CameraIcon" }).addComponent(editor.CameraIcon), { camera: component, editorCamera: this.editorCamera });
                 this.gameObject.addChild(cameraIcon.gameObject);
                 this.cameraIconMap.set(component, cameraIcon);
             }
         };
         EditorComponent.prototype.removeComponent = function (component) {
             if (component instanceof feng3d.DirectionalLight) {
-                Object.setValue(this.directionLightIconMap.get(component), { light: null }).gameObject.remove();
+                feng3d.serialization.setValue(this.directionLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.directionLightIconMap.delete(component);
             }
             else if (component instanceof feng3d.PointLight) {
-                Object.setValue(this.pointLightIconMap.get(component), { light: null }).gameObject.remove();
+                feng3d.serialization.setValue(this.pointLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.pointLightIconMap.delete(component);
             }
             else if (component instanceof feng3d.SpotLight) {
-                Object.setValue(this.spotLightIconMap.get(component), { light: null }).gameObject.remove();
+                feng3d.serialization.setValue(this.spotLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.spotLightIconMap.delete(component);
             }
             else if (component instanceof feng3d.Camera) {
-                Object.setValue(this.cameraIconMap.get(component), { camera: null }).gameObject.remove();
+                feng3d.serialization.setValue(this.cameraIconMap.get(component), { camera: null }).gameObject.remove();
                 this.cameraIconMap.delete(component);
             }
         };
@@ -13173,8 +13173,8 @@ var editor;
         function Feng3dScreenShot() {
             this.defaultGeometry = feng3d.Geometry.sphere;
             this.defaultMaterial = feng3d.Material.default;
-            this.materialObject = Object.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
-            this.geometryObject = Object.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
+            this.materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
+            this.geometryObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
             // 初始化3d
             var engine = this.engine = new feng3d.Engine();
             engine.canvas.style.visibility = "hidden";
@@ -13187,7 +13187,7 @@ var editor;
             var camera = this.camera = engine.camera;
             camera.lens = new feng3d.PerspectiveLens(45);
             //
-            var light = Object.setValue(new feng3d.GameObject(), {
+            var light = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "DirectionalLight",
                 components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "feng3d.DirectionalLight" },]
             });
@@ -13416,30 +13416,30 @@ var editor;
         Navigation.prototype.init = function (gameobject) {
             _super.prototype.init.call(this, gameobject);
             this.hideFlags = this.hideFlags | feng3d.HideFlags.DontSaveInBuild;
-            this._navobject = Object.setValue(new feng3d.GameObject(), { name: "NavObject", hideFlags: feng3d.HideFlags.DontSave });
-            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+            this._navobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "NavObject", hideFlags: feng3d.HideFlags.DontSave });
+            var pointsObject = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "allowedVoxels",
                 components: [{
                         __class__: "feng3d.MeshModel",
-                        material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 1, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                        material: feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 1, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
                         geometry: this._allowedVoxelsPointGeometry = new feng3d.PointGeometry()
                     },]
             });
             this._navobject.addChild(pointsObject);
-            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+            var pointsObject = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "rejectivedVoxels",
                 components: [{
                         __class__: "feng3d.MeshModel",
-                        material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(1, 0, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                        material: feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(1, 0, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
                         geometry: this._rejectivedVoxelsPointGeometry = new feng3d.PointGeometry()
                     },]
             });
             this._navobject.addChild(pointsObject);
-            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+            var pointsObject = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "debugVoxels",
                 components: [{
                         __class__: "feng3d.MeshModel",
-                        material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 0, 1), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                        material: feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 0, 1), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
                         geometry: this._debugVoxelsPointGeometry = new feng3d.PointGeometry()
                     },]
             });
@@ -14449,11 +14449,11 @@ function createSegment() {
     // var parentobject = editor.engine.root.find("editorObject") || editor.engine.root;
     var parentobject;
     if (!debugSegment) {
-        debugSegment = Object.setValue(new feng3d.GameObject(), { name: "segment" });
+        debugSegment = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "segment" });
         debugSegment.mouseEnabled = false;
         //初始化材质
         var model = debugSegment.addComponent(feng3d.Model);
-        var material = model.material = Object.setValue(new feng3d.Material(), {
+        var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
             shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
             uniforms: { u_segmentColor: new feng3d.Color4(1.0, 0, 0) },
         });
@@ -14462,11 +14462,11 @@ function createSegment() {
     parentobject.addChild(debugSegment);
     //
     if (!debugPoint) {
-        debugPoint = Object.setValue(new feng3d.GameObject(), { name: "points" });
+        debugPoint = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "points" });
         debugPoint.mouseEnabled = false;
         var model = debugPoint.addComponent(feng3d.Model);
         pointGeometry = model.geometry = new feng3d.PointGeometry();
-        var materialp = model.material = Object.setValue(new feng3d.Material(), {
+        var materialp = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
             shaderName: "point", renderParams: { renderMode: feng3d.RenderMode.POINTS },
             uniforms: { u_PointSize: 5, u_color: new feng3d.Color4() },
         });
@@ -14699,10 +14699,10 @@ var editor;
         };
         MouseRayTestScript.prototype.onclick = function () {
             var mouseRay3D = this.gameObject.scene.mouseRay3D;
-            var gameobject = Object.setValue(new feng3d.GameObject(), { name: "test" });
+            var gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "test" });
             var model = gameobject.addComponent(feng3d.Model);
             model.material = new feng3d.Material();
-            model.geometry = Object.setValue(new feng3d.SphereGeometry(), { radius: 10 });
+            model.geometry = feng3d.serialization.setValue(new feng3d.SphereGeometry(), { radius: 10 });
             gameobject.mouseEnabled = false;
             this.gameObject.addChild(gameobject);
             var position = mouseRay3D.position.clone();
@@ -14761,7 +14761,7 @@ var editor;
             if (!this._editorCamera)
                 return;
             var linesize = 10;
-            var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
+            var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
                         __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
@@ -14793,7 +14793,7 @@ var editor;
                 var y1 = Math.cos(angle1) * linesize;
                 segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
             }
-            var lightLines = this._lightLines = Object.setValue(new feng3d.GameObject(), {
+            var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{ __class__: "feng3d.HoldSizeComponent", camera: this.editorCamera, holdSize: 1 },
                     {
@@ -14868,7 +14868,7 @@ var editor;
         PointLightIcon.prototype.initicon = function () {
             if (!this._editorCamera)
                 return;
-            var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
+            var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "PointLightIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
@@ -14892,7 +14892,7 @@ var editor;
             this._textureMaterial = lightIcon.getComponent(feng3d.Model).material;
             this.gameObject.addChild(lightIcon);
             //
-            var lightLines = this._lightLines = Object.setValue(new feng3d.GameObject(), {
+            var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                         __class__: "feng3d.MeshModel", material: {
@@ -14908,7 +14908,7 @@ var editor;
             this._segmentGeometry = lightLines.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this._lightpoints = Object.setValue(new feng3d.GameObject(), {
+            var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                         __class__: "feng3d.MeshModel",
@@ -15089,7 +15089,7 @@ var editor;
         SpotLightIcon.prototype.initicon = function () {
             if (!this._editorCamera)
                 return;
-            var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
+            var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "SpotLightIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
@@ -15113,7 +15113,7 @@ var editor;
             this._textureMaterial = lightIcon.getComponent(feng3d.Model).material;
             this.gameObject.addChild(lightIcon);
             //
-            var lightLines = this._lightLines = Object.setValue(new feng3d.GameObject(), {
+            var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                         __class__: "feng3d.MeshModel", material: {
@@ -15128,7 +15128,7 @@ var editor;
             this._segmentGeometry = lightLines.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this._lightpoints = Object.setValue(new feng3d.GameObject(), {
+            var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
                         __class__: "feng3d.MeshModel",
@@ -15252,7 +15252,7 @@ var editor;
                 return;
             if (this._lightIcon)
                 return;
-            var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
+            var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "CameraIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
@@ -15274,7 +15274,7 @@ var editor;
             });
             this.gameObject.addChild(lightIcon);
             //
-            var lightLines = this._lightLines = Object.setValue(new feng3d.GameObject(), {
+            var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
                         __class__: "feng3d.MeshModel", material: {
@@ -15290,7 +15290,7 @@ var editor;
             this._segmentGeometry = lightLines.getComponent(feng3d.Model).geometry;
             this.gameObject.addChild(lightLines);
             //
-            var lightpoints = this._lightpoints = Object.setValue(new feng3d.GameObject(), {
+            var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
                         __class__: "feng3d.MeshModel",
@@ -15458,7 +15458,7 @@ var editor;
         function parse(object3d, parent) {
             if (object3d.type == "Bone")
                 return null;
-            var gameobject = Object.setValue(new feng3d.GameObject(), { name: object3d.name });
+            var gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: object3d.name });
             gameobject.transform.position = new feng3d.Vector3(object3d.position.x, object3d.position.y, object3d.position.z);
             gameobject.transform.orientation = new feng3d.Quaternion(object3d.quaternion.x, object3d.quaternion.y, object3d.quaternion.z, object3d.quaternion.w);
             gameobject.transform.scale = new feng3d.Vector3(object3d.scale.x, object3d.scale.y, object3d.scale.z);
