@@ -32,6 +32,7 @@
   "author": "feng",
   "license": "ISC",
   "devDependencies": {
+    "@feng3d/build": "0.0.2",
     "asar": "^1.0.0",
     "fs-extra": "^7.0.1"
   },

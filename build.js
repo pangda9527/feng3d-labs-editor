@@ -1,16 +1,20 @@
 'use strict';
 
+// var build = require("@feng3d/build");
+var build = require("./node_modules/@feng3d/build/out/index");
+
 var process = require('child_process');
 var fs = require("fs");
 var path = require("path");
+
 
 watchcopyDir("../feng3d/out", "resource/template/libs");
 
 /**
  * Watch for changes in TypeScript
  */
-watchProject([
-    __dirname,
+build.watchProject([
+    { path: __dirname, }
 ]);
 
 function watchcopyDir(srcdir, destdir)
@@ -48,36 +52,4 @@ function watchcopyDir(srcdir, destdir)
             fs.writeFileSync(dest, str, "utf8");
         }
     }
-}
-
-function watchProject(project)
-{
-    if (project instanceof Array)
-    {
-        for (var i = 0; i < project.length; i++)
-        {
-            watchProject(project[i]);
-        }
-        return;
-    }
-
-    var childProcess = process.exec('tsc -w -p ' + project, function (error, stdout, stderr)
-    {
-        if (error !== null)
-        {
-            console.log('exec error: ' + error);
-        }
-        console.log(stdout)
-        console.log(stderr)
-    });
-    childProcess.stdout.on('data', function (data)
-    {
-        data = data.trim();
-        if (data.length > 10) console.log(data);
-    });
-    childProcess.stderr.on('data', function (data)
-    {
-        data = data.trim();
-        console.error(data);
-    });
 }
