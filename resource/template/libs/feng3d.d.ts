@@ -1,3 +1,12 @@
+declare type gPartial<T> = {
+    [P in keyof T]?: gPartial<T[P]>;
+};
+declare namespace feng3d {
+    /**
+     * feng3d的版本号
+     */
+    var revision: string;
+}
 declare namespace feng3d {
 }
 interface String {
@@ -79,12 +88,6 @@ interface ObjectConstructor {
      */
     runFunc<T>(obj: T, func: (obj: T) => void): T;
     /**
-     * 给指定对象进行深度赋值
-     * @param obj 对象
-     * @param value 数据
-     */
-    setValue<T>(obj: T, value: gPartial<T>): T;
-    /**
      * 深拷贝
      * @param obj 被拷贝对象
      */
@@ -157,7 +160,26 @@ interface Map<K, V> {
     getKeys(): K[];
     getValues(): V[];
 }
+interface Array<T> {
+    /**
+     * 使数组变得唯一，不存在两个相等的元素
+     *
+     * @param compare 比较函数
+     */
+    unique(compare?: (a: T, b: T) => boolean): this;
+    /**
+     * 删除元素
+     *
+     * @param item 被删除元素
+     * @returns 被删除元素在数组中的位置
+     */
+    delete(item: T): number;
+}
 declare namespace feng3d {
+    /**
+     * 是否开启调试(主要用于断言)
+     */
+    var debuger: boolean;
     /**
      * 测试代码运行时间
      * @param fn 被测试的方法
@@ -317,7 +339,7 @@ declare namespace feng3d {
          * @param target 目标对象
          * @param object 数据对象
          */
-        setValue<T>(target: T, object: gPartial<T>, tempInfo?: SerializationTempInfo): void;
+        setValue<T>(target: T, object: gPartial<T>, tempInfo?: SerializationTempInfo): T;
         /**
          * 给目标对象的指定属性赋值
          * @param target 目标对象
@@ -1026,6 +1048,10 @@ declare namespace feng3d {
          * canvas转换为dataURL
          */
         canvasToDataURL(canvas: HTMLCanvasElement, type?: "png" | "jpeg"): string;
+        /**
+         * canvas转换为图片
+         */
+        canvasToImage(canvas: HTMLCanvasElement, type: "png" | "jpeg", callback: (img: HTMLImageElement) => void): void;
         /**
          * File、Blob对象转换为dataURL
          * File对象也是一个Blob对象，二者的处理相同。
@@ -4392,6 +4418,10 @@ declare namespace feng3d {
          */
         bottomRight: Vector2;
         /**
+         * 中心点
+         */
+        readonly center: Vector2;
+        /**
          * 将源 Rectangle 对象中的所有矩形数据复制到调用方 Rectangle 对象中。
          * @param sourceRect 要从中复制数据的 Rectangle 对象。
          */
@@ -6898,8 +6928,43 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    var fevent: FEvent;
+    /**
+     * 事件
+     */
+    var event: FEvent;
+    /**
+     * 只针对Object的事件
+     */
+    var objectevent: ObjectEventDispatcher<Object, ObjectEventType>;
+    /**
+     * Object 事件类型
+     */
+    interface ObjectEventType {
+        /**
+         * 属性值变化
+         */
+        propertyValueChanged: {
+            property: string;
+            oldValue: any;
+            newValue: any;
+        };
+    }
+    /**
+     * 用于适配不同对象对于的事件
+     */
+    interface ObjectEventDispatcher<O, T> {
+        once<K extends keyof T>(target: O, type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof T>(target: O, type: K, data?: T[K], bubbles?: boolean): Event<T[K]>;
+        has<K extends keyof T>(target: O, type: K): boolean;
+        on<K extends keyof T>(target: O, type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof T>(target: O, type?: K, listener?: (event: Event<T[K]>) => void, thisObject?: any): void;
+    }
+    /**
+     * 事件
+     */
     class FEvent {
+        private feventMap;
+        private getBubbleTargets;
         /**
          * 监听一次事件后将会被移除
          * @param type						事件的类型。
@@ -6952,14 +7017,14 @@ declare namespace feng3d {
          * @param thisObject 回调函数 this 指针
          * @param priority 优先级
          */
-        onAll(obj: Object, listener: (event: any) => any, thisObject?: any, priority?: number): void;
+        onAll(obj: Object, listener: (event: any) => void, thisObject?: any, priority?: number): void;
         /**
          * 移除监听对象的所有事件
          * @param obj 被监听对象
          * @param listener 回调函数
          * @param thisObject 回调函数 this 指针
          */
-        offAll(obj: Object, listener?: (event: any) => any, thisObject?: any): void;
+        offAll(obj: Object, listener?: (event: any) => void, thisObject?: any): void;
         /**
          * 处理事件
          * @param e 事件
@@ -6971,8 +7036,6 @@ declare namespace feng3d {
          */
         protected handelEventBubbles(obj: Object, e: Event<any>): void;
     }
-}
-declare namespace feng3d {
     /**
      * 事件
      */
@@ -7009,13 +7072,72 @@ declare namespace feng3d {
          * 事件流过的对象列表，事件路径
          */
         targets: any[];
+        /**
+         * 处理列表
+         */
+        handles: ListenerVO[];
+    }
+    /**
+     * 监听数据
+     */
+    interface ListenerVO {
+        /**
+         * 监听函数
+         */
+        listener: (event: Event<any>) => void;
+        /**
+         * 监听函数作用域
+         */
+        thisObject: any;
+        /**
+         * 优先级
+         */
+        priority: number;
+        /**
+         * 是否只监听一次
+         */
+        once: boolean;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 全局事件
+     */
+    var dispatcher: IEventDispatcher<GlobalEvents>;
+    interface GlobalEvents {
+        /**
+         * shader资源发生变化
+         */
+        "asset.shaderChanged": any;
+        /**
+         * 脚本发生变化
+         */
+        "asset.scriptChanged": any;
+        /**
+         * 图片资源发生变化
+         */
+        "asset.imageAssetChanged": {
+            url: string;
+        };
+        /**
+         * 解析出资源
+         */
+        "asset.parsed": any;
+        /**
+         * 删除文件
+         */
+        "fs.delete": string;
+        /**
+         * 写文件
+         */
+        "fs.write": string;
     }
     interface IEventDispatcher<T> {
         once<K extends keyof T>(type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number): void;
         dispatch<K extends keyof T>(type: K, data?: T[K], bubbles?: boolean): Event<T[K]>;
         has<K extends keyof T>(type: K): boolean;
-        on<K extends keyof T>(type: K, listener: (event: Event<T[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
-        off<K extends keyof T>(type?: K, listener?: (event: Event<T[K]>) => any, thisObject?: any): any;
+        on<K extends keyof T>(type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof T>(type?: K, listener?: (event: Event<T[K]>) => void, thisObject?: any): void;
     }
     /**
      * 事件适配器
@@ -7058,14 +7180,29 @@ declare namespace feng3d {
          * @param listener					处理事件的侦听器函数。
          * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
          */
-        on(type: string, listener: (event: any) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        on(type: string, listener: (event: any) => void, thisObject?: any, priority?: number, once?: boolean): void;
         /**
          * 移除监听
          * @param dispatcher 派发器
          * @param type						事件的类型。
          * @param listener					要删除的侦听器对象。
          */
-        off(type?: string, listener?: (event: any) => any, thisObject?: any): void;
+        off(type?: string, listener?: (event: any) => void, thisObject?: any): void;
+        /**
+         * 监听对象的所有事件
+         * @param obj 被监听对象
+         * @param listener 回调函数
+         * @param thisObject 回调函数 this 指针
+         * @param priority 优先级
+         */
+        onAll(listener: (event: any) => void, thisObject?: any, priority?: number): void;
+        /**
+         * 移除监听对象的所有事件
+         * @param obj 被监听对象
+         * @param listener 回调函数
+         * @param thisObject 回调函数 this 指针
+         */
+        offAll(listener?: (event: any) => void, thisObject?: any): void;
         /**
          * 处理事件
          * @param e 事件
@@ -7081,7 +7218,6 @@ declare namespace feng3d {
 declare namespace feng3d {
     /**
      * 代理 EventTarget, 处理js事件中this关键字问题
-
      */
     class EventProxy extends EventDispatcher {
         pageX: number;
@@ -7141,52 +7277,79 @@ declare namespace feng3d {
         once<K extends keyof WindowEventMap>(type: K, listener: (event: WindowEventMap[K]) => void, thisObject?: any, priority?: number): void;
         dispatch<K extends keyof WindowEventMap>(type: K, data?: WindowEventMap[K], bubbles?: boolean): any;
         has<K extends keyof WindowEventMap>(type: K): boolean;
-        on<K extends keyof WindowEventMap>(type: K, listener: (event: WindowEventMap[K]) => any, thisObject?: any, priority?: number, once?: boolean): any;
-        off<K extends keyof WindowEventMap>(type?: K, listener?: (event: WindowEventMap[K]) => any, thisObject?: any): any;
+        on<K extends keyof WindowEventMap>(type: K, listener: (event: WindowEventMap[K]) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof WindowEventMap>(type?: K, listener?: (event: WindowEventMap[K]) => any, thisObject?: any): void;
+    }
+    interface IEventProxy<T> {
+        once<K extends keyof T>(type: K, listener: (event: T[K]) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof T>(type: K, data?: T[K], bubbles?: boolean): any;
+        has<K extends keyof T>(type: K): boolean;
+        on<K extends keyof T>(type: K, listener: (event: T[K]) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof T>(type?: K, listener?: (event: T[K]) => any, thisObject?: any): void;
     }
     class WindowEventProxy extends EventProxy {
     }
     /**
      * 键盘鼠标输入
      */
-    var windowEventProxy: WindowEventProxy;
+    var windowEventProxy: IEventProxy<WindowEventMap> & EventProxy;
 }
 declare namespace feng3d {
     /**
-     * 全局事件
+     * 任务，用于处理任务之间依赖
      */
-    var feng3dDispatcher: Feng3dDispatcher;
-    interface Feng3dEventMap {
+    var task: Task;
+    /**
+     * 任务函数
+     */
+    interface TaskFunction {
         /**
-         * shader资源发生变化
+         * 函数自身名称
          */
-        "asset.shaderChanged": any;
+        readonly name?: string;
         /**
-         * 脚本发生变化
+         * 函数自身
          */
-        "asset.scriptChanged": any;
-        /**
-         * 图片资源发生变化
-         */
-        "asset.imageAssetChanged": {
-            url: string;
-        };
-        /**
-         * 解析出资源
-         */
-        "asset.parsed": any;
-    }
-    interface Feng3dDispatcher {
-        once<K extends keyof Feng3dEventMap>(type: K, listener: (event: Event<Feng3dEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof Feng3dEventMap>(type: K, data?: Feng3dEventMap[K], bubbles?: boolean): Event<Feng3dEventMap[K]>;
-        has<K extends keyof Feng3dEventMap>(type: K): boolean;
-        on<K extends keyof Feng3dEventMap>(type: K, listener: (event: Event<Feng3dEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
-        off<K extends keyof Feng3dEventMap>(type?: K, listener?: (event: Event<Feng3dEventMap[K]>) => any, thisObject?: any): any;
+        (callback: () => void): void;
     }
     /**
-     * 全局事件
+     * 任务
+     *
+     * 处理 异步任务(函数)串联并联执行功能
      */
-    class Feng3dDispatcher extends EventDispatcher {
+    class Task {
+        /**
+         * 并联多个异步函数为一个函数
+         *
+         * 这些异步函数同时执行
+         *
+         * @param fns 一组异步函数
+         */
+        parallel(fns: TaskFunction[]): TaskFunction;
+        /**
+         * 串联多个异步函数为一个函数
+         *
+         * 这些异步函数按顺序依次执行，等待前一个异步函数执行完调用回调后才执行下一个异步函数。
+         *
+         * @param fns 一组异步函数
+         */
+        series(fns: TaskFunction[]): TaskFunction;
+        /**
+         * 创建一组并行同类任务，例如同时加载一组资源，并在回调中返回结果数组
+         *
+         * @param ps 一组参数
+         * @param fn 单一任务函数
+         * @param done 完成回调
+         */
+        parallelResults<P, R>(ps: P[], fn: (p: P, callback: (r: R) => void) => void, done: (rs: R[]) => void): void;
+        /**
+         * 创建一组串联同类任务，例如排序加载一组资源
+         *
+         * @param ps 一组参数
+         * @param fn 单一任务函数
+         * @param done 完成回调
+         */
+        seriesResults<P, R>(ps: P[], fn: (p: P, callback: (r: R) => void) => void, done: (rs: R[]) => void): void;
     }
 }
 declare namespace feng3d {
@@ -7211,10 +7374,12 @@ declare namespace feng3d {
          * 资源名称
          */
         name: string;
+        private _name;
         /**
          * 资源编号
          */
         assetId: string;
+        private _assetId;
         /**
          * 资源类型，由具体对象类型决定
          */
@@ -7435,9 +7600,24 @@ declare namespace feng3d {
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
-         * @param callback 回调函数
          */
-        abstract getAbsolutePath(path: string, callback: (err: Error, absolutePath: string) => void): void;
+        abstract getAbsolutePath(path: string): string;
+        /**
+         * 读取文件列表为字符串列表
+         *
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        readStrings(paths: string[], callback: (strs: (string | Error)[]) => void): void;
+        /**
+         * 获取已经加载的图片，如果未加载则返回null
+         *
+         * @param path 图片路径
+         */
+        getImage(path: string): HTMLImageElement;
+        protected _images: {
+            [path: string]: HTMLImageElement;
+        };
     }
 }
 declare namespace feng3d {
@@ -7511,6 +7691,25 @@ declare namespace feng3d {
          */
         abstract copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
         /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        abstract isDirectory(path: string, callback: (result: boolean) => void): void;
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        abstract initproject(projectname: string, callback: (err: Error) => void): void;
+        /**
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        abstract hasProject(projectname: string, callback: (has: boolean) => void): void;
+        /**
          * 获取所有文件路径
          * @param callback 回调函数
          */
@@ -7572,11 +7771,6 @@ declare namespace feng3d {
          * @param callback 回调函数
          */
         delete(path: string, callback?: (err: Error) => void): void;
-        /**
-         * 是否为文件夹
-         * @param path 文件路径
-         */
-        isDir(path: string): boolean;
     }
 }
 declare namespace feng3d {
@@ -7644,13 +7838,20 @@ declare namespace feng3d {
          * @param path 图片路径
          * @param callback 加载完成回调
          */
-        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
+        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): HTMLImageElement;
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
          * @param callback 回调函数
          */
-        getAbsolutePath(path: string, callback: (err: Error, absolutePath: string) => void): void;
+        getAbsolutePath(path: string): string;
+        /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        isDirectory(path: string, callback: (result: boolean) => void): void;
         /**
          * 文件是否存在
          * @param path 文件路径
@@ -7715,6 +7916,18 @@ declare namespace feng3d {
          * @param callback 回调函数
          */
         getAllPaths(callback: (err: Error, allPaths: string[]) => void): void;
+        /**
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        hasProject(projectname: string, callback: (has: boolean) => void): void;
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        initproject(projectname: string, callback: (err: Error) => void): void;
     }
 }
 declare namespace feng3d {
@@ -7751,14 +7964,13 @@ declare namespace feng3d {
          * @param path 图片路径
          * @param callback 加载完成回调
          */
-        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
+        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): HTMLImageElement;
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
          * @param callback 回调函数
          */
-        getAbsolutePath(path: string, callback: (err: Error, absolutePath: string) => void): void;
-        private _getAbsolutePath;
+        getAbsolutePath(path: string): string;
     }
 }
 declare namespace feng3d {
@@ -7858,11 +8070,6 @@ declare namespace feng3d {
          */
         assetId: string;
         /**
-         * 名称
-         */
-        name: string;
-        private _name;
-        /**
          * 资源元标签，该对象也用来判断资源是否被加载，值为null表示未加载，否则已加载。
          *
          * 并且该对象还会用于存储主文件无法存储的数据，比如 TextureAsset 中存储了 Texture2D 信息
@@ -7881,11 +8088,17 @@ declare namespace feng3d {
         /**
          * 文件后缀
          */
-        extenson: string;
+        readonly extenson: string;
         /**
          * 父资源
          */
         parentAsset: FolderAsset;
+        /**
+         * 文件名称
+         *
+         * 不包含后缀
+         */
+        readonly fileName: string;
         /**
          * 资源路径
          */
@@ -8016,6 +8229,7 @@ declare namespace feng3d {
          * 资源树保存路径
          */
         protected resources: string;
+        private _status;
         /**
          * 构建可读资源系统
          *
@@ -8032,18 +8246,20 @@ declare namespace feng3d {
          * 新建资源
          *
          * @param cls 资源类定义
+         * @param fileName 文件名称
          * @param value 初始数据
          * @param parent 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        createAsset<T extends FileAsset>(cls: new () => T, value?: gPartial<T>, parent?: FolderAsset, callback?: (err: Error, asset: T) => void): void;
+        createAsset<T extends FileAsset>(cls: new () => T, fileName?: string, value?: gPartial<T>, parent?: FolderAsset, callback?: (err: Error, asset: T) => void): void;
         /**
          * 获取有效子文件名称
          *
          * @param parent 父文件夹
-         * @param name 名称
+         * @param fileName 文件名称
          */
-        getValidChildName(parent: FolderAsset, name: string): string;
+        getValidChildName(parent: FolderAsset, fileName: string): string;
+        private _assetStatus;
         /**
          * 读取文件为资源对象
          * @param id 资源编号
@@ -8126,11 +8342,12 @@ declare namespace feng3d {
          * 新建资源
          *
          * @param cls 资源类定义
+         * @param fileName 文件名称
          * @param value 初始数据
          * @param parent 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        createAsset<T extends FileAsset>(cls: new () => T, value?: gPartial<T>, parent?: FolderAsset, callback?: (err: Error, asset: T) => void): void;
+        createAsset<T extends FileAsset>(cls: new () => T, fileName?: string, value?: gPartial<T>, parent?: FolderAsset, callback?: (err: Error, asset: T) => void): void;
         /**
          * 写（保存）资源
          *
@@ -10856,7 +11073,7 @@ declare namespace feng3d {
         /**
          * 使纹理失效
          */
-        protected invalidate(): void;
+        invalidate(): void;
         readonly activePixels: HTMLCanvasElement | ImageData | HTMLImageElement | HTMLVideoElement | ImageBitmap | (HTMLCanvasElement | ImageData | HTMLImageElement | HTMLVideoElement | ImageBitmap)[];
         /**
          *
@@ -11320,6 +11537,22 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    /**
+     * Graphics 类包含一组可用来创建矢量形状的方法。
+     */
+    class Graphics extends Component {
+        __class__: "feng3d.Graphics";
+        private image;
+        private context2D;
+        private canvas;
+        private width;
+        private height;
+        constructor();
+        draw(width: number, height: number, callback: (context2D: CanvasRenderingContext2D) => void): this;
+    }
+    function watchContext2D(context2D: CanvasRenderingContext2D, watchFuncs?: string[]): void;
+}
+declare namespace feng3d {
     interface ComponentMap {
         Behaviour: Behaviour;
     }
@@ -11721,16 +11954,51 @@ declare namespace feng3d {
          * 构建3D对象
          */
         constructor();
+        /**
+         * 根据名称查找对象
+         *
+         * @param name 对象名称
+         */
         find(name: string): GameObject;
+        /**
+         * 是否包含指定对象
+         *
+         * @param child 可能的子孙对象
+         */
         contains(child: GameObject): boolean;
+        /**
+         * 添加子对象
+         *
+         * @param child 子对象
+         */
         addChild(child: GameObject): GameObject;
+        /**
+         * 添加子对象
+         *
+         * @param childarray 子对象
+         */
         addChildren(...childarray: GameObject[]): void;
         /**
          * 移除自身
          */
         remove(): void;
+        /**
+         * 移除子对象
+         *
+         * @param child 子对象
+         */
         removeChild(child: GameObject): void;
+        /**
+         * 删除指定位置的子对象
+         *
+         * @param index 需要删除子对象的所有
+         */
         removeChildAt(index: number): void;
+        /**
+         * 获取指定位置的子对象
+         *
+         * @param index
+         */
         getChildAt(index: number): GameObject;
         /**
          * 获取子对象列表（备份）
@@ -11856,6 +12124,16 @@ declare namespace feng3d {
          * @param callback 完成回调
          */
         onLoadCompleted(callback: () => void): void;
+        /**
+         * 渲染前执行函数
+         *
+         * 可用于渲染前收集渲染数据，或者更新显示效果等
+         *
+         * @param gl
+         * @param renderAtomic
+         * @param scene3d
+         * @param camera
+         */
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene3d: Scene3D, camera: Camera): void;
         /**
          * Finds a game object by name and returns it.
@@ -11915,12 +12193,12 @@ declare namespace feng3d {
          * 鼠标在3D视图中的位置
          */
         readonly mousePos: Vector2;
-        readonly mouseinview: boolean;
         readonly viewRect: Rectangle;
         /**
          * 鼠标事件管理
          */
         mouse3DManager: Mouse3DManager;
+        protected contextLost: boolean;
         /**
          * 构建3D视图
          * @param canvas    画布
@@ -11941,6 +12219,36 @@ declare namespace feng3d {
          * 绘制场景
          */
         render(interval?: number): void;
+        /**
+         * 屏幕坐标转GPU坐标
+         * @param screenPos 屏幕坐标 (x: [0-width], y: [0 - height])
+         * @return GPU坐标 (x: [-1, 1], y: [-1, 1])
+         */
+        screenToGpuPosition(screenPos: Vector2): Vector2;
+        /**
+         * 投影坐标（世界坐标转换为3D视图坐标）
+         * @param point3d 世界坐标
+         * @return 屏幕的绝对坐标
+         */
+        project(point3d: Vector3): Vector3;
+        /**
+         * 屏幕坐标投影到场景坐标
+         * @param nX 屏幕坐标X ([0-width])
+         * @param nY 屏幕坐标Y ([0-height])
+         * @param sZ 到屏幕的距离
+         * @param v 场景坐标（输出）
+         * @return 场景坐标
+         */
+        unproject(sX: number, sY: number, sZ: number, v?: Vector3): Vector3;
+        /**
+         * 获取单位像素在指定深度映射的大小
+         * @param   depth   深度
+         */
+        getScaleByDepth(depth: number, dir?: Vector2): number;
+        /**
+         * 获取鼠标射线（与鼠标重叠的摄像机射线）
+         */
+        getMouseRay3D(): Ray3D;
         /**
          * 获取屏幕区域内所有游戏对象
          * @param start 起点
@@ -12231,6 +12539,14 @@ declare namespace feng3d {
          * 用于处理某些脚本只在在feng3d引擎或者编辑器中运行的问题。例如 FPSController 默认只在feng3d中运行，在编辑器模式下不会运行。
          */
         runEnvironment: RunEnvironment;
+        /**
+         * 鼠标射线，在渲染时被设置
+         */
+        mouseRay3D: Ray3D;
+        /**
+         * 上次渲染时用的摄像机
+         */
+        camera: Camera;
         /**
          * 构造3D场景
          */
@@ -12944,10 +13260,6 @@ declare namespace feng3d {
         readonly single: boolean;
         projection: Projection;
         /**
-         * 视窗矩形
-         */
-        viewRect: Rectangle;
-        /**
          * 镜头
          */
         lens: LensBase;
@@ -12963,10 +13275,6 @@ declare namespace feng3d {
          * 创建一个摄像机
          */
         init(gameObject: GameObject): void;
-        /**
-         * 获取鼠标射线（与鼠标重叠的摄像机射线）
-         */
-        getMouseRay3D(): Ray3D;
         /**
          * 获取与坐标重叠的射线
          * @param x view3D上的X坐标
@@ -12990,16 +13298,11 @@ declare namespace feng3d {
          */
         unproject(sX: number, sY: number, sZ: number, v?: Vector3): Vector3;
         /**
-         * 屏幕坐标转GPU坐标
-         * @param screenPos 屏幕坐标 (x: [0-width], y: [0 - height])
-         * @return GPU坐标 (x: [-1, 1], y: [-1, 1])
-         */
-        screenToGpuPosition(screenPos: Vector2): Vector2;
-        /**
-         * 获取单位像素在指定深度映射的大小
+         * 获取摄像机能够在指定深度处的视野；镜头在指定深度的尺寸。
+         *
          * @param   depth   深度
          */
-        getScaleByDepth(depth: number): number;
+        getScaleByDepth(depth: number, dir?: Vector2): number;
         /**
          * 是否与盒子相交
          * @param box 盒子
@@ -13475,15 +13778,24 @@ declare namespace feng3d {
          */
         noPixels: ImageDatas;
         /**
-         * 是否加载
+         * 是否已加载
          */
-        isLoaded: boolean;
+        readonly isLoaded: boolean;
+        private _loadings;
+        readonly image: HTMLImageElement;
         /**
          * 用于表示初始化纹理的数据来源
          */
         source: {
             url: string;
         };
+        constructor();
+        private onItemLoadCompleted;
+        /**
+         * 已加载完成或者加载完成时立即调用
+         * @param callback 完成回调
+         */
+        onLoadCompleted(callback: () => void): void;
         private _source;
         /**
          * 纹理类型
@@ -13557,27 +13869,46 @@ declare namespace feng3d {
         on<K extends keyof TextureCubeEventMap>(type: K, listener: (event: Event<TextureCubeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
         off<K extends keyof TextureCubeEventMap>(type?: K, listener?: (event: Event<TextureCubeEventMap[K]>) => any, thisObject?: any): any;
     }
+    type TextureCubeImageName = "positive_x_url" | "positive_y_url" | "positive_z_url" | "negative_x_url" | "negative_y_url" | "negative_z_url";
     /**
      * 立方体纹理
      */
     class TextureCube extends TextureInfo {
         __class__: "feng3d.TextureCube";
         assetType: AssetType;
-        positive_x_url: string;
-        positive_y_url: string;
-        positive_z_url: string;
-        negative_x_url: string;
-        negative_y_url: string;
-        negative_z_url: string;
+        static ImageNames: TextureCubeImageName[];
+        OAVCubeMap: string;
+        /**
+         * 原始数据
+         */
+        private rawData;
         noPixels: ImageDatas[];
         protected _pixels: any[];
         protected _textureType: TextureType;
-        private loadingNum;
-        private urlChanged;
         /**
          * 是否加载完成
          */
         readonly isLoaded: boolean;
+        private _loading;
+        setTexture2D(pos: TextureCubeImageName, texture: Texture2D): void;
+        setTexture2DPath(pos: TextureCubeImageName, path: string): void;
+        getTextureImage(pos: TextureCubeImageName, callback: (img?: HTMLImageElement) => void): void;
+        private _rawDataChanged;
+        /**
+         * 加载单个贴图
+         *
+         * @param texture 贴图
+         * @param index 索引
+         */
+        private _loadItemTexture;
+        /**
+         * 加载单个图片
+         *
+         * @param imagepath 图片路径
+         * @param index 索引
+         */
+        private _loadItemImagePath;
+        private _onItemLoadCompleted;
         /**
          * 已加载完成或者加载完成时立即调用
          * @param callback 完成回调
@@ -15165,8 +15496,8 @@ declare namespace feng3d {
      * 文件夹资源
      */
     class FolderAsset extends FileAsset {
+        static extenson: string;
         assetType: AssetType;
-        extenson: string;
         /**
          * 子资源列表
          */
@@ -15188,7 +15519,6 @@ declare namespace feng3d {
      * 二进制 资源
      */
     class ArrayBufferAsset extends FileAsset {
-        name: string;
         /**
          * 文件数据
          */
@@ -15228,10 +15558,6 @@ declare namespace feng3d {
      */
     abstract class ObjectAsset extends FileAsset {
         /**
-         * 名称
-         */
-        name: string;
-        /**
          * 资源对象
          */
         data: AssetData;
@@ -15242,6 +15568,8 @@ declare namespace feng3d {
          * @param callback 完成回调
          */
         readFile(callback?: (err: Error) => void): void;
+        private _dataChanged;
+        private _onDataChanged;
     }
 }
 declare namespace feng3d {
@@ -15249,9 +15577,8 @@ declare namespace feng3d {
      * 脚本资源
      */
     class ScriptAsset extends StringAsset {
+        static extenson: string;
         assetType: AssetType;
-        name: string;
-        extenson: string;
         textContent: string;
         /**
          * 脚本父类名称
@@ -15269,8 +15596,8 @@ declare namespace feng3d {
      * 着色器 资源
      */
     class ShaderAsset extends ScriptAsset {
+        static extenson: string;
         assetType: AssetType;
-        extenson: string;
     }
 }
 declare namespace feng3d {
@@ -15278,8 +15605,8 @@ declare namespace feng3d {
      * JS资源
      */
     class JSAsset extends StringAsset {
+        static extenson: string;
         assetType: AssetType;
-        extenson: string;
         textContent: string;
     }
 }
@@ -15288,15 +15615,15 @@ declare namespace feng3d {
      * JSON 资源
      */
     class JsonAsset extends StringAsset {
+        static extenson: string;
         assetType: AssetType;
-        extenson: string;
         textContent: string;
     }
 }
 declare namespace feng3d {
     class TextAsset extends StringAsset {
+        static extenson: string;
         assetType: AssetType;
-        extenson: string;
         textContent: string;
     }
 }
@@ -15306,7 +15633,6 @@ declare namespace feng3d {
      */
     class AudioAsset extends FileAsset {
         readonly assetType: AssetType;
-        readonly extenson: ".ogg" | ".mp3" | ".wav";
         /**
          * 保存文件
          * @param callback 完成回调
@@ -15324,11 +15650,11 @@ declare namespace feng3d {
      * 纹理文件
      */
     class TextureAsset extends FileAsset {
+        static extenson: ".jpg" | ".png" | ".jpeg" | ".gif";
         /**
          * 材质
          */
         data: Texture2D;
-        extenson: ".jpg" | ".png" | ".jpeg" | ".gif";
         /**
          * 图片
          */
@@ -15361,11 +15687,11 @@ declare namespace feng3d {
      * 立方体纹理资源
      */
     class TextureCubeAsset extends ObjectAsset {
+        static extenson: string;
         /**
          * 材质
          */
         data: TextureCube;
-        extenson: string;
         assetType: AssetType;
     }
 }
@@ -15374,12 +15700,12 @@ declare namespace feng3d {
      * 几何体资源
      */
     class GeometryAsset extends ObjectAsset {
+        static extenson: string;
         /**
          * 几何体
          */
         data: Geometry;
         assetType: AssetType;
-        extenson: string;
     }
 }
 declare namespace feng3d {
@@ -15387,12 +15713,12 @@ declare namespace feng3d {
      * 材质资源
      */
     class MaterialAsset extends ObjectAsset {
+        static extenson: string;
         /**
          * 材质
          */
         data: Material;
         assetType: AssetType;
-        extenson: string;
     }
 }
 declare namespace feng3d {
@@ -15405,7 +15731,7 @@ declare namespace feng3d {
          */
         data: GameObject;
         assetType: AssetType;
-        extenson: string;
+        static extenson: string;
     }
 }
 declare namespace feng3d {
@@ -16156,7 +16482,7 @@ declare namespace feng3d {
          * @param scene3d 场景
          * @param camera 摄像机
          */
-        pick(scene3d: Scene3D, camera: Camera): GameObject;
+        pick(engine: Engine, scene3d: Scene3D, camera: Camera): GameObject;
         constructor(mouseInput: MouseInput, viewport?: Lazy<Rectangle>);
         private _selectedGameObject;
         private _mouseEventTypes;
@@ -16313,18 +16639,5 @@ declare namespace feng3d {
             clientY: number;
         };
     }
-}
-declare type gPartial<T> = {
-    [P in keyof T]?: gPartial<T[P]>;
-};
-declare namespace feng3d {
-    /**
-     * feng3d的版本号
-     */
-    var revision: string;
-    /**
-     * 是否开启调试(主要用于断言)
-     */
-    var debuger: boolean;
 }
 //# sourceMappingURL=feng3d.d.ts.map

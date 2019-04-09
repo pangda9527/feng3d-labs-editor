@@ -19,6 +19,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var feng3d;
 (function (feng3d) {
+    /**
+     * feng3d的版本号
+     */
+    feng3d.revision = "2019.04.04.00";
+    console.log("feng3d version " + feng3d.revision);
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     feng3d.shaderConfig = {
         "shaders": {
             "color": {
@@ -203,10 +211,6 @@ Object.runFunc = function (obj, func) {
     func(obj);
     return obj;
 };
-Object.setValue = function (obj, value) {
-    feng3d.serialization.setValue(obj, value);
-    return obj;
-};
 Object.deepClone = function (obj) {
     return feng3d.serialization.clone(obj);
 };
@@ -225,8 +229,30 @@ Map.prototype.getValues = function () {
     });
     return values;
 };
+Array.prototype.unique = function (compare) {
+    if (compare === void 0) { compare = function (a, b) { return a == b; }; }
+    var arr = this;
+    for (var i = 0; i < arr.length; i++) {
+        for (var j = arr.length - 1; j > i; j--) {
+            if (compare(arr[i], arr[j]))
+                arr.splice(j, 1);
+        }
+    }
+    return this;
+};
+Array.prototype.delete = function (item) {
+    var arr = this;
+    var index = arr.indexOf(item);
+    if (index != -1)
+        arr.splice(index, 1);
+    return index;
+};
 var feng3d;
 (function (feng3d) {
+    /**
+     * 是否开启调试(主要用于断言)
+     */
+    feng3d.debuger = true;
     /**
      * 测试代码运行时间
      * @param fn 被测试的方法
@@ -757,7 +783,7 @@ var feng3d;
          */
         Serialization.prototype.setValue = function (target, object, tempInfo) {
             if (!object)
-                return;
+                return target;
             tempInfo = initTempInfo(tempInfo);
             var serializeAssets = getSerializableMembers(target).reduce(function (pv, cv) { if (cv.asset)
                 pv.push(cv.property); return pv; }, []);
@@ -787,6 +813,7 @@ var feng3d;
             for (var property in object) {
                 _loop_1(property);
             }
+            return target;
         };
         /**
          * 给目标对象的指定属性赋值
@@ -1033,7 +1060,7 @@ var feng3d;
                 }
             }
             var cls = this.OVComponent[classConfig.component];
-            feng3d.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + classConfig.component + " \u5BF9\u5E94\u7684\u5BF9\u8C61\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + classConfig.component + " \u4E2D\u4F7F\u7528@OVComponent()\u6807\u8BB0");
+            feng3d.debuger && feng3d.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + classConfig.component + " \u5BF9\u5E94\u7684\u5BF9\u8C61\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + classConfig.component + " \u4E2D\u4F7F\u7528@OVComponent()\u6807\u8BB0");
             var view = new cls(classConfig);
             return view;
         };
@@ -1060,7 +1087,7 @@ var feng3d;
                 attributeViewInfo.component = this.defaultObjectAttributeViewClass;
             }
             var cls = this.OAVComponent[attributeViewInfo.component];
-            feng3d.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + attributeViewInfo.component + " \u5BF9\u5E94\u7684\u5C5E\u6027\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + attributeViewInfo.component + " \u4E2D\u4F7F\u7528@OVAComponent()\u6807\u8BB0");
+            feng3d.debuger && feng3d.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + attributeViewInfo.component + " \u5BF9\u5E94\u7684\u5C5E\u6027\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + attributeViewInfo.component + " \u4E2D\u4F7F\u7528@OVAComponent()\u6807\u8BB0");
             var view = new cls(attributeViewInfo);
             return view;
         };
@@ -1079,7 +1106,7 @@ var feng3d;
                 blockViewInfo.component = this.defaultObjectAttributeBlockView;
             }
             var cls = this.OBVComponent[blockViewInfo.component];
-            feng3d.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + blockViewInfo.component + " \u5BF9\u5E94\u7684\u5757\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + blockViewInfo.component + " \u4E2D\u4F7F\u7528@OVBComponent()\u6807\u8BB0");
+            feng3d.debuger && feng3d.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + blockViewInfo.component + " \u5BF9\u5E94\u7684\u5757\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + blockViewInfo.component + " \u4E2D\u4F7F\u7528@OVBComponent()\u6807\u8BB0");
             var view = new cls(blockViewInfo);
             return view;
         };
@@ -1453,7 +1480,7 @@ var feng3d;
             affers.push([addTickerFunc, [item]]);
             return;
         }
-        removeTickerFunc(item);
+        // removeTickerFunc(item);
         if (item.priority == undefined)
             item.priority = 0;
         item.runtime = Date.now() + feng3d.lazy.getvalue(item.interval);
@@ -1482,18 +1509,11 @@ var feng3d;
             return a.priority - b.priority;
         });
         var currenttime = Date.now();
+        var needTickerFuncItems = [];
         for (var i = tickerFuncs.length - 1; i >= 0; i--) {
             var element = tickerFuncs[i];
             if (element.runtime < currenttime) {
-                // try
-                // {
-                element.func.call(element.thisObject, feng3d.lazy.getvalue(element.interval));
-                // } catch (error)
-                // {
-                //     warn(`${element.func} 方法执行错误，从 ticker 中移除`, error)
-                //     tickerFuncs.splice(i, 1);
-                //     continue;
-                // }
+                needTickerFuncItems.push(element);
                 if (element.once) {
                     tickerFuncs.splice(i, 1);
                     continue;
@@ -1501,6 +1521,20 @@ var feng3d;
                 element.runtime = nextRuntime(element.runtime, feng3d.lazy.getvalue(element.interval));
             }
         }
+        needTickerFuncItems.reverse();
+        // 相同的函数只执行一个
+        needTickerFuncItems.unique(function (a, b) { return (a.func == b.func && a.thisObject == b.thisObject); });
+        needTickerFuncItems.forEach(function (v) {
+            try {
+                v.func.call(v.thisObject, feng3d.lazy.getvalue(v.interval));
+            }
+            catch (error) {
+                feng3d.warn(v.func + " \u65B9\u6CD5\u6267\u884C\u9519\u8BEF\uFF0C\u4ECE ticker \u4E2D\u79FB\u9664", error);
+                var index = tickerFuncs.indexOf(v);
+                if (index != -1)
+                    tickerFuncs.splice(index, 1);
+            }
+        });
         running = false;
         for (var i = 0; i < affers.length; i++) {
             var affer = affers[i];
@@ -1514,7 +1548,9 @@ var feng3d;
     }
     var localrequestAnimationFrame;
     if (typeof requestAnimationFrame == "undefined") {
+        var _global;
         if (typeof window != "undefined") {
+            _global = window;
             localrequestAnimationFrame =
                 window["requestAnimationFrame"] ||
                     window["webkitRequestAnimationFrame"] ||
@@ -1522,9 +1558,12 @@ var feng3d;
                     window["oRequestAnimationFrame"] ||
                     window["msRequestAnimationFrame"];
         }
-        else {
+        else if (typeof global != "undefined") {
+            _global = global;
+        }
+        if (localrequestAnimationFrame == undefined) {
             localrequestAnimationFrame = function (callback) {
-                return window.setTimeout(callback, 1000 / feng3d.ticker.frameRate);
+                return _global.setTimeout(callback, 1000 / feng3d.ticker.frameRate);
             };
         }
     }
@@ -1603,6 +1642,14 @@ var feng3d;
             if (type == "png")
                 return canvas.toDataURL("image/png");
             return canvas.toDataURL("image/jpeg", 0.8);
+        };
+        /**
+         * canvas转换为图片
+         */
+        DataTransform.prototype.canvasToImage = function (canvas, type, callback) {
+            if (type === void 0) { type = "png"; }
+            var dataURL = this.canvasToDataURL(canvas, type);
+            this.dataURLToImage(dataURL, callback);
         };
         /**
          * File、Blob对象转换为dataURL
@@ -1816,7 +1863,13 @@ var feng3d;
     ;
     feng3d.classUtils = new ClassUtils();
     var _definitionCache = {};
-    var _global = window;
+    var _global;
+    if (typeof window != "undefined") {
+        _global = window;
+    }
+    else if (typeof global != "undefined") {
+        _global = global;
+    }
     var _classNameSpaces = ["feng3d"];
     /**
      * 为一个类定义注册完全限定类名
@@ -1867,6 +1920,8 @@ var feng3d;
             if (width === void 0) { width = 1; }
             if (height === void 0) { height = 1; }
             if (fillcolor === void 0) { fillcolor = new feng3d.Color4(0, 0, 0, 0); }
+            if (typeof document == "undefined")
+                return;
             var canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
@@ -1889,7 +1944,7 @@ var feng3d;
             canvasImg.width = image.width;
             canvasImg.height = image.height;
             var ctxt = canvasImg.getContext('2d');
-            feng3d.assert(!!ctxt);
+            feng3d.debuger && feng3d.assert(!!ctxt);
             ctxt.drawImage(image, 0, 0);
             this.imageData = ctxt.getImageData(0, 0, image.width, image.height); //读取整张图片的像素。
             return this;
@@ -2191,6 +2246,8 @@ var feng3d;
         function Stats() {
             var _this = this;
             var mode = 0;
+            if (typeof document == "undefined")
+                return;
             var container = document.createElement('div');
             container.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;';
             container.addEventListener('click', function (event) {
@@ -2325,6 +2382,7 @@ var feng3d;
          * @param path 路径
          */
         PathUtils.prototype.getName = function (path) {
+            feng3d.debuger && feng3d.assert(path != undefined);
             var name = this.getNameWithExtension(path);
             if (this.isDirectory(path))
                 return name;
@@ -2336,6 +2394,7 @@ var feng3d;
          * @param path 路径
          */
         PathUtils.prototype.getNameWithExtension = function (path) {
+            feng3d.debuger && feng3d.assert(path != undefined);
             var paths = path.split("/");
             var name = paths.pop();
             if (name == "")
@@ -2347,15 +2406,19 @@ var feng3d;
          * @param path 路径
          */
         PathUtils.prototype.getExtension = function (path) {
+            feng3d.debuger && feng3d.assert(path != undefined);
             var name = this.getNameWithExtension(path);
-            var extension = name.split(".").slice(1).join(".");
-            return extension;
+            var index = name.indexOf(".");
+            if (index == -1)
+                return "";
+            return name.substr(index);
         };
         /**
          * 父路径
          * @param path 路径
          */
         PathUtils.prototype.getParentPath = function (path) {
+            feng3d.debuger && feng3d.assert(path != undefined);
             var paths = path.split("/");
             if (this.isDirectory(path))
                 paths.pop();
@@ -2369,6 +2432,8 @@ var feng3d;
          * @param childName 子文件名称
          */
         PathUtils.prototype.getChildFilePath = function (parentPath, childName) {
+            feng3d.debuger && feng3d.assert(parentPath != undefined);
+            feng3d.debuger && feng3d.assert(childName != undefined);
             if (parentPath.charAt(parentPath.length - 1) != "/")
                 parentPath += "/";
             return parentPath + childName;
@@ -2458,7 +2523,7 @@ var feng3d;
         __extends(ERR_INVALID_ARG_TYPE, _super);
         function ERR_INVALID_ARG_TYPE(name, expected, actual) {
             var _this = this;
-            assert(typeof name === 'string', "'name' must be a string");
+            feng3d.debuger && assert(typeof name === 'string', "'name' must be a string");
             // determiner: 'must be' or 'must not be'
             var determiner;
             if (typeof expected === 'string' && expected.startsWith('not ')) {
@@ -2485,10 +2550,10 @@ var feng3d;
         return ERR_INVALID_ARG_TYPE;
     }(TypeError));
     function oneOf(expected, thing) {
-        assert(typeof thing === 'string', '`thing` has to be of type string');
+        feng3d.debuger && assert(typeof thing === 'string', '`thing` has to be of type string');
         if (Array.isArray(expected)) {
             var len = expected.length;
-            assert(len > 0, 'At least one expected value needs to be specified');
+            feng3d.debuger && assert(len > 0, 'At least one expected value needs to be specified');
             expected = expected.map(function (i) { return String(i); });
             if (len > 2) {
                 return "one of " + thing + " " + expected.slice(0, len - 1).join(', ') + ", or " +
@@ -6639,12 +6704,13 @@ var feng3d;
          * 获取唯一标识符
          * @see http://www.broofa.com/Tools/Math.uuid.htm
          */
-        uuid: function () {
+        uuid: function (length) {
+            if (length === void 0) { length = 36; }
             var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-            var id = new Array(36);
+            var id = new Array(length);
             var rnd = 0, r = 0;
             return function generateUUID() {
-                for (var i = 0; i < 36; i++) {
+                for (var i = 0; i < length; i++) {
                     if (i === 8 || i === 13 || i === 18 || i === 23) {
                         id[i] = '-';
                     }
@@ -9104,6 +9170,16 @@ var feng3d;
             set: function (value) {
                 this.bottom = value.y;
                 this.right = value.x;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Rectangle.prototype, "center", {
+            /**
+             * 中心点
+             */
+            get: function () {
+                return new feng3d.Vector2(this.x + this.width / 2, this.y + this.height / 2);
             },
             enumerable: true,
             configurable: true
@@ -14210,7 +14286,7 @@ var feng3d;
             }
             if (keys.length == 0)
                 return new feng3d.AnimationCurveKeyframe({ time: t, value: 0, tangent: 0 });
-            feng3d.assert(isfind);
+            feng3d.debuger && feng3d.assert(isfind);
             return new feng3d.AnimationCurveKeyframe({ time: t, value: value, tangent: tangent });
         };
         /**
@@ -14333,7 +14409,7 @@ var feng3d;
             /**
              * 曲线1
              */
-            this.curve1 = Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
+            this.curve1 = feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
             /**
              * 曲线缩放比
              */
@@ -14424,13 +14500,16 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
-    var feventMap = new Map();
-    function getBubbleTargets(target) {
-        return [target["parent"]];
-    }
+    /**
+     * 事件
+     */
     var FEvent = /** @class */ (function () {
         function FEvent() {
+            this.feventMap = new Map();
         }
+        FEvent.prototype.getBubbleTargets = function (target) {
+            return [target["parent"]];
+        };
         /**
          * 监听一次事件后将会被移除
          * @param type						事件的类型。
@@ -14456,6 +14535,7 @@ var feng3d;
             if (targets.indexOf(obj) != -1)
                 return false;
             targets.push(obj);
+            e.handles = [];
             this.handleEvent(obj, e);
             this.handelEventBubbles(obj, e);
             return true;
@@ -14468,7 +14548,7 @@ var feng3d;
          */
         FEvent.prototype.dispatch = function (obj, type, data, bubbles) {
             if (bubbles === void 0) { bubbles = false; }
-            var e = { type: type, data: data, bubbles: bubbles, target: null, currentTarget: null, isStop: false, isStopBubbles: false, targets: [] };
+            var e = { type: type, data: data, bubbles: bubbles, target: null, currentTarget: null, isStop: false, isStopBubbles: false, targets: [], handles: [] };
             this.dispatchEvent(obj, e);
             return e;
         };
@@ -14479,7 +14559,7 @@ var feng3d;
          * @return 			如果指定类型的侦听器已注册，则值为 true；否则，值为 false。
          */
         FEvent.prototype.has = function (obj, type) {
-            return !!(feventMap.get(obj) && feventMap.get(obj)[type] && feventMap.get(obj)[type].length);
+            return !!(this.feventMap.get(obj) && this.feventMap.get(obj)[type] && this.feventMap.get(obj)[type].length);
         };
         /**
          * 添加监听
@@ -14490,9 +14570,9 @@ var feng3d;
         FEvent.prototype.on = function (obj, type, listener, thisObject, priority, once) {
             if (priority === void 0) { priority = 0; }
             if (once === void 0) { once = false; }
-            var objectListener = feventMap.get(obj);
+            var objectListener = this.feventMap.get(obj);
             if (!objectListener)
-                (feventMap.set(obj, objectListener = {}));
+                (this.feventMap.set(obj, objectListener = {}));
             var listeners = objectListener[type] = objectListener[type] || [];
             for (var i = 0; i < listeners.length; i++) {
                 var element = listeners[i];
@@ -14517,15 +14597,15 @@ var feng3d;
          */
         FEvent.prototype.off = function (obj, type, listener, thisObject) {
             if (!type) {
-                feventMap.delete(obj);
+                this.feventMap.delete(obj);
                 return;
             }
             if (!listener) {
-                if (feventMap.get(obj))
-                    delete feventMap.get(obj)[type];
+                if (this.feventMap.get(obj))
+                    delete this.feventMap.get(obj)[type];
                 return;
             }
-            var listeners = feventMap.get(obj) && feventMap.get(obj)[type];
+            var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[type];
             if (listeners) {
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     var element = listeners[i];
@@ -14534,7 +14614,7 @@ var feng3d;
                     }
                 }
                 if (listeners.length == 0) {
-                    delete feventMap.get(obj)[type];
+                    delete this.feventMap.get(obj)[type];
                 }
             }
         };
@@ -14547,9 +14627,9 @@ var feng3d;
          */
         FEvent.prototype.onAll = function (obj, listener, thisObject, priority) {
             if (priority === void 0) { priority = 0; }
-            var objectListener = feventMap.get(obj);
+            var objectListener = this.feventMap.get(obj);
             if (!objectListener)
-                (feventMap.set(obj, objectListener = {}));
+                (this.feventMap.set(obj, objectListener = {}));
             var listeners = objectListener.__allEventType__ = objectListener.__allEventType__ || [];
             for (var i = 0; i < listeners.length; i++) {
                 var element = listeners[i];
@@ -14574,11 +14654,11 @@ var feng3d;
          */
         FEvent.prototype.offAll = function (obj, listener, thisObject) {
             if (!listener) {
-                if (feventMap.get(obj))
-                    delete feventMap.get(obj).__allEventType__;
+                if (this.feventMap.get(obj))
+                    delete this.feventMap.get(obj).__allEventType__;
                 return;
             }
-            var listeners = feventMap.get(obj) && feventMap.get(obj).__allEventType__;
+            var listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
             if (listeners) {
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     var element = listeners[i];
@@ -14587,7 +14667,7 @@ var feng3d;
                     }
                 }
                 if (listeners.length == 0) {
-                    delete feventMap.get(obj).__allEventType__;
+                    delete this.feventMap.get(obj).__allEventType__;
                 }
             }
         };
@@ -14603,32 +14683,35 @@ var feng3d;
                 e.currentTarget = obj;
             }
             catch (error) { }
-            var listeners = feventMap.get(obj) && feventMap.get(obj)[e.type];
+            var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[e.type];
             if (listeners) {
                 //遍历调用事件回调函数
-                for (var i = 0; i < listeners.length && !e.isStop; i++) {
-                    listeners[i].listener.call(listeners[i].thisObject, e);
+                var listeners0 = listeners.concat();
+                for (var i = 0; i < listeners0.length && !e.isStop; i++) {
+                    listeners0[i].listener.call(listeners0[i].thisObject, e); //此处可能会删除当前事件，所以上面必须拷贝
+                    e.handles.push(listeners0[i]);
                 }
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     if (listeners[i].once)
                         listeners.splice(i, 1);
                 }
                 if (listeners.length == 0)
-                    delete feventMap.get(obj)[e.type];
+                    delete this.feventMap.get(obj)[e.type];
             }
             // All_EVENT_Type
-            listeners = feventMap.get(obj) && feventMap.get(obj).__allEventType__;
+            listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
             if (listeners) {
                 //遍历调用事件回调函数
-                for (var i = 0; i < listeners.length && !e.isStop; i++) {
-                    listeners[i].listener.call(listeners[i].thisObject, e);
+                var listeners0 = listeners.concat();
+                for (var i = 0; i < listeners0.length && !e.isStop; i++) {
+                    listeners0[i].listener.call(listeners0[i].thisObject, e); //此处可能会删除当前事件，所以上面必须拷贝
                 }
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     if (listeners[i].once)
                         listeners.splice(i, 1);
                 }
                 if (listeners.length == 0)
-                    delete feventMap.get(obj).__allEventType__;
+                    delete this.feventMap.get(obj).__allEventType__;
             }
         };
         /**
@@ -14637,7 +14720,7 @@ var feng3d;
          */
         FEvent.prototype.handelEventBubbles = function (obj, e) {
             if (e.bubbles && !e.isStopBubbles) {
-                var bubbleTargets = getBubbleTargets(obj);
+                var bubbleTargets = this.getBubbleTargets(obj);
                 for (var i = 0, n = bubbleTargets.length; i < n; i++) {
                     var bubbleTarget = bubbleTargets[i];
                     if (!e.isStop && bubbleTarget instanceof feng3d.EventDispatcher)
@@ -14648,7 +14731,7 @@ var feng3d;
         return FEvent;
     }());
     feng3d.FEvent = FEvent;
-    feng3d.fevent = new FEvent();
+    feng3d.objectevent = feng3d.event = new FEvent();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -14668,7 +14751,7 @@ var feng3d;
         EventDispatcher.prototype.once = function (type, listener, thisObject, priority) {
             if (thisObject === void 0) { thisObject = null; }
             if (priority === void 0) { priority = 0; }
-            feng3d.fevent.on(this, type, listener, thisObject, priority, true);
+            feng3d.event.on(this, type, listener, thisObject, priority, true);
         };
         /**
          * 派发事件
@@ -14679,7 +14762,7 @@ var feng3d;
          * @returns 返回事件是否被该对象处理
          */
         EventDispatcher.prototype.dispatchEvent = function (e) {
-            return feng3d.fevent.dispatchEvent(this, e);
+            return feng3d.event.dispatchEvent(this, e);
         };
         /**
          * 将事件调度到事件流中. 事件目标是对其调用 dispatchEvent() 方法的 IEvent 对象。
@@ -14689,7 +14772,7 @@ var feng3d;
          */
         EventDispatcher.prototype.dispatch = function (type, data, bubbles) {
             if (bubbles === void 0) { bubbles = false; }
-            return feng3d.fevent.dispatch(this, type, data, bubbles);
+            return feng3d.event.dispatch(this, type, data, bubbles);
         };
         /**
          * 检查 Event 对象是否为特定事件类型注册了任何侦听器.
@@ -14698,7 +14781,7 @@ var feng3d;
          * @return 			如果指定类型的侦听器已注册，则值为 true；否则，值为 false。
          */
         EventDispatcher.prototype.has = function (type) {
-            return feng3d.fevent.has(this, type);
+            return feng3d.event.has(this, type);
         };
         /**
          * 添加监听
@@ -14709,7 +14792,7 @@ var feng3d;
         EventDispatcher.prototype.on = function (type, listener, thisObject, priority, once) {
             if (priority === void 0) { priority = 0; }
             if (once === void 0) { once = false; }
-            feng3d.fevent.on(this, type, listener, thisObject, priority, once);
+            feng3d.event.on(this, type, listener, thisObject, priority, once);
         };
         /**
          * 移除监听
@@ -14718,31 +14801,51 @@ var feng3d;
          * @param listener					要删除的侦听器对象。
          */
         EventDispatcher.prototype.off = function (type, listener, thisObject) {
-            feng3d.fevent.off(this, type, listener, thisObject);
+            feng3d.event.off(this, type, listener, thisObject);
+        };
+        /**
+         * 监听对象的所有事件
+         * @param obj 被监听对象
+         * @param listener 回调函数
+         * @param thisObject 回调函数 this 指针
+         * @param priority 优先级
+         */
+        EventDispatcher.prototype.onAll = function (listener, thisObject, priority) {
+            if (priority === void 0) { priority = 0; }
+            feng3d.event.onAll(this, listener, thisObject, priority);
+        };
+        /**
+         * 移除监听对象的所有事件
+         * @param obj 被监听对象
+         * @param listener 回调函数
+         * @param thisObject 回调函数 this 指针
+         */
+        EventDispatcher.prototype.offAll = function (listener, thisObject) {
+            feng3d.event.offAll(this, listener, thisObject);
         };
         /**
          * 处理事件
          * @param e 事件
          */
         EventDispatcher.prototype.handleEvent = function (e) {
-            feng3d.fevent["handleEvent"](this, e);
+            feng3d.event["handleEvent"](this, e);
         };
         /**
          * 处理事件冒泡
          * @param e 事件
          */
         EventDispatcher.prototype.handelEventBubbles = function (e) {
-            feng3d.fevent["handelEventBubbles"](this, e);
+            feng3d.event["handelEventBubbles"](this, e);
         };
         return EventDispatcher;
     }());
     feng3d.EventDispatcher = EventDispatcher;
+    feng3d.dispatcher = new EventDispatcher();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
     /**
      * 代理 EventTarget, 处理js事件中this关键字问题
-
      */
     var EventProxy = /** @class */ (function (_super) {
         __extends(EventProxy, _super);
@@ -14907,25 +15010,133 @@ var feng3d;
         return WindowEventProxy;
     }(feng3d.EventProxy));
     feng3d.WindowEventProxy = WindowEventProxy;
-    if (typeof global != "undefined")
-        feng3d.windowEventProxy = new WindowEventProxy(global);
-    else
+    if (typeof window != "undefined")
         feng3d.windowEventProxy = new WindowEventProxy(window);
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
     /**
-     * 全局事件
+     * 任务
+     *
+     * 处理 异步任务(函数)串联并联执行功能
      */
-    var Feng3dDispatcher = /** @class */ (function (_super) {
-        __extends(Feng3dDispatcher, _super);
-        function Feng3dDispatcher() {
-            return _super !== null && _super.apply(this, arguments) || this;
+    var Task = /** @class */ (function () {
+        function Task() {
         }
-        return Feng3dDispatcher;
-    }(feng3d.EventDispatcher));
-    feng3d.Feng3dDispatcher = Feng3dDispatcher;
-    feng3d.feng3dDispatcher = new Feng3dDispatcher();
+        /**
+         * 并联多个异步函数为一个函数
+         *
+         * 这些异步函数同时执行
+         *
+         * @param fns 一组异步函数
+         */
+        Task.prototype.parallel = function (fns) {
+            var result = function (callback) {
+                if (fns.length == 0) {
+                    callback();
+                    return;
+                }
+                var index = 0;
+                fns.forEach(function (fn) {
+                    var callbackNum = 0;
+                    fn(function () {
+                        callbackNum++;
+                        if (callbackNum == 1) {
+                            index++;
+                            if (index == fns.length) {
+                                callback();
+                            }
+                        }
+                        else {
+                            console.warn((fn.name ? "函数" + fn.name : "匿名函数") + " \u591A\u6B21\u8C03\u7528\u56DE\u8C03\u51FD\u6570\uFF0C\u5F53\u524D\u6B21\u6570 " + callbackNum);
+                        }
+                    });
+                });
+            };
+            return result;
+        };
+        /**
+         * 串联多个异步函数为一个函数
+         *
+         * 这些异步函数按顺序依次执行，等待前一个异步函数执行完调用回调后才执行下一个异步函数。
+         *
+         * @param fns 一组异步函数
+         */
+        Task.prototype.series = function (fns) {
+            var result = function (callback) {
+                if (fns.length == 0) {
+                    callback();
+                    return;
+                }
+                var index = 0;
+                var next = function () {
+                    var fn = fns[index];
+                    var callbackNum = 0;
+                    fn(function () {
+                        callbackNum++;
+                        if (callbackNum == 1) {
+                            index++;
+                            if (index < fns.length) {
+                                next();
+                            }
+                            else {
+                                callback && callback();
+                            }
+                        }
+                        else {
+                            console.warn((fn.name ? "函数" + fn.name : "匿名函数") + " \u591A\u6B21\u8C03\u7528\u56DE\u8C03\u51FD\u6570\uFF0C\u5F53\u524D\u6B21\u6570 " + callbackNum);
+                        }
+                    });
+                };
+                next();
+            };
+            return result;
+        };
+        /**
+         * 创建一组并行同类任务，例如同时加载一组资源，并在回调中返回结果数组
+         *
+         * @param ps 一组参数
+         * @param fn 单一任务函数
+         * @param done 完成回调
+         */
+        Task.prototype.parallelResults = function (ps, fn, done) {
+            var map = new Map();
+            // 包装函数
+            var fns = ps.map(function (p) { return function (callback) {
+                fn(p, function (r) {
+                    map.set(p, r);
+                    callback();
+                });
+            }; });
+            this.parallel(fns)(function () {
+                var results = ps.map(function (p) { return map.get(p); });
+                done(results);
+            });
+        };
+        /**
+         * 创建一组串联同类任务，例如排序加载一组资源
+         *
+         * @param ps 一组参数
+         * @param fn 单一任务函数
+         * @param done 完成回调
+         */
+        Task.prototype.seriesResults = function (ps, fn, done) {
+            var map = new Map();
+            // 包装函数
+            var fns = ps.map(function (p) { return function (callback) {
+                fn(p, function (r) {
+                    map.set(p, r);
+                    callback();
+                });
+            }; });
+            this.series(fns)(function () {
+                var results = ps.map(function (p) { return map.get(p); });
+                done(results);
+            });
+        };
+        return Task;
+    }());
+    feng3d.task = new Task();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -14958,12 +15169,47 @@ var feng3d;
         function AssetData() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(AssetData.prototype, "name", {
+            /**
+             * 资源名称
+             */
+            get: function () {
+                if (!this._name) {
+                    var asset = feng3d.rs.getAsset(this.assetId);
+                    if (asset)
+                        return asset.fileName;
+                }
+                return this._name;
+            },
+            set: function (v) { this._name = v; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(AssetData.prototype, "assetId", {
+            /**
+             * 资源编号
+             */
+            get: function () {
+                return this._assetId;
+            },
+            set: function (v) {
+                if (this._assetId == v)
+                    return;
+                if (this._assetId != undefined) {
+                    feng3d.debuger && feng3d.error("\u4E0D\u5141\u8BB8\u4FEE\u6539 assetId");
+                    return;
+                }
+                this._assetId = v;
+            },
+            enumerable: true,
+            configurable: true
+        });
         __decorate([
             feng3d.serialize
-        ], AssetData.prototype, "name", void 0);
+        ], AssetData.prototype, "name", null);
         __decorate([
             feng3d.serialize
-        ], AssetData.prototype, "assetId", void 0);
+        ], AssetData.prototype, "assetId", null);
         return AssetData;
     }(feng3d.Feng3dObject));
     feng3d.AssetData = AssetData;
@@ -15407,7 +15653,7 @@ var feng3d;
                 this._dbStatus[dbname] = { status: DBStatus.unOpen, onsuccessCallbacks: [], onupgradeneededCallbacks: [] };
             this._dbStatus[dbname].onsuccessCallbacks.push(callback);
             if (upgrade) {
-                feng3d.assert(!!onupgrade);
+                feng3d.debuger && feng3d.assert(!!onupgrade);
                 this._dbStatus[dbname].onupgradeneededCallbacks.push(onupgrade);
             }
             if (this._dbStatus[dbname].status == DBStatus.opening || this._dbStatus[dbname].status == DBStatus.upgrading)
@@ -15701,7 +15947,30 @@ var feng3d;
      */
     var ReadFS = /** @class */ (function () {
         function ReadFS() {
+            this._images = {};
         }
+        /**
+         * 读取文件列表为字符串列表
+         *
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        ReadFS.prototype.readStrings = function (paths, callback) {
+            var _this = this;
+            feng3d.task.parallelResults(paths, function (path, callback) {
+                _this.readString(path, function (err, str) {
+                    callback(err || str);
+                });
+            }, callback);
+        };
+        /**
+         * 获取已经加载的图片，如果未加载则返回null
+         *
+         * @param path 图片路径
+         */
+        ReadFS.prototype.getImage = function (path) {
+            return this._images[path];
+        };
         return ReadFS;
     }());
     feng3d.ReadFS = ReadFS;
@@ -15730,7 +15999,6 @@ var feng3d;
          */
         ReadWriteFS.prototype.getAllfilepathInFolder = function (dirpath, callback) {
             var _this = this;
-            feng3d.assert(this.isDir(dirpath), "\u6587\u4EF6\u5939\u8DEF\u5F84\u5FC5\u987B\u4EE5 / \u7ED3\u5C3E\uFF01");
             var dirs = [dirpath];
             var result = [];
             var currentdir = "";
@@ -15739,13 +16007,21 @@ var feng3d;
                 if (dirs.length > 0) {
                     currentdir = dirs.shift();
                     _this.readdir(currentdir, function (err, files) {
-                        files.forEach(function (element) {
-                            var childpath = currentdir + element;
+                        // 获取子文件路径
+                        var getChildPath = function () {
+                            if (files.length == 0) {
+                                handle();
+                                return;
+                            }
+                            var childpath = currentdir + (currentdir == "" ? "" : "/") + files.shift();
                             result.push(childpath);
-                            if (_this.isDir(childpath))
-                                dirs.push(childpath);
-                        });
-                        handle();
+                            _this.isDirectory(childpath, function (result) {
+                                if (result)
+                                    dirs.push(childpath);
+                                getChildPath();
+                            });
+                        };
+                        getChildPath();
                     });
                 }
                 else {
@@ -15842,22 +16118,24 @@ var feng3d;
          */
         ReadWriteFS.prototype.rename = function (oldPath, newPath, callback) {
             var _this = this;
-            if (this.isDir(oldPath)) {
-                this.getAllfilepathInFolder(oldPath, function (err, filepaths) {
-                    if (err) {
-                        callback && callback(err);
-                        return;
-                    }
-                    var renamelists = [[oldPath, newPath]];
-                    filepaths.forEach(function (element) {
-                        renamelists.push([element, element.replace(oldPath, newPath)]);
+            this.isDirectory(oldPath, function (result) {
+                if (result) {
+                    _this.getAllfilepathInFolder(oldPath, function (err, filepaths) {
+                        if (err) {
+                            callback && callback(err);
+                            return;
+                        }
+                        var renamelists = [[oldPath, newPath]];
+                        filepaths.forEach(function (element) {
+                            renamelists.push([element, element.replace(oldPath, newPath)]);
+                        });
+                        _this.moveFiles(renamelists, callback);
                     });
-                    _this.moveFiles(renamelists, callback);
-                });
-            }
-            else {
-                this.renameFile(oldPath, newPath, callback);
-            }
+                }
+                else {
+                    _this.renameFile(oldPath, newPath, callback);
+                }
+            });
         };
         /**
          * 移动文件(夹)
@@ -15876,28 +16154,21 @@ var feng3d;
          */
         ReadWriteFS.prototype.delete = function (path, callback) {
             var _this = this;
-            if (this.isDir(path)) {
-                this.getAllfilepathInFolder(path, function (err, filepaths) {
-                    if (err) {
-                        callback && callback(err);
-                        return;
-                    }
-                    var removelists = filepaths.concat(path);
-                    _this.deleteFiles(removelists, callback);
-                });
-            }
-            else {
-                this.deleteFile(path, callback);
-            }
-        };
-        /**
-         * 是否为文件夹
-         * @param path 文件路径
-         */
-        ReadWriteFS.prototype.isDir = function (path) {
-            if (path == "")
-                return true;
-            return path.charAt(path.length - 1) == "/";
+            this.isDirectory(path, function (result) {
+                if (result) {
+                    _this.getAllfilepathInFolder(path, function (err, filepaths) {
+                        if (err) {
+                            callback && callback(err);
+                            return;
+                        }
+                        var removelists = filepaths.concat(path);
+                        _this.deleteFiles(removelists, callback);
+                    });
+                }
+                else {
+                    _this.deleteFile(path, callback);
+                }
+            });
         };
         return ReadWriteFS;
     }(feng3d.ReadFS));
@@ -15905,6 +16176,10 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
+    /**
+     * 用于是否为文件夹
+     */
+    var directorytoken = "!!!___directory___!!!";
     /**
      * 索引数据文件系统
      */
@@ -15940,7 +16215,7 @@ var feng3d;
                     callback(null, data);
                 }
                 else if (data instanceof Object) {
-                    var str = JSON.stringify(data);
+                    var str = JSON.stringify(data, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
                     var arraybuffer = feng3d.dataTransform.stringToArrayBuffer(str);
                     callback(null, arraybuffer);
                 }
@@ -15967,7 +16242,7 @@ var feng3d;
                     });
                 }
                 else if (data instanceof Object) {
-                    var str = JSON.stringify(data);
+                    var str = JSON.stringify(data, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
                     callback(null, str);
                 }
                 else {
@@ -16010,12 +16285,16 @@ var feng3d;
          * @param callback 加载完成回调
          */
         IndexedDBFS.prototype.readImage = function (path, callback) {
+            var _this = this;
+            if (this._images[path])
+                return this._images[path];
             this.readArrayBuffer(path, function (err, data) {
                 if (err) {
                     callback(err, null);
                     return;
                 }
                 feng3d.dataTransform.arrayBufferToImage(data, function (img) {
+                    _this._images[path] = img;
                     callback(null, img);
                 });
             });
@@ -16025,8 +16304,19 @@ var feng3d;
          * @param path （相对）路径
          * @param callback 回调函数
          */
-        IndexedDBFS.prototype.getAbsolutePath = function (path, callback) {
-            callback(null, path);
+        IndexedDBFS.prototype.getAbsolutePath = function (path) {
+            return path;
+        };
+        /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        IndexedDBFS.prototype.isDirectory = function (path, callback) {
+            this.readString(path, function (err, data) {
+                callback(data == directorytoken);
+            });
         };
         /**
          * 文件是否存在
@@ -16051,12 +16341,11 @@ var feng3d;
                 }
                 var subfilemap = {};
                 allfilepaths.forEach(function (element) {
-                    if (element.substr(0, path.length) == path && element != path) {
-                        var result = element.substr(path.length);
-                        var index = result.indexOf("/");
-                        if (index != -1)
-                            result = result.substring(0, index + 1);
-                        subfilemap[result] = 1;
+                    var dirp = path == "" ? path : (path + "/");
+                    if (element.substr(0, dirp.length) == dirp && element != path) {
+                        var result = element.substr(dirp.length);
+                        var subfile = result.split("/").shift();
+                        subfilemap[subfile] = 1;
                     }
                 });
                 var files = Object.keys(subfilemap);
@@ -16075,7 +16364,7 @@ var feng3d;
                     callback(new Error("\u6587\u4EF6\u5939" + path + "\u5DF2\u5B58\u5728\u65E0\u6CD5\u65B0\u5EFA"));
                     return;
                 }
-                feng3d._indexedDB.objectStorePut(_this.DBname, _this.projectname, path, "", callback);
+                feng3d._indexedDB.objectStorePut(_this.DBname, _this.projectname, path, directorytoken, callback);
             });
         };
         /**
@@ -16086,6 +16375,7 @@ var feng3d;
         IndexedDBFS.prototype.deleteFile = function (path, callback) {
             // 删除文件
             feng3d._indexedDB.objectStoreDelete(this.DBname, this.projectname, path, callback);
+            feng3d.dispatcher.dispatch("fs.delete", path);
         };
         /**
          * 写文件
@@ -16095,6 +16385,7 @@ var feng3d;
          */
         IndexedDBFS.prototype.writeArrayBuffer = function (path, data, callback) {
             feng3d._indexedDB.objectStorePut(this.DBname, this.projectname, path, data, callback);
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 写文件
@@ -16104,6 +16395,7 @@ var feng3d;
          */
         IndexedDBFS.prototype.writeString = function (path, data, callback) {
             feng3d._indexedDB.objectStorePut(this.DBname, this.projectname, path, data, callback);
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 写文件
@@ -16114,6 +16406,7 @@ var feng3d;
         IndexedDBFS.prototype.writeObject = function (path, data, callback) {
             var obj = feng3d.serialization.serialize(data);
             feng3d._indexedDB.objectStorePut(this.DBname, this.projectname, path, obj, callback);
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 写图片
@@ -16125,6 +16418,7 @@ var feng3d;
             var _this = this;
             feng3d.dataTransform.imageToArrayBuffer(image, function (arraybuffer) {
                 _this.writeArrayBuffer(path, arraybuffer, callback);
+                feng3d.dispatcher.dispatch("fs.write", path);
             });
         };
         /**
@@ -16156,6 +16450,29 @@ var feng3d;
                 callback(err, allPaths);
             });
         };
+        /**
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        IndexedDBFS.prototype.hasProject = function (projectname, callback) {
+            feng3d._indexedDB.getObjectStoreNames(this.DBname, function (err, objectStoreNames) {
+                if (err) {
+                    callback(false);
+                    return;
+                }
+                callback(objectStoreNames.indexOf(projectname) != -1);
+            });
+        };
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        IndexedDBFS.prototype.initproject = function (projectname, callback) {
+            this.projectname = projectname;
+            feng3d._indexedDB.createObjectStore(this.DBname, projectname, callback);
+        };
         return IndexedDBFS;
     }(feng3d.ReadWriteFS));
     feng3d.IndexedDBFS = IndexedDBFS;
@@ -16177,7 +16494,9 @@ var feng3d;
             _this.rootPath = "";
             _this.rootPath = rootPath;
             if (_this.rootPath == "") {
-                _this.rootPath = document.URL.substring(0, document.URL.lastIndexOf("/") + 1);
+                if (typeof document != "undefined") {
+                    _this.rootPath = document.URL.substring(0, document.URL.lastIndexOf("/") + 1);
+                }
             }
             return _this;
         }
@@ -16195,7 +16514,7 @@ var feng3d;
          */
         HttpFS.prototype.readArrayBuffer = function (path, callback) {
             // rootPath
-            feng3d.loader.loadBinary(this._getAbsolutePath(path), function (content) {
+            feng3d.loader.loadBinary(this.getAbsolutePath(path), function (content) {
                 callback(null, content);
             }, null, function (e) {
                 callback(e, null);
@@ -16207,7 +16526,7 @@ var feng3d;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         HttpFS.prototype.readString = function (path, callback) {
-            feng3d.loader.loadText(this._getAbsolutePath(path), function (content) {
+            feng3d.loader.loadText(this.getAbsolutePath(path), function (content) {
                 callback(null, content);
             }, null, function (e) {
                 callback(e, null);
@@ -16219,7 +16538,7 @@ var feng3d;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         HttpFS.prototype.readObject = function (path, callback) {
-            feng3d.loader.loadText(this._getAbsolutePath(path), function (content) {
+            feng3d.loader.loadText(this.getAbsolutePath(path), function (content) {
                 var obj = JSON.parse(content);
                 var object = feng3d.serialization.deserialize(obj);
                 callback(null, object);
@@ -16233,24 +16552,25 @@ var feng3d;
          * @param callback 加载完成回调
          */
         HttpFS.prototype.readImage = function (path, callback) {
+            var _this = this;
+            if (this._images[path])
+                return this._images[path];
             var img = new Image();
             img.onload = function () {
+                _this._images[path] = img;
                 callback(null, img);
             };
             img.onerror = function (evt) {
                 callback(new Error("\u52A0\u8F7D\u56FE\u7247" + path + "\u5931\u8D25"), null);
             };
-            img.src = this._getAbsolutePath(path);
+            img.src = this.getAbsolutePath(path);
         };
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
          * @param callback 回调函数
          */
-        HttpFS.prototype.getAbsolutePath = function (path, callback) {
-            callback(null, this._getAbsolutePath(path));
-        };
-        HttpFS.prototype._getAbsolutePath = function (path) {
+        HttpFS.prototype.getAbsolutePath = function (path) {
             return this.rootPath + path;
         };
         return HttpFS;
@@ -16355,19 +16675,30 @@ var feng3d;
      */
     var FileAsset = /** @class */ (function () {
         function FileAsset() {
-            this._name = "";
+        }
+        Object.defineProperty(FileAsset.prototype, "extenson", {
             /**
              * 文件后缀
              */
-            this.extenson = "";
-        }
-        Object.defineProperty(FileAsset.prototype, "name", {
+            get: function () {
+                feng3d.debuger && feng3d.assert(!!this.assetPath);
+                var ext = feng3d.pathUtils.getExtension(this.assetPath);
+                return ext;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(FileAsset.prototype, "fileName", {
             /**
-             * 名称
+             * 文件名称
+             *
+             * 不包含后缀
              */
-            get: function () { return this._name; },
-            set: function (v) { this._name = v; if (this.data)
-                this.data.name = v; },
+            get: function () {
+                feng3d.debuger && feng3d.assert(!!this.assetPath);
+                var fn = feng3d.pathUtils.getName(this.assetPath);
+                return fn;
+            },
             enumerable: true,
             configurable: true
         });
@@ -16500,12 +16831,8 @@ var feng3d;
             feng3d.serialize
         ], FileAsset.prototype, "assetId", void 0);
         __decorate([
-            feng3d.oav(),
             feng3d.serialize
-        ], FileAsset.prototype, "name", null);
-        __decorate([
-            feng3d.serialize
-        ], FileAsset.prototype, "extenson", void 0);
+        ], FileAsset.prototype, "assetPath", void 0);
         return FileAsset;
     }());
     feng3d.FileAsset = FileAsset;
@@ -16534,6 +16861,8 @@ var feng3d;
              * 资源树保存路径
              */
             this.resources = "resource.json";
+            this._status = { isiniting: false, isinit: false };
+            this._assetStatus = {};
             this._fs = fs;
         }
         Object.defineProperty(ReadRS.prototype, "fs", {
@@ -16559,6 +16888,15 @@ var feng3d;
          */
         ReadRS.prototype.init = function (callback) {
             var _this = this;
+            if (this._status.isinit) {
+                callback && callback();
+                return;
+            }
+            var eventtype = "init";
+            feng3d.event.once(this, eventtype, function () { callback && callback(); });
+            if (this._status.isiniting)
+                return;
+            this._status.isiniting = true;
             this.fs.readObject(this.resources, function (err, data) {
                 if (data) {
                     _this._root = data;
@@ -16569,11 +16907,6 @@ var feng3d;
                         var asset = assets[index];
                         // 设置资源系统
                         asset.rs = _this;
-                        // 计算路径
-                        var path = asset.name + asset.extenson;
-                        if (asset.parentAsset)
-                            path = asset.parentAsset.assetPath + "/" + path;
-                        asset.assetPath = path;
                         // 新增映射
                         _this.idMap[asset.assetId] = asset;
                         _this.pathMap[asset.assetPath] = asset;
@@ -16589,12 +16922,12 @@ var feng3d;
                         }
                         index++;
                     }
-                    callback && callback();
+                    feng3d.event.dispatch(_this, eventtype);
                 }
                 else {
-                    _this.createAsset(feng3d.FolderAsset, { name: "Assets" }, null, function (err, asset) {
+                    _this.createAsset(feng3d.FolderAsset, "Assets", null, null, function (err, asset) {
                         _this._root = asset;
-                        callback && callback();
+                        feng3d.event.dispatch(_this, eventtype);
                     });
                 }
             });
@@ -16603,11 +16936,12 @@ var feng3d;
          * 新建资源
          *
          * @param cls 资源类定义
+         * @param fileName 文件名称
          * @param value 初始数据
          * @param parent 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        ReadRS.prototype.createAsset = function (cls, value, parent, callback) {
+        ReadRS.prototype.createAsset = function (cls, fileName, value, parent, callback) {
             parent = parent || this._root;
             //
             var asset = new cls();
@@ -16616,18 +16950,24 @@ var feng3d;
             asset.rs = this;
             asset.assetId = assetId;
             asset.meta = { guid: assetId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: asset.assetType };
-            Object.setValue(asset, value);
+            feng3d.serialization.setValue(asset, value);
+            //
+            var extenson = feng3d.pathUtils.getExtension(fileName);
+            fileName = feng3d.pathUtils.getName(fileName);
             // 设置默认名称
-            asset.name = asset.name || "new " + asset.assetType;
+            fileName = fileName || "new " + asset.assetType;
             if (parent) {
                 // 计算有效名称
-                asset.name = this.getValidChildName(parent, asset.name);
+                fileName = this.getValidChildName(parent, fileName);
                 // 处理资源父子关系
                 parent.childrenAssets.push(asset);
                 asset.parentAsset = parent;
             }
             // 计算路径
-            var path = asset.name + asset.extenson;
+            if (extenson == "")
+                extenson = cls["extenson"];
+            feng3d.debuger && feng3d.assert(extenson != undefined, "\u5BF9\u8C61 " + cls + " \u6CA1\u6709\u8BBE\u7F6E extenson \u503C\uFF0C\u53C2\u8003 FolderAsset.extenson");
+            var path = fileName + extenson;
             if (asset.parentAsset)
                 path = asset.parentAsset.assetPath + "/" + path;
             asset.assetPath = path;
@@ -16640,14 +16980,14 @@ var feng3d;
          * 获取有效子文件名称
          *
          * @param parent 父文件夹
-         * @param name 名称
+         * @param fileName 文件名称
          */
-        ReadRS.prototype.getValidChildName = function (parent, name) {
-            var childrenNames = parent.childrenAssets.map(function (v) { return v.name; });
-            var newName = name;
+        ReadRS.prototype.getValidChildName = function (parent, fileName) {
+            var childrenNames = parent.childrenAssets.map(function (v) { return v.fileName; });
+            var newName = fileName;
             var index = 1;
             while (childrenNames.indexOf(newName) != -1) {
-                newName = name + index;
+                newName = fileName + index;
                 index++;
             }
             return newName;
@@ -16658,22 +16998,29 @@ var feng3d;
          * @param callback 读取完成回调
          */
         ReadRS.prototype.readAsset = function (id, callback) {
+            var _this = this;
             var asset = this.idMap[id];
             if (!asset) {
                 callback(new Error("\u4E0D\u5B58\u5728\u8D44\u6E90 " + id), asset);
                 return;
             }
-            if (asset.meta) {
+            var status = this._assetStatus[id] = this._assetStatus[id] || { isLoaded: false, isLoading: false };
+            if (status.isLoaded) {
                 callback(null, asset);
                 return;
             }
+            var eventtype = "load_" + id;
+            feng3d.event.once(this, eventtype, function () { callback(null, asset); });
+            if (status.isLoading)
+                return;
+            status.isLoading = true;
             asset.readMeta(function (err) {
                 if (err) {
-                    callback(err, asset);
+                    feng3d.event.dispatch(_this, eventtype);
                     return;
                 }
                 asset.readFile(function (err) {
-                    callback(err, asset);
+                    feng3d.event.dispatch(_this, eventtype);
                 });
             });
         };
@@ -16736,7 +17083,7 @@ var feng3d;
          * @param assetId 资源编号
          */
         ReadRS.prototype.getAssetData = function (assetId) {
-            return defaultAssets[assetId] || this.idMap[assetId].data;
+            return defaultAssets[assetId] || (this.idMap[assetId] && this.idMap[assetId].data);
         };
         /**
          * 获取所有资源
@@ -16791,14 +17138,15 @@ var feng3d;
          * 新建资源
          *
          * @param cls 资源类定义
+         * @param fileName 文件名称
          * @param value 初始数据
          * @param parent 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        ReadWriteRS.prototype.createAsset = function (cls, value, parent, callback) {
+        ReadWriteRS.prototype.createAsset = function (cls, fileName, value, parent, callback) {
             var _this = this;
             // 新建资源
-            _super.prototype.createAsset.call(this, cls, value, parent, function (err, asset) {
+            _super.prototype.createAsset.call(this, cls, fileName, value, parent, function (err, asset) {
                 if (asset) {
                     // 保存资源
                     _this.writeAsset(asset, function (err) {
@@ -16839,8 +17187,8 @@ var feng3d;
          */
         ReadWriteRS.prototype.moveAsset = function (asset, folder, callback) {
             var _this = this;
-            var filename = asset.name + asset.extenson;
-            var cnames = folder.childrenAssets.map(function (v) { return v.name + v.extenson; });
+            var filename = asset.fileName + asset.extenson;
+            var cnames = folder.childrenAssets.map(function (v) { return v.fileName + v.extenson; });
             if (cnames.indexOf(filename) != -1) {
                 callback && callback(new Error("\u76EE\u6807\u6587\u4EF6\u5939\u4E2D\u5B58\u5728\u540C\u540D\u6587\u4EF6\uFF08\u5939\uFF09\uFF0C\u65E0\u6CD5\u79FB\u52A8"));
                 return;
@@ -16900,10 +17248,10 @@ var feng3d;
                         // 修复删除资源时破坏的父资源引用
                         la.parentAsset = pla;
                         // 计算资源新路径
-                        var np = la.name + la.extenson;
+                        var np = la.fileName + la.extenson;
                         var p = la.parentAsset;
                         while (p) {
-                            np = p.name + "/" + np;
+                            np = p.fileName + "/" + np;
                             p = p.parentAsset;
                         }
                         la.assetPath = np;
@@ -17044,6 +17392,9 @@ var feng3d;
             this._mouseKeyDic = {};
             this._keyState = shortCut.keyState;
             //
+            if (!feng3d.windowEventProxy) {
+                return;
+            }
             feng3d.windowEventProxy.on("keydown", this.onKeydown, this);
             feng3d.windowEventProxy.on("keyup", this.onKeyup, this);
             //监听鼠标事件
@@ -17088,8 +17439,14 @@ var feng3d;
             if (!feng3d.shortcut.enable)
                 return;
             var boardKey = feng3d.KeyBoard.getKey(event.keyCode);
-            if (boardKey != null)
+            boardKey = boardKey || event.key;
+            if (boardKey) {
+                boardKey = boardKey.toLocaleLowerCase();
                 this._keyState.pressKey(boardKey, event);
+            }
+            else {
+                feng3d.error("\u65E0\u6CD5\u8BC6\u522B\u6309\u94AE " + event.key);
+            }
         };
         /**
          * 键盘弹起事件
@@ -17098,8 +17455,14 @@ var feng3d;
             if (!feng3d.shortcut.enable)
                 return;
             var boardKey = feng3d.KeyBoard.getKey(event.keyCode);
-            if (boardKey)
+            boardKey = boardKey || event.key;
+            if (boardKey) {
+                boardKey = boardKey.toLocaleLowerCase();
                 this._keyState.releaseKey(boardKey, event);
+            }
+            else {
+                feng3d.error("\u65E0\u6CD5\u8BC6\u522B\u6309\u94AE " + event.key);
+            }
         };
         return KeyCapture;
     }());
@@ -17562,6 +17925,7 @@ var feng3d;
     function xmlHttpRequestLoad(loadItem) {
         var request = new XMLHttpRequest();
         request.open('Get', loadItem.url, true);
+        request.setRequestHeader("Access-Control-Allow-Origin", "*");
         request.responseType = loadItem.dataFormat == feng3d.LoaderDataFormat.BINARY ? "arraybuffer" : "";
         request.onreadystatechange = onRequestReadystatechange(request, loadItem);
         request.onprogress = onRequestProgress(request, loadItem);
@@ -17589,6 +17953,7 @@ var feng3d;
                 else {
                     var err = new Error(loadItem.url + " 加载失败！");
                     loadItem.onError && loadItem.onError(err);
+                    loadItem.onCompleted && loadItem.onCompleted(null);
                 }
             }
         };
@@ -18267,7 +18632,7 @@ var feng3d;
      */
     var GLExtension = /** @class */ (function () {
         function GLExtension(gl) {
-            feng3d.assert(!gl.extensions, gl + " " + gl.extensions + " \u5B58\u5728\uFF01");
+            feng3d.debuger && feng3d.assert(!gl.extensions, gl + " " + gl.extensions + " \u5B58\u5728\uFF01");
             gl.extensions = this;
             this.initExtensions(gl);
             this.cacheGLQuery(gl);
@@ -18410,7 +18775,7 @@ var feng3d;
             this.macroInvalid = true;
             this.map = new Map();
             this.shaderName = shaderName;
-            feng3d.feng3dDispatcher.on("asset.shaderChanged", this.onShaderChanged, this);
+            feng3d.dispatcher.on("asset.shaderChanged", this.onShaderChanged, this);
         }
         /**
          * 激活渲染程序
@@ -18533,7 +18898,7 @@ var feng3d;
                 var name = activeInfo.name;
                 var names = [name];
                 if (activeInfo.size > 1) {
-                    feng3d.assert(name.substr(-3, 3) == "[0]");
+                    feng3d.debuger && feng3d.assert(name.substr(-3, 3) == "[0]");
                     var baseName = name.substring(0, name.length - 3);
                     for (var j = 1; j < activeInfo.size; j++) {
                         names[j] = baseName + ("[" + j + "]");
@@ -19615,7 +19980,7 @@ var feng3d;
     var ShaderLib = /** @class */ (function () {
         function ShaderLib() {
             this._shaderCache = {};
-            feng3d.feng3dDispatcher.on("asset.shaderChanged", this.onShaderChanged, this);
+            feng3d.dispatcher.on("asset.shaderChanged", this.onShaderChanged, this);
         }
         Object.defineProperty(ShaderLib.prototype, "shaderConfig", {
             get: function () {
@@ -19694,7 +20059,7 @@ var feng3d;
      */
     var Renderer = /** @class */ (function () {
         function Renderer(gl) {
-            feng3d.assert(!gl.renderer, gl + " " + gl.renderer + " \u5B58\u5728\uFF01");
+            feng3d.debuger && feng3d.assert(!gl.renderer, gl + " " + gl.renderer + " \u5B58\u5728\uFF01");
             gl.renderer = this;
             this.draw = function (renderAtomic1) {
                 var instanceCount = renderAtomic1.getInstanceCount();
@@ -20387,7 +20752,7 @@ var feng3d;
          */
         function Component() {
             var _this = _super.call(this) || this;
-            feng3d.fevent.onAll(_this, _this._onAllListener, _this);
+            _this.onAll(_this._onAllListener, _this);
             return _this;
         }
         Object.defineProperty(Component.prototype, "gameObject", {
@@ -20480,6 +20845,66 @@ var feng3d;
     }(feng3d.Feng3dObject));
     feng3d.Component = Component;
 })(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * Graphics 类包含一组可用来创建矢量形状的方法。
+     */
+    var Graphics = /** @class */ (function (_super) {
+        __extends(Graphics, _super);
+        function Graphics() {
+            var _this = _super.call(this) || this;
+            _this.__class__ = "feng3d.Graphics";
+            _this.canvas = document.createElement("canvas");
+            _this.canvas.width = _this.width;
+            _this.canvas.height = _this.height;
+            _this.context2D = _this.canvas.getContext('2d');
+            //
+            watchContext2D(_this.context2D);
+            return _this;
+        }
+        Graphics.prototype.draw = function (width, height, callback) {
+            var _this = this;
+            var canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            var ctxt = canvas.getContext('2d');
+            callback(ctxt);
+            feng3d.dataTransform.canvasToImage(canvas, "png", function (img) {
+                _this.image = img;
+            });
+            return this;
+        };
+        return Graphics;
+    }(feng3d.Component));
+    feng3d.Graphics = Graphics;
+    function watchContext2D(context2D, watchFuncs) {
+        if (watchFuncs === void 0) { watchFuncs = ["rect"]; }
+        watchFuncs.forEach(function (v) {
+            var oldFunc = context2D[v];
+            context2D[v] = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                oldFunc.apply(context2D, args);
+                // 标记更改
+                context2D["__changed"] = true;
+            };
+        });
+    }
+    feng3d.watchContext2D = watchContext2D;
+})(feng3d || (feng3d = {}));
+// var ctxts = [];
+// var num = 100;
+// for (var i = 0; i < num; i++)
+// {
+//     var canvas = document.createElement("canvas");
+//     canvas.width = 100;
+//     canvas.height = 100;
+//     var ctxt = canvas.getContext('2d');
+//     ctxts.push(ctxt);
+// }
 var feng3d;
 (function (feng3d) {
     /**
@@ -20900,6 +21325,7 @@ var feng3d;
             if (this.parent)
                 this._localToWorldMatrix.append(this.parent.localToWorldMatrix);
             this.dispatch("updateLocalToWorldMatrix");
+            feng3d.debuger && feng3d.assert(!isNaN(this._localToWorldMatrix.rawData[0]));
             return this._localToWorldMatrix;
         };
         //------------------------------------------
@@ -21502,7 +21928,7 @@ var feng3d;
             _this.guid = feng3d.FMath.uuid();
             //
             GameObject.pool.set(_this.guid, _this);
-            feng3d.fevent.onAll(_this, _this._onAllListener, _this);
+            _this.onAll(_this._onAllListener, _this);
             return _this;
         }
         Object.defineProperty(GameObject.prototype, "transform", {
@@ -21603,6 +22029,11 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 根据名称查找对象
+         *
+         * @param name 对象名称
+         */
         GameObject.prototype.find = function (name) {
             if (this.name == name)
                 return this;
@@ -21613,6 +22044,11 @@ var feng3d;
             }
             return null;
         };
+        /**
+         * 是否包含指定对象
+         *
+         * @param child 可能的子孙对象
+         */
         GameObject.prototype.contains = function (child) {
             var checkitem = child;
             do {
@@ -21622,18 +22058,37 @@ var feng3d;
             } while (checkitem);
             return false;
         };
+        /**
+         * 添加子对象
+         *
+         * @param child 子对象
+         */
         GameObject.prototype.addChild = function (child) {
             if (child == null)
                 return;
-            if (child.contains(this))
-                throw "无法添加到自身中!";
-            if (child._parent)
-                child._parent.removeChild(child);
-            child._setParent(this);
-            this._children.push(child);
-            this.dispatch("addChild", child, true);
+            if (child.parent == this) {
+                // 把子对象移动到最后
+                var childIndex = this._children.indexOf(child);
+                if (childIndex != -1)
+                    this._children.splice(childIndex, 1);
+                this._children.push(child);
+            }
+            else {
+                if (child.contains(this))
+                    throw "无法添加到自身中!";
+                if (child._parent)
+                    child._parent.removeChild(child);
+                child._setParent(this);
+                this._children.push(child);
+                this.dispatch("addChild", child, true);
+            }
             return child;
         };
+        /**
+         * 添加子对象
+         *
+         * @param childarray 子对象
+         */
         GameObject.prototype.addChildren = function () {
             var childarray = [];
             for (var _i = 0; _i < arguments.length; _i++) {
@@ -21651,6 +22106,11 @@ var feng3d;
             if (this.parent)
                 this.parent.removeChild(this);
         };
+        /**
+         * 移除子对象
+         *
+         * @param child 子对象
+         */
         GameObject.prototype.removeChild = function (child) {
             if (child == null)
                 throw new Error("Parameter child cannot be null").message;
@@ -21659,10 +22119,20 @@ var feng3d;
                 throw new Error("Parameter is not a child of the caller").message;
             this.removeChildInternal(childIndex, child);
         };
+        /**
+         * 删除指定位置的子对象
+         *
+         * @param index 需要删除子对象的所有
+         */
         GameObject.prototype.removeChildAt = function (index) {
             var child = this._children[index];
-            this.removeChildInternal(index, child);
+            return this.removeChildInternal(index, child);
         };
+        /**
+         * 获取指定位置的子对象
+         *
+         * @param index
+         */
         GameObject.prototype.getChildAt = function (index) {
             index = index;
             return this._children[index];
@@ -21984,6 +22454,16 @@ var feng3d;
             if (loadingNum == 0)
                 callback();
         };
+        /**
+         * 渲染前执行函数
+         *
+         * 可用于渲染前收集渲染数据，或者更新显示效果等
+         *
+         * @param gl
+         * @param renderAtomic
+         * @param scene3d
+         * @param camera
+         */
         GameObject.prototype.beforeRender = function (gl, renderAtomic, scene3d, camera) {
             this._components.forEach(function (element) {
                 element.beforeRender(gl, renderAtomic, scene3d, camera);
@@ -22112,6 +22592,7 @@ var feng3d;
          */
         function Engine(canvas, scene, camera) {
             var _this = this;
+            this.contextLost = false;
             if (!canvas) {
                 canvas = document.createElement("canvas");
                 canvas.id = "glcanvas";
@@ -22124,7 +22605,20 @@ var feng3d;
             }
             feng3d.debuger && feng3d.assert(canvas instanceof HTMLCanvasElement, "canvas\u53C2\u6570\u5FC5\u987B\u4E3A HTMLCanvasElement \u7C7B\u578B\uFF01");
             this.canvas = canvas;
-            this.scene = scene || Object.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
+            canvas.addEventListener("webglcontextlost", function (event) {
+                event.preventDefault();
+                _this.contextLost = true;
+                // #ifdef DEBUG
+                console.log('pc.GraphicsDevice: WebGL context lost.');
+                // #endif
+            }, false);
+            canvas.addEventListener("webglcontextrestored", function () {
+                _this.contextLost = false;
+                // #ifdef DEBUG
+                console.log('pc.GraphicsDevice: WebGL context restored.');
+                // #endif
+            }, false);
+            this.scene = scene || feng3d.serialization.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
             this.camera = camera;
             this.start();
             this.mouse3DManager = new feng3d.Mouse3DManager(new feng3d.WindowMouseInput(), function () { return _this.viewRect; });
@@ -22137,7 +22631,7 @@ var feng3d;
                 if (!this._camera) {
                     var cameras = this.scene.getComponentsInChildren(feng3d.Camera);
                     if (cameras.length == 0) {
-                        this._camera = Object.setValue(new feng3d.GameObject(), { name: "defaultCamera" }).addComponent(feng3d.Camera);
+                        this._camera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "defaultCamera" }).addComponent(feng3d.Camera);
                         this.scene.gameObject.addChild(this._camera.gameObject);
                     }
                     else {
@@ -22181,13 +22675,6 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Engine.prototype, "mouseinview", {
-            get: function () {
-                return this.viewRect.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(Engine.prototype, "viewRect", {
             get: function () {
                 var clientRect = this.canvas.getBoundingClientRect();
@@ -22224,18 +22711,24 @@ var feng3d;
         Engine.prototype.render = function (interval) {
             if (!this.scene)
                 return;
+            if (this.contextLost)
+                return;
             this.scene.update(interval);
             this.canvas.width = this.canvas.clientWidth;
             this.canvas.height = this.canvas.clientHeight;
+            if (this.canvas.width * this.canvas.height == 0)
+                return;
             var viewRect = this.viewRect;
-            this.camera.viewRect = viewRect;
             this.camera.lens.aspect = viewRect.width / viewRect.height;
+            // 设置鼠标射线
+            this.scene.mouseRay3D = this.getMouseRay3D();
+            this.scene.camera = this.camera;
             // 默认渲染
             this.gl.clearColor(this.scene.background.r, this.scene.background.g, this.scene.background.b, this.scene.background.a);
             this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
             this.gl.enable(this.gl.DEPTH_TEST);
             //鼠标拾取渲染
-            this.selectedObject = this.mouse3DManager.pick(this.scene, this.camera);
+            this.selectedObject = this.mouse3DManager.pick(this, this.scene, this.camera);
             //绘制阴影图
             feng3d.shadowRenderer.draw(this.gl, this.scene, this.camera);
             feng3d.skyboxRenderer.draw(this.gl, this.scene, this.camera);
@@ -22243,6 +22736,59 @@ var feng3d;
             feng3d.forwardRenderer.draw(this.gl, this.scene, this.camera);
             feng3d.outlineRenderer.draw(this.gl, this.scene, this.camera);
             feng3d.wireframeRenderer.draw(this.gl, this.scene, this.camera);
+        };
+        /**
+         * 屏幕坐标转GPU坐标
+         * @param screenPos 屏幕坐标 (x: [0-width], y: [0 - height])
+         * @return GPU坐标 (x: [-1, 1], y: [-1, 1])
+         */
+        Engine.prototype.screenToGpuPosition = function (screenPos) {
+            var gpuPos = new feng3d.Vector2();
+            gpuPos.x = (screenPos.x * 2 - this.viewRect.width) / this.viewRect.width;
+            // 屏幕坐标与gpu中使用的坐标Y轴方向相反
+            gpuPos.y = -(screenPos.y * 2 - this.viewRect.height) / this.viewRect.height;
+            return gpuPos;
+        };
+        /**
+         * 投影坐标（世界坐标转换为3D视图坐标）
+         * @param point3d 世界坐标
+         * @return 屏幕的绝对坐标
+         */
+        Engine.prototype.project = function (point3d) {
+            var v = this.camera.project(point3d);
+            v.x = (v.x + 1.0) * this.viewRect.width / 2.0;
+            v.y = (1.0 - v.y) * this.viewRect.height / 2.0;
+            return v;
+        };
+        /**
+         * 屏幕坐标投影到场景坐标
+         * @param nX 屏幕坐标X ([0-width])
+         * @param nY 屏幕坐标Y ([0-height])
+         * @param sZ 到屏幕的距离
+         * @param v 场景坐标（输出）
+         * @return 场景坐标
+         */
+        Engine.prototype.unproject = function (sX, sY, sZ, v) {
+            if (v === void 0) { v = new feng3d.Vector3(); }
+            var gpuPos = this.screenToGpuPosition(new feng3d.Vector2(sX, sY));
+            return this.camera.unproject(gpuPos.x, gpuPos.y, sZ, v);
+        };
+        /**
+         * 获取单位像素在指定深度映射的大小
+         * @param   depth   深度
+         */
+        Engine.prototype.getScaleByDepth = function (depth, dir) {
+            if (dir === void 0) { dir = new feng3d.Vector2(0, 1); }
+            var scale = this.camera.getScaleByDepth(depth, dir);
+            scale = scale / new feng3d.Vector2(this.viewRect.width * dir.x, this.viewRect.height * dir.y).length;
+            return scale;
+        };
+        /**
+         * 获取鼠标射线（与鼠标重叠的摄像机射线）
+         */
+        Engine.prototype.getMouseRay3D = function () {
+            var gpuPos = this.screenToGpuPosition(new feng3d.Vector2(feng3d.windowEventProxy.clientX - this.viewRect.x, feng3d.windowEventProxy.clientY - this.viewRect.y));
+            return this.camera.getRay3D(gpuPos.x, gpuPos.y);
         };
         /**
          * 获取屏幕区域内所有游戏对象
@@ -22265,12 +22811,12 @@ var feng3d;
                 var m = t.getComponent(feng3d.Model);
                 if (m) {
                     var include = m.selfWorldBounds.toPoints().every(function (pos) {
-                        var p = _this.camera.project(pos);
+                        var p = _this.project(pos);
                         return rect.contains(p.x, p.y);
                     });
                     return include;
                 }
-                var p = _this.camera.project(t.scenePosition);
+                var p = _this.project(t.scenePosition);
                 return rect.contains(p.x, p.y);
             }).map(function (t) { return t.gameObject; });
             return gs;
@@ -22321,8 +22867,9 @@ var feng3d;
             if (this.holdSize && this.camera && _localToWorldMatrix) {
                 var depthScale = this.getDepthScale(this.camera);
                 var vec = _localToWorldMatrix.decompose();
-                vec[2].scaleNumber(depthScale);
+                vec[2].scaleNumber(depthScale * this.holdSize);
                 _localToWorldMatrix.recompose(vec);
+                feng3d.debuger && feng3d.assert(!isNaN(_localToWorldMatrix.rawData[0]));
             }
         };
         HoldSizeComponent.prototype.getDepthScale = function (camera) {
@@ -22733,7 +23280,7 @@ var feng3d;
         }
         ScriptComponent.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
-            feng3d.feng3dDispatcher.on("asset.scriptChanged", this.onScriptChanged, this);
+            feng3d.dispatcher.on("asset.scriptChanged", this.onScriptChanged, this);
         };
         ScriptComponent.prototype.scriptChanged = function (property, oldValue, newValue) {
             if (this.scriptInstance) {
@@ -22755,7 +23302,7 @@ var feng3d;
             if (this.scriptInstance instanceof cls)
                 return;
             var newInstance = new cls();
-            Object.setValue(newInstance, this.scriptInstance);
+            feng3d.serialization.setValue(newInstance, this.scriptInstance);
             this.scriptInstance = newInstance;
         };
         /**
@@ -22780,7 +23327,7 @@ var feng3d;
                 this.scriptInstance = null;
             }
             _super.prototype.dispose.call(this);
-            feng3d.feng3dDispatcher.off("asset.scriptChanged", this.onScriptChanged, this);
+            feng3d.dispatcher.off("asset.scriptChanged", this.onScriptChanged, this);
         };
         __decorate([
             feng3d.serialize,
@@ -24252,7 +24799,7 @@ var feng3d;
         return PointGeometry;
     }(feng3d.Geometry));
     feng3d.PointGeometry = PointGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.point = Object.setValue(new PointGeometry(), { name: "PointGeometry", assetId: "PointGeometry", points: [], hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.point = feng3d.serialization.setValue(new PointGeometry(), { name: "PointGeometry", assetId: "PointGeometry", points: [], hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -24466,6 +25013,7 @@ var feng3d;
          * 投影矩阵失效
          */
         LensBase.prototype.invalidate = function () {
+            feng3d.debuger && feng3d.assert(!isNaN(this.aspect));
             this._matrixInvalid = true;
             this._invertMatrixInvalid = true;
             this._viewBoxInvalid = true;
@@ -24681,10 +25229,6 @@ var feng3d;
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.Camera";
             _this.projection = feng3d.Projection.Perspective;
-            /**
-             * 视窗矩形
-             */
-            _this.viewRect = new feng3d.Rectangle(0, 0, 1, 1);
             _this._viewProjection = new feng3d.Matrix4x4();
             _this._viewProjectionInvalid = true;
             _this._viewBox = new feng3d.Box();
@@ -24739,12 +25283,6 @@ var feng3d;
             this._viewProjectionInvalid = true;
         };
         /**
-         * 获取鼠标射线（与鼠标重叠的摄像机射线）
-         */
-        Camera.prototype.getMouseRay3D = function () {
-            return this.getRay3D(feng3d.windowEventProxy.clientX - this.viewRect.x, feng3d.windowEventProxy.clientY - this.viewRect.y);
-        };
-        /**
          * 获取与坐标重叠的射线
          * @param x view3D上的X坐标
          * @param y view3D上的X坐标
@@ -24752,8 +25290,7 @@ var feng3d;
          */
         Camera.prototype.getRay3D = function (x, y, ray3D) {
             if (ray3D === void 0) { ray3D = new feng3d.Ray3D(); }
-            var gpuPos = this.screenToGpuPosition(new feng3d.Vector2(x, y));
-            return this.lens.unprojectRay(gpuPos.x, gpuPos.y, ray3D).applyMatri4x4(this.transform.localToWorldMatrix);
+            return this.lens.unprojectRay(x, y, ray3D).applyMatri4x4(this.transform.localToWorldMatrix);
         };
         /**
          * 投影坐标（世界坐标转换为3D视图坐标）
@@ -24762,8 +25299,6 @@ var feng3d;
          */
         Camera.prototype.project = function (point3d) {
             var v = this.lens.project(this.transform.worldToLocalMatrix.transformVector(point3d));
-            v.x = (v.x + 1.0) * this.viewRect.width / 2.0;
-            v.y = (1.0 - v.y) * this.viewRect.height / 2.0;
             return v;
         };
         /**
@@ -24776,30 +25311,17 @@ var feng3d;
          */
         Camera.prototype.unproject = function (sX, sY, sZ, v) {
             if (v === void 0) { v = new feng3d.Vector3(); }
-            var gpuPos = this.screenToGpuPosition(new feng3d.Vector2(sX, sY));
-            return this.transform.localToWorldMatrix.transformVector(this.lens.unprojectWithDepth(gpuPos.x, gpuPos.y, sZ, v), v);
+            return this.transform.localToWorldMatrix.transformVector(this.lens.unprojectWithDepth(sX, sY, sZ, v), v);
         };
         /**
-         * 屏幕坐标转GPU坐标
-         * @param screenPos 屏幕坐标 (x: [0-width], y: [0 - height])
-         * @return GPU坐标 (x: [-1, 1], y: [-1, 1])
-         */
-        Camera.prototype.screenToGpuPosition = function (screenPos) {
-            var gpuPos = new feng3d.Vector2();
-            gpuPos.x = (screenPos.x * 2 - this.viewRect.width) / this.viewRect.width;
-            // 屏幕坐标与gpu中使用的坐标Y轴方向相反
-            gpuPos.y = -(screenPos.y * 2 - this.viewRect.height) / this.viewRect.height;
-            return gpuPos;
-        };
-        /**
-         * 获取单位像素在指定深度映射的大小
+         * 获取摄像机能够在指定深度处的视野；镜头在指定深度的尺寸。
+         *
          * @param   depth   深度
          */
-        Camera.prototype.getScaleByDepth = function (depth) {
-            var centerX = this.viewRect.width / 2;
-            var centerY = this.viewRect.height / 2;
-            var lt = this.unproject(centerX - 0.5, centerY - 0.5, depth);
-            var rb = this.unproject(centerX + 0.5, centerY + 0.5, depth);
+        Camera.prototype.getScaleByDepth = function (depth, dir) {
+            if (dir === void 0) { dir = new feng3d.Vector2(0, 1); }
+            var lt = this.unproject(-0.5 * dir.x, -0.5 * dir.y, depth);
+            var rb = this.unproject(+0.5 * dir.x, +0.5 * dir.y, depth);
             var scale = lt.subTo(rb).length;
             return scale;
         };
@@ -25100,7 +25622,7 @@ var feng3d;
         return PlaneGeometry;
     }(feng3d.Geometry));
     feng3d.PlaneGeometry = PlaneGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.plane = Object.setValue(new PlaneGeometry(), { name: "Plane", assetId: "Plane", width: 10, height: 10, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.plane = feng3d.serialization.setValue(new PlaneGeometry(), { name: "Plane", assetId: "Plane", width: 10, height: 10, hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -25526,7 +26048,7 @@ var feng3d;
         return CubeGeometry;
     }(feng3d.Geometry));
     feng3d.CubeGeometry = CubeGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cube = Object.setValue(new CubeGeometry(), { name: "Cube", assetId: "Cube", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cube = feng3d.serialization.setValue(new CubeGeometry(), { name: "Cube", assetId: "Cube", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -25713,7 +26235,7 @@ var feng3d;
         return SphereGeometry;
     }(feng3d.Geometry));
     feng3d.SphereGeometry = SphereGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.sphere = Object.setValue(new SphereGeometry(), { name: "Sphere", assetId: "Sphere", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.sphere = feng3d.serialization.setValue(new SphereGeometry(), { name: "Sphere", assetId: "Sphere", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -25909,7 +26431,7 @@ var feng3d;
         return CapsuleGeometry;
     }(feng3d.Geometry));
     feng3d.CapsuleGeometry = CapsuleGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.capsule = Object.setValue(new CapsuleGeometry(), { name: "Capsule", assetId: "Capsule", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.capsule = feng3d.serialization.setValue(new CapsuleGeometry(), { name: "Capsule", assetId: "Capsule", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26264,7 +26786,7 @@ var feng3d;
         return CylinderGeometry;
     }(feng3d.Geometry));
     feng3d.CylinderGeometry = CylinderGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cylinder = Object.setValue(new CylinderGeometry(), { name: "Cylinder", assetId: "Cylinder", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cylinder = feng3d.serialization.setValue(new CylinderGeometry(), { name: "Cylinder", assetId: "Cylinder", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26295,7 +26817,7 @@ var feng3d;
         return ConeGeometry;
     }(feng3d.CylinderGeometry));
     feng3d.ConeGeometry = ConeGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cone = Object.setValue(new ConeGeometry(), { name: "Cone", assetId: "Cone", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cone = feng3d.serialization.setValue(new ConeGeometry(), { name: "Cone", assetId: "Cone", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26490,7 +27012,7 @@ var feng3d;
         return TorusGeometry;
     }(feng3d.Geometry));
     feng3d.TorusGeometry = TorusGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.torus = Object.setValue(new TorusGeometry(), { name: "Torus", assetId: "Torus", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.torus = feng3d.serialization.setValue(new TorusGeometry(), { name: "Torus", assetId: "Torus", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26504,38 +27026,52 @@ var feng3d;
         ImageDatas["defaultNormal"] = "defaultNormal";
         ImageDatas["defaultParticle"] = "defaultParticle";
     })(ImageDatas = feng3d.ImageDatas || (feng3d.ImageDatas = {}));
-    feng3d.imageDatas = {
-        black: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.black)).imageData,
-        white: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.white)).imageData,
-        red: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.red)).imageData,
-        green: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.green)).imageData,
-        blue: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.blue)).imageData,
-        defaultNormal: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(0x8080ff)).imageData,
-        defaultParticle: new feng3d.ImageUtil().drawDefaultParticle().imageData,
-    };
+    if (typeof document != "undefined") {
+        feng3d.imageDatas = {
+            black: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.black)).imageData,
+            white: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.white)).imageData,
+            red: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.red)).imageData,
+            green: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.green)).imageData,
+            blue: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.blue)).imageData,
+            defaultNormal: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(0x8080ff)).imageData,
+            defaultParticle: new feng3d.ImageUtil().drawDefaultParticle().imageData,
+        };
+    }
     /**
      * 2D纹理
      */
     var Texture2D = /** @class */ (function (_super) {
         __extends(Texture2D, _super);
         function Texture2D() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super.call(this) || this;
             _this.__class__ = "feng3d.Texture2D";
             _this.assetType = feng3d.AssetType.texture;
             /**
              * 当贴图数据未加载好等情况时代替使用
              */
             _this.noPixels = ImageDatas.white;
-            /**
-             * 是否加载
-             */
-            _this.isLoaded = true;
+            _this._loadings = [];
             /**
              * 纹理类型
              */
             _this._textureType = feng3d.TextureType.TEXTURE_2D;
             return _this;
         }
+        Object.defineProperty(Texture2D.prototype, "isLoaded", {
+            /**
+             * 是否已加载
+             */
+            get: function () { return this._loadings.length == 0; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Texture2D.prototype, "image", {
+            get: function () {
+                return this._pixels;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Texture2D.prototype, "source", {
             /**
              * 用于表示初始化纹理的数据来源
@@ -26545,6 +27081,11 @@ var feng3d;
             },
             set: function (v) {
                 var _this = this;
+                if (this.assetId) {
+                    // 来源于资源
+                    console.log("\u6765\u6E90\u4E8E\u8D44\u6E90\uFF0C\u4E0D\u53EF\u4FEE\u6539\uFF01");
+                    return;
+                }
                 this._source = v;
                 if (!v) {
                     this._pixels = null;
@@ -26552,31 +27093,46 @@ var feng3d;
                     return;
                 }
                 if (v.url) {
-                    this.isLoaded = false;
+                    this._loadings.push(v.url);
                     feng3d.loader.loadImage(v.url, function (img) {
                         _this._pixels = img;
                         _this.invalidate();
-                        _this.isLoaded = true;
-                        _this.dispatch("loadCompleted");
+                        _this._loadings.delete(v.url);
+                        _this.onItemLoadCompleted();
                     }, null, function (e) {
                         feng3d.error(e);
-                        _this.isLoaded = true;
-                        _this.dispatch("loadCompleted");
+                        _this._loadings.delete(v.url);
+                        _this.onItemLoadCompleted();
                     });
                 }
             },
             enumerable: true,
             configurable: true
         });
+        Texture2D.prototype.onItemLoadCompleted = function () {
+            if (this._loadings.length == 0)
+                this.dispatch("loadCompleted");
+        };
+        /**
+         * 已加载完成或者加载完成时立即调用
+         * @param callback 完成回调
+         */
+        Texture2D.prototype.onLoadCompleted = function (callback) {
+            if (this.isLoaded) {
+                callback();
+                return;
+            }
+            this.once("loadCompleted", callback);
+        };
         __decorate([
             feng3d.serialize
         ], Texture2D.prototype, "source", null);
         return Texture2D;
     }(feng3d.TextureInfo));
     feng3d.Texture2D = Texture2D;
-    feng3d.rs.setDefaultAssetData(Texture2D.default = Object.setValue(new Texture2D(), { name: "Default-Texture", assetId: "Default-Texture", hideFlags: feng3d.HideFlags.NotEditable }));
-    feng3d.rs.setDefaultAssetData(Texture2D.defaultNormal = Object.setValue(new Texture2D(), { name: "Default-NormalTexture", assetId: "Default-NormalTexture", noPixels: ImageDatas.defaultNormal, hideFlags: feng3d.HideFlags.NotEditable }));
-    feng3d.rs.setDefaultAssetData(Texture2D.defaultParticle = Object.setValue(new Texture2D(), { name: "Default-ParticleTexture", assetId: "Default-ParticleTexture", noPixels: ImageDatas.defaultParticle, format: feng3d.TextureFormat.RGBA, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(Texture2D.default = feng3d.serialization.setValue(new Texture2D(), { name: "Default-Texture", assetId: "Default-Texture", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(Texture2D.defaultNormal = feng3d.serialization.setValue(new Texture2D(), { name: "Default-NormalTexture", assetId: "Default-NormalTexture", noPixels: ImageDatas.defaultNormal, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(Texture2D.defaultParticle = feng3d.serialization.setValue(new Texture2D(), { name: "Default-ParticleTexture", assetId: "Default-ParticleTexture", noPixels: ImageDatas.defaultParticle, format: feng3d.TextureFormat.RGBA, hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26691,84 +27247,148 @@ var feng3d;
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.TextureCube";
             _this.assetType = feng3d.AssetType.texturecube;
+            _this.OAVCubeMap = "";
             _this.noPixels = [feng3d.ImageDatas.white, feng3d.ImageDatas.white, feng3d.ImageDatas.white, feng3d.ImageDatas.white, feng3d.ImageDatas.white, feng3d.ImageDatas.white];
             _this._pixels = [null, null, null, null, null, null];
             _this._textureType = feng3d.TextureType.TEXTURE_CUBE_MAP;
-            _this.loadingNum = 0;
+            _this._loading = [];
             return _this;
         }
-        TextureCube.prototype.urlChanged = function (property, oldValue, newValue) {
-            var _this = this;
-            var index = ["positive_x_url", "positive_y_url", "positive_z_url", "negative_x_url", "negative_y_url", "negative_z_url"].indexOf(property);
-            feng3d.assert(index != -1);
-            this.loadingNum++;
-            feng3d.fs.readImage(newValue, function (err, img) {
-                if (err) {
-                    // error(err);
-                    _this._pixels[index] = null;
-                }
-                else
-                    _this._pixels[index] = img;
-                _this.loadingNum--;
-                _this.invalidate();
-                if (_this.loadingNum == 0) {
-                    _this.dispatch("loadCompleted");
-                }
-            });
-        };
         Object.defineProperty(TextureCube.prototype, "isLoaded", {
             /**
              * 是否加载完成
              */
-            get: function () {
-                if (this.loadingNum == 0)
-                    return true;
-                return false;
-            },
+            get: function () { return this._loading.length == 0; },
             enumerable: true,
             configurable: true
         });
+        TextureCube.prototype.setTexture2D = function (pos, texture) {
+            if (this.rawData == null || this.rawData.type != "texture") {
+                this.rawData = { type: "texture", textures: [] };
+            }
+            var index = TextureCube.ImageNames.indexOf(pos);
+            this.rawData.textures[index] = texture;
+            this._loadItemTexture(texture, index);
+        };
+        TextureCube.prototype.setTexture2DPath = function (pos, path) {
+            if (this.rawData == null || this.rawData.type != "path") {
+                this.rawData = { type: "path", paths: [] };
+            }
+            var index = TextureCube.ImageNames.indexOf(pos);
+            this.rawData.paths[index] = path;
+            this._loadItemImagePath(path, index);
+        };
+        TextureCube.prototype.getTextureImage = function (pos, callback) {
+            if (!this.rawData) {
+                callback();
+                return;
+            }
+            var index = TextureCube.ImageNames.indexOf(pos);
+            if (this.rawData.type == "texture") {
+                var texture = this.rawData.textures[index];
+                if (!texture) {
+                    callback();
+                    return;
+                }
+                ;
+                texture.onLoadCompleted(function () {
+                    callback(texture.image);
+                });
+            }
+            else if (this.rawData.type == "path") {
+                var path_1 = this.rawData.paths[index];
+                if (!path_1) {
+                    callback();
+                    return;
+                }
+                feng3d.fs.readImage(path_1, function (err, img) {
+                    callback(img);
+                });
+            }
+        };
+        TextureCube.prototype._rawDataChanged = function () {
+            var _this = this;
+            if (!this.rawData)
+                return;
+            if (this.rawData.type == "texture") {
+                this.rawData.textures.forEach(function (v, index) {
+                    _this._loadItemTexture(v, index);
+                });
+                this.invalidate();
+            }
+            else if (this.rawData.type == "path") {
+                this.rawData.paths.forEach(function (v, index) {
+                    _this._loadItemImagePath(v, index);
+                });
+            }
+        };
+        /**
+         * 加载单个贴图
+         *
+         * @param texture 贴图
+         * @param index 索引
+         */
+        TextureCube.prototype._loadItemTexture = function (texture, index) {
+            var _this = this;
+            if (texture == null)
+                return;
+            this._loading.push(texture);
+            texture.onLoadCompleted(function () {
+                if (_this.rawData.type == "texture" && _this.rawData.textures[index] == texture) {
+                    _this._pixels[index] = texture.image;
+                    _this.invalidate();
+                }
+                _this._loading.delete(texture);
+                _this._onItemLoadCompleted();
+            });
+        };
+        /**
+         * 加载单个图片
+         *
+         * @param imagepath 图片路径
+         * @param index 索引
+         */
+        TextureCube.prototype._loadItemImagePath = function (imagepath, index) {
+            var _this = this;
+            if (imagepath == null)
+                return;
+            this._loading.push(imagepath);
+            feng3d.fs.readImage(imagepath, function (err, img) {
+                if (img != null && _this.rawData.type == "path" && _this.rawData.paths[index] == imagepath) {
+                    _this._pixels[index] = img;
+                    _this.invalidate();
+                }
+                _this._loading.delete(imagepath);
+                _this._onItemLoadCompleted();
+            });
+        };
+        TextureCube.prototype._onItemLoadCompleted = function () {
+            if (this._loading.length == 0)
+                this.dispatch("loadCompleted");
+        };
         /**
          * 已加载完成或者加载完成时立即调用
          * @param callback 完成回调
          */
         TextureCube.prototype.onLoadCompleted = function (callback) {
-            if (this.loadingNum == 0) {
+            if (this.isLoaded) {
                 callback();
                 return;
             }
-            else
-                this.once("loadCompleted", callback);
+            this.once("loadCompleted", callback);
         };
+        TextureCube.ImageNames = ["positive_x_url", "positive_y_url", "positive_z_url", "negative_x_url", "negative_y_url", "negative_z_url"];
         __decorate([
-            feng3d.oav({ component: "OAVCubeMap", priority: -1 }),
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "positive_x_url", void 0);
-        __decorate([
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "positive_y_url", void 0);
+            feng3d.oav({ component: "OAVCubeMap", priority: -1 })
+        ], TextureCube.prototype, "OAVCubeMap", void 0);
         __decorate([
             feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "positive_z_url", void 0);
-        __decorate([
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "negative_x_url", void 0);
-        __decorate([
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "negative_y_url", void 0);
-        __decorate([
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "negative_z_url", void 0);
+            feng3d.watch("_rawDataChanged")
+        ], TextureCube.prototype, "rawData", void 0);
         return TextureCube;
     }(feng3d.TextureInfo));
     feng3d.TextureCube = TextureCube;
-    feng3d.rs.setDefaultAssetData(TextureCube.default = Object.setValue(new TextureCube(), { name: "Default-TextureCube", assetId: "Default-TextureCube", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(TextureCube.default = feng3d.serialization.setValue(new TextureCube(), { name: "Default-TextureCube", assetId: "Default-TextureCube", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26794,7 +27414,7 @@ var feng3d;
              * 渲染参数
              */
             _this.renderParams = new feng3d.RenderParams();
-            feng3d.feng3dDispatcher.on("asset.shaderChanged", _this.onShaderChanged, _this);
+            feng3d.dispatcher.on("asset.shaderChanged", _this.onShaderChanged, _this);
             return _this;
         }
         Material.prototype.beforeRender = function (renderAtomic) {
@@ -27136,7 +27756,7 @@ var feng3d;
     }());
     feng3d.StandardUniforms = StandardUniforms;
     feng3d.shaderConfig.shaders["standard"].cls = StandardUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.default = Object.setValue(new feng3d.Material(), { name: "Default-Material", assetId: "Default-Material", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Material.default = feng3d.serialization.setValue(new feng3d.Material(), { name: "Default-Material", assetId: "Default-Material", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27220,7 +27840,7 @@ var feng3d;
              */
             _this.frameBufferObject = new feng3d.FrameBufferObject();
             _this.debugShadowMap = false;
-            _this.shadowCamera = Object.setValue(new feng3d.GameObject(), { name: "LightShadowCamera" }).addComponent(feng3d.Camera);
+            _this.shadowCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "LightShadowCamera" }).addComponent(feng3d.Camera);
             return _this;
         }
         Object.defineProperty(Light.prototype, "position", {
@@ -27292,8 +27912,8 @@ var feng3d;
                 gameObject.addComponent(feng3d.BillboardComponent);
                 //材质
                 var model = gameObject.getComponent(feng3d.Model);
-                model.geometry = Object.setValue(new feng3d.PlaneGeometry(), { width: this.lightType == feng3d.LightType.Point ? 1 : 0.5, height: 0.5, segmentsW: 1, segmentsH: 1, yUp: false });
-                var textureMaterial = model.material = Object.setValue(new feng3d.Material(), { shaderName: "texture", uniforms: { s_texture: this.frameBufferObject.texture } });
+                model.geometry = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { width: this.lightType == feng3d.LightType.Point ? 1 : 0.5, height: 0.5, segmentsW: 1, segmentsH: 1, yUp: false });
+                var textureMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "texture", uniforms: { s_texture: this.frameBufferObject.texture } });
                 //
                 // textureMaterial.uniforms.s_texture.url = 'Assets/pz.jpg';
                 // textureMaterial.uniforms.u_color.setTo(1.0, 0.0, 0.0, 1.0);
@@ -27380,7 +28000,7 @@ var feng3d;
                 this.shadowCamera.lens = this.orthographicLens = new feng3d.OrthographicLens(radius, 1, this.shadowCameraNear, this.shadowCameraNear + radius * 2);
             }
             else {
-                Object.setValue(this.orthographicLens, { size: radius, near: this.shadowCameraNear, far: this.shadowCameraNear + radius * 2 });
+                feng3d.serialization.setValue(this.orthographicLens, { size: radius, near: this.shadowCameraNear, far: this.shadowCameraNear + radius * 2 });
             }
         };
         return DirectionalLight;
@@ -28269,6 +28889,8 @@ var feng3d;
     feng3d.AudioListener = AudioListener;
 })(feng3d || (feng3d = {}));
 (function () {
+    if (typeof window == "undefined")
+        return;
     window["AudioContext"] = window["AudioContext"] || window["webkitAudioContext"];
     var audioCtx = feng3d.audioCtx = new AudioContext();
     var globalGain = feng3d.globalGain = audioCtx.createGain();
@@ -28702,7 +29324,7 @@ var feng3d;
             var target = mirrorWorldPosition.subTo(lookAtPosition);
             target.reflect(normal).negate();
             target.add(mirrorWorldPosition);
-            var mirrorCamera = Object.setValue(new feng3d.GameObject(), { name: "waterMirrorCamera" }).addComponent(feng3d.Camera);
+            var mirrorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "waterMirrorCamera" }).addComponent(feng3d.Camera);
             mirrorCamera.transform.position = view;
             mirrorCamera.transform.lookAt(target, rotationMatrix.up);
             mirrorCamera.lens = camera.lens.clone();
@@ -28800,7 +29422,7 @@ var feng3d;
     }());
     feng3d.WaterUniforms = WaterUniforms;
     feng3d.shaderConfig.shaders["water"].cls = WaterUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.water = Object.setValue(new feng3d.Material(), { name: "Water-Material", assetId: "Water-Material", shaderName: "water", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Material.water = feng3d.serialization.setValue(new feng3d.Material(), { name: "Water-Material", assetId: "Water-Material", shaderName: "water", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -29024,7 +29646,7 @@ var feng3d;
      * 默认高度图
      */
     var defaultHeightMap = new feng3d.ImageUtil(1024, 1024, new feng3d.Color4(0, 0, 0, 0)).imageData;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.terrain = Object.setValue(new TerrainGeometry(), { name: "Terrain-Geometry", assetId: "Terrain-Geometry", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.terrain = feng3d.serialization.setValue(new TerrainGeometry(), { name: "Terrain-Geometry", assetId: "Terrain-Geometry", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -29064,7 +29686,7 @@ var feng3d;
     }(feng3d.StandardUniforms));
     feng3d.TerrainUniforms = TerrainUniforms;
     feng3d.shaderConfig.shaders["terrain"].cls = TerrainUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.terrain = Object.setValue(new feng3d.Material(), { name: "Terrain-Material", assetId: "Terrain-Material", shaderName: "terrain", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Material.terrain = feng3d.serialization.setValue(new feng3d.Material(), { name: "Terrain-Material", assetId: "Terrain-Material", shaderName: "terrain", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -29333,7 +29955,7 @@ var feng3d;
     }(feng3d.StandardUniforms));
     feng3d.ParticleUniforms = ParticleUniforms;
     feng3d.shaderConfig.shaders["particle"].cls = ParticleUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.particle = Object.setValue(new feng3d.Material(), {
+    feng3d.rs.setDefaultAssetData(feng3d.Material.particle = feng3d.serialization.setValue(new feng3d.Material(), {
         name: "Particle-Material", assetId: "Particle-Material", shaderName: "particle",
         renderParams: { enableBlend: true, depthMask: false },
         hideFlags: feng3d.HideFlags.NotEditable,
@@ -29677,7 +30299,7 @@ var feng3d;
         return ParticleSystem;
     }(feng3d.Model));
     feng3d.ParticleSystem = ParticleSystem;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.billboard = Object.setValue(new feng3d.PlaneGeometry(), { name: "Billboard", assetId: "Billboard-Geometry", yUp: false, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.billboard = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { name: "Billboard", assetId: "Billboard-Geometry", yUp: false, hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -30009,19 +30631,19 @@ var feng3d;
             /**
              * 起始寿命为秒，粒子寿命为0时死亡。
              */
-            _this.startLifetime = Object.setValue(new feng3d.MinMaxCurve(), { between0And1: true, constant: 5, constant1: 5 });
+            _this.startLifetime = feng3d.serialization.setValue(new feng3d.MinMaxCurve(), { between0And1: true, constant: 5, constant1: 5 });
             /**
              * 粒子的起始速度，应用于起始方向。
              */
-            _this.startSpeed = Object.setValue(new feng3d.MinMaxCurve(), { constant: 5, constant1: 5 });
+            _this.startSpeed = feng3d.serialization.setValue(new feng3d.MinMaxCurve(), { constant: 5, constant1: 5 });
             /**
              * 粒子的起始缩放。
              */
-            _this.startScale = Object.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
+            _this.startScale = feng3d.serialization.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
             /**
              * 粒子的起始旋转角度。
              */
-            _this.startRotation = Object.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { curveMultiplier: 180 }, yCurve: { curveMultiplier: 180 }, zCurve: { curveMultiplier: 180 } });
+            _this.startRotation = feng3d.serialization.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { curveMultiplier: 180 }, yCurve: { curveMultiplier: 180 }, zCurve: { curveMultiplier: 180 } });
             /**
              * 粒子的起始颜色。
              */
@@ -30172,7 +30794,7 @@ var feng3d;
             /**
              * 发射率，每秒发射粒子数量
              */
-            _this.rate = Object.setValue(new feng3d.MinMaxCurve(), { between0And1: true, constant: 10, constant1: 10 });
+            _this.rate = feng3d.serialization.setValue(new feng3d.MinMaxCurve(), { between0And1: true, constant: 10, constant1: 10 });
             // rate = 10;
             /**
              * 爆发，在time时刻额外喷射particles粒子
@@ -30344,7 +30966,7 @@ var feng3d;
         __extends(ParticleScaleOverLifetimeModule, _super);
         function ParticleScaleOverLifetimeModule() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.scale = Object.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { constant: 1, constant1: 1, curveMultiplier: 1 }, yCurve: { constant: 1, constant1: 1, curveMultiplier: 1 }, zCurve: { constant: 1, constant1: 1, curveMultiplier: 1 } });
+            _this.scale = feng3d.serialization.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { constant: 1, constant1: 1, curveMultiplier: 1 }, yCurve: { constant: 1, constant1: 1, curveMultiplier: 1 }, zCurve: { constant: 1, constant1: 1, curveMultiplier: 1 } });
             return _this;
         }
         /**
@@ -30398,7 +31020,7 @@ var feng3d;
         __extends(ParticlePalstanceOverLifetimeModule, _super);
         function ParticlePalstanceOverLifetimeModule() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.palstance = Object.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constant1: 45, curveMultiplier: 45 } });
+            _this.palstance = feng3d.serialization.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constant1: 45, curveMultiplier: 45 } });
             return _this;
         }
         /**
@@ -30575,7 +31197,7 @@ var feng3d;
                 }
                 var jointGameobject = parentGameobject.find(skeletonJoint.name);
                 if (!jointGameobject) {
-                    jointGameobject = Object.setValue(new feng3d.GameObject(), { name: skeletonJoint.name, hideFlags: feng3d.HideFlags.DontSave });
+                    jointGameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: skeletonJoint.name, hideFlags: feng3d.HideFlags.DontSave });
                     parentGameobject.addChild(jointGameobject);
                 }
                 var transform = jointGameobject.transform;
@@ -31000,7 +31622,6 @@ var feng3d;
         function FolderAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.folder;
-            _this.extenson = "";
             /**
              * 子资源列表
              */
@@ -31021,6 +31642,7 @@ var feng3d;
         FolderAsset.prototype.readFile = function (callback) {
             callback && callback(null);
         };
+        FolderAsset.extenson = "";
         __decorate([
             feng3d.serialize
         ], FolderAsset.prototype, "childrenAssets", void 0);
@@ -31058,9 +31680,6 @@ var feng3d;
                 callback && callback(err);
             });
         };
-        __decorate([
-            feng3d.oav()
-        ], ArrayBufferAsset.prototype, "name", void 0);
         return ArrayBufferAsset;
     }(feng3d.FileAsset));
     feng3d.ArrayBufferAsset = ArrayBufferAsset;
@@ -31122,15 +31741,24 @@ var feng3d;
             var _this = this;
             this.rs.fs.readObject(this.assetPath, function (err, data) {
                 _this.data = data;
-                _this.data.assetId = _this.assetId;
+                feng3d.debuger && feng3d.assert(_this.data.assetId == _this.assetId);
                 callback && callback(err);
             });
         };
+        ObjectAsset.prototype._dataChanged = function (property, oldValue, newValue) {
+            if (oldValue) {
+                feng3d.objectevent.off(oldValue, "propertyValueChanged", this._onDataChanged, this);
+            }
+            if (newValue) {
+                feng3d.objectevent.on(newValue, "propertyValueChanged", this._onDataChanged, this);
+            }
+        };
+        ObjectAsset.prototype._onDataChanged = function () {
+            this.write();
+        };
         __decorate([
-            feng3d.oav({ exclude: true })
-        ], ObjectAsset.prototype, "name", void 0);
-        __decorate([
-            feng3d.oav({ component: "OAVObjectView" })
+            feng3d.oav({ component: "OAVObjectView" }),
+            feng3d.watch("_dataChanged")
         ], ObjectAsset.prototype, "data", void 0);
         return ObjectAsset;
     }(feng3d.FileAsset));
@@ -31146,19 +31774,17 @@ var feng3d;
         function ScriptAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.script;
-            _this.extenson = ".ts";
             _this.textContent = "";
             return _this;
         }
         ScriptAsset.prototype.onTextContentChanged = function () {
             if (!this.textContent) {
                 this.scriptName = "";
-                this.name = "";
                 return;
             }
             // 获取脚本类名称
             var result = feng3d.regExps.classReg.exec(this.textContent);
-            feng3d.assert(result != null, "\u5728\u811A\u672C " + this.assetPath + " \u4E2D\u6CA1\u6709\u627E\u5230 \u811A\u672C\u7C7B\u5B9A\u4E49");
+            feng3d.debuger && feng3d.assert(result != null, "\u5728\u811A\u672C " + this.assetPath + " \u4E2D\u6CA1\u6709\u627E\u5230 \u811A\u672C\u7C7B\u5B9A\u4E49");
             var script = result[3];
             if (result[5]) {
                 this.parentScriptName = result[5].split(".").pop();
@@ -31166,14 +31792,12 @@ var feng3d;
             // 获取导出类命名空间
             if (result[1]) {
                 result = feng3d.regExps.namespace.exec(this.textContent);
-                feng3d.assert(result != null, "\u83B7\u53D6\u811A\u672C " + this.assetPath + " \u547D\u540D\u7A7A\u95F4\u5931\u8D25");
+                feng3d.debuger && feng3d.assert(result != null, "\u83B7\u53D6\u811A\u672C " + this.assetPath + " \u547D\u540D\u7A7A\u95F4\u5931\u8D25");
                 script = result[1] + "." + script;
             }
             this.scriptName = script;
         };
-        __decorate([
-            feng3d.oav({ editable: false, priority: -1 })
-        ], ScriptAsset.prototype, "name", void 0);
+        ScriptAsset.extenson = ".ts";
         __decorate([
             feng3d.watch("onTextContentChanged")
         ], ScriptAsset.prototype, "textContent", void 0);
@@ -31191,9 +31815,9 @@ var feng3d;
         function ShaderAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.shader;
-            _this.extenson = ".ts";
             return _this;
         }
+        ShaderAsset.extenson = ".ts";
         return ShaderAsset;
     }(feng3d.ScriptAsset));
     feng3d.ShaderAsset = ShaderAsset;
@@ -31208,10 +31832,10 @@ var feng3d;
         function JSAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.js;
-            _this.extenson = ".js";
             _this.textContent = "";
             return _this;
         }
+        JSAsset.extenson = ".js";
         return JSAsset;
     }(feng3d.StringAsset));
     feng3d.JSAsset = JSAsset;
@@ -31226,10 +31850,10 @@ var feng3d;
         function JsonAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.json;
-            _this.extenson = ".json";
             _this.textContent = "{}";
             return _this;
         }
+        JsonAsset.extenson = ".json";
         return JsonAsset;
     }(feng3d.StringAsset));
     feng3d.JsonAsset = JsonAsset;
@@ -31241,10 +31865,10 @@ var feng3d;
         function TextAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.txt;
-            _this.extenson = ".txt";
             _this.textContent = "";
             return _this;
         }
+        TextAsset.extenson = ".txt";
         return TextAsset;
     }(feng3d.StringAsset));
     feng3d.TextAsset = TextAsset;
@@ -31259,9 +31883,9 @@ var feng3d;
         function AudioAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.audio;
-            _this.extenson = ".mp3";
             return _this;
         }
+        // readonly extenson: ".ogg" | ".mp3" | ".wav" = ".mp3";
         /**
          * 保存文件
          * @param callback 完成回调
@@ -31289,11 +31913,6 @@ var feng3d;
         __extends(TextureAsset, _super);
         function TextureAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            /**
-             * 材质
-             */
-            _this.data = new feng3d.Texture2D();
-            _this.extenson = ".png";
             _this.assetType = feng3d.AssetType.texture;
             return _this;
         }
@@ -31304,13 +31923,14 @@ var feng3d;
             get: function () { return this._image; },
             set: function (v) {
                 this._image = v;
-                this.data["_pixels"] = v;
+                if (this.data)
+                    this.data["_pixels"] = v;
+                this.saveFile();
             },
             enumerable: true,
             configurable: true
         });
         TextureAsset.prototype.saveFile = function (callback) {
-            this.data.assetId = this.assetId;
             this.rs.fs.writeImage(this.assetPath, this.image, function (err) {
                 callback && callback(err);
             });
@@ -31323,8 +31943,8 @@ var feng3d;
         TextureAsset.prototype.readFile = function (callback) {
             var _this = this;
             this.rs.fs.readImage(this.assetPath, function (err, img) {
-                _this.image = img;
-                _this.data.assetId = _this.assetId;
+                _this._image = img;
+                _this.data["_pixels"] = img;
                 callback && callback(err);
             });
         };
@@ -31336,7 +31956,7 @@ var feng3d;
         TextureAsset.prototype.readMeta = function (callback) {
             var _this = this;
             _super.prototype.readMeta.call(this, function (err) {
-                _this.data = feng3d.serialization.deserialize(_this.meta["texture"]);
+                _this.data = _this.meta["texture"];
                 callback && callback(err);
             });
         };
@@ -31346,9 +31966,17 @@ var feng3d;
          * @param callback 完成回调
          */
         TextureAsset.prototype.writeMeta = function (callback) {
-            this.meta["texture"] = feng3d.serialization.serialize(this.data);
+            if (this.data == undefined) {
+                this.data = new feng3d.Texture2D();
+                this.data["_pixels"] = this._image;
+            }
+            if (this.data.assetId == undefined)
+                this.data.assetId = this.assetId;
+            feng3d.debuger && feng3d.assert(this.data.assetId == this.assetId);
+            this.meta["texture"] = this.data;
             this.rs.fs.writeObject(this.metaPath, this.meta, callback);
         };
+        TextureAsset.extenson = ".png";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], TextureAsset.prototype, "data", void 0);
@@ -31365,10 +31993,10 @@ var feng3d;
         __extends(TextureCubeAsset, _super);
         function TextureCubeAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.extenson = ".json";
             _this.assetType = feng3d.AssetType.texturecube;
             return _this;
         }
+        TextureCubeAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], TextureCubeAsset.prototype, "data", void 0);
@@ -31386,9 +32014,9 @@ var feng3d;
         function GeometryAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.geometry;
-            _this.extenson = ".json";
             return _this;
         }
+        GeometryAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], GeometryAsset.prototype, "data", void 0);
@@ -31406,9 +32034,9 @@ var feng3d;
         function MaterialAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.material;
-            _this.extenson = ".json";
             return _this;
         }
+        MaterialAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], MaterialAsset.prototype, "data", void 0);
@@ -31430,9 +32058,9 @@ var feng3d;
              */
             _this.data = new feng3d.GameObject();
             _this.assetType = feng3d.AssetType.gameobject;
-            _this.extenson = ".json";
             return _this;
         }
+        GameObjectAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], GameObjectAsset.prototype, "data", void 0);
@@ -32447,7 +33075,7 @@ var feng3d;
             War3Model.prototype.getMesh = function () {
                 this.meshs = [];
                 this.meshs.length = this.geosets.length;
-                var container = Object.setValue(new feng3d.GameObject(), { name: this.model.name });
+                var container = feng3d.serialization.setValue(new feng3d.GameObject(), { name: this.model.name });
                 var skeletonjoints = createSkeleton(this);
                 this.skeletonComponent = container.addComponent(feng3d.SkeletonComponent);
                 this.skeletonComponent.joints = skeletonjoints;
@@ -32476,11 +33104,11 @@ var feng3d;
                         // {
                         // image = image.substring(0, image.indexOf("."));
                         // image += ".JPG";
-                        material.material = model.material = Object.setValue(new feng3d.Material(), { name: image, renderParams: { cullFace: feng3d.CullFace.FRONT } });
+                        material.material = model.material = feng3d.serialization.setValue(new feng3d.Material(), { name: image, renderParams: { cullFace: feng3d.CullFace.FRONT } });
                         // }
-                        feng3d.feng3dDispatcher.dispatch("asset.parsed", material.material);
+                        feng3d.dispatcher.dispatch("asset.parsed", material.material);
                     }
-                    feng3d.feng3dDispatcher.dispatch("asset.parsed", geometry);
+                    feng3d.dispatcher.dispatch("asset.parsed", geometry);
                     model.geometry = geometry;
                     model.skinSkeleton = skinSkeleton;
                     container.addChild(mesh);
@@ -32592,7 +33220,7 @@ var feng3d;
                 war3Model.bones.forEach(function (bone) {
                     bone.buildAnimationclip(animationclip, __chache__, sequence.interval.start, sequence.interval.end);
                 });
-                feng3d.feng3dDispatcher.dispatch("asset.parsed", animationclip);
+                feng3d.dispatcher.dispatch("asset.parsed", animationclip);
                 animationclips.push(animationclip);
             }
             return animationclips;
@@ -33845,14 +34473,14 @@ var feng3d;
             var materials = {};
             for (var name_5 in mtl) {
                 var materialInfo = mtl[name_5];
-                var material = materials[name_5] = Object.setValue(new feng3d.Material(), {
+                var material = materials[name_5] = feng3d.serialization.setValue(new feng3d.Material(), {
                     name: materialInfo.name,
                     uniforms: {
                         u_diffuse: { r: materialInfo.kd[0], g: materialInfo.kd[1], b: materialInfo.kd[2], },
                         u_specular: { r: materialInfo.ks[0], g: materialInfo.ks[1], b: materialInfo.ks[2], },
                     },
                 });
-                feng3d.feng3dDispatcher.dispatch("asset.parsed", material);
+                feng3d.dispatcher.dispatch("asset.parsed", material);
             }
             completed && completed(null, materials);
         };
@@ -33884,7 +34512,7 @@ var feng3d;
                 var gameObject = createSubObj(objData, obj, materials);
                 object.addChild(gameObject);
             }
-            feng3d.feng3dDispatcher.dispatch("asset.parsed", object);
+            feng3d.dispatcher.dispatch("asset.parsed", object);
             completed && completed(object);
         };
         return OBJConverter;
@@ -33892,7 +34520,7 @@ var feng3d;
     feng3d.OBJConverter = OBJConverter;
     feng3d.objConverter = new OBJConverter();
     function createSubObj(objData, obj, materials) {
-        var gameObject = Object.setValue(new feng3d.GameObject(), { name: obj.name });
+        var gameObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: obj.name });
         var subObjs = obj.subObjs;
         for (var i = 0; i < subObjs.length; i++) {
             var materialObj = createMaterialObj(objData, subObjs[i], materials);
@@ -33932,7 +34560,7 @@ var feng3d;
             geometry.setVAData("a_normal", normals, 3);
         if (uvs.length > 0)
             geometry.setVAData("a_uv", uvs, 2);
-        feng3d.feng3dDispatcher.dispatch("asset.parsed", geometry);
+        feng3d.dispatcher.dispatch("asset.parsed", geometry);
         return gameObject;
         function translateVertexData(face, vertexIndex, vertices, uvs, indices, normals, obj) {
             var index;
@@ -34006,7 +34634,7 @@ var feng3d;
                 skinnedModel.skinSkeleton = skinSkeleton;
                 gameObject.addChild(skeletonGameObject);
             }
-            feng3d.feng3dDispatcher.dispatch("asset.parsed", gameObject);
+            feng3d.dispatcher.dispatch("asset.parsed", gameObject);
             completed && completed(gameObject);
         };
         /**
@@ -34188,7 +34816,7 @@ var feng3d;
             for (var i = 0; i < md5AnimData.numFrames; ++i) {
                 translatePose(md5AnimData, md5AnimData.frame[i], animationClip);
             }
-            feng3d.feng3dDispatcher.dispatch("asset.parsed", animationClip);
+            feng3d.dispatcher.dispatch("asset.parsed", animationClip);
             completed && completed(animationClip);
             /**
              * 将一个关键帧数据转换为SkeletonPose
@@ -34389,8 +35017,8 @@ var feng3d;
             feng3d.fs.readString(mdlurl, function (err, content) {
                 feng3d.war3.mdlParser.parse(content, function (war3Model) {
                     var showMesh = war3Model.getMesh();
-                    var gameObject = Object.setValue(new feng3d.GameObject(), { name: feng3d.pathUtils.getName(mdlurl), children: [showMesh] });
-                    feng3d.feng3dDispatcher.dispatch("asset.parsed", gameObject);
+                    var gameObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: feng3d.pathUtils.getName(mdlurl), children: [showMesh] });
+                    feng3d.dispatcher.dispatch("asset.parsed", gameObject);
                     callback && callback(gameObject);
                 });
             });
@@ -34407,102 +35035,102 @@ var feng3d;
         }
         GameObjectFactory.prototype.createGameObject = function (name) {
             if (name === void 0) { name = "GameObject"; }
-            return Object.setValue(new feng3d.GameObject(), { name: name });
+            return feng3d.serialization.setValue(new feng3d.GameObject(), { name: name });
         };
         GameObjectFactory.prototype.createCube = function (name) {
             if (name === void 0) { name = "cube"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.cube },]
             });
         };
         GameObjectFactory.prototype.createPlane = function (name) {
             if (name === void 0) { name = "plane"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.plane },]
             });
         };
         GameObjectFactory.prototype.createCylinder = function (name) {
             if (name === void 0) { name = "cylinder"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.cylinder },]
             });
         };
         GameObjectFactory.prototype.createCone = function (name) {
             if (name === void 0) { name = "Cone"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.cone },]
             });
         };
         GameObjectFactory.prototype.createTorus = function (name) {
             if (name === void 0) { name = "Torus"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.torus },]
             });
         };
         GameObjectFactory.prototype.createSphere = function (name) {
             if (name === void 0) { name = "sphere"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.sphere },]
             });
         };
         GameObjectFactory.prototype.createCapsule = function (name) {
             if (name === void 0) { name = "capsule"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.capsule },]
             });
         };
         GameObjectFactory.prototype.createTerrain = function (name) {
             if (name === void 0) { name = "Terrain"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.Terrain" },]
             });
         };
         GameObjectFactory.prototype.createCamera = function (name) {
             if (name === void 0) { name = "Camera"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.Camera" },]
             });
         };
         GameObjectFactory.prototype.createPointLight = function (name) {
             if (name === void 0) { name = "PointLight"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.PointLight" },]
             });
         };
         GameObjectFactory.prototype.createDirectionalLight = function (name) {
             if (name === void 0) { name = "DirectionalLight"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.DirectionalLight" },]
             });
         };
         GameObjectFactory.prototype.createSpotLight = function (name) {
             if (name === void 0) { name = "SpotLight"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.SpotLight" },]
             });
         };
         GameObjectFactory.prototype.createParticle = function (name) {
             if (name === void 0) { name = "Particle"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.Transform", rx: -90 }, { __class__: "feng3d.ParticleSystem" },],
             });
         };
         GameObjectFactory.prototype.createWater = function (name) {
             if (name === void 0) { name = "water"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.Water" },],
             });
@@ -34539,11 +35167,11 @@ var feng3d;
          * @param scene3d 场景
          * @param camera 摄像机
          */
-        Mouse3DManager.prototype.pick = function (scene3d, camera) {
+        Mouse3DManager.prototype.pick = function (engine, scene3d, camera) {
             if (this._mouseEventTypes.length == 0)
                 return;
             //计算得到鼠标射线相交的物体
-            var pickingCollisionVO = feng3d.raycaster.pick(camera.getMouseRay3D(), scene3d.mouseCheckObjects);
+            var pickingCollisionVO = feng3d.raycaster.pick(engine.getMouseRay3D(), scene3d.mouseCheckObjects);
             var gameobject = pickingCollisionVO && pickingCollisionVO.gameObject;
             return gameobject;
         };
@@ -34658,7 +35286,7 @@ var feng3d;
                 return null;
             if (!this.catchMouseMove && type == "mousemove")
                 return null;
-            return feng3d.fevent.dispatch(this, type, data, bubbles);
+            return _super.prototype.dispatch.call(this, type, data, bubbles);
         };
         /**
          * 派发事件
@@ -34722,17 +35350,5 @@ var feng3d;
         return WindowMouseInput;
     }(MouseInput));
     feng3d.WindowMouseInput = WindowMouseInput;
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * feng3d的版本号
-     */
-    feng3d.revision = "2019.03.01";
-    /**
-     * 是否开启调试(主要用于断言)
-     */
-    feng3d.debuger = true;
-    feng3d.log("feng3d version " + feng3d.revision);
 })(feng3d || (feng3d = {}));
 //# sourceMappingURL=feng3d.js.map
