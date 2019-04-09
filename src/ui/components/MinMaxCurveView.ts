@@ -146,7 +146,7 @@ namespace editor
                 menus.push({
                     label: "Paste", click: () =>
                     {
-                        Object.setValue(this.minMaxCurve, copyCurve);
+                        feng3d.serialization.setValue(this.minMaxCurve, copyCurve);
 
                         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                         this.dispatchEvent(new egret.Event(egret.Event.CHANGE));

@@ -13,10 +13,10 @@ namespace editor
         {
             var mouseRay3D = this.gameObject.scene.mouseRay3D;
 
-            var gameobject = Object.setValue(new feng3d.GameObject(), { name: "test" });
+            var gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "test" });
             var model = gameobject.addComponent(feng3d.Model);
             model.material = new feng3d.Material();
-            model.geometry = Object.setValue(new feng3d.SphereGeometry(), { radius: 10 });
+            model.geometry = feng3d.serialization.setValue(new feng3d.SphereGeometry(), { radius: 10 });
             gameobject.mouseEnabled = false;
             this.gameObject.addChild(gameobject);
 

@@ -31,7 +31,7 @@ namespace editor
             var camera = this.camera = engine.camera;
             camera.lens = new feng3d.PerspectiveLens(45);
             //
-            var light = Object.setValue(new feng3d.GameObject(), {
+            var light = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "DirectionalLight",
                 components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "feng3d.DirectionalLight" },]
             });
@@ -205,8 +205,8 @@ namespace editor
         }
 
         private currentObject: feng3d.GameObject;
-        private materialObject = Object.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
-        private geometryObject = Object.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
+        private materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
+        private geometryObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
 
         private _drawGameObject(gameObject: feng3d.GameObject)
         {

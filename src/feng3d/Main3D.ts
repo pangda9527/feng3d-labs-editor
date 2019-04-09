@@ -33,7 +33,7 @@ namespace editor
 
     export function creatNewScene()
     {
-        var scene = Object.setValue(new feng3d.GameObject(), { name: "Untitled" }).addComponent(feng3d.Scene3D)
+        var scene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "Untitled" }).addComponent(feng3d.Scene3D)
         scene.background.setTo(0.408, 0.38, 0.357);
         scene.ambientColor.setTo(0.4, 0.4, 0.4);
 
@@ -42,7 +42,7 @@ namespace editor
         camera.transform.position = new feng3d.Vector3(0, 1, -10);
         scene.gameObject.addChild(camera);
 
-        var directionalLight = Object.setValue(new feng3d.GameObject(), { name: "DirectionalLight" });
+        var directionalLight = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "DirectionalLight" });
         directionalLight.addComponent(feng3d.DirectionalLight).shadowType = feng3d.ShadowType.Hard_Shadows;
         directionalLight.transform.rx = 50;
         directionalLight.transform.ry = -30;

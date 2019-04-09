@@ -29,7 +29,7 @@ namespace editor
 
             var linesize = 20;
 
-            var lightIcon = this._lightIcon = Object.setValue(new feng3d.GameObject(), {
+            var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                 {
                     __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
@@ -64,7 +64,7 @@ namespace editor
                 var y1 = Math.cos(angle1) * linesize;
                 segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
             }
-            var lightLines = this._lightLines = Object.setValue(new feng3d.GameObject(), {
+            var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{ __class__: "feng3d.HoldSizeComponent", camera: this.editorCamera, holdSize: 0.005 },
                 {

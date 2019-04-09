@@ -58,7 +58,7 @@ namespace editor
 				(<any>document.getElementById("app")).append(this._canvas);
 				this.engine = new EditorEngine(this._canvas);
 				//
-				var editorCamera = this.editorCamera = Object.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
+				var editorCamera = this.editorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
 				editorCamera.lens.far = 5000;
 				editorCamera.transform.x = 5;
 				editorCamera.transform.y = 3;
@@ -67,7 +67,7 @@ namespace editor
 				editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
 				this.engine.camera = editorCamera;
 				//
-				var editorScene = Object.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene3D);
+				var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene3D);
 				editorScene.runEnvironment = feng3d.RunEnvironment.all;
 				this.engine.editorScene = editorScene;
 				//

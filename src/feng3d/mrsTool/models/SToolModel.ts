@@ -23,24 +23,24 @@ namespace editor
 
         private initModels()
         {
-            this.xCube = Object.setValue(new feng3d.GameObject(), { name: "xCube" }).addComponent(CoordinateScaleCube);
+            this.xCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xCube" }).addComponent(CoordinateScaleCube);
             this.xCube.color.setTo(1, 0, 0, 1);
             this.xCube.update();
             this.xCube.transform.rz = -90;
             this.gameObject.addChild(this.xCube.gameObject);
 
-            this.yCube = Object.setValue(new feng3d.GameObject(), { name: "yCube" }).addComponent(CoordinateScaleCube);
+            this.yCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yCube" }).addComponent(CoordinateScaleCube);
             this.yCube.color.setTo(0, 1, 0, 1);
             this.yCube.update();
             this.gameObject.addChild(this.yCube.gameObject);
 
-            this.zCube = Object.setValue(new feng3d.GameObject(), { name: "zCube" }).addComponent(CoordinateScaleCube);
+            this.zCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zCube" }).addComponent(CoordinateScaleCube);
             this.zCube.color.setTo(0, 0, 1, 1);
             this.zCube.update();
             this.zCube.transform.rx = 90;
             this.gameObject.addChild(this.zCube.gameObject);
 
-            this.oCube = Object.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
+            this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
             this.oCube.gameObject.transform.scale = new feng3d.Vector3(1.2, 1.2, 1.2);
             this.gameObject.addChild(this.oCube.gameObject);
         }
@@ -67,19 +67,19 @@ namespace editor
             super.init(gameObject);
             var xLine = new feng3d.GameObject();
             var model = xLine.addComponent(feng3d.Model);
-            var material = model.material = Object.setValue(new feng3d.Material(), {
+            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
             });
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(xLine);
-            this.coordinateCube = Object.setValue(new feng3d.GameObject(), { name: "coordinateCube" }).addComponent(CoordinateCube);
+            this.coordinateCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "coordinateCube" }).addComponent(CoordinateCube);
             this.gameObject.addChild(this.coordinateCube.gameObject);
 
-            var mouseHit = Object.setValue(new feng3d.GameObject(), { name: "hit" });
+            var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hit" });
             model = mouseHit.addComponent(feng3d.Model);
-            model.geometry = Object.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length - 4 });
+            model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length - 4 });
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;

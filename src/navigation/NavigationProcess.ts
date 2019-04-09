@@ -649,11 +649,11 @@ function createSegment()
     var parentobject;
     if (!debugSegment)
     {
-        debugSegment = Object.setValue(new feng3d.GameObject(), { name: "segment" });
+        debugSegment = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "segment" });
         debugSegment.mouseEnabled = false;
         //初始化材质
         var model = debugSegment.addComponent(feng3d.Model);
-        var material = model.material = Object.setValue(new feng3d.Material(), {
+        var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
             shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
             uniforms: { u_segmentColor: new feng3d.Color4(1.0, 0, 0) },
         });
@@ -663,11 +663,11 @@ function createSegment()
     //
     if (!debugPoint)
     {
-        debugPoint = Object.setValue(new feng3d.GameObject(), { name: "points" });
+        debugPoint = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "points" });
         debugPoint.mouseEnabled = false;
         var model = debugPoint.addComponent(feng3d.Model);
         pointGeometry = model.geometry = new feng3d.PointGeometry();
-        var materialp = model.material = Object.setValue(new feng3d.Material(), {
+        var materialp = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
             shaderName: "point", renderParams: { renderMode: feng3d.RenderMode.POINTS },
             uniforms: { u_PointSize: 5, u_color: new feng3d.Color4() },
         });

@@ -40,11 +40,11 @@ namespace editor
         {
             super.init(gameObject);
 
-            this.mrsToolObject = Object.setValue(new feng3d.GameObject(), { name: "MRSTool" });
+            this.mrsToolObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MRSTool" });
 
-            this.mTool = Object.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(MTool);
-            this.rTool = Object.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(RTool);
-            this.sTool = Object.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(STool);
+            this.mTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(MTool);
+            this.rTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(RTool);
+            this.sTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(STool);
 
             this.mTool.mrsToolTarget = this.mrsToolTarget;
             this.rTool.mrsToolTarget = this.mrsToolTarget;

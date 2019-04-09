@@ -54,30 +54,30 @@ namespace editor
             super.init(gameobject);
             this.hideFlags = this.hideFlags | feng3d.HideFlags.DontSaveInBuild;
 
-            this._navobject = Object.setValue(new feng3d.GameObject(), { name: "NavObject", hideFlags: feng3d.HideFlags.DontSave });
-            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+            this._navobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "NavObject", hideFlags: feng3d.HideFlags.DontSave });
+            var pointsObject = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "allowedVoxels",
                 components: [{
                     __class__: "feng3d.MeshModel",
-                    material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 1, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                    material: feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 1, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
                     geometry: this._allowedVoxelsPointGeometry = new feng3d.PointGeometry()
                 },]
             });
             this._navobject.addChild(pointsObject);
-            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+            var pointsObject = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "rejectivedVoxels",
                 components: [{
                     __class__: "feng3d.MeshModel",
-                    material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(1, 0, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                    material: feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(1, 0, 0), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
                     geometry: this._rejectivedVoxelsPointGeometry = new feng3d.PointGeometry()
                 },]
             });
             this._navobject.addChild(pointsObject);
-            var pointsObject = Object.setValue(new feng3d.GameObject(), {
+            var pointsObject = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "debugVoxels",
                 components: [{
                     __class__: "feng3d.MeshModel",
-                    material: Object.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 0, 1), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
+                    material: feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "point", uniforms: { u_color: new feng3d.Color4(0, 0, 1), u_PointSize: 2 }, renderParams: { renderMode: feng3d.RenderMode.POINTS } }),
                     geometry: this._debugVoxelsPointGeometry = new feng3d.PointGeometry()
                 },]
             });

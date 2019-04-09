@@ -32,14 +32,14 @@ namespace editor
         {
             super.init(gameObject);
 
-            var groundGridObject = Object.setValue(new feng3d.GameObject(), { name: "GroundGrid" });
+            var groundGridObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "GroundGrid" });
             groundGridObject.mouseEnabled = false;
 
             gameObject.addChild(groundGridObject);
 
             var model = groundGridObject.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            var material = model.material = Object.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES } });
+            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES } });
             material.renderParams.enableBlend = true;
         }
 

@@ -255,13 +255,13 @@ namespace editor
                             if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                                 this.minMaxGradient.color.copy(copyColor);
                             else
-                                Object.setValue(this.minMaxGradient.gradient, copyGradient);
+                                feng3d.serialization.setValue(this.minMaxGradient.gradient, copyGradient);
                         } else if (target == this.colorGroup1)
                         {
                             if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                                 this.minMaxGradient.color1.copy(copyColor);
                             else
-                                Object.setValue(this.minMaxGradient.gradient1, copyGradient);
+                                feng3d.serialization.setValue(this.minMaxGradient.gradient1, copyGradient);
                         }
 
                         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
