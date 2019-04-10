@@ -1,10 +1,10 @@
-/// <reference path="feng3d/out/feng3d.d.ts" />
+/// <reference path="node_modules/feng3d/out/feng3d.d.ts" />
 
 var fstype = GetQueryString("fstype");
 
 var result = [];
 
-xhrTsconfig("feng3d/tsconfig.json", () =>
+xhrTsconfig("node_modules/feng3d/tsconfig.json", () =>
 {
     loadjs(result, () =>
     {

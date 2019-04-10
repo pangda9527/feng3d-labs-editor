@@ -2181,6 +2181,41 @@ var editor;
     editor.Drag = Drag;
     ;
     editor.drag = new Drag();
+    var DragData = /** @class */ (function () {
+        function DragData() {
+            this.datas = [];
+        }
+        /**
+         * 添加拖拽数据
+         *
+         * @param datatype
+         * @param value
+         */
+        DragData.prototype.addDragData = function (datatype, value) {
+            var item = { datatype: datatype, value: value };
+            this.datas.push(item);
+        };
+        /**
+         * 获取拖拽数据列表
+         *
+         * @param datatype
+         */
+        DragData.prototype.getDragData = function (datatype) {
+            var data = this.datas.filter(function (v) { return v.datatype == datatype; }).map(function (v) { return v.value; });
+            return data;
+        };
+        /**
+         * 是否拥有指定类型数据
+         *
+         * @param datatype
+         */
+        DragData.prototype.hasDragData = function (datatype) {
+            var data = this.datas.filter(function (v) { return v.datatype == datatype; }).map(function (v) { return v.value; });
+            return data.length > 0;
+        };
+        return DragData;
+    }());
+    editor.DragData = DragData;
     var stage;
     var registers = [];
     /**
@@ -2213,7 +2248,7 @@ var editor;
      * @param dragSource
      */
     function acceptData(item, dragSource) {
-        var hasdata = item.accepttypes.reduce(function (prevalue, accepttype) { return prevalue || !!dragSource[accepttype]; }, false);
+        var hasdata = item.accepttypes.reduce(function (prevalue, accepttype) { return prevalue || dragSource.hasDragData(accepttype); }, false);
         return hasdata;
     }
     function onItemMouseDown(event) {
@@ -2237,9 +2272,11 @@ var editor;
         stage.removeEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
         acceptableitems = null;
         if (accepter) {
-            accepter.alpha = accepterAlpha;
             var accepteritem = getitem(accepter);
-            accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
+            if (accepter != dragitem.displayObject) {
+                accepter.alpha = accepterAlpha;
+                accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
+            }
         }
         accepter = null;
         dragitem = null;
@@ -2249,11 +2286,11 @@ var editor;
     function onMouseMove(event) {
         if (!acceptableitems) {
             //获取拖拽数据
-            dragSource = {};
+            dragSource = new DragData();
             dragitem.setdargSource(dragSource);
             //获取可接受数据的对象列表
             acceptableitems = registers.reduce(function (value, item) {
-                if (item != dragitem && acceptData(item, dragSource) && item.displayObject.stage) {
+                if (acceptData(item, dragSource) && item.displayObject.stage) {
                     item["hierarchyValue"] = getHierarchyValue(item.displayObject);
                     value.push(item);
                 }
@@ -2272,7 +2309,9 @@ var editor;
             acceptableitems.reverse();
         }
         if (accepter) {
-            accepter.alpha = accepterAlpha;
+            if (dragitem.displayObject != accepter) {
+                accepter.alpha = accepterAlpha;
+            }
             accepter = null;
         }
         //
@@ -2281,12 +2320,19 @@ var editor;
             var rect = element.displayObject.getGlobalBounds();
             if (rect.contains(event.stageX, event.stageY)) {
                 accepter = element.displayObject;
-                accepterAlpha = element.displayObject.alpha;
-                element.displayObject.alpha = 0.5;
+                if (dragitem.displayObject != accepter) {
+                    accepterAlpha = element.displayObject.alpha;
+                    element.displayObject.alpha = 0.5;
+                }
                 break;
             }
         }
     }
+    /**
+     * 获取显示对象的层级
+     *
+     * @param displayObject
+     */
     function getHierarchyValue(displayObject) {
         var hierarchys = [];
         if (displayObject.parent) {
@@ -2535,8 +2581,7 @@ var editor;
                 groundGrid.editorCamera = editorCamera;
                 var mrsTool = editorScene.gameObject.addComponent(editor.MRSTool);
                 mrsTool.editorCamera = editorCamera;
-                editor.editorComponent = editorScene.gameObject.addComponent(editor.EditorComponent);
-                editor.editorComponent.editorCamera = editorCamera;
+                this.engine.editorComponent = editorScene.gameObject.addComponent(editor.EditorComponent);
                 //
                 feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), function (content) {
                     var trident = feng3d.serialization.deserialize(JSON.parse(content));
@@ -2546,33 +2591,39 @@ var editor;
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+            feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
             //
             feng3d.shortcut.on("areaSelectStart", this._onAreaSelectStart, this);
             feng3d.shortcut.on("areaSelect", this._onAreaSelect, this);
             feng3d.shortcut.on("areaSelectEnd", this._onAreaSelectEnd, this);
-            feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
+            //
             feng3d.shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
             feng3d.shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
+            feng3d.shortcut.on("mouseRotateSceneEnd", this.onMouseRotateSceneEnd, this);
             //
             feng3d.shortcut.on("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
             feng3d.shortcut.on("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
+            feng3d.shortcut.on("sceneCameraForwardBackMouseMoveEnd", this.onSceneCameraForwardBackMouseMoveEnd, this);
             //
             feng3d.shortcut.on("lookToSelectedGameObject", this.onLookToSelectedGameObject, this);
+            //
             feng3d.shortcut.on("dragSceneStart", this.onDragSceneStart, this);
             feng3d.shortcut.on("dragScene", this.onDragScene, this);
+            feng3d.shortcut.on("dragSceneEnd", this.onDragSceneEnd, this);
+            //
             feng3d.shortcut.on("fpsViewStart", this.onFpsViewStart, this);
             feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
-                if (dragdata.file_gameobject) {
-                    editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, editor.hierarchy.rootnode.gameobject);
-                }
-                if (dragdata.file_script) {
+                dragdata.getDragData("file_gameobject").forEach(function (v) {
+                    editor.hierarchy.addGameoObjectFromAsset(v, editor.hierarchy.rootnode.gameobject);
+                });
+                dragdata.getDragData("file_script").forEach(function (v) {
                     var gameobject = _this.engine.mouse3DManager.selectedGameObject;
                     if (!gameobject || !gameobject.scene)
                         gameobject = editor.hierarchy.rootnode.gameobject;
-                    gameobject.addScript(dragdata.file_script.scriptName);
-                }
+                    gameobject.addScript(v.scriptName);
+                });
             });
             this.once(egret.Event.ENTER_FRAME, this.onResize, this);
         };
@@ -2581,15 +2632,19 @@ var editor;
             this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             //
+            feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
+            //
             feng3d.shortcut.off("areaSelectStart", this._onAreaSelectStart, this);
             feng3d.shortcut.off("areaSelect", this._onAreaSelect, this);
             feng3d.shortcut.off("areaSelectEnd", this._onAreaSelectEnd, this);
-            feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
+            //
             feng3d.shortcut.off("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
             feng3d.shortcut.off("mouseRotateScene", this.onMouseRotateScene, this);
+            feng3d.shortcut.off("mouseRotateSceneEnd", this.onMouseRotateSceneEnd, this);
             //
             feng3d.shortcut.off("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
             feng3d.shortcut.off("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
+            feng3d.shortcut.off("sceneCameraForwardBackMouseMoveEnd", this.onSceneCameraForwardBackMouseMoveEnd, this);
             //
             feng3d.shortcut.off("lookToSelectedGameObject", this.onLookToSelectedGameObject, this);
             feng3d.shortcut.off("dragSceneStart", this.onDragSceneStart, this);
@@ -2604,9 +2659,13 @@ var editor;
             }
         };
         SceneView.prototype._onAreaSelectStart = function () {
+            if (!this.mouseInView)
+                return;
             this._areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
         };
         SceneView.prototype._onAreaSelect = function () {
+            if (!this._areaSelectStartPosition)
+                return;
             var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var rectangle = this.getGlobalBounds();
             //
@@ -2621,6 +2680,7 @@ var editor;
             editor.editorData.selectMultiObject(gs0);
         };
         SceneView.prototype._onAreaSelectEnd = function () {
+            this._areaSelectStartPosition = null;
             this._areaSelectRect.hide();
         };
         SceneView.prototype._onMouseOver = function () {
@@ -2707,7 +2767,7 @@ var editor;
             }
         };
         SceneView.prototype.onMouseRotateScene = function () {
-            if (!this.mouseInView)
+            if (!this.rotateSceneMousePoint)
                 return;
             var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
             var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -2719,13 +2779,16 @@ var editor;
             globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
             this.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
         };
+        SceneView.prototype.onMouseRotateSceneEnd = function () {
+            this.rotateSceneMousePoint = null;
+        };
         SceneView.prototype.onSceneCameraForwardBackMouseMoveStart = function () {
             if (!this.mouseInView)
                 return;
             this.preMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
         };
         SceneView.prototype.onSceneCameraForwardBackMouseMove = function () {
-            if (!this.mouseInView)
+            if (!this.preMousePoint)
                 return;
             var currentMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var moveDistance = (currentMousePoint.x + currentMousePoint.y - this.preMousePoint.x - this.preMousePoint.y) * editor.sceneControlConfig.sceneCameraForwardBackwardStep;
@@ -2737,6 +2800,9 @@ var editor;
             this.editorCamera.transform.position = newCameraPosition;
             this.preMousePoint = currentMousePoint;
         };
+        SceneView.prototype.onSceneCameraForwardBackMouseMoveEnd = function () {
+            this.preMousePoint = null;
+        };
         SceneView.prototype.onDragSceneStart = function () {
             if (!this.mouseInView)
                 return;
@@ -2744,11 +2810,11 @@ var editor;
             this.dragSceneCameraGlobalMatrix3D = this.editorCamera.transform.localToWorldMatrix.clone();
         };
         SceneView.prototype.onDragScene = function () {
-            if (!this.mouseInView)
+            if (!this.dragSceneMousePoint)
                 return;
             var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
-            var scale = this.editorCamera.getScaleByDepth(editor.sceneControlConfig.lookDistance);
+            var scale = this.engine.getScaleByDepth(editor.sceneControlConfig.lookDistance);
             var up = this.dragSceneCameraGlobalMatrix3D.up;
             var right = this.dragSceneCameraGlobalMatrix3D.right;
             up.scaleNumber(addPoint.y * scale);
@@ -2756,6 +2822,10 @@ var editor;
             var globalMatrix3D = this.dragSceneCameraGlobalMatrix3D.clone();
             globalMatrix3D.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
             this.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
+        };
+        SceneView.prototype.onDragSceneEnd = function () {
+            this.dragSceneMousePoint = null;
+            this.dragSceneCameraGlobalMatrix3D = null;
         };
         SceneView.prototype.onFpsViewStart = function () {
             if (!this.mouseInView)
@@ -3393,38 +3463,42 @@ var editor;
         TabView.prototype._onAddedToStage = function () {
             var _this = this;
             editor.drag.register(this.tabGroup, null, ["moduleView"], function (dragSource) {
-                if (dragSource.moduleView.tabView == _this) {
-                    var result = _this._moduleViews.filter(function (v) { return v.moduleName == dragSource.moduleView.moduleName; })[0];
-                    if (result) {
-                        var index = _this._moduleViews.indexOf(result);
-                        _this._moduleViews.splice(index, 1);
-                        _this._moduleViews.push(result);
-                        _this._invalidateView();
+                dragSource.getDragData("moduleView").forEach(function (v) {
+                    if (v.tabView == _this) {
+                        var result = _this._moduleViews.filter(function (v) { return v.moduleName == v.moduleName; })[0];
+                        if (result) {
+                            var index = _this._moduleViews.indexOf(result);
+                            _this._moduleViews.splice(index, 1);
+                            _this._moduleViews.push(result);
+                            _this._invalidateView();
+                        }
                     }
-                }
-                else {
-                    var moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
-                    _this.addModule(moduleView);
-                }
-                feng3d.dispatcher.dispatch("viewLayout.changed");
+                    else {
+                        var moduleView = v.tabView.removeModule(v.moduleName);
+                        _this.addModule(moduleView);
+                    }
+                    feng3d.dispatcher.dispatch("viewLayout.changed");
+                });
             });
             editor.drag.register(this.contentGroup, null, ["moduleView"], function (dragSource) {
-                if (dragSource.moduleView.tabView == _this && _this._moduleViews.length == 1)
-                    return;
-                var moduleView = dragSource.moduleView.tabView.removeModule(dragSource.moduleView.moduleName);
-                var rect = _this.getGlobalBounds();
-                var center = rect.center;
-                var mouse = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
-                var sub = mouse.sub(center);
-                sub.x = sub.x / rect.width;
-                sub.y = sub.y / rect.height;
-                if (sub.x * sub.x > sub.y * sub.y) {
-                    _this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
-                }
-                else {
-                    _this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
-                }
-                feng3d.dispatcher.dispatch("viewLayout.changed");
+                dragSource.getDragData("moduleView").forEach(function (v) {
+                    if (v.tabView == _this && _this._moduleViews.length == 1)
+                        return;
+                    var moduleView = v.tabView.removeModule(v.moduleName);
+                    var rect = _this.getGlobalBounds();
+                    var center = rect.center;
+                    var mouse = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
+                    var sub = mouse.sub(center);
+                    sub.x = sub.x / rect.width;
+                    sub.y = sub.y / rect.height;
+                    if (sub.x * sub.x > sub.y * sub.y) {
+                        _this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
+                    }
+                    else {
+                        _this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
+                    }
+                    feng3d.dispatcher.dispatch("viewLayout.changed");
+                });
             });
             this._invalidateView();
         };
@@ -3490,7 +3564,7 @@ var editor;
         TabView.prototype.removeModule = function (moduleName) {
             var moduleView = this._moduleViews.filter(function (v) { return v.moduleName == moduleName; })[0];
             var index = this._moduleViews.indexOf(moduleView);
-            feng3d.assert(index != -1);
+            feng3d.debuger && feng3d.assert(index != -1);
             this._moduleViews.splice(index, 1);
             this.adjust(this);
             this._invalidateView();
@@ -3527,7 +3601,7 @@ var editor;
                     this.adjust(parent);
                 }
                 else {
-                    feng3d.assert(false);
+                    feng3d.debuger && feng3d.assert(false);
                 }
             }
             // 找到对象所属窗口，删除空窗口
@@ -3610,7 +3684,7 @@ var editor;
                 v.addEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
                 //
                 editor.drag.register(v, function (dragSource) {
-                    dragSource.moduleView = { tabView: _this, moduleName: v.moduleName };
+                    dragSource.addDragData("moduleView", { tabView: _this, moduleName: v.moduleName });
                 }, []);
                 v.addEventListener(egret.MouseEvent.RIGHT_CLICK, _this.onTabButtonRightClick, _this);
             });
@@ -4266,7 +4340,7 @@ var editor;
         };
         TreeNode.prototype.addChild = function (node) {
             node.remove();
-            feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
+            feng3d.debuger && feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
             if (this.children.indexOf(node) == -1)
                 this.children.push(node);
             node.parent = this;
@@ -4300,9 +4374,15 @@ var editor;
         TreeNode.prototype.openChanged = function () {
             this.dispatch("openChanged", null, true);
         };
+        TreeNode.prototype.selectedChanged = function () {
+            this.openParents();
+        };
         __decorate([
             feng3d.watch("openChanged")
         ], TreeNode.prototype, "isOpen", void 0);
+        __decorate([
+            feng3d.watch("selectedChanged")
+        ], TreeNode.prototype, "selected", void 0);
         return TreeNode;
     }(feng3d.EventDispatcher));
     editor.TreeNode = TreeNode;
@@ -4671,8 +4751,9 @@ var editor;
             var menuItem = this.handleShow({ submenu: menuItems });
             if (menuItem.submenu.length == 0)
                 return;
-            var menuUI = MenuUI.create(menuItem.submenu);
+            var menuUI = MenuUI.create(menuItem.submenu, null);
             editor.maskview.mask(menuUI);
+            return menuUI;
         };
         /**
          * 处理菜单中 show==false的菜单项
@@ -5439,7 +5520,7 @@ var editor;
                 return;
             var menus = [{
                     label: "Copy", click: function () {
-                        copyCurve = Object.deepClone(_this.minMaxCurve);
+                        copyCurve = feng3d.serialization.clone(_this.minMaxCurve);
                     }
                 }];
             if (copyCurve && this.minMaxCurve.mode == copyCurve.mode && copyCurve.between0And1 == this.minMaxCurve.between0And1) {
@@ -6148,13 +6229,13 @@ var editor;
                             if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                                 copyColor = _this.minMaxGradient.color.clone();
                             else
-                                copyGradient = Object.deepClone(_this.minMaxGradient.gradient);
+                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradient);
                         }
                         else if (target == _this.colorGroup1) {
                             if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
                                 copyColor = _this.minMaxGradient.color1.clone();
                             else
-                                copyGradient = Object.deepClone(_this.minMaxGradient.gradient1);
+                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradient1);
                         }
                     }
                 }];
@@ -6550,7 +6631,7 @@ var editor;
             Object.assign(this, v);
             //
             this.initView();
-            this.updateView();
+            this.invalidateView();
             //
             return this;
         };
@@ -6578,7 +6659,7 @@ var editor;
             objectViewEvent.attributeValue = this.space[this.attribute];
             this.textInput.dispatchEvent(objectViewEvent);
             this.dispatch("valueChanged");
-            this.updateView();
+            this.invalidateView();
         };
         TextInputBinder.prototype.updateView = function () {
             if (!this._textfocusintxt) {
@@ -6593,7 +6674,10 @@ var editor;
         };
         TextInputBinder.prototype.ontxtfocusout = function () {
             this._textfocusintxt = false;
-            this.updateView();
+            this.invalidateView();
+        };
+        TextInputBinder.prototype.invalidateView = function () {
+            feng3d.ticker.nextframe(this.updateView, this);
         };
         return TextInputBinder;
     }(feng3d.EventDispatcher));
@@ -6698,6 +6782,7 @@ var editor;
             else if (event.key == "ArrowDown") {
                 this.space[this.attribute] -= this.step;
             }
+            this.invalidateView();
         };
         return NumberTextInputBinder;
     }(editor.TextInputBinder));
@@ -6999,73 +7084,22 @@ var editor;
             this._space.on("transformChanged", this.updateView, this);
             //
             this.updateView();
-            [this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach(function (item) {
-                _this.addItemEventListener(item);
+            ["x", "y", "z", "sx", "sy", "sz"].forEach(function (v) {
+                _this.addBinder(new editor.NumberTextInputBinder().init({
+                    space: _this.space, attribute: v, textInput: _this[v + "TextInput"], editable: true,
+                    controller: _this[v + "Label"],
+                }));
+            });
+            ["rx", "ry", "rz"].forEach(function (v) {
+                _this.addBinder(new editor.NumberTextInputBinder().init({
+                    space: _this.space, attribute: v, textInput: _this[v + "TextInput"], editable: true,
+                    controller: _this[v + "Label"], step: 0.1,
+                }));
             });
         };
         OVTransform.prototype.onRemovedFromStage = function () {
-            var _this = this;
             this._space.off("transformChanged", this.updateView, this);
             //
-            [this.xTextInput, this.yTextInput, this.zTextInput, this.rxTextInput, this.ryTextInput, this.rzTextInput, this.sxTextInput, this.syTextInput, this.szTextInput,].forEach(function (item) {
-                _this.removeItemEventListener(item);
-            });
-        };
-        OVTransform.prototype.addItemEventListener = function (input) {
-            input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-        };
-        OVTransform.prototype.removeItemEventListener = function (input) {
-            input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-        };
-        OVTransform.prototype.ontxtfocusin = function () {
-            this._textfocusintxt = true;
-        };
-        OVTransform.prototype.ontxtfocusout = function () {
-            this._textfocusintxt = false;
-            this.updateView();
-        };
-        OVTransform.prototype.onTextChange = function (event) {
-            if (!this._textfocusintxt)
-                return;
-            var transfrom = this.space;
-            var value = 0;
-            if (event.currentTarget.text != undefined) {
-                value = Number(event.currentTarget.text);
-                value = isNaN(value) ? 0 : value;
-            }
-            switch (event.currentTarget) {
-                case this.xTextInput:
-                    transfrom.x = value;
-                    break;
-                case this.yTextInput:
-                    transfrom.y = value;
-                    break;
-                case this.zTextInput:
-                    transfrom.z = value;
-                    break;
-                case this.rxTextInput:
-                    transfrom.rx = value;
-                    break;
-                case this.ryTextInput:
-                    transfrom.ry = value;
-                    break;
-                case this.rzTextInput:
-                    transfrom.rz = value;
-                    break;
-                case this.sxTextInput:
-                    transfrom.sx = value ? value : 1;
-                    break;
-                case this.syTextInput:
-                    transfrom.sy = value ? value : 1;
-                    break;
-                case this.szTextInput:
-                    transfrom.sz = value ? value : 1;
-                    break;
-            }
         };
         Object.defineProperty(OVTransform.prototype, "space", {
             get: function () {
@@ -7092,20 +7126,9 @@ var editor;
          * 更新界面
          */
         OVTransform.prototype.updateView = function () {
-            if (this._textfocusintxt)
-                return;
             var transfrom = this.space;
             if (!transfrom)
                 return;
-            this.xTextInput.text = "" + transfrom.x;
-            this.yTextInput.text = "" + transfrom.y;
-            this.zTextInput.text = "" + transfrom.z;
-            this.rxTextInput.text = "" + transfrom.rx;
-            this.ryTextInput.text = "" + transfrom.ry;
-            this.rzTextInput.text = "" + transfrom.rz;
-            this.sxTextInput.text = "" + transfrom.sx;
-            this.syTextInput.text = "" + transfrom.sy;
-            this.szTextInput.text = "" + transfrom.sz;
         };
         OVTransform = __decorate([
             feng3d.OVComponent()
@@ -7139,7 +7162,7 @@ var editor;
         };
         OBVDefault.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
-            this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+            this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
             this.dispose();
         };
         OBVDefault.prototype.initView = function () {
@@ -7784,19 +7807,16 @@ var editor;
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
         };
         OAVCubeMap.prototype.updateImage = function (i) {
-            var textureCube = this.space;
-            var imagePath = textureCube[propertys[i]];
             var image = this.images[i];
-            if (imagePath) {
-                editor.editorRS.fs.readArrayBuffer(imagePath, function (err, data) {
-                    feng3d.dataTransform.arrayBufferToDataURL(data, function (dataurl) {
-                        image.source = dataurl;
-                    });
-                });
-            }
-            else {
-                image.source = null;
-            }
+            var textureCube = this.space;
+            textureCube.getTextureImage(feng3d.TextureCube.ImageNames[i], function (img) {
+                if (img) {
+                    image.source = feng3d.dataTransform.imageToDataURL(img);
+                }
+                else {
+                    image.source = null;
+                }
+            });
         };
         OAVCubeMap.prototype.onImageClick = function (e) {
             var _this = this;
@@ -7806,7 +7826,7 @@ var editor;
                 var texture2ds = feng3d.rs.getAssetDatasByType(feng3d.Texture2D);
                 var menus = [{
                         label: "None", click: function () {
-                            textureCube[propertys[index]] = "";
+                            textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], null);
                             _this.updateImage(index);
                             _this.dispatchValueChange(index);
                         }
@@ -7814,7 +7834,7 @@ var editor;
                 texture2ds.forEach(function (d) {
                     menus.push({
                         label: d.name, click: function () {
-                            textureCube[propertys[index]] = d;
+                            textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], d);
                             _this.updateImage(index);
                             _this.dispatchValueChange(index);
                         }
@@ -7828,6 +7848,8 @@ var editor;
             objectViewEvent.space = this._space;
             objectViewEvent.attributeName = propertys[index];
             this.dispatchEvent(objectViewEvent);
+            //
+            feng3d.objectevent.dispatch(this._space, "propertyValueChanged");
         };
         OAVCubeMap.prototype.dispose = function () {
         };
@@ -7921,9 +7943,9 @@ var editor;
             this.space.on("addComponent", this.onAddCompont, this);
             this.space.on("removeComponent", this.onRemoveComponent, this);
             editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
-                if (dragdata.file_script) {
-                    _this.space.addScript(dragdata.file_script.scriptName);
-                }
+                dragdata.getDragData("file_script").forEach(function (v) {
+                    _this.space.addScript(v.scriptName);
+                });
             });
             this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
         };
@@ -8283,9 +8305,9 @@ var editor;
                 var param = this._attributeViewInfo.componentParam;
                 editor.drag.register(this, function (dragsource) {
                     if (param.datatype)
-                        dragsource[param.datatype] = _this.attributeValue;
+                        dragsource.addDragData(param.datatype, _this.attributeValue);
                 }, [param.accepttype], function (dragSource) {
-                    _this.attributeValue = dragSource[param.accepttype];
+                    _this.attributeValue = dragSource.getDragData(param.accepttype)[0];
                 });
             }
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
@@ -8329,7 +8351,7 @@ var editor;
                     var audioFiles = editor.editorRS.getAssetsByType(feng3d.AudioAsset);
                     audioFiles.forEach(function (item) {
                         menus.push({
-                            label: item.name, click: function () {
+                            label: item.fileName, click: function () {
                                 _this.attributeValue = item.assetPath;
                             }
                         });
@@ -8768,7 +8790,7 @@ var editor;
                         if (!this._viewData.isLoaded) {
                             var viewData = this._viewData;
                             viewData.load(function () {
-                                feng3d.assert(!!viewData.asset);
+                                feng3d.debuger && feng3d.assert(!!viewData.asset);
                                 if (viewData == _this._viewData)
                                     _this.updateShowData(viewData.asset);
                             });
@@ -8792,7 +8814,7 @@ var editor;
                     var feng3dAsset = feng3d.rs.getAsset(this._viewData.assetId);
                     if (feng3dAsset) {
                         editor.editorRS.writeAsset(feng3dAsset, function (err) {
-                            feng3d.assert(!err, "\u8D44\u6E90 " + feng3dAsset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                            feng3d.debuger && feng3d.assert(!err, "\u8D44\u6E90 " + feng3dAsset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                             callback && callback();
                         });
                     }
@@ -8920,20 +8942,10 @@ var editor;
         HierarchyTreeItemRenderer.prototype.$onAddToStage = function (stage, nestLevel) {
             var _this = this;
             _super.prototype.$onAddToStage.call(this, stage, nestLevel);
-            editor.drag.register(this, this.setdargSource.bind(this), ["gameobject", "file_gameobject", "file_script"], function (dragdata) {
-                if (dragdata.gameobject) {
-                    if (!dragdata.gameobject.contains(_this.data.gameobject)) {
-                        var localToWorldMatrix = dragdata.gameobject.transform.localToWorldMatrix;
-                        _this.data.gameobject.addChild(dragdata.gameobject);
-                        dragdata.gameobject.transform.localToWorldMatrix = localToWorldMatrix;
-                    }
-                }
-                if (dragdata.file_gameobject) {
-                    editor.hierarchy.addGameoObjectFromAsset(dragdata.file_gameobject, _this.data.gameobject);
-                }
-                if (dragdata.file_script) {
-                    _this.data.gameobject.addScript(dragdata.file_script.scriptName);
-                }
+            editor.drag.register(this, function (dragSource) {
+                _this.data.setdargSource(dragSource);
+            }, ["gameobject", "file_gameobject", "file_script"], function (dragdata) {
+                _this.data.acceptDragDrop(dragdata);
             });
             editor.MouseOnDisableScroll.register(this);
             //
@@ -8948,9 +8960,6 @@ var editor;
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-        };
-        HierarchyTreeItemRenderer.prototype.setdargSource = function (dragSource) {
-            dragSource.gameobject = this.data.gameobject;
         };
         HierarchyTreeItemRenderer.prototype.onclick = function () {
             editor.editorData.selectObject(this.data.gameobject);
@@ -8999,6 +9008,9 @@ var editor;
             }
         };
         HierarchyView.prototype.onAddedToStage = function () {
+            editor.drag.register(this.list, null, ["gameobject", "file_gameobject", "file_script"], function (dragdata) {
+                editor.hierarchy.rootnode.acceptDragDrop(dragdata);
+            });
             this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
             this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
             feng3d.watcher.watch(editor.hierarchy, "rootnode", this.onRootNodeChanged, this);
@@ -9006,6 +9018,7 @@ var editor;
             this.invalidHierarchy();
         };
         HierarchyView.prototype.onRemovedFromStage = function () {
+            editor.drag.unregister(this.list);
             this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
             this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
             feng3d.watcher.unwatch(editor.hierarchy, "rootnode", this.onRootNodeChanged, this);
@@ -9137,19 +9150,23 @@ var editor;
          */
         EditorAsset.prototype.saveAsset = function (assetNode, callback) {
             editor.editorRS.writeAsset(assetNode.asset, function (err) {
-                feng3d.assert(!err, "\u8D44\u6E90 " + assetNode.asset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                feng3d.debuger && feng3d.assert(!err, "\u8D44\u6E90 " + assetNode.asset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
             });
         };
         /**
          * 新增资源
          *
-         * @param feng3dAssets
+         * @param cls 资源类定义
+         * @param fileName 文件名称
+         * @param value 初始数据
+         * @param folderNode 所在文件夹，如果值为null时默认添加到根文件夹中
+         * @param callback 完成回调函数
          */
-        EditorAsset.prototype.createAsset = function (folderNode, cls, value, callback) {
+        EditorAsset.prototype.createAsset = function (folderNode, cls, fileName, value, callback) {
             var _this = this;
             var folder = folderNode.asset;
-            editor.editorRS.createAsset(cls, value, folder, function (err, asset) {
+            editor.editorRS.createAsset(cls, fileName, value, folder, function (err, asset) {
                 if (asset) {
                     var assetNode = new editor.AssetNode(asset);
                     assetNode.isLoaded = true;
@@ -9176,13 +9193,13 @@ var editor;
                     submenu: [
                         {
                             label: "文件夹", click: function () {
-                                _this.createAsset(assetNode, feng3d.FolderAsset, { name: "NewFolder" });
+                                _this.createAsset(assetNode, feng3d.FolderAsset, "NewFolder");
                             }
                         },
                         {
                             label: "脚本", click: function () {
                                 var fileName = editor.editorRS.getValidChildName(folder, "NewScript");
-                                _this.createAsset(assetNode, feng3d.ScriptAsset, { name: fileName, textContent: editor.assetFileTemplates.getNewScript(fileName) }, function () {
+                                _this.createAsset(assetNode, feng3d.ScriptAsset, fileName, { textContent: editor.assetFileTemplates.getNewScript(fileName) }, function () {
                                     feng3d.dispatcher.dispatch("script.compile");
                                 });
                             }
@@ -9190,35 +9207,35 @@ var editor;
                         {
                             label: "着色器", click: function () {
                                 var fileName = editor.editorRS.getValidChildName(folder, "NewShader");
-                                _this.createAsset(assetNode, feng3d.ShaderAsset, { name: fileName, textContent: editor.assetFileTemplates.getNewShader(fileName) }, function () {
+                                _this.createAsset(assetNode, feng3d.ShaderAsset, fileName, { textContent: editor.assetFileTemplates.getNewShader(fileName) }, function () {
                                     feng3d.dispatcher.dispatch("script.compile");
                                 });
                             }
                         },
                         {
                             label: "js", click: function () {
-                                _this.createAsset(assetNode, feng3d.JSAsset, { name: "NewJs" });
+                                _this.createAsset(assetNode, feng3d.JSAsset, "NewJs");
                             }
                         },
                         {
                             label: "Json", click: function () {
-                                _this.createAsset(assetNode, feng3d.JsonAsset, { name: "New Json" });
+                                _this.createAsset(assetNode, feng3d.JsonAsset, "New Json");
                             }
                         },
                         {
                             label: "文本", click: function () {
-                                _this.createAsset(assetNode, feng3d.TextAsset, { name: "New Text" });
+                                _this.createAsset(assetNode, feng3d.TextAsset, "New Text");
                             }
                         },
                         { type: "separator" },
                         {
                             label: "立方体贴图", click: function () {
-                                _this.createAsset(assetNode, feng3d.TextureCubeAsset, { name: "new TextureCube", data: new feng3d.TextureCube() });
+                                _this.createAsset(assetNode, feng3d.TextureCubeAsset, "new TextureCube", { data: new feng3d.TextureCube() });
                             }
                         },
                         {
                             label: "材质", click: function () {
-                                _this.createAsset(assetNode, feng3d.MaterialAsset, { name: "New Material", data: new feng3d.Material() });
+                                _this.createAsset(assetNode, feng3d.MaterialAsset, "New Material", { data: new feng3d.Material() });
                             }
                         },
                         {
@@ -9226,42 +9243,42 @@ var editor;
                             submenu: [
                                 {
                                     label: "平面", click: function () {
-                                        _this.createAsset(assetNode, feng3d.GeometryAsset, { name: "New PlaneGeometry", data: new feng3d.PlaneGeometry() });
+                                        _this.createAsset(assetNode, feng3d.GeometryAsset, "New PlaneGeometry", { data: new feng3d.PlaneGeometry() });
                                     }
                                 },
                                 {
                                     label: "立方体", click: function () {
-                                        _this.createAsset(assetNode, feng3d.GeometryAsset, { name: "New CubeGeometry", data: new feng3d.CubeGeometry() });
+                                        _this.createAsset(assetNode, feng3d.GeometryAsset, "New CubeGeometry", { data: new feng3d.CubeGeometry() });
                                     }
                                 },
                                 {
                                     label: "球体", click: function () {
-                                        _this.createAsset(assetNode, feng3d.GeometryAsset, { name: "New SphereGeometry", data: new feng3d.SphereGeometry() });
+                                        _this.createAsset(assetNode, feng3d.GeometryAsset, "New SphereGeometry", { data: new feng3d.SphereGeometry() });
                                     }
                                 },
                                 {
                                     label: "胶囊体", click: function () {
-                                        _this.createAsset(assetNode, feng3d.GeometryAsset, { name: "New CapsuleGeometry", data: new feng3d.CapsuleGeometry() });
+                                        _this.createAsset(assetNode, feng3d.GeometryAsset, "New CapsuleGeometry", { data: new feng3d.CapsuleGeometry() });
                                     }
                                 },
                                 {
                                     label: "圆柱体", click: function () {
-                                        _this.createAsset(assetNode, feng3d.GeometryAsset, { name: "New CylinderGeometry", data: new feng3d.CylinderGeometry() });
+                                        _this.createAsset(assetNode, feng3d.GeometryAsset, "New CylinderGeometry", { data: new feng3d.CylinderGeometry() });
                                     }
                                 },
                                 {
                                     label: "圆锥体", click: function () {
-                                        _this.createAsset(assetNode, feng3d.GeometryAsset, { name: "New ConeGeometry", data: new feng3d.ConeGeometry() });
+                                        _this.createAsset(assetNode, feng3d.GeometryAsset, "New ConeGeometry", { data: new feng3d.ConeGeometry() });
                                     }
                                 },
                                 {
                                     label: "圆环", click: function () {
-                                        _this.createAsset(assetNode, feng3d.GeometryAsset, { name: "New TorusGeometry", data: new feng3d.TorusGeometry() });
+                                        _this.createAsset(assetNode, feng3d.GeometryAsset, "New TorusGeometry", { data: new feng3d.TorusGeometry() });
                                     }
                                 },
                                 {
                                     label: "地形", click: function () {
-                                        _this.createAsset(assetNode, feng3d.GeometryAsset, { name: "New TerrainGeometry", data: new feng3d.TerrainGeometry() });
+                                        _this.createAsset(assetNode, feng3d.GeometryAsset, "New TerrainGeometry", { data: new feng3d.TerrainGeometry() });
                                     }
                                 },
                             ],
@@ -9384,17 +9401,13 @@ var editor;
                     _this.inputFiles(files, callback, assetNodes);
                 };
                 var fileName = file.name;
-                var lastIndex = fileName.lastIndexOf(".");
-                if (lastIndex != -1) {
-                    fileName = fileName.substring(0, lastIndex);
-                }
                 if (feng3d.regExps.image.test(file.name)) {
                     feng3d.dataTransform.arrayBufferToImage(result, function (img) {
-                        _this.createAsset(showFloder, feng3d.TextureAsset, { name: fileName, image: img }, createAssetCallback);
+                        _this.createAsset(showFloder, feng3d.TextureAsset, fileName, { image: img }, createAssetCallback);
                     });
                 }
                 else {
-                    _this.createAsset(showFloder, feng3d.ArrayBufferAsset, { name: fileName, arraybuffer: result }, createAssetCallback);
+                    _this.createAsset(showFloder, feng3d.ArrayBufferAsset, fileName, { arraybuffer: result }, createAssetCallback);
                 }
             }, false);
             reader.readAsArrayBuffer(file);
@@ -9501,30 +9514,16 @@ var editor;
                 if (this.data.isDirectory) {
                     var folder = this.data.asset;
                     editor.drag.register(this, function (dragsource) {
-                        if (editor.editorData.selectedAssetNodes.indexOf(_this.data) != -1) {
-                            dragsource.assetNodes = editor.editorData.selectedAssetNodes.concat();
-                        }
-                        else {
-                            dragsource.assetNodes = [_this.data];
-                        }
+                        _this.data.setdargSource(dragsource);
                     }, ["assetNodes"], function (dragdata) {
-                        dragdata.assetNodes.forEach(function (v) {
-                            editor.editorRS.moveAsset(v.asset, folder, function (err) {
-                                if (!err) {
-                                    _this.data.addChild(v);
-                                }
-                                else {
-                                    alert(err.message);
-                                }
-                            });
-                        });
+                        _this.data.acceptDragDrop(dragdata);
                     });
                 }
                 else {
                     if (!this.data.isLoaded) {
                         var data = this.data;
                         data.load(function () {
-                            feng3d.assert(data.isLoaded);
+                            feng3d.debuger && feng3d.assert(data.isLoaded);
                             if (data == _this.data)
                                 _this.dataChanged();
                         });
@@ -9534,36 +9533,31 @@ var editor;
                         var extension = _this.data.asset.assetType;
                         switch (extension) {
                             case feng3d.AssetType.gameobject:
-                                dragsource.file_gameobject = feng3d.serialization.clone(_this.data.asset.data);
+                                dragsource.addDragData("file_gameobject", feng3d.serialization.clone(_this.data.asset.data));
                                 break;
                             case feng3d.AssetType.script:
-                                dragsource.file_script = _this.data.asset.data;
+                                dragsource.addDragData("file_script", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.anim:
-                                dragsource.animationclip = _this.data.asset.data;
+                                dragsource.addDragData("animationclip", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.material:
-                                dragsource.material = _this.data.asset.data;
+                                dragsource.addDragData("material", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.texturecube:
-                                dragsource.texturecube = _this.data.asset.data;
+                                dragsource.addDragData("texturecube", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.geometry:
-                                dragsource.geometry = _this.data.asset.data;
+                                dragsource.addDragData("geometry", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.texture:
-                                dragsource.texture2d = _this.data.asset.data;
+                                dragsource.addDragData("texture2d", _this.data.asset.data);
                                 break;
                             case feng3d.AssetType.audio:
-                                dragsource.audio = _this.data.asset.data;
+                                dragsource.addDragData("audio", _this.data.asset.data);
                                 break;
                         }
-                        if (editor.editorData.selectedAssetNodes.indexOf(_this.data) != -1) {
-                            dragsource.assetNodes = editor.editorData.selectedAssetNodes.concat();
-                        }
-                        else {
-                            dragsource.assetNodes = [_this.data];
-                        }
+                        dragsource.addDragData("assetNodes", _this.data);
                     }, []);
                 }
             }
@@ -9642,7 +9636,7 @@ var editor;
             _this.isLoaded = false;
             _this.asset = asset;
             _this.isDirectory = asset.assetType == feng3d.AssetType.folder;
-            _this.label = asset.name;
+            _this.label = asset.fileName;
             // 更新图标
             if (_this.isDirectory) {
                 _this.image = "folder_png";
@@ -9677,7 +9671,7 @@ var editor;
             }
             this.isLoading = true;
             editor.editorRS.readAsset(this.asset.assetId, function (err, asset) {
-                feng3d.assert(!err);
+                feng3d.debuger && feng3d.assert(!err);
                 _this.isLoading = false;
                 _this.isLoaded = true;
                 callback && callback();
@@ -9772,6 +9766,35 @@ var editor;
             return files;
         };
         /**
+         * 提供拖拽数据
+         *
+         * @param dragSource
+         */
+        AssetNode.prototype.setdargSource = function (dragSource) {
+            dragSource.addDragData("assetNodes", this);
+        };
+        /**
+         * 接受拖拽数据
+         *
+         * @param dragdata
+         */
+        AssetNode.prototype.acceptDragDrop = function (dragdata) {
+            var _this = this;
+            if (!(this.asset instanceof feng3d.FolderAsset))
+                return;
+            var folder = this.asset;
+            dragdata.getDragData("assetNodes").forEach(function (v) {
+                editor.editorRS.moveAsset(v.asset, folder, function (err) {
+                    if (!err) {
+                        _this.addChild(v);
+                    }
+                    else {
+                        feng3d.dispatcher.dispatch("message.error", err.message);
+                    }
+                });
+            });
+        };
+        /**
          * 导出
          */
         AssetNode.prototype.export = function () {
@@ -9835,20 +9858,10 @@ var editor;
             var _this = this;
             _super.prototype.dataChanged.call(this);
             if (this.data) {
-                var folder = this.data.asset;
                 editor.drag.register(this, function (dragsource) {
-                    dragsource.assetNodes = [_this.data];
+                    _this.data.setdargSource(dragsource);
                 }, ["assetNodes"], function (dragdata) {
-                    dragdata.assetNodes.forEach(function (v) {
-                        editor.editorRS.moveAsset(v.asset, folder, function (err) {
-                            if (!err) {
-                                _this.data.addChild(v);
-                            }
-                            else {
-                                feng3d.dispatcher.dispatch("message.error", err.message);
-                            }
-                        });
-                    });
+                    _this.data.acceptDragDrop(dragdata);
                 });
             }
             else {
@@ -9910,32 +9923,34 @@ var editor;
             this.filepathLabel.text = "";
             //
             editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject"], function (dragSource) {
-                if (dragSource.gameobject) {
-                    var gameobject = feng3d.serialization.clone(dragSource.gameobject);
+                dragSource.getDragData("gameobject").forEach(function (v) {
+                    var gameobject = feng3d.serialization.clone(v);
                     editor.editorAsset.saveObject(gameobject);
-                }
+                });
             });
             this.initlist();
             //
             this.fileDrag.addEventListener();
-            this.filelist.addEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
-            this.filelist.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.addEventListener(egret.Event.CHANGE, this.onfilter, this);
+            this.filelist.addEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
+            this.filelist.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.filelist.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            editor.MouseOnDisableScroll.register(this.filelist);
             this.floderpathTxt.touchEnabled = true;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.dispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         };
         ProjectView.prototype.$onRemoveFromStage = function () {
             _super.prototype.$onRemoveFromStage.call(this);
-            this.filelist.removeEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
-            this.filelist.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.includeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
+            this.filelist.removeEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
+            this.filelist.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.filelist.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-            this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
+            editor.MouseOnDisableScroll.register(this.filelist);
             feng3d.watcher.unwatch(editor.editorAsset, "showFloder", this.updateShowFloder, this);
+            this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.dispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
             //
             editor.drag.unregister(this.filelistgroup);
@@ -10024,7 +10039,7 @@ var editor;
             var selectedAssetFile = editor.editorData.selectedAssetNodes;
             if (selectedAssetFile.length > 0)
                 this.filepathLabel.text = selectedAssetFile.map(function (v) {
-                    return v.asset.name + v.asset.extenson;
+                    return v.asset.fileName + v.asset.extenson;
                 }).join(",");
             else
                 this.filepathLabel.text = "";
@@ -10159,7 +10174,6 @@ var editor;
             }
         };
         TopView.prototype.onAddedToStage = function () {
-            this.mainButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.moveButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.rotateButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.scaleButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
@@ -10170,10 +10184,19 @@ var editor;
             this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
             this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             feng3d.dispatcher.on("editor.toolTypeChanged", this.updateview, this);
+            //
+            var menuItems = editor.menuConfig.getMainMenu();
+            var menuItem = editor.menu.handleShow({ submenu: menuItems });
+            menuItems = menuItem.submenu;
+            menuItems = menuItems.filter(function (v) { return v.type != "separator"; });
+            var dataProvider = new eui.ArrayCollection();
+            dataProvider.replaceAll(menuItems);
+            //
+            this.menuList.itemRenderer = TopMenuItemRenderer;
+            this.menuList.dataProvider = dataProvider;
             this.updateview();
         };
         TopView.prototype.onRemovedFromStage = function () {
-            this.mainButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.moveButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.rotateButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.scaleButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
@@ -10193,9 +10216,6 @@ var editor;
         };
         TopView.prototype.onButtonClick = function (event) {
             switch (event.currentTarget) {
-                case this.mainButton:
-                    editor.menu.popup(editor.menuConfig.getMainMenu());
-                    break;
                 case this.moveButton:
                     editor.editorData.toolType = editor.MRSToolType.MOVE;
                     break;
@@ -10240,6 +10260,7 @@ var editor;
             }
         };
         TopView.prototype.updateview = function () {
+            this.labelLab.text = editor.editorcache.projectname;
             this.moveButton.selected = editor.editorData.toolType == editor.MRSToolType.MOVE;
             this.rotateButton.selected = editor.editorData.toolType == editor.MRSToolType.ROTATION;
             this.scaleButton.selected = editor.editorData.toolType == editor.MRSToolType.SCALE;
@@ -10249,6 +10270,85 @@ var editor;
         return TopView;
     }(eui.Component));
     editor.TopView = TopView;
+    var showMenuItem;
+    var items;
+    var TopMenuItemRenderer = /** @class */ (function (_super) {
+        __extends(TopMenuItemRenderer, _super);
+        function TopMenuItemRenderer() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "TopMenuItemRender";
+            return _this;
+        }
+        TopMenuItemRenderer.prototype.dataChanged = function () {
+            _super.prototype.dataChanged.call(this);
+            this.updateView();
+        };
+        TopMenuItemRenderer.prototype.onComplete = function () {
+            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+            if (this.stage) {
+                this.onAddedToStage();
+            }
+        };
+        TopMenuItemRenderer.prototype.onAddedToStage = function () {
+            this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
+            this.updateView();
+        };
+        TopMenuItemRenderer.prototype.onRemovedFromStage = function () {
+            this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
+        };
+        TopMenuItemRenderer.prototype.updateView = function () {
+            if (!this.data)
+                return;
+            this.touchEnabled = true;
+            this.touchChildren = true;
+            this.skin.currentState = "normal";
+            this.selectedRect.visible = false;
+        };
+        TopMenuItemRenderer.prototype.onItemMouseDown = function (event) {
+            if (showMenuItem)
+                return;
+            var list = this.parent;
+            feng3d.debuger && feng3d.assert(list instanceof eui.List);
+            items = list.$children.filter(function (v) { return v instanceof TopMenuItemRenderer; }).map(function (v) { return { item: v, rect: v.getGlobalBounds() }; });
+            showMenu(this);
+            feng3d.windowEventProxy.on("mousemove", onMenuMouseMove);
+        };
+        return TopMenuItemRenderer;
+    }(eui.ItemRenderer));
+    editor.TopMenuItemRenderer = TopMenuItemRenderer;
+    function showMenu(item) {
+        removeMenu();
+        //
+        var rect = item.getTransformedBounds(item.stage);
+        var menuView = editor.menu.popup(item.data.submenu);
+        menuView.x = rect.x;
+        menuView.y = rect.bottom;
+        menuView.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromeStage, null);
+        showMenuItem = { menu: menuView, item: item };
+    }
+    function onMenuMouseMove() {
+        var p = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        var overitem = items.filter(function (v) { return v.rect.contains(p.x, p.y); })[0];
+        if (!overitem)
+            return;
+        if (showMenuItem.item == overitem.item)
+            return;
+        showMenu(overitem.item);
+    }
+    function removeMenu() {
+        if (showMenuItem) {
+            showMenuItem.menu.removeEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromeStage, null);
+            showMenuItem.menu.remove();
+        }
+        ;
+        showMenuItem = null;
+    }
+    function onRemoveFromeStage() {
+        removeMenu();
+        feng3d.windowEventProxy.off("mousemove", onMenuMouseMove);
+    }
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -11019,8 +11119,8 @@ var editor;
             this._startScaleVec = [];
             this._position = new feng3d.Vector3();
             this._rotation = new feng3d.Vector3();
-            feng3d.dispatcher.on("editor.isWoldCoordinateChanged", this.updateControllerImage, this);
-            feng3d.dispatcher.on("editor.isBaryCenterChanged", this.updateControllerImage, this);
+            feng3d.dispatcher.on("editor.isWoldCoordinateChanged", this.invalidateControllerImage, this);
+            feng3d.dispatcher.on("editor.isBaryCenterChanged", this.invalidateControllerImage, this);
             //
             feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
         }
@@ -11040,8 +11140,19 @@ var editor;
         });
         Object.defineProperty(MRSToolTarget.prototype, "controllerTargets", {
             set: function (value) {
+                var _this = this;
+                if (this._controllerTargets) {
+                    this._controllerTargets.forEach(function (v) {
+                        v.off("scenetransformChanged", _this.invalidateControllerImage, _this);
+                    });
+                }
                 this._controllerTargets = value;
-                this.updateControllerImage();
+                if (this._controllerTargets) {
+                    this._controllerTargets.forEach(function (v) {
+                        v.on("scenetransformChanged", _this.invalidateControllerImage, _this);
+                    });
+                }
+                this.invalidateControllerImage();
             },
             enumerable: true,
             configurable: true
@@ -11058,6 +11169,9 @@ var editor;
             else {
                 this.controllerTargets = null;
             }
+        };
+        MRSToolTarget.prototype.invalidateControllerImage = function () {
+            feng3d.ticker.nextframe(this.updateControllerImage, this);
         };
         MRSToolTarget.prototype.updateControllerImage = function () {
             if (!this._controllerTargets || this._controllerTargets.length == 0)
@@ -11258,7 +11372,6 @@ var editor;
         return MRSToolTarget;
     }());
     editor.MRSToolTarget = MRSToolTarget;
-    editor.mrsToolTarget = new MRSToolTarget();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -11844,20 +11957,20 @@ var editor;
         MRSToolBase.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
             var holdSizeComponent = this.gameObject.addComponent(feng3d.HoldSizeComponent);
-            holdSizeComponent.holdSize = 1;
+            holdSizeComponent.holdSize = 0.005;
             //
             this.on("addedToScene", this.onAddedToScene, this);
             this.on("removedFromScene", this.onRemovedFromScene, this);
         };
         MRSToolBase.prototype.onAddedToScene = function () {
-            editor.mrsToolTarget.controllerTool = this.transform;
+            this.mrsToolTarget.controllerTool = this.transform;
             //
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
             feng3d.ticker.onframe(this.updateToolModel, this);
         };
         MRSToolBase.prototype.onRemovedFromScene = function () {
-            editor.mrsToolTarget.controllerTool = null;
+            this.mrsToolTarget.controllerTool = null;
             //
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
@@ -12045,7 +12158,7 @@ var editor;
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
             this.startPos = this.toolModel.transform.position;
-            editor.mrsToolTarget.startTranslation();
+            this.mrsToolTarget.startTranslation();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
@@ -12058,12 +12171,12 @@ var editor;
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
             var sceneAddpos = sceneTransform.position.subTo(this.startSceneTransform.position);
-            editor.mrsToolTarget.translation(sceneAddpos);
+            this.mrsToolTarget.translation(sceneAddpos);
         };
         MTool.prototype.onMouseUp = function () {
             _super.prototype.onMouseUp.call(this);
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-            editor.mrsToolTarget.stopTranslation();
+            this.mrsToolTarget.stopTranslation();
             this.startPos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
@@ -12162,7 +12275,7 @@ var editor;
             //
             this.startMousePos = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
             this.startSceneTransform = globalMatrix3D.clone();
-            editor.mrsToolTarget.startRotate();
+            this.mrsToolTarget.startRotate();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
@@ -12188,9 +12301,9 @@ var editor;
                     sign = sign > 0 ? 1 : -1;
                     angle = angle * sign;
                     //
-                    editor.mrsToolTarget.rotate1(angle, this.movePlane3D.getNormal());
+                    this.mrsToolTarget.rotate1(angle, this.movePlane3D.getNormal());
                     this.stepPlaneCross.copy(planeCross);
-                    editor.mrsToolTarget.startRotate();
+                    this.mrsToolTarget.startRotate();
                     //绘制扇形区域
                     if (this.selectedItem instanceof editor.CoordinateRotationAxis) {
                         this.selectedItem.showSector(this.startPlanePos, planeCross);
@@ -12202,10 +12315,10 @@ var editor;
                     var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
                     var right = cameraSceneTransform.right;
                     var up = cameraSceneTransform.up;
-                    editor.mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
+                    this.mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
                     //
                     this.startMousePos = endPoint;
-                    editor.mrsToolTarget.startRotate();
+                    this.mrsToolTarget.startRotate();
                     break;
             }
         };
@@ -12215,7 +12328,7 @@ var editor;
             if (this.selectedItem instanceof editor.CoordinateRotationAxis) {
                 this.selectedItem.hideSector();
             }
-            editor.mrsToolTarget.stopRote();
+            this.mrsToolTarget.stopRote();
             this.startMousePos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
@@ -12321,7 +12434,7 @@ var editor;
             }
             this.startSceneTransform = globalMatrix3D.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
-            editor.mrsToolTarget.startScale();
+            this.mrsToolTarget.startScale();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
         };
@@ -12351,7 +12464,7 @@ var editor;
                 addScale.y += 1;
                 addScale.z += 1;
             }
-            editor.mrsToolTarget.doScale(addScale);
+            this.mrsToolTarget.doScale(addScale);
             //
             this.toolModel.xCube.scaleValue = addScale.x;
             this.toolModel.yCube.scaleValue = addScale.y;
@@ -12360,7 +12473,7 @@ var editor;
         STool.prototype.onMouseUp = function () {
             _super.prototype.onMouseUp.call(this);
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-            editor.mrsToolTarget.stopScale();
+            this.mrsToolTarget.stopScale();
             this.startPlanePos = null;
             this.startSceneTransform = null;
             //
@@ -12391,7 +12504,9 @@ var editor;
     var MRSTool = /** @class */ (function (_super) {
         __extends(MRSTool, _super);
         function MRSTool() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mrsToolTarget = new editor.MRSToolTarget();
+            return _this;
         }
         Object.defineProperty(MRSTool.prototype, "editorCamera", {
             get: function () { return this._editorCamera; },
@@ -12405,6 +12520,9 @@ var editor;
             this.mTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(editor.MTool);
             this.rTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(editor.RTool);
             this.sTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(editor.STool);
+            this.mTool.mrsToolTarget = this.mrsToolTarget;
+            this.rTool.mrsToolTarget = this.mrsToolTarget;
+            this.sTool.mrsToolTarget = this.mrsToolTarget;
             setAwaysVisible(this.mTool);
             setAwaysVisible(this.rTool);
             setAwaysVisible(this.sTool);
@@ -12502,6 +12620,38 @@ var editor;
             return _this;
         }
         /**
+         * 提供拖拽数据
+         *
+         * @param dragSource
+         */
+        HierarchyNode.prototype.setdargSource = function (dragSource) {
+            dragSource.addDragData("gameobject", this.gameobject);
+        };
+        /**
+         * 接受拖拽数据
+         *
+         * @param dragdata
+         */
+        HierarchyNode.prototype.acceptDragDrop = function (dragdata) {
+            var _this = this;
+            dragdata.getDragData("gameobject").forEach(function (v) {
+                if (!v.contains(_this.gameobject)) {
+                    var localToWorldMatrix = v.transform.localToWorldMatrix;
+                    _this.gameobject.addChild(v);
+                    v.transform.localToWorldMatrix = localToWorldMatrix;
+                    //
+                    editor.hierarchy.getNode(v).openParents();
+                }
+            });
+            dragdata.getDragData("file_gameobject").forEach(function (v) {
+                editor.hierarchy.addGameoObjectFromAsset(v, _this.gameobject);
+                editor.hierarchy.getNode(v).openParents();
+            });
+            dragdata.getDragData("file_script").forEach(function (v) {
+                _this.gameobject.addScript(v.scriptName);
+            });
+        };
+        /**
          * 销毁
          */
         HierarchyNode.prototype.destroy = function () {
@@ -12590,7 +12740,6 @@ var editor;
             this._selectedGameObjects.forEach(function (element) {
                 var node = _this.getNode(element);
                 node.selected = true;
-                node.openParents();
             });
         };
         Hierarchy.prototype.ongameobjectadded = function (event) {
@@ -12964,12 +13113,17 @@ var editor;
                     editor.hierarchy.rootGameObject = this.scene.gameObject;
                 }
             }
-            if (editor.editorComponent)
-                editor.editorComponent.scene = this.scene;
+            if (this.editorComponent) {
+                this.editorComponent.scene = this.scene;
+                this.editorComponent.editorCamera = this.camera;
+            }
             _super.prototype.render.call(this);
+            if (this.contextLost)
+                return;
             if (this.editorScene) {
                 // 设置鼠标射线
                 this.editorScene.mouseRay3D = this.getMouseRay3D();
+                this.editorScene.camera = this.camera;
                 this.editorScene.update();
                 feng3d.forwardRenderer.draw(this.gl, this.editorScene, this.camera);
                 var selectedObject = this.mouse3DManager.pick(this, this.editorScene, this.camera);
@@ -12986,6 +13140,9 @@ var editor;
         return EditorEngine;
     }(feng3d.Engine));
     editor.EditorEngine = EditorEngine;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
     /**
     * 编辑器3D入口
     */
@@ -13071,7 +13228,8 @@ var editor;
         });
         Object.defineProperty(EditorComponent.prototype, "editorCamera", {
             get: function () { return this._editorCamera; },
-            set: function (v) { this._editorCamera = v; this.update(); },
+            set: function (v) { if (this._editorCamera == v)
+                return; this._editorCamera = v; this.update(); },
             enumerable: true,
             configurable: true
         });
@@ -14335,7 +14493,7 @@ var navigation;
         NavigationData.prototype.init = function (geometry) {
             var positions = geometry.positions;
             var indices = geometry.indices;
-            feng3d.assert(indices.length % 3 == 0);
+            feng3d.debuger && feng3d.assert(indices.length % 3 == 0);
             var pointmap = this.pointmap = new Map();
             var linemap = this.linemap = new Map();
             var trianglemap = this.trianglemap = new Map();
@@ -14760,7 +14918,7 @@ var editor;
         DirectionLightIcon.prototype.initicon = function () {
             if (!this._editorCamera)
                 return;
-            var linesize = 10;
+            var linesize = 20;
             var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
@@ -14795,7 +14953,7 @@ var editor;
             }
             var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
-                components: [{ __class__: "feng3d.HoldSizeComponent", camera: this.editorCamera, holdSize: 1 },
+                components: [{ __class__: "feng3d.HoldSizeComponent", camera: this.editorCamera, holdSize: 0.005 },
                     {
                         __class__: "feng3d.MeshModel",
                         material: { __class__: "feng3d.Material", shaderName: "segment", uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 163 / 255, g: 162 / 255, b: 107 / 255 } }, renderParams: { renderMode: feng3d.RenderMode.LINES } },
@@ -15472,7 +15630,7 @@ var editor;
                     var skinnedModel = gameobject.addComponent(feng3d.SkinnedModel);
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
-                    feng3d.assert(object3d.bindMode == "attached");
+                    feng3d.debuger && feng3d.assert(object3d.bindMode == "attached");
                     skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
                         skinnedModel.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();
@@ -15736,171 +15894,196 @@ var editor;
         MenuConfig.prototype.getMainMenu = function () {
             var mainMenu = [
                 {
-                    label: "新建项目", click: function () {
-                        editor.popupview.popupObject({ newprojectname: "newproject" }, {
-                            closecallback: function (data) {
-                                if (data.newprojectname && data.newprojectname.length > 0) {
-                                    editor.editorcache.projectname = data.newprojectname;
-                                    window.location.reload();
-                                }
+                    label: "文件",
+                    submenu: [
+                        {
+                            label: "新建项目", click: function () {
+                                editor.popupview.popupObject({ newprojectname: "newproject" }, {
+                                    closecallback: function (data) {
+                                        if (data.newprojectname && data.newprojectname.length > 0) {
+                                            editor.editorcache.projectname = data.newprojectname;
+                                            window.location.reload();
+                                        }
+                                    }
+                                });
+                            },
+                        },
+                        {
+                            label: "打开最近的项目",
+                            submenu: editor.editorcache.lastProjects.map(function (element) {
+                                var menuItem = {
+                                    label: element, click: function () {
+                                        if (editor.editorcache.projectname != element) {
+                                            editor.editorcache.projectname = element;
+                                            window.location.reload();
+                                        }
+                                    }
+                                };
+                                return menuItem;
+                            }),
+                            click: function () {
+                                editor.popupview.popupObject({ newprojectname: "newproject" }, {
+                                    closecallback: function (data) {
+                                        if (data.newprojectname && data.newprojectname.length > 0) {
+                                            editor.editorcache.projectname = data.newprojectname;
+                                            window.location.reload();
+                                        }
+                                    }
+                                });
                             }
-                        });
-                    },
-                },
-                {
-                    label: "打开最近的项目",
-                    submenu: editor.editorcache.lastProjects.map(function (element) {
-                        var menuItem = {
-                            label: element, click: function () {
-                                if (editor.editorcache.projectname != element) {
-                                    editor.editorcache.projectname = element;
-                                    window.location.reload();
-                                }
+                        },
+                        {
+                            label: "保存场景", click: function () {
+                                var gameobject = editor.hierarchy.rootnode.gameobject;
+                                editor.editorAsset.saveObject(gameobject);
                             }
-                        };
-                        return menuItem;
-                    }),
-                    click: function () {
-                        editor.popupview.popupObject({ newprojectname: "newproject" }, {
-                            closecallback: function (data) {
-                                if (data.newprojectname && data.newprojectname.length > 0) {
-                                    editor.editorcache.projectname = data.newprojectname;
-                                    window.location.reload();
-                                }
-                            }
-                        });
-                    }
-                },
-                {
-                    label: "保存场景", click: function () {
-                        var gameobject = editor.hierarchy.rootnode.gameobject;
-                        editor.editorAsset.saveObject(gameobject);
-                    }
-                },
-                {
-                    label: "导入项目", click: function () {
-                        editor.editorRS.selectFile(function (filelist) {
-                            editor.editorRS.importProject(filelist.item(0), function () {
-                                console.log("导入项目完成");
-                                editor.editorAsset.initproject(function () {
-                                    editor.editorAsset.runProjectScript(function () {
-                                        editor.editorAsset.readScene("default.scene.json", function (err, scene) {
-                                            editor.editorData.gameScene = scene;
-                                            editor.editorui.assetview.invalidateAssettree();
-                                            console.log("导入项目完成!");
+                        },
+                        {
+                            label: "导入项目", click: function () {
+                                editor.editorRS.selectFile(function (filelist) {
+                                    editor.editorRS.importProject(filelist.item(0), function () {
+                                        console.log("导入项目完成");
+                                        editor.editorAsset.initproject(function () {
+                                            editor.editorAsset.runProjectScript(function () {
+                                                editor.editorAsset.readScene("default.scene.json", function (err, scene) {
+                                                    editor.editorData.gameScene = scene;
+                                                    editor.editorui.assetview.invalidateAssettree();
+                                                    console.log("导入项目完成!");
+                                                });
+                                            });
                                         });
                                     });
                                 });
-                            });
-                        });
-                    }
-                },
-                {
-                    label: "导出项目", click: function () {
-                        editor.editorRS.exportProject(function (err, content) {
-                            // see FileSaver.js
-                            saveAs(content, editor.editorcache.projectname + ".feng3d.zip");
-                        });
-                    }
-                },
-                {
-                    label: "打开网络项目",
-                    submenu: [
+                            }
+                        },
                         {
-                            label: "地形", click: function () {
-                                openDownloadProject("terrain.feng3d.zip");
+                            label: "导出项目", click: function () {
+                                editor.editorRS.exportProject(function (err, content) {
+                                    // see FileSaver.js
+                                    saveAs(content, editor.editorcache.projectname + ".feng3d.zip");
+                                });
+                            }
+                        },
+                        {
+                            label: "打开网络项目",
+                            submenu: [
+                                {
+                                    label: "地形", click: function () {
+                                        openDownloadProject("terrain.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "自定义材质", click: function () {
+                                        openDownloadProject("customshader.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "水", click: function () {
+                                        openDownloadProject("water.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "灯光", click: function () {
+                                        openDownloadProject("light.feng3d.zip");
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            label: "下载网络项目",
+                            submenu: [
+                                {
+                                    label: "地形", click: function () {
+                                        downloadProject("terrain.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "自定义材质", click: function () {
+                                        downloadProject("customshader.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "水", click: function () {
+                                        downloadProject("water.feng3d.zip");
+                                    },
+                                },
+                                {
+                                    label: "灯光", click: function () {
+                                        downloadProject("light.feng3d.zip");
+                                    },
+                                },
+                            ],
+                        },
+                        {
+                            label: "升级项目",
+                            click: function () {
+                                editor.editorRS.upgradeProject(function () {
+                                    alert("升级完成！");
+                                });
                             },
                         },
                         {
-                            label: "自定义材质", click: function () {
-                                openDownloadProject("customshader.feng3d.zip");
+                            label: "清空项目",
+                            click: function () {
+                                editor.editorAsset.rootFile.remove();
+                                editor.editorAsset.initproject(function () {
+                                    editor.editorAsset.runProjectScript(function () {
+                                        editor.editorData.gameScene = editor.creatNewScene();
+                                        editor.editorui.assetview.invalidateAssettree();
+                                        console.log("清空项目完成!");
+                                    });
+                                });
                             },
                         },
                         {
-                            label: "水", click: function () {
-                                openDownloadProject("water.feng3d.zip");
-                            },
-                        },
-                        {
-                            label: "灯光", click: function () {
-                                openDownloadProject("light.feng3d.zip");
-                            },
+                            label: "首选项",
+                            submenu: [
+                                {
+                                    label: "快捷方式",
+                                    click: function () {
+                                        editor.popupview.popupView(editor.ShortCutSetting.instance);
+                                    },
+                                },
+                            ],
                         },
                     ],
-                },
-                {
-                    label: "下载网络项目",
-                    submenu: [
-                        {
-                            label: "地形", click: function () {
-                                downloadProject("terrain.feng3d.zip");
-                            },
-                        },
-                        {
-                            label: "自定义材质", click: function () {
-                                downloadProject("customshader.feng3d.zip");
-                            },
-                        },
-                        {
-                            label: "水", click: function () {
-                                downloadProject("water.feng3d.zip");
-                            },
-                        },
-                        {
-                            label: "灯光", click: function () {
-                                downloadProject("light.feng3d.zip");
-                            },
-                        },
-                    ],
-                },
-                {
-                    label: "升级项目",
-                    click: function () {
-                        editor.editorRS.upgradeProject(function () {
-                            alert("升级完成！");
-                        });
-                    },
-                },
-                {
-                    label: "清空项目",
-                    click: function () {
-                        editor.editorAsset.rootFile.remove();
-                        editor.editorAsset.initproject(function () {
-                            editor.editorAsset.runProjectScript(function () {
-                                editor.editorData.gameScene = editor.creatNewScene();
-                                editor.editorui.assetview.invalidateAssettree();
-                                console.log("清空项目完成!");
-                            });
-                        });
-                    },
                 },
                 { type: "separator" },
                 {
-                    label: "打开开发者工具",
-                    click: function () {
-                        editor.nativeAPI.openDevTools();
-                    }, show: !!editor.nativeAPI,
+                    label: "调试",
+                    submenu: [{
+                            label: "打开开发者工具",
+                            click: function () {
+                                editor.nativeAPI.openDevTools();
+                            }, show: !!editor.nativeAPI,
+                        },
+                        {
+                            label: "编译脚本",
+                            click: function () {
+                                feng3d.dispatcher.dispatch("script.compile");
+                            },
+                        },],
                 },
                 {
-                    label: "首选项",
+                    label: "窗口",
+                    submenu: this.getWindowSubMenus(),
+                },
+                {
+                    label: "帮助",
                     submenu: [
                         {
-                            label: "快捷方式",
+                            label: "问题",
                             click: function () {
-                                editor.popupview.popupView(editor.ShortCutSetting.instance);
+                                window.open("https://github.com/feng3d-labs/editor/issues");
+                            },
+                        },
+                        {
+                            label: "文档",
+                            click: function () {
+                                window.open("http://feng3d.com");
                             },
                         },
                     ],
-                },
-                {
-                    label: "编译脚本",
-                    click: function () {
-                        feng3d.dispatcher.dispatch("script.compile");
-                    },
-                },
-                {
-                    label: "Window",
-                    submenu: this.getWindowSubMenus(),
                 },
             ];
             return mainMenu;
@@ -16171,24 +16354,32 @@ var shortcutConfig = [
     //	when				[可选]	快捷键激活的条件；使用“+”连接多个状态，没带“!”表示需要处于激活状态，否则需要处于非激活状态； 例如 “stateA+!stateB”表示stateA处于激活状态且stateB处于非激活状态时会判断按键是否满足条件。
     { key: "alt+rightmousedown", command: "sceneCameraForwardBackMouseMoveStart", stateCommand: "sceneCameraForwardBackMouseMoving", when: "mouseInView3D+!fpsViewing" },
     { key: "mousemove", command: "sceneCameraForwardBackMouseMove", when: "sceneCameraForwardBackMouseMoving" },
-    { key: "rightmouseup", stateCommand: "!sceneCameraForwardBackMouseMoving", when: "sceneCameraForwardBackMouseMoving" },
+    { key: "rightmouseup", command: "sceneCameraForwardBackMouseMoveEnd", stateCommand: "!sceneCameraForwardBackMouseMoving", when: "sceneCameraForwardBackMouseMoving" },
+    //
     { key: "rightmousedown", command: "fpsViewStart", stateCommand: "fpsViewing", when: "!sceneCameraForwardBackMouseMoving" },
     { key: "rightmouseup", command: "fpsViewStop", stateCommand: "!fpsViewing", when: "fpsViewing" },
+    //
+    { key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "mouseInView3D" },
     { key: "mousemove", command: "mouseRotateScene", when: "mouseRotateSceneing" },
-    { key: "mouseup", stateCommand: "!mouseRotateSceneing", when: "mouseRotateSceneing" },
+    { key: "mouseup", command: "mouseRotateSceneEnd", stateCommand: "!mouseRotateSceneing", when: "mouseRotateSceneing" },
+    //
     { key: "middlemousedown", command: "dragSceneStart", stateCommand: "dragSceneing", when: "mouseInView3D" },
     { key: "mousemove", command: "dragScene", when: "dragSceneing" },
-    { key: "middlemouseup", stateCommand: "!dragSceneing", when: "dragSceneing" },
+    { key: "middlemouseup", command: "dragSceneEnd", stateCommand: "!dragSceneing", when: "dragSceneing" },
+    //
     { key: "wheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
-    { key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "mouseInView3D" },
+    //
     { key: "f", command: "lookToSelectedGameObject", when: "" },
     { key: "w", command: "gameobjectMoveTool", when: "!fpsViewing" },
     { key: "e", command: "gameobjectRotationTool", when: "!fpsViewing" },
     { key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
+    //
     { key: "del", command: "deleteSeletedGameObject", when: "" },
+    //
     { key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal" },
     { key: "mousemove", stateCommand: "!selecting", when: "selecting" },
     { key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "selecting" },
+    //
     { key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D+!splitGroupDraging" },
     { key: "mousemove", command: "areaSelect", when: "areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
     { key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
@@ -16969,6 +17160,8 @@ var editor;
             });
         };
         ScriptCompiler.prototype.onFileChanged = function (e) {
+            if (!e.data)
+                return;
             if (e.data.substr(-3) == ".ts") {
                 feng3d.ticker.once(2000, this.onScriptCompile, this);
             }
@@ -17141,3 +17334,20 @@ var editor;
     editor.Editor = Editor;
 })(editor || (editor = {}));
 //# sourceMappingURL=editor.js.map
+
+(function universalModuleDefinition(root, factory)
+{
+    if (typeof exports === 'object' && typeof module === 'object')
+        module.exports = factory();
+    else if (typeof define === 'function' && define.amd)
+        define([], factory);
+    else if (typeof exports === 'object')
+        exports["feng3d"] = factory();
+    else
+        root["feng3d"] = factory();
+    var globalObject = (typeof global !== 'undefined') ? global : ((typeof window !== 'undefined') ? window : this);
+    globalObject["feng3d"] = factory();
+})(this, function ()
+{
+    return feng3d;
+});
