@@ -46,7 +46,7 @@ namespace editor
 		{
 			super.$onRemoveFromStage();
 
-			this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+			this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
 			this.dispose();
 		}
 
