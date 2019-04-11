@@ -8137,6 +8137,7 @@ var editor;
         function OAVObjectView(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
             _this.skinName = "OVDefault";
+            _this.alpha = 1;
             return _this;
         }
         OAVObjectView.prototype.initView = function () {
@@ -8148,7 +8149,7 @@ var editor;
                 arr.push(this.attributeValue);
             this.views = [];
             arr.forEach(function (element) {
-                var editable = _this._attributeViewInfo.editable;
+                var editable = true;
                 if (element instanceof feng3d.Feng3dObject)
                     editable = editable && !Boolean(element.hideFlags & feng3d.HideFlags.NotEditable);
                 var view = feng3d.objectview.getObjectView(element, { editable: editable });

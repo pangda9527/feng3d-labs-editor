@@ -11,6 +11,8 @@ namespace editor
 		{
 			super(attributeViewInfo);
 			this.skinName = "OVDefault";
+
+			this.alpha = 1;
 		}
 
 		initView()
@@ -24,7 +26,7 @@ namespace editor
 			this.views = [];
 			arr.forEach(element =>
 			{
-				var editable = this._attributeViewInfo.editable;
+				var editable = true;
 				if (element instanceof feng3d.Feng3dObject) editable = editable && !Boolean(element.hideFlags & feng3d.HideFlags.NotEditable);
 				var view = feng3d.objectview.getObjectView(element, { editable: editable });
 				view.percentWidth = 100;
