@@ -10,7 +10,7 @@
         // "outDir": "debug"
     },
     "include": [
-        "node_modules/feng3d/debug/**/*.ts"
+        "node_modules/feng3d/out/feng3d.d.ts"
     ],
     "files": [
         //

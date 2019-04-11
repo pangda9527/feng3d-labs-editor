@@ -1,9 +1,6 @@
 declare module 'feng3d' {
     export = feng3d;
 }
-declare module 'feng3d' {
-    export = feng3d;
-}
 /// <reference path="../libs/typescriptServices.d.ts" />
 declare namespace ts {
     function hasModifier(node: Node, flags: ModifierFlags): boolean;
