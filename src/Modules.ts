@@ -20,7 +20,7 @@ namespace editor
                 var cls = Modules.moduleViewCls[moduleName];
                 if (!cls)
                 {
-                    feng3d.error(`无法获取模块 ${moduleName} 界面类定义`);
+                    console.error(`无法获取模块 ${moduleName} 界面类定义`);
                     return;
                 }
                 moduleview = new cls();

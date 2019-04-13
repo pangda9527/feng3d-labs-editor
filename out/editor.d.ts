@@ -404,10 +404,6 @@ declare namespace editor {
         getUser(): void;
     }
 }
-interface NodeRequire {
-}
-declare var require: (s: any) => any;
-declare var __dirname: string;
 declare namespace editor {
     /**
      * 本地文件系统
@@ -1606,7 +1602,7 @@ declare namespace editor {
         /**
          * tip界面映射表，{key:数据类定义,value:界面类定义}，例如 {key:String,value:TipString}
          */
-        tipviewmap: Map<any, new () => ITipView>;
+        tipviewmap: any;
         private tipmap;
         private tipView;
         register(displayObject: egret.DisplayObject, tip: any): void;
@@ -3569,7 +3565,7 @@ declare namespace editor {
         /**
          * 获取结点
          */
-        getNode(gameObject: feng3d.GameObject): HierarchyNode;
+        getNode(gameObject: feng3d.GameObject): any;
         delete(gameobject: feng3d.GameObject): void;
         /**
          * 添加游戏对象到层级树

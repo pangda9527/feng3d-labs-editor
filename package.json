@@ -36,6 +36,6 @@
     "fs-extra": "^7.0.1"
   },
   "dependencies": {
-    "feng3d": "0.1.0"
+    "feng3d": "0.1.3"
   }
 }

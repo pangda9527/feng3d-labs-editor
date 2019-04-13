@@ -1342,6 +1342,8 @@ var editor;
     editor.GiteeOauth = GiteeOauth;
     editor.giteeOauth = new GiteeOauth();
 })(editor || (editor = {}));
+// declare var require: (s: any) => any;
+// declare var __dirname: string;
 var editor;
 (function (editor) {
     /**
@@ -2498,7 +2500,7 @@ var editor;
             if (!moduleview) {
                 var cls = Modules.moduleViewCls[moduleName];
                 if (!cls) {
-                    feng3d.error("\u65E0\u6CD5\u83B7\u53D6\u6A21\u5757 " + moduleName + " \u754C\u9762\u7C7B\u5B9A\u4E49");
+                    console.error("\u65E0\u6CD5\u83B7\u53D6\u6A21\u5757 " + moduleName + " \u754C\u9762\u7C7B\u5B9A\u4E49");
                     return;
                 }
                 moduleview = new cls();
@@ -9524,7 +9526,7 @@ var editor;
                     if (!this.data.isLoaded) {
                         var data = this.data;
                         data.load(function () {
-                            feng3d.debuger && feng3d.assert(data.isLoaded);
+                            feng3d.debug.debuger && console.assert(data.isLoaded);
                             if (data == _this.data)
                                 _this.dataChanged();
                         });
@@ -14319,8 +14321,8 @@ var navigation;
             var linemap = this.data.linemap;
             var trianglemap = this.data.trianglemap;
             //
-            var triangle0s = trianglemap.getValues().map(createTriangle);
-            pointmap.getValues().forEach(handlePoint);
+            var triangle0s = feng3d.maputils.getValues(trianglemap).map(createTriangle);
+            feng3d.maputils.getValues(pointmap).forEach(handlePoint);
             //
             function createTriangle(triangle) {
                 var triangle3D = triangle.getTriangle3D();
@@ -14494,7 +14496,7 @@ var navigation;
         NavigationData.prototype.init = function (geometry) {
             var positions = geometry.positions;
             var indices = geometry.indices;
-            feng3d.debuger && feng3d.assert(indices.length % 3 == 0);
+            feng3d.debug.debuger && console.assert(indices.length % 3 == 0);
             var pointmap = this.pointmap = new Map();
             var linemap = this.linemap = new Map();
             var trianglemap = this.trianglemap = new Map();
@@ -15606,13 +15608,13 @@ var editor;
             var gameobject = parse(scene);
             gameobject.transform.sx = -1;
             onParseComplete && onParseComplete(gameobject);
-            feng3d.log("onLoad");
+            console.log("onLoad");
         }
         function onProgress(event) {
-            feng3d.log(event);
+            console.log(event);
         }
         function onError(err) {
-            feng3d.error(err);
+            console.error(err);
         }
         function parse(object3d, parent) {
             if (object3d.type == "Bone")
@@ -15631,7 +15633,7 @@ var editor;
                     var skinnedModel = gameobject.addComponent(feng3d.SkinnedModel);
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
-                    feng3d.debuger && feng3d.assert(object3d.bindMode == "attached");
+                    feng3d.debug.debuger && console.assert(object3d.bindMode == "attached");
                     skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
                         skinnedModel.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();
@@ -15651,7 +15653,7 @@ var editor;
                     //Bone 由SkeletonComponent自动生成，不用解析
                     break;
                 default:
-                    feng3d.warn("\u6CA1\u6709\u63D0\u4F9B " + object3d.type + " \u7C7B\u578B\u5BF9\u8C61\u7684\u89E3\u6790");
+                    console.warn("\u6CA1\u6709\u63D0\u4F9B " + object3d.type + " \u7C7B\u578B\u5BF9\u8C61\u7684\u89E3\u6790");
                     break;
             }
             if (object3d.animations && object3d.animations.length > 0) {
@@ -15703,13 +15705,13 @@ var editor;
                     propertyClip.propertyName = "orientation";
                     break;
                 default:
-                    feng3d.warn("\u6CA1\u6709\u5904\u7406 propertyName " + result[2]);
+                    console.warn("\u6CA1\u6709\u5904\u7406 propertyName " + result[2]);
                     break;
             }
             propertyClip.propertyValues = [];
             var propertyValues = propertyClip.propertyValues;
             var times = keyframeTrack.times;
-            var values = ds.utils.arrayFrom(keyframeTrack.values);
+            var values = feng3d.utils.arrayFrom(keyframeTrack.values);
             if (usenumberfixed) {
                 values = values.map(function (v) { return Number(v.toFixed(6)); });
             }
@@ -15728,7 +15730,7 @@ var editor;
                     }
                     break;
                 default:
-                    feng3d.warn("\u6CA1\u6709\u63D0\u4F9B\u89E3\u6790 " + keyframeTrack.ValueTypeName + " \u7C7B\u578BTrack\u6570\u636E");
+                    console.warn("\u6CA1\u6709\u63D0\u4F9B\u89E3\u6790 " + keyframeTrack.ValueTypeName + " \u7C7B\u578BTrack\u6570\u636E");
                     break;
             }
             return propertyClip;
@@ -15774,7 +15776,7 @@ var editor;
                 joints[jointsMapitem[0]].matrix3D = new feng3d.Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
             }
             else {
-                feng3d.warn("\u6CA1\u6709\u5728\u9AA8\u67B6\u4E2D\u627E\u5230 \u9AA8\u9ABC " + bones[i].name);
+                console.warn("\u6CA1\u6709\u5728\u9AA8\u67B6\u4E2D\u627E\u5230 \u9AA8\u9ABC " + bones[i].name);
             }
         }
         return skinSkeleton;
@@ -15785,7 +15787,7 @@ var editor;
         for (var key in attributes) {
             if (attributes.hasOwnProperty(key)) {
                 var element = attributes[key];
-                var array = ds.utils.arrayFrom(element.array);
+                var array = feng3d.utils.arrayFrom(element.array);
                 if (usenumberfixed) {
                     array = array.map(function (v) { return Number(v.toFixed(6)); });
                 }
@@ -15806,7 +15808,7 @@ var editor;
                         geo.setVAData("a_jointweight0", array, 4);
                         break;
                     default:
-                        feng3d.warn("没有解析顶点数据", key);
+                        console.warn("没有解析顶点数据", key);
                         break;
                 }
             }

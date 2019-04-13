@@ -1,6 +1,15 @@
 declare module 'feng3d' {
     export = feng3d;
 }
+declare type gPartial<T> = {
+    [P in keyof T]?: gPartial<T[P]>;
+};
+declare namespace feng3d {
+    /**
+     * feng3d的版本号
+     */
+    var revision: string;
+}
 declare namespace feng3d {
     /**
      * 观察装饰器，观察被装饰属性的变化
@@ -82,214 +91,144 @@ getset平均耗时比 17.3
         unwatchchain(host: any, property: string, handler?: (host: any, property: string, oldvalue: any) => void, thisObject?: any): void;
     }
 }
-declare type gPartial<T> = {
-    [P in keyof T]?: gPartial<T[P]>;
-};
 declare namespace feng3d {
-    /**
-     * feng3d的版本号
-     */
-    var revision: string;
-}
-declare namespace feng3d {
-}
-interface String {
-    /**
-     * Returns true if the sequence of elements of searchString converted to a String is the
-     * same as the corresponding elements of this object (converted to a String) starting at
-     * position. Otherwise returns false.
-     */
-    startsWith(searchString: string, position?: number): boolean;
-    /**
-     * Returns true if searchString appears as a substring of the result of converting this
-     * object to a String, at one or more positions that are
-     * greater than or equal to position; otherwise, returns false.
-     * @param searchString search string
-     * @param position If position is undefined, 0 is assumed, so as to search all of the String.
-     */
-    includes(searchString: string, position?: number): boolean;
-    /**
-     * Returns true if the sequence of elements of searchString converted to a String is the
-     * same as the corresponding elements of this object (converted to a String) starting at
-     * endPosition – length(this). Otherwise returns false.
-     */
-    endsWith(searchString: string, endPosition?: number): boolean;
-}
-interface ObjectConstructor {
-    /**
-     * Copy the values of all of the enumerable own properties from one or more source objects to a
-     * target object. Returns the target object.
-     * @param target The target object to copy to.
-     * @param source The source object from which to copy properties.
-     */
-    assign<T, U>(target: T, source: U): T & U;
-    /**
-     * Copy the values of all of the enumerable own properties from one or more source objects to a
-     * target object. Returns the target object.
-     * @param target The target object to copy to.
-     * @param source1 The first source object from which to copy properties.
-     * @param source2 The second source object from which to copy properties.
-     */
-    assign<T, U, V>(target: T, source1: U, source2: V): T & U & V;
-    /**
-     * Copy the values of all of the enumerable own properties from one or more source objects to a
-     * target object. Returns the target object.
-     * @param target The target object to copy to.
-     * @param source1 The first source object from which to copy properties.
-     * @param source2 The second source object from which to copy properties.
-     * @param source3 The third source object from which to copy properties.
-     */
-    assign<T, U, V, W>(target: T, source1: U, source2: V, source3: W): T & U & V & W;
-    /**
-     * Copy the values of all of the enumerable own properties from one or more source objects to a
-     * target object. Returns the target object.
-     * @param target The target object to copy to.
-     * @param sources One or more source objects from which to copy properties
-     */
-    assign(target: object, ...sources: any[]): any;
-    /**
-     * 从对象以及对象的原型中获取属性描述
-     * @param obj 对象
-     * @param property 属性名称
-     */
-    getPropertyDescriptor(obj: Object, property: string): PropertyDescriptor;
-    /**
-     * 属性是否可写
-     * @param obj 对象
-     * @param property 属性名称
-     */
-    propertyIsWritable(obj: Object, property: string): boolean;
-    /**
-     * 执行方法
-     *
-     * 用例：
-     * 1. 给一个新建的对象进行初始化
-     *
-     *  ``` startLifetime = Object.runFunc(new MinMaxCurve(), (obj) => { obj.mode = MinMaxCurveMode.Constant; (<MinMaxCurveConstant>obj.minMaxCurve).value = 5; }); ```
-     *
-     * @param obj 对象
-     * @param func 被执行的方法
-     */
-    runFunc<T>(obj: T, func: (obj: T) => void): T;
-}
-interface Map<K, V> {
-    clear(): void;
-    delete(key: K): boolean;
-    forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
-    get(key: K): V | undefined;
-    has(key: K): boolean;
-    set(key: K, value: V): this;
-    readonly size: number;
-}
-interface MapConstructor {
-    new (): Map<any, any>;
-    new <K, V>(entries?: [K, V][]): Map<K, V>;
-    readonly prototype: Map<any, any>;
-}
-declare var Map: MapConstructor;
-interface ReadonlyMap<K, V> {
-    forEach(callbackfn: (value: V, key: K, map: ReadonlyMap<K, V>) => void, thisArg?: any): void;
-    get(key: K): V | undefined;
-    has(key: K): boolean;
-    readonly size: number;
-}
-interface WeakMap<K extends object, V> {
-    delete(key: K): boolean;
-    get(key: K): V | undefined;
-    has(key: K): boolean;
-    set(key: K, value: V): this;
-}
-interface WeakMapConstructor {
-    new (): WeakMap<object, any>;
-    new <K extends object, V>(entries?: [K, V][]): WeakMap<K, V>;
-    readonly prototype: WeakMap<object, any>;
-}
-declare var WeakMap: WeakMapConstructor;
-interface Set<T> {
-    add(value: T): this;
-    clear(): void;
-    delete(value: T): boolean;
-    forEach(callbackfn: (value: T, value2: T, set: Set<T>) => void, thisArg?: any): void;
-    has(value: T): boolean;
-    readonly size: number;
-}
-interface SetConstructor {
-    new (): Set<any>;
-    new <T>(values?: T[]): Set<T>;
-    readonly prototype: Set<any>;
-}
-declare var Set: SetConstructor;
-interface ReadonlySet<T> {
-    forEach(callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void, thisArg?: any): void;
-    has(value: T): boolean;
-    readonly size: number;
-}
-interface WeakSet<T> {
-    add(value: T): this;
-    delete(value: T): boolean;
-    has(value: T): boolean;
-}
-interface WeakSetConstructor {
-    new (): WeakSet<object>;
-    new <T extends object>(values?: T[]): WeakSet<T>;
-    readonly prototype: WeakSet<object>;
-}
-declare var WeakSet: WeakSetConstructor;
-interface Map<K, V> {
-    getKeys(): K[];
-    getValues(): V[];
-}
-interface Array<T> {
-    /**
-     * 使数组变得唯一，不存在两个相等的元素
-     *
-     * @param compare 比较函数
-     */
-    unique(compare?: (a: T, b: T) => boolean): this;
-    /**
-     * 删除元素
-     *
-     * @param item 被删除元素
-     * @returns 被删除元素在数组中的位置
-     */
-    delete(item: T): number;
 }
 declare namespace feng3d {
     /**
-     * 是否开启调试(主要用于断言)
+     * Object 工具
+     *
+     * 增强Object功能
      */
-    var debuger: boolean;
+    var objectutils: ObjectUtils;
     /**
-     * 测试代码运行时间
-     * @param fn 被测试的方法
-     * @param labal 标签
+     * Object 工具
+     *
+     * 增强Object功能
      */
-    function time(fn: Function, labal?: string): void;
+    class ObjectUtils {
+        /**
+         * 从对象以及对象的原型中获取属性描述
+         * @param obj 对象
+         * @param property 属性名称
+         */
+        getPropertyDescriptor(host: Object, property: string): PropertyDescriptor;
+        /**
+         * 属性是否可写
+         * @param obj 对象
+         * @param property 属性名称
+         */
+        propertyIsWritable(host: Object, property: string): boolean;
+        /**
+         * 执行方法
+         *
+         * 用例：
+         * 1. 给一个新建的对象进行初始化
+         *
+         *  ``` startLifetime = Object.runFunc(new MinMaxCurve(), (obj) => { obj.mode = MinMaxCurveMode.Constant; (<MinMaxCurveConstant>obj.minMaxCurve).value = 5; }); ```
+         *
+         * @param obj 对象
+         * @param func 被执行的方法
+         */
+        runFunc<T>(obj: T, func: (obj: T) => void): T;
+    }
+}
+declare namespace feng3d {
     /**
-     * 断言，测试不通过时报错
-     * @param test 测试项
-     * @param message 测试失败时提示信息
-     * @param optionalParams
+     * 增强Map功能
      */
-    function assert(test?: boolean, message?: string, ...optionalParams: any[]): void;
+    var maputils: MapUtils;
     /**
-     * 输出错误
-     * @param message 错误信息
-     * @param optionalParams
+     * 增强Map功能
      */
-    function error(message?: any, ...optionalParams: any[]): void;
+    class MapUtils {
+        /**
+         * 获取所有键
+         *
+         * @param map Map对象
+         */
+        getKeys<K, V>(map: Map<K, V>): K[];
+        /**
+         * 获取所有值
+         *
+         * @param map Map对象
+         */
+        getValues<K, V>(map: Map<K, V>): V[];
+    }
+}
+declare namespace feng3d {
     /**
-     * 记录日志信息
-     * @param message 日志信息
-     * @param optionalParams
+     * 数组工具，增强Array功能
      */
-    function log(message?: any, ...optionalParams: any[]): void;
+    var arrayutils: ArrayUtils;
     /**
-     * 警告
-     * @param message 警告信息
-     * @param optionalParams
+     * 数组工具，增强Array功能
      */
-    function warn(message?: any, ...optionalParams: any[]): void;
+    class ArrayUtils {
+        /**
+         * 使数组变得唯一，不存在两个相等的元素
+         *
+         * @param arr 数组
+         * @param compare 比较函数
+         *
+         * @returns 返回传入的数组
+         */
+        unique<T>(arr: T[], compare?: (a: T, b: T) => boolean): T[];
+        /**
+         * 删除第一个指定元素
+         *
+         * @param arr 数组
+         * @param item 被删除元素
+         *
+         * @returns 被删除元素在数组中的位置
+         */
+        delete<T>(arr: T[], item: T): number;
+    }
+}
+declare namespace feng3d {
+    var functionwarp: FunctionWarp;
+    /**
+     * 函数经
+     *
+     * 包装函数，以及对应的拆包
+     */
+    class FunctionWarp {
+        /**
+         * 包装函数
+         *
+         * 一般用于调试
+         * 使用场景示例：
+         * 1. 在函数执行前后记录时间来计算函数执行时间。
+         * 1. 在console.error调用前使用 debugger 进行断点调试。
+         *
+         * @param space 函数所属对象或者原型
+         * @param funcName 函数名称
+         * @param pf 在函数执行前执行的函数
+         * @param nf 在函数执行后执行的函数
+         */
+        wrap<T, K extends keyof T, V extends T[K]>(space: T, funcName: K, pf?: V, nf?: V): void;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 调试工具
+     */
+    var debug: Debug;
+    /**
+     * 调试工具
+     */
+    class Debug {
+        /**
+         * 是否开启调试
+         */
+        debuger: boolean;
+        constructor();
+        /**
+         * 测试代码运行时间
+         * @param fn 被测试的方法
+         * @param labal 标签
+         */
+        time(fn: Function, labal?: string): void;
+    }
 }
 declare namespace feng3d {
     /**
@@ -1521,7 +1460,7 @@ declare namespace feng3d {
         classReg: RegExp;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     type CompareFunction<T> = (a: T, b: T) => number;
     /**
      * 比较器
@@ -1581,7 +1520,7 @@ declare namespace ds {
         reverse(): void;
     }
 }
-declare module ds {
+declare namespace feng3d {
     /**
      * 工具
      */
@@ -1633,7 +1572,7 @@ declare module ds {
         binarySearchInsert<T>(array: T[], target: T, compare: (a: T, b: T) => number, start?: number, end?: number): number;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 链表
      *
@@ -1755,7 +1694,7 @@ declare namespace ds {
         next: LinkedListNode<T>;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 双向链表
      *
@@ -1874,7 +1813,7 @@ declare namespace ds {
         next: DoublyLinkedListNode<T>;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 队列，只能从后面进，前面出
      * 使用单向链表实现
@@ -1924,7 +1863,7 @@ declare namespace ds {
         toString(valueToString?: (value: T) => string): string;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 栈
      *
@@ -1964,7 +1903,7 @@ declare namespace ds {
         toString(valueToString?: (value: T) => string): string;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 堆
      *
@@ -2109,7 +2048,7 @@ declare namespace ds {
         abstract pairIsInCorrectOrder(firstElement: T, secondElement: T): boolean;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 最大堆
      *
@@ -2127,7 +2066,7 @@ declare namespace ds {
         pairIsInCorrectOrder(firstElement: T, secondElement: T): boolean;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 最小堆
      *
@@ -2145,7 +2084,7 @@ declare namespace ds {
         pairIsInCorrectOrder(firstElement: T, secondElement: T): boolean;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 哈希表（散列表）
      *
@@ -2202,7 +2141,7 @@ declare namespace ds {
         getKeys(): string[];
     }
 }
-declare module ds {
+declare namespace feng3d {
     /**
      * 优先队列
      *
@@ -2246,7 +2185,7 @@ declare module ds {
         fromArray(array: T[]): void;
     }
 }
-declare module ds {
+declare namespace feng3d {
     /**
      * 优先队列
      *
@@ -2307,7 +2246,7 @@ declare module ds {
         compareValue(a: T, b: T): 0 | 1 | -1;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 布隆过滤器 （ 在 JavaScript中 该类可由Object对象代替）
      *
@@ -2368,7 +2307,7 @@ declare namespace ds {
         getHashValues(item: string): number[];
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 并查集
      *
@@ -2475,7 +2414,7 @@ declare namespace ds {
         addChild(childNode: DisjointSetNode<T>): this;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 图
      *
@@ -2685,7 +2624,7 @@ declare namespace ds {
         toString(callback?: (value: T) => string): string;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 二叉树结点
      *
@@ -2787,7 +2726,7 @@ declare namespace ds {
         toString(): string;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 二叉查找树结点
      *
@@ -2851,7 +2790,7 @@ declare namespace ds {
         findMin(): BinarySearchTreeNode<T>;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 二叉查找树
      *
@@ -2905,7 +2844,7 @@ declare namespace ds {
         toString(): string;
     }
 }
-declare namespace ds {
+declare namespace feng3d {
     /**
      * 平衡二叉树
      *
@@ -7303,8 +7242,8 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 任务，用于处理任务之间依赖
-     */
+  * 任务，用于处理任务之间依赖
+  */
     var task: Task;
     /**
      * 任务函数
