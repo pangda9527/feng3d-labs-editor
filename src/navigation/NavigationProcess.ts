@@ -243,8 +243,8 @@ namespace navigation
             var linemap = this.data.linemap;
             var trianglemap = this.data.trianglemap;
             //
-            var triangle0s = feng3d.maputils.getValues(trianglemap).map(createTriangle);
-            feng3d.maputils.getValues(pointmap).forEach(handlePoint);
+            var triangle0s = trianglemap.getValues().map(createTriangle);
+            pointmap.getValues().forEach(handlePoint);
 
             //
             function createTriangle(triangle: Triangle)
@@ -510,7 +510,7 @@ namespace navigation
             var positions = geometry.positions;
             var indices = geometry.indices;
 
-            feng3d.debug.debuger && console.assert(indices.length % 3 == 0);
+            feng3d.debuger && console.assert(indices.length % 3 == 0);
             var pointmap = this.pointmap = new Map<number, Point>();
             var linemap = this.linemap = new Map<number, Line>();
             var trianglemap = this.trianglemap = new Map<number, Triangle>();

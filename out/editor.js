@@ -1342,8 +1342,6 @@ var editor;
     editor.GiteeOauth = GiteeOauth;
     editor.giteeOauth = new GiteeOauth();
 })(editor || (editor = {}));
-// declare var require: (s: any) => any;
-// declare var __dirname: string;
 var editor;
 (function (editor) {
     /**
@@ -1524,7 +1522,7 @@ var editor;
             var _this = this;
             editor.editorRS.fs.readdir(this._path, function (err, files) {
                 if (err) {
-                    feng3d.warn(err);
+                    console.warn(err);
                     onError(_this);
                 }
                 else {
@@ -1542,7 +1540,7 @@ var editor;
             var _this = this;
             editor.editorRS.fs.mkdir(this._path, function (err) {
                 if (err) {
-                    feng3d.warn(_this);
+                    console.warn(_this);
                     onError(_this);
                     return;
                 }
@@ -1599,7 +1597,7 @@ var editor;
             var newPath = this.location ? (this.location + "/" + newName) : newName;
             editor.editorRS.fs.rename(oldPath, newPath, function (err) {
                 if (err) {
-                    feng3d.warn(err);
+                    console.warn(err);
                     onError(_this);
                     return;
                 }
@@ -1619,7 +1617,7 @@ var editor;
             var _this = this;
             editor.editorRS.fs.move(this._path, newPath, function (err) {
                 if (err) {
-                    feng3d.warn(err);
+                    console.warn(err);
                     onError(_this);
                     return;
                 }
@@ -1638,7 +1636,7 @@ var editor;
             var _this = this;
             editor.editorRS.fs.delete(this._path, function (err) {
                 if (err) {
-                    feng3d.warn(err);
+                    console.warn(err);
                     onError(_this);
                     return;
                 }
@@ -2004,12 +2002,12 @@ var editor;
                 feng3d.loader.loadText(urls[index][0], function (content) {
                     _this.fs.writeString(urls[index][1], content, function (err) {
                         if (err)
-                            feng3d.warn(err);
+                            console.warn(err);
                         index++;
                         loadUrls();
                     });
                 }, null, function (e) {
-                    feng3d.warn(e);
+                    console.warn(e);
                     index++;
                     loadUrls();
                 });
@@ -3566,7 +3564,7 @@ var editor;
         TabView.prototype.removeModule = function (moduleName) {
             var moduleView = this._moduleViews.filter(function (v) { return v.moduleName == moduleName; })[0];
             var index = this._moduleViews.indexOf(moduleView);
-            feng3d.debuger && feng3d.assert(index != -1);
+            feng3d.debuger && console.assert(index != -1);
             this._moduleViews.splice(index, 1);
             this.adjust(this);
             this._invalidateView();
@@ -3603,7 +3601,7 @@ var editor;
                     this.adjust(parent);
                 }
                 else {
-                    feng3d.debuger && feng3d.assert(false);
+                    feng3d.debuger && console.assert(false);
                 }
             }
             // 找到对象所属窗口，删除空窗口
@@ -4342,7 +4340,7 @@ var editor;
         };
         TreeNode.prototype.addChild = function (node) {
             node.remove();
-            feng3d.debuger && feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
+            feng3d.debuger && console.assert(!node.contain(this), "无法添加到自身结点中!");
             if (this.children.indexOf(node) == -1)
                 this.children.push(node);
             node.parent = this;
@@ -8793,7 +8791,7 @@ var editor;
                         if (!this._viewData.isLoaded) {
                             var viewData = this._viewData;
                             viewData.load(function () {
-                                feng3d.debuger && feng3d.assert(!!viewData.asset);
+                                feng3d.debuger && console.assert(!!viewData.asset);
                                 if (viewData == _this._viewData)
                                     _this.updateShowData(viewData.asset);
                             });
@@ -8817,7 +8815,7 @@ var editor;
                     var feng3dAsset = feng3d.rs.getAsset(this._viewData.assetId);
                     if (feng3dAsset) {
                         editor.editorRS.writeAsset(feng3dAsset, function (err) {
-                            feng3d.debuger && feng3d.assert(!err, "\u8D44\u6E90 " + feng3dAsset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                            feng3d.debuger && console.assert(!err, "\u8D44\u6E90 " + feng3dAsset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                             callback && callback();
                         });
                     }
@@ -9153,7 +9151,7 @@ var editor;
          */
         EditorAsset.prototype.saveAsset = function (assetNode, callback) {
             editor.editorRS.writeAsset(assetNode.asset, function (err) {
-                feng3d.debuger && feng3d.assert(!err, "\u8D44\u6E90 " + assetNode.asset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                feng3d.debuger && console.assert(!err, "\u8D44\u6E90 " + assetNode.asset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
             });
         };
@@ -9371,7 +9369,7 @@ var editor;
          * @param callback
          */
         EditorAsset.prototype.saveObject = function (object, callback) {
-            feng3d.error("\u672A\u5B9E\u73B0");
+            console.error("\u672A\u5B9E\u73B0");
             // var assetsFile = this.createAssets(this.showFloder, object.name, object);
             // callback && callback(assetsFile);
         };
@@ -9428,7 +9426,7 @@ var editor;
                         feng3d.dispatcher.dispatch("inspector.update");
                     }
                     catch (error) {
-                        feng3d.warn(error);
+                        console.warn(error);
                     }
                 }
                 _this._preProjectJsContent = content;
@@ -9526,7 +9524,7 @@ var editor;
                     if (!this.data.isLoaded) {
                         var data = this.data;
                         data.load(function () {
-                            feng3d.debug.debuger && console.assert(data.isLoaded);
+                            feng3d.debuger && console.assert(data.isLoaded);
                             if (data == _this.data)
                                 _this.dataChanged();
                         });
@@ -9674,7 +9672,7 @@ var editor;
             }
             this.isLoading = true;
             editor.editorRS.readAsset(this.asset.assetId, function (err, asset) {
-                feng3d.debuger && feng3d.assert(!err);
+                feng3d.debuger && console.assert(!err);
                 _this.isLoading = false;
                 _this.isLoaded = true;
                 callback && callback();
@@ -9801,7 +9799,7 @@ var editor;
          * 导出
          */
         AssetNode.prototype.export = function () {
-            feng3d.error("未实现");
+            console.error("未实现");
             var zip = new JSZip();
             var path = this.asset.assetPath;
             if (!feng3d.pathUtils.isDirectory(path))
@@ -10238,7 +10236,7 @@ var editor;
                     var e = feng3d.dispatcher.dispatch("inspector.saveShowData", function () {
                         editor.editorRS.fs.writeObject("default.scene.json", editor.editorData.gameScene.gameObject, function (err) {
                             if (err) {
-                                feng3d.warn(err);
+                                console.warn(err);
                                 return;
                             }
                             if (editor.editorRS.fs.type == feng3d.FSType.indexedDB) {
@@ -10313,7 +10311,7 @@ var editor;
             if (showMenuItem)
                 return;
             var list = this.parent;
-            feng3d.debuger && feng3d.assert(list instanceof eui.List);
+            feng3d.debuger && console.assert(list instanceof eui.List);
             items = list.$children.filter(function (v) { return v instanceof TopMenuItemRenderer; }).map(function (v) { return { item: v, rect: v.getGlobalBounds() }; });
             showMenu(this);
             feng3d.windowEventProxy.on("mousemove", onMenuMouseMove);
@@ -10784,7 +10782,7 @@ var editor;
          *  The resource group loading failed
          */
         MainUI.prototype.onItemLoadError = function (event) {
-            feng3d.warn("Url:" + event.resItem.url + " has failed to load");
+            console.warn("Url:" + event.resItem.url + " has failed to load");
         };
         /**
          * 资源组加载出错
@@ -10792,7 +10790,7 @@ var editor;
          */
         MainUI.prototype.onResourceLoadError = function (event) {
             //TODO
-            feng3d.warn("Group:" + event.groupName + " has failed to load");
+            console.warn("Group:" + event.groupName + " has failed to load");
             //忽略加载失败的项目
             //ignore loading failed projects
             this.onResourceLoadComplete(event);
@@ -11335,7 +11333,7 @@ var editor;
             }
         };
         MRSToolTarget.prototype.doScale = function (scale) {
-            feng3d.debuger && feng3d.assert(!!scale.length);
+            feng3d.debuger && console.assert(!!scale.length);
             for (var i = 0; i < this._controllerTargets.length; i++) {
                 var result = this._startScaleVec[i].multiplyTo(scale);
                 this._controllerTargets[i].sx = result.x;
@@ -14321,8 +14319,8 @@ var navigation;
             var linemap = this.data.linemap;
             var trianglemap = this.data.trianglemap;
             //
-            var triangle0s = feng3d.maputils.getValues(trianglemap).map(createTriangle);
-            feng3d.maputils.getValues(pointmap).forEach(handlePoint);
+            var triangle0s = trianglemap.getValues().map(createTriangle);
+            pointmap.getValues().forEach(handlePoint);
             //
             function createTriangle(triangle) {
                 var triangle3D = triangle.getTriangle3D();
@@ -14496,7 +14494,7 @@ var navigation;
         NavigationData.prototype.init = function (geometry) {
             var positions = geometry.positions;
             var indices = geometry.indices;
-            feng3d.debug.debuger && console.assert(indices.length % 3 == 0);
+            feng3d.debuger && console.assert(indices.length % 3 == 0);
             var pointmap = this.pointmap = new Map();
             var linemap = this.linemap = new Map();
             var trianglemap = this.trianglemap = new Map();
@@ -15633,7 +15631,7 @@ var editor;
                     var skinnedModel = gameobject.addComponent(feng3d.SkinnedModel);
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
-                    feng3d.debug.debuger && console.assert(object3d.bindMode == "attached");
+                    feng3d.debuger && console.assert(object3d.bindMode == "attached");
                     skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
                         skinnedModel.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();
@@ -17155,7 +17153,7 @@ var editor;
                         var str = strs[i];
                         if (typeof str == "string")
                             return { path: f, code: str };
-                        feng3d.warn("\u6CA1\u6709\u627E\u5230\u6587\u4EF6 " + f);
+                        console.warn("\u6CA1\u6709\u627E\u5230\u6587\u4EF6 " + f);
                         return null;
                     }).filter(function (v) { return !!v; });
                     callback(tslibs);
@@ -17255,10 +17253,10 @@ var editor;
 var editor;
 (function (editor) {
     /**
-     * feng3d的版本号
+     * editor的版本号
      */
     editor.revision = "2018.08.22";
-    feng3d.log("editor version " + editor.revision);
+    console.log("editor version " + editor.revision);
     /**
      * 编辑器
      */

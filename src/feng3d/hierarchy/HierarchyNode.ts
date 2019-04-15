@@ -17,7 +17,7 @@ namespace editor
          */
         children: HierarchyNode[] = [];
 
-        constructor(obj: gPartial<HierarchyNode>)
+        constructor(obj: feng3d.gPartial<HierarchyNode>)
         {
             super(obj);
 

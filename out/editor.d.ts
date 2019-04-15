@@ -2,6 +2,7 @@ declare module 'feng3d' {
     export = feng3d;
 }
 /// <reference path="../libs/typescriptServices.d.ts" />
+/// <reference types="feng3d" />
 declare namespace ts {
     function hasModifier(node: Node, flags: ModifierFlags): boolean;
     function getAllAccessorDeclarations(declarations: NodeArray<Declaration>, accessor: AccessorDeclaration): any;
@@ -404,6 +405,8 @@ declare namespace editor {
         getUser(): void;
     }
 }
+declare var require: (s: any) => any;
+declare var __dirname: string;
 declare namespace editor {
     /**
      * 本地文件系统
@@ -1381,7 +1384,7 @@ declare namespace editor {
          * 子结点列表
          */
         children: TreeNode[];
-        constructor(obj?: gPartial<TreeNode>);
+        constructor(obj?: feng3d.gPartial<TreeNode>);
         /**
          * 销毁
          */
@@ -1602,7 +1605,7 @@ declare namespace editor {
         /**
          * tip界面映射表，{key:数据类定义,value:界面类定义}，例如 {key:String,value:TipString}
          */
-        tipviewmap: any;
+        tipviewmap: Map<any, new () => ITipView>;
         private tipmap;
         private tipView;
         register(displayObject: egret.DisplayObject, tip: any): void;
@@ -2692,7 +2695,7 @@ declare namespace editor {
          * @param folderNode 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        createAsset<T extends feng3d.FileAsset>(folderNode: AssetNode, cls: new () => T, fileName?: string, value?: gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void): void;
+        createAsset<T extends feng3d.FileAsset>(folderNode: AssetNode, cls: new () => T, fileName?: string, value?: feng3d.gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void): void;
         /**
          * 弹出文件菜单
          */
@@ -3532,7 +3535,7 @@ declare namespace editor {
          * 子结点列表
          */
         children: HierarchyNode[];
-        constructor(obj: gPartial<HierarchyNode>);
+        constructor(obj: feng3d.gPartial<HierarchyNode>);
         /**
          * 提供拖拽数据
          *
@@ -3565,7 +3568,7 @@ declare namespace editor {
         /**
          * 获取结点
          */
-        getNode(gameObject: feng3d.GameObject): any;
+        getNode(gameObject: feng3d.GameObject): HierarchyNode;
         delete(gameobject: feng3d.GameObject): void;
         /**
          * 添加游戏对象到层级树
@@ -4658,7 +4661,7 @@ declare namespace editor {
 declare namespace editor {
     var editorData: EditorData;
     /**
-     * feng3d的版本号
+     * editor的版本号
      */
     var revision: string;
     /**

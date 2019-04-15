@@ -275,7 +275,7 @@ namespace editor
 
         doScale(scale: feng3d.Vector3)
         {
-            feng3d.debuger && feng3d.assert(!!scale.length);
+            feng3d.debuger && console.assert(!!scale.length);
             for (var i = 0; i < this._controllerTargets.length; i++)
             {
                 var result = this._startScaleVec[i].multiplyTo(scale);

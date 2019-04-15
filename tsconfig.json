@@ -6,12 +6,16 @@
         "declarationMap": true,
         "declaration": true,
         "experimentalDecorators": true,
+        "lib": [
+            "es2015",
+            "dom"
+        ],
+        "types": [
+            "feng3d"
+        ],
         "outFile": "out/editor.js"
         // "outDir": "debug"
     },
-    "include": [
-        "node_modules/feng3d/out/feng3d.d.ts"
-    ],
     "files": [
         //
         "libs/modules/egret/egret.d.ts",

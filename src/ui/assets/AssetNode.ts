@@ -111,7 +111,7 @@ namespace editor
 
             editorRS.readAsset(this.asset.assetId, (err, asset) =>
             {
-                feng3d.debuger && feng3d.assert(!err);
+                feng3d.debuger && console.assert(!err);
 
                 this.isLoading = false;
                 this.isLoaded = true;
@@ -275,7 +275,7 @@ namespace editor
          */
         export()
         {
-            feng3d.error("未实现");
+            console.error("未实现");
 
             var zip = new JSZip();
 

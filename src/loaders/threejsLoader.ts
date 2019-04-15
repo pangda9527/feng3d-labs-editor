@@ -84,7 +84,7 @@ namespace editor
                     var skinnedModel = gameobject.addComponent(feng3d.SkinnedModel);
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
-                    feng3d.debug.debuger && console.assert(object3d.bindMode == "attached");
+                    feng3d.debuger && console.assert(object3d.bindMode == "attached");
                     skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
                         skinnedModel.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();

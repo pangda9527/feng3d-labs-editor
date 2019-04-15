@@ -56,7 +56,7 @@ namespace editor
          */
 		children: TreeNode[];
 
-		constructor(obj?: gPartial<TreeNode>)
+		constructor(obj?: feng3d.gPartial<TreeNode>)
 		{
 			super();
 			if (obj)
@@ -100,7 +100,7 @@ namespace editor
 		{
 			node.remove();
 
-			feng3d.debuger && feng3d.assert(!node.contain(this), "无法添加到自身结点中!");
+			feng3d.debuger && console.assert(!node.contain(this), "无法添加到自身结点中!");
 
 			if (this.children.indexOf(node) == -1) this.children.push(node);
 			node.parent = this;

@@ -1,15 +1,6 @@
 declare module 'feng3d' {
     export = feng3d;
 }
-declare type gPartial<T> = {
-    [P in keyof T]?: gPartial<T[P]>;
-};
-declare namespace feng3d {
-    /**
-     * feng3d的版本号
-     */
-    var revision: string;
-}
 declare namespace feng3d {
     /**
      * 观察装饰器，观察被装饰属性的变化
@@ -95,94 +86,63 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * Object 工具
-     *
-     * 增强Object功能
+     * 让T中以及所有属性中的所有属性都是可选的
      */
-    var objectutils: ObjectUtils;
-    /**
-     * Object 工具
-     *
-     * 增强Object功能
-     */
-    class ObjectUtils {
-        /**
-         * 从对象以及对象的原型中获取属性描述
-         * @param obj 对象
-         * @param property 属性名称
-         */
-        getPropertyDescriptor(host: Object, property: string): PropertyDescriptor;
-        /**
-         * 属性是否可写
-         * @param obj 对象
-         * @param property 属性名称
-         */
-        propertyIsWritable(host: Object, property: string): boolean;
-        /**
-         * 执行方法
-         *
-         * 用例：
-         * 1. 给一个新建的对象进行初始化
-         *
-         *  ``` startLifetime = Object.runFunc(new MinMaxCurve(), (obj) => { obj.mode = MinMaxCurveMode.Constant; (<MinMaxCurveConstant>obj.minMaxCurve).value = 5; }); ```
-         *
-         * @param obj 对象
-         * @param func 被执行的方法
-         */
-        runFunc<T>(obj: T, func: (obj: T) => void): T;
-    }
+    type gPartial<T> = {
+        [P in keyof T]?: gPartial<T[P]>;
+    };
+    type Lazy<T> = T | (() => T);
+    type LazyObject<T> = {
+        [P in keyof T]: Lazy<T[P]>;
+    };
+    var lazy: {
+        getvalue: <T>(lazyItem: Lazy<T>) => T;
+    };
 }
-declare namespace feng3d {
+interface ObjectConstructor {
     /**
-     * 增强Map功能
+     * 从对象以及对象的原型中获取属性描述
+     * @param obj 对象
+     * @param property 属性名称
      */
-    var maputils: MapUtils;
+    getPropertyDescriptor(obj: Object, property: string): PropertyDescriptor;
     /**
-     * 增强Map功能
+     * 属性是否可写
+     * @param obj 对象
+     * @param property 属性名称
      */
-    class MapUtils {
-        /**
-         * 获取所有键
-         *
-         * @param map Map对象
-         */
-        getKeys<K, V>(map: Map<K, V>): K[];
-        /**
-         * 获取所有值
-         *
-         * @param map Map对象
-         */
-        getValues<K, V>(map: Map<K, V>): V[];
-    }
+    propertyIsWritable(obj: Object, property: string): boolean;
+    /**
+     * 执行方法
+     *
+     * 用例：
+     * 1. 给一个新建的对象进行初始化
+     *
+     *  ``` startLifetime = Object.runFunc(new MinMaxCurve(), (obj) => { obj.mode = MinMaxCurveMode.Constant; (<MinMaxCurveConstant>obj.minMaxCurve).value = 5; }); ```
+     *
+     * @param obj 对象
+     * @param func 被执行的方法
+     */
+    runFunc<T>(obj: T, func: (obj: T) => void): T;
 }
-declare namespace feng3d {
+interface Map<K, V> {
+    getKeys(): K[];
+    getValues(): V[];
+}
+interface Array<T> {
     /**
-     * 数组工具，增强Array功能
+     * 使数组变得唯一，不存在两个相等的元素
+     *
+     * @param compare 比较函数
      */
-    var arrayutils: ArrayUtils;
+    unique(compare?: (a: T, b: T) => boolean): this;
     /**
-     * 数组工具，增强Array功能
+     * 删除元素
+     *
+     * @param item 被删除元素
+     * @returns 被删除元素在数组中的位置
      */
-    class ArrayUtils {
-        /**
-         * 使数组变得唯一，不存在两个相等的元素
-         *
-         * @param arr 数组
-         * @param compare 比较函数
-         *
-         * @returns 返回传入的数组
-         */
-        unique<T>(arr: T[], compare?: (a: T, b: T) => boolean): T[];
-        /**
-         * 删除第一个指定元素
-         *
-         * @param arr 数组
-         * @param item 被删除元素
-         *
-         * @returns 被删除元素在数组中的位置
-         */
-        delete<T>(arr: T[], item: T): number;
-    }
+    delete(item: T): number;
 }
 declare namespace feng3d {
     var functionwarp: FunctionWarp;
@@ -214,13 +174,13 @@ declare namespace feng3d {
      */
     var debug: Debug;
     /**
+     * 是否开启调试
+     */
+    var debuger: boolean;
+    /**
      * 调试工具
      */
     class Debug {
-        /**
-         * 是否开启调试
-         */
-        debuger: boolean;
         constructor();
         /**
          * 测试代码运行时间
@@ -1419,15 +1379,6 @@ declare namespace feng3d {
          */
         name?: string;
     }
-}
-declare namespace feng3d {
-    type Lazy<T> = T | (() => T);
-    type LazyObject<T> = {
-        [P in keyof T]: Lazy<T[P]>;
-    };
-    var lazy: {
-        getvalue: <T>(lazyItem: Lazy<T>) => T;
-    };
 }
 declare namespace feng3d {
     /**
