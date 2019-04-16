@@ -54,13 +54,16 @@ namespace editor
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
-            editorRS.fs.readObject(path, (err, object: feng3d.GameObject) =>
+            // editorRS.deserializeWithAssets(object, (data: AssetData) =>
+
+            editorRS.fs.readObject(path, (err, obj) =>
             {
                 if (err)
                 {
                     callback(err, null);
                     return;
                 }
+                var object: feng3d.GameObject = feng3d.serialization.deserialize(obj);
                 var scene = object.getComponent(feng3d.Scene3D);
                 callback(null, scene);
             });

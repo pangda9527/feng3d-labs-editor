@@ -1732,8 +1732,7 @@ var editor;
                     return;
                 }
                 feng3d.dataTransform.arrayBufferToObject(buffer, function (content) {
-                    var object = feng3d.serialization.deserialize(content);
-                    callback(null, object);
+                    callback(null, content);
                 });
             });
         };
@@ -1856,8 +1855,7 @@ var editor;
          * @param callback 回调函数
          */
         NativeFS.prototype.writeObject = function (path, object, callback) {
-            var obj = feng3d.serialization.serialize(object);
-            var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
+            var str = JSON.stringify(object, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
             this.writeString(path, str, callback);
             feng3d.dispatcher.dispatch("fs.write", path);
         };
@@ -9109,11 +9107,13 @@ var editor;
             });
         };
         EditorAsset.prototype.readScene = function (path, callback) {
-            editor.editorRS.fs.readObject(path, function (err, object) {
+            // editorRS.deserializeWithAssets(object, (data: AssetData) =>
+            editor.editorRS.fs.readObject(path, function (err, obj) {
                 if (err) {
                     callback(err, null);
                     return;
                 }
+                var object = feng3d.serialization.deserialize(obj);
                 var scene = object.getComponent(feng3d.Scene3D);
                 callback(null, scene);
             });
