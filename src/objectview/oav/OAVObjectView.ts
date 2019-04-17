@@ -18,7 +18,7 @@ namespace editor
 		initView()
 		{
 			var arr = [];
-			if (this.attributeValue instanceof Array)
+			if (Array.isArray(this.attributeValue))
 				arr = this.attributeValue;
 			else
 				arr.push(this.attributeValue);
