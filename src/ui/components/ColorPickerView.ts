@@ -104,8 +104,8 @@ namespace editor
             var start = image.localToGlobal(0, 0);
             var end = image.localToGlobal(image.width, image.height);
 
-            var rw = feng3d.FMath.clamp((p.x - start.x) / (end.x - start.x), 0, 1);
-            var rh = feng3d.FMath.clamp((p.y - start.y) / (end.y - start.y), 0, 1);
+            var rw = Math.clamp((p.x - start.x) / (end.x - start.x), 0, 1);
+            var rh = Math.clamp((p.y - start.y) / (end.y - start.y), 0, 1);
 
             if (this.group0 == this._mouseDownGroup)
             {
@@ -303,13 +303,13 @@ namespace editor
                 var result = 0;
                 if (r1 == 1)
                 {
-                    result = feng3d.FMath.mapLinear(r, c0.r, c1.r, ratios[i], ratios[i + 1]);
+                    result = Math.mapLinear(r, c0.r, c1.r, ratios[i], ratios[i + 1]);
                 } else if (g1 == 1)
                 {
-                    result = feng3d.FMath.mapLinear(g, c0.g, c1.g, ratios[i], ratios[i + 1]);
+                    result = Math.mapLinear(g, c0.g, c1.g, ratios[i], ratios[i + 1]);
                 } else if (b1 == 1)
                 {
-                    result = feng3d.FMath.mapLinear(b, c0.b, c1.b, ratios[i], ratios[i + 1]);
+                    result = Math.mapLinear(b, c0.b, c1.b, ratios[i], ratios[i + 1]);
                 }
                 return result;
             }
@@ -352,7 +352,7 @@ namespace editor
         {
             if (ratios[i] <= ratio && ratio <= ratios[i + 1])
             {
-                var mix = feng3d.FMath.mapLinear(ratio, ratios[i], ratios[i + 1], 0, 1);
+                var mix = Math.mapLinear(ratio, ratios[i], ratios[i + 1], 0, 1);
                 var c = colors1[i].mixTo(colors1[i + 1], mix);
                 return c;
             }

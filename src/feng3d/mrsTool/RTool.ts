@@ -107,7 +107,7 @@ namespace editor
                     endDir.normalize();
                     //计算夹角
                     var cosValue = startDir.dot(endDir);
-                    var angle = Math.acos(cosValue) * feng3d.FMath.RAD2DEG;
+                    var angle = Math.acos(cosValue) * Math.RAD2DEG;
                     //计算是否顺时针
                     var sign = this.movePlane3D.getNormal().cross(startDir).dot(endDir);
                     sign = sign > 0 ? 1 : -1;
@@ -170,7 +170,7 @@ namespace editor
             var temp = cameraSceneTransform.clone();
             temp.append(this.toolModel.transform.worldToLocalMatrix);
             var rotation = temp.decompose()[1];
-            rotation.scaleNumber(feng3d.FMath.RAD2DEG);
+            rotation.scaleNumber(Math.RAD2DEG);
             this.toolModel.freeAxis.transform.rotation = rotation;
             this.toolModel.cameraAxis.transform.rotation = rotation;
         }

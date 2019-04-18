@@ -156,10 +156,10 @@ namespace editor
 
         private updateXYLabels()
         {
-            this.yLabels[0].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0, 1, 0, this.range[0], this.range[1])).toString();
-            this.yLabels[1].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0.25, 1, 0, this.range[0], this.range[1])).toString();
-            this.yLabels[2].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0.5, 1, 0, this.range[0], this.range[1])).toString();
-            this.yLabels[3].text = (this.minMaxCurve.curveMultiplier * feng3d.FMath.mapLinear(0.75, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[0].text = (this.minMaxCurve.curveMultiplier * Math.mapLinear(0, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[1].text = (this.minMaxCurve.curveMultiplier * Math.mapLinear(0.25, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[2].text = (this.minMaxCurve.curveMultiplier * Math.mapLinear(0.5, 1, 0, this.range[0], this.range[1])).toString();
+            this.yLabels[3].text = (this.minMaxCurve.curveMultiplier * Math.mapLinear(0.75, 1, 0, this.range[0], this.range[1])).toString();
 
             // for (let i = 0; i <= 10; i++)
             // {
@@ -245,8 +245,8 @@ namespace editor
          */
         private curveToUIPos(time: number, value: number)
         {
-            var x = feng3d.FMath.mapLinear(time, 0, 1, this.curveRect.left, this.curveRect.right);
-            var y = feng3d.FMath.mapLinear(value, this.range[0], this.range[1], this.curveRect.top, this.curveRect.bottom);
+            var x = Math.mapLinear(time, 0, 1, this.curveRect.left, this.curveRect.right);
+            var y = Math.mapLinear(value, this.range[0], this.range[1], this.curveRect.top, this.curveRect.bottom);
             return new feng3d.Vector2(x, y);
         }
 
@@ -257,8 +257,8 @@ namespace editor
          */
         private uiToCurvePos(x: number, y: number)
         {
-            var time = feng3d.FMath.mapLinear(x, this.curveRect.left, this.curveRect.right, 0, 1);
-            var value = feng3d.FMath.mapLinear(y, this.curveRect.top, this.curveRect.bottom, this.range[0], this.range[1]);
+            var time = Math.mapLinear(x, this.curveRect.left, this.curveRect.right, 0, 1);
+            var value = Math.mapLinear(y, this.curveRect.top, this.curveRect.bottom, this.range[0], this.range[1]);
             return { time: time, value: value };
         }
 
@@ -412,8 +412,8 @@ namespace editor
 
             if (this.editKey)
             {
-                curvePos.time = feng3d.FMath.clamp(curvePos.time, 0, 1);
-                curvePos.value = feng3d.FMath.clamp(curvePos.value, this.range[0], this.range[1]);
+                curvePos.time = Math.clamp(curvePos.time, 0, 1);
+                curvePos.value = Math.clamp(curvePos.value, this.range[0], this.range[1]);
 
                 //
                 this.editKey.time = curvePos.time;

@@ -89,7 +89,7 @@ namespace editor
                 var num = 36;
                 var point0: feng3d.Vector3;
                 var point1: feng3d.Vector3;
-                var radius = this.light.range * Math.tan(this.light.angle * feng3d.FMath.DEG2RAD * 0.5);
+                var radius = this.light.range * Math.tan(this.light.angle * Math.DEG2RAD * 0.5);
                 var distance = this.light.range;
                 for (var i = 0; i < num; i++)
                 {
