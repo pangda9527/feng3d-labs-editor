@@ -8141,7 +8141,7 @@ var editor;
         OAVObjectView.prototype.initView = function () {
             var _this = this;
             var arr = [];
-            if (this.attributeValue instanceof Array)
+            if (Array.isArray(this.attributeValue))
                 arr = this.attributeValue;
             else
                 arr.push(this.attributeValue);
