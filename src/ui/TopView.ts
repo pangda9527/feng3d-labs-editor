@@ -110,7 +110,8 @@ namespace editor
 				case this.playBtn:
 					var e = feng3d.dispatcher.dispatch("inspector.saveShowData", () =>
 					{
-						editorRS.fs.writeObject("default.scene.json", editorData.gameScene.gameObject, (err) =>
+						let obj = feng3d.serialization.serialize(editorData.gameScene.gameObject);
+						editorRS.fs.writeObject("default.scene.json", obj, (err) =>
 						{
 							if (err)
 							{

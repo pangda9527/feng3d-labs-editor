@@ -48,27 +48,31 @@ function loadProjectJs(callback)
     }
 }
 
-function initProject()
+function initProject(callback)
 {
     var view3D = new feng3d.Engine();
 
     // 加载并初始化场景
-    feng3d.fs.readObject("default.scene.json", (err, scene) =>
+    feng3d.fs.readObject("default.scene.json", (err, obj) =>
     {
-        if (scene.getComponent(feng3d.Scene3D))
-            view3D.scene = scene.getComponent(feng3d.Scene3D);
+        feng3d.rs.deserializeWithAssets(obj, (scene) =>
+        {
+            if (scene.getComponent(feng3d.Scene3D))
+                view3D.scene = scene.getComponent(feng3d.Scene3D);
 
-        var cameras = view3D.root.getComponentsInChildren(feng3d.Camera);
-        if (cameras.length > 0)
-        {
-            view3D.camera = cameras[0];
-        } else
-        {
-            var camera = view3D.camera;
-            camera.transform.z = -10;
-            camera.transform.lookAt(new feng3d.Vector3D());
-            //
-        }
+            var cameras = view3D.root.getComponentsInChildren(feng3d.Camera);
+            if (cameras.length > 0)
+            {
+                view3D.camera = cameras[0];
+            } else
+            {
+                var camera = view3D.camera;
+                camera.transform.z = -10;
+                camera.transform.lookAt(new feng3d.Vector3D());
+                //
+            }
+            callback && callback();
+        });
     });
 }
 

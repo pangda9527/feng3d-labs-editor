@@ -26,7 +26,8 @@ namespace editor
 
             window.addEventListener("beforeunload", () =>
             {
-                editorRS.fs.writeObject("default.scene.json", editorData.gameScene.gameObject);
+                let obj = feng3d.serialization.serialize(editorData.gameScene.gameObject);
+                editorRS.fs.writeObject("default.scene.json", obj);
             });
         }
     }
