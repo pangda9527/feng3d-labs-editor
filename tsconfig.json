@@ -13,8 +13,8 @@
         "types": [
             // "feng3d"
         ],
-        // "outFile": "out/editor.js"
-        "outDir": "debug"
+        "outFile": "out/editor.js"
+        // "outDir": "debug"
     },
     "include": [
         "../feng3d/out",

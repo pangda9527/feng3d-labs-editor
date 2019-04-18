@@ -12,8 +12,38 @@ namespace editor
             feng3d.dispatcher.on("script.compile", this.onScriptCompile, this);
             feng3d.dispatcher.on("script.gettslibs", this.onGettsLibs, this);
 
+            feng3d.dispatcher.on("openScript", this.onOpenScript, this);
+
             feng3d.dispatcher.on("fs.delete", this.onFileChanged, this);
             feng3d.dispatcher.on("fs.write", this.onFileChanged, this);
+        }
+
+        private onOpenScript(e)
+        {
+            editorData.openScript = e.data;
+
+            if (nativeAPI)
+            {
+                // 使用本地 VSCode 打开
+                var path = editorRS.fs.getAbsolutePath(editorData.openScript.assetPath);
+                nativeAPI.openWithVSCode(editorRS.fs.projectname, (err) =>
+                {
+                    if (err) throw err;
+                    nativeAPI.openWithVSCode(path, (err) =>
+                    {
+                        if (err) throw err;
+                    });
+                });
+            } else
+            {
+
+                if (codeeditoWin) codeeditoWin.close();
+                codeeditoWin = window.open(`codeeditor.html`);
+                codeeditoWin.onload = () =>
+                {
+                    feng3d.dispatcher.dispatch("codeeditor.openScript", editorData.openScript);
+                };
+            }
         }
 
         private onGettsLibs(e: feng3d.Event<{ callback: (tslibs: { path: string; code: string; }[]) => void; }>)
@@ -31,7 +61,7 @@ namespace editor
             // 加载 ts 配置
             editorRS.fs.readString("tsconfig.json", (err, str) =>
             {
-                if (err) { throw err; return; }
+                console.assert(!err);
 
                 this.tsconfig = json.parse(str);
                 console.log(this.tsconfig);

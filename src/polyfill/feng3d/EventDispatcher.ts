@@ -71,5 +71,10 @@ namespace feng3d
          * 还原默认窗口布局
          */
         "viewLayout.reset": Object;
+
+        /**
+         * 打开脚本
+         */
+        "openScript": feng3d.StringAsset;
     }
 }

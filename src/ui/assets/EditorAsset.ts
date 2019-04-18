@@ -309,28 +309,7 @@ namespace editor
                     {
                         label: "编辑", click: () =>
                         {
-                            if (nativeAPI)
-                            {
-                                // 使用本地 VSCode 打开
-                                var path = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
-                                nativeAPI.openWithVSCode(editorRS.fs.projectname, (err) =>
-                                {
-                                    if (err) throw err;
-                                    nativeAPI.openWithVSCode(path, (err) =>
-                                    {
-                                        if (err) throw err;
-                                    });
-                                });
-                            } else
-                            {
-                                if (codeeditoWin) codeeditoWin.close();
-                                codeeditoWin = window.open(`codeeditor.html`);
-                                var script = <feng3d.StringAsset>assetNode.asset;
-                                codeeditoWin.onload = () =>
-                                {
-                                    feng3d.dispatcher.dispatch("codeeditor.openScript", script);
-                                };
-                            }
+                            feng3d.dispatcher.dispatch("openScript",  <feng3d.StringAsset>assetNode.asset);
                         }, show: assetNode.asset instanceof feng3d.StringAsset,
                     },
                 ];

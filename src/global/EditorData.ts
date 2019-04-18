@@ -237,6 +237,11 @@ namespace editor
         private _selectedAssetNodes: AssetNode[] = [];
 
         /**
+         * 编辑器打开的脚本
+         */
+        openScript: feng3d.StringAsset;
+
+        /**
          * 获取编辑器资源绝对路径
          * @param url 编辑器资源相对路径
          */

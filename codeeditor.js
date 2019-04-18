@@ -1,4 +1,4 @@
-/// <reference path="feng3d/out/feng3d.d.ts" />
+/// <reference path="../feng3d/out/feng3d.d.ts" />
 /// <reference path="out/editor.d.ts" />
 /// <reference path="libs/monaco-editor/monaco.d.ts" />
 
@@ -10,31 +10,36 @@
 window.feng3d = window.opener.feng3d;
 window.editor = window.opener.editor;
 
-feng3d.dispatcher.on("codeeditor.openScript", (e) =>
+initMonaco(() =>
 {
-    initMonaco(() =>
+    if (!monacoEditor)
     {
-        if (!monacoEditor)
-        {
-            monacoEditor = monaco.editor.create(document.getElementById('container'), {
-                model: null,
-                formatOnType: true,
-            });
-            window.onresize = function ()
-            {
-                monacoEditor.layout();
-            };
-        }
-
-        feng3d.dispatcher.dispatch("script.gettslibs", {
-            callback: (tslibs) =>
-            {
-                codeEditor(tslibs, e.data);
-            }
+        monacoEditor = monaco.editor.create(document.getElementById('container'), {
+            model: null,
+            formatOnType: true,
         });
+        window.onresize = function ()
+        {
+            monacoEditor.layout();
+        };
+    }
 
+    feng3d.dispatcher.on("codeeditor.openScript", (e) =>
+    {
+        openScript(e.data);
     });
+    openScript(editor.editorData.openScript);
 });
+
+function openScript(script)
+{
+    feng3d.dispatcher.dispatch("script.gettslibs", {
+        callback: (tslibs) =>
+        {
+            codeEditor(tslibs, script);
+        }
+    });
+}
 
 var isInitMonaco = false;
 
@@ -132,14 +137,9 @@ function codeEditor(tslibs, file)
     // monacoEditor.setValue(code);
     if (file instanceof feng3d.ScriptAsset)
     {
-        var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
         tslibs.forEach(v =>
         {
-            monaco.languages.typescript.typescriptDefaults.addExtraLib(v.code, v.path);
-        });
-        tslist.forEach(v =>
-        {
-            if (v != file) monaco.languages.typescript.typescriptDefaults.addExtraLib(v.textContent, v.assetPath);
+            if (v.path != file.assetPath) monaco.languages.typescript.typescriptDefaults.addExtraLib(v.code, v.path);
         });
         logLabel.textContent = "初次编译中。。。。";
         triggerCompile();

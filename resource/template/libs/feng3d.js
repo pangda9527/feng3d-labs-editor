@@ -697,7 +697,7 @@ var feng3d;
             if (Object.isBaseType(object))
                 return object;
             if (feng3d.debuger && object.constructor == Object) {
-                var assetids = feng3d.rs.getAssets(object);
+                var assetids = feng3d.rs.getAssetsWithObject(object);
                 var assets = assetids.reduce(function (pv, cv) { var r = feng3d.rs.getAssetData(cv); if (r)
                     pv.push(r); return pv; }, []);
                 console.assert(assetids.length == assets.length, "\u5B58\u5728\u8D44\u6E90\u672A\u52A0\u8F7D\uFF0C\u8BF7\u4F7F\u7528 deserializeWithAssets \u8FDB\u884C\u53CD\u5E8F\u5217\u5316");
@@ -1784,6 +1784,30 @@ var feng3d;
             return definition;
         };
         /**
+         * 获取默认实例
+         *
+         * @param name 类名称
+         */
+        ClassUtils.prototype.getDefaultInstanceByName = function (name) {
+            var cls = this.getDefinitionByName(name);
+            if (!cls)
+                return undefined;
+            var key = "__default_instance__";
+            return cls[key] = cls[key] || new cls();
+        };
+        /**
+         * 获取实例
+         *
+         * @param name 类名称
+         */
+        ClassUtils.prototype.getInstanceByName = function (name) {
+            var cls = this.getDefinitionByName(name);
+            console.assert(cls);
+            if (!cls)
+                return undefined;
+            return new cls();
+        };
+        /**
          * 新增反射对象所在的命名空间，使得getQualifiedClassName能够得到正确的结果
          */
         ClassUtils.prototype.addClassNameSpace = function (namespace) {
@@ -2032,7 +2056,7 @@ var feng3d;
             var half = size / 2;
             for (var i = 0; i < size; i++) {
                 for (var j = 0; j < size; j++) {
-                    var l = feng3d.FMath.clamp(new feng3d.Vector2(i - half, j - half).length, 0, half) / half;
+                    var l = Math.clamp(new feng3d.Vector2(i - half, j - half).length, 0, half) / half;
                     // l = l * l;
                     var f = 1 - l;
                     f = f * f;
@@ -2122,7 +2146,7 @@ var feng3d;
             for (var i = 0; i < rect.width; i++) {
                 //
                 var y = curve.getValue(i / (rect.width - 1));
-                y = feng3d.FMath.mapLinear(y, range[0], range[1], 0, 1);
+                y = Math.mapLinear(y, range[0], range[1], 0, 1);
                 var j = Math.round(y * (rect.height - 1));
                 this.setPixel(rect.x + i, rect.y + j, color);
             }
@@ -2146,8 +2170,8 @@ var feng3d;
                 //
                 var y0 = curve.getValue(i / (rect.width - 1));
                 var y1 = curve1.getValue(i / (rect.width - 1));
-                y0 = feng3d.FMath.mapLinear(y0, range[0], range[1], 0, 1);
-                y1 = feng3d.FMath.mapLinear(y1, range[0], range[1], 0, 1);
+                y0 = Math.mapLinear(y0, range[0], range[1], 0, 1);
+                y1 = Math.mapLinear(y1, range[0], range[1], 0, 1);
                 y0 = Math.round(y0 * (rect.height - 1));
                 y1 = Math.round(y1 * (rect.height - 1));
                 this.drawLine(new feng3d.Vector2(rect.x + i, rect.y + y0), new feng3d.Vector2(rect.x + i, rect.y + y1), fillcolor);
@@ -6612,259 +6636,245 @@ var feng3d;
     }(feng3d.BinarySearchTree));
     feng3d.AvlTree = AvlTree;
 })(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    feng3d.FMath = {
-        /**
-         * 角度转弧度因子
-         */
-        DEG2RAD: Math.PI / 180,
-        /**
-         * 弧度转角度因子
-         */
-        RAD2DEG: 180 / Math.PI,
-        /**
-         * 默认精度
-         */
-        PRECISION: 0.000001,
-        /**
-         * 获取唯一标识符
-         * @see http://www.broofa.com/Tools/Math.uuid.htm
-         */
-        uuid: function (length) {
-            if (length === void 0) { length = 36; }
-            var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-            var id = new Array(length);
-            var rnd = 0, r = 0;
-            return function generateUUID() {
-                for (var i = 0; i < length; i++) {
-                    if (i === 8 || i === 13 || i === 18 || i === 23) {
-                        id[i] = '-';
-                    }
-                    else if (i === 14) {
-                        id[i] = '4';
-                    }
-                    else {
-                        if (rnd <= 0x02)
-                            rnd = 0x2000000 + (Math.random() * 0x1000000) | 0;
-                        r = rnd & 0xf;
-                        rnd = rnd >> 4;
-                        id[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r];
-                    }
-                }
-                return id.join('');
-            };
-        }(),
-        /**
-         * （夹紧）计算指定值到区间[edge0 ,edge1]最近的值
-         *
-         * @param value 指定值
-         * @param lowerlimit 区间下界
-         * @param upperlimit 区间上界
-         */
-        clamp: function (value, lowerlimit, upperlimit) {
-            if ((value - lowerlimit) * (value - upperlimit) <= 0)
-                return value;
-            if (value < lowerlimit)
-                return lowerlimit < upperlimit ? lowerlimit : upperlimit;
-            return lowerlimit > upperlimit ? lowerlimit : upperlimit;
-        },
-        /**
-         * 计算欧几里得模（整数模） ((n % m) + m) % m
-         *
-         * @param n 被除数
-         * @param m 除数
-         * @see https://en.wikipedia.org/wiki/Modulo_operation
-         */
-        euclideanModulo: function (n, m) {
-            return ((n % m) + m) % m;
-        },
-        /**
-         * 使 x 值从区间 <a1, a2> 线性映射到区间 <b1, b2>
-         *
-         * @param x 第一个区间中值
-         * @param a1 第一个区间起始值
-         * @param a2 第一个区间终止值
-         * @param b1 第二个区间起始值
-         * @param b2 第二个区间起始值
-         */
-        mapLinear: function (x, a1, a2, b1, b2) {
-            return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
-        },
-        /**
-         * 线性插值
-         *
-         * @param start 起始值
-         * @param end 终止值
-         * @param t 插值系数 [0 ,1]
-         *
-         * @see https://en.wikipedia.org/wiki/Linear_interpolation
-         */
-        lerp: function (start, end, t) {
-            return (1 - t) * start + t * end;
-        },
-        /**
-         * 计算平滑值 3x^2 - 2x^3
-         *
-         * @param x
-         * @param min 最小值
-         * @param max 最大值
-         *
-         * @see http://en.wikipedia.org/wiki/Smoothstep
-         */
-        smoothstep: function (x, min, max) {
-            if (x <= min)
-                return 0;
-            if (x >= max)
-                return 1;
-            x = (x - min) / (max - min);
-            return x * x * (3 - 2 * x);
-        },
-        /**
-         * 计算平滑值 6x^5 - 15x^4 + 10x^3
-         *
-         * @param x
-         * @param min 最小值
-         * @param max 最大值
-         */
-        smootherstep: function (x, min, max) {
-            if (x <= min)
-                return 0;
-            if (x >= max)
-                return 1;
-            x = (x - min) / (max - min);
-            return x * x * x * (x * (x * 6 - 15) + 10);
-        },
-        /**
-         * 从<low, high>获取随机整数
-         *
-         * @param low 区间起始值
-         * @param high 区间终止值
-         */
-        randInt: function (low, high) {
-            return low + Math.floor(Math.random() * (high - low + 1));
-        },
-        /**
-         * 从<low, high>获取随机浮点数
-         *
-         * @param low 区间起始值
-         * @param high 区间终止值
-         */
-        randFloat: function (low, high) {
-            return low + Math.random() * (high - low);
-        },
-        /**
-         * 从<-range/2, range/2>获取随机浮点数
-         *
-         * @param range 范围
-         */
-        randFloatSpread: function (range) {
-            return range * (0.5 - Math.random());
-        },
-        /**
-         * 角度转换为弧度
-         *
-         * @param degrees 角度
-         */
-        degToRad: function (degrees) {
-            return degrees * this.DEG2RAD;
-        },
-        /**
-         * 弧度转换为角度
-         *
-         * @param radians 弧度
-         */
-        radToDeg: function (radians) {
-            return radians * this.RAD2DEG;
-        },
-        /**
-         * 判断指定整数是否为2的幂
-         *
-         * @param value 整数
-         */
-        isPowerOfTwo: function (value) {
-            return (value & (value - 1)) === 0 && value !== 0;
-        },
-        /**
-         * 获取离指定整数最近的2的幂
-         *
-         * @param value 整数
-         */
-        nearestPowerOfTwo: function (value) {
-            return Math.pow(2, Math.round(Math.log(value) / Math.LN2));
-        },
-        /**
-         * 获取指定大于等于整数最小2的幂，3->4,5->8,17->32,33->64
-         *
-         * @param value 整数
-         */
-        nextPowerOfTwo: function (value) {
-            value--;
-            value |= value >> 1;
-            value |= value >> 2;
-            value |= value >> 4;
-            value |= value >> 8;
-            value |= value >> 16;
-            value++;
-            return value;
-        },
-        /**
-         * 获取目标最近的值
-         *
-         * source增加或者减少整数倍precision后得到离target最近的值
-         *
-         * ```
-         * Math.toRound(71,0,5);//运算结果为1
-         * ```
-         *
-         * @param source 初始值
-         * @param target 目标值
-         * @param precision 精度
-         */
-        toRound: function (source, target, precision) {
-            if (precision === void 0) { precision = 360; }
-            return source + Math.round((target - source) / precision) * precision;
-        },
-        /**
-         * 比较两个Number是否相等
-         *
-         * @param a 数字a
-         * @param b 数字b
-         * @param precision 进度
-         */
-        equals: function (a, b, precision) {
-            if (precision == undefined)
-                precision = this.PRECISION;
-            return Math.abs(a - b) < precision;
-        },
-        /**
-         * 计算最大公约数
-         *
-         * @param a 整数a
-         * @param b 整数b
-         *
-         * @see https://en.wikipedia.org/wiki/Greatest_common_divisor
-         */
-        gcd: function (a, b) {
-            if (b)
-                while ((a %= b) && (b %= a))
-                    ;
-            return a + b;
-        },
-        /**
-         * 计算最小公倍数
-         * Least common multiple
-         *
-         * @param a 整数a
-         * @param b 整数b
-         *
-         * @see https://en.wikipedia.org/wiki/Least_common_multiple
-         */
-        lcm: function (a, b) {
-            return a * b / feng3d.FMath.gcd(a, b);
-        },
+Math.DEG2RAD = Math.PI / 180;
+Math.RAD2DEG = 180 / Math.PI;
+Math.PRECISION = 0.000001;
+/**
+ * 获取唯一标识符
+ * @see http://www.broofa.com/Tools/Math.uuid.htm
+ */
+Math.uuid = Math.uuid || function (length) {
+    if (length === void 0) { length = 36; }
+    var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+    var id = new Array(length);
+    var rnd = 0, r = 0;
+    return function generateUUID() {
+        for (var i = 0; i < length; i++) {
+            if (i === 8 || i === 13 || i === 18 || i === 23) {
+                id[i] = '-';
+            }
+            else if (i === 14) {
+                id[i] = '4';
+            }
+            else {
+                if (rnd <= 0x02)
+                    rnd = 0x2000000 + (Math.random() * 0x1000000) | 0;
+                r = rnd & 0xf;
+                rnd = rnd >> 4;
+                id[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r];
+            }
+        }
+        return id.join('');
     };
-})(feng3d || (feng3d = {}));
+}();
+/**
+ * （夹紧）计算指定值到区间[edge0 ,edge1]最近的值
+ *
+ * @param value 指定值
+ * @param lowerlimit 区间下界
+ * @param upperlimit 区间上界
+ */
+Math.clamp = Math.clamp || function (value, lowerlimit, upperlimit) {
+    if ((value - lowerlimit) * (value - upperlimit) <= 0)
+        return value;
+    if (value < lowerlimit)
+        return lowerlimit < upperlimit ? lowerlimit : upperlimit;
+    return lowerlimit > upperlimit ? lowerlimit : upperlimit;
+};
+/**
+ * 计算欧几里得模（整数模） ((n % m) + m) % m
+ *
+ * @param n 被除数
+ * @param m 除数
+ * @see https://en.wikipedia.org/wiki/Modulo_operation
+ */
+Math.euclideanModulo = Math.euclideanModulo || function (n, m) {
+    return ((n % m) + m) % m;
+};
+/**
+ * 使 x 值从区间 <a1, a2> 线性映射到区间 <b1, b2>
+ *
+ * @param x 第一个区间中值
+ * @param a1 第一个区间起始值
+ * @param a2 第一个区间终止值
+ * @param b1 第二个区间起始值
+ * @param b2 第二个区间起始值
+ */
+Math.mapLinear = Math.mapLinear || function (x, a1, a2, b1, b2) {
+    return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
+};
+/**
+ * 线性插值
+ *
+ * @param start 起始值
+ * @param end 终止值
+ * @param t 插值系数 [0 ,1]
+ *
+ * @see https://en.wikipedia.org/wiki/Linear_interpolation
+ */
+Math.lerp = Math.lerp || function (start, end, t) {
+    return (1 - t) * start + t * end;
+};
+/**
+ * 计算平滑值 3x^2 - 2x^3
+ *
+ * @param x
+ * @param min 最小值
+ * @param max 最大值
+ *
+ * @see http://en.wikipedia.org/wiki/Smoothstep
+ */
+Math.smoothstep = Math.smoothstep || function (x, min, max) {
+    if (x <= min)
+        return 0;
+    if (x >= max)
+        return 1;
+    x = (x - min) / (max - min);
+    return x * x * (3 - 2 * x);
+};
+/**
+ * 计算平滑值 6x^5 - 15x^4 + 10x^3
+ *
+ * @param x
+ * @param min 最小值
+ * @param max 最大值
+ */
+Math.smootherstep = Math.smootherstep || function (x, min, max) {
+    if (x <= min)
+        return 0;
+    if (x >= max)
+        return 1;
+    x = (x - min) / (max - min);
+    return x * x * x * (x * (x * 6 - 15) + 10);
+};
+/**
+ * 从<low, high>获取随机整数
+ *
+ * @param low 区间起始值
+ * @param high 区间终止值
+ */
+Math.randInt = Math.randInt || function (low, high) {
+    return low + Math.floor(Math.random() * (high - low + 1));
+};
+/**
+ * 从<low, high>获取随机浮点数
+ *
+ * @param low 区间起始值
+ * @param high 区间终止值
+ */
+Math.randFloat = Math.randFloat || function (low, high) {
+    return low + Math.random() * (high - low);
+};
+/**
+ * 从<-range/2, range/2>获取随机浮点数
+ *
+ * @param range 范围
+ */
+Math.randFloatSpread = Math.randFloatSpread || function (range) {
+    return range * (0.5 - Math.random());
+};
+/**
+ * 角度转换为弧度
+ *
+ * @param degrees 角度
+ */
+Math.degToRad = Math.degToRad || function (degrees) {
+    return degrees * this.DEG2RAD;
+};
+/**
+ * 弧度转换为角度
+ *
+ * @param radians 弧度
+ */
+Math.radToDeg = Math.radToDeg || function (radians) {
+    return radians * this.RAD2DEG;
+};
+/**
+ * 判断指定整数是否为2的幂
+ *
+ * @param value 整数
+ */
+Math.isPowerOfTwo = Math.isPowerOfTwo || function (value) {
+    return (value & (value - 1)) === 0 && value !== 0;
+};
+/**
+ * 获取离指定整数最近的2的幂
+ *
+ * @param value 整数
+ */
+Math.nearestPowerOfTwo = Math.nearestPowerOfTwo || function (value) {
+    return Math.pow(2, Math.round(Math.log(value) / Math.LN2));
+};
+/**
+ * 获取指定大于等于整数最小2的幂，3->4,5->8,17->32,33->64
+ *
+ * @param value 整数
+ */
+Math.nextPowerOfTwo = Math.nextPowerOfTwo || function (value) {
+    value--;
+    value |= value >> 1;
+    value |= value >> 2;
+    value |= value >> 4;
+    value |= value >> 8;
+    value |= value >> 16;
+    value++;
+    return value;
+};
+/**
+ * 获取目标最近的值
+ *
+ * source增加或者减少整数倍precision后得到离target最近的值
+ *
+ * ```
+ * Math.toRound(71,0,5);//运算结果为1
+ * ```
+ *
+ * @param source 初始值
+ * @param target 目标值
+ * @param precision 精度
+ */
+Math.toRound = Math.toRound || function (source, target, precision) {
+    if (precision === void 0) { precision = 360; }
+    return source + Math.round((target - source) / precision) * precision;
+};
+/**
+ * 比较两个Number是否相等
+ *
+ * @param a 数字a
+ * @param b 数字b
+ * @param precision 进度
+ */
+Math.equals = Math.equals || function (a, b, precision) {
+    if (precision == undefined)
+        precision = this.PRECISION;
+    return Math.abs(a - b) < precision;
+};
+/**
+ * 计算最大公约数
+ *
+ * @param a 整数a
+ * @param b 整数b
+ *
+ * @see https://en.wikipedia.org/wiki/Greatest_common_divisor
+ */
+Math.gcd = Math.gcd || function (a, b) {
+    if (b)
+        while ((a %= b) && (b %= a))
+            ;
+    return a + b;
+};
+/**
+ * 计算最小公倍数
+ * Least common multiple
+ *
+ * @param a 整数a
+ * @param b 整数b
+ *
+ * @see https://en.wikipedia.org/wiki/Least_common_multiple
+ */
+Math.lcm = Math.lcm || function (a, b) {
+    return a * b / Math.gcd(a, b);
+};
 var feng3d;
 (function (feng3d) {
     /**
@@ -7393,12 +7403,12 @@ var feng3d;
          * 通过将当前 Color3 对象的 r、g 和 b 元素与指定的 Color3 对象的 r、g 和 b 元素进行比较，确定这两个对象是否相等。
          */
         Color3.prototype.equals = function (object, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
-            if (!feng3d.FMath.equals(this.r - object.r, 0, precision))
+            if (precision === void 0) { precision = Math.PRECISION; }
+            if (!Math.equals(this.r - object.r, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.g - object.g, 0, precision))
+            if (!Math.equals(this.g - object.g, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.b - object.b, 0, precision))
+            if (!Math.equals(this.b - object.b, 0, precision))
                 return false;
             return true;
         };
@@ -7620,14 +7630,14 @@ var feng3d;
          * 通过将当前 Color3 对象的 r、g 和 b 元素与指定的 Color3 对象的 r、g 和 b 元素进行比较，确定这两个对象是否相等。
          */
         Color4.prototype.equals = function (object, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
-            if (!feng3d.FMath.equals(this.r - object.r, 0, precision))
+            if (precision === void 0) { precision = Math.PRECISION; }
+            if (!Math.equals(this.r - object.r, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.g - object.g, 0, precision))
+            if (!Math.equals(this.g - object.g, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.b - object.b, 0, precision))
+            if (!Math.equals(this.b - object.b, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.a - object.a, 0, precision))
+            if (!Math.equals(this.a - object.a, 0, precision))
                 return false;
             return true;
         };
@@ -7898,8 +7908,8 @@ var feng3d;
          * @param max 最大值
          */
         Vector2.prototype.clamp = function (min, max) {
-            this.x = feng3d.FMath.clamp(this.x, min.x, max.x);
-            this.y = feng3d.FMath.clamp(this.y, min.y, max.y);
+            this.x = Math.clamp(this.x, min.x, max.x);
+            this.y = Math.clamp(this.y, min.y, max.y);
             return this;
         };
         /**
@@ -8263,12 +8273,12 @@ var feng3d;
          * 通过将当前 Vector3 对象的 x、y 和 z 元素与指定的 Vector3 对象的 x、y 和 z 元素进行比较，确定这两个对象是否相等。
          */
         Vector3.prototype.equals = function (object, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
-            if (!feng3d.FMath.equals(this.x - object.x, 0, precision))
+            if (precision === void 0) { precision = Math.PRECISION; }
+            if (!Math.equals(this.x - object.x, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.y - object.y, 0, precision))
+            if (!Math.equals(this.y - object.y, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.z - object.z, 0, precision))
+            if (!Math.equals(this.z - object.z, 0, precision))
                 return false;
             return true;
         };
@@ -8453,9 +8463,9 @@ var feng3d;
          * @param max 最大值
          */
         Vector3.prototype.clamp = function (min, max) {
-            this.x = feng3d.FMath.clamp(this.x, min.x, max.x);
-            this.y = feng3d.FMath.clamp(this.y, min.y, max.y);
-            this.z = feng3d.FMath.clamp(this.z, min.z, max.z);
+            this.x = Math.clamp(this.x, min.x, max.x);
+            this.y = Math.clamp(this.y, min.y, max.y);
+            this.z = Math.clamp(this.z, min.z, max.z);
             return this;
         };
         /**
@@ -8576,8 +8586,8 @@ var feng3d;
          * @param v 向量
          */
         Vector3.prototype.isParallel = function (v, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
-            return feng3d.FMath.equals(Math.abs(this.clone().normalize().dot(v.clone().normalize())), 1, precision);
+            if (precision === void 0) { precision = Math.PRECISION; }
+            return Math.equals(Math.abs(this.clone().normalize().dot(v.clone().normalize())), 1, precision);
         };
         /**
          * 返回当前 Vector3 对象的字符串表示形式。
@@ -8854,14 +8864,14 @@ var feng3d;
          * @return 相等返回true，否则false
          */
         Vector4.prototype.equals = function (v, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
-            if (!feng3d.FMath.equals(this.x - v.x, 0, precision))
+            if (precision === void 0) { precision = Math.PRECISION; }
+            if (!Math.equals(this.x - v.x, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.y - v.y, 0, precision))
+            if (!Math.equals(this.y - v.y, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.z - v.z, 0, precision))
+            if (!Math.equals(this.z - v.z, 0, precision))
                 return false;
-            if (!feng3d.FMath.equals(this.w - v.w, 0, precision))
+            if (!Math.equals(this.w - v.w, 0, precision))
                 return false;
             return true;
         };
@@ -10077,9 +10087,9 @@ var feng3d;
          * @param   rz      用于沿 z 轴旋转对象的角度。
          */
         Matrix4x4.fromRotation = function (rx, ry, rz) {
-            rx = feng3d.FMath.degToRad(rx);
-            ry = feng3d.FMath.degToRad(ry);
-            rz = feng3d.FMath.degToRad(rz);
+            rx = Math.degToRad(rx);
+            ry = Math.degToRad(ry);
+            rz = Math.degToRad(rz);
             var sx = Math.sin(rx), cx = Math.cos(rx), sy = Math.sin(ry), cy = Math.cos(ry), sz = Math.sin(rz), cz = Math.cos(rz);
             return new Matrix4x4([
                 cy * cz, cy * sz, -sy, 0,
@@ -10673,10 +10683,10 @@ var feng3d;
          * 比较矩阵是否相等
          */
         Matrix4x4.prototype.equals = function (matrix3D, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
+            if (precision === void 0) { precision = Math.PRECISION; }
             var r2 = matrix3D.rawData;
             for (var i = 0; i < 16; ++i) {
-                if (!feng3d.FMath.equals(this.rawData[i] - r2[i], 0, precision))
+                if (!Math.equals(this.rawData[i] - r2[i], 0, precision))
                     return false;
             }
             return true;
@@ -11330,8 +11340,8 @@ var feng3d;
          * @param precision 精度
          */
         Line3D.prototype.onWithPoint = function (point, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
-            if (feng3d.FMath.equals(this.distanceWithPoint(point), 0, precision))
+            if (precision === void 0) { precision = Math.PRECISION; }
+            if (Math.equals(this.distanceWithPoint(point), 0, precision))
                 return true;
             return false;
         };
@@ -11368,7 +11378,7 @@ var feng3d;
          * @return 相等返回true，否则false
          */
         Line3D.prototype.equals = function (line, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
+            if (precision === void 0) { precision = Math.PRECISION; }
             if (!this.onWithPoint(line.position))
                 return false;
             if (!this.onWithPoint(line.position.addTo(line.direction)))
@@ -11441,8 +11451,8 @@ var feng3d;
          * @param point
          */
         Segment3D.prototype.onWithPoint = function (point, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
-            return feng3d.FMath.equals(this.getPointDistance(point), 0, precision);
+            if (precision === void 0) { precision = Math.PRECISION; }
+            return Math.equals(this.getPointDistance(point), 0, precision);
         };
         /**
          * 判定点是否投影在线段上
@@ -11554,7 +11564,7 @@ var feng3d;
          */
         Segment3D.prototype.clampPoint = function (point, pout) {
             if (pout === void 0) { pout = new feng3d.Vector3(); }
-            return this.getPoint(feng3d.FMath.clamp(this.getPositionByPoint(point), 0, 1), pout);
+            return this.getPoint(Math.clamp(this.getPositionByPoint(point), 0, 1), pout);
         };
         /**
          * 判定线段是否相等
@@ -11812,7 +11822,7 @@ var feng3d;
          * @param precision 精度，如果距离小于精度则判定为在三角形上
          */
         Triangle3D.prototype.onWithPoint = function (p, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
+            if (precision === void 0) { precision = Math.PRECISION; }
             var plane3d = this.getPlane3d();
             if (plane3d.classifyPoint(p, precision) != feng3d.PlaneClassification.INTERSECT)
                 return false;
@@ -12896,7 +12906,7 @@ var feng3d;
          * @param p 点
          */
         Plane3D.prototype.onWithPoint = function (p) {
-            return feng3d.FMath.equals(this.distanceWithPoint(p), 0);
+            return Math.equals(this.distanceWithPoint(p), 0);
         };
         /**
          * 顶点分类
@@ -12905,9 +12915,9 @@ var feng3d;
          * @return			顶点类型 PlaneClassification.BACK,PlaneClassification.FRONT,PlaneClassification.INTERSECT
          */
         Plane3D.prototype.classifyPoint = function (p, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
+            if (precision === void 0) { precision = Math.PRECISION; }
             var len = this.distanceWithPoint(p);
-            if (feng3d.FMath.equals(len, 0, precision))
+            if (Math.equals(len, 0, precision))
                 return feng3d.PlaneClassification.INTERSECT;
             if (len < 0)
                 return feng3d.PlaneClassification.BACK;
@@ -12918,8 +12928,8 @@ var feng3d;
          * @param line3D
          */
         Plane3D.prototype.parallelWithLine3D = function (line3D, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
-            if (feng3d.FMath.equals(line3D.direction.dot(this.getNormal()), 0, precision))
+            if (precision === void 0) { precision = Math.PRECISION; }
+            if (Math.equals(line3D.direction.dot(this.getNormal()), 0, precision))
                 return true;
             return false;
         };
@@ -12928,7 +12938,7 @@ var feng3d;
          * @param plane3D
          */
         Plane3D.prototype.parallelWithPlane3D = function (plane3D, precision) {
-            if (precision === void 0) { precision = feng3d.FMath.PRECISION; }
+            if (precision === void 0) { precision = Math.PRECISION; }
             if (plane3D.getNormal().isParallel(this.getNormal(), precision))
                 return true;
             return false;
@@ -13368,7 +13378,7 @@ var feng3d;
                 if (t < time && time < nt) {
                     if (this.mode == feng3d.GradientMode.Fixed)
                         return nv;
-                    return feng3d.FMath.mapLinear(time, t, nt, v, nv);
+                    return Math.mapLinear(time, t, nt, v, nv);
                 }
             }
             return 1;
@@ -14156,13 +14166,13 @@ var feng3d;
         AnimationCurve.prototype.getPoint = function (t) {
             switch (this.wrapMode) {
                 case feng3d.AnimationCurveWrapMode.Clamp:
-                    t = feng3d.FMath.clamp(t, 0, 1);
+                    t = Math.clamp(t, 0, 1);
                     break;
                 case feng3d.AnimationCurveWrapMode.Loop:
-                    t = feng3d.FMath.clamp(t - Math.floor(t), 0, 1);
+                    t = Math.clamp(t - Math.floor(t), 0, 1);
                     break;
                 case feng3d.AnimationCurveWrapMode.PingPong:
-                    t = feng3d.FMath.clamp(t - Math.floor(t), 0, 1);
+                    t = Math.clamp(t - Math.floor(t), 0, 1);
                     if (Math.floor(t) % 2 == 1)
                         t = 1 - t;
                     break;
@@ -14357,9 +14367,9 @@ var feng3d;
                 case feng3d.MinMaxCurveMode.Curve:
                     return this.curve.getValue(time) * this.curveMultiplier;
                 case feng3d.MinMaxCurveMode.RandomBetweenTwoConstants:
-                    return feng3d.FMath.lerp(this.constant, this.constant1, Math.random());
+                    return Math.lerp(this.constant, this.constant1, Math.random());
                 case feng3d.MinMaxCurveMode.RandomBetweenTwoCurves:
-                    return feng3d.FMath.lerp(this.curve.getValue(time), this.curve1.getValue(time), Math.random()) * this.curveMultiplier;
+                    return Math.lerp(this.curve.getValue(time), this.curve1.getValue(time), Math.random()) * this.curveMultiplier;
             }
             return this.constant;
         };
@@ -14943,10 +14953,6 @@ var feng3d;
 var feng3d;
 (function (feng3d) {
     /**
-     * 用于临时存放函数执行结果，获取结果后会自动清除
-     */
-    var tempResutProperty = "__result__";
-    /**
      * 任务
      *
      * 处理 异步任务(函数)串联并联执行功能
@@ -15031,19 +15037,19 @@ var feng3d;
          * @param done 完成回调
          */
         Task.prototype.parallelResults = function (ps, fn, done) {
+            var map = new Map();
             // 包装函数
             var fns = ps.map(function (p) { return function (callback) {
                 fn(p, function (r) {
-                    p[tempResutProperty] = r;
+                    map.set(p, r);
                     callback();
                 });
             }; });
             this.parallel(fns)(function () {
                 var results = ps.map(function (p) {
-                    var r = p[tempResutProperty];
-                    delete p[tempResutProperty];
-                    return r;
+                    return map.get(p);
                 });
+                map.clear();
                 done(results);
             });
         };
@@ -15055,19 +15061,19 @@ var feng3d;
          * @param done 完成回调
          */
         Task.prototype.seriesResults = function (ps, fn, done) {
+            var map = new Map();
             // 包装函数
             var fns = ps.map(function (p) { return function (callback) {
                 fn(p, function (r) {
-                    p[tempResutProperty] = r;
+                    map.set(p, r);
                     callback();
                 });
             }; });
             this.series(fns)(function () {
                 var results = ps.map(function (p) {
-                    var r = p[tempResutProperty];
-                    delete p[tempResutProperty];
-                    return r;
+                    return map.get(p);
                 });
+                map.clear();
                 done(results);
             });
         };
@@ -16933,7 +16939,7 @@ var feng3d;
             parent = parent || this._root;
             //
             var asset = new cls();
-            var assetId = feng3d.FMath.uuid();
+            var assetId = Math.uuid();
             // 初始化
             asset.rs = this;
             asset.assetId = assetId;
@@ -17090,40 +17096,22 @@ var feng3d;
         /**
          * 获取需要反序列化对象中的资源id列表
          */
-        ReadRS.prototype.getAssets = function (object, assetids) {
+        ReadRS.prototype.getAssetsWithObject = function (object, assetids) {
             var _this = this;
             if (assetids === void 0) { assetids = []; }
-            //基础类型
             if (Object.isBaseType(object))
-                return assetids;
-            //处理数组
-            if (Array.isArray(object)) {
-                object.forEach(function (v) { return _this.getAssets(v, assetids); });
-                return assetids;
-            }
-            // 获取类型
-            var className = object[feng3d.CLASS_KEY];
-            // 处理普通Object
-            if (className == "Object" || className == null) {
-                for (var key in object) {
-                    if (key != feng3d.CLASS_KEY)
-                        this.getAssets(object[key], assetids);
-                }
-                return assetids;
-            }
-            //处理方法
-            if (className == "function")
-                return assetids;
-            var cls = feng3d.classUtils.getDefinitionByName(className);
-            if (!cls) {
-                console.warn("\u65E0\u6CD5\u5E8F\u5217\u53F7\u5BF9\u8C61 " + className);
-                return assetids;
-            }
-            var target = new cls();
-            // 处理资源
-            if (target instanceof feng3d.AssetData && object.assetId != undefined) {
-                assetids.push(object.assetId);
-                return assetids;
+                return;
+            //
+            var ins = feng3d.classUtils.getDefaultInstanceByName(object[feng3d.CLASS_KEY]);
+            var assetId = object.assetId;
+            if (ins instanceof feng3d.AssetData && assetId)
+                assetids.push(assetId);
+            //
+            if (object.constructor.name == "Object" || Array.isArray(object)) {
+                var keys = Object.keys(object);
+                keys.forEach(function (k) {
+                    _this.getAssetsWithObject(object[k], assetids);
+                });
             }
             return assetids;
         };
@@ -17134,25 +17122,14 @@ var feng3d;
          * @param callback 完成回调
          */
         ReadRS.prototype.deserializeWithAssets = function (object, callback) {
-            //
-            var className = object[feng3d.CLASS_KEY];
-            var assetId = object.assetId;
-            feng3d.debuger && console.assert(className != undefined && assetId != undefined);
-            // 获取资源类定义
-            var cls = feng3d.classUtils.getDefinitionByName(className);
-            if (!cls) {
-                console.warn("\u65E0\u6CD5\u5E8F\u5217\u53F7\u5BF9\u8C61 " + className);
-                return;
-            }
-            // 创建资源数据实例
-            var assetData = new cls();
-            feng3d.debuger && console.assert(assetData instanceof feng3d.AssetData);
             // 获取所包含的资源列表
-            var assetids = this.getAssets(object);
+            var assetids = this.getAssetsWithObject(object);
             // 不需要加载本资源，移除自身资源
-            assetids.delete(assetId);
+            assetids.delete(object.assetId);
             // 加载包含的资源数据
             this.readAssetDatas(assetids, function (err, result) {
+                // 创建资源数据实例
+                var assetData = feng3d.classUtils.getInstanceByName(object[feng3d.CLASS_KEY]);
                 //默认反序列
                 feng3d.serialization.setValue(assetData, object);
                 callback(assetData);
@@ -19443,9 +19420,9 @@ var feng3d;
          */
         TextureInfo.prototype.isPowerOfTwo = function (pixels) {
             if (this._isRenderTarget) {
-                if (this.OFFSCREEN_WIDTH == 0 || !feng3d.FMath.isPowerOfTwo(this.OFFSCREEN_WIDTH))
+                if (this.OFFSCREEN_WIDTH == 0 || !Math.isPowerOfTwo(this.OFFSCREEN_WIDTH))
                     return false;
-                if (this.OFFSCREEN_HEIGHT == 0 || !feng3d.FMath.isPowerOfTwo(this.OFFSCREEN_HEIGHT))
+                if (this.OFFSCREEN_HEIGHT == 0 || !Math.isPowerOfTwo(this.OFFSCREEN_HEIGHT))
                     return false;
                 return true;
             }
@@ -19455,9 +19432,9 @@ var feng3d;
                 pixels = [pixels];
             for (var i = 0; i < pixels.length; i++) {
                 var element = pixels[i];
-                if (element.width == 0 || !feng3d.FMath.isPowerOfTwo(element.width))
+                if (element.width == 0 || !Math.isPowerOfTwo(element.width))
                     return false;
-                if (element.height == 0 || !feng3d.FMath.isPowerOfTwo(element.height))
+                if (element.height == 0 || !Math.isPowerOfTwo(element.height))
                     return false;
             }
             return true;
@@ -21510,7 +21487,7 @@ var feng3d;
                 }
                 val.decompose(feng3d.Orientation3D.EULER_ANGLES, elements);
                 this.position = elements[0];
-                this.rotation = elements[1].scaleNumber(feng3d.FMath.RAD2DEG);
+                this.rotation = elements[1].scaleNumber(Math.RAD2DEG);
                 this.scale = elements[2];
             },
             enumerable: true,
@@ -21587,7 +21564,7 @@ var feng3d;
             },
             set: function (value) {
                 var angles = value.toEulerAngles();
-                angles.scaleNumber(feng3d.FMath.RAD2DEG);
+                angles.scaleNumber(Math.RAD2DEG);
                 this.rotation = angles;
             },
             enumerable: true,
@@ -21820,7 +21797,7 @@ var feng3d;
         //------------------------------------------
         Transform.prototype.updateMatrix3D = function () {
             tempComponents[0].init(this._x, this._y, this._z);
-            tempComponents[1].init(this._rx * feng3d.FMath.DEG2RAD, this._ry * feng3d.FMath.DEG2RAD, this._rz * feng3d.FMath.DEG2RAD);
+            tempComponents[1].init(this._rx * Math.DEG2RAD, this._ry * Math.DEG2RAD, this._rz * Math.DEG2RAD);
             tempComponents[2].init(this._sx, this._sy, this._sz);
             this._matrix3d = new feng3d.Matrix4x4().recompose(tempComponents);
         };
@@ -21933,7 +21910,7 @@ var feng3d;
             _this._children = [];
             _this.name = "GameObject";
             _this.addComponent(feng3d.Transform);
-            _this.guid = feng3d.FMath.uuid();
+            _this.guid = Math.uuid();
             //
             GameObject.pool.set(_this.guid, _this);
             _this.onAll(_this._onAllListener, _this);
@@ -28087,14 +28064,14 @@ var feng3d;
              * 椎体cos值
              */
             get: function () {
-                return Math.cos(this.angle * 0.5 * feng3d.FMath.DEG2RAD);
+                return Math.cos(this.angle * 0.5 * Math.DEG2RAD);
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(SpotLight.prototype, "penumbraCos", {
             get: function () {
-                return Math.cos(this.angle * 0.5 * feng3d.FMath.DEG2RAD * (1 - this.penumbra));
+                return Math.cos(this.angle * 0.5 * Math.DEG2RAD * (1 - this.penumbra));
             },
             enumerable: true,
             configurable: true
@@ -28548,9 +28525,9 @@ var feng3d;
                 this._pos.y = this._origin.y;
                 this._pos.z = this._origin.z;
             }
-            this._targetObject.transform.x = this._pos.x + this._distance * Math.sin(this._currentPanAngle * feng3d.FMath.DEG2RAD) * Math.cos(this._currentTiltAngle * feng3d.FMath.DEG2RAD);
-            this._targetObject.transform.z = this._pos.z + this._distance * Math.cos(this._currentPanAngle * feng3d.FMath.DEG2RAD) * Math.cos(this._currentTiltAngle * feng3d.FMath.DEG2RAD);
-            this._targetObject.transform.y = this._pos.y + this._distance * Math.sin(this._currentTiltAngle * feng3d.FMath.DEG2RAD) * this._yFactor;
+            this._targetObject.transform.x = this._pos.x + this._distance * Math.sin(this._currentPanAngle * Math.DEG2RAD) * Math.cos(this._currentTiltAngle * Math.DEG2RAD);
+            this._targetObject.transform.z = this._pos.z + this._distance * Math.cos(this._currentPanAngle * Math.DEG2RAD) * Math.cos(this._currentTiltAngle * Math.DEG2RAD);
+            this._targetObject.transform.y = this._pos.y + this._distance * Math.sin(this._currentTiltAngle * Math.DEG2RAD) * this._yFactor;
             _super.prototype.update.call(this);
         };
         return HoverController;
@@ -30127,9 +30104,9 @@ var feng3d;
             for (var i = 0, n = this._activeParticles.length; i < n; i++) {
                 var particle = this._activeParticles[i];
                 if (this.geometry == feng3d.Geometry.billboard && cameraMatrix) {
-                    var matrix = new feng3d.Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(feng3d.FMath.DEG2RAD), particle.scale]);
+                    var matrix = new feng3d.Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.scale]);
                     matrix.lookAt(localCameraPos, localCameraUp);
-                    particle.rotation = matrix.decompose()[1].scaleNumber(feng3d.FMath.RAD2DEG);
+                    particle.rotation = matrix.decompose()[1].scaleNumber(Math.RAD2DEG);
                 }
                 positions.push(particle.position.x, particle.position.y, particle.position.z);
                 scales.push(particle.scale.x, particle.scale.y, particle.scale.z);
@@ -30400,12 +30377,12 @@ var feng3d;
         ParticleSystemShapeCone.prototype.initParticleState = function (particle) {
             var speed = particle.velocity.length;
             // 计算位置
-            var angle = Math.random() * feng3d.FMath.degToRad(this.arc);
+            var angle = Math.random() * Math.degToRad(this.arc);
             var r = Math.random();
             var p = new feng3d.Vector3(Math.sin(angle), Math.cos(angle), 0);
             particle.position.copy(p).scaleNumber(this.radius).scaleNumber(r);
             // 计算速度
-            p.scaleNumber(this.radius + this.height * Math.tan(feng3d.FMath.degToRad(this.angle))).scaleNumber(r);
+            p.scaleNumber(this.radius + this.height * Math.tan(Math.degToRad(this.angle))).scaleNumber(r);
             p.z = this.height;
             var dir = p.sub(particle.position).normalize();
             particle.velocity.copy(dir).scaleNumber(speed);
@@ -30526,7 +30503,7 @@ var feng3d;
         ParticleSystemShapeCircle.prototype.initParticleState = function (particle) {
             var speed = particle.velocity.length;
             // 计算位置
-            var angle = Math.random() * feng3d.FMath.degToRad(this.arc);
+            var angle = Math.random() * Math.degToRad(this.arc);
             var dir = new feng3d.Vector3(Math.sin(angle), Math.cos(angle), 0);
             var p = dir.scaleNumberTo(this.radius * Math.random());
             //
