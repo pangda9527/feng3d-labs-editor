@@ -54,13 +54,16 @@ namespace editor
 
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
         {
-            editorRS.fs.readObject(path, (err, object: feng3d.GameObject) =>
+            // editorRS.deserializeWithAssets(object, (data: AssetData) =>
+
+            editorRS.fs.readObject(path, (err, obj) =>
             {
                 if (err)
                 {
                     callback(err, null);
                     return;
                 }
+                var object: feng3d.GameObject = feng3d.serialization.deserialize(obj);
                 var scene = object.getComponent(feng3d.Scene3D);
                 callback(null, scene);
             });
@@ -108,7 +111,7 @@ namespace editor
         {
             editorRS.writeAsset(assetNode.asset, (err) =>
             {
-                feng3d.debuger && feng3d.assert(!err, `资源 ${assetNode.asset.assetId} 保存失败！`);
+                feng3d.debuger && console.assert(!err, `资源 ${assetNode.asset.assetId} 保存失败！`);
                 callback && callback();
             });
         }
@@ -122,7 +125,7 @@ namespace editor
          * @param folderNode 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        createAsset<T extends feng3d.FileAsset>(folderNode: AssetNode, cls: new () => T, fileName?: string, value?: gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void)
+        createAsset<T extends feng3d.FileAsset>(folderNode: AssetNode, cls: new () => T, fileName?: string, value?: feng3d.gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void)
         {
             var folder = <feng3d.FolderAsset>folderNode.asset;
             editorRS.createAsset(cls, fileName, value, folder, (err, asset) =>
@@ -371,7 +374,7 @@ namespace editor
          */
         saveObject(object: feng3d.AssetData, callback?: (file: AssetNode) => void)
         {
-            feng3d.error(`未实现`);
+            console.error(`未实现`);
 
             // var assetsFile = this.createAssets(this.showFloder, object.name, object);
             // callback && callback(assetsFile);
@@ -442,7 +445,7 @@ namespace editor
 
                     } catch (error)
                     {
-                        feng3d.warn(error);
+                        console.warn(error);
                     }
                 }
                 this._preProjectJsContent = content;

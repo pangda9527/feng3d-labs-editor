@@ -63,8 +63,7 @@ namespace editor
                 if (err) { callback(err, null); return; }
                 feng3d.dataTransform.arrayBufferToObject(buffer, (content) =>
                 {
-                    var object = feng3d.serialization.deserialize(content);
-                    callback(null, object);
+                    callback(null, content);
                 });
             });
         }
@@ -213,8 +212,7 @@ namespace editor
          */
         writeObject(path: string, object: Object, callback?: (err: Error) => void)
         {
-            var obj = feng3d.serialization.serialize(object);
-            var str = JSON.stringify(obj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1')
+            var str = JSON.stringify(object, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1')
             this.writeString(path, str, callback);
             feng3d.dispatcher.dispatch("fs.write", path);
         }

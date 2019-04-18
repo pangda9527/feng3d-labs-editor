@@ -8,7 +8,7 @@ var result = [
     isdebug ? "libs/modules/tween/tween.js" : "libs/modules/tween/tween.min.js",
 ];
 
-xhrTsconfig("feng3d/tsconfig.json", () =>
+xhrTsconfig("node_modules/feng3d/tsconfig.json", () =>
 {
     xhrTsconfig("tsconfig.json", () =>
     {
@@ -76,13 +76,8 @@ function xhrTsconfig(url, callback)
     var root = ps.join("/");
     xhr(url, (xhr) =>
     {
-        var obj = JSON.parse(xhr.responseText.split("\n").map(v =>
-        {
-            var index = v.indexOf("//");
-            if (index > 0)
-                v = v.substr(0, index);
-            return v;
-        }).join(""));
+        var obj = {};
+        eval(`obj = ${xhr.responseText}`);
         if (obj.compilerOptions.outDir)
         {
             var files = obj.files.filter(v => v.indexOf(".d.ts") == -1);

@@ -46,7 +46,7 @@ namespace editor
                     var tslibs = files.map((f, i) =>
                     {
                         let str = strs[i]; if (typeof str == "string") return { path: f, code: str };
-                        feng3d.warn(`没有找到文件 ${f}`);
+                        console.warn(`没有找到文件 ${f}`);
                         return null;
                     }).filter(v => !!v);
                     callback(tslibs)

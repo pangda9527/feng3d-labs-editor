@@ -1,5 +1,4 @@
-interface NodeRequire { }
-declare var require: NodeRequire;
+declare var require: (s: any) => any;
 declare var __dirname: string;
 
 namespace editor

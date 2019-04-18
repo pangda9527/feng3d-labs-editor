@@ -114,7 +114,7 @@ namespace editor
 						{
 							if (err)
 							{
-								feng3d.warn(err);
+								console.warn(err);
 								return;
 							}
 							if (editorRS.fs.type == feng3d.FSType.indexedDB)
@@ -211,7 +211,7 @@ namespace editor
 			if (showMenuItem) return;
 
 			var list = this.parent;
-			feng3d.debuger && feng3d.assert(list instanceof eui.List);
+			feng3d.debuger && console.assert(list instanceof eui.List);
 			items = list.$children.filter(v => v instanceof TopMenuItemRenderer).map((v: TopMenuItemRenderer) => { return { item: v, rect: v.getGlobalBounds() }; });
 
 			showMenu(this);

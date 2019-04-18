@@ -19,285 +19,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var feng3d;
 (function (feng3d) {
-    feng3d.shaderConfig = {
-        "shaders": {
-            "color": {
-                "fragment": "precision mediump float;\r\n\r\nuniform vec4 u_diffuseInput;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = u_diffuseInput;\r\n}\r\n",
-                "vertex": "attribute vec3 a_position;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvoid main()\r\n{\r\n    vec4 worldPosition = u_modelMatrix * vec4(a_position, 1.0);\r\n    gl_Position = u_viewProjection * worldPosition;\r\n}"
-            },
-            "mouse": {
-                "fragment": "precision highp float;\r\n\r\nuniform int u_objectID;\r\n\r\nvoid main()\r\n{\r\n    //支持 255*255*255*255 个索引\r\n    const float invColor = 1.0/255.0;\r\n    float temp = float(u_objectID);\r\n    temp = floor(temp) * invColor;\r\n    gl_FragColor.x = fract(temp);\r\n    temp = floor(temp) * invColor;\r\n    gl_FragColor.y = fract(temp);\r\n    temp = floor(temp) * invColor;\r\n    gl_FragColor.z = fract(temp);\r\n    temp = floor(temp) * invColor;\r\n    gl_FragColor.w = fract(temp);\r\n}",
-                "vertex": "attribute vec3 a_position;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvoid main()\r\n{\r\n    vec4 worldPosition = u_modelMatrix * vec4(a_position, 1.0);\r\n    gl_Position = u_viewProjection * worldPosition;\r\n}"
-            },
-            "outline": {
-                "fragment": "precision mediump float;\r\n\r\nuniform vec4 u_outlineColor;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = u_outlineColor;\r\n}",
-                "vertex": "precision mediump float;  \r\n\r\n//坐标属性\r\nattribute vec3 a_position;\r\nattribute vec3 a_normal;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_ITModelMatrix;\r\nuniform vec3 u_cameraPos;\r\nuniform mat4 u_viewProjection;\r\nuniform float u_scaleByDepth;\r\nuniform float u_outlineMorphFactor;\r\n\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n\r\nuniform float u_outlineSize;\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n    \r\n    vec3 normal = a_normal;\r\n\r\n    //全局坐标\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    //全局法线\r\n    vec3 globalNormal = normalize((u_ITModelMatrix * vec4(normal, 0.0)).xyz);\r\n\r\n    float depth = distance(worldPosition.xyz , u_cameraPos.xyz);\r\n    \r\n    vec3 offsetDir = mix(globalNormal, normalize(worldPosition.xyz), u_outlineMorphFactor);\r\n    //摄像机远近保持粗细一致\r\n    offsetDir = offsetDir * depth * u_scaleByDepth;\r\n    //描边宽度\r\n    offsetDir = offsetDir * u_outlineSize;\r\n\r\n    worldPosition.xyz = worldPosition.xyz + offsetDir;//\r\n\r\n    //计算投影坐标\r\n    gl_Position = u_viewProjection * worldPosition;\r\n}"
-            },
-            "particle": {
-                "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\n\r\nuniform float u_alphaThreshold;\r\n//漫反射\r\nuniform vec4 u_diffuse;\r\nuniform sampler2D s_diffuse;\r\n\r\n#include<particle_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n\r\n    //获取漫反射基本颜色\r\n    vec4 diffuseColor = u_diffuse * texture2D(s_diffuse, v_uv);\r\n\r\n    if(diffuseColor.w < u_alphaThreshold)\r\n    {\r\n        discard;\r\n    }\r\n\r\n    finalColor = diffuseColor;\r\n\r\n    #include<particle_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
-                "vertex": "precision mediump float;  \r\n\r\n//坐标属性\r\nattribute vec3 a_position;\r\nattribute vec2 a_uv;\r\nattribute vec3 a_normal;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_ITModelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvarying vec2 v_uv;\r\n\r\nuniform float u_PointSize;\r\n\r\n#include<particle_pars_vert>\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n    \r\n    #include<particle_vert>\r\n\r\n    vec3 normal = a_normal;\r\n\r\n    //获取全局坐标\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    //计算投影坐标\r\n    gl_Position = u_viewProjection * worldPosition;\r\n    //输出uv\r\n    v_uv = a_uv;\r\n\r\n    gl_PointSize = u_PointSize;\r\n}"
-            },
-            "point": {
-                "fragment": "precision mediump float;\r\n\r\nvarying vec4 v_color;\r\nuniform vec4 u_color;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = v_color * u_color;\r\n}\r\n",
-                "vertex": "attribute vec3 a_position;\r\nattribute vec4 a_color;\r\n\r\nuniform float u_PointSize;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvarying vec4 v_color;\r\n\r\nvoid main() \r\n{\r\n    vec4 worldPosition = u_modelMatrix * vec4(a_position, 1.0);\r\n    gl_Position = u_viewProjection * worldPosition;\r\n    gl_PointSize = u_PointSize;\r\n\r\n    v_color = a_color;\r\n}"
-            },
-            "segment": {
-                "fragment": "precision mediump float;\r\n\r\nvarying vec4 v_color;\r\n\r\nuniform vec4 u_segmentColor;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = v_color * u_segmentColor;\r\n}",
-                "vertex": "attribute vec3 a_position;\r\nattribute vec4 a_color;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvarying vec4 v_color;\r\n\r\nvoid main() \r\n{\r\n    gl_Position = u_viewProjection * u_modelMatrix * vec4(a_position, 1.0);\r\n    v_color = a_color;\r\n}"
-            },
-            "shadow": {
-                "fragment": "precision mediump float;\r\n\r\nvarying vec3 v_worldPosition;\r\n\r\nuniform int u_lightType;\r\nuniform vec3 u_lightPosition;\r\nuniform float u_shadowCameraNear;\r\nuniform float u_shadowCameraFar;\r\n\r\n// @see https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/packing.glsl\r\nconst float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)\r\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\r\nconst float ShiftRight8 = 1. / 256.;\r\nvec4 packDepthToRGBA( const in float v ) \r\n{\r\n\tvec4 r = vec4( fract( v * PackFactors ), v );\r\n\tr.yzw -= r.xyz * ShiftRight8; // tidy overflow\r\n\treturn r * PackUpscale;\r\n}\r\n\r\nvoid main() \r\n{\r\n    vec3 lightToPosition = (v_worldPosition - u_lightPosition);\r\n    float dp = ( length( lightToPosition ) - u_shadowCameraNear ) / ( u_shadowCameraFar - u_shadowCameraNear ); // need to clamp?\r\n    gl_FragColor = packDepthToRGBA( dp );\r\n}",
-                "vertex": "precision mediump float;  \r\n\r\nattribute vec3 a_position;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n\r\nvarying vec3 v_worldPosition;\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    gl_Position = u_viewProjection * worldPosition;\r\n    v_worldPosition = worldPosition.xyz;\r\n}"
-            },
-            "skybox": {
-                "fragment": "precision highp float;\r\n\r\nuniform samplerCube s_skyboxTexture;\r\nuniform vec3 u_cameraPos;\r\n\r\nvarying vec3 v_worldPos;\r\n\r\nvoid main()\r\n{\r\n    vec3 cameraDir = normalize(u_cameraPos.xyz - v_worldPos);\r\n    gl_FragColor = textureCube(s_skyboxTexture, -cameraDir);\r\n}",
-                "vertex": "attribute vec3 a_position;\r\n\r\nuniform vec3 u_cameraPos;\r\nuniform mat4 u_viewProjection;\r\n\r\nuniform float u_skyBoxSize;\r\n\r\nvarying vec3 v_worldPos;\r\n\r\nvoid main()\r\n{\r\n    vec3 worldPos = a_position.xyz * u_skyBoxSize + u_cameraPos.xyz;\r\n    gl_Position = u_viewProjection * vec4(worldPos.xyz, 1.0);\r\n    v_worldPos = worldPos;\r\n}"
-            },
-            "standard": {
-                "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\nvarying vec3 v_worldPosition;\r\nuniform vec3 u_cameraPos;\r\n\r\n#include<normal_pars_frag>\r\n#include<diffuse_pars_frag>\r\n#include<alphatest_pars_frag>\r\n\r\n#include<ambient_pars_frag>\r\n#include<specular_pars_frag>\r\n#include<lights_pars_frag>\r\n\r\n#include<envmap_pars_frag>\r\n#include<particle_pars_frag>\r\n#include<fog_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0,1.0,1.0,1.0);\r\n\r\n    #include<normal_frag>\r\n    #include<diffuse_frag>\r\n    #include<alphatest_frag>\r\n\r\n    #include<ambient_frag>\r\n    #include<specular_frag>\r\n    #include<lights_frag>\r\n\r\n    #include<envmap_frag>\r\n    #include<particle_frag>\r\n    #include<fog_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
-                "vertex": "precision mediump float;  \r\n\r\n#include<position_pars_vert>\r\n#include<normal_pars_vert>\r\n#include<tangent_pars_vert>\r\n//\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n//\r\n#include<worldposition_pars_vert>\r\n#include<project_pars_vert>\r\n//\r\n#include<uv_pars_vert>\r\n#include<normalmap_pars_vert>\r\n//\r\n#include<lights_pars_vert>\r\n#include<pointsize_pars_vert>\r\n\r\nvoid main()\r\n{\r\n    // 初始化\r\n    #include<position_vert>\r\n    #include<normal_vert>\r\n    #include<tangent_vert>\r\n    // 动画\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n    // 投影\r\n    #include<worldposition_vert>\r\n    #include<project_vert>\r\n    // \r\n    #include<uv_vert>\r\n    #include<normalmap_vert>\r\n    //\r\n    #include<lights_vert>\r\n    #include<pointsize_vert>\r\n}"
-            },
-            "terrain": {
-                "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\nvarying vec3 v_worldPosition;\r\nuniform vec3 u_cameraPos;\r\n\r\n#include<normal_pars_frag>\r\n#include<diffuse_pars_frag>\r\n#include<alphatest_pars_frag>\r\n\r\n#include<terrain_pars_frag>\r\n\r\n#include<ambient_pars_frag>\r\n#include<specular_pars_frag>\r\n#include<lights_pars_frag>\r\n\r\n#include<envmap_pars_frag>\r\n#include<fog_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n\r\n    #include<normal_frag>\r\n    #include<diffuse_frag>\r\n    #include<alphatest_frag>\r\n\r\n    #include<terrain_frag>\r\n\r\n    #include<ambient_frag>\r\n    #include<specular_frag>\r\n    #include<lights_frag>\r\n\r\n    #include<envmap_frag>\r\n    #include<fog_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
-                "vertex": "precision mediump float;  \r\n\r\n#include<position_pars_vert>\r\n#include<normal_pars_vert>\r\n#include<tangent_pars_vert>\r\n//\r\n#include<worldposition_pars_vert>\r\n#include<project_pars_vert>\r\n//\r\n#include<uv_pars_vert>\r\n#include<normalmap_pars_vert>\r\n//\r\n#include<lights_pars_vert>\r\n#include<pointsize_pars_vert>\r\n\r\nvoid main() \r\n{\r\n    // 初始化\r\n    #include<position_vert>\r\n    #include<normal_vert>\r\n    #include<tangent_vert>\r\n    // 投影\r\n    #include<worldposition_vert>\r\n    #include<project_vert>\r\n    // \r\n    #include<uv_vert>\r\n    #include<normalmap_vert>\r\n    //\r\n    #include<lights_vert>\r\n    #include<pointsize_vert>\r\n}"
-            },
-            "texture": {
-                "fragment": "precision mediump float;\r\n\r\nuniform sampler2D s_texture;\r\nvarying vec2 v_uv;\r\n\r\nuniform vec4 u_color;\r\n\r\nvoid main() {\r\n\r\n    vec4 color = texture2D(s_texture, v_uv);\r\n    gl_FragColor = color * u_color;\r\n}\r\n",
-                "vertex": "attribute vec3 a_position;\r\nattribute vec2 a_uv;\r\n\r\nvarying vec2 v_uv;\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvoid main() \r\n{\r\n    gl_Position = u_viewProjection * u_modelMatrix * vec4(a_position, 1.0);\r\n    v_uv = a_uv;\r\n}"
-            },
-            "water": {
-                "fragment": "precision mediump float;  \r\n\r\nuniform vec3 u_cameraPos;\r\n\r\nvarying vec4 v_mirrorCoord;\r\nvarying vec4 v_worldPosition;\r\n\r\nuniform sampler2D s_mirrorSampler;\r\nuniform sampler2D s_normalSampler;\r\n\r\nuniform float u_alpha;\r\nuniform float u_time;\r\nuniform float u_size;\r\nuniform float u_distortionScale;\r\nuniform vec3 u_sunColor;\r\nuniform vec3 u_sunDirection;\r\nuniform vec3 u_waterColor;\r\n\r\nvec4 getNoise( vec2 uv ) \r\n{\r\n\tvec2 uv0 = ( uv / 103.0 ) + vec2(u_time / 17.0, u_time / 29.0);\r\n\tvec2 uv1 = uv / 107.0-vec2( u_time / -19.0, u_time / 31.0 );\r\n\tvec2 uv2 = uv / vec2( 8907.0, 9803.0 ) + vec2( u_time / 101.0, u_time / 97.0 );\r\n\tvec2 uv3 = uv / vec2( 1091.0, 1027.0 ) - vec2( u_time / 109.0, u_time / -113.0 );\r\n\tvec4 noise = texture2D( s_normalSampler, uv0 ) +\r\n\t\ttexture2D( s_normalSampler, uv1 ) +\r\n\t\ttexture2D( s_normalSampler, uv2 ) +\r\n\t\ttexture2D( s_normalSampler, uv3 );\r\n\treturn noise * 0.5 - 1.0;\r\n}\r\n\r\nvoid sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor ) \r\n{\r\n\tvec3 reflection = normalize( reflect( -u_sunDirection, surfaceNormal ) );\r\n\tfloat direction = max( 0.0, dot( eyeDirection, reflection ) );\r\n\tspecularColor += pow( direction, shiny ) * u_sunColor * spec;\r\n\tdiffuseColor += max( dot( u_sunDirection, surfaceNormal ), 0.0 ) * u_sunColor * diffuse;\r\n}\r\n\r\nvoid main() \r\n{\r\n\tvec4 noise = getNoise( v_worldPosition.xz * u_size );\r\n\tvec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );\r\n\tvec3 diffuseLight = vec3(0.0);\r\n\tvec3 specularLight = vec3(0.0);\r\n\tvec3 worldToEye = u_cameraPos-v_worldPosition.xyz;\r\n\tvec3 eyeDirection = normalize( worldToEye );\r\n\tsunLight( surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight );\r\n\tfloat distance = length(worldToEye);\r\n\tvec2 distortion = surfaceNormal.xz * ( 0.001 + 1.0 / distance ) * u_distortionScale;\r\n\tvec3 reflectionSample = vec3( texture2D( s_mirrorSampler, v_mirrorCoord.xy / v_mirrorCoord.z + distortion ) );\r\n\tfloat theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );\r\n\tfloat rf0 = 0.3;\r\n\tfloat reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );\r\n\tvec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * u_waterColor;\r\n\r\n\tfloat shadowMask = 1.0;\r\n\t// float shadowMask = getShadowMask();\r\n\r\n\tvec3 albedo = mix( ( u_sunColor * diffuseLight * 0.3 + scatter ) * shadowMask, ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance);\r\n\tvec3 outgoingLight = albedo;\r\n\tgl_FragColor = vec4( outgoingLight, u_alpha );\r\n\r\n\t// debug\r\n\t// gl_FragColor = texture2D( s_mirrorSampler, (v_mirrorCoord.xy / v_mirrorCoord.z + 1.0) / 2.0 );\r\n\t// gl_FragColor = vec4( reflectionSample, 1.0 );\r\n\t// gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\r\n}",
-                "vertex": "attribute vec3 a_position;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nuniform mat4 u_textureMatrix;\r\n\r\nvarying vec4 v_mirrorCoord;\r\nvarying vec4 v_worldPosition;\r\n\r\nvoid main() \r\n{\r\n\tvec4 position = vec4(a_position, 1.0);\r\n\t//获取全局坐标\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    //计算投影坐标\r\n    gl_Position = u_viewProjection * worldPosition;\r\n\t\r\n\tv_worldPosition = worldPosition;\r\n\tv_mirrorCoord = u_textureMatrix * worldPosition;\r\n}"
-            },
-            "wireframe": {
-                "fragment": "precision mediump float;\r\n\r\nuniform vec4 u_wireframeColor;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = u_wireframeColor;\r\n}",
-                "vertex": "precision mediump float;  \r\n\r\nattribute vec3 a_position;\r\nattribute vec4 a_color;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n\r\n    gl_Position = u_viewProjection * u_modelMatrix * position;\r\n}"
-            }
-        },
-        "modules": {
-            "alphatest_frag": "if(diffuseColor.w < u_alphaThreshold) discard;",
-            "alphatest_pars_frag": "uniform float u_alphaThreshold;",
-            "ambient_frag": "//环境光\r\nvec3 ambientColor = u_ambient.w * u_ambient.xyz * u_sceneAmbientColor.xyz * u_sceneAmbientColor.w;\r\nambientColor = ambientColor * texture2D(s_ambient, v_uv).xyz;",
-            "ambient_pars_frag": "uniform vec4 u_sceneAmbientColor;\r\n\r\n//环境\r\nuniform vec4 u_ambient;\r\nuniform sampler2D s_ambient;",
-            "cartoon_pars_frag": "#ifdef IS_CARTOON\r\n    #ifdef cartoon_Anti_aliasing\r\n        #extension GL_OES_standard_derivatives : enable\r\n    #endif\r\n\r\n    uniform vec4 u_diffuseSegment;\r\n    uniform vec4 u_diffuseSegmentValue;\r\n    uniform float u_specularSegment;\r\n\r\n    //漫反射\r\n    float cartoonLightDiffuse(vec3 normal,vec3 lightDir)\r\n    {\r\n        float diff = dot(normal, lightDir);\r\n        diff = diff * 0.5 + 0.5;\r\n\r\n        #ifdef cartoon_Anti_aliasing\r\n            float w = fwidth(diff) * 2.0;\r\n            if (diff < u_diffuseSegment.x + w) \r\n            {\r\n                diff = mix(u_diffuseSegment.x, u_diffuseSegment.y, smoothstep(u_diffuseSegment.x - w, u_diffuseSegment.x + w, diff));\r\n            //  diff = mix(u_diffuseSegment.x, u_diffuseSegment.y, clamp(0.5 * (diff - u_diffuseSegment.x) / w, 0, 1));\r\n            } else if (diff < u_diffuseSegment.y + w) \r\n            {\r\n                diff = mix(u_diffuseSegment.y, u_diffuseSegment.z, smoothstep(u_diffuseSegment.y - w, u_diffuseSegment.y + w, diff));\r\n            //  diff = mix(u_diffuseSegment.y, u_diffuseSegment.z, clamp(0.5 * (diff - u_diffuseSegment.y) / w, 0, 1));\r\n            } else if (diff < u_diffuseSegment.z + w) \r\n            {\r\n                diff = mix(u_diffuseSegment.z, u_diffuseSegment.w, smoothstep(u_diffuseSegment.z - w, u_diffuseSegment.z + w, diff));\r\n            //  diff = mix(u_diffuseSegment.z, u_diffuseSegment.w, clamp(0.5 * (diff - u_diffuseSegment.z) / w, 0, 1));\r\n            } else \r\n            {\r\n                diff = u_diffuseSegment.w;\r\n            }\r\n        #else\r\n            if (diff < u_diffuseSegment.x) \r\n            {\r\n                diff = u_diffuseSegmentValue.x;\r\n            } else if (diff < u_diffuseSegment.y) \r\n            {\r\n                diff = u_diffuseSegmentValue.y;\r\n            } else if (diff < u_diffuseSegment.z) \r\n            {\r\n                diff = u_diffuseSegmentValue.z;\r\n            } else \r\n            {\r\n                diff = u_diffuseSegmentValue.w;\r\n            }\r\n        #endif\r\n\r\n        return diff;\r\n    }\r\n\r\n    //镜面反射漫反射\r\n    float cartoonLightSpecular(vec3 normal,vec3 lightDir,vec3 cameraDir,float glossiness)\r\n    {\r\n        vec3 halfVec = normalize(lightDir + cameraDir);\r\n        float specComp = max(dot(normal,halfVec),0.0);\r\n        specComp = pow(specComp, glossiness);\r\n\r\n        #ifdef cartoon_Anti_aliasing\r\n            float w = fwidth(specComp);\r\n            if (specComp < u_specularSegment + w) \r\n            {\r\n                specComp = mix(0.0, 1.0, smoothstep(u_specularSegment - w, u_specularSegment + w, specComp));\r\n                // specComp = smoothstep(u_specularSegment - w, u_specularSegment + w, specComp);\r\n            } else \r\n            {\r\n                specComp = 1.0;\r\n            }\r\n        #else\r\n            if(specComp < u_specularSegment)\r\n            {\r\n                specComp = 0.0;\r\n            }else\r\n            {\r\n                specComp = 1.0;\r\n            }\r\n        #endif\r\n\r\n        return specComp;\r\n    }\r\n#endif",
-            "diffuse_frag": "//获取漫反射基本颜色\r\nvec4 diffuseColor = u_diffuse;\r\ndiffuseColor = diffuseColor * texture2D(s_diffuse, v_uv);\r\n\r\nfinalColor = diffuseColor;",
-            "diffuse_pars_frag": "//漫反射\r\nuniform vec4 u_diffuse;\r\nuniform sampler2D s_diffuse;",
-            "envmap_frag": "finalColor = envmapMethod(finalColor);",
-            "envmap_pars_frag": "uniform samplerCube s_envMap;\r\nuniform float u_reflectivity;\r\n\r\nvec4 envmapMethod(vec4 finalColor)\r\n{\r\n    vec3 cameraToVertex = normalize( v_worldPosition - u_cameraPos );\r\n    vec3 reflectVec = reflect( cameraToVertex, v_normal );\r\n    vec4 envColor = textureCube( s_envMap, reflectVec );\r\n    finalColor.xyz *= envColor.xyz * u_reflectivity;\r\n    return finalColor;\r\n}",
-            "fog_frag": "finalColor = fogMethod(finalColor);",
-            "fog_pars_frag": "#define FOGMODE_NONE    0.\r\n#define FOGMODE_EXP     1.\r\n#define FOGMODE_EXP2    2.\r\n#define FOGMODE_LINEAR  3.\r\n#define E 2.71828\r\n\r\nuniform float u_fogMode;\r\nuniform float u_fogMinDistance;\r\nuniform float u_fogMaxDistance;\r\nuniform float u_fogDensity;\r\nuniform vec3 u_fogColor;\r\n\r\nfloat CalcFogFactor(float fogDistance)\r\n{\r\n\tfloat fogCoeff = 1.0;\r\n\tif (FOGMODE_LINEAR == u_fogMode)\r\n\t{\r\n\t\tfogCoeff = (u_fogMaxDistance - fogDistance) / (u_fogMaxDistance - u_fogMinDistance);\r\n\t}\r\n\telse if (FOGMODE_EXP == u_fogMode)\r\n\t{\r\n\t\tfogCoeff = 1.0 / pow(E, fogDistance * u_fogDensity);\r\n\t}\r\n\telse if (FOGMODE_EXP2 == u_fogMode)\r\n\t{\r\n\t\tfogCoeff = 1.0 / pow(E, fogDistance * fogDistance * u_fogDensity * u_fogDensity);\r\n\t}\r\n\r\n\treturn clamp(fogCoeff, 0.0, 1.0);\r\n}\r\n\r\nvec4 fogMethod(vec4 color)\r\n{\r\n    vec3 fogDistance = u_cameraPos - v_worldPosition.xyz;\r\n\tfloat fog = CalcFogFactor(length(fogDistance));\r\n\tcolor.rgb = fog * color.rgb + (1.0 - fog) * u_fogColor;\r\n    return color;\r\n}",
-            "lights_frag": "//渲染灯光\r\n#if NUM_LIGHT > 0\r\n    finalColor.xyz = lightShading(normal, diffuseColor.xyz, specularColor, ambientColor, glossiness);\r\n#endif",
-            "lights_pars_frag": "#if NUM_POINTLIGHT > 0\r\n    // 点光源\r\n    struct PointLight\r\n    {\r\n        // 位置\r\n        vec3 position;\r\n        // 颜色\r\n        vec3 color;\r\n        // 强度\r\n        float intensity;\r\n        // 范围\r\n        float range;\r\n    };\r\n    // 点光源列表\r\n    uniform PointLight u_pointLights[NUM_POINTLIGHT];\r\n#endif\r\n\r\n#if NUM_SPOT_LIGHTS > 0\r\n    // 聚光灯\r\n    struct SpotLight\r\n    {\r\n        // 位置\r\n        vec3 position;\r\n        // 颜色\r\n        vec3 color;\r\n        // 强度\r\n        float intensity;\r\n        // 范围\r\n        float range;\r\n        // 方向\r\n        vec3 direction;\r\n        // 椎体cos值\r\n        float coneCos;\r\n        // 半影cos\r\n        float penumbraCos;\r\n    };\r\n    // 方向光源列表\r\n    uniform SpotLight u_spotLights[ NUM_SPOT_LIGHTS ];\r\n#endif\r\n\r\n#if NUM_DIRECTIONALLIGHT > 0\r\n    // 方向光源\r\n    struct DirectionalLight\r\n    {\r\n        // 方向\r\n        vec3 direction;\r\n        // 颜色\r\n        vec3 color;\r\n        // 强度\r\n        float intensity;\r\n    };\r\n    // 方向光源列表\r\n    uniform DirectionalLight u_directionalLights[ NUM_DIRECTIONALLIGHT ];\r\n#endif\r\n\r\n//卡通\r\n#include<cartoon_pars_frag>\r\n\r\n#include<shadowmap_pars_frag>\r\n\r\n//计算光照漫反射系数\r\nfloat calculateLightDiffuse(vec3 normal,vec3 lightDir)\r\n{\r\n    #ifdef IS_CARTOON\r\n        return cartoonLightDiffuse(normal,lightDir);\r\n    #else\r\n        return clamp(dot(normal,lightDir),0.0,1.0);\r\n    #endif\r\n}\r\n\r\n//计算光照镜面反射系数\r\nfloat calculateLightSpecular(vec3 normal,vec3 lightDir,vec3 viewDir,float glossiness)\r\n{\r\n    #ifdef IS_CARTOON\r\n        return cartoonLightSpecular(normal,lightDir,viewDir,glossiness);\r\n    #else\r\n        vec3 halfVec = normalize(lightDir + viewDir);\r\n        float specComp = max(dot(normal,halfVec),0.0);\r\n        specComp = pow(specComp, glossiness);\r\n\r\n        return specComp;\r\n    #endif\r\n}\r\n\r\n//根据距离计算衰减\r\nfloat computeDistanceLightFalloff(float lightDistance, float range)\r\n{\r\n    #ifdef USEPHYSICALLIGHTFALLOFF\r\n        float lightDistanceFalloff = 1.0 / ((lightDistance * lightDistance + 0.0001));\r\n    #else\r\n        float lightDistanceFalloff = max(0., 1.0 - lightDistance / range);\r\n    #endif\r\n    \r\n    return lightDistanceFalloff;\r\n}\r\n\r\n//渲染点光源\r\nvec3 lightShading(vec3 normal, vec3 diffuseColor, vec3 specularColor, vec3 ambientColor, float glossiness)\r\n{\r\n    //视线方向\r\n    vec3 viewDir = normalize(u_cameraPos - v_worldPosition);\r\n\r\n    vec3 resultColor = vec3(0.0,0.0,0.0);\r\n    \r\n    #if NUM_POINTLIGHT > 0\r\n        PointLight pointLight;\r\n        for(int i = 0;i<NUM_POINTLIGHT;i++)\r\n        {\r\n            pointLight = u_pointLights[i];\r\n            //\r\n            vec3 lightOffset = pointLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(lightOffset);\r\n            //灯光颜色\r\n            vec3 lightColor = pointLight.color;\r\n            //灯光强度\r\n            float lightIntensity = pointLight.intensity;\r\n            float falloff = computeDistanceLightFalloff(length(lightOffset), pointLight.range);\r\n            float diffuse = calculateLightDiffuse(normal, lightDir);\r\n            float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n            float shadow = 1.0;\r\n            \r\n            resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow;\r\n        }\r\n    #endif\r\n\r\n    #if NUM_POINTLIGHT_CASTSHADOW > 0\r\n        CastShadowPointLight castShadowPointLight;\r\n        for(int i = 0;i<NUM_POINTLIGHT_CASTSHADOW;i++)\r\n        {\r\n            castShadowPointLight = u_castShadowPointLights[i];\r\n            //\r\n            vec3 lightOffset = castShadowPointLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(lightOffset);\r\n            //灯光颜色\r\n            vec3 lightColor = castShadowPointLight.color;\r\n            //灯光强度\r\n            float lightIntensity = castShadowPointLight.intensity;\r\n            float falloff = computeDistanceLightFalloff(length(lightOffset), castShadowPointLight.range);\r\n            // 计算阴影\r\n            float shadow = getPointShadow( u_pointShadowMaps[ i ], castShadowPointLight.shadowType, castShadowPointLight.shadowMapSize, castShadowPointLight.shadowBias, castShadowPointLight.shadowRadius, -lightOffset, castShadowPointLight.shadowCameraNear, castShadowPointLight.shadowCameraFar );\r\n            float diffuse = calculateLightDiffuse(normal, lightDir);\r\n            float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n            //\r\n            resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow;\r\n        }\r\n    #endif\r\n\r\n    #if NUM_SPOT_LIGHTS > 0\r\n        SpotLight spotLight;\r\n        for(int i = 0; i < NUM_SPOT_LIGHTS; i++)\r\n        {\r\n            spotLight = u_spotLights[i];\r\n            //\r\n            vec3 lightOffset = spotLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(lightOffset);\r\n            float angleCos = dot(lightDir, -spotLight.direction);\r\n            if(angleCos > spotLight.coneCos)\r\n            {\r\n                float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );\r\n                \r\n                //灯光颜色\r\n                vec3 lightColor = spotLight.color;\r\n                //灯光强度\r\n                float lightIntensity = spotLight.intensity;\r\n                float falloff = computeDistanceLightFalloff(length(lightOffset) * angleCos, spotLight.range);\r\n                float diffuse = calculateLightDiffuse(normal, lightDir);\r\n                float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n                float shadow = 1.0;\r\n                \r\n                resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow * spotEffect;\r\n            }            \r\n        }\r\n    #endif\r\n    \r\n    #if NUM_SPOT_LIGHTS_CASTSHADOW > 0\r\n        CastShadowSpotLight castShadowSpotLight;\r\n        for(int i = 0; i < NUM_SPOT_LIGHTS_CASTSHADOW; i++)\r\n        {\r\n            castShadowSpotLight = u_castShadowSpotLights[i];\r\n            //\r\n            vec3 lightOffset = castShadowSpotLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(lightOffset);\r\n            float angleCos = dot(lightDir, -castShadowSpotLight.direction);\r\n            if(angleCos > castShadowSpotLight.coneCos)\r\n            {\r\n                float spotEffect = smoothstep( castShadowSpotLight.coneCos, castShadowSpotLight.penumbraCos, angleCos );\r\n                \r\n                //灯光颜色\r\n                vec3 lightColor = castShadowSpotLight.color;\r\n                //灯光强度\r\n                float lightIntensity = castShadowSpotLight.intensity;\r\n                float falloff = computeDistanceLightFalloff(length(lightOffset) * angleCos, castShadowSpotLight.range);\r\n                float diffuse = calculateLightDiffuse(normal, lightDir);\r\n                float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n                // 计算阴影\r\n                float shadow = getShadow( u_spotShadowMaps[i], castShadowSpotLight.shadowType, castShadowSpotLight.shadowMapSize, castShadowSpotLight.shadowBias, castShadowSpotLight.shadowRadius, v_spotShadowCoord[ i ], -lightOffset, castShadowSpotLight.shadowCameraNear, castShadowSpotLight.shadowCameraFar);\r\n                \r\n                resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow * spotEffect;\r\n            }            \r\n        }\r\n    #endif\r\n\r\n    #if NUM_DIRECTIONALLIGHT > 0\r\n        DirectionalLight directionalLight;\r\n        for(int i = 0;i<NUM_DIRECTIONALLIGHT;i++)\r\n        {\r\n            directionalLight = u_directionalLights[i];\r\n            //光照方向\r\n            vec3 lightDir = normalize(-directionalLight.direction);\r\n            //灯光颜色\r\n            vec3 lightColor = directionalLight.color;\r\n            //灯光强度\r\n            float lightIntensity = directionalLight.intensity;\r\n\r\n            float falloff = 1.0;\r\n            float diffuse = calculateLightDiffuse(normal, lightDir);\r\n            float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n            float shadow = 1.0;\r\n            //\r\n            resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow;\r\n        }\r\n    #endif\r\n\r\n    #if NUM_DIRECTIONALLIGHT_CASTSHADOW > 0\r\n        CastShadowDirectionalLight castShadowDirectionalLight;\r\n        for(int i = 0;i<NUM_DIRECTIONALLIGHT_CASTSHADOW;i++)\r\n        {\r\n            castShadowDirectionalLight = u_castShadowDirectionalLights[i];\r\n            //\r\n            vec3 lightOffset = castShadowDirectionalLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(-castShadowDirectionalLight.direction);\r\n            //灯光颜色\r\n            vec3 lightColor = castShadowDirectionalLight.color;\r\n            //灯光强度\r\n            float lightIntensity = castShadowDirectionalLight.intensity;\r\n            // 计算阴影\r\n            float shadow = getShadow( u_directionalShadowMaps[i], castShadowDirectionalLight.shadowType, castShadowDirectionalLight.shadowMapSize, castShadowDirectionalLight.shadowBias, castShadowDirectionalLight.shadowRadius, v_directionalShadowCoord[ i ], -lightOffset, castShadowDirectionalLight.shadowCameraNear, castShadowDirectionalLight.shadowCameraFar);\r\n            \r\n            float falloff = 1.0;\r\n            float diffuse = calculateLightDiffuse(normal, lightDir);\r\n            float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n            //\r\n            resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow;\r\n        }\r\n    #endif\r\n\r\n    resultColor += ambientColor * diffuseColor;\r\n    return resultColor;\r\n}",
-            "lights_pars_vert": "// 灯光声明\r\n\r\n#if NUM_DIRECTIONALLIGHT_CASTSHADOW > 0\r\n    // 方向光源投影矩阵列表\r\n    uniform mat4 u_directionalShadowMatrixs[ NUM_DIRECTIONALLIGHT_CASTSHADOW ];\r\n    // 方向光源投影uv列表\r\n    varying vec4 v_directionalShadowCoord[ NUM_DIRECTIONALLIGHT_CASTSHADOW ];\r\n#endif\r\n\r\n#if NUM_SPOT_LIGHTS_CASTSHADOW > 0\r\n    // 聚光灯投影矩阵列表\r\n    uniform mat4 u_spotShadowMatrix[ NUM_SPOT_LIGHTS_CASTSHADOW ];\r\n    // 聚光灯投影uv列表\r\n    varying vec4 v_spotShadowCoord[ NUM_SPOT_LIGHTS_CASTSHADOW ];\r\n#endif",
-            "lights_vert": "#if NUM_DIRECTIONALLIGHT_CASTSHADOW > 0\r\n    for ( int i = 0; i < NUM_DIRECTIONALLIGHT_CASTSHADOW; i ++ ) \r\n    {\r\n        v_directionalShadowCoord[ i ] = u_directionalShadowMatrixs[ i ] * worldPosition;\r\n    }\r\n#endif\r\n\r\n#if NUM_SPOT_LIGHTS_CASTSHADOW > 0\r\n    for ( int i = 0; i < NUM_SPOT_LIGHTS_CASTSHADOW; i ++ ) \r\n    {\r\n        v_spotShadowCoord[ i ] = u_spotShadowMatrix[ i ] * worldPosition;\r\n    }\r\n#endif",
-            "normalmap_pars_vert": "uniform mat4 u_ITModelMatrix;\r\n\r\nvarying vec3 v_normal;\r\nvarying vec3 v_tangent;\r\nvarying vec3 v_bitangent;",
-            "normalmap_vert": "//计算法线\r\nv_normal = normalize((u_ITModelMatrix * vec4(normal, 0.0)).xyz);\r\nv_tangent = normalize((u_modelMatrix * vec4(tangent, 0.0)).xyz);\r\nv_bitangent = cross(v_normal, v_tangent);",
-            "normal_frag": "//获取法线\r\nvec3 normal = texture2D(s_normal,v_uv).xyz * 2.0 - 1.0;\r\nnormal = normalize(normal.x * v_tangent + normal.y * v_bitangent + normal.z * v_normal);",
-            "normal_pars_frag": "varying vec3 v_normal;\r\nvarying vec3 v_tangent;\r\nvarying vec3 v_bitangent;\r\n\r\n//法线贴图\r\nuniform sampler2D s_normal;",
-            "normal_pars_vert": "attribute vec3 a_normal;",
-            "normal_vert": "vec3 normal = a_normal;",
-            "particle_frag": "#ifdef HAS_PARTICLE_ANIMATOR\r\n    finalColor = particleAnimation(finalColor);\r\n#endif",
-            "particle_pars_frag": "#ifdef HAS_PARTICLE_ANIMATOR\r\n    varying vec4 v_particle_color;\r\n\r\n    vec4 particleAnimation(vec4 color) {\r\n\r\n        return color * v_particle_color;\r\n    }\r\n#endif",
-            "particle_pars_vert": "#ifdef HAS_PARTICLE_ANIMATOR\r\n    //\r\n    attribute vec3 a_particle_position;\r\n    attribute vec3 a_particle_scale;\r\n    attribute vec3 a_particle_rotation;\r\n    attribute vec4 a_particle_color;\r\n\r\n    varying vec4 v_particle_color;\r\n\r\n    mat3 makeParticleRotationMatrix(vec3 rotation)\r\n    {\r\n        float DEG2RAD = 3.1415926 / 180.0;\r\n        \r\n        float rx = rotation.x * DEG2RAD;\r\n        float ry = rotation.y * DEG2RAD;\r\n        float rz = rotation.z * DEG2RAD;\r\n\r\n        float sx = sin(rx);\r\n        float cx = cos(rx);\r\n        float sy = sin(ry);\r\n        float cy = cos(ry);\r\n        float sz = sin(rz);\r\n        float cz = cos(rz);\r\n\r\n        mat3 tmp;\r\n        tmp[ 0 ] = vec3(cy * cz, cy * sz, -sy);\r\n        tmp[ 1 ] = vec3(sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy);\r\n        tmp[ 2 ] = vec3(cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy);\r\n        return tmp;\r\n    }\r\n\r\n    vec4 particleAnimation(vec4 position) \r\n    {\r\n        // 计算缩放\r\n        position.xyz = position.xyz * a_particle_scale;\r\n\r\n        // 计算旋转\r\n        mat3 rMat = makeParticleRotationMatrix(a_particle_rotation);\r\n        position.xyz = rMat * position.xyz;\r\n\r\n        // 位移\r\n        position.xyz = position.xyz + a_particle_position;\r\n\r\n        // 颜色\r\n        v_particle_color = a_particle_color;\r\n        \r\n        return position;\r\n    }\r\n#endif",
-            "particle_vert": "#ifdef HAS_PARTICLE_ANIMATOR\r\n    position = particleAnimation(position);\r\n#endif",
-            "pointsize_pars_vert": "#ifdef IS_POINTS_MODE\r\n    uniform float u_PointSize;\r\n#endif",
-            "pointsize_vert": "#ifdef IS_POINTS_MODE\r\n    gl_PointSize = u_PointSize;\r\n#endif",
-            "position_pars_vert": "attribute vec3 a_position;",
-            "position_vert": "vec4 position = vec4(a_position, 1.0);",
-            "project_pars_vert": "uniform mat4 u_viewProjection;",
-            "project_vert": "//计算投影坐标\r\ngl_Position = u_viewProjection * worldPosition;",
-            "shadowmap_pars_frag": "#if (NUM_POINTLIGHT_CASTSHADOW > 0) ||  (NUM_DIRECTIONALLIGHT_CASTSHADOW > 0) ||  (NUM_SPOT_LIGHTS_CASTSHADOW > 0)\r\n    #if NUM_POINTLIGHT_CASTSHADOW > 0\r\n        // 投影的点光源\r\n        struct CastShadowPointLight\r\n        {\r\n            // 位置\r\n            vec3 position;\r\n            // 颜色\r\n            vec3 color;\r\n            // 强度\r\n            float intensity;\r\n            // 范围\r\n            float range;\r\n            // 阴影类型\r\n            int shadowType;\r\n            // 阴影偏差，用来解决判断是否为阴影时精度问题\r\n            float shadowBias;\r\n            // 阴影半径，边缘宽度\r\n            float shadowRadius;\r\n            // 阴影图尺寸\r\n            vec2 shadowMapSize;\r\n            float shadowCameraNear;\r\n            float shadowCameraFar;\r\n        };\r\n        // 投影的点光源列表\r\n        uniform CastShadowPointLight u_castShadowPointLights[NUM_POINTLIGHT_CASTSHADOW];\r\n        // 点光源阴影图\r\n        uniform sampler2D u_pointShadowMaps[NUM_POINTLIGHT_CASTSHADOW];\r\n    #endif\r\n\r\n    #if NUM_SPOT_LIGHTS_CASTSHADOW > 0\r\n        // 投影的聚光灯\r\n        struct CastShadowSpotLight\r\n        {\r\n            // 位置\r\n            vec3 position;\r\n            // 颜色\r\n            vec3 color;\r\n            // 强度\r\n            float intensity;\r\n            // 范围\r\n            float range;\r\n            // 方向\r\n            vec3 direction;\r\n            // 椎体cos值\r\n            float coneCos;\r\n            // 半影cos\r\n            float penumbraCos;\r\n\r\n            // 阴影类型\r\n            int shadowType;\r\n            // 阴影偏差，用来解决判断是否为阴影时精度问题\r\n            float shadowBias;\r\n            // 阴影半径，边缘宽度\r\n            float shadowRadius;\r\n            // 阴影图尺寸\r\n            vec2 shadowMapSize;\r\n            float shadowCameraNear;\r\n            float shadowCameraFar;\r\n        };\r\n        // 投影的投影的聚光灯列表\r\n        uniform CastShadowSpotLight u_castShadowSpotLights[NUM_SPOT_LIGHTS_CASTSHADOW];\r\n        // 投影的聚光灯阴影图\r\n        uniform sampler2D u_spotShadowMaps[NUM_SPOT_LIGHTS_CASTSHADOW];\r\n        // 方向光源投影uv列表\r\n        varying vec4 v_spotShadowCoord[ NUM_SPOT_LIGHTS_CASTSHADOW ];\r\n    #endif\r\n\r\n    #if NUM_DIRECTIONALLIGHT_CASTSHADOW > 0\r\n        // 投影的方向光源\r\n        struct CastShadowDirectionalLight\r\n        {\r\n            // 方向\r\n            vec3 direction;\r\n            // 颜色\r\n            vec3 color;\r\n            // 强度\r\n            float intensity;\r\n            // 阴影类型\r\n            int shadowType;\r\n            // 阴影偏差，用来解决判断是否为阴影时精度问题\r\n            float shadowBias;\r\n            // 阴影半径，边缘宽度\r\n            float shadowRadius;\r\n            // 阴影图尺寸\r\n            vec2 shadowMapSize;\r\n            // 位置\r\n            vec3 position;\r\n            float shadowCameraNear;\r\n            float shadowCameraFar;\r\n        };\r\n        // 投影的方向光源列表\r\n        uniform CastShadowDirectionalLight u_castShadowDirectionalLights[NUM_DIRECTIONALLIGHT_CASTSHADOW];\r\n        // 方向光源阴影图\r\n        uniform sampler2D u_directionalShadowMaps[NUM_DIRECTIONALLIGHT_CASTSHADOW];\r\n        // 方向光源投影uv列表\r\n        varying vec4 v_directionalShadowCoord[ NUM_DIRECTIONALLIGHT_CASTSHADOW ];\r\n    #endif\r\n\r\n    // @see https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/packing.glsl\r\n    const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)\r\n    const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\r\n    const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\r\n    float unpackRGBAToDepth( const in vec4 v ) \r\n    {\r\n        return dot( v, UnpackFactors );\r\n    }\r\n\r\n    float texture2DCompare( sampler2D depths, vec2 uv, float compare ) \r\n    {\r\n        return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\r\n    }\r\n\r\n    float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) \r\n    {\r\n        const vec2 offset = vec2( 0.0, 1.0 );\r\n\r\n        vec2 texelSize = vec2( 1.0 ) / size;\r\n        vec2 centroidUV = floor( uv * size + 0.5 ) / size;\r\n\r\n        float lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );\r\n        float lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );\r\n        float rb = texture2DCompare( depths, centroidUV + texelSize * offset.yx, compare );\r\n        float rt = texture2DCompare( depths, centroidUV + texelSize * offset.yy, compare );\r\n\r\n        vec2 f = fract( uv * size + 0.5 );\r\n\r\n        float a = mix( lb, lt, f.y );\r\n        float b = mix( rb, rt, f.y );\r\n        float c = mix( a, b, f.x );\r\n\r\n        return c;\r\n    }\r\n\r\n    // 计算阴影值 @see https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/shadowmap_pars_fragment.glsl\r\n    float getShadow( sampler2D shadowMap, int shadowType, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord, vec3 lightToPosition, float shadowCameraNear, float shadowCameraFar) \r\n    {\r\n        float shadow = 1.0;\r\n\r\n        shadowCoord.xy /= shadowCoord.w;\r\n        shadowCoord.xy = (shadowCoord.xy + 1.0) / 2.0;\r\n\r\n        // dp = normalized distance from light to fragment position\r\n        float dp = ( length( lightToPosition ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear ); // need to clamp?\r\n        dp += shadowBias;\r\n        shadowCoord.z = dp;\r\n\r\n        // if ( something && something ) breaks ATI OpenGL shader compiler\r\n        // if ( all( something, something ) ) using this instead\r\n\r\n        bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\r\n        bool inFrustum = all( inFrustumVec );\r\n\r\n        bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\r\n\r\n        bool frustumTest = all( frustumTestVec );\r\n\r\n        if ( frustumTest ) \r\n        {\r\n            if (shadowType == 2)\r\n            {\r\n                // PCF\r\n                vec2 texelSize = vec2( 1.0 ) / shadowMapSize;\r\n\r\n                float dx0 = - texelSize.x * shadowRadius;\r\n                float dy0 = - texelSize.y * shadowRadius;\r\n                float dx1 = + texelSize.x * shadowRadius;\r\n                float dy1 = + texelSize.y * shadowRadius;\r\n\r\n                shadow = (\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n                ) * ( 1.0 / 9.0 );\r\n            }\r\n            else if(shadowType == 3)\r\n            {\r\n                // PCF soft\r\n                vec2 texelSize = vec2( 1.0 ) / shadowMapSize;\r\n\r\n                float dx0 = - texelSize.x * shadowRadius;\r\n                float dy0 = - texelSize.y * shadowRadius;\r\n                float dx1 = + texelSize.x * shadowRadius;\r\n                float dy1 = + texelSize.y * shadowRadius;\r\n\r\n                shadow = (\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n                ) * ( 1.0 / 9.0 );\r\n            }\r\n            else\r\n            {\r\n                shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\r\n            }\r\n        }\r\n\r\n        return shadow;\r\n    }\r\n\r\n    // cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D\r\n    // vector suitable for 2D texture mapping. This code uses the following layout for the\r\n    // 2D texture:\r\n    //\r\n    // xzXZ\r\n    //  y Y\r\n    //\r\n    // Y - Positive y direction\r\n    // y - Negative y direction\r\n    // X - Positive x direction\r\n    // x - Negative x direction\r\n    // Z - Positive z direction\r\n    // z - Negative z direction\r\n    //\r\n    // Source and test bed:\r\n    // https://gist.github.com/tschw/da10c43c467ce8afd0c4\r\n\r\n    vec2 cubeToUV( vec3 v, float texelSizeY ) \r\n    {\r\n        // Number of texels to avoid at the edge of each square\r\n        vec3 absV = abs( v );\r\n\r\n        // Intersect unit cube\r\n        float scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );\r\n        absV *= scaleToCube;\r\n\r\n        // Apply scale to avoid seams\r\n\r\n        // two texels less per square (one texel will do for NEAREST)\r\n        v *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );\r\n\r\n        // Unwrap\r\n\r\n        // space: -1 ... 1 range for each square\r\n        //\r\n        // #X##\t\tdim    := ( 1/4 , 1/2 )\r\n        //  # #\t\tcenter := ( 1/2 , 1/2 )\r\n        vec2 planar;\r\n        float almostOne = 1.0 - 1.5 * texelSizeY;\r\n        if ( absV.z >= almostOne ) \r\n        {\r\n            if ( v.z > 0.0 )\r\n            {\r\n                planar.x = (0.5 + v.x * 0.5) * 0.25 + 0.75;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }else\r\n            {\r\n                planar.x = (0.5 - v.x * 0.5) * 0.25 + 0.25;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }\r\n        } else if ( absV.x >= almostOne ) \r\n        {\r\n            if( v.x > 0.0)\r\n            {\r\n                planar.x = (0.5 - v.z * 0.5) * 0.25 + 0.5;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }else\r\n            {\r\n                planar.x = (0.5 + v.z * 0.5) * 0.25 + 0.0;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }\r\n        } else if ( absV.y >= almostOne ) \r\n        {\r\n            if( v.y > 0.0)\r\n            {\r\n                planar.x = (0.5 - v.x * 0.5) * 0.25 + 0.75;\r\n                planar.y = (0.5 + v.z * 0.5) * 0.5 + 0.0;\r\n            }else\r\n            {\r\n                planar.x = (0.5 - v.x * 0.5) * 0.25 + 0.25;\r\n                planar.y = (0.5 - v.z * 0.5) * 0.5 + 0.0;\r\n            }\r\n        }\r\n        return planar;\r\n    }\r\n\r\n    float getPointShadow( sampler2D shadowMap, int shadowType, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec3 lightToPosition, float shadowCameraNear, float shadowCameraFar ) \r\n    {\r\n        vec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );\r\n\r\n        // for point lights, the uniform @vShadowCoord is re-purposed to hold\r\n        // the vector from the light to the world-space position of the fragment.\r\n        // vec3 lightToPosition = shadowCoord.xyz;\r\n\r\n        // dp = normalized distance from light to fragment position\r\n        float dp = ( length( lightToPosition ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear ); // need to clamp?\r\n        dp += shadowBias;\r\n\r\n        // bd3D = base direction 3D\r\n        vec3 bd3D = normalize( lightToPosition );\r\n\r\n        if(shadowType == 2 || shadowType == 3)\r\n        {\r\n            vec2 offset = vec2( - 1, 1 ) * shadowRadius * texelSize.y;\r\n\r\n            return (\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyx, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyx, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxx, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxx, texelSize.y ), dp )\r\n            ) * ( 1.0 / 9.0 );\r\n        }else\r\n        {\r\n            return texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );\r\n        }\r\n    }\r\n#endif",
-            "skeleton_pars_vert": "#ifdef HAS_SKELETON_ANIMATION\r\n\r\n    attribute vec4 a_jointindex0;\r\n    attribute vec4 a_jointweight0;\r\n\r\n    #ifdef HAS_a_jointindex1\r\n        attribute vec4 a_jointindex1;\r\n        attribute vec4 a_jointweight1;\r\n    #endif\r\n\r\n    #ifdef NUM_SKELETONJOINT\r\n        uniform mat4 u_skeletonGlobalMatriices[NUM_SKELETONJOINT];\r\n    #endif\r\n\r\n    vec4 skeletonAnimation(vec4 position) \r\n    {\r\n        vec4 totalPosition = vec4(0.0,0.0,0.0,1.0);\r\n        for(int i = 0; i < 4; i++)\r\n        {\r\n            totalPosition += u_skeletonGlobalMatriices[int(a_jointindex0[i])] * position * a_jointweight0[i];\r\n        }\r\n        #ifdef HAS_a_jointindex1\r\n            for(int i = 0; i < 4; i++)\r\n            {\r\n                totalPosition += u_skeletonGlobalMatriices[int(a_jointindex1[i])] * position * a_jointweight1[i];\r\n            }\r\n        #endif\r\n        position.xyz = totalPosition.xyz;\r\n        return position;\r\n    }\r\n#endif",
-            "skeleton_vert": "#ifdef HAS_SKELETON_ANIMATION\r\n    position = skeletonAnimation(position);\r\n#endif",
-            "specular_frag": "//获取高光值\r\nfloat glossiness = u_glossiness;\r\n//获取镜面反射基本颜色\r\nvec3 specularColor = u_specular;\r\nvec4 specularMapColor = texture2D(s_specular, v_uv);\r\nspecularColor.xyz = specularMapColor.xyz;\r\nglossiness = glossiness * specularMapColor.w;",
-            "specular_pars_frag": "//镜面反射\r\nuniform vec3 u_specular;\r\nuniform float u_glossiness;\r\nuniform sampler2D s_specular;",
-            "tangent_pars_vert": "attribute vec3 a_tangent;",
-            "tangent_vert": "vec3 tangent = a_tangent;",
-            "terrainDefault_pars_frag": "uniform sampler2D s_splatTexture1;\r\nuniform sampler2D s_splatTexture2;\r\nuniform sampler2D s_splatTexture3;\r\n\r\nuniform sampler2D s_blendTexture;\r\nuniform vec4 u_splatRepeats;\r\n\r\nvec4 terrainMethod(vec4 diffuseColor,vec2 v_uv) \r\n{\r\n    vec4 blend = texture2D(s_blendTexture, v_uv);\r\n\r\n    vec2 t_uv = v_uv.xy * u_splatRepeats.y;\r\n    vec4 tColor = texture2D(s_splatTexture1, t_uv);\r\n    diffuseColor = (tColor - diffuseColor) * blend.x + diffuseColor;\r\n\r\n    t_uv = v_uv.xy * u_splatRepeats.z;\r\n    tColor = texture2D(s_splatTexture2, t_uv);\r\n    diffuseColor = (tColor - diffuseColor) * blend.y + diffuseColor;\r\n\r\n    t_uv = v_uv.xy * u_splatRepeats.w;\r\n    tColor = texture2D(s_splatTexture3, t_uv);\r\n    diffuseColor = (tColor - diffuseColor) * blend.z + diffuseColor;\r\n\r\n    return diffuseColor;\r\n}",
-            "terrainMerge_pars_frag": "//代码实现lod以及线性插值 feng\r\n#extension GL_EXT_shader_texture_lod : enable\r\n#extension GL_OES_standard_derivatives : enable\r\n\r\n#define LOD_LINEAR\r\n\r\nuniform sampler2D s_splatMergeTexture;\r\nuniform sampler2D s_blendTexture;\r\nuniform vec4 u_splatRepeats;\r\n\r\nuniform vec2 u_imageSize;\r\nuniform vec4 u_tileOffset[3];\r\nuniform vec4 u_lod0vec;\r\nuniform vec2 u_tileSize;\r\nuniform float u_maxLod;\r\nuniform float u_scaleByDepth;\r\nuniform float u_uvPositionScale;\r\n\r\n\r\nvec4 terrainTexture2DLod(sampler2D s_splatMergeTexture,vec2 uv,float lod,vec4 offset){\r\n\r\n    //计算不同lod像素缩放以及起始坐标\r\n    vec4 lodvec = u_lod0vec;\r\n    lodvec.x = lodvec.x * pow(0.5,lod);\r\n    lodvec.y = lodvec.x * 2.0;\r\n    lodvec.z = 1.0 - lodvec.y;\r\n\r\n    //lod块尺寸\r\n    vec2 lodSize = u_imageSize * lodvec.xy;\r\n    vec2 lodPixelOffset = 1.0 / lodSize * 2.0;\r\n\r\n    // uv = uv - 1.0 / lodPixelOffset;\r\n    vec2 mixFactor = mod(uv, lodPixelOffset) / lodPixelOffset;\r\n\r\n    //lod块中像素索引\r\n    vec2 t_uv = fract(uv + lodPixelOffset * vec2(0.0, 0.0));\r\n    t_uv = t_uv * offset.xy + offset.zw;\r\n    //添加lod起始坐标\r\n    t_uv = t_uv * lodvec.xy + lodvec.zw;\r\n    //取整像素\r\n    t_uv = floor(t_uv * u_imageSize) / u_imageSize;\r\n    vec4 tColor00 = texture2D(s_splatMergeTexture,t_uv);\r\n\r\n    t_uv = fract(uv + lodPixelOffset * vec2(1.0, 0.0));\r\n    t_uv = t_uv * offset.xy + offset.zw;\r\n    //添加lod起始坐标\r\n    t_uv = t_uv * lodvec.xy + lodvec.zw;\r\n    //取整像素\r\n    t_uv = floor(t_uv * u_imageSize) / u_imageSize;\r\n    vec4 tColor10 = texture2D(s_splatMergeTexture,t_uv);\r\n\r\n    t_uv = fract(uv + lodPixelOffset * vec2(0.0, 1.0));\r\n    t_uv = t_uv * offset.xy + offset.zw;\r\n    //添加lod起始坐标\r\n    t_uv = t_uv * lodvec.xy + lodvec.zw;\r\n    //取整像素\r\n    t_uv = floor(t_uv * u_imageSize) / u_imageSize;\r\n    vec4 tColor01 = texture2D(s_splatMergeTexture,t_uv);\r\n\r\n    t_uv = fract(uv + lodPixelOffset * vec2(1.0, 1.0));\r\n    t_uv = t_uv * offset.xy + offset.zw;\r\n    //添加lod起始坐标\r\n    t_uv = t_uv * lodvec.xy + lodvec.zw;\r\n    //取整像素\r\n    t_uv = floor(t_uv * u_imageSize) / u_imageSize;\r\n    vec4 tColor11 = texture2D(s_splatMergeTexture,t_uv);\r\n\r\n    vec4 tColor0 = mix(tColor00,tColor10,mixFactor.x);\r\n    vec4 tColor1 = mix(tColor01,tColor11,mixFactor.x);\r\n    vec4 tColor = mix(tColor0,tColor1,mixFactor.y);\r\n\r\n    return tColor;\r\n\r\n    // return vec4(mixFactor.x,mixFactor.y,0.0,1.0);\r\n    // return vec4(mixFactor.x + 0.5,mixFactor.y + 0.5,0.0,1.0);\r\n}\r\n\r\n//参考 http://blog.csdn.net/cgwbr/article/details/6620318\r\n//计算MipMap层函数：\r\nfloat mipmapLevel(vec2 uv)\r\n{\r\n    vec2 dx = dFdx(uv);\r\n    vec2 dy = dFdy(uv);\r\n    float d = max(dot(dx, dx), dot(dy, dy));\r\n    return 0.5 * log2(d);\r\n}\r\n\r\n//根据距离以及法线计算MipMap层函数：\r\nfloat mipmapLevel1(vec2 uv)\r\n{\r\n    //视线方向\r\n    vec3 cameraDir = u_cameraPos - v_worldPosition.xyz;\r\n    float fogDistance = length(cameraDir);\r\n    float value = u_scaleByDepth * fogDistance * u_uvPositionScale;//uv变化率与距离成正比，0.001为顶点位置与uv的变化比率\r\n    cameraDir = normalize(cameraDir);\r\n    float dd = clamp(dot(cameraDir, v_normal),0.05,1.0);//取法线与视线余弦值的倒数，余弦值越大（朝向摄像机时uv变化程度越低）lod越小\r\n    value = value / dd;\r\n    value = value * 0.5;//还没搞懂0.5的来历\r\n    return log2(value);\r\n}\r\n\r\nvec4 terrainTexture2D(sampler2D s_splatMergeTexture, vec2 t_uv, float lod, vec4 offset){\r\n \r\n    #ifdef LOD_LINEAR\r\n        vec4 tColor = mix(terrainTexture2DLod(s_splatMergeTexture, t_uv, floor(lod), offset),terrainTexture2DLod(s_splatMergeTexture, t_uv, ceil(lod), offset), fract(lod));\r\n    #else\r\n        vec4 tColor = terrainTexture2DLod(s_splatMergeTexture, t_uv, ceil(lod), offset);\r\n    #endif\r\n\r\n    return tColor;\r\n}\r\n\r\nvec4 terrainMethod(vec4 diffuseColor, vec2 v_uv) \r\n{\r\n    float lod = 0.0;\r\n    vec4 blend = texture2D(s_blendTexture, v_uv);\r\n    for(int i = 0; i < 3; i++)\r\n    {\r\n        vec2 t_uv = v_uv * u_splatRepeats[i];\r\n        // lod = mipmapLevel(v_uv) + log2(u_tileSize.x * u_splatRepeats[i]);\r\n        lod = mipmapLevel1(v_uv) + log2(u_tileSize.x * u_splatRepeats[i]);\r\n        lod = clamp(lod, 0.0, u_maxLod);\r\n        vec4 tColor = terrainTexture2D(s_splatMergeTexture, t_uv, lod, u_tileOffset[i]);\r\n        diffuseColor = (tColor - diffuseColor) * blend[i] + diffuseColor;\r\n    }\r\n\r\n    // diffuseColor.xyz = vec3(1.0,0.0,0.0);\r\n    // diffuseColor.xyz = vec3(lod/u_maxLod,0.0,0.0);\r\n    // diffuseColor.xyz = vec3(floor(lod)/u_maxLod,0.0,0.0);\r\n    return diffuseColor;\r\n}",
-            "terrain_frag": "diffuseColor = terrainMethod(diffuseColor, v_uv);",
-            "terrain_pars_frag": "#ifdef USE_TERRAIN_MERGE\r\n    #include<terrainMerge_pars_frag>\r\n#else\r\n    #include<terrainDefault_pars_frag>\r\n#endif",
-            "uv_pars_vert": "attribute vec2 a_uv;\r\n\r\nvarying vec2 v_uv;",
-            "uv_vert": "v_uv = a_uv;",
-            "worldposition_pars_vert": "uniform mat4 u_modelMatrix;\r\n\r\nvarying vec3 v_worldPosition;",
-            "worldposition_vert": "//获取全局坐标\r\nvec4 worldPosition = u_modelMatrix * position;\r\n//输出全局坐标\r\nv_worldPosition = worldPosition.xyz;"
-        }
-    };
-})(feng3d || (feng3d = {}));
-if (!String.prototype.startsWith) {
-    Object.defineProperty(String.prototype, 'startsWith', {
-        value: function (search, pos) {
-            return this.substring(!pos || pos < 0 ? 0 : +pos, pos + search.length) === search;
-        }
-    });
-}
-if (!String.prototype.includes) {
-    Object.defineProperty(String.prototype, 'includes', {
-        value: function (search, start) {
-            if (typeof start !== 'number') {
-                start = 0;
-            }
-            if (start + search.length > this.length) {
-                return false;
-            }
-            else {
-                return this.indexOf(search, start) !== -1;
-            }
-        }
-    });
-}
-if (!String.prototype.endsWith) {
-    String.prototype.endsWith = function (search, this_len) {
-        if (this_len === undefined || this_len > this.length) {
-            this_len = this.length;
-        }
-        return this.substring(this_len - search.length, this_len) === search;
-    };
-}
-if (typeof Object.assign != 'function') {
-    // Must be writable: true, enumerable: false, configurable: true
-    Object.defineProperty(Object, "assign", {
-        value: function assign(target, varArgs) {
-            'use strict';
-            if (target == null) { // TypeError if undefined or null
-                throw new TypeError('Cannot convert undefined or null to object');
-            }
-            var to = Object(target);
-            for (var index = 1; index < arguments.length; index++) {
-                var nextSource = arguments[index];
-                if (nextSource != null) { // Skip over if undefined or null
-                    for (var nextKey in nextSource) {
-                        // Avoid bugs when hasOwnProperty is shadowed
-                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                            to[nextKey] = nextSource[nextKey];
-                        }
-                    }
-                }
-            }
-            return to;
-        },
-        writable: true,
-        configurable: true
-    });
-}
-Object.getPropertyDescriptor = function (host, property) {
-    var data = Object.getOwnPropertyDescriptor(host, property);
-    if (data) {
-        return data;
-    }
-    var prototype = Object.getPrototypeOf(host);
-    if (prototype) {
-        return Object.getPropertyDescriptor(prototype, property);
-    }
-    return null;
-};
-Object.propertyIsWritable = function (host, property) {
-    var data = Object.getPropertyDescriptor(host, property);
-    if (!data)
-        return false;
-    if (data.get && !data.set)
-        return false;
-    return true;
-};
-Object.runFunc = function (obj, func) {
-    func(obj);
-    return obj;
-};
-Object.setValue = function (obj, value) {
-    feng3d.serialization.setValue(obj, value);
-    return obj;
-};
-Object.deepClone = function (obj) {
-    return feng3d.serialization.clone(obj);
-};
-//参考 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
-Map.prototype.getKeys = function () {
-    var keys = [];
-    this.forEach(function (v, k) {
-        keys.push(k);
-    });
-    return keys;
-};
-Map.prototype.getValues = function () {
-    var values = [];
-    this.forEach(function (v, k) {
-        values.push(v);
-    });
-    return values;
-};
-var feng3d;
-(function (feng3d) {
-    /**
-     * 测试代码运行时间
-     * @param fn 被测试的方法
-     * @param labal 标签
-     */
-    function time(fn, labal) {
-        labal = labal || fn["name"] || "Anonymous function " + Math.random();
-        console.time(labal);
-        fn();
-        console.timeEnd(labal);
-    }
-    feng3d.time = time;
-    /**
-     * 断言，测试不通过时报错
-     * @param test 测试项
-     * @param message 测试失败时提示信息
-     * @param optionalParams
-     */
-    function assert(test, message) {
-        var optionalParams = [];
-        for (var _i = 2; _i < arguments.length; _i++) {
-            optionalParams[_i - 2] = arguments[_i];
-        }
-        if (!test)
-            debugger;
-        console.assert.apply(null, arguments);
-    }
-    feng3d.assert = assert;
-    /**
-     * 输出错误
-     * @param message 错误信息
-     * @param optionalParams
-     */
-    function error(message) {
-        var optionalParams = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            optionalParams[_i - 1] = arguments[_i];
-        }
-        debugger;
-        console.error.apply(null, arguments);
-    }
-    feng3d.error = error;
-    /**
-     * 记录日志信息
-     * @param message 日志信息
-     * @param optionalParams
-     */
-    function log(message) {
-        var optionalParams = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            optionalParams[_i - 1] = arguments[_i];
-        }
-        console.log.apply(null, arguments);
-    }
-    feng3d.log = log;
-    /**
-     * 警告
-     * @param message 警告信息
-     * @param optionalParams
-     */
-    function warn(message) {
-        var optionalParams = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            optionalParams[_i - 1] = arguments[_i];
-        }
-        console.warn.apply(null, arguments);
-    }
-    feng3d.warn = warn;
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
     /**
      * 观察装饰器，观察被装饰属性的变化
      *
@@ -410,7 +131,7 @@ getset平均耗时比 17.3
                 var oldPropertyDescriptor = Object.getOwnPropertyDescriptor(host, property1);
                 watchs[property1] = { value: host[property1], oldPropertyDescriptor: oldPropertyDescriptor, handlers: [] };
                 //
-                var data = Object.getPropertyDescriptor(host, property1);
+                var data = getPropertyDescriptor(host, property1);
                 if (data && data.set && data.get) {
                     data = { enumerable: true, configurable: true, get: data.get, set: data.set };
                     var orgSet = data.set;
@@ -436,7 +157,7 @@ getset平均耗时比 17.3
                     };
                 }
                 else {
-                    feng3d.warn("watch " + host + " . " + property + " \u5931\u8D25\uFF01");
+                    console.warn("watch " + host + " . " + property + " \u5931\u8D25\uFF01");
                     return;
                 }
                 Object.defineProperty(host, property1, data);
@@ -570,6 +291,272 @@ getset平均耗时比 17.3
             element.handler.call(element.thisObject, host, property, oldview);
         });
     }
+    function getPropertyDescriptor(host, property) {
+        var data = Object.getOwnPropertyDescriptor(host, property);
+        if (data) {
+            return data;
+        }
+        var prototype = Object.getPrototypeOf(host);
+        if (prototype) {
+            return getPropertyDescriptor(prototype, property);
+        }
+        return null;
+    }
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    feng3d.shaderConfig = {
+        "shaders": {
+            "color": {
+                "fragment": "precision mediump float;\r\n\r\nuniform vec4 u_diffuseInput;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = u_diffuseInput;\r\n}\r\n",
+                "vertex": "attribute vec3 a_position;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvoid main()\r\n{\r\n    vec4 worldPosition = u_modelMatrix * vec4(a_position, 1.0);\r\n    gl_Position = u_viewProjection * worldPosition;\r\n}"
+            },
+            "mouse": {
+                "fragment": "precision highp float;\r\n\r\nuniform int u_objectID;\r\n\r\nvoid main()\r\n{\r\n    //支持 255*255*255*255 个索引\r\n    const float invColor = 1.0/255.0;\r\n    float temp = float(u_objectID);\r\n    temp = floor(temp) * invColor;\r\n    gl_FragColor.x = fract(temp);\r\n    temp = floor(temp) * invColor;\r\n    gl_FragColor.y = fract(temp);\r\n    temp = floor(temp) * invColor;\r\n    gl_FragColor.z = fract(temp);\r\n    temp = floor(temp) * invColor;\r\n    gl_FragColor.w = fract(temp);\r\n}",
+                "vertex": "attribute vec3 a_position;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvoid main()\r\n{\r\n    vec4 worldPosition = u_modelMatrix * vec4(a_position, 1.0);\r\n    gl_Position = u_viewProjection * worldPosition;\r\n}"
+            },
+            "outline": {
+                "fragment": "precision mediump float;\r\n\r\nuniform vec4 u_outlineColor;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = u_outlineColor;\r\n}",
+                "vertex": "precision mediump float;  \r\n\r\n//坐标属性\r\nattribute vec3 a_position;\r\nattribute vec3 a_normal;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_ITModelMatrix;\r\nuniform vec3 u_cameraPos;\r\nuniform mat4 u_viewProjection;\r\nuniform float u_scaleByDepth;\r\nuniform float u_outlineMorphFactor;\r\n\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n\r\nuniform float u_outlineSize;\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n    \r\n    vec3 normal = a_normal;\r\n\r\n    //全局坐标\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    //全局法线\r\n    vec3 globalNormal = normalize((u_ITModelMatrix * vec4(normal, 0.0)).xyz);\r\n\r\n    float depth = distance(worldPosition.xyz , u_cameraPos.xyz);\r\n    \r\n    vec3 offsetDir = mix(globalNormal, normalize(worldPosition.xyz), u_outlineMorphFactor);\r\n    //摄像机远近保持粗细一致\r\n    offsetDir = offsetDir * depth * u_scaleByDepth;\r\n    //描边宽度\r\n    offsetDir = offsetDir * u_outlineSize;\r\n\r\n    worldPosition.xyz = worldPosition.xyz + offsetDir;//\r\n\r\n    //计算投影坐标\r\n    gl_Position = u_viewProjection * worldPosition;\r\n}"
+            },
+            "particle": {
+                "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\n\r\nuniform float u_alphaThreshold;\r\n//漫反射\r\nuniform vec4 u_diffuse;\r\nuniform sampler2D s_diffuse;\r\n\r\n#include<particle_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n\r\n    //获取漫反射基本颜色\r\n    vec4 diffuseColor = u_diffuse * texture2D(s_diffuse, v_uv);\r\n\r\n    if(diffuseColor.w < u_alphaThreshold)\r\n    {\r\n        discard;\r\n    }\r\n\r\n    finalColor = diffuseColor;\r\n\r\n    #include<particle_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
+                "vertex": "precision mediump float;  \r\n\r\n//坐标属性\r\nattribute vec3 a_position;\r\nattribute vec2 a_uv;\r\nattribute vec3 a_normal;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_ITModelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvarying vec2 v_uv;\r\n\r\nuniform float u_PointSize;\r\n\r\n#include<particle_pars_vert>\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n    \r\n    #include<particle_vert>\r\n\r\n    vec3 normal = a_normal;\r\n\r\n    //获取全局坐标\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    //计算投影坐标\r\n    gl_Position = u_viewProjection * worldPosition;\r\n    //输出uv\r\n    v_uv = a_uv;\r\n\r\n    gl_PointSize = u_PointSize;\r\n}"
+            },
+            "point": {
+                "fragment": "precision mediump float;\r\n\r\nvarying vec4 v_color;\r\nuniform vec4 u_color;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = v_color * u_color;\r\n}\r\n",
+                "vertex": "attribute vec3 a_position;\r\nattribute vec4 a_color;\r\n\r\nuniform float u_PointSize;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvarying vec4 v_color;\r\n\r\nvoid main() \r\n{\r\n    vec4 worldPosition = u_modelMatrix * vec4(a_position, 1.0);\r\n    gl_Position = u_viewProjection * worldPosition;\r\n    gl_PointSize = u_PointSize;\r\n\r\n    v_color = a_color;\r\n}"
+            },
+            "segment": {
+                "fragment": "precision mediump float;\r\n\r\nvarying vec4 v_color;\r\n\r\nuniform vec4 u_segmentColor;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = v_color * u_segmentColor;\r\n}",
+                "vertex": "attribute vec3 a_position;\r\nattribute vec4 a_color;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvarying vec4 v_color;\r\n\r\nvoid main() \r\n{\r\n    gl_Position = u_viewProjection * u_modelMatrix * vec4(a_position, 1.0);\r\n    v_color = a_color;\r\n}"
+            },
+            "shadow": {
+                "fragment": "precision mediump float;\r\n\r\nvarying vec3 v_worldPosition;\r\n\r\nuniform int u_lightType;\r\nuniform vec3 u_lightPosition;\r\nuniform float u_shadowCameraNear;\r\nuniform float u_shadowCameraFar;\r\n\r\n// @see https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/packing.glsl\r\nconst float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)\r\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\r\nconst float ShiftRight8 = 1. / 256.;\r\nvec4 packDepthToRGBA( const in float v ) \r\n{\r\n\tvec4 r = vec4( fract( v * PackFactors ), v );\r\n\tr.yzw -= r.xyz * ShiftRight8; // tidy overflow\r\n\treturn r * PackUpscale;\r\n}\r\n\r\nvoid main() \r\n{\r\n    vec3 lightToPosition = (v_worldPosition - u_lightPosition);\r\n    float dp = ( length( lightToPosition ) - u_shadowCameraNear ) / ( u_shadowCameraFar - u_shadowCameraNear ); // need to clamp?\r\n    gl_FragColor = packDepthToRGBA( dp );\r\n}",
+                "vertex": "precision mediump float;  \r\n\r\nattribute vec3 a_position;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n\r\nvarying vec3 v_worldPosition;\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    gl_Position = u_viewProjection * worldPosition;\r\n    v_worldPosition = worldPosition.xyz;\r\n}"
+            },
+            "skybox": {
+                "fragment": "precision highp float;\r\n\r\nuniform samplerCube s_skyboxTexture;\r\nuniform vec3 u_cameraPos;\r\n\r\nvarying vec3 v_worldPos;\r\n\r\nvoid main()\r\n{\r\n    vec3 cameraDir = normalize(u_cameraPos.xyz - v_worldPos);\r\n    gl_FragColor = textureCube(s_skyboxTexture, -cameraDir);\r\n}",
+                "vertex": "attribute vec3 a_position;\r\n\r\nuniform vec3 u_cameraPos;\r\nuniform mat4 u_viewProjection;\r\n\r\nuniform float u_skyBoxSize;\r\n\r\nvarying vec3 v_worldPos;\r\n\r\nvoid main()\r\n{\r\n    vec3 worldPos = a_position.xyz * u_skyBoxSize + u_cameraPos.xyz;\r\n    gl_Position = u_viewProjection * vec4(worldPos.xyz, 1.0);\r\n    v_worldPos = worldPos;\r\n}"
+            },
+            "standard": {
+                "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\nvarying vec3 v_worldPosition;\r\nuniform vec3 u_cameraPos;\r\n\r\n#include<normal_pars_frag>\r\n#include<diffuse_pars_frag>\r\n#include<alphatest_pars_frag>\r\n\r\n#include<ambient_pars_frag>\r\n#include<specular_pars_frag>\r\n#include<lights_pars_frag>\r\n\r\n#include<envmap_pars_frag>\r\n#include<particle_pars_frag>\r\n#include<fog_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0,1.0,1.0,1.0);\r\n\r\n    #include<normal_frag>\r\n    #include<diffuse_frag>\r\n    #include<alphatest_frag>\r\n\r\n    #include<ambient_frag>\r\n    #include<specular_frag>\r\n    #include<lights_frag>\r\n\r\n    #include<envmap_frag>\r\n    #include<particle_frag>\r\n    #include<fog_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
+                "vertex": "precision mediump float;  \r\n\r\n#include<position_pars_vert>\r\n#include<normal_pars_vert>\r\n#include<tangent_pars_vert>\r\n//\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n//\r\n#include<worldposition_pars_vert>\r\n#include<project_pars_vert>\r\n//\r\n#include<uv_pars_vert>\r\n#include<normalmap_pars_vert>\r\n//\r\n#include<lights_pars_vert>\r\n#include<pointsize_pars_vert>\r\n\r\nvoid main()\r\n{\r\n    // 初始化\r\n    #include<position_vert>\r\n    #include<normal_vert>\r\n    #include<tangent_vert>\r\n    // 动画\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n    // 投影\r\n    #include<worldposition_vert>\r\n    #include<project_vert>\r\n    // \r\n    #include<uv_vert>\r\n    #include<normalmap_vert>\r\n    //\r\n    #include<lights_vert>\r\n    #include<pointsize_vert>\r\n}"
+            },
+            "terrain": {
+                "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\nvarying vec3 v_worldPosition;\r\nuniform vec3 u_cameraPos;\r\n\r\n#include<normal_pars_frag>\r\n#include<diffuse_pars_frag>\r\n#include<alphatest_pars_frag>\r\n\r\n#include<terrain_pars_frag>\r\n\r\n#include<ambient_pars_frag>\r\n#include<specular_pars_frag>\r\n#include<lights_pars_frag>\r\n\r\n#include<envmap_pars_frag>\r\n#include<fog_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n\r\n    #include<normal_frag>\r\n    #include<diffuse_frag>\r\n    #include<alphatest_frag>\r\n\r\n    #include<terrain_frag>\r\n\r\n    #include<ambient_frag>\r\n    #include<specular_frag>\r\n    #include<lights_frag>\r\n\r\n    #include<envmap_frag>\r\n    #include<fog_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
+                "vertex": "precision mediump float;  \r\n\r\n#include<position_pars_vert>\r\n#include<normal_pars_vert>\r\n#include<tangent_pars_vert>\r\n//\r\n#include<worldposition_pars_vert>\r\n#include<project_pars_vert>\r\n//\r\n#include<uv_pars_vert>\r\n#include<normalmap_pars_vert>\r\n//\r\n#include<lights_pars_vert>\r\n#include<pointsize_pars_vert>\r\n\r\nvoid main() \r\n{\r\n    // 初始化\r\n    #include<position_vert>\r\n    #include<normal_vert>\r\n    #include<tangent_vert>\r\n    // 投影\r\n    #include<worldposition_vert>\r\n    #include<project_vert>\r\n    // \r\n    #include<uv_vert>\r\n    #include<normalmap_vert>\r\n    //\r\n    #include<lights_vert>\r\n    #include<pointsize_vert>\r\n}"
+            },
+            "texture": {
+                "fragment": "precision mediump float;\r\n\r\nuniform sampler2D s_texture;\r\nvarying vec2 v_uv;\r\n\r\nuniform vec4 u_color;\r\n\r\nvoid main() {\r\n\r\n    vec4 color = texture2D(s_texture, v_uv);\r\n    gl_FragColor = color * u_color;\r\n}\r\n",
+                "vertex": "attribute vec3 a_position;\r\nattribute vec2 a_uv;\r\n\r\nvarying vec2 v_uv;\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvoid main() \r\n{\r\n    gl_Position = u_viewProjection * u_modelMatrix * vec4(a_position, 1.0);\r\n    v_uv = a_uv;\r\n}"
+            },
+            "water": {
+                "fragment": "precision mediump float;  \r\n\r\nuniform vec3 u_cameraPos;\r\n\r\nvarying vec4 v_mirrorCoord;\r\nvarying vec4 v_worldPosition;\r\n\r\nuniform sampler2D s_mirrorSampler;\r\nuniform sampler2D s_normalSampler;\r\n\r\nuniform float u_alpha;\r\nuniform float u_time;\r\nuniform float u_size;\r\nuniform float u_distortionScale;\r\nuniform vec3 u_sunColor;\r\nuniform vec3 u_sunDirection;\r\nuniform vec3 u_waterColor;\r\n\r\nvec4 getNoise( vec2 uv ) \r\n{\r\n\tvec2 uv0 = ( uv / 103.0 ) + vec2(u_time / 17.0, u_time / 29.0);\r\n\tvec2 uv1 = uv / 107.0-vec2( u_time / -19.0, u_time / 31.0 );\r\n\tvec2 uv2 = uv / vec2( 8907.0, 9803.0 ) + vec2( u_time / 101.0, u_time / 97.0 );\r\n\tvec2 uv3 = uv / vec2( 1091.0, 1027.0 ) - vec2( u_time / 109.0, u_time / -113.0 );\r\n\tvec4 noise = texture2D( s_normalSampler, uv0 ) +\r\n\t\ttexture2D( s_normalSampler, uv1 ) +\r\n\t\ttexture2D( s_normalSampler, uv2 ) +\r\n\t\ttexture2D( s_normalSampler, uv3 );\r\n\treturn noise * 0.5 - 1.0;\r\n}\r\n\r\nvoid sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor ) \r\n{\r\n\tvec3 reflection = normalize( reflect( -u_sunDirection, surfaceNormal ) );\r\n\tfloat direction = max( 0.0, dot( eyeDirection, reflection ) );\r\n\tspecularColor += pow( direction, shiny ) * u_sunColor * spec;\r\n\tdiffuseColor += max( dot( u_sunDirection, surfaceNormal ), 0.0 ) * u_sunColor * diffuse;\r\n}\r\n\r\nvoid main() \r\n{\r\n\tvec4 noise = getNoise( v_worldPosition.xz * u_size );\r\n\tvec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );\r\n\tvec3 diffuseLight = vec3(0.0);\r\n\tvec3 specularLight = vec3(0.0);\r\n\tvec3 worldToEye = u_cameraPos-v_worldPosition.xyz;\r\n\tvec3 eyeDirection = normalize( worldToEye );\r\n\tsunLight( surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight );\r\n\tfloat distance = length(worldToEye);\r\n\tvec2 distortion = surfaceNormal.xz * ( 0.001 + 1.0 / distance ) * u_distortionScale;\r\n\tvec3 reflectionSample = vec3( texture2D( s_mirrorSampler, v_mirrorCoord.xy / v_mirrorCoord.z + distortion ) );\r\n\tfloat theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );\r\n\tfloat rf0 = 0.3;\r\n\tfloat reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );\r\n\tvec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * u_waterColor;\r\n\r\n\tfloat shadowMask = 1.0;\r\n\t// float shadowMask = getShadowMask();\r\n\r\n\tvec3 albedo = mix( ( u_sunColor * diffuseLight * 0.3 + scatter ) * shadowMask, ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance);\r\n\tvec3 outgoingLight = albedo;\r\n\tgl_FragColor = vec4( outgoingLight, u_alpha );\r\n\r\n\t// debug\r\n\t// gl_FragColor = texture2D( s_mirrorSampler, (v_mirrorCoord.xy / v_mirrorCoord.z + 1.0) / 2.0 );\r\n\t// gl_FragColor = vec4( reflectionSample, 1.0 );\r\n\t// gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\r\n}",
+                "vertex": "attribute vec3 a_position;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nuniform mat4 u_textureMatrix;\r\n\r\nvarying vec4 v_mirrorCoord;\r\nvarying vec4 v_worldPosition;\r\n\r\nvoid main() \r\n{\r\n\tvec4 position = vec4(a_position, 1.0);\r\n\t//获取全局坐标\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    //计算投影坐标\r\n    gl_Position = u_viewProjection * worldPosition;\r\n\t\r\n\tv_worldPosition = worldPosition;\r\n\tv_mirrorCoord = u_textureMatrix * worldPosition;\r\n}"
+            },
+            "wireframe": {
+                "fragment": "precision mediump float;\r\n\r\nuniform vec4 u_wireframeColor;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = u_wireframeColor;\r\n}",
+                "vertex": "precision mediump float;  \r\n\r\nattribute vec3 a_position;\r\nattribute vec4 a_color;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n\r\n    gl_Position = u_viewProjection * u_modelMatrix * position;\r\n}"
+            }
+        },
+        "modules": {
+            "alphatest_frag": "if(diffuseColor.w < u_alphaThreshold) discard;",
+            "alphatest_pars_frag": "uniform float u_alphaThreshold;",
+            "ambient_frag": "//环境光\r\nvec3 ambientColor = u_ambient.w * u_ambient.xyz * u_sceneAmbientColor.xyz * u_sceneAmbientColor.w;\r\nambientColor = ambientColor * texture2D(s_ambient, v_uv).xyz;",
+            "ambient_pars_frag": "uniform vec4 u_sceneAmbientColor;\r\n\r\n//环境\r\nuniform vec4 u_ambient;\r\nuniform sampler2D s_ambient;",
+            "cartoon_pars_frag": "#ifdef IS_CARTOON\r\n    #ifdef cartoon_Anti_aliasing\r\n        #extension GL_OES_standard_derivatives : enable\r\n    #endif\r\n\r\n    uniform vec4 u_diffuseSegment;\r\n    uniform vec4 u_diffuseSegmentValue;\r\n    uniform float u_specularSegment;\r\n\r\n    //漫反射\r\n    float cartoonLightDiffuse(vec3 normal,vec3 lightDir)\r\n    {\r\n        float diff = dot(normal, lightDir);\r\n        diff = diff * 0.5 + 0.5;\r\n\r\n        #ifdef cartoon_Anti_aliasing\r\n            float w = fwidth(diff) * 2.0;\r\n            if (diff < u_diffuseSegment.x + w) \r\n            {\r\n                diff = mix(u_diffuseSegment.x, u_diffuseSegment.y, smoothstep(u_diffuseSegment.x - w, u_diffuseSegment.x + w, diff));\r\n            //  diff = mix(u_diffuseSegment.x, u_diffuseSegment.y, clamp(0.5 * (diff - u_diffuseSegment.x) / w, 0, 1));\r\n            } else if (diff < u_diffuseSegment.y + w) \r\n            {\r\n                diff = mix(u_diffuseSegment.y, u_diffuseSegment.z, smoothstep(u_diffuseSegment.y - w, u_diffuseSegment.y + w, diff));\r\n            //  diff = mix(u_diffuseSegment.y, u_diffuseSegment.z, clamp(0.5 * (diff - u_diffuseSegment.y) / w, 0, 1));\r\n            } else if (diff < u_diffuseSegment.z + w) \r\n            {\r\n                diff = mix(u_diffuseSegment.z, u_diffuseSegment.w, smoothstep(u_diffuseSegment.z - w, u_diffuseSegment.z + w, diff));\r\n            //  diff = mix(u_diffuseSegment.z, u_diffuseSegment.w, clamp(0.5 * (diff - u_diffuseSegment.z) / w, 0, 1));\r\n            } else \r\n            {\r\n                diff = u_diffuseSegment.w;\r\n            }\r\n        #else\r\n            if (diff < u_diffuseSegment.x) \r\n            {\r\n                diff = u_diffuseSegmentValue.x;\r\n            } else if (diff < u_diffuseSegment.y) \r\n            {\r\n                diff = u_diffuseSegmentValue.y;\r\n            } else if (diff < u_diffuseSegment.z) \r\n            {\r\n                diff = u_diffuseSegmentValue.z;\r\n            } else \r\n            {\r\n                diff = u_diffuseSegmentValue.w;\r\n            }\r\n        #endif\r\n\r\n        return diff;\r\n    }\r\n\r\n    //镜面反射漫反射\r\n    float cartoonLightSpecular(vec3 normal,vec3 lightDir,vec3 cameraDir,float glossiness)\r\n    {\r\n        vec3 halfVec = normalize(lightDir + cameraDir);\r\n        float specComp = max(dot(normal,halfVec),0.0);\r\n        specComp = pow(specComp, glossiness);\r\n\r\n        #ifdef cartoon_Anti_aliasing\r\n            float w = fwidth(specComp);\r\n            if (specComp < u_specularSegment + w) \r\n            {\r\n                specComp = mix(0.0, 1.0, smoothstep(u_specularSegment - w, u_specularSegment + w, specComp));\r\n                // specComp = smoothstep(u_specularSegment - w, u_specularSegment + w, specComp);\r\n            } else \r\n            {\r\n                specComp = 1.0;\r\n            }\r\n        #else\r\n            if(specComp < u_specularSegment)\r\n            {\r\n                specComp = 0.0;\r\n            }else\r\n            {\r\n                specComp = 1.0;\r\n            }\r\n        #endif\r\n\r\n        return specComp;\r\n    }\r\n#endif",
+            "diffuse_frag": "//获取漫反射基本颜色\r\nvec4 diffuseColor = u_diffuse;\r\ndiffuseColor = diffuseColor * texture2D(s_diffuse, v_uv);\r\n\r\nfinalColor = diffuseColor;",
+            "diffuse_pars_frag": "//漫反射\r\nuniform vec4 u_diffuse;\r\nuniform sampler2D s_diffuse;",
+            "envmap_frag": "finalColor = envmapMethod(finalColor);",
+            "envmap_pars_frag": "uniform samplerCube s_envMap;\r\nuniform float u_reflectivity;\r\n\r\nvec4 envmapMethod(vec4 finalColor)\r\n{\r\n    vec3 cameraToVertex = normalize( v_worldPosition - u_cameraPos );\r\n    vec3 reflectVec = reflect( cameraToVertex, v_normal );\r\n    vec4 envColor = textureCube( s_envMap, reflectVec );\r\n    finalColor.xyz *= envColor.xyz * u_reflectivity;\r\n    return finalColor;\r\n}",
+            "fog_frag": "finalColor = fogMethod(finalColor);",
+            "fog_pars_frag": "#define FOGMODE_NONE    0.\r\n#define FOGMODE_EXP     1.\r\n#define FOGMODE_EXP2    2.\r\n#define FOGMODE_LINEAR  3.\r\n#define E 2.71828\r\n\r\nuniform float u_fogMode;\r\nuniform float u_fogMinDistance;\r\nuniform float u_fogMaxDistance;\r\nuniform float u_fogDensity;\r\nuniform vec3 u_fogColor;\r\n\r\nfloat CalcFogFactor(float fogDistance)\r\n{\r\n\tfloat fogCoeff = 1.0;\r\n\tif (FOGMODE_LINEAR == u_fogMode)\r\n\t{\r\n\t\tfogCoeff = (u_fogMaxDistance - fogDistance) / (u_fogMaxDistance - u_fogMinDistance);\r\n\t}\r\n\telse if (FOGMODE_EXP == u_fogMode)\r\n\t{\r\n\t\tfogCoeff = 1.0 / pow(E, fogDistance * u_fogDensity);\r\n\t}\r\n\telse if (FOGMODE_EXP2 == u_fogMode)\r\n\t{\r\n\t\tfogCoeff = 1.0 / pow(E, fogDistance * fogDistance * u_fogDensity * u_fogDensity);\r\n\t}\r\n\r\n\treturn clamp(fogCoeff, 0.0, 1.0);\r\n}\r\n\r\nvec4 fogMethod(vec4 color)\r\n{\r\n    vec3 fogDistance = u_cameraPos - v_worldPosition.xyz;\r\n\tfloat fog = CalcFogFactor(length(fogDistance));\r\n\tcolor.rgb = fog * color.rgb + (1.0 - fog) * u_fogColor;\r\n    return color;\r\n}",
+            "lights_frag": "//渲染灯光\r\n#if NUM_LIGHT > 0\r\n    finalColor.xyz = lightShading(normal, diffuseColor.xyz, specularColor, ambientColor, glossiness);\r\n#endif",
+            "lights_pars_frag": "#if NUM_POINTLIGHT > 0\r\n    // 点光源\r\n    struct PointLight\r\n    {\r\n        // 位置\r\n        vec3 position;\r\n        // 颜色\r\n        vec3 color;\r\n        // 强度\r\n        float intensity;\r\n        // 范围\r\n        float range;\r\n    };\r\n    // 点光源列表\r\n    uniform PointLight u_pointLights[NUM_POINTLIGHT];\r\n#endif\r\n\r\n#if NUM_SPOT_LIGHTS > 0\r\n    // 聚光灯\r\n    struct SpotLight\r\n    {\r\n        // 位置\r\n        vec3 position;\r\n        // 颜色\r\n        vec3 color;\r\n        // 强度\r\n        float intensity;\r\n        // 范围\r\n        float range;\r\n        // 方向\r\n        vec3 direction;\r\n        // 椎体cos值\r\n        float coneCos;\r\n        // 半影cos\r\n        float penumbraCos;\r\n    };\r\n    // 方向光源列表\r\n    uniform SpotLight u_spotLights[ NUM_SPOT_LIGHTS ];\r\n#endif\r\n\r\n#if NUM_DIRECTIONALLIGHT > 0\r\n    // 方向光源\r\n    struct DirectionalLight\r\n    {\r\n        // 方向\r\n        vec3 direction;\r\n        // 颜色\r\n        vec3 color;\r\n        // 强度\r\n        float intensity;\r\n    };\r\n    // 方向光源列表\r\n    uniform DirectionalLight u_directionalLights[ NUM_DIRECTIONALLIGHT ];\r\n#endif\r\n\r\n//卡通\r\n#include<cartoon_pars_frag>\r\n\r\n#include<shadowmap_pars_frag>\r\n\r\n//计算光照漫反射系数\r\nfloat calculateLightDiffuse(vec3 normal,vec3 lightDir)\r\n{\r\n    #ifdef IS_CARTOON\r\n        return cartoonLightDiffuse(normal,lightDir);\r\n    #else\r\n        return clamp(dot(normal,lightDir),0.0,1.0);\r\n    #endif\r\n}\r\n\r\n//计算光照镜面反射系数\r\nfloat calculateLightSpecular(vec3 normal,vec3 lightDir,vec3 viewDir,float glossiness)\r\n{\r\n    #ifdef IS_CARTOON\r\n        return cartoonLightSpecular(normal,lightDir,viewDir,glossiness);\r\n    #else\r\n        vec3 halfVec = normalize(lightDir + viewDir);\r\n        float specComp = max(dot(normal,halfVec),0.0);\r\n        specComp = pow(specComp, glossiness);\r\n\r\n        return specComp;\r\n    #endif\r\n}\r\n\r\n//根据距离计算衰减\r\nfloat computeDistanceLightFalloff(float lightDistance, float range)\r\n{\r\n    #ifdef USEPHYSICALLIGHTFALLOFF\r\n        float lightDistanceFalloff = 1.0 / ((lightDistance * lightDistance + 0.0001));\r\n    #else\r\n        float lightDistanceFalloff = max(0., 1.0 - lightDistance / range);\r\n    #endif\r\n    \r\n    return lightDistanceFalloff;\r\n}\r\n\r\n//渲染点光源\r\nvec3 lightShading(vec3 normal, vec3 diffuseColor, vec3 specularColor, vec3 ambientColor, float glossiness)\r\n{\r\n    //视线方向\r\n    vec3 viewDir = normalize(u_cameraPos - v_worldPosition);\r\n\r\n    vec3 resultColor = vec3(0.0,0.0,0.0);\r\n    \r\n    #if NUM_POINTLIGHT > 0\r\n        PointLight pointLight;\r\n        for(int i = 0;i<NUM_POINTLIGHT;i++)\r\n        {\r\n            pointLight = u_pointLights[i];\r\n            //\r\n            vec3 lightOffset = pointLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(lightOffset);\r\n            //灯光颜色\r\n            vec3 lightColor = pointLight.color;\r\n            //灯光强度\r\n            float lightIntensity = pointLight.intensity;\r\n            float falloff = computeDistanceLightFalloff(length(lightOffset), pointLight.range);\r\n            float diffuse = calculateLightDiffuse(normal, lightDir);\r\n            float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n            float shadow = 1.0;\r\n            \r\n            resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow;\r\n        }\r\n    #endif\r\n\r\n    #if NUM_POINTLIGHT_CASTSHADOW > 0\r\n        CastShadowPointLight castShadowPointLight;\r\n        for(int i = 0;i<NUM_POINTLIGHT_CASTSHADOW;i++)\r\n        {\r\n            castShadowPointLight = u_castShadowPointLights[i];\r\n            //\r\n            vec3 lightOffset = castShadowPointLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(lightOffset);\r\n            //灯光颜色\r\n            vec3 lightColor = castShadowPointLight.color;\r\n            //灯光强度\r\n            float lightIntensity = castShadowPointLight.intensity;\r\n            float falloff = computeDistanceLightFalloff(length(lightOffset), castShadowPointLight.range);\r\n            // 计算阴影\r\n            float shadow = getPointShadow( u_pointShadowMaps[ i ], castShadowPointLight.shadowType, castShadowPointLight.shadowMapSize, castShadowPointLight.shadowBias, castShadowPointLight.shadowRadius, -lightOffset, castShadowPointLight.shadowCameraNear, castShadowPointLight.shadowCameraFar );\r\n            float diffuse = calculateLightDiffuse(normal, lightDir);\r\n            float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n            //\r\n            resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow;\r\n        }\r\n    #endif\r\n\r\n    #if NUM_SPOT_LIGHTS > 0\r\n        SpotLight spotLight;\r\n        for(int i = 0; i < NUM_SPOT_LIGHTS; i++)\r\n        {\r\n            spotLight = u_spotLights[i];\r\n            //\r\n            vec3 lightOffset = spotLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(lightOffset);\r\n            float angleCos = dot(lightDir, -spotLight.direction);\r\n            if(angleCos > spotLight.coneCos)\r\n            {\r\n                float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );\r\n                \r\n                //灯光颜色\r\n                vec3 lightColor = spotLight.color;\r\n                //灯光强度\r\n                float lightIntensity = spotLight.intensity;\r\n                float falloff = computeDistanceLightFalloff(length(lightOffset) * angleCos, spotLight.range);\r\n                float diffuse = calculateLightDiffuse(normal, lightDir);\r\n                float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n                float shadow = 1.0;\r\n                \r\n                resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow * spotEffect;\r\n            }            \r\n        }\r\n    #endif\r\n    \r\n    #if NUM_SPOT_LIGHTS_CASTSHADOW > 0\r\n        CastShadowSpotLight castShadowSpotLight;\r\n        for(int i = 0; i < NUM_SPOT_LIGHTS_CASTSHADOW; i++)\r\n        {\r\n            castShadowSpotLight = u_castShadowSpotLights[i];\r\n            //\r\n            vec3 lightOffset = castShadowSpotLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(lightOffset);\r\n            float angleCos = dot(lightDir, -castShadowSpotLight.direction);\r\n            if(angleCos > castShadowSpotLight.coneCos)\r\n            {\r\n                float spotEffect = smoothstep( castShadowSpotLight.coneCos, castShadowSpotLight.penumbraCos, angleCos );\r\n                \r\n                //灯光颜色\r\n                vec3 lightColor = castShadowSpotLight.color;\r\n                //灯光强度\r\n                float lightIntensity = castShadowSpotLight.intensity;\r\n                float falloff = computeDistanceLightFalloff(length(lightOffset) * angleCos, castShadowSpotLight.range);\r\n                float diffuse = calculateLightDiffuse(normal, lightDir);\r\n                float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n                // 计算阴影\r\n                float shadow = getShadow( u_spotShadowMaps[i], castShadowSpotLight.shadowType, castShadowSpotLight.shadowMapSize, castShadowSpotLight.shadowBias, castShadowSpotLight.shadowRadius, v_spotShadowCoord[ i ], -lightOffset, castShadowSpotLight.shadowCameraNear, castShadowSpotLight.shadowCameraFar);\r\n                \r\n                resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow * spotEffect;\r\n            }            \r\n        }\r\n    #endif\r\n\r\n    #if NUM_DIRECTIONALLIGHT > 0\r\n        DirectionalLight directionalLight;\r\n        for(int i = 0;i<NUM_DIRECTIONALLIGHT;i++)\r\n        {\r\n            directionalLight = u_directionalLights[i];\r\n            //光照方向\r\n            vec3 lightDir = normalize(-directionalLight.direction);\r\n            //灯光颜色\r\n            vec3 lightColor = directionalLight.color;\r\n            //灯光强度\r\n            float lightIntensity = directionalLight.intensity;\r\n\r\n            float falloff = 1.0;\r\n            float diffuse = calculateLightDiffuse(normal, lightDir);\r\n            float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n            float shadow = 1.0;\r\n            //\r\n            resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow;\r\n        }\r\n    #endif\r\n\r\n    #if NUM_DIRECTIONALLIGHT_CASTSHADOW > 0\r\n        CastShadowDirectionalLight castShadowDirectionalLight;\r\n        for(int i = 0;i<NUM_DIRECTIONALLIGHT_CASTSHADOW;i++)\r\n        {\r\n            castShadowDirectionalLight = u_castShadowDirectionalLights[i];\r\n            //\r\n            vec3 lightOffset = castShadowDirectionalLight.position - v_worldPosition;\r\n            //光照方向\r\n            vec3 lightDir = normalize(-castShadowDirectionalLight.direction);\r\n            //灯光颜色\r\n            vec3 lightColor = castShadowDirectionalLight.color;\r\n            //灯光强度\r\n            float lightIntensity = castShadowDirectionalLight.intensity;\r\n            // 计算阴影\r\n            float shadow = getShadow( u_directionalShadowMaps[i], castShadowDirectionalLight.shadowType, castShadowDirectionalLight.shadowMapSize, castShadowDirectionalLight.shadowBias, castShadowDirectionalLight.shadowRadius, v_directionalShadowCoord[ i ], -lightOffset, castShadowDirectionalLight.shadowCameraNear, castShadowDirectionalLight.shadowCameraFar);\r\n            \r\n            float falloff = 1.0;\r\n            float diffuse = calculateLightDiffuse(normal, lightDir);\r\n            float specular = calculateLightSpecular(normal, lightDir, viewDir, glossiness);\r\n            //\r\n            resultColor += (diffuse * diffuseColor + specular * specularColor) * lightColor * lightIntensity * falloff * shadow;\r\n        }\r\n    #endif\r\n\r\n    resultColor += ambientColor * diffuseColor;\r\n    return resultColor;\r\n}",
+            "lights_pars_vert": "// 灯光声明\r\n\r\n#if NUM_DIRECTIONALLIGHT_CASTSHADOW > 0\r\n    // 方向光源投影矩阵列表\r\n    uniform mat4 u_directionalShadowMatrixs[ NUM_DIRECTIONALLIGHT_CASTSHADOW ];\r\n    // 方向光源投影uv列表\r\n    varying vec4 v_directionalShadowCoord[ NUM_DIRECTIONALLIGHT_CASTSHADOW ];\r\n#endif\r\n\r\n#if NUM_SPOT_LIGHTS_CASTSHADOW > 0\r\n    // 聚光灯投影矩阵列表\r\n    uniform mat4 u_spotShadowMatrix[ NUM_SPOT_LIGHTS_CASTSHADOW ];\r\n    // 聚光灯投影uv列表\r\n    varying vec4 v_spotShadowCoord[ NUM_SPOT_LIGHTS_CASTSHADOW ];\r\n#endif",
+            "lights_vert": "#if NUM_DIRECTIONALLIGHT_CASTSHADOW > 0\r\n    for ( int i = 0; i < NUM_DIRECTIONALLIGHT_CASTSHADOW; i ++ ) \r\n    {\r\n        v_directionalShadowCoord[ i ] = u_directionalShadowMatrixs[ i ] * worldPosition;\r\n    }\r\n#endif\r\n\r\n#if NUM_SPOT_LIGHTS_CASTSHADOW > 0\r\n    for ( int i = 0; i < NUM_SPOT_LIGHTS_CASTSHADOW; i ++ ) \r\n    {\r\n        v_spotShadowCoord[ i ] = u_spotShadowMatrix[ i ] * worldPosition;\r\n    }\r\n#endif",
+            "normalmap_pars_vert": "uniform mat4 u_ITModelMatrix;\r\n\r\nvarying vec3 v_normal;\r\nvarying vec3 v_tangent;\r\nvarying vec3 v_bitangent;",
+            "normalmap_vert": "//计算法线\r\nv_normal = normalize((u_ITModelMatrix * vec4(normal, 0.0)).xyz);\r\nv_tangent = normalize((u_modelMatrix * vec4(tangent, 0.0)).xyz);\r\nv_bitangent = cross(v_normal, v_tangent);",
+            "normal_frag": "//获取法线\r\nvec3 normal = texture2D(s_normal,v_uv).xyz * 2.0 - 1.0;\r\nnormal = normalize(normal.x * v_tangent + normal.y * v_bitangent + normal.z * v_normal);",
+            "normal_pars_frag": "varying vec3 v_normal;\r\nvarying vec3 v_tangent;\r\nvarying vec3 v_bitangent;\r\n\r\n//法线贴图\r\nuniform sampler2D s_normal;",
+            "normal_pars_vert": "attribute vec3 a_normal;",
+            "normal_vert": "vec3 normal = a_normal;",
+            "particle_frag": "#ifdef HAS_PARTICLE_ANIMATOR\r\n    finalColor = particleAnimation(finalColor);\r\n#endif",
+            "particle_pars_frag": "#ifdef HAS_PARTICLE_ANIMATOR\r\n    varying vec4 v_particle_color;\r\n\r\n    vec4 particleAnimation(vec4 color) {\r\n\r\n        return color * v_particle_color;\r\n    }\r\n#endif",
+            "particle_pars_vert": "#ifdef HAS_PARTICLE_ANIMATOR\r\n    //\r\n    attribute vec3 a_particle_position;\r\n    attribute vec3 a_particle_scale;\r\n    attribute vec3 a_particle_rotation;\r\n    attribute vec4 a_particle_color;\r\n\r\n    varying vec4 v_particle_color;\r\n\r\n    mat3 makeParticleRotationMatrix(vec3 rotation)\r\n    {\r\n        float DEG2RAD = 3.1415926 / 180.0;\r\n        \r\n        float rx = rotation.x * DEG2RAD;\r\n        float ry = rotation.y * DEG2RAD;\r\n        float rz = rotation.z * DEG2RAD;\r\n\r\n        float sx = sin(rx);\r\n        float cx = cos(rx);\r\n        float sy = sin(ry);\r\n        float cy = cos(ry);\r\n        float sz = sin(rz);\r\n        float cz = cos(rz);\r\n\r\n        mat3 tmp;\r\n        tmp[ 0 ] = vec3(cy * cz, cy * sz, -sy);\r\n        tmp[ 1 ] = vec3(sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy);\r\n        tmp[ 2 ] = vec3(cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy);\r\n        return tmp;\r\n    }\r\n\r\n    vec4 particleAnimation(vec4 position) \r\n    {\r\n        // 计算缩放\r\n        position.xyz = position.xyz * a_particle_scale;\r\n\r\n        // 计算旋转\r\n        mat3 rMat = makeParticleRotationMatrix(a_particle_rotation);\r\n        position.xyz = rMat * position.xyz;\r\n\r\n        // 位移\r\n        position.xyz = position.xyz + a_particle_position;\r\n\r\n        // 颜色\r\n        v_particle_color = a_particle_color;\r\n        \r\n        return position;\r\n    }\r\n#endif",
+            "particle_vert": "#ifdef HAS_PARTICLE_ANIMATOR\r\n    position = particleAnimation(position);\r\n#endif",
+            "pointsize_pars_vert": "#ifdef IS_POINTS_MODE\r\n    uniform float u_PointSize;\r\n#endif",
+            "pointsize_vert": "#ifdef IS_POINTS_MODE\r\n    gl_PointSize = u_PointSize;\r\n#endif",
+            "position_pars_vert": "attribute vec3 a_position;",
+            "position_vert": "vec4 position = vec4(a_position, 1.0);",
+            "project_pars_vert": "uniform mat4 u_viewProjection;",
+            "project_vert": "//计算投影坐标\r\ngl_Position = u_viewProjection * worldPosition;",
+            "shadowmap_pars_frag": "#if (NUM_POINTLIGHT_CASTSHADOW > 0) ||  (NUM_DIRECTIONALLIGHT_CASTSHADOW > 0) ||  (NUM_SPOT_LIGHTS_CASTSHADOW > 0)\r\n    #if NUM_POINTLIGHT_CASTSHADOW > 0\r\n        // 投影的点光源\r\n        struct CastShadowPointLight\r\n        {\r\n            // 位置\r\n            vec3 position;\r\n            // 颜色\r\n            vec3 color;\r\n            // 强度\r\n            float intensity;\r\n            // 范围\r\n            float range;\r\n            // 阴影类型\r\n            int shadowType;\r\n            // 阴影偏差，用来解决判断是否为阴影时精度问题\r\n            float shadowBias;\r\n            // 阴影半径，边缘宽度\r\n            float shadowRadius;\r\n            // 阴影图尺寸\r\n            vec2 shadowMapSize;\r\n            float shadowCameraNear;\r\n            float shadowCameraFar;\r\n        };\r\n        // 投影的点光源列表\r\n        uniform CastShadowPointLight u_castShadowPointLights[NUM_POINTLIGHT_CASTSHADOW];\r\n        // 点光源阴影图\r\n        uniform sampler2D u_pointShadowMaps[NUM_POINTLIGHT_CASTSHADOW];\r\n    #endif\r\n\r\n    #if NUM_SPOT_LIGHTS_CASTSHADOW > 0\r\n        // 投影的聚光灯\r\n        struct CastShadowSpotLight\r\n        {\r\n            // 位置\r\n            vec3 position;\r\n            // 颜色\r\n            vec3 color;\r\n            // 强度\r\n            float intensity;\r\n            // 范围\r\n            float range;\r\n            // 方向\r\n            vec3 direction;\r\n            // 椎体cos值\r\n            float coneCos;\r\n            // 半影cos\r\n            float penumbraCos;\r\n\r\n            // 阴影类型\r\n            int shadowType;\r\n            // 阴影偏差，用来解决判断是否为阴影时精度问题\r\n            float shadowBias;\r\n            // 阴影半径，边缘宽度\r\n            float shadowRadius;\r\n            // 阴影图尺寸\r\n            vec2 shadowMapSize;\r\n            float shadowCameraNear;\r\n            float shadowCameraFar;\r\n        };\r\n        // 投影的投影的聚光灯列表\r\n        uniform CastShadowSpotLight u_castShadowSpotLights[NUM_SPOT_LIGHTS_CASTSHADOW];\r\n        // 投影的聚光灯阴影图\r\n        uniform sampler2D u_spotShadowMaps[NUM_SPOT_LIGHTS_CASTSHADOW];\r\n        // 方向光源投影uv列表\r\n        varying vec4 v_spotShadowCoord[ NUM_SPOT_LIGHTS_CASTSHADOW ];\r\n    #endif\r\n\r\n    #if NUM_DIRECTIONALLIGHT_CASTSHADOW > 0\r\n        // 投影的方向光源\r\n        struct CastShadowDirectionalLight\r\n        {\r\n            // 方向\r\n            vec3 direction;\r\n            // 颜色\r\n            vec3 color;\r\n            // 强度\r\n            float intensity;\r\n            // 阴影类型\r\n            int shadowType;\r\n            // 阴影偏差，用来解决判断是否为阴影时精度问题\r\n            float shadowBias;\r\n            // 阴影半径，边缘宽度\r\n            float shadowRadius;\r\n            // 阴影图尺寸\r\n            vec2 shadowMapSize;\r\n            // 位置\r\n            vec3 position;\r\n            float shadowCameraNear;\r\n            float shadowCameraFar;\r\n        };\r\n        // 投影的方向光源列表\r\n        uniform CastShadowDirectionalLight u_castShadowDirectionalLights[NUM_DIRECTIONALLIGHT_CASTSHADOW];\r\n        // 方向光源阴影图\r\n        uniform sampler2D u_directionalShadowMaps[NUM_DIRECTIONALLIGHT_CASTSHADOW];\r\n        // 方向光源投影uv列表\r\n        varying vec4 v_directionalShadowCoord[ NUM_DIRECTIONALLIGHT_CASTSHADOW ];\r\n    #endif\r\n\r\n    // @see https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/packing.glsl\r\n    const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)\r\n    const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\r\n    const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\r\n    float unpackRGBAToDepth( const in vec4 v ) \r\n    {\r\n        return dot( v, UnpackFactors );\r\n    }\r\n\r\n    float texture2DCompare( sampler2D depths, vec2 uv, float compare ) \r\n    {\r\n        return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\r\n    }\r\n\r\n    float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) \r\n    {\r\n        const vec2 offset = vec2( 0.0, 1.0 );\r\n\r\n        vec2 texelSize = vec2( 1.0 ) / size;\r\n        vec2 centroidUV = floor( uv * size + 0.5 ) / size;\r\n\r\n        float lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );\r\n        float lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );\r\n        float rb = texture2DCompare( depths, centroidUV + texelSize * offset.yx, compare );\r\n        float rt = texture2DCompare( depths, centroidUV + texelSize * offset.yy, compare );\r\n\r\n        vec2 f = fract( uv * size + 0.5 );\r\n\r\n        float a = mix( lb, lt, f.y );\r\n        float b = mix( rb, rt, f.y );\r\n        float c = mix( a, b, f.x );\r\n\r\n        return c;\r\n    }\r\n\r\n    // 计算阴影值 @see https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/shadowmap_pars_fragment.glsl\r\n    float getShadow( sampler2D shadowMap, int shadowType, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord, vec3 lightToPosition, float shadowCameraNear, float shadowCameraFar) \r\n    {\r\n        float shadow = 1.0;\r\n\r\n        shadowCoord.xy /= shadowCoord.w;\r\n        shadowCoord.xy = (shadowCoord.xy + 1.0) / 2.0;\r\n\r\n        // dp = normalized distance from light to fragment position\r\n        float dp = ( length( lightToPosition ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear ); // need to clamp?\r\n        dp += shadowBias;\r\n        shadowCoord.z = dp;\r\n\r\n        // if ( something && something ) breaks ATI OpenGL shader compiler\r\n        // if ( all( something, something ) ) using this instead\r\n\r\n        bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\r\n        bool inFrustum = all( inFrustumVec );\r\n\r\n        bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\r\n\r\n        bool frustumTest = all( frustumTestVec );\r\n\r\n        if ( frustumTest ) \r\n        {\r\n            if (shadowType == 2)\r\n            {\r\n                // PCF\r\n                vec2 texelSize = vec2( 1.0 ) / shadowMapSize;\r\n\r\n                float dx0 = - texelSize.x * shadowRadius;\r\n                float dy0 = - texelSize.y * shadowRadius;\r\n                float dx1 = + texelSize.x * shadowRadius;\r\n                float dy1 = + texelSize.y * shadowRadius;\r\n\r\n                shadow = (\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n                ) * ( 1.0 / 9.0 );\r\n            }\r\n            else if(shadowType == 3)\r\n            {\r\n                // PCF soft\r\n                vec2 texelSize = vec2( 1.0 ) / shadowMapSize;\r\n\r\n                float dx0 = - texelSize.x * shadowRadius;\r\n                float dy0 = - texelSize.y * shadowRadius;\r\n                float dx1 = + texelSize.x * shadowRadius;\r\n                float dy1 = + texelSize.y * shadowRadius;\r\n\r\n                shadow = (\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n                ) * ( 1.0 / 9.0 );\r\n            }\r\n            else\r\n            {\r\n                shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\r\n            }\r\n        }\r\n\r\n        return shadow;\r\n    }\r\n\r\n    // cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D\r\n    // vector suitable for 2D texture mapping. This code uses the following layout for the\r\n    // 2D texture:\r\n    //\r\n    // xzXZ\r\n    //  y Y\r\n    //\r\n    // Y - Positive y direction\r\n    // y - Negative y direction\r\n    // X - Positive x direction\r\n    // x - Negative x direction\r\n    // Z - Positive z direction\r\n    // z - Negative z direction\r\n    //\r\n    // Source and test bed:\r\n    // https://gist.github.com/tschw/da10c43c467ce8afd0c4\r\n\r\n    vec2 cubeToUV( vec3 v, float texelSizeY ) \r\n    {\r\n        // Number of texels to avoid at the edge of each square\r\n        vec3 absV = abs( v );\r\n\r\n        // Intersect unit cube\r\n        float scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );\r\n        absV *= scaleToCube;\r\n\r\n        // Apply scale to avoid seams\r\n\r\n        // two texels less per square (one texel will do for NEAREST)\r\n        v *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );\r\n\r\n        // Unwrap\r\n\r\n        // space: -1 ... 1 range for each square\r\n        //\r\n        // #X##\t\tdim    := ( 1/4 , 1/2 )\r\n        //  # #\t\tcenter := ( 1/2 , 1/2 )\r\n        vec2 planar;\r\n        float almostOne = 1.0 - 1.5 * texelSizeY;\r\n        if ( absV.z >= almostOne ) \r\n        {\r\n            if ( v.z > 0.0 )\r\n            {\r\n                planar.x = (0.5 + v.x * 0.5) * 0.25 + 0.75;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }else\r\n            {\r\n                planar.x = (0.5 - v.x * 0.5) * 0.25 + 0.25;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }\r\n        } else if ( absV.x >= almostOne ) \r\n        {\r\n            if( v.x > 0.0)\r\n            {\r\n                planar.x = (0.5 - v.z * 0.5) * 0.25 + 0.5;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }else\r\n            {\r\n                planar.x = (0.5 + v.z * 0.5) * 0.25 + 0.0;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }\r\n        } else if ( absV.y >= almostOne ) \r\n        {\r\n            if( v.y > 0.0)\r\n            {\r\n                planar.x = (0.5 - v.x * 0.5) * 0.25 + 0.75;\r\n                planar.y = (0.5 + v.z * 0.5) * 0.5 + 0.0;\r\n            }else\r\n            {\r\n                planar.x = (0.5 - v.x * 0.5) * 0.25 + 0.25;\r\n                planar.y = (0.5 - v.z * 0.5) * 0.5 + 0.0;\r\n            }\r\n        }\r\n        return planar;\r\n    }\r\n\r\n    float getPointShadow( sampler2D shadowMap, int shadowType, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec3 lightToPosition, float shadowCameraNear, float shadowCameraFar ) \r\n    {\r\n        vec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );\r\n\r\n        // for point lights, the uniform @vShadowCoord is re-purposed to hold\r\n        // the vector from the light to the world-space position of the fragment.\r\n        // vec3 lightToPosition = shadowCoord.xyz;\r\n\r\n        // dp = normalized distance from light to fragment position\r\n        float dp = ( length( lightToPosition ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear ); // need to clamp?\r\n        dp += shadowBias;\r\n\r\n        // bd3D = base direction 3D\r\n        vec3 bd3D = normalize( lightToPosition );\r\n\r\n        if(shadowType == 2 || shadowType == 3)\r\n        {\r\n            vec2 offset = vec2( - 1, 1 ) * shadowRadius * texelSize.y;\r\n\r\n            return (\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyx, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyx, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxx, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxx, texelSize.y ), dp )\r\n            ) * ( 1.0 / 9.0 );\r\n        }else\r\n        {\r\n            return texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );\r\n        }\r\n    }\r\n#endif",
+            "skeleton_pars_vert": "#ifdef HAS_SKELETON_ANIMATION\r\n\r\n    attribute vec4 a_jointindex0;\r\n    attribute vec4 a_jointweight0;\r\n\r\n    #ifdef HAS_a_jointindex1\r\n        attribute vec4 a_jointindex1;\r\n        attribute vec4 a_jointweight1;\r\n    #endif\r\n\r\n    #ifdef NUM_SKELETONJOINT\r\n        uniform mat4 u_skeletonGlobalMatriices[NUM_SKELETONJOINT];\r\n    #endif\r\n\r\n    vec4 skeletonAnimation(vec4 position) \r\n    {\r\n        vec4 totalPosition = vec4(0.0,0.0,0.0,1.0);\r\n        for(int i = 0; i < 4; i++)\r\n        {\r\n            totalPosition += u_skeletonGlobalMatriices[int(a_jointindex0[i])] * position * a_jointweight0[i];\r\n        }\r\n        #ifdef HAS_a_jointindex1\r\n            for(int i = 0; i < 4; i++)\r\n            {\r\n                totalPosition += u_skeletonGlobalMatriices[int(a_jointindex1[i])] * position * a_jointweight1[i];\r\n            }\r\n        #endif\r\n        position.xyz = totalPosition.xyz;\r\n        return position;\r\n    }\r\n#endif",
+            "skeleton_vert": "#ifdef HAS_SKELETON_ANIMATION\r\n    position = skeletonAnimation(position);\r\n#endif",
+            "specular_frag": "//获取高光值\r\nfloat glossiness = u_glossiness;\r\n//获取镜面反射基本颜色\r\nvec3 specularColor = u_specular;\r\nvec4 specularMapColor = texture2D(s_specular, v_uv);\r\nspecularColor.xyz = specularMapColor.xyz;\r\nglossiness = glossiness * specularMapColor.w;",
+            "specular_pars_frag": "//镜面反射\r\nuniform vec3 u_specular;\r\nuniform float u_glossiness;\r\nuniform sampler2D s_specular;",
+            "tangent_pars_vert": "attribute vec3 a_tangent;",
+            "tangent_vert": "vec3 tangent = a_tangent;",
+            "terrainDefault_pars_frag": "uniform sampler2D s_splatTexture1;\r\nuniform sampler2D s_splatTexture2;\r\nuniform sampler2D s_splatTexture3;\r\n\r\nuniform sampler2D s_blendTexture;\r\nuniform vec4 u_splatRepeats;\r\n\r\nvec4 terrainMethod(vec4 diffuseColor,vec2 v_uv) \r\n{\r\n    vec4 blend = texture2D(s_blendTexture, v_uv);\r\n\r\n    vec2 t_uv = v_uv.xy * u_splatRepeats.y;\r\n    vec4 tColor = texture2D(s_splatTexture1, t_uv);\r\n    diffuseColor = (tColor - diffuseColor) * blend.x + diffuseColor;\r\n\r\n    t_uv = v_uv.xy * u_splatRepeats.z;\r\n    tColor = texture2D(s_splatTexture2, t_uv);\r\n    diffuseColor = (tColor - diffuseColor) * blend.y + diffuseColor;\r\n\r\n    t_uv = v_uv.xy * u_splatRepeats.w;\r\n    tColor = texture2D(s_splatTexture3, t_uv);\r\n    diffuseColor = (tColor - diffuseColor) * blend.z + diffuseColor;\r\n\r\n    return diffuseColor;\r\n}",
+            "terrainMerge_pars_frag": "//代码实现lod以及线性插值 feng\r\n#extension GL_EXT_shader_texture_lod : enable\r\n#extension GL_OES_standard_derivatives : enable\r\n\r\n#define LOD_LINEAR\r\n\r\nuniform sampler2D s_splatMergeTexture;\r\nuniform sampler2D s_blendTexture;\r\nuniform vec4 u_splatRepeats;\r\n\r\nuniform vec2 u_imageSize;\r\nuniform vec4 u_tileOffset[3];\r\nuniform vec4 u_lod0vec;\r\nuniform vec2 u_tileSize;\r\nuniform float u_maxLod;\r\nuniform float u_scaleByDepth;\r\nuniform float u_uvPositionScale;\r\n\r\n\r\nvec4 terrainTexture2DLod(sampler2D s_splatMergeTexture,vec2 uv,float lod,vec4 offset){\r\n\r\n    //计算不同lod像素缩放以及起始坐标\r\n    vec4 lodvec = u_lod0vec;\r\n    lodvec.x = lodvec.x * pow(0.5,lod);\r\n    lodvec.y = lodvec.x * 2.0;\r\n    lodvec.z = 1.0 - lodvec.y;\r\n\r\n    //lod块尺寸\r\n    vec2 lodSize = u_imageSize * lodvec.xy;\r\n    vec2 lodPixelOffset = 1.0 / lodSize * 2.0;\r\n\r\n    // uv = uv - 1.0 / lodPixelOffset;\r\n    vec2 mixFactor = mod(uv, lodPixelOffset) / lodPixelOffset;\r\n\r\n    //lod块中像素索引\r\n    vec2 t_uv = fract(uv + lodPixelOffset * vec2(0.0, 0.0));\r\n    t_uv = t_uv * offset.xy + offset.zw;\r\n    //添加lod起始坐标\r\n    t_uv = t_uv * lodvec.xy + lodvec.zw;\r\n    //取整像素\r\n    t_uv = floor(t_uv * u_imageSize) / u_imageSize;\r\n    vec4 tColor00 = texture2D(s_splatMergeTexture,t_uv);\r\n\r\n    t_uv = fract(uv + lodPixelOffset * vec2(1.0, 0.0));\r\n    t_uv = t_uv * offset.xy + offset.zw;\r\n    //添加lod起始坐标\r\n    t_uv = t_uv * lodvec.xy + lodvec.zw;\r\n    //取整像素\r\n    t_uv = floor(t_uv * u_imageSize) / u_imageSize;\r\n    vec4 tColor10 = texture2D(s_splatMergeTexture,t_uv);\r\n\r\n    t_uv = fract(uv + lodPixelOffset * vec2(0.0, 1.0));\r\n    t_uv = t_uv * offset.xy + offset.zw;\r\n    //添加lod起始坐标\r\n    t_uv = t_uv * lodvec.xy + lodvec.zw;\r\n    //取整像素\r\n    t_uv = floor(t_uv * u_imageSize) / u_imageSize;\r\n    vec4 tColor01 = texture2D(s_splatMergeTexture,t_uv);\r\n\r\n    t_uv = fract(uv + lodPixelOffset * vec2(1.0, 1.0));\r\n    t_uv = t_uv * offset.xy + offset.zw;\r\n    //添加lod起始坐标\r\n    t_uv = t_uv * lodvec.xy + lodvec.zw;\r\n    //取整像素\r\n    t_uv = floor(t_uv * u_imageSize) / u_imageSize;\r\n    vec4 tColor11 = texture2D(s_splatMergeTexture,t_uv);\r\n\r\n    vec4 tColor0 = mix(tColor00,tColor10,mixFactor.x);\r\n    vec4 tColor1 = mix(tColor01,tColor11,mixFactor.x);\r\n    vec4 tColor = mix(tColor0,tColor1,mixFactor.y);\r\n\r\n    return tColor;\r\n\r\n    // return vec4(mixFactor.x,mixFactor.y,0.0,1.0);\r\n    // return vec4(mixFactor.x + 0.5,mixFactor.y + 0.5,0.0,1.0);\r\n}\r\n\r\n//参考 http://blog.csdn.net/cgwbr/article/details/6620318\r\n//计算MipMap层函数：\r\nfloat mipmapLevel(vec2 uv)\r\n{\r\n    vec2 dx = dFdx(uv);\r\n    vec2 dy = dFdy(uv);\r\n    float d = max(dot(dx, dx), dot(dy, dy));\r\n    return 0.5 * log2(d);\r\n}\r\n\r\n//根据距离以及法线计算MipMap层函数：\r\nfloat mipmapLevel1(vec2 uv)\r\n{\r\n    //视线方向\r\n    vec3 cameraDir = u_cameraPos - v_worldPosition.xyz;\r\n    float fogDistance = length(cameraDir);\r\n    float value = u_scaleByDepth * fogDistance * u_uvPositionScale;//uv变化率与距离成正比，0.001为顶点位置与uv的变化比率\r\n    cameraDir = normalize(cameraDir);\r\n    float dd = clamp(dot(cameraDir, v_normal),0.05,1.0);//取法线与视线余弦值的倒数，余弦值越大（朝向摄像机时uv变化程度越低）lod越小\r\n    value = value / dd;\r\n    value = value * 0.5;//还没搞懂0.5的来历\r\n    return log2(value);\r\n}\r\n\r\nvec4 terrainTexture2D(sampler2D s_splatMergeTexture, vec2 t_uv, float lod, vec4 offset){\r\n \r\n    #ifdef LOD_LINEAR\r\n        vec4 tColor = mix(terrainTexture2DLod(s_splatMergeTexture, t_uv, floor(lod), offset),terrainTexture2DLod(s_splatMergeTexture, t_uv, ceil(lod), offset), fract(lod));\r\n    #else\r\n        vec4 tColor = terrainTexture2DLod(s_splatMergeTexture, t_uv, ceil(lod), offset);\r\n    #endif\r\n\r\n    return tColor;\r\n}\r\n\r\nvec4 terrainMethod(vec4 diffuseColor, vec2 v_uv) \r\n{\r\n    float lod = 0.0;\r\n    vec4 blend = texture2D(s_blendTexture, v_uv);\r\n    for(int i = 0; i < 3; i++)\r\n    {\r\n        vec2 t_uv = v_uv * u_splatRepeats[i];\r\n        // lod = mipmapLevel(v_uv) + log2(u_tileSize.x * u_splatRepeats[i]);\r\n        lod = mipmapLevel1(v_uv) + log2(u_tileSize.x * u_splatRepeats[i]);\r\n        lod = clamp(lod, 0.0, u_maxLod);\r\n        vec4 tColor = terrainTexture2D(s_splatMergeTexture, t_uv, lod, u_tileOffset[i]);\r\n        diffuseColor = (tColor - diffuseColor) * blend[i] + diffuseColor;\r\n    }\r\n\r\n    // diffuseColor.xyz = vec3(1.0,0.0,0.0);\r\n    // diffuseColor.xyz = vec3(lod/u_maxLod,0.0,0.0);\r\n    // diffuseColor.xyz = vec3(floor(lod)/u_maxLod,0.0,0.0);\r\n    return diffuseColor;\r\n}",
+            "terrain_frag": "diffuseColor = terrainMethod(diffuseColor, v_uv);",
+            "terrain_pars_frag": "#ifdef USE_TERRAIN_MERGE\r\n    #include<terrainMerge_pars_frag>\r\n#else\r\n    #include<terrainDefault_pars_frag>\r\n#endif",
+            "uv_pars_vert": "attribute vec2 a_uv;\r\n\r\nvarying vec2 v_uv;",
+            "uv_vert": "v_uv = a_uv;",
+            "worldposition_pars_vert": "uniform mat4 u_modelMatrix;\r\n\r\nvarying vec3 v_worldPosition;",
+            "worldposition_vert": "//获取全局坐标\r\nvec4 worldPosition = u_modelMatrix * position;\r\n//输出全局坐标\r\nv_worldPosition = worldPosition.xyz;"
+        }
+    };
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    feng3d.lazy = {
+        getvalue: function (lazyItem) {
+            if (typeof lazyItem == "function")
+                return lazyItem();
+            return lazyItem;
+        }
+    };
+})(feng3d || (feng3d = {}));
+/**
+ * 判断是否为基础类型（在序列化中不发生变化的对象）
+ */
+Object.isBaseType = function (object) {
+    //基础类型
+    if (object == undefined
+        || object == null
+        || typeof object == "boolean"
+        || typeof object == "string"
+        || typeof object == "number")
+        return true;
+};
+Object.getPropertyDescriptor = function (host, property) {
+    var data = Object.getOwnPropertyDescriptor(host, property);
+    if (data) {
+        return data;
+    }
+    var prototype = Object.getPrototypeOf(host);
+    if (prototype) {
+        return Object.getPropertyDescriptor(prototype, property);
+    }
+    return null;
+};
+Object.propertyIsWritable = function (host, property) {
+    var data = Object.getPropertyDescriptor(host, property);
+    if (!data)
+        return false;
+    if (data.get && !data.set)
+        return false;
+    return true;
+};
+Object.runFunc = function (obj, func) {
+    func(obj);
+    return obj;
+};
+Map.prototype.getKeys = function () {
+    var keys = [];
+    this.forEach(function (v, k) {
+        keys.push(k);
+    });
+    return keys;
+};
+Map.prototype.getValues = function () {
+    var values = [];
+    this.forEach(function (v, k) {
+        values.push(v);
+    });
+    return values;
+};
+Array.prototype.unique = function (compare) {
+    if (compare === void 0) { compare = function (a, b) { return a == b; }; }
+    var arr = this;
+    for (var i = 0; i < arr.length; i++) {
+        for (var j = arr.length - 1; j > i; j--) {
+            if (compare(arr[i], arr[j]))
+                arr.splice(j, 1);
+        }
+    }
+    return this;
+};
+Array.prototype.delete = function (item) {
+    var arr = this;
+    var index = arr.indexOf(item);
+    if (index != -1)
+        arr.splice(index, 1);
+    return index;
+};
+var feng3d;
+(function (feng3d) {
+    /**
+     * 函数经
+     *
+     * 包装函数，以及对应的拆包
+     */
+    var FunctionWarp = /** @class */ (function () {
+        function FunctionWarp() {
+        }
+        /**
+         * 包装函数
+         *
+         * 一般用于调试
+         * 使用场景示例：
+         * 1. 在函数执行前后记录时间来计算函数执行时间。
+         * 1. 在console.error调用前使用 debugger 进行断点调试。
+         *
+         * @param space 函数所属对象或者原型
+         * @param funcName 函数名称
+         * @param pf 在函数执行前执行的函数
+         * @param nf 在函数执行后执行的函数
+         */
+        FunctionWarp.prototype.wrap = function (space, funcName, pf, nf) {
+            if (pf == undefined && nf == undefined)
+                return;
+            var oldlog = space[funcName];
+            space[funcName] = function () {
+                pf && pf.apply(this, arguments);
+                oldlog.apply(this, arguments);
+                nf && nf.apply(this, arguments);
+            };
+        };
+        return FunctionWarp;
+    }());
+    feng3d.FunctionWarp = FunctionWarp;
+    feng3d.functionwarp = new FunctionWarp();
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * 是否开启调试
+     */
+    feng3d.debuger = true;
+    /**
+     * 调试工具
+     */
+    var Debug = /** @class */ (function () {
+        function Debug() {
+            // 断言失败前进入断点调试
+            feng3d.functionwarp.wrap(console, "assert", function (test) { if (!test)
+                debugger; });
+            // 输出错误前进入断点调试
+            feng3d.functionwarp.wrap(console, "error", function () { debugger; });
+        }
+        /**
+         * 测试代码运行时间
+         * @param fn 被测试的方法
+         * @param labal 标签
+         */
+        Debug.prototype.time = function (fn, labal) {
+            labal = labal || fn["name"] || "Anonymous function " + Math.random();
+            console.time(labal);
+            fn();
+            console.timeEnd(labal);
+        };
+        return Debug;
+    }());
+    feng3d.Debug = Debug;
+    feng3d.debug = new Debug();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -584,16 +571,6 @@ var feng3d;
     }
     feng3d.serialize = serialize;
     /**
-     * 序列化资源装饰器，被装饰属性将被序列化为资源编号
-     * @param {*} target                序列化原型
-     * @param {string} propertyKey      序列化属性
-     */
-    function serializeAsset(target, propertyKey) {
-        var serializeInfo = getSerializeInfo(target);
-        serializeInfo.propertys.push({ property: propertyKey, asset: true });
-    }
-    feng3d.serializeAsset = serializeAsset;
-    /**
      * 序列化
      */
     var Serialization = /** @class */ (function () {
@@ -607,7 +584,7 @@ var feng3d;
         Serialization.prototype.serialize = function (target, saveFlags) {
             if (saveFlags === void 0) { saveFlags = feng3d.HideFlags.DontSave; }
             //基础类型
-            if (isBaseType(target))
+            if (Object.isBaseType(target))
                 return target;
             // 排除不支持序列化对象
             if (target.hasOwnProperty("serializable") && !target["serializable"])
@@ -636,12 +613,11 @@ var feng3d;
             }
             //处理方法
             if (typeof target == "function") {
-                object[CLASS_KEY] = "function";
+                object[feng3d.CLASS_KEY] = "function";
                 object.data = target.toString();
                 return object;
             }
-            var className = feng3d.classUtils.getQualifiedClassName(target);
-            object[CLASS_KEY] = className;
+            object[feng3d.CLASS_KEY] = feng3d.classUtils.getQualifiedClassName(target);
             if (target["serialize"])
                 return target["serialize"](object);
             //使用默认序列化
@@ -658,22 +634,20 @@ var feng3d;
          */
         Serialization.prototype.different = function (target, defaultInstance, different) {
             different = different || {};
+            if (target == defaultInstance)
+                return different;
+            if (defaultInstance == null) {
+                different = this.serialize(target);
+                return different;
+            }
             var serializableMembers = getSerializableMembers(target);
             if (target.constructor == Object)
                 serializableMembers = Object.keys(target).map(function (v) { return { property: v }; });
             for (var i = 0; i < serializableMembers.length; i++) {
                 var property = serializableMembers[i].property;
-                var asset = serializableMembers[i].asset;
-                if (asset && target[property] instanceof feng3d.AssetData && target[property].assetId) {
-                    var assetId0 = target[property] && target[property].assetId;
-                    var assetId1 = defaultInstance[property] && defaultInstance[property].assetId;
-                    if (assetId0 != assetId1)
-                        different[property] = assetId0;
-                    continue;
-                }
                 if (target[property] === defaultInstance[property])
                     continue;
-                if (isBaseType(target[property])) {
+                if (Object.isBaseType(target[property])) {
                     different[property] = target[property];
                     continue;
                 }
@@ -695,6 +669,14 @@ var feng3d;
                     different[property] = this.serialize(target[property]);
                     continue;
                 }
+                // 处理资源
+                if (target[property] instanceof feng3d.AssetData && target[property].assetId != undefined) {
+                    var diff0 = {};
+                    diff0[feng3d.CLASS_KEY] = feng3d.classUtils.getQualifiedClassName(target[property]);
+                    diff0.assetId = target[property].assetId;
+                    different[property] = diff0;
+                    continue;
+                }
                 var diff = this.different(target[property], defaultInstance[property]);
                 if (Object.keys(diff).length > 0)
                     different[property] = diff;
@@ -703,31 +685,39 @@ var feng3d;
         };
         /**
          * 反序列化
+         *
+         * 注意！ 如果反序列前需要把包含的资源提前加载，否则会报错！
+         *
          * @param object 换为Json的对象
          * @returns 反序列化后的数据
          */
-        Serialization.prototype.deserialize = function (object, tempInfo) {
+        Serialization.prototype.deserialize = function (object) {
             var _this = this;
-            tempInfo = initTempInfo(tempInfo);
             //基础类型
-            if (isBaseType(object))
+            if (Object.isBaseType(object))
                 return object;
+            if (feng3d.debuger && object.constructor == Object) {
+                var assetids = feng3d.rs.getAssets(object);
+                var assets = assetids.reduce(function (pv, cv) { var r = feng3d.rs.getAssetData(cv); if (r)
+                    pv.push(r); return pv; }, []);
+                console.assert(assetids.length == assets.length, "\u5B58\u5728\u8D44\u6E90\u672A\u52A0\u8F7D\uFF0C\u8BF7\u4F7F\u7528 deserializeWithAssets \u8FDB\u884C\u53CD\u5E8F\u5217\u5316");
+            }
             //处理数组
             if (object instanceof Array) {
-                var arr = object.map(function (v) { return _this.deserialize(v, tempInfo); });
+                var arr = object.map(function (v) { return _this.deserialize(v); });
                 return arr;
             }
             if (object.constructor != Object) {
                 return object;
             }
             // 获取类型
-            var className = object[CLASS_KEY];
+            var className = object[feng3d.CLASS_KEY];
             // 处理普通Object
             if (className == "Object" || className == null) {
                 var target = {};
                 for (var key in object) {
-                    if (key != CLASS_KEY)
-                        target[key] = this.deserialize(object[key], tempInfo);
+                    if (key != feng3d.CLASS_KEY)
+                        target[key] = this.deserialize(object[key]);
                 }
                 return target;
             }
@@ -739,15 +729,21 @@ var feng3d;
             }
             var cls = feng3d.classUtils.getDefinitionByName(className);
             if (!cls) {
-                feng3d.warn("\u65E0\u6CD5\u5E8F\u5217\u53F7\u5BF9\u8C61 " + className);
+                console.warn("\u65E0\u6CD5\u5E8F\u5217\u53F7\u5BF9\u8C61 " + className);
                 return undefined;
             }
             target = new cls();
+            // 处理资源
+            if (target instanceof feng3d.AssetData && object.assetId != undefined) {
+                var result = feng3d.rs.getAssetData(object.assetId);
+                feng3d.debuger && console.assert(!!result, "\u8D44\u6E90 " + object.assetId + " \u672A\u52A0\u8F7D\uFF0C\u8BF7\u4F7F\u7528 ReadRS.deserializeWithAssets \u8FDB\u884C\u5E8F\u5217\u5316\u5305\u542B\u52A0\u8F7D\u7684\u8D44\u6E90\u5BF9\u8C61\u3002");
+                return result;
+            }
             //处理自定义反序列化对象
             if (target["deserialize"])
                 return target["deserialize"](object);
             //默认反序列
-            this.setValue(target, object, tempInfo);
+            this.setValue(target, object);
             return target;
         };
         /**
@@ -755,38 +751,15 @@ var feng3d;
          * @param target 目标对象
          * @param object 数据对象
          */
-        Serialization.prototype.setValue = function (target, object, tempInfo) {
+        Serialization.prototype.setValue = function (target, object) {
             if (!object)
-                return;
-            tempInfo = initTempInfo(tempInfo);
-            var serializeAssets = getSerializableMembers(target).reduce(function (pv, cv) { if (cv.asset)
-                pv.push(cv.property); return pv; }, []);
-            var _loop_1 = function (property) {
-                if (object.hasOwnProperty(property)) {
-                    if (serializeAssets.indexOf(property) != -1) {
-                        if (typeof object[property] == "string") {
-                            tempInfo.loadingNum++;
-                            feng3d.rs.readAssetData(object[property], function (err, data) {
-                                target[property] = data;
-                                tempInfo.loadingNum--;
-                                if (tempInfo.loadingNum == 0) {
-                                    tempInfo.onLoaded && tempInfo.onLoaded();
-                                }
-                            });
-                        }
-                        else {
-                            target[property] = this_1.deserialize(object[property], tempInfo);
-                        }
-                    }
-                    else {
-                        this_1.setPropertyValue(target, object, property, tempInfo);
-                    }
-                }
-            };
-            var this_1 = this;
+                return target;
             for (var property in object) {
-                _loop_1(property);
+                if (object.hasOwnProperty(property)) {
+                    this.setPropertyValue(target, object, property);
+                }
             }
+            return target;
         };
         /**
          * 给目标对象的指定属性赋值
@@ -794,42 +767,46 @@ var feng3d;
          * @param object 数据对象
          * @param property 属性名称
          */
-        Serialization.prototype.setPropertyValue = function (target, object, property, tempInfo) {
+        Serialization.prototype.setPropertyValue = function (target, object, property) {
             if (target[property] == object[property])
                 return;
-            tempInfo = initTempInfo(tempInfo);
             var objvalue = object[property];
             // 当原值等于null时直接反序列化赋值
             if (target[property] == null) {
-                target[property] = this.deserialize(objvalue, tempInfo);
+                target[property] = this.deserialize(objvalue);
                 return;
             }
-            if (isBaseType(objvalue)) {
+            if (Object.isBaseType(objvalue)) {
                 target[property] = objvalue;
                 return;
             }
             if (objvalue.constructor == Array) {
-                target[property] = this.deserialize(objvalue, tempInfo);
+                target[property] = this.deserialize(objvalue);
                 return;
             }
             // 处理同为Object类型
-            if (objvalue[CLASS_KEY] == undefined) {
+            if (objvalue[feng3d.CLASS_KEY] == undefined) {
                 if (target[property].constructor == Object) {
                     for (var key in objvalue) {
-                        this.setPropertyValue(target[property], objvalue, key, tempInfo);
+                        this.setPropertyValue(target[property], objvalue, key);
                     }
                 }
                 else {
-                    this.setValue(target[property], objvalue, tempInfo);
+                    this.setValue(target[property], objvalue);
                 }
                 return;
             }
+            // 处理资源
+            if (target[property] instanceof feng3d.AssetData) {
+                target[property] = this.deserialize(objvalue);
+                return;
+            }
             var targetClassName = feng3d.classUtils.getQualifiedClassName(target[property]);
-            if (targetClassName == objvalue[CLASS_KEY]) {
-                this.setValue(target[property], objvalue, tempInfo);
+            if (targetClassName == objvalue[feng3d.CLASS_KEY]) {
+                this.setValue(target[property], objvalue);
             }
             else {
-                target[property] = this.deserialize(objvalue, tempInfo);
+                target[property] = this.deserialize(objvalue);
             }
         };
         /**
@@ -842,20 +819,8 @@ var feng3d;
         return Serialization;
     }());
     feng3d.Serialization = Serialization;
-    var CLASS_KEY = "__class__";
+    feng3d.CLASS_KEY = "__class__";
     var SERIALIZE_KEY = "_serialize__";
-    /**
-     * 判断是否为基础类型（在序列化中不发生变化的对象）
-     */
-    function isBaseType(object) {
-        //基础类型
-        if (object == undefined
-            || object == null
-            || typeof object == "boolean"
-            || typeof object == "string"
-            || typeof object == "number")
-            return true;
-    }
     /**
      * 获取默认实例
      */
@@ -898,11 +863,6 @@ var feng3d;
             }
         }
         return serializableMembers;
-    }
-    function initTempInfo(tempInfo) {
-        tempInfo = tempInfo || { loadingNum: 0, onLoaded: function () { } };
-        tempInfo.loadingNum = tempInfo.loadingNum || 0;
-        return tempInfo;
     }
     feng3d.serialization = new Serialization();
 })(feng3d || (feng3d = {}));
@@ -1033,7 +993,7 @@ var feng3d;
                 }
             }
             var cls = this.OVComponent[classConfig.component];
-            feng3d.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + classConfig.component + " \u5BF9\u5E94\u7684\u5BF9\u8C61\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + classConfig.component + " \u4E2D\u4F7F\u7528@OVComponent()\u6807\u8BB0");
+            feng3d.debuger && console.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + classConfig.component + " \u5BF9\u5E94\u7684\u5BF9\u8C61\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + classConfig.component + " \u4E2D\u4F7F\u7528@OVComponent()\u6807\u8BB0");
             var view = new cls(classConfig);
             return view;
         };
@@ -1060,7 +1020,7 @@ var feng3d;
                 attributeViewInfo.component = this.defaultObjectAttributeViewClass;
             }
             var cls = this.OAVComponent[attributeViewInfo.component];
-            feng3d.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + attributeViewInfo.component + " \u5BF9\u5E94\u7684\u5C5E\u6027\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + attributeViewInfo.component + " \u4E2D\u4F7F\u7528@OVAComponent()\u6807\u8BB0");
+            feng3d.debuger && console.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + attributeViewInfo.component + " \u5BF9\u5E94\u7684\u5C5E\u6027\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + attributeViewInfo.component + " \u4E2D\u4F7F\u7528@OVAComponent()\u6807\u8BB0");
             var view = new cls(attributeViewInfo);
             return view;
         };
@@ -1079,7 +1039,7 @@ var feng3d;
                 blockViewInfo.component = this.defaultObjectAttributeBlockView;
             }
             var cls = this.OBVComponent[blockViewInfo.component];
-            feng3d.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + blockViewInfo.component + " \u5BF9\u5E94\u7684\u5757\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + blockViewInfo.component + " \u4E2D\u4F7F\u7528@OVBComponent()\u6807\u8BB0");
+            feng3d.debuger && console.assert(cls != null, "\u6CA1\u6709\u5B9A\u4E49 " + blockViewInfo.component + " \u5BF9\u5E94\u7684\u5757\u754C\u9762\u7C7B\uFF0C\u9700\u8981\u5728 " + blockViewInfo.component + " \u4E2D\u4F7F\u7528@OVBComponent()\u6807\u8BB0");
             var view = new cls(blockViewInfo);
             return view;
         };
@@ -1453,7 +1413,7 @@ var feng3d;
             affers.push([addTickerFunc, [item]]);
             return;
         }
-        removeTickerFunc(item);
+        // removeTickerFunc(item);
         if (item.priority == undefined)
             item.priority = 0;
         item.runtime = Date.now() + feng3d.lazy.getvalue(item.interval);
@@ -1482,18 +1442,11 @@ var feng3d;
             return a.priority - b.priority;
         });
         var currenttime = Date.now();
+        var needTickerFuncItems = [];
         for (var i = tickerFuncs.length - 1; i >= 0; i--) {
             var element = tickerFuncs[i];
             if (element.runtime < currenttime) {
-                // try
-                // {
-                element.func.call(element.thisObject, feng3d.lazy.getvalue(element.interval));
-                // } catch (error)
-                // {
-                //     warn(`${element.func} 方法执行错误，从 ticker 中移除`, error)
-                //     tickerFuncs.splice(i, 1);
-                //     continue;
-                // }
+                needTickerFuncItems.push(element);
                 if (element.once) {
                     tickerFuncs.splice(i, 1);
                     continue;
@@ -1501,6 +1454,20 @@ var feng3d;
                 element.runtime = nextRuntime(element.runtime, feng3d.lazy.getvalue(element.interval));
             }
         }
+        needTickerFuncItems.reverse();
+        // 相同的函数只执行一个
+        needTickerFuncItems.unique(function (a, b) { return (a.func == b.func && a.thisObject == b.thisObject); });
+        needTickerFuncItems.forEach(function (v) {
+            try {
+                v.func.call(v.thisObject, feng3d.lazy.getvalue(v.interval));
+            }
+            catch (error) {
+                console.warn(v.func + " \u65B9\u6CD5\u6267\u884C\u9519\u8BEF\uFF0C\u4ECE ticker \u4E2D\u79FB\u9664", error);
+                var index = tickerFuncs.indexOf(v);
+                if (index != -1)
+                    tickerFuncs.splice(index, 1);
+            }
+        });
         running = false;
         for (var i = 0; i < affers.length; i++) {
             var affer = affers[i];
@@ -1514,7 +1481,10 @@ var feng3d;
     }
     var localrequestAnimationFrame;
     if (typeof requestAnimationFrame == "undefined") {
+        var _global;
+        var global;
         if (typeof window != "undefined") {
+            _global = window;
             localrequestAnimationFrame =
                 window["requestAnimationFrame"] ||
                     window["webkitRequestAnimationFrame"] ||
@@ -1522,9 +1492,12 @@ var feng3d;
                     window["oRequestAnimationFrame"] ||
                     window["msRequestAnimationFrame"];
         }
-        else {
+        else if (typeof global != "undefined") {
+            _global = global;
+        }
+        if (localrequestAnimationFrame == undefined) {
             localrequestAnimationFrame = function (callback) {
-                return window.setTimeout(callback, 1000 / feng3d.ticker.frameRate);
+                return _global.setTimeout(callback, 1000 / feng3d.ticker.frameRate);
             };
         }
     }
@@ -1603,6 +1576,14 @@ var feng3d;
             if (type == "png")
                 return canvas.toDataURL("image/png");
             return canvas.toDataURL("image/jpeg", 0.8);
+        };
+        /**
+         * canvas转换为图片
+         */
+        DataTransform.prototype.canvasToImage = function (canvas, type, callback) {
+            if (type === void 0) { type = "png"; }
+            var dataURL = this.canvasToDataURL(canvas, type);
+            this.dataURLToImage(dataURL, callback);
         };
         /**
          * File、Blob对象转换为dataURL
@@ -1772,7 +1753,7 @@ var feng3d;
                     return className;
                 }
             }
-            feng3d.error("\u672A\u5728\u7ED9\u51FA\u7684\u547D\u540D\u7A7A\u95F4 " + _classNameSpaces + " \u5185\u627E\u5230 " + value + " \u7684\u5B9A\u4E49");
+            console.error("\u672A\u5728\u7ED9\u51FA\u7684\u547D\u540D\u7A7A\u95F4 " + _classNameSpaces + " \u5185\u627E\u5230 " + value + " \u7684\u5B9A\u4E49");
             return "undefined";
         };
         /**
@@ -1816,7 +1797,14 @@ var feng3d;
     ;
     feng3d.classUtils = new ClassUtils();
     var _definitionCache = {};
-    var _global = window;
+    var _global;
+    var global;
+    if (typeof window != "undefined") {
+        _global = window;
+    }
+    else if (typeof global != "undefined") {
+        _global = global;
+    }
     var _classNameSpaces = ["feng3d"];
     /**
      * 为一个类定义注册完全限定类名
@@ -1867,6 +1855,8 @@ var feng3d;
             if (width === void 0) { width = 1; }
             if (height === void 0) { height = 1; }
             if (fillcolor === void 0) { fillcolor = new feng3d.Color4(0, 0, 0, 0); }
+            if (typeof document == "undefined")
+                return;
             var canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
@@ -1889,7 +1879,7 @@ var feng3d;
             canvasImg.width = image.width;
             canvasImg.height = image.height;
             var ctxt = canvasImg.getContext('2d');
-            feng3d.assert(!!ctxt);
+            feng3d.debuger && console.assert(!!ctxt);
             ctxt.drawImage(image, 0, 0);
             this.imageData = ctxt.getImageData(0, 0, image.width, image.height); //读取整张图片的像素。
             return this;
@@ -2191,6 +2181,8 @@ var feng3d;
         function Stats() {
             var _this = this;
             var mode = 0;
+            if (typeof document == "undefined")
+                return;
             var container = document.createElement('div');
             container.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;';
             container.addEventListener('click', function (event) {
@@ -2268,7 +2260,7 @@ var feng3d;
             canvas.style.cssText = 'width:80px;height:48px';
             var context0 = canvas.getContext('2d');
             if (context0 == null) {
-                feng3d.log("\u65E0\u6CD5\u521B\u5EFA CanvasRenderingContext2D ");
+                console.log("\u65E0\u6CD5\u521B\u5EFA CanvasRenderingContext2D ");
                 return;
             }
             var context = context0;
@@ -2325,6 +2317,7 @@ var feng3d;
          * @param path 路径
          */
         PathUtils.prototype.getName = function (path) {
+            feng3d.debuger && console.assert(path != undefined);
             var name = this.getNameWithExtension(path);
             if (this.isDirectory(path))
                 return name;
@@ -2336,6 +2329,7 @@ var feng3d;
          * @param path 路径
          */
         PathUtils.prototype.getNameWithExtension = function (path) {
+            feng3d.debuger && console.assert(path != undefined);
             var paths = path.split("/");
             var name = paths.pop();
             if (name == "")
@@ -2347,15 +2341,19 @@ var feng3d;
          * @param path 路径
          */
         PathUtils.prototype.getExtension = function (path) {
+            feng3d.debuger && console.assert(path != undefined);
             var name = this.getNameWithExtension(path);
-            var extension = name.split(".").slice(1).join(".");
-            return extension;
+            var index = name.indexOf(".");
+            if (index == -1)
+                return "";
+            return name.substr(index);
         };
         /**
          * 父路径
          * @param path 路径
          */
         PathUtils.prototype.getParentPath = function (path) {
+            feng3d.debuger && console.assert(path != undefined);
             var paths = path.split("/");
             if (this.isDirectory(path))
                 paths.pop();
@@ -2369,6 +2367,8 @@ var feng3d;
          * @param childName 子文件名称
          */
         PathUtils.prototype.getChildFilePath = function (parentPath, childName) {
+            feng3d.debuger && console.assert(parentPath != undefined);
+            feng3d.debuger && console.assert(childName != undefined);
             if (parentPath.charAt(parentPath.length - 1) != "/")
                 parentPath += "/";
             return parentPath + childName;
@@ -2458,7 +2458,7 @@ var feng3d;
         __extends(ERR_INVALID_ARG_TYPE, _super);
         function ERR_INVALID_ARG_TYPE(name, expected, actual) {
             var _this = this;
-            assert(typeof name === 'string', "'name' must be a string");
+            feng3d.debuger && assert(typeof name === 'string', "'name' must be a string");
             // determiner: 'must be' or 'must not be'
             var determiner;
             if (typeof expected === 'string' && expected.startsWith('not ')) {
@@ -2485,10 +2485,10 @@ var feng3d;
         return ERR_INVALID_ARG_TYPE;
     }(TypeError));
     function oneOf(expected, thing) {
-        assert(typeof thing === 'string', '`thing` has to be of type string');
+        feng3d.debuger && assert(typeof thing === 'string', '`thing` has to be of type string');
         if (Array.isArray(expected)) {
             var len = expected.length;
-            assert(len > 0, 'At least one expected value needs to be specified');
+            feng3d.debuger && assert(len > 0, 'At least one expected value needs to be specified');
             expected = expected.map(function (i) { return String(i); });
             if (len > 2) {
                 return "one of " + thing + " " + expected.slice(0, len - 1).join(', ') + ", or " +
@@ -3922,16 +3922,6 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
-    feng3d.lazy = {
-        getvalue: function (lazyItem) {
-            if (typeof lazyItem == "function")
-                return lazyItem();
-            return lazyItem;
-        }
-    };
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
     /**
      * 常用正则表示式
      */
@@ -3963,8 +3953,8 @@ var feng3d;
     feng3d.RegExps = RegExps;
     feng3d.regExps = new RegExps();
 })(feng3d || (feng3d = {}));
-var ds;
-(function (ds) {
+var feng3d;
+(function (feng3d) {
     /**
      * 比较器
      */
@@ -4041,10 +4031,10 @@ var ds;
         };
         return Comparator;
     }());
-    ds.Comparator = Comparator;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.Comparator = Comparator;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 工具
      */
@@ -4150,11 +4140,11 @@ var ds;
         };
         return Utils;
     }());
-    ds.Utils = Utils;
-    ds.utils = new Utils();
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.Utils = Utils;
+    feng3d.utils = new Utils();
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 链表
      *
@@ -4169,7 +4159,7 @@ var ds;
         function LinkedList(comparatorFunction) {
             this.head = null;
             this.tail = null;
-            this.compare = new ds.Comparator(comparatorFunction);
+            this.compare = new feng3d.Comparator(comparatorFunction);
         }
         /**
          * 是否为空
@@ -4425,10 +4415,10 @@ var ds;
         };
         return LinkedList;
     }());
-    ds.LinkedList = LinkedList;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.LinkedList = LinkedList;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 双向链表
      *
@@ -4443,7 +4433,7 @@ var ds;
         function DoublyLinkedList(comparatorFunction) {
             this.head = null;
             this.tail = null;
-            this.compare = new ds.Comparator(comparatorFunction);
+            this.compare = new feng3d.Comparator(comparatorFunction);
         }
         /**
          * 是否为空
@@ -4700,10 +4690,10 @@ var ds;
         };
         return DoublyLinkedList;
     }());
-    ds.DoublyLinkedList = DoublyLinkedList;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.DoublyLinkedList = DoublyLinkedList;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 队列，只能从后面进，前面出
      * 使用单向链表实现
@@ -4717,7 +4707,7 @@ var ds;
          * @param comparatorFunction 比较函数
          */
         function Queue() {
-            this.linkedList = new ds.LinkedList();
+            this.linkedList = new feng3d.LinkedList();
         }
         /**
          * 是否为空
@@ -4768,10 +4758,10 @@ var ds;
         };
         return Queue;
     }());
-    ds.Queue = Queue;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.Queue = Queue;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 栈
      *
@@ -4781,7 +4771,7 @@ var ds;
      */
     var Stack = /** @class */ (function () {
         function Stack() {
-            this.linkedList = new ds.LinkedList();
+            this.linkedList = new feng3d.LinkedList();
         }
         /**
          * 是否为空
@@ -4826,10 +4816,10 @@ var ds;
         };
         return Stack;
     }());
-    ds.Stack = Stack;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.Stack = Stack;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 堆
      *
@@ -4849,7 +4839,7 @@ var ds;
                 throw new TypeError('无法直接构造堆实例');
             }
             this.heapContainer = [];
-            this.compare = new ds.Comparator(comparatorFunction);
+            this.compare = new feng3d.Comparator(comparatorFunction);
         }
         /**
          * 获取左边子结点索引
@@ -5068,10 +5058,10 @@ var ds;
         };
         return Heap;
     }());
-    ds.Heap = Heap;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.Heap = Heap;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 最大堆
      *
@@ -5094,11 +5084,11 @@ var ds;
             return this.compare.greaterThanOrEqual(firstElement, secondElement);
         };
         return MaxHeap;
-    }(ds.Heap));
-    ds.MaxHeap = MaxHeap;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    }(feng3d.Heap));
+    feng3d.MaxHeap = MaxHeap;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 最小堆
      *
@@ -5121,11 +5111,11 @@ var ds;
             return this.compare.lessThanOrEqual(firstElement, secondElement);
         };
         return MinHeap;
-    }(ds.Heap));
-    ds.MinHeap = MinHeap;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    }(feng3d.Heap));
+    feng3d.MinHeap = MinHeap;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 默认哈希表 （建议使用Object代替）
      *
@@ -5147,7 +5137,7 @@ var ds;
             if (hashTableSize === void 0) { hashTableSize = defaultHashTableSize; }
             this.buckets = [];
             for (var i = 0; i < hashTableSize; i++) {
-                this.buckets.push(new ds.LinkedList());
+                this.buckets.push(new feng3d.LinkedList());
             }
             this.keys = {};
         }
@@ -5220,10 +5210,10 @@ var ds;
         };
         return HashTable;
     }());
-    ds.HashTable = HashTable;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.HashTable = HashTable;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 优先队列
      *
@@ -5276,7 +5266,7 @@ var ds;
                 items[_i] = arguments[_i];
             }
             items.forEach(function (item) {
-                var insert = ds.utils.binarySearchInsert(_this.items, item, _this._compare);
+                var insert = feng3d.utils.binarySearchInsert(_this.items, item, _this._compare);
                 _this.items.splice(insert, 0, item);
             });
             return this.items.length;
@@ -5302,10 +5292,10 @@ var ds;
         };
         return PriorityQueue;
     }());
-    ds.PriorityQueue = PriorityQueue;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.PriorityQueue = PriorityQueue;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 优先队列
      *
@@ -5319,7 +5309,7 @@ var ds;
         function PriorityQueue1() {
             var _this = _super.call(this) || this;
             _this.priorities = {};
-            _this.compare = new ds.Comparator(_this.comparePriority.bind(_this));
+            _this.compare = new feng3d.Comparator(_this.comparePriority.bind(_this));
             return _this;
         }
         /**
@@ -5353,7 +5343,7 @@ var ds;
          * @param priority 优先级
          */
         PriorityQueue1.prototype.changePriority = function (item, priority) {
-            this.remove(item, new ds.Comparator(this.compareValue));
+            this.remove(item, new feng3d.Comparator(this.compareValue));
             this.add(item, priority);
             return this;
         };
@@ -5363,7 +5353,7 @@ var ds;
          * @param item 元素
          */
         PriorityQueue1.prototype.findByValue = function (item) {
-            return this.find(item, new ds.Comparator(this.compareValue));
+            return this.find(item, new feng3d.Comparator(this.compareValue));
         };
         /**
          * 是否拥有元素
@@ -5398,11 +5388,11 @@ var ds;
             return a < b ? -1 : 1;
         };
         return PriorityQueue1;
-    }(ds.MinHeap));
-    ds.PriorityQueue1 = PriorityQueue1;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    }(feng3d.MinHeap));
+    feng3d.PriorityQueue1 = PriorityQueue1;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 布隆过滤器 （ 在 JavaScript中 该类可由Object对象代替）
      *
@@ -5523,10 +5513,10 @@ var ds;
         };
         return BloomFilter;
     }());
-    ds.BloomFilter = BloomFilter;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.BloomFilter = BloomFilter;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 并查集
      *
@@ -5611,7 +5601,7 @@ var ds;
         };
         return DisjointSet;
     }());
-    ds.DisjointSet = DisjointSet;
+    feng3d.DisjointSet = DisjointSet;
     /**
      * 并查集结点
      */
@@ -5691,10 +5681,10 @@ var ds;
         };
         return DisjointSetNode;
     }());
-    ds.DisjointSetNode = DisjointSetNode;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.DisjointSetNode = DisjointSetNode;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 图
      *
@@ -5895,7 +5885,7 @@ var ds;
         };
         return Graph;
     }());
-    ds.Graph = Graph;
+    feng3d.Graph = Graph;
     /**
      * 图边
      */
@@ -5937,7 +5927,7 @@ var ds;
         };
         return GraphEdge;
     }());
-    ds.GraphEdge = GraphEdge;
+    feng3d.GraphEdge = GraphEdge;
     /**
      * 图顶点
      */
@@ -5955,7 +5945,7 @@ var ds;
                 return edgeA.getKey() < edgeB.getKey() ? -1 : 1;
             };
             this.value = value;
-            this.edges = new ds.LinkedList(edgeComparator);
+            this.edges = new feng3d.LinkedList(edgeComparator);
         }
         /**
          * 新增边
@@ -6051,10 +6041,10 @@ var ds;
         };
         return GraphVertex;
     }());
-    ds.GraphVertex = GraphVertex;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.GraphVertex = GraphVertex;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 二叉树结点
      *
@@ -6072,8 +6062,8 @@ var ds;
             this.right = null;
             this.parent = null;
             this.value = value;
-            this.meta = new ds.HashTable();
-            this.nodeComparator = new ds.Comparator();
+            this.meta = new feng3d.HashTable();
+            this.nodeComparator = new feng3d.Comparator();
         }
         Object.defineProperty(BinaryTreeNode.prototype, "leftHeight", {
             /**
@@ -6254,10 +6244,11 @@ var ds;
         };
         return BinaryTreeNode;
     }());
-    ds.BinaryTreeNode = BinaryTreeNode;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.BinaryTreeNode = BinaryTreeNode;
+})(feng3d || (feng3d = {}));
+/// <reference path="./BinaryTreeNode.ts" />
+var feng3d;
+(function (feng3d) {
     /**
      * 二叉查找树结点
      *
@@ -6274,7 +6265,7 @@ var ds;
         function BinarySearchTreeNode(value, compareFunction) {
             var _this = _super.call(this, value) || this;
             _this.compareFunction = compareFunction;
-            _this.nodeValueComparator = new ds.Comparator(compareFunction);
+            _this.nodeValueComparator = new feng3d.Comparator(compareFunction);
             return _this;
         }
         /**
@@ -6378,7 +6369,7 @@ var ds;
                     parent.replaceChild(nodeToRemove, childNode);
                 }
                 else {
-                    ds.BinaryTreeNode.copyNode(childNode, nodeToRemove);
+                    feng3d.BinaryTreeNode.copyNode(childNode, nodeToRemove);
                 }
             }
             nodeToRemove.parent = null;
@@ -6394,11 +6385,11 @@ var ds;
             return this.left.findMin();
         };
         return BinarySearchTreeNode;
-    }(ds.BinaryTreeNode));
-    ds.BinarySearchTreeNode = BinarySearchTreeNode;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    }(feng3d.BinaryTreeNode));
+    feng3d.BinarySearchTreeNode = BinarySearchTreeNode;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 二叉查找树
      *
@@ -6420,7 +6411,7 @@ var ds;
          * @param nodeValueCompareFunction 结点值比较器
          */
         function BinarySearchTree(nodeValueCompareFunction) {
-            this.root = new ds.BinarySearchTreeNode(null, nodeValueCompareFunction);
+            this.root = new feng3d.BinarySearchTreeNode(null, nodeValueCompareFunction);
             // 从根节点中窃取节点比较器。
             this.nodeComparator = this.root.nodeComparator;
         }
@@ -6456,10 +6447,11 @@ var ds;
         };
         return BinarySearchTree;
     }());
-    ds.BinarySearchTree = BinarySearchTree;
-})(ds || (ds = {}));
-var ds;
-(function (ds) {
+    feng3d.BinarySearchTree = BinarySearchTree;
+})(feng3d || (feng3d = {}));
+/// <reference path="./BinarySearchTree.ts" />
+var feng3d;
+(function (feng3d) {
     /**
      * 平衡二叉树
      *
@@ -6617,9 +6609,9 @@ var ds;
             rightNode.setLeft(rootNode);
         };
         return AvlTree;
-    }(ds.BinarySearchTree));
-    ds.AvlTree = AvlTree;
-})(ds || (ds = {}));
+    }(feng3d.BinarySearchTree));
+    feng3d.AvlTree = AvlTree;
+})(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
     feng3d.FMath = {
@@ -6639,12 +6631,13 @@ var feng3d;
          * 获取唯一标识符
          * @see http://www.broofa.com/Tools/Math.uuid.htm
          */
-        uuid: function () {
+        uuid: function (length) {
+            if (length === void 0) { length = 36; }
             var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-            var id = new Array(36);
+            var id = new Array(length);
             var rnd = 0, r = 0;
             return function generateUUID() {
-                for (var i = 0; i < 36; i++) {
+                for (var i = 0; i < length; i++) {
                     if (i === 8 || i === 13 || i === 18 || i === 23) {
                         id[i] = '-';
                     }
@@ -9108,6 +9101,16 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Rectangle.prototype, "center", {
+            /**
+             * 中心点
+             */
+            get: function () {
+                return new feng3d.Vector2(this.x + this.width / 2, this.y + this.height / 2);
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 将源 Rectangle 对象中的所有矩形数据复制到调用方 Rectangle 对象中。
          * @param sourceRect 要从中复制数据的 Rectangle 对象。
@@ -10144,7 +10147,7 @@ var feng3d;
             this.rawData[13] = m141 * m212 + m142 * m222 + m143 * m232 + m144 * m242;
             this.rawData[14] = m141 * m213 + m142 * m223 + m143 * m233 + m144 * m243;
             this.rawData[15] = m141 * m214 + m142 * m224 + m143 * m234 + m144 * m244;
-            feng3d.debuger && feng3d.assert(this.rawData[0] !== NaN && this.rawData[4] !== NaN && this.rawData[8] !== NaN && this.rawData[12] !== NaN);
+            feng3d.debuger && console.assert(this.rawData[0] !== NaN && this.rawData[4] !== NaN && this.rawData[8] !== NaN && this.rawData[12] !== NaN);
             return this;
         };
         /**
@@ -10450,7 +10453,7 @@ var feng3d;
         Matrix4x4.prototype.invert = function () {
             var d = this.determinant;
             if (d == 0) {
-                feng3d.error("无法获取逆矩阵");
+                console.error("无法获取逆矩阵");
                 return this;
             }
             d = 1 / d;
@@ -13093,7 +13096,7 @@ var feng3d;
          */
         TriangleGeometry.prototype.getPoints = function () {
             var ps = this.triangles.reduce(function (v, t) { return v.concat(t.getPoints()); }, []);
-            ds.utils.arrayUnique(ps, function (a, b) { return a.equals(b); });
+            feng3d.utils.arrayUnique(ps, function (a, b) { return a.equals(b); });
             return ps;
         };
         /**
@@ -13217,11 +13220,11 @@ var feng3d;
                 ps.push(r);
             });
             // 清除相同的线段
-            ds.utils.arrayUnique(ss, function (a, b) { return a.equals(b); });
+            feng3d.utils.arrayUnique(ss, function (a, b) { return a.equals(b); });
             // 删除在相交线段上的交点
             ps = ps.filter(function (p) { return ss.every(function (s) { return !s.onWithPoint(p); }); });
             // 清除相同点
-            ds.utils.arrayUnique(ps, function (a, b) { return a.equals(b); });
+            feng3d.utils.arrayUnique(ps, function (a, b) { return a.equals(b); });
             if (ss.length + ps.length == 0)
                 return null;
             return { segments: ss, points: ps };
@@ -14210,7 +14213,7 @@ var feng3d;
             }
             if (keys.length == 0)
                 return new feng3d.AnimationCurveKeyframe({ time: t, value: 0, tangent: 0 });
-            feng3d.assert(isfind);
+            feng3d.debuger && console.assert(isfind);
             return new feng3d.AnimationCurveKeyframe({ time: t, value: value, tangent: tangent });
         };
         /**
@@ -14333,7 +14336,7 @@ var feng3d;
             /**
              * 曲线1
              */
-            this.curve1 = Object.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
+            this.curve1 = feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
             /**
              * 曲线缩放比
              */
@@ -14424,13 +14427,16 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
-    var feventMap = new Map();
-    function getBubbleTargets(target) {
-        return [target["parent"]];
-    }
+    /**
+     * 事件
+     */
     var FEvent = /** @class */ (function () {
         function FEvent() {
+            this.feventMap = new Map();
         }
+        FEvent.prototype.getBubbleTargets = function (target) {
+            return [target["parent"]];
+        };
         /**
          * 监听一次事件后将会被移除
          * @param type						事件的类型。
@@ -14456,6 +14462,7 @@ var feng3d;
             if (targets.indexOf(obj) != -1)
                 return false;
             targets.push(obj);
+            e.handles = [];
             this.handleEvent(obj, e);
             this.handelEventBubbles(obj, e);
             return true;
@@ -14468,7 +14475,7 @@ var feng3d;
          */
         FEvent.prototype.dispatch = function (obj, type, data, bubbles) {
             if (bubbles === void 0) { bubbles = false; }
-            var e = { type: type, data: data, bubbles: bubbles, target: null, currentTarget: null, isStop: false, isStopBubbles: false, targets: [] };
+            var e = { type: type, data: data, bubbles: bubbles, target: null, currentTarget: null, isStop: false, isStopBubbles: false, targets: [], handles: [] };
             this.dispatchEvent(obj, e);
             return e;
         };
@@ -14479,7 +14486,7 @@ var feng3d;
          * @return 			如果指定类型的侦听器已注册，则值为 true；否则，值为 false。
          */
         FEvent.prototype.has = function (obj, type) {
-            return !!(feventMap.get(obj) && feventMap.get(obj)[type] && feventMap.get(obj)[type].length);
+            return !!(this.feventMap.get(obj) && this.feventMap.get(obj)[type] && this.feventMap.get(obj)[type].length);
         };
         /**
          * 添加监听
@@ -14490,9 +14497,9 @@ var feng3d;
         FEvent.prototype.on = function (obj, type, listener, thisObject, priority, once) {
             if (priority === void 0) { priority = 0; }
             if (once === void 0) { once = false; }
-            var objectListener = feventMap.get(obj);
+            var objectListener = this.feventMap.get(obj);
             if (!objectListener)
-                (feventMap.set(obj, objectListener = {}));
+                (this.feventMap.set(obj, objectListener = {}));
             var listeners = objectListener[type] = objectListener[type] || [];
             for (var i = 0; i < listeners.length; i++) {
                 var element = listeners[i];
@@ -14517,15 +14524,15 @@ var feng3d;
          */
         FEvent.prototype.off = function (obj, type, listener, thisObject) {
             if (!type) {
-                feventMap.delete(obj);
+                this.feventMap.delete(obj);
                 return;
             }
             if (!listener) {
-                if (feventMap.get(obj))
-                    delete feventMap.get(obj)[type];
+                if (this.feventMap.get(obj))
+                    delete this.feventMap.get(obj)[type];
                 return;
             }
-            var listeners = feventMap.get(obj) && feventMap.get(obj)[type];
+            var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[type];
             if (listeners) {
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     var element = listeners[i];
@@ -14534,7 +14541,7 @@ var feng3d;
                     }
                 }
                 if (listeners.length == 0) {
-                    delete feventMap.get(obj)[type];
+                    delete this.feventMap.get(obj)[type];
                 }
             }
         };
@@ -14547,9 +14554,9 @@ var feng3d;
          */
         FEvent.prototype.onAll = function (obj, listener, thisObject, priority) {
             if (priority === void 0) { priority = 0; }
-            var objectListener = feventMap.get(obj);
+            var objectListener = this.feventMap.get(obj);
             if (!objectListener)
-                (feventMap.set(obj, objectListener = {}));
+                (this.feventMap.set(obj, objectListener = {}));
             var listeners = objectListener.__allEventType__ = objectListener.__allEventType__ || [];
             for (var i = 0; i < listeners.length; i++) {
                 var element = listeners[i];
@@ -14574,11 +14581,11 @@ var feng3d;
          */
         FEvent.prototype.offAll = function (obj, listener, thisObject) {
             if (!listener) {
-                if (feventMap.get(obj))
-                    delete feventMap.get(obj).__allEventType__;
+                if (this.feventMap.get(obj))
+                    delete this.feventMap.get(obj).__allEventType__;
                 return;
             }
-            var listeners = feventMap.get(obj) && feventMap.get(obj).__allEventType__;
+            var listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
             if (listeners) {
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     var element = listeners[i];
@@ -14587,7 +14594,7 @@ var feng3d;
                     }
                 }
                 if (listeners.length == 0) {
-                    delete feventMap.get(obj).__allEventType__;
+                    delete this.feventMap.get(obj).__allEventType__;
                 }
             }
         };
@@ -14603,32 +14610,35 @@ var feng3d;
                 e.currentTarget = obj;
             }
             catch (error) { }
-            var listeners = feventMap.get(obj) && feventMap.get(obj)[e.type];
+            var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[e.type];
             if (listeners) {
                 //遍历调用事件回调函数
-                for (var i = 0; i < listeners.length && !e.isStop; i++) {
-                    listeners[i].listener.call(listeners[i].thisObject, e);
+                var listeners0 = listeners.concat();
+                for (var i = 0; i < listeners0.length && !e.isStop; i++) {
+                    listeners0[i].listener.call(listeners0[i].thisObject, e); //此处可能会删除当前事件，所以上面必须拷贝
+                    e.handles.push(listeners0[i]);
                 }
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     if (listeners[i].once)
                         listeners.splice(i, 1);
                 }
                 if (listeners.length == 0)
-                    delete feventMap.get(obj)[e.type];
+                    delete this.feventMap.get(obj)[e.type];
             }
             // All_EVENT_Type
-            listeners = feventMap.get(obj) && feventMap.get(obj).__allEventType__;
+            listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
             if (listeners) {
                 //遍历调用事件回调函数
-                for (var i = 0; i < listeners.length && !e.isStop; i++) {
-                    listeners[i].listener.call(listeners[i].thisObject, e);
+                var listeners0 = listeners.concat();
+                for (var i = 0; i < listeners0.length && !e.isStop; i++) {
+                    listeners0[i].listener.call(listeners0[i].thisObject, e); //此处可能会删除当前事件，所以上面必须拷贝
                 }
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     if (listeners[i].once)
                         listeners.splice(i, 1);
                 }
                 if (listeners.length == 0)
-                    delete feventMap.get(obj).__allEventType__;
+                    delete this.feventMap.get(obj).__allEventType__;
             }
         };
         /**
@@ -14637,10 +14647,10 @@ var feng3d;
          */
         FEvent.prototype.handelEventBubbles = function (obj, e) {
             if (e.bubbles && !e.isStopBubbles) {
-                var bubbleTargets = getBubbleTargets(obj);
+                var bubbleTargets = this.getBubbleTargets(obj);
                 for (var i = 0, n = bubbleTargets.length; i < n; i++) {
                     var bubbleTarget = bubbleTargets[i];
-                    if (!e.isStop && bubbleTarget instanceof feng3d.EventDispatcher)
+                    if (!e.isStop && bubbleTarget && bubbleTarget.dispatchEvent)
                         bubbleTarget.dispatchEvent(e);
                 }
             }
@@ -14648,7 +14658,7 @@ var feng3d;
         return FEvent;
     }());
     feng3d.FEvent = FEvent;
-    feng3d.fevent = new FEvent();
+    feng3d.objectevent = feng3d.event = new FEvent();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -14668,7 +14678,7 @@ var feng3d;
         EventDispatcher.prototype.once = function (type, listener, thisObject, priority) {
             if (thisObject === void 0) { thisObject = null; }
             if (priority === void 0) { priority = 0; }
-            feng3d.fevent.on(this, type, listener, thisObject, priority, true);
+            feng3d.event.on(this, type, listener, thisObject, priority, true);
         };
         /**
          * 派发事件
@@ -14679,7 +14689,7 @@ var feng3d;
          * @returns 返回事件是否被该对象处理
          */
         EventDispatcher.prototype.dispatchEvent = function (e) {
-            return feng3d.fevent.dispatchEvent(this, e);
+            return feng3d.event.dispatchEvent(this, e);
         };
         /**
          * 将事件调度到事件流中. 事件目标是对其调用 dispatchEvent() 方法的 IEvent 对象。
@@ -14689,7 +14699,7 @@ var feng3d;
          */
         EventDispatcher.prototype.dispatch = function (type, data, bubbles) {
             if (bubbles === void 0) { bubbles = false; }
-            return feng3d.fevent.dispatch(this, type, data, bubbles);
+            return feng3d.event.dispatch(this, type, data, bubbles);
         };
         /**
          * 检查 Event 对象是否为特定事件类型注册了任何侦听器.
@@ -14698,7 +14708,7 @@ var feng3d;
          * @return 			如果指定类型的侦听器已注册，则值为 true；否则，值为 false。
          */
         EventDispatcher.prototype.has = function (type) {
-            return feng3d.fevent.has(this, type);
+            return feng3d.event.has(this, type);
         };
         /**
          * 添加监听
@@ -14709,7 +14719,7 @@ var feng3d;
         EventDispatcher.prototype.on = function (type, listener, thisObject, priority, once) {
             if (priority === void 0) { priority = 0; }
             if (once === void 0) { once = false; }
-            feng3d.fevent.on(this, type, listener, thisObject, priority, once);
+            feng3d.event.on(this, type, listener, thisObject, priority, once);
         };
         /**
          * 移除监听
@@ -14718,31 +14728,51 @@ var feng3d;
          * @param listener					要删除的侦听器对象。
          */
         EventDispatcher.prototype.off = function (type, listener, thisObject) {
-            feng3d.fevent.off(this, type, listener, thisObject);
+            feng3d.event.off(this, type, listener, thisObject);
+        };
+        /**
+         * 监听对象的所有事件
+         * @param obj 被监听对象
+         * @param listener 回调函数
+         * @param thisObject 回调函数 this 指针
+         * @param priority 优先级
+         */
+        EventDispatcher.prototype.onAll = function (listener, thisObject, priority) {
+            if (priority === void 0) { priority = 0; }
+            feng3d.event.onAll(this, listener, thisObject, priority);
+        };
+        /**
+         * 移除监听对象的所有事件
+         * @param obj 被监听对象
+         * @param listener 回调函数
+         * @param thisObject 回调函数 this 指针
+         */
+        EventDispatcher.prototype.offAll = function (listener, thisObject) {
+            feng3d.event.offAll(this, listener, thisObject);
         };
         /**
          * 处理事件
          * @param e 事件
          */
         EventDispatcher.prototype.handleEvent = function (e) {
-            feng3d.fevent["handleEvent"](this, e);
+            feng3d.event["handleEvent"](this, e);
         };
         /**
          * 处理事件冒泡
          * @param e 事件
          */
         EventDispatcher.prototype.handelEventBubbles = function (e) {
-            feng3d.fevent["handelEventBubbles"](this, e);
+            feng3d.event["handelEventBubbles"](this, e);
         };
         return EventDispatcher;
     }());
     feng3d.EventDispatcher = EventDispatcher;
+    feng3d.dispatcher = new EventDispatcher();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
     /**
      * 代理 EventTarget, 处理js事件中this关键字问题
-
      */
     var EventProxy = /** @class */ (function (_super) {
         __extends(EventProxy, _super);
@@ -14907,25 +14937,143 @@ var feng3d;
         return WindowEventProxy;
     }(feng3d.EventProxy));
     feng3d.WindowEventProxy = WindowEventProxy;
-    if (typeof global != "undefined")
-        feng3d.windowEventProxy = new WindowEventProxy(global);
-    else
+    if (typeof window != "undefined")
         feng3d.windowEventProxy = new WindowEventProxy(window);
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
     /**
-     * 全局事件
+     * 用于临时存放函数执行结果，获取结果后会自动清除
      */
-    var Feng3dDispatcher = /** @class */ (function (_super) {
-        __extends(Feng3dDispatcher, _super);
-        function Feng3dDispatcher() {
-            return _super !== null && _super.apply(this, arguments) || this;
+    var tempResutProperty = "__result__";
+    /**
+     * 任务
+     *
+     * 处理 异步任务(函数)串联并联执行功能
+     */
+    var Task = /** @class */ (function () {
+        function Task() {
         }
-        return Feng3dDispatcher;
-    }(feng3d.EventDispatcher));
-    feng3d.Feng3dDispatcher = Feng3dDispatcher;
-    feng3d.feng3dDispatcher = new Feng3dDispatcher();
+        /**
+         * 并联多个异步函数为一个函数
+         *
+         * 这些异步函数同时执行
+         *
+         * @param fns 一组异步函数
+         */
+        Task.prototype.parallel = function (fns) {
+            var result = function (callback) {
+                if (fns.length == 0) {
+                    callback();
+                    return;
+                }
+                var index = 0;
+                fns.forEach(function (fn) {
+                    var callbackNum = 0;
+                    fn(function () {
+                        callbackNum++;
+                        if (callbackNum == 1) {
+                            index++;
+                            if (index == fns.length) {
+                                callback();
+                            }
+                        }
+                        else {
+                            console.warn((fn.name ? "函数" + fn.name : "匿名函数") + " \u591A\u6B21\u8C03\u7528\u56DE\u8C03\u51FD\u6570\uFF0C\u5F53\u524D\u6B21\u6570 " + callbackNum);
+                        }
+                    });
+                });
+            };
+            return result;
+        };
+        /**
+         * 串联多个异步函数为一个函数
+         *
+         * 这些异步函数按顺序依次执行，等待前一个异步函数执行完调用回调后才执行下一个异步函数。
+         *
+         * @param fns 一组异步函数
+         */
+        Task.prototype.series = function (fns) {
+            var result = function (callback) {
+                if (fns.length == 0) {
+                    callback();
+                    return;
+                }
+                var index = 0;
+                var next = function () {
+                    var fn = fns[index];
+                    var callbackNum = 0;
+                    fn(function () {
+                        callbackNum++;
+                        if (callbackNum == 1) {
+                            index++;
+                            if (index < fns.length) {
+                                next();
+                            }
+                            else {
+                                callback && callback();
+                            }
+                        }
+                        else {
+                            console.warn((fn.name ? "函数" + fn.name : "匿名函数") + " \u591A\u6B21\u8C03\u7528\u56DE\u8C03\u51FD\u6570\uFF0C\u5F53\u524D\u6B21\u6570 " + callbackNum);
+                        }
+                    });
+                };
+                next();
+            };
+            return result;
+        };
+        /**
+         * 创建一组并行同类任务，例如同时加载一组资源，并在回调中返回结果数组
+         *
+         * @param ps 一组参数
+         * @param fn 单一任务函数
+         * @param done 完成回调
+         */
+        Task.prototype.parallelResults = function (ps, fn, done) {
+            // 包装函数
+            var fns = ps.map(function (p) { return function (callback) {
+                fn(p, function (r) {
+                    p[tempResutProperty] = r;
+                    callback();
+                });
+            }; });
+            this.parallel(fns)(function () {
+                var results = ps.map(function (p) {
+                    var r = p[tempResutProperty];
+                    delete p[tempResutProperty];
+                    return r;
+                });
+                done(results);
+            });
+        };
+        /**
+         * 创建一组串联同类任务，例如排序加载一组资源
+         *
+         * @param ps 一组参数
+         * @param fn 单一任务函数
+         * @param done 完成回调
+         */
+        Task.prototype.seriesResults = function (ps, fn, done) {
+            // 包装函数
+            var fns = ps.map(function (p) { return function (callback) {
+                fn(p, function (r) {
+                    p[tempResutProperty] = r;
+                    callback();
+                });
+            }; });
+            this.series(fns)(function () {
+                var results = ps.map(function (p) {
+                    var r = p[tempResutProperty];
+                    delete p[tempResutProperty];
+                    return r;
+                });
+                done(results);
+            });
+        };
+        return Task;
+    }());
+    feng3d.task = new Task();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -14958,12 +15106,47 @@ var feng3d;
         function AssetData() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(AssetData.prototype, "name", {
+            /**
+             * 资源名称
+             */
+            get: function () {
+                if (!this._name) {
+                    var asset = feng3d.rs.getAsset(this.assetId);
+                    if (asset)
+                        return asset.fileName;
+                }
+                return this._name;
+            },
+            set: function (v) { this._name = v; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(AssetData.prototype, "assetId", {
+            /**
+             * 资源编号
+             */
+            get: function () {
+                return this._assetId;
+            },
+            set: function (v) {
+                if (this._assetId == v)
+                    return;
+                if (this._assetId != undefined) {
+                    feng3d.debuger && console.error("\u4E0D\u5141\u8BB8\u4FEE\u6539 assetId");
+                    return;
+                }
+                this._assetId = v;
+            },
+            enumerable: true,
+            configurable: true
+        });
         __decorate([
             feng3d.serialize
-        ], AssetData.prototype, "name", void 0);
+        ], AssetData.prototype, "name", null);
         __decorate([
             feng3d.serialize
-        ], AssetData.prototype, "assetId", void 0);
+        ], AssetData.prototype, "assetId", null);
         return AssetData;
     }(feng3d.Feng3dObject));
     feng3d.AssetData = AssetData;
@@ -15407,7 +15590,7 @@ var feng3d;
                 this._dbStatus[dbname] = { status: DBStatus.unOpen, onsuccessCallbacks: [], onupgradeneededCallbacks: [] };
             this._dbStatus[dbname].onsuccessCallbacks.push(callback);
             if (upgrade) {
-                feng3d.assert(!!onupgrade);
+                feng3d.debuger && console.assert(!!onupgrade);
                 this._dbStatus[dbname].onupgradeneededCallbacks.push(onupgrade);
             }
             if (this._dbStatus[dbname].status == DBStatus.opening || this._dbStatus[dbname].status == DBStatus.upgrading)
@@ -15701,7 +15884,30 @@ var feng3d;
      */
     var ReadFS = /** @class */ (function () {
         function ReadFS() {
+            this._images = {};
         }
+        /**
+         * 读取文件列表为字符串列表
+         *
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        ReadFS.prototype.readStrings = function (paths, callback) {
+            var _this = this;
+            feng3d.task.parallelResults(paths, function (path, callback) {
+                _this.readString(path, function (err, str) {
+                    callback(err || str);
+                });
+            }, callback);
+        };
+        /**
+         * 获取已经加载的图片，如果未加载则返回null
+         *
+         * @param path 图片路径
+         */
+        ReadFS.prototype.getImage = function (path) {
+            return this._images[path];
+        };
         return ReadFS;
     }());
     feng3d.ReadFS = ReadFS;
@@ -15730,7 +15936,6 @@ var feng3d;
          */
         ReadWriteFS.prototype.getAllfilepathInFolder = function (dirpath, callback) {
             var _this = this;
-            feng3d.assert(this.isDir(dirpath), "\u6587\u4EF6\u5939\u8DEF\u5F84\u5FC5\u987B\u4EE5 / \u7ED3\u5C3E\uFF01");
             var dirs = [dirpath];
             var result = [];
             var currentdir = "";
@@ -15739,13 +15944,21 @@ var feng3d;
                 if (dirs.length > 0) {
                     currentdir = dirs.shift();
                     _this.readdir(currentdir, function (err, files) {
-                        files.forEach(function (element) {
-                            var childpath = currentdir + element;
+                        // 获取子文件路径
+                        var getChildPath = function () {
+                            if (files.length == 0) {
+                                handle();
+                                return;
+                            }
+                            var childpath = currentdir + (currentdir == "" ? "" : "/") + files.shift();
                             result.push(childpath);
-                            if (_this.isDir(childpath))
-                                dirs.push(childpath);
-                        });
-                        handle();
+                            _this.isDirectory(childpath, function (result) {
+                                if (result)
+                                    dirs.push(childpath);
+                                getChildPath();
+                            });
+                        };
+                        getChildPath();
                     });
                 }
                 else {
@@ -15842,22 +16055,24 @@ var feng3d;
          */
         ReadWriteFS.prototype.rename = function (oldPath, newPath, callback) {
             var _this = this;
-            if (this.isDir(oldPath)) {
-                this.getAllfilepathInFolder(oldPath, function (err, filepaths) {
-                    if (err) {
-                        callback && callback(err);
-                        return;
-                    }
-                    var renamelists = [[oldPath, newPath]];
-                    filepaths.forEach(function (element) {
-                        renamelists.push([element, element.replace(oldPath, newPath)]);
+            this.isDirectory(oldPath, function (result) {
+                if (result) {
+                    _this.getAllfilepathInFolder(oldPath, function (err, filepaths) {
+                        if (err) {
+                            callback && callback(err);
+                            return;
+                        }
+                        var renamelists = [[oldPath, newPath]];
+                        filepaths.forEach(function (element) {
+                            renamelists.push([element, element.replace(oldPath, newPath)]);
+                        });
+                        _this.moveFiles(renamelists, callback);
                     });
-                    _this.moveFiles(renamelists, callback);
-                });
-            }
-            else {
-                this.renameFile(oldPath, newPath, callback);
-            }
+                }
+                else {
+                    _this.renameFile(oldPath, newPath, callback);
+                }
+            });
         };
         /**
          * 移动文件(夹)
@@ -15876,28 +16091,21 @@ var feng3d;
          */
         ReadWriteFS.prototype.delete = function (path, callback) {
             var _this = this;
-            if (this.isDir(path)) {
-                this.getAllfilepathInFolder(path, function (err, filepaths) {
-                    if (err) {
-                        callback && callback(err);
-                        return;
-                    }
-                    var removelists = filepaths.concat(path);
-                    _this.deleteFiles(removelists, callback);
-                });
-            }
-            else {
-                this.deleteFile(path, callback);
-            }
-        };
-        /**
-         * 是否为文件夹
-         * @param path 文件路径
-         */
-        ReadWriteFS.prototype.isDir = function (path) {
-            if (path == "")
-                return true;
-            return path.charAt(path.length - 1) == "/";
+            this.isDirectory(path, function (result) {
+                if (result) {
+                    _this.getAllfilepathInFolder(path, function (err, filepaths) {
+                        if (err) {
+                            callback && callback(err);
+                            return;
+                        }
+                        var removelists = filepaths.concat(path);
+                        _this.deleteFiles(removelists, callback);
+                    });
+                }
+                else {
+                    _this.deleteFile(path, callback);
+                }
+            });
         };
         return ReadWriteFS;
     }(feng3d.ReadFS));
@@ -15905,6 +16113,10 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
+    /**
+     * 用于是否为文件夹
+     */
+    var directorytoken = "!!!___directory___!!!";
     /**
      * 索引数据文件系统
      */
@@ -15940,7 +16152,7 @@ var feng3d;
                     callback(null, data);
                 }
                 else if (data instanceof Object) {
-                    var str = JSON.stringify(data);
+                    var str = JSON.stringify(data, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
                     var arraybuffer = feng3d.dataTransform.stringToArrayBuffer(str);
                     callback(null, arraybuffer);
                 }
@@ -15967,7 +16179,7 @@ var feng3d;
                     });
                 }
                 else if (data instanceof Object) {
-                    var str = JSON.stringify(data);
+                    var str = JSON.stringify(data, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
                     callback(null, str);
                 }
                 else {
@@ -15989,18 +16201,16 @@ var feng3d;
                 if (data instanceof ArrayBuffer) {
                     feng3d.dataTransform.arrayBufferToString(data, function (str) {
                         var obj = JSON.parse(str);
-                        var object = feng3d.serialization.deserialize(obj);
-                        callback(null, object);
+                        callback(null, obj);
                     });
                 }
                 else if (data instanceof Object) {
-                    var object = feng3d.serialization.deserialize(data);
-                    callback(null, object);
+                    callback(null, data);
                 }
                 else {
+                    feng3d.debuger && console.assert(typeof data == "string");
                     var obj = JSON.parse(data);
-                    var object = feng3d.serialization.deserialize(obj);
-                    callback(null, object);
+                    callback(null, obj);
                 }
             });
         };
@@ -16010,12 +16220,16 @@ var feng3d;
          * @param callback 加载完成回调
          */
         IndexedDBFS.prototype.readImage = function (path, callback) {
+            var _this = this;
+            if (this._images[path])
+                return this._images[path];
             this.readArrayBuffer(path, function (err, data) {
                 if (err) {
                     callback(err, null);
                     return;
                 }
                 feng3d.dataTransform.arrayBufferToImage(data, function (img) {
+                    _this._images[path] = img;
                     callback(null, img);
                 });
             });
@@ -16025,8 +16239,19 @@ var feng3d;
          * @param path （相对）路径
          * @param callback 回调函数
          */
-        IndexedDBFS.prototype.getAbsolutePath = function (path, callback) {
-            callback(null, path);
+        IndexedDBFS.prototype.getAbsolutePath = function (path) {
+            return path;
+        };
+        /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        IndexedDBFS.prototype.isDirectory = function (path, callback) {
+            this.readString(path, function (err, data) {
+                callback(data == directorytoken);
+            });
         };
         /**
          * 文件是否存在
@@ -16051,12 +16276,11 @@ var feng3d;
                 }
                 var subfilemap = {};
                 allfilepaths.forEach(function (element) {
-                    if (element.substr(0, path.length) == path && element != path) {
-                        var result = element.substr(path.length);
-                        var index = result.indexOf("/");
-                        if (index != -1)
-                            result = result.substring(0, index + 1);
-                        subfilemap[result] = 1;
+                    var dirp = path == "" ? path : (path + "/");
+                    if (element.substr(0, dirp.length) == dirp && element != path) {
+                        var result = element.substr(dirp.length);
+                        var subfile = result.split("/").shift();
+                        subfilemap[subfile] = 1;
                     }
                 });
                 var files = Object.keys(subfilemap);
@@ -16075,7 +16299,7 @@ var feng3d;
                     callback(new Error("\u6587\u4EF6\u5939" + path + "\u5DF2\u5B58\u5728\u65E0\u6CD5\u65B0\u5EFA"));
                     return;
                 }
-                feng3d._indexedDB.objectStorePut(_this.DBname, _this.projectname, path, "", callback);
+                feng3d._indexedDB.objectStorePut(_this.DBname, _this.projectname, path, directorytoken, callback);
             });
         };
         /**
@@ -16086,6 +16310,7 @@ var feng3d;
         IndexedDBFS.prototype.deleteFile = function (path, callback) {
             // 删除文件
             feng3d._indexedDB.objectStoreDelete(this.DBname, this.projectname, path, callback);
+            feng3d.dispatcher.dispatch("fs.delete", path);
         };
         /**
          * 写文件
@@ -16095,6 +16320,7 @@ var feng3d;
          */
         IndexedDBFS.prototype.writeArrayBuffer = function (path, data, callback) {
             feng3d._indexedDB.objectStorePut(this.DBname, this.projectname, path, data, callback);
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 写文件
@@ -16104,16 +16330,17 @@ var feng3d;
          */
         IndexedDBFS.prototype.writeString = function (path, data, callback) {
             feng3d._indexedDB.objectStorePut(this.DBname, this.projectname, path, data, callback);
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 写文件
          * @param path 文件路径
-         * @param data 文件数据
+         * @param object 文件数据
          * @param callback 回调函数
          */
-        IndexedDBFS.prototype.writeObject = function (path, data, callback) {
-            var obj = feng3d.serialization.serialize(data);
-            feng3d._indexedDB.objectStorePut(this.DBname, this.projectname, path, obj, callback);
+        IndexedDBFS.prototype.writeObject = function (path, object, callback) {
+            feng3d._indexedDB.objectStorePut(this.DBname, this.projectname, path, object, callback);
+            feng3d.dispatcher.dispatch("fs.write", path);
         };
         /**
          * 写图片
@@ -16125,6 +16352,7 @@ var feng3d;
             var _this = this;
             feng3d.dataTransform.imageToArrayBuffer(image, function (arraybuffer) {
                 _this.writeArrayBuffer(path, arraybuffer, callback);
+                feng3d.dispatcher.dispatch("fs.write", path);
             });
         };
         /**
@@ -16156,6 +16384,29 @@ var feng3d;
                 callback(err, allPaths);
             });
         };
+        /**
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        IndexedDBFS.prototype.hasProject = function (projectname, callback) {
+            feng3d._indexedDB.getObjectStoreNames(this.DBname, function (err, objectStoreNames) {
+                if (err) {
+                    callback(false);
+                    return;
+                }
+                callback(objectStoreNames.indexOf(projectname) != -1);
+            });
+        };
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        IndexedDBFS.prototype.initproject = function (projectname, callback) {
+            this.projectname = projectname;
+            feng3d._indexedDB.createObjectStore(this.DBname, projectname, callback);
+        };
         return IndexedDBFS;
     }(feng3d.ReadWriteFS));
     feng3d.IndexedDBFS = IndexedDBFS;
@@ -16177,7 +16428,9 @@ var feng3d;
             _this.rootPath = "";
             _this.rootPath = rootPath;
             if (_this.rootPath == "") {
-                _this.rootPath = document.URL.substring(0, document.URL.lastIndexOf("/") + 1);
+                if (typeof document != "undefined") {
+                    _this.rootPath = document.URL.substring(0, document.URL.lastIndexOf("/") + 1);
+                }
             }
             return _this;
         }
@@ -16195,7 +16448,7 @@ var feng3d;
          */
         HttpFS.prototype.readArrayBuffer = function (path, callback) {
             // rootPath
-            feng3d.loader.loadBinary(this._getAbsolutePath(path), function (content) {
+            feng3d.loader.loadBinary(this.getAbsolutePath(path), function (content) {
                 callback(null, content);
             }, null, function (e) {
                 callback(e, null);
@@ -16207,7 +16460,7 @@ var feng3d;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         HttpFS.prototype.readString = function (path, callback) {
-            feng3d.loader.loadText(this._getAbsolutePath(path), function (content) {
+            feng3d.loader.loadText(this.getAbsolutePath(path), function (content) {
                 callback(null, content);
             }, null, function (e) {
                 callback(e, null);
@@ -16219,10 +16472,9 @@ var feng3d;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         HttpFS.prototype.readObject = function (path, callback) {
-            feng3d.loader.loadText(this._getAbsolutePath(path), function (content) {
+            feng3d.loader.loadText(this.getAbsolutePath(path), function (content) {
                 var obj = JSON.parse(content);
-                var object = feng3d.serialization.deserialize(obj);
-                callback(null, object);
+                callback(null, obj);
             }, null, function (e) {
                 callback(e, null);
             });
@@ -16233,24 +16485,25 @@ var feng3d;
          * @param callback 加载完成回调
          */
         HttpFS.prototype.readImage = function (path, callback) {
+            var _this = this;
+            if (this._images[path])
+                return this._images[path];
             var img = new Image();
             img.onload = function () {
+                _this._images[path] = img;
                 callback(null, img);
             };
             img.onerror = function (evt) {
                 callback(new Error("\u52A0\u8F7D\u56FE\u7247" + path + "\u5931\u8D25"), null);
             };
-            img.src = this._getAbsolutePath(path);
+            img.src = this.getAbsolutePath(path);
         };
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
          * @param callback 回调函数
          */
-        HttpFS.prototype.getAbsolutePath = function (path, callback) {
-            callback(null, this._getAbsolutePath(path));
-        };
-        HttpFS.prototype._getAbsolutePath = function (path) {
+        HttpFS.prototype.getAbsolutePath = function (path) {
             return this.rootPath + path;
         };
         return HttpFS;
@@ -16355,19 +16608,38 @@ var feng3d;
      */
     var FileAsset = /** @class */ (function () {
         function FileAsset() {
-            this._name = "";
+            /**
+             * 是否已加载
+             */
+            this.isLoaded = false;
+            /**
+             * 是否正在加载中
+             */
+            this.isLoading = false;
+        }
+        Object.defineProperty(FileAsset.prototype, "extenson", {
             /**
              * 文件后缀
              */
-            this.extenson = "";
-        }
-        Object.defineProperty(FileAsset.prototype, "name", {
+            get: function () {
+                feng3d.debuger && console.assert(!!this.assetPath);
+                var ext = feng3d.pathUtils.getExtension(this.assetPath);
+                return ext;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(FileAsset.prototype, "fileName", {
             /**
-             * 名称
+             * 文件名称
+             *
+             * 不包含后缀
              */
-            get: function () { return this._name; },
-            set: function (v) { this._name = v; if (this.data)
-                this.data.name = v; },
+            get: function () {
+                feng3d.debuger && console.assert(!!this.assetPath);
+                var fn = feng3d.pathUtils.getName(this.assetPath);
+                return fn;
+            },
             enumerable: true,
             configurable: true
         });
@@ -16377,7 +16649,25 @@ var feng3d;
          * @param callback 完成回调
          */
         FileAsset.prototype.read = function (callback) {
-            this.rs.readAsset(this.assetId, callback);
+            var _this = this;
+            if (this.isLoaded) {
+                callback();
+                return;
+            }
+            var eventtype = "loaded";
+            feng3d.event.once(this, eventtype, function () { callback(); });
+            if (this.isLoading)
+                return;
+            this.isLoading = true;
+            this.readMeta(function (err) {
+                if (err) {
+                    feng3d.event.dispatch(_this, eventtype);
+                    return;
+                }
+                _this.readFile(function (err) {
+                    feng3d.event.dispatch(_this, eventtype);
+                });
+            });
         };
         /**
          * 写入资源
@@ -16385,7 +16675,17 @@ var feng3d;
          * @param callback 完成回调
          */
         FileAsset.prototype.write = function (callback) {
-            this.rs.writeAsset(this, callback);
+            var _this = this;
+            this.meta.mtimeMs = Date.now();
+            this.writeMeta(function (err) {
+                if (err) {
+                    callback && callback(err);
+                    return;
+                }
+                _this.saveFile(function (err) {
+                    callback && callback(err);
+                });
+            });
         };
         /**
          * 删除资源
@@ -16393,7 +16693,25 @@ var feng3d;
          * @param callback 完成回调
          */
         FileAsset.prototype.delete = function (callback) {
-            this.rs.deleteAsset(this, callback);
+            var _this = this;
+            // 删除 meta 文件
+            this.deleteMeta(function (err) {
+                if (err) {
+                    callback && callback(err);
+                    return;
+                }
+                _this.deleteFile(function (err) {
+                    // 删除父子资源关系
+                    if (_this.parentAsset) {
+                        _this.parentAsset.childrenAssets.delete(_this);
+                        _this.parentAsset = null;
+                    }
+                    // 删除映射
+                    delete _this.rs.idMap[_this.assetId];
+                    delete _this.rs.pathMap[_this.assetPath];
+                    callback && callback();
+                });
+            });
         };
         /**
          * 读取资源缩略图标
@@ -16500,12 +16818,8 @@ var feng3d;
             feng3d.serialize
         ], FileAsset.prototype, "assetId", void 0);
         __decorate([
-            feng3d.oav(),
             feng3d.serialize
-        ], FileAsset.prototype, "name", null);
-        __decorate([
-            feng3d.serialize
-        ], FileAsset.prototype, "extenson", void 0);
+        ], FileAsset.prototype, "assetPath", void 0);
         return FileAsset;
     }());
     feng3d.FileAsset = FileAsset;
@@ -16534,6 +16848,8 @@ var feng3d;
              * 资源树保存路径
              */
             this.resources = "resource.json";
+            this._status = { isiniting: false, isinit: false };
+            this._assetStatus = {};
             this._fs = fs;
         }
         Object.defineProperty(ReadRS.prototype, "fs", {
@@ -16559,8 +16875,18 @@ var feng3d;
          */
         ReadRS.prototype.init = function (callback) {
             var _this = this;
-            this.fs.readObject(this.resources, function (err, data) {
-                if (data) {
+            if (this._status.isinit) {
+                callback && callback();
+                return;
+            }
+            var eventtype = "init";
+            feng3d.event.once(this, eventtype, function () { callback && callback(); });
+            if (this._status.isiniting)
+                return;
+            this._status.isiniting = true;
+            this.fs.readObject(this.resources, function (err, object) {
+                if (object) {
+                    var data = feng3d.serialization.deserialize(object);
                     _this._root = data;
                     //
                     var assets = [data];
@@ -16569,11 +16895,6 @@ var feng3d;
                         var asset = assets[index];
                         // 设置资源系统
                         asset.rs = _this;
-                        // 计算路径
-                        var path = asset.name + asset.extenson;
-                        if (asset.parentAsset)
-                            path = asset.parentAsset.assetPath + "/" + path;
-                        asset.assetPath = path;
                         // 新增映射
                         _this.idMap[asset.assetId] = asset;
                         _this.pathMap[asset.assetPath] = asset;
@@ -16589,12 +16910,12 @@ var feng3d;
                         }
                         index++;
                     }
-                    callback && callback();
+                    feng3d.event.dispatch(_this, eventtype);
                 }
                 else {
-                    _this.createAsset(feng3d.FolderAsset, { name: "Assets" }, null, function (err, asset) {
+                    _this.createAsset(feng3d.FolderAsset, "Assets", null, null, function (err, asset) {
                         _this._root = asset;
-                        callback && callback();
+                        feng3d.event.dispatch(_this, eventtype);
                     });
                 }
             });
@@ -16603,11 +16924,12 @@ var feng3d;
          * 新建资源
          *
          * @param cls 资源类定义
+         * @param fileName 文件名称
          * @param value 初始数据
          * @param parent 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        ReadRS.prototype.createAsset = function (cls, value, parent, callback) {
+        ReadRS.prototype.createAsset = function (cls, fileName, value, parent, callback) {
             parent = parent || this._root;
             //
             var asset = new cls();
@@ -16615,39 +16937,49 @@ var feng3d;
             // 初始化
             asset.rs = this;
             asset.assetId = assetId;
+            asset.createData();
             asset.meta = { guid: assetId, mtimeMs: Date.now(), birthtimeMs: Date.now(), assetType: asset.assetType };
-            Object.setValue(asset, value);
+            feng3d.serialization.setValue(asset, value);
+            //
+            var extenson = feng3d.pathUtils.getExtension(fileName);
+            fileName = feng3d.pathUtils.getName(fileName);
             // 设置默认名称
-            asset.name = asset.name || "new " + asset.assetType;
+            fileName = fileName || "new " + asset.assetType;
             if (parent) {
                 // 计算有效名称
-                asset.name = this.getValidChildName(parent, asset.name);
+                fileName = this.getValidChildName(parent, fileName);
                 // 处理资源父子关系
                 parent.childrenAssets.push(asset);
                 asset.parentAsset = parent;
             }
             // 计算路径
-            var path = asset.name + asset.extenson;
+            if (extenson == "")
+                extenson = cls["extenson"];
+            feng3d.debuger && console.assert(extenson != undefined, "\u5BF9\u8C61 " + cls + " \u6CA1\u6709\u8BBE\u7F6E extenson \u503C\uFF0C\u53C2\u8003 FolderAsset.extenson");
+            var path = fileName + extenson;
             if (asset.parentAsset)
                 path = asset.parentAsset.assetPath + "/" + path;
             asset.assetPath = path;
             // 新增映射
             this.idMap[asset.assetId] = asset;
             this.pathMap[asset.assetPath] = asset;
-            callback && callback(null, asset);
+            //
+            asset.write(function (err) {
+                callback && callback(null, asset);
+            });
         };
         /**
          * 获取有效子文件名称
          *
          * @param parent 父文件夹
-         * @param name 名称
+         * @param fileName 文件名称
          */
-        ReadRS.prototype.getValidChildName = function (parent, name) {
-            var childrenNames = parent.childrenAssets.map(function (v) { return v.name; });
-            var newName = name;
+        ReadRS.prototype.getValidChildName = function (parent, fileName) {
+            var childrenNames = parent.childrenAssets.map(function (v) { return v.fileName; });
+            var newName = fileName;
             var index = 1;
             while (childrenNames.indexOf(newName) != -1) {
-                newName = name + index;
+                newName = fileName + index;
                 index++;
             }
             return newName;
@@ -16663,18 +16995,8 @@ var feng3d;
                 callback(new Error("\u4E0D\u5B58\u5728\u8D44\u6E90 " + id), asset);
                 return;
             }
-            if (asset.meta) {
-                callback(null, asset);
-                return;
-            }
-            asset.readMeta(function (err) {
-                if (err) {
-                    callback(err, asset);
-                    return;
-                }
-                asset.readFile(function (err) {
-                    callback(err, asset);
-                });
+            asset.read(function (err) {
+                callback(err, asset);
             });
         };
         /**
@@ -16690,6 +17012,25 @@ var feng3d;
             }
             this.readAsset(id, function (err, asset) {
                 callback(err, asset && asset.data);
+            });
+        };
+        /**
+         * 读取资源数据列表
+         *
+         * @param assetids 资源编号列表
+         * @param callback 完成回调
+         */
+        ReadRS.prototype.readAssetDatas = function (assetids, callback) {
+            var result = [];
+            var fns = assetids.map(function (v) { return function (callback) {
+                feng3d.rs.readAssetData(v, function (err, data) {
+                    result.push(data);
+                    callback();
+                });
+            }; });
+            feng3d.task.parallel(fns)(function () {
+                feng3d.debuger && console.assert(assetids.length == result.filter(function (v) { return v != null; }).length);
+                callback(null, result);
             });
         };
         /**
@@ -16736,7 +17077,7 @@ var feng3d;
          * @param assetId 资源编号
          */
         ReadRS.prototype.getAssetData = function (assetId) {
-            return defaultAssets[assetId] || this.idMap[assetId].data;
+            return defaultAssets[assetId] || (this.idMap[assetId] && this.idMap[assetId].data);
         };
         /**
          * 获取所有资源
@@ -16745,6 +17086,77 @@ var feng3d;
             var _this = this;
             var assets = Object.keys(this.idMap).map(function (v) { return _this.idMap[v]; });
             return assets;
+        };
+        /**
+         * 获取需要反序列化对象中的资源id列表
+         */
+        ReadRS.prototype.getAssets = function (object, assetids) {
+            var _this = this;
+            if (assetids === void 0) { assetids = []; }
+            //基础类型
+            if (Object.isBaseType(object))
+                return assetids;
+            //处理数组
+            if (object instanceof Array) {
+                object.forEach(function (v) { return _this.getAssets(v, assetids); });
+                return assetids;
+            }
+            // 获取类型
+            var className = object[feng3d.CLASS_KEY];
+            // 处理普通Object
+            if (className == "Object" || className == null) {
+                for (var key in object) {
+                    if (key != feng3d.CLASS_KEY)
+                        this.getAssets(object[key], assetids);
+                }
+                return assetids;
+            }
+            //处理方法
+            if (className == "function")
+                return assetids;
+            var cls = feng3d.classUtils.getDefinitionByName(className);
+            if (!cls) {
+                console.warn("\u65E0\u6CD5\u5E8F\u5217\u53F7\u5BF9\u8C61 " + className);
+                return assetids;
+            }
+            var target = new cls();
+            // 处理资源
+            if (target instanceof feng3d.AssetData && object.assetId != undefined) {
+                assetids.push(object.assetId);
+                return assetids;
+            }
+            return assetids;
+        };
+        /**
+         * 反序列化包含资源的对象
+         *
+         * @param object 反序列化的对象
+         * @param callback 完成回调
+         */
+        ReadRS.prototype.deserializeWithAssets = function (object, callback) {
+            //
+            var className = object[feng3d.CLASS_KEY];
+            var assetId = object.assetId;
+            feng3d.debuger && console.assert(className != undefined && assetId != undefined);
+            // 获取资源类定义
+            var cls = feng3d.classUtils.getDefinitionByName(className);
+            if (!cls) {
+                console.warn("\u65E0\u6CD5\u5E8F\u5217\u53F7\u5BF9\u8C61 " + className);
+                return;
+            }
+            // 创建资源数据实例
+            var assetData = new cls();
+            feng3d.debuger && console.assert(assetData instanceof feng3d.AssetData);
+            // 获取所包含的资源列表
+            var assetids = this.getAssets(object);
+            // 不需要加载本资源，移除自身资源
+            assetids.delete(assetId);
+            // 加载包含的资源数据
+            this.readAssetDatas(assetids, function (err, result) {
+                //默认反序列
+                feng3d.serialization.setValue(assetData, object);
+                callback(assetData);
+            });
         };
         return ReadRS;
     }());
@@ -16785,20 +17197,22 @@ var feng3d;
          * @param callback 完成回调
          */
         ReadWriteRS.prototype.save = function (callback) {
-            this.fs.writeObject(this.resources, this.root, callback);
+            var object = feng3d.serialization.serialize(this.root);
+            this.fs.writeObject(this.resources, object, callback);
         };
         /**
          * 新建资源
          *
          * @param cls 资源类定义
+         * @param fileName 文件名称
          * @param value 初始数据
          * @param parent 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        ReadWriteRS.prototype.createAsset = function (cls, value, parent, callback) {
+        ReadWriteRS.prototype.createAsset = function (cls, fileName, value, parent, callback) {
             var _this = this;
             // 新建资源
-            _super.prototype.createAsset.call(this, cls, value, parent, function (err, asset) {
+            _super.prototype.createAsset.call(this, cls, fileName, value, parent, function (err, asset) {
                 if (asset) {
                     // 保存资源
                     _this.writeAsset(asset, function (err) {
@@ -16819,16 +17233,7 @@ var feng3d;
          * @param callback 完成回调
          */
         ReadWriteRS.prototype.writeAsset = function (asset, callback) {
-            asset.meta.mtimeMs = Date.now();
-            asset.writeMeta(function (err) {
-                if (err) {
-                    callback && callback(err);
-                    return;
-                }
-                asset.saveFile(function (err) {
-                    callback && callback(err);
-                });
-            });
+            asset.write(callback);
         };
         /**
          * 移动资源到指定文件夹
@@ -16839,8 +17244,8 @@ var feng3d;
          */
         ReadWriteRS.prototype.moveAsset = function (asset, folder, callback) {
             var _this = this;
-            var filename = asset.name + asset.extenson;
-            var cnames = folder.childrenAssets.map(function (v) { return v.name + v.extenson; });
+            var filename = asset.fileName + asset.extenson;
+            var cnames = folder.childrenAssets.map(function (v) { return v.fileName + v.extenson; });
             if (cnames.indexOf(filename) != -1) {
                 callback && callback(new Error("\u76EE\u6807\u6587\u4EF6\u5939\u4E2D\u5B58\u5728\u540C\u540D\u6587\u4EF6\uFF08\u5939\uFF09\uFF0C\u65E0\u6CD5\u79FB\u52A8"));
                 return;
@@ -16900,10 +17305,10 @@ var feng3d;
                         // 修复删除资源时破坏的父资源引用
                         la.parentAsset = pla;
                         // 计算资源新路径
-                        var np = la.name + la.extenson;
+                        var np = la.fileName + la.extenson;
                         var p = la.parentAsset;
                         while (p) {
-                            np = p.name + "/" + np;
+                            np = p.fileName + "/" + np;
                             p = p.parentAsset;
                         }
                         la.assetPath = np;
@@ -16950,25 +17355,7 @@ var feng3d;
                     return;
                 }
                 var la = assets.pop();
-                // 删除 meta 文件
-                la.deleteMeta(function (err) {
-                    if (err) {
-                        callback && callback(err);
-                        return;
-                    }
-                    la.deleteFile(function (err) {
-                        // 删除父子资源关系
-                        if (la.parentAsset) {
-                            var index = la.parentAsset.childrenAssets.indexOf(la);
-                            la.parentAsset.childrenAssets.splice(index, 1);
-                            la.parentAsset = null;
-                        }
-                        // 删除映射
-                        delete _this.idMap[la.assetId];
-                        delete _this.pathMap[la.assetPath];
-                        deleteLastAsset();
-                    });
-                });
+                la.delete(deleteLastAsset);
             };
             deleteLastAsset();
         };
@@ -17019,7 +17406,7 @@ var feng3d;
                         return Number(code_1);
                 }
             }
-            feng3d.error("\u65E0\u6CD5\u83B7\u53D6\u6309\u952E " + key + " \u7684\u503C\uFF01");
+            console.error("\u65E0\u6CD5\u83B7\u53D6\u6309\u952E " + key + " \u7684\u503C\uFF01");
             return code;
         };
         return KeyBoard;
@@ -17044,6 +17431,9 @@ var feng3d;
             this._mouseKeyDic = {};
             this._keyState = shortCut.keyState;
             //
+            if (!feng3d.windowEventProxy) {
+                return;
+            }
             feng3d.windowEventProxy.on("keydown", this.onKeydown, this);
             feng3d.windowEventProxy.on("keyup", this.onKeyup, this);
             //监听鼠标事件
@@ -17088,8 +17478,14 @@ var feng3d;
             if (!feng3d.shortcut.enable)
                 return;
             var boardKey = feng3d.KeyBoard.getKey(event.keyCode);
-            if (boardKey != null)
+            boardKey = boardKey || event.key;
+            if (boardKey) {
+                boardKey = boardKey.toLocaleLowerCase();
                 this._keyState.pressKey(boardKey, event);
+            }
+            else {
+                console.error("\u65E0\u6CD5\u8BC6\u522B\u6309\u94AE " + event.key);
+            }
         };
         /**
          * 键盘弹起事件
@@ -17098,8 +17494,14 @@ var feng3d;
             if (!feng3d.shortcut.enable)
                 return;
             var boardKey = feng3d.KeyBoard.getKey(event.keyCode);
-            if (boardKey)
+            boardKey = boardKey || event.key;
+            if (boardKey) {
+                boardKey = boardKey.toLocaleLowerCase();
                 this._keyState.releaseKey(boardKey, event);
+            }
+            else {
+                console.error("\u65E0\u6CD5\u8BC6\u522B\u6309\u94AE " + event.key);
+            }
         };
         return KeyCapture;
     }());
@@ -17541,7 +17943,7 @@ var feng3d;
                 onCompleted && onCompleted(image);
             };
             image.onerror = function (event) {
-                feng3d.debuger && feng3d.error("Error while trying to load texture: " + url);
+                feng3d.debuger && console.error("Error while trying to load texture: " + url);
                 //
                 image.src = "data:image/jpg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/4QBmRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAAQAAAATgAAAAAAAABgAAAAAQAAAGAAAAABcGFpbnQubmV0IDQuMC41AP/bAEMABAIDAwMCBAMDAwQEBAQFCQYFBQUFCwgIBgkNCw0NDQsMDA4QFBEODxMPDAwSGBITFRYXFxcOERkbGRYaFBYXFv/bAEMBBAQEBQUFCgYGChYPDA8WFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFv/AABEIAQABAAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APH6KKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FCiiigD6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++gooooA+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gUKKKKAPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76CiiigD5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BQooooA+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/voKKKKAPl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FCiiigD6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++gooooA+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gUKKKKAPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76CiiigD5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BQooooA+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/voKKKKAPl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FCiiigD6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++gooooA+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gUKKKKAPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76P//Z";
                 //
@@ -17562,6 +17964,7 @@ var feng3d;
     function xmlHttpRequestLoad(loadItem) {
         var request = new XMLHttpRequest();
         request.open('Get', loadItem.url, true);
+        request.setRequestHeader("Access-Control-Allow-Origin", "*");
         request.responseType = loadItem.dataFormat == feng3d.LoaderDataFormat.BINARY ? "arraybuffer" : "";
         request.onreadystatechange = onRequestReadystatechange(request, loadItem);
         request.onprogress = onRequestProgress(request, loadItem);
@@ -17589,6 +17992,7 @@ var feng3d;
                 else {
                     var err = new Error(loadItem.url + " 加载失败！");
                     loadItem.onError && loadItem.onError(err);
+                    loadItem.onCompleted && loadItem.onCompleted(null);
                 }
             }
         };
@@ -18267,7 +18671,7 @@ var feng3d;
      */
     var GLExtension = /** @class */ (function () {
         function GLExtension(gl) {
-            feng3d.assert(!gl.extensions, gl + " " + gl.extensions + " \u5B58\u5728\uFF01");
+            feng3d.debuger && console.assert(!gl.extensions, gl + " " + gl.extensions + " \u5B58\u5728\uFF01");
             gl.extensions = this;
             this.initExtensions(gl);
             this.cacheGLQuery(gl);
@@ -18410,7 +18814,7 @@ var feng3d;
             this.macroInvalid = true;
             this.map = new Map();
             this.shaderName = shaderName;
-            feng3d.feng3dDispatcher.on("asset.shaderChanged", this.onShaderChanged, this);
+            feng3d.dispatcher.on("asset.shaderChanged", this.onShaderChanged, this);
         }
         /**
          * 激活渲染程序
@@ -18425,7 +18829,7 @@ var feng3d;
                 this.map.set(gl, result);
             }
             catch (error) {
-                feng3d.error(this.shaderName + " \u7F16\u8BD1\u5931\u8D25\uFF01\n" + error);
+                console.error(this.shaderName + " \u7F16\u8BD1\u5931\u8D25\uFF01\n" + error);
                 return null;
             }
             return result;
@@ -18533,7 +18937,7 @@ var feng3d;
                 var name = activeInfo.name;
                 var names = [name];
                 if (activeInfo.size > 1) {
-                    feng3d.assert(name.substr(-3, 3) == "[0]");
+                    feng3d.debuger && console.assert(name.substr(-3, 3) == "[0]");
                     var baseName = name.substring(0, name.length - 3);
                     for (var j = 1; j < activeInfo.size; j++) {
                         names[j] = baseName + ("[" + j + "]");
@@ -18632,8 +19036,7 @@ var feng3d;
              * 是否使用 viewRect
              */
             this.useViewRect = false;
-            if (raw)
-                feng3d.serialization.setValue(this, raw);
+            Object.assign(this, raw);
         }
         __decorate([
             feng3d.serialize,
@@ -18676,10 +19079,12 @@ var feng3d;
             feng3d.oav({ tooltip: "是否开启深度标记" })
         ], RenderParams.prototype, "depthMask", void 0);
         __decorate([
-            feng3d.oav({ tooltip: "绘制在画布上的区域" })
+            feng3d.oav({ tooltip: "绘制在画布上的区域" }),
+            feng3d.serialize
         ], RenderParams.prototype, "viewRect", void 0);
         __decorate([
-            feng3d.oav({ tooltip: "是否使用 viewRect" })
+            feng3d.oav({ tooltip: "是否使用 viewRect" }),
+            feng3d.serialize
         ], RenderParams.prototype, "useViewRect", void 0);
         return RenderParams;
     }());
@@ -18689,7 +19094,6 @@ var feng3d;
 (function (feng3d) {
     /**
      * 渲染原子（该对象会收集一切渲染所需数据以及参数）
-
      */
     var RenderAtomic = /** @class */ (function () {
         function RenderAtomic() {
@@ -18708,106 +19112,55 @@ var feng3d;
             /**
              * 渲染参数
              */
-            this.renderParams = new feng3d.RenderParams();
+            this.renderParams = {};
         }
         RenderAtomic.prototype.getIndexBuffer = function () {
-            var node = this;
-            while (node) {
-                if (node.indexBuffer != undefined) {
-                    return node.indexBuffer;
-                }
-                node = node.next;
-            }
-            return undefined;
+            if (this.indexBuffer != undefined)
+                return this.indexBuffer;
+            return (this.next && this.next.getIndexBuffer());
         };
         RenderAtomic.prototype.getAttributes = function (attributes) {
             if (attributes === void 0) { attributes = {}; }
-            var node = this;
-            while (node) {
-                for (var name_1 in node.attributes) {
-                    if (!attributes.hasOwnProperty(name_1)) {
-                        attributes[name_1] = node.attributes[name_1];
-                    }
-                }
-                node = node.next;
-            }
+            this.next && this.next.getAttributes(attributes);
+            Object.assign(attributes, this.attributes);
             return attributes;
         };
         RenderAtomic.prototype.getAttributeByKey = function (key) {
-            var node = this;
-            while (node) {
-                if (node.attributes[key] != undefined)
-                    return node.attributes[key];
-                node = node.next;
-            }
-            return undefined;
+            if (this.attributes[key] != undefined)
+                return this.attributes[key];
+            return (this.next && this.next.getAttributeByKey(key));
         };
         RenderAtomic.prototype.getUniforms = function (uniforms) {
             if (uniforms === void 0) { uniforms = {}; }
-            var node = this;
-            while (node) {
-                for (var name_2 in node.uniforms) {
-                    if (!uniforms.hasOwnProperty(name_2)) {
-                        uniforms[name_2] = feng3d.lazy.getvalue(node.uniforms[name_2]);
-                    }
-                }
-                node = node.next;
-            }
+            this.next && this.next.getUniforms(uniforms);
+            Object.assign(uniforms, this.uniforms);
             return uniforms;
         };
         RenderAtomic.prototype.getUniformByKey = function (key) {
-            var node = this;
-            while (node) {
-                if (node.uniforms[key] != undefined)
-                    return feng3d.lazy.getvalue(node.uniforms[key]);
-                node = node.next;
-            }
-            return undefined;
+            if (this.uniforms[key] != undefined)
+                return feng3d.lazy.getvalue(this.uniforms[key]);
+            return (this.next && this.next.getUniformByKey(key));
         };
         RenderAtomic.prototype.getInstanceCount = function () {
-            var node = this;
-            while (node) {
-                if (node.instanceCount != undefined) {
-                    return feng3d.lazy.getvalue(node.instanceCount);
-                }
-                node = node.next;
-            }
-            return undefined;
+            if (this.instanceCount != undefined)
+                return feng3d.lazy.getvalue(this.instanceCount);
+            return this.next && this.next.getInstanceCount();
         };
         RenderAtomic.prototype.getShader = function () {
-            var node = this;
-            while (node) {
-                if (node.shader != undefined) {
-                    return node.shader;
-                }
-                node = node.next;
-            }
-            return undefined;
+            if (this.shader != undefined)
+                return this.shader;
+            return this.next && this.next.getShader();
         };
         RenderAtomic.prototype.getRenderParams = function (renderParams) {
-            if (renderParams === void 0) { renderParams = {}; }
-            var node = this;
-            while (node) {
-                for (var name_3 in node.renderParams) {
-                    if (!renderParams.hasOwnProperty(name_3)) {
-                        renderParams[name_3] = node.renderParams[name_3];
-                    }
-                }
-                node = node.next;
-            }
+            if (renderParams === void 0) { renderParams = new feng3d.RenderParams(); }
+            this.next && this.next.getRenderParams(renderParams);
+            Object.assign(renderParams, this.renderParams);
             return renderParams;
         };
         RenderAtomic.prototype.getShaderMacro = function (shaderMacro) {
             if (shaderMacro === void 0) { shaderMacro = {}; }
-            var node = this;
-            while (node) {
-                for (var name_4 in node.shaderMacro) {
-                    if (!shaderMacro.hasOwnProperty(name_4)) {
-                        shaderMacro[name_4] = node.shaderMacro[name_4];
-                    }
-                }
-                node = node.next;
-            }
+            this.next && this.next.getShaderMacro(shaderMacro);
+            Object.assign(shaderMacro, this.shaderMacro);
             return shaderMacro;
         };
         return RenderAtomic;
@@ -18874,7 +19227,7 @@ var feng3d;
             if (!buffer) {
                 buffer = gl.createBuffer();
                 if (!buffer) {
-                    feng3d.error("createBuffer 失败！");
+                    console.error("createBuffer 失败！");
                     throw "";
                 }
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
@@ -18985,7 +19338,7 @@ var feng3d;
                 gl.extensions.aNGLEInstancedArrays.vertexAttribDivisorANGLE(location, this.divisor);
             }
             else {
-                feng3d.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 vertexAttribDivisor \uFF01");
+                console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 vertexAttribDivisor \uFF01");
             }
         };
         Attribute.prototype.invalidate = function () {
@@ -18999,7 +19352,7 @@ var feng3d;
             if (!buffer) {
                 var newbuffer = gl.createBuffer();
                 if (!newbuffer) {
-                    feng3d.error("createBuffer 失败！");
+                    console.error("createBuffer 失败！");
                     throw "";
                 }
                 buffer = newbuffer;
@@ -19230,7 +19583,7 @@ var feng3d;
                 if (eXTTextureFilterAnisotropic) {
                     if (this.anisotropy > gl.maxAnisotropy) {
                         this.anisotropy = gl.maxAnisotropy;
-                        feng3d.warn(this.anisotropy + " \u8D85\u51FA maxAnisotropy \u7684\u6700\u5927\u503C " + gl.maxAnisotropy + " \uFF01,\u4F7F\u7528\u6700\u5927\u503C\u66FF\u6362\u3002");
+                        console.warn(this.anisotropy + " \u8D85\u51FA maxAnisotropy \u7684\u6700\u5927\u503C " + gl.maxAnisotropy + " \uFF01,\u4F7F\u7528\u6700\u5927\u503C\u66FF\u6362\u3002");
                     }
                     gl.texParameterf(textureType, eXTTextureFilterAnisotropic.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropy);
                 }
@@ -19249,7 +19602,7 @@ var feng3d;
             if (!texture) {
                 var newtexture = gl.createTexture(); // Create a texture object
                 if (!newtexture) {
-                    feng3d.error("createTexture 失败！");
+                    console.error("createTexture 失败！");
                     throw "";
                 }
                 texture = newtexture;
@@ -19615,7 +19968,7 @@ var feng3d;
     var ShaderLib = /** @class */ (function () {
         function ShaderLib() {
             this._shaderCache = {};
-            feng3d.feng3dDispatcher.on("asset.shaderChanged", this.onShaderChanged, this);
+            feng3d.dispatcher.on("asset.shaderChanged", this.onShaderChanged, this);
         }
         Object.defineProperty(ShaderLib.prototype, "shaderConfig", {
             get: function () {
@@ -19694,7 +20047,7 @@ var feng3d;
      */
     var Renderer = /** @class */ (function () {
         function Renderer(gl) {
-            feng3d.assert(!gl.renderer, gl + " " + gl.renderer + " \u5B58\u5728\uFF01");
+            feng3d.debuger && console.assert(!gl.renderer, gl + " " + gl.renderer + " \u5B58\u5728\uFF01");
             gl.renderer = this;
             this.draw = function (renderAtomic1) {
                 var instanceCount = renderAtomic1.getInstanceCount();
@@ -19706,6 +20059,14 @@ var feng3d;
                 var shaderResult = shader.activeShaderProgram(gl);
                 if (!shaderResult)
                     return;
+                //
+                renderAtomic1.uniforms.u_mvMatrix = function () {
+                    return feng3d.lazy.getvalue(renderAtomic1.uniforms.u_modelMatrix).clone().append(feng3d.lazy.getvalue(renderAtomic1.uniforms.u_viewMatrix));
+                };
+                renderAtomic1.uniforms.u_ITMVMatrix = function () {
+                    return feng3d.lazy.getvalue(renderAtomic1.uniforms.u_mvMatrix).clone().invert().transpose();
+                };
+                //
                 var renderAtomic = checkRenderData(renderAtomic1);
                 if (!renderAtomic)
                     return;
@@ -19718,22 +20079,22 @@ var feng3d;
                 disableAttributes(shaderResult.attributes);
             };
             function checkRenderData(renderAtomic) {
-                var atomic = new feng3d.RenderAtomic();
                 var shader = renderAtomic.getShader();
                 var shaderResult = shader.activeShaderProgram(gl);
                 if (!shaderResult) {
-                    feng3d.warn("\u7F3A\u5C11\u7740\u8272\u5668\uFF0C\u65E0\u6CD5\u6E32\u67D3!");
+                    console.warn("\u7F3A\u5C11\u7740\u8272\u5668\uFF0C\u65E0\u6CD5\u6E32\u67D3!");
                     return null;
                 }
-                atomic.shader = shader;
+                var attributes = {};
                 for (var key_1 in shaderResult.attributes) {
                     var attribute = renderAtomic.getAttributeByKey(key_1);
                     if (attribute == undefined) {
-                        feng3d.warn("\u7F3A\u5C11\u9876\u70B9 attribute \u6570\u636E " + key_1 + " \uFF0C\u65E0\u6CD5\u6E32\u67D3!");
+                        console.warn("\u7F3A\u5C11\u9876\u70B9 attribute \u6570\u636E " + key_1 + " \uFF0C\u65E0\u6CD5\u6E32\u67D3!");
                         return null;
                     }
-                    atomic.attributes[key_1] = attribute;
+                    attributes[key_1] = attribute;
                 }
+                var uniforms = {};
                 for (var key in shaderResult.uniforms) {
                     var activeInfo = shaderResult.uniforms[key];
                     if (activeInfo.name) {
@@ -19741,19 +20102,24 @@ var feng3d;
                     }
                     var uniform = renderAtomic.getUniformByKey(key);
                     if (uniform == undefined) {
-                        feng3d.warn("\u7F3A\u5C11 uniform \u6570\u636E " + key + " ,\u65E0\u6CD5\u6E32\u67D3\uFF01");
+                        console.warn("\u7F3A\u5C11 uniform \u6570\u636E " + key + " ,\u65E0\u6CD5\u6E32\u67D3\uFF01");
                         return null;
                     }
-                    atomic.uniforms[key] = uniform;
+                    uniforms[key] = uniform;
                 }
-                atomic.renderParams = renderAtomic.getRenderParams();
-                atomic.indexBuffer = renderAtomic.getIndexBuffer();
-                if (!atomic.indexBuffer) {
-                    feng3d.warn("\u786E\u5B9E\u9876\u70B9\u7D22\u5F15\u6570\u636E\uFF0C\u65E0\u6CD5\u6E32\u67D3\uFF01");
+                var indexBuffer = renderAtomic.getIndexBuffer();
+                if (!indexBuffer) {
+                    console.warn("\u786E\u5B9E\u9876\u70B9\u7D22\u5F15\u6570\u636E\uFF0C\u65E0\u6CD5\u6E32\u67D3\uFF01");
                     return null;
                 }
-                atomic.instanceCount = renderAtomic.getInstanceCount();
-                return atomic;
+                return {
+                    shader: shader,
+                    attributes: attributes,
+                    uniforms: uniforms,
+                    renderParams: renderAtomic.getRenderParams(),
+                    indexBuffer: indexBuffer,
+                    instanceCount: renderAtomic.getInstanceCount(),
+                };
             }
             function activeShaderParams(shaderParams) {
                 var cullfaceEnum = shaderParams.cullFace;
@@ -19894,7 +20260,7 @@ var feng3d;
                     indexBuffer.active(gl);
                     var arrayType = gl[indexBuffer.type];
                     if (indexBuffer.count == 0) {
-                        feng3d.warn("\u9876\u70B9\u7D22\u5F15\u4E3A0\uFF0C\u4E0D\u8FDB\u884C\u6E32\u67D3\uFF01");
+                        console.warn("\u9876\u70B9\u7D22\u5F15\u4E3A0\uFF0C\u4E0D\u8FDB\u884C\u6E32\u67D3\uFF01");
                         return;
                     }
                     if (instanceCount > 1) {
@@ -19906,7 +20272,7 @@ var feng3d;
                             gl.extensions.aNGLEInstancedArrays.drawElementsInstancedANGLE(renderMode, indexBuffer.count, arrayType, indexBuffer.offset, instanceCount);
                         }
                         else {
-                            feng3d.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
                         }
                     }
                     else {
@@ -19924,7 +20290,7 @@ var feng3d;
                         return 0;
                     })(renderAtomic.attributes);
                     if (vertexNum == 0) {
-                        feng3d.warn("\u9876\u70B9\u6570\u91CF\u4E3A0\uFF0C\u4E0D\u8FDB\u884C\u6E32\u67D3\uFF01");
+                        console.warn("\u9876\u70B9\u6570\u91CF\u4E3A0\uFF0C\u4E0D\u8FDB\u884C\u6E32\u67D3\uFF01");
                         return;
                     }
                     if (instanceCount > 1) {
@@ -19936,7 +20302,7 @@ var feng3d;
                             gl.extensions.aNGLEInstancedArrays.drawArraysInstancedANGLE(renderMode, 0, vertexNum, instanceCount);
                         }
                         else {
-                            feng3d.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawArraysInstanced \uFF01");
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawArraysInstanced \uFF01");
                         }
                     }
                     else {
@@ -20387,7 +20753,7 @@ var feng3d;
          */
         function Component() {
             var _this = _super.call(this) || this;
-            feng3d.fevent.onAll(_this, _this._onAllListener, _this);
+            _this.onAll(_this._onAllListener, _this);
             return _this;
         }
         Object.defineProperty(Component.prototype, "gameObject", {
@@ -20483,6 +20849,66 @@ var feng3d;
 var feng3d;
 (function (feng3d) {
     /**
+     * Graphics 类包含一组可用来创建矢量形状的方法。
+     */
+    var Graphics = /** @class */ (function (_super) {
+        __extends(Graphics, _super);
+        function Graphics() {
+            var _this = _super.call(this) || this;
+            _this.__class__ = "feng3d.Graphics";
+            _this.canvas = document.createElement("canvas");
+            _this.canvas.width = _this.width;
+            _this.canvas.height = _this.height;
+            _this.context2D = _this.canvas.getContext('2d');
+            //
+            watchContext2D(_this.context2D);
+            return _this;
+        }
+        Graphics.prototype.draw = function (width, height, callback) {
+            var _this = this;
+            var canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            var ctxt = canvas.getContext('2d');
+            callback(ctxt);
+            feng3d.dataTransform.canvasToImage(canvas, "png", function (img) {
+                _this.image = img;
+            });
+            return this;
+        };
+        return Graphics;
+    }(feng3d.Component));
+    feng3d.Graphics = Graphics;
+    function watchContext2D(context2D, watchFuncs) {
+        if (watchFuncs === void 0) { watchFuncs = ["rect"]; }
+        watchFuncs.forEach(function (v) {
+            var oldFunc = context2D[v];
+            context2D[v] = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                oldFunc.apply(context2D, args);
+                // 标记更改
+                context2D["__changed"] = true;
+            };
+        });
+    }
+    feng3d.watchContext2D = watchContext2D;
+})(feng3d || (feng3d = {}));
+// var ctxts = [];
+// var num = 100;
+// for (var i = 0; i < num; i++)
+// {
+//     var canvas = document.createElement("canvas");
+//     canvas.width = 100;
+//     canvas.height = 100;
+//     var ctxt = canvas.getContext('2d');
+//     ctxts.push(ctxt);
+// }
+var feng3d;
+(function (feng3d) {
+    /**
      * 行为
      *
      * 可以控制开关的组件
@@ -20548,7 +20974,7 @@ var feng3d;
             renderAtomic.uniforms.s_skyboxTexture = function () { return _this.s_skyboxTexture; };
         };
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ component: "OAVPick", componentParam: { accepttype: "texturecube", datatype: "texturecube" } })
         ], SkyBox.prototype, "s_skyboxTexture", void 0);
         return SkyBox;
@@ -20721,6 +21147,7 @@ var feng3d;
         function Transform() {
             var _this = _super.call(this) || this;
             _this.__class__ = "feng3d.Transform";
+            _this.renderAtomic = new feng3d.RenderAtomic();
             //------------------------------------------
             // Private Properties
             //------------------------------------------
@@ -20738,6 +21165,8 @@ var feng3d;
             _this._sx = 1;
             _this._sy = 1;
             _this._sz = 1;
+            _this.renderAtomic.uniforms.u_modelMatrix = function () { return _this.localToWorldMatrix; };
+            _this.renderAtomic.uniforms.u_ITModelMatrix = function () { return _this.ITlocalToWorldMatrix; };
             return _this;
         }
         Object.defineProperty(Transform.prototype, "single", {
@@ -20886,6 +21315,9 @@ var feng3d;
             vector = matrix3d.deltaTransformVector(vector);
             return vector;
         };
+        Transform.prototype.beforeRender = function (gl, renderAtomic, scene3d, camera) {
+            Object.assign(renderAtomic.uniforms, this.renderAtomic.uniforms);
+        };
         Transform.prototype.dispose = function () {
             _super.prototype.dispose.call(this);
         };
@@ -20900,6 +21332,7 @@ var feng3d;
             if (this.parent)
                 this._localToWorldMatrix.append(this.parent.localToWorldMatrix);
             this.dispatch("updateLocalToWorldMatrix");
+            feng3d.debuger && console.assert(!isNaN(this._localToWorldMatrix.rawData[0]));
             return this._localToWorldMatrix;
         };
         //------------------------------------------
@@ -20929,7 +21362,8 @@ var feng3d;
             },
             set: function (val) {
                 val = Number(val.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(val));
+                feng3d.debuger && console.
+                    assert(!isNaN(val));
                 if (this._x == val)
                     return;
                 this._x = val;
@@ -20944,7 +21378,7 @@ var feng3d;
             },
             set: function (val) {
                 val = Number(val.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(val));
+                feng3d.debuger && console.assert(!isNaN(val));
                 if (this._y == val)
                     return;
                 this._y = val;
@@ -20959,7 +21393,7 @@ var feng3d;
             },
             set: function (val) {
                 val = Number(val.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(val));
+                feng3d.debuger && console.assert(!isNaN(val));
                 if (this._z == val)
                     return;
                 this._z = val;
@@ -20974,7 +21408,7 @@ var feng3d;
             },
             set: function (val) {
                 val = Number(val.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(val));
+                feng3d.debuger && console.assert(!isNaN(val));
                 if (this.rx == val)
                     return;
                 this._rx = val;
@@ -20989,7 +21423,7 @@ var feng3d;
             },
             set: function (val) {
                 val = Number(val.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(val));
+                feng3d.debuger && console.assert(!isNaN(val));
                 if (this.ry == val)
                     return;
                 this._ry = val;
@@ -21004,7 +21438,7 @@ var feng3d;
             },
             set: function (val) {
                 val = Number(val.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(val));
+                feng3d.debuger && console.assert(!isNaN(val));
                 if (this.rz == val)
                     return;
                 this._rz = val;
@@ -21019,7 +21453,7 @@ var feng3d;
             },
             set: function (val) {
                 val = Number(val.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(val) && val != 0);
+                feng3d.debuger && console.assert(!isNaN(val) && val != 0);
                 if (this._sx == val)
                     return;
                 this._sx = val;
@@ -21034,7 +21468,7 @@ var feng3d;
             },
             set: function (val) {
                 val = Number(val.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(val) && val != 0);
+                feng3d.debuger && console.assert(!isNaN(val) && val != 0);
                 if (this._sy == val)
                     return;
                 this._sy = val;
@@ -21049,7 +21483,7 @@ var feng3d;
             },
             set: function (val) {
                 val = Number(val.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(val) && val != 0);
+                feng3d.debuger && console.assert(!isNaN(val) && val != 0);
                 if (this._sz == val)
                     return;
                 this._sz = val;
@@ -21107,9 +21541,9 @@ var feng3d;
                 x = Number(x.toFixed(fixedNum));
                 y = Number(y.toFixed(fixedNum));
                 z = Number(z.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(x));
-                feng3d.debuger && feng3d.assert(!isNaN(y));
-                feng3d.debuger && feng3d.assert(!isNaN(z));
+                feng3d.debuger && console.assert(!isNaN(x));
+                feng3d.debuger && console.assert(!isNaN(y));
+                feng3d.debuger && console.assert(!isNaN(z));
                 if (this._x != x || this._y != y || this._z != z) {
                     this._x = x;
                     this._y = y;
@@ -21130,9 +21564,9 @@ var feng3d;
                 x = Number(x.toFixed(fixedNum));
                 y = Number(y.toFixed(fixedNum));
                 z = Number(z.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(x));
-                feng3d.debuger && feng3d.assert(!isNaN(y));
-                feng3d.debuger && feng3d.assert(!isNaN(z));
+                feng3d.debuger && console.assert(!isNaN(x));
+                feng3d.debuger && console.assert(!isNaN(y));
+                feng3d.debuger && console.assert(!isNaN(z));
                 if (this._rx != x || this._ry != y || this._rz != z) {
                     this._rx = x;
                     this._ry = y;
@@ -21169,9 +21603,9 @@ var feng3d;
                 x = Number(x.toFixed(fixedNum));
                 y = Number(y.toFixed(fixedNum));
                 z = Number(z.toFixed(fixedNum));
-                feng3d.debuger && feng3d.assert(!isNaN(x) && x != 0);
-                feng3d.debuger && feng3d.assert(!isNaN(y) && y != 0);
-                feng3d.debuger && feng3d.assert(!isNaN(z) && z != 0);
+                feng3d.debuger && console.assert(!isNaN(x) && x != 0);
+                feng3d.debuger && console.assert(!isNaN(y) && y != 0);
+                feng3d.debuger && console.assert(!isNaN(z) && z != 0);
                 if (this._sx != x || this._sy != y || this._sz != z) {
                     this._sx = x;
                     this._sy = y;
@@ -21502,7 +21936,7 @@ var feng3d;
             _this.guid = feng3d.FMath.uuid();
             //
             GameObject.pool.set(_this.guid, _this);
-            feng3d.fevent.onAll(_this, _this._onAllListener, _this);
+            _this.onAll(_this._onAllListener, _this);
             return _this;
         }
         Object.defineProperty(GameObject.prototype, "transform", {
@@ -21603,6 +22037,11 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 根据名称查找对象
+         *
+         * @param name 对象名称
+         */
         GameObject.prototype.find = function (name) {
             if (this.name == name)
                 return this;
@@ -21613,6 +22052,11 @@ var feng3d;
             }
             return null;
         };
+        /**
+         * 是否包含指定对象
+         *
+         * @param child 可能的子孙对象
+         */
         GameObject.prototype.contains = function (child) {
             var checkitem = child;
             do {
@@ -21622,18 +22066,37 @@ var feng3d;
             } while (checkitem);
             return false;
         };
+        /**
+         * 添加子对象
+         *
+         * @param child 子对象
+         */
         GameObject.prototype.addChild = function (child) {
             if (child == null)
                 return;
-            if (child.contains(this))
-                throw "无法添加到自身中!";
-            if (child._parent)
-                child._parent.removeChild(child);
-            child._setParent(this);
-            this._children.push(child);
-            this.dispatch("addChild", child, true);
+            if (child.parent == this) {
+                // 把子对象移动到最后
+                var childIndex = this._children.indexOf(child);
+                if (childIndex != -1)
+                    this._children.splice(childIndex, 1);
+                this._children.push(child);
+            }
+            else {
+                if (child.contains(this))
+                    throw "无法添加到自身中!";
+                if (child._parent)
+                    child._parent.removeChild(child);
+                child._setParent(this);
+                this._children.push(child);
+                this.dispatch("addChild", child, true);
+            }
             return child;
         };
+        /**
+         * 添加子对象
+         *
+         * @param childarray 子对象
+         */
         GameObject.prototype.addChildren = function () {
             var childarray = [];
             for (var _i = 0; _i < arguments.length; _i++) {
@@ -21651,6 +22114,11 @@ var feng3d;
             if (this.parent)
                 this.parent.removeChild(this);
         };
+        /**
+         * 移除子对象
+         *
+         * @param child 子对象
+         */
         GameObject.prototype.removeChild = function (child) {
             if (child == null)
                 throw new Error("Parameter child cannot be null").message;
@@ -21659,10 +22127,20 @@ var feng3d;
                 throw new Error("Parameter is not a child of the caller").message;
             this.removeChildInternal(childIndex, child);
         };
+        /**
+         * 删除指定位置的子对象
+         *
+         * @param index 需要删除子对象的所有
+         */
         GameObject.prototype.removeChildAt = function (index) {
             var child = this._children[index];
-            this.removeChildInternal(index, child);
+            return this.removeChildInternal(index, child);
         };
+        /**
+         * 获取指定位置的子对象
+         *
+         * @param index
+         */
         GameObject.prototype.getChildAt = function (index) {
             index = index;
             return this._children[index];
@@ -21679,7 +22157,7 @@ var feng3d;
          * @return				子组件
          */
         GameObject.prototype.getComponentAt = function (index) {
-            feng3d.debuger && feng3d.assert(index < this.numComponents, "给出索引超出范围");
+            feng3d.debuger && console.assert(index < this.numComponents, "给出索引超出范围");
             return this._components[index];
         };
         /**
@@ -21785,9 +22263,9 @@ var feng3d;
          * @param index				位置索引
          */
         GameObject.prototype.setComponentIndex = function (component, index) {
-            feng3d.debuger && feng3d.assert(index >= 0 && index < this.numComponents, "给出索引超出范围");
+            feng3d.debuger && console.assert(index >= 0 && index < this.numComponents, "给出索引超出范围");
             var oldIndex = this._components.indexOf(component);
-            feng3d.debuger && feng3d.assert(oldIndex >= 0 && oldIndex < this.numComponents, "子组件不在容器内");
+            feng3d.debuger && console.assert(oldIndex >= 0 && oldIndex < this.numComponents, "子组件不在容器内");
             this._components.splice(oldIndex, 1);
             this._components.splice(index, 0, component);
         };
@@ -21807,7 +22285,7 @@ var feng3d;
          * @param component 被移除组件
          */
         GameObject.prototype.removeComponent = function (component) {
-            feng3d.debuger && feng3d.assert(this.hasComponent(component), "只能移除在容器中的组件");
+            feng3d.debuger && console.assert(this.hasComponent(component), "只能移除在容器中的组件");
             var index = this.getComponentIndex(component);
             this.removeComponentAt(index);
         };
@@ -21817,7 +22295,7 @@ var feng3d;
          * @return				    组件在容器的索引位置
          */
         GameObject.prototype.getComponentIndex = function (component) {
-            feng3d.debuger && feng3d.assert(this._components.indexOf(component) != -1, "组件不在容器中");
+            feng3d.debuger && console.assert(this._components.indexOf(component) != -1, "组件不在容器中");
             var index = this._components.indexOf(component);
             return index;
         };
@@ -21826,7 +22304,7 @@ var feng3d;
          * @param index		要删除的 Component 的子索引。
          */
         GameObject.prototype.removeComponentAt = function (index) {
-            feng3d.debuger && feng3d.assert(index >= 0 && index < this.numComponents, "给出索引超出范围");
+            feng3d.debuger && console.assert(index >= 0 && index < this.numComponents, "给出索引超出范围");
             var component = this._components.splice(index, 1)[0];
             //派发移除组件事件
             this.dispatch("removeComponent", component, true);
@@ -21839,8 +22317,8 @@ var feng3d;
          * @param index2		第二个子组件的索引位置
          */
         GameObject.prototype.swapComponentsAt = function (index1, index2) {
-            feng3d.debuger && feng3d.assert(index1 >= 0 && index1 < this.numComponents, "第一个子组件的索引位置超出范围");
-            feng3d.debuger && feng3d.assert(index2 >= 0 && index2 < this.numComponents, "第二个子组件的索引位置超出范围");
+            feng3d.debuger && console.assert(index1 >= 0 && index1 < this.numComponents, "第一个子组件的索引位置超出范围");
+            feng3d.debuger && console.assert(index2 >= 0 && index2 < this.numComponents, "第二个子组件的索引位置超出范围");
             var temp = this._components[index1];
             this._components[index1] = this._components[index2];
             this._components[index2] = temp;
@@ -21851,8 +22329,8 @@ var feng3d;
          * @param b		第二个子组件
          */
         GameObject.prototype.swapComponents = function (a, b) {
-            feng3d.debuger && feng3d.assert(this.hasComponent(a), "第一个子组件不在容器中");
-            feng3d.debuger && feng3d.assert(this.hasComponent(b), "第二个子组件不在容器中");
+            feng3d.debuger && console.assert(this.hasComponent(a), "第一个子组件不在容器中");
+            feng3d.debuger && console.assert(this.hasComponent(b), "第二个子组件不在容器中");
             this.swapComponentsAt(this.getComponentIndex(a), this.getComponentIndex(b));
         };
         /**
@@ -21984,6 +22462,16 @@ var feng3d;
             if (loadingNum == 0)
                 callback();
         };
+        /**
+         * 渲染前执行函数
+         *
+         * 可用于渲染前收集渲染数据，或者更新显示效果等
+         *
+         * @param gl
+         * @param renderAtomic
+         * @param scene3d
+         * @param camera
+         */
         GameObject.prototype.beforeRender = function (gl, renderAtomic, scene3d, camera) {
             this._components.forEach(function (element) {
                 element.beforeRender(gl, renderAtomic, scene3d, camera);
@@ -22052,7 +22540,7 @@ var feng3d;
         GameObject.prototype.addComponentAt = function (component, index) {
             if (component == null)
                 return;
-            feng3d.debuger && feng3d.assert(index >= 0 && index <= this.numComponents, "给出索引超出范围");
+            feng3d.debuger && console.assert(index >= 0 && index <= this.numComponents, "给出索引超出范围");
             if (this.hasComponent(component)) {
                 index = Math.min(index, this._components.length - 1);
                 this.setComponentIndex(component, index);
@@ -22112,6 +22600,7 @@ var feng3d;
          */
         function Engine(canvas, scene, camera) {
             var _this = this;
+            this.contextLost = false;
             if (!canvas) {
                 canvas = document.createElement("canvas");
                 canvas.id = "glcanvas";
@@ -22122,9 +22611,22 @@ var feng3d;
                 canvas.style.height = "100%";
                 document.body.appendChild(canvas);
             }
-            feng3d.debuger && feng3d.assert(canvas instanceof HTMLCanvasElement, "canvas\u53C2\u6570\u5FC5\u987B\u4E3A HTMLCanvasElement \u7C7B\u578B\uFF01");
+            feng3d.debuger && console.assert(canvas instanceof HTMLCanvasElement, "canvas\u53C2\u6570\u5FC5\u987B\u4E3A HTMLCanvasElement \u7C7B\u578B\uFF01");
             this.canvas = canvas;
-            this.scene = scene || Object.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
+            canvas.addEventListener("webglcontextlost", function (event) {
+                event.preventDefault();
+                _this.contextLost = true;
+                // #ifdef DEBUG
+                console.log('pc.GraphicsDevice: WebGL context lost.');
+                // #endif
+            }, false);
+            canvas.addEventListener("webglcontextrestored", function () {
+                _this.contextLost = false;
+                // #ifdef DEBUG
+                console.log('pc.GraphicsDevice: WebGL context restored.');
+                // #endif
+            }, false);
+            this.scene = scene || feng3d.serialization.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
             this.camera = camera;
             this.start();
             this.mouse3DManager = new feng3d.Mouse3DManager(new feng3d.WindowMouseInput(), function () { return _this.viewRect; });
@@ -22137,7 +22639,7 @@ var feng3d;
                 if (!this._camera) {
                     var cameras = this.scene.getComponentsInChildren(feng3d.Camera);
                     if (cameras.length == 0) {
-                        this._camera = Object.setValue(new feng3d.GameObject(), { name: "defaultCamera" }).addComponent(feng3d.Camera);
+                        this._camera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "defaultCamera" }).addComponent(feng3d.Camera);
                         this.scene.gameObject.addChild(this._camera.gameObject);
                     }
                     else {
@@ -22181,13 +22683,6 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Engine.prototype, "mouseinview", {
-            get: function () {
-                return this.viewRect.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(Engine.prototype, "viewRect", {
             get: function () {
                 var clientRect = this.canvas.getBoundingClientRect();
@@ -22224,18 +22719,24 @@ var feng3d;
         Engine.prototype.render = function (interval) {
             if (!this.scene)
                 return;
+            if (this.contextLost)
+                return;
             this.scene.update(interval);
             this.canvas.width = this.canvas.clientWidth;
             this.canvas.height = this.canvas.clientHeight;
+            if (this.canvas.width * this.canvas.height == 0)
+                return;
             var viewRect = this.viewRect;
-            this.camera.viewRect = viewRect;
             this.camera.lens.aspect = viewRect.width / viewRect.height;
+            // 设置鼠标射线
+            this.scene.mouseRay3D = this.getMouseRay3D();
+            this.scene.camera = this.camera;
             // 默认渲染
             this.gl.clearColor(this.scene.background.r, this.scene.background.g, this.scene.background.b, this.scene.background.a);
             this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
             this.gl.enable(this.gl.DEPTH_TEST);
             //鼠标拾取渲染
-            this.selectedObject = this.mouse3DManager.pick(this.scene, this.camera);
+            this.selectedObject = this.mouse3DManager.pick(this, this.scene, this.camera);
             //绘制阴影图
             feng3d.shadowRenderer.draw(this.gl, this.scene, this.camera);
             feng3d.skyboxRenderer.draw(this.gl, this.scene, this.camera);
@@ -22243,6 +22744,59 @@ var feng3d;
             feng3d.forwardRenderer.draw(this.gl, this.scene, this.camera);
             feng3d.outlineRenderer.draw(this.gl, this.scene, this.camera);
             feng3d.wireframeRenderer.draw(this.gl, this.scene, this.camera);
+        };
+        /**
+         * 屏幕坐标转GPU坐标
+         * @param screenPos 屏幕坐标 (x: [0-width], y: [0 - height])
+         * @return GPU坐标 (x: [-1, 1], y: [-1, 1])
+         */
+        Engine.prototype.screenToGpuPosition = function (screenPos) {
+            var gpuPos = new feng3d.Vector2();
+            gpuPos.x = (screenPos.x * 2 - this.viewRect.width) / this.viewRect.width;
+            // 屏幕坐标与gpu中使用的坐标Y轴方向相反
+            gpuPos.y = -(screenPos.y * 2 - this.viewRect.height) / this.viewRect.height;
+            return gpuPos;
+        };
+        /**
+         * 投影坐标（世界坐标转换为3D视图坐标）
+         * @param point3d 世界坐标
+         * @return 屏幕的绝对坐标
+         */
+        Engine.prototype.project = function (point3d) {
+            var v = this.camera.project(point3d);
+            v.x = (v.x + 1.0) * this.viewRect.width / 2.0;
+            v.y = (1.0 - v.y) * this.viewRect.height / 2.0;
+            return v;
+        };
+        /**
+         * 屏幕坐标投影到场景坐标
+         * @param nX 屏幕坐标X ([0-width])
+         * @param nY 屏幕坐标Y ([0-height])
+         * @param sZ 到屏幕的距离
+         * @param v 场景坐标（输出）
+         * @return 场景坐标
+         */
+        Engine.prototype.unproject = function (sX, sY, sZ, v) {
+            if (v === void 0) { v = new feng3d.Vector3(); }
+            var gpuPos = this.screenToGpuPosition(new feng3d.Vector2(sX, sY));
+            return this.camera.unproject(gpuPos.x, gpuPos.y, sZ, v);
+        };
+        /**
+         * 获取单位像素在指定深度映射的大小
+         * @param   depth   深度
+         */
+        Engine.prototype.getScaleByDepth = function (depth, dir) {
+            if (dir === void 0) { dir = new feng3d.Vector2(0, 1); }
+            var scale = this.camera.getScaleByDepth(depth, dir);
+            scale = scale / new feng3d.Vector2(this.viewRect.width * dir.x, this.viewRect.height * dir.y).length;
+            return scale;
+        };
+        /**
+         * 获取鼠标射线（与鼠标重叠的摄像机射线）
+         */
+        Engine.prototype.getMouseRay3D = function () {
+            var gpuPos = this.screenToGpuPosition(new feng3d.Vector2(feng3d.windowEventProxy.clientX - this.viewRect.x, feng3d.windowEventProxy.clientY - this.viewRect.y));
+            return this.camera.getRay3D(gpuPos.x, gpuPos.y);
         };
         /**
          * 获取屏幕区域内所有游戏对象
@@ -22265,12 +22819,12 @@ var feng3d;
                 var m = t.getComponent(feng3d.Model);
                 if (m) {
                     var include = m.selfWorldBounds.toPoints().every(function (pos) {
-                        var p = _this.camera.project(pos);
+                        var p = _this.project(pos);
                         return rect.contains(p.x, p.y);
                     });
                     return include;
                 }
-                var p = _this.camera.project(t.scenePosition);
+                var p = _this.project(t.scenePosition);
                 return rect.contains(p.x, p.y);
             }).map(function (t) { return t.gameObject; });
             return gs;
@@ -22321,8 +22875,9 @@ var feng3d;
             if (this.holdSize && this.camera && _localToWorldMatrix) {
                 var depthScale = this.getDepthScale(this.camera);
                 var vec = _localToWorldMatrix.decompose();
-                vec[2].scaleNumber(depthScale);
+                vec[2].scaleNumber(depthScale * this.holdSize);
                 _localToWorldMatrix.recompose(vec);
+                feng3d.debuger && console.assert(!isNaN(_localToWorldMatrix.rawData[0]));
             }
         };
         HoldSizeComponent.prototype.getDepthScale = function (camera) {
@@ -22583,11 +23138,6 @@ var feng3d;
             this.on("scenetransformChanged", this.onScenetransformChanged, this);
         };
         Model.prototype.beforeRender = function (gl, renderAtomic, scene3d, camera) {
-            var _this = this;
-            renderAtomic.uniforms.u_modelMatrix = function () { return _this.transform.localToWorldMatrix; };
-            renderAtomic.uniforms.u_ITModelMatrix = function () { return _this.transform.ITlocalToWorldMatrix; };
-            renderAtomic.uniforms.u_mvMatrix = function () { return feng3d.lazy.getvalue(renderAtomic.uniforms.u_modelMatrix).clone().append(feng3d.lazy.getvalue(renderAtomic.uniforms.u_viewMatrix)); };
-            renderAtomic.uniforms.u_ITMVMatrix = function () { return feng3d.lazy.getvalue(renderAtomic.uniforms.u_mvMatrix).clone().invert().transpose(); };
             //
             this.geometry.beforeRender(renderAtomic);
             this.material.beforeRender(renderAtomic);
@@ -22685,12 +23235,12 @@ var feng3d;
         };
         __decorate([
             feng3d.oav({ component: "OAVPick", tooltip: "几何体，提供模型以形状", componentParam: { accepttype: "geometry", datatype: "geometry" } }),
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.watch("onGeometryChanged")
         ], Model.prototype, "geometry", void 0);
         __decorate([
             feng3d.oav({ component: "OAVPick", tooltip: "材质，提供模型以皮肤", componentParam: { accepttype: "material", datatype: "material" } }),
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.watch("onMaterialChanged")
         ], Model.prototype, "material", void 0);
         __decorate([
@@ -22733,7 +23283,7 @@ var feng3d;
         }
         ScriptComponent.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
-            feng3d.feng3dDispatcher.on("asset.scriptChanged", this.onScriptChanged, this);
+            feng3d.dispatcher.on("asset.scriptChanged", this.onScriptChanged, this);
         };
         ScriptComponent.prototype.scriptChanged = function (property, oldValue, newValue) {
             if (this.scriptInstance) {
@@ -22747,7 +23297,7 @@ var feng3d;
             if (cls)
                 this.scriptInstance = new cls();
             else
-                feng3d.warn("\u65E0\u6CD5\u521D\u59CB\u5316\u811A\u672C " + this.scriptName);
+                console.warn("\u65E0\u6CD5\u521D\u59CB\u5316\u811A\u672C " + this.scriptName);
             this.scriptInit = false;
         };
         ScriptComponent.prototype.onScriptChanged = function () {
@@ -22755,7 +23305,7 @@ var feng3d;
             if (this.scriptInstance instanceof cls)
                 return;
             var newInstance = new cls();
-            Object.setValue(newInstance, this.scriptInstance);
+            feng3d.serialization.setValue(newInstance, this.scriptInstance);
             this.scriptInstance = newInstance;
         };
         /**
@@ -22780,7 +23330,7 @@ var feng3d;
                 this.scriptInstance = null;
             }
             _super.prototype.dispose.call(this);
-            feng3d.feng3dDispatcher.off("asset.scriptChanged", this.onScriptChanged, this);
+            feng3d.dispatcher.off("asset.scriptChanged", this.onScriptChanged, this);
         };
         __decorate([
             feng3d.serialize,
@@ -24013,7 +24563,7 @@ var feng3d;
          * @param geometrys 几何体列表
          */
         GeometryUtils.prototype.mergeGeometry = function (geometrys) {
-            var result = Object.deepClone(geometrys[0]);
+            var result = feng3d.serialization.clone(geometrys[0]);
             for (var i = 1; i < geometrys.length; i++) {
                 var geometry = geometrys[i];
                 var startIndex = result.positions.length / 3;
@@ -24252,7 +24802,7 @@ var feng3d;
         return PointGeometry;
     }(feng3d.Geometry));
     feng3d.PointGeometry = PointGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.point = Object.setValue(new PointGeometry(), { name: "PointGeometry", assetId: "PointGeometry", points: [], hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.point = feng3d.serialization.setValue(new PointGeometry(), { name: "PointGeometry", assetId: "PointGeometry", points: [], hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -24466,6 +25016,7 @@ var feng3d;
          * 投影矩阵失效
          */
         LensBase.prototype.invalidate = function () {
+            feng3d.debuger && console.assert(!isNaN(this.aspect));
             this._matrixInvalid = true;
             this._invertMatrixInvalid = true;
             this._viewBoxInvalid = true;
@@ -24681,10 +25232,6 @@ var feng3d;
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.Camera";
             _this.projection = feng3d.Projection.Perspective;
-            /**
-             * 视窗矩形
-             */
-            _this.viewRect = new feng3d.Rectangle(0, 0, 1, 1);
             _this._viewProjection = new feng3d.Matrix4x4();
             _this._viewProjectionInvalid = true;
             _this._viewBox = new feng3d.Box();
@@ -24739,12 +25286,6 @@ var feng3d;
             this._viewProjectionInvalid = true;
         };
         /**
-         * 获取鼠标射线（与鼠标重叠的摄像机射线）
-         */
-        Camera.prototype.getMouseRay3D = function () {
-            return this.getRay3D(feng3d.windowEventProxy.clientX - this.viewRect.x, feng3d.windowEventProxy.clientY - this.viewRect.y);
-        };
-        /**
          * 获取与坐标重叠的射线
          * @param x view3D上的X坐标
          * @param y view3D上的X坐标
@@ -24752,8 +25293,7 @@ var feng3d;
          */
         Camera.prototype.getRay3D = function (x, y, ray3D) {
             if (ray3D === void 0) { ray3D = new feng3d.Ray3D(); }
-            var gpuPos = this.screenToGpuPosition(new feng3d.Vector2(x, y));
-            return this.lens.unprojectRay(gpuPos.x, gpuPos.y, ray3D).applyMatri4x4(this.transform.localToWorldMatrix);
+            return this.lens.unprojectRay(x, y, ray3D).applyMatri4x4(this.transform.localToWorldMatrix);
         };
         /**
          * 投影坐标（世界坐标转换为3D视图坐标）
@@ -24762,8 +25302,6 @@ var feng3d;
          */
         Camera.prototype.project = function (point3d) {
             var v = this.lens.project(this.transform.worldToLocalMatrix.transformVector(point3d));
-            v.x = (v.x + 1.0) * this.viewRect.width / 2.0;
-            v.y = (1.0 - v.y) * this.viewRect.height / 2.0;
             return v;
         };
         /**
@@ -24776,30 +25314,17 @@ var feng3d;
          */
         Camera.prototype.unproject = function (sX, sY, sZ, v) {
             if (v === void 0) { v = new feng3d.Vector3(); }
-            var gpuPos = this.screenToGpuPosition(new feng3d.Vector2(sX, sY));
-            return this.transform.localToWorldMatrix.transformVector(this.lens.unprojectWithDepth(gpuPos.x, gpuPos.y, sZ, v), v);
+            return this.transform.localToWorldMatrix.transformVector(this.lens.unprojectWithDepth(sX, sY, sZ, v), v);
         };
         /**
-         * 屏幕坐标转GPU坐标
-         * @param screenPos 屏幕坐标 (x: [0-width], y: [0 - height])
-         * @return GPU坐标 (x: [-1, 1], y: [-1, 1])
-         */
-        Camera.prototype.screenToGpuPosition = function (screenPos) {
-            var gpuPos = new feng3d.Vector2();
-            gpuPos.x = (screenPos.x * 2 - this.viewRect.width) / this.viewRect.width;
-            // 屏幕坐标与gpu中使用的坐标Y轴方向相反
-            gpuPos.y = -(screenPos.y * 2 - this.viewRect.height) / this.viewRect.height;
-            return gpuPos;
-        };
-        /**
-         * 获取单位像素在指定深度映射的大小
+         * 获取摄像机能够在指定深度处的视野；镜头在指定深度的尺寸。
+         *
          * @param   depth   深度
          */
-        Camera.prototype.getScaleByDepth = function (depth) {
-            var centerX = this.viewRect.width / 2;
-            var centerY = this.viewRect.height / 2;
-            var lt = this.unproject(centerX - 0.5, centerY - 0.5, depth);
-            var rb = this.unproject(centerX + 0.5, centerY + 0.5, depth);
+        Camera.prototype.getScaleByDepth = function (depth, dir) {
+            if (dir === void 0) { dir = new feng3d.Vector2(0, 1); }
+            var lt = this.unproject(-0.5 * dir.x, -0.5 * dir.y, depth);
+            var rb = this.unproject(+0.5 * dir.x, +0.5 * dir.y, depth);
             var scale = lt.subTo(rb).length;
             return scale;
         };
@@ -25100,7 +25625,7 @@ var feng3d;
         return PlaneGeometry;
     }(feng3d.Geometry));
     feng3d.PlaneGeometry = PlaneGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.plane = Object.setValue(new PlaneGeometry(), { name: "Plane", assetId: "Plane", width: 10, height: 10, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.plane = feng3d.serialization.setValue(new PlaneGeometry(), { name: "Plane", assetId: "Plane", width: 10, height: 10, hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -25526,7 +26051,7 @@ var feng3d;
         return CubeGeometry;
     }(feng3d.Geometry));
     feng3d.CubeGeometry = CubeGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cube = Object.setValue(new CubeGeometry(), { name: "Cube", assetId: "Cube", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cube = feng3d.serialization.setValue(new CubeGeometry(), { name: "Cube", assetId: "Cube", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -25713,7 +26238,7 @@ var feng3d;
         return SphereGeometry;
     }(feng3d.Geometry));
     feng3d.SphereGeometry = SphereGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.sphere = Object.setValue(new SphereGeometry(), { name: "Sphere", assetId: "Sphere", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.sphere = feng3d.serialization.setValue(new SphereGeometry(), { name: "Sphere", assetId: "Sphere", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -25909,7 +26434,7 @@ var feng3d;
         return CapsuleGeometry;
     }(feng3d.Geometry));
     feng3d.CapsuleGeometry = CapsuleGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.capsule = Object.setValue(new CapsuleGeometry(), { name: "Capsule", assetId: "Capsule", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.capsule = feng3d.serialization.setValue(new CapsuleGeometry(), { name: "Capsule", assetId: "Capsule", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26264,7 +26789,7 @@ var feng3d;
         return CylinderGeometry;
     }(feng3d.Geometry));
     feng3d.CylinderGeometry = CylinderGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cylinder = Object.setValue(new CylinderGeometry(), { name: "Cylinder", assetId: "Cylinder", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cylinder = feng3d.serialization.setValue(new CylinderGeometry(), { name: "Cylinder", assetId: "Cylinder", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26295,7 +26820,7 @@ var feng3d;
         return ConeGeometry;
     }(feng3d.CylinderGeometry));
     feng3d.ConeGeometry = ConeGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cone = Object.setValue(new ConeGeometry(), { name: "Cone", assetId: "Cone", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cone = feng3d.serialization.setValue(new ConeGeometry(), { name: "Cone", assetId: "Cone", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26490,7 +27015,7 @@ var feng3d;
         return TorusGeometry;
     }(feng3d.Geometry));
     feng3d.TorusGeometry = TorusGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.torus = Object.setValue(new TorusGeometry(), { name: "Torus", assetId: "Torus", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.torus = feng3d.serialization.setValue(new TorusGeometry(), { name: "Torus", assetId: "Torus", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26504,38 +27029,52 @@ var feng3d;
         ImageDatas["defaultNormal"] = "defaultNormal";
         ImageDatas["defaultParticle"] = "defaultParticle";
     })(ImageDatas = feng3d.ImageDatas || (feng3d.ImageDatas = {}));
-    feng3d.imageDatas = {
-        black: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.black)).imageData,
-        white: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.white)).imageData,
-        red: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.red)).imageData,
-        green: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.green)).imageData,
-        blue: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.blue)).imageData,
-        defaultNormal: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(0x8080ff)).imageData,
-        defaultParticle: new feng3d.ImageUtil().drawDefaultParticle().imageData,
-    };
+    if (typeof document != "undefined") {
+        feng3d.imageDatas = {
+            black: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.black)).imageData,
+            white: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.white)).imageData,
+            red: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.red)).imageData,
+            green: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.green)).imageData,
+            blue: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(feng3d.ColorKeywords.blue)).imageData,
+            defaultNormal: new feng3d.ImageUtil(1, 1, feng3d.Color4.fromUnit24(0x8080ff)).imageData,
+            defaultParticle: new feng3d.ImageUtil().drawDefaultParticle().imageData,
+        };
+    }
     /**
      * 2D纹理
      */
     var Texture2D = /** @class */ (function (_super) {
         __extends(Texture2D, _super);
         function Texture2D() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super.call(this) || this;
             _this.__class__ = "feng3d.Texture2D";
             _this.assetType = feng3d.AssetType.texture;
             /**
              * 当贴图数据未加载好等情况时代替使用
              */
             _this.noPixels = ImageDatas.white;
-            /**
-             * 是否加载
-             */
-            _this.isLoaded = true;
+            _this._loadings = [];
             /**
              * 纹理类型
              */
             _this._textureType = feng3d.TextureType.TEXTURE_2D;
             return _this;
         }
+        Object.defineProperty(Texture2D.prototype, "isLoaded", {
+            /**
+             * 是否已加载
+             */
+            get: function () { return this._loadings.length == 0; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Texture2D.prototype, "image", {
+            get: function () {
+                return this._pixels;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Texture2D.prototype, "source", {
             /**
              * 用于表示初始化纹理的数据来源
@@ -26545,6 +27084,11 @@ var feng3d;
             },
             set: function (v) {
                 var _this = this;
+                if (this.assetId) {
+                    // 来源于资源
+                    console.log("\u6765\u6E90\u4E8E\u8D44\u6E90\uFF0C\u4E0D\u53EF\u4FEE\u6539\uFF01");
+                    return;
+                }
                 this._source = v;
                 if (!v) {
                     this._pixels = null;
@@ -26552,31 +27096,46 @@ var feng3d;
                     return;
                 }
                 if (v.url) {
-                    this.isLoaded = false;
+                    this._loadings.push(v.url);
                     feng3d.loader.loadImage(v.url, function (img) {
                         _this._pixels = img;
                         _this.invalidate();
-                        _this.isLoaded = true;
-                        _this.dispatch("loadCompleted");
+                        _this._loadings.delete(v.url);
+                        _this.onItemLoadCompleted();
                     }, null, function (e) {
-                        feng3d.error(e);
-                        _this.isLoaded = true;
-                        _this.dispatch("loadCompleted");
+                        console.error(e);
+                        _this._loadings.delete(v.url);
+                        _this.onItemLoadCompleted();
                     });
                 }
             },
             enumerable: true,
             configurable: true
         });
+        Texture2D.prototype.onItemLoadCompleted = function () {
+            if (this._loadings.length == 0)
+                this.dispatch("loadCompleted");
+        };
+        /**
+         * 已加载完成或者加载完成时立即调用
+         * @param callback 完成回调
+         */
+        Texture2D.prototype.onLoadCompleted = function (callback) {
+            if (this.isLoaded) {
+                callback();
+                return;
+            }
+            this.once("loadCompleted", callback);
+        };
         __decorate([
             feng3d.serialize
         ], Texture2D.prototype, "source", null);
         return Texture2D;
     }(feng3d.TextureInfo));
     feng3d.Texture2D = Texture2D;
-    feng3d.rs.setDefaultAssetData(Texture2D.default = Object.setValue(new Texture2D(), { name: "Default-Texture", assetId: "Default-Texture", hideFlags: feng3d.HideFlags.NotEditable }));
-    feng3d.rs.setDefaultAssetData(Texture2D.defaultNormal = Object.setValue(new Texture2D(), { name: "Default-NormalTexture", assetId: "Default-NormalTexture", noPixels: ImageDatas.defaultNormal, hideFlags: feng3d.HideFlags.NotEditable }));
-    feng3d.rs.setDefaultAssetData(Texture2D.defaultParticle = Object.setValue(new Texture2D(), { name: "Default-ParticleTexture", assetId: "Default-ParticleTexture", noPixels: ImageDatas.defaultParticle, format: feng3d.TextureFormat.RGBA, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(Texture2D.default = feng3d.serialization.setValue(new Texture2D(), { name: "Default-Texture", assetId: "Default-Texture", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(Texture2D.defaultNormal = feng3d.serialization.setValue(new Texture2D(), { name: "Default-NormalTexture", assetId: "Default-NormalTexture", noPixels: ImageDatas.defaultNormal, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(Texture2D.defaultParticle = feng3d.serialization.setValue(new Texture2D(), { name: "Default-ParticleTexture", assetId: "Default-ParticleTexture", noPixels: ImageDatas.defaultParticle, format: feng3d.TextureFormat.RGBA, hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26691,84 +27250,148 @@ var feng3d;
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.TextureCube";
             _this.assetType = feng3d.AssetType.texturecube;
+            _this.OAVCubeMap = "";
             _this.noPixels = [feng3d.ImageDatas.white, feng3d.ImageDatas.white, feng3d.ImageDatas.white, feng3d.ImageDatas.white, feng3d.ImageDatas.white, feng3d.ImageDatas.white];
             _this._pixels = [null, null, null, null, null, null];
             _this._textureType = feng3d.TextureType.TEXTURE_CUBE_MAP;
-            _this.loadingNum = 0;
+            _this._loading = [];
             return _this;
         }
-        TextureCube.prototype.urlChanged = function (property, oldValue, newValue) {
-            var _this = this;
-            var index = ["positive_x_url", "positive_y_url", "positive_z_url", "negative_x_url", "negative_y_url", "negative_z_url"].indexOf(property);
-            feng3d.assert(index != -1);
-            this.loadingNum++;
-            feng3d.fs.readImage(newValue, function (err, img) {
-                if (err) {
-                    // error(err);
-                    _this._pixels[index] = null;
-                }
-                else
-                    _this._pixels[index] = img;
-                _this.loadingNum--;
-                _this.invalidate();
-                if (_this.loadingNum == 0) {
-                    _this.dispatch("loadCompleted");
-                }
-            });
-        };
         Object.defineProperty(TextureCube.prototype, "isLoaded", {
             /**
              * 是否加载完成
              */
-            get: function () {
-                if (this.loadingNum == 0)
-                    return true;
-                return false;
-            },
+            get: function () { return this._loading.length == 0; },
             enumerable: true,
             configurable: true
         });
+        TextureCube.prototype.setTexture2D = function (pos, texture) {
+            if (this.rawData == null || this.rawData.type != "texture") {
+                this.rawData = { type: "texture", textures: [] };
+            }
+            var index = TextureCube.ImageNames.indexOf(pos);
+            this.rawData.textures[index] = texture;
+            this._loadItemTexture(texture, index);
+        };
+        TextureCube.prototype.setTexture2DPath = function (pos, path) {
+            if (this.rawData == null || this.rawData.type != "path") {
+                this.rawData = { type: "path", paths: [] };
+            }
+            var index = TextureCube.ImageNames.indexOf(pos);
+            this.rawData.paths[index] = path;
+            this._loadItemImagePath(path, index);
+        };
+        TextureCube.prototype.getTextureImage = function (pos, callback) {
+            if (!this.rawData) {
+                callback();
+                return;
+            }
+            var index = TextureCube.ImageNames.indexOf(pos);
+            if (this.rawData.type == "texture") {
+                var texture = this.rawData.textures[index];
+                if (!texture) {
+                    callback();
+                    return;
+                }
+                ;
+                texture.onLoadCompleted(function () {
+                    callback(texture.image);
+                });
+            }
+            else if (this.rawData.type == "path") {
+                var path_1 = this.rawData.paths[index];
+                if (!path_1) {
+                    callback();
+                    return;
+                }
+                feng3d.fs.readImage(path_1, function (err, img) {
+                    callback(img);
+                });
+            }
+        };
+        TextureCube.prototype._rawDataChanged = function () {
+            var _this = this;
+            if (!this.rawData)
+                return;
+            if (this.rawData.type == "texture") {
+                this.rawData.textures.forEach(function (v, index) {
+                    _this._loadItemTexture(v, index);
+                });
+                this.invalidate();
+            }
+            else if (this.rawData.type == "path") {
+                this.rawData.paths.forEach(function (v, index) {
+                    _this._loadItemImagePath(v, index);
+                });
+            }
+        };
+        /**
+         * 加载单个贴图
+         *
+         * @param texture 贴图
+         * @param index 索引
+         */
+        TextureCube.prototype._loadItemTexture = function (texture, index) {
+            var _this = this;
+            if (texture == null)
+                return;
+            this._loading.push(texture);
+            texture.onLoadCompleted(function () {
+                if (_this.rawData.type == "texture" && _this.rawData.textures[index] == texture) {
+                    _this._pixels[index] = texture.image;
+                    _this.invalidate();
+                }
+                _this._loading.delete(texture);
+                _this._onItemLoadCompleted();
+            });
+        };
+        /**
+         * 加载单个图片
+         *
+         * @param imagepath 图片路径
+         * @param index 索引
+         */
+        TextureCube.prototype._loadItemImagePath = function (imagepath, index) {
+            var _this = this;
+            if (imagepath == null)
+                return;
+            this._loading.push(imagepath);
+            feng3d.fs.readImage(imagepath, function (err, img) {
+                if (img != null && _this.rawData.type == "path" && _this.rawData.paths[index] == imagepath) {
+                    _this._pixels[index] = img;
+                    _this.invalidate();
+                }
+                _this._loading.delete(imagepath);
+                _this._onItemLoadCompleted();
+            });
+        };
+        TextureCube.prototype._onItemLoadCompleted = function () {
+            if (this._loading.length == 0)
+                this.dispatch("loadCompleted");
+        };
         /**
          * 已加载完成或者加载完成时立即调用
          * @param callback 完成回调
          */
         TextureCube.prototype.onLoadCompleted = function (callback) {
-            if (this.loadingNum == 0) {
+            if (this.isLoaded) {
                 callback();
                 return;
             }
-            else
-                this.once("loadCompleted", callback);
+            this.once("loadCompleted", callback);
         };
+        TextureCube.ImageNames = ["positive_x_url", "positive_y_url", "positive_z_url", "negative_x_url", "negative_y_url", "negative_z_url"];
         __decorate([
-            feng3d.oav({ component: "OAVCubeMap", priority: -1 }),
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "positive_x_url", void 0);
-        __decorate([
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "positive_y_url", void 0);
+            feng3d.oav({ component: "OAVCubeMap", priority: -1 })
+        ], TextureCube.prototype, "OAVCubeMap", void 0);
         __decorate([
             feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "positive_z_url", void 0);
-        __decorate([
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "negative_x_url", void 0);
-        __decorate([
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "negative_y_url", void 0);
-        __decorate([
-            feng3d.serialize,
-            feng3d.watch("urlChanged")
-        ], TextureCube.prototype, "negative_z_url", void 0);
+            feng3d.watch("_rawDataChanged")
+        ], TextureCube.prototype, "rawData", void 0);
         return TextureCube;
     }(feng3d.TextureInfo));
     feng3d.TextureCube = TextureCube;
-    feng3d.rs.setDefaultAssetData(TextureCube.default = Object.setValue(new TextureCube(), { name: "Default-TextureCube", assetId: "Default-TextureCube", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(TextureCube.default = feng3d.serialization.setValue(new TextureCube(), { name: "Default-TextureCube", assetId: "Default-TextureCube", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26780,6 +27403,8 @@ var feng3d;
         function Material() {
             var _this = _super.call(this) || this;
             _this.__class__ = "feng3d.Material";
+            //
+            _this.renderAtomic = new feng3d.RenderAtomic();
             _this.preview = "";
             /**
              * shader名称
@@ -26794,19 +27419,15 @@ var feng3d;
              * 渲染参数
              */
             _this.renderParams = new feng3d.RenderParams();
-            feng3d.feng3dDispatcher.on("asset.shaderChanged", _this.onShaderChanged, _this);
+            feng3d.dispatcher.on("asset.shaderChanged", _this.onShaderChanged, _this);
             return _this;
         }
         Material.prototype.beforeRender = function (renderAtomic) {
-            for (var key in this.uniforms) {
-                if (this.uniforms.hasOwnProperty(key)) {
-                    renderAtomic.uniforms[key] = this.uniforms[key];
-                }
+            Object.assign(renderAtomic.uniforms, this.renderAtomic.uniforms);
+            if (!renderAtomic.shader) {
+                renderAtomic.shader = this.renderAtomic.shader;
             }
-            if (!renderAtomic.shader || renderAtomic.shader["shaderName"] != this.shaderName) {
-                renderAtomic.shader = new feng3d.Shader(this.shaderName);
-            }
-            renderAtomic.renderParams = this.renderParams;
+            renderAtomic.renderParams = this.renderAtomic.renderParams;
             renderAtomic.shaderMacro.IS_POINTS_MODE = this.renderParams.renderMode == feng3d.RenderMode.POINTS;
         };
         Object.defineProperty(Material.prototype, "isLoaded", {
@@ -26855,13 +27476,20 @@ var feng3d;
             if (cls) {
                 if (this.uniforms == null || this.uniforms.constructor != cls) {
                     var newuniforms = new cls();
-                    // serialization.setValue(newuniforms, <any>this.uniforms);
+                    Object.assign(newuniforms, this.uniforms);
                     this.uniforms = newuniforms;
                 }
             }
             else {
                 this.uniforms = {};
             }
+            this.renderAtomic.shader = new feng3d.Shader(this.shaderName);
+        };
+        Material.prototype.onUniformsChanged = function () {
+            this.renderAtomic.uniforms = this.uniforms;
+        };
+        Material.prototype.onRenderParamsChanged = function () {
+            this.renderAtomic.renderParams = this.renderParams;
         };
         __decorate([
             feng3d.oav({ component: "OAVFeng3dPreView" })
@@ -26877,10 +27505,12 @@ var feng3d;
         ], Material.prototype, "name", void 0);
         __decorate([
             feng3d.serialize,
+            feng3d.watch("onUniformsChanged"),
             feng3d.oav({ component: "OAVObjectView" })
         ], Material.prototype, "uniforms", void 0);
         __decorate([
             feng3d.serialize,
+            feng3d.watch("onRenderParamsChanged"),
             feng3d.oav({ block: "渲染参数", component: "OAVObjectView" })
         ], Material.prototype, "renderParams", void 0);
         return Material;
@@ -26976,7 +27606,7 @@ var feng3d;
         ], TextureUniforms.prototype, "u_color", void 0);
         __decorate([
             feng3d.oav(),
-            feng3d.serializeAsset
+            feng3d.serialize
         ], TextureUniforms.prototype, "s_texture", void 0);
         return TextureUniforms;
     }());
@@ -27069,7 +27699,7 @@ var feng3d;
             feng3d.oav()
         ], StandardUniforms.prototype, "u_PointSize", void 0);
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ block: "diffuse" })
         ], StandardUniforms.prototype, "s_diffuse", void 0);
         __decorate([
@@ -27081,11 +27711,11 @@ var feng3d;
             feng3d.oav({ block: "diffuse" })
         ], StandardUniforms.prototype, "u_alphaThreshold", void 0);
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ block: "normalMethod" })
         ], StandardUniforms.prototype, "s_normal", void 0);
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ block: "specular" })
         ], StandardUniforms.prototype, "s_specular", void 0);
         __decorate([
@@ -27097,7 +27727,7 @@ var feng3d;
             feng3d.oav({ block: "specular" })
         ], StandardUniforms.prototype, "u_glossiness", void 0);
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ block: "ambient" })
         ], StandardUniforms.prototype, "s_ambient", void 0);
         __decorate([
@@ -27105,7 +27735,7 @@ var feng3d;
             feng3d.oav({ block: "ambient" })
         ], StandardUniforms.prototype, "u_ambient", void 0);
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ component: "OAVPick", block: "envMap", componentParam: { accepttype: "texturecube", datatype: "texturecube" } })
         ], StandardUniforms.prototype, "s_envMap", void 0);
         __decorate([
@@ -27136,7 +27766,7 @@ var feng3d;
     }());
     feng3d.StandardUniforms = StandardUniforms;
     feng3d.shaderConfig.shaders["standard"].cls = StandardUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.default = Object.setValue(new feng3d.Material(), { name: "Default-Material", assetId: "Default-Material", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Material.default = feng3d.serialization.setValue(new feng3d.Material(), { name: "Default-Material", assetId: "Default-Material", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27189,7 +27819,6 @@ var feng3d;
 (function (feng3d) {
     /**
      * 灯光
-
      */
     var Light = /** @class */ (function (_super) {
         __extends(Light, _super);
@@ -27220,7 +27849,7 @@ var feng3d;
              */
             _this.frameBufferObject = new feng3d.FrameBufferObject();
             _this.debugShadowMap = false;
-            _this.shadowCamera = Object.setValue(new feng3d.GameObject(), { name: "LightShadowCamera" }).addComponent(feng3d.Camera);
+            _this.shadowCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "LightShadowCamera" }).addComponent(feng3d.Camera);
             return _this;
         }
         Object.defineProperty(Light.prototype, "position", {
@@ -27292,8 +27921,8 @@ var feng3d;
                 gameObject.addComponent(feng3d.BillboardComponent);
                 //材质
                 var model = gameObject.getComponent(feng3d.Model);
-                model.geometry = Object.setValue(new feng3d.PlaneGeometry(), { width: this.lightType == feng3d.LightType.Point ? 1 : 0.5, height: 0.5, segmentsW: 1, segmentsH: 1, yUp: false });
-                var textureMaterial = model.material = Object.setValue(new feng3d.Material(), { shaderName: "texture", uniforms: { s_texture: this.frameBufferObject.texture } });
+                model.geometry = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { width: this.lightType == feng3d.LightType.Point ? 1 : 0.5, height: 0.5, segmentsW: 1, segmentsH: 1, yUp: false });
+                var textureMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "texture", uniforms: { s_texture: this.frameBufferObject.texture } });
                 //
                 // textureMaterial.uniforms.s_texture.url = 'Assets/pz.jpg';
                 // textureMaterial.uniforms.u_color.setTo(1.0, 0.0, 0.0, 1.0);
@@ -27380,7 +28009,7 @@ var feng3d;
                 this.shadowCamera.lens = this.orthographicLens = new feng3d.OrthographicLens(radius, 1, this.shadowCameraNear, this.shadowCameraNear + radius * 2);
             }
             else {
-                Object.setValue(this.orthographicLens, { size: radius, near: this.shadowCameraNear, far: this.shadowCameraNear + radius * 2 });
+                feng3d.serialization.setValue(this.orthographicLens, { size: radius, near: this.shadowCameraNear, far: this.shadowCameraNear + radius * 2 });
             }
         };
         return DirectionalLight;
@@ -28269,6 +28898,8 @@ var feng3d;
     feng3d.AudioListener = AudioListener;
 })(feng3d || (feng3d = {}));
 (function () {
+    if (typeof window == "undefined")
+        return;
     window["AudioContext"] = window["AudioContext"] || window["webkitAudioContext"];
     var audioCtx = feng3d.audioCtx = new AudioContext();
     var globalGain = feng3d.globalGain = audioCtx.createGain();
@@ -28534,7 +29165,7 @@ var feng3d;
                 var url = this.url;
                 feng3d.fs.readArrayBuffer(this.url, function (err, data) {
                     if (err) {
-                        feng3d.warn(err);
+                        console.warn(err);
                         return;
                     }
                     if (url != _this.url)
@@ -28702,7 +29333,7 @@ var feng3d;
             var target = mirrorWorldPosition.subTo(lookAtPosition);
             target.reflect(normal).negate();
             target.add(mirrorWorldPosition);
-            var mirrorCamera = Object.setValue(new feng3d.GameObject(), { name: "waterMirrorCamera" }).addComponent(feng3d.Camera);
+            var mirrorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "waterMirrorCamera" }).addComponent(feng3d.Camera);
             mirrorCamera.transform.position = view;
             mirrorCamera.transform.lookAt(target, rotationMatrix.up);
             mirrorCamera.lens = camera.lens.clone();
@@ -28789,7 +29420,7 @@ var feng3d;
         ], WaterUniforms.prototype, "u_waterColor", void 0);
         __decorate([
             feng3d.oav(),
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ tooltip: "水体法线图" })
         ], WaterUniforms.prototype, "s_normalSampler", void 0);
         __decorate([
@@ -28800,7 +29431,7 @@ var feng3d;
     }());
     feng3d.WaterUniforms = WaterUniforms;
     feng3d.shaderConfig.shaders["water"].cls = WaterUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.water = Object.setValue(new feng3d.Material(), { name: "Water-Material", assetId: "Water-Material", shaderName: "water", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Material.water = feng3d.serialization.setValue(new feng3d.Material(), { name: "Water-Material", assetId: "Water-Material", shaderName: "water", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -28978,7 +29609,7 @@ var feng3d;
             return blue;
         };
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav(),
             feng3d.watch("onHeightMapChanged")
         ], TerrainGeometry.prototype, "heightMap", void 0);
@@ -29024,7 +29655,7 @@ var feng3d;
      * 默认高度图
      */
     var defaultHeightMap = new feng3d.ImageUtil(1024, 1024, new feng3d.Color4(0, 0, 0, 0)).imageData;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.terrain = Object.setValue(new TerrainGeometry(), { name: "Terrain-Geometry", assetId: "Terrain-Geometry", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.terrain = feng3d.serialization.setValue(new TerrainGeometry(), { name: "Terrain-Geometry", assetId: "Terrain-Geometry", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -29041,19 +29672,19 @@ var feng3d;
             return _this;
         }
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ block: "terrain" })
         ], TerrainUniforms.prototype, "s_splatTexture1", void 0);
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ block: "terrain" })
         ], TerrainUniforms.prototype, "s_splatTexture2", void 0);
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ block: "terrain" })
         ], TerrainUniforms.prototype, "s_splatTexture3", void 0);
         __decorate([
-            feng3d.serializeAsset,
+            feng3d.serialize,
             feng3d.oav({ block: "terrain" })
         ], TerrainUniforms.prototype, "s_blendTexture", void 0);
         __decorate([
@@ -29064,7 +29695,7 @@ var feng3d;
     }(feng3d.StandardUniforms));
     feng3d.TerrainUniforms = TerrainUniforms;
     feng3d.shaderConfig.shaders["terrain"].cls = TerrainUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.terrain = Object.setValue(new feng3d.Material(), { name: "Terrain-Material", assetId: "Terrain-Material", shaderName: "terrain", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Material.terrain = feng3d.serialization.setValue(new feng3d.Material(), { name: "Terrain-Material", assetId: "Terrain-Material", shaderName: "terrain", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -29333,7 +29964,7 @@ var feng3d;
     }(feng3d.StandardUniforms));
     feng3d.ParticleUniforms = ParticleUniforms;
     feng3d.shaderConfig.shaders["particle"].cls = ParticleUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.particle = Object.setValue(new feng3d.Material(), {
+    feng3d.rs.setDefaultAssetData(feng3d.Material.particle = feng3d.serialization.setValue(new feng3d.Material(), {
         name: "Particle-Material", assetId: "Particle-Material", shaderName: "particle",
         renderParams: { enableBlend: true, depthMask: false },
         hideFlags: feng3d.HideFlags.NotEditable,
@@ -29677,7 +30308,7 @@ var feng3d;
         return ParticleSystem;
     }(feng3d.Model));
     feng3d.ParticleSystem = ParticleSystem;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.billboard = Object.setValue(new feng3d.PlaneGeometry(), { name: "Billboard", assetId: "Billboard-Geometry", yUp: false, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.rs.setDefaultAssetData(feng3d.Geometry.billboard = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { name: "Billboard", assetId: "Billboard-Geometry", yUp: false, hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -30009,19 +30640,19 @@ var feng3d;
             /**
              * 起始寿命为秒，粒子寿命为0时死亡。
              */
-            _this.startLifetime = Object.setValue(new feng3d.MinMaxCurve(), { between0And1: true, constant: 5, constant1: 5 });
+            _this.startLifetime = feng3d.serialization.setValue(new feng3d.MinMaxCurve(), { between0And1: true, constant: 5, constant1: 5 });
             /**
              * 粒子的起始速度，应用于起始方向。
              */
-            _this.startSpeed = Object.setValue(new feng3d.MinMaxCurve(), { constant: 5, constant1: 5 });
+            _this.startSpeed = feng3d.serialization.setValue(new feng3d.MinMaxCurve(), { constant: 5, constant1: 5 });
             /**
              * 粒子的起始缩放。
              */
-            _this.startScale = Object.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
+            _this.startScale = feng3d.serialization.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
             /**
              * 粒子的起始旋转角度。
              */
-            _this.startRotation = Object.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { curveMultiplier: 180 }, yCurve: { curveMultiplier: 180 }, zCurve: { curveMultiplier: 180 } });
+            _this.startRotation = feng3d.serialization.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { curveMultiplier: 180 }, yCurve: { curveMultiplier: 180 }, zCurve: { curveMultiplier: 180 } });
             /**
              * 粒子的起始颜色。
              */
@@ -30172,7 +30803,7 @@ var feng3d;
             /**
              * 发射率，每秒发射粒子数量
              */
-            _this.rate = Object.setValue(new feng3d.MinMaxCurve(), { between0And1: true, constant: 10, constant1: 10 });
+            _this.rate = feng3d.serialization.setValue(new feng3d.MinMaxCurve(), { between0And1: true, constant: 10, constant1: 10 });
             // rate = 10;
             /**
              * 爆发，在time时刻额外喷射particles粒子
@@ -30344,7 +30975,7 @@ var feng3d;
         __extends(ParticleScaleOverLifetimeModule, _super);
         function ParticleScaleOverLifetimeModule() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.scale = Object.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { constant: 1, constant1: 1, curveMultiplier: 1 }, yCurve: { constant: 1, constant1: 1, curveMultiplier: 1 }, zCurve: { constant: 1, constant1: 1, curveMultiplier: 1 } });
+            _this.scale = feng3d.serialization.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { constant: 1, constant1: 1, curveMultiplier: 1 }, yCurve: { constant: 1, constant1: 1, curveMultiplier: 1 }, zCurve: { constant: 1, constant1: 1, curveMultiplier: 1 } });
             return _this;
         }
         /**
@@ -30398,7 +31029,7 @@ var feng3d;
         __extends(ParticlePalstanceOverLifetimeModule, _super);
         function ParticlePalstanceOverLifetimeModule() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.palstance = Object.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constant1: 45, curveMultiplier: 45 } });
+            _this.palstance = feng3d.serialization.setValue(new feng3d.MinMaxCurveVector3(), { xCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constant1: 45, curveMultiplier: 45 } });
             return _this;
         }
         /**
@@ -30575,7 +31206,7 @@ var feng3d;
                 }
                 var jointGameobject = parentGameobject.find(skeletonJoint.name);
                 if (!jointGameobject) {
-                    jointGameobject = Object.setValue(new feng3d.GameObject(), { name: skeletonJoint.name, hideFlags: feng3d.HideFlags.DontSave });
+                    jointGameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: skeletonJoint.name, hideFlags: feng3d.HideFlags.DontSave });
                     parentGameobject.addChild(jointGameobject);
                 }
                 var transform = jointGameobject.transform;
@@ -30809,7 +31440,7 @@ var feng3d;
                 return feng3d.Vector3.fromArray(value);
             if (this.type == "Quaternion")
                 return feng3d.Quaternion.fromArray(value);
-            feng3d.error("\u672A\u5904\u7406 \u52A8\u753B\u6570\u636E\u7C7B\u578B " + this.type);
+            console.error("\u672A\u5904\u7406 \u52A8\u753B\u6570\u636E\u7C7B\u578B " + this.type);
             throw "";
         };
         __decorate([
@@ -31000,13 +31631,22 @@ var feng3d;
         function FolderAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.folder;
-            _this.extenson = "";
             /**
              * 子资源列表
              */
             _this.childrenAssets = [];
             return _this;
         }
+        FolderAsset.prototype.createData = function () {
+        };
+        /**
+         * 删除资源
+         *
+         * @param callback 完成回调
+         */
+        FolderAsset.prototype.delete = function (callback) {
+            throw "\u672A\u5B9E\u73B0";
+        };
         /**
          * 保存文件
          * @param callback 完成回调
@@ -31021,6 +31661,7 @@ var feng3d;
         FolderAsset.prototype.readFile = function (callback) {
             callback && callback(null);
         };
+        FolderAsset.extenson = "";
         __decorate([
             feng3d.serialize
         ], FolderAsset.prototype, "childrenAssets", void 0);
@@ -31038,6 +31679,8 @@ var feng3d;
         function ArrayBufferAsset() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        ArrayBufferAsset.prototype.createData = function () {
+        };
         /**
          * 保存文件
          *
@@ -31058,9 +31701,6 @@ var feng3d;
                 callback && callback(err);
             });
         };
-        __decorate([
-            feng3d.oav()
-        ], ArrayBufferAsset.prototype, "name", void 0);
         return ArrayBufferAsset;
     }(feng3d.FileAsset));
     feng3d.ArrayBufferAsset = ArrayBufferAsset;
@@ -31109,7 +31749,8 @@ var feng3d;
         }
         ObjectAsset.prototype.saveFile = function (callback) {
             this.data.assetId = this.assetId;
-            this.rs.fs.writeObject(this.assetPath, this.data, function (err) {
+            var d = feng3d.serialization.serialize(this.data);
+            this.rs.fs.writeObject(this.assetPath, d, function (err) {
                 callback && callback(err);
             });
         };
@@ -31120,17 +31761,28 @@ var feng3d;
          */
         ObjectAsset.prototype.readFile = function (callback) {
             var _this = this;
-            this.rs.fs.readObject(this.assetPath, function (err, data) {
-                _this.data = data;
-                _this.data.assetId = _this.assetId;
-                callback && callback(err);
+            this.rs.fs.readObject(this.assetPath, function (err, object) {
+                _this.rs.deserializeWithAssets(object, function (data) {
+                    _this.data = data;
+                    feng3d.debuger && console.assert(_this.data.assetId == _this.assetId);
+                    callback && callback(err);
+                });
             });
         };
+        ObjectAsset.prototype._dataChanged = function (property, oldValue, newValue) {
+            if (oldValue) {
+                feng3d.objectevent.off(oldValue, "propertyValueChanged", this._onDataChanged, this);
+            }
+            if (newValue) {
+                feng3d.objectevent.on(newValue, "propertyValueChanged", this._onDataChanged, this);
+            }
+        };
+        ObjectAsset.prototype._onDataChanged = function () {
+            this.write();
+        };
         __decorate([
-            feng3d.oav({ exclude: true })
-        ], ObjectAsset.prototype, "name", void 0);
-        __decorate([
-            feng3d.oav({ component: "OAVObjectView" })
+            feng3d.oav({ component: "OAVObjectView" }),
+            feng3d.watch("_dataChanged")
         ], ObjectAsset.prototype, "data", void 0);
         return ObjectAsset;
     }(feng3d.FileAsset));
@@ -31146,19 +31798,19 @@ var feng3d;
         function ScriptAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.script;
-            _this.extenson = ".ts";
-            _this.textContent = "";
             return _this;
         }
+        ScriptAsset.prototype.createData = function () {
+            this.textContent = "";
+        };
         ScriptAsset.prototype.onTextContentChanged = function () {
             if (!this.textContent) {
                 this.scriptName = "";
-                this.name = "";
                 return;
             }
             // 获取脚本类名称
             var result = feng3d.regExps.classReg.exec(this.textContent);
-            feng3d.assert(result != null, "\u5728\u811A\u672C " + this.assetPath + " \u4E2D\u6CA1\u6709\u627E\u5230 \u811A\u672C\u7C7B\u5B9A\u4E49");
+            feng3d.debuger && console.assert(result != null, "\u5728\u811A\u672C " + this.assetPath + " \u4E2D\u6CA1\u6709\u627E\u5230 \u811A\u672C\u7C7B\u5B9A\u4E49");
             var script = result[3];
             if (result[5]) {
                 this.parentScriptName = result[5].split(".").pop();
@@ -31166,14 +31818,12 @@ var feng3d;
             // 获取导出类命名空间
             if (result[1]) {
                 result = feng3d.regExps.namespace.exec(this.textContent);
-                feng3d.assert(result != null, "\u83B7\u53D6\u811A\u672C " + this.assetPath + " \u547D\u540D\u7A7A\u95F4\u5931\u8D25");
+                feng3d.debuger && console.assert(result != null, "\u83B7\u53D6\u811A\u672C " + this.assetPath + " \u547D\u540D\u7A7A\u95F4\u5931\u8D25");
                 script = result[1] + "." + script;
             }
             this.scriptName = script;
         };
-        __decorate([
-            feng3d.oav({ editable: false, priority: -1 })
-        ], ScriptAsset.prototype, "name", void 0);
+        ScriptAsset.extenson = ".ts";
         __decorate([
             feng3d.watch("onTextContentChanged")
         ], ScriptAsset.prototype, "textContent", void 0);
@@ -31191,9 +31841,9 @@ var feng3d;
         function ShaderAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.shader;
-            _this.extenson = ".ts";
             return _this;
         }
+        ShaderAsset.extenson = ".ts";
         return ShaderAsset;
     }(feng3d.ScriptAsset));
     feng3d.ShaderAsset = ShaderAsset;
@@ -31208,10 +31858,12 @@ var feng3d;
         function JSAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.js;
-            _this.extenson = ".js";
-            _this.textContent = "";
             return _this;
         }
+        JSAsset.prototype.createData = function () {
+            this.textContent = "";
+        };
+        JSAsset.extenson = ".js";
         return JSAsset;
     }(feng3d.StringAsset));
     feng3d.JSAsset = JSAsset;
@@ -31226,10 +31878,12 @@ var feng3d;
         function JsonAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.json;
-            _this.extenson = ".json";
-            _this.textContent = "{}";
             return _this;
         }
+        JsonAsset.prototype.createData = function () {
+            this.textContent = "{}";
+        };
+        JsonAsset.extenson = ".json";
         return JsonAsset;
     }(feng3d.StringAsset));
     feng3d.JsonAsset = JsonAsset;
@@ -31241,10 +31895,12 @@ var feng3d;
         function TextAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.txt;
-            _this.extenson = ".txt";
-            _this.textContent = "";
             return _this;
         }
+        TextAsset.prototype.createData = function () {
+            this.textContent = "";
+        };
+        TextAsset.extenson = ".txt";
         return TextAsset;
     }(feng3d.StringAsset));
     feng3d.TextAsset = TextAsset;
@@ -31259,9 +31915,12 @@ var feng3d;
         function AudioAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.audio;
-            _this.extenson = ".mp3";
             return _this;
         }
+        // readonly extenson: ".ogg" | ".mp3" | ".wav" = ".mp3";
+        AudioAsset.prototype.createData = function () {
+            throw "\u672A\u5B9E\u73B0";
+        };
         /**
          * 保存文件
          * @param callback 完成回调
@@ -31289,11 +31948,6 @@ var feng3d;
         __extends(TextureAsset, _super);
         function TextureAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            /**
-             * 材质
-             */
-            _this.data = new feng3d.Texture2D();
-            _this.extenson = ".png";
             _this.assetType = feng3d.AssetType.texture;
             return _this;
         }
@@ -31301,16 +31955,19 @@ var feng3d;
             /**
              * 图片
              */
-            get: function () { return this._image; },
+            get: function () { return this.data["_pixels"]; },
             set: function (v) {
-                this._image = v;
                 this.data["_pixels"] = v;
+                this.saveFile();
             },
             enumerable: true,
             configurable: true
         });
-        TextureAsset.prototype.saveFile = function (callback) {
+        TextureAsset.prototype.createData = function () {
+            this.data = new feng3d.Texture2D();
             this.data.assetId = this.assetId;
+        };
+        TextureAsset.prototype.saveFile = function (callback) {
             this.rs.fs.writeImage(this.assetPath, this.image, function (err) {
                 callback && callback(err);
             });
@@ -31323,8 +31980,7 @@ var feng3d;
         TextureAsset.prototype.readFile = function (callback) {
             var _this = this;
             this.rs.fs.readImage(this.assetPath, function (err, img) {
-                _this.image = img;
-                _this.data.assetId = _this.assetId;
+                _this.data["_pixels"] = img;
                 callback && callback(err);
             });
         };
@@ -31336,8 +31992,10 @@ var feng3d;
         TextureAsset.prototype.readMeta = function (callback) {
             var _this = this;
             _super.prototype.readMeta.call(this, function (err) {
-                _this.data = feng3d.serialization.deserialize(_this.meta["texture"]);
-                callback && callback(err);
+                _this.rs.deserializeWithAssets(_this.meta.texture, function (result) {
+                    _this.data = result;
+                    callback && callback(err);
+                });
             });
         };
         /**
@@ -31346,9 +32004,10 @@ var feng3d;
          * @param callback 完成回调
          */
         TextureAsset.prototype.writeMeta = function (callback) {
-            this.meta["texture"] = feng3d.serialization.serialize(this.data);
-            this.rs.fs.writeObject(this.metaPath, this.meta, callback);
+            this.meta.texture = feng3d.serialization.serialize(this.data);
+            _super.prototype.writeMeta.call(this, callback);
         };
+        TextureAsset.extenson = ".png";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], TextureAsset.prototype, "data", void 0);
@@ -31365,10 +32024,14 @@ var feng3d;
         __extends(TextureCubeAsset, _super);
         function TextureCubeAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.extenson = ".json";
             _this.assetType = feng3d.AssetType.texturecube;
             return _this;
         }
+        TextureCubeAsset.prototype.createData = function () {
+            this.data = new feng3d.TextureCube();
+            this.data.assetId = this.assetId;
+        };
+        TextureCubeAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], TextureCubeAsset.prototype, "data", void 0);
@@ -31386,9 +32049,12 @@ var feng3d;
         function GeometryAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.geometry;
-            _this.extenson = ".json";
             return _this;
         }
+        GeometryAsset.prototype.createData = function () {
+            throw "\u672A\u5B9E\u73B0";
+        };
+        GeometryAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], GeometryAsset.prototype, "data", void 0);
@@ -31406,9 +32072,13 @@ var feng3d;
         function MaterialAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.assetType = feng3d.AssetType.material;
-            _this.extenson = ".json";
             return _this;
         }
+        MaterialAsset.prototype.createData = function () {
+            this.data = new feng3d.Material();
+            this.data.assetId = this.assetId;
+        };
+        MaterialAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], MaterialAsset.prototype, "data", void 0);
@@ -31425,14 +32095,13 @@ var feng3d;
         __extends(GameObjectAsset, _super);
         function GameObjectAsset() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            /**
-             * 材质
-             */
-            _this.data = new feng3d.GameObject();
             _this.assetType = feng3d.AssetType.gameobject;
-            _this.extenson = ".json";
             return _this;
         }
+        GameObjectAsset.prototype.createData = function () {
+            throw "\u672A\u5B9E\u73B0";
+        };
+        GameObjectAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
         ], GameObjectAsset.prototype, "data", void 0);
@@ -32447,7 +33116,7 @@ var feng3d;
             War3Model.prototype.getMesh = function () {
                 this.meshs = [];
                 this.meshs.length = this.geosets.length;
-                var container = Object.setValue(new feng3d.GameObject(), { name: this.model.name });
+                var container = feng3d.serialization.setValue(new feng3d.GameObject(), { name: this.model.name });
                 var skeletonjoints = createSkeleton(this);
                 this.skeletonComponent = container.addComponent(feng3d.SkeletonComponent);
                 this.skeletonComponent.joints = skeletonjoints;
@@ -32476,11 +33145,11 @@ var feng3d;
                         // {
                         // image = image.substring(0, image.indexOf("."));
                         // image += ".JPG";
-                        material.material = model.material = Object.setValue(new feng3d.Material(), { name: image, renderParams: { cullFace: feng3d.CullFace.FRONT } });
+                        material.material = model.material = feng3d.serialization.setValue(new feng3d.Material(), { name: image, renderParams: { cullFace: feng3d.CullFace.FRONT } });
                         // }
-                        feng3d.feng3dDispatcher.dispatch("asset.parsed", material.material);
+                        feng3d.dispatcher.dispatch("asset.parsed", material.material);
                     }
-                    feng3d.feng3dDispatcher.dispatch("asset.parsed", geometry);
+                    feng3d.dispatcher.dispatch("asset.parsed", geometry);
                     model.geometry = geometry;
                     model.skinSkeleton = skinSkeleton;
                     container.addChild(mesh);
@@ -32592,7 +33261,7 @@ var feng3d;
                 war3Model.bones.forEach(function (bone) {
                     bone.buildAnimationclip(animationclip, __chache__, sequence.interval.start, sequence.interval.end);
                 });
-                feng3d.feng3dDispatcher.dispatch("asset.parsed", animationclip);
+                feng3d.dispatcher.dispatch("asset.parsed", animationclip);
                 animationclips.push(animationclip);
             }
             return animationclips;
@@ -33843,16 +34512,16 @@ var feng3d;
          */
         MTLConverter.prototype.convert = function (mtl, completed) {
             var materials = {};
-            for (var name_5 in mtl) {
-                var materialInfo = mtl[name_5];
-                var material = materials[name_5] = Object.setValue(new feng3d.Material(), {
+            for (var name_1 in mtl) {
+                var materialInfo = mtl[name_1];
+                var material = materials[name_1] = feng3d.serialization.setValue(new feng3d.Material(), {
                     name: materialInfo.name,
                     uniforms: {
                         u_diffuse: { r: materialInfo.kd[0], g: materialInfo.kd[1], b: materialInfo.kd[2], },
                         u_specular: { r: materialInfo.ks[0], g: materialInfo.ks[1], b: materialInfo.ks[2], },
                     },
                 });
-                feng3d.feng3dDispatcher.dispatch("asset.parsed", material);
+                feng3d.dispatcher.dispatch("asset.parsed", material);
             }
             completed && completed(null, materials);
         };
@@ -33884,7 +34553,7 @@ var feng3d;
                 var gameObject = createSubObj(objData, obj, materials);
                 object.addChild(gameObject);
             }
-            feng3d.feng3dDispatcher.dispatch("asset.parsed", object);
+            feng3d.dispatcher.dispatch("asset.parsed", object);
             completed && completed(object);
         };
         return OBJConverter;
@@ -33892,7 +34561,7 @@ var feng3d;
     feng3d.OBJConverter = OBJConverter;
     feng3d.objConverter = new OBJConverter();
     function createSubObj(objData, obj, materials) {
-        var gameObject = Object.setValue(new feng3d.GameObject(), { name: obj.name });
+        var gameObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: obj.name });
         var subObjs = obj.subObjs;
         for (var i = 0; i < subObjs.length; i++) {
             var materialObj = createMaterialObj(objData, subObjs[i], materials);
@@ -33932,7 +34601,7 @@ var feng3d;
             geometry.setVAData("a_normal", normals, 3);
         if (uvs.length > 0)
             geometry.setVAData("a_uv", uvs, 2);
-        feng3d.feng3dDispatcher.dispatch("asset.parsed", geometry);
+        feng3d.dispatcher.dispatch("asset.parsed", geometry);
         return gameObject;
         function translateVertexData(face, vertexIndex, vertices, uvs, indices, normals, obj) {
             var index;
@@ -33993,7 +34662,7 @@ var feng3d;
             gameObject.transform.rx = -90;
             //顶点最大关节关联数
             var _maxJointCount = this.calculateMaxJointCount(md5MeshData);
-            feng3d.debuger && feng3d.assert(_maxJointCount <= 8, "顶点最大关节关联数最多支持8个");
+            feng3d.debuger && console.assert(_maxJointCount <= 8, "顶点最大关节关联数最多支持8个");
             var skeletonjoints = this.createSkeleton(md5MeshData.joints);
             var skeletonComponent = gameObject.addComponent(feng3d.SkeletonComponent);
             skeletonComponent.joints = skeletonjoints;
@@ -34006,7 +34675,7 @@ var feng3d;
                 skinnedModel.skinSkeleton = skinSkeleton;
                 gameObject.addChild(skeletonGameObject);
             }
-            feng3d.feng3dDispatcher.dispatch("asset.parsed", gameObject);
+            feng3d.dispatcher.dispatch("asset.parsed", gameObject);
             completed && completed(gameObject);
         };
         /**
@@ -34188,7 +34857,7 @@ var feng3d;
             for (var i = 0; i < md5AnimData.numFrames; ++i) {
                 translatePose(md5AnimData, md5AnimData.frame[i], animationClip);
             }
-            feng3d.feng3dDispatcher.dispatch("asset.parsed", animationClip);
+            feng3d.dispatcher.dispatch("asset.parsed", animationClip);
             completed && completed(animationClip);
             /**
              * 将一个关键帧数据转换为SkeletonPose
@@ -34389,8 +35058,8 @@ var feng3d;
             feng3d.fs.readString(mdlurl, function (err, content) {
                 feng3d.war3.mdlParser.parse(content, function (war3Model) {
                     var showMesh = war3Model.getMesh();
-                    var gameObject = Object.setValue(new feng3d.GameObject(), { name: feng3d.pathUtils.getName(mdlurl), children: [showMesh] });
-                    feng3d.feng3dDispatcher.dispatch("asset.parsed", gameObject);
+                    var gameObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: feng3d.pathUtils.getName(mdlurl), children: [showMesh] });
+                    feng3d.dispatcher.dispatch("asset.parsed", gameObject);
                     callback && callback(gameObject);
                 });
             });
@@ -34402,107 +35071,118 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
+    var UIImage = /** @class */ (function (_super) {
+        __extends(UIImage, _super);
+        function UIImage() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return UIImage;
+    }(feng3d.Model));
+    feng3d.UIImage = UIImage;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     var GameObjectFactory = /** @class */ (function () {
         function GameObjectFactory() {
         }
         GameObjectFactory.prototype.createGameObject = function (name) {
             if (name === void 0) { name = "GameObject"; }
-            return Object.setValue(new feng3d.GameObject(), { name: name });
+            return feng3d.serialization.setValue(new feng3d.GameObject(), { name: name });
         };
         GameObjectFactory.prototype.createCube = function (name) {
             if (name === void 0) { name = "cube"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.cube },]
             });
         };
         GameObjectFactory.prototype.createPlane = function (name) {
             if (name === void 0) { name = "plane"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.plane },]
             });
         };
         GameObjectFactory.prototype.createCylinder = function (name) {
             if (name === void 0) { name = "cylinder"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.cylinder },]
             });
         };
         GameObjectFactory.prototype.createCone = function (name) {
             if (name === void 0) { name = "Cone"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.cone },]
             });
         };
         GameObjectFactory.prototype.createTorus = function (name) {
             if (name === void 0) { name = "Torus"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.torus },]
             });
         };
         GameObjectFactory.prototype.createSphere = function (name) {
             if (name === void 0) { name = "sphere"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.sphere },]
             });
         };
         GameObjectFactory.prototype.createCapsule = function (name) {
             if (name === void 0) { name = "capsule"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.capsule },]
             });
         };
         GameObjectFactory.prototype.createTerrain = function (name) {
             if (name === void 0) { name = "Terrain"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.Terrain" },]
             });
         };
         GameObjectFactory.prototype.createCamera = function (name) {
             if (name === void 0) { name = "Camera"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.Camera" },]
             });
         };
         GameObjectFactory.prototype.createPointLight = function (name) {
             if (name === void 0) { name = "PointLight"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.PointLight" },]
             });
         };
         GameObjectFactory.prototype.createDirectionalLight = function (name) {
             if (name === void 0) { name = "DirectionalLight"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.DirectionalLight" },]
             });
         };
         GameObjectFactory.prototype.createSpotLight = function (name) {
             if (name === void 0) { name = "SpotLight"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.SpotLight" },]
             });
         };
         GameObjectFactory.prototype.createParticle = function (name) {
             if (name === void 0) { name = "Particle"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.Transform", rx: -90 }, { __class__: "feng3d.ParticleSystem" },],
             });
         };
         GameObjectFactory.prototype.createWater = function (name) {
             if (name === void 0) { name = "water"; }
-            return Object.setValue(new feng3d.GameObject(), {
+            return feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.Water" },],
             });
@@ -34539,11 +35219,11 @@ var feng3d;
          * @param scene3d 场景
          * @param camera 摄像机
          */
-        Mouse3DManager.prototype.pick = function (scene3d, camera) {
+        Mouse3DManager.prototype.pick = function (engine, scene3d, camera) {
             if (this._mouseEventTypes.length == 0)
                 return;
             //计算得到鼠标射线相交的物体
-            var pickingCollisionVO = feng3d.raycaster.pick(camera.getMouseRay3D(), scene3d.mouseCheckObjects);
+            var pickingCollisionVO = feng3d.raycaster.pick(engine.getMouseRay3D(), scene3d.mouseCheckObjects);
             var gameobject = pickingCollisionVO && pickingCollisionVO.gameObject;
             return gameobject;
         };
@@ -34658,7 +35338,7 @@ var feng3d;
                 return null;
             if (!this.catchMouseMove && type == "mousemove")
                 return null;
-            return feng3d.fevent.dispatch(this, type, data, bubbles);
+            return _super.prototype.dispatch.call(this, type, data, bubbles);
         };
         /**
          * 派发事件
@@ -34723,16 +35403,22 @@ var feng3d;
     }(MouseInput));
     feng3d.WindowMouseInput = WindowMouseInput;
 })(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * feng3d的版本号
-     */
-    feng3d.revision = "2019.03.01";
-    /**
-     * 是否开启调试(主要用于断言)
-     */
-    feng3d.debuger = true;
-    feng3d.log("feng3d version " + feng3d.revision);
-})(feng3d || (feng3d = {}));
 //# sourceMappingURL=feng3d.js.map
+console.log("feng3d-0.1.3");
+(function universalModuleDefinition(root, factory)
+{
+    if (typeof exports === 'object' && typeof module === 'object')
+        module.exports = factory();
+    else if (typeof define === 'function' && define.amd)
+        define([], factory);
+    else if (typeof exports === 'object')
+        exports["feng3d"] = factory();
+    else
+        root["feng3d"] = factory();
+    
+    var globalObject = (typeof global !== 'undefined') ? global : ((typeof window !== 'undefined') ? window : this);
+    globalObject["feng3d"] = factory();
+})(this, function ()
+{
+    return feng3d;
+});

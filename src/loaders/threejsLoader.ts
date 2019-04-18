@@ -52,15 +52,15 @@ namespace editor
             var gameobject = parse(scene);
             gameobject.transform.sx = -1;
             onParseComplete && onParseComplete(gameobject);
-            feng3d.log("onLoad");
+            console.log("onLoad");
         }
         function onProgress(event: ProgressEvent)
         {
-            feng3d.log(event);
+            console.log(event);
         }
         function onError(err)
         {
-            feng3d.error(err);
+            console.error(err);
         }
 
         function parse(object3d, parent?: feng3d.GameObject)
@@ -84,7 +84,7 @@ namespace editor
                     var skinnedModel = gameobject.addComponent(feng3d.SkinnedModel);
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
-                    feng3d.debuger && feng3d.assert(object3d.bindMode == "attached");
+                    feng3d.debuger && console.assert(object3d.bindMode == "attached");
                     skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
                         skinnedModel.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();
@@ -105,7 +105,7 @@ namespace editor
                     //Bone 由SkeletonComponent自动生成，不用解析
                     break;
                 default:
-                    feng3d.warn(`没有提供 ${object3d.type} 类型对象的解析`);
+                    console.warn(`没有提供 ${object3d.type} 类型对象的解析`);
                     break;
             }
 
@@ -177,14 +177,14 @@ namespace editor
                     propertyClip.propertyName = "orientation";
                     break;
                 default:
-                    feng3d.warn(`没有处理 propertyName ${result[2]}`);
+                    console.warn(`没有处理 propertyName ${result[2]}`);
                     break;
             }
 
             propertyClip.propertyValues = [];
             var propertyValues = propertyClip.propertyValues;
             var times: number[] = keyframeTrack.times;
-            var values: number[] = ds.utils.arrayFrom(keyframeTrack.values);
+            var values: number[] = feng3d.utils.arrayFrom(keyframeTrack.values);
             if (usenumberfixed)
             {
                 values = values.map((v: number) => { return Number(v.toFixed(6)); });
@@ -208,7 +208,7 @@ namespace editor
                     }
                     break;
                 default:
-                    feng3d.warn(`没有提供解析 ${keyframeTrack.ValueTypeName} 类型Track数据`);
+                    console.warn(`没有提供解析 ${keyframeTrack.ValueTypeName} 类型Track数据`);
                     break;
             }
 
@@ -271,7 +271,7 @@ namespace editor
                 joints[jointsMapitem[0]].matrix3D = new feng3d.Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
             } else
             {
-                feng3d.warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);
+                console.warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);
             }
         }
 
@@ -289,7 +289,7 @@ namespace editor
             if (attributes.hasOwnProperty(key))
             {
                 var element = attributes[key];
-                var array: number[] = ds.utils.arrayFrom(element.array);
+                var array: number[] = feng3d.utils.arrayFrom(element.array);
                 if (usenumberfixed)
                 {
                     array = array.map((v: number) => { return Number(v.toFixed(6)); });
@@ -312,7 +312,7 @@ namespace editor
                         geo.setVAData("a_jointweight0", array, 4);
                         break;
                     default:
-                        feng3d.warn("没有解析顶点数据", key);
+                        console.warn("没有解析顶点数据", key);
                         break;
                 }
             }

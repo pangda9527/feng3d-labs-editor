@@ -123,7 +123,7 @@ namespace editor
          */
         private onItemLoadError(event: RES.ResourceEvent): void
         {
-            feng3d.warn("Url:" + event.resItem.url + " has failed to load");
+            console.warn("Url:" + event.resItem.url + " has failed to load");
         }
         /**
          * 资源组加载出错
@@ -132,7 +132,7 @@ namespace editor
         private onResourceLoadError(event: RES.ResourceEvent): void
         {
             //TODO
-            feng3d.warn("Group:" + event.groupName + " has failed to load");
+            console.warn("Group:" + event.groupName + " has failed to load");
             //忽略加载失败的项目
             //ignore loading failed projects
             this.onResourceLoadComplete(event);

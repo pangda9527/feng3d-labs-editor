@@ -159,7 +159,7 @@ namespace editor
             {
                 if (err)
                 {
-                    feng3d.warn(err);
+                    console.warn(err);
                     onError(this);
                 } else
                 {
@@ -180,7 +180,7 @@ namespace editor
             {
                 if (err)
                 {
-                    feng3d.warn(this);
+                    console.warn(this);
                     onError(this);
                     return;
                 }
@@ -250,7 +250,7 @@ namespace editor
             {
                 if (err)
                 {
-                    feng3d.warn(err);
+                    console.warn(err);
                     onError(this);
                     return;
                 }
@@ -274,7 +274,7 @@ namespace editor
             {
                 if (err)
                 {
-                    feng3d.warn(err);
+                    console.warn(err);
                     onError(this);
                     return;
                 }
@@ -297,7 +297,7 @@ namespace editor
             {
                 if (err)
                 {
-                    feng3d.warn(err);
+                    console.warn(err);
                     onError(this);
                     return;
                 }
