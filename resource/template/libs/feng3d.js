@@ -16661,7 +16661,11 @@ var feng3d;
                 return;
             }
             var eventtype = "loaded";
-            feng3d.event.once(this, eventtype, function () { callback(); });
+            feng3d.event.once(this, eventtype, function () {
+                _this.isLoaded = true;
+                _this.isLoading = false;
+                callback();
+            });
             if (this.isLoading)
                 return;
             this.isLoading = true;
@@ -23255,35 +23259,49 @@ var feng3d;
         function ScriptComponent() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.runEnvironment = feng3d.RunEnvironment.feng3d;
+            _this._invalid = true;
             _this.scriptInit = false;
             return _this;
         }
+        Object.defineProperty(ScriptComponent.prototype, "scriptInstance", {
+            /**
+             * 脚本对象
+             */
+            get: function () {
+                if (this._invalid)
+                    this.updateScriptInstance();
+                return this._scriptInstance;
+            },
+            enumerable: true,
+            configurable: true
+        });
         ScriptComponent.prototype.init = function (gameObject) {
             _super.prototype.init.call(this, gameObject);
-            feng3d.dispatcher.on("asset.scriptChanged", this.onScriptChanged, this);
+            feng3d.dispatcher.on("asset.scriptChanged", this.invalidateScriptInstance, this);
         };
-        ScriptComponent.prototype.scriptChanged = function (property, oldValue, newValue) {
-            if (this.scriptInstance) {
-                this.scriptInstance.component = null;
-                this.scriptInstance.dispose();
-                this.scriptInstance = null;
-            }
+        ScriptComponent.prototype.updateScriptInstance = function () {
+            var oldInstance = this._scriptInstance;
+            this._scriptInstance = null;
             if (!this.scriptName)
                 return;
             var cls = feng3d.classUtils.getDefinitionByName(this.scriptName, false);
             if (cls)
-                this.scriptInstance = new cls();
+                this._scriptInstance = new cls();
             else
                 console.warn("\u65E0\u6CD5\u521D\u59CB\u5316\u811A\u672C " + this.scriptName);
             this.scriptInit = false;
+            // 移除旧实例
+            if (oldInstance) {
+                // 如果两个类定义名称相同，则保留上个对象数据
+                if (feng3d.classUtils.getQualifiedClassName(oldInstance) == this.scriptName) {
+                    feng3d.serialization.setValue(this._scriptInstance, oldInstance);
+                }
+                oldInstance.component = null;
+                oldInstance.dispose();
+            }
         };
-        ScriptComponent.prototype.onScriptChanged = function () {
-            var cls = feng3d.classUtils.getDefinitionByName(this.scriptName, false);
-            if (this.scriptInstance instanceof cls)
-                return;
-            var newInstance = new cls();
-            feng3d.serialization.setValue(newInstance, this.scriptInstance);
-            this.scriptInstance = newInstance;
+        ScriptComponent.prototype.invalidateScriptInstance = function () {
+            this._invalid = true;
         };
         /**
          * 每帧执行
@@ -23301,22 +23319,22 @@ var feng3d;
          */
         ScriptComponent.prototype.dispose = function () {
             this.enabled = false;
-            if (this.scriptInstance) {
-                this.scriptInstance.component = null;
-                this.scriptInstance.dispose();
-                this.scriptInstance = null;
+            if (this._scriptInstance) {
+                this._scriptInstance.component = null;
+                this._scriptInstance.dispose();
+                this._scriptInstance = null;
             }
             _super.prototype.dispose.call(this);
-            feng3d.dispatcher.off("asset.scriptChanged", this.onScriptChanged, this);
+            feng3d.dispatcher.off("asset.scriptChanged", this.invalidateScriptInstance, this);
         };
         __decorate([
             feng3d.serialize,
-            feng3d.watch("scriptChanged"),
+            feng3d.watch("invalidateScriptInstance"),
             feng3d.oav({ component: "OAVPick", componentParam: { accepttype: "file_script" } })
         ], ScriptComponent.prototype, "scriptName", void 0);
         __decorate([
             feng3d.serialize
-        ], ScriptComponent.prototype, "scriptInstance", void 0);
+        ], ScriptComponent.prototype, "scriptInstance", null);
         return ScriptComponent;
     }(feng3d.Behaviour));
     feng3d.ScriptComponent = ScriptComponent;

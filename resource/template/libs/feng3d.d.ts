@@ -12401,11 +12401,13 @@ declare namespace feng3d {
         /**
          * 脚本对象
          */
-        scriptInstance: Script;
+        readonly scriptInstance: Script;
+        private _scriptInstance;
+        private _invalid;
         private scriptInit;
         init(gameObject: GameObject): void;
-        private scriptChanged;
-        private onScriptChanged;
+        private updateScriptInstance;
+        private invalidateScriptInstance;
         /**
          * 每帧执行
          */

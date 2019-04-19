@@ -74,7 +74,7 @@ namespace editor
                                 dragsource.addDragData("file_gameobject", feng3d.serialization.clone(<feng3d.GameObject>this.data.asset.data));
                                 break;
                             case feng3d.AssetType.script:
-                                dragsource.addDragData("file_script", <any>this.data.asset.data);
+                                dragsource.addDragData("file_script", <any>this.data.asset);
                                 break;
                             case feng3d.AssetType.anim:
                                 dragsource.addDragData("animationclip", <any>this.data.asset.data);

@@ -20,6 +20,13 @@ namespace editor
                     label: "文件",
                     submenu: [
                         {
+                            label: "新建场景",
+                            click: () =>
+                            {
+                                editorData.gameScene = creatNewScene();
+                            },
+                        },
+                        {
                             label: "新建项目", click: () =>
                             {
                                 popupview.popupObject({ newprojectname: "newproject" }, {
