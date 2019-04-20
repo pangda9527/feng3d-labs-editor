@@ -11843,6 +11843,10 @@ declare namespace feng3d {
         __class__: "feng3d.GameObject";
         assetType: AssetType;
         /**
+         * 预设资源编号
+         */
+        prefabId: string;
+        /**
          * 资源编号
          */
         assetId: string;

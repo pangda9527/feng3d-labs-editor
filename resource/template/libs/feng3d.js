@@ -22063,8 +22063,10 @@ var feng3d;
                 this._children.push(child);
             }
             else {
-                if (child.contains(this))
-                    throw "无法添加到自身中!";
+                if (child.contains(this)) {
+                    console.error("无法添加到自身中!");
+                    return;
+                }
                 if (child._parent)
                     child._parent.removeChild(child);
                 child._setParent(this);
@@ -22102,11 +22104,10 @@ var feng3d;
          */
         GameObject.prototype.removeChild = function (child) {
             if (child == null)
-                throw new Error("Parameter child cannot be null").message;
+                return;
             var childIndex = this._children.indexOf(child);
-            if (childIndex == -1)
-                throw new Error("Parameter is not a child of the caller").message;
-            this.removeChildInternal(childIndex, child);
+            if (childIndex != -1)
+                this.removeChildInternal(childIndex, child);
         };
         /**
          * 删除指定位置的子对象
@@ -22539,6 +22540,9 @@ var feng3d;
          * 游戏对象池
          */
         GameObject.pool = new Map();
+        __decorate([
+            feng3d.serialize
+        ], GameObject.prototype, "prefabId", void 0);
         __decorate([
             feng3d.serialize
         ], GameObject.prototype, "assetId", void 0);
@@ -32094,7 +32098,8 @@ var feng3d;
             return _this;
         }
         GameObjectAsset.prototype.createData = function () {
-            throw "\u672A\u5B9E\u73B0";
+            this.data = new feng3d.GameObject();
+            this.data.assetId = this.assetId;
         };
         GameObjectAsset.extenson = ".json";
         __decorate([

@@ -309,7 +309,7 @@ namespace editor
                     {
                         label: "编辑", click: () =>
                         {
-                            feng3d.dispatcher.dispatch("openScript",  <feng3d.StringAsset>assetNode.asset);
+                            feng3d.dispatcher.dispatch("openScript", <feng3d.StringAsset>assetNode.asset);
                         }, show: assetNode.asset instanceof feng3d.StringAsset,
                     },
                 ];
@@ -353,10 +353,10 @@ namespace editor
          */
         saveObject(object: feng3d.AssetData, callback?: (file: AssetNode) => void)
         {
-            console.error(`未实现`);
-
-            // var assetsFile = this.createAssets(this.showFloder, object.name, object);
-            // callback && callback(assetsFile);
+            this.createAsset(this.showFloder, feng3d.GameObjectAsset, object.name, { data: object }, (err, assetNode) =>
+            {
+                callback && callback(assetNode);
+            });
         }
 
         /**

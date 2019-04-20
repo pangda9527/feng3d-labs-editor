@@ -95,7 +95,7 @@ namespace editor
 		material: feng3d.Material;
 		geometry: feng3d.Geometry;
 		//
-		file_gameobject: feng3d.GameObject;
+		file_gameobject: feng3d.GameObjectAsset;
 		/**
 		 * 脚本路径
 		 */

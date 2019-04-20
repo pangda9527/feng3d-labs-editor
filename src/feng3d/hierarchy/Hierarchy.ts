@@ -57,15 +57,23 @@ namespace editor
             editorData.selectObject(gameobject);
         }
 
-        addGameoObjectFromAsset(gameobject: feng3d.GameObject, parent?: feng3d.GameObject)
+        addGameoObjectFromAsset(gameobjectAsset: feng3d.GameObjectAsset, parent?: feng3d.GameObject)
         {
-            gameobject = feng3d.serialization.clone(gameobject);
+            gameobjectAsset.data;
+
+            var gameobject = new feng3d.GameObject();
+            feng3d.serialization.setValue(gameobject, gameobjectAsset.data);
+            delete gameobject.assetId;
+            gameobject.prefabId = gameobjectAsset.assetId;
+
+            feng3d.debuger && console.assert(!gameobject.parent);
 
             if (parent)
                 parent.addChild(gameobject);
             else
                 this.rootnode.gameobject.addChild(gameobject);
             editorData.selectObject(gameobject);
+            return gameobject;
         }
 
         private _selectedGameObjects: feng3d.GameObject[] = [];

@@ -67,35 +67,7 @@ namespace editor
 
                     drag.register(this, (dragsource) =>
                     {
-                        var extension = this.data.asset.assetType;
-                        switch (extension)
-                        {
-                            case feng3d.AssetType.gameobject:
-                                dragsource.addDragData("file_gameobject", feng3d.serialization.clone(<feng3d.GameObject>this.data.asset.data));
-                                break;
-                            case feng3d.AssetType.script:
-                                dragsource.addDragData("file_script", <any>this.data.asset);
-                                break;
-                            case feng3d.AssetType.anim:
-                                dragsource.addDragData("animationclip", <any>this.data.asset.data);
-                                break;
-                            case feng3d.AssetType.material:
-                                dragsource.addDragData("material", <any>this.data.asset.data);
-                                break;
-                            case feng3d.AssetType.texturecube:
-                                dragsource.addDragData("texturecube", <any>this.data.asset.data);
-                                break;
-                            case feng3d.AssetType.geometry:
-                                dragsource.addDragData("geometry", <any>this.data.asset.data);
-                                break;
-                            case feng3d.AssetType.texture:
-                                dragsource.addDragData("texture2d", <any>this.data.asset.data);
-                                break;
-                            case feng3d.AssetType.audio:
-                                dragsource.addDragData("audio", <any>this.data.asset.data);
-                                break;
-                        }
-                        dragsource.addDragData("assetNodes", this.data);
+                        this.data.setdargSource(dragsource);
                     }, []);
                 }
             } else

@@ -238,11 +238,39 @@ namespace editor
         /**
          * 提供拖拽数据
          * 
-         * @param dragSource 
+         * @param dragsource 
          */
-        setdargSource(dragSource: DragData)
+        setdargSource(dragsource: DragData)
         {
-            dragSource.addDragData("assetNodes", this);
+            var extension = this.asset.assetType;
+            switch (extension)
+            {
+                case feng3d.AssetType.gameobject:
+                    dragsource.addDragData("file_gameobject", <any>this.asset);
+                    break;
+                case feng3d.AssetType.script:
+                    dragsource.addDragData("file_script", <any>this.asset);
+                    break;
+                case feng3d.AssetType.anim:
+                    dragsource.addDragData("animationclip", <any>this.asset.data);
+                    break;
+                case feng3d.AssetType.material:
+                    dragsource.addDragData("material", <any>this.asset.data);
+                    break;
+                case feng3d.AssetType.texturecube:
+                    dragsource.addDragData("texturecube", <any>this.asset.data);
+                    break;
+                case feng3d.AssetType.geometry:
+                    dragsource.addDragData("geometry", <any>this.asset.data);
+                    break;
+                case feng3d.AssetType.texture:
+                    dragsource.addDragData("texture2d", <any>this.asset.data);
+                    break;
+                case feng3d.AssetType.audio:
+                    dragsource.addDragData("audio", <any>this.asset.data);
+                    break;
+            }
+            dragsource.addDragData("assetNodes", this);
         }
 
         /**
