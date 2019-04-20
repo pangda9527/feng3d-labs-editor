@@ -178,11 +178,12 @@ namespace editor
 
     if (supportNative)
     {
-        feng3d.fs.basefs = new NativeFS(nativeFS);
+        feng3d.basefs = new NativeFS(nativeFS);
     } else
     {
-        feng3d.fs.basefs = feng3d.indexedDBFS;
+        feng3d.basefs = feng3d.indexedDBFS;
     }
+    feng3d.fs = new feng3d.ReadWriteFS();
     feng3d.rs = editorRS = new EditorRS();
 
     //

@@ -15185,8 +15185,11 @@ var feng3d;
          * @param asset 可能的资源数据
          */
         AssetData.isAssetData = function (asset) {
-            return asset.assetId != undefined;
-            // return FileAsset.assetMap.has(asset);
+            if (asset.assetId == undefined)
+                return false;
+            if (feng3d.classUtils.getDefaultInstanceByName(asset[feng3d.CLASS_KEY]) instanceof AssetData)
+                return true;
+            return false;
         };
         /**
          * 序列化
@@ -15972,6 +15975,9 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 可读文件系统
      */
@@ -15979,13 +15985,13 @@ var feng3d;
         function ReadFS(fs) {
             this._images = {};
             this._state = {};
-            this._fs = fs;
+            this.fs = fs;
         }
-        Object.defineProperty(ReadFS.prototype, "basefs", {
+        Object.defineProperty(ReadFS.prototype, "fs", {
             /**
              * 基础文件系统
              */
-            get: function () { return this._fs || feng3d.httpfs; },
+            get: function () { return this._fs || feng3d.basefs; },
             set: function (v) { this._fs = v; },
             enumerable: true,
             configurable: true
@@ -15996,7 +16002,7 @@ var feng3d;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         ReadFS.prototype.readArrayBuffer = function (path, callback) {
-            this._fs.readArrayBuffer(path, callback);
+            this.fs.readArrayBuffer(path, callback);
         };
         /**
          * 读取文件为字符串
@@ -16004,7 +16010,7 @@ var feng3d;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         ReadFS.prototype.readString = function (path, callback) {
-            this._fs.readString(path, callback);
+            this.fs.readString(path, callback);
         };
         /**
          * 读取文件为Object
@@ -16012,7 +16018,7 @@ var feng3d;
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         ReadFS.prototype.readObject = function (path, callback) {
-            this._fs.readObject(path, callback);
+            this.fs.readObject(path, callback);
         };
         /**
          * 加载图片
@@ -16032,7 +16038,7 @@ var feng3d;
                 return;
             this._state[eventtype] = true;
             //
-            this._fs.readImage(path, function (err, img) {
+            this.fs.readImage(path, function (err, img) {
                 delete _this._state[eventtype];
                 _this._images[path] = img;
                 feng3d.event.dispatch(_this, eventtype);
@@ -16043,7 +16049,7 @@ var feng3d;
          * @param path （相对）路径
          */
         ReadFS.prototype.getAbsolutePath = function (path) {
-            return this._fs.getAbsolutePath(path);
+            return this.fs.getAbsolutePath(path);
         };
         /**
          * 读取文件列表为字符串列表
@@ -16082,7 +16088,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.exists = function (path, callback) {
-            this._fs.exists(path, callback);
+            this.fs.exists(path, callback);
         };
         /**
          * 读取文件夹中文件列表
@@ -16090,7 +16096,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.readdir = function (path, callback) {
-            this._fs.readdir(path, callback);
+            this.fs.readdir(path, callback);
         };
         /**
          * 新建文件夹
@@ -16098,7 +16104,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.mkdir = function (path, callback) {
-            this._fs.mkdir(path, callback);
+            this.fs.mkdir(path, callback);
         };
         /**
          * 删除文件
@@ -16106,7 +16112,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.deleteFile = function (path, callback) {
-            this._fs.deleteFile(path, callback);
+            this.fs.deleteFile(path, callback);
         };
         /**
          * 写ArrayBuffer(新建)文件
@@ -16115,7 +16121,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.writeArrayBuffer = function (path, arraybuffer, callback) {
-            this._fs.writeArrayBuffer(path, arraybuffer, callback);
+            this.fs.writeArrayBuffer(path, arraybuffer, callback);
         };
         /**
          * 写字符串到(新建)文件
@@ -16124,7 +16130,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.writeString = function (path, str, callback) {
-            this._fs.writeString(path, str, callback);
+            this.fs.writeString(path, str, callback);
         };
         /**
          * 写Object到(新建)文件
@@ -16133,7 +16139,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.writeObject = function (path, object, callback) {
-            this._fs.writeObject(path, object, callback);
+            this.fs.writeObject(path, object, callback);
         };
         /**
          * 写图片
@@ -16142,7 +16148,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.writeImage = function (path, image, callback) {
-            this._fs.writeImage(path, image);
+            this.fs.writeImage(path, image);
         };
         /**
          * 复制文件
@@ -16151,7 +16157,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.copyFile = function (src, dest, callback) {
-            this._fs.copyFile(src, dest, callback);
+            this.fs.copyFile(src, dest, callback);
         };
         /**
          * 是否为文件夹
@@ -16160,7 +16166,7 @@ var feng3d;
          * @param callback 完成回调
          */
         ReadWriteFS.prototype.isDirectory = function (path, callback) {
-            this._fs.isDirectory(path, callback);
+            this.fs.isDirectory(path, callback);
         };
         /**
          * 初始化项目
@@ -16168,7 +16174,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.initproject = function (projectname, callback) {
-            this._fs.initproject(projectname, callback);
+            this.fs.initproject(projectname, callback);
         };
         /**
          * 是否存在指定项目
@@ -16176,7 +16182,7 @@ var feng3d;
          * @param callback 回调函数
          */
         ReadWriteFS.prototype.hasProject = function (projectname, callback) {
-            this._fs.hasProject(projectname, callback);
+            this.fs.hasProject(projectname, callback);
         };
         /**
          * 获取指定文件下所有文件路径列表
@@ -16724,7 +16730,7 @@ var feng3d;
         return HttpFS;
     }());
     feng3d.HttpFS = HttpFS;
-    feng3d.httpfs = new HttpFS();
+    feng3d.basefs = new HttpFS();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {

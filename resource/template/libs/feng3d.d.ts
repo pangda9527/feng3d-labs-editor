@@ -7550,6 +7550,10 @@ declare namespace feng3d {
          */
         getAbsolutePath(path: string): string;
     }
+    /**
+     * 默认基础文件系统
+     */
+    var basefs: IReadFS;
 }
 declare namespace feng3d {
     /**
@@ -7563,8 +7567,8 @@ declare namespace feng3d {
         /**
          * 基础文件系统
          */
-        basefs: IReadFS;
-        protected _fs: IReadFS;
+        fs: IReadFS;
+        private _fs;
         /**
          * 文件系统类型
          */
@@ -7709,13 +7713,13 @@ declare namespace feng3d {
      *
      * 扩展基础可读写文件系统
      */
-    class ReadWriteFS extends ReadFS implements IReadWriteFS {
+    class ReadWriteFS extends ReadFS {
         /**
          * 项目名称（表单名称）
          */
         projectname: string;
-        protected _fs: IReadWriteFS;
-        constructor(fs: IReadWriteFS);
+        fs: IReadWriteFS;
+        constructor(fs?: IReadWriteFS);
         /**
          * 文件是否存在
          * @param path 文件路径
@@ -8006,7 +8010,6 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    var httpfs: HttpFS;
     /**
      * Http可读文件系统
      */
