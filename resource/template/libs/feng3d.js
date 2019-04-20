@@ -15976,9 +15976,75 @@ var feng3d;
      * 可读文件系统
      */
     var ReadFS = /** @class */ (function () {
-        function ReadFS() {
+        function ReadFS(fs) {
             this._images = {};
+            this._state = {};
+            this._fs = fs;
         }
+        Object.defineProperty(ReadFS.prototype, "basefs", {
+            /**
+             * 基础文件系统
+             */
+            get: function () { return this._fs || feng3d.httpfs; },
+            set: function (v) { this._fs = v; },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 读取文件为ArrayBuffer
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        ReadFS.prototype.readArrayBuffer = function (path, callback) {
+            this._fs.readArrayBuffer(path, callback);
+        };
+        /**
+         * 读取文件为字符串
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        ReadFS.prototype.readString = function (path, callback) {
+            this._fs.readString(path, callback);
+        };
+        /**
+         * 读取文件为Object
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        ReadFS.prototype.readObject = function (path, callback) {
+            this._fs.readObject(path, callback);
+        };
+        /**
+         * 加载图片
+         * @param path 图片路径
+         * @param callback 加载完成回调
+         */
+        ReadFS.prototype.readImage = function (path, callback) {
+            var _this = this;
+            var image = this._images[path];
+            if (image) {
+                callback(null, image);
+                return;
+            }
+            var eventtype = arguments.callee.name + " " + path;
+            feng3d.event.once(this, eventtype, function () { _this.readImage(path, callback); });
+            if (this._state[eventtype])
+                return;
+            this._state[eventtype] = true;
+            //
+            this._fs.readImage(path, function (err, img) {
+                delete _this._state[eventtype];
+                _this._images[path] = img;
+                feng3d.event.dispatch(_this, eventtype);
+            });
+        };
+        /**
+         * 获取文件绝对路径
+         * @param path （相对）路径
+         */
+        ReadFS.prototype.getAbsolutePath = function (path) {
+            return this._fs.getAbsolutePath(path);
+        };
         /**
          * 读取文件列表为字符串列表
          *
@@ -15993,17 +16059,10 @@ var feng3d;
                 });
             }, callback);
         };
-        /**
-         * 获取已经加载的图片，如果未加载则返回null
-         *
-         * @param path 图片路径
-         */
-        ReadFS.prototype.getImage = function (path) {
-            return this._images[path];
-        };
         return ReadFS;
     }());
     feng3d.ReadFS = ReadFS;
+    feng3d.fs = new ReadFS();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -16014,21 +16073,117 @@ var feng3d;
      */
     var ReadWriteFS = /** @class */ (function (_super) {
         __extends(ReadWriteFS, _super);
-        function ReadWriteFS() {
-            return _super !== null && _super.apply(this, arguments) || this;
+        function ReadWriteFS(fs) {
+            return _super.call(this, fs) || this;
         }
         /**
-         * 获取所有文件路径
+         * 文件是否存在
+         * @param path 文件路径
          * @param callback 回调函数
          */
-        ReadWriteFS.prototype.getAllPaths = function (callback) {
-            this.getAllfilepathInFolder("", callback);
+        ReadWriteFS.prototype.exists = function (path, callback) {
+            this._fs.exists(path, callback);
+        };
+        /**
+         * 读取文件夹中文件列表
+         * @param path 路径
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.readdir = function (path, callback) {
+            this._fs.readdir(path, callback);
+        };
+        /**
+         * 新建文件夹
+         * @param path 文件夹路径
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.mkdir = function (path, callback) {
+            this._fs.mkdir(path, callback);
+        };
+        /**
+         * 删除文件
+         * @param path 文件路径
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.deleteFile = function (path, callback) {
+            this._fs.deleteFile(path, callback);
+        };
+        /**
+         * 写ArrayBuffer(新建)文件
+         * @param path 文件路径
+         * @param arraybuffer 文件数据
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.writeArrayBuffer = function (path, arraybuffer, callback) {
+            this._fs.writeArrayBuffer(path, arraybuffer, callback);
+        };
+        /**
+         * 写字符串到(新建)文件
+         * @param path 文件路径
+         * @param str 文件数据
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.writeString = function (path, str, callback) {
+            this._fs.writeString(path, str, callback);
+        };
+        /**
+         * 写Object到(新建)文件
+         * @param path 文件路径
+         * @param object 文件数据
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.writeObject = function (path, object, callback) {
+            this._fs.writeObject(path, object, callback);
+        };
+        /**
+         * 写图片
+         * @param path 图片路径
+         * @param image 图片
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.writeImage = function (path, image, callback) {
+            this._fs.writeImage(path, image);
+        };
+        /**
+         * 复制文件
+         * @param src    源路径
+         * @param dest    目标路径
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.copyFile = function (src, dest, callback) {
+            this._fs.copyFile(src, dest, callback);
+        };
+        /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        ReadWriteFS.prototype.isDirectory = function (path, callback) {
+            this._fs.isDirectory(path, callback);
+        };
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.initproject = function (projectname, callback) {
+            this._fs.initproject(projectname, callback);
+        };
+        /**
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        ReadWriteFS.prototype.hasProject = function (projectname, callback) {
+            this._fs.hasProject(projectname, callback);
         };
         /**
          * 获取指定文件下所有文件路径列表
          */
-        ReadWriteFS.prototype.getAllfilepathInFolder = function (dirpath, callback) {
+        ReadWriteFS.prototype.getAllPathsInFolder = function (dirpath, callback) {
             var _this = this;
+            if (dirpath === void 0) { dirpath = ""; }
             var dirs = [dirpath];
             var result = [];
             var currentdir = "";
@@ -16150,7 +16305,7 @@ var feng3d;
             var _this = this;
             this.isDirectory(oldPath, function (result) {
                 if (result) {
-                    _this.getAllfilepathInFolder(oldPath, function (err, filepaths) {
+                    _this.getAllPathsInFolder(oldPath, function (err, filepaths) {
                         if (err) {
                             callback && callback(err);
                             return;
@@ -16186,7 +16341,7 @@ var feng3d;
             var _this = this;
             this.isDirectory(path, function (result) {
                 if (result) {
-                    _this.getAllfilepathInFolder(path, function (err, filepaths) {
+                    _this.getAllPathsInFolder(path, function (err, filepaths) {
                         if (err) {
                             callback && callback(err);
                             return;
@@ -16213,15 +16368,12 @@ var feng3d;
     /**
      * 索引数据文件系统
      */
-    var IndexedDBFS = /** @class */ (function (_super) {
-        __extends(IndexedDBFS, _super);
+    var IndexedDBFS = /** @class */ (function () {
         function IndexedDBFS(DBname, projectname) {
             if (DBname === void 0) { DBname = "feng3d-editor"; }
             if (projectname === void 0) { projectname = "testproject"; }
-            var _this = _super.call(this) || this;
-            _this.DBname = DBname;
-            _this.projectname = projectname;
-            return _this;
+            this.DBname = DBname;
+            this.projectname = projectname;
         }
         Object.defineProperty(IndexedDBFS.prototype, "type", {
             get: function () {
@@ -16313,16 +16465,12 @@ var feng3d;
          * @param callback 加载完成回调
          */
         IndexedDBFS.prototype.readImage = function (path, callback) {
-            var _this = this;
-            if (this._images[path])
-                return this._images[path];
             this.readArrayBuffer(path, function (err, data) {
                 if (err) {
                     callback(err, null);
                     return;
                 }
                 feng3d.dataTransform.arrayBufferToImage(data, function (img) {
-                    _this._images[path] = img;
                     callback(null, img);
                 });
             });
@@ -16362,7 +16510,7 @@ var feng3d;
          * @param callback 回调函数
          */
         IndexedDBFS.prototype.readdir = function (path, callback) {
-            this.getAllPaths(function (err, allfilepaths) {
+            feng3d._indexedDB.getAllKeys(this.DBname, this.projectname, function (err, allfilepaths) {
                 if (!allfilepaths) {
                     callback(err, null);
                     return;
@@ -16465,19 +16613,6 @@ var feng3d;
             });
         };
         /**
-         * 获取所有文件路径
-         * @param callback 回调函数
-         */
-        IndexedDBFS.prototype.getAllPaths = function (callback) {
-            feng3d._indexedDB.getAllKeys(this.DBname, this.projectname, function (err, allPaths) {
-                if (err) {
-                    callback(err, allPaths);
-                    return;
-                }
-                callback(err, allPaths);
-            });
-        };
-        /**
          * 是否存在指定项目
          * @param projectname 项目名称
          * @param callback 回调函数
@@ -16501,7 +16636,7 @@ var feng3d;
             feng3d._indexedDB.createObjectStore(this.DBname, projectname, callback);
         };
         return IndexedDBFS;
-    }(feng3d.ReadWriteFS));
+    }());
     feng3d.IndexedDBFS = IndexedDBFS;
     feng3d.indexedDBFS = new IndexedDBFS();
 })(feng3d || (feng3d = {}));
@@ -16510,30 +16645,21 @@ var feng3d;
     /**
      * Http可读文件系统
      */
-    var HttpFS = /** @class */ (function (_super) {
-        __extends(HttpFS, _super);
+    var HttpFS = /** @class */ (function () {
         function HttpFS(rootPath) {
             if (rootPath === void 0) { rootPath = ""; }
-            var _this = _super.call(this) || this;
             /**
              * 根路径
              */
-            _this.rootPath = "";
-            _this.rootPath = rootPath;
-            if (_this.rootPath == "") {
+            this.rootPath = "";
+            this.type = feng3d.FSType.http;
+            this.rootPath = rootPath;
+            if (this.rootPath == "") {
                 if (typeof document != "undefined") {
-                    _this.rootPath = document.URL.substring(0, document.URL.lastIndexOf("/") + 1);
+                    this.rootPath = document.URL.substring(0, document.URL.lastIndexOf("/") + 1);
                 }
             }
-            return _this;
         }
-        Object.defineProperty(HttpFS.prototype, "type", {
-            get: function () {
-                return feng3d.FSType.http;
-            },
-            enumerable: true,
-            configurable: true
-        });
         /**
          * 读取文件
          * @param path 路径
@@ -16578,12 +16704,8 @@ var feng3d;
          * @param callback 加载完成回调
          */
         HttpFS.prototype.readImage = function (path, callback) {
-            var _this = this;
-            if (this._images[path])
-                return this._images[path];
             var img = new Image();
             img.onload = function () {
-                _this._images[path] = img;
                 callback(null, img);
             };
             img.onerror = function (evt) {
@@ -16600,9 +16722,9 @@ var feng3d;
             return this.rootPath + path;
         };
         return HttpFS;
-    }(feng3d.ReadFS));
+    }());
     feng3d.HttpFS = HttpFS;
-    feng3d.fs = new HttpFS();
+    feng3d.httpfs = new HttpFS();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {

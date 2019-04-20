@@ -106,7 +106,7 @@ namespace editor
         exportProject(callback: (err: Error, data: Blob) => void)
         {
             var zip = new JSZip();
-            this.fs.getAllfilepathInFolder("", (err, filepaths) =>
+            this.fs.getAllPathsInFolder("", (err, filepaths) =>
             {
                 readfiles();
                 function readfiles()
@@ -178,13 +178,12 @@ namespace editor
 
     if (supportNative)
     {
-        feng3d.fs = new NativeFS(nativeFS);
-        feng3d.rs = editorRS = new EditorRS();
+        feng3d.fs.basefs = new NativeFS(nativeFS);
     } else
     {
-        feng3d.fs = feng3d.indexedDBFS;
-        feng3d.rs = editorRS = new EditorRS();
+        feng3d.fs.basefs = feng3d.indexedDBFS;
     }
+    feng3d.rs = editorRS = new EditorRS();
 
     //
     var isSelectFile = false;

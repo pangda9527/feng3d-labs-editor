@@ -3,7 +3,7 @@ namespace editor
     /**
      * 本地文件系统
      */
-    export class NativeFS extends feng3d.ReadWriteFS
+    export class NativeFS implements feng3d.IReadWriteFS
     {
         /**
          * 项目路径
@@ -19,7 +19,6 @@ namespace editor
 
         constructor(fs: NativeFSBase)
         {
-            super();
             this.fs = fs;
         }
 

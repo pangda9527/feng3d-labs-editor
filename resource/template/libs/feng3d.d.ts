@@ -7517,46 +7517,88 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
+     * 可读文件系统
+     */
+    interface IReadFS {
+        /**
+         * 读取文件为ArrayBuffer
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        readArrayBuffer(path: string, callback: (err: Error, arraybuffer: ArrayBuffer) => void): void;
+        /**
+         * 读取文件为字符串
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        readString(path: string, callback: (err: Error, str: string) => void): void;
+        /**
+         * 读取文件为Object
+         * @param path 路径
+         * @param callback 读取完成回调 当err不为null时表示读取失败
+         */
+        readObject(path: string, callback: (err: Error, object: Object) => void): void;
+        /**
+         * 加载图片
+         * @param path 图片路径
+         * @param callback 加载完成回调
+         */
+        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
+        /**
+         * 获取文件绝对路径
+         * @param path （相对）路径
+         */
+        getAbsolutePath(path: string): string;
+    }
+}
+declare namespace feng3d {
+    /**
      * 默认文件系统
      */
     var fs: ReadFS;
     /**
      * 可读文件系统
      */
-    abstract class ReadFS {
+    class ReadFS {
+        /**
+         * 基础文件系统
+         */
+        basefs: IReadFS;
+        protected _fs: IReadFS;
         /**
          * 文件系统类型
          */
         readonly type: FSType;
+        constructor(fs?: IReadFS);
         /**
          * 读取文件为ArrayBuffer
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        abstract readArrayBuffer(path: string, callback: (err: Error, arraybuffer: ArrayBuffer) => void): void;
+        readArrayBuffer(path: string, callback: (err: Error, arraybuffer: ArrayBuffer) => void): void;
         /**
          * 读取文件为字符串
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        abstract readString(path: string, callback: (err: Error, str: string) => void): void;
+        readString(path: string, callback: (err: Error, str: string) => void): void;
         /**
          * 读取文件为Object
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        abstract readObject(path: string, callback: (err: Error, object: Object) => void): void;
+        readObject(path: string, callback: (err: Error, object: Object) => void): void;
         /**
          * 加载图片
          * @param path 图片路径
          * @param callback 加载完成回调
          */
-        abstract readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
+        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
          */
-        abstract getAbsolutePath(path: string): string;
+        getAbsolutePath(path: string): string;
         /**
          * 读取文件列表为字符串列表
          *
@@ -7564,15 +7606,10 @@ declare namespace feng3d {
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         readStrings(paths: string[], callback: (strs: (string | Error)[]) => void): void;
-        /**
-         * 获取已经加载的图片，如果未加载则返回null
-         *
-         * @param path 图片路径
-         */
-        getImage(path: string): HTMLImageElement;
         protected _images: {
             [path: string]: HTMLImageElement;
         };
+        private _state;
     }
 }
 declare namespace feng3d {
@@ -7581,7 +7618,7 @@ declare namespace feng3d {
      *
      * 扩展基础可读写文件系统
      */
-    abstract class ReadWriteFS extends ReadFS {
+    interface IReadWriteFS extends IReadFS {
         /**
          * 项目名称（表单名称）
          */
@@ -7591,88 +7628,176 @@ declare namespace feng3d {
          * @param path 文件路径
          * @param callback 回调函数
          */
-        abstract exists(path: string, callback: (exists: boolean) => void): void;
+        exists(path: string, callback: (exists: boolean) => void): void;
         /**
          * 读取文件夹中文件列表
          * @param path 路径
          * @param callback 回调函数
          */
-        abstract readdir(path: string, callback: (err: Error, files: string[]) => void): void;
+        readdir(path: string, callback: (err: Error, files: string[]) => void): void;
         /**
          * 新建文件夹
          * @param path 文件夹路径
          * @param callback 回调函数
          */
-        abstract mkdir(path: string, callback?: (err: Error) => void): void;
+        mkdir(path: string, callback?: (err: Error) => void): void;
         /**
          * 删除文件
          * @param path 文件路径
          * @param callback 回调函数
          */
-        abstract deleteFile(path: string, callback?: (err: Error) => void): void;
+        deleteFile(path: string, callback?: (err: Error) => void): void;
         /**
          * 写ArrayBuffer(新建)文件
          * @param path 文件路径
          * @param arraybuffer 文件数据
          * @param callback 回调函数
          */
-        abstract writeArrayBuffer(path: string, arraybuffer: ArrayBuffer, callback?: (err: Error) => void): void;
+        writeArrayBuffer(path: string, arraybuffer: ArrayBuffer, callback?: (err: Error) => void): void;
         /**
          * 写字符串到(新建)文件
          * @param path 文件路径
          * @param str 文件数据
          * @param callback 回调函数
          */
-        abstract writeString(path: string, str: string, callback?: (err: Error) => void): void;
+        writeString(path: string, str: string, callback?: (err: Error) => void): void;
         /**
          * 写Object到(新建)文件
          * @param path 文件路径
          * @param object 文件数据
          * @param callback 回调函数
          */
-        abstract writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
+        writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
         /**
          * 写图片
          * @param path 图片路径
          * @param image 图片
          * @param callback 回调函数
          */
-        abstract writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
+        writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
         /**
          * 复制文件
          * @param src    源路径
          * @param dest    目标路径
          * @param callback 回调函数
          */
-        abstract copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
+        copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
         /**
          * 是否为文件夹
          *
          * @param path 文件路径
          * @param callback 完成回调
          */
-        abstract isDirectory(path: string, callback: (result: boolean) => void): void;
+        isDirectory(path: string, callback: (result: boolean) => void): void;
         /**
          * 初始化项目
          * @param projectname 项目名称
          * @param callback 回调函数
          */
-        abstract initproject(projectname: string, callback: (err: Error) => void): void;
+        initproject(projectname: string, callback: (err: Error) => void): void;
         /**
          * 是否存在指定项目
          * @param projectname 项目名称
          * @param callback 回调函数
          */
-        abstract hasProject(projectname: string, callback: (has: boolean) => void): void;
+        hasProject(projectname: string, callback: (has: boolean) => void): void;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 可读写文件系统
+     *
+     * 扩展基础可读写文件系统
+     */
+    class ReadWriteFS extends ReadFS implements IReadWriteFS {
         /**
-         * 获取所有文件路径
+         * 项目名称（表单名称）
+         */
+        projectname: string;
+        protected _fs: IReadWriteFS;
+        constructor(fs: IReadWriteFS);
+        /**
+         * 文件是否存在
+         * @param path 文件路径
          * @param callback 回调函数
          */
-        getAllPaths(callback: (err: Error, allPaths: string[]) => void): void;
+        exists(path: string, callback: (exists: boolean) => void): void;
+        /**
+         * 读取文件夹中文件列表
+         * @param path 路径
+         * @param callback 回调函数
+         */
+        readdir(path: string, callback: (err: Error, files: string[]) => void): void;
+        /**
+         * 新建文件夹
+         * @param path 文件夹路径
+         * @param callback 回调函数
+         */
+        mkdir(path: string, callback?: (err: Error) => void): void;
+        /**
+         * 删除文件
+         * @param path 文件路径
+         * @param callback 回调函数
+         */
+        deleteFile(path: string, callback?: (err: Error) => void): void;
+        /**
+         * 写ArrayBuffer(新建)文件
+         * @param path 文件路径
+         * @param arraybuffer 文件数据
+         * @param callback 回调函数
+         */
+        writeArrayBuffer(path: string, arraybuffer: ArrayBuffer, callback?: (err: Error) => void): void;
+        /**
+         * 写字符串到(新建)文件
+         * @param path 文件路径
+         * @param str 文件数据
+         * @param callback 回调函数
+         */
+        writeString(path: string, str: string, callback?: (err: Error) => void): void;
+        /**
+         * 写Object到(新建)文件
+         * @param path 文件路径
+         * @param object 文件数据
+         * @param callback 回调函数
+         */
+        writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
+        /**
+         * 写图片
+         * @param path 图片路径
+         * @param image 图片
+         * @param callback 回调函数
+         */
+        writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
+        /**
+         * 复制文件
+         * @param src    源路径
+         * @param dest    目标路径
+         * @param callback 回调函数
+         */
+        copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
+        /**
+         * 是否为文件夹
+         *
+         * @param path 文件路径
+         * @param callback 完成回调
+         */
+        isDirectory(path: string, callback: (result: boolean) => void): void;
+        /**
+         * 初始化项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        initproject(projectname: string, callback: (err: Error) => void): void;
+        /**
+         * 是否存在指定项目
+         * @param projectname 项目名称
+         * @param callback 回调函数
+         */
+        hasProject(projectname: string, callback: (has: boolean) => void): void;
         /**
          * 获取指定文件下所有文件路径列表
          */
-        getAllfilepathInFolder(dirpath: string, callback: (err: Error, filepaths: string[]) => void): void;
+        getAllPathsInFolder(dirpath: string, callback: (err: Error, filepaths: string[]) => void): void;
         /**
          * 移动文件
          * @param src 源路径
@@ -7759,7 +7884,7 @@ declare namespace feng3d {
     /**
      * 索引数据文件系统
      */
-    class IndexedDBFS extends ReadWriteFS {
+    class IndexedDBFS implements IReadWriteFS {
         readonly type: FSType;
         /**
          * 数据库名称
@@ -7793,7 +7918,7 @@ declare namespace feng3d {
          * @param path 图片路径
          * @param callback 加载完成回调
          */
-        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): HTMLImageElement;
+        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
@@ -7867,11 +7992,6 @@ declare namespace feng3d {
          */
         copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
         /**
-         * 获取所有文件路径
-         * @param callback 回调函数
-         */
-        getAllPaths(callback: (err: Error, allPaths: string[]) => void): void;
-        /**
          * 是否存在指定项目
          * @param projectname 项目名称
          * @param callback 回调函数
@@ -7886,15 +8006,16 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    var httpfs: HttpFS;
     /**
      * Http可读文件系统
      */
-    class HttpFS extends ReadFS {
+    class HttpFS implements IReadFS {
         /**
          * 根路径
          */
         rootPath: string;
-        readonly type: FSType;
+        type: FSType;
         constructor(rootPath?: string);
         /**
          * 读取文件
@@ -7919,7 +8040,7 @@ declare namespace feng3d {
          * @param path 图片路径
          * @param callback 加载完成回调
          */
-        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): HTMLImageElement;
+        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
