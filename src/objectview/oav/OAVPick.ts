@@ -58,7 +58,7 @@ namespace editor
                 if (param.accepttype == "texture2d")
                 {
                     var menus: MenuItem[] = [];
-                    var texture2ds = editorRS.getAssetDatasByType(feng3d.Texture2D);
+                    var texture2ds = editorRS.getLoadedAssetDatasByType(feng3d.Texture2D);
                     texture2ds.forEach(item =>
                     {
                         menus.push({
@@ -73,7 +73,7 @@ namespace editor
                 else if (param.accepttype == "texturecube")
                 {
                     var menus: MenuItem[] = [];
-                    var textureCubes = editorRS.getAssetDatasByType(feng3d.TextureCube);
+                    var textureCubes = editorRS.getLoadedAssetDatasByType(feng3d.TextureCube);
                     textureCubes.forEach(item =>
                     {
                         menus.push({
@@ -117,7 +117,7 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "material")
                 {
-                    var assets = editorRS.getAssetDatasByType(feng3d.Material);
+                    var assets = editorRS.getLoadedAssetDatasByType(feng3d.Material);
                     var menus: MenuItem[] = [];
                     assets.forEach(element =>
                     {
@@ -132,7 +132,7 @@ namespace editor
                     menu.popup(menus);
                 } else if (param.accepttype == "geometry")
                 {
-                    var geometrys = editorRS.getAssetDatasByType(feng3d.Geometry);
+                    var geometrys = editorRS.getLoadedAssetDatasByType(feng3d.Geometry);
                     var menus: MenuItem[] = [];
                     geometrys.forEach(element =>
                     {

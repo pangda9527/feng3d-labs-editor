@@ -8267,7 +8267,7 @@ declare namespace feng3d {
          *
          * @param type 资源类型
          */
-        getAssetDatasByType<T extends AssetData>(type: Constructor<T>): T[];
+        getLoadedAssetDatasByType<T extends AssetData>(type: Constructor<T>): T[];
         /**
          * 获取资源
          *

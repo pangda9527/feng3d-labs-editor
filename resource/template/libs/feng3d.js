@@ -17177,11 +17177,8 @@ var feng3d;
          *
          * @param type 资源类型
          */
-        ReadRS.prototype.getAssetDatasByType = function (type) {
-            var _this = this;
-            var defaults = feng3d.AssetData.getAllLoadedAssetDatas();
-            var assets = Object.keys(this.idMap).map(function (v) { return _this.idMap[v].getAssetData(); });
-            assets = defaults.concat(assets);
+        ReadRS.prototype.getLoadedAssetDatasByType = function (type) {
+            var assets = feng3d.AssetData.getAllLoadedAssetDatas();
             return assets.filter(function (v) { return v instanceof type; });
         };
         /**
@@ -31868,6 +31865,7 @@ var feng3d;
             this.rs.fs.readObject(this.assetPath, function (err, object) {
                 _this.rs.deserializeWithAssets(object, function (data) {
                     _this.data = data;
+                    feng3d.AssetData.addAssetData(_this.assetId, data);
                     feng3d.debuger && console.assert(_this.data.assetId == _this.assetId);
                     callback && callback(err);
                 });
@@ -32067,6 +32065,7 @@ var feng3d;
         TextureAsset.prototype.createData = function () {
             this.data = new feng3d.Texture2D();
             this.data.assetId = this.assetId;
+            feng3d.AssetData.addAssetData(this.assetId, this.data);
         };
         TextureAsset.prototype.saveFile = function (callback) {
             this.rs.fs.writeImage(this.assetPath, this.image, function (err) {
@@ -32095,6 +32094,7 @@ var feng3d;
             _super.prototype.readMeta.call(this, function (err) {
                 _this.rs.deserializeWithAssets(_this.meta.texture, function (result) {
                     _this.data = result;
+                    feng3d.AssetData.addAssetData(_this.assetId, _this.data);
                     callback && callback(err);
                 });
             });
@@ -32131,6 +32131,7 @@ var feng3d;
         TextureCubeAsset.prototype.createData = function () {
             this.data = new feng3d.TextureCube();
             this.data.assetId = this.assetId;
+            feng3d.AssetData.addAssetData(this.assetId, this.data);
         };
         TextureCubeAsset.extenson = ".json";
         __decorate([
@@ -32175,6 +32176,7 @@ var feng3d;
         MaterialAsset.prototype.createData = function () {
             this.data = new feng3d.Material();
             this.data.assetId = this.assetId;
+            feng3d.AssetData.addAssetData(this.assetId, this.data);
         };
         MaterialAsset.extenson = ".json";
         __decorate([
@@ -32199,6 +32201,7 @@ var feng3d;
         GameObjectAsset.prototype.createData = function () {
             this.data = new feng3d.GameObject();
             this.data.assetId = this.assetId;
+            feng3d.AssetData.addAssetData(this.assetId, this.data);
         };
         GameObjectAsset.prototype._getAssetData = function () {
             var gameobject = new feng3d.GameObject();
