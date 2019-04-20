@@ -56,8 +56,8 @@ namespace editor
             });
             dragdata.getDragData("file_gameobject").forEach(v =>
             {
-                hierarchy.addGameoObjectFromAsset(v, this.gameobject);
-                hierarchy.getNode(v).openParents();
+                let gameobject = hierarchy.addGameoObjectFromAsset(v, this.gameobject);
+                hierarchy.getNode(gameobject).openParents();
             });
             dragdata.getDragData("file_script").forEach(v =>
             {

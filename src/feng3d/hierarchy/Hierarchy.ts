@@ -59,12 +59,7 @@ namespace editor
 
         addGameoObjectFromAsset(gameobjectAsset: feng3d.GameObjectAsset, parent?: feng3d.GameObject)
         {
-            gameobjectAsset.data;
-
-            var gameobject = new feng3d.GameObject();
-            feng3d.serialization.setValue(gameobject, gameobjectAsset.data);
-            delete gameobject.assetId;
-            gameobject.prefabId = gameobjectAsset.assetId;
+            var gameobject = gameobjectAsset.getAssetData();
 
             feng3d.debuger && console.assert(!gameobject.parent);
 

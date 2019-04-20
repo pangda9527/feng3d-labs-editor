@@ -14,16 +14,6 @@ namespace editor
 
         initView()
         {
-            if (this.space instanceof feng3d.GameObject)
-            {
-                feng3dScreenShot.drawGameObject(this.space);
-            } else if (this.space instanceof feng3d.Geometry)
-            {
-                feng3dScreenShot.drawGeometry(<any>this.space);
-            } else if (this.space instanceof feng3d.Material)
-            {
-                feng3dScreenShot.drawMaterial(this.space);
-            }
             this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
             this.onResize();
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
@@ -72,7 +62,17 @@ namespace editor
         private onDrawObject()
         {
             this.cameraRotation && (feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
-            feng3dScreenShot.updateCameraPosition();
+
+            if (this.space instanceof feng3d.GameObject)
+            {
+                feng3dScreenShot.drawGameObject(this.space);
+            } else if (this.space instanceof feng3d.Geometry)
+            {
+                feng3dScreenShot.drawGeometry(<any>this.space);
+            } else if (this.space instanceof feng3d.Material)
+            {
+                feng3dScreenShot.drawMaterial(this.space);
+            }
             this.image.source = feng3dScreenShot.toDataURL(this.width, this.height);
         }
 

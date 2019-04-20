@@ -13,6 +13,8 @@ namespace editor
 
         camera: feng3d.Camera;
 
+        container: feng3d.GameObject;
+
         defaultGeometry = feng3d.Geometry.sphere;
 
         defaultMaterial = feng3d.Material.default;
@@ -36,6 +38,11 @@ namespace editor
                 components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "feng3d.DirectionalLight" },]
             });
             scene.gameObject.addChild(light);
+
+            this.container = new feng3d.GameObject();
+            this.container.name = "渲染截图容器";
+            scene.gameObject.addChild(this.container);
+
             engine.stop();
         }
 
@@ -179,10 +186,10 @@ namespace editor
             return dataUrl;
         }
 
-        updateCameraPosition()
+        updateCameraPosition(gameObject: feng3d.GameObject)
         {
             //
-            var bounds = this.currentObject.worldBounds;
+            var bounds = gameObject.worldBounds;
             var scenePosition = bounds.getCenter();
             var size = bounds.getSize().length;
             size = Math.max(size, 1);
@@ -204,23 +211,16 @@ namespace editor
             this.camera.transform.position = localLookPos;
         }
 
-        private currentObject: feng3d.GameObject;
         private materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
         private geometryObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
 
         private _drawGameObject(gameObject: feng3d.GameObject)
         {
-            if (this.currentObject)
-            {
-                this.scene.gameObject.removeChild(this.currentObject);
-                this.currentObject = null;
-            }
+            this.container.removeChildren();
             //
-            this.scene.gameObject.addChild(gameObject);
-            this.currentObject = gameObject;
-
+            this.container.addChild(gameObject);
             //
-            this.updateCameraPosition();
+            this.updateCameraPosition(gameObject);
         }
 
     }

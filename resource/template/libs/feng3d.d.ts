@@ -8014,11 +8014,21 @@ declare namespace feng3d {
         /**
          * 资源对象
          */
-        data: AssetData;
+        protected $data: AssetData;
         /**
          * 创建资源对象
          */
-        abstract createData(): void;
+        createData(): void;
+        /**
+         * 获取资源数据
+         *
+         * @param callback 完成回调，当资源已加载时会立即调用回调，否则在资源加载完成后调用。
+         */
+        getAssetData(callback?: (result: feng3d.AssetData) => void): AssetData;
+        /**
+         * 资源已加载时获取资源数据，内部使用
+         */
+        protected _getAssetData(): AssetData;
         /**
          * 读取资源
          *
@@ -11930,6 +11940,10 @@ declare namespace feng3d {
          */
         remove(): void;
         /**
+         * 移除所有子对象
+         */
+        removeChildren(): void;
+        /**
          * 移除子对象
          *
          * @param child 子对象
@@ -15481,7 +15495,6 @@ declare namespace feng3d {
          * 文件数据
          */
         arraybuffer: ArrayBuffer;
-        createData(): void;
         /**
          * 保存文件
          *
@@ -15519,7 +15532,7 @@ declare namespace feng3d {
         /**
          * 资源对象
          */
-        data: AssetData;
+        $data: AssetData;
         saveFile(callback?: (err: Error) => void): void;
         /**
          * 读取文件
@@ -15596,7 +15609,6 @@ declare namespace feng3d {
      */
     class AudioAsset extends FileAsset {
         readonly assetType: AssetType;
-        createData(): void;
         /**
          * 保存文件
          * @param callback 完成回调
@@ -15618,7 +15630,7 @@ declare namespace feng3d {
         /**
          * 材质
          */
-        data: Texture2D;
+        $data: Texture2D;
         /**
          * 图片
          */
@@ -15659,7 +15671,7 @@ declare namespace feng3d {
         /**
          * 材质
          */
-        data: TextureCube;
+        $data: TextureCube;
         assetType: AssetType;
         createData(): void;
     }
@@ -15673,9 +15685,8 @@ declare namespace feng3d {
         /**
          * 几何体
          */
-        data: Geometry;
+        $data: Geometry;
         assetType: AssetType;
-        createData(): void;
     }
 }
 declare namespace feng3d {
@@ -15687,7 +15698,7 @@ declare namespace feng3d {
         /**
          * 材质
          */
-        data: Material;
+        $data: Material;
         assetType: AssetType;
         createData(): void;
     }
@@ -15700,10 +15711,11 @@ declare namespace feng3d {
         /**
          * 材质
          */
-        data: GameObject;
+        $data: GameObject;
         assetType: AssetType;
         static extenson: string;
         createData(): void;
+        protected _getAssetData(): GameObject;
     }
 }
 declare namespace feng3d {
