@@ -669,12 +669,16 @@ var feng3d;
                     different[property] = this.serialize(target[property]);
                     continue;
                 }
-                // 处理资源
-                if (target[property] instanceof feng3d.AssetData && target[property].assetId != undefined) {
+                if (feng3d.AssetData.isAssetData(target[property])) {
                     var diff0 = {};
                     diff0[feng3d.CLASS_KEY] = feng3d.classUtils.getQualifiedClassName(target[property]);
                     diff0.assetId = target[property].assetId;
                     different[property] = diff0;
+                    continue;
+                }
+                // 处理资源
+                if (feng3d.AssetData.isAssetData(target[property])) {
+                    different[property] = feng3d.AssetData.serialize(target[property]);
                     continue;
                 }
                 var diff = this.different(target[property], defaultInstance[property]);
@@ -698,7 +702,7 @@ var feng3d;
                 return object;
             if (feng3d.debuger && object.constructor == Object) {
                 var assetids = feng3d.rs.getAssetsWithObject(object);
-                var assets = assetids.reduce(function (pv, cv) { var r = feng3d.rs.getAssetData(cv); if (r)
+                var assets = assetids.reduce(function (pv, cv) { var r = feng3d.AssetData.getLoadedAssetData(cv); if (r)
                     pv.push(r); return pv; }, []);
                 console.assert(assetids.length == assets.length, "\u5B58\u5728\u8D44\u6E90\u672A\u52A0\u8F7D\uFF0C\u8BF7\u4F7F\u7528 deserializeWithAssets \u8FDB\u884C\u53CD\u5E8F\u5217\u5316");
             }
@@ -734,9 +738,8 @@ var feng3d;
             }
             target = new cls();
             // 处理资源
-            if (target instanceof feng3d.AssetData && object.assetId != undefined) {
-                var result = feng3d.rs.getAssetData(object.assetId);
-                feng3d.debuger && console.assert(!!result, "\u8D44\u6E90 " + object.assetId + " \u672A\u52A0\u8F7D\uFF0C\u8BF7\u4F7F\u7528 ReadRS.deserializeWithAssets \u8FDB\u884C\u5E8F\u5217\u5316\u5305\u542B\u52A0\u8F7D\u7684\u8D44\u6E90\u5BF9\u8C61\u3002");
+            if (feng3d.AssetData.isAssetData(object)) {
+                var result = feng3d.AssetData.deserialize(object);
                 return result;
             }
             //处理自定义反序列化对象
@@ -15147,6 +15150,90 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 新增资源数据
+         *
+         * @param assetId 资源编号
+         * @param data 资源数据
+         */
+        AssetData.addAssetData = function (assetId, data) {
+            this.assetMap.set(data, assetId);
+            this.idAssetMap.set(assetId, data);
+        };
+        /**
+         * 删除资源数据
+         *
+         * @param data 资源数据
+         */
+        AssetData.deleteAssetData = function (data) {
+            feng3d.debuger && console.assert(this.assetMap.has(data));
+            var assetId = this.assetMap.get(data);
+            this._delete(assetId, data);
+        };
+        AssetData.deleteAssetDataById = function (assetId) {
+            feng3d.debuger && console.assert(this.idAssetMap.has(assetId));
+            var data = this.idAssetMap.get(assetId);
+            this._delete(assetId, data);
+        };
+        AssetData._delete = function (assetId, data) {
+            this.assetMap.delete(data);
+            this.idAssetMap.delete(assetId);
+        };
+        /**
+         * 判断是否为资源数据
+         *
+         * @param asset 可能的资源数据
+         */
+        AssetData.isAssetData = function (asset) {
+            return asset.assetId != undefined;
+            // return FileAsset.assetMap.has(asset);
+        };
+        /**
+         * 序列化
+         *
+         * @param asset 资源数据
+         */
+        AssetData.serialize = function (asset) {
+            var diff0 = {};
+            diff0[feng3d.CLASS_KEY] = feng3d.classUtils.getQualifiedClassName(asset);
+            diff0.assetId = asset.assetId;
+        };
+        /**
+         * 反序列化
+         *
+         * @param object 资源对象
+         */
+        AssetData.deserialize = function (object) {
+            var result = this.getLoadedAssetData(object.assetId);
+            feng3d.debuger && console.assert(!!result, "\u8D44\u6E90 " + object.assetId + " \u672A\u52A0\u8F7D\uFF0C\u8BF7\u4F7F\u7528 ReadRS.deserializeWithAssets \u8FDB\u884C\u5E8F\u5217\u5316\u5305\u542B\u52A0\u8F7D\u7684\u8D44\u6E90\u5BF9\u8C61\u3002");
+            return result;
+        };
+        /**
+         * 获取已加载的资源数据
+         *
+         * @param assetId 资源编号
+         */
+        AssetData.getLoadedAssetData = function (assetId) {
+            return this.idAssetMap.get(assetId);
+        };
+        /**
+         * 获取所有已加载资源数据
+         */
+        AssetData.getAllLoadedAssetDatas = function () {
+            return this.assetMap.getKeys();
+        };
+        /**
+         * 资源属性标记名称
+         */
+        AssetData.assetPropertySign = "assetId";
+        /**
+         * 资源与编号对应表
+         */
+        AssetData.assetMap = new Map();
+        /**
+         * 编号与资源对应表
+         */
+        AssetData.idAssetMap = new Map();
         __decorate([
             feng3d.serialize
         ], AssetData.prototype, "name", null);
@@ -16678,7 +16765,7 @@ var feng3d;
          * 资源已加载时获取资源数据，内部使用
          */
         FileAsset.prototype._getAssetData = function () {
-            return this.$data;
+            return this.data;
         };
         /**
          * 读取资源
@@ -16748,8 +16835,8 @@ var feng3d;
                         _this.parentAsset = null;
                     }
                     // 删除映射
-                    delete _this.rs.idMap[_this.assetId];
-                    delete _this.rs.pathMap[_this.assetPath];
+                    delete feng3d.rs.idMap[_this.assetId];
+                    delete feng3d.rs.pathMap[_this.assetPath];
                     callback && callback();
                 });
             });
@@ -16890,7 +16977,6 @@ var feng3d;
              */
             this.resources = "resource.json";
             this._status = { isiniting: false, isinit: false };
-            this._assetStatus = {};
             this._fs = fs;
         }
         Object.defineProperty(ReadRS.prototype, "fs", {
@@ -17047,8 +17133,9 @@ var feng3d;
          * @param callback 完成回调
          */
         ReadRS.prototype.readAssetData = function (id, callback) {
-            if (defaultAssets[id]) {
-                callback(null, defaultAssets[id]);
+            var asset = feng3d.AssetData.getLoadedAssetData(id);
+            if (asset) {
+                callback(null, asset);
                 return;
             }
             this.readAsset(id, function (err, asset) {
@@ -17092,18 +17179,10 @@ var feng3d;
          */
         ReadRS.prototype.getAssetDatasByType = function (type) {
             var _this = this;
-            var defaults = Object.keys(defaultAssets).map(function (v) { return defaultAssets[v]; });
+            var defaults = feng3d.AssetData.getAllLoadedAssetDatas();
             var assets = Object.keys(this.idMap).map(function (v) { return _this.idMap[v].getAssetData(); });
             assets = defaults.concat(assets);
             return assets.filter(function (v) { return v instanceof type; });
-        };
-        /**
-         * 设置默认资源，该类资源不会保存到文件系统中
-         *
-         * @param assets 资源
-         */
-        ReadRS.prototype.setDefaultAssetData = function (assetData) {
-            defaultAssets[assetData.assetId] = assetData;
         };
         /**
          * 获取资源
@@ -17112,14 +17191,6 @@ var feng3d;
          */
         ReadRS.prototype.getAsset = function (assetId) {
             return this.idMap[assetId];
-        };
-        /**
-         * 获取资源数据
-         *
-         * @param assetId 资源编号
-         */
-        ReadRS.prototype.getAssetData = function (assetId) {
-            return defaultAssets[assetId] || (this.idMap[assetId] && this.idMap[assetId].getAssetData());
         };
         /**
          * 获取所有资源
@@ -17174,10 +17245,6 @@ var feng3d;
         return ReadRS;
     }());
     feng3d.ReadRS = ReadRS;
-    /**
-     * 默认资源数据，该类资源不会保存到文件系统中
-     */
-    var defaultAssets = {};
     feng3d.rs = new ReadRS();
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -24841,7 +24908,7 @@ var feng3d;
         return PointGeometry;
     }(feng3d.Geometry));
     feng3d.PointGeometry = PointGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.point = feng3d.serialization.setValue(new PointGeometry(), { name: "PointGeometry", assetId: "PointGeometry", points: [], hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("PointGeometry", feng3d.Geometry.point = feng3d.serialization.setValue(new PointGeometry(), { name: "PointGeometry", assetId: "PointGeometry", points: [], hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -25664,7 +25731,7 @@ var feng3d;
         return PlaneGeometry;
     }(feng3d.Geometry));
     feng3d.PlaneGeometry = PlaneGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.plane = feng3d.serialization.setValue(new PlaneGeometry(), { name: "Plane", assetId: "Plane", width: 10, height: 10, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Plane", feng3d.Geometry.plane = feng3d.serialization.setValue(new PlaneGeometry(), { name: "Plane", assetId: "Plane", width: 10, height: 10, hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26090,7 +26157,7 @@ var feng3d;
         return CubeGeometry;
     }(feng3d.Geometry));
     feng3d.CubeGeometry = CubeGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cube = feng3d.serialization.setValue(new CubeGeometry(), { name: "Cube", assetId: "Cube", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Cube", feng3d.Geometry.cube = feng3d.serialization.setValue(new CubeGeometry(), { name: "Cube", assetId: "Cube", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26277,7 +26344,7 @@ var feng3d;
         return SphereGeometry;
     }(feng3d.Geometry));
     feng3d.SphereGeometry = SphereGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.sphere = feng3d.serialization.setValue(new SphereGeometry(), { name: "Sphere", assetId: "Sphere", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Sphere", feng3d.Geometry.sphere = feng3d.serialization.setValue(new SphereGeometry(), { name: "Sphere", assetId: "Sphere", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26473,7 +26540,7 @@ var feng3d;
         return CapsuleGeometry;
     }(feng3d.Geometry));
     feng3d.CapsuleGeometry = CapsuleGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.capsule = feng3d.serialization.setValue(new CapsuleGeometry(), { name: "Capsule", assetId: "Capsule", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Capsule", feng3d.Geometry.capsule = feng3d.serialization.setValue(new CapsuleGeometry(), { name: "Capsule", assetId: "Capsule", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26828,7 +26895,7 @@ var feng3d;
         return CylinderGeometry;
     }(feng3d.Geometry));
     feng3d.CylinderGeometry = CylinderGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cylinder = feng3d.serialization.setValue(new CylinderGeometry(), { name: "Cylinder", assetId: "Cylinder", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Cylinder", feng3d.Geometry.cylinder = feng3d.serialization.setValue(new CylinderGeometry(), { name: "Cylinder", assetId: "Cylinder", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -26859,7 +26926,7 @@ var feng3d;
         return ConeGeometry;
     }(feng3d.CylinderGeometry));
     feng3d.ConeGeometry = ConeGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.cone = feng3d.serialization.setValue(new ConeGeometry(), { name: "Cone", assetId: "Cone", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Cone", feng3d.Geometry.cone = feng3d.serialization.setValue(new ConeGeometry(), { name: "Cone", assetId: "Cone", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27054,7 +27121,7 @@ var feng3d;
         return TorusGeometry;
     }(feng3d.Geometry));
     feng3d.TorusGeometry = TorusGeometry;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.torus = feng3d.serialization.setValue(new TorusGeometry(), { name: "Torus", assetId: "Torus", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Torus", feng3d.Geometry.torus = feng3d.serialization.setValue(new TorusGeometry(), { name: "Torus", assetId: "Torus", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27172,9 +27239,9 @@ var feng3d;
         return Texture2D;
     }(feng3d.TextureInfo));
     feng3d.Texture2D = Texture2D;
-    feng3d.rs.setDefaultAssetData(Texture2D.default = feng3d.serialization.setValue(new Texture2D(), { name: "Default-Texture", assetId: "Default-Texture", hideFlags: feng3d.HideFlags.NotEditable }));
-    feng3d.rs.setDefaultAssetData(Texture2D.defaultNormal = feng3d.serialization.setValue(new Texture2D(), { name: "Default-NormalTexture", assetId: "Default-NormalTexture", noPixels: ImageDatas.defaultNormal, hideFlags: feng3d.HideFlags.NotEditable }));
-    feng3d.rs.setDefaultAssetData(Texture2D.defaultParticle = feng3d.serialization.setValue(new Texture2D(), { name: "Default-ParticleTexture", assetId: "Default-ParticleTexture", noPixels: ImageDatas.defaultParticle, format: feng3d.TextureFormat.RGBA, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Default-Texture", Texture2D.default = feng3d.serialization.setValue(new Texture2D(), { name: "Default-Texture", assetId: "Default-Texture", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Default-NormalTexture", Texture2D.defaultNormal = feng3d.serialization.setValue(new Texture2D(), { name: "Default-NormalTexture", assetId: "Default-NormalTexture", noPixels: ImageDatas.defaultNormal, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Default-ParticleTexture", Texture2D.defaultParticle = feng3d.serialization.setValue(new Texture2D(), { name: "Default-ParticleTexture", assetId: "Default-ParticleTexture", noPixels: ImageDatas.defaultParticle, format: feng3d.TextureFormat.RGBA, hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27430,7 +27497,7 @@ var feng3d;
         return TextureCube;
     }(feng3d.TextureInfo));
     feng3d.TextureCube = TextureCube;
-    feng3d.rs.setDefaultAssetData(TextureCube.default = feng3d.serialization.setValue(new TextureCube(), { name: "Default-TextureCube", assetId: "Default-TextureCube", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Default-TextureCube", TextureCube.default = feng3d.serialization.setValue(new TextureCube(), { name: "Default-TextureCube", assetId: "Default-TextureCube", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27805,7 +27872,7 @@ var feng3d;
     }());
     feng3d.StandardUniforms = StandardUniforms;
     feng3d.shaderConfig.shaders["standard"].cls = StandardUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.default = feng3d.serialization.setValue(new feng3d.Material(), { name: "Default-Material", assetId: "Default-Material", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Default-Material", feng3d.Material.default = feng3d.serialization.setValue(new feng3d.Material(), { name: "Default-Material", assetId: "Default-Material", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -29470,7 +29537,7 @@ var feng3d;
     }());
     feng3d.WaterUniforms = WaterUniforms;
     feng3d.shaderConfig.shaders["water"].cls = WaterUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.water = feng3d.serialization.setValue(new feng3d.Material(), { name: "Water-Material", assetId: "Water-Material", shaderName: "water", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Water-Material", feng3d.Material.water = feng3d.serialization.setValue(new feng3d.Material(), { name: "Water-Material", assetId: "Water-Material", shaderName: "water", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -29694,7 +29761,7 @@ var feng3d;
      * 默认高度图
      */
     var defaultHeightMap = new feng3d.ImageUtil(1024, 1024, new feng3d.Color4(0, 0, 0, 0)).imageData;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.terrain = feng3d.serialization.setValue(new TerrainGeometry(), { name: "Terrain-Geometry", assetId: "Terrain-Geometry", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Terrain-Geometry", feng3d.Geometry.terrain = feng3d.serialization.setValue(new TerrainGeometry(), { name: "Terrain-Geometry", assetId: "Terrain-Geometry", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -29734,7 +29801,7 @@ var feng3d;
     }(feng3d.StandardUniforms));
     feng3d.TerrainUniforms = TerrainUniforms;
     feng3d.shaderConfig.shaders["terrain"].cls = TerrainUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.terrain = feng3d.serialization.setValue(new feng3d.Material(), { name: "Terrain-Material", assetId: "Terrain-Material", shaderName: "terrain", hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Terrain-Material", feng3d.Material.terrain = feng3d.serialization.setValue(new feng3d.Material(), { name: "Terrain-Material", assetId: "Terrain-Material", shaderName: "terrain", hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -30003,7 +30070,7 @@ var feng3d;
     }(feng3d.StandardUniforms));
     feng3d.ParticleUniforms = ParticleUniforms;
     feng3d.shaderConfig.shaders["particle"].cls = ParticleUniforms;
-    feng3d.rs.setDefaultAssetData(feng3d.Material.particle = feng3d.serialization.setValue(new feng3d.Material(), {
+    feng3d.AssetData.addAssetData("Particle-Material", feng3d.Material.particle = feng3d.serialization.setValue(new feng3d.Material(), {
         name: "Particle-Material", assetId: "Particle-Material", shaderName: "particle",
         renderParams: { enableBlend: true, depthMask: false },
         hideFlags: feng3d.HideFlags.NotEditable,
@@ -30347,7 +30414,7 @@ var feng3d;
         return ParticleSystem;
     }(feng3d.Model));
     feng3d.ParticleSystem = ParticleSystem;
-    feng3d.rs.setDefaultAssetData(feng3d.Geometry.billboard = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { name: "Billboard", assetId: "Billboard-Geometry", yUp: false, hideFlags: feng3d.HideFlags.NotEditable }));
+    feng3d.AssetData.addAssetData("Billboard", feng3d.Geometry.billboard = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { name: "Billboard", assetId: "Billboard-Geometry", yUp: false, hideFlags: feng3d.HideFlags.NotEditable }));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -31785,8 +31852,8 @@ var feng3d;
             return _super !== null && _super.apply(this, arguments) || this;
         }
         ObjectAsset.prototype.saveFile = function (callback) {
-            this.$data.assetId = this.assetId;
-            var d = feng3d.serialization.serialize(this.$data);
+            this.data.assetId = this.assetId;
+            var d = feng3d.serialization.serialize(this.data);
             this.rs.fs.writeObject(this.assetPath, d, function (err) {
                 callback && callback(err);
             });
@@ -31800,8 +31867,8 @@ var feng3d;
             var _this = this;
             this.rs.fs.readObject(this.assetPath, function (err, object) {
                 _this.rs.deserializeWithAssets(object, function (data) {
-                    _this.$data = data;
-                    feng3d.debuger && console.assert(_this.$data.assetId == _this.assetId);
+                    _this.data = data;
+                    feng3d.debuger && console.assert(_this.data.assetId == _this.assetId);
                     callback && callback(err);
                 });
             });
@@ -31820,7 +31887,7 @@ var feng3d;
         __decorate([
             feng3d.oav({ component: "OAVObjectView" }),
             feng3d.watch("_dataChanged")
-        ], ObjectAsset.prototype, "$data", void 0);
+        ], ObjectAsset.prototype, "data", void 0);
         return ObjectAsset;
     }(feng3d.FileAsset));
     feng3d.ObjectAsset = ObjectAsset;
@@ -31989,17 +32056,17 @@ var feng3d;
             /**
              * 图片
              */
-            get: function () { return this.$data["_pixels"]; },
+            get: function () { return this.data["_pixels"]; },
             set: function (v) {
-                this.$data["_pixels"] = v;
+                this.data["_pixels"] = v;
                 this.saveFile();
             },
             enumerable: true,
             configurable: true
         });
         TextureAsset.prototype.createData = function () {
-            this.$data = new feng3d.Texture2D();
-            this.$data.assetId = this.assetId;
+            this.data = new feng3d.Texture2D();
+            this.data.assetId = this.assetId;
         };
         TextureAsset.prototype.saveFile = function (callback) {
             this.rs.fs.writeImage(this.assetPath, this.image, function (err) {
@@ -32014,7 +32081,7 @@ var feng3d;
         TextureAsset.prototype.readFile = function (callback) {
             var _this = this;
             this.rs.fs.readImage(this.assetPath, function (err, img) {
-                _this.$data["_pixels"] = img;
+                _this.data["_pixels"] = img;
                 callback && callback(err);
             });
         };
@@ -32027,7 +32094,7 @@ var feng3d;
             var _this = this;
             _super.prototype.readMeta.call(this, function (err) {
                 _this.rs.deserializeWithAssets(_this.meta.texture, function (result) {
-                    _this.$data = result;
+                    _this.data = result;
                     callback && callback(err);
                 });
             });
@@ -32038,13 +32105,13 @@ var feng3d;
          * @param callback 完成回调
          */
         TextureAsset.prototype.writeMeta = function (callback) {
-            this.meta.texture = feng3d.serialization.serialize(this.$data);
+            this.meta.texture = feng3d.serialization.serialize(this.data);
             _super.prototype.writeMeta.call(this, callback);
         };
         TextureAsset.extenson = ".png";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
-        ], TextureAsset.prototype, "$data", void 0);
+        ], TextureAsset.prototype, "data", void 0);
         return TextureAsset;
     }(feng3d.FileAsset));
     feng3d.TextureAsset = TextureAsset;
@@ -32062,13 +32129,13 @@ var feng3d;
             return _this;
         }
         TextureCubeAsset.prototype.createData = function () {
-            this.$data = new feng3d.TextureCube();
-            this.$data.assetId = this.assetId;
+            this.data = new feng3d.TextureCube();
+            this.data.assetId = this.assetId;
         };
         TextureCubeAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
-        ], TextureCubeAsset.prototype, "$data", void 0);
+        ], TextureCubeAsset.prototype, "data", void 0);
         return TextureCubeAsset;
     }(feng3d.ObjectAsset));
     feng3d.TextureCubeAsset = TextureCubeAsset;
@@ -32088,7 +32155,7 @@ var feng3d;
         GeometryAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
-        ], GeometryAsset.prototype, "$data", void 0);
+        ], GeometryAsset.prototype, "data", void 0);
         return GeometryAsset;
     }(feng3d.ObjectAsset));
     feng3d.GeometryAsset = GeometryAsset;
@@ -32106,13 +32173,13 @@ var feng3d;
             return _this;
         }
         MaterialAsset.prototype.createData = function () {
-            this.$data = new feng3d.Material();
-            this.$data.assetId = this.assetId;
+            this.data = new feng3d.Material();
+            this.data.assetId = this.assetId;
         };
         MaterialAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
-        ], MaterialAsset.prototype, "$data", void 0);
+        ], MaterialAsset.prototype, "data", void 0);
         return MaterialAsset;
     }(feng3d.ObjectAsset));
     feng3d.MaterialAsset = MaterialAsset;
@@ -32130,12 +32197,12 @@ var feng3d;
             return _this;
         }
         GameObjectAsset.prototype.createData = function () {
-            this.$data = new feng3d.GameObject();
-            this.$data.assetId = this.assetId;
+            this.data = new feng3d.GameObject();
+            this.data.assetId = this.assetId;
         };
         GameObjectAsset.prototype._getAssetData = function () {
             var gameobject = new feng3d.GameObject();
-            feng3d.serialization.setValue(gameobject, this.$data);
+            feng3d.serialization.setValue(gameobject, this.data);
             delete gameobject.assetId;
             gameobject.prefabId = this.assetId;
             return gameobject;
@@ -32143,7 +32210,7 @@ var feng3d;
         GameObjectAsset.extenson = ".json";
         __decorate([
             feng3d.oav({ component: "OAVObjectView" })
-        ], GameObjectAsset.prototype, "$data", void 0);
+        ], GameObjectAsset.prototype, "data", void 0);
         return GameObjectAsset;
     }(feng3d.ObjectAsset));
     feng3d.GameObjectAsset = GameObjectAsset;

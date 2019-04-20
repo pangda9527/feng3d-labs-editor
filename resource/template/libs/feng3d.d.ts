@@ -7284,6 +7284,61 @@ declare namespace feng3d {
          * 资源类型，由具体对象类型决定
          */
         assetType: AssetType;
+        /**
+         * 新增资源数据
+         *
+         * @param assetId 资源编号
+         * @param data 资源数据
+         */
+        static addAssetData(assetId: string, data: AssetData): void;
+        /**
+         * 删除资源数据
+         *
+         * @param data 资源数据
+         */
+        static deleteAssetData(data: AssetData): void;
+        static deleteAssetDataById(assetId: string): void;
+        private static _delete;
+        /**
+         * 判断是否为资源数据
+         *
+         * @param asset 可能的资源数据
+         */
+        static isAssetData(asset: any): boolean;
+        /**
+         * 资源属性标记名称
+         */
+        private static assetPropertySign;
+        /**
+         * 序列化
+         *
+         * @param asset 资源数据
+         */
+        static serialize(asset: AssetData): void;
+        /**
+         * 反序列化
+         *
+         * @param object 资源对象
+         */
+        static deserialize(object: any): AssetData;
+        /**
+         * 获取已加载的资源数据
+         *
+         * @param assetId 资源编号
+         */
+        static getLoadedAssetData(assetId: string): AssetData;
+        /**
+         * 获取所有已加载资源数据
+         */
+        static getAllLoadedAssetDatas(): AssetData[];
+        /**
+         * 资源与编号对应表
+         */
+        static assetMap: Map<AssetData, string>;
+        /**
+         * 编号与资源对应表
+         */
+        static idAssetMap: Map<string, AssetData>;
     }
 }
 declare namespace feng3d {
@@ -8014,7 +8069,7 @@ declare namespace feng3d {
         /**
          * 资源对象
          */
-        protected $data: AssetData;
+        data: AssetData;
         /**
          * 创建资源对象
          */
@@ -8181,7 +8236,6 @@ declare namespace feng3d {
          * @param fileName 文件名称
          */
         getValidChildName(parent: FolderAsset, fileName: string): string;
-        private _assetStatus;
         /**
          * 读取文件为资源对象
          * @param id 资源编号
@@ -8215,23 +8269,11 @@ declare namespace feng3d {
          */
         getAssetDatasByType<T extends AssetData>(type: Constructor<T>): T[];
         /**
-         * 设置默认资源，该类资源不会保存到文件系统中
-         *
-         * @param assets 资源
-         */
-        setDefaultAssetData(assetData: AssetData): void;
-        /**
          * 获取资源
          *
          * @param assetId 资源编号
          */
         getAsset(assetId: string): FileAsset;
-        /**
-         * 获取资源数据
-         *
-         * @param assetId 资源编号
-         */
-        getAssetData(assetId: string): AssetData;
         /**
          * 获取所有资源
          */
@@ -15532,7 +15574,7 @@ declare namespace feng3d {
         /**
          * 资源对象
          */
-        $data: AssetData;
+        data: AssetData;
         saveFile(callback?: (err: Error) => void): void;
         /**
          * 读取文件
@@ -15630,7 +15672,7 @@ declare namespace feng3d {
         /**
          * 材质
          */
-        $data: Texture2D;
+        data: Texture2D;
         /**
          * 图片
          */
@@ -15671,7 +15713,7 @@ declare namespace feng3d {
         /**
          * 材质
          */
-        $data: TextureCube;
+        data: TextureCube;
         assetType: AssetType;
         createData(): void;
     }
@@ -15685,7 +15727,7 @@ declare namespace feng3d {
         /**
          * 几何体
          */
-        $data: Geometry;
+        data: Geometry;
         assetType: AssetType;
     }
 }
@@ -15698,12 +15740,15 @@ declare namespace feng3d {
         /**
          * 材质
          */
-        $data: Material;
+        data: Material;
         assetType: AssetType;
         createData(): void;
     }
 }
 declare namespace feng3d {
+    interface GameObjectAsset {
+        getAssetData(callback?: (result: GameObject) => void): GameObject;
+    }
     /**
      * 游戏对象资源
      */
@@ -15711,7 +15756,7 @@ declare namespace feng3d {
         /**
          * 材质
          */
-        $data: GameObject;
+        data: GameObject;
         assetType: AssetType;
         static extenson: string;
         createData(): void;
