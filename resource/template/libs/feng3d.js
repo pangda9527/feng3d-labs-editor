@@ -464,7 +464,8 @@ Object.assignShallow = function (target, source) {
     });
     return target;
 };
-Object.assignDeep = function (target, source, replacer, deep) {
+Object.assignDeep = function (target, source, replacers, deep) {
+    if (replacers === void 0) { replacers = []; }
     if (deep === void 0) { deep = Number.MAX_SAFE_INTEGER; }
     if (source == null)
         return target;
@@ -472,28 +473,36 @@ Object.assignDeep = function (target, source, replacer, deep) {
         return target;
     var keys = Object.keys(source);
     keys.forEach(function (k) {
-        if (replacer && replacer(target, source, k))
-            return;
         //
-        var spv = source[k];
-        var tpv = target[k];
-        //
-        if (tpv == spv)
-            return;
-        if (Object.isBaseType(tpv) || Object.isBaseType(spv)) {
-            target[k] = spv;
-            return;
+        var handles = [].concat(replacers).concat(Object.DefaultAssignDeepReplacers);
+        for (var i = 0; i < handles.length; i++) {
+            if (handles[i](target, source, k, replacers, deep)) {
+                return;
+            }
         }
         //
-        if (Array.isArray(spv) || Object.isObject(spv)) {
-            Object.assignDeep(tpv, spv, replacer, deep - 1);
-            return;
-        }
-        //
-        target[k] = spv;
+        target[k] = source[k];
     });
     return target;
 };
+Object.DefaultAssignDeepReplacers = [
+    function (target, source, key, replacers, deep) {
+        if (target[key] == source[key])
+            return true;
+    },
+    function (target, source, key, replacers, deep) {
+        if (Object.isBaseType(target[key]) || Object.isBaseType(source[key])) {
+            target[key] = source[key];
+            return true;
+        }
+    },
+    function (target, source, key, replacers, deep) {
+        if (Array.isArray(source[key]) || Object.isObject(source[key])) {
+            Object.assignDeep(target[key], source[key], replacers, deep - 1);
+            return true;
+        }
+    },
+];
 Map.prototype.getKeys = function () {
     var keys = [];
     this.forEach(function (v, k) {
@@ -657,67 +666,73 @@ var feng3d;
          * @returns 序列化后可以转换为Json的数据对象
          */
         Serialization.prototype.serialize = function (target) {
+            var result = {};
+            this.serializeProperty(result, { "": target }, "");
+            var v = result[""];
+            return v;
+        };
+        Serialization.prototype.serializeProperty = function (r, s, k) {
             var _this = this;
-            var result = Object.assignDeep({}, { "": target }, function (t, s, k) {
-                var spv = s[k];
-                //处理方法
-                if (typeof spv == "function") {
-                    var object_1 = {};
-                    object_1[feng3d.CLASS_KEY] = typeof spv;
-                    object_1.data = spv.toString();
-                    t[k] = object_1;
-                    return true;
-                }
-                //基础类型
-                if (Object.isBaseType(spv)) {
-                    t[k] = spv;
-                    return true;
-                }
-                // 排除不支持序列化对象
-                if (spv.hasOwnProperty("serializable") && !spv["serializable"]) {
-                    return true;
-                }
-                if (spv instanceof feng3d.Feng3dObject && !!(spv.hideFlags & feng3d.HideFlags.DontSave)) {
-                    return true;
-                }
-                // 处理资源
-                if (feng3d.AssetData.isAssetData(spv)) {
-                    var object_2 = feng3d.AssetData.serialize(spv);
-                    t[k];
-                    return object_2;
-                }
-                //处理数组
-                if (Array.isArray(spv)) {
-                    var arr = spv.map(function (v) { return _this.serialize(v); });
-                    return arr;
-                }
-                //处理普通Object
-                if (Object.isObject(spv)) {
-                    var object_3 = {};
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        object_3[key] = _this.serialize(spv[key]);
-                    });
-                    return object_3;
-                }
-                if (spv["serialize"]) {
-                    var object_4 = {};
-                    object_4[feng3d.CLASS_KEY] = feng3d.classUtils.getQualifiedClassName(spv);
-                    spv["serialize"](object_4);
-                    return object_4;
-                }
-                //使用默认序列化
-                var object = {};
-                object[feng3d.CLASS_KEY] = feng3d.classUtils.getQualifiedClassName(spv);
-                var serializableMembers = getSerializableMembers(spv);
-                for (var i = 0; i < serializableMembers.length; i++) {
-                    var property = serializableMembers[i];
-                    object[property] = _this.serialize(spv[property]);
-                }
-                return object;
-                return true;
+            var spv = s[k];
+            //处理方法
+            if (typeof spv == "function") {
+                var object_1 = {};
+                object_1[feng3d.CLASS_KEY] = typeof spv;
+                object_1.data = spv.toString();
+                r[k] = object_1;
+                return;
+            }
+            //基础类型
+            if (Object.isBaseType(spv)) {
+                r[k] = spv;
+                return;
+            }
+            // 排除不支持序列化对象
+            if (spv.hasOwnProperty("serializable") && !spv["serializable"])
+                return;
+            if (spv instanceof feng3d.Feng3dObject && !!(spv.hideFlags & feng3d.HideFlags.DontSave))
+                return;
+            // 处理资源
+            if (feng3d.AssetData.isAssetData(spv)) {
+                r[k] = feng3d.AssetData.serialize(spv);
+                return;
+            }
+            if (spv["serialize"]) {
+                var object_2 = {};
+                object_2[feng3d.CLASS_KEY] = feng3d.classUtils.getQualifiedClassName(spv);
+                spv["serialize"](object_2);
+                r[k] = object_2;
+                return;
+            }
+            //处理数组
+            if (Array.isArray(spv)) {
+                var arr_1 = [];
+                var keys_1 = Object.keys(spv);
+                keys_1.forEach(function (v) {
+                    _this.serializeProperty(arr_1, spv, v);
+                });
+                r[k] = arr_1;
+                return;
+            }
+            //处理普通Object
+            if (Object.isObject(spv)) {
+                var object_3 = {};
+                var keys_2 = Object.keys(spv);
+                keys_2.forEach(function (key) {
+                    _this.serializeProperty(object_3, spv, key);
+                });
+                r[k] = object_3;
+                return;
+            }
+            //使用默认序列化
+            var object = {};
+            object[feng3d.CLASS_KEY] = feng3d.classUtils.getQualifiedClassName(spv);
+            var keys = getSerializableMembers(spv);
+            keys.forEach(function (v) {
+                _this.serializeProperty(object, spv, v);
             });
-            return result[""];
+            r[k] = object;
+            return;
         };
         /**
          * 比较两个对象的不同，提取出不同的数据

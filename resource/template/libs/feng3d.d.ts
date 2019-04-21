@@ -99,6 +99,20 @@ declare namespace feng3d {
         getvalue: <T>(lazyItem: Lazy<T>) => T;
     };
 }
+/**
+ * Object.assignDeep 中 转换结果的函数定义
+ */
+interface AssignDeepReplacer {
+    /**
+     *
+     * @param target 目标对象
+     * @param source 源数据
+     * @param key 属性名称
+     * @param replacers 转换函数
+     * @param deep 当前深度
+     */
+    (target: any, source: any, key: string, replacers: AssignDeepReplacer[], deep: number): boolean;
+}
 interface ObjectConstructor {
     /**
      * 从对象以及对象的原型中获取属性描述
@@ -136,10 +150,10 @@ interface ObjectConstructor {
      *
      * @param target 被赋值对象
      * @param source 源数据
-     * @param replacer 转换结果的函数。返回值为true表示该属性赋值已完成跳过默认属性赋值操作，否则执行默认属性赋值操作。
+     * @param replacers 转换结果的函数。返回值为true表示该属性赋值已完成跳过默认属性赋值操作，否则执行默认属性赋值操作。执行在 Object.DefaultAssignDeepReplacers 前。
      * @param deep 赋值深度，deep<1时直接返回。
      */
-    assignDeep<T>(target: T, source: feng3d.gPartial<T>, replacer?: (target: any, source: any, key: string) => boolean, deep?: number): T;
+    assignDeep<T>(target: T, source: feng3d.gPartial<T>, replacers?: AssignDeepReplacer | AssignDeepReplacer[], deep?: number): T;
     /**
      * 执行方法
      *
@@ -152,6 +166,10 @@ interface ObjectConstructor {
      * @param func 被执行的方法
      */
     runFunc<T>(obj: T, func: (obj: T) => void): T;
+    /**
+     * Object.assignDeep 中 默认转换结果的函数列表
+     */
+    DefaultAssignDeepReplacers: AssignDeepReplacer[];
 }
 interface Map<K, V> {
     getKeys(): K[];
@@ -277,6 +295,7 @@ declare namespace feng3d {
          * @returns 序列化后可以转换为Json的数据对象
          */
         serialize<T>(target: T): gPartial<T>;
+        private serializeProperty;
         /**
          * 比较两个对象的不同，提取出不同的数据
          * @param target 用于检测不同的数据
