@@ -113,9 +113,33 @@ interface ObjectConstructor {
      */
     propertyIsWritable(obj: Object, property: string): boolean;
     /**
-     * 判断是否为基础类型 undefined,null,boolean,string,number
+     * 判断是否为基础类型 undefined,null,boolean,string,number,function
      */
     isBaseType(object: any): boolean;
+    /**
+     * 判断是否为Object对象，构造函数是否为Object， 检测 object.constructor == Object
+     *
+     * @param object 用于判断的对象
+     */
+    isObject(object: any): boolean;
+    /**
+     * 浅赋值
+     * 从源数据取所有可枚举属性值赋值给目标对象
+     *
+     * @param target 目标对象
+     * @param source 源数据
+     */
+    assignShallow<T>(target: T, source: Partial<T>): T;
+    /**
+     * 深度赋值
+     * 从源数据取所有子代可枚举属性值赋值给目标对象
+     *
+     * @param target 被赋值对象
+     * @param source 源数据
+     * @param replacer 转换结果的函数。返回值为true表示该属性赋值已完成跳过默认属性赋值操作，否则执行默认属性赋值操作。
+     * @param deep 赋值深度，deep<1时直接返回。
+     */
+    assignDeep<T>(target: T, source: feng3d.gPartial<T>, replacer?: (target: any, source: any, key: string) => boolean, deep?: number): T;
     /**
      * 执行方法
      *
@@ -147,6 +171,19 @@ interface Array<T> {
      * @returns 被删除元素在数组中的位置
      */
     delete(item: T): number;
+    /**
+     * 连接一个或多个数组到自身
+     *
+      * @param items 要添加到数组末尾的其他项。
+      * @returns 返回自身
+      */
+    concatToSelf(...items: (T | ConcatArray<T>)[]): this;
+    /**
+     * 比较两个数组是否相等
+     *
+     * @param arr 用于比较的数组
+     */
+    equal(arr: ArrayLike<T>): boolean;
 }
 declare namespace feng3d {
     var functionwarp: FunctionWarp;
@@ -205,16 +242,41 @@ declare namespace feng3d {
      * @param {string} propertyKey      序列化属性
      */
     function serialize(target: any, propertyKey: string): void;
+    interface SerializationComponent {
+        /**
+         * 名称
+         */
+        name: string;
+        /**
+         * 序列化
+         *
+         * @param target 序列化对象
+         *
+         * @returns Json对象
+         */
+        serialize?(target: any): any;
+        /**
+         * 反序列化
+         *
+         * @param object Json的对象
+         *
+         * @returns 反序列化后的数据
+         */
+        deserialize?(object: any): {
+            result: any;
+        };
+    }
     /**
      * 序列化
      */
     class Serialization {
+        components: SerializationComponent[];
         /**
          * 序列化对象
          * @param target 被序列化的对象
          * @returns 序列化后可以转换为Json的数据对象
          */
-        serialize(target: any, saveFlags?: HideFlags): any;
+        serialize<T>(target: T): gPartial<T>;
         /**
          * 比较两个对象的不同，提取出不同的数据
          * @param target 用于检测不同的数据
@@ -222,7 +284,7 @@ declare namespace feng3d {
          * @param different 比较得出的不同（简单结构）数据
          * @returns 比较得出的不同（简单结构）数据
          */
-        different(target: Object, defaultInstance: Object, different?: Object): Object;
+        different<T>(target: T, defaultInstance: T, different?: gPartial<T>): gPartial<T>;
         /**
          * 反序列化
          *
@@ -231,17 +293,24 @@ declare namespace feng3d {
          * @param object 换为Json的对象
          * @returns 反序列化后的数据
          */
-        deserialize(object: any): any;
+        deserialize<T>(object: gPartial<T>): T;
+        /**
+         * 处理组件反序列化
+         *
+         * @returns 序列化是否返回null，否则返回 包含结果的 {result:any} 对象
+         */
+        private handleComponentsDeserialize;
         /**
          * 从数据对象中提取数据给目标对象赋值
          * @param target 目标对象
-         * @param object 数据对象
+         * @param source 数据对象
          */
-        setValue<T>(target: T, object: gPartial<T>): T;
+        setValue<T>(target: T, source: gPartial<T>): T;
         /**
          * 给目标对象的指定属性赋值
+         *
          * @param target 目标对象
-         * @param object 数据对象
+         * @param source 数据对象
          * @param property 属性名称
          */
         private setPropertyValue;
@@ -3519,7 +3588,8 @@ declare namespace feng3d {
          */
         static polar(len: number, angle: number): Vector2;
         /**
-         * 创建一个 egret.Point 对象.若不传入任何参数，将会创建一个位于（0，0）位置的点。
+         * 创建一个 Vector2 对象.若不传入任何参数，将会创建一个位于（0，0）位置的点。
+         *
          * @param x 该对象的x属性值，默认为0
          * @param y 该对象的y属性值，默认为0
          */
@@ -7304,7 +7374,7 @@ declare namespace feng3d {
          *
          * @param asset 可能的资源数据
          */
-        static isAssetData(asset: any): boolean;
+        static isAssetData(asset: any): asset is AssetData;
         /**
          * 资源属性标记名称
          */
@@ -7314,7 +7384,7 @@ declare namespace feng3d {
          *
          * @param asset 资源数据
          */
-        static serialize(asset: AssetData): void;
+        static serialize(asset: AssetData): any;
         /**
          * 反序列化
          *
@@ -7520,6 +7590,10 @@ declare namespace feng3d {
      * 可读文件系统
      */
     interface IReadFS {
+        /**
+         * 文件系统类型
+         */
+        type: FSType;
         /**
          * 读取文件为ArrayBuffer
          * @param path 路径

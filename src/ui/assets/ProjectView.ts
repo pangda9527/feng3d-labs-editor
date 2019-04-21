@@ -69,8 +69,7 @@ namespace editor
             {
                 dragSource.getDragData("gameobject").forEach(v =>
                 {
-                    var gameobject = feng3d.serialization.clone(v);
-                    editorAsset.saveObject(gameobject);
+                    editorAsset.saveObject(v);
                 });
             });
 
