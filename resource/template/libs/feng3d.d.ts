@@ -1,6 +1,15 @@
 declare module 'feng3d' {
     export = feng3d;
 }
+declare type gPartial<T> = {
+    [P in keyof T]?: gPartial<T[P]>;
+};
+declare namespace feng3d {
+    /**
+     * feng3d的版本号
+     */
+    var revision: string;
+}
 declare namespace feng3d {
     /**
      * 观察装饰器，观察被装饰属性的变化
@@ -86,122 +95,94 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 让T中以及所有属性中的所有属性都是可选的
+     * Object 工具
+     *
+     * 增强Object功能
      */
-    type gPartial<T> = {
-        [P in keyof T]?: gPartial<T[P]>;
-    };
-    type Lazy<T> = T | (() => T);
-    type LazyObject<T> = {
-        [P in keyof T]: Lazy<T[P]>;
-    };
-    var lazy: {
-        getvalue: <T>(lazyItem: Lazy<T>) => T;
-    };
+    var objectutils: ObjectUtils;
+    /**
+     * Object 工具
+     *
+     * 增强Object功能
+     */
+    class ObjectUtils {
+        /**
+         * 从对象以及对象的原型中获取属性描述
+         * @param obj 对象
+         * @param property 属性名称
+         */
+        getPropertyDescriptor(host: Object, property: string): PropertyDescriptor;
+        /**
+         * 属性是否可写
+         * @param obj 对象
+         * @param property 属性名称
+         */
+        propertyIsWritable(host: Object, property: string): boolean;
+        /**
+         * 执行方法
+         *
+         * 用例：
+         * 1. 给一个新建的对象进行初始化
+         *
+         *  ``` startLifetime = Object.runFunc(new MinMaxCurve(), (obj) => { obj.mode = MinMaxCurveMode.Constant; (<MinMaxCurveConstant>obj.minMaxCurve).value = 5; }); ```
+         *
+         * @param obj 对象
+         * @param func 被执行的方法
+         */
+        runFunc<T>(obj: T, func: (obj: T) => void): T;
+    }
 }
-/**
- * Object.assignDeep 中 转换结果的函数定义
- */
-interface AssignDeepReplacer {
+declare namespace feng3d {
     /**
-     *
-     * @param target 目标对象
-     * @param source 源数据
-     * @param key 属性名称
-     * @param replacers 转换函数
-     * @param deep 当前深度
+     * 增强Map功能
      */
-    (target: any, source: any, key: string, replacers: AssignDeepReplacer[], deep: number): boolean;
+    var maputils: MapUtils;
+    /**
+     * 增强Map功能
+     */
+    class MapUtils {
+        /**
+         * 获取所有键
+         *
+         * @param map Map对象
+         */
+        getKeys<K, V>(map: Map<K, V>): K[];
+        /**
+         * 获取所有值
+         *
+         * @param map Map对象
+         */
+        getValues<K, V>(map: Map<K, V>): V[];
+    }
 }
-interface ObjectConstructor {
+declare namespace feng3d {
     /**
-     * 从对象以及对象的原型中获取属性描述
-     * @param obj 对象
-     * @param property 属性名称
+     * 数组工具，增强Array功能
      */
-    getPropertyDescriptor(obj: Object, property: string): PropertyDescriptor;
+    var arrayutils: ArrayUtils;
     /**
-     * 属性是否可写
-     * @param obj 对象
-     * @param property 属性名称
+     * 数组工具，增强Array功能
      */
-    propertyIsWritable(obj: Object, property: string): boolean;
-    /**
-     * 判断是否为基础类型 undefined,null,boolean,string,number,function
-     */
-    isBaseType(object: any): boolean;
-    /**
-     * 判断是否为Object对象，构造函数是否为Object， 检测 object.constructor == Object
-     *
-     * @param object 用于判断的对象
-     */
-    isObject(object: any): boolean;
-    /**
-     * 浅赋值
-     * 从源数据取所有可枚举属性值赋值给目标对象
-     *
-     * @param target 目标对象
-     * @param source 源数据
-     */
-    assignShallow<T>(target: T, source: Partial<T>): T;
-    /**
-     * 深度赋值
-     * 从源数据取所有子代可枚举属性值赋值给目标对象
-     *
-     * @param target 被赋值对象
-     * @param source 源数据
-     * @param replacers 转换结果的函数。返回值为true表示该属性赋值已完成跳过默认属性赋值操作，否则执行默认属性赋值操作。执行在 Object.DefaultAssignDeepReplacers 前。
-     * @param deep 赋值深度，deep<1时直接返回。
-     */
-    assignDeep<T>(target: T, source: feng3d.gPartial<T>, replacers?: AssignDeepReplacer | AssignDeepReplacer[], deep?: number): T;
-    /**
-     * 执行方法
-     *
-     * 用例：
-     * 1. 给一个新建的对象进行初始化
-     *
-     *  ``` startLifetime = Object.runFunc(new MinMaxCurve(), (obj) => { obj.mode = MinMaxCurveMode.Constant; (<MinMaxCurveConstant>obj.minMaxCurve).value = 5; }); ```
-     *
-     * @param obj 对象
-     * @param func 被执行的方法
-     */
-    runFunc<T>(obj: T, func: (obj: T) => void): T;
-    /**
-     * Object.assignDeep 中 默认转换结果的函数列表
-     */
-    DefaultAssignDeepReplacers: AssignDeepReplacer[];
-}
-interface Map<K, V> {
-    getKeys(): K[];
-    getValues(): V[];
-}
-interface Array<T> {
-    /**
-     * 使数组变得唯一，不存在两个相等的元素
-     *
-     * @param compare 比较函数
-     */
-    unique(compare?: (a: T, b: T) => boolean): this;
-    /**
-     * 删除元素
-     *
-     * @param item 被删除元素
-     * @returns 被删除元素在数组中的位置
-     */
-    delete(item: T): number;
-    /**
-     * 连接一个或多个数组到自身
-     *
-      * @param items 要添加到数组末尾的其他项。
-      * @returns 返回自身
-      */
-    concatToSelf(...items: (T | ConcatArray<T>)[]): this;
-    /**
-     * 比较两个数组是否相等
-     *
-     * @param arr 用于比较的数组
-     */
-    equal(arr: ArrayLike<T>): boolean;
+    class ArrayUtils {
+        /**
+         * 使数组变得唯一，不存在两个相等的元素
+         *
+         * @param arr 数组
+         * @param compare 比较函数
+         *
+         * @returns 返回传入的数组
+         */
+        unique<T>(arr: T[], compare?: (a: T, b: T) => boolean): T[];
+        /**
+         * 删除第一个指定元素
+         *
+         * @param arr 数组
+         * @param item 被删除元素
+         *
+         * @returns 被删除元素在数组中的位置
+         */
+        delete<T>(arr: T[], item: T): number;
+    }
 }
 declare namespace feng3d {
     var functionwarp: FunctionWarp;
@@ -233,13 +214,13 @@ declare namespace feng3d {
      */
     var debug: Debug;
     /**
-     * 是否开启调试
-     */
-    var debuger: boolean;
-    /**
      * 调试工具
      */
     class Debug {
+        /**
+         * 是否开启调试
+         */
+        debuger: boolean;
         constructor();
         /**
          * 测试代码运行时间
@@ -260,42 +241,16 @@ declare namespace feng3d {
      * @param {string} propertyKey      序列化属性
      */
     function serialize(target: any, propertyKey: string): void;
-    interface SerializationComponent {
-        /**
-         * 名称
-         */
-        name: string;
-        /**
-         * 序列化
-         *
-         * @param target 序列化对象
-         *
-         * @returns Json对象
-         */
-        serialize?(target: any): any;
-        /**
-         * 反序列化
-         *
-         * @param object Json的对象
-         *
-         * @returns 反序列化后的数据
-         */
-        deserialize?(object: any): {
-            result: any;
-        };
-    }
     /**
      * 序列化
      */
     class Serialization {
-        components: SerializationComponent[];
         /**
          * 序列化对象
          * @param target 被序列化的对象
          * @returns 序列化后可以转换为Json的数据对象
          */
-        serialize<T>(target: T): gPartial<T>;
-        private serializeProperty;
+        serialize(target: any, saveFlags?: HideFlags): any;
         /**
          * 比较两个对象的不同，提取出不同的数据
          * @param target 用于检测不同的数据
@@ -303,7 +258,7 @@ declare namespace feng3d {
          * @param different 比较得出的不同（简单结构）数据
          * @returns 比较得出的不同（简单结构）数据
          */
-        different<T>(target: T, defaultInstance: T, different?: gPartial<T>): gPartial<T>;
+        different(target: Object, defaultInstance: Object, different?: Object): Object;
         /**
          * 反序列化
          *
@@ -312,27 +267,31 @@ declare namespace feng3d {
          * @param object 换为Json的对象
          * @returns 反序列化后的数据
          */
-        deserialize<T>(object: gPartial<T>): T;
-        /**
-         * 处理组件反序列化
-         *
-         * @returns 序列化是否返回null，否则返回 包含结果的 {result:any} 对象
-         */
-        private handleComponentsDeserialize;
+        deserialize(object: any): any;
         /**
          * 从数据对象中提取数据给目标对象赋值
          * @param target 目标对象
-         * @param source 数据对象
+         * @param object 数据对象
          */
-        setValue<T>(target: T, source: gPartial<T>): T;
+        setValue<T>(target: T, object: gPartial<T>): T;
         /**
          * 给目标对象的指定属性赋值
-         *
          * @param target 目标对象
-         * @param source 数据对象
+         * @param object 数据对象
          * @param property 属性名称
          */
         private setPropertyValue;
+        /**
+         * 获取需要反序列化对象中的资源id列表
+         */
+        getAssets(object: any, assetids?: string[]): string[];
+        /**
+         * 反序列化包含资源的对象
+         *
+         * @param object 反序列化的对象
+         * @param callback 完成回调
+         */
+        deserializeWithAssets(object: any, callback: (result: any) => void): void;
         /**
          * 克隆
          * @param target 被克隆对象
@@ -1100,18 +1059,6 @@ declare namespace feng3d {
          */
         getDefinitionByName(name: string, readCache?: boolean): any;
         /**
-         * 获取默认实例
-         *
-         * @param name 类名称
-         */
-        getDefaultInstanceByName(name: string): any;
-        /**
-         * 获取实例
-         *
-         * @param name 类名称
-         */
-        getInstanceByName(name: string): any;
-        /**
          * 新增反射对象所在的命名空间，使得getQualifiedClassName能够得到正确的结果
          */
         addClassNameSpace(namespace: string): void;
@@ -1472,6 +1419,15 @@ declare namespace feng3d {
          */
         name?: string;
     }
+}
+declare namespace feng3d {
+    type Lazy<T> = T | (() => T);
+    type LazyObject<T> = {
+        [P in keyof T]: Lazy<T[P]>;
+    };
+    var lazy: {
+        getvalue: <T>(lazyItem: Lazy<T>) => T;
+    };
 }
 declare namespace feng3d {
     /**
@@ -2931,169 +2887,171 @@ declare namespace feng3d {
         rotateRightRight(rootNode: BinarySearchTreeNode<T>): void;
     }
 }
-interface Math {
-    /**
-     * 角度转弧度因子
-     */
-    DEG2RAD: number;
-    /**
-     * 弧度转角度因子
-     */
-    RAD2DEG: number;
-    /**
-     * 默认精度
-     */
-    PRECISION: number;
-    /**
-     * 获取唯一标识符
-     * @see http://www.broofa.com/Tools/Math.uuid.htm
-     */
-    uuid: () => string;
-    /**
-     * （夹紧）计算指定值到区间[edge0 ,edge1]最近的值
-     *
-     * @param value 指定值
-     * @param lowerlimit 区间下界
-     * @param upperlimit 区间上界
-     */
-    clamp(value: number, lowerlimit: number, upperlimit: number): number;
-    /**
-     * 计算欧几里得模（整数模） ((n % m) + m) % m
-     *
-     * @param n 被除数
-     * @param m 除数
-     * @see https://en.wikipedia.org/wiki/Modulo_operation
-     */
-    euclideanModulo(n: number, m: number): number;
-    /**
-     * 使 x 值从区间 <a1, a2> 线性映射到区间 <b1, b2>
-     *
-     * @param x 第一个区间中值
-     * @param a1 第一个区间起始值
-     * @param a2 第一个区间终止值
-     * @param b1 第二个区间起始值
-     * @param b2 第二个区间起始值
-     */
-    mapLinear: (x: number, a1: number, a2: number, b1: number, b2: number) => number;
-    /**
-     * 线性插值
-     *
-     * @param start 起始值
-     * @param end 终止值
-     * @param t 插值系数 [0 ,1]
-     *
-     * @see https://en.wikipedia.org/wiki/Linear_interpolation
-     */
-    lerp(start: number, end: number, t: number): number;
-    /**
-     * 计算平滑值 3x^2 - 2x^3
-     *
-     * @param x
-     * @param min 最小值
-     * @param max 最大值
-     *
-     * @see http://en.wikipedia.org/wiki/Smoothstep
-     */
-    smoothstep(x: number, min: number, max: number): number;
-    /**
-     * 计算平滑值 6x^5 - 15x^4 + 10x^3
-     *
-     * @param x
-     * @param min 最小值
-     * @param max 最大值
-     */
-    smootherstep(x: number, min: number, max: number): number;
-    /**
-     * 从<low, high>获取随机整数
-     *
-     * @param low 区间起始值
-     * @param high 区间终止值
-     */
-    randInt(low: number, high: number): number;
-    /**
-     * 从<low, high>获取随机浮点数
-     *
-     * @param low 区间起始值
-     * @param high 区间终止值
-     */
-    randFloat(low: number, high: number): number;
-    /**
-     * 从<-range/2, range/2>获取随机浮点数
-     *
-     * @param range 范围
-     */
-    randFloatSpread(range: number): number;
-    /**
-     * 角度转换为弧度
-     *
-     * @param degrees 角度
-     */
-    degToRad(degrees: number): number;
-    /**
-     * 弧度转换为角度
-     *
-     * @param radians 弧度
-     */
-    radToDeg(radians: number): number;
-    /**
-     * 判断指定整数是否为2的幂
-     *
-     * @param value 整数
-     */
-    isPowerOfTwo(value: number): boolean;
-    /**
-     * 获取离指定整数最近的2的幂
-     *
-     * @param value 整数
-     */
-    nearestPowerOfTwo(value: number): number;
-    /**
-     * 获取指定大于等于整数最小2的幂，3->4,5->8,17->32,33->64
-     *
-     * @param value 整数
-     */
-    nextPowerOfTwo(value: number): number;
-    /**
-     * 获取目标最近的值
-     *
-     * source增加或者减少整数倍precision后得到离target最近的值
-     *
-     * ```
-     * Math.toRound(71,0,5);//运算结果为1
-     * ```
-     *
-     * @param source 初始值
-     * @param target 目标值
-     * @param precision 精度
-     */
-    toRound(source: number, target: number, precision?: number): number;
-    /**
-     * 比较两个Number是否相等
-     *
-     * @param a 数字a
-     * @param b 数字b
-     * @param precision 进度
-     */
-    equals(a: number, b: number, precision?: number): boolean;
-    /**
-     * 计算最大公约数
-     *
-     * @param a 整数a
-     * @param b 整数b
-     *
-     * @see https://en.wikipedia.org/wiki/Greatest_common_divisor
-     */
-    gcd(a: number, b: number): number;
-    /**
-     * 计算最小公倍数
-     * Least common multiple
-     *
-     * @param a 整数a
-     * @param b 整数b
-     *
-     * @see https://en.wikipedia.org/wiki/Least_common_multiple
-     */
-    lcm(a: number, b: number): number;
+declare namespace feng3d {
+    var FMath: {
+        /**
+         * 角度转弧度因子
+         */
+        DEG2RAD: number;
+        /**
+         * 弧度转角度因子
+         */
+        RAD2DEG: number;
+        /**
+         * 默认精度
+         */
+        PRECISION: number;
+        /**
+         * 获取唯一标识符
+         * @see http://www.broofa.com/Tools/Math.uuid.htm
+         */
+        uuid: () => string;
+        /**
+         * （夹紧）计算指定值到区间[edge0 ,edge1]最近的值
+         *
+         * @param value 指定值
+         * @param lowerlimit 区间下界
+         * @param upperlimit 区间上界
+         */
+        clamp(value: number, lowerlimit: number, upperlimit: number): number;
+        /**
+         * 计算欧几里得模（整数模） ((n % m) + m) % m
+         *
+         * @param n 被除数
+         * @param m 除数
+         * @see https://en.wikipedia.org/wiki/Modulo_operation
+         */
+        euclideanModulo(n: number, m: number): number;
+        /**
+         * 使 x 值从区间 <a1, a2> 线性映射到区间 <b1, b2>
+         *
+         * @param x 第一个区间中值
+         * @param a1 第一个区间起始值
+         * @param a2 第一个区间终止值
+         * @param b1 第二个区间起始值
+         * @param b2 第二个区间起始值
+         */
+        mapLinear: (x: number, a1: number, a2: number, b1: number, b2: number) => number;
+        /**
+         * 线性插值
+         *
+         * @param start 起始值
+         * @param end 终止值
+         * @param t 插值系数 [0 ,1]
+         *
+         * @see https://en.wikipedia.org/wiki/Linear_interpolation
+         */
+        lerp(start: number, end: number, t: number): number;
+        /**
+         * 计算平滑值 3x^2 - 2x^3
+         *
+         * @param x
+         * @param min 最小值
+         * @param max 最大值
+         *
+         * @see http://en.wikipedia.org/wiki/Smoothstep
+         */
+        smoothstep(x: number, min: number, max: number): number;
+        /**
+         * 计算平滑值 6x^5 - 15x^4 + 10x^3
+         *
+         * @param x
+         * @param min 最小值
+         * @param max 最大值
+         */
+        smootherstep(x: number, min: number, max: number): number;
+        /**
+         * 从<low, high>获取随机整数
+         *
+         * @param low 区间起始值
+         * @param high 区间终止值
+         */
+        randInt(low: number, high: number): number;
+        /**
+         * 从<low, high>获取随机浮点数
+         *
+         * @param low 区间起始值
+         * @param high 区间终止值
+         */
+        randFloat(low: number, high: number): number;
+        /**
+         * 从<-range/2, range/2>获取随机浮点数
+         *
+         * @param range 范围
+         */
+        randFloatSpread(range: number): number;
+        /**
+         * 角度转换为弧度
+         *
+         * @param degrees 角度
+         */
+        degToRad(degrees: number): number;
+        /**
+         * 弧度转换为角度
+         *
+         * @param radians 弧度
+         */
+        radToDeg(radians: number): number;
+        /**
+         * 判断指定整数是否为2的幂
+         *
+         * @param value 整数
+         */
+        isPowerOfTwo(value: number): boolean;
+        /**
+         * 获取离指定整数最近的2的幂
+         *
+         * @param value 整数
+         */
+        nearestPowerOfTwo(value: number): number;
+        /**
+         * 获取指定大于等于整数最小2的幂，3->4,5->8,17->32,33->64
+         *
+         * @param value 整数
+         */
+        nextPowerOfTwo(value: number): number;
+        /**
+         * 获取目标最近的值
+         *
+         * source增加或者减少整数倍precision后得到离target最近的值
+         *
+         * ```
+         * Math.toRound(71,0,5);//运算结果为1
+         * ```
+         *
+         * @param source 初始值
+         * @param target 目标值
+         * @param precision 精度
+         */
+        toRound(source: number, target: number, precision?: number): number;
+        /**
+         * 比较两个Number是否相等
+         *
+         * @param a 数字a
+         * @param b 数字b
+         * @param precision 进度
+         */
+        equals(a: number, b: number, precision?: number): boolean;
+        /**
+         * 计算最大公约数
+         *
+         * @param a 整数a
+         * @param b 整数b
+         *
+         * @see https://en.wikipedia.org/wiki/Greatest_common_divisor
+         */
+        gcd(a: number, b: number): number;
+        /**
+         * 计算最小公倍数
+         * Least common multiple
+         *
+         * @param a 整数a
+         * @param b 整数b
+         *
+         * @see https://en.wikipedia.org/wiki/Least_common_multiple
+         */
+        lcm(a: number, b: number): number;
+    };
 }
 declare namespace feng3d {
     /**
@@ -3607,8 +3565,7 @@ declare namespace feng3d {
          */
         static polar(len: number, angle: number): Vector2;
         /**
-         * 创建一个 Vector2 对象.若不传入任何参数，将会创建一个位于（0，0）位置的点。
-         *
+         * 创建一个 egret.Point 对象.若不传入任何参数，将会创建一个位于（0，0）位置的点。
          * @param x 该对象的x属性值，默认为0
          * @param y 该对象的y属性值，默认为0
          */
@@ -7285,8 +7242,8 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 任务，用于处理任务之间依赖
-     */
+  * 任务，用于处理任务之间依赖
+  */
     var task: Task;
     /**
      * 任务函数
@@ -7373,61 +7330,6 @@ declare namespace feng3d {
          * 资源类型，由具体对象类型决定
          */
         assetType: AssetType;
-        /**
-         * 新增资源数据
-         *
-         * @param assetId 资源编号
-         * @param data 资源数据
-         */
-        static addAssetData(assetId: string, data: AssetData): void;
-        /**
-         * 删除资源数据
-         *
-         * @param data 资源数据
-         */
-        static deleteAssetData(data: AssetData): void;
-        static deleteAssetDataById(assetId: string): void;
-        private static _delete;
-        /**
-         * 判断是否为资源数据
-         *
-         * @param asset 可能的资源数据
-         */
-        static isAssetData(asset: any): asset is AssetData;
-        /**
-         * 资源属性标记名称
-         */
-        private static assetPropertySign;
-        /**
-         * 序列化
-         *
-         * @param asset 资源数据
-         */
-        static serialize(asset: AssetData): any;
-        /**
-         * 反序列化
-         *
-         * @param object 资源对象
-         */
-        static deserialize(object: any): AssetData;
-        /**
-         * 获取已加载的资源数据
-         *
-         * @param assetId 资源编号
-         */
-        static getLoadedAssetData(assetId: string): AssetData;
-        /**
-         * 获取所有已加载资源数据
-         */
-        static getAllLoadedAssetDatas(): AssetData[];
-        /**
-         * 资源与编号对应表
-         */
-        static assetMap: Map<AssetData, string>;
-        /**
-         * 编号与资源对应表
-         */
-        static idAssetMap: Map<string, AssetData>;
     }
 }
 declare namespace feng3d {
@@ -7606,96 +7508,46 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 可读文件系统
-     */
-    interface IReadFS {
-        /**
-         * 文件系统类型
-         */
-        type: FSType;
-        /**
-         * 读取文件为ArrayBuffer
-         * @param path 路径
-         * @param callback 读取完成回调 当err不为null时表示读取失败
-         */
-        readArrayBuffer(path: string, callback: (err: Error, arraybuffer: ArrayBuffer) => void): void;
-        /**
-         * 读取文件为字符串
-         * @param path 路径
-         * @param callback 读取完成回调 当err不为null时表示读取失败
-         */
-        readString(path: string, callback: (err: Error, str: string) => void): void;
-        /**
-         * 读取文件为Object
-         * @param path 路径
-         * @param callback 读取完成回调 当err不为null时表示读取失败
-         */
-        readObject(path: string, callback: (err: Error, object: Object) => void): void;
-        /**
-         * 加载图片
-         * @param path 图片路径
-         * @param callback 加载完成回调
-         */
-        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
-        /**
-         * 获取文件绝对路径
-         * @param path （相对）路径
-         */
-        getAbsolutePath(path: string): string;
-    }
-    /**
-     * 默认基础文件系统
-     */
-    var basefs: IReadFS;
-}
-declare namespace feng3d {
-    /**
      * 默认文件系统
      */
     var fs: ReadFS;
     /**
      * 可读文件系统
      */
-    class ReadFS {
-        /**
-         * 基础文件系统
-         */
-        fs: IReadFS;
-        private _fs;
+    abstract class ReadFS {
         /**
          * 文件系统类型
          */
         readonly type: FSType;
-        constructor(fs?: IReadFS);
         /**
          * 读取文件为ArrayBuffer
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readArrayBuffer(path: string, callback: (err: Error, arraybuffer: ArrayBuffer) => void): void;
+        abstract readArrayBuffer(path: string, callback: (err: Error, arraybuffer: ArrayBuffer) => void): void;
         /**
          * 读取文件为字符串
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readString(path: string, callback: (err: Error, str: string) => void): void;
+        abstract readString(path: string, callback: (err: Error, str: string) => void): void;
         /**
          * 读取文件为Object
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readObject(path: string, callback: (err: Error, object: Object) => void): void;
+        abstract readObject(path: string, callback: (err: Error, object: Object) => void): void;
         /**
          * 加载图片
          * @param path 图片路径
          * @param callback 加载完成回调
          */
-        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
+        abstract readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
          */
-        getAbsolutePath(path: string): string;
+        abstract getAbsolutePath(path: string): string;
         /**
          * 读取文件列表为字符串列表
          *
@@ -7703,10 +7555,15 @@ declare namespace feng3d {
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
         readStrings(paths: string[], callback: (strs: (string | Error)[]) => void): void;
+        /**
+         * 获取已经加载的图片，如果未加载则返回null
+         *
+         * @param path 图片路径
+         */
+        getImage(path: string): HTMLImageElement;
         protected _images: {
             [path: string]: HTMLImageElement;
         };
-        private _state;
     }
 }
 declare namespace feng3d {
@@ -7715,7 +7572,7 @@ declare namespace feng3d {
      *
      * 扩展基础可读写文件系统
      */
-    interface IReadWriteFS extends IReadFS {
+    abstract class ReadWriteFS extends ReadFS {
         /**
          * 项目名称（表单名称）
          */
@@ -7725,176 +7582,88 @@ declare namespace feng3d {
          * @param path 文件路径
          * @param callback 回调函数
          */
-        exists(path: string, callback: (exists: boolean) => void): void;
+        abstract exists(path: string, callback: (exists: boolean) => void): void;
         /**
          * 读取文件夹中文件列表
          * @param path 路径
          * @param callback 回调函数
          */
-        readdir(path: string, callback: (err: Error, files: string[]) => void): void;
+        abstract readdir(path: string, callback: (err: Error, files: string[]) => void): void;
         /**
          * 新建文件夹
          * @param path 文件夹路径
          * @param callback 回调函数
          */
-        mkdir(path: string, callback?: (err: Error) => void): void;
+        abstract mkdir(path: string, callback?: (err: Error) => void): void;
         /**
          * 删除文件
          * @param path 文件路径
          * @param callback 回调函数
          */
-        deleteFile(path: string, callback?: (err: Error) => void): void;
+        abstract deleteFile(path: string, callback?: (err: Error) => void): void;
         /**
          * 写ArrayBuffer(新建)文件
          * @param path 文件路径
          * @param arraybuffer 文件数据
          * @param callback 回调函数
          */
-        writeArrayBuffer(path: string, arraybuffer: ArrayBuffer, callback?: (err: Error) => void): void;
+        abstract writeArrayBuffer(path: string, arraybuffer: ArrayBuffer, callback?: (err: Error) => void): void;
         /**
          * 写字符串到(新建)文件
          * @param path 文件路径
          * @param str 文件数据
          * @param callback 回调函数
          */
-        writeString(path: string, str: string, callback?: (err: Error) => void): void;
+        abstract writeString(path: string, str: string, callback?: (err: Error) => void): void;
         /**
          * 写Object到(新建)文件
          * @param path 文件路径
          * @param object 文件数据
          * @param callback 回调函数
          */
-        writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
+        abstract writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
         /**
          * 写图片
          * @param path 图片路径
          * @param image 图片
          * @param callback 回调函数
          */
-        writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
+        abstract writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
         /**
          * 复制文件
          * @param src    源路径
          * @param dest    目标路径
          * @param callback 回调函数
          */
-        copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
+        abstract copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
         /**
          * 是否为文件夹
          *
          * @param path 文件路径
          * @param callback 完成回调
          */
-        isDirectory(path: string, callback: (result: boolean) => void): void;
+        abstract isDirectory(path: string, callback: (result: boolean) => void): void;
         /**
          * 初始化项目
          * @param projectname 项目名称
          * @param callback 回调函数
          */
-        initproject(projectname: string, callback: (err: Error) => void): void;
+        abstract initproject(projectname: string, callback: (err: Error) => void): void;
         /**
          * 是否存在指定项目
          * @param projectname 项目名称
          * @param callback 回调函数
          */
-        hasProject(projectname: string, callback: (has: boolean) => void): void;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 可读写文件系统
-     *
-     * 扩展基础可读写文件系统
-     */
-    class ReadWriteFS extends ReadFS {
+        abstract hasProject(projectname: string, callback: (has: boolean) => void): void;
         /**
-         * 项目名称（表单名称）
-         */
-        projectname: string;
-        fs: IReadWriteFS;
-        constructor(fs?: IReadWriteFS);
-        /**
-         * 文件是否存在
-         * @param path 文件路径
+         * 获取所有文件路径
          * @param callback 回调函数
          */
-        exists(path: string, callback: (exists: boolean) => void): void;
-        /**
-         * 读取文件夹中文件列表
-         * @param path 路径
-         * @param callback 回调函数
-         */
-        readdir(path: string, callback: (err: Error, files: string[]) => void): void;
-        /**
-         * 新建文件夹
-         * @param path 文件夹路径
-         * @param callback 回调函数
-         */
-        mkdir(path: string, callback?: (err: Error) => void): void;
-        /**
-         * 删除文件
-         * @param path 文件路径
-         * @param callback 回调函数
-         */
-        deleteFile(path: string, callback?: (err: Error) => void): void;
-        /**
-         * 写ArrayBuffer(新建)文件
-         * @param path 文件路径
-         * @param arraybuffer 文件数据
-         * @param callback 回调函数
-         */
-        writeArrayBuffer(path: string, arraybuffer: ArrayBuffer, callback?: (err: Error) => void): void;
-        /**
-         * 写字符串到(新建)文件
-         * @param path 文件路径
-         * @param str 文件数据
-         * @param callback 回调函数
-         */
-        writeString(path: string, str: string, callback?: (err: Error) => void): void;
-        /**
-         * 写Object到(新建)文件
-         * @param path 文件路径
-         * @param object 文件数据
-         * @param callback 回调函数
-         */
-        writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
-        /**
-         * 写图片
-         * @param path 图片路径
-         * @param image 图片
-         * @param callback 回调函数
-         */
-        writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
-        /**
-         * 复制文件
-         * @param src    源路径
-         * @param dest    目标路径
-         * @param callback 回调函数
-         */
-        copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
-        /**
-         * 是否为文件夹
-         *
-         * @param path 文件路径
-         * @param callback 完成回调
-         */
-        isDirectory(path: string, callback: (result: boolean) => void): void;
-        /**
-         * 初始化项目
-         * @param projectname 项目名称
-         * @param callback 回调函数
-         */
-        initproject(projectname: string, callback: (err: Error) => void): void;
-        /**
-         * 是否存在指定项目
-         * @param projectname 项目名称
-         * @param callback 回调函数
-         */
-        hasProject(projectname: string, callback: (has: boolean) => void): void;
+        getAllPaths(callback: (err: Error, allPaths: string[]) => void): void;
         /**
          * 获取指定文件下所有文件路径列表
          */
-        getAllPathsInFolder(dirpath: string, callback: (err: Error, filepaths: string[]) => void): void;
+        getAllfilepathInFolder(dirpath: string, callback: (err: Error, filepaths: string[]) => void): void;
         /**
          * 移动文件
          * @param src 源路径
@@ -7981,7 +7750,7 @@ declare namespace feng3d {
     /**
      * 索引数据文件系统
      */
-    class IndexedDBFS implements IReadWriteFS {
+    class IndexedDBFS extends ReadWriteFS {
         readonly type: FSType;
         /**
          * 数据库名称
@@ -8015,7 +7784,7 @@ declare namespace feng3d {
          * @param path 图片路径
          * @param callback 加载完成回调
          */
-        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
+        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): HTMLImageElement;
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
@@ -8070,10 +7839,10 @@ declare namespace feng3d {
         /**
          * 写文件
          * @param path 文件路径
-         * @param object 文件数据
+         * @param data 文件数据
          * @param callback 回调函数
          */
-        writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
+        writeObject(path: string, data: Object, callback?: (err: Error) => void): void;
         /**
          * 写图片
          * @param path 图片路径
@@ -8088,6 +7857,11 @@ declare namespace feng3d {
          * @param callback 回调函数
          */
         copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
+        /**
+         * 获取所有文件路径
+         * @param callback 回调函数
+         */
+        getAllPaths(callback: (err: Error, allPaths: string[]) => void): void;
         /**
          * 是否存在指定项目
          * @param projectname 项目名称
@@ -8106,12 +7880,12 @@ declare namespace feng3d {
     /**
      * Http可读文件系统
      */
-    class HttpFS implements IReadFS {
+    class HttpFS extends ReadFS {
         /**
          * 根路径
          */
         rootPath: string;
-        type: FSType;
+        readonly type: FSType;
         constructor(rootPath?: string);
         /**
          * 读取文件
@@ -8136,7 +7910,7 @@ declare namespace feng3d {
          * @param path 图片路径
          * @param callback 加载完成回调
          */
-        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): void;
+        readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void): HTMLImageElement;
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
@@ -8258,14 +8032,6 @@ declare namespace feng3d {
          */
         assetType: AssetType;
         /**
-         * 是否已加载
-         */
-        isLoaded: boolean;
-        /**
-         * 是否正在加载中
-         */
-        isLoading: boolean;
-        /**
          * 文件后缀
          */
         readonly extenson: string;
@@ -8288,25 +8054,11 @@ declare namespace feng3d {
          */
         data: AssetData;
         /**
-         * 创建资源对象
-         */
-        createData(): void;
-        /**
-         * 获取资源数据
-         *
-         * @param callback 完成回调，当资源已加载时会立即调用回调，否则在资源加载完成后调用。
-         */
-        getAssetData(callback?: (result: feng3d.AssetData) => void): AssetData;
-        /**
-         * 资源已加载时获取资源数据，内部使用
-         */
-        protected _getAssetData(): AssetData;
-        /**
          * 读取资源
          *
          * @param callback 完成回调
          */
-        read(callback: (err?: Error) => void): void;
+        read(callback: (err: Error) => void): void;
         /**
          * 写入资源
          *
@@ -8318,7 +8070,7 @@ declare namespace feng3d {
          *
          * @param callback 完成回调
          */
-        delete(callback?: (err?: Error) => void): void;
+        delete(callback?: (err: Error) => void): void;
         /**
          * 读取资源缩略图标
          *
@@ -8355,7 +8107,7 @@ declare namespace feng3d {
          *
          * @param callback 完成回调
          */
-        protected deleteFile(callback?: (err: Error) => void): void;
+        deleteFile(callback?: (err: Error) => void): void;
         /**
          * 元标签路径
          */
@@ -8365,19 +8117,19 @@ declare namespace feng3d {
          *
          * @param callback 完成回调
          */
-        protected readMeta(callback?: (err?: Error) => void): void;
+        readMeta(callback?: (err?: Error) => void): void;
         /**
          * 写元标签
          *
          * @param callback 完成回调
          */
-        protected writeMeta(callback?: (err: Error) => void): void;
+        writeMeta(callback?: (err: Error) => void): void;
         /**
          * 删除元标签
          *
          * @param callback 完成回调
          */
-        protected deleteMeta(callback?: (err: Error) => void): void;
+        deleteMeta(callback?: (err: Error) => void): void;
         /**
          * 缩略图
          */
@@ -8410,13 +8162,13 @@ declare namespace feng3d {
         /**
          * 资源编号映射
          */
-        idMap: {
+        protected idMap: {
             [id: string]: FileAsset;
         };
         /**
          * 资源路径映射
          */
-        pathMap: {
+        protected pathMap: {
             [path: string]: FileAsset;
         };
         /**
@@ -8453,6 +8205,7 @@ declare namespace feng3d {
          * @param fileName 文件名称
          */
         getValidChildName(parent: FolderAsset, fileName: string): string;
+        private _assetStatus;
         /**
          * 读取文件为资源对象
          * @param id 资源编号
@@ -8467,13 +8220,6 @@ declare namespace feng3d {
          */
         readAssetData(id: string, callback: (err: Error, data: AssetData) => void): void;
         /**
-         * 读取资源数据列表
-         *
-         * @param assetids 资源编号列表
-         * @param callback 完成回调
-         */
-        readAssetDatas(assetids: string[], callback: (err: Error, data: AssetData[]) => void): void;
-        /**
          * 获取指定类型资源
          *
          * @param type 资源类型
@@ -8484,7 +8230,13 @@ declare namespace feng3d {
          *
          * @param type 资源类型
          */
-        getLoadedAssetDatasByType<T extends AssetData>(type: Constructor<T>): T[];
+        getAssetDatasByType<T extends AssetData>(type: Constructor<T>): T[];
+        /**
+         * 设置默认资源，该类资源不会保存到文件系统中
+         *
+         * @param assets 资源
+         */
+        setDefaultAssetData(assetData: AssetData): void;
         /**
          * 获取资源
          *
@@ -8492,20 +8244,15 @@ declare namespace feng3d {
          */
         getAsset(assetId: string): FileAsset;
         /**
+         * 获取资源数据
+         *
+         * @param assetId 资源编号
+         */
+        getAssetData(assetId: string): AssetData;
+        /**
          * 获取所有资源
          */
         getAllAssets(): FileAsset[];
-        /**
-         * 获取需要反序列化对象中的资源id列表
-         */
-        getAssetsWithObject(object: any, assetids?: string[]): string[];
-        /**
-         * 反序列化包含资源的对象
-         *
-         * @param object 反序列化的对象
-         * @param callback 完成回调
-         */
-        deserializeWithAssets(object: any, callback: (result: any) => void): void;
     }
 }
 declare namespace feng3d {
@@ -12112,10 +11859,6 @@ declare namespace feng3d {
         __class__: "feng3d.GameObject";
         assetType: AssetType;
         /**
-         * 预设资源编号
-         */
-        prefabId: string;
-        /**
          * 资源编号
          */
         assetId: string;
@@ -12198,10 +11941,6 @@ declare namespace feng3d {
          * 移除自身
          */
         remove(): void;
-        /**
-         * 移除所有子对象
-         */
-        removeChildren(): void;
         /**
          * 移除子对象
          *
@@ -12678,13 +12417,11 @@ declare namespace feng3d {
         /**
          * 脚本对象
          */
-        readonly scriptInstance: Script;
-        private _scriptInstance;
-        private _invalid;
+        scriptInstance: Script;
         private scriptInit;
         init(gameObject: GameObject): void;
-        private updateScriptInstance;
-        private invalidateScriptInstance;
+        private scriptChanged;
+        private onScriptChanged;
         /**
          * 每帧执行
          */
@@ -15726,13 +15463,6 @@ declare namespace feng3d {
          * 子资源列表
          */
         childrenAssets: FileAsset[];
-        createData(): void;
-        /**
-         * 删除资源
-         *
-         * @param callback 完成回调
-         */
-        delete(callback?: (err: Error) => void): void;
         /**
          * 保存文件
          * @param callback 完成回调
@@ -15819,7 +15549,6 @@ declare namespace feng3d {
          * 脚本类定义
          */
         scriptName: string;
-        createData(): void;
         private onTextContentChanged;
     }
 }
@@ -15840,7 +15569,6 @@ declare namespace feng3d {
         static extenson: string;
         assetType: AssetType;
         textContent: string;
-        createData(): void;
     }
 }
 declare namespace feng3d {
@@ -15851,7 +15579,6 @@ declare namespace feng3d {
         static extenson: string;
         assetType: AssetType;
         textContent: string;
-        createData(): void;
     }
 }
 declare namespace feng3d {
@@ -15859,7 +15586,6 @@ declare namespace feng3d {
         static extenson: string;
         assetType: AssetType;
         textContent: string;
-        createData(): void;
     }
 }
 declare namespace feng3d {
@@ -15889,14 +15615,15 @@ declare namespace feng3d {
         /**
          * 材质
          */
-        data: Texture2D;
+        readonly data: Texture2D;
+        private _data;
+        assetId: string;
         /**
          * 图片
          */
         image: HTMLImageElement;
         meta: TextureAssetMeta;
         assetType: AssetType;
-        createData(): void;
         saveFile(callback?: (err: Error) => void): void;
         /**
          * 读取文件
@@ -15909,13 +15636,13 @@ declare namespace feng3d {
          *
          * @param callback 完成回调
          */
-        protected readMeta(callback?: (err?: Error) => void): void;
+        readMeta(callback?: (err?: Error) => void): void;
         /**
          * 写元标签
          *
          * @param callback 完成回调
          */
-        protected writeMeta(callback?: (err: Error) => void): void;
+        writeMeta(callback?: (err: Error) => void): void;
     }
     interface TextureAssetMeta extends AssetMeta {
         texture: gPartial<Texture2D>;
@@ -15932,7 +15659,6 @@ declare namespace feng3d {
          */
         data: TextureCube;
         assetType: AssetType;
-        createData(): void;
     }
 }
 declare namespace feng3d {
@@ -15959,13 +15685,9 @@ declare namespace feng3d {
          */
         data: Material;
         assetType: AssetType;
-        createData(): void;
     }
 }
 declare namespace feng3d {
-    interface GameObjectAsset {
-        getAssetData(callback?: (result: GameObject) => void): GameObject;
-    }
     /**
      * 游戏对象资源
      */
@@ -15976,8 +15698,6 @@ declare namespace feng3d {
         data: GameObject;
         assetType: AssetType;
         static extenson: string;
-        createData(): void;
-        protected _getAssetData(): GameObject;
     }
 }
 declare namespace feng3d {
