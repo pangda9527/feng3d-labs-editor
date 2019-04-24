@@ -104,7 +104,7 @@ namespace editor
         {
             if (!this.projectname)
             {
-                throw `请先使用 initproject 初始化项目`;
+                console.error(`请先使用 initproject 初始化项目`);
             }
             return this.projectname + "/" + path;
         }

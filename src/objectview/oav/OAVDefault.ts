@@ -114,7 +114,7 @@ namespace editor
 						this.attributeValue = Boolean(this.text.text);
 						break;
 					default:
-						throw `无法处理类型${this._attributeType}!`;
+						console.error(`无法处理类型${this._attributeType}!`);
 				}
 			}
 		}
