@@ -337,8 +337,12 @@ declare namespace feng3d {
         }[];
         /**
          * 序列化对象
+         *
+         * 过程中使用 different与默认值作比较减少结果中的数据。
+         *
          * @param target 被序列化的对象
-         * @returns 序列化后可以转换为Json的数据对象
+         *
+         * @returns 序列化后简单数据对象（由Object与Array组合可 JSON.stringify 的简单结构）
          */
         serialize<T>(target: T): gPartial<T>;
         /**
@@ -349,18 +353,20 @@ declare namespace feng3d {
          */
         deserialize<T>(object: gPartial<T>): T;
         /**
-         * 比较两个对象的不同，提取出不同的数据（由Object与Array组合）
+         * 比较两个对象的不同，提取出不同的数据(可能会经过反序列化处理)
          *
          * @param target 用于检测不同的数据
          * @param source   模板（默认）数据
          * @param different 比较得出的不同（简单结构）数据
-         * @returns 比较得出的不同（简单结构）数据
+         *
+         * @returns 比较得出的不同数据（由Object与Array组合可 JSON.stringify 的简单结构）
          */
         different<T>(target: T, source: T): gPartial<T>;
         /**
-         * 从数据对象中提取数据给目标对象赋值
+         * 从数据对象中提取数据给目标对象赋值（可能会经过序列化处理）
+         *
          * @param target 目标对象
-         * @param source 数据对象
+         * @param source 数据对象 可由Object与Array以及自定义类型组合
          */
         setValue<T>(target: T, source: gPartial<T>): T;
         /**
@@ -1129,6 +1135,7 @@ declare namespace feng3d {
          * @param name 类的名称。
          */
         getDefinitionByName(name: string, readCache?: boolean): any;
+        private defaultInstMap;
         /**
          * 获取默认实例
          *
