@@ -7,6 +7,8 @@ namespace editor
      */
     export class MainSplitView extends eui.Component implements eui.UIComponent
     {
+        private view: SplitGroup;
+
         constructor()
         {
             super();
@@ -30,6 +32,7 @@ namespace editor
         {
             feng3d.dispatcher.on("viewLayout.changed", this._saveViewLayout, this);
             feng3d.dispatcher.on("viewLayout.reset", this._resetLayout, this);
+
             this._initViewLayout();
         }
 
@@ -41,16 +44,12 @@ namespace editor
 
         private _initViewLayout()
         {
-            if (editorcache.viewLayout)
+            if (!this.view)
             {
-                var child = this.removeChildAt(0);
-                this._resolve(child);
+                editorcache.viewLayout = editorcache.viewLayout || viewLayoutConfig.Default;
                 //
-                var sp: SplitGroup = <any>this._createViews(editorcache.viewLayout);
-                this.addChild(sp);
-            } else
-            {
-                this._saveViewLayout();
+                this.view = <any>this._createViews(editorcache.viewLayout);
+                this.addChild(this.view);
             }
         }
 
@@ -61,13 +60,18 @@ namespace editor
             var data = this._getData(sp);
 
             editorcache.viewLayout = data;
-
-            // console.log(data);
         }
 
         private _resetLayout(event: feng3d.Event<Object>)
         {
             editorcache.viewLayout = event.data || viewLayoutConfig.Default;
+
+            if (this.view != null)
+            {
+                this.view.remove();
+                this._resolve(this.view);
+                this.view = null;
+            }
             this._initViewLayout();
         }
 
