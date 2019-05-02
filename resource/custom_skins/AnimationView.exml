@@ -1,3 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="AnimationView" width="400" height="300" xmlns:e="http://ns.egret.com/eui">
+<e:Skin class="AnimationView" width="400" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+	<e:Group left="5" right="5">
+		<e:ToggleButton id="recordTBtn" x="11" y="158" selected="true">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="animation_record_up_png" source.down="animation_record_selected_png"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" xmlns:w="http://ns.egret.com/wing" xmlns:ns1="*"/>
+				</e:Skin>
+			</e:skinName>
+		</e:ToggleButton>
+		<e:Button id="beginBtn" label="" scaleX="1" scaleY="1" x="80" y="10">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="animation_begin_up_png" source.down="animation_begin_down_png"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+				</e:Skin>
+			</e:skinName>
+		</e:Button>
+		<e:Button id="previousBtn" label="" scaleX="1" scaleY="1" x="90" y="20">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="animation_previous_up_png" source.down="animation_previous_down_png"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+				</e:Skin>
+			</e:skinName>
+		</e:Button>
+		<e:Button id="playBtn" label="" scaleX="1" scaleY="1" x="100" y="30">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="animation_play_up_png" source.down="animation_play_down_png"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+				</e:Skin>
+			</e:skinName>
+		</e:Button>
+		<e:Button id="nextBtn" label="" scaleX="1" scaleY="1" x="110" y="40">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="animation_next_up_png" source.down="animation_next_down_png"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+				</e:Skin>
+			</e:skinName>
+		</e:Button>
+		<e:Button id="endBtn" label="" scaleX="1" scaleY="1" x="120" y="50">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="animation_end_up_png" source.down="animation_end_down_png"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+				</e:Skin>
+			</e:skinName>
+		</e:Button>
+		<e:layout>
+			<e:HorizontalLayout gap="-1"/>
+		</e:layout>
+	</e:Group>
 </e:Skin>
