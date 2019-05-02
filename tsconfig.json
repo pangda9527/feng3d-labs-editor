@@ -58,9 +58,10 @@
         "src/ui/drag/Cursor.ts",
         //
         "src/shortcut/Editorshortcut.ts",
-        "src/shortcut/ShortCutSetting.ts",
         //
         "src/Modules.ts",
+        //
+        "src/shortcut/ShortCutSetting.ts",
         //
         "src/ui/SceneView.ts",
         "src/ui/CameraPreview.ts",

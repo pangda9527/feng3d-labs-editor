@@ -197,18 +197,6 @@ namespace editor
                                 });
                             },
                         },
-                        {
-                            label: "首选项",
-                            submenu: [
-                                {
-                                    label: "快捷方式",
-                                    click: () =>
-                                    {
-                                        popupview.popupView(ShortCutSetting.instance);
-                                    },
-                                },
-                            ],
-                        },
                     ],
                 },
                 { type: "separator" },
@@ -257,6 +245,9 @@ namespace editor
             return mainMenu;
         }
 
+        /**
+         * 获取窗口子菜单
+         */
         private getWindowSubMenus()
         {
             var menus: MenuItem[] = [
@@ -275,7 +266,15 @@ namespace editor
                 },
             ];
 
-            [SceneView.moduleName, InspectorView.moduleName, HierarchyView.moduleName, ProjectView.moduleName,].forEach(v =>
+            // popupview.popupViewWindow(ShortCutSetting.instance, { mode: false, width: 800, height: 600 });
+
+            [SceneView.moduleName,
+            InspectorView.moduleName,
+            HierarchyView.moduleName,
+            ProjectView.moduleName,
+            AnimationView.moduleName,
+            ShortCutSetting.moduleName,
+            ].forEach(v =>
             {
                 menus.push({
                     label: v,

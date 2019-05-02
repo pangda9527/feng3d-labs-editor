@@ -5,14 +5,19 @@ namespace editor
      */
     export class ShortCutSetting extends eui.Component
     {
+        static moduleName = "ShortCutSetting";
+
         public searchTxt: eui.TextInput;
         public list: eui.List;
+
+        moduleName: string;
 
         constructor()
         {
             super();
             this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.skinName = "ShortCutSetting";
+            this.moduleName = ShortCutSetting.moduleName;
         }
 
         private onComplete(): void
@@ -56,11 +61,7 @@ namespace editor
             })
             this.list.dataProvider = new eui.ArrayCollection(data);
         }
-
-        static get instance()
-        {
-            return this["_instance"] = this["_instance"] || new ShortCutSetting();
-        }
     }
 
+    Modules.moduleViewCls[ShortCutSetting.moduleName] = ShortCutSetting;
 }
