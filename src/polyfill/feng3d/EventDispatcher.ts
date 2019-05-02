@@ -18,17 +18,17 @@ namespace feng3d
         "asset.deletefile": { id: string };
 
         /**
-         * 更新属性面板（检查器）
+         * 更新属性界面（检查器）
          */
         "inspector.update": undefined;
 
         /**
-         * 属性面板（检查器）显示数据
+         * 属性界面（检查器）显示数据
          */
         "inspector.showData": any;
 
         /**
-         * 保存属性面板（检查器）数据
+         * 保存属性界面（检查器）数据
          */
         "inspector.saveShowData": () => void;
 

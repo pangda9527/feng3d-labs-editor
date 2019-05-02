@@ -14,7 +14,7 @@ namespace egret
         feng3d.windowEventProxy.off("wheel", onMouseWheel, this);
     }
 
-    // 阻止拖拽滚动面板
+    // 阻止拖拽滚动界面
     var oldonTouchMove = eui.Scroller.prototype["onTouchMove"];
     eui.Scroller.prototype["onTouchMove"] = function (event)
     {

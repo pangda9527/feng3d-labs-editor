@@ -28,6 +28,11 @@ namespace editor
             return moduleview;
         }
 
+        /**
+         * 回收模块界面
+         * 
+         * @param moduleView 模块界面
+         */
         recycleModuleView(moduleView: ModuleView)
         {
             this.moduleViewMap[moduleView.moduleName] = this.moduleViewMap[moduleView.moduleName] || [];
