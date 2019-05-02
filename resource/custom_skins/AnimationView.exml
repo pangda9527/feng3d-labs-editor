@@ -1,82 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="AnimationView" width="400" height="300" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:editor="editor.*">
-	<e:Rect minHeight="50" minWidth="50" width="100%" x="0" height="100%" y="1" fillColor="0xC2C2C2" strokeColor="0x828282"/>
-	<e:Group left="0" top="0" right="0" bottom="0">
-		<e:Group left="0" right="0" x="-519" y="-188" scaleX="1" scaleY="1">
-			<e:Rect fillAlpha="0" left="0" top="0" right="0" bottom="0" strokeColor="0x919191" strokeAlpha="1" strokeWeight="1"/>
-			<e:Group left="5" right="5" x="5" y="0" scaleX="1" scaleY="1">
-			<e:ToggleButton id="recordTBtn" x="11" y="158">
-				<e:skinName>
-				<e:Skin states="up,down,disabled">
-					<e:Image width="100%" height="100%" source="animation_record_up_png" source.down="animation_record_selected_png"/>
-					<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" xmlns:ns1="*"/>
-				</e:Skin>
-				</e:skinName>
-			</e:ToggleButton>
-			<e:Button id="beginBtn" label="" scaleX="1" scaleY="1" x="80" y="10">
-				<e:skinName>
-				<e:Skin states="up,down,disabled">
-					<e:Image width="100%" height="100%" source="animation_begin_up_png" source.down="animation_begin_down_png"/>
-					<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
-				</e:Skin>
-				</e:skinName>
-			</e:Button>
-			<e:Button id="previousBtn" label="" scaleX="1" scaleY="1" x="90" y="20">
-				<e:skinName>
-				<e:Skin states="up,down,disabled">
-					<e:Image width="100%" height="100%" source="animation_previous_up_png" source.down="animation_previous_down_png"/>
-					<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
-				</e:Skin>
-				</e:skinName>
-			</e:Button>
-				<e:ToggleButton id="playBtn" x="21" y="168">
-					<e:skinName>
-						<e:Skin states="up,down,disabled">
-						<e:Image width="100%" height="100%" source="animation_play_up_png" source.down="animation_play_selected_png"/>
-						<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" xmlns:ns1="*"/>
-						</e:Skin>
-					</e:skinName>
-				</e:ToggleButton>
-			<e:Button id="nextBtn" label="" scaleX="1" scaleY="1" x="110" y="40">
-				<e:skinName>
-				<e:Skin states="up,down,disabled">
-					<e:Image width="100%" height="100%" source="animation_next_up_png" source.down="animation_next_down_png"/>
-					<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
-				</e:Skin>
-				</e:skinName>
-			</e:Button>
-			<e:Button id="endBtn" label="" scaleX="1" scaleY="1" x="120" y="50">
-				<e:skinName>
-				<e:Skin states="up,down,disabled">
-					<e:Image width="100%" height="100%" source="animation_end_up_png" source.down="animation_end_down_png"/>
-					<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
-				</e:Skin>
-				</e:skinName>
-			</e:Button>
-			<e:layout>
-				<e:HorizontalLayout gap="-1"/>
-			</e:layout>
+<e:Skin class="AnimationView" width="800" height="300" xmlns:e="http://ns.egret.com/eui"
+        xmlns:w="http://ns.egret.com/wing" xmlns:editor="editor.*">
+	<e:Rect minHeight="50" minWidth="50" width="100%" x="0" height="100%" y="1" fillColor="0xC2C2C2" strokeColor="0x828282" />
+	<editor:SplitGroup left="0" top="0" right="0" bottom="0">
+		<e:Group top="0" x="0" y="0" scaleX="1" scaleY="1" width="300" height="100%" minWidth="220">
+			<e:Group left="0" right="0" x="-519" y="-188" scaleX="1" scaleY="1">
+				<e:Rect fillAlpha="0" left="0" top="0" right="0" bottom="0" strokeColor="0x919191" strokeAlpha="1" strokeWeight="1" />
+				<e:Group left="5" right="5" x="5" y="0" scaleX="1" scaleY="1">
+					<e:ToggleButton id="recordTBtn" x="11" y="158">
+						<e:skinName>
+							<e:Skin states="up,down,disabled">
+								<e:Image width="100%" height="100%" source="animation_record_up_png" source.down="animation_record_selected_png" />
+								<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" xmlns:ns1="*" />
+							</e:Skin>
+						</e:skinName>
+					</e:ToggleButton>
+					<e:Button id="beginBtn" label="" scaleX="1" scaleY="1" x="80" y="10">
+						<e:skinName>
+							<e:Skin states="up,down,disabled">
+								<e:Image width="100%" height="100%" source="animation_begin_up_png" source.down="animation_begin_down_png" />
+								<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" />
+							</e:Skin>
+						</e:skinName>
+					</e:Button>
+					<e:Button id="previousBtn" label="" scaleX="1" scaleY="1" x="90" y="20">
+						<e:skinName>
+							<e:Skin states="up,down,disabled">
+								<e:Image width="100%" height="100%" source="animation_previous_up_png" source.down="animation_previous_down_png" />
+								<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" />
+							</e:Skin>
+						</e:skinName>
+					</e:Button>
+					<e:ToggleButton id="playBtn" x="21" y="168">
+						<e:skinName>
+							<e:Skin states="up,down,disabled">
+								<e:Image width="100%" height="100%" source="animation_play_up_png" source.down="animation_play_selected_png" />
+								<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" xmlns:ns1="*" />
+							</e:Skin>
+						</e:skinName>
+					</e:ToggleButton>
+					<e:Button id="nextBtn" label="" scaleX="1" scaleY="1" x="110" y="40">
+						<e:skinName>
+							<e:Skin states="up,down,disabled">
+								<e:Image width="100%" height="100%" source="animation_next_up_png" source.down="animation_next_down_png" />
+								<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" />
+							</e:Skin>
+						</e:skinName>
+					</e:Button>
+					<e:Button id="endBtn" label="" scaleX="1" scaleY="1" x="120" y="50">
+						<e:skinName>
+							<e:Skin states="up,down,disabled">
+								<e:Image width="100%" height="100%" source="animation_end_up_png" source.down="animation_end_down_png" />
+								<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" />
+							</e:Skin>
+						</e:skinName>
+					</e:Button>
+					<e:layout>
+						<e:HorizontalLayout gap="-1" />
+					</e:layout>
+				</e:Group>
+				<e:TextInput id="currentFrameInput" width="40" scaleX="1" scaleY="1" right="5" text="0" />
 			</e:Group>
-			<e:TextInput id="currentFrameInput" width="40" scaleX="1" scaleY="1" right="5" text="0"/>
-		</e:Group>
-		<e:Group>
-			<e:Rect fillAlpha="0" left="0" top="0" right="0" bottom="0" strokeColor="0x919191" strokeAlpha="1" strokeWeight="1"/>
-			<editor:ComboBox id="combobox" scaleX="1" scaleY="1"/>
-		</e:Group>
-		<e:Scroller left="0" right="0" height="100%">
 			<e:Group>
-			<e:List id="propertyList" width="100%" x="0" scaleX="1" scaleY="1" top="0" bottom="0" y="0" itemRendererSkinName="AnimationPropertyItemRenderer">
-				<e:ArrayCollection>
-				<e:Array>
-					<e:Object label="1"/>
-					<e:Object label="2"/>
-				</e:Array>
-				</e:ArrayCollection>
-			</e:List>
+				<e:Rect fillAlpha="0" left="0" top="0" right="0" bottom="0" strokeColor="0x919191" strokeAlpha="1" strokeWeight="1" />
+				<editor:ComboBox id="combobox" scaleX="1" scaleY="1" />
+				<e:Label text="帧率" size="12" y="0" textColor="0x000000" verticalAlign="middle" multiline="false" right="50" />
+				<e:TextInput id="fpsInput" width="40" scaleX="1" scaleY="1" right="5" text="60" />
 			</e:Group>
-		</e:Scroller>
+			<e:Scroller left="0" right="0" height="100%">
+				<e:Group>
+					<e:List id="propertyList" width="100%" x="0" scaleX="1" scaleY="1" y="0"
+					        itemRendererSkinName="AnimationPropertyItemRenderer">
+						<e:ArrayCollection>
+							<e:Array>
+								<e:Object label="1"/>
+								<e:Object label="2"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+								<e:Object label="null"/>
+							</e:Array>
+						</e:ArrayCollection>
+					</e:List>
+				</e:Group>
+			</e:Scroller>
+			<e:layout>
+				<e:VerticalLayout gap="0" horizontalAlign="justify" />
+			</e:layout>
+		</e:Group>
+		<e:Group top="0" left="300" height="100%" width="100%" minWidth="200">
+			<e:Rect width="100%" height="100%" />
+		</e:Group>
 		<e:layout>
-			<e:VerticalLayout gap="0" horizontalAlign="justify"/>
+			<e:HorizontalLayout gap="0" />
 		</e:layout>
-	</e:Group>
+	</editor:SplitGroup>
 </e:Skin>

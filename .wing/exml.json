@@ -1,7 +1,7 @@
 {
   "global": {
     "globalBindingDataTestObj": [],
-    "globalAutoLayerMarkEnable": true,
+    "globalAutoLayerMarkEnable": false,
     "gridColor": 15011856,
     "gridEnabled": false,
     "gridSize": 20,
