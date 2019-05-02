@@ -106,6 +106,7 @@
         "resource/custom_skins/TopView.exml",
         "resource/custom_skins/InspectorView.exml",
         "resource/custom_skins/AnimationView.exml",
+        "resource/custom_skins/AnimationPropertyItemRenderer.exml",
         "resource/custom_skins/SceneView.exml",
         "resource/custom_skins/CameraPreview.exml",
         "resource/custom_skins/HierarchyView.exml",
