@@ -167,8 +167,19 @@ namespace editor
 		return hasdata;
 	}
 
+	/**
+	 * 是否处于拖拽中
+	 */
+	var draging = false;
+	// 鼠标按下时位置
+	var mouseDownPosX = 0;
+	var mouseDownPosY = 0;
+
 	function onItemMouseDown(event: egret.TouchEvent): void
 	{
+		mouseDownPosX = feng3d.windowEventProxy.clientX;
+		mouseDownPosY = feng3d.windowEventProxy.clientY;
+
 		if (dragitem)
 			return;
 		dragitem = getitem(event.currentTarget);
@@ -207,12 +218,24 @@ namespace editor
 		}
 		accepter = null;
 		dragitem = null;
+		draging = false;
 		//
 		feng3d.shortcut.deactivityState(feng3d.shortCutStates.draging);
 	}
 
 	function onMouseMove(event: egret.MouseEvent)
 	{
+		if (!dragitem) return;
+
+		if (!draging)
+		{
+			if (Math.abs(mouseDownPosX - feng3d.windowEventProxy.clientX) +
+				Math.abs(mouseDownPosY - feng3d.windowEventProxy.clientY) > 5)
+			{
+				draging = true;
+			}
+			return;
+		}
 		if (!acceptableitems)
 		{
 			//获取拖拽数据
