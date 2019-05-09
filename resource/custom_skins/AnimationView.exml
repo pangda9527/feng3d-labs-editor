@@ -42,8 +42,8 @@
 					<e:Button id="nextBtn" label="" scaleX="1" scaleY="1" x="110" y="40">
 						<e:skinName>
 							<e:Skin states="up,down,disabled">
-								<e:Image width="100%" height="100%" source="animation_next_up_png" source.down="animation_next_down_png" />
-								<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0" />
+							<e:Image width="100%" height="100%" source="animation_next_up_png" source.down="animation_next_down_png"/>
+							<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
 							</e:Skin>
 						</e:skinName>
 					</e:Button>
@@ -63,9 +63,9 @@
 			</e:Group>
 			<e:Group>
 				<e:Rect fillAlpha="0" left="0" top="0" right="0" bottom="0" strokeColor="0x919191" strokeAlpha="1" strokeWeight="1" />
-				<editor:ComboBox id="combobox" scaleX="1" scaleY="1" />
-				<e:Label text="帧率" size="12" y="0" textColor="0x000000" verticalAlign="middle" multiline="false" right="50" />
-				<e:TextInput id="fpsInput" width="40" scaleX="1" scaleY="1" right="5" text="60" />
+				<editor:ComboBox id="combobox" scaleX="1" scaleY="1"  verticalCenter="0"/>
+				<e:Label text="帧率" size="12" textColor="0x000000" verticalAlign="middle" multiline="false" right="50"  verticalCenter="0"/>
+				<e:TextInput id="fpsInput" width="40" scaleX="1" scaleY="1" right="5" text="60"  verticalCenter="0"/>
 			</e:Group>
 			<e:Scroller left="0" right="0" height="100%">
 				<e:Group>
@@ -112,7 +112,8 @@
 			</e:layout>
 		</e:Group>
 		<e:Group top="0" left="300" height="100%" width="100%" minWidth="200">
-			<e:Rect width="100%" height="100%" />
+			<e:Rect width="100%" height="100%"  fillColor="0xc2c2c2" strokeWeight="1" strokeColor="0x808080"/>
+			<e:Button id="addComponentButton" label="创建" width="80" verticalCenter="0" horizontalCenter="0"/>
 		</e:Group>
 		<e:layout>
 			<e:HorizontalLayout gap="0" />
