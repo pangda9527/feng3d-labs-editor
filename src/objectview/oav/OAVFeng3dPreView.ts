@@ -61,17 +61,15 @@ namespace editor
         private cameraRotation: feng3d.Vector3;
         private onDrawObject()
         {
-            this.cameraRotation && (feng3dScreenShot.camera.transform.rotation = this.cameraRotation);
-
             if (this.space instanceof feng3d.GameObject)
             {
-                feng3dScreenShot.drawGameObject(this.space);
+                feng3dScreenShot.drawGameObject(this.space, this.cameraRotation);
             } else if (this.space instanceof feng3d.Geometry)
             {
-                feng3dScreenShot.drawGeometry(<any>this.space);
+                feng3dScreenShot.drawGeometry(<any>this.space, this.cameraRotation);
             } else if (this.space instanceof feng3d.Material)
             {
-                feng3dScreenShot.drawMaterial(this.space);
+                feng3dScreenShot.drawMaterial(this.space, this.cameraRotation);
             }
             this.image.source = feng3dScreenShot.toDataURL(this.width, this.height);
         }
