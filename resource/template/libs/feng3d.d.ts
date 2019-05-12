@@ -98,6 +98,19 @@ declare namespace feng3d {
     var lazy: {
         getvalue: <T>(lazyItem: Lazy<T>) => T;
     };
+    /**
+     * 可销毁对象
+     */
+    interface IDisposable {
+        /**
+         * 是否已销毁
+         */
+        readonly disposed: boolean;
+        /**
+         * 销毁
+         */
+        dispose(): void;
+    }
 }
 /**
  * Object.assignDeep 中 转换结果的函数定义
@@ -230,6 +243,14 @@ declare namespace feng3d {
          * @param before 运行在原函数之前
          */
         wrap<T, K extends keyof T, V extends T[K] & Function>(space: T, funcName: K, warpFunc: V, before?: boolean): void;
+        wrapF(funcHost: any, func: Function, params: any[], callback: (err: Error, img: HTMLImageElement) => void): void;
+        getArrayUuid(arr: any[]): string;
+        getObjectUuid(o: Object): string;
+        objectUuid: WeakMap<Object, string>;
+        wrapFResult: any[];
+        _state: {
+            [uuid: string]: boolean;
+        };
     }
     const __functionwarp__ = "__functionwarp__";
     const functionwarp: FunctionWarp;
@@ -7383,11 +7404,45 @@ declare namespace feng3d {
     /**
      * 所有feng3d对象的基类
      */
-    class Feng3dObject extends EventDispatcher {
+    class Feng3dObject extends EventDispatcher implements IDisposable {
         /**
          * 隐藏标记，用于控制是否在层级界面、检查器显示，是否保存
          */
         hideFlags: HideFlags;
+        /**
+         * 通用唯一标识符（Universally Unique Identifier）
+         */
+        readonly uuid: string;
+        /**
+         * 是否已销毁
+         */
+        readonly disposed: boolean;
+        /**
+         * 构建
+         *
+         * 新增不可修改属性 guid
+         */
+        constructor();
+        /**
+         * 销毁
+         */
+        dispose(): void;
+        /**
+         * 获取对象
+         *
+         * @param uuid 通用唯一标识符
+         */
+        static getObject(uuid: string): Feng3dObject;
+        /**
+         * 获取对象
+         *
+         * @param type
+         */
+        static getObjects<T extends Feng3dObject>(type?: Constructor<T>): T[];
+        /**
+         * 对象库
+         */
+        private static objectLib;
     }
 }
 declare namespace feng3d {
@@ -11723,7 +11778,7 @@ declare namespace feng3d {
      *
      * 注意，您的代码永远不会直接创建组件。相反，你可以编写脚本代码，并将脚本附加到GameObject(游戏物体)上。
      */
-    class Component extends Feng3dObject {
+    class Component extends Feng3dObject implements IDisposable {
         /**
          * 此组件附加到的游戏对象。组件总是附加到游戏对象上。
          */
@@ -11740,6 +11795,11 @@ declare namespace feng3d {
          * 是否唯一，同类型3D对象组件只允许一个
          */
         readonly single: boolean;
+        /**
+         * 是否已销毁
+         */
+        readonly disposed: boolean;
+        private _disposed;
         /**
          * 创建一个组件容器
          */
@@ -11959,6 +12019,8 @@ declare namespace feng3d {
         Transfrom: Transform;
     }
     /**
+     * 变换
+     *
      * 物体的位置、旋转和比例。
      *
      * 场景中的每个对象都有一个变换。它用于存储和操作对象的位置、旋转和缩放。每个转换都可以有一个父元素，它允许您分层应用位置、旋转和缩放
@@ -12146,7 +12208,7 @@ declare namespace feng3d {
     /**
      * 游戏对象，场景唯一存在的对象类型
      */
-    class GameObject extends AssetData {
+    class GameObject extends AssetData implements IDisposable {
         __class__: "feng3d.GameObject";
         assetType: AssetType;
         /**
@@ -12159,12 +12221,7 @@ declare namespace feng3d {
         assetId: string;
         readonly renderAtomic: RenderAtomic;
         /**
-         * 游戏对象池
-         */
-        static pool: Map<string, GameObject>;
-        /**
-         * The name of the Feng3dObject.
-         * Components share the same name with the game object and all attached components.
+         * 名称
          */
         name: string;
         /**
@@ -12184,7 +12241,7 @@ declare namespace feng3d {
          */
         userData: GameObjectUserData;
         /**
-         * The Transform attached to this GameObject. (null if there is none attached).
+         * 变换
          */
         readonly transform: Transform;
         private _transform;
@@ -12269,8 +12326,8 @@ declare namespace feng3d {
          */
         getComponentAt(index: number): Component;
         /**
-         * 添加组件
-         * Adds a component class named className to the game object.
+         * 添加指定组件类型到游戏对象
+         *
          * @param param 被添加组件
          */
         addComponent<T extends Components>(param: Constructor<T>, callback?: (component: T) => void): T;
@@ -12280,19 +12337,22 @@ declare namespace feng3d {
          */
         addScript(scriptName: string): ScriptComponent;
         /**
-         * Returns the component of Type type if the game object has one attached, null if it doesn't.
+         * 获取游戏对象上第一个指定类型的组件，不存在时返回null
+         *
          * @param type				类定义
          * @return                  返回指定类型组件
          */
         getComponent<T extends Components>(type: Constructor<T>): T;
         /**
-         * Returns all components of Type type in the GameObject.
+         * 获取游戏对象上所有指定类型的组件数组
+         *
          * @param type		类定义
          * @return			返回与给出类定义一致的组件
          */
         getComponents<T extends Components>(type?: Constructor<T>): T[];
         /**
-         * 从子对象中获取组件
+         * 从自身与子代（孩子，孩子的孩子，...）游戏对象中获取所有指定类型的组件
+         *
          * @param type		类定义
          * @return			返回与给出类定义一致的组件
          */
@@ -12301,7 +12361,8 @@ declare namespace feng3d {
             value: boolean;
         }, result?: T[]): T[];
         /**
-         * 从父类中获取组件
+         * 从父代（父亲，父亲的父亲，...）中获取组件
+         *
          * @param type		类定义
          * @return			返回与给出类定义一致的组件
          */
@@ -12394,7 +12455,8 @@ declare namespace feng3d {
          */
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene3d: Scene3D, camera: Camera): void;
         /**
-         * Finds a game object by name and returns it.
+         * 查找指定名称的游戏对象
+         *
          * @param name
          */
         static find(name: string): GameObject;
@@ -12405,7 +12467,6 @@ declare namespace feng3d {
         protected _children: GameObject[];
         protected _scene: Scene3D;
         protected _parent: GameObject;
-        private guid;
         private _setParent;
         private updateScene;
         private updateChildrenScene;
@@ -12431,7 +12492,7 @@ declare namespace feng3d {
     /**
      * 3D视图
      */
-    class Engine {
+    class Engine extends Feng3dObject {
         canvas: HTMLCanvasElement;
         /**
          * 摄像机
@@ -14141,7 +14202,13 @@ declare namespace feng3d {
         /**
          * 原始数据
          */
-        private rawData;
+        rawData: {
+            type: "texture";
+            textures: Texture2D[];
+        } | {
+            type: "path";
+            paths: string[];
+        };
         noPixels: ImageDatas[];
         protected _pixels: any[];
         protected _textureType: TextureType;
@@ -14326,7 +14393,7 @@ declare namespace feng3d {
          */
         u_alphaThreshold: number;
         /**
-         * 漫反射纹理
+         * 法线纹理
          */
         s_normal: Texture2D;
         /**
@@ -14346,7 +14413,7 @@ declare namespace feng3d {
          */
         s_ambient: Texture2D;
         /**
-         * 颜色
+         * 环境光颜色
          */
         u_ambient: Color4;
         /**
@@ -14369,6 +14436,9 @@ declare namespace feng3d {
          * 雾的颜色
          */
         u_fogColor: Color3;
+        /**
+         * 雾的密度
+         */
         u_fogDensity: number;
         /**
          * 雾模式

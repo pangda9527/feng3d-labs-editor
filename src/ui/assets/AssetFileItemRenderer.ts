@@ -43,7 +43,6 @@ namespace editor
             {
                 if (this.data.isDirectory)
                 {
-                    var folder = <feng3d.FolderAsset>this.data.asset;
                     drag.register(this, (dragsource) =>
                     {
                         this.data.setdargSource(dragsource);

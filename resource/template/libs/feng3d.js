@@ -604,6 +604,9 @@ var feng3d;
      */
     var FunctionWarp = /** @class */ (function () {
         function FunctionWarp() {
+            this.objectUuid = new WeakMap();
+            this.wrapFResult = [];
+            this._state = {};
         }
         /**
          * 包装函数
@@ -642,6 +645,49 @@ var feng3d;
                     f.apply(_this, args);
                 });
             };
+        };
+        FunctionWarp.prototype.wrapF = function (funcHost, func, params, callback) {
+            var _this = this;
+            // 获取唯一编号
+            var uuid = this.getArrayUuid([func].concat(params));
+            // 检查是否执行过
+            var result = this.wrapFResult[uuid];
+            if (result) {
+                callback(result.err, result.img);
+                return;
+            }
+            // 监听执行完成事件
+            feng3d.event.once(this, uuid, function () {
+                // 完成时重新执行函数
+                _this.wrapF(funcHost, func, params, callback);
+            });
+            // 正在执行时直接返回等待完成事件
+            if (this._state[uuid])
+                return;
+            // 标记正在执行中
+            this._state[uuid] = true;
+            // 执行函数
+            func.apply(funcHost, params.concat(function (err, img) {
+                // 清理执行标记
+                delete _this._state[uuid];
+                // 保存执行结果
+                _this.wrapFResult[uuid] = { err: err, img: img };
+                // 通知执行完成
+                feng3d.event.dispatch(_this, uuid);
+            }));
+        };
+        FunctionWarp.prototype.getArrayUuid = function (arr) {
+            var _this = this;
+            var uuids = arr.map(function (v) { if (Object.isObject(v))
+                return _this.getObjectUuid(v); return String(v); });
+            var groupUuid = uuids.join("-");
+            return groupUuid;
+        };
+        FunctionWarp.prototype.getObjectUuid = function (o) {
+            if (!this.objectUuid.has(o)) {
+                this.objectUuid.set(o, Math.uuid());
+            }
+            return this.objectUuid.get(o);
         };
         return FunctionWarp;
     }());
@@ -1290,24 +1336,6 @@ var feng3d;
                 return false;
             }
         },
-        // 处理 Object 基础类型数据
-        {
-            priority: 0,
-            handler: function (target, source, property, handlers, serialization) {
-                var tpv = target[property];
-                var spv = source[property];
-                if (Object.isObject(spv) && spv[feng3d.CLASS_KEY] == undefined) {
-                    feng3d.debuger && console.assert(!!tpv);
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        propertyHandler(tpv, spv, key, handlers, serialization);
-                    });
-                    target[property] = tpv;
-                    return true;
-                }
-                return false;
-            }
-        },
         // 处理资源
         {
             priority: 0,
@@ -1323,7 +1351,33 @@ var feng3d;
                     return true;
                 }
                 if (feng3d.AssetData.isAssetData(tpv)) {
-                    target[property] = serialization.deserialize(spv);
+                    if (spv.__class__ == null) {
+                        var className = feng3d.classUtils.getQualifiedClassName(tpv);
+                        var inst = feng3d.classUtils.getInstanceByName(className);
+                        serialization.setValue(inst, spv);
+                        target[property] = inst;
+                    }
+                    else {
+                        target[property] = serialization.deserialize(spv);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        },
+        // 处理 Object 基础类型数据
+        {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                if (Object.isObject(spv) && spv[feng3d.CLASS_KEY] == undefined) {
+                    feng3d.debuger && console.assert(!!tpv);
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(tpv, spv, key, handlers, serialization);
+                    });
+                    target[property] = tpv;
                     return true;
                 }
                 return false;
@@ -15579,20 +15633,59 @@ var feng3d;
      */
     var Feng3dObject = /** @class */ (function (_super) {
         __extends(Feng3dObject, _super);
+        /**
+         * 构建
+         *
+         * 新增不可修改属性 guid
+         */
         function Feng3dObject() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super.call(this) || this;
             /**
              * 隐藏标记，用于控制是否在层级界面、检查器显示，是否保存
              */
             _this.hideFlags = feng3d.HideFlags.None;
+            Object.defineProperty(_this, "uuid", { value: Math.uuid() });
+            Object.defineProperty(_this, "disposed", { value: false, configurable: true });
+            feng3d.debuger && console.assert(!Feng3dObject.objectLib[_this.uuid], "\u552F\u4E00\u6807\u8BC6\u7B26\u5B58\u5728\u91CD\u590D\uFF01\uFF1F");
+            Feng3dObject.objectLib[_this.uuid] = _this;
             return _this;
         }
+        /**
+         * 销毁
+         */
+        Feng3dObject.prototype.dispose = function () {
+            Object.defineProperty(this, "disposed", { value: true, configurable: false });
+        };
+        /**
+         * 获取对象
+         *
+         * @param uuid 通用唯一标识符
+         */
+        Feng3dObject.getObject = function (uuid) {
+            return this.objectLib[uuid];
+        };
+        /**
+         * 获取对象
+         *
+         * @param type
+         */
+        Feng3dObject.getObjects = function (type) {
+            var _this = this;
+            var objects = Object.keys(this.objectLib).map(function (v) { return _this.objectLib[v]; });
+            //
+            var filterResult = objects;
+            if (type) {
+                filterResult = objects.filter(function (v) { return v instanceof type; });
+            }
+            return filterResult;
+        };
         __decorate([
             feng3d.serialize
         ], Feng3dObject.prototype, "hideFlags", void 0);
         return Feng3dObject;
     }(feng3d.EventDispatcher));
     feng3d.Feng3dObject = Feng3dObject;
+    Object.defineProperty(Feng3dObject, "objectLib", { value: {} });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -16526,23 +16619,8 @@ var feng3d;
          * @param callback 加载完成回调
          */
         ReadFS.prototype.readImage = function (path, callback) {
-            var _this = this;
-            var image = this._images[path];
-            if (image) {
-                callback(null, image);
-                return;
-            }
-            var eventtype = arguments.callee.name + " " + path;
-            feng3d.event.once(this, eventtype, function () { _this.readImage(path, callback); });
-            if (this._state[eventtype])
-                return;
-            this._state[eventtype] = true;
-            //
-            this.fs.readImage(path, function (err, img) {
-                delete _this._state[eventtype];
-                _this._images[path] = img;
-                feng3d.event.dispatch(_this, eventtype);
-            });
+            this.fs.readImage(path, callback);
+            // functionwarp.wrapF(this.fs, this.fs.readImage, [path], callback);
         };
         /**
          * 获取文件绝对路径
@@ -21456,6 +21534,7 @@ var feng3d;
          */
         function Component() {
             var _this = _super.call(this) || this;
+            _this._disposed = false;
             _this.onAll(_this._onAllListener, _this);
             return _this;
         }
@@ -21477,7 +21556,7 @@ var feng3d;
              * The Transform attached to this GameObject (null if there is none attached).
              */
             get: function () {
-                return this._gameObject.transform;
+                return this._gameObject && this._gameObject.transform;
             },
             enumerable: true,
             configurable: true
@@ -21489,6 +21568,14 @@ var feng3d;
             get: function () {
                 return false;
             },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Component.prototype, "disposed", {
+            /**
+             * 是否已销毁
+             */
+            get: function () { return this._disposed; },
             enumerable: true,
             configurable: true
         });
@@ -21532,6 +21619,7 @@ var feng3d;
          */
         Component.prototype.dispose = function () {
             this._gameObject = null;
+            this._disposed = true;
         };
         Component.prototype.beforeRender = function (gl, renderAtomic, scene3d, camera) {
         };
@@ -21838,6 +21926,8 @@ var feng3d;
 (function (feng3d) {
     var fixedNum = 6;
     /**
+     * 变换
+     *
      * 物体的位置、旋转和比例。
      *
      * 场景中的每个对象都有一个变换。它用于存储和操作对象的位置、旋转和缩放。每个转换都可以有一个父元素，它允许您分层应用位置、旋转和缩放
@@ -22636,9 +22726,6 @@ var feng3d;
             _this._children = [];
             _this.name = "GameObject";
             _this.addComponent(feng3d.Transform);
-            _this.guid = Math.uuid();
-            //
-            GameObject.pool.set(_this.guid, _this);
             _this.onAll(_this._onAllListener, _this);
             return _this;
         }
@@ -22647,7 +22734,7 @@ var feng3d;
             // Variables
             //------------------------------------------
             /**
-             * The Transform attached to this GameObject. (null if there is none attached).
+             * 变换
              */
             get: function () {
                 if (!this._transform)
@@ -22873,8 +22960,8 @@ var feng3d;
             return this._components[index];
         };
         /**
-         * 添加组件
-         * Adds a component class named className to the game object.
+         * 添加指定组件类型到游戏对象
+         *
          * @param param 被添加组件
          */
         GameObject.prototype.addComponent = function (param, callback) {
@@ -22900,7 +22987,8 @@ var feng3d;
             return scriptComponent;
         };
         /**
-         * Returns the component of Type type if the game object has one attached, null if it doesn't.
+         * 获取游戏对象上第一个指定类型的组件，不存在时返回null
+         *
          * @param type				类定义
          * @return                  返回指定类型组件
          */
@@ -22909,7 +22997,8 @@ var feng3d;
             return component;
         };
         /**
-         * Returns all components of Type type in the GameObject.
+         * 获取游戏对象上所有指定类型的组件数组
+         *
          * @param type		类定义
          * @return			返回与给出类定义一致的组件
          */
@@ -22924,7 +23013,8 @@ var feng3d;
             return filterResult;
         };
         /**
-         * 从子对象中获取组件
+         * 从自身与子代（孩子，孩子的孩子，...）游戏对象中获取所有指定类型的组件
+         *
          * @param type		类定义
          * @return			返回与给出类定义一致的组件
          */
@@ -22955,7 +23045,8 @@ var feng3d;
             return result;
         };
         /**
-         * 从父类中获取组件
+         * 从父代（父亲，父亲的父亲，...）中获取组件
+         *
          * @param type		类定义
          * @return			返回与给出类定义一致的组件
          */
@@ -23093,7 +23184,7 @@ var feng3d;
             for (var i = this._components.length - 1; i >= 0; i--) {
                 this.removeComponentAt(i);
             }
-            GameObject.pool.delete(this.guid);
+            _super.prototype.dispose.call(this);
         };
         GameObject.prototype.disposeWithChildren = function () {
             this.dispose();
@@ -23193,17 +23284,21 @@ var feng3d;
         // Static Functions
         //------------------------------------------
         /**
-         * Finds a game object by name and returns it.
+         * 查找指定名称的游戏对象
+         *
          * @param name
          */
         GameObject.find = function (name) {
-            var target = null;
-            this.pool.forEach(function (element) {
-                if (target == null && element.name == name)
-                    target = element;
-            });
-            return target;
+            var gameobjects = feng3d.Feng3dObject.getObjects(GameObject);
+            var result = gameobjects.filter(function (v) { return !v.disposed && (v.name == name); });
+            return result[0];
         };
+        //------------------------------------------
+        // Protected Functions
+        //------------------------------------------
+        //------------------------------------------
+        // Private Properties
+        //------------------------------------------
         //------------------------------------------
         // Private Methods
         //------------------------------------------
@@ -23266,10 +23361,6 @@ var feng3d;
             //派发添加组件事件
             this.dispatch("addComponent", component, true);
         };
-        /**
-         * 游戏对象池
-         */
-        GameObject.pool = new Map();
         __decorate([
             feng3d.serialize
         ], GameObject.prototype, "prefabId", void 0);
@@ -23306,7 +23397,8 @@ var feng3d;
     /**
      * 3D视图
      */
-    var Engine = /** @class */ (function () {
+    var Engine = /** @class */ (function (_super) {
+        __extends(Engine, _super);
         /**
          * 构建3D视图
          * @param canvas    画布
@@ -23314,8 +23406,8 @@ var feng3d;
          * @param camera    摄像机
          */
         function Engine(canvas, scene, camera) {
-            var _this = this;
-            this.contextLost = false;
+            var _this = _super.call(this) || this;
+            _this.contextLost = false;
             if (!canvas) {
                 canvas = document.createElement("canvas");
                 canvas.id = "glcanvas";
@@ -23327,7 +23419,7 @@ var feng3d;
                 document.body.appendChild(canvas);
             }
             feng3d.debuger && console.assert(canvas instanceof HTMLCanvasElement, "canvas\u53C2\u6570\u5FC5\u987B\u4E3A HTMLCanvasElement \u7C7B\u578B\uFF01");
-            this.canvas = canvas;
+            _this.canvas = canvas;
             canvas.addEventListener("webglcontextlost", function (event) {
                 event.preventDefault();
                 _this.contextLost = true;
@@ -23341,10 +23433,11 @@ var feng3d;
                 console.log('pc.GraphicsDevice: WebGL context restored.');
                 // #endif
             }, false);
-            this.scene = scene || feng3d.serialization.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
-            this.camera = camera;
-            this.start();
-            this.mouse3DManager = new feng3d.Mouse3DManager(new feng3d.WindowMouseInput(), function () { return _this.viewRect; });
+            _this.scene = scene || feng3d.serialization.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene3D);
+            _this.camera = camera;
+            _this.start();
+            _this.mouse3DManager = new feng3d.Mouse3DManager(new feng3d.WindowMouseInput(), function () { return _this.viewRect; });
+            return _this;
         }
         Object.defineProperty(Engine.prototype, "camera", {
             /**
@@ -23545,7 +23638,7 @@ var feng3d;
             return gs;
         };
         return Engine;
-    }());
+    }(feng3d.Feng3dObject));
     feng3d.Engine = Engine;
 })(feng3d || (feng3d = {}));
 // var viewRect0 = { x: 0, y: 0, w: 400, h: 300 };
@@ -24033,6 +24126,7 @@ var feng3d;
                 oldInstance.component = null;
                 oldInstance.dispose();
             }
+            this._invalid = false;
         };
         ScriptComponent.prototype.invalidateScriptInstance = function () {
             this._invalid = true;
@@ -28216,7 +28310,7 @@ var feng3d;
             if (cls) {
                 if (this.uniforms == null || this.uniforms.constructor != cls) {
                     var newuniforms = new cls();
-                    Object.assign(newuniforms, this.uniforms);
+                    // Object.assign(newuniforms, this.uniforms);
                     this.uniforms = newuniforms;
                 }
             }
@@ -28385,7 +28479,7 @@ var feng3d;
              */
             this.u_alphaThreshold = 0;
             /**
-             * 漫反射纹理
+             * 法线纹理
              */
             this.s_normal = feng3d.Texture2D.defaultNormal;
             /**
@@ -28405,7 +28499,7 @@ var feng3d;
              */
             this.s_ambient = feng3d.Texture2D.default;
             /**
-             * 颜色
+             * 环境光颜色
              */
             this.u_ambient = new feng3d.Color4();
             /**
@@ -28428,6 +28522,9 @@ var feng3d;
              * 雾的颜色
              */
             this.u_fogColor = new feng3d.Color3();
+            /**
+             * 雾的密度
+             */
             this.u_fogDensity = 0.1;
             /**
              * 雾模式
