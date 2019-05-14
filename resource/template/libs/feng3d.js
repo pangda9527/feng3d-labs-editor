@@ -119,13 +119,13 @@ getset平均耗时比 17.3
          * @param thisObject
          */
         Watcher.prototype.watch = function (host, property, handler, thisObject) {
-            if (!Object.getOwnPropertyDescriptor(host, bindables)) {
-                Object.defineProperty(host, bindables, {
+            if (!Object.getOwnPropertyDescriptor(host, __watchs__)) {
+                Object.defineProperty(host, __watchs__, {
                     value: {},
                     enumerable: false,
                 });
             }
-            var watchs = host[bindables];
+            var watchs = host[__watchs__];
             var property1 = property;
             if (!watchs[property1]) {
                 var oldPropertyDescriptor = Object.getOwnPropertyDescriptor(host, property1);
@@ -146,12 +146,12 @@ getset平均耗时比 17.3
                 else if (!data || (!data.get && !data.set)) {
                     data = { enumerable: true, configurable: true };
                     data.get = function () {
-                        return this[bindables][property1].value;
+                        return this[__watchs__][property1].value;
                     };
                     data.set = function (value) {
-                        var oldvalue = this[bindables][property1].value;
+                        var oldvalue = this[__watchs__][property1].value;
                         if (oldvalue != value) {
-                            this[bindables][property1].value = value;
+                            this[__watchs__][property1].value = value;
                             notifyListener(this, property1, oldvalue);
                         }
                     };
@@ -168,7 +168,7 @@ getset平均耗时比 17.3
                 propertywatchs.handlers.push({ handler: handler, thisObject: thisObject });
         };
         Watcher.prototype.unwatch = function (host, property, handler, thisObject) {
-            var watchs = host[bindables];
+            var watchs = host[__watchs__];
             if (!watchs)
                 return;
             var property1 = property;
@@ -189,7 +189,7 @@ getset平均耗时比 17.3
                     delete watchs[property1];
                 }
                 if (Object.keys(watchs).length == 0) {
-                    delete host[bindables];
+                    delete host[__watchs__];
                 }
             }
         };
@@ -200,9 +200,9 @@ getset平均耗时比 17.3
                 this.watch(host, property, handler, thisObject);
                 return;
             }
-            if (!Object.getOwnPropertyDescriptor(host, bindablechains))
-                Object.defineProperty(host, bindablechains, { value: {}, enumerable: false, });
-            var watchchains = host[bindablechains];
+            if (!Object.getOwnPropertyDescriptor(host, __watchchains__))
+                Object.defineProperty(host, __watchchains__, { value: {}, enumerable: false, });
+            var watchchains = host[__watchchains__];
             if (!watchchains[property]) {
                 watchchains[property] = [];
             }
@@ -253,7 +253,7 @@ getset平均耗时比 17.3
             var currentp = property.substr(0, notIndex);
             var nextp = property.substr(notIndex + 1);
             //
-            var watchchains = host[bindablechains];
+            var watchchains = host[__watchchains__];
             if (!watchchains || !watchchains[property])
                 return;
             // 
@@ -275,17 +275,17 @@ getset平均耗时比 17.3
             if (propertywatchs.length == 0)
                 delete watchchains[property];
             if (Object.keys(watchchains).length == 0) {
-                delete host[bindablechains];
+                delete host[__watchchains__];
             }
         };
         return Watcher;
     }());
     feng3d.Watcher = Watcher;
     feng3d.watcher = new Watcher();
-    var bindables = "__watchs__";
-    var bindablechains = "__watchchains__";
+    var __watchs__ = "__watchs__";
+    var __watchchains__ = "__watchchains__";
     function notifyListener(host, property, oldview) {
-        var watchs = host[bindables];
+        var watchs = host[__watchs__];
         var handlers = watchs[property].handlers;
         handlers.forEach(function (element) {
             element.handler.call(element.thisObject, host, property, oldview);
@@ -604,8 +604,7 @@ var feng3d;
      */
     var FunctionWarp = /** @class */ (function () {
         function FunctionWarp() {
-            this.objectUuid = new WeakMap();
-            this.wrapFResult = [];
+            this._wrapFResult = {};
             this._state = {};
         }
         /**
@@ -646,54 +645,101 @@ var feng3d;
                 });
             };
         };
-        FunctionWarp.prototype.wrapF = function (funcHost, func, params, callback) {
+        /**
+         * 包装一个异步函数，使其避免重复执行
+         *
+         * 使用场景示例：同时加载同一资源时，使其只加载一次，完成后调用所有相关回调函数。
+         *
+         * @param funcHost 函数所属对象
+         * @param func 函数
+         * @param params 函数除callback外的参数列表
+         * @param callback 完成回调函数
+         */
+        FunctionWarp.prototype.wrapAsyncFunc = function (funcHost, func, params, callback) {
             var _this = this;
             // 获取唯一编号
-            var uuid = this.getArrayUuid([func].concat(params));
+            var cuuid = feng3d.uuid.getArrayUuid([func].concat(params));
             // 检查是否执行过
-            var result = this.wrapFResult[uuid];
+            var result = this._wrapFResult[cuuid];
             if (result) {
-                callback(result.err, result.img);
+                callback.apply(null, result);
                 return;
             }
             // 监听执行完成事件
-            feng3d.event.once(this, uuid, function () {
+            feng3d.event.once(this, cuuid, function () {
                 // 完成时重新执行函数
-                _this.wrapF(funcHost, func, params, callback);
+                _this.wrapAsyncFunc(funcHost, func, params, callback);
             });
             // 正在执行时直接返回等待完成事件
-            if (this._state[uuid])
+            if (this._state[cuuid])
                 return;
             // 标记正在执行中
-            this._state[uuid] = true;
+            this._state[cuuid] = true;
             // 执行函数
-            func.apply(funcHost, params.concat(function (err, img) {
+            func.apply(funcHost, params.concat(function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
                 // 清理执行标记
-                delete _this._state[uuid];
+                delete _this._state[cuuid];
                 // 保存执行结果
-                _this.wrapFResult[uuid] = { err: err, img: img };
+                _this._wrapFResult[cuuid] = args;
                 // 通知执行完成
-                feng3d.event.dispatch(_this, uuid);
+                feng3d.event.dispatch(_this, cuuid);
             }));
-        };
-        FunctionWarp.prototype.getArrayUuid = function (arr) {
-            var _this = this;
-            var uuids = arr.map(function (v) { if (Object.isObject(v))
-                return _this.getObjectUuid(v); return String(v); });
-            var groupUuid = uuids.join("-");
-            return groupUuid;
-        };
-        FunctionWarp.prototype.getObjectUuid = function (o) {
-            if (!this.objectUuid.has(o)) {
-                this.objectUuid.set(o, Math.uuid());
-            }
-            return this.objectUuid.get(o);
         };
         return FunctionWarp;
     }());
     feng3d.FunctionWarp = FunctionWarp;
     feng3d.__functionwarp__ = "__functionwarp__";
     feng3d.functionwarp = new FunctionWarp();
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * 通用唯一标识符（Universally Unique Identifier）
+     *
+     * 用于给所有对象分配一个通用唯一标识符
+     */
+    var Uuid = /** @class */ (function () {
+        function Uuid() {
+            this.objectUuid = new WeakMap();
+        }
+        /**
+         * 获取数组 通用唯一标识符
+         *
+         * @param arr 数组
+         * @param separator 分割符
+         */
+        Uuid.prototype.getArrayUuid = function (arr, separator) {
+            var _this = this;
+            if (separator === void 0) { separator = "$__uuid__$"; }
+            var uuids = arr.map(function (v) { return _this.getObjectUuid(v); });
+            var groupUuid = uuids.join(separator);
+            return groupUuid;
+        };
+        /**
+         * 获取对象 通用唯一标识符
+         *
+         * 当参数object非Object对象时强制转换为字符串返回
+         *
+         * @param object 对象
+         */
+        Uuid.prototype.getObjectUuid = function (object) {
+            if (Object.isBaseType(object)) {
+                return String(object);
+            }
+            if (!object[feng3d.__uuid__]) {
+                Object.defineProperty(object, feng3d.__uuid__, { value: Math.uuid() });
+            }
+            return object[feng3d.__uuid__];
+        };
+        return Uuid;
+    }());
+    feng3d.Uuid = Uuid;
+    feng3d.__uuid__ = "__uuid__";
+    feng3d.uuid = new Uuid();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
