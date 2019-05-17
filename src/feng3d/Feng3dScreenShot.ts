@@ -3,7 +3,7 @@ namespace editor
     export var feng3dScreenShot: Feng3dScreenShot;
 
     /**
-     * feng3d缩略图工具
+     * feng3d预览图工具
      */
     export class Feng3dScreenShot
     {

@@ -23,82 +23,17 @@ var feng3d;
      * 观察装饰器，观察被装饰属性的变化
      *
      * @param onChange 属性变化回调  例如参数为“onChange”时，回调将会调用this.onChange(property, oldValue, newValue)
-     * @see https://gitee.com/feng3d/feng3d/issues/IGIK0
      *
      * 使用@watch后会自动生成一个带"_"的属性，例如 属性"a"会生成"_a"
      *
      * 通过使用 eval 函数 生成出 与自己手动写的set get 一样的函数，性能已经接近 手动写的get set函数。
      *
-     * 性能：
-     * chrome：
-     * 测试 get ：
-Test.ts:100 watch与getset最大耗时比 1.2222222222222223
-Test.ts:101 watch与getset最小耗时比 0.7674418604651163
-Test.ts:102 watch与getset平均耗时比 0.9558823529411765
-Test.ts:103 watch平均耗时比 13
-Test.ts:104 getset平均耗时比 13.6
-Test.ts:98 测试 set ：
-Test.ts:100 watch与getset最大耗时比 4.5
-Test.ts:101 watch与getset最小耗时比 2.409090909090909
-Test.ts:102 watch与getset平均耗时比 3.037037037037037
-Test.ts:103 watch平均耗时比 57.4
-Test.ts:104 getset平均耗时比 18.9
-
-     *
-     * nodejs:
-     * 测试 get ：
-watch与getset最大耗时比 1.3333333333333333
-watch与getset最小耗时比 0.55
-watch与getset平均耗时比 1.0075757575757576
-watch平均耗时比 13.3
-getset平均耗时比 13.2
-测试 set ：
-watch与getset最大耗时比 4.9
-watch与getset最小耗时比 3
-watch与getset平均耗时比 4.143497757847534
-watch平均耗时比 92.4
-getset平均耗时比 22.3
-     *
-     *
-     * firefox:
-     * 测试 get ：  Test.js:122:5
-watch与getset最大耗时比 4.142857142857143  Test.js:124:5
-watch与getset最小耗时比 0.4090909090909091  Test.js:125:5
-watch与getset平均耗时比 1.0725806451612903  Test.js:126:5
-watch平均耗时比 13.3  Test.js:127:5
-getset平均耗时比 12.4  Test.js:128:5
-测试 set ：  Test.js:122:5
-watch与getset最大耗时比 1.5333333333333334  Test.js:124:5
-watch与getset最小耗时比 0.6842105263157895  Test.js:125:5
-watch与getset平均耗时比 0.9595375722543352  Test.js:126:5
-watch平均耗时比 16.6  Test.js:127:5
-getset平均耗时比 17.3
-     *
-     * 结果分析：
-     * chrome、nodejs、firefox运行结果出现差异,firefox运行结果最完美
-     *
-     * 使用watch后的get测试的消耗与手动写get消耗一致
-     * chrome与nodejs上set消耗是手动写set的消耗(3-4)倍
-     *
-     * 注：不适用eval的情况下，chrome表现最好的，与此次测试结果差不多；在nodejs与firfox上将会出现比使用eval情况下消耗的（40-400）倍，其中详细原因不明，求高人解释！
-     *
      */
     function watch(onChange) {
         return function (target, property) {
             var key = "_" + property;
-            var get;
-            // get = function () { return this[key]; };
-            eval("get = function (){return this." + key + "}");
-            var set;
-            // set = function (value)
-            // {
-            //     if (this[key] === value)
-            //         return;
-            //     var oldValue = this[key];
-            //     this[key] = value;
-            //     this[onChange](propertyKey, oldValue, this[key]);
-            // };
-            eval("set = function (value){\n                if (this." + key + " == value)\n                    return;\n                var oldValue = this." + key + ";\n                this." + key + " = value;\n                this." + onChange + "(\"" + property + "\", oldValue, value);\n            }");
+            var get = eval("(function (){return this." + key + "})");
+            var set = eval("(function (value){\n                if (this." + key + " == value)\n                    return;\n                var oldValue = this." + key + ";\n                this." + key + " = value;\n                this." + onChange + "(\"" + property + "\", oldValue, value);\n            })");
             Object.defineProperty(target, property, {
                 get: get,
                 set: set,
@@ -112,68 +47,79 @@ getset平均耗时比 17.3
         function Watcher() {
         }
         /**
-         * 注意：使用watch后获取该属性值的性能将会是原来的1/60，禁止在feng3d引擎内部使用watch
-         * @param host
-         * @param property1
-         * @param handler
-         * @param thisObject
+         * 监听对象属性的变化
+         *
+         * 注意：使用watch后获取该属性值的性能将会是原来的1/60，避免在运算密集处使用该函数。
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性
+         * @param handler 变化回调函数 (object: T, property: string, oldvalue: V) => void
+         * @param thisObject 变化回调函数 this值
          */
-        Watcher.prototype.watch = function (host, property, handler, thisObject) {
-            if (!Object.getOwnPropertyDescriptor(host, __watchs__)) {
-                Object.defineProperty(host, __watchs__, {
+        Watcher.prototype.watch = function (object, property, handler, thisObject) {
+            if (!Object.getOwnPropertyDescriptor(object, feng3d.__watchs__)) {
+                Object.defineProperty(object, feng3d.__watchs__, {
                     value: {},
                     enumerable: false,
+                    configurable: true,
+                    writable: false,
                 });
             }
-            var watchs = host[__watchs__];
-            var property1 = property;
-            if (!watchs[property1]) {
-                var oldPropertyDescriptor = Object.getOwnPropertyDescriptor(host, property1);
-                watchs[property1] = { value: host[property1], oldPropertyDescriptor: oldPropertyDescriptor, handlers: [] };
+            var watchs = object[feng3d.__watchs__];
+            if (!watchs[property]) {
+                var oldPropertyDescriptor = Object.getOwnPropertyDescriptor(object, property);
+                watchs[property] = { value: object[property], oldPropertyDescriptor: oldPropertyDescriptor, handlers: [] };
                 //
-                var data = getPropertyDescriptor(host, property1);
+                var data = Object.getPropertyDescriptor(object, property);
                 if (data && data.set && data.get) {
-                    data = { enumerable: true, configurable: true, get: data.get, set: data.set };
+                    data = { enumerable: data.enumerable, configurable: true, get: data.get, set: data.set };
                     var orgSet = data.set;
                     data.set = function (value) {
-                        var oldvalue = this[property1];
+                        var oldvalue = this[property];
                         if (oldvalue != value) {
                             orgSet && orgSet.call(this, value);
-                            notifyListener(this, property1, oldvalue);
+                            notifyListener(this, property, oldvalue);
                         }
                     };
                 }
                 else if (!data || (!data.get && !data.set)) {
                     data = { enumerable: true, configurable: true };
                     data.get = function () {
-                        return this[__watchs__][property1].value;
+                        return this[feng3d.__watchs__][property].value;
                     };
                     data.set = function (value) {
-                        var oldvalue = this[__watchs__][property1].value;
+                        var oldvalue = this[feng3d.__watchs__][property].value;
                         if (oldvalue != value) {
-                            this[__watchs__][property1].value = value;
-                            notifyListener(this, property1, oldvalue);
+                            this[feng3d.__watchs__][property].value = value;
+                            notifyListener(this, property, oldvalue);
                         }
                     };
                 }
                 else {
-                    console.warn("watch " + host + " . " + property + " \u5931\u8D25\uFF01");
+                    console.warn("watch " + object + " . " + property + " \u5931\u8D25\uFF01");
                     return;
                 }
-                Object.defineProperty(host, property1, data);
+                Object.defineProperty(object, property, data);
             }
-            var propertywatchs = watchs[property1];
+            var propertywatchs = watchs[property];
             var has = propertywatchs.handlers.reduce(function (v, item) { return v || (item.handler == handler && item.thisObject == thisObject); }, false);
             if (!has)
                 propertywatchs.handlers.push({ handler: handler, thisObject: thisObject });
         };
-        Watcher.prototype.unwatch = function (host, property, handler, thisObject) {
-            var watchs = host[__watchs__];
+        /**
+         * 取消监听对象属性的变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性
+         * @param handler 变化回调函数 (object: T, property: string, oldvalue: V) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        Watcher.prototype.unwatch = function (object, property, handler, thisObject) {
+            var watchs = object[feng3d.__watchs__];
             if (!watchs)
                 return;
-            var property1 = property;
-            if (watchs[property1]) {
-                var handlers = watchs[property1].handlers;
+            if (watchs[property]) {
+                var handlers = watchs[property].handlers;
                 if (handler === undefined)
                     handlers.length = 0;
                 for (var i = handlers.length - 1; i >= 0; i--) {
@@ -181,28 +127,36 @@ getset平均耗时比 17.3
                         handlers.splice(i, 1);
                 }
                 if (handlers.length == 0) {
-                    var value = host[property1];
-                    delete host[property1];
-                    if (watchs[property1].oldPropertyDescriptor)
-                        Object.defineProperty(host, property1, watchs[property1].oldPropertyDescriptor);
-                    host[property1] = value;
-                    delete watchs[property1];
+                    var value = object[property];
+                    delete object[property];
+                    if (watchs[property].oldPropertyDescriptor)
+                        Object.defineProperty(object, property, watchs[property].oldPropertyDescriptor);
+                    object[property] = value;
+                    delete watchs[property];
                 }
                 if (Object.keys(watchs).length == 0) {
-                    delete host[__watchs__];
+                    delete object[feng3d.__watchs__];
                 }
             }
         };
-        Watcher.prototype.watchchain = function (host, property, handler, thisObject) {
+        /**
+         * 监听对象属性链值变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性 例如："a.b"
+         * @param handler 变化回调函数 (object: T, property: string, oldvalue: V) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        Watcher.prototype.watchchain = function (object, property, handler, thisObject) {
             var _this = this;
             var notIndex = property.indexOf(".");
             if (notIndex == -1) {
-                this.watch(host, property, handler, thisObject);
+                this.watch(object, property, handler, thisObject);
                 return;
             }
-            if (!Object.getOwnPropertyDescriptor(host, __watchchains__))
-                Object.defineProperty(host, __watchchains__, { value: {}, enumerable: false, });
-            var watchchains = host[__watchchains__];
+            if (!Object.getOwnPropertyDescriptor(object, feng3d.__watchchains__))
+                Object.defineProperty(object, feng3d.__watchchains__, { value: {}, enumerable: false, writable: false, configurable: true });
+            var watchchains = object[feng3d.__watchchains__];
             if (!watchchains[property]) {
                 watchchains[property] = [];
             }
@@ -212,8 +166,8 @@ getset平均耗时比 17.3
                 // 添加下级监听链
                 var currentp = property.substr(0, notIndex);
                 var nextp = property.substr(notIndex + 1);
-                if (host[currentp]) {
-                    this.watchchain(host[currentp], nextp, handler, thisObject);
+                if (object[currentp]) {
+                    this.watchchain(object[currentp], nextp, handler, thisObject);
                 }
                 // 添加链监听
                 var watchchainFun = function (h, p, oldvalue) {
@@ -223,37 +177,35 @@ getset平均耗时比 17.3
                     if (newvalue)
                         _this.watchchain(newvalue, nextp, handler, thisObject);
                     // 当更换对象且监听值发生改变时触发处理函数
-                    try {
-                        var ov = eval("oldvalue." + nextp + "");
-                    }
-                    catch (e) {
-                        ov = undefined;
-                    }
-                    try {
-                        var nv = eval("newvalue." + nextp + "");
-                    }
-                    catch (e) {
-                        nv = undefined;
-                    }
+                    var ov = Object.getPropertyValue(oldvalue, nextp);
+                    var nv = Object.getPropertyValue(newvalue, nextp);
                     if (ov != nv) {
                         handler.call(thisObject, newvalue, nextp, ov);
                     }
                 };
-                this.watch(host, currentp, watchchainFun);
+                this.watch(object, currentp, watchchainFun);
                 // 记录链监听函数
                 propertywatchs.push({ handler: handler, thisObject: thisObject, watchchainFun: watchchainFun });
             }
         };
-        Watcher.prototype.unwatchchain = function (host, property, handler, thisObject) {
+        /**
+         * 取消监听对象属性链值变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性 例如："a.b"
+         * @param handler 变化回调函数 (object: T, property: string, oldvalue: V) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        Watcher.prototype.unwatchchain = function (object, property, handler, thisObject) {
             var notIndex = property.indexOf(".");
             if (notIndex == -1) {
-                this.unwatch(host, property, handler, thisObject);
+                this.unwatch(object, property, handler, thisObject);
                 return;
             }
             var currentp = property.substr(0, notIndex);
             var nextp = property.substr(notIndex + 1);
             //
-            var watchchains = host[__watchchains__];
+            var watchchains = object[feng3d.__watchchains__];
             if (!watchchains || !watchchains[property])
                 return;
             // 
@@ -262,11 +214,11 @@ getset平均耗时比 17.3
                 var element = propertywatchs[i];
                 if (handler == null || (handler == element.handler && thisObject == element.thisObject)) {
                     // 删除下级监听链
-                    if (host[currentp]) {
-                        this.unwatchchain(host[currentp], nextp, element.handler, element.thisObject);
+                    if (object[currentp]) {
+                        this.unwatchchain(object[currentp], nextp, element.handler, element.thisObject);
                     }
                     // 删除链监听
-                    this.unwatch(host, currentp, element.watchchainFun);
+                    this.unwatch(object, currentp, element.watchchainFun);
                     // 清理记录链监听函数
                     propertywatchs.splice(i, 1);
                 }
@@ -275,32 +227,51 @@ getset平均耗时比 17.3
             if (propertywatchs.length == 0)
                 delete watchchains[property];
             if (Object.keys(watchchains).length == 0) {
-                delete host[__watchchains__];
+                delete object[feng3d.__watchchains__];
             }
+        };
+        /**
+         * 监听对象属性链值变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性 例如：{a:{b:null,d:null}} 表示监听 object.a.b 与 object.a.d 值得变化，如果property == object时表示监听对象中所有叶子属性变化。
+         * @param handler 变化回调函数 (object: T, property: string, oldvalue: V) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        Watcher.prototype.watchobject = function (object, property, handler, thisObject) {
+            var _this = this;
+            var chains = Object.getPropertyChains(object);
+            chains.forEach(function (v) {
+                _this.watchchain(object, v, handler, thisObject);
+            });
+        };
+        /**
+         * 取消监听对象属性链值变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性 例如：{a:{b:null,d:null}} 表示监听 object.a.b 与 object.a.d 值得变化，如果property == object时表示监听对象中所有叶子属性变化。
+         * @param handler 变化回调函数 (object: T, property: string, oldvalue: V) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        Watcher.prototype.unwatchobject = function (object, property, handler, thisObject) {
+            var _this = this;
+            var chains = Object.getPropertyChains(property);
+            chains.forEach(function (v) {
+                _this.unwatchchain(object, v, handler, thisObject);
+            });
         };
         return Watcher;
     }());
     feng3d.Watcher = Watcher;
     feng3d.watcher = new Watcher();
-    var __watchs__ = "__watchs__";
-    var __watchchains__ = "__watchchains__";
+    feng3d.__watchs__ = "__watchs__";
+    feng3d.__watchchains__ = "__watchchains__";
     function notifyListener(host, property, oldview) {
-        var watchs = host[__watchs__];
+        var watchs = host[feng3d.__watchs__];
         var handlers = watchs[property].handlers;
         handlers.forEach(function (element) {
             element.handler.call(element.thisObject, host, property, oldview);
         });
-    }
-    function getPropertyDescriptor(host, property) {
-        var data = Object.getOwnPropertyDescriptor(host, property);
-        if (data) {
-            return data;
-        }
-        var prototype = Object.getPrototypeOf(host);
-        if (prototype) {
-            return getPropertyDescriptor(prototype, property);
-        }
-        return null;
     }
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -454,6 +425,56 @@ Object.runFunc = function (obj, func) {
 };
 Object.isObject = function (obj) {
     return obj != null && (obj.constructor == Object || (obj.constructor.name == "Object")); // 兼容其他 HTMLIFrameElement 传入的Object
+};
+Object.getPropertyValue = function (object, property) {
+    if (typeof property == "string")
+        property = property.split(".");
+    var value = object;
+    var len = property.length;
+    for (var i = 0; i < property.length; i++) {
+        if (value == null)
+            return undefined;
+        value = value[property[i]];
+    }
+    return value;
+};
+Object.getPropertyChains = function (object) {
+    var result = [];
+    // 属性名称列表
+    var propertys = Object.keys(object);
+    // 属性所属对象列表
+    var hosts = new Array(propertys.length).fill(object);
+    // 父属性所在编号列表
+    var parentPropertyIndices = new Array(propertys.length).fill(-1);
+    // 处理到的位置
+    var index = 0;
+    while (index < propertys.length) {
+        var host = hosts[index];
+        var cp = propertys[index];
+        var cv = host[cp];
+        var vks;
+        if (cv == null || Object.isBaseType(cv) || (vks = Object.keys(cv)).length == 0) {
+            // 处理叶子属性
+            var ps = [cp];
+            var ci = index;
+            // 查找并组合属性链
+            while ((ci = parentPropertyIndices[ci]) != -1) {
+                ps.push(propertys[ci]);
+            }
+            ps.reverse();
+            result.push(ps.join("."));
+        }
+        else {
+            // 处理中间属性
+            vks.forEach(function (k) {
+                propertys.push(k);
+                hosts.push(cv);
+                parentPropertyIndices.push(index);
+            });
+        }
+        index++;
+    }
+    return result;
 };
 Object.equalDeep = function (a, b) {
     if (a == b)
@@ -17594,42 +17615,42 @@ var feng3d;
             });
         };
         /**
-         * 读取资源缩略图标
+         * 读取资源预览图标
          *
          * @param callback 完成回调
          */
-        FileAsset.prototype.readThumbnail = function (callback) {
+        FileAsset.prototype.readPreview = function (callback) {
             var _this = this;
-            if (this._thumbnail) {
-                callback(null, this._thumbnail);
+            if (this._preview) {
+                callback(null, this._preview);
                 return;
             }
-            this.rs.fs.readImage(this.thumbnailPath, function (err, image) {
-                _this._thumbnail = image;
+            this.rs.fs.readImage(this.previewPath, function (err, image) {
+                _this._preview = image;
                 callback(err, image);
             });
         };
         /**
-         * 读取资源缩略图标
+         * 读取资源预览图标
          *
-         * @param image 缩略图
+         * @param image 预览图
          * @param callback 完成回调
          */
-        FileAsset.prototype.writeThumbnail = function (image, callback) {
-            if (this._thumbnail == image) {
+        FileAsset.prototype.writePreview = function (image, callback) {
+            if (this._preview == image) {
                 callback && callback(null);
                 return;
             }
-            this._thumbnail = image;
-            this.rs.fs.writeImage(this.thumbnailPath, image, callback);
+            this._preview = image;
+            this.rs.fs.writeImage(this.previewPath, image, callback);
         };
         /**
-         * 删除资源缩略图标
+         * 删除资源预览图标
          *
          * @param callback 完成回调
          */
-        FileAsset.prototype.deleteThumbnail = function (callback) {
-            this.rs.fs.deleteFile(this.thumbnailPath, callback);
+        FileAsset.prototype.deletePreview = function (callback) {
+            this.rs.fs.deleteFile(this.previewPath, callback);
         };
         /**
          * 删除文件
@@ -17642,7 +17663,7 @@ var feng3d;
             // 延迟一帧判断该资源是否被删除，排除移动文件时出现的临时删除情况
             feng3d.ticker.once(1000, function () {
                 if (_this.rs.getAsset(_this.assetId) == null) {
-                    _this.deleteThumbnail();
+                    _this.deletePreview();
                 }
             });
         };
@@ -17684,12 +17705,12 @@ var feng3d;
         FileAsset.prototype.deleteMeta = function (callback) {
             this.rs.fs.deleteFile(this.metaPath, callback);
         };
-        Object.defineProperty(FileAsset.prototype, "thumbnailPath", {
+        Object.defineProperty(FileAsset.prototype, "previewPath", {
             /**
-             * 缩略图路径
+             * 预览图路径
              */
             get: function () {
-                return "assetIcons/" + this.assetId + ".png";
+                return "previews/" + this.assetId + ".png";
             },
             enumerable: true,
             configurable: true

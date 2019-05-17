@@ -76,7 +76,7 @@ namespace editor
                 this.image = "file_png";
             }
 
-            asset.readThumbnail((err, image) =>
+            asset.readPreview((err, image) =>
             {
                 if (image)
                 {
@@ -123,7 +123,7 @@ namespace editor
         }
 
         /**
-         * 更新缩略图
+         * 更新预览图
          */
         updateImage()
         {
@@ -135,7 +135,7 @@ namespace editor
 
                 feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
-                    this.asset.writeThumbnail(image);
+                    this.asset.writePreview(image);
                 });
 
             } else if (this.asset instanceof feng3d.TextureCubeAsset)
@@ -147,7 +147,7 @@ namespace editor
 
                     feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                     {
-                        this.asset.writeThumbnail(image);
+                        this.asset.writePreview(image);
                     });
                 });
             } else if (this.asset instanceof feng3d.MaterialAsset)
@@ -158,7 +158,7 @@ namespace editor
                     this.image = feng3dScreenShot.drawMaterial(mat.data).toDataURL();
                     feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                     {
-                        this.asset.writeThumbnail(image);
+                        this.asset.writePreview(image);
                     });
                 });
             } else if (this.asset instanceof feng3d.GeometryAsset)
@@ -167,7 +167,7 @@ namespace editor
 
                 feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {
-                    this.asset.writeThumbnail(image);
+                    this.asset.writePreview(image);
                 });
             } else if (this.asset instanceof feng3d.GameObjectAsset)
             {
@@ -177,7 +177,7 @@ namespace editor
                     this.image = feng3dScreenShot.drawGameObject(gameObject).toDataURL();
                     feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                     {
-                        this.asset.writeThumbnail(image);
+                        this.asset.writePreview(image);
                     });
                 });
             }
