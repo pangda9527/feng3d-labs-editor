@@ -113,11 +113,7 @@ namespace editor
                         {
                             label: "导出项目", click: () =>
                             {
-                                editorRS.exportProject(function (err, content)
-                                {
-                                    // see FileSaver.js
-                                    saveAs(content, `${editorcache.projectname}.feng3d.zip`);
-                                });
+                                editorRS.exportProjectToJSZip(`${editorcache.projectname}.feng3d.zip`);
                             }
                         },
                         {

@@ -94,6 +94,11 @@ namespace editor
             loadUrls();
         }
 
+        /**
+         * 选择文件
+         * 
+         * @param callback 完成回调
+         */
         selectFile(callback: (file: FileList) => void)
         {
             selectFileCallback = callback;
@@ -101,38 +106,81 @@ namespace editor
         }
 
         /**
-         * 导出项目
+         * 导出项目为zip压缩包
+         * 
+         * @param filename 导出后压缩包名称
+         * @param callback 完成回调
          */
-        exportProject(callback: (err: Error, data: Blob) => void)
+        exportProjectToJSZip(filename: string, callback?: () => void)
         {
-            var zip = new JSZip();
             this.fs.getAllPathsInFolder("", (err, filepaths) =>
             {
-                var fns = filepaths.map(p => (callback) =>
+                if (err)
                 {
-                    this.fs.isDirectory(p, (result) =>
+                    console.error(err);
+                    callback && callback();
+                    return;
+                }
+                this.exportFilesToJSZip(filename, filepaths, callback);
+            });
+        }
+
+        /**
+         * 导出指定文件夹为zip压缩包
+         * 
+         * @param filename 导出后压缩包名称
+         * @param folderpath 需要导出的文件夹路径
+         * @param callback 完成回调
+         */
+        exportFolderToJSZip(filename: string, folderpath: string, callback: () => void)
+        {
+            this.fs.getAllPathsInFolder(folderpath, (err, filepaths) =>
+            {
+                if (err)
+                {
+                    console.error(err);
+                    callback && callback();
+                    return;
+                }
+                this.exportFilesToJSZip(filename, filepaths, callback);
+            });
+        }
+
+        /**
+         * 导出文件列表为zip压缩包
+         * 
+         * @param filename 导出后压缩包名称
+         * @param filepaths 需要导出的文件列表
+         * @param callback 完成回调
+         */
+        exportFilesToJSZip(filename: string, filepaths: string[], callback?: () => void)
+        {
+            var zip = new JSZip();
+            var fns = filepaths.map(p => (callback) =>
+            {
+                this.fs.isDirectory(p, (result) =>
+                {
+                    if (result)
                     {
-                        if (result)
+                        zip.folder(p);
+                        callback();
+                    } else
+                    {
+                        this.fs.readArrayBuffer(p, (err, data) =>
                         {
-                            zip.folder(p);
+                            //处理文件夹
+                            data && zip.file(p, data);
                             callback();
-                        } else
-                        {
-                            this.fs.readArrayBuffer(p, (err, data) =>
-                            {
-                                //处理文件夹
-                                data && zip.file(p, data);
-                                callback();
-                            });
-                        }
-                    });
+                        });
+                    }
                 });
-                feng3d.task.parallel(fns)(() =>
+            });
+            feng3d.task.parallel(fns)(() =>
+            {
+                zip.generateAsync({ type: "blob" }).then(function (content)
                 {
-                    zip.generateAsync({ type: "blob" }).then(function (content)
-                    {
-                        callback(null, content);
-                    });
+                    saveAs(content, filename);
+                    callback && callback();
                 });
             });
         }
@@ -148,36 +196,29 @@ namespace editor
                 var filepaths = Object.keys(value.files);
                 filepaths.sort();
 
-                writeFiles();
-
-                function writeFiles()
+                var fns = filepaths.map(p => (callback) =>
                 {
-                    if (filepaths.length > 0)
+                    if (value.files[p].dir)
                     {
-                        var filepath = filepaths.shift();
-                        if (value.files[filepath].dir)
+                        this.fs.mkdir(p, (err) =>
                         {
-                            this.fs.mkdir(filepath, (err) =>
-                            {
-                                writeFiles();
-                            });
-                        } else
-                        {
-                            zip.file(filepath).async("arraybuffer").then((data) =>
-                            {
-                                this.fs.writeArrayBuffer(filepath, data, (err) =>
-                                {
-                                    writeFiles();
-                                });
-                            }, (reason) =>
-                                {
-                                });
-                        }
+                            callback();
+                        });
                     } else
                     {
-                        callback();
+                        zip.file(p).async("arraybuffer").then((data) =>
+                        {
+                            this.fs.writeArrayBuffer(p, data, (err) =>
+                            {
+                                callback();
+                            });
+                        }, (reason) =>
+                            {
+                            });
                     }
-                }
+                });
+
+                feng3d.task.series(fns)(callback);
             });
         }
     }
