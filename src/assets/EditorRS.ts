@@ -108,26 +108,32 @@ namespace editor
             var zip = new JSZip();
             this.fs.getAllPathsInFolder("", (err, filepaths) =>
             {
-                readfiles();
-                function readfiles()
+                var fns = filepaths.map(p => (callback) =>
                 {
-                    if (filepaths.length > 0)
+                    this.fs.isDirectory(p, (result) =>
                     {
-                        var filepath = filepaths.shift();
-                        this.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                        if (result)
                         {
-                            //处理文件夹
-                            data && zip.file(filepath, data);
-                            readfiles();
-                        });
-                    } else
+                            zip.folder(p);
+                            callback();
+                        } else
+                        {
+                            this.fs.readArrayBuffer(p, (err, data) =>
+                            {
+                                //处理文件夹
+                                data && zip.file(p, data);
+                                callback();
+                            });
+                        }
+                    });
+                });
+                feng3d.task.parallel(fns)(() =>
+                {
+                    zip.generateAsync({ type: "blob" }).then(function (content)
                     {
-                        zip.generateAsync({ type: "blob" }).then(function (content)
-                        {
-                            callback(null, content);
-                        });
-                    }
-                }
+                        callback(null, content);
+                    });
+                });
             });
         }
 

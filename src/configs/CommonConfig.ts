@@ -27,6 +27,13 @@ namespace editor
                             },
                         },
                         {
+                            label: "打开场景",
+                            click: () =>
+                            {
+                                editorData.gameScene = creatNewScene();
+                            },
+                        },
+                        {
                             label: "新建项目", click: () =>
                             {
                                 popupview.popupObject({ newprojectname: "newproject" }, {

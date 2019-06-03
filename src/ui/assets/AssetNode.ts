@@ -303,8 +303,6 @@ namespace editor
          */
         export()
         {
-            console.error("未实现");
-
             var zip = new JSZip();
 
             var path = this.asset.assetPath;
