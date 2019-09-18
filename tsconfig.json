@@ -18,7 +18,7 @@
     },
     "include": [
         "../feng3d/out",
-        "../feng3d/debug",
+        "../feng3d/debug"
     ],
     "files": [
         //
