@@ -101,11 +101,11 @@ feng3d.shaderConfig.shaders["NewShader"] = {
 type NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };
 interface MaterialFactory
 {
-    create(shader: "NewShader", raw?: gPartial<NewShaderMaterial>): NewShaderMaterial;
+    create(shader: "NewShader", raw?: feng3d.gPartial<NewShaderMaterial>): NewShaderMaterial;
 }
 
 interface MaterialRawMap
 {
-    NewShader: gPartial<NewShaderMaterial>;
+    NewShader: feng3d.gPartial<NewShaderMaterial>;
 }`;
 }
