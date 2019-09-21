@@ -52,9 +52,6 @@ namespace editor
 
             this._selectedObjects = v;
 
-            this._historySelectedObject.push(this._selectedObjects);
-            if (this._historySelectedObject.length > this._maxHistorySelectedObject) this._historySelectedObject.unshift();
-
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetFileInvalid = true;
             this._transformGameObjectInvalid = true;
@@ -63,16 +60,6 @@ namespace editor
             feng3d.dispatcher.dispatch("editor.selectedObjectsChanged");
         }
         private _selectedObjects = [];
-
-        /**
-         * 历史选中对象列表
-         */
-        private _historySelectedObject = [];
-
-        /**
-         * 最多存储历史选中对象数量
-         */
-        private _maxHistorySelectedObject = 10;
 
         clearSelectedObjects()
         {

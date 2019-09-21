@@ -24,16 +24,38 @@ namespace editor
 			this.moduleName = InspectorView.moduleName;
 		}
 
+        /**
+         * 历史选中对象列表
+         */
+		private _historySelectedObject = [];
+
+        /**
+         * 最多存储历史选中对象数量
+         */
+		private _maxHistorySelectedObject = 10;
+
+		get historySelectedObjectLength()
+		{
+			return this._historySelectedObject.length;
+		}
+
+        /**
+         * 
+         */
+		preSelectedObjects()
+		{
+			this._historySelectedObject.pop();
+			var v = this._historySelectedObject.pop();
+			editorData.selectedObjects = v;
+		}
+
 		private showData(data: any)
 		{
 			if (this._viewData == data) return;
 			if (this._viewData)
 			{
 				this.saveShowData();
-				this._viewDataList.push(this._viewData);
 			}
-			if (this._viewDataList.length > this.maxlog)
-				this._viewDataList.unshift();
 
 			//
 			this._viewData = data;
@@ -48,7 +70,7 @@ namespace editor
 		private updateView()
 		{
 			this.typeLab.text = ``;
-			this.backButton.visible = this._viewDataList.length > 0;
+			this.backButton.visible = this._historySelectedObject.length > 1;
 			if (this._view && this._view.parent)
 			{
 				this._view.parent.removeChild(this._view);
@@ -119,7 +141,6 @@ namespace editor
 		//
 		private _view: eui.Component;
 		private _viewData: any;
-		private _viewDataList = [];
 		private _dataChanged = false;
 
 		private onComplete(): void
@@ -135,7 +156,7 @@ namespace editor
 
 		private onAddedToStage()
 		{
-			this.backButton.visible = this._viewDataList.length > 0;
+			this.backButton.visible = this._historySelectedObject.length > 1;
 
 			this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
 			feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
@@ -158,6 +179,9 @@ namespace editor
 
 		private onSelectedObjectsChanged()
 		{
+			this._historySelectedObject.push(editorData.selectedObjects);
+			if (this._historySelectedObject.length > this._maxHistorySelectedObject) this._historySelectedObject.shift();
+
 			var data = inspectorMultiObject.convertInspectorObject(editorData.selectedObjects);
 			this.showData(data);
 		}
@@ -194,8 +218,7 @@ namespace editor
 
 		private onBackButton()
 		{
-			this._viewData = this._viewDataList.pop();
-			this.updateView();
+			this.preSelectedObjects();
 		}
 	}
 
