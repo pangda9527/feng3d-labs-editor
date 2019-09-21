@@ -14,8 +14,6 @@ namespace editor
 
 		moduleName: string;
 
-		maxlog = 10;
-
 		constructor()
 		{
 			super();
