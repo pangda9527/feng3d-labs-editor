@@ -89,6 +89,7 @@ namespace editor
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
             feng3d.dispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.dispatcher.on("asset.showAsset", this.onShowAsset, this);
         }
 
         $onRemoveFromStage()
@@ -101,12 +102,13 @@ namespace editor
             this.filelist.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onfilelistrightclick, this);
             this.filelist.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
 
-            MouseOnDisableScroll.register(this.filelist);
+            MouseOnDisableScroll.unRegister(this.filelist);
 
             feng3d.watcher.unwatch(editorAsset, "showFloder", this.updateShowFloder, this);
 
             this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.dispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.dispatcher.on("asset.showAsset", this.onShowAsset, this);
 
             //
             drag.unregister(this.filelistgroup);
@@ -229,6 +231,11 @@ namespace editor
                 }).join(",");
             else
                 this.filepathLabel.text = "";
+        }
+
+        private onShowAsset()
+        {
+            
         }
 
         private onfilelistclick(e: egret.MouseEvent)

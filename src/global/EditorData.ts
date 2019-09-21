@@ -35,8 +35,6 @@ namespace editor
          */
         gameScene: feng3d.Scene3D;
 
-        
-
         /**
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
@@ -45,16 +43,40 @@ namespace editor
         {
             return this._selectedObjects;
         }
-        private _selectedObjects: (feng3d.GameObject | AssetNode)[] = [];
 
-        clearSelectedObjects()
+        set selectedObjects(v)
         {
-            this._selectedObjects.length = 0;
+            if (!v) v = [];
+            if (v == this._selectedObjects) return;
+            if (v.length == this.selectedObjects.length && v.concat(this._selectedObjects).unique().length == v.length) return;
+
+            this._selectedObjects = v;
+
+            this._historySelectedObject.push(this._selectedObjects);
+            if (this._historySelectedObject.length > this._maxHistorySelectedObject) this._historySelectedObject.unshift();
+
             this._selectedGameObjectsInvalid = true;
             this._selectedAssetFileInvalid = true;
             this._transformGameObjectInvalid = true;
             this._transformBoxInvalid = true;
+
             feng3d.dispatcher.dispatch("editor.selectedObjectsChanged");
+        }
+        private _selectedObjects = [];
+
+        /**
+         * 历史选中对象列表
+         */
+        private _historySelectedObject = [];
+
+        /**
+         * 最多存储历史选中对象数量
+         */
+        private _maxHistorySelectedObject = 10;
+
+        clearSelectedObjects()
+        {
+            this.selectedObjects = [];
         }
 
         /**
@@ -62,20 +84,18 @@ namespace editor
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectObject(object: (feng3d.GameObject | AssetNode))
+        selectObject(object: any)
         {
+            var selecteds = this.selectedObjects.concat();
+
             var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
-            if (!isAdd) this._selectedObjects.length = 0;
+            if (!isAdd) selecteds.length = 0;
             //
-            var index = this._selectedObjects.indexOf(object);
-            if (index == -1) this._selectedObjects.push(object);
-            else this._selectedObjects.splice(index, 1);
+            var index = selecteds.indexOf(object);
+            if (index == -1) selecteds.push(object);
+            else selecteds.splice(index, 1);
             //
-            this._selectedGameObjectsInvalid = true;
-            this._selectedAssetFileInvalid = true;
-            this._transformGameObjectInvalid = true;
-            this._transformBoxInvalid = true;
-            feng3d.dispatcher.dispatch("editor.selectedObjectsChanged");
+            this.selectedObjects = selecteds;
         }
 
         /**
@@ -85,22 +105,20 @@ namespace editor
          */
         selectMultiObject(objs: (feng3d.GameObject | AssetNode)[])
         {
+            var selecteds = this.selectedObjects.concat();
+
             var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
-            if (!isAdd) this._selectedObjects.length = 0;
+            if (!isAdd) selecteds.length = 0;
+            //
             objs.forEach(v =>
             {
-                var index = this._selectedObjects.indexOf(v);
-                if (index == -1) this._selectedObjects.push(v);
-                else this._selectedObjects.splice(index, 1);
+                var index = selecteds.indexOf(v);
+                if (index == -1) selecteds.push(v);
+                else selecteds.splice(index, 1);
             });
-            this._selectedGameObjectsInvalid = true;
-            this._selectedAssetFileInvalid = true;
-            this._transformGameObjectInvalid = true;
-            this._transformBoxInvalid = true;
-            feng3d.dispatcher.dispatch("editor.selectedObjectsChanged");
+            //
+            this.selectedObjects = selecteds;
         }
-
-
 
         /**
          * 使用的控制工具类型
@@ -126,7 +144,7 @@ namespace editor
             if (this._selectedGameObjectsInvalid)
             {
                 this._selectedGameObjects.length = 0;
-                this._selectedObjects.forEach(v =>
+                this.selectedObjects.forEach(v =>
                 {
                     if (v instanceof feng3d.GameObject) this._selectedGameObjects.push(v);
                 });
@@ -227,7 +245,7 @@ namespace editor
             if (this._selectedAssetFileInvalid)
             {
                 this._selectedAssetNodes.length = 0;
-                this._selectedObjects.forEach(v =>
+                this.selectedObjects.forEach(v =>
                 {
                     if (v instanceof AssetNode) this._selectedAssetNodes.push(v);
                 });

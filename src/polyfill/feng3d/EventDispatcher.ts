@@ -18,6 +18,11 @@ namespace feng3d
         "asset.deletefile": { id: string };
 
         /**
+         * 显示指定资源
+         */
+        "asset.showAsset"
+
+        /**
          * 更新属性界面（检查器）
          */
         "inspector.update": undefined;
@@ -30,7 +35,7 @@ namespace feng3d
         /**
          * 旋转场景摄像机
          */
-        editorCameraRotate: Vector3
+        "editorCameraRotate": Vector3
 
         /**
          * 使用编辑器打开脚本
