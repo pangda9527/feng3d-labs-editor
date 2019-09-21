@@ -14,6 +14,8 @@ namespace editor
 
 		moduleName: string;
 
+		maxlog = 10;
+
 		constructor()
 		{
 			super();
@@ -22,7 +24,7 @@ namespace editor
 			this.moduleName = InspectorView.moduleName;
 		}
 
-		private showData(data: any, removeBack = false)
+		private showData(data: any)
 		{
 			if (this._viewData == data) return;
 			if (this._viewData)
@@ -30,18 +32,12 @@ namespace editor
 				this.saveShowData();
 				this._viewDataList.push(this._viewData);
 			}
-			if (removeBack)
-			{
-				this._viewDataList.length = 0;
-			}
+			if (this._viewDataList.length > this.maxlog)
+				this._viewDataList.unshift();
+
 			//
 			this._viewData = data;
 			this.updateView();
-		}
-
-		private onShowData(event: feng3d.Event<any>)
-		{
-			this.showData(event.data);
 		}
 
 		private onSaveShowData(event: feng3d.Event<() => void>)
@@ -145,7 +141,6 @@ namespace editor
 			feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
 			//
 			feng3d.dispatcher.on("inspector.update", this.updateView, this);
-			feng3d.dispatcher.on("inspector.showData", this.onShowData, this);
 			feng3d.dispatcher.on("inspector.saveShowData", this.onSaveShowData, this);
 
 			//
@@ -158,14 +153,13 @@ namespace editor
 			feng3d.dispatcher.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
 			//
 			feng3d.dispatcher.off("inspector.update", this.updateView, this);
-			feng3d.dispatcher.off("inspector.showData", this.onShowData, this);
 			feng3d.dispatcher.off("inspector.saveShowData", this.onSaveShowData, this);
 		}
 
 		private onSelectedObjectsChanged()
 		{
 			var data = inspectorMultiObject.convertInspectorObject(editorData.selectedObjects);
-			this.showData(data, true);
+			this.showData(data);
 		}
 
 		private updateShowData(showdata: Object)

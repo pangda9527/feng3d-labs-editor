@@ -35,6 +35,8 @@ namespace editor
          */
         gameScene: feng3d.Scene3D;
 
+        
+
         /**
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象

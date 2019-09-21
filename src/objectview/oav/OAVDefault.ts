@@ -93,7 +93,7 @@ namespace editor
 
 		private onDoubleClick()
 		{
-			feng3d.dispatcher.dispatch("inspector.showData", this.attributeValue);
+			editorData.selectObject(this.attributeValue);
 		}
 
 		private onTextChange()

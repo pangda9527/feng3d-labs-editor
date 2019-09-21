@@ -23,11 +23,6 @@ namespace feng3d
         "inspector.update": undefined;
 
         /**
-         * 属性界面（检查器）显示数据
-         */
-        "inspector.showData": any;
-
-        /**
          * 保存属性界面（检查器）数据
          */
         "inspector.saveShowData": () => void;

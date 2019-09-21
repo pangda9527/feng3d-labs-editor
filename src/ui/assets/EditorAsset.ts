@@ -323,24 +323,24 @@ namespace editor
                         assetNode.export();
                     }, show: !assetNode.isDirectory,
                 }, {
-                    label: "删除", click: () =>
+                label: "删除", click: () =>
+                {
+                    assetNode.delete();
+                }, show: assetNode != this.rootFile && assetNode != this.showFloder,
+            }, {
+                label: "去除背景色", click: () =>
+                {
+                    var image: HTMLImageElement = assetNode.asset["image"];
+                    var imageUtil = new feng3d.ImageUtil().fromImage(image);
+                    var backColor = new feng3d.Color4(222 / 255, 222 / 255, 222 / 255);
+                    imageUtil.clearBackColor(backColor);
+                    feng3d.dataTransform.imagedataToImage(imageUtil.imageData, (img) =>
                     {
-                        assetNode.delete();
-                    }, show: assetNode != this.rootFile && assetNode != this.showFloder,
-                }, {
-                    label: "去除背景色", click: () =>
-                    {
-                        var image: HTMLImageElement = assetNode.asset["image"];
-                        var imageUtil = new feng3d.ImageUtil().fromImage(image);
-                        var backColor = new feng3d.Color4(222 / 255, 222 / 255, 222 / 255);
-                        imageUtil.clearBackColor(backColor);
-                        feng3d.dataTransform.imagedataToImage(imageUtil.imageData, (img) =>
-                        {
-                            assetNode.asset["image"] = img;
-                            this.saveAsset(assetNode);
-                        });
-                    }, show: assetNode.asset.data instanceof feng3d.Texture2D,
-                },
+                        assetNode.asset["image"] = img;
+                        this.saveAsset(assetNode);
+                    });
+                }, show: assetNode.asset.data instanceof feng3d.Texture2D,
+            },
             );
             menu.popup(menuconfig);
         }
@@ -377,7 +377,7 @@ namespace editor
             var reader = new FileReader();
             reader.addEventListener('load', (event) =>
             {
-                var result: ArrayBuffer = event.target["result"];
+                var result: ArrayBuffer = <any>event.target["result"];
                 var showFloder = this.showFloder;
 
                 var createAssetCallback = (err: Error, assetNode: AssetNode) =>

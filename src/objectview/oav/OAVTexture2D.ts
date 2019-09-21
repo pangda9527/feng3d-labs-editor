@@ -64,7 +64,7 @@ namespace editor
         private onDoubleClick()
         {
             if (this.attributeValue && typeof this.attributeValue == "object")
-                feng3d.dispatcher.dispatch("inspector.showData", this.attributeValue);
+                editorData.selectObject(this.attributeValue);
         }
     }
 }
