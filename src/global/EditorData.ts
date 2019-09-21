@@ -46,6 +46,7 @@ namespace editor
 
         set selectedObjects(v)
         {
+            v = v.filter(v => !!v);
             if (!v) v = [];
             if (v == this._selectedObjects) return;
             if (v.length == this.selectedObjects.length && v.concat(this._selectedObjects).unique().length == v.length) return;

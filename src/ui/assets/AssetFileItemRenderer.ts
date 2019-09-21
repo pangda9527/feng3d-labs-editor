@@ -47,9 +47,9 @@ namespace editor
                     {
                         this.data.setdargSource(dragsource);
                     }, ["assetNodes"], (dragdata) =>
-                        {
-                            this.data.acceptDragDrop(dragdata);
-                        });
+                    {
+                        this.data.acceptDragDrop(dragdata);
+                    });
                 }
                 else
                 {
@@ -123,8 +123,18 @@ namespace editor
 
         private selectedfilechanged()
         {
-            var selectedAssetFile = editorData.selectedAssetNodes;
-            var selected = this.data ? selectedAssetFile.indexOf(this.data) != -1 : false;
+            var selected = false;
+            if (this.data)
+            {
+                var selectedAssetFile = editorData.selectedAssetNodes;
+                selected = selectedAssetFile.indexOf(this.data) != -1;
+                if (!selected)
+                {
+                    var assetids = editorData.selectedObjects.map(v => (<feng3d.AssetData>v).assetId);
+                    selected = assetids.indexOf(this.data.asset.assetId) != -1;
+                }
+            }
+
             if (this.itemSelected != selected)
             {
                 this.itemSelected = selected;

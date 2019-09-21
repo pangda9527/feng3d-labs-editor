@@ -12,15 +12,24 @@ namespace editor
         convertInspectorObject(objects: any[]): any
         {
             if (objects.length == 0) return 0;
+
+            objects = objects.map(element =>
+            {
+                if (element instanceof AssetNode)
+                {
+                    if (element.asset.data)
+                        element = element.asset.data;
+                    else
+                        element = element.asset;
+                }
+                return element;
+            });
+
             if (objects.length == 1) return objects[0];
 
             var data: { [type: string]: any[] } = {};
             objects.forEach(element =>
             {
-                if (element instanceof AssetNode)
-                {
-                    element = element.asset;
-                }
                 var type = feng3d.classUtils.getQualifiedClassName(element);
                 var list = data[type] = data[type] || [];
                 list.push(element);
