@@ -397,7 +397,9 @@ namespace editor
                 {
                     feng3d.dataTransform.arrayBufferToImage(result, (img) =>
                     {
-                        this.createAsset(showFloder, feng3d.TextureAsset, fileName, { image: img }, createAssetCallback);
+                        var texture2D = new feng3d.Texture2D();
+                        texture2D["_pixels"] = img;
+                        this.createAsset(showFloder, feng3d.TextureAsset, fileName, { data: texture2D }, createAssetCallback);
                     });
                 } else
                 {
