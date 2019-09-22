@@ -56,11 +56,11 @@ namespace editor
                     });
 
                 }, null, (e) =>
-                    {
-                        throw e;
-                        index++;
-                        loadUrls();
-                    });
+                {
+                    throw e;
+                    index++;
+                    loadUrls();
+                });
             }
             loadUrls();
         }
@@ -85,11 +85,11 @@ namespace editor
                     });
 
                 }, null, (e) =>
-                    {
-                        console.warn(e);
-                        index++;
-                        loadUrls();
-                    });
+                {
+                    console.warn(e);
+                    index++;
+                    loadUrls();
+                });
             }
             loadUrls();
         }
@@ -208,13 +208,13 @@ namespace editor
                     {
                         zip.file(p).async("arraybuffer").then((data) =>
                         {
-                            this.fs.writeArrayBuffer(p, data, (err) =>
+                            this.fs.writeFile(p, data, (err) =>
                             {
                                 callback();
                             });
                         }, (reason) =>
-                            {
-                            });
+                        {
+                        });
                     }
                 });
 
