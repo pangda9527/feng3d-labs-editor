@@ -12,15 +12,17 @@ namespace editor
 
         private init()
         {
-            //
-            editorAsset.runProjectScript(() =>
+            editorAsset.initproject(() =>
             {
-                editorAsset.readScene("default.scene.json", (err, scene) =>
+                editorAsset.runProjectScript(() =>
                 {
-                    if (err)
-                        editorData.gameScene = creatNewScene();
-                    else
-                        editorData.gameScene = scene;
+                    editorAsset.readScene("default.scene.json", (err, scene) =>
+                    {
+                        if (err)
+                            editorData.gameScene = creatNewScene();
+                        else
+                            editorData.gameScene = scene;
+                    });
                 });
             });
 
