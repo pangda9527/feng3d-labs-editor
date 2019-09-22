@@ -118,16 +118,13 @@ namespace editor
 
         private initlist()
         {
-            editorAsset.initproject(() =>
-            {
-                this.invalidateAssettree();
+            this.invalidateAssettree();
 
-                editorAsset.rootFile.on("openChanged", this.invalidateAssettree, this);
-                editorAsset.rootFile.on("added", this.invalidateAssettree, this);
-                editorAsset.rootFile.on("removed", this.invalidateAssettree, this);
+            editorAsset.rootFile.on("openChanged", this.invalidateAssettree, this);
+            editorAsset.rootFile.on("added", this.invalidateAssettree, this);
+            editorAsset.rootFile.on("removed", this.invalidateAssettree, this);
 
-                feng3d.watcher.watch(editorAsset, "showFloder", this.updateShowFloder, this);
-            });
+            feng3d.watcher.watch(editorAsset, "showFloder", this.updateShowFloder, this);
         }
 
         private update()
@@ -235,7 +232,7 @@ namespace editor
 
         private onShowAsset()
         {
-            
+
         }
 
         private onfilelistclick(e: egret.MouseEvent)
