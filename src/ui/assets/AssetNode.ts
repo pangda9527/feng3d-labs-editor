@@ -131,7 +131,7 @@ namespace editor
             {
                 var texture = this.asset.data;
 
-                this.image = texture.dataURL;
+                this.image = feng3dScreenShot.drawTexture(texture);
 
                 feng3d.dataTransform.dataURLToImage(this.image, (image) =>
                 {

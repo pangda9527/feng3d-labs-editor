@@ -107,6 +107,7 @@ namespace editor
                     endDir.normalize();
                     //计算夹角
                     var cosValue = startDir.dot(endDir);
+                    cosValue = Math.clamp(cosValue, -1, 1);
                     var angle = Math.acos(cosValue) * Math.RAD2DEG;
                     //计算是否顺时针
                     var sign = this.movePlane3D.getNormal().cross(startDir).dot(endDir);
