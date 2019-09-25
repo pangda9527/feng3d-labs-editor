@@ -143,6 +143,12 @@ namespace editor
                                         openDownloadProject("light.feng3d.zip");
                                     },
                                 },
+                                {
+                                    label: "声音", click: () =>
+                                    {
+                                        openDownloadProject("audio.feng3d.zip");
+                                    },
+                                },
                             ],
                         },
                         {
