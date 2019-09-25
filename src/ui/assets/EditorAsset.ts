@@ -401,6 +401,9 @@ namespace editor
                         texture2D["_pixels"] = img;
                         this.createAsset(showFloder, feng3d.TextureAsset, fileName, { data: texture2D }, createAssetCallback);
                     });
+                } else if (feng3d.regExps.audio.test(file.name))
+                {
+                    this.createAsset(showFloder, feng3d.AudioAsset, fileName, { arraybuffer: result }, createAssetCallback);
                 } else
                 {
                     this.createAsset(showFloder, feng3d.ArrayBufferAsset, fileName, { arraybuffer: result }, createAssetCallback);
