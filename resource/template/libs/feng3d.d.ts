@@ -1621,6 +1621,43 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    /**
+     * 对象池
+     *
+     * 对象池并不能带来性能的提升，反而会严重影响性能。但是在管理内存时可以考虑使用。
+     *
+     * js虚拟机会在对象没有被引用时自动释放内存，谨慎使用对象池。
+     *
+     */
+    class Pool<T> {
+        private _objects;
+        private _type;
+        constructor(type: Constructor<T>);
+        /**
+         * 获取对象
+         */
+        get(): T;
+        /**
+         * 释放对象
+         *
+         * @param args 被释放对象列表
+         */
+        release(...args: T[]): void;
+        /**
+         * 获取指定数量的对象
+         *
+         * @param num 数量
+         */
+        getArray(num: number): T[];
+        /**
+         * 释放对象
+         *
+         * @param objects 被释放对象列表
+         */
+        releaseArray(objects: T[]): void;
+    }
+}
+declare namespace feng3d {
     type CompareFunction<T> = (a: T, b: T) => number;
     /**
      * 比较器
@@ -3887,7 +3924,6 @@ declare namespace feng3d {
 declare namespace feng3d {
     /**
      * Vector3 类使用笛卡尔坐标 x、y 和 z 表示三维空间中的点或位置
-
      */
     class Vector3 {
         __class__: "feng3d.Vector3";
@@ -3955,6 +3991,10 @@ declare namespace feng3d {
          */
         init(x: number, y: number, z: number): this;
         /**
+         * 把所有分量都设为零
+         */
+        setZero(): void;
+        /**
          * 从Vector2初始化
          */
         fromVector2(vector: Vector2, z?: number): this;
@@ -4016,6 +4056,24 @@ declare namespace feng3d {
          * 如果当前 Vector3 对象和作为参数指定的 Vector3 对象均为单位顶点，此方法将返回这两个顶点之间所成角的余弦值。
          */
         dot(a: Vector3): number;
+        /**
+         * 是否为零向量
+         */
+        isZero(): boolean;
+        tangents(t1: Vector3, t2: Vector3): void;
+        /**
+         * 检查一个向量是否接近零
+         *
+         * @param precision
+         */
+        almostZero(precision?: number): boolean;
+        /**
+         * 检查这个向量是否与另一个向量反平行。
+         *
+         * @param  v
+         * @param  precision 设置为零以进行精确比较
+         */
+        isAntiparallelTo(v: Vector3, precision?: number): boolean;
         /**
          * 加上标量
          * @param n 标量
@@ -4096,6 +4154,10 @@ declare namespace feng3d {
          * 通过将最前面的三个元素（x、y、z）除以矢量的长度可将 Vector3 对象转换为单位矢量。
          */
         normalize(thickness?: number): this;
+        /**
+         * 得到这个向量长度为1
+         */
+        unit(target?: Vector3): Vector3;
         /**
          * 按标量（大小）缩放当前的 Vector3 对象。
          */
@@ -4242,6 +4304,11 @@ declare namespace feng3d {
          * @param v 向量
          */
         isParallel(v: Vector3, precision?: number): boolean;
+        /**
+         * 从向量中得到叉乘矩阵a_cross，使得a x b = a_cross * b = c
+         * @see http://www8.cs.umu.se/kurser/TDBD24/VT06/lectures/Lecture6.pdf
+         */
+        crossmat(): CANNON.Mat3;
         /**
          * 返回当前 Vector3 对象的字符串表示形式。
          */
@@ -5309,56 +5376,110 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * A Quaternion object which can be used to represent rotations.
+     * 可用于表示旋转的四元数对象
      */
     class Quaternion {
         static fromArray(array: ArrayLike<number>, offset?: number): Quaternion;
         /**
-         * The x value of the quaternion.
+         * 虚基向量i的乘子
          */
         x: number;
         /**
-         * The y value of the quaternion.
+         * 虚基向量j的乘子
          */
         y: number;
         /**
-         * The z value of the quaternion.
+         * 虚基向量k的乘子
          */
         z: number;
         /**
-         * The w value of the quaternion.
+         * 实部的乘数
          */
         w: number;
         /**
-         * Creates a new Quaternion object.
-         * @param x The x value of the quaternion.
-         * @param y The y value of the quaternion.
-         * @param z The z value of the quaternion.
-         * @param w The w value of the quaternion.
+         * 四元数描述三维空间中的旋转。四元数的数学定义为Q = x*i + y*j + z*k + w，其中(i,j,k)为虚基向量。(x,y,z)可以看作是一个与旋转轴相关的向量，而实际的乘法器w与旋转量相关。
+         *
+         * @param x 虚基向量i的乘子
+         * @param y 虚基向量j的乘子
+         * @param z 虚基向量k的乘子
+         * @param w 实部的乘数
          */
         constructor(x?: number, y?: number, z?: number, w?: number);
         /**
-         * Returns the magnitude of the quaternion object.
+         * 返回四元数对象的大小
          */
         readonly magnitude: number;
-        setTo(x?: number, y?: number, z?: number, w?: number): void;
+        /**
+         * 设置四元数的值。
+         *
+         * @param x 虚基向量i的乘子
+         * @param y 虚基向量j的乘子
+         * @param z 虚基向量k的乘子
+         * @param w 实部的乘数
+         */
+        set(x?: number, y?: number, z?: number, w?: number): this;
         fromArray(array: ArrayLike<number>, offset?: number): this;
+        /**
+         * 转换为数组
+         *
+         * @param array
+         * @param offset
+         */
         toArray(array?: number[], offset?: number): number[];
         /**
-         * Fills the quaternion object with the result from a multiplication of two quaternion objects.
+         * 四元数乘法
          *
-         * @param    qa    The first quaternion in the multiplication.
-         * @param    qb    The second quaternion in the multiplication.
+         * @param q
+         * @param this
          */
-        multiply(qa: Quaternion, qb: Quaternion): void;
+        mult(q: Quaternion): this;
+        /**
+         * 四元数乘法
+         *
+         * @param q
+         * @param target
+         */
+        multTo(q: Quaternion, target?: Quaternion): Quaternion;
+        /**
+         * 得到反四元数旋转
+         */
+        inverse(): this;
+        /**
+         * 得到反四元数旋转
+         */
+        inverseTo(target?: Quaternion): Quaternion;
+        /**
+         * 得到四元数共轭
+         */
+        conjugate(): this;
+        /**
+         * 得到四元数共轭
+         *
+         * @param target
+         */
+        conjugateTo(target?: Quaternion): Quaternion;
         multiplyVector(vector: Vector3, target?: Quaternion): Quaternion;
         /**
-         * Fills the quaternion object with values representing the given rotation around a vector.
+         * 用表示给定绕向量旋转的值填充四元数对象。
          *
-         * @param    axis    The axis around which to rotate
-         * @param    angle    The angle in radians of the rotation.
+         * @param axis 要绕其旋转的轴
+         * @param angle 以弧度为单位的旋转角度。
          */
-        fromAxisAngle(axis: Vector3, angle: number): void;
+        fromAxisAngle(axis: Vector3, angle: number): this;
+        /**
+         * 将四元数转换为轴/角表示形式
+         *
+         * @param targetAxis 要重用的向量对象，用于存储轴
+         * @return 一个数组，第一个元素是轴，第二个元素是弧度
+         */
+        toAxisAngle(targetAxis?: Vector3): (number | Vector3)[];
+        /**
+         * 给定两个向量，设置四元数值。得到的旋转将是将u旋转到v所需要的旋转。
+         *
+         * @param u
+         * @param v
+         */
+        setFromVectors(u: Vector3, v: Vector3): this;
         /**
          * Spherically interpolates between two quaternions, providing an interpolation between rotations with constant angle change rate.
          * @param qa The first quaternion to interpolate.
@@ -5390,11 +5511,16 @@ declare namespace feng3d {
         /**
          * Normalises the quaternion object.
          */
-        normalize(val?: number): void;
+        normalize(val?: number): this;
         /**
-         * Used to trace the values of a quaternion.
+         * 四元数归一化的近似。当quat已经几乎标准化时，效果最好。
          *
-         * @return A string representation of the quaternion object.
+         * @see http://jsperf.com/fast-quaternion-normalization
+         * @author unphased, https://github.com/unphased
+         */
+        normalizeFast(): this;
+        /**
+         * 转换为可读格式
          */
         toString(): string;
         /**
@@ -5427,10 +5553,18 @@ declare namespace feng3d {
          */
         rotatePoint(vector: Vector3, target?: Vector3): Vector3;
         /**
-         * Copies the data from a quaternion into this instance.
-         * @param q The quaternion to copy from.
+          * 将四元数乘以一个向量
+          *
+          * @param v
+          * @param target
+          */
+        vmult(v: Vector3, target?: Vector3): Vector3;
+        /**
+         * 将源的值复制到此四元数
+         *
+         * @param q 要复制的四元数
          */
-        copyFrom(q: Quaternion): void;
+        copy(q: Quaternion): this;
     }
 }
 declare namespace feng3d {
@@ -12766,6 +12900,8 @@ declare namespace feng3d {
     class BodyComponent extends Behaviour {
         __class__: "feng3d.BodyComponent";
         body: CANNON.Body;
+        runEnvironment: RunEnvironment;
+        mass: number;
         init(gameobject: GameObject): void;
         /**
          * 每帧执行
@@ -12939,7 +13075,7 @@ declare namespace feng3d {
         /**
          * 重力加速度
          */
-        gravity: CANNON.Vec3;
+        gravity: Vector3;
         /**
          * 指定所运行环境
          *
@@ -17075,182 +17211,6 @@ declare namespace feng3d {
     }
 }
 declare namespace CANNON {
-    class Vec3 {
-        x: number;
-        y: number;
-        z: number;
-        /**
-         * 3-dimensional vector
-         *
-         * @param x
-         * @param y
-         * @param z
-         *
-         * @author schteppe
-         * @example
-         *     var v = new Vec3(1, 2, 3);
-         *     console.log('x=' + v.x); // x=1
-         */
-        constructor(x?: number, y?: number, z?: number);
-        static ZERO: Vec3;
-        static UNIT_X: Vec3;
-        static UNIT_Y: Vec3;
-        static UNIT_Z: Vec3;
-        /**
-         * Vector cross product
-         *
-         * @param v
-         * @param target Target to save in.
-         */
-        cross(v: Vec3, target?: Vec3): Vec3;
-        /**
-         * Set the vectors' 3 elements
-         * @param x
-         * @param y
-         * @param z
-         */
-        set(x: number, y: number, z: number): this;
-        /**
-         * Set all components of the vector to zero.
-         */
-        setZero(): void;
-        /**
-         * Vector addition
-         * @param v
-         * @param target
-         */
-        vadd(v: Vec3, target?: Vec3): Vec3;
-        /**
-         * Vector subtraction
-         * @param v
-         * @param target Target to save in.
-         */
-        vsub(v: Vec3, target?: Vec3): Vec3;
-        /**
-         * Get the cross product matrix a_cross from a vector, such that a x b = a_cross * b = c
-         * @see http://www8.cs.umu.se/kurser/TDBD24/VT06/lectures/Lecture6.pdf
-         */
-        crossmat(): Mat3;
-        /**
-         * Normalize the vector. Note that this changes the values in the vector.
-         * @returns Returns the norm of the vector
-         */
-        normalize(): number;
-        /**
-         * Get the version of this vector that is of length 1.
-         * @param target target to save in
-         */
-        unit(target?: Vec3): Vec3;
-        /**
-         * Get the length of the vector
-         * @deprecated Use .length() instead
-         */
-        norm(): number;
-        /**
-         * Get the length of the vector
-         */
-        length(): number;
-        /**
-         * Get the squared length of the vector
-         * @deprecated Use .lengthSquared() instead.
-         */
-        norm2(): number;
-        /**
-         * Get the squared length of the vector
-         */
-        lengthSquared(): number;
-        /**
-         * Get distance from this point to another point
-         * @param p
-         */
-        distanceTo(p: Vec3): number;
-        /**
-         * Get squared distance from this point to another point
-         * @param p
-         */
-        distanceSquared(p: Vec3): number;
-        /**
-         * Multiply all the components of the vector with a scalar.
-         * @param scalar
-         * @param  target The vector to save the result in.
-         * @deprecated Use .scale() instead
-         */
-        mult(scalar: number, target?: Vec3): Vec3;
-        /**
-         * Multiply all the components of the vector with a scalar.
-         * @param scalar
-         * @param  target The vector to save the result in.
-         */
-        scale(scalar: number, target?: Vec3): Vec3;
-        /**
-         * Multiply the vector with an other vector, component-wise.
-         * @param  vector
-         * @param  target The vector to save the result in.
-         */
-        vmul(vector: Vec3, target?: Vec3): Vec3;
-        /**
-         * Scale a vector and add it to this vector. Save the result in "target". (target = this + vector * scalar)
-         * @param scalar
-         * @param vector
-         * @param  target The vector to save the result in.
-         */
-        addScaledVector(scalar: number, vector: Vec3, target?: Vec3): Vec3;
-        /**
-         * Calculate dot product
-         * @param {Vec3} v
-         */
-        dot(v: Vec3): number;
-        isZero(): boolean;
-        /**
-         * Make the vector point in the opposite direction.
-         * @param target Optional target to save in
-         */
-        negate(target: Vec3): Vec3;
-        tangents(t1: Vec3, t2: Vec3): void;
-        /**
-         * Converts to a more readable format
-         */
-        toString(): string;
-        /**
-         * Converts to an array
-         */
-        toArray(): number[];
-        /**
-         * Copies value of source to this vector.
-         * @param source
-         */
-        copy(source: Vec3): this;
-        /**
-         * Do a linear interpolation between two vectors
-         *
-         * @param v
-         * @param t A number between 0 and 1. 0 will make this function return u, and 1 will make it return v. Numbers in between will generate a vector in between them.
-         */
-        lerp(v: Vec3, t: number, target: Vec3): void;
-        /**
-         * Check if a vector equals is almost equal to another one.
-         * @param v
-         * @param  precision
-         */
-        almostEquals(v: Vec3, precision?: number): boolean;
-        /**
-         * Check if a vector is almost zero
-         * @param precision
-         */
-        almostZero(precision?: number): boolean;
-        /**
-         * Check if the vector is anti-parallel to another vector.
-         * @param  v
-         * @param  precision Set to zero for exact comparisons
-         */
-        isAntiparallelTo(v: Vec3, precision?: number): boolean;
-        /**
-         * Clone the vector
-         */
-        clone(): Vec3;
-    }
-}
-declare namespace CANNON {
     class Mat3 {
         /**
          * A vector of length 9, containing all matrix elements
@@ -17278,17 +17238,17 @@ declare namespace CANNON {
          * Sets the matrix diagonal elements from a Vec3
          * @param vec3
          */
-        setTrace(vec3: Vec3): void;
+        setTrace(vec3: feng3d.Vector3): void;
         /**
          * Gets the matrix diagonal elements
          */
-        getTrace(target?: Vec3): void;
+        getTrace(target?: feng3d.Vector3): void;
         /**
          * Matrix-Vector multiplication
          * @param v The vector to multiply with
          * @param target Optional, target to save the result in.
          */
-        vmult(v: Vec3, target?: Vec3): Vec3;
+        vmult(v: feng3d.Vector3, target?: feng3d.Vector3): feng3d.Vector3;
         /**
          * Matrix-scalar multiplication
          * @param s
@@ -17303,14 +17263,14 @@ declare namespace CANNON {
          * Scale each column of the matrix
          * @param v
          */
-        scale(v: Vec3, target?: Mat3): Mat3;
+        scale(v: feng3d.Vector3, target?: Mat3): Mat3;
         /**
          * Solve Ax=b
          * @param b The right hand side
          * @param target Optional. Target vector to save in.
          * @todo should reuse arrays
          */
-        solve(b: Vec3, target?: Vec3): Vec3;
+        solve(b: feng3d.Vector3, target?: feng3d.Vector3): feng3d.Vector3;
         /**
          * Get an element in the matrix by index. Index starts at 0, not 1!!!
          * @param row
@@ -17394,35 +17354,35 @@ declare namespace CANNON {
          * @param axis
          * @param angle in radians
          */
-        setFromAxisAngle(axis: Vec3, angle: number): this;
+        fromAxisAngle(axis: feng3d.Vector3, angle: number): this;
         /**
          * Converts the quaternion to axis/angle representation.
          * @param targetAxis A vector object to reuse for storing the axis.
          * @return An array, first elemnt is the axis and the second is the angle in radians.
          */
-        toAxisAngle(targetAxis?: Vec3): (number | Vec3)[];
+        toAxisAngle(targetAxis?: feng3d.Vector3): (number | feng3d.Vector3)[];
         /**
          * Set the quaternion value given two vectors. The resulting rotation will be the needed rotation to rotate u to v.
          * @param u
          * @param v
          */
-        setFromVectors(u: Vec3, v: Vec3): this;
+        setFromVectors(u: feng3d.Vector3, v: feng3d.Vector3): this;
         /**
          * Quaternion multiplication
          * @param q
          * @param target
          */
-        mult(q: Quaternion, target?: Quaternion): Quaternion;
+        multTo(q: Quaternion, target?: Quaternion): Quaternion;
         /**
          * Get the inverse quaternion rotation.
          * @param target
          */
-        inverse(target: Quaternion): Quaternion;
+        inverseTo(target: Quaternion): Quaternion;
         /**
          * Get the quaternion conjugate
          * @param target
          */
-        conjugate(target?: Quaternion): Quaternion;
+        conjugateTo(target?: Quaternion): Quaternion;
         /**
          * Normalize the quaternion. Note that this changes the values of the quaternion.
          */
@@ -17438,7 +17398,7 @@ declare namespace CANNON {
          * @param v
          * @param target Optional
          */
-        vmult(v: Vec3, target?: Vec3): Vec3;
+        vmult(v: feng3d.Vector3, target?: feng3d.Vector3): feng3d.Vector3;
         /**
          * Copies value of source to this quaternion.
          * @param source
@@ -17449,7 +17409,7 @@ declare namespace CANNON {
          * @param target
          * @param order Three-character string e.g. "YZX", which also is default.
          */
-        toEuler(target: Vec3, order: string): void;
+        toEuler(target: feng3d.Vector3, order: string): void;
         /**
          * See http://www.mathworks.com/matlabcentral/fileexchange/20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/content/SpinCalc.m
          * @param x
@@ -17476,12 +17436,12 @@ declare namespace CANNON {
          * @param  target
          * @return The "target" object
          */
-        integrate(angularVelocity: Vec3, dt: number, angularFactor: Vec3, target: Quaternion): Quaternion;
+        integrate(angularVelocity: feng3d.Vector3, dt: number, angularFactor: feng3d.Vector3, target: Quaternion): Quaternion;
     }
 }
 declare namespace CANNON {
     class Transform {
-        position: Vec3;
+        position: feng3d.Vector3;
         quaternion: Quaternion;
         constructor(options?: any);
         /**
@@ -17490,37 +17450,37 @@ declare namespace CANNON {
          * @param worldPoint
          * @param result
          */
-        static pointToLocalFrame(position: Vec3, quaternion: Quaternion, worldPoint: Vec3, result?: Vec3): Vec3;
+        static pointToLocalFrame(position: feng3d.Vector3, quaternion: Quaternion, worldPoint: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
         /**
          * Get a global point in local transform coordinates.
          * @param worldPoint
          * @param result
          * @returnThe "result" vector object
          */
-        pointToLocal(worldPoint: Vec3, result: Vec3): Vec3;
+        pointToLocal(worldPoint: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
         /**
          * @param position
          * @param quaternion
          * @param localPoint
          * @param result
          */
-        static pointToWorldFrame(position: Vec3, quaternion: Quaternion, localPoint: Vec3, result?: Vec3): Vec3;
+        static pointToWorldFrame(position: feng3d.Vector3, quaternion: Quaternion, localPoint: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
         /**
          * Get a local point in global transform coordinates.
          * @param point
          * @param result
          * @return The "result" vector object
          */
-        pointToWorld(localPoint: Vec3, result: Vec3): Vec3;
-        vectorToWorldFrame(localVector: Vec3, result?: Vec3): Vec3;
-        static vectorToWorldFrame(quaternion: Quaternion, localVector: Vec3, result: Vec3): Vec3;
-        static vectorToLocalFrame(position: Vec3, quaternion: Quaternion, worldVector: Vec3, result?: Vec3): Vec3;
+        pointToWorld(localPoint: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
+        vectorToWorldFrame(localVector: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
+        static vectorToWorldFrame(quaternion: Quaternion, localVector: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
+        static vectorToLocalFrame(position: feng3d.Vector3, quaternion: Quaternion, worldVector: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
     }
 }
 declare namespace CANNON {
     class JacobianElement {
-        spatial: Vec3;
-        rotational: Vec3;
+        spatial: feng3d.Vector3;
+        rotational: feng3d.Vector3;
         /**
          * An element containing 6 entries, 3 spatial and 3 rotational degrees of freedom.
          */
@@ -17535,7 +17495,7 @@ declare namespace CANNON {
          * @param spatial
          * @param rotational
          */
-        multiplyVectors(spatial: Vec3, rotational: Vec3): number;
+        multiplyVectors(spatial: feng3d.Vector3, rotational: feng3d.Vector3): number;
     }
 }
 declare namespace CANNON {
@@ -17581,39 +17541,6 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
-    /**
-     * For pooling objects that can be reused.
-     */
-    class Pool {
-        /**
-         * The pooled objects
-         */
-        objects: any[];
-        /**
-         * Constructor of the objects
-         */
-        type: Object;
-        constructor();
-        /**
-         * Release an object after use
-         */
-        release(...args: any[]): this;
-        /**
-         * Get an object
-         */
-        get(): any;
-        /**
-         * Construct an object. Should be implmented in each subclass.
-         */
-        constructObject(): void;
-        /**
-         * @param size
-         * @return Self, for chaining
-         */
-        resize(size: number): this;
-    }
-}
-declare namespace CANNON {
     class Utils {
         /**
          * Extend an options object with default values.
@@ -17622,15 +17549,6 @@ declare namespace CANNON {
          * @return The modified options object.
          */
         static defaults(options: Object, defaults: Object): Object;
-    }
-}
-declare namespace CANNON {
-    class Vec3Pool extends Pool {
-        constructor();
-        /**
-         * Construct a vector
-         */
-        constructObject(): Vec3;
     }
 }
 declare namespace CANNON {
@@ -17715,11 +17633,11 @@ declare namespace CANNON {
         /**
          * Pivot, defined locally in bodyA.
          */
-        pivotA: Vec3;
+        pivotA: feng3d.Vector3;
         /**
          * Pivot, defined locally in bodyB.
          */
-        pivotB: Vec3;
+        pivotB: feng3d.Vector3;
         equationX: ContactEquation;
         equationY: ContactEquation;
         equationZ: ContactEquation;
@@ -17746,14 +17664,14 @@ declare namespace CANNON {
          *     var constraint = new PointToPointConstraint(bodyA, localPivotA, bodyB, localPivotB);
          *     world.addConstraint(constraint);
          */
-        constructor(bodyA: Body, pivotA: Vec3, bodyB: Body, pivotB: Vec3, maxForce?: number);
+        constructor(bodyA: Body, pivotA: feng3d.Vector3, bodyB: Body, pivotB: feng3d.Vector3, maxForce?: number);
         update(): void;
     }
 }
 declare namespace CANNON {
     class ConeTwistConstraint extends PointToPointConstraint {
-        axisA: Vec3;
-        axisB: Vec3;
+        axisA: feng3d.Vector3;
+        axisB: feng3d.Vector3;
         angle: number;
         coneEquation: ConeEquation;
         twistEquation: RotationalEquation;
@@ -17768,11 +17686,11 @@ declare namespace CANNON {
          * @author schteppe
          */
         constructor(bodyA: Body, bodyB: Body, options?: {
-            pivotA?: Vec3;
-            pivotB?: Vec3;
+            pivotA?: feng3d.Vector3;
+            pivotB?: feng3d.Vector3;
             maxForce?: number;
-            axisA?: Vec3;
-            axisB?: Vec3;
+            axisA?: feng3d.Vector3;
+            axisB?: feng3d.Vector3;
             collideConnected?: boolean;
             angle?: number;
             twistAngle?: number;
@@ -17785,11 +17703,11 @@ declare namespace CANNON {
         /**
          * Rotation axis, defined locally in bodyA.
          */
-        axisA: Vec3;
+        axisA: feng3d.Vector3;
         /**
          * Rotation axis, defined locally in bodyB.
          */
-        axisB: Vec3;
+        axisB: feng3d.Vector3;
         rotationalEquation1: RotationalEquation;
         rotationalEquation2: RotationalEquation;
         motorEquation: RotationalMotorEquation;
@@ -17807,11 +17725,11 @@ declare namespace CANNON {
          * @author schteppe
          */
         constructor(bodyA: Body, bodyB: Body, options?: {
-            pivotA?: Vec3;
-            pivotB?: Vec3;
+            pivotA?: feng3d.Vector3;
+            pivotB?: feng3d.Vector3;
             maxForce?: number;
-            axisA?: Vec3;
-            axisB?: Vec3;
+            axisA?: feng3d.Vector3;
+            axisB?: feng3d.Vector3;
             collideConnected?: boolean;
         });
         enableMotor(): void;
@@ -17823,11 +17741,11 @@ declare namespace CANNON {
 }
 declare namespace CANNON {
     class LockConstraint extends PointToPointConstraint {
-        xA: Vec3;
+        xA: feng3d.Vector3;
         xB: any;
-        yA: Vec3;
+        yA: feng3d.Vector3;
         yB: any;
-        zA: Vec3;
+        zA: feng3d.Vector3;
         zB: any;
         rotationalEquation1: RotationalEquation;
         rotationalEquation2: RotationalEquation;
@@ -17872,8 +17790,8 @@ declare namespace CANNON {
         body: Body;
         faces: number[][];
         indices: number[];
-        vertices: Vec3[] | number[];
-        faceNormals: Vec3[];
+        vertices: feng3d.Vector3[] | number[];
+        faceNormals: feng3d.Vector3[];
         convexPolyhedronRepresentation: Shape;
         radius: number;
         /**
@@ -17903,8 +17821,8 @@ declare namespace CANNON {
          * @param target
          * @see http://en.wikipedia.org/wiki/List_of_moments_of_inertia
          */
-        calculateLocalInertia(mass: number, target: Vec3): void;
-        calculateWorldAABB(pos: Vec3, quat: Quaternion, min: Vec3, max: Vec3): void;
+        calculateLocalInertia(mass: number, target: feng3d.Vector3): void;
+        calculateWorldAABB(pos: feng3d.Vector3, quat: Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
         static idCounter: number;
         /**
          * The available shape types.
@@ -17924,8 +17842,8 @@ declare namespace CANNON {
 }
 declare namespace CANNON {
     class ConvexPolyhedron extends Shape {
-        vertices: Vec3[];
-        worldVertices: Vec3[];
+        vertices: feng3d.Vector3[];
+        worldVertices: feng3d.Vector3[];
         worldVerticesNeedsUpdate: boolean;
         /**
          * Array of integer arrays, indicating which vertices each face consists of
@@ -17933,10 +17851,10 @@ declare namespace CANNON {
         faces: ({
             connectedFaces: number[];
         } & (number[]))[];
-        faceNormals: Vec3[];
+        faceNormals: feng3d.Vector3[];
         worldFaceNormalsNeedsUpdate: boolean;
-        worldFaceNormals: Vec3[];
-        uniqueEdges: Vec3[];
+        worldFaceNormals: feng3d.Vector3[];
+        uniqueEdges: feng3d.Vector3[];
         /**
          * If given, these locally defined, normalized axes are the only ones being checked when doing separating axis check.
          */
@@ -17960,7 +17878,7 @@ declare namespace CANNON {
          * @todo Move the clipping functions to ContactGenerator?
          * @todo Automatically merge coplanar polygons in constructor.
          */
-        constructor(points?: Vec3[], faces?: number[][], uniqueAxes?: any[]);
+        constructor(points?: feng3d.Vector3[], faces?: number[][], uniqueAxes?: any[]);
         /**
          * Computes uniqueEdges
          */
@@ -17977,14 +17895,14 @@ declare namespace CANNON {
          * @param vc
          * @param target
          */
-        static computeNormal(va: Vec3, vb: Vec3, vc: Vec3, target: Vec3): void;
+        static computeNormal(va: feng3d.Vector3, vb: feng3d.Vector3, vc: feng3d.Vector3, target: feng3d.Vector3): void;
         /**
          * Compute the normal of a face from its vertices
          *
          * @param i
          * @param target
          */
-        getFaceNormal(i: number, target: Vec3): void;
+        getFaceNormal(i: number, target: feng3d.Vector3): void;
         /**
          * @param posA
          * @param quatA
@@ -17997,7 +17915,7 @@ declare namespace CANNON {
          * @param result The an array of contact point objects, see clipFaceAgainstHull
          * @see http://bullet.googlecode.com/svn/trunk/src/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp
          */
-        clipAgainstHull(posA: Vec3, quatA: Quaternion, hullB: ConvexPolyhedron, posB: Vec3, quatB: Quaternion, separatingNormal: Vec3, minDist: number, maxDist: number, result: number[]): void;
+        clipAgainstHull(posA: feng3d.Vector3, quatA: Quaternion, hullB: ConvexPolyhedron, posB: feng3d.Vector3, quatB: Quaternion, separatingNormal: feng3d.Vector3, minDist: number, maxDist: number, result: number[]): void;
         /**
          * Find the separating axis between this hull and another
          *
@@ -18011,7 +17929,7 @@ declare namespace CANNON {
          * @param faceListB
          * @returns Returns false if a separation is found, else true
          */
-        findSeparatingAxis(hullB: ConvexPolyhedron, posA: Vec3, quatA: Quaternion, posB: Vec3, quatB: Quaternion, target: Vec3, faceListA: number[], faceListB: number[]): boolean;
+        findSeparatingAxis(hullB: ConvexPolyhedron, posA: feng3d.Vector3, quatA: Quaternion, posB: feng3d.Vector3, quatB: Quaternion, target: feng3d.Vector3, faceListA: number[], faceListB: number[]): boolean;
         /**
          * Test separating axis against two hulls. Both hulls are projected onto the axis and the overlap size is returned if there is one.
          *
@@ -18023,13 +17941,13 @@ declare namespace CANNON {
          * @param quatB
          * @return The overlap depth, or FALSE if no penetration.
          */
-        testSepAxis(axis: Vec3, hullB: ConvexPolyhedron, posA: Vec3, quatA: Quaternion, posB: Vec3, quatB: Quaternion): number | false;
+        testSepAxis(axis: feng3d.Vector3, hullB: ConvexPolyhedron, posA: feng3d.Vector3, quatA: Quaternion, posB: feng3d.Vector3, quatB: Quaternion): number | false;
         /**
          *
          * @param mass
          * @param target
          */
-        calculateLocalInertia(mass: number, target: Vec3): void;
+        calculateLocalInertia(mass: number, target: feng3d.Vector3): void;
         /**
          *
          * @param face_i Index of the face
@@ -18046,7 +17964,7 @@ declare namespace CANNON {
          * @param maxDist
          * @param result Array to store resulting contact points in. Will be objects with properties: point, depth, normal. These are represented in world coordinates.
          */
-        clipFaceAgainstHull(separatingNormal: Vec3, posA: Vec3, quatA: Quaternion, worldVertsB1: Vec3[], minDist: number, maxDist: number, result: any[]): void;
+        clipFaceAgainstHull(separatingNormal: feng3d.Vector3, posA: feng3d.Vector3, quatA: Quaternion, worldVertsB1: feng3d.Vector3[], minDist: number, maxDist: number, result: any[]): void;
         /**
          * Clip a face in a hull against the back of a plane.
          *
@@ -18055,8 +17973,8 @@ declare namespace CANNON {
          * @param planeNormal
          * @param planeConstant The constant in the mathematical plane equation
          */
-        clipFaceAgainstPlane(inVertices: Vec3[], outVertices: Vec3[], planeNormal: Vec3, planeConstant: number): Vec3[];
-        computeWorldVertices(position: Vec3, quat: Quaternion): void;
+        clipFaceAgainstPlane(inVertices: feng3d.Vector3[], outVertices: feng3d.Vector3[], planeNormal: feng3d.Vector3, planeConstant: number): feng3d.Vector3[];
+        computeWorldVertices(position: feng3d.Vector3, quat: Quaternion): void;
         computeLocalAABB(aabbmin: any, aabbmax: any): void;
         /**
          * Updates .worldVertices and sets .worldVerticesNeedsUpdate to false.
@@ -18072,7 +17990,7 @@ declare namespace CANNON {
          * @param min
          * @param max
          */
-        calculateWorldAABB(pos: Vec3, quat: Quaternion, min: Vec3, max: Vec3): void;
+        calculateWorldAABB(pos: feng3d.Vector3, quat: Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
         /**
          * Get approximate convex volume
          */
@@ -18082,20 +18000,20 @@ declare namespace CANNON {
          *
          * @param target
          */
-        getAveragePointLocal(target: Vec3): Vec3;
+        getAveragePointLocal(target: feng3d.Vector3): feng3d.Vector3;
         /**
          * Transform all local points. Will change the .vertices
          *
          * @param  offset
          * @param quat
          */
-        transformAllPoints(offset: Vec3, quat: Quaternion): void;
+        transformAllPoints(offset: feng3d.Vector3, quat: Quaternion): void;
         /**
          * Checks whether p is inside the polyhedra. Must be in local coords. The point lies outside of the convex hull of the other points if and only if the direction of all the vectors from it to those other points are on less than one half of a sphere around it.
          *
          * @param p      A point given in local coordinates
          */
-        pointIsInside(p: Vec3): false | 1 | -1;
+        pointIsInside(p: feng3d.Vector3): false | 1 | -1;
         /**
          * Get max and min dot product of a convex hull at position (pos,quat) projected onto an axis. Results are saved in the array maxmin.
          *
@@ -18105,12 +18023,12 @@ declare namespace CANNON {
          * @param quat
          * @param result result[0] and result[1] will be set to maximum and minimum, respectively.
          */
-        static project(hull: ConvexPolyhedron, axis: Vec3, pos: Vec3, quat: Quaternion, result: number[]): void;
+        static project(hull: ConvexPolyhedron, axis: feng3d.Vector3, pos: feng3d.Vector3, quat: Quaternion, result: number[]): void;
     }
 }
 declare namespace CANNON {
     class Box extends Shape {
-        halfExtents: Vec3;
+        halfExtents: feng3d.Vector3;
         /**
          * Used by the contact generator to make contacts with other convex polyhedra for example
          */
@@ -18120,23 +18038,23 @@ declare namespace CANNON {
          * @param halfExtents
          * @author schteppe
          */
-        constructor(halfExtents: Vec3);
+        constructor(halfExtents: feng3d.Vector3);
         /**
          * Updates the local convex polyhedron representation used for some collisions.
          */
         updateConvexPolyhedronRepresentation(): void;
-        calculateLocalInertia(mass: number, target?: Vec3): Vec3;
-        static calculateInertia(halfExtents: Vec3, mass: number, target: Vec3): void;
+        calculateLocalInertia(mass: number, target?: feng3d.Vector3): feng3d.Vector3;
+        static calculateInertia(halfExtents: feng3d.Vector3, mass: number, target: feng3d.Vector3): void;
         /**
          * Get the box 6 side normals
          * @param sixTargetVectors An array of 6 vectors, to store the resulting side normals in.
          * @param quat             Orientation to apply to the normal vectors. If not provided, the vectors will be in respect to the local frame.
          */
-        getSideNormals(sixTargetVectors: Vec3[], quat: Quaternion): Vec3[];
+        getSideNormals(sixTargetVectors: feng3d.Vector3[], quat: Quaternion): feng3d.Vector3[];
         volume(): number;
         updateBoundingSphereRadius(): void;
-        forEachWorldCorner(pos: Vec3, quat: Quaternion, callback: Function): void;
-        calculateWorldAABB(pos: Vec3, quat: Quaternion, min: Vec3, max: Vec3): void;
+        forEachWorldCorner(pos: feng3d.Vector3, quat: Quaternion, callback: Function): void;
+        calculateWorldAABB(pos: feng3d.Vector3, quat: Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
     }
 }
 declare namespace CANNON {
@@ -18174,7 +18092,7 @@ declare namespace CANNON {
         elementSize: number;
         cacheEnabled: boolean;
         pillarConvex: ConvexPolyhedron;
-        pillarOffset: Vec3;
+        pillarOffset: feng3d.Vector3;
         private _cachedPillars;
         /**
          * Heightfield shape class. Height data is given as an array. These data points are spread out evenly with a given distance.
@@ -18253,8 +18171,8 @@ declare namespace CANNON {
          * @param clamp If the position should be clamped to the heightfield edge.
          */
         getIndexOfPosition(x: number, y: number, result: any[], clamp: boolean): boolean;
-        getTriangleAt(x: number, y: number, edgeClamp: boolean, a: Vec3, b: Vec3, c: Vec3): boolean;
-        getNormalAt(x: number, y: number, edgeClamp: boolean, result: Vec3): void;
+        getTriangleAt(x: number, y: number, edgeClamp: boolean, a: feng3d.Vector3, b: feng3d.Vector3, c: feng3d.Vector3): boolean;
+        getNormalAt(x: number, y: number, edgeClamp: boolean, result: feng3d.Vector3): void;
         /**
          * Get an AABB of a square in the heightfield
          *
@@ -18273,7 +18191,7 @@ declare namespace CANNON {
         getHeightAt(x: number, y: number, edgeClamp: boolean): number;
         getCacheConvexTrianglePillarKey(xi: number, yi: number, getUpperTriangle: boolean): string;
         getCachedConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean): any;
-        setCachedConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean, convex: ConvexPolyhedron, offset: Vec3): void;
+        setCachedConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean, convex: ConvexPolyhedron, offset: feng3d.Vector3): void;
         clearCachedConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean): void;
         /**
          * Get a triangle from the heightfield
@@ -18285,7 +18203,7 @@ declare namespace CANNON {
          * @param b
          * @param c
          */
-        getTriangle(xi: number, yi: number, upper: boolean, a: Vec3, b: Vec3, c: Vec3): void;
+        getTriangle(xi: number, yi: number, upper: boolean, a: feng3d.Vector3, b: feng3d.Vector3, c: feng3d.Vector3): void;
         /**
          * Get a triangle in the terrain in the form of a triangular convex shape.
          *
@@ -18294,9 +18212,9 @@ declare namespace CANNON {
          * @param getUpperTriangle
          */
         getConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean): void;
-        calculateLocalInertia(mass: number, target?: Vec3): Vec3;
+        calculateLocalInertia(mass: number, target?: feng3d.Vector3): feng3d.Vector3;
         volume(): number;
-        calculateWorldAABB(pos: Vec3, quat: Quaternion, min: Vec3, max: Vec3): void;
+        calculateWorldAABB(pos: feng3d.Vector3, quat: Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
         updateBoundingSphereRadius(): void;
         /**
          * Sets the height values from an image. Currently only supported in browser.
@@ -18304,11 +18222,15 @@ declare namespace CANNON {
          * @param image
          * @param scale
          */
-        setHeightsFromImage(image: HTMLImageElement, scale: Vec3): void;
+        setHeightsFromImage(image: HTMLImageElement, scale: feng3d.Vector3): void;
     }
 }
 declare namespace CANNON {
     class Particle extends Shape {
+        position: feng3d.Vector3;
+        velocity: feng3d.Vector3;
+        mass: number;
+        force: feng3d.Vector3;
         /**
          * Particle shape.
          *
@@ -18319,15 +18241,15 @@ declare namespace CANNON {
          * @param mass
          * @param target
          */
-        calculateLocalInertia(mass: number, target: Vec3): Vec3;
+        calculateLocalInertia(mass: number, target: feng3d.Vector3): feng3d.Vector3;
         volume(): number;
         updateBoundingSphereRadius(): void;
-        calculateWorldAABB(pos: Vec3, quat: Quaternion, min: Vec3, max: Vec3): void;
+        calculateWorldAABB(pos: feng3d.Vector3, quat: Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
     }
 }
 declare namespace CANNON {
     class Plane extends Shape {
-        worldNormal: Vec3;
+        worldNormal: feng3d.Vector3;
         worldNormalNeedsUpdate: boolean;
         /**
          * A plane, facing in the Z direction. The plane has its surface at z=0 and everything below z=0 is assumed to be solid plane. To make the plane face in some other direction than z, you must put it inside a Body and rotate that body. See the demos.
@@ -18336,9 +18258,9 @@ declare namespace CANNON {
          */
         constructor();
         computeWorldNormal(quat: Quaternion): void;
-        calculateLocalInertia(mass: number, target?: Vec3): Vec3;
+        calculateLocalInertia(mass: number, target?: feng3d.Vector3): feng3d.Vector3;
         volume(): number;
-        calculateWorldAABB(pos: Vec3, quat: Quaternion, min: Vec3, max: Vec3): void;
+        calculateWorldAABB(pos: feng3d.Vector3, quat: Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
         updateBoundingSphereRadius(): void;
     }
 }
@@ -18352,10 +18274,10 @@ declare namespace CANNON {
          * @author schteppe / http://github.com/schteppe
          */
         constructor(radius: number);
-        calculateLocalInertia(mass: number, target?: Vec3): Vec3;
+        calculateLocalInertia(mass: number, target?: feng3d.Vector3): feng3d.Vector3;
         volume(): number;
         updateBoundingSphereRadius(): void;
-        calculateWorldAABB(pos: Vec3, quat: Quaternion, min: Vec3, max: Vec3): void;
+        calculateWorldAABB(pos: feng3d.Vector3, quat: Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
     }
 }
 declare namespace CANNON {
@@ -18363,11 +18285,11 @@ declare namespace CANNON {
         /**
          * The lower bound of the bounding box.
          */
-        lowerBound: Vec3;
+        lowerBound: feng3d.Vector3;
         /**
          * The upper bound of the bounding box.
          */
-        upperBound: Vec3;
+        upperBound: feng3d.Vector3;
         /**
          *
          * @param options
@@ -18375,8 +18297,8 @@ declare namespace CANNON {
          * Axis aligned bounding box class.
          */
         constructor(options?: {
-            lowerBound?: Vec3;
-            upperBound?: Vec3;
+            lowerBound?: feng3d.Vector3;
+            upperBound?: feng3d.Vector3;
         });
         /**
          * Set the AABB bounds from a set of points.
@@ -18386,7 +18308,7 @@ declare namespace CANNON {
          * @param skinSize
          * @return The self object
          */
-        setFromPoints(points: Vec3[], position?: Vec3, quaternion?: Quaternion, skinSize?: number): this;
+        setFromPoints(points: feng3d.Vector3[], position?: feng3d.Vector3, quaternion?: Quaternion, skinSize?: number): this;
         /**
          * Copy bounds from an AABB to this AABB
          * @param aabb Source to copy from
@@ -18416,7 +18338,7 @@ declare namespace CANNON {
          * @param aabb
          */
         contains(aabb: AABB): boolean;
-        getCorners(a: Vec3, b: Vec3, c: Vec3, d: Vec3, e: Vec3, f: Vec3, g: Vec3, h: Vec3): void;
+        getCorners(a: feng3d.Vector3, b: feng3d.Vector3, c: feng3d.Vector3, d: feng3d.Vector3, e: feng3d.Vector3, f: feng3d.Vector3, g: feng3d.Vector3, h: feng3d.Vector3): void;
         /**
          * Get the representation of an AABB in another frame.
          * @param frame
@@ -18455,7 +18377,7 @@ declare namespace CANNON {
         /**
          * Local scaling of the mesh. Use .setScale() to set it.
          */
-        scale: Vec3;
+        scale: feng3d.Vector3;
         /**
          * The indexed triangles. Use .updateTree() to update it.
          */
@@ -18488,7 +18410,7 @@ declare namespace CANNON {
         /**
          * @param scale
          */
-        setScale(scale: Vec3): void;
+        setScale(scale: feng3d.Vector3): void;
         /**
          * Compute the normals of the faces. Will save in the .normals array.
          */
@@ -18504,14 +18426,14 @@ declare namespace CANNON {
          * @param firstOrSecond 0 or 1, depending on which one of the vertices you need.
          * @param vertexStore Where to store the result
          */
-        getEdgeVertex(edgeIndex: number, firstOrSecond: number, vertexStore: Vec3): void;
+        getEdgeVertex(edgeIndex: number, firstOrSecond: number, vertexStore: feng3d.Vector3): void;
         /**
          * Get a vector along an edge.
          *
          * @param edgeIndex
          * @param vectorStore
          */
-        getEdgeVector(edgeIndex: number, vectorStore: Vec3): void;
+        getEdgeVector(edgeIndex: number, vectorStore: feng3d.Vector3): void;
         /**
          * Get face normal given 3 vertices
          *
@@ -18520,7 +18442,7 @@ declare namespace CANNON {
          * @param vc
          * @param target
          */
-        static computeNormal(va: Vec3, vb: Vec3, vc: Vec3, target: Vec3): void;
+        static computeNormal(va: feng3d.Vector3, vb: feng3d.Vector3, vc: feng3d.Vector3, target: feng3d.Vector3): void;
         /**
          * Get vertex i.
          *
@@ -18528,7 +18450,7 @@ declare namespace CANNON {
          * @param out
          * @return The "out" vector object
          */
-        getVertex(i: number, out: Vec3): Vec3;
+        getVertex(i: number, out: feng3d.Vector3): feng3d.Vector3;
         /**
          * Get raw vertex i
          *
@@ -18546,7 +18468,7 @@ declare namespace CANNON {
          * @param out
          * @return The "out" vector object
          */
-        getWorldVertex(i: number, pos: Vec3, quat: Quaternion, out: Vec3): Vec3;
+        getWorldVertex(i: number, pos: feng3d.Vector3, quat: Quaternion, out: feng3d.Vector3): feng3d.Vector3;
         /**
          * Get the three vertices for triangle i.
          *
@@ -18555,7 +18477,7 @@ declare namespace CANNON {
          * @param b
          * @param c
          */
-        getTriangleVertices(i: number, a: Vec3, b: Vec3, c: Vec3): void;
+        getTriangleVertices(i: number, a: feng3d.Vector3, b: feng3d.Vector3, c: feng3d.Vector3): void;
         /**
          * Compute the normal of triangle i.
          *
@@ -18563,14 +18485,14 @@ declare namespace CANNON {
          * @param target
          * @return The "target" vector object
          */
-        getNormal(i: number, target: Vec3): Vec3;
+        getNormal(i: number, target: feng3d.Vector3): feng3d.Vector3;
         /**
          *
          * @param mass
          * @param target
          * @return The "target" vector object
          */
-        calculateLocalInertia(mass: number, target: Vec3): Vec3;
+        calculateLocalInertia(mass: number, target: feng3d.Vector3): feng3d.Vector3;
         /**
          * Compute the local AABB for the trimesh
          *
@@ -18585,7 +18507,7 @@ declare namespace CANNON {
          * Will update the .boundingSphereRadius property
          */
         updateBoundingSphereRadius(): void;
-        calculateWorldAABB(pos: Vec3, quat: Quaternion, min: Vec3, max: Vec3): void;
+        calculateWorldAABB(pos: feng3d.Vector3, quat: Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
         /**
          * Get approximate volume
          */
@@ -18769,10 +18691,10 @@ declare namespace CANNON {
 }
 declare namespace CANNON {
     class RaycastResult {
-        rayFromWorld: Vec3;
-        rayToWorld: Vec3;
-        hitNormalWorld: Vec3;
-        hitPointWorld: Vec3;
+        rayFromWorld: feng3d.Vector3;
+        rayToWorld: feng3d.Vector3;
+        hitNormalWorld: feng3d.Vector3;
+        hitPointWorld: feng3d.Vector3;
         hasHit: boolean;
         shape: Shape;
         body: Body;
@@ -18785,7 +18707,7 @@ declare namespace CANNON {
          */
         distance: number;
         suspensionLength: number;
-        directionWorld: Vec3;
+        directionWorld: feng3d.Vector3;
         /**
          * If the ray should stop traversing the bodies.
          */
@@ -18800,7 +18722,7 @@ declare namespace CANNON {
          */
         reset(): void;
         abort(): void;
-        set(rayFromWorld: Vec3, rayToWorld: Vec3, hitNormalWorld: Vec3, hitPointWorld: Vec3, shape: Shape, body: Body, distance: number): void;
+        set(rayFromWorld: feng3d.Vector3, rayToWorld: feng3d.Vector3, hitNormalWorld: feng3d.Vector3, hitPointWorld: feng3d.Vector3, shape: Shape, body: Body, distance: number): void;
     }
 }
 declare namespace CANNON {
@@ -18896,8 +18818,8 @@ declare namespace CANNON {
         nx: number;
         ny: number;
         nz: number;
-        aabbMin: Vec3;
-        aabbMax: Vec3;
+        aabbMin: feng3d.Vector3;
+        aabbMax: feng3d.Vector3;
         bins: any[];
         binLengths: any[];
         /**
@@ -18911,7 +18833,7 @@ declare namespace CANNON {
          *
          * @todo Needs support for more than just planes and spheres.
          */
-        constructor(aabbMin: Vec3, aabbMax: Vec3, nx: number, ny: number, nz: number);
+        constructor(aabbMin: feng3d.Vector3, aabbMax: feng3d.Vector3, nx: number, ny: number, nz: number);
         /**
          * Get all the collision pairs in the physics world
          *
@@ -19002,9 +18924,9 @@ declare namespace CANNON {
 }
 declare namespace CANNON {
     class Ray {
-        from: Vec3;
-        to: Vec3;
-        _direction: Vec3;
+        from: feng3d.Vector3;
+        to: feng3d.Vector3;
+        _direction: feng3d.Vector3;
         /**
          * The precision of the ray. Used when checking parallelity etc.
          */
@@ -19040,7 +18962,7 @@ declare namespace CANNON {
          * @param from
          * @param to
          */
-        constructor(from?: Vec3, to?: Vec3);
+        constructor(from?: feng3d.Vector3, to?: feng3d.Vector3);
         static CLOSEST: number;
         static ANY: number;
         static ALL: number;
@@ -19056,8 +18978,8 @@ declare namespace CANNON {
             skipBackfaces?: boolean;
             collisionFilterMask?: number;
             collisionFilterGroup?: number;
-            from?: Vec3;
-            to?: Vec3;
+            from?: feng3d.Vector3;
+            to?: feng3d.Vector3;
             callback?: Function;
         }): boolean;
         /**
@@ -19090,7 +19012,7 @@ declare namespace CANNON {
          * @private
          * @param  {Shape} shape
          * @param  {Quaternion} quat
-         * @param  {Vec3} position
+         * @param  {Vector3} position
          * @param  {Body} body
          * @param {object} [options]
          */
@@ -19108,7 +19030,7 @@ declare namespace CANNON {
          */
         private intersectTrimesh;
         private reportIntersection;
-        static pointInTriangle(p: Vec3, a: Vec3, b: Vec3, c: Vec3): boolean;
+        static pointInTriangle(p: feng3d.Vector3, a: feng3d.Vector3, b: feng3d.Vector3, c: feng3d.Vector3): boolean;
     }
 }
 declare namespace CANNON {
@@ -19209,7 +19131,7 @@ declare namespace CANNON {
          * @deprecated Use World events instead
          */
         postStep: Function;
-        vlambda: Vec3;
+        vlambda: feng3d.Vector3;
         collisionFilterGroup: number;
         collisionFilterMask: number;
         /**
@@ -19219,25 +19141,25 @@ declare namespace CANNON {
         /**
          * World space position of the body.
          */
-        position: Vec3;
-        previousPosition: Vec3;
+        position: feng3d.Vector3;
+        previousPosition: feng3d.Vector3;
         /**
          * Interpolated position of the body.
          */
-        interpolatedPosition: Vec3;
+        interpolatedPosition: feng3d.Vector3;
         /**
          * Initial position of the body
          */
-        initPosition: Vec3;
+        initPosition: feng3d.Vector3;
         /**
          * World space velocity of the body.
          */
-        velocity: Vec3;
-        initVelocity: Vec3;
+        velocity: feng3d.Vector3;
+        initVelocity: feng3d.Vector3;
         /**
          * Linear force on the body in world space.
          */
-        force: Vec3;
+        force: feng3d.Vector3;
         mass: number;
         invMass: number;
         material: Material;
@@ -19263,11 +19185,11 @@ declare namespace CANNON {
          */
         sleepTimeLimit: number;
         timeLastSleepy: number;
-        private _wakeUpAfterNarrowphase;
+        _wakeUpAfterNarrowphase: boolean;
         /**
          * World space rotational force on the body, around center of mass.
          */
-        torque: Vec3;
+        torque: feng3d.Vector3;
         /**
          * World space orientation of the body.
          */
@@ -19281,22 +19203,22 @@ declare namespace CANNON {
         /**
          * Angular velocity of the body, in world space. Think of the angular velocity as a vector, which the body rotates around. The length of this vector determines how fast (in radians per second) the body rotates.
          */
-        angularVelocity: Vec3;
-        initAngularVelocity: Vec3;
+        angularVelocity: feng3d.Vector3;
+        initAngularVelocity: feng3d.Vector3;
         shapes: Shape[];
         /**
          * Position of each Shape in the body, given in local Body space.
          */
-        shapeOffsets: Vec3[];
+        shapeOffsets: feng3d.Vector3[];
         /**
          * Orientation of each Shape, given in local Body space.
          */
         shapeOrientations: Quaternion[];
-        inertia: Vec3;
-        invInertia: Vec3;
+        inertia: feng3d.Vector3;
+        invInertia: feng3d.Vector3;
         invInertiaWorld: Mat3;
         invMassSolve: number;
-        invInertiaSolve: Vec3;
+        invInertiaSolve: feng3d.Vector3;
         invInertiaWorldSolve: Mat3;
         /**
          * Set to true if you don't want the body to rotate. Make sure to run .updateMassProperties() after changing this.
@@ -19306,11 +19228,11 @@ declare namespace CANNON {
         /**
          * Use this property to limit the motion along any world axis. (1,1,1) will allow motion along all axes while (0,0,0) allows none.
          */
-        linearFactor: Vec3;
+        linearFactor: feng3d.Vector3;
         /**
          * Use this property to limit the rotational motion along any world axis. (1,1,1) will allow rotation along all axes while (0,0,0) allows none.
          */
-        angularFactor: Vec3;
+        angularFactor: feng3d.Vector3;
         /**
          * World space bounding box of the body and its shapes.
          */
@@ -19323,7 +19245,7 @@ declare namespace CANNON {
          * Total bounding radius of the Body including its shapes, relative to body.position.
          */
         boundingRadius: number;
-        wlambda: Vec3;
+        wlambda: feng3d.Vector3;
         shape: Shape;
         index: number;
         /**
@@ -19343,8 +19265,8 @@ declare namespace CANNON {
         constructor(options?: {
             collisionFilterGroup?: number;
             collisionFilterMask?: number;
-            position?: Vec3;
-            velocity?: Vec3;
+            position?: feng3d.Vector3;
+            velocity?: feng3d.Vector3;
             material?: Material;
             mass?: number;
             linearDamping?: number;
@@ -19353,11 +19275,11 @@ declare namespace CANNON {
             sleepSpeedLimit?: number;
             sleepTimeLimit?: number;
             quaternion?: Quaternion;
-            angularVelocity?: Vec3;
+            angularVelocity?: feng3d.Vector3;
             fixedRotation?: boolean;
             angularDamping?: number;
-            linearFactor?: Vec3;
-            angularFactor?: Vec3;
+            linearFactor?: feng3d.Vector3;
+            angularFactor?: feng3d.Vector3;
             shape?: Shape;
         }, a?: any);
         static COLLIDE_EVENT_NAME: string;
@@ -19418,28 +19340,28 @@ declare namespace CANNON {
          * @param worldPoint
          * @param result
          */
-        pointToLocalFrame(worldPoint: Vec3, result: Vec3): Vec3;
+        pointToLocalFrame(worldPoint: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
         /**
          * Convert a world vector to local body frame.
          *
          * @param worldPoint
          * @param result
          */
-        vectorToLocalFrame(worldVector: any, result?: Vec3): Vec3;
+        vectorToLocalFrame(worldVector: any, result?: feng3d.Vector3): feng3d.Vector3;
         /**
          * Convert a local body point to world frame.
          *
          * @param localPoint
          * @param result
          */
-        pointToWorldFrame(localPoint: Vec3, result: Vec3): Vec3;
+        pointToWorldFrame(localPoint: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
         /**
          * Convert a local body point to world frame.
          *
          * @param localVector
          * @param result
          */
-        vectorToWorldFrame(localVector: Vec3, result: Vec3): Vec3;
+        vectorToWorldFrame(localVector: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
         /**
          * Add a shape to the body with a local offset and orientation.
          *
@@ -19448,7 +19370,7 @@ declare namespace CANNON {
          * @param_orientation
          * @return The body object, for chainability.
          */
-        addShape(shape: Shape, _offset?: Vec3, _orientation?: Quaternion): this;
+        addShape(shape: Shape, _offset?: feng3d.Vector3, _orientation?: Quaternion): this;
         /**
          * Update the bounding radius of the body. Should be done if any of the shapes are changed.
          */
@@ -19469,28 +19391,28 @@ declare namespace CANNON {
          * @param force The amount of force to add.
          * @param relativePoint A point relative to the center of mass to apply the force on.
          */
-        applyForce(force: Vec3, relativePoint: Vec3): void;
+        applyForce(force: feng3d.Vector3, relativePoint: feng3d.Vector3): void;
         /**
          * Apply force to a local point in the body.
          *
          * @param force The force vector to apply, defined locally in the body frame.
          * @param localPoint A local point in the body to apply the force on.
          */
-        applyLocalForce(localForce: Vec3, localPoint: Vec3): void;
+        applyLocalForce(localForce: feng3d.Vector3, localPoint: feng3d.Vector3): void;
         /**
          * Apply impulse to a world point. This could for example be a point on the Body surface. An impulse is a force added to a body during a short period of time (impulse = force * time). Impulses will be added to Body.velocity and Body.angularVelocity.
          *
          * @param impulse The amount of impulse to add.
          * @param relativePoint A point relative to the center of mass to apply the force on.
          */
-        applyImpulse(impulse: Vec3, relativePoint: Vec3): void;
+        applyImpulse(impulse: feng3d.Vector3, relativePoint: feng3d.Vector3): void;
         /**
          * Apply locally-defined impulse to a local point in the body.
          *
          * @param force The force vector to apply, defined locally in the body frame.
          * @param localPoint A local point in the body to apply the force on.
          */
-        applyLocalImpulse(localImpulse: Vec3, localPoint: Vec3): void;
+        applyLocalImpulse(localImpulse: feng3d.Vector3, localPoint: feng3d.Vector3): void;
         /**
          * Should be called whenever you change the body shape or mass.
          */
@@ -19498,9 +19420,9 @@ declare namespace CANNON {
         /**
          * Get world velocity of a point in the body.
          * @method getVelocityAtWorldPoint
-         * @param  {Vec3} worldPoint
-         * @param  {Vec3} result
-         * @return {Vec3} The result vector.
+         * @param  {Vector3} worldPoint
+         * @param  {Vector3} result
+         * @return {Vector3} The result vector.
          */
         getVelocityAtWorldPoint(worldPoint: any, result: any): any;
         /**
@@ -19537,11 +19459,11 @@ declare namespace CANNON {
         /**
          * Anchor for bodyA in local bodyA coordinates.
          */
-        localAnchorA: Vec3;
+        localAnchorA: feng3d.Vector3;
         /**
          * Anchor for bodyB in local bodyB coordinates.
          */
-        localAnchorB: Vec3;
+        localAnchorB: feng3d.Vector3;
         /**
          * A spring, connecting two bodies.
          *
@@ -19553,31 +19475,31 @@ declare namespace CANNON {
             restLength?: number;
             stiffness?: number;
             damping?: number;
-            localAnchorA?: Vec3;
-            localAnchorB?: Vec3;
-            worldAnchorA?: Vec3;
-            worldAnchorB?: Vec3;
+            localAnchorA?: feng3d.Vector3;
+            localAnchorB?: feng3d.Vector3;
+            worldAnchorA?: feng3d.Vector3;
+            worldAnchorB?: feng3d.Vector3;
         });
         /**
          * Set the anchor point on body A, using world coordinates.
          * @param worldAnchorA
          */
-        setWorldAnchorA(worldAnchorA: Vec3): void;
+        setWorldAnchorA(worldAnchorA: feng3d.Vector3): void;
         /**
          * Set the anchor point on body B, using world coordinates.
          * @param worldAnchorB
          */
-        setWorldAnchorB(worldAnchorB: Vec3): void;
+        setWorldAnchorB(worldAnchorB: feng3d.Vector3): void;
         /**
          * Get the anchor point on body A, in world coordinates.
          * @param result The vector to store the result in.
          */
-        getWorldAnchorA(result: Vec3): void;
+        getWorldAnchorA(result: feng3d.Vector3): void;
         /**
          * Get the anchor point on body B, in world coordinates.
          * @param result The vector to store the result in.
          */
-        getWorldAnchorB(result: Vec3): void;
+        getWorldAnchorB(result: feng3d.Vector3): void;
         /**
          * Apply the spring force to the connected bodies.
          */
@@ -19602,12 +19524,12 @@ declare namespace CANNON {
         /**
          * Connection point, defined locally in the chassis body frame.
          */
-        chassisConnectionPointLocal: Vec3;
-        chassisConnectionPointWorld: Vec3;
-        directionLocal: Vec3;
-        directionWorld: Vec3;
-        axleLocal: Vec3;
-        axleWorld: Vec3;
+        chassisConnectionPointLocal: feng3d.Vector3;
+        chassisConnectionPointWorld: feng3d.Vector3;
+        directionLocal: feng3d.Vector3;
+        directionWorld: feng3d.Vector3;
+        axleLocal: feng3d.Vector3;
+        axleWorld: feng3d.Vector3;
         suspensionRestLength: number;
         suspensionMaxLength: number;
         radius: number;
@@ -19651,12 +19573,12 @@ declare namespace CANNON {
             maxSuspensionTravel?: number;
             customSlidingRotationalSpeed?: number;
             useCustomSlidingRotationalSpeed?: boolean;
-            chassisConnectionPointLocal?: Vec3;
-            chassisConnectionPointWorld?: Vec3;
-            directionLocal?: Vec3;
-            directionWorld?: Vec3;
-            axleLocal?: Vec3;
-            axleWorld?: Vec3;
+            chassisConnectionPointLocal?: feng3d.Vector3;
+            chassisConnectionPointWorld?: feng3d.Vector3;
+            directionLocal?: feng3d.Vector3;
+            directionWorld?: feng3d.Vector3;
+            axleLocal?: feng3d.Vector3;
+            axleWorld?: feng3d.Vector3;
             suspensionRestLength?: number;
             suspensionMaxLength?: number;
             radius?: number;
@@ -19747,7 +19669,7 @@ declare namespace CANNON {
          * @param axisIndex
          * @param result
          */
-        getVehicleAxisWorld(axisIndex: number, result: Vec3): void;
+        getVehicleAxisWorld(axisIndex: number, result: feng3d.Vector3): void;
         updateVehicle(timeStep: number): void;
         updateSuspension(deltaTime: number): void;
         /**
@@ -19799,8 +19721,8 @@ declare namespace CANNON {
         addWheel(options?: {
             body?: Body;
             isFrontWheel?: boolean;
-            position?: Vec3;
-            axis?: Vec3;
+            position?: feng3d.Vector3;
+            axis?: feng3d.Vector3;
         }): number;
         /**
          * Set the steering value of a wheel.
@@ -19860,7 +19782,7 @@ declare namespace CANNON {
 }
 declare namespace CANNON {
     class SPHSystem {
-        particles: any[];
+        particles: Particle[];
         /**
          * Density of the system (kg/m3).
          */
@@ -19888,23 +19810,23 @@ declare namespace CANNON {
          *
          * @param particle
          */
-        add(particle: Body): void;
+        add(particle: Particle): void;
         /**
          * Remove a particle from the system.
          *
          * @param particle
          */
-        remove(particle: Body): void;
+        remove(particle: Particle): void;
         /**
          * Get neighbors within smoothing volume, save in the array neighbors
          *
          * @param particle
          * @param neighbors
          */
-        getNeighbors(particle: Body, neighbors: any[]): void;
+        getNeighbors(particle: Particle, neighbors: any[]): void;
         update(): void;
         w(r: number): number;
-        gradw(rVec: Vec3, resultVec: Vec3): void;
+        gradw(rVec: feng3d.Vector3, resultVec: feng3d.Vector3): void;
         nablaw(r: number): number;
     }
 }
@@ -19981,8 +19903,8 @@ declare namespace CANNON {
 }
 declare namespace CANNON {
     class ConeEquation extends Equation {
-        axisA: Vec3;
-        axisB: Vec3;
+        axisA: feng3d.Vector3;
+        axisB: feng3d.Vector3;
         /**
          * The cone angle to keep
          */
@@ -19998,8 +19920,8 @@ declare namespace CANNON {
          */
         constructor(bodyA: Body, bodyB: Body, options?: {
             maxForce?: number;
-            axisA?: Vec3;
-            axisB?: Vec3;
+            axisA?: feng3d.Vector3;
+            axisB?: feng3d.Vector3;
             angle?: number;
         });
         computeB(h: number): number;
@@ -20011,15 +19933,17 @@ declare namespace CANNON {
         /**
          * World-oriented vector that goes from the center of bi to the contact point.
          */
-        ri: Vec3;
+        ri: feng3d.Vector3;
         /**
          * World-oriented vector that starts in body j position and goes to the contact point.
          */
-        rj: Vec3;
+        rj: feng3d.Vector3;
         /**
          * Contact normal, pointing out of body i.
          */
-        ni: Vec3;
+        ni: feng3d.Vector3;
+        si: Shape;
+        sj: Shape;
         /**
          * Contact/non-penetration constraint equation
          *
@@ -20038,9 +19962,9 @@ declare namespace CANNON {
 }
 declare namespace CANNON {
     class FrictionEquation extends Equation {
-        ri: Vec3;
-        rj: Vec3;
-        t: Vec3;
+        ri: feng3d.Vector3;
+        rj: feng3d.Vector3;
+        t: feng3d.Vector3;
         /**
          * Constrains the slipping in a contact along a tangent
          * @class FrictionEquation
@@ -20057,8 +19981,8 @@ declare namespace CANNON {
 }
 declare namespace CANNON {
     class RotationalEquation extends Equation {
-        axisA: Vec3;
-        axisB: Vec3;
+        axisA: feng3d.Vector3;
+        axisB: feng3d.Vector3;
         maxAngle: number;
         /**
          * Rotational constraint. Works to keep the local vectors orthogonal to each other in world space.
@@ -20070,8 +19994,8 @@ declare namespace CANNON {
          * @author schteppe
          */
         constructor(bodyA: Body, bodyB: Body, options?: {
-            axisA?: Vec3;
-            axisB?: Vec3;
+            axisA?: feng3d.Vector3;
+            axisB?: feng3d.Vector3;
             maxForce?: number;
         });
         computeB(h: number): number;
@@ -20082,11 +20006,11 @@ declare namespace CANNON {
         /**
          * World oriented rotational axis
          */
-        axisA: Vec3;
+        axisA: feng3d.Vector3;
         /**
          * World oriented rotational axis
          */
-        axisB: Vec3;
+        axisB: feng3d.Vector3;
         /**
          * Motor velocity
          */
@@ -20199,8 +20123,8 @@ declare namespace CANNON {
         /**
          * All the current contacts (instances of ContactEquation) in the world.
          */
-        contacts: any[];
-        frictionEquations: any[];
+        contacts: ContactEquation[];
+        frictionEquations: FrictionEquation[];
         /**
          * How often to normalize quaternions. Set to 0 for every step, 1 for every second etc.. A larger value increases performance. If bodies tend to explode, set to a smaller value (zero to be sure nothing can go wrong).
          */
@@ -20219,17 +20143,17 @@ declare namespace CANNON {
         stepnumber: number;
         default_dt: number;
         nextId: number;
-        gravity: Vec3;
+        gravity: feng3d.Vector3;
         /**
          * The broadphase algorithm to use. Default is NaiveBroadphase
          */
         broadphase: Broadphase;
-        bodies: any[];
+        bodies: Body[];
         /**
          * The solver algorithm to use. Default is GSSolver
          */
         solver: Solver;
-        constraints: any[];
+        constraints: Constraint[];
         narrowphase: Narrowphase;
         collisionMatrix: ArrayCollisionMatrix;
         /**
@@ -20242,7 +20166,7 @@ declare namespace CANNON {
          * All added materials
          */
         materials: Material[];
-        contactmaterials: any[];
+        contactmaterials: ContactMaterial[];
         /**
          * Used to look up a ContactMaterial given two instances of Material.
          */
@@ -20285,7 +20209,7 @@ declare namespace CANNON {
          * @param options
          */
         constructor(options?: {
-            gravity?: Vec3;
+            gravity?: feng3d.Vector3;
             allowSleep?: boolean;
             broadphase?: Broadphase;
             solver?: Solver;
@@ -20343,7 +20267,7 @@ declare namespace CANNON {
          * @param result
          * @deprecated Use .raycastAll, .raycastClosest or .raycastAny instead.
          */
-        rayTest(from: Vec3, to: Vec3, result: RaycastResult): void;
+        rayTest(from: feng3d.Vector3, to: feng3d.Vector3, result: RaycastResult): void;
         /**
          * Ray cast against all bodies. The provided callback will be executed for each hit with a RaycastResult as single argument.
          * @param from
@@ -20352,14 +20276,14 @@ declare namespace CANNON {
          * @param callback
          * @return True if any body was hit.
          */
-        raycastAll(from: Vec3, to: Vec3, options: {
+        raycastAll(from: feng3d.Vector3, to: feng3d.Vector3, options: {
             collisionFilterMask?: number;
             collisionFilterGroup?: number;
             skipBackfaces?: boolean;
             checkCollisionResponse?: boolean;
             mode?: number;
-            from?: Vec3;
-            to?: Vec3;
+            from?: feng3d.Vector3;
+            to?: feng3d.Vector3;
             callback?: Function;
         }, callback: Function): boolean;
         /**
@@ -20372,14 +20296,14 @@ declare namespace CANNON {
          *
          * @return True if any body was hit.
          */
-        raycastAny(from: Vec3, to: Vec3, options: {
+        raycastAny(from: feng3d.Vector3, to: feng3d.Vector3, options: {
             collisionFilterMask?: number;
             collisionFilterGroup?: number;
             skipBackfaces?: boolean;
             checkCollisionResponse?: boolean;
             mode?: number;
-            from?: Vec3;
-            to?: Vec3;
+            from?: feng3d.Vector3;
+            to?: feng3d.Vector3;
             callback?: Function;
             result?: RaycastResult;
         }, result: RaycastResult): boolean;
@@ -20393,14 +20317,14 @@ declare namespace CANNON {
          *
          * @return True if any body was hit.
          */
-        raycastClosest(from: Vec3, to: Vec3, options: {
+        raycastClosest(from: feng3d.Vector3, to: feng3d.Vector3, options: {
             collisionFilterMask?: number;
             collisionFilterGroup?: number;
             skipBackfaces?: boolean;
             checkCollisionResponse?: boolean;
             mode?: number;
-            from?: Vec3;
-            to?: Vec3;
+            from?: feng3d.Vector3;
+            to?: feng3d.Vector3;
             callback?: Function;
             result?: RaycastResult;
         }, result: RaycastResult): boolean;
@@ -20416,7 +20340,7 @@ declare namespace CANNON {
          */
         removeBody(body: Body): void;
         getBodyById(id: number): any;
-        getShapeById(id: number): any;
+        getShapeById(id: number): Shape;
         /**
          * Adds a material to the World.
          * @param m
@@ -20460,10 +20384,6 @@ declare namespace CANNON {
         frictionEquationPool: any[];
         result: any[];
         frictionResult: any[];
-        /**
-         * Pooled vectors.
-         */
-        v3pool: Vec3Pool;
         world: World;
         currentContactMaterial: any;
         enableFrictionReduction: boolean;
@@ -20486,7 +20406,7 @@ declare namespace CANNON {
          * @param overrideShapeA
          * @param overrideShapeB
          */
-        createContactEquation(bi: Body, bj: Body, si: Shape, sj: Shape, overrideShapeA: Shape, overrideShapeB: Shape): any;
+        createContactEquation(bi: Body, bj: Body, si: Shape, sj: Shape, overrideShapeA: Shape, overrideShapeB: Shape): ContactEquation;
         createFrictionEquationsFromContact(contactEquation: any, outArray: FrictionEquation[]): boolean;
         createFrictionFromAverage(numContacts: number): void;
         /**
@@ -20502,44 +20422,44 @@ declare namespace CANNON {
         boxBox(si: any, sj: any, xi: any, xj: any, qi: any, qj: any, bi: any, bj: any, rsi: any, rsj: any, justTest: any): boolean;
         boxConvex(si: any, sj: any, xi: any, xj: any, qi: any, qj: any, bi: any, bj: any, rsi: any, rsj: any, justTest: any): boolean;
         boxParticle(si: any, sj: any, xi: any, xj: any, qi: any, qj: any, bi: any, bj: any, rsi: any, rsj: any, justTest: any): boolean;
-        sphereSphere(si: Shape, sj: Shape, xi: Vec3, xj: Vec3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereSphere(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         /**
          * @method planeTrimesh
          * @param  {Shape}      si
          * @param  {Shape}      sj
-         * @param  {Vec3}       xi
-         * @param  {Vec3}       xj
+         * @param  {Vector3}       xi
+         * @param  {Vector3}       xj
          * @param  {Quaternion} qi
          * @param  {Quaternion} qj
          * @param  {Body}       bi
          * @param  {Body}       bj
          */
-        planeTrimesh(planeShape: Shape, trimeshShape: any, planePos: Vec3, trimeshPos: Vec3, planeQuat: Quaternion, trimeshQuat: Quaternion, planeBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereTrimesh(sphereShape: Shape, trimeshShape: any, spherePos: Vec3, trimeshPos: Vec3, sphereQuat: Quaternion, trimeshQuat: Quaternion, sphereBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        spherePlane(si: Shape, sj: Shape, xi: Vec3, xj: Vec3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereBox(si: Shape, sj: any, xi: Vec3, xj: Vec3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereConvex(si: Shape, sj: Shape, xi: Vec3, xj: Vec3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        planeBox(si: Shape, sj: Shape, xi: Vec3, xj: Vec3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        planeConvex(planeShape: Shape, convexShape: any, planePosition: Vec3, convexPosition: Vec3, planeQuat: Quaternion, convexQuat: Quaternion, planeBody: Body, convexBody: Body, si: Shape, sj: Shape, justTest: boolean): boolean;
-        convexConvex(si: any, sj: Shape, xi: Vec3, xj: Vec3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean, faceListA?: any[], faceListB?: any[]): boolean;
+        planeTrimesh(planeShape: Shape, trimeshShape: any, planePos: feng3d.Vector3, trimeshPos: feng3d.Vector3, planeQuat: Quaternion, trimeshQuat: Quaternion, planeBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereTrimesh(sphereShape: Shape, trimeshShape: any, spherePos: feng3d.Vector3, trimeshPos: feng3d.Vector3, sphereQuat: Quaternion, trimeshQuat: Quaternion, sphereBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        spherePlane(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereBox(si: Shape, sj: any, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereConvex(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        planeBox(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        planeConvex(planeShape: Shape, convexShape: any, planePosition: feng3d.Vector3, convexPosition: feng3d.Vector3, planeQuat: Quaternion, convexQuat: Quaternion, planeBody: Body, convexBody: Body, si: Shape, sj: Shape, justTest: boolean): boolean;
+        convexConvex(si: any, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean, faceListA?: any[], faceListB?: any[]): boolean;
         /**
          * @method convexTrimesh
          * @param  {Array}      result
          * @param  {Shape}      si
          * @param  {Shape}      sj
-         * @param  {Vec3}       xi
-         * @param  {Vec3}       xj
+         * @param  {Vector3}       xi
+         * @param  {Vector3}       xj
          * @param  {Quaternion} qi
          * @param  {Quaternion} qj
          * @param  {Body}       bi
          * @param  {Body}       bj
          */
-        planeParticle(sj: Shape, si: Shape, xj: Vec3, xi: Vec3, qj: Quaternion, qi: Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereParticle(sj: Shape, si: Shape, xj: Vec3, xi: Vec3, qj: Quaternion, qi: Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        convexParticle(sj: any, si: Shape, xj: Vec3, xi: Vec3, qj: Quaternion, qi: Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        boxHeightfield(si: Shape, sj: Shape, xi: Vec3, xj: Vec3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        convexHeightfield(convexShape: Shape, hfShape: any, convexPos: Vec3, hfPos: Vec3, convexQuat: Quaternion, hfQuat: Quaternion, convexBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereHeightfield(sphereShape: Shape, hfShape: any, spherePos: Vec3, hfPos: Vec3, sphereQuat: Quaternion, hfQuat: Quaternion, sphereBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        planeParticle(sj: Shape, si: Shape, xj: feng3d.Vector3, xi: feng3d.Vector3, qj: Quaternion, qi: Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereParticle(sj: Shape, si: Shape, xj: feng3d.Vector3, xi: feng3d.Vector3, qj: Quaternion, qi: Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        convexParticle(sj: any, si: Shape, xj: feng3d.Vector3, xi: feng3d.Vector3, qj: Quaternion, qi: Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        boxHeightfield(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: Quaternion, qj: Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        convexHeightfield(convexShape: Shape, hfShape: any, convexPos: feng3d.Vector3, hfPos: feng3d.Vector3, convexQuat: Quaternion, hfQuat: Quaternion, convexBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereHeightfield(sphereShape: Shape, hfShape: any, spherePos: feng3d.Vector3, hfPos: feng3d.Vector3, sphereQuat: Quaternion, hfQuat: Quaternion, sphereBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
     }
 }
 //# sourceMappingURL=feng3d.d.ts.map
