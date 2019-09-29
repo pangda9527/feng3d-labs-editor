@@ -24107,6 +24107,42 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
+    var BodyComponent = /** @class */ (function (_super) {
+        __extends(BodyComponent, _super);
+        function BodyComponent() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.__class__ = "feng3d.BodyComponent";
+            return _this;
+        }
+        BodyComponent.prototype.init = function (gameobject) {
+            _super.prototype.init.call(this, gameobject);
+            var radius = 1; // m
+            this.body = new CANNON.Body({
+                mass: 5,
+                position: new CANNON.Vec3(0, 10, 0),
+                shape: new CANNON.Sphere(radius)
+            });
+        };
+        /**
+         * 每帧执行
+         */
+        BodyComponent.prototype.update = function (interval) {
+            var scene3D = this.getComponentsInParents(feng3d.Scene3D)[0];
+            if (scene3D && scene3D.runEnvironment == feng3d.RunEnvironment.feng3d) {
+                this.transform.x = this.body.position.x;
+                this.transform.y = this.body.position.y;
+                this.transform.z = this.body.position.z;
+            }
+        };
+        __decorate([
+            feng3d.oav()
+        ], BodyComponent.prototype, "body", void 0);
+        return BodyComponent;
+    }(feng3d.Behaviour));
+    feng3d.BodyComponent = BodyComponent;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     var Model = /** @class */ (function (_super) {
         __extends(Model, _super);
         function Model() {
@@ -24446,6 +24482,10 @@ var feng3d;
              */
             _this.ambientColor = new feng3d.Color4();
             /**
+             * 重力加速度
+             */
+            _this.gravity = new CANNON.Vec3(0, -9.82, 0);
+            /**
              * 指定所运行环境
              *
              * 控制运行符合指定环境场景中所有 Behaviour.update 方法
@@ -24460,12 +24500,19 @@ var feng3d;
          * 构造3D场景
          */
         Scene3D.prototype.init = function (gameObject) {
+            var _this = this;
             _super.prototype.init.call(this, gameObject);
             this.transform.hideFlags = this.transform.hideFlags | feng3d.HideFlags.Hide;
             this.gameObject.hideFlags = this.gameObject.hideFlags | feng3d.HideFlags.DontTransform;
             //
             gameObject["_scene"] = this;
             this.gameObject["updateChildrenScene"]();
+            this.world = new CANNON.World();
+            this.world.gravity = this.gravity;
+            var bodys = this.getComponentsInChildren(feng3d.BodyComponent).map(function (c) { return c.body; });
+            bodys.forEach(function (v) {
+                _this.world.addBody(v);
+            });
             //
             this.on("addChild", this.onAddChild, this);
             this.on("removeChild", this.onRemoveChild, this);
@@ -24473,15 +24520,30 @@ var feng3d;
             this.on("removeComponent", this.onRemovedComponent, this);
         };
         Scene3D.prototype.onAddComponent = function (e) {
+            if (e.data instanceof feng3d.BodyComponent) {
+                this.world.addBody(e.data.body);
+            }
         };
         Scene3D.prototype.onRemovedComponent = function (e) {
+            if (e.data instanceof feng3d.BodyComponent) {
+                this.world.removeBody(e.data.body);
+            }
         };
         Scene3D.prototype.onAddChild = function (e) {
+            var bodyComponent = e.data.getComponent(feng3d.BodyComponent);
+            if (bodyComponent) {
+                this.world.addBody(bodyComponent.body);
+            }
         };
         Scene3D.prototype.onRemoveChild = function (e) {
+            var bodyComponent = e.data.getComponent(feng3d.BodyComponent);
+            if (bodyComponent) {
+                this.world.removeBody(bodyComponent.body);
+            }
         };
         Scene3D.prototype.update = function (interval) {
             var _this = this;
+            interval = interval || (1000 / feng3d.ticker.frameRate);
             this._mouseCheckObjects = null;
             this._models = null;
             this._visibleAndEnabledModels = null;
@@ -24501,8 +24563,11 @@ var feng3d;
             this._pickMap.forEach(function (item) { return item.clear(); });
             this.behaviours.forEach(function (element) {
                 if (element.isVisibleAndEnabled && Boolean(_this.runEnvironment & element.runEnvironment))
-                    element.update(interval || (1000 / feng3d.ticker.frameRate));
+                    element.update(interval);
             });
+            // 只在
+            if (this.runEnvironment == feng3d.RunEnvironment.feng3d)
+                this.world.step(1.0 / 60.0, interval / 1000, 3);
         };
         Object.defineProperty(Scene3D.prototype, "models", {
             /**
@@ -24690,6 +24755,9 @@ var feng3d;
             feng3d.serialize,
             feng3d.oav()
         ], Scene3D.prototype, "ambientColor", void 0);
+        __decorate([
+            feng3d.oav()
+        ], Scene3D.prototype, "gravity", void 0);
         return Scene3D;
     }(feng3d.Component));
     feng3d.Scene3D = Scene3D;
@@ -36145,10 +36213,12 @@ var feng3d;
         };
         GameObjectFactory.prototype.createSphere = function (name) {
             if (name === void 0) { name = "sphere"; }
-            return feng3d.serialization.setValue(new feng3d.GameObject(), {
+            var sphere = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.sphere },]
             });
+            var sphereBody = sphere.addComponent(feng3d.BodyComponent);
+            return sphere;
         };
         GameObjectFactory.prototype.createCapsule = function (name) {
             if (name === void 0) { name = "capsule"; }
@@ -39879,7 +39949,7 @@ var CANNON;
         }
         Plane.prototype.computeWorldNormal = function (quat) {
             var n = this.worldNormal;
-            n.set(0, 0, 1);
+            n.set(0, 1, 0);
             quat.vmult(n, n);
             this.worldNormalNeedsUpdate = false;
         };
@@ -39892,7 +39962,7 @@ var CANNON;
         };
         Plane.prototype.calculateWorldAABB = function (pos, quat, min, max) {
             // The plane AABB is infinite, except if the normal is pointing along any axis
-            tempNormal.set(0, 0, 1); // Default plane normal is z
+            tempNormal.set(0, 1, 0); // Default plane normal is y
             quat.vmult(tempNormal, tempNormal);
             var maxVal = Number.MAX_VALUE;
             min.set(-maxVal, -maxVal, -maxVal);
@@ -41837,7 +41907,7 @@ var CANNON;
             var to = this.to;
             var direction = this._direction;
             // Get plane normal
-            var worldNormal = new CANNON.Vec3(0, 0, 1);
+            var worldNormal = new CANNON.Vec3(0, 1, 0);
             quat.vmult(worldNormal, worldNormal);
             var len = new CANNON.Vec3();
             from.vsub(position, len);
@@ -44915,19 +44985,17 @@ var CANNON;
             this.contactMaterialTable.set(cmat.materials[0].id, cmat.materials[1].id, cmat);
         };
         /**
-         * Step the physics world forward in time.
+         * 让物理世界在时间上向前迈进。
          *
-         * There are two modes. The simple mode is fixed timestepping without interpolation. In this case you only use the first argument. The second case uses interpolation. In that you also provide the time since the function was last used, as well as the maximum fixed timesteps to take.
+         * 有两种模式。简单的模式是固定的时间步长没有插值。在本例中，您只使用第一个参数。第二种情况使用插值。因为您还提供了函数上次使用以来的时间，以及要采取的最大固定时间步骤。
          *
-         * @param dt                       The fixed time step size to use.
-         * @param timeSinceLastCalled    The time elapsed since the function was last called.
-         * @param maxSubSteps         Maximum number of fixed steps to take per function call.
+         * @param dt 使用固定时间步长。单位为s。
+         * @param timeSinceLastCalled 函数上次调用后经过的时间。单位为s。
+         * @param maxSubSteps 每个函数调用要执行的最大固定步骤数。
          *
          * @example
-         *     // fixed timestepping without interpolation
+         *     // 固定的时间步进没有插值
          *     world.step(1/60);
-         *
-         * @see http://bulletphysics.org/mediawiki-1.5.8/index.php/Stepping_The_World
          */
         World.prototype.step = function (dt, timeSinceLastCalled, maxSubSteps) {
             maxSubSteps = maxSubSteps || 10;
@@ -45541,7 +45609,7 @@ var CANNON;
             // Make contacts!
             var v = new CANNON.Vec3();
             var normal = planeTrimesh_normal;
-            normal.set(0, 0, 1);
+            normal.set(0, 1, 0);
             planeQuat.vmult(normal, normal); // Turn normal according to plane
             for (var i = 0; i < trimeshShape.vertices.length / 3; i++) {
                 // Get world vertex from trimesh
@@ -45701,7 +45769,7 @@ var CANNON;
             // We will have one contact in this case
             var r = this.createContactEquation(bi, bj, si, sj, rsi, rsj);
             // Contact normal
-            r.ni.set(0, 0, 1);
+            r.ni.set(0, 1, 0);
             qj.vmult(r.ni, r.ni);
             r.ni.negate(r.ni); // body i is the sphere, flip normal
             r.ni.normalize(); // Needed?
@@ -46100,7 +46168,7 @@ var CANNON;
         Narrowphase.prototype.planeConvex = function (planeShape, convexShape, planePosition, convexPosition, planeQuat, convexQuat, planeBody, convexBody, si, sj, justTest) {
             // Simply return the points behind the plane.
             var worldVertex = planeConvex_v, worldNormal = planeConvex_normal;
-            worldNormal.set(0, 0, 1);
+            worldNormal.set(0, 1, 0);
             planeQuat.vmult(worldNormal, worldNormal); // Turn normal according to plane orientation
             var numContacts = 0;
             var relpos = planeConvex_relpos;
@@ -46248,7 +46316,7 @@ var CANNON;
         // };
         Narrowphase.prototype.planeParticle = function (sj, si, xj, xi, qj, qi, bj, bi, rsi, rsj, justTest) {
             var normal = particlePlane_normal;
-            normal.set(0, 0, 1);
+            normal.set(0, 1, 0);
             bj.quaternion.vmult(normal, normal); // Turn normal according to plane orientation
             var relpos = particlePlane_relpos;
             xi.vsub(bj.position, relpos);
@@ -46275,7 +46343,7 @@ var CANNON;
         Narrowphase.prototype.sphereParticle = function (sj, si, xj, xi, qj, qi, bj, bi, rsi, rsj, justTest) {
             // The normal is the unit vector from sphere center to particle center
             var normal = particleSphere_normal;
-            normal.set(0, 0, 1);
+            normal.set(0, 1, 0);
             xi.vsub(xj, normal);
             var lengthSquared = normal.norm2();
             if (lengthSquared <= sj.radius * sj.radius) {
