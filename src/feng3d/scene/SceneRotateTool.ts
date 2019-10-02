@@ -245,8 +245,7 @@ namespace editor
             egret.Tween.get(rate, {
                 onChange: () =>
                 {
-                    var cameraQuat = new feng3d.Quaternion();
-                    cameraQuat.slerp(sourceQuat, targetQuat, rate.rate);
+                    var cameraQuat = sourceQuat.slerpTo(targetQuat, rate.rate);
                     camera.transform.orientation = cameraQuat;
                     //
                     var translation = camera.transform.forwardVector;
