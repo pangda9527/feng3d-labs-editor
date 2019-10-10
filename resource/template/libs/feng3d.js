@@ -24312,7 +24312,6 @@ var feng3d;
             if (component.single)
                 this.removeComponentsByType(component.constructor);
             this._components.splice(index, 0, component);
-            component["_gameObject"] = this;
             component.setGameObject(this);
             component.init();
             //派发添加组件事件
@@ -24845,52 +24844,6 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
-    var BodyComponent = /** @class */ (function (_super) {
-        __extends(BodyComponent, _super);
-        function BodyComponent() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.__class__ = "feng3d.BodyComponent";
-            _this.shapeType = CANNON.ShapeType.SPHERE;
-            _this.runEnvironment = feng3d.RunEnvironment.feng3d;
-            _this.mass = 5;
-            return _this;
-        }
-        BodyComponent.prototype.init = function () {
-            this.body = new CANNON.Body({
-                mass: this.mass,
-            });
-            switch (this.shapeType) {
-                case CANNON.ShapeType.SPHERE:
-                    var radius = 1;
-                    this.body.addShape(new CANNON.Sphere(radius));
-                    break;
-                case CANNON.ShapeType.PLANE:
-                    this.body.addShape(new CANNON.Plane());
-                    break;
-                default:
-                    break;
-            }
-            this.body.position = this.transform.position;
-        };
-        /**
-         * 每帧执行
-         */
-        BodyComponent.prototype.update = function (interval) {
-            var scene3D = this.getComponentsInParents(feng3d.Scene3D)[0];
-            if (scene3D) {
-                this.transform.position = this.body.position;
-            }
-        };
-        __decorate([
-            feng3d.oav(),
-            feng3d.serialize
-        ], BodyComponent.prototype, "mass", void 0);
-        return BodyComponent;
-    }(feng3d.Behaviour));
-    feng3d.BodyComponent = BodyComponent;
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
     var Model = /** @class */ (function (_super) {
         __extends(Model, _super);
         function Model() {
@@ -25257,7 +25210,7 @@ var feng3d;
             this._gameObject["updateChildrenScene"]();
             this.world = new CANNON.World();
             this.world.gravity = this.gravity;
-            var bodys = this.getComponentsInChildren(feng3d.BodyComponent).map(function (c) { return c.body; });
+            var bodys = this.getComponentsInChildren(feng3d.Rigidbody).map(function (c) { return c.body; });
             bodys.forEach(function (v) {
                 _this.world.addBody(v);
             });
@@ -25268,23 +25221,23 @@ var feng3d;
             this.on("removeComponent", this.onRemovedComponent, this);
         };
         Scene3D.prototype.onAddComponent = function (e) {
-            if (e.data instanceof feng3d.BodyComponent) {
+            if (e.data instanceof feng3d.Rigidbody) {
                 this.world.addBody(e.data.body);
             }
         };
         Scene3D.prototype.onRemovedComponent = function (e) {
-            if (e.data instanceof feng3d.BodyComponent) {
+            if (e.data instanceof feng3d.Rigidbody) {
                 this.world.removeBody(e.data.body);
             }
         };
         Scene3D.prototype.onAddChild = function (e) {
-            var bodyComponent = e.data.getComponent(feng3d.BodyComponent);
+            var bodyComponent = e.data.getComponent(feng3d.Rigidbody);
             if (bodyComponent) {
                 this.world.addBody(bodyComponent.body);
             }
         };
         Scene3D.prototype.onRemoveChild = function (e) {
-            var bodyComponent = e.data.getComponent(feng3d.BodyComponent);
+            var bodyComponent = e.data.getComponent(feng3d.Rigidbody);
             if (bodyComponent) {
                 this.world.removeBody(bodyComponent.body);
             }
@@ -36924,17 +36877,23 @@ var feng3d;
         };
         GameObjectFactory.prototype.createCube = function (name) {
             if (name === void 0) { name = "cube"; }
-            return feng3d.serialization.setValue(new feng3d.GameObject(), {
+            var g = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.cube },]
             });
+            g.addComponent(feng3d.BoxCollider);
+            g.addComponent(feng3d.Rigidbody);
+            return g;
         };
         GameObjectFactory.prototype.createPlane = function (name) {
             if (name === void 0) { name = "plane"; }
-            return feng3d.serialization.setValue(new feng3d.GameObject(), {
+            var g = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.plane },]
             });
+            g.addComponent(feng3d.PlaneCollider);
+            g.addComponent(feng3d.Rigidbody);
+            return g;
         };
         GameObjectFactory.prototype.createCylinder = function (name) {
             if (name === void 0) { name = "cylinder"; }
@@ -36963,7 +36922,8 @@ var feng3d;
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.sphere },]
             });
-            var sphereBody = sphere.addComponent(feng3d.BodyComponent);
+            sphere.addComponent(feng3d.SphereCollider);
+            sphere.addComponent(feng3d.Rigidbody);
             return sphere;
         };
         GameObjectFactory.prototype.createCapsule = function (name) {
@@ -38717,11 +38677,6 @@ var CANNON;
                 [2, 3, 7, 6],
                 [0, 4, 7, 3],
                 [1, 2, 6, 5],
-            ];
-            var axes = [
-                new V(0, 0, 1),
-                new V(0, 1, 0),
-                new V(1, 0, 0)
             ];
             var h = new CANNON.ConvexPolyhedron(vertices, indices);
             this.convexPolyhedronRepresentation = h;
@@ -46235,6 +46190,48 @@ var CANNON;
 var feng3d;
 (function (feng3d) {
     /**
+     * 刚体
+     */
+    var Rigidbody = /** @class */ (function (_super) {
+        __extends(Rigidbody, _super);
+        function Rigidbody() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.__class__ = "feng3d.Rigidbody";
+            _this.runEnvironment = feng3d.RunEnvironment.feng3d;
+            _this.mass = 0;
+            return _this;
+        }
+        Rigidbody.prototype.init = function () {
+            var _this = this;
+            this.body = new CANNON.Body({
+                mass: this.mass,
+            });
+            this.body.position = this.transform.position;
+            var colliders = this.gameObject.getComponents(feng3d.Collider);
+            colliders.forEach(function (element) {
+                _this.body.addShape(element.shape);
+            });
+        };
+        /**
+         * 每帧执行
+         */
+        Rigidbody.prototype.update = function (interval) {
+            var scene3D = this.getComponentsInParents(feng3d.Scene3D)[0];
+            if (scene3D) {
+                this.transform.position = this.body.position;
+            }
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], Rigidbody.prototype, "mass", void 0);
+        return Rigidbody;
+    }(feng3d.Behaviour));
+    feng3d.Rigidbody = Rigidbody;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
      * 碰撞体
      */
     var Collider = /** @class */ (function (_super) {
@@ -46242,9 +46239,59 @@ var feng3d;
         function Collider() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(Collider.prototype, "shape", {
+            get: function () {
+                return this._shape;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return Collider;
     }(feng3d.Component));
     feng3d.Collider = Collider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * 长方体碰撞体
+     */
+    var BoxCollider = /** @class */ (function (_super) {
+        __extends(BoxCollider, _super);
+        function BoxCollider() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            /**
+             * 宽度
+             */
+            _this.width = 1;
+            /**
+             * 高度
+             */
+            _this.height = 1;
+            /**
+             * 深度
+             */
+            _this.depth = 1;
+            return _this;
+        }
+        BoxCollider.prototype.init = function () {
+            var halfExtents = new feng3d.Vector3(this.width / 2, this.height / 2, this.depth / 2);
+            this._shape = new CANNON.Box(halfExtents);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], BoxCollider.prototype, "width", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], BoxCollider.prototype, "height", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], BoxCollider.prototype, "depth", void 0);
+        return BoxCollider;
+    }(feng3d.Collider));
+    feng3d.BoxCollider = BoxCollider;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -46255,7 +46302,7 @@ var feng3d;
         __extends(SphereCollider, _super);
         function SphereCollider() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this._radius = 1;
+            _this._radius = 0.5;
             return _this;
         }
         Object.defineProperty(SphereCollider.prototype, "radius", {
@@ -46273,19 +46320,33 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SphereCollider.prototype, "shape", {
-            get: function () {
-                return this._shape;
-            },
-            enumerable: true,
-            configurable: true
-        });
         SphereCollider.prototype.init = function () {
             this._shape = new CANNON.Sphere(this._radius);
         };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], SphereCollider.prototype, "radius", null);
         return SphereCollider;
     }(feng3d.Collider));
     feng3d.SphereCollider = SphereCollider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * 平面碰撞体
+     */
+    var PlaneCollider = /** @class */ (function (_super) {
+        __extends(PlaneCollider, _super);
+        function PlaneCollider() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        PlaneCollider.prototype.init = function () {
+            this._shape = new CANNON.Plane();
+        };
+        return PlaneCollider;
+    }(feng3d.Collider));
+    feng3d.PlaneCollider = PlaneCollider;
 })(feng3d || (feng3d = {}));
 //# sourceMappingURL=feng3d.js.map
 console.log("feng3d-0.1.3");
