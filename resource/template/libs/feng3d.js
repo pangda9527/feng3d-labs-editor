@@ -8868,6 +8868,8 @@ var feng3d;
          */
         Vector3.prototype.addTo = function (a, vout) {
             if (vout === void 0) { vout = new Vector3(); }
+            if (a == vout)
+                a = a.clone();
             return vout.copy(this).add(a);
         };
         /**
@@ -8887,6 +8889,8 @@ var feng3d;
          */
         Vector3.prototype.multiplyTo = function (a, vout) {
             if (vout === void 0) { vout = new Vector3(); }
+            if (a == vout)
+                a = a.clone();
             return vout.copy(this).multiply(a);
         };
         /**
@@ -8906,6 +8910,8 @@ var feng3d;
          */
         Vector3.prototype.divideTo = function (a, vout) {
             if (vout === void 0) { vout = new Vector3(); }
+            if (a == vout)
+                a = a.clone();
             return vout.copy(this).divide(a);
         };
         /**
@@ -8922,6 +8928,8 @@ var feng3d;
          */
         Vector3.prototype.crossTo = function (a, vout) {
             if (vout === void 0) { vout = new Vector3(); }
+            if (a == vout)
+                a = a.clone();
             return vout.copy(this).cross(a);
         };
         /**
@@ -9193,6 +9201,8 @@ var feng3d;
          */
         Vector3.prototype.scaleTo = function (s, vout) {
             if (vout === void 0) { vout = new Vector3(); }
+            if (s == vout)
+                s = s.clone();
             return vout.copy(this).scale(s);
         };
         /**
@@ -9213,6 +9223,8 @@ var feng3d;
          */
         Vector3.prototype.subTo = function (a, vout) {
             if (vout === void 0) { vout = new Vector3(); }
+            if (a == vout)
+                a = a.clone();
             return vout.copy(this).sub(a);
         };
         /**
@@ -9235,6 +9247,8 @@ var feng3d;
          */
         Vector3.prototype.lerpTo = function (v, alpha, vout) {
             if (vout === void 0) { vout = new Vector3(); }
+            if (v == vout)
+                v = v.clone();
             return vout.copy(this).lerp(v, alpha);
         };
         /**
@@ -9257,6 +9271,8 @@ var feng3d;
          */
         Vector3.prototype.lerpNumberTo = function (v, alpha, vout) {
             if (vout === void 0) { vout = new Vector3(); }
+            if (v == vout)
+                v = v.clone();
             return vout.copy(this).lerpNumber(v, alpha);
         };
         /**
@@ -36897,10 +36913,13 @@ var feng3d;
         };
         GameObjectFactory.prototype.createCylinder = function (name) {
             if (name === void 0) { name = "cylinder"; }
-            return feng3d.serialization.setValue(new feng3d.GameObject(), {
+            var g = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.cylinder },]
             });
+            g.addComponent(feng3d.CylinderCollider);
+            g.addComponent(feng3d.Rigidbody);
+            return g;
         };
         GameObjectFactory.prototype.createCone = function (name) {
             if (name === void 0) { name = "Cone"; }
@@ -45031,10 +45050,10 @@ var CANNON;
                         if (resolver) {
                             var retval = false;
                             if (si.type < sj.type) {
-                                retval = resolver.call(this, si, sj, xi, xj, qi, qj, bi, bj, si, sj, justTest);
+                                retval = resolver.call(this, si, sj, new CANNON.Transform(xi, qi), new CANNON.Transform(xj, qj), bi, bj, si, sj, justTest);
                             }
                             else {
-                                retval = resolver.call(this, sj, si, xj, xi, qj, qi, bj, bi, si, sj, justTest);
+                                retval = resolver.call(this, sj, si, new CANNON.Transform(xj, qj), new CANNON.Transform(xi, qi), bj, bi, si, sj, justTest);
                             }
                             if (retval && justTest) {
                                 // Register overlap
@@ -45046,22 +45065,22 @@ var CANNON;
                 }
             }
         };
-        Narrowphase.prototype.boxBox = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
+        Narrowphase.prototype.boxBox = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
             si.convexPolyhedronRepresentation.material = si.material;
             sj.convexPolyhedronRepresentation.material = sj.material;
             si.convexPolyhedronRepresentation.collisionResponse = si.collisionResponse;
             sj.convexPolyhedronRepresentation.collisionResponse = sj.collisionResponse;
-            return this.convexConvex(si.convexPolyhedronRepresentation, sj.convexPolyhedronRepresentation, xi, xj, qi, qj, bi, bj, si, sj, justTest);
+            return this.convexConvex(si.convexPolyhedronRepresentation, sj.convexPolyhedronRepresentation, transformi, transformj, bi, bj, si, sj, justTest);
         };
-        Narrowphase.prototype.boxConvex = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
+        Narrowphase.prototype.boxConvex = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
             si.convexPolyhedronRepresentation.material = si.material;
             si.convexPolyhedronRepresentation.collisionResponse = si.collisionResponse;
-            return this.convexConvex(si.convexPolyhedronRepresentation, sj, xi, xj, qi, qj, bi, bj, si, sj, justTest);
+            return this.convexConvex(si.convexPolyhedronRepresentation, sj, transformi, transformj, bi, bj, si, sj, justTest);
         };
-        Narrowphase.prototype.boxParticle = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
+        Narrowphase.prototype.boxParticle = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
             si.convexPolyhedronRepresentation.material = si.material;
             si.convexPolyhedronRepresentation.collisionResponse = si.collisionResponse;
-            return this.convexParticle(si.convexPolyhedronRepresentation, sj, xi, xj, qi, qj, bi, bj, si, sj, justTest);
+            return this.convexParticle(si.convexPolyhedronRepresentation, sj, transformi, transformj, bi, bj, si, sj, justTest);
         };
         Narrowphase.prototype.sphereSphere = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
             if (justTest) {
@@ -45625,13 +45644,14 @@ var CANNON;
                 }
             }
         };
-        Narrowphase.prototype.planeBox = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
+        Narrowphase.prototype.planeBox = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
             sj.convexPolyhedronRepresentation.material = sj.material;
             sj.convexPolyhedronRepresentation.collisionResponse = sj.collisionResponse;
             sj.convexPolyhedronRepresentation.id = sj.id;
-            return this.planeConvex(si, sj.convexPolyhedronRepresentation, xi, xj, qi, qj, bi, bj, si, sj, justTest);
+            return this.planeConvex(si, sj.convexPolyhedronRepresentation, transformi, transformj, bi, bj, si, sj, justTest);
         };
-        Narrowphase.prototype.planeConvex = function (planeShape, convexShape, planePosition, convexPosition, planeQuat, convexQuat, planeBody, convexBody, si, sj, justTest) {
+        Narrowphase.prototype.planeConvex = function (planeShape, convexShape, planeTransform, convexTransform, planeBody, convexBody, si, sj, justTest) {
+            var planePosition = planeTransform.position, convexPosition = convexTransform.position, planeQuat = planeTransform.quaternion, convexQuat = convexTransform.quaternion;
             // Simply return the points behind the plane.
             var worldVertex = planeConvex_v, worldNormal = planeConvex_normal;
             worldNormal.init(0, 1, 0);
@@ -45680,7 +45700,7 @@ var CANNON;
             if (xi.distance(xj) > si.boundingSphereRadius + sj.boundingSphereRadius) {
                 return;
             }
-            if (si.findSeparatingAxis(sj, xi, qi, xj, qj, sepAxis, faceListA, faceListB)) {
+            if (si.findSeparatingAxis(sj, transformi, transformj, sepAxis, faceListA, faceListB)) {
                 var res = [];
                 var q = convexConvex_q;
                 si.clipAgainstHull(xi, qi, sj, xj, qj, sepAxis, -100, 100, res);
@@ -45828,7 +45848,8 @@ var CANNON;
                 this.createFrictionEquationsFromContact(r, this.frictionResult);
             }
         };
-        Narrowphase.prototype.convexParticle = function (sj, si, xj, xi, qj, qi, bj, bi, rsi, rsj, justTest) {
+        Narrowphase.prototype.convexParticle = function (sj, si, transformi, transformj, bj, bi, rsi, rsj, justTest) {
+            var xj = transformi.position, xi = transformj.position, qj = transformi.quaternion, qi = transformj.quaternion;
             var penetratedFaceIndex = -1;
             var penetratedFaceNormal = convexParticle_penetratedFaceNormal;
             var worldPenetrationVec = convexParticle_worldPenetrationVec;
@@ -46330,6 +46351,56 @@ var feng3d;
         return SphereCollider;
     }(feng3d.Collider));
     feng3d.SphereCollider = SphereCollider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * 圆柱体碰撞体
+     */
+    var CylinderCollider = /** @class */ (function (_super) {
+        __extends(CylinderCollider, _super);
+        function CylinderCollider() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            /**
+             * 顶部半径
+             */
+            _this.topRadius = 0.5;
+            /**
+             * 底部半径
+             */
+            _this.bottomRadius = 0.5;
+            /**
+             * 高度
+             */
+            _this.height = 2;
+            /**
+             * 横向分割数
+             */
+            _this.segmentsW = 16;
+            return _this;
+        }
+        CylinderCollider.prototype.init = function () {
+            this._shape = new CANNON.Cylinder(this.topRadius, this.bottomRadius, this.height, this.segmentsW);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderCollider.prototype, "topRadius", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderCollider.prototype, "bottomRadius", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderCollider.prototype, "height", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderCollider.prototype, "segmentsW", void 0);
+        return CylinderCollider;
+    }(feng3d.Collider));
+    feng3d.CylinderCollider = CylinderCollider;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {

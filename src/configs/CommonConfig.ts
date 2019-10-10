@@ -429,6 +429,7 @@ namespace editor
                     submenu: [
                         { label: "Box Collider", click: () => { gameobject.addComponent(feng3d.BoxCollider); } },
                         { label: "Sphere Collider", click: () => { gameobject.addComponent(feng3d.SphereCollider); } },
+                        { label: "Cylinder Collider", click: () => { gameobject.addComponent(feng3d.CylinderCollider); } },
                         { label: "Plane Collider", click: () => { gameobject.addComponent(feng3d.PlaneCollider); } },
                         { label: "Rigidbody", click: () => { gameobject.addComponent(feng3d.Rigidbody); } },
                     ]
