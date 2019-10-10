@@ -14,9 +14,9 @@ namespace editor
         zCube: CoordinateScaleCube;
         oCube: CoordinateCube;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             this.gameObject.name = "GameObjectScaleModel";
             this.initModels();
         }
@@ -62,9 +62,9 @@ namespace editor
         @feng3d.watch("update")
         scaleValue = 1;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             var xLine = new feng3d.GameObject();
             var model = xLine.addComponent(feng3d.Model);
             var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {

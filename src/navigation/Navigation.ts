@@ -49,9 +49,9 @@ namespace editor
         private _rejectivedVoxelsPointGeometry: feng3d.PointGeometry;
         private _debugVoxelsPointGeometry: feng3d.PointGeometry;
 
-        init(gameobject: feng3d.GameObject)
+        init()
         {
-            super.init(gameobject);
+            super.init();
             this.hideFlags = this.hideFlags | feng3d.HideFlags.DontSaveInBuild;
 
             this._navobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "NavObject", hideFlags: feng3d.HideFlags.DontSave });

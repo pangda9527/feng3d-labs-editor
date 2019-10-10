@@ -28,14 +28,14 @@ namespace editor
         private _editorCamera: feng3d.Camera;
         private segmentGeometry: feng3d.SegmentGeometry;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
 
             var groundGridObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "GroundGrid" });
             groundGridObject.mouseEnabled = false;
 
-            gameObject.addChild(groundGridObject);
+            this._gameObject.addChild(groundGridObject);
 
             var model = groundGridObject.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();

@@ -19,9 +19,9 @@ namespace editor
 
         oCube: CoordinateCube;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             this.gameObject.name = "GameObjectMoveModel";
             this.initModels();
         }
@@ -83,9 +83,9 @@ namespace editor
         @feng3d.watch("update")
         selected = false;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
 
             var xLine = new feng3d.GameObject();
             var model = xLine.addComponent(feng3d.Model);
@@ -137,9 +137,9 @@ namespace editor
         @feng3d.watch("update")
         selected = false;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             //
             this.oCube = new feng3d.GameObject();
             var model = this.oCube.addComponent(feng3d.Model)
@@ -179,9 +179,9 @@ namespace editor
         @feng3d.watch("update")
         selected = false;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
 
             var plane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "plane" });
             var model = plane.addComponent(feng3d.Model);

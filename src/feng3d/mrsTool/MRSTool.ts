@@ -36,9 +36,9 @@ namespace editor
         set editorCamera(v) { this._editorCamera = v; this.invalidate(); }
         private _editorCamera: feng3d.Camera;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
 
             this.mrsToolObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MRSTool" });
 

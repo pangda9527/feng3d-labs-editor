@@ -15,9 +15,9 @@ namespace editor
         private arrowsZ: feng3d.GameObject;
         private arrowsNZ: feng3d.GameObject;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
 
             this.load();
         }

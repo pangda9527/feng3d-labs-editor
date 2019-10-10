@@ -9,9 +9,9 @@ namespace editor
         private stepPlaneCross: feng3d.Vector3;
         private startMousePos: feng3d.Vector2;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             this.toolModel = new feng3d.GameObject().addComponent(RToolModel);
         }
         protected onAddedToScene()

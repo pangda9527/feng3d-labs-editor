@@ -2,9 +2,9 @@ namespace editor
 {
     export class MouseRayTestScript extends EditorScript
     {
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
 
             feng3d.windowEventProxy.on("click", this.onclick, this);
         }

@@ -9,9 +9,9 @@ namespace editor
         set editorCamera(v) { this._editorCamera = v; this.initicon(); }
         private _editorCamera: feng3d.Camera;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             this.initicon()
             this.on("mousedown", this.onMousedown, this);
         }

@@ -16,9 +16,9 @@ namespace editor
         freeAxis: CoordinateRotationFreeAxis;
         cameraAxis: CoordinateRotationAxis;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             this.gameObject.name = "GameObjectRotationModel";
             this.initModels();
         }
@@ -77,9 +77,9 @@ namespace editor
         @feng3d.watch("update")
         filterNormal: feng3d.Vector3;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             this.initModels();
         }
 
@@ -192,9 +192,9 @@ namespace editor
         /**
          * 构建3D对象
          */
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             this.gameObject.name = "sector";
 
             var model = this.gameObject.addComponent(feng3d.Model);
@@ -272,9 +272,9 @@ namespace editor
         @feng3d.watch("update")
         selected = false;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             this.initModels();
         }
 

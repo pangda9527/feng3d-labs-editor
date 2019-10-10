@@ -44,11 +44,6 @@ namespace editor
         set editorCamera(v) { if (this._editorCamera == v) return; this._editorCamera = v; this.update(); }
         private _editorCamera: feng3d.Camera;
 
-        init(gameobject: feng3d.GameObject)
-        {
-            super.init(gameobject);
-        }
-
         /**
          * 销毁
          */

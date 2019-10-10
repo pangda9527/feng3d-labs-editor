@@ -9424,7 +9424,7 @@ var feng3d;
          * @see http://www8.cs.umu.se/kurser/TDBD24/VT06/lectures/Lecture6.pdf
          */
         Vector3.prototype.crossmat = function () {
-            return new CANNON.Mat3([0, -this.z, this.y,
+            return new feng3d.Matrix3x3([0, -this.z, this.y,
                 this.z, 0, -this.x,
                 -this.y, this.x, 0]);
         };
@@ -10771,6 +10771,372 @@ var feng3d;
         return Matrix;
     }());
     feng3d.Matrix = Matrix;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var Matrix3x3 = /** @class */ (function () {
+        /**
+         * 构建3x3矩阵
+         *
+         * @param elements 九个元素的数组
+         */
+        function Matrix3x3(elements) {
+            if (elements === void 0) { elements = [1, 0, 0, 0, 1, 0, 0, 0, 1]; }
+            this.elements = elements;
+        }
+        /**
+         * 设置矩阵为单位矩阵
+         */
+        Matrix3x3.prototype.identity = function () {
+            var e = this.elements;
+            e[0] = 1;
+            e[1] = 0;
+            e[2] = 0;
+            e[3] = 0;
+            e[4] = 1;
+            e[5] = 0;
+            e[6] = 0;
+            e[7] = 0;
+            e[8] = 1;
+            return this;
+        };
+        /**
+         * 将所有元素设置为0
+         */
+        Matrix3x3.prototype.setZero = function () {
+            var e = this.elements;
+            e[0] = 0;
+            e[1] = 0;
+            e[2] = 0;
+            e[3] = 0;
+            e[4] = 0;
+            e[5] = 0;
+            e[6] = 0;
+            e[7] = 0;
+            e[8] = 0;
+            return this;
+        };
+        /**
+         * 根据一个 Vector3 设置矩阵对角元素
+         *
+         * @param vec3
+         */
+        Matrix3x3.prototype.setTrace = function (vec3) {
+            var e = this.elements;
+            e[0] = vec3.x;
+            e[4] = vec3.y;
+            e[8] = vec3.z;
+            return this;
+        };
+        /**
+         * 获取矩阵对角元素
+         */
+        Matrix3x3.prototype.getTrace = function (target) {
+            if (target === void 0) { target = new feng3d.Vector3(); }
+            var e = this.elements;
+            target.x = e[0];
+            target.y = e[4];
+            target.z = e[8];
+            return target;
+        };
+        /**
+         * 矩阵向量乘法
+         *
+         * @param v 要乘以的向量
+         * @param target 目标保存结果
+         */
+        Matrix3x3.prototype.vmult = function (v, target) {
+            if (target === void 0) { target = new feng3d.Vector3(); }
+            var e = this.elements, x = v.x, y = v.y, z = v.z;
+            target.x = e[0] * x + e[1] * y + e[2] * z;
+            target.y = e[3] * x + e[4] * y + e[5] * z;
+            target.z = e[6] * x + e[7] * y + e[8] * z;
+            return target;
+        };
+        /**
+         * 矩阵标量乘法
+         * @param s
+         */
+        Matrix3x3.prototype.smult = function (s) {
+            for (var i = 0; i < this.elements.length; i++) {
+                this.elements[i] *= s;
+            }
+        };
+        /**
+         * 矩阵乘法
+         * @param  m 要从左边乘的矩阵。
+         */
+        Matrix3x3.prototype.mmult = function (m, target) {
+            if (target === void 0) { target = new feng3d.Matrix3x3(); }
+            for (var i = 0; i < 3; i++) {
+                for (var j = 0; j < 3; j++) {
+                    var sum = 0.0;
+                    for (var k = 0; k < 3; k++) {
+                        sum += m.elements[i + k * 3] * this.elements[k + j * 3];
+                    }
+                    target.elements[i + j * 3] = sum;
+                }
+            }
+            return target;
+        };
+        /**
+         * 缩放矩阵的每一列
+         *
+         * @param v
+         */
+        Matrix3x3.prototype.scale = function (v, target) {
+            if (target === void 0) { target = new feng3d.Matrix3x3(); }
+            var e = this.elements, t = target.elements;
+            for (var i = 0; i !== 3; i++) {
+                t[3 * i + 0] = v.x * e[3 * i + 0];
+                t[3 * i + 1] = v.y * e[3 * i + 1];
+                t[3 * i + 2] = v.z * e[3 * i + 2];
+            }
+            return target;
+        };
+        /**
+         * 解决Ax = b
+         *
+         * @param b 右手边
+         * @param target 结果
+         */
+        Matrix3x3.prototype.solve = function (b, target) {
+            if (target === void 0) { target = new feng3d.Vector3(); }
+            // Construct equations
+            var nr = 3; // num rows
+            var nc = 4; // num cols
+            var eqns = [];
+            for (var i = 0; i < nr * nc; i++) {
+                eqns.push(0);
+            }
+            var i, j;
+            for (i = 0; i < 3; i++) {
+                for (j = 0; j < 3; j++) {
+                    eqns[i + nc * j] = this.elements[i + 3 * j];
+                }
+            }
+            eqns[3 + 4 * 0] = b.x;
+            eqns[3 + 4 * 1] = b.y;
+            eqns[3 + 4 * 2] = b.z;
+            // 计算矩阵的右上三角型——高斯消去法
+            var n = 3, k = n, np;
+            var kp = 4; // num rows
+            var p;
+            do {
+                i = k - n;
+                if (eqns[i + nc * i] === 0) {
+                    // the pivot is null, swap lines
+                    for (j = i + 1; j < k; j++) {
+                        if (eqns[i + nc * j] !== 0) {
+                            np = kp;
+                            do { // do ligne( i ) = ligne( i ) + ligne( k )
+                                p = kp - np;
+                                eqns[p + nc * i] += eqns[p + nc * j];
+                            } while (--np);
+                            break;
+                        }
+                    }
+                }
+                if (eqns[i + nc * i] !== 0) {
+                    for (j = i + 1; j < k; j++) {
+                        var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
+                        np = kp;
+                        do { // do ligne( k ) = ligne( k ) - multiplier * ligne( i )
+                            p = kp - np;
+                            eqns[p + nc * j] = p <= i ? 0 : eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
+                        } while (--np);
+                    }
+                }
+            } while (--n);
+            // Get the solution
+            target.z = eqns[2 * nc + 3] / eqns[2 * nc + 2];
+            target.y = (eqns[1 * nc + 3] - eqns[1 * nc + 2] * target.z) / eqns[1 * nc + 1];
+            target.x = (eqns[0 * nc + 3] - eqns[0 * nc + 2] * target.z - eqns[0 * nc + 1] * target.y) / eqns[0 * nc + 0];
+            if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z) || target.x === Infinity || target.y === Infinity || target.z === Infinity) {
+                throw "Could not solve equation! Got x=[" + target.toString() + "], b=[" + b.toString() + "], A=[" + this.toString() + "]";
+            }
+            return target;
+        };
+        /**
+         * 获取指定行列元素值
+         *
+         * @param row
+         * @param column
+         */
+        Matrix3x3.prototype.getElement = function (row, column) {
+            return this.elements[column + 3 * row];
+        };
+        /**
+         * 设置指定行列元素值
+         *
+         * @param row
+         * @param column
+         * @param value
+         */
+        Matrix3x3.prototype.setElement = function (row, column, value) {
+            this.elements[column + 3 * row] = value;
+        };
+        /**
+         * 将另一个矩阵复制到这个矩阵对象中
+         *
+         * @param source
+         */
+        Matrix3x3.prototype.copy = function (source) {
+            for (var i = 0; i < source.elements.length; i++) {
+                this.elements[i] = source.elements[i];
+            }
+            return this;
+        };
+        /**
+         * 返回矩阵的字符串表示形式
+         */
+        Matrix3x3.prototype.toString = function () {
+            var r = "";
+            var sep = ",";
+            for (var i = 0; i < 9; i++) {
+                r += this.elements[i] + sep;
+            }
+            return r;
+        };
+        /**
+         * 逆矩阵
+         */
+        Matrix3x3.prototype.reverse = function () {
+            // Construct equations
+            var nr = 3; // num rows
+            var nc = 6; // num cols
+            var eqns = [];
+            for (var i = 0; i < nr * nc; i++) {
+                eqns.push(0);
+            }
+            var i, j;
+            for (i = 0; i < 3; i++) {
+                for (j = 0; j < 3; j++) {
+                    eqns[i + nc * j] = this.elements[i + 3 * j];
+                }
+            }
+            eqns[3 + 6 * 0] = 1;
+            eqns[3 + 6 * 1] = 0;
+            eqns[3 + 6 * 2] = 0;
+            eqns[4 + 6 * 0] = 0;
+            eqns[4 + 6 * 1] = 1;
+            eqns[4 + 6 * 2] = 0;
+            eqns[5 + 6 * 0] = 0;
+            eqns[5 + 6 * 1] = 0;
+            eqns[5 + 6 * 2] = 1;
+            // Compute right upper triangular version of the matrix - Gauss elimination
+            var n = 3, k = n, np;
+            var kp = nc; // num rows
+            var p;
+            do {
+                i = k - n;
+                if (eqns[i + nc * i] === 0) {
+                    // the pivot is null, swap lines
+                    for (j = i + 1; j < k; j++) {
+                        if (eqns[i + nc * j] !== 0) {
+                            np = kp;
+                            do { // do line( i ) = line( i ) + line( k )
+                                p = kp - np;
+                                eqns[p + nc * i] += eqns[p + nc * j];
+                            } while (--np);
+                            break;
+                        }
+                    }
+                }
+                if (eqns[i + nc * i] !== 0) {
+                    for (j = i + 1; j < k; j++) {
+                        var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
+                        np = kp;
+                        do { // do line( k ) = line( k ) - multiplier * line( i )
+                            p = kp - np;
+                            eqns[p + nc * j] = p <= i ? 0 : eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
+                        } while (--np);
+                    }
+                }
+            } while (--n);
+            // eliminate the upper left triangle of the matrix
+            i = 2;
+            do {
+                j = i - 1;
+                do {
+                    var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
+                    np = nc;
+                    do {
+                        p = nc - np;
+                        eqns[p + nc * j] = eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
+                    } while (--np);
+                } while (j--);
+            } while (--i);
+            // operations on the diagonal
+            i = 2;
+            do {
+                var multiplier = 1 / eqns[i + nc * i];
+                np = nc;
+                do {
+                    p = nc - np;
+                    eqns[p + nc * i] = eqns[p + nc * i] * multiplier;
+                } while (--np);
+            } while (i--);
+            i = 2;
+            do {
+                j = 2;
+                do {
+                    p = eqns[nr + j + nc * i];
+                    if (isNaN(p) || p === Infinity) {
+                        throw "Could not reverse! A=[" + this.toString() + "]";
+                    }
+                    this.setElement(i, j, p);
+                } while (j--);
+            } while (i--);
+            return this;
+        };
+        /**
+         * 逆矩阵
+         */
+        Matrix3x3.prototype.reverseTo = function (target) {
+            if (target === void 0) { target = new feng3d.Matrix3x3(); }
+            return target.copy(this).reverse();
+        };
+        /**
+         * 从四元数设置矩阵
+         *
+         * @param q
+         */
+        Matrix3x3.prototype.setRotationFromQuaternion = function (q) {
+            var x = q.x, y = q.y, z = q.z, w = q.w, x2 = x + x, y2 = y + y, z2 = z + z, xx = x * x2, xy = x * y2, xz = x * z2, yy = y * y2, yz = y * z2, zz = z * z2, wx = w * x2, wy = w * y2, wz = w * z2, e = this.elements;
+            e[3 * 0 + 0] = 1 - (yy + zz);
+            e[3 * 0 + 1] = xy - wz;
+            e[3 * 0 + 2] = xz + wy;
+            e[3 * 1 + 0] = xy + wz;
+            e[3 * 1 + 1] = 1 - (xx + zz);
+            e[3 * 1 + 2] = yz - wx;
+            e[3 * 2 + 0] = xz - wy;
+            e[3 * 2 + 1] = yz + wx;
+            e[3 * 2 + 2] = 1 - (xx + yy);
+            return this;
+        };
+        /**
+         * 转置矩阵
+         */
+        Matrix3x3.prototype.transpose = function () {
+            var Mt = this.elements, M = this.elements.concat();
+            for (var i = 0; i !== 3; i++) {
+                for (var j = 0; j !== 3; j++) {
+                    Mt[3 * i + j] = M[3 * j + i];
+                }
+            }
+            return this;
+        };
+        /**
+         * 转置矩阵
+         */
+        Matrix3x3.prototype.transposeTo = function (target) {
+            if (target === void 0) { target = new feng3d.Matrix3x3(); }
+            return target.copy(this).transpose();
+        };
+        return Matrix3x3;
+    }());
+    feng3d.Matrix3x3 = Matrix3x3;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -22163,8 +22529,7 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Component.prototype.init = function (gameObject) {
-            this._gameObject = gameObject;
+        Component.prototype.init = function () {
         };
         /**
          * Returns the component of Type type if the game object has one attached, null if it doesn't.
@@ -22213,6 +22578,15 @@ var feng3d;
         Component.prototype._onAllListener = function (e) {
             if (this._gameObject)
                 this._gameObject.dispatchEvent(e);
+        };
+        /**
+         * 该方法仅在GameObject中使用
+         * @private
+         *
+         * @param gameObject 游戏对象
+         */
+        Component.prototype.setGameObject = function (gameObject) {
+            this._gameObject = gameObject;
         };
         __decorate([
             feng3d.serialize
@@ -22551,9 +22925,6 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Transform.prototype.init = function (gameObject) {
-            _super.prototype.init.call(this, gameObject);
-        };
         Object.defineProperty(Transform.prototype, "scenePosition", {
             get: function () {
                 return this.localToWorldMatrix.position;
@@ -23941,7 +24312,9 @@ var feng3d;
             if (component.single)
                 this.removeComponentsByType(component.constructor);
             this._components.splice(index, 0, component);
-            component.init(this);
+            component["_gameObject"] = this;
+            component.setGameObject(this);
+            component.init();
             //派发添加组件事件
             this.dispatch("addComponent", component, true);
         };
@@ -24239,8 +24612,7 @@ var feng3d;
             _this.holdSize = 1;
             return _this;
         }
-        HoldSizeComponent.prototype.init = function (gameobject) {
-            _super.prototype.init.call(this, gameobject);
+        HoldSizeComponent.prototype.init = function () {
             this.transform.on("updateLocalToWorldMatrix", this.updateLocalToWorldMatrix, this);
         };
         HoldSizeComponent.prototype.dispose = function () {
@@ -24311,8 +24683,8 @@ var feng3d;
                 value.on("scenetransformChanged", this.invalidHoldSizeMatrix, this);
             this.invalidHoldSizeMatrix();
         };
-        BillboardComponent.prototype.init = function (gameobject) {
-            _super.prototype.init.call(this, gameobject);
+        BillboardComponent.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.transform.on("updateLocalToWorldMatrix", this.updateLocalToWorldMatrix, this);
             this.invalidHoldSizeMatrix();
         };
@@ -24397,9 +24769,6 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        CartoonComponent.prototype.init = function (gameObject) {
-            _super.prototype.init.call(this, gameObject);
-        };
         CartoonComponent.prototype.beforeRender = function (gl, renderAtomic, scene3d, camera) {
             renderAtomic.uniforms.u_diffuseSegment = this.diffuseSegment;
             renderAtomic.uniforms.u_diffuseSegmentValue = this.diffuseSegmentValue;
@@ -24453,9 +24822,6 @@ var feng3d;
             _this.outlineMorphFactor = 0.0;
             return _this;
         }
-        OutLineComponent.prototype.init = function (gameobject) {
-            _super.prototype.init.call(this, gameobject);
-        };
         OutLineComponent.prototype.beforeRender = function (gl, renderAtomic, scene3d, camera) {
             renderAtomic.uniforms.u_outlineSize = this.size;
             renderAtomic.uniforms.u_outlineColor = this.color;
@@ -24484,18 +24850,27 @@ var feng3d;
         function BodyComponent() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.BodyComponent";
+            _this.shapeType = CANNON.ShapeType.SPHERE;
             _this.runEnvironment = feng3d.RunEnvironment.feng3d;
             _this.mass = 5;
             return _this;
         }
-        BodyComponent.prototype.init = function (gameobject) {
-            _super.prototype.init.call(this, gameobject);
-            var radius = 1; // m
+        BodyComponent.prototype.init = function () {
             this.body = new CANNON.Body({
                 mass: this.mass,
-                position: new feng3d.Vector3(0, 10, 0),
-                shape: new CANNON.Sphere(radius)
             });
+            switch (this.shapeType) {
+                case CANNON.ShapeType.SPHERE:
+                    var radius = 1;
+                    this.body.addShape(new CANNON.Sphere(radius));
+                    break;
+                case CANNON.ShapeType.PLANE:
+                    this.body.addShape(new CANNON.Plane());
+                    break;
+                default:
+                    break;
+            }
+            this.body.position = this.transform.position;
         };
         /**
          * 每帧执行
@@ -24562,8 +24937,8 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Model.prototype.init = function (gameObject) {
-            _super.prototype.init.call(this, gameObject);
+        Model.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.on("scenetransformChanged", this.onScenetransformChanged, this);
         };
         Model.prototype.beforeRender = function (gl, renderAtomic, scene3d, camera) {
@@ -24723,8 +25098,8 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        ScriptComponent.prototype.init = function (gameObject) {
-            _super.prototype.init.call(this, gameObject);
+        ScriptComponent.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.dispatcher.on("asset.scriptChanged", this.invalidateScriptInstance, this);
         };
         ScriptComponent.prototype.updateScriptInstance = function () {
@@ -24872,14 +25247,14 @@ var feng3d;
         /**
          * 构造3D场景
          */
-        Scene3D.prototype.init = function (gameObject) {
+        Scene3D.prototype.init = function () {
             var _this = this;
-            _super.prototype.init.call(this, gameObject);
+            _super.prototype.init.call(this);
             this.transform.hideFlags = this.transform.hideFlags | feng3d.HideFlags.Hide;
             this.gameObject.hideFlags = this.gameObject.hideFlags | feng3d.HideFlags.DontTransform;
             //
-            gameObject["_scene"] = this;
-            this.gameObject["updateChildrenScene"]();
+            this._gameObject["_scene"] = this;
+            this._gameObject["updateChildrenScene"]();
             this.world = new CANNON.World();
             this.world.gravity = this.gravity;
             var bodys = this.getComponentsInChildren(feng3d.BodyComponent).map(function (c) { return c.body; });
@@ -26741,8 +27116,8 @@ var feng3d;
         /**
          * 创建一个摄像机
          */
-        Camera.prototype.init = function (gameObject) {
-            _super.prototype.init.call(this, gameObject);
+        Camera.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.lens = this.lens || new feng3d.PerspectiveLens();
             //
             this.on("scenetransformChanged", this.onScenetransformChanged, this);
@@ -29373,9 +29748,6 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Light.prototype.init = function (gameObject) {
-            _super.prototype.init.call(this, gameObject);
-        };
         Light.prototype.updateDebugShadowMap = function (scene3d, viewCamera) {
             var gameObject = this.debugShadowMapObject;
             if (!gameObject) {
@@ -30059,8 +30431,8 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        FPSController.prototype.init = function (gameobject) {
-            _super.prototype.init.call(this, gameobject);
+        FPSController.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.keyDirectionDic = {};
             this.keyDirectionDic["a"] = new feng3d.Vector3(-1, 0, 0); //左
             this.keyDirectionDic["d"] = new feng3d.Vector3(1, 0, 0); //右
@@ -30318,8 +30690,8 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        AudioListener.prototype.init = function (gameObject) {
-            _super.prototype.init.call(this, gameObject);
+        AudioListener.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.on("scenetransformChanged", this.onScenetransformChanged, this);
             this.onScenetransformChanged();
         };
@@ -30610,8 +30982,8 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        AudioSource.prototype.init = function (gameObject) {
-            _super.prototype.init.call(this, gameObject);
+        AudioSource.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.on("scenetransformChanged", this.onScenetransformChanged, this);
         };
         AudioSource.prototype.onScenetransformChanged = function () {
@@ -31518,9 +31890,9 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        ParticleSystem.prototype.init = function (gameObject) {
+        ParticleSystem.prototype.init = function () {
             var _this = this;
-            _super.prototype.init.call(this, gameObject);
+            _super.prototype.init.call(this);
             this._modules = [
                 this.main = this.main || new feng3d.ParticleMainModule(),
                 this.emission = this.emission || new feng3d.ParticleEmissionModule(),
@@ -32721,8 +33093,8 @@ var feng3d;
         /**
          * 创建一个骨骼动画类
          */
-        SkinnedModel.prototype.init = function (gameObject) {
-            _super.prototype.init.call(this, gameObject);
+        SkinnedModel.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.hideFlags = feng3d.HideFlags.DontTransform;
         };
         SkinnedModel.prototype.beforeRender = function (gl, renderAtomic, scene3d, camera) {
@@ -36868,368 +37240,12 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var CANNON;
 (function (CANNON) {
-    var Mat3 = /** @class */ (function () {
-        /**
-         * 构建3x3矩阵
-         *
-         * @param elements 九个元素的数组
-         */
-        function Mat3(elements) {
-            if (elements === void 0) { elements = [1, 0, 0, 0, 1, 0, 0, 0, 1]; }
-            this.elements = elements;
-        }
-        /**
-         * 设置矩阵为单位矩阵
-         */
-        Mat3.prototype.identity = function () {
-            var e = this.elements;
-            e[0] = 1;
-            e[1] = 0;
-            e[2] = 0;
-            e[3] = 0;
-            e[4] = 1;
-            e[5] = 0;
-            e[6] = 0;
-            e[7] = 0;
-            e[8] = 1;
-            return this;
-        };
-        /**
-         * 将所有元素设置为0
-         */
-        Mat3.prototype.setZero = function () {
-            var e = this.elements;
-            e[0] = 0;
-            e[1] = 0;
-            e[2] = 0;
-            e[3] = 0;
-            e[4] = 0;
-            e[5] = 0;
-            e[6] = 0;
-            e[7] = 0;
-            e[8] = 0;
-            return this;
-        };
-        /**
-         * 根据一个 Vector3 设置矩阵对角元素
-         *
-         * @param vec3
-         */
-        Mat3.prototype.setTrace = function (vec3) {
-            var e = this.elements;
-            e[0] = vec3.x;
-            e[4] = vec3.y;
-            e[8] = vec3.z;
-            return this;
-        };
-        /**
-         * 获取矩阵对角元素
-         */
-        Mat3.prototype.getTrace = function (target) {
-            if (target === void 0) { target = new feng3d.Vector3(); }
-            var e = this.elements;
-            target.x = e[0];
-            target.y = e[4];
-            target.z = e[8];
-            return target;
-        };
-        /**
-         * 矩阵向量乘法
-         *
-         * @param v 要乘以的向量
-         * @param target 目标保存结果
-         */
-        Mat3.prototype.vmult = function (v, target) {
-            if (target === void 0) { target = new feng3d.Vector3(); }
-            var e = this.elements, x = v.x, y = v.y, z = v.z;
-            target.x = e[0] * x + e[1] * y + e[2] * z;
-            target.y = e[3] * x + e[4] * y + e[5] * z;
-            target.z = e[6] * x + e[7] * y + e[8] * z;
-            return target;
-        };
-        /**
-         * 矩阵标量乘法
-         * @param s
-         */
-        Mat3.prototype.smult = function (s) {
-            for (var i = 0; i < this.elements.length; i++) {
-                this.elements[i] *= s;
-            }
-        };
-        /**
-         * 矩阵乘法
-         * @param  m 要从左边乘的矩阵。
-         */
-        Mat3.prototype.mmult = function (m, target) {
-            if (target === void 0) { target = new Mat3(); }
-            for (var i = 0; i < 3; i++) {
-                for (var j = 0; j < 3; j++) {
-                    var sum = 0.0;
-                    for (var k = 0; k < 3; k++) {
-                        sum += m.elements[i + k * 3] * this.elements[k + j * 3];
-                    }
-                    target.elements[i + j * 3] = sum;
-                }
-            }
-            return target;
-        };
-        /**
-         * 缩放矩阵的每一列
-         *
-         * @param v
-         */
-        Mat3.prototype.scale = function (v, target) {
-            if (target === void 0) { target = new Mat3(); }
-            var e = this.elements, t = target.elements;
-            for (var i = 0; i !== 3; i++) {
-                t[3 * i + 0] = v.x * e[3 * i + 0];
-                t[3 * i + 1] = v.y * e[3 * i + 1];
-                t[3 * i + 2] = v.z * e[3 * i + 2];
-            }
-            return target;
-        };
-        /**
-         * 解决Ax = b
-         *
-         * @param b 右手边
-         * @param target 结果
-         */
-        Mat3.prototype.solve = function (b, target) {
-            if (target === void 0) { target = new feng3d.Vector3(); }
-            // Construct equations
-            var nr = 3; // num rows
-            var nc = 4; // num cols
-            var eqns = [];
-            for (var i = 0; i < nr * nc; i++) {
-                eqns.push(0);
-            }
-            var i, j;
-            for (i = 0; i < 3; i++) {
-                for (j = 0; j < 3; j++) {
-                    eqns[i + nc * j] = this.elements[i + 3 * j];
-                }
-            }
-            eqns[3 + 4 * 0] = b.x;
-            eqns[3 + 4 * 1] = b.y;
-            eqns[3 + 4 * 2] = b.z;
-            // 计算矩阵的右上三角型——高斯消去法
-            var n = 3, k = n, np;
-            var kp = 4; // num rows
-            var p;
-            do {
-                i = k - n;
-                if (eqns[i + nc * i] === 0) {
-                    // the pivot is null, swap lines
-                    for (j = i + 1; j < k; j++) {
-                        if (eqns[i + nc * j] !== 0) {
-                            np = kp;
-                            do { // do ligne( i ) = ligne( i ) + ligne( k )
-                                p = kp - np;
-                                eqns[p + nc * i] += eqns[p + nc * j];
-                            } while (--np);
-                            break;
-                        }
-                    }
-                }
-                if (eqns[i + nc * i] !== 0) {
-                    for (j = i + 1; j < k; j++) {
-                        var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
-                        np = kp;
-                        do { // do ligne( k ) = ligne( k ) - multiplier * ligne( i )
-                            p = kp - np;
-                            eqns[p + nc * j] = p <= i ? 0 : eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
-                        } while (--np);
-                    }
-                }
-            } while (--n);
-            // Get the solution
-            target.z = eqns[2 * nc + 3] / eqns[2 * nc + 2];
-            target.y = (eqns[1 * nc + 3] - eqns[1 * nc + 2] * target.z) / eqns[1 * nc + 1];
-            target.x = (eqns[0 * nc + 3] - eqns[0 * nc + 2] * target.z - eqns[0 * nc + 1] * target.y) / eqns[0 * nc + 0];
-            if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z) || target.x === Infinity || target.y === Infinity || target.z === Infinity) {
-                throw "Could not solve equation! Got x=[" + target.toString() + "], b=[" + b.toString() + "], A=[" + this.toString() + "]";
-            }
-            return target;
-        };
-        /**
-         * Get an element in the matrix by index. Index starts at 0, not 1!!!
-         * @param row
-         * @param column
-         * @param value Optional. If provided, the matrix element will be set to this value.
-         */
-        Mat3.prototype.e = function (row, column, value) {
-            if (value === undefined) {
-                return this.elements[column + 3 * row];
-            }
-            else {
-                // Set value
-                this.elements[column + 3 * row] = value;
-            }
-        };
-        /**
-         * Copy another matrix into this matrix object.
-         * @param source
-         */
-        Mat3.prototype.copy = function (source) {
-            for (var i = 0; i < source.elements.length; i++) {
-                this.elements[i] = source.elements[i];
-            }
-            return this;
-        };
-        /**
-         * Returns a string representation of the matrix.
-         */
-        Mat3.prototype.toString = function () {
-            var r = "";
-            var sep = ",";
-            for (var i = 0; i < 9; i++) {
-                r += this.elements[i] + sep;
-            }
-            return r;
-        };
-        /**
-         * reverse the matrix
-         * @param target Optional. Target matrix to save in.
-         */
-        Mat3.prototype.reverse = function (target) {
-            if (target === void 0) { target = new Mat3(); }
-            // Construct equations
-            var nr = 3; // num rows
-            var nc = 6; // num cols
-            var eqns = [];
-            for (var i = 0; i < nr * nc; i++) {
-                eqns.push(0);
-            }
-            var i, j;
-            for (i = 0; i < 3; i++) {
-                for (j = 0; j < 3; j++) {
-                    eqns[i + nc * j] = this.elements[i + 3 * j];
-                }
-            }
-            eqns[3 + 6 * 0] = 1;
-            eqns[3 + 6 * 1] = 0;
-            eqns[3 + 6 * 2] = 0;
-            eqns[4 + 6 * 0] = 0;
-            eqns[4 + 6 * 1] = 1;
-            eqns[4 + 6 * 2] = 0;
-            eqns[5 + 6 * 0] = 0;
-            eqns[5 + 6 * 1] = 0;
-            eqns[5 + 6 * 2] = 1;
-            // Compute right upper triangular version of the matrix - Gauss elimination
-            var n = 3, k = n, np;
-            var kp = nc; // num rows
-            var p;
-            do {
-                i = k - n;
-                if (eqns[i + nc * i] === 0) {
-                    // the pivot is null, swap lines
-                    for (j = i + 1; j < k; j++) {
-                        if (eqns[i + nc * j] !== 0) {
-                            np = kp;
-                            do { // do line( i ) = line( i ) + line( k )
-                                p = kp - np;
-                                eqns[p + nc * i] += eqns[p + nc * j];
-                            } while (--np);
-                            break;
-                        }
-                    }
-                }
-                if (eqns[i + nc * i] !== 0) {
-                    for (j = i + 1; j < k; j++) {
-                        var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
-                        np = kp;
-                        do { // do line( k ) = line( k ) - multiplier * line( i )
-                            p = kp - np;
-                            eqns[p + nc * j] = p <= i ? 0 : eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
-                        } while (--np);
-                    }
-                }
-            } while (--n);
-            // eliminate the upper left triangle of the matrix
-            i = 2;
-            do {
-                j = i - 1;
-                do {
-                    var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
-                    np = nc;
-                    do {
-                        p = nc - np;
-                        eqns[p + nc * j] = eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
-                    } while (--np);
-                } while (j--);
-            } while (--i);
-            // operations on the diagonal
-            i = 2;
-            do {
-                var multiplier = 1 / eqns[i + nc * i];
-                np = nc;
-                do {
-                    p = nc - np;
-                    eqns[p + nc * i] = eqns[p + nc * i] * multiplier;
-                } while (--np);
-            } while (i--);
-            i = 2;
-            do {
-                j = 2;
-                do {
-                    p = eqns[nr + j + nc * i];
-                    if (isNaN(p) || p === Infinity) {
-                        throw "Could not reverse! A=[" + this.toString() + "]";
-                    }
-                    target.e(i, j, p);
-                } while (j--);
-            } while (i--);
-            return target;
-        };
-        /**
-         * Set the matrix from a quaterion
-         * @param q
-         */
-        Mat3.prototype.setRotationFromQuaternion = function (q) {
-            var x = q.x, y = q.y, z = q.z, w = q.w, x2 = x + x, y2 = y + y, z2 = z + z, xx = x * x2, xy = x * y2, xz = x * z2, yy = y * y2, yz = y * z2, zz = z * z2, wx = w * x2, wy = w * y2, wz = w * z2, e = this.elements;
-            e[3 * 0 + 0] = 1 - (yy + zz);
-            e[3 * 0 + 1] = xy - wz;
-            e[3 * 0 + 2] = xz + wy;
-            e[3 * 1 + 0] = xy + wz;
-            e[3 * 1 + 1] = 1 - (xx + zz);
-            e[3 * 1 + 2] = yz - wx;
-            e[3 * 2 + 0] = xz - wy;
-            e[3 * 2 + 1] = yz + wx;
-            e[3 * 2 + 2] = 1 - (xx + yy);
-            return this;
-        };
-        /**
-         * Transpose the matrix
-         * @param target Where to store the result.
-         * @return The target Mat3, or a new Mat3 if target was omitted.
-         */
-        Mat3.prototype.transpose = function (target) {
-            if (target === void 0) { target = new Mat3(); }
-            var Mt = target.elements, M = this.elements;
-            for (var i = 0; i !== 3; i++) {
-                for (var j = 0; j !== 3; j++) {
-                    Mt[3 * i + j] = M[3 * j + i];
-                }
-            }
-            return target;
-        };
-        return Mat3;
-    }());
-    CANNON.Mat3 = Mat3;
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
     var Transform = /** @class */ (function () {
-        function Transform(options) {
-            if (options === void 0) { options = {}; }
-            this.position = new feng3d.Vector3();
-            if (options.position) {
-                this.position.copy(options.position);
-            }
-            this.quaternion = new feng3d.Quaternion();
-            if (options.quaternion) {
-                this.quaternion.copy(options.quaternion);
-            }
+        function Transform(position, quaternion) {
+            if (position === void 0) { position = new feng3d.Vector3(); }
+            if (quaternion === void 0) { quaternion = new feng3d.Quaternion(); }
+            this.position = position;
+            this.quaternion = quaternion;
         }
         /**
          * @param position
@@ -37237,21 +37253,12 @@ var CANNON;
          * @param worldPoint
          * @param result
          */
-        Transform.pointToLocalFrame = function (position, quaternion, worldPoint, result) {
+        Transform.pointToLocalFrame = function (transform, worldPoint, result) {
             if (result === void 0) { result = new feng3d.Vector3(); }
-            worldPoint.subTo(position, result);
-            quaternion.conjugateTo(tmpQuat);
+            worldPoint.subTo(transform.position, result);
+            var tmpQuat = transform.quaternion.conjugateTo();
             tmpQuat.vmult(result, result);
             return result;
-        };
-        /**
-         * Get a global point in local transform coordinates.
-         * @param worldPoint
-         * @param result
-         * @returnThe "result" vector object
-         */
-        Transform.prototype.pointToLocal = function (worldPoint, result) {
-            return Transform.pointToLocalFrame(this.position, this.quaternion, worldPoint, result);
         };
         /**
          * @param position
@@ -37259,41 +37266,26 @@ var CANNON;
          * @param localPoint
          * @param result
          */
-        Transform.pointToWorldFrame = function (position, quaternion, localPoint, result) {
+        Transform.pointToWorldFrame = function (transform, localPoint, result) {
             if (result === void 0) { result = new feng3d.Vector3(); }
-            quaternion.vmult(localPoint, result);
-            result.addTo(position, result);
+            transform.quaternion.vmult(localPoint, result);
+            result.addTo(transform.position, result);
             return result;
         };
-        /**
-         * Get a local point in global transform coordinates.
-         * @param point
-         * @param result
-         * @return The "result" vector object
-         */
-        Transform.prototype.pointToWorld = function (localPoint, result) {
-            return Transform.pointToWorldFrame(this.position, this.quaternion, localPoint, result);
-        };
-        Transform.prototype.vectorToWorldFrame = function (localVector, result) {
-            if (result === void 0) { result = new feng3d.Vector3(); }
-            this.quaternion.vmult(localVector, result);
+        Transform.vectorToWorldFrame = function (transform, localVector, result) {
+            transform.quaternion.vmult(localVector, result);
             return result;
         };
-        Transform.vectorToWorldFrame = function (quaternion, localVector, result) {
-            quaternion.vmult(localVector, result);
-            return result;
-        };
-        Transform.vectorToLocalFrame = function (position, quaternion, worldVector, result) {
+        Transform.vectorToLocalFrame = function (transform, worldVector, result) {
             if (result === void 0) { result = new feng3d.Vector3(); }
-            quaternion.w *= -1;
-            quaternion.vmult(worldVector, result);
-            quaternion.w *= -1;
+            transform.quaternion.w *= -1;
+            transform.quaternion.vmult(worldVector, result);
+            transform.quaternion.w *= -1;
             return result;
         };
         return Transform;
     }());
     CANNON.Transform = Transform;
-    var tmpQuat = new feng3d.Quaternion();
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
@@ -37848,6 +37840,33 @@ var CANNON;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 形状类型
+     */
+    var ShapeType;
+    (function (ShapeType) {
+        /**
+         * 球形
+         */
+        ShapeType[ShapeType["SPHERE"] = 1] = "SPHERE";
+        /**
+         * 平面
+         */
+        ShapeType[ShapeType["PLANE"] = 2] = "PLANE";
+        /**
+         * 盒子
+         */
+        ShapeType[ShapeType["BOX"] = 4] = "BOX";
+        ShapeType[ShapeType["COMPOUND"] = 8] = "COMPOUND";
+        ShapeType[ShapeType["CONVEXPOLYHEDRON"] = 16] = "CONVEXPOLYHEDRON";
+        ShapeType[ShapeType["HEIGHTFIELD"] = 32] = "HEIGHTFIELD";
+        ShapeType[ShapeType["PARTICLE"] = 64] = "PARTICLE";
+        ShapeType[ShapeType["CYLINDER"] = 128] = "CYLINDER";
+        ShapeType[ShapeType["TRIMESH"] = 256] = "TRIMESH";
+    })(ShapeType = CANNON.ShapeType || (CANNON.ShapeType = {}));
+})(CANNON || (CANNON = {}));
+var CANNON;
+(function (CANNON) {
     var Shape = /** @class */ (function () {
         /**
          * Base class for shapes
@@ -37891,20 +37910,6 @@ var CANNON;
             throw "未实现";
         };
         Shape.idCounter = 0;
-        /**
-         * The available shape types.
-         */
-        Shape.types = {
-            SPHERE: 1,
-            PLANE: 2,
-            BOX: 4,
-            COMPOUND: 8,
-            CONVEXPOLYHEDRON: 16,
-            HEIGHTFIELD: 32,
-            PARTICLE: 64,
-            CYLINDER: 128,
-            TRIMESH: 256
-        };
         return Shape;
     }());
     CANNON.Shape = Shape;
@@ -37934,7 +37939,7 @@ var CANNON;
          */
         function ConvexPolyhedron(points, faces, uniqueAxes) {
             var _this = _super.call(this, {
-                type: CANNON.Shape.types.CONVEXPOLYHEDRON
+                type: CANNON.ShapeType.CONVEXPOLYHEDRON
             }) || this;
             _this.vertices = points || [];
             _this.worldVertices = []; // World transformed version of .vertices
@@ -38082,16 +38087,14 @@ var CANNON;
          * Find the separating axis between this hull and another
          *
          * @param hullB
-         * @param posA
-         * @param quatA
-         * @param posB
-         * @param quatB
+         * @param transformA
+         * @param transformB
          * @param target The target vector to save the axis in
          * @param faceListA
          * @param faceListB
          * @returns Returns false if a separation is found, else true
          */
-        ConvexPolyhedron.prototype.findSeparatingAxis = function (hullB, posA, quatA, posB, quatB, target, faceListA, faceListB) {
+        ConvexPolyhedron.prototype.findSeparatingAxis = function (hullB, transformA, transformB, target, faceListA, faceListB) {
             var faceANormalWS3 = fsa_faceANormalWS3, Worldnormal1 = fsa_Worldnormal1, deltaC = fsa_deltaC, worldEdge0 = fsa_worldEdge0, worldEdge1 = fsa_worldEdge1, Cross = fsa_Cross;
             var dmin = Number.MAX_VALUE;
             var hullA = this;
@@ -38103,8 +38106,8 @@ var CANNON;
                     var fi = faceListA ? faceListA[i] : i;
                     // Get world face normal
                     faceANormalWS3.copy(hullA.faceNormals[fi]);
-                    quatA.vmult(faceANormalWS3, faceANormalWS3);
-                    var d = hullA.testSepAxis(faceANormalWS3, hullB, posA, quatA, posB, quatB);
+                    transformA.quaternion.vmult(faceANormalWS3, faceANormalWS3);
+                    var d = hullA.testSepAxis(faceANormalWS3, hullB, transformA, transformB);
                     if (d === false) {
                         return false;
                     }
@@ -38118,8 +38121,8 @@ var CANNON;
                 // Test unique axes
                 for (var i = 0; i !== hullA.uniqueAxes.length; i++) {
                     // Get world axis
-                    quatA.vmult(hullA.uniqueAxes[i], faceANormalWS3);
-                    var d = hullA.testSepAxis(faceANormalWS3, hullB, posA, quatA, posB, quatB);
+                    transformA.quaternion.vmult(hullA.uniqueAxes[i], faceANormalWS3);
+                    var d = hullA.testSepAxis(faceANormalWS3, hullB, transformA, transformB);
                     if (d === false) {
                         return false;
                     }
@@ -38135,9 +38138,9 @@ var CANNON;
                 for (var i = 0; i < numFacesB; i++) {
                     var fi = faceListB ? faceListB[i] : i;
                     Worldnormal1.copy(hullB.faceNormals[fi]);
-                    quatB.vmult(Worldnormal1, Worldnormal1);
+                    transformB.quaternion.vmult(Worldnormal1, Worldnormal1);
                     curPlaneTests++;
-                    var d = hullA.testSepAxis(Worldnormal1, hullB, posA, quatA, posB, quatB);
+                    var d = hullA.testSepAxis(Worldnormal1, hullB, transformA, transformB);
                     if (d === false) {
                         return false;
                     }
@@ -38150,9 +38153,9 @@ var CANNON;
             else {
                 // Test unique axes in B
                 for (var i = 0; i !== hullB.uniqueAxes.length; i++) {
-                    quatB.vmult(hullB.uniqueAxes[i], Worldnormal1);
+                    transformB.quaternion.vmult(hullB.uniqueAxes[i], Worldnormal1);
                     curPlaneTests++;
-                    var d = hullA.testSepAxis(Worldnormal1, hullB, posA, quatA, posB, quatB);
+                    var d = hullA.testSepAxis(Worldnormal1, hullB, transformA, transformB);
                     if (d === false) {
                         return false;
                     }
@@ -38165,14 +38168,14 @@ var CANNON;
             // Test edges
             for (var e0 = 0; e0 !== hullA.uniqueEdges.length; e0++) {
                 // Get world edge
-                quatA.vmult(hullA.uniqueEdges[e0], worldEdge0);
+                transformA.quaternion.vmult(hullA.uniqueEdges[e0], worldEdge0);
                 for (var e1 = 0; e1 !== hullB.uniqueEdges.length; e1++) {
                     // Get world edge 2
-                    quatB.vmult(hullB.uniqueEdges[e1], worldEdge1);
+                    transformB.quaternion.vmult(hullB.uniqueEdges[e1], worldEdge1);
                     worldEdge0.crossTo(worldEdge1, Cross);
                     if (!Cross.almostZero()) {
                         Cross.normalize();
-                        var dist = hullA.testSepAxis(Cross, hullB, posA, quatA, posB, quatB);
+                        var dist = hullA.testSepAxis(Cross, hullB, transformA, transformB);
                         if (dist === false) {
                             return false;
                         }
@@ -38183,7 +38186,7 @@ var CANNON;
                     }
                 }
             }
-            posB.subTo(posA, deltaC);
+            transformB.position.subTo(transformA.position, deltaC);
             if ((deltaC.dot(target)) > 0.0) {
                 target.negateTo(target);
             }
@@ -38194,16 +38197,14 @@ var CANNON;
          *
          * @param axis
          * @param hullB
-         * @param posA
-         * @param quatA
-         * @param posB
-         * @param quatB
+         * @param transformA
+         * @param transformB
          * @return The overlap depth, or FALSE if no penetration.
          */
-        ConvexPolyhedron.prototype.testSepAxis = function (axis, hullB, posA, quatA, posB, quatB) {
+        ConvexPolyhedron.prototype.testSepAxis = function (axis, hullB, transformA, transformB) {
             var hullA = this;
-            ConvexPolyhedron.project(hullA, axis, posA, quatA, maxminA);
-            ConvexPolyhedron.project(hullB, axis, posB, quatB, maxminB);
+            ConvexPolyhedron.project(hullA, axis, transformA, maxminA);
+            ConvexPolyhedron.project(hullB, axis, transformB, maxminB);
             var maxA = maxminA[0];
             var minA = maxminA[1];
             var maxB = maxminB[0];
@@ -38609,12 +38610,12 @@ var CANNON;
          * @param quat
          * @param result result[0] and result[1] will be set to maximum and minimum, respectively.
          */
-        ConvexPolyhedron.project = function (hull, axis, pos, quat, result) {
+        ConvexPolyhedron.project = function (hull, axis, transform, result) {
             var n = hull.vertices.length, worldVertex = project_worldVertex, localAxis = project_localAxis, max = 0, min = 0, localOrigin = project_localOrigin, vs = hull.vertices;
             localOrigin.setZero();
             // Transform the axis to local
-            CANNON.Transform.vectorToLocalFrame(pos, quat, axis, localAxis);
-            CANNON.Transform.pointToLocalFrame(pos, quat, localOrigin, localOrigin);
+            CANNON.Transform.vectorToLocalFrame(transform, axis, localAxis);
+            CANNON.Transform.pointToLocalFrame(transform, localOrigin, localOrigin);
             var add = localOrigin.dot(localAxis);
             min = max = vs[0].dot(localAxis);
             for (var i = 1; i < n; i++) {
@@ -38683,7 +38684,7 @@ var CANNON;
          */
         function Box(halfExtents) {
             var _this = _super.call(this, {
-                type: CANNON.Shape.types.BOX
+                type: CANNON.ShapeType.BOX
             }) || this;
             _this.halfExtents = halfExtents;
             _this.convexPolyhedronRepresentation = null;
@@ -38975,7 +38976,7 @@ var CANNON;
             }
             _this.cacheEnabled = true;
             CANNON.Shape.call(_this, {
-                type: CANNON.Shape.types.HEIGHTFIELD
+                type: CANNON.ShapeType.HEIGHTFIELD
             });
             _this.pillarConvex = new CANNON.ConvexPolyhedron();
             _this.pillarOffset = new feng3d.Vector3();
@@ -39437,7 +39438,7 @@ var CANNON;
          */
         function Particle() {
             return _super.call(this, {
-                type: CANNON.Shape.types.PARTICLE
+                type: CANNON.ShapeType.PARTICLE
             }) || this;
         }
         /**
@@ -39475,7 +39476,7 @@ var CANNON;
          */
         function Plane() {
             var _this = _super.call(this, {
-                type: CANNON.Shape.types.PLANE
+                type: CANNON.ShapeType.PLANE
             }) || this;
             // World oriented normal
             _this.worldNormal = new feng3d.Vector3();
@@ -39535,16 +39536,17 @@ var CANNON;
     var Sphere = /** @class */ (function (_super) {
         __extends(Sphere, _super);
         /**
-         * Spherical shape
+         * 球体
          *
-         * @param radius The radius of the sphere, a non-negative number.
+         * @param radius 半径
          * @author schteppe / http://github.com/schteppe
          */
         function Sphere(radius) {
+            if (radius === void 0) { radius = 1; }
             var _this = _super.call(this, {
-                type: CANNON.Shape.types.SPHERE
+                type: CANNON.ShapeType.SPHERE
             }) || this;
-            _this.radius = radius !== undefined ? radius : 1.0;
+            _this.radius = radius;
             if (_this.radius < 0) {
                 throw new Error('The sphere radius cannot be negative.');
             }
@@ -39750,7 +39752,7 @@ var CANNON;
             // Transform them to new local frame
             for (var i = 0; i !== 8; i++) {
                 var corner = corners[i];
-                frame.pointToLocal(corner, corner);
+                CANNON.Transform.pointToLocalFrame(frame, corner, corner);
             }
             return target.setFromPoints(corners);
         };
@@ -39775,7 +39777,7 @@ var CANNON;
             // Transform them to new local frame
             for (var i = 0; i !== 8; i++) {
                 var corner = corners[i];
-                frame.pointToWorld(corner, corner);
+                CANNON.Transform.pointToWorldFrame(frame, corner, corner);
             }
             return target.setFromPoints(corners);
         };
@@ -39848,7 +39850,7 @@ var CANNON;
          */
         function Trimesh(vertices, indices) {
             var _this = _super.call(this, {
-                type: CANNON.Shape.types.TRIMESH
+                type: CANNON.ShapeType.TRIMESH
             }) || this;
             _this.vertices = new Float32Array(vertices);
             /**
@@ -40054,9 +40056,9 @@ var CANNON;
          * @param out
          * @return The "out" vector object
          */
-        Trimesh.prototype.getWorldVertex = function (i, pos, quat, out) {
+        Trimesh.prototype.getWorldVertex = function (i, transform, out) {
             this.getVertex(i, out);
-            CANNON.Transform.pointToWorldFrame(pos, quat, out, out);
+            CANNON.Transform.pointToWorldFrame(transform, out, out);
             return out;
         };
         /**
@@ -40811,7 +40813,9 @@ var CANNON;
         Broadphase.boundingSphereCheck = function (bodyA, bodyB) {
             var dist = bsc_dist;
             bodyA.position.subTo(bodyB.position, dist);
-            return Math.pow(bodyA.shape.boundingSphereRadius + bodyB.shape.boundingSphereRadius, 2) > dist.lengthSquared;
+            throw "";
+            return true;
+            // return Math.pow(bodyA.shape.boundingSphereRadius + bodyB.shape.boundingSphereRadius, 2) > dist.lengthSquared;
         };
         /**
          * Returns all the bodies within the AABB.
@@ -40886,8 +40890,7 @@ var CANNON;
             var xmult = nx / (xmax - xmin), ymult = ny / (ymax - ymin), zmult = nz / (zmax - zmin);
             var binsizeX = (xmax - xmin) / nx, binsizeY = (ymax - ymin) / ny, binsizeZ = (zmax - zmin) / nz;
             var binRadius = Math.sqrt(binsizeX * binsizeX + binsizeY * binsizeY + binsizeZ * binsizeZ) * 0.5;
-            var types = CANNON.Shape.types;
-            var SPHERE = types.SPHERE, PLANE = types.PLANE, BOX = types.BOX, COMPOUND = types.COMPOUND, CONVEXPOLYHEDRON = types.CONVEXPOLYHEDRON;
+            var SPHERE = CANNON.ShapeType.SPHERE, PLANE = CANNON.ShapeType.PLANE, BOX = CANNON.ShapeType.BOX, COMPOUND = CANNON.ShapeType.COMPOUND, CONVEXPOLYHEDRON = CANNON.ShapeType.CONVEXPOLYHEDRON;
             var bins = this.bins, binLengths = this.binLengths, Nbins = this.bins.length;
             // Reset bins
             for (var i = 0; i !== Nbins; i++) {
@@ -40952,7 +40955,9 @@ var CANNON;
             // Put all bodies into the bins
             for (var i = 0; i !== N; i++) {
                 var bi = bodies[i];
-                var si = bi.shape;
+                throw "";
+                // var si = bi.shape;
+                var si;
                 switch (si.type) {
                     case SPHERE:
                         // Put in bin
@@ -41482,14 +41487,15 @@ var CANNON;
             result.upperBound.y = Math.max(to.y, from.y);
             result.upperBound.z = Math.max(to.z, from.z);
         };
-        Ray.prototype.intersectHeightfield = function (shape, quat, position, body, reportedShape) {
+        Ray.prototype.intersectHeightfield = function (shape, transform, body, reportedShape) {
+            var quat = transform.quaternion;
             var data = shape.data, w = shape.elementSize;
             // Convert the ray to local heightfield coordinates
             var localRay = intersectHeightfield_localRay; //new Ray(this.from, this.to);
             localRay.from.copy(this.from);
             localRay.to.copy(this.to);
-            CANNON.Transform.pointToLocalFrame(position, quat, localRay.from, localRay.from);
-            CANNON.Transform.pointToLocalFrame(position, quat, localRay.to, localRay.to);
+            CANNON.Transform.pointToLocalFrame(transform, localRay.from, localRay.from);
+            CANNON.Transform.pointToLocalFrame(transform, localRay.to, localRay.to);
             localRay._updateDirection();
             // Get the index of the data points to test against
             var index = intersectHeightfield_index;
@@ -41516,14 +41522,14 @@ var CANNON;
                     }
                     // Lower triangle
                     shape.getConvexTrianglePillar(i, j, false);
-                    CANNON.Transform.pointToWorldFrame(position, quat, shape.pillarOffset, worldPillarOffset);
+                    CANNON.Transform.pointToWorldFrame(transform, shape.pillarOffset, worldPillarOffset);
                     this.intersectConvex(shape.pillarConvex, quat, worldPillarOffset, body, reportedShape, intersectConvexOptions);
                     if (this.result._shouldStop) {
                         return;
                     }
                     // Upper triangle
                     shape.getConvexTrianglePillar(i, j, true);
-                    CANNON.Transform.pointToWorldFrame(position, quat, shape.pillarOffset, worldPillarOffset);
+                    CANNON.Transform.pointToWorldFrame(transform, shape.pillarOffset, worldPillarOffset);
                     this.intersectConvex(shape.pillarConvex, quat, worldPillarOffset, body, reportedShape, intersectConvexOptions);
                 }
             }
@@ -41680,9 +41686,9 @@ var CANNON;
             treeTransform.position.copy(position);
             treeTransform.quaternion.copy(quat);
             // Transform ray to local space!
-            CANNON.Transform.vectorToLocalFrame(position, quat, direction, localDirection);
-            CANNON.Transform.pointToLocalFrame(position, quat, from, localFrom);
-            CANNON.Transform.pointToLocalFrame(position, quat, to, localTo);
+            CANNON.Transform.vectorToLocalFrame(treeTransform, direction, localDirection);
+            CANNON.Transform.pointToLocalFrame(treeTransform, from, localFrom);
+            CANNON.Transform.pointToLocalFrame(treeTransform, to, localTo);
             localTo.x *= mesh.scale.x;
             localTo.y *= mesh.scale.y;
             localTo.z *= mesh.scale.z;
@@ -41725,8 +41731,8 @@ var CANNON;
                     continue;
                 }
                 // transform intersectpoint and normal to world
-                CANNON.Transform.vectorToWorldFrame(quat, normal, worldNormal);
-                CANNON.Transform.pointToWorldFrame(position, quat, intersectPoint, worldIntersectPoint);
+                CANNON.Transform.vectorToWorldFrame(treeTransform, normal, worldNormal);
+                CANNON.Transform.pointToWorldFrame(treeTransform, intersectPoint, worldIntersectPoint);
                 this.reportIntersection(worldNormal, worldIntersectPoint, reportedShape, body, trianglesIndex);
             }
             triangles.length = 0;
@@ -41826,12 +41832,12 @@ var CANNON;
     var intersectConvex_minDistNormal = new feng3d.Vector3();
     var intersectConvex_minDistIntersect = new feng3d.Vector3();
     var intersectConvex_vector = new feng3d.Vector3();
-    Ray.prototype[CANNON.Shape.types.BOX] = Ray.prototype["intersectBox"];
-    Ray.prototype[CANNON.Shape.types.PLANE] = Ray.prototype["intersectPlane"];
-    Ray.prototype[CANNON.Shape.types.HEIGHTFIELD] = Ray.prototype["intersectHeightfield"];
-    Ray.prototype[CANNON.Shape.types.SPHERE] = Ray.prototype["intersectSphere"];
-    Ray.prototype[CANNON.Shape.types.TRIMESH] = Ray.prototype["intersectTrimesh"];
-    Ray.prototype[CANNON.Shape.types.CONVEXPOLYHEDRON] = Ray.prototype["intersectConvex"];
+    Ray.prototype[CANNON.ShapeType.BOX] = Ray.prototype["intersectBox"];
+    Ray.prototype[CANNON.ShapeType.PLANE] = Ray.prototype["intersectPlane"];
+    Ray.prototype[CANNON.ShapeType.HEIGHTFIELD] = Ray.prototype["intersectHeightfield"];
+    Ray.prototype[CANNON.ShapeType.SPHERE] = Ray.prototype["intersectSphere"];
+    Ray.prototype[CANNON.ShapeType.TRIMESH] = Ray.prototype["intersectTrimesh"];
+    Ray.prototype[CANNON.ShapeType.CONVEXPOLYHEDRON] = Ray.prototype["intersectConvex"];
     function distanceFromIntersection(from, direction, position) {
         // v0 is vector from from to position
         position.vsub(from, v0);
@@ -41989,10 +41995,10 @@ var CANNON;
             _this.shapeOrientations = [];
             _this.inertia = new feng3d.Vector3();
             _this.invInertia = new feng3d.Vector3();
-            _this.invInertiaWorld = new CANNON.Mat3();
+            _this.invInertiaWorld = new feng3d.Matrix3x3();
             _this.invMassSolve = 0;
             _this.invInertiaSolve = new feng3d.Vector3();
-            _this.invInertiaWorldSolve = new CANNON.Mat3();
+            _this.invInertiaWorldSolve = new feng3d.Matrix3x3();
             _this.fixedRotation = typeof (options.fixedRotation) !== "undefined" ? options.fixedRotation : false;
             _this.angularDamping = typeof (options.angularDamping) !== 'undefined' ? options.angularDamping : 0.01;
             _this.linearFactor = new feng3d.Vector3(1, 1, 1);
@@ -42197,7 +42203,7 @@ var CANNON;
             else {
                 var m1 = uiw_m1, m2 = uiw_m2, m3 = uiw_m3;
                 m1.setRotationFromQuaternion(this.quaternion);
-                m1.transpose(m2);
+                m1.transposeTo(m2);
                 m1.scale(I, m1);
                 m1.mmult(m2, this.invInertiaWorld);
             }
@@ -42308,7 +42314,7 @@ var CANNON;
          */
         Body.prototype.getVelocityAtWorldPoint = function (worldPoint, result) {
             var r = new feng3d.Vector3();
-            worldPoint.vsub(this.position, r);
+            worldPoint.subTo(this.position, r);
             this.angularVelocity.crossTo(r, result);
             this.velocity.addTo(result, result);
             return result;
@@ -42411,9 +42417,9 @@ var CANNON;
     var Body_applyImpulse_rotVelo = new feng3d.Vector3();
     var Body_applyLocalImpulse_worldImpulse = new feng3d.Vector3();
     var Body_applyLocalImpulse_relativePoint = new feng3d.Vector3();
-    var uiw_m1 = new CANNON.Mat3();
-    var uiw_m2 = new CANNON.Mat3();
-    var uiw_m3 = new CANNON.Mat3();
+    var uiw_m1 = new feng3d.Matrix3x3();
+    var uiw_m2 = new feng3d.Matrix3x3();
+    var uiw_m3 = new feng3d.Matrix3x3();
     var computeAABB_shapeAABB = new CANNON.AABB();
 })(CANNON || (CANNON = {}));
 var CANNON;
@@ -42966,7 +42972,7 @@ var CANNON;
                     var axlei = axle[i];
                     var wheelTrans = this.getWheelTransformWorld(i);
                     // Get world axle
-                    wheelTrans.vectorToWorldFrame(directions[this.indexRightAxis], axlei);
+                    CANNON.Transform.vectorToWorldFrame(wheelTrans, directions[this.indexRightAxis], axlei);
                     var surfNormalWS = wheel.raycastResult.hitNormalWorld;
                     var proj = axlei.dot(surfNormalWS);
                     surfNormalWS.scaleNumberTo(proj, surfNormalWS_scaled_proj);
@@ -45135,19 +45141,20 @@ var CANNON;
          * @param  {Body}       bi
          * @param  {Body}       bj
          */
-        Narrowphase.prototype.planeTrimesh = function (planeShape, trimeshShape, planePos, trimeshPos, planeQuat, trimeshQuat, planeBody, trimeshBody, rsi, rsj, justTest) {
+        Narrowphase.prototype.planeTrimesh = function (planeShape, trimeshShape, planeTransform, trimeshTransform, planeBody, trimeshBody, rsi, rsj, justTest) {
             // Make contacts!
             var v = new feng3d.Vector3();
+            var planePos = planeTransform.position;
             var normal = planeTrimesh_normal;
             normal.init(0, 1, 0);
-            planeQuat.vmult(normal, normal); // Turn normal according to plane
+            planeTransform.quaternion.vmult(normal, normal); // Turn normal according to plane
             for (var i = 0; i < trimeshShape.vertices.length / 3; i++) {
                 // Get world vertex from trimesh
                 trimeshShape.getVertex(i, v);
                 // Safe up
                 var v2 = new feng3d.Vector3();
                 v2.copy(v);
-                CANNON.Transform.pointToWorldFrame(trimeshPos, trimeshQuat, v2, v);
+                CANNON.Transform.pointToWorldFrame(trimeshTransform, v2, v);
                 // Check plane side
                 var relpos = planeTrimesh_relpos;
                 v.subTo(planePos, relpos);
@@ -45173,7 +45180,9 @@ var CANNON;
                 }
             }
         };
-        Narrowphase.prototype.sphereTrimesh = function (sphereShape, trimeshShape, spherePos, trimeshPos, sphereQuat, trimeshQuat, sphereBody, trimeshBody, rsi, rsj, justTest) {
+        Narrowphase.prototype.sphereTrimesh = function (sphereShape, trimeshShape, sphereTransform, trimeshTransform, sphereBody, trimeshBody, rsi, rsj, justTest) {
+            var spherePos = sphereTransform.position;
+            //
             var edgeVertexA = sphereTrimesh_edgeVertexA;
             var edgeVertexB = sphereTrimesh_edgeVertexB;
             var edgeVector = sphereTrimesh_edgeVector;
@@ -45185,7 +45194,7 @@ var CANNON;
             var relpos = sphereTrimesh_relpos;
             var triangles = sphereTrimesh_triangles;
             // Convert sphere position to local in the trimesh
-            CANNON.Transform.pointToLocalFrame(trimeshPos, trimeshQuat, spherePos, localSpherePos);
+            CANNON.Transform.pointToLocalFrame(trimeshTransform, spherePos, localSpherePos);
             // Get the aabb of the sphere locally in the trimesh
             var sphereRadius = sphereShape.radius;
             localSphereAABB.lowerBound.init(localSpherePos.x - sphereRadius, localSpherePos.y - sphereRadius, localSpherePos.z - sphereRadius);
@@ -45203,7 +45212,7 @@ var CANNON;
                     if (relpos.lengthSquared <= radiusSquared) {
                         // Safe up
                         v2.copy(v);
-                        CANNON.Transform.pointToWorldFrame(trimeshPos, trimeshQuat, v2, v);
+                        CANNON.Transform.pointToWorldFrame(trimeshTransform, v2, v);
                         v.subTo(spherePos, relpos);
                         if (justTest) {
                             return true;
@@ -45253,10 +45262,10 @@ var CANNON;
                             tmp.subTo(localSpherePos, r.ni);
                             r.ni.normalize();
                             r.ni.scaleNumberTo(sphereShape.radius, r.ri);
-                            CANNON.Transform.pointToWorldFrame(trimeshPos, trimeshQuat, tmp, tmp);
+                            CANNON.Transform.pointToWorldFrame(trimeshTransform, tmp, tmp);
                             tmp.subTo(trimeshBody.position, r.rj);
-                            CANNON.Transform.vectorToWorldFrame(trimeshQuat, r.ni, r.ni);
-                            CANNON.Transform.vectorToWorldFrame(trimeshQuat, r.ri, r.ri);
+                            CANNON.Transform.vectorToWorldFrame(trimeshTransform, r.ni, r.ni);
+                            CANNON.Transform.vectorToWorldFrame(trimeshTransform, r.ri, r.ri);
                             this.result.push(r);
                             this.createFrictionEquationsFromContact(r, this.frictionResult);
                         }
@@ -45285,10 +45294,10 @@ var CANNON;
                     tmp.subTo(localSpherePos, r.ni);
                     r.ni.normalize();
                     r.ni.scaleNumberTo(sphereShape.radius, r.ri);
-                    CANNON.Transform.pointToWorldFrame(trimeshPos, trimeshQuat, tmp, tmp);
+                    CANNON.Transform.pointToWorldFrame(trimeshTransform, tmp, tmp);
                     tmp.subTo(trimeshBody.position, r.rj);
-                    CANNON.Transform.vectorToWorldFrame(trimeshQuat, r.ni, r.ni);
-                    CANNON.Transform.vectorToWorldFrame(trimeshQuat, r.ri, r.ri);
+                    CANNON.Transform.vectorToWorldFrame(trimeshTransform, r.ni, r.ni);
+                    CANNON.Transform.vectorToWorldFrame(trimeshTransform, r.ri, r.ri);
                     this.result.push(r);
                     this.createFrictionEquationsFromContact(r, this.frictionResult);
                 }
@@ -45508,7 +45517,8 @@ var CANNON;
                 }
             }
         };
-        Narrowphase.prototype.sphereConvex = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
+        Narrowphase.prototype.sphereConvex = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
+            var xi = transformi.position, xj = transformj.position, qj = transformj.quaternion;
             xi.subTo(xj, convex_to_sphere);
             var normals = sj.faceNormals;
             var faces = sj.faces;
@@ -45709,7 +45719,8 @@ var CANNON;
                 this.createFrictionFromAverage(numContacts);
             }
         };
-        Narrowphase.prototype.convexConvex = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest, faceListA, faceListB) {
+        Narrowphase.prototype.convexConvex = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest, faceListA, faceListB) {
+            var xi = transformi.position, xj = transformj.position, qi = transformi.quaternion, qj = transformj.quaternion;
             var sepAxis = convexConvex_sepAxis;
             if (xi.distance(xj) > si.boundingSphereRadius + sj.boundingSphereRadius) {
                 return;
@@ -45760,7 +45771,7 @@ var CANNON;
          * @param  {Body}       bi
          * @param  {Body}       bj
          */
-        // Narrowphase.prototype[Shape.types.CONVEXPOLYHEDRON | Shape.types.TRIMESH] =
+        // Narrowphase.prototype[ShapeType.CONVEXPOLYHEDRON | ShapeType.TRIMESH] =
         // Narrowphase.prototype.convexTrimesh = function(si,sj,xi,xj,qi,qj,bi,bj,rsi,rsj,faceListA,faceListB){
         //     var sepAxis = convexConvex_sepAxis;
         //     if(xi.distanceTo(xj) > si.boundingSphereRadius + sj.boundingSphereRadius){
@@ -45926,16 +45937,18 @@ var CANNON;
                 }
             }
         };
-        Narrowphase.prototype.boxHeightfield = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
+        Narrowphase.prototype.boxHeightfield = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
             si.convexPolyhedronRepresentation.material = si.material;
             si.convexPolyhedronRepresentation.collisionResponse = si.collisionResponse;
-            return this.convexHeightfield(si.convexPolyhedronRepresentation, sj, xi, xj, qi, qj, bi, bj, si, sj, justTest);
+            return this.convexHeightfield(si.convexPolyhedronRepresentation, sj, transformi, transformj, bi, bj, si, sj, justTest);
         };
-        Narrowphase.prototype.convexHeightfield = function (convexShape, hfShape, convexPos, hfPos, convexQuat, hfQuat, convexBody, hfBody, rsi, rsj, justTest) {
+        Narrowphase.prototype.convexHeightfield = function (convexShape, hfShape, convexTransform, hfTransform, convexBody, hfBody, rsi, rsj, justTest) {
+            var convexPos = convexTransform.position;
+            var hfQuat = hfTransform.quaternion;
             var data = hfShape.data, w = hfShape.elementSize, radius = convexShape.boundingSphereRadius, worldPillarOffset = convexHeightfield_tmp2, faceList = convexHeightfield_faceList;
             // Get sphere position to heightfield local!
             var localConvexPos = convexHeightfield_tmp1;
-            CANNON.Transform.pointToLocalFrame(hfPos, hfQuat, convexPos, localConvexPos);
+            CANNON.Transform.pointToLocalFrame(hfTransform, convexPos, localConvexPos);
             // Get the index of the data points to test against
             var iMinX = Math.floor((localConvexPos.x - radius) / w) - 1, iMaxX = Math.ceil((localConvexPos.x + radius) / w) + 1, iMinY = Math.floor((localConvexPos.y - radius) / w) - 1, iMaxY = Math.ceil((localConvexPos.y + radius) / w) + 1;
             // Bail out if we are out of the terrain
@@ -45980,18 +45993,18 @@ var CANNON;
                     var intersecting = false;
                     // Lower triangle
                     hfShape.getConvexTrianglePillar(i, j, false);
-                    CANNON.Transform.pointToWorldFrame(hfPos, hfQuat, hfShape.pillarOffset, worldPillarOffset);
+                    CANNON.Transform.pointToWorldFrame(hfTransform, hfShape.pillarOffset, worldPillarOffset);
                     if (convexPos.distance(worldPillarOffset) < hfShape.pillarConvex.boundingSphereRadius + convexShape.boundingSphereRadius) {
-                        intersecting = this.convexConvex(convexShape, hfShape.pillarConvex, convexPos, worldPillarOffset, convexQuat, hfQuat, convexBody, hfBody, null, null, justTest, faceList, null);
+                        intersecting = this.convexConvex(convexShape, hfShape.pillarConvex, convexTransform, new CANNON.Transform(worldPillarOffset, hfQuat), convexBody, hfBody, null, null, justTest, faceList, null);
                     }
                     if (justTest && intersecting) {
                         return true;
                     }
                     // Upper triangle
                     hfShape.getConvexTrianglePillar(i, j, true);
-                    CANNON.Transform.pointToWorldFrame(hfPos, hfQuat, hfShape.pillarOffset, worldPillarOffset);
+                    CANNON.Transform.pointToWorldFrame(hfTransform, hfShape.pillarOffset, worldPillarOffset);
                     if (convexPos.distance(worldPillarOffset) < hfShape.pillarConvex.boundingSphereRadius + convexShape.boundingSphereRadius) {
-                        intersecting = this.convexConvex(convexShape, hfShape.pillarConvex, convexPos, worldPillarOffset, convexQuat, hfQuat, convexBody, hfBody, null, null, justTest, faceList, null);
+                        intersecting = this.convexConvex(convexShape, hfShape.pillarConvex, convexTransform, new CANNON.Transform(worldPillarOffset, hfQuat), convexBody, hfBody, null, null, justTest, faceList, null);
                     }
                     if (justTest && intersecting) {
                         return true;
@@ -46000,11 +46013,13 @@ var CANNON;
             }
         };
         ;
-        Narrowphase.prototype.sphereHeightfield = function (sphereShape, hfShape, spherePos, hfPos, sphereQuat, hfQuat, sphereBody, hfBody, rsi, rsj, justTest) {
+        Narrowphase.prototype.sphereHeightfield = function (sphereShape, hfShape, sphereTransform, hfTransform, sphereBody, hfBody, rsi, rsj, justTest) {
             var data = hfShape.data, radius = sphereShape.radius, w = hfShape.elementSize, worldPillarOffset = sphereHeightfield_tmp2;
+            var spherePos = sphereTransform.position;
+            var hfQuat = hfTransform.quaternion;
             // Get sphere position to heightfield local!
             var localSpherePos = sphereHeightfield_tmp1;
-            CANNON.Transform.pointToLocalFrame(hfPos, hfQuat, spherePos, localSpherePos);
+            CANNON.Transform.pointToLocalFrame(hfTransform, spherePos, localSpherePos);
             // Get the index of the data points to test against
             var iMinX = Math.floor((localSpherePos.x - radius) / w) - 1, iMaxX = Math.ceil((localSpherePos.x + radius) / w) + 1, iMinY = Math.floor((localSpherePos.y - radius) / w) - 1, iMaxY = Math.ceil((localSpherePos.y + radius) / w) + 1;
             // Bail out if we are out of the terrain
@@ -46051,18 +46066,18 @@ var CANNON;
                     var intersecting = false;
                     // Lower triangle
                     hfShape.getConvexTrianglePillar(i, j, false);
-                    CANNON.Transform.pointToWorldFrame(hfPos, hfQuat, hfShape.pillarOffset, worldPillarOffset);
+                    CANNON.Transform.pointToWorldFrame(hfTransform, hfShape.pillarOffset, worldPillarOffset);
                     if (spherePos.distance(worldPillarOffset) < hfShape.pillarConvex.boundingSphereRadius + sphereShape.boundingSphereRadius) {
-                        intersecting = this.sphereConvex(sphereShape, hfShape.pillarConvex, spherePos, worldPillarOffset, sphereQuat, hfQuat, sphereBody, hfBody, sphereShape, hfShape, justTest);
+                        intersecting = this.sphereConvex(sphereShape, hfShape.pillarConvex, sphereTransform, new CANNON.Transform(worldPillarOffset, hfQuat), sphereBody, hfBody, sphereShape, hfShape, justTest);
                     }
                     if (justTest && intersecting) {
                         return true;
                     }
                     // Upper triangle
                     hfShape.getConvexTrianglePillar(i, j, true);
-                    CANNON.Transform.pointToWorldFrame(hfPos, hfQuat, hfShape.pillarOffset, worldPillarOffset);
+                    CANNON.Transform.pointToWorldFrame(hfTransform, hfShape.pillarOffset, worldPillarOffset);
                     if (spherePos.distance(worldPillarOffset) < hfShape.pillarConvex.boundingSphereRadius + sphereShape.boundingSphereRadius) {
-                        intersecting = this.sphereConvex(sphereShape, hfShape.pillarConvex, spherePos, worldPillarOffset, sphereQuat, hfQuat, sphereBody, hfBody, sphereShape, hfShape, justTest);
+                        intersecting = this.sphereConvex(sphereShape, hfShape.pillarConvex, sphereTransform, new CANNON.Transform(worldPillarOffset, hfQuat), sphereBody, hfBody, sphereShape, hfShape, justTest);
                     }
                     if (justTest && intersecting) {
                         return true;
@@ -46198,25 +46213,80 @@ var CANNON;
     var convexHeightfield_faceList = [0];
     var sphereHeightfield_tmp1 = new feng3d.Vector3();
     var sphereHeightfield_tmp2 = new feng3d.Vector3();
-    Narrowphase.prototype[CANNON.Shape.types.BOX | CANNON.Shape.types.BOX] = Narrowphase.prototype.boxBox;
-    Narrowphase.prototype[CANNON.Shape.types.BOX | CANNON.Shape.types.CONVEXPOLYHEDRON] = Narrowphase.prototype.boxConvex;
-    Narrowphase.prototype[CANNON.Shape.types.BOX | CANNON.Shape.types.PARTICLE] = Narrowphase.prototype.boxParticle;
-    Narrowphase.prototype[CANNON.Shape.types.SPHERE] = Narrowphase.prototype.sphereSphere;
-    Narrowphase.prototype[CANNON.Shape.types.PLANE | CANNON.Shape.types.TRIMESH] = Narrowphase.prototype.planeTrimesh;
-    Narrowphase.prototype[CANNON.Shape.types.SPHERE | CANNON.Shape.types.TRIMESH] = Narrowphase.prototype.sphereTrimesh;
-    Narrowphase.prototype[CANNON.Shape.types.SPHERE | CANNON.Shape.types.PLANE] = Narrowphase.prototype.spherePlane;
-    Narrowphase.prototype[CANNON.Shape.types.SPHERE | CANNON.Shape.types.BOX] = Narrowphase.prototype.sphereBox;
-    Narrowphase.prototype[CANNON.Shape.types.SPHERE | CANNON.Shape.types.CONVEXPOLYHEDRON] = Narrowphase.prototype.sphereConvex;
-    Narrowphase.prototype[CANNON.Shape.types.PLANE | CANNON.Shape.types.BOX] = Narrowphase.prototype.planeBox;
-    Narrowphase.prototype[CANNON.Shape.types.PLANE | CANNON.Shape.types.CONVEXPOLYHEDRON] = Narrowphase.prototype.planeConvex;
-    Narrowphase.prototype[CANNON.Shape.types.CONVEXPOLYHEDRON] = Narrowphase.prototype.convexConvex;
-    Narrowphase.prototype[CANNON.Shape.types.PLANE | CANNON.Shape.types.PARTICLE] = Narrowphase.prototype.planeParticle;
-    Narrowphase.prototype[CANNON.Shape.types.PARTICLE | CANNON.Shape.types.SPHERE] = Narrowphase.prototype.sphereParticle;
-    Narrowphase.prototype[CANNON.Shape.types.PARTICLE | CANNON.Shape.types.CONVEXPOLYHEDRON] = Narrowphase.prototype.convexParticle;
-    Narrowphase.prototype[CANNON.Shape.types.BOX | CANNON.Shape.types.HEIGHTFIELD] = Narrowphase.prototype.boxHeightfield;
-    Narrowphase.prototype[CANNON.Shape.types.SPHERE | CANNON.Shape.types.HEIGHTFIELD] = Narrowphase.prototype.sphereHeightfield;
-    Narrowphase.prototype[CANNON.Shape.types.CONVEXPOLYHEDRON | CANNON.Shape.types.HEIGHTFIELD] = Narrowphase.prototype.convexHeightfield;
+    Narrowphase.prototype[CANNON.ShapeType.BOX | CANNON.ShapeType.BOX] = Narrowphase.prototype.boxBox;
+    Narrowphase.prototype[CANNON.ShapeType.BOX | CANNON.ShapeType.CONVEXPOLYHEDRON] = Narrowphase.prototype.boxConvex;
+    Narrowphase.prototype[CANNON.ShapeType.BOX | CANNON.ShapeType.PARTICLE] = Narrowphase.prototype.boxParticle;
+    Narrowphase.prototype[CANNON.ShapeType.SPHERE] = Narrowphase.prototype.sphereSphere;
+    Narrowphase.prototype[CANNON.ShapeType.PLANE | CANNON.ShapeType.TRIMESH] = Narrowphase.prototype.planeTrimesh;
+    Narrowphase.prototype[CANNON.ShapeType.SPHERE | CANNON.ShapeType.TRIMESH] = Narrowphase.prototype.sphereTrimesh;
+    Narrowphase.prototype[CANNON.ShapeType.SPHERE | CANNON.ShapeType.PLANE] = Narrowphase.prototype.spherePlane;
+    Narrowphase.prototype[CANNON.ShapeType.SPHERE | CANNON.ShapeType.BOX] = Narrowphase.prototype.sphereBox;
+    Narrowphase.prototype[CANNON.ShapeType.SPHERE | CANNON.ShapeType.CONVEXPOLYHEDRON] = Narrowphase.prototype.sphereConvex;
+    Narrowphase.prototype[CANNON.ShapeType.PLANE | CANNON.ShapeType.BOX] = Narrowphase.prototype.planeBox;
+    Narrowphase.prototype[CANNON.ShapeType.PLANE | CANNON.ShapeType.CONVEXPOLYHEDRON] = Narrowphase.prototype.planeConvex;
+    Narrowphase.prototype[CANNON.ShapeType.CONVEXPOLYHEDRON] = Narrowphase.prototype.convexConvex;
+    Narrowphase.prototype[CANNON.ShapeType.PLANE | CANNON.ShapeType.PARTICLE] = Narrowphase.prototype.planeParticle;
+    Narrowphase.prototype[CANNON.ShapeType.PARTICLE | CANNON.ShapeType.SPHERE] = Narrowphase.prototype.sphereParticle;
+    Narrowphase.prototype[CANNON.ShapeType.PARTICLE | CANNON.ShapeType.CONVEXPOLYHEDRON] = Narrowphase.prototype.convexParticle;
+    Narrowphase.prototype[CANNON.ShapeType.BOX | CANNON.ShapeType.HEIGHTFIELD] = Narrowphase.prototype.boxHeightfield;
+    Narrowphase.prototype[CANNON.ShapeType.SPHERE | CANNON.ShapeType.HEIGHTFIELD] = Narrowphase.prototype.sphereHeightfield;
+    Narrowphase.prototype[CANNON.ShapeType.CONVEXPOLYHEDRON | CANNON.ShapeType.HEIGHTFIELD] = Narrowphase.prototype.convexHeightfield;
 })(CANNON || (CANNON = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * 碰撞体
+     */
+    var Collider = /** @class */ (function (_super) {
+        __extends(Collider, _super);
+        function Collider() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return Collider;
+    }(feng3d.Component));
+    feng3d.Collider = Collider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * 球形碰撞体
+     */
+    var SphereCollider = /** @class */ (function (_super) {
+        __extends(SphereCollider, _super);
+        function SphereCollider() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._radius = 1;
+            return _this;
+        }
+        Object.defineProperty(SphereCollider.prototype, "radius", {
+            /**
+             * 半径
+             */
+            get: function () {
+                return this._radius;
+            },
+            set: function (v) {
+                this._radius = v;
+                if (this._shape)
+                    this._shape.radius = v;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SphereCollider.prototype, "shape", {
+            get: function () {
+                return this._shape;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        SphereCollider.prototype.init = function () {
+            this._shape = new CANNON.Sphere(this._radius);
+        };
+        return SphereCollider;
+    }(feng3d.Collider));
+    feng3d.SphereCollider = SphereCollider;
+})(feng3d || (feng3d = {}));
 //# sourceMappingURL=feng3d.js.map
 console.log("feng3d-0.1.3");
 (function universalModuleDefinition(root, factory)

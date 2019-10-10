@@ -18,9 +18,9 @@ namespace editor
 
         mrsToolTarget: MRSToolTarget;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
             var holdSizeComponent = this.gameObject.addComponent(feng3d.HoldSizeComponent);
             holdSizeComponent.holdSize = 0.005;
             //

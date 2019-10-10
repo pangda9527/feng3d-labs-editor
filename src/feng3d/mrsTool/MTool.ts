@@ -16,9 +16,9 @@ namespace editor
         private startPlanePos: feng3d.Vector3;
         private startPos: feng3d.Vector3;
 
-        init(gameObject: feng3d.GameObject)
+        init()
         {
-            super.init(gameObject);
+            super.init();
 
             this.toolModel = new feng3d.GameObject().addComponent(MToolModel);
         }

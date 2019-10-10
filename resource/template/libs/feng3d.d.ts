@@ -4308,7 +4308,7 @@ declare namespace feng3d {
          * 从向量中得到叉乘矩阵a_cross，使得a x b = a_cross * b = c
          * @see http://www8.cs.umu.se/kurser/TDBD24/VT06/lectures/Lecture6.pdf
          */
-        crossmat(): CANNON.Mat3;
+        crossmat(): Matrix3x3;
         /**
          * 返回当前 Vector3 对象的字符串表示形式。
          */
@@ -5048,6 +5048,115 @@ declare namespace feng3d {
          * @param dy The amount of movement down along the <i>y</i> axis, in pixels.
          */
         translate(dx: number, dy: number): void;
+    }
+}
+declare namespace feng3d {
+    class Matrix3x3 {
+        /**
+         * 长度为9的向量，包含所有的矩阵元素
+         */
+        elements: [number, number, number, number, number, number, number, number, number];
+        /**
+         * 构建3x3矩阵
+         *
+         * @param elements 九个元素的数组
+         */
+        constructor(elements?: [number, number, number, number, number, number, number, number, number]);
+        /**
+         * 设置矩阵为单位矩阵
+         */
+        identity(): this;
+        /**
+         * 将所有元素设置为0
+         */
+        setZero(): this;
+        /**
+         * 根据一个 Vector3 设置矩阵对角元素
+         *
+         * @param vec3
+         */
+        setTrace(vec3: Vector3): this;
+        /**
+         * 获取矩阵对角元素
+         */
+        getTrace(target?: Vector3): Vector3;
+        /**
+         * 矩阵向量乘法
+         *
+         * @param v 要乘以的向量
+         * @param target 目标保存结果
+         */
+        vmult(v: Vector3, target?: Vector3): Vector3;
+        /**
+         * 矩阵标量乘法
+         * @param s
+         */
+        smult(s: number): void;
+        /**
+         * 矩阵乘法
+         * @param  m 要从左边乘的矩阵。
+         */
+        mmult(m: feng3d.Matrix3x3, target?: Matrix3x3): Matrix3x3;
+        /**
+         * 缩放矩阵的每一列
+         *
+         * @param v
+         */
+        scale(v: Vector3, target?: Matrix3x3): Matrix3x3;
+        /**
+         * 解决Ax = b
+         *
+         * @param b 右手边
+         * @param target 结果
+         */
+        solve(b: Vector3, target?: Vector3): Vector3;
+        /**
+         * 获取指定行列元素值
+         *
+         * @param row
+         * @param column
+         */
+        getElement(row: number, column: number): number;
+        /**
+         * 设置指定行列元素值
+         *
+         * @param row
+         * @param column
+         * @param value
+         */
+        setElement(row: number, column: number, value: number): void;
+        /**
+         * 将另一个矩阵复制到这个矩阵对象中
+         *
+         * @param source
+         */
+        copy(source: feng3d.Matrix3x3): this;
+        /**
+         * 返回矩阵的字符串表示形式
+         */
+        toString(): string;
+        /**
+         * 逆矩阵
+         */
+        reverse(): this;
+        /**
+         * 逆矩阵
+         */
+        reverseTo(target?: Matrix3x3): Matrix3x3;
+        /**
+         * 从四元数设置矩阵
+         *
+         * @param q
+         */
+        setRotationFromQuaternion(q: feng3d.Quaternion): this;
+        /**
+         * 转置矩阵
+         */
+        transpose(): this;
+        /**
+         * 转置矩阵
+         */
+        transposeTo(target?: Matrix3x3): Matrix3x3;
     }
 }
 declare namespace feng3d {
@@ -12034,7 +12143,7 @@ declare namespace feng3d {
          * 创建一个组件容器
          */
         constructor();
-        init(gameObject: GameObject): void;
+        init(): void;
         /**
          * Returns the component of Type type if the game object has one attached, null if it doesn't.
          * @param type				The type of Component to retrieve.
@@ -12071,6 +12180,13 @@ declare namespace feng3d {
          * 监听对象的所有事件并且传播到所有组件中
          */
         private _onAllListener;
+        /**
+         * 该方法仅在GameObject中使用
+         * @private
+         *
+         * @param gameObject 游戏对象
+         */
+        setGameObject(gameObject: GameObject): void;
         protected _gameObject: GameObject;
     }
 }
@@ -12263,7 +12379,6 @@ declare namespace feng3d {
          * 创建一个实体，该类为虚类
          */
         constructor();
-        init(gameObject: GameObject): void;
         readonly scenePosition: Vector3;
         readonly parent: Transform;
         /**
@@ -12821,7 +12936,7 @@ declare namespace feng3d {
          * 相机
          */
         camera: Camera;
-        init(gameobject: GameObject): void;
+        init(): void;
         dispose(): void;
         private onHoldSizeChanged;
         private onCameraChanged;
@@ -12841,7 +12956,7 @@ declare namespace feng3d {
          */
         camera: Camera;
         private onCameraChanged;
-        init(gameobject: GameObject): void;
+        init(): void;
         private invalidHoldSizeMatrix;
         private updateLocalToWorldMatrix;
         dispose(): void;
@@ -12882,7 +12997,6 @@ declare namespace feng3d {
         specularSegment: number;
         cartoon_Anti_aliasing: boolean;
         _cartoon_Anti_aliasing: boolean;
-        init(gameObject: GameObject): void;
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene3d: Scene3D, camera: Camera): void;
     }
     interface Uniforms {
@@ -12900,7 +13014,6 @@ declare namespace feng3d {
         size: number;
         color: Color4;
         outlineMorphFactor: number;
-        init(gameobject: GameObject): void;
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene3d: Scene3D, camera: Camera): void;
     }
     interface Uniforms {
@@ -12922,10 +13035,11 @@ declare namespace feng3d {
 declare namespace feng3d {
     class BodyComponent extends Behaviour {
         __class__: "feng3d.BodyComponent";
+        shapeType: CANNON.ShapeType;
         body: CANNON.Body;
         runEnvironment: RunEnvironment;
         mass: number;
-        init(gameobject: GameObject): void;
+        init(): void;
         /**
          * 每帧执行
          */
@@ -12958,7 +13072,7 @@ declare namespace feng3d {
          */
         readonly selfWorldBounds: Box;
         constructor();
-        init(gameObject: GameObject): void;
+        init(): void;
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene3d: Scene3D, camera: Camera): void;
         /**
           * 判断射线是否穿过对象
@@ -13024,7 +13138,7 @@ declare namespace feng3d {
         private _scriptInstance;
         private _invalid;
         private scriptInit;
-        init(gameObject: GameObject): void;
+        init(): void;
         private updateScriptInstance;
         private invalidateScriptInstance;
         /**
@@ -13122,7 +13236,7 @@ declare namespace feng3d {
         /**
          * 构造3D场景
          */
-        init(gameObject: GameObject): void;
+        init(): void;
         private onAddComponent;
         private onRemovedComponent;
         private onAddChild;
@@ -13838,7 +13952,7 @@ declare namespace feng3d {
         /**
          * 创建一个摄像机
          */
-        init(gameObject: GameObject): void;
+        init(): void;
         /**
          * 获取与坐标重叠的射线
          * @param x view3D上的X坐标
@@ -14793,7 +14907,6 @@ declare namespace feng3d {
         debugShadowMap: boolean;
         private debugShadowMapObject;
         constructor();
-        init(gameObject: GameObject): void;
         updateDebugShadowMap(scene3d: Scene3D, viewCamera: Camera): void;
     }
 }
@@ -14972,7 +15085,7 @@ declare namespace feng3d {
         private ischange;
         private _auto;
         auto: boolean;
-        init(gameobject: GameObject): void;
+        init(): void;
         onMousedown(): void;
         onMouseup(): void;
         /**
@@ -15095,7 +15208,7 @@ declare namespace feng3d {
         volume: number;
         private _volume;
         constructor();
-        init(gameObject: GameObject): void;
+        init(): void;
         private onScenetransformChanged;
         private enabledChanged;
         dispose(): void;
@@ -15193,7 +15306,7 @@ declare namespace feng3d {
         rolloffFactor: number;
         private _rolloffFactor;
         constructor();
-        init(gameObject: GameObject): void;
+        init(): void;
         private onScenetransformChanged;
         private onUrlChanged;
         play(): void;
@@ -15486,7 +15599,7 @@ declare namespace feng3d {
          */
         readonly numActiveParticles: number;
         readonly single: boolean;
-        init(gameObject: GameObject): void;
+        init(): void;
         update(interval: number): void;
         /**
          * 停止
@@ -15961,7 +16074,7 @@ declare namespace feng3d {
         /**
          * 创建一个骨骼动画类
          */
-        init(gameObject: GameObject): void;
+        init(): void;
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene3d: Scene3D, camera: Camera): void;
         /**
          * 销毁
@@ -17234,135 +17347,30 @@ declare namespace feng3d {
     }
 }
 declare namespace CANNON {
-    class Mat3 {
-        /**
-         * 长度为9的向量，包含所有的矩阵元素
-         */
-        elements: [number, number, number, number, number, number, number, number, number];
-        /**
-         * 构建3x3矩阵
-         *
-         * @param elements 九个元素的数组
-         */
-        constructor(elements?: [number, number, number, number, number, number, number, number, number]);
-        /**
-         * 设置矩阵为单位矩阵
-         */
-        identity(): this;
-        /**
-         * 将所有元素设置为0
-         */
-        setZero(): this;
-        /**
-         * 根据一个 Vector3 设置矩阵对角元素
-         *
-         * @param vec3
-         */
-        setTrace(vec3: feng3d.Vector3): this;
-        /**
-         * 获取矩阵对角元素
-         */
-        getTrace(target?: feng3d.Vector3): feng3d.Vector3;
-        /**
-         * 矩阵向量乘法
-         *
-         * @param v 要乘以的向量
-         * @param target 目标保存结果
-         */
-        vmult(v: feng3d.Vector3, target?: feng3d.Vector3): feng3d.Vector3;
-        /**
-         * 矩阵标量乘法
-         * @param s
-         */
-        smult(s: number): void;
-        /**
-         * 矩阵乘法
-         * @param  m 要从左边乘的矩阵。
-         */
-        mmult(m: Mat3, target?: Mat3): Mat3;
-        /**
-         * 缩放矩阵的每一列
-         *
-         * @param v
-         */
-        scale(v: feng3d.Vector3, target?: Mat3): Mat3;
-        /**
-         * 解决Ax = b
-         *
-         * @param b 右手边
-         * @param target 结果
-         */
-        solve(b: feng3d.Vector3, target?: feng3d.Vector3): feng3d.Vector3;
-        /**
-         * Get an element in the matrix by index. Index starts at 0, not 1!!!
-         * @param row
-         * @param column
-         * @param value Optional. If provided, the matrix element will be set to this value.
-         */
-        e(row: number, column: number, value: number): number;
-        /**
-         * Copy another matrix into this matrix object.
-         * @param source
-         */
-        copy(source: Mat3): this;
-        /**
-         * Returns a string representation of the matrix.
-         */
-        toString(): string;
-        /**
-         * reverse the matrix
-         * @param target Optional. Target matrix to save in.
-         */
-        reverse(target?: Mat3): Mat3;
-        /**
-         * Set the matrix from a quaterion
-         * @param q
-         */
-        setRotationFromQuaternion(q: feng3d.Quaternion): this;
-        /**
-         * Transpose the matrix
-         * @param target Where to store the result.
-         * @return The target Mat3, or a new Mat3 if target was omitted.
-         */
-        transpose(target?: Mat3): Mat3;
+    interface ITransform {
+        position: feng3d.Vector3;
+        quaternion: feng3d.Quaternion;
     }
-}
-declare namespace CANNON {
     class Transform {
         position: feng3d.Vector3;
         quaternion: feng3d.Quaternion;
-        constructor(options?: any);
+        constructor(position?: feng3d.Vector3, quaternion?: feng3d.Quaternion);
         /**
          * @param position
          * @param quaternion
          * @param worldPoint
          * @param result
          */
-        static pointToLocalFrame(position: feng3d.Vector3, quaternion: feng3d.Quaternion, worldPoint: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
-        /**
-         * Get a global point in local transform coordinates.
-         * @param worldPoint
-         * @param result
-         * @returnThe "result" vector object
-         */
-        pointToLocal(worldPoint: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
+        static pointToLocalFrame(transform: ITransform, worldPoint: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
         /**
          * @param position
          * @param quaternion
          * @param localPoint
          * @param result
          */
-        static pointToWorldFrame(position: feng3d.Vector3, quaternion: feng3d.Quaternion, localPoint: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
-        /**
-         * Get a local point in global transform coordinates.
-         * @param point
-         * @param result
-         * @return The "result" vector object
-         */
-        pointToWorld(localPoint: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
-        vectorToWorldFrame(localVector: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
-        static vectorToWorldFrame(quaternion: feng3d.Quaternion, localVector: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
-        static vectorToLocalFrame(position: feng3d.Vector3, quaternion: feng3d.Quaternion, worldVector: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
+        static pointToWorldFrame(transform: ITransform, localPoint: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
+        static vectorToWorldFrame(transform: ITransform, localVector: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
+        static vectorToLocalFrame(transform: ITransform, worldVector: feng3d.Vector3, result?: feng3d.Vector3): feng3d.Vector3;
     }
 }
 declare namespace CANNON {
@@ -17655,6 +17663,31 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
+    /**
+     * 形状类型
+     */
+    enum ShapeType {
+        /**
+         * 球形
+         */
+        SPHERE = 1,
+        /**
+         * 平面
+         */
+        PLANE = 2,
+        /**
+         * 盒子
+         */
+        BOX = 4,
+        COMPOUND = 8,
+        CONVEXPOLYHEDRON = 16,
+        HEIGHTFIELD = 32,
+        PARTICLE = 64,
+        CYLINDER = 128,
+        TRIMESH = 256
+    }
+}
+declare namespace CANNON {
     class Shape {
         /**
          * Identifyer of the Shape.
@@ -17689,7 +17722,7 @@ declare namespace CANNON {
          * @author schteppe
          */
         constructor(options?: {
-            type?: number;
+            type?: ShapeType;
             collisionFilterGroup?: number;
             collisionFilterMask?: number;
             collisionResponse?: boolean;
@@ -17712,20 +17745,6 @@ declare namespace CANNON {
         calculateLocalInertia(mass: number, target: feng3d.Vector3): void;
         calculateWorldAABB(pos: feng3d.Vector3, quat: feng3d.Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
         static idCounter: number;
-        /**
-         * The available shape types.
-         */
-        static types: {
-            SPHERE: number;
-            PLANE: number;
-            BOX: number;
-            COMPOUND: number;
-            CONVEXPOLYHEDRON: number;
-            HEIGHTFIELD: number;
-            PARTICLE: number;
-            CYLINDER: number;
-            TRIMESH: number;
-        };
     }
 }
 declare namespace CANNON {
@@ -17808,28 +17827,24 @@ declare namespace CANNON {
          * Find the separating axis between this hull and another
          *
          * @param hullB
-         * @param posA
-         * @param quatA
-         * @param posB
-         * @param quatB
+         * @param transformA
+         * @param transformB
          * @param target The target vector to save the axis in
          * @param faceListA
          * @param faceListB
          * @returns Returns false if a separation is found, else true
          */
-        findSeparatingAxis(hullB: ConvexPolyhedron, posA: feng3d.Vector3, quatA: feng3d.Quaternion, posB: feng3d.Vector3, quatB: feng3d.Quaternion, target: feng3d.Vector3, faceListA: number[], faceListB: number[]): boolean;
+        findSeparatingAxis(hullB: ConvexPolyhedron, transformA: ITransform, transformB: Transform, target: feng3d.Vector3, faceListA: number[], faceListB: number[]): boolean;
         /**
          * Test separating axis against two hulls. Both hulls are projected onto the axis and the overlap size is returned if there is one.
          *
          * @param axis
          * @param hullB
-         * @param posA
-         * @param quatA
-         * @param posB
-         * @param quatB
+         * @param transformA
+         * @param transformB
          * @return The overlap depth, or FALSE if no penetration.
          */
-        testSepAxis(axis: feng3d.Vector3, hullB: ConvexPolyhedron, posA: feng3d.Vector3, quatA: feng3d.Quaternion, posB: feng3d.Vector3, quatB: feng3d.Quaternion): number | false;
+        testSepAxis(axis: feng3d.Vector3, hullB: ConvexPolyhedron, transformA: Transform, transformB: Transform): number | false;
         /**
          *
          * @param mass
@@ -17911,7 +17926,7 @@ declare namespace CANNON {
          * @param quat
          * @param result result[0] and result[1] will be set to maximum and minimum, respectively.
          */
-        static project(hull: ConvexPolyhedron, axis: feng3d.Vector3, pos: feng3d.Vector3, quat: feng3d.Quaternion, result: number[]): void;
+        static project(hull: ConvexPolyhedron, axis: feng3d.Vector3, transform: Transform, result: number[]): void;
     }
 }
 declare namespace CANNON {
@@ -18156,12 +18171,12 @@ declare namespace CANNON {
     class Sphere extends Shape {
         radius: number;
         /**
-         * Spherical shape
+         * 球体
          *
-         * @param radius The radius of the sphere, a non-negative number.
+         * @param radius 半径
          * @author schteppe / http://github.com/schteppe
          */
-        constructor(radius: number);
+        constructor(radius?: number);
         calculateLocalInertia(mass: number, target?: feng3d.Vector3): feng3d.Vector3;
         volume(): number;
         updateBoundingSphereRadius(): void;
@@ -18356,7 +18371,7 @@ declare namespace CANNON {
          * @param out
          * @return The "out" vector object
          */
-        getWorldVertex(i: number, pos: feng3d.Vector3, quat: feng3d.Quaternion, out: feng3d.Vector3): feng3d.Vector3;
+        getWorldVertex(i: number, transform: Transform, out: feng3d.Vector3): feng3d.Vector3;
         /**
          * Get the three vertices for triangle i.
          *
@@ -19104,10 +19119,10 @@ declare namespace CANNON {
         shapeOrientations: feng3d.Quaternion[];
         inertia: feng3d.Vector3;
         invInertia: feng3d.Vector3;
-        invInertiaWorld: Mat3;
+        invInertiaWorld: feng3d.Matrix3x3;
         invMassSolve: number;
         invInertiaSolve: feng3d.Vector3;
-        invInertiaWorldSolve: Mat3;
+        invInertiaWorldSolve: feng3d.Matrix3x3;
         /**
          * Set to true if you don't want the body to rotate. Make sure to run .updateMassProperties() after changing this.
          */
@@ -19134,7 +19149,6 @@ declare namespace CANNON {
          */
         boundingRadius: number;
         wlambda: feng3d.Vector3;
-        shape: Shape;
         index: number;
         /**
          * Base class for all body types.
@@ -19272,7 +19286,7 @@ declare namespace CANNON {
         /**
          * Update .inertiaWorld and .invInertiaWorld
          */
-        updateInertiaWorld(force?: any): void;
+        updateInertiaWorld(force?: boolean): void;
         /**
          * Apply force to a world point. This could for example be a point on the Body surface. Applying force this way will add to Body.force and Body.torque.
          *
@@ -19312,7 +19326,7 @@ declare namespace CANNON {
          * @param  {Vector3} result
          * @return {Vector3} The result vector.
          */
-        getVelocityAtWorldPoint(worldPoint: any, result: any): any;
+        getVelocityAtWorldPoint(worldPoint: feng3d.Vector3, result: feng3d.Vector3): feng3d.Vector3;
         /**
          * Move the body forward in time.
          * @param dt Time step
@@ -20322,14 +20336,14 @@ declare namespace CANNON {
          * @param  {Body}       bi
          * @param  {Body}       bj
          */
-        planeTrimesh(planeShape: Shape, trimeshShape: any, planePos: feng3d.Vector3, trimeshPos: feng3d.Vector3, planeQuat: feng3d.Quaternion, trimeshQuat: feng3d.Quaternion, planeBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereTrimesh(sphereShape: Shape, trimeshShape: any, spherePos: feng3d.Vector3, trimeshPos: feng3d.Vector3, sphereQuat: feng3d.Quaternion, trimeshQuat: feng3d.Quaternion, sphereBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        planeTrimesh(planeShape: Shape, trimeshShape: any, planeTransform: Transform, trimeshTransform: Transform, planeBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereTrimesh(sphereShape: Shape, trimeshShape: any, sphereTransform: Transform, trimeshTransform: Transform, sphereBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         spherePlane(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         sphereBox(si: Shape, sj: any, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereConvex(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereConvex(si: Shape, sj: Shape, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         planeBox(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         planeConvex(planeShape: Shape, convexShape: any, planePosition: feng3d.Vector3, convexPosition: feng3d.Vector3, planeQuat: feng3d.Quaternion, convexQuat: feng3d.Quaternion, planeBody: Body, convexBody: Body, si: Shape, sj: Shape, justTest: boolean): boolean;
-        convexConvex(si: any, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean, faceListA?: any[], faceListB?: any[]): boolean;
+        convexConvex(si: any, sj: Shape, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean, faceListA?: any[], faceListB?: any[]): boolean;
         /**
          * @method convexTrimesh
          * @param  {Array}      result
@@ -20345,9 +20359,31 @@ declare namespace CANNON {
         planeParticle(sj: Shape, si: Shape, xj: feng3d.Vector3, xi: feng3d.Vector3, qj: feng3d.Quaternion, qi: feng3d.Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         sphereParticle(sj: Shape, si: Shape, xj: feng3d.Vector3, xi: feng3d.Vector3, qj: feng3d.Quaternion, qi: feng3d.Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         convexParticle(sj: any, si: Shape, xj: feng3d.Vector3, xi: feng3d.Vector3, qj: feng3d.Quaternion, qi: feng3d.Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        boxHeightfield(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        convexHeightfield(convexShape: Shape, hfShape: any, convexPos: feng3d.Vector3, hfPos: feng3d.Vector3, convexQuat: feng3d.Quaternion, hfQuat: feng3d.Quaternion, convexBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereHeightfield(sphereShape: Shape, hfShape: any, spherePos: feng3d.Vector3, hfPos: feng3d.Vector3, sphereQuat: feng3d.Quaternion, hfQuat: feng3d.Quaternion, sphereBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        boxHeightfield(si: Shape, sj: Shape, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        convexHeightfield(convexShape: Shape, hfShape: any, convexTransform: Transform, hfTransform: Transform, convexBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereHeightfield(sphereShape: Shape, hfShape: any, sphereTransform: Transform, hfTransform: Transform, sphereBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 碰撞体
+     */
+    class Collider extends Component {
+    }
+}
+declare namespace feng3d {
+    /**
+     * 球形碰撞体
+     */
+    class SphereCollider extends Collider {
+        /**
+         * 半径
+         */
+        radius: number;
+        private _radius;
+        readonly shape: CANNON.Sphere;
+        private _shape;
+        init(): void;
     }
 }
 //# sourceMappingURL=feng3d.d.ts.map
