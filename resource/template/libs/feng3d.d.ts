@@ -11471,6 +11471,7 @@ declare namespace feng3d {
          * 索引数据
          */
         indices: number[];
+        private _indices;
         private invalidate;
         /**
          * 渲染数量
@@ -11557,6 +11558,7 @@ declare namespace feng3d {
          * 属性数据
          */
         data: number[];
+        private _data;
         /**
          * 数据尺寸
          *
@@ -11635,22 +11637,27 @@ declare namespace feng3d {
          * 格式
          */
         format: TextureFormat;
+        private _format;
         /**
          * 数据类型
          */
         type: TextureDataType;
+        private _type;
         /**
          * 是否生成mipmap
          */
         generateMipmap: boolean;
+        private _generateMipmap;
         /**
          * 对图像进行Y轴反转。默认值为false
          */
         flipY: boolean;
+        private _flipY;
         /**
          * 将图像RGB颜色值得每一个分量乘以A。默认为false
          */
         premulAlpha: boolean;
+        private _premulAlpha;
         minFilter: TextureMinFilter;
         magFilter: TextureMagFilter;
         /**
@@ -11682,7 +11689,9 @@ declare namespace feng3d {
          */
         protected _isRenderTarget: boolean;
         protected OFFSCREEN_WIDTH: number;
+        protected _OFFSCREEN_WIDTH: number;
         protected OFFSCREEN_HEIGHT: number;
+        protected _OFFSCREEN_HEIGHT: number;
         /**
          * 纹理缓冲
          */
@@ -11752,10 +11761,15 @@ declare namespace feng3d {
      */
     class FrameBufferObject {
         OFFSCREEN_WIDTH: number;
+        private _OFFSCREEN_WIDTH;
         OFFSCREEN_HEIGHT: number;
+        private _OFFSCREEN_HEIGHT;
         frameBuffer: FrameBuffer;
+        private _frameBuffer;
         texture: RenderTargetTexture2D;
+        private _texture;
         depthBuffer: RenderBuffer;
+        private _depthBuffer;
         constructor(width?: number, height?: number);
         active(gl: GL): {
             framebuffer: WebGLFramebuffer;
@@ -11779,7 +11793,9 @@ declare namespace feng3d {
 declare namespace feng3d {
     class RenderBuffer {
         OFFSCREEN_WIDTH: number;
+        private _OFFSCREEN_WIDTH;
         OFFSCREEN_HEIGHT: number;
+        private _OFFSCREEN_HEIGHT;
         protected _depthBufferMap: Map<GL, WebGLRenderbuffer>;
         /**
          * 是否失效
@@ -12932,14 +12948,15 @@ declare namespace feng3d {
          * 保持缩放尺寸
          */
         holdSize: number;
+        private _holdSize;
         /**
          * 相机
          */
         camera: Camera;
+        private _camera;
         init(): void;
         dispose(): void;
         private onHoldSizeChanged;
-        private onCameraChanged;
         private invalidateSceneTransform;
         private updateLocalToWorldMatrix;
         private getDepthScale;
@@ -12955,7 +12972,7 @@ declare namespace feng3d {
          * 相机
          */
         camera: Camera;
-        private onCameraChanged;
+        private _camera;
         init(): void;
         private invalidHoldSizeMatrix;
         private updateLocalToWorldMatrix;
@@ -13042,11 +13059,13 @@ declare namespace feng3d {
         /**
          * 几何体
          */
-        geometry: Geometrys;
+        geometry: CustomGeometry | PointGeometry | SegmentGeometry | PlaneGeometry | CubeGeometry | SphereGeometry | CapsuleGeometry | CylinderGeometry | TorusGeometry | TerrainGeometry;
+        private _geometry;
         /**
          * 材质
          */
         material: Material;
+        private _material;
         castShadows: boolean;
         receiveShadows: boolean;
         /**
@@ -13082,8 +13101,6 @@ declare namespace feng3d {
         private _lightPicker;
         private _selfLocalBounds;
         private _selfWorldBounds;
-        private onGeometryChanged;
-        private onMaterialChanged;
         private onScenetransformChanged;
         /**
          * 更新世界边界
@@ -13117,6 +13134,7 @@ declare namespace feng3d {
     class ScriptComponent extends Behaviour {
         runEnvironment: RunEnvironment;
         scriptName: string;
+        private _scriptName;
         /**
          * 脚本对象
          */
@@ -13651,6 +13669,7 @@ declare namespace feng3d {
          * 修改数组内数据时需要手动调用 invalidateGeometry();
          */
         points: PointInfo[];
+        private _points;
         /**
          * 构建几何体
          */
@@ -13680,6 +13699,7 @@ declare namespace feng3d {
          * 修改数组内数据时需要手动调用 invalidateGeometry();
          */
         segments: Segment[];
+        private _segments;
         constructor();
         /**
          * 更新几何体
@@ -13741,14 +13761,17 @@ declare namespace feng3d {
          * 最近距离
          */
         near: number;
+        protected _near: number;
         /**
          * 最远距离
          */
         far: number;
+        protected _far: number;
         /**
          * 视窗缩放比例(width/height)，在渲染器中设置
          */
         aspect: number;
+        protected _aspect: number;
         /**
          * 创建一个摄像机镜头
          */
@@ -13835,6 +13858,7 @@ declare namespace feng3d {
          * 尺寸
          */
         size: number;
+        private _size;
         /**
          * 构建正射投影镜头
          * @param size 尺寸
@@ -13855,10 +13879,7 @@ declare namespace feng3d {
          * 垂直视角，视锥体顶面和底面间的夹角；单位为角度，取值范围 [1,179]
          */
         fov: number;
-        /**
-         * 视窗缩放比例(width/height)，在渲染器中设置
-         */
-        aspect: number;
+        private _fov;
         /**
          * 创建一个透视摄像机镜头
          * @param fov 垂直视角，视锥体顶面和底面间的夹角；单位为角度，取值范围 [1,179]
@@ -13923,6 +13944,7 @@ declare namespace feng3d {
         __class__: "feng3d.Camera";
         readonly single: boolean;
         projection: Projection;
+        private _projection;
         /**
          * 镜头
          */
@@ -14006,22 +14028,27 @@ declare namespace feng3d {
          * 宽度
          */
         width: number;
+        private _width;
         /**
          * 高度
          */
         height: number;
+        private _height;
         /**
          * 横向分割数
          */
         segmentsW: number;
+        private _segmentsW;
         /**
          * 纵向分割数
          */
         segmentsH: number;
+        private _segmentsH;
         /**
          * 是否朝上
          */
         yUp: boolean;
+        private _yUp;
         name: string;
         /**
          * 构建几何体数据
@@ -14079,30 +14106,37 @@ declare namespace feng3d {
          * 宽度
          */
         width: number;
+        private _width;
         /**
          * 高度
          */
         height: number;
+        private _height;
         /**
          * 深度
          */
         depth: number;
+        private _depth;
         /**
          * 宽度方向分割数
          */
         segmentsW: number;
+        private _segmentsW;
         /**
          * 高度方向分割数
          */
         segmentsH: number;
+        private _segmentsH;
         /**
          * 深度方向分割数
          */
         segmentsD: number;
+        private _segmentsD;
         /**
          * 是否为6块贴图，默认true。
          */
         tile6: boolean;
+        private _tile6;
         protected buildGeometry(): void;
         /**
          * 构建坐标
@@ -14159,18 +14193,22 @@ declare namespace feng3d {
          * 球体半径
          */
         radius: number;
+        private _radius;
         /**
          * 横向分割数
          */
         segmentsW: number;
+        private _segmentsW;
         /**
          * 纵向分割数
          */
         segmentsH: number;
+        private _segmentsH;
         /**
          * 是否朝上
          */
         yUp: boolean;
+        private _yUp;
         name: string;
         /**
          * 构建几何体数据
@@ -14208,22 +14246,27 @@ declare namespace feng3d {
          * 胶囊体半径
          */
         radius: number;
+        private _radius;
         /**
          * 胶囊体高度
          */
         height: number;
+        private _height;
         /**
          * 横向分割数
          */
         segmentsW: number;
+        private _segmentsW;
         /**
          * 纵向分割数
          */
         segmentsH: number;
+        private _segmentsH;
         /**
          * 正面朝向 true:Y+ false:Z+
          */
         yUp: boolean;
+        private _yUp;
         name: string;
         /**
          * 构建几何体数据
@@ -14263,38 +14306,47 @@ declare namespace feng3d {
          * 顶部半径
          */
         topRadius: number;
+        private _topRadius;
         /**
          * 底部半径
          */
         bottomRadius: number;
+        private _bottomRadius;
         /**
          * 高度
          */
         height: number;
+        private _height;
         /**
          * 横向分割数
          */
         segmentsW: number;
+        private _segmentsW;
         /**
          * 纵向分割数
          */
         segmentsH: number;
+        private _segmentsH;
         /**
          * 顶部是否封口
          */
         topClosed: boolean;
+        private _topClosed;
         /**
          * 底部是否封口
          */
         bottomClosed: boolean;
+        private _bottomClosed;
         /**
          * 侧面是否封口
          */
         surfaceClosed: boolean;
+        private _surfaceClosed;
         /**
          * 是否朝上
          */
         yUp: boolean;
+        private _yUp;
         name: string;
         /**
          * 构建几何体数据
@@ -14350,22 +14402,27 @@ declare namespace feng3d {
          * 半径
          */
         radius: number;
+        private _radius;
         /**
          * 管道半径
          */
         tubeRadius: number;
+        private _tubeRadius;
         /**
          * 半径方向分割数
          */
         segmentsR: number;
+        private _segmentsR;
         /**
          * 管道方向分割数
          */
         segmentsT: number;
+        private _segmentsT;
         /**
          * 是否朝上
          */
         yUp: boolean;
+        private _yUp;
         name: string;
         protected _vertexPositionData: number[];
         protected _vertexNormalData: number[];
@@ -14485,24 +14542,28 @@ declare namespace feng3d {
      */
     class ImageTexture2D extends Texture2D {
         image: HTMLImageElement;
+        private _image;
         private imageChanged;
     }
 }
 declare namespace feng3d {
     class ImageDataTexture2D extends Texture2D {
         imageData: ImageData;
+        private _imageData;
         private imageDataChanged;
     }
 }
 declare namespace feng3d {
     class CanvasTexture2D extends Texture2D {
         canvas: HTMLCanvasElement;
+        private _canvas;
         private canvasChanged;
     }
 }
 declare namespace feng3d {
     class VideoTexture2D extends Texture2D {
         video: HTMLVideoElement;
+        private _video;
         private videoChanged;
     }
 }
@@ -14512,7 +14573,9 @@ declare namespace feng3d {
      */
     class RenderTargetTexture2D extends Texture2D {
         OFFSCREEN_WIDTH: number;
+        protected _OFFSCREEN_WIDTH: number;
         OFFSCREEN_HEIGHT: number;
+        protected _OFFSCREEN_HEIGHT: number;
         format: TextureFormat;
         minFilter: TextureMinFilter;
         magFilter: TextureMagFilter;
@@ -14552,6 +14615,7 @@ declare namespace feng3d {
             type: "path";
             paths: string[];
         };
+        private _rawData;
         noPixels: ImageDatas[];
         protected _pixels: any[];
         protected _textureType: TextureType;
@@ -14602,16 +14666,19 @@ declare namespace feng3d {
         /**
          * shader名称
          */
-        shaderName: ShaderNames;
+        shaderName: "color" | "standard" | "texture" | "point" | "segment" | "water" | "terrain" | "particle";
+        private _shaderName;
         name: string;
         /**
          * Uniform数据
          */
-        uniforms: UniformsData;
+        uniforms: ColorUniforms | StandardUniforms | TextureUniforms | PointUniforms | SegmentUniforms | WaterUniforms | TerrainUniforms | ParticleUniforms;
+        private _uniforms;
         /**
          * 渲染参数
          */
         renderParams: RenderParams;
+        private _renderParams;
         constructor();
         beforeRender(renderAtomic: RenderAtomic): void;
         /**
@@ -14933,6 +15000,7 @@ declare namespace feng3d {
          * 光照范围
          */
         range: number;
+        private _range;
         /**
          * 阴影图尺寸
          */
@@ -14954,10 +15022,12 @@ declare namespace feng3d {
          * 光照范围
          */
         range: number;
+        private _range;
         /**
          *
          */
         angle: number;
+        private _angle;
         /**
          * 半影.
          */
@@ -15188,6 +15258,7 @@ declare namespace feng3d {
     class AudioListener extends Behaviour {
         gain: GainNode;
         enabled: boolean;
+        private _enabled;
         /**
          * 音量
          */
@@ -15234,10 +15305,12 @@ declare namespace feng3d {
         private buffer;
         private gain;
         enabled: boolean;
+        private _enabled;
         /**
          * 声音文件路径
          */
         url: string;
+        private _url;
         /**
          * 是否循环播放
          */
@@ -15359,34 +15432,42 @@ declare namespace feng3d {
          * 高度图路径
          */
         heightMap: Texture2D;
+        private _heightMap;
         /**
          * 地形宽度
          */
         width: number;
+        private _width;
         /**
          * 地形高度
          */
         height: number;
+        private _height;
         /**
          * 地形深度
          */
         depth: number;
+        private _depth;
         /**
          * 横向网格段数
          */
         segmentsW: number;
+        private _segmentsW;
         /**
          * 纵向网格段数
          */
         segmentsH: number;
+        private _segmentsH;
         /**
          * 最大地形高度
          */
         maxElevation: number;
+        private _maxElevation;
         /**
          * 最小地形高度
          */
         minElevation: number;
+        private _minElevation;
         private _heightImageData;
         /**
          * 创建高度地形 拥有segmentsW*segmentsH个顶点
@@ -15915,6 +15996,7 @@ declare namespace feng3d {
          * 发射形状类型
          */
         type: ParticleSystemShapeType;
+        private _type;
         /**
          * 发射形状
          */
@@ -16139,11 +16221,13 @@ declare namespace feng3d {
     }
     class Animation extends Behaviour {
         animation: AnimationClip;
+        private _animation;
         animations: AnimationClip[];
         /**
          * 动画事件，单位为ms
          */
         time: number;
+        private _time;
         isplaying: boolean;
         /**
          * 播放速度
@@ -16242,6 +16326,7 @@ declare namespace feng3d {
          * 资源对象
          */
         data: AssetData;
+        private _data;
         saveFile(callback?: (err: Error) => void): void;
         /**
          * 读取文件
@@ -16249,7 +16334,6 @@ declare namespace feng3d {
          * @param callback 完成回调
          */
         readFile(callback?: (err: Error) => void): void;
-        private _dataChanged;
         private _onDataChanged;
     }
 }
@@ -16261,6 +16345,7 @@ declare namespace feng3d {
         static extenson: string;
         assetType: AssetType;
         textContent: string;
+        private _textContent;
         /**
          * 脚本父类名称
          */
@@ -17164,6 +17249,7 @@ declare namespace feng3d {
      */
     class Mouse3DManager {
         mouseInput: MouseInput;
+        private _mouseInput;
         selectedGameObject: GameObject;
         /**
          * 视窗，鼠标在该矩形内时为有效事件
@@ -17186,7 +17272,6 @@ declare namespace feng3d {
          * 统计处理click次数，判断是否达到dblclick
          */
         private gameObjectClickNum;
-        private mouseInputChanged;
         private dispatch;
         /**
          * 监听鼠标事件收集事件类型

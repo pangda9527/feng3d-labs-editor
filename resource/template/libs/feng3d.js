@@ -20939,6 +20939,22 @@ var feng3d;
              */
             this.invalid = true;
         }
+        Object.defineProperty(Index.prototype, "indices", {
+            /**
+             * 索引数据
+             */
+            get: function () {
+                return this._indices;
+            },
+            set: function (v) {
+                if (this._indices == v)
+                    return;
+                this._indices = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Index.prototype.invalidate = function () {
             this.invalid = true;
         };
@@ -20992,9 +21008,6 @@ var feng3d;
             });
             this._indexBufferMap.clear();
         };
-        __decorate([
-            feng3d.watch("invalidate")
-        ], Index.prototype, "indices", void 0);
         return Index;
     }());
     feng3d.Index = Index;
@@ -21062,6 +21075,20 @@ var feng3d;
             this.size = size;
             this.divisor = divisor;
         }
+        Object.defineProperty(Attribute.prototype, "data", {
+            /**
+             * 属性数据
+             */
+            get: function () {
+                return this._data;
+            },
+            set: function (v) {
+                this._data = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          *
          * @param gl
@@ -21118,9 +21145,6 @@ var feng3d;
             });
             this._indexBufferMap.clear();
         };
-        __decorate([
-            feng3d.watch("invalidate")
-        ], Attribute.prototype, "data", void 0);
         return Attribute;
     }());
     feng3d.Attribute = Attribute;
@@ -21134,26 +21158,11 @@ var feng3d;
         __extends(TextureInfo, _super);
         function TextureInfo() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            /**
-             * 格式
-             */
-            _this.format = feng3d.TextureFormat.RGB;
-            /**
-             * 数据类型
-             */
-            _this.type = feng3d.TextureDataType.UNSIGNED_BYTE;
-            /**
-             * 是否生成mipmap
-             */
-            _this.generateMipmap = false;
-            /**
-             * 对图像进行Y轴反转。默认值为false
-             */
-            _this.flipY = false;
-            /**
-             * 将图像RGB颜色值得每一个分量乘以A。默认为false
-             */
-            _this.premulAlpha = false;
+            _this._format = feng3d.TextureFormat.RGB;
+            _this._type = feng3d.TextureDataType.UNSIGNED_BYTE;
+            _this._generateMipmap = false;
+            _this._flipY = false;
+            _this._premulAlpha = false;
             _this.minFilter = feng3d.TextureMinFilter.LINEAR;
             _this.magFilter = feng3d.TextureMagFilter.LINEAR;
             /**
@@ -21172,8 +21181,8 @@ var feng3d;
              * 是否为渲染目标纹理
              */
             _this._isRenderTarget = false;
-            _this.OFFSCREEN_WIDTH = 1024;
-            _this.OFFSCREEN_HEIGHT = 1024;
+            _this._OFFSCREEN_WIDTH = 1024;
+            _this._OFFSCREEN_HEIGHT = 1024;
             /**
              * 纹理缓冲
              */
@@ -21185,6 +21194,112 @@ var feng3d;
             _this._isPowerOfTwo = false;
             return _this;
         }
+        Object.defineProperty(TextureInfo.prototype, "format", {
+            /**
+             * 格式
+             */
+            get: function () {
+                return this._format;
+            },
+            set: function (v) {
+                if (this._format == v)
+                    return;
+                this._format = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextureInfo.prototype, "type", {
+            /**
+             * 数据类型
+             */
+            get: function () {
+                return this._type;
+            },
+            set: function (v) {
+                if (this._type == v)
+                    return;
+                this._type = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextureInfo.prototype, "generateMipmap", {
+            /**
+             * 是否生成mipmap
+             */
+            get: function () {
+                return this._generateMipmap;
+            },
+            set: function (v) {
+                if (this._generateMipmap == v)
+                    return;
+                this._generateMipmap = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextureInfo.prototype, "flipY", {
+            /**
+             * 对图像进行Y轴反转。默认值为false
+             */
+            get: function () {
+                return this._flipY;
+            },
+            set: function (v) {
+                if (this._flipY == v)
+                    return;
+                this._flipY = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextureInfo.prototype, "premulAlpha", {
+            /**
+             * 将图像RGB颜色值得每一个分量乘以A。默认为false
+             */
+            get: function () {
+                return this._premulAlpha;
+            },
+            set: function (v) {
+                if (this._premulAlpha == v)
+                    return;
+                this._premulAlpha = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextureInfo.prototype, "OFFSCREEN_WIDTH", {
+            get: function () {
+                return this._OFFSCREEN_WIDTH;
+            },
+            set: function (v) {
+                if (this._OFFSCREEN_WIDTH == v)
+                    return;
+                this._OFFSCREEN_WIDTH = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TextureInfo.prototype, "OFFSCREEN_HEIGHT", {
+            get: function () {
+                return this._OFFSCREEN_HEIGHT;
+            },
+            set: function (v) {
+                if (this._OFFSCREEN_HEIGHT == v)
+                    return;
+                this._OFFSCREEN_HEIGHT = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 是否为2的幂贴图
          */
@@ -21409,29 +21524,24 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.watch("invalidate"),
             feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.TextureFormat } })
-        ], TextureInfo.prototype, "format", void 0);
+        ], TextureInfo.prototype, "format", null);
         __decorate([
             feng3d.serialize,
-            feng3d.watch("invalidate"),
             feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.TextureDataType } })
-        ], TextureInfo.prototype, "type", void 0);
+        ], TextureInfo.prototype, "type", null);
         __decorate([
             feng3d.serialize,
-            feng3d.watch("invalidate"),
             feng3d.oav()
-        ], TextureInfo.prototype, "generateMipmap", void 0);
+        ], TextureInfo.prototype, "generateMipmap", null);
         __decorate([
             feng3d.serialize,
-            feng3d.watch("invalidate"),
             feng3d.oav()
-        ], TextureInfo.prototype, "flipY", void 0);
+        ], TextureInfo.prototype, "flipY", null);
         __decorate([
             feng3d.serialize,
-            feng3d.watch("invalidate"),
             feng3d.oav()
-        ], TextureInfo.prototype, "premulAlpha", void 0);
+        ], TextureInfo.prototype, "premulAlpha", null);
         __decorate([
             feng3d.serialize,
             feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.TextureMinFilter } })
@@ -21452,12 +21562,6 @@ var feng3d;
             feng3d.serialize,
             feng3d.oav()
         ], TextureInfo.prototype, "anisotropy", void 0);
-        __decorate([
-            feng3d.watch("invalidate")
-        ], TextureInfo.prototype, "OFFSCREEN_WIDTH", void 0);
-        __decorate([
-            feng3d.watch("invalidate")
-        ], TextureInfo.prototype, "OFFSCREEN_HEIGHT", void 0);
         return TextureInfo;
     }(feng3d.AssetData));
     feng3d.TextureInfo = TextureInfo;
@@ -21512,8 +21616,8 @@ var feng3d;
         function FrameBufferObject(width, height) {
             if (width === void 0) { width = 1024; }
             if (height === void 0) { height = 1024; }
-            this.OFFSCREEN_WIDTH = 1024;
-            this.OFFSCREEN_HEIGHT = 1024;
+            this._OFFSCREEN_WIDTH = 1024;
+            this._OFFSCREEN_HEIGHT = 1024;
             /**
              * 是否失效
              */
@@ -21525,6 +21629,71 @@ var feng3d;
             this.OFFSCREEN_WIDTH = width;
             this.OFFSCREEN_HEIGHT = height;
         }
+        Object.defineProperty(FrameBufferObject.prototype, "OFFSCREEN_WIDTH", {
+            get: function () {
+                return this._OFFSCREEN_WIDTH;
+            },
+            set: function (v) {
+                if (this._OFFSCREEN_WIDTH == v)
+                    return;
+                this._OFFSCREEN_WIDTH = v;
+                this.invalidateSize();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(FrameBufferObject.prototype, "OFFSCREEN_HEIGHT", {
+            get: function () {
+                return this._OFFSCREEN_HEIGHT;
+            },
+            set: function (v) {
+                if (this._OFFSCREEN_HEIGHT == v)
+                    return;
+                this._OFFSCREEN_HEIGHT = v;
+                this.invalidateSize();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(FrameBufferObject.prototype, "frameBuffer", {
+            get: function () {
+                return this._frameBuffer;
+            },
+            set: function (v) {
+                if (this._frameBuffer == v)
+                    return;
+                this._frameBuffer = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(FrameBufferObject.prototype, "texture", {
+            get: function () {
+                return this._texture;
+            },
+            set: function (v) {
+                if (this._texture == v)
+                    return;
+                this._texture = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(FrameBufferObject.prototype, "depthBuffer", {
+            get: function () {
+                return this._depthBuffer;
+            },
+            set: function (v) {
+                if (this._depthBuffer == v)
+                    return;
+                this._depthBuffer = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
         FrameBufferObject.prototype.active = function (gl) {
             if (this._invalid) {
                 this._invalid = false;
@@ -21580,21 +21749,6 @@ var feng3d;
         FrameBufferObject.prototype.clear = function () {
             this._map.clear();
         };
-        __decorate([
-            feng3d.watch("invalidateSize")
-        ], FrameBufferObject.prototype, "OFFSCREEN_WIDTH", void 0);
-        __decorate([
-            feng3d.watch("invalidateSize")
-        ], FrameBufferObject.prototype, "OFFSCREEN_HEIGHT", void 0);
-        __decorate([
-            feng3d.watch("invalidate")
-        ], FrameBufferObject.prototype, "frameBuffer", void 0);
-        __decorate([
-            feng3d.watch("invalidate")
-        ], FrameBufferObject.prototype, "texture", void 0);
-        __decorate([
-            feng3d.watch("invalidate")
-        ], FrameBufferObject.prototype, "depthBuffer", void 0);
         return FrameBufferObject;
     }());
     feng3d.FrameBufferObject = FrameBufferObject;
@@ -21603,14 +21757,40 @@ var feng3d;
 (function (feng3d) {
     var RenderBuffer = /** @class */ (function () {
         function RenderBuffer() {
-            this.OFFSCREEN_WIDTH = 1024;
-            this.OFFSCREEN_HEIGHT = 1024;
+            this._OFFSCREEN_WIDTH = 1024;
+            this._OFFSCREEN_HEIGHT = 1024;
             this._depthBufferMap = new Map();
             /**
              * 是否失效
              */
             this._invalid = true;
         }
+        Object.defineProperty(RenderBuffer.prototype, "OFFSCREEN_WIDTH", {
+            get: function () {
+                return this._OFFSCREEN_WIDTH;
+            },
+            set: function (v) {
+                if (this._OFFSCREEN_WIDTH == v)
+                    return;
+                this._OFFSCREEN_WIDTH = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RenderBuffer.prototype, "OFFSCREEN_HEIGHT", {
+            get: function () {
+                return this._OFFSCREEN_HEIGHT;
+            },
+            set: function (v) {
+                if (this._OFFSCREEN_HEIGHT == v)
+                    return;
+                this._OFFSCREEN_HEIGHT = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 使失效
          */
@@ -21649,12 +21829,6 @@ var feng3d;
             });
             this._depthBufferMap.clear();
         };
-        __decorate([
-            feng3d.watch("invalidate")
-        ], RenderBuffer.prototype, "OFFSCREEN_WIDTH", void 0);
-        __decorate([
-            feng3d.watch("invalidate")
-        ], RenderBuffer.prototype, "OFFSCREEN_HEIGHT", void 0);
         return RenderBuffer;
     }());
     feng3d.RenderBuffer = RenderBuffer;
@@ -24621,12 +24795,45 @@ var feng3d;
         function HoldSizeComponent() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.HoldSizeComponent";
+            _this._holdSize = 1;
+            return _this;
+        }
+        Object.defineProperty(HoldSizeComponent.prototype, "holdSize", {
             /**
              * 保持缩放尺寸
              */
-            _this.holdSize = 1;
-            return _this;
-        }
+            get: function () {
+                return this._holdSize;
+            },
+            set: function (v) {
+                if (this._holdSize == v)
+                    return;
+                this._holdSize = v;
+                this.onHoldSizeChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(HoldSizeComponent.prototype, "camera", {
+            /**
+             * 相机
+             */
+            get: function () {
+                return this._camera;
+            },
+            set: function (v) {
+                if (this._camera == v)
+                    return;
+                if (this._camera)
+                    this._camera.off("scenetransformChanged", this.invalidateSceneTransform, this);
+                this._camera = v;
+                if (this._camera)
+                    this._camera.on("scenetransformChanged", this.invalidateSceneTransform, this);
+                this.invalidateSceneTransform();
+            },
+            enumerable: true,
+            configurable: true
+        });
         HoldSizeComponent.prototype.init = function () {
             this.transform.on("updateLocalToWorldMatrix", this.updateLocalToWorldMatrix, this);
         };
@@ -24636,13 +24843,6 @@ var feng3d;
             _super.prototype.dispose.call(this);
         };
         HoldSizeComponent.prototype.onHoldSizeChanged = function () {
-            this.invalidateSceneTransform();
-        };
-        HoldSizeComponent.prototype.onCameraChanged = function (property, oldValue, value) {
-            if (oldValue)
-                oldValue.off("scenetransformChanged", this.invalidateSceneTransform, this);
-            if (value)
-                value.on("scenetransformChanged", this.invalidateSceneTransform, this);
             this.invalidateSceneTransform();
         };
         HoldSizeComponent.prototype.invalidateSceneTransform = function () {
@@ -24671,13 +24871,11 @@ var feng3d;
             return scale;
         };
         __decorate([
-            feng3d.oav(),
-            feng3d.watch("onHoldSizeChanged")
-        ], HoldSizeComponent.prototype, "holdSize", void 0);
+            feng3d.oav()
+        ], HoldSizeComponent.prototype, "holdSize", null);
         __decorate([
-            feng3d.oav(),
-            feng3d.watch("onCameraChanged")
-        ], HoldSizeComponent.prototype, "camera", void 0);
+            feng3d.oav()
+        ], HoldSizeComponent.prototype, "camera", null);
         return HoldSizeComponent;
     }(feng3d.Component));
     feng3d.HoldSizeComponent = HoldSizeComponent;
@@ -24691,13 +24889,26 @@ var feng3d;
             _this.__class__ = "feng3d.BillboardComponent";
             return _this;
         }
-        BillboardComponent.prototype.onCameraChanged = function (property, oldValue, value) {
-            if (oldValue)
-                oldValue.off("scenetransformChanged", this.invalidHoldSizeMatrix, this);
-            if (value)
-                value.on("scenetransformChanged", this.invalidHoldSizeMatrix, this);
-            this.invalidHoldSizeMatrix();
-        };
+        Object.defineProperty(BillboardComponent.prototype, "camera", {
+            /**
+             * 相机
+             */
+            get: function () {
+                return this._camera;
+            },
+            set: function (v) {
+                if (this._camera == v)
+                    return;
+                if (this._camera)
+                    this._camera.off("scenetransformChanged", this.invalidHoldSizeMatrix, this);
+                this._camera = v;
+                if (this._camera)
+                    this._camera.on("scenetransformChanged", this.invalidHoldSizeMatrix, this);
+                this.invalidHoldSizeMatrix();
+            },
+            enumerable: true,
+            configurable: true
+        });
         BillboardComponent.prototype.init = function () {
             _super.prototype.init.call(this);
             this.transform.on("updateLocalToWorldMatrix", this.updateLocalToWorldMatrix, this);
@@ -24722,9 +24933,8 @@ var feng3d;
             _super.prototype.dispose.call(this);
         };
         __decorate([
-            feng3d.oav(),
-            feng3d.watch("onCameraChanged")
-        ], BillboardComponent.prototype, "camera", void 0);
+            feng3d.oav()
+        ], BillboardComponent.prototype, "camera", null);
         return BillboardComponent;
     }(feng3d.Component));
     feng3d.BillboardComponent = BillboardComponent;
@@ -24864,14 +25074,8 @@ var feng3d;
         __extends(Model, _super);
         function Model() {
             var _this = _super.call(this) || this;
-            /**
-             * 几何体
-             */
-            _this.geometry = feng3d.Geometry.cube;
-            /**
-             * 材质
-             */
-            _this.material = feng3d.Material.default;
+            _this._geometry = feng3d.Geometry.cube;
+            _this._material = feng3d.Material.default;
             _this.castShadows = true;
             _this.receiveShadows = true;
             _this._lightPicker = new feng3d.LightPicker(_this);
@@ -24879,6 +25083,43 @@ var feng3d;
         }
         Object.defineProperty(Model.prototype, "single", {
             get: function () { return true; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Model.prototype, "geometry", {
+            /**
+             * 几何体
+             */
+            get: function () {
+                return this._geometry;
+            },
+            set: function (v) {
+                if (this._geometry == v)
+                    return;
+                if (this._geometry) {
+                    this._geometry.off("boundsInvalid", this.onBoundsInvalid, this);
+                }
+                this._geometry = v;
+                if (this._geometry) {
+                    this._geometry.on("boundsInvalid", this.onBoundsInvalid, this);
+                }
+                this.geometry = this.geometry || feng3d.Geometry.cube;
+                this.onBoundsInvalid();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Model.prototype, "material", {
+            /**
+             * 材质
+             */
+            get: function () {
+                return this._material;
+            },
+            set: function (v) {
+                this._material = v;
+                this._material = this._material || feng3d.Material.default;
+            },
             enumerable: true,
             configurable: true
         });
@@ -24971,19 +25212,6 @@ var feng3d;
             this.material = null;
             _super.prototype.dispose.call(this);
         };
-        Model.prototype.onGeometryChanged = function (property, oldValue, value) {
-            if (oldValue) {
-                oldValue.off("boundsInvalid", this.onBoundsInvalid, this);
-            }
-            if (value) {
-                value.on("boundsInvalid", this.onBoundsInvalid, this);
-            }
-            this.geometry = this.geometry || feng3d.Geometry.cube;
-            this.onBoundsInvalid();
-        };
-        Model.prototype.onMaterialChanged = function () {
-            this.material = this.material || feng3d.Material.default;
-        };
         Model.prototype.onScenetransformChanged = function () {
             this._selfWorldBounds = null;
         };
@@ -25008,14 +25236,12 @@ var feng3d;
         };
         __decorate([
             feng3d.oav({ component: "OAVPick", tooltip: "几何体，提供模型以形状", componentParam: { accepttype: "geometry", datatype: "geometry" } }),
-            feng3d.serialize,
-            feng3d.watch("onGeometryChanged")
-        ], Model.prototype, "geometry", void 0);
+            feng3d.serialize
+        ], Model.prototype, "geometry", null);
         __decorate([
             feng3d.oav({ component: "OAVPick", tooltip: "材质，提供模型以皮肤", componentParam: { accepttype: "material", datatype: "material" } }),
-            feng3d.serialize,
-            feng3d.watch("onMaterialChanged")
-        ], Model.prototype, "material", void 0);
+            feng3d.serialize
+        ], Model.prototype, "material", null);
         __decorate([
             feng3d.oav({ tooltip: "是否投射阴影" }),
             feng3d.serialize
@@ -25055,6 +25281,19 @@ var feng3d;
             _this.scriptInit = false;
             return _this;
         }
+        Object.defineProperty(ScriptComponent.prototype, "scriptName", {
+            get: function () {
+                return this._scriptName;
+            },
+            set: function (v) {
+                if (this._scriptName == v)
+                    return;
+                this._scriptName = v;
+                this.invalidateScriptInstance();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(ScriptComponent.prototype, "scriptInstance", {
             /**
              * 脚本对象
@@ -25122,9 +25361,8 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.watch("invalidateScriptInstance"),
             feng3d.oav({ component: "OAVPick", componentParam: { accepttype: "file_script" } })
-        ], ScriptComponent.prototype, "scriptName", void 0);
+        ], ScriptComponent.prototype, "scriptName", null);
         __decorate([
             feng3d.serialize
         ], ScriptComponent.prototype, "scriptInstance", null);
@@ -26565,13 +26803,26 @@ var feng3d;
         function PointGeometry() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.PointGeometry";
+            _this._points = [];
+            return _this;
+        }
+        Object.defineProperty(PointGeometry.prototype, "points", {
             /**
              * 点数据列表
              * 修改数组内数据时需要手动调用 invalidateGeometry();
              */
-            _this.points = [];
-            return _this;
-        }
+            get: function () {
+                return this._points;
+            },
+            set: function (v) {
+                if (this._points == v)
+                    return;
+                this._points = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 构建几何体
          */
@@ -26603,9 +26854,8 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], PointGeometry.prototype, "points", void 0);
+            feng3d.oav()
+        ], PointGeometry.prototype, "points", null);
         return PointGeometry;
     }(feng3d.Geometry));
     feng3d.PointGeometry = PointGeometry;
@@ -26621,13 +26871,26 @@ var feng3d;
         function SegmentGeometry() {
             var _this = _super.call(this) || this;
             _this.__class__ = "feng3d.SegmentGeometry";
+            _this._segments = [];
+            return _this;
+        }
+        Object.defineProperty(SegmentGeometry.prototype, "segments", {
             /**
              * 线段列表
              * 修改数组内数据时需要手动调用 invalidateGeometry();
              */
-            _this.segments = [];
-            return _this;
-        }
+            get: function () {
+                return this._segments;
+            },
+            set: function (v) {
+                if (this._segments == v)
+                    return;
+                this._segments = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 更新几何体
          */
@@ -26653,9 +26916,8 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], SegmentGeometry.prototype, "segments", void 0);
+            feng3d.oav()
+        ], SegmentGeometry.prototype, "segments", null);
         return SegmentGeometry;
     }(feng3d.Geometry));
     feng3d.SegmentGeometry = SegmentGeometry;
@@ -26716,6 +26978,54 @@ var feng3d;
             _this.far = far;
             return _this;
         }
+        Object.defineProperty(LensBase.prototype, "near", {
+            /**
+             * 最近距离
+             */
+            get: function () {
+                return this._near;
+            },
+            set: function (v) {
+                if (this._near == v)
+                    return;
+                this._near = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LensBase.prototype, "far", {
+            /**
+             * 最远距离
+             */
+            get: function () {
+                return this._far;
+            },
+            set: function (v) {
+                if (this._far == v)
+                    return;
+                this._far = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LensBase.prototype, "aspect", {
+            /**
+             * 视窗缩放比例(width/height)，在渲染器中设置
+             */
+            get: function () {
+                return this._aspect;
+            },
+            set: function (v) {
+                if (this._aspect == v)
+                    return;
+                this._aspect = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(LensBase.prototype, "matrix", {
             /**
              * 投影矩阵
@@ -26831,17 +27141,12 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidate")
-        ], LensBase.prototype, "near", void 0);
+            feng3d.oav()
+        ], LensBase.prototype, "near", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidate")
-        ], LensBase.prototype, "far", void 0);
-        __decorate([
-            feng3d.watch("invalidate")
-        ], LensBase.prototype, "aspect", void 0);
+            feng3d.oav()
+        ], LensBase.prototype, "far", null);
         return LensBase;
     }(feng3d.Feng3dObject));
     feng3d.LensBase = LensBase;
@@ -26866,14 +27171,30 @@ var feng3d;
             _this.size = size;
             return _this;
         }
+        Object.defineProperty(OrthographicLens.prototype, "size", {
+            /**
+             * 尺寸
+             */
+            get: function () {
+                return this._size;
+            },
+            set: function (v) {
+                if (this._size == v)
+                    return;
+                this._size = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
         OrthographicLens.prototype.updateMatrix = function () {
-            this._matrix.setOrtho(-this.size, this.size, this.size, -this.size, this.near, this.far);
+            this._matrix.setOrtho(-this._size, this._size, this._size, -this._size, this.near, this.far);
         };
         OrthographicLens.prototype.updateViewBox = function () {
-            var left = -this.size * this.aspect;
-            var right = this.size * this.aspect;
-            var top = this.size;
-            var bottom = -this.size;
+            var left = -this._size * this.aspect;
+            var right = this._size * this.aspect;
+            var top = this._size;
+            var bottom = -this._size;
             var near = this.near;
             var far = this.far;
             this._viewBox.fromPoints([
@@ -26888,13 +27209,12 @@ var feng3d;
             ]);
         };
         OrthographicLens.prototype.clone = function () {
-            return new OrthographicLens(this.size, this.aspect, this.near, this.far);
+            return new OrthographicLens(this._size, this.aspect, this.near, this.far);
         };
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidate")
-        ], OrthographicLens.prototype, "size", void 0);
+            feng3d.oav()
+        ], OrthographicLens.prototype, "size", null);
         return OrthographicLens;
     }(feng3d.LensBase));
     feng3d.OrthographicLens = OrthographicLens;
@@ -26921,12 +27241,28 @@ var feng3d;
             _this.fov = fov;
             return _this;
         }
+        Object.defineProperty(PerspectiveLens.prototype, "fov", {
+            /**
+             * 垂直视角，视锥体顶面和底面间的夹角；单位为角度，取值范围 [1,179]
+             */
+            get: function () {
+                return this._fov;
+            },
+            set: function (v) {
+                if (this._fov == v)
+                    return;
+                this._fov = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(PerspectiveLens.prototype, "focalLength", {
             /**
              * 焦距
              */
             get: function () {
-                return 1 / Math.tan(this.fov * Math.PI / 360);
+                return 1 / Math.tan(this._fov * Math.PI / 360);
             },
             set: function (value) {
                 this.fov = Math.atan(1 / value) * 360 / Math.PI;
@@ -26977,10 +27313,10 @@ var feng3d;
             return v;
         };
         PerspectiveLens.prototype.updateMatrix = function () {
-            this._matrix.setPerspectiveFromFOV(this.fov, this.aspect, this.near, this.far);
+            this._matrix.setPerspectiveFromFOV(this._fov, this.aspect, this.near, this.far);
         };
         PerspectiveLens.prototype.updateViewBox = function () {
-            var fov = this.fov;
+            var fov = this._fov;
             var aspect = this.aspect;
             var near = this.near;
             var far = this.far;
@@ -26997,16 +27333,12 @@ var feng3d;
             ]);
         };
         PerspectiveLens.prototype.clone = function () {
-            return new PerspectiveLens(this.fov, this.aspect, this.near, this.far);
+            return new PerspectiveLens(this._fov, this._aspect, this._near, this._far);
         };
         __decorate([
-            feng3d.watch("invalidate"),
             feng3d.serialize,
             feng3d.oav()
-        ], PerspectiveLens.prototype, "fov", void 0);
-        __decorate([
-            feng3d.watch("invalidate")
-        ], PerspectiveLens.prototype, "aspect", void 0);
+        ], PerspectiveLens.prototype, "fov", null);
         return PerspectiveLens;
     }(feng3d.LensBase));
     feng3d.PerspectiveLens = PerspectiveLens;
@@ -27038,7 +27370,7 @@ var feng3d;
         function Camera() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.Camera";
-            _this.projection = feng3d.Projection.Perspective;
+            _this._projection = feng3d.Projection.Perspective;
             _this._viewProjection = new feng3d.Matrix4x4();
             _this._viewProjectionInvalid = true;
             _this._viewBox = new feng3d.Box();
@@ -27048,6 +27380,39 @@ var feng3d;
         }
         Object.defineProperty(Camera.prototype, "single", {
             get: function () { return true; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Camera.prototype, "projection", {
+            get: function () {
+                return this._projection;
+            },
+            set: function (v) {
+                if (this._projection == v)
+                    return;
+                this._projection = v;
+                this.onProjectionChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Camera.prototype, "lens", {
+            /**
+             * 镜头
+             */
+            get: function () {
+                return this._lens;
+            },
+            set: function (v) {
+                if (this._lens == v)
+                    return;
+                if (this._lens)
+                    this._lens.off("lensChanged", this.onLensChanged, this);
+                this._lens = v;
+                if (this._lens)
+                    this._lens.on("lensChanged", this.onLensChanged, this);
+                this.onLensChanged();
+            },
             enumerable: true,
             configurable: true
         });
@@ -27162,24 +27527,18 @@ var feng3d;
         /**
          * 处理镜头变化事件
          */
-        Camera.prototype.onLensChanged = function (property, oldValue, value) {
+        Camera.prototype.onLensChanged = function () {
             this._viewProjectionInvalid = true;
-            if (oldValue)
-                oldValue.off("lensChanged", this.onLensChanged, this);
-            if (value)
-                value.on("lensChanged", this.onLensChanged, this);
             if (this.lens instanceof feng3d.PerspectiveLens) {
                 this.projection = feng3d.Projection.Perspective;
             }
             else if (this.lens instanceof feng3d.OrthographicLens) {
                 this.projection = feng3d.Projection.Orthographic;
             }
-            if (oldValue != value) {
-                this.dispatch("refreshView");
-            }
+            this.dispatch("refreshView");
             this.dispatch("lensChanged");
         };
-        Camera.prototype.onProjectionChanged = function (property, oldValue, value) {
+        Camera.prototype.onProjectionChanged = function () {
             var aspect = 1;
             var near = 0.3;
             var far = 1000;
@@ -27203,14 +27562,12 @@ var feng3d;
             }
         };
         __decorate([
-            feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.Projection } }),
-            feng3d.watch("onProjectionChanged")
-        ], Camera.prototype, "projection", void 0);
+            feng3d.oav({ component: "OAVEnum", componentParam: { enumClass: feng3d.Projection } })
+        ], Camera.prototype, "projection", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav({ component: "OAVObjectView" }),
-            feng3d.watch("onLensChanged")
-        ], Camera.prototype, "lens", void 0);
+            feng3d.oav({ component: "OAVObjectView" })
+        ], Camera.prototype, "lens", null);
         return Camera;
     }(feng3d.Component));
     feng3d.Camera = Camera;
@@ -27227,29 +27584,94 @@ var feng3d;
         function PlaneGeometry() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.PlaneGeometry";
-            /**
-             * 宽度
-             */
-            _this.width = 1;
-            /**
-             * 高度
-             */
-            _this.height = 1;
-            /**
-             * 横向分割数
-             */
-            _this.segmentsW = 1;
-            /**
-             * 纵向分割数
-             */
-            _this.segmentsH = 1;
-            /**
-             * 是否朝上
-             */
-            _this.yUp = true;
+            _this._width = 1;
+            _this._height = 1;
+            _this._segmentsW = 1;
+            _this._segmentsH = 1;
+            _this._yUp = true;
             _this.name = "Plane";
             return _this;
         }
+        Object.defineProperty(PlaneGeometry.prototype, "width", {
+            /**
+             * 宽度
+             */
+            get: function () {
+                return this._width;
+            },
+            set: function (v) {
+                if (this._width == v)
+                    return;
+                this._width = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PlaneGeometry.prototype, "height", {
+            /**
+             * 高度
+             */
+            get: function () {
+                return this._height;
+            },
+            set: function (v) {
+                if (this._height == v)
+                    return;
+                this._height = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PlaneGeometry.prototype, "segmentsW", {
+            /**
+             * 横向分割数
+             */
+            get: function () {
+                return this._segmentsW;
+            },
+            set: function (v) {
+                if (this._segmentsW == v)
+                    return;
+                this._segmentsW = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PlaneGeometry.prototype, "segmentsH", {
+            /**
+             * 纵向分割数
+             */
+            get: function () {
+                return this._segmentsH;
+            },
+            set: function (v) {
+                if (this._segmentsH == v)
+                    return;
+                this._segmentsH = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PlaneGeometry.prototype, "yUp", {
+            /**
+             * 是否朝上
+             */
+            get: function () {
+                return this._yUp;
+            },
+            set: function (v) {
+                if (this._yUp == v)
+                    return;
+                this._yUp = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 构建几何体数据
          */
@@ -27406,29 +27828,24 @@ var feng3d;
         };
         __decorate([
             feng3d.oav(),
-            feng3d.serialize,
-            feng3d.watch("invalidateGeometry")
-        ], PlaneGeometry.prototype, "width", void 0);
+            feng3d.serialize
+        ], PlaneGeometry.prototype, "width", null);
         __decorate([
             feng3d.oav(),
-            feng3d.serialize,
-            feng3d.watch("invalidateGeometry")
-        ], PlaneGeometry.prototype, "height", void 0);
+            feng3d.serialize
+        ], PlaneGeometry.prototype, "height", null);
         __decorate([
             feng3d.oav(),
-            feng3d.serialize,
-            feng3d.watch("invalidateGeometry")
-        ], PlaneGeometry.prototype, "segmentsW", void 0);
+            feng3d.serialize
+        ], PlaneGeometry.prototype, "segmentsW", null);
         __decorate([
             feng3d.oav(),
-            feng3d.serialize,
-            feng3d.watch("invalidateGeometry")
-        ], PlaneGeometry.prototype, "segmentsH", void 0);
+            feng3d.serialize
+        ], PlaneGeometry.prototype, "segmentsH", null);
         __decorate([
             feng3d.oav(),
-            feng3d.serialize,
-            feng3d.watch("invalidateGeometry")
-        ], PlaneGeometry.prototype, "yUp", void 0);
+            feng3d.serialize
+        ], PlaneGeometry.prototype, "yUp", null);
         return PlaneGeometry;
     }(feng3d.Geometry));
     feng3d.PlaneGeometry = PlaneGeometry;
@@ -27445,36 +27862,127 @@ var feng3d;
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.CubeGeometry";
             _this.name = "Cube";
+            _this._width = 1;
+            _this._height = 1;
+            _this._depth = 1;
+            _this._segmentsW = 1;
+            _this._segmentsH = 1;
+            _this._segmentsD = 1;
+            _this._tile6 = false;
+            return _this;
+        }
+        Object.defineProperty(CubeGeometry.prototype, "width", {
             /**
              * 宽度
              */
-            _this.width = 1;
+            get: function () {
+                return this._width;
+            },
+            set: function (v) {
+                if (this._width == v)
+                    return;
+                this._width = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CubeGeometry.prototype, "height", {
             /**
              * 高度
              */
-            _this.height = 1;
+            get: function () {
+                return this._height;
+            },
+            set: function (v) {
+                if (this._height == v)
+                    return;
+                this._height = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CubeGeometry.prototype, "depth", {
             /**
              * 深度
              */
-            _this.depth = 1;
+            get: function () {
+                return this._depth;
+            },
+            set: function (v) {
+                if (this._depth == v)
+                    return;
+                this._depth = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CubeGeometry.prototype, "segmentsW", {
             /**
              * 宽度方向分割数
              */
-            _this.segmentsW = 1;
+            get: function () {
+                return this._segmentsW;
+            },
+            set: function (v) {
+                if (this._segmentsW == v)
+                    return;
+                this._segmentsW = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CubeGeometry.prototype, "segmentsH", {
             /**
              * 高度方向分割数
              */
-            _this.segmentsH = 1;
+            get: function () {
+                return this._segmentsH;
+            },
+            set: function (v) {
+                if (this._segmentsH == v)
+                    return;
+                this._segmentsH = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CubeGeometry.prototype, "segmentsD", {
             /**
              * 深度方向分割数
              */
-            _this.segmentsD = 1;
+            get: function () {
+                return this._segmentsD;
+            },
+            set: function (v) {
+                if (this._segmentsD == v)
+                    return;
+                this._segmentsD = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CubeGeometry.prototype, "tile6", {
             /**
              * 是否为6块贴图，默认true。
              */
-            _this.tile6 = false;
-            return _this;
-        }
+            get: function () {
+                return this._tile6;
+            },
+            set: function (v) {
+                if (this._tile6 == v)
+                    return;
+                this._tile6 = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
         CubeGeometry.prototype.buildGeometry = function () {
             var vertexPositionData = this.buildPosition();
             this.setVAData("a_position", vertexPositionData, 3);
@@ -27821,40 +28329,32 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CubeGeometry.prototype, "width", void 0);
+            feng3d.oav()
+        ], CubeGeometry.prototype, "width", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CubeGeometry.prototype, "height", void 0);
+            feng3d.oav()
+        ], CubeGeometry.prototype, "height", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CubeGeometry.prototype, "depth", void 0);
+            feng3d.oav()
+        ], CubeGeometry.prototype, "depth", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CubeGeometry.prototype, "segmentsW", void 0);
+            feng3d.oav()
+        ], CubeGeometry.prototype, "segmentsW", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CubeGeometry.prototype, "segmentsH", void 0);
+            feng3d.oav()
+        ], CubeGeometry.prototype, "segmentsH", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry"),
-            feng3d.watch("invalidateGeometry")
-        ], CubeGeometry.prototype, "segmentsD", void 0);
+            feng3d.oav()
+        ], CubeGeometry.prototype, "segmentsD", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CubeGeometry.prototype, "tile6", void 0);
+            feng3d.oav()
+        ], CubeGeometry.prototype, "tile6", null);
         return CubeGeometry;
     }(feng3d.Geometry));
     feng3d.CubeGeometry = CubeGeometry;
@@ -27871,25 +28371,77 @@ var feng3d;
         function SphereGeometry() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.SphereGeometry";
-            /**
-             * 球体半径
-             */
-            _this.radius = 0.5;
-            /**
-             * 横向分割数
-             */
-            _this.segmentsW = 16;
-            /**
-             * 纵向分割数
-             */
-            _this.segmentsH = 12;
-            /**
-             * 是否朝上
-             */
-            _this.yUp = true;
+            _this._radius = 0.5;
+            _this._segmentsW = 16;
+            _this._segmentsH = 12;
+            _this._yUp = true;
             _this.name = "Sphere";
             return _this;
         }
+        Object.defineProperty(SphereGeometry.prototype, "radius", {
+            /**
+             * 球体半径
+             */
+            get: function () {
+                return this._radius;
+            },
+            set: function (v) {
+                if (this._radius == v)
+                    return;
+                this._radius = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SphereGeometry.prototype, "segmentsW", {
+            /**
+             * 横向分割数
+             */
+            get: function () {
+                return this._segmentsW;
+            },
+            set: function (v) {
+                if (this._segmentsW == v)
+                    return;
+                this._segmentsW = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SphereGeometry.prototype, "segmentsH", {
+            /**
+             * 纵向分割数
+             */
+            get: function () {
+                return this._segmentsH;
+            },
+            set: function (v) {
+                if (this._segmentsH == v)
+                    return;
+                this._segmentsH = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SphereGeometry.prototype, "yUp", {
+            /**
+             * 是否朝上
+             */
+            get: function () {
+                return this._yUp;
+            },
+            set: function (v) {
+                if (this._yUp == v)
+                    return;
+                this._yUp = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 构建几何体数据
          * @param this.radius 球体半径
@@ -28024,24 +28576,20 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], SphereGeometry.prototype, "radius", void 0);
+            feng3d.oav()
+        ], SphereGeometry.prototype, "radius", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], SphereGeometry.prototype, "segmentsW", void 0);
+            feng3d.oav()
+        ], SphereGeometry.prototype, "segmentsW", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], SphereGeometry.prototype, "segmentsH", void 0);
+            feng3d.oav()
+        ], SphereGeometry.prototype, "segmentsH", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], SphereGeometry.prototype, "yUp", void 0);
+            feng3d.oav()
+        ], SphereGeometry.prototype, "yUp", null);
         return SphereGeometry;
     }(feng3d.Geometry));
     feng3d.SphereGeometry = SphereGeometry;
@@ -28057,29 +28605,94 @@ var feng3d;
         function CapsuleGeometry() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.CapsuleGeometry";
-            /**
-             * 胶囊体半径
-             */
-            _this.radius = 0.5;
-            /**
-             * 胶囊体高度
-             */
-            _this.height = 1;
-            /**
-             * 横向分割数
-             */
-            _this.segmentsW = 16;
-            /**
-             * 纵向分割数
-             */
-            _this.segmentsH = 15;
-            /**
-             * 正面朝向 true:Y+ false:Z+
-             */
-            _this.yUp = true;
+            _this._radius = 0.5;
+            _this._height = 1;
+            _this._segmentsW = 16;
+            _this._segmentsH = 15;
+            _this._yUp = true;
             _this.name = "Capsule";
             return _this;
         }
+        Object.defineProperty(CapsuleGeometry.prototype, "radius", {
+            /**
+             * 胶囊体半径
+             */
+            get: function () {
+                return this._radius;
+            },
+            set: function (v) {
+                if (this._radius == v)
+                    return;
+                this._radius = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleGeometry.prototype, "height", {
+            /**
+             * 胶囊体高度
+             */
+            get: function () {
+                return this._height;
+            },
+            set: function (v) {
+                if (this._height == v)
+                    return;
+                this._height = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleGeometry.prototype, "segmentsW", {
+            /**
+             * 横向分割数
+             */
+            get: function () {
+                return this._segmentsW;
+            },
+            set: function (v) {
+                if (this._segmentsW == v)
+                    return;
+                this._segmentsW = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleGeometry.prototype, "segmentsH", {
+            /**
+             * 纵向分割数
+             */
+            get: function () {
+                return this._segmentsH;
+            },
+            set: function (v) {
+                if (this._segmentsH == v)
+                    return;
+                this._segmentsH = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleGeometry.prototype, "yUp", {
+            /**
+             * 正面朝向 true:Y+ false:Z+
+             */
+            get: function () {
+                return this._yUp;
+            },
+            set: function (v) {
+                if (this._yUp == v)
+                    return;
+                this._yUp = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 构建几何体数据
          * @param radius 胶囊体半径
@@ -28215,29 +28828,24 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CapsuleGeometry.prototype, "radius", void 0);
+            feng3d.oav()
+        ], CapsuleGeometry.prototype, "radius", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CapsuleGeometry.prototype, "height", void 0);
+            feng3d.oav()
+        ], CapsuleGeometry.prototype, "height", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CapsuleGeometry.prototype, "segmentsW", void 0);
+            feng3d.oav()
+        ], CapsuleGeometry.prototype, "segmentsW", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CapsuleGeometry.prototype, "segmentsH", void 0);
+            feng3d.oav()
+        ], CapsuleGeometry.prototype, "segmentsH", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], CapsuleGeometry.prototype, "yUp", void 0);
+            feng3d.oav()
+        ], CapsuleGeometry.prototype, "yUp", null);
         return CapsuleGeometry;
     }(feng3d.Geometry));
     feng3d.CapsuleGeometry = CapsuleGeometry;
@@ -28254,45 +28862,162 @@ var feng3d;
         function CylinderGeometry() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.CylinderGeometry";
-            /**
-             * 顶部半径
-             */
-            _this.topRadius = 0.5;
-            /**
-             * 底部半径
-             */
-            _this.bottomRadius = 0.5;
-            /**
-             * 高度
-             */
-            _this.height = 2;
-            /**
-             * 横向分割数
-             */
-            _this.segmentsW = 16;
-            /**
-             * 纵向分割数
-             */
-            _this.segmentsH = 1;
-            /**
-             * 顶部是否封口
-             */
-            _this.topClosed = true;
-            /**
-             * 底部是否封口
-             */
-            _this.bottomClosed = true;
-            /**
-             * 侧面是否封口
-             */
-            _this.surfaceClosed = true;
-            /**
-             * 是否朝上
-             */
-            _this.yUp = true;
+            _this._topRadius = 0.5;
+            _this._bottomRadius = 0.5;
+            _this._height = 2;
+            _this._segmentsW = 16;
+            _this._segmentsH = 1;
+            _this._topClosed = true;
+            _this._bottomClosed = true;
+            _this._surfaceClosed = true;
+            _this._yUp = true;
             _this.name = "Cylinder";
             return _this;
         }
+        Object.defineProperty(CylinderGeometry.prototype, "topRadius", {
+            /**
+             * 顶部半径
+             */
+            get: function () {
+                return this._topRadius;
+            },
+            set: function (v) {
+                if (this._topRadius == v)
+                    return;
+                this._topRadius = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CylinderGeometry.prototype, "bottomRadius", {
+            /**
+             * 底部半径
+             */
+            get: function () {
+                return this._bottomRadius;
+            },
+            set: function (v) {
+                if (this._bottomRadius == v)
+                    return;
+                this._bottomRadius = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CylinderGeometry.prototype, "height", {
+            /**
+             * 高度
+             */
+            get: function () {
+                return this._height;
+            },
+            set: function (v) {
+                if (this._height == v)
+                    return;
+                this._height = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CylinderGeometry.prototype, "segmentsW", {
+            /**
+             * 横向分割数
+             */
+            get: function () {
+                return this._segmentsW;
+            },
+            set: function (v) {
+                if (this._segmentsW == v)
+                    return;
+                this._segmentsW = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CylinderGeometry.prototype, "segmentsH", {
+            /**
+             * 纵向分割数
+             */
+            get: function () {
+                return this._segmentsH;
+            },
+            set: function (v) {
+                if (this._segmentsH == v)
+                    return;
+                this._segmentsH = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CylinderGeometry.prototype, "topClosed", {
+            /**
+             * 顶部是否封口
+             */
+            get: function () {
+                return this._topClosed;
+            },
+            set: function (v) {
+                if (this._topClosed == v)
+                    return;
+                this._topClosed = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CylinderGeometry.prototype, "bottomClosed", {
+            /**
+             * 底部是否封口
+             */
+            get: function () {
+                return this._bottomClosed;
+            },
+            set: function (v) {
+                if (this._bottomClosed == v)
+                    return;
+                this._bottomClosed = v;
+                this.invalidateGeometry;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CylinderGeometry.prototype, "surfaceClosed", {
+            /**
+             * 侧面是否封口
+             */
+            get: function () {
+                return this._surfaceClosed;
+            },
+            set: function (v) {
+                if (this._surfaceClosed == v)
+                    return;
+                this._surfaceClosed = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CylinderGeometry.prototype, "yUp", {
+            /**
+             * 是否朝上
+             */
+            get: function () {
+                return this._yUp;
+            },
+            set: function (v) {
+                if (this._yUp == v)
+                    return;
+                this._yUp = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 构建几何体数据
          */
@@ -28549,50 +29274,41 @@ var feng3d;
             return data;
         };
         __decorate([
-            feng3d.watch("invalidateGeometry"),
             feng3d.serialize,
             feng3d.oav()
-        ], CylinderGeometry.prototype, "topRadius", void 0);
+        ], CylinderGeometry.prototype, "topRadius", null);
         __decorate([
-            feng3d.watch("invalidateGeometry"),
             feng3d.serialize,
             feng3d.oav()
-        ], CylinderGeometry.prototype, "bottomRadius", void 0);
+        ], CylinderGeometry.prototype, "bottomRadius", null);
         __decorate([
-            feng3d.watch("invalidateGeometry"),
             feng3d.serialize,
             feng3d.oav()
-        ], CylinderGeometry.prototype, "height", void 0);
+        ], CylinderGeometry.prototype, "height", null);
         __decorate([
-            feng3d.watch("invalidateGeometry"),
             feng3d.serialize,
             feng3d.oav()
-        ], CylinderGeometry.prototype, "segmentsW", void 0);
+        ], CylinderGeometry.prototype, "segmentsW", null);
         __decorate([
-            feng3d.watch("invalidateGeometry"),
             feng3d.serialize,
             feng3d.oav()
-        ], CylinderGeometry.prototype, "segmentsH", void 0);
+        ], CylinderGeometry.prototype, "segmentsH", null);
         __decorate([
-            feng3d.watch("invalidateGeometry"),
-            feng3d.serialize,
-            feng3d.oav()
-        ], CylinderGeometry.prototype, "topClosed", void 0);
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderGeometry.prototype, "topClosed", null);
         __decorate([
-            feng3d.watch("invalidateGeometry"),
-            feng3d.serialize,
-            feng3d.oav()
-        ], CylinderGeometry.prototype, "bottomClosed", void 0);
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderGeometry.prototype, "bottomClosed", null);
         __decorate([
-            feng3d.watch("invalidateGeometry"),
-            feng3d.serialize,
-            feng3d.oav()
-        ], CylinderGeometry.prototype, "surfaceClosed", void 0);
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderGeometry.prototype, "surfaceClosed", null);
         __decorate([
-            feng3d.watch("invalidateGeometry"),
             feng3d.serialize,
             feng3d.oav()
-        ], CylinderGeometry.prototype, "yUp", void 0);
+        ], CylinderGeometry.prototype, "yUp", null);
         return CylinderGeometry;
     }(feng3d.Geometry));
     feng3d.CylinderGeometry = CylinderGeometry;
@@ -28639,32 +29355,97 @@ var feng3d;
         function TorusGeometry() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.__class__ = "feng3d.TorusGeometry";
-            /**
-             * 半径
-             */
-            _this.radius = 0.5;
-            /**
-             * 管道半径
-             */
-            _this.tubeRadius = 0.1;
-            /**
-             * 半径方向分割数
-             */
-            _this.segmentsR = 16;
-            /**
-             * 管道方向分割数
-             */
-            _this.segmentsT = 8;
-            /**
-             * 是否朝上
-             */
-            _this.yUp = true;
+            _this._radius = 0.5;
+            _this._tubeRadius = 0.1;
+            _this._segmentsR = 16;
+            _this._segmentsT = 8;
+            _this._yUp = true;
             _this.name = "Torus";
             _this._vertexPositionStride = 3;
             _this._vertexNormalStride = 3;
             _this._vertexTangentStride = 3;
             return _this;
         }
+        Object.defineProperty(TorusGeometry.prototype, "radius", {
+            /**
+             * 半径
+             */
+            get: function () {
+                return this._radius;
+            },
+            set: function (v) {
+                if (this._radius == v)
+                    return;
+                this._radius = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TorusGeometry.prototype, "tubeRadius", {
+            /**
+             * 管道半径
+             */
+            get: function () {
+                return this._tubeRadius;
+            },
+            set: function (v) {
+                if (this._tubeRadius == v)
+                    return;
+                this._tubeRadius = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TorusGeometry.prototype, "segmentsR", {
+            /**
+             * 半径方向分割数
+             */
+            get: function () {
+                return this._segmentsR;
+            },
+            set: function (v) {
+                if (this._segmentsR == v)
+                    return;
+                this._segmentsR = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TorusGeometry.prototype, "segmentsT", {
+            /**
+             * 管道方向分割数
+             */
+            get: function () {
+                return this._segmentsT;
+            },
+            set: function (v) {
+                if (this._segmentsT == v)
+                    return;
+                this._segmentsT = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TorusGeometry.prototype, "yUp", {
+            /**
+             * 是否朝上
+             */
+            get: function () {
+                return this._yUp;
+            },
+            set: function (v) {
+                if (this._yUp == v)
+                    return;
+                this._yUp = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 添加顶点数据
          */
@@ -28796,29 +29577,24 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TorusGeometry.prototype, "radius", void 0);
+            feng3d.oav()
+        ], TorusGeometry.prototype, "radius", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TorusGeometry.prototype, "tubeRadius", void 0);
+            feng3d.oav()
+        ], TorusGeometry.prototype, "tubeRadius", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TorusGeometry.prototype, "segmentsR", void 0);
+            feng3d.oav()
+        ], TorusGeometry.prototype, "segmentsR", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TorusGeometry.prototype, "segmentsT", void 0);
+            feng3d.oav()
+        ], TorusGeometry.prototype, "segmentsT", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TorusGeometry.prototype, "yUp", void 0);
+            feng3d.oav()
+        ], TorusGeometry.prototype, "yUp", null);
         return TorusGeometry;
     }(feng3d.Geometry));
     feng3d.TorusGeometry = TorusGeometry;
@@ -28954,13 +29730,24 @@ var feng3d;
         function ImageTexture2D() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(ImageTexture2D.prototype, "image", {
+            // __class__: "feng3d.ImageTexture2D" = "feng3d.ImageTexture2D";
+            get: function () {
+                return this._image;
+            },
+            set: function (v) {
+                if (this._image == v)
+                    return;
+                this._image = v;
+                this.imageChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         ImageTexture2D.prototype.imageChanged = function () {
             this._pixels = this.image;
             this.invalidate();
         };
-        __decorate([
-            feng3d.watch("imageChanged")
-        ], ImageTexture2D.prototype, "image", void 0);
         return ImageTexture2D;
     }(feng3d.Texture2D));
     feng3d.ImageTexture2D = ImageTexture2D;
@@ -28972,13 +29759,23 @@ var feng3d;
         function ImageDataTexture2D() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(ImageDataTexture2D.prototype, "imageData", {
+            get: function () {
+                return this._imageData;
+            },
+            set: function (v) {
+                if (this._imageData == v)
+                    return;
+                this._imageData = v;
+                this.imageDataChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         ImageDataTexture2D.prototype.imageDataChanged = function () {
             this._pixels = this.imageData;
             this.invalidate();
         };
-        __decorate([
-            feng3d.watch("imageDataChanged")
-        ], ImageDataTexture2D.prototype, "imageData", void 0);
         return ImageDataTexture2D;
     }(feng3d.Texture2D));
     feng3d.ImageDataTexture2D = ImageDataTexture2D;
@@ -28990,13 +29787,23 @@ var feng3d;
         function CanvasTexture2D() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(CanvasTexture2D.prototype, "canvas", {
+            get: function () {
+                return this._canvas;
+            },
+            set: function (v) {
+                if (this._canvas == v)
+                    return;
+                this._canvas = v;
+                this.canvasChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         CanvasTexture2D.prototype.canvasChanged = function () {
             this._pixels = this.canvas;
             this.invalidate();
         };
-        __decorate([
-            feng3d.watch("canvasChanged")
-        ], CanvasTexture2D.prototype, "canvas", void 0);
         return CanvasTexture2D;
     }(feng3d.Texture2D));
     feng3d.CanvasTexture2D = CanvasTexture2D;
@@ -29008,13 +29815,23 @@ var feng3d;
         function VideoTexture2D() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(VideoTexture2D.prototype, "video", {
+            get: function () {
+                return this._video;
+            },
+            set: function (v) {
+                if (this._video == v)
+                    return;
+                this._video = v;
+                this.videoChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         VideoTexture2D.prototype.videoChanged = function () {
             this._pixels = this.video;
             this.invalidate();
         };
-        __decorate([
-            feng3d.watch("videoChanged")
-        ], VideoTexture2D.prototype, "video", void 0);
         return VideoTexture2D;
     }(feng3d.Texture2D));
     feng3d.VideoTexture2D = VideoTexture2D;
@@ -29028,20 +29845,40 @@ var feng3d;
         __extends(RenderTargetTexture2D, _super);
         function RenderTargetTexture2D() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.OFFSCREEN_WIDTH = 1024;
-            _this.OFFSCREEN_HEIGHT = 1024;
+            _this._OFFSCREEN_WIDTH = 1024;
+            _this._OFFSCREEN_HEIGHT = 1024;
             _this.format = feng3d.TextureFormat.RGBA;
             _this.minFilter = feng3d.TextureMinFilter.NEAREST;
             _this.magFilter = feng3d.TextureMagFilter.NEAREST;
             _this._isRenderTarget = true;
             return _this;
         }
-        __decorate([
-            feng3d.watch("invalidate")
-        ], RenderTargetTexture2D.prototype, "OFFSCREEN_WIDTH", void 0);
-        __decorate([
-            feng3d.watch("invalidate")
-        ], RenderTargetTexture2D.prototype, "OFFSCREEN_HEIGHT", void 0);
+        Object.defineProperty(RenderTargetTexture2D.prototype, "OFFSCREEN_WIDTH", {
+            get: function () {
+                return this._OFFSCREEN_WIDTH;
+            },
+            set: function (v) {
+                if (this._OFFSCREEN_WIDTH == v)
+                    return;
+                this._OFFSCREEN_WIDTH = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RenderTargetTexture2D.prototype, "OFFSCREEN_HEIGHT", {
+            get: function () {
+                return this._OFFSCREEN_HEIGHT;
+            },
+            set: function (v) {
+                if (this._OFFSCREEN_HEIGHT == v)
+                    return;
+                this._OFFSCREEN_HEIGHT = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
         return RenderTargetTexture2D;
     }(feng3d.Texture2D));
     feng3d.RenderTargetTexture2D = RenderTargetTexture2D;
@@ -29064,6 +29901,22 @@ var feng3d;
             _this._loading = [];
             return _this;
         }
+        Object.defineProperty(TextureCube.prototype, "rawData", {
+            /**
+             * 原始数据
+             */
+            get: function () {
+                return this._rawData;
+            },
+            set: function (v) {
+                if (this._rawData == v)
+                    return;
+                this._rawData = v;
+                this._rawDataChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(TextureCube.prototype, "isLoaded", {
             /**
              * 是否加载完成
@@ -29192,9 +30045,8 @@ var feng3d;
             feng3d.oav({ component: "OAVCubeMap", priority: -1 })
         ], TextureCube.prototype, "OAVCubeMap", void 0);
         __decorate([
-            feng3d.serialize,
-            feng3d.watch("_rawDataChanged")
-        ], TextureCube.prototype, "rawData", void 0);
+            feng3d.serialize
+        ], TextureCube.prototype, "rawData", null);
         return TextureCube;
     }(feng3d.TextureInfo));
     feng3d.TextureCube = TextureCube;
@@ -29213,22 +30065,61 @@ var feng3d;
             //
             _this.renderAtomic = new feng3d.RenderAtomic();
             _this.preview = "";
+            _this.name = "";
+            feng3d.dispatcher.on("asset.shaderChanged", _this.onShaderChanged, _this);
+            _this.shaderName = "standard";
+            _this.uniforms = new feng3d.StandardUniforms();
+            _this.renderParams = new feng3d.RenderParams();
+            return _this;
+        }
+        Object.defineProperty(Material.prototype, "shaderName", {
             /**
              * shader名称
              */
-            _this.shaderName = "standard";
-            _this.name = "";
+            get: function () {
+                return this._shaderName;
+            },
+            set: function (v) {
+                if (this._shaderName == v)
+                    return;
+                this._shaderName = v;
+                this.onShaderChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Material.prototype, "uniforms", {
             /**
              * Uniform数据
              */
-            _this.uniforms = new feng3d.StandardUniforms();
+            get: function () {
+                return this._uniforms;
+            },
+            set: function (v) {
+                if (this._uniforms == v)
+                    return;
+                this._uniforms = v;
+                this.onUniformsChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Material.prototype, "renderParams", {
             /**
              * 渲染参数
              */
-            _this.renderParams = new feng3d.RenderParams();
-            feng3d.dispatcher.on("asset.shaderChanged", _this.onShaderChanged, _this);
-            return _this;
-        }
+            get: function () {
+                return this._renderParams;
+            },
+            set: function (v) {
+                if (this._renderParams == v)
+                    return;
+                this._renderParams = v;
+                this.onRenderParamsChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Material.prototype.beforeRender = function (renderAtomic) {
             Object.assign(renderAtomic.uniforms, this.renderAtomic.uniforms);
             renderAtomic.shader = this.renderAtomic.shader;
@@ -29301,23 +30192,20 @@ var feng3d;
         ], Material.prototype, "preview", void 0);
         __decorate([
             feng3d.oav({ component: "OAVMaterialName" }),
-            feng3d.serialize,
-            feng3d.watch("onShaderChanged")
-        ], Material.prototype, "shaderName", void 0);
+            feng3d.serialize
+        ], Material.prototype, "shaderName", null);
         __decorate([
             feng3d.oav({ editable: false }),
             feng3d.serialize
         ], Material.prototype, "name", void 0);
         __decorate([
             feng3d.serialize,
-            feng3d.watch("onUniformsChanged"),
             feng3d.oav({ component: "OAVObjectView" })
-        ], Material.prototype, "uniforms", void 0);
+        ], Material.prototype, "uniforms", null);
         __decorate([
             feng3d.serialize,
-            feng3d.watch("onRenderParamsChanged"),
             feng3d.oav({ block: "渲染参数", component: "OAVObjectView" })
-        ], Material.prototype, "renderParams", void 0);
+        ], Material.prototype, "renderParams", null);
         return Material;
     }(feng3d.AssetData));
     feng3d.Material = Material;
@@ -29832,13 +30720,26 @@ var feng3d;
             var _this = _super.call(this) || this;
             _this.__class__ = "feng3d.PointLight";
             _this.lightType = feng3d.LightType.Point;
-            /**
-             * 光照范围
-             */
-            _this.range = 10;
+            _this._range = 10;
             _this.shadowCamera.lens = new feng3d.PerspectiveLens(90, 1, 0.1, _this.range);
             return _this;
         }
+        Object.defineProperty(PointLight.prototype, "range", {
+            /**
+             * 光照范围
+             */
+            get: function () {
+                return this._range;
+            },
+            set: function (v) {
+                if (this._range == v)
+                    return;
+                this._range = v;
+                this.invalidRange();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(PointLight.prototype, "shadowMapSize", {
             /**
              * 阴影图尺寸
@@ -29855,9 +30756,8 @@ var feng3d;
         };
         __decorate([
             feng3d.oav(),
-            feng3d.serialize,
-            feng3d.watch("invalidRange")
-        ], PointLight.prototype, "range", void 0);
+            feng3d.serialize
+        ], PointLight.prototype, "range", null);
         return PointLight;
     }(feng3d.Light));
     feng3d.PointLight = PointLight;
@@ -29872,14 +30772,8 @@ var feng3d;
         function SpotLight() {
             var _this = _super.call(this) || this;
             _this.lightType = feng3d.LightType.Spot;
-            /**
-             * 光照范围
-             */
-            _this.range = 10;
-            /**
-             *
-             */
-            _this.angle = 60;
+            _this._range = 10;
+            _this._angle = 60;
             /**
              * 半影.
              */
@@ -29887,6 +30781,38 @@ var feng3d;
             _this.perspectiveLens = _this.shadowCamera.lens = new feng3d.PerspectiveLens(_this.angle, 1, 0.1, _this.range);
             return _this;
         }
+        Object.defineProperty(SpotLight.prototype, "range", {
+            /**
+             * 光照范围
+             */
+            get: function () {
+                return this._range;
+            },
+            set: function (v) {
+                if (this._range == v)
+                    return;
+                this._range = v;
+                this.invalidRange();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SpotLight.prototype, "angle", {
+            /**
+             *
+             */
+            get: function () {
+                return this._angle;
+            },
+            set: function (v) {
+                if (this._angle == v)
+                    return;
+                this._angle = v;
+                this.invalidAngle();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(SpotLight.prototype, "coneCos", {
             /**
              * 椎体cos值
@@ -29914,14 +30840,12 @@ var feng3d;
         };
         __decorate([
             feng3d.oav(),
-            feng3d.serialize,
-            feng3d.watch("invalidRange")
-        ], SpotLight.prototype, "range", void 0);
+            feng3d.serialize
+        ], SpotLight.prototype, "range", null);
         __decorate([
             feng3d.oav(),
-            feng3d.serialize,
-            feng3d.watch("invalidAngle")
-        ], SpotLight.prototype, "angle", void 0);
+            feng3d.serialize
+        ], SpotLight.prototype, "angle", null);
         __decorate([
             feng3d.oav(),
             feng3d.serialize
@@ -30638,13 +31562,26 @@ var feng3d;
         __extends(AudioListener, _super);
         function AudioListener() {
             var _this = _super.call(this) || this;
-            _this.enabled = true;
+            _this._enabled = true;
             _this._volume = 1;
             _this.gain = feng3d.audioCtx.createGain();
             _this.gain.connect(feng3d.audioCtx.destination);
             _this.enabledChanged();
             return _this;
         }
+        Object.defineProperty(AudioListener.prototype, "enabled", {
+            get: function () {
+                return this._enabled;
+            },
+            set: function (v) {
+                if (this._enabled == v)
+                    return;
+                this._enabled = v;
+                this.enabledChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(AudioListener.prototype, "volume", {
             /**
              * 音量
@@ -30696,9 +31633,6 @@ var feng3d;
             this.off("scenetransformChanged", this.onScenetransformChanged, this);
             _super.prototype.dispose.call(this);
         };
-        __decorate([
-            feng3d.watch("enabledChanged")
-        ], AudioListener.prototype, "enabled", void 0);
         __decorate([
             feng3d.serialize,
             feng3d.oav({ tooltip: "音量" })
@@ -30764,11 +31698,8 @@ var feng3d;
         __extends(AudioSource, _super);
         function AudioSource() {
             var _this = _super.call(this) || this;
-            _this.enabled = true;
-            /**
-             * 声音文件路径
-             */
-            _this.url = "";
+            _this._enabled = true;
+            _this._url = "";
             _this._loop = true;
             _this._enablePosition = true;
             _this.panner = createPanner();
@@ -30788,6 +31719,35 @@ var feng3d;
             _this.connect();
             return _this;
         }
+        Object.defineProperty(AudioSource.prototype, "enabled", {
+            get: function () {
+                return this._enabled;
+            },
+            set: function (v) {
+                if (this._enabled == v)
+                    return;
+                this._enabled = v;
+                this.enabledChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(AudioSource.prototype, "url", {
+            /**
+             * 声音文件路径
+             */
+            get: function () {
+                return this._url;
+            },
+            set: function (v) {
+                if (this._url == v)
+                    return;
+                this._url = v;
+                this.onUrlChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(AudioSource.prototype, "loop", {
             /**
              * 是否循环播放
@@ -31043,13 +32003,9 @@ var feng3d;
             _super.prototype.dispose.call(this);
         };
         __decorate([
-            feng3d.watch("enabledChanged")
-        ], AudioSource.prototype, "enabled", void 0);
-        __decorate([
             feng3d.serialize,
-            feng3d.oav({ component: "OAVPick", tooltip: "声音文件路径", componentParam: { accepttype: "audio" } }),
-            feng3d.watch("onUrlChanged")
-        ], AudioSource.prototype, "url", void 0);
+            feng3d.oav({ component: "OAVPick", tooltip: "声音文件路径", componentParam: { accepttype: "audio" } })
+        ], AudioSource.prototype, "url", null);
         __decorate([
             feng3d.serialize,
             feng3d.oav({ tooltip: "是否循环播放" })
@@ -31260,43 +32216,147 @@ var feng3d;
          */
         function TerrainGeometry(raw) {
             var _this = _super.call(this) || this;
-            /**
-             * 高度图路径
-             */
-            _this.heightMap = feng3d.Texture2D.default;
-            /**
-             * 地形宽度
-             */
-            _this.width = 10;
-            /**
-             * 地形高度
-             */
-            _this.height = 1;
-            /**
-             * 地形深度
-             */
-            _this.depth = 10;
-            /**
-             * 横向网格段数
-             */
-            _this.segmentsW = 30;
-            /**
-             * 纵向网格段数
-             */
-            _this.segmentsH = 30;
-            /**
-             * 最大地形高度
-             */
-            _this.maxElevation = 255;
-            /**
-             * 最小地形高度
-             */
-            _this.minElevation = 0;
+            _this._heightMap = feng3d.Texture2D.default;
+            _this._width = 10;
+            _this._height = 1;
+            _this._depth = 10;
+            _this._segmentsW = 30;
+            _this._segmentsH = 30;
+            _this._maxElevation = 255;
+            _this._minElevation = 0;
             _this._heightImageData = defaultHeightMap;
             _this.name = "terrain";
             feng3d.serialization.setValue(_this, raw);
             return _this;
         }
+        Object.defineProperty(TerrainGeometry.prototype, "heightMap", {
+            /**
+             * 高度图路径
+             */
+            get: function () {
+                return this._heightMap;
+            },
+            set: function (v) {
+                if (this._heightMap == v)
+                    return;
+                this._heightMap = v;
+                this.onHeightMapChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TerrainGeometry.prototype, "width", {
+            /**
+             * 地形宽度
+             */
+            get: function () {
+                return this._width;
+            },
+            set: function (v) {
+                if (this._width == v)
+                    return;
+                this._width = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TerrainGeometry.prototype, "height", {
+            /**
+             * 地形高度
+             */
+            get: function () {
+                return this._height;
+            },
+            set: function (v) {
+                if (this._height == v)
+                    return;
+                this._height = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TerrainGeometry.prototype, "depth", {
+            /**
+             * 地形深度
+             */
+            get: function () {
+                return this._depth;
+            },
+            set: function (v) {
+                if (this._depth == v)
+                    return;
+                this._depth = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TerrainGeometry.prototype, "segmentsW", {
+            /**
+             * 横向网格段数
+             */
+            get: function () {
+                return this._segmentsW;
+            },
+            set: function (v) {
+                if (this._segmentsW == v)
+                    return;
+                this._segmentsW = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TerrainGeometry.prototype, "segmentsH", {
+            /**
+             * 纵向网格段数
+             */
+            get: function () {
+                return this._segmentsH;
+            },
+            set: function (v) {
+                if (this._segmentsH == v)
+                    return;
+                this._segmentsH = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TerrainGeometry.prototype, "maxElevation", {
+            /**
+             * 最大地形高度
+             */
+            get: function () {
+                return this._maxElevation;
+            },
+            set: function (v) {
+                if (this._maxElevation == v)
+                    return;
+                this._maxElevation = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TerrainGeometry.prototype, "minElevation", {
+            /**
+             * 最小地形高度
+             */
+            get: function () {
+                return this._minElevation;
+            },
+            set: function (v) {
+                if (this._minElevation == v)
+                    return;
+                this._minElevation = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
         TerrainGeometry.prototype.onHeightMapChanged = function () {
             var _this = this;
             if (!this.heightMap["_pixels"]) {
@@ -31425,44 +32485,36 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("onHeightMapChanged")
-        ], TerrainGeometry.prototype, "heightMap", void 0);
+            feng3d.oav()
+        ], TerrainGeometry.prototype, "heightMap", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TerrainGeometry.prototype, "width", void 0);
+            feng3d.oav()
+        ], TerrainGeometry.prototype, "width", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TerrainGeometry.prototype, "height", void 0);
+            feng3d.oav()
+        ], TerrainGeometry.prototype, "height", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TerrainGeometry.prototype, "depth", void 0);
+            feng3d.oav()
+        ], TerrainGeometry.prototype, "depth", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TerrainGeometry.prototype, "segmentsW", void 0);
+            feng3d.oav()
+        ], TerrainGeometry.prototype, "segmentsW", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TerrainGeometry.prototype, "segmentsH", void 0);
+            feng3d.oav()
+        ], TerrainGeometry.prototype, "segmentsH", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TerrainGeometry.prototype, "maxElevation", void 0);
+            feng3d.oav()
+        ], TerrainGeometry.prototype, "maxElevation", null);
         __decorate([
             feng3d.serialize,
-            feng3d.oav(),
-            feng3d.watch("invalidateGeometry")
-        ], TerrainGeometry.prototype, "minElevation", void 0);
+            feng3d.oav()
+        ], TerrainGeometry.prototype, "minElevation", null);
         return TerrainGeometry;
     }(feng3d.Geometry));
     feng3d.TerrainGeometry = TerrainGeometry;
@@ -32646,12 +33698,25 @@ var feng3d;
         __extends(ParticleShapeModule, _super);
         function ParticleShapeModule() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._type = feng3d.ParticleSystemShapeType.Cone;
+            return _this;
+        }
+        Object.defineProperty(ParticleShapeModule.prototype, "type", {
             /**
              * 发射形状类型
              */
-            _this.type = feng3d.ParticleSystemShapeType.Cone;
-            return _this;
-        }
+            get: function () {
+                return this._type;
+            },
+            set: function (v) {
+                if (this._type == v)
+                    return;
+                this._type = v;
+                this._onTypeChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -32683,9 +33748,8 @@ var feng3d;
         };
         __decorate([
             feng3d.serialize,
-            feng3d.watch("_onTypeChanged"),
             feng3d.oav({ tooltip: "发射形状类型", component: "OAVEnum", componentParam: { enumClass: feng3d.ParticleSystemShapeType } })
-        ], ParticleShapeModule.prototype, "type", void 0);
+        ], ParticleShapeModule.prototype, "type", null);
         __decorate([
             feng3d.serialize,
             feng3d.oav({ component: "OAVObjectView" })
@@ -33312,10 +34376,7 @@ var feng3d;
         function Animation() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.animations = [];
-            /**
-             * 动画事件，单位为ms
-             */
-            _this.time = 0;
+            _this._time = 0;
             _this.isplaying = false;
             /**
              * 播放速度
@@ -33326,6 +34387,35 @@ var feng3d;
             _this._objectCache = new Map();
             return _this;
         }
+        Object.defineProperty(Animation.prototype, "animation", {
+            get: function () {
+                return this._animation;
+            },
+            set: function (v) {
+                if (this._animation == v)
+                    return;
+                this._animation = v;
+                this.onAnimationChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Animation.prototype, "time", {
+            /**
+             * 动画事件，单位为ms
+             */
+            get: function () {
+                return this._time;
+            },
+            set: function (v) {
+                if (this._time == v)
+                    return;
+                this._time = v;
+                this.onTimeChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Animation.prototype, "clipName", {
             /**
              * 动作名称
@@ -33410,17 +34500,15 @@ var feng3d;
         };
         __decorate([
             feng3d.oav({ component: "OAVDefault", componentParam: { dragparam: { accepttype: "animationclip", datatype: "animationclip" } } }),
-            feng3d.serialize,
-            feng3d.watch("onAnimationChanged")
-        ], Animation.prototype, "animation", void 0);
+            feng3d.serialize
+        ], Animation.prototype, "animation", null);
         __decorate([
             feng3d.oav({ component: "OAVArray", componentParam: { dragparam: { accepttype: "animationclip", datatype: "animationclip" }, defaultItem: function () { return new feng3d.AnimationClip(); } } }),
             feng3d.serialize
         ], Animation.prototype, "animations", void 0);
         __decorate([
-            feng3d.oav(),
-            feng3d.watch("onTimeChanged")
-        ], Animation.prototype, "time", void 0);
+            feng3d.oav()
+        ], Animation.prototype, "time", null);
         __decorate([
             feng3d.oav(),
             feng3d.serialize
@@ -33558,6 +34646,27 @@ var feng3d;
         function ObjectAsset() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(ObjectAsset.prototype, "data", {
+            /**
+             * 资源对象
+             */
+            get: function () {
+                return this._data;
+            },
+            set: function (v) {
+                if (this._data == v)
+                    return;
+                if (this._data) {
+                    feng3d.objectevent.off(this._data, "propertyValueChanged", this._onDataChanged, this);
+                }
+                this._data = v;
+                if (this._data) {
+                    feng3d.objectevent.on(this._data, "propertyValueChanged", this._onDataChanged, this);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         ObjectAsset.prototype.saveFile = function (callback) {
             this.data.assetId = this.assetId;
             var d = feng3d.serialization.serialize(this.data);
@@ -33580,21 +34689,12 @@ var feng3d;
                 });
             });
         };
-        ObjectAsset.prototype._dataChanged = function (property, oldValue, newValue) {
-            if (oldValue) {
-                feng3d.objectevent.off(oldValue, "propertyValueChanged", this._onDataChanged, this);
-            }
-            if (newValue) {
-                feng3d.objectevent.on(newValue, "propertyValueChanged", this._onDataChanged, this);
-            }
-        };
         ObjectAsset.prototype._onDataChanged = function () {
             this.write();
         };
         __decorate([
-            feng3d.oav({ component: "OAVObjectView" }),
-            feng3d.watch("_dataChanged")
-        ], ObjectAsset.prototype, "data", void 0);
+            feng3d.oav({ component: "OAVObjectView" })
+        ], ObjectAsset.prototype, "data", null);
         return ObjectAsset;
     }(feng3d.FileAsset));
     feng3d.ObjectAsset = ObjectAsset;
@@ -33611,6 +34711,19 @@ var feng3d;
             _this.assetType = feng3d.AssetType.script;
             return _this;
         }
+        Object.defineProperty(ScriptAsset.prototype, "textContent", {
+            get: function () {
+                return this._textContent;
+            },
+            set: function (v) {
+                if (this._textContent == v)
+                    return;
+                this._textContent = v;
+                this.onTextContentChanged();
+            },
+            enumerable: true,
+            configurable: true
+        });
         ScriptAsset.prototype.initAsset = function () {
             this.textContent = this.textContent || "";
         };
@@ -33635,9 +34748,6 @@ var feng3d;
             this.scriptName = script;
         };
         ScriptAsset.extenson = ".ts";
-        __decorate([
-            feng3d.watch("onTextContentChanged")
-        ], ScriptAsset.prototype, "textContent", void 0);
         return ScriptAsset;
     }(feng3d.StringAsset));
     feng3d.ScriptAsset = ScriptAsset;
@@ -37018,6 +38128,29 @@ var feng3d;
             this.mouseInput = mouseInput;
             this.viewport = viewport;
         }
+        Object.defineProperty(Mouse3DManager.prototype, "mouseInput", {
+            get: function () {
+                return this._mouseInput;
+            },
+            set: function (v) {
+                var _this = this;
+                if (this._mouseInput == v)
+                    return;
+                if (this._mouseInput) {
+                    mouseEventTypes.forEach(function (element) {
+                        _this._mouseInput.off(element, _this.onMouseEvent, _this);
+                    });
+                }
+                this._mouseInput = v;
+                if (this._mouseInput) {
+                    mouseEventTypes.forEach(function (element) {
+                        _this._mouseInput.on(element, _this.onMouseEvent, _this);
+                    });
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Mouse3DManager.prototype, "selectedGameObject", {
             get: function () {
                 return this._selectedGameObject;
@@ -37040,19 +38173,6 @@ var feng3d;
             var pickingCollisionVO = feng3d.raycaster.pick(engine.getMouseRay3D(), scene3d.mouseCheckObjects);
             var gameobject = pickingCollisionVO && pickingCollisionVO.gameObject;
             return gameobject;
-        };
-        Mouse3DManager.prototype.mouseInputChanged = function (property, oldValue, newValue) {
-            var _this = this;
-            if (oldValue) {
-                mouseEventTypes.forEach(function (element) {
-                    oldValue.off(element, _this.onMouseEvent, _this);
-                });
-            }
-            if (newValue) {
-                mouseEventTypes.forEach(function (element) {
-                    newValue.on(element, _this.onMouseEvent, _this);
-                });
-            }
         };
         Mouse3DManager.prototype.dispatch = function (type) {
             if (this.viewport) {
@@ -37117,9 +38237,6 @@ var feng3d;
             });
             this._mouseEventTypes.length = 0;
         };
-        __decorate([
-            feng3d.watch("mouseInputChanged")
-        ], Mouse3DManager.prototype, "mouseInput", void 0);
         return Mouse3DManager;
     }());
     feng3d.Mouse3DManager = Mouse3DManager;
