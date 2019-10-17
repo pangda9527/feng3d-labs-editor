@@ -13394,7 +13394,7 @@ var feng3d;
          * 栅格化，点阵化为XYZ轴间距为1的点阵
          */
         Triangle3D.prototype.rasterize = function () {
-            var aabb = feng3d.Box.fromPoints([this.p0, this.p1, this.p2]);
+            var aabb = feng3d.AABB.fromPoints([this.p0, this.p1, this.p2]);
             aabb.min.round();
             aabb.max.round();
             var point = new feng3d.Vector3();
@@ -13477,13 +13477,13 @@ var feng3d;
     /**
      * 长方体，盒子
      */
-    var Box = /** @class */ (function () {
+    var AABB = /** @class */ (function () {
         /**
          * 创建盒子
          * @param min 最小点
          * @param max 最大点
          */
-        function Box(min, max) {
+        function AABB(min, max) {
             if (min === void 0) { min = new feng3d.Vector3(+Infinity, +Infinity, +Infinity); }
             if (max === void 0) { max = new feng3d.Vector3(-Infinity, -Infinity, -Infinity); }
             this.min = min.clone();
@@ -13493,36 +13493,36 @@ var feng3d;
          * 从一组顶点初始化盒子
          * @param positions 坐标数据列表
          */
-        Box.formPositions = function (positions) {
-            return new Box().formPositions(positions);
+        AABB.formPositions = function (positions) {
+            return new AABB().formPositions(positions);
         };
         /**
          * 从一组点初始化盒子
          * @param ps 点列表
          */
-        Box.fromPoints = function (ps) {
-            return new Box().fromPoints(ps);
+        AABB.fromPoints = function (ps) {
+            return new AABB().fromPoints(ps);
         };
         /**
          * 随机盒子
          */
-        Box.random = function () {
+        AABB.random = function () {
             var min = feng3d.Vector3.random();
             var max = feng3d.Vector3.random().add(min);
-            return new Box(min, max);
+            return new AABB(min, max);
         };
         /**
          * 获取中心点
          * @param vout 输出向量
          */
-        Box.prototype.getCenter = function (vout) {
+        AABB.prototype.getCenter = function (vout) {
             if (vout === void 0) { vout = new feng3d.Vector3(); }
             return vout.copy(this.min).add(this.max).scaleNumber(0.5);
         };
         /**
          * 尺寸
          */
-        Box.prototype.getSize = function (vout) {
+        AABB.prototype.getSize = function (vout) {
             if (vout === void 0) { vout = new feng3d.Vector3(); }
             return vout.copy(this.max).sub(this.min);
         };
@@ -13531,7 +13531,7 @@ var feng3d;
          * @param min 最小值
          * @param max 最大值
          */
-        Box.prototype.init = function (min, max) {
+        AABB.prototype.init = function (min, max) {
             this.min = min.clone();
             this.max = max.clone();
             return this;
@@ -13539,7 +13539,7 @@ var feng3d;
         /**
          * 转换为盒子八个角所在点列表
          */
-        Box.prototype.toPoints = function () {
+        AABB.prototype.toPoints = function () {
             var min = this.min;
             var max = this.max;
             return [
@@ -13557,7 +13557,7 @@ var feng3d;
          * 从一组顶点初始化盒子
          * @param positions 坐标数据列表
          */
-        Box.prototype.formPositions = function (positions) {
+        AABB.prototype.formPositions = function (positions) {
             var minX = +Infinity;
             var minY = +Infinity;
             var minZ = +Infinity;
@@ -13589,7 +13589,7 @@ var feng3d;
          * 从一组点初始化盒子
          * @param ps 点列表
          */
-        Box.prototype.fromPoints = function (ps) {
+        AABB.prototype.fromPoints = function (ps) {
             var _this = this;
             this.empty();
             ps.forEach(function (element) {
@@ -13600,7 +13600,7 @@ var feng3d;
         /**
          * 盒子内随机点
          */
-        Box.prototype.randomPoint = function (pout) {
+        AABB.prototype.randomPoint = function (pout) {
             if (pout === void 0) { pout = new feng3d.Vector3(); }
             return pout.copy(this.min).lerp(this.max, feng3d.Vector3.random());
         };
@@ -13608,7 +13608,7 @@ var feng3d;
          * 使用点扩张盒子
          * @param point 点
          */
-        Box.prototype.expandByPoint = function (point) {
+        AABB.prototype.expandByPoint = function (point) {
             this.min.min(point);
             this.max.max(point);
             return this;
@@ -13617,7 +13617,7 @@ var feng3d;
          * 应用矩阵
          * @param mat 矩阵
          */
-        Box.prototype.applyMatrix3D = function (mat) {
+        AABB.prototype.applyMatrix3D = function (mat) {
             this.fromPoints(this.toPoints().map(function (v) {
                 return v.applyMatrix4x4(mat);
             }));
@@ -13627,35 +13627,35 @@ var feng3d;
          * 应用矩阵
          * @param mat 矩阵
          */
-        Box.prototype.applyMatrix3DTo = function (mat, out) {
-            if (out === void 0) { out = new Box(); }
+        AABB.prototype.applyMatrix3DTo = function (mat, out) {
+            if (out === void 0) { out = new AABB(); }
             return out.copy(this).applyMatrix3D(mat);
         };
         /**
          *
          */
-        Box.prototype.clone = function () {
-            return new Box(this.min.clone(), this.max.clone());
+        AABB.prototype.clone = function () {
+            return new AABB(this.min.clone(), this.max.clone());
         };
         /**
          * 是否包含指定点
          * @param p 点
          */
-        Box.prototype.containsPoint = function (p) {
+        AABB.prototype.containsPoint = function (p) {
             return this.min.lessequal(p) && this.max.greaterequal(p);
         };
         /**
          * 是否包含盒子
          * @param box 盒子
          */
-        Box.prototype.containsBox = function (box) {
+        AABB.prototype.containsBox = function (box) {
             return this.min.lessequal(box.min) && this.max.greaterequal(box.max);
         };
         /**
          * 拷贝
          * @param box 盒子
          */
-        Box.prototype.copy = function (box) {
+        AABB.prototype.copy = function (box) {
             this.min.copy(box.min);
             this.max.copy(box.max);
             return this;
@@ -13664,7 +13664,7 @@ var feng3d;
          * 比较盒子是否相等
          * @param box 盒子
          */
-        Box.prototype.equals = function (box) {
+        AABB.prototype.equals = function (box) {
             return this.min.equals(box.min) && this.max.equals(box.max);
         };
         /**
@@ -13673,7 +13673,7 @@ var feng3d;
          * @param dy y方向膨胀量
          * @param dz z方向膨胀量
          */
-        Box.prototype.inflate = function (dx, dy, dz) {
+        AABB.prototype.inflate = function (dx, dy, dz) {
             this.min.x -= dx / 2;
             this.min.y -= dy / 2;
             this.min.z -= dz / 2;
@@ -13685,7 +13685,7 @@ var feng3d;
          * 膨胀盒子
          * @param delta 膨胀量
          */
-        Box.prototype.inflatePoint = function (delta) {
+        AABB.prototype.inflatePoint = function (delta) {
             delta = delta.scaleNumberTo(0.5);
             this.min.sub(delta);
             this.max.add(delta);
@@ -13694,7 +13694,7 @@ var feng3d;
          * 与盒子相交
          * @param box 盒子
          */
-        Box.prototype.intersection = function (box) {
+        AABB.prototype.intersection = function (box) {
             this.min.clamp(box.min, box.max);
             this.max.clamp(box.min, box.max);
             return this;
@@ -13703,15 +13703,15 @@ var feng3d;
          * 与盒子相交
          * @param box 盒子
          */
-        Box.prototype.intersectionTo = function (box, vbox) {
-            if (vbox === void 0) { vbox = new Box(); }
+        AABB.prototype.intersectionTo = function (box, vbox) {
+            if (vbox === void 0) { vbox = new AABB(); }
             return vbox.copy(this).intersection(box);
         };
         /**
          * 盒子是否相交
          * @param box 盒子
          */
-        Box.prototype.intersects = function (box) {
+        AABB.prototype.intersects = function (box) {
             var b = this.intersectionTo(box);
             var c = b.getCenter();
             return this.containsPoint(c) && box.containsPoint(c);
@@ -13723,7 +13723,7 @@ var feng3d;
          * @param targetNormal 相交处法线
          * @return 起点到box距离
          */
-        Box.prototype.rayIntersection = function (position, direction, targetNormal) {
+        AABB.prototype.rayIntersection = function (position, direction, targetNormal) {
             if (this.containsPoint(position))
                 return 0;
             var halfExtentsX = (this.max.x - this.min.x) / 2;
@@ -13742,7 +13742,7 @@ var feng3d;
             var iy;
             var iz;
             var rayEntryDistance = -1;
-            // ray-plane tests
+            // 射线与平面相交测试
             var intersects = false;
             if (vx < 0) {
                 rayEntryDistance = (halfExtentsX - px) / vx;
@@ -13825,40 +13825,19 @@ var feng3d;
             return intersects ? rayEntryDistance : -1;
         };
         /**
-         * Finds the closest point on the Box to another given point. This can be used for maximum error calculations for content within a given Box.
+         * 获取长方体上距离指定点最近的点
          *
-         * @param point The point for which to find the closest point on the Box
-         * @param target An optional Vector3 to store the result to prevent creating a new object.
-         * @return
+         * @param point 指定点
+         * @param target 存储最近的点
          */
-        Box.prototype.closestPointToPoint = function (point, target) {
-            var p;
-            if (target == null)
-                target = new feng3d.Vector3();
-            p = point.x;
-            if (p < this.min.x)
-                p = this.min.x;
-            if (p > this.max.x)
-                p = this.max.x;
-            target.x = p;
-            p = point.y;
-            if (p < this.max.y)
-                p = this.max.y;
-            if (p > this.min.y)
-                p = this.min.y;
-            target.y = p;
-            p = point.z;
-            if (p < this.min.z)
-                p = this.min.z;
-            if (p > this.max.z)
-                p = this.max.z;
-            target.z = p;
-            return target;
+        AABB.prototype.closestPointToPoint = function (point, target) {
+            if (target === void 0) { target = new feng3d.Vector3(); }
+            return this.clampPoint(point, target);
         };
         /**
          * 清空盒子
          */
-        Box.prototype.empty = function () {
+        AABB.prototype.empty = function () {
             this.min.x = this.min.y = this.min.z = +Infinity;
             this.max.x = this.max.y = this.max.z = -Infinity;
             return this;
@@ -13867,7 +13846,7 @@ var feng3d;
          * 是否为空
          * 当体积为0时为空
          */
-        Box.prototype.isEmpty = function () {
+        AABB.prototype.isEmpty = function () {
             return (this.max.x <= this.min.x) || (this.max.y <= this.min.y) || (this.max.z <= this.min.z);
         };
         /**
@@ -13876,26 +13855,26 @@ var feng3d;
          * @param dy y轴偏移
          * @param dz z轴偏移
          */
-        Box.prototype.offset = function (dx, dy, dz) {
+        AABB.prototype.offset = function (dx, dy, dz) {
             return this.offsetPosition(new feng3d.Vector3(dx, dy, dz));
         };
         /**
          * 偏移
          * @param position 偏移量
          */
-        Box.prototype.offsetPosition = function (position) {
+        AABB.prototype.offsetPosition = function (position) {
             this.min.add(position);
             this.max.add(position);
             return this;
         };
-        Box.prototype.toString = function () {
+        AABB.prototype.toString = function () {
             return "[Box] (min=" + this.min.toString() + ", max=" + this.max.toString() + ")";
         };
         /**
          * 联合盒子
          * @param box 盒子
          */
-        Box.prototype.union = function (box) {
+        AABB.prototype.union = function (box) {
             this.min.min(box.min);
             this.max.max(box.max);
             return this;
@@ -13904,19 +13883,18 @@ var feng3d;
          * 是否与球相交
          * @param sphere 球
          */
-        Box.prototype.intersectsSphere = function (sphere) {
+        AABB.prototype.intersectsSphere = function (sphere) {
             var closestPoint = new feng3d.Vector3();
-            // Find the point on the AABB closest to the sphere center.
             this.clampPoint(sphere.center, closestPoint);
-            // If that point is inside the sphere, the AABB and sphere intersect.
             return closestPoint.distanceSquared(sphere.center) <= (sphere.radius * sphere.radius);
         };
         /**
+         * 夹紧？
          *
          * @param point 点
          * @param pout 输出点
          */
-        Box.prototype.clampPoint = function (point, pout) {
+        AABB.prototype.clampPoint = function (point, pout) {
             if (pout === void 0) { pout = new feng3d.Vector3(); }
             return pout.copy(point).clamp(this.min, this.max);
         };
@@ -13924,7 +13902,7 @@ var feng3d;
          * 是否与平面相交
          * @param plane 平面
          */
-        Box.prototype.intersectsPlane = function (plane) {
+        AABB.prototype.intersectsPlane = function (plane) {
             var min = Infinity;
             var max = -Infinity;
             this.toPoints().forEach(function (p) {
@@ -13938,66 +13916,44 @@ var feng3d;
          * 是否与三角形相交
          * @param triangle 三角形
          */
-        Box.prototype.intersectsTriangle = function (triangle) {
+        AABB.prototype.intersectsTriangle = function (triangle) {
             if (this.isEmpty()) {
                 return false;
             }
-            // compute box center and extents
+            // 计算长方体中心和区段
             var center = this.getCenter();
             var extents = this.max.subTo(center);
-            // translate triangle to aabb origin
+            // 把三角形顶点转换长方体空间
             var v0 = triangle.p0.subTo(center);
             var v1 = triangle.p1.subTo(center);
             var v2 = triangle.p2.subTo(center);
-            // compute edge vectors for triangle
+            // 计算三边向量
             var f0 = v1.subTo(v0);
             var f1 = v2.subTo(v1);
             var f2 = v0.subTo(v2);
-            // test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
-            // make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
-            // axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
+            // 测试三边向量分别所在三个轴面上的法线
             var axes = [
                 0, -f0.z, f0.y, 0, -f1.z, f1.y, 0, -f2.z, f2.y,
                 f0.z, 0, -f0.x, f1.z, 0, -f1.x, f2.z, 0, -f2.x,
                 -f0.y, f0.x, 0, -f1.y, f1.x, 0, -f2.y, f2.x, 0
             ];
-            if (!satForAxes(axes)) {
+            if (!satForAxes(axes, v0, v1, v2, extents)) {
                 return false;
             }
-            // test 3 face normals from the aabb
+            // 测试三个面法线
             axes = [1, 0, 0, 0, 1, 0, 0, 0, 1];
-            if (!satForAxes(axes)) {
+            if (!satForAxes(axes, v0, v1, v2, extents)) {
                 return false;
             }
-            // finally testing the face normal of the triangle
-            // use already existing triangle edge vectors here
+            // 检测三角形面法线
             var triangleNormal = f0.crossTo(f1);
             axes = [triangleNormal.x, triangleNormal.y, triangleNormal.z];
-            return satForAxes(axes);
-            function satForAxes(axes) {
-                var i, j;
-                for (i = 0, j = axes.length - 3; i <= j; i += 3) {
-                    var testAxis = feng3d.Vector3.fromArray(axes, i);
-                    // project the aabb onto the seperating axis
-                    var r = extents.x * Math.abs(testAxis.x) + extents.y * Math.abs(testAxis.y) + extents.z * Math.abs(testAxis.z);
-                    // project all 3 vertices of the triangle onto the seperating axis
-                    var p0 = v0.dot(testAxis);
-                    var p1 = v1.dot(testAxis);
-                    var p2 = v2.dot(testAxis);
-                    // actual test, basically see if either of the most extreme of the triangle points intersects r
-                    if (Math.max(-Math.max(p0, p1, p2), Math.min(p0, p1, p2)) > r) {
-                        // points of the projected triangle are outside the projected half-length of the aabb
-                        // the axis is seperating and we can exit
-                        return false;
-                    }
-                }
-                return true;
-            }
+            return satForAxes(axes, v0, v1, v2, extents);
         };
         /**
          * 转换为三角形列表
          */
-        Box.prototype.toTriangles = function (triangles) {
+        AABB.prototype.toTriangles = function (triangles) {
             if (triangles === void 0) { triangles = []; }
             var min = this.min;
             var max = this.max;
@@ -14016,9 +13972,34 @@ var feng3d;
             feng3d.Triangle3D.fromPoints(new feng3d.Vector3(min.x, min.y, min.z), new feng3d.Vector3(max.x, min.y, min.z), new feng3d.Vector3(min.x, min.y, max.z)), feng3d.Triangle3D.fromPoints(new feng3d.Vector3(max.x, min.y, min.z), new feng3d.Vector3(max.x, min.y, max.z), new feng3d.Vector3(min.x, min.y, max.z)));
             return triangles;
         };
-        return Box;
+        return AABB;
     }());
-    feng3d.Box = Box;
+    feng3d.AABB = AABB;
+    /**
+     * 判断三角形三个点是否可能与长方体在指定轴（列表）上投影相交
+     *
+     * @param axes
+     * @param v0
+     * @param v1
+     * @param v2
+     * @param extents
+     */
+    function satForAxes(axes, v0, v1, v2, extents) {
+        for (var i = 0, j = axes.length - 3; i <= j; i += 3) {
+            var testAxis = feng3d.Vector3.fromArray(axes, i);
+            // 投影长方体到指定轴的长度
+            var r = extents.x * Math.abs(testAxis.x) + extents.y * Math.abs(testAxis.y) + extents.z * Math.abs(testAxis.z);
+            // 投影三角形的三个点到指定轴
+            var p0 = v0.dot(testAxis);
+            var p1 = v1.dot(testAxis);
+            var p2 = v2.dot(testAxis);
+            // 三个点在长方体投影外同侧
+            if (Math.min(p0, p1, p2) > r || Math.max(p0, p1, p2) < -r) {
+                return false;
+            }
+        }
+        return true;
+    }
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -14092,7 +14073,7 @@ var feng3d;
          * @param points 点列表
          */
         Sphere.prototype.fromPoints = function (points) {
-            var box = new feng3d.Box();
+            var box = new feng3d.AABB();
             var center = this.center;
             box.fromPoints(points).getCenter(center);
             var maxRadiusSq = 0;
@@ -14107,7 +14088,7 @@ var feng3d;
          * @param positions 坐标数据列表
          */
         Sphere.prototype.fromPositions = function (positions) {
-            var box = new feng3d.Box();
+            var box = new feng3d.AABB();
             var v = new feng3d.Vector3();
             var center = this.center;
             box.formPositions(positions).getCenter(center);
@@ -14185,7 +14166,7 @@ var feng3d;
          * 获取包围盒
          */
         Sphere.prototype.getBoundingBox = function (box) {
-            if (box === void 0) { box = new feng3d.Box(); }
+            if (box === void 0) { box = new feng3d.AABB(); }
             box.init(this.center.subNumberTo(this.radius), this.center.addNumberTo(this.radius));
             return box;
         };
@@ -14552,7 +14533,7 @@ var feng3d;
          * 包围盒
          */
         TriangleGeometry.prototype.getBox = function (box) {
-            if (box === void 0) { box = new feng3d.Box(); }
+            if (box === void 0) { box = new feng3d.AABB(); }
             return box.fromPoints(this.getPoints());
         };
         /**
@@ -24299,7 +24280,7 @@ var feng3d;
              */
             get: function () {
                 var model = this.getComponent(feng3d.Model);
-                var box = model ? model.selfWorldBounds : new feng3d.Box(this.transform.scenePosition, this.transform.scenePosition);
+                var box = model ? model.selfWorldBounds : new feng3d.AABB(this.transform.scenePosition, this.transform.scenePosition);
                 this.children.forEach(function (element) {
                     var ebox = element.worldBounds;
                     box.union(ebox);
@@ -26105,8 +26086,8 @@ var feng3d;
                 if (!this._bounding) {
                     var positions = this.positions;
                     if (!positions || positions.length == 0)
-                        return new feng3d.Box();
-                    this._bounding = feng3d.Box.formPositions(this.positions);
+                        return new feng3d.AABB();
+                    this._bounding = feng3d.AABB.formPositions(this.positions);
                 }
                 return this._bounding;
             },
@@ -26786,7 +26767,7 @@ var feng3d;
          * @param positions 顶点数据
          */
         GeometryUtils.prototype.getAABB = function (positions) {
-            return feng3d.Box.formPositions(positions);
+            return feng3d.AABB.formPositions(positions);
         };
         return GeometryUtils;
     }());
@@ -26971,7 +26952,7 @@ var feng3d;
             _this._inverseMatrix = new feng3d.Matrix4x4();
             _this._viewBoxInvalid = true;
             //
-            _this._viewBox = new feng3d.Box();
+            _this._viewBox = new feng3d.AABB();
             _this._matrix = new feng3d.Matrix4x4();
             _this.aspect = aspectRatio;
             _this.near = near;
@@ -27373,7 +27354,7 @@ var feng3d;
             _this._projection = feng3d.Projection.Perspective;
             _this._viewProjection = new feng3d.Matrix4x4();
             _this._viewProjectionInvalid = true;
-            _this._viewBox = new feng3d.Box();
+            _this._viewBox = new feng3d.AABB();
             _this._viewBoxInvalid = true;
             _this._backups = { fov: 60, size: 1 };
             return _this;
@@ -27507,7 +27488,7 @@ var feng3d;
         Camera.prototype.intersectsBox = function (box) {
             var _this = this;
             // 投影后的包围盒
-            var box0 = feng3d.Box.fromPoints(box.toPoints().map(function (v) { return _this.lens.project(_this.transform.worldToLocalMatrix.transformVector(v)); }));
+            var box0 = feng3d.AABB.fromPoints(box.toPoints().map(function (v) { return _this.lens.project(_this.transform.worldToLocalMatrix.transformVector(v)); }));
             var intersects = box0.intersects(visibleBox);
             return intersects;
         };
@@ -27572,7 +27553,7 @@ var feng3d;
     }(feng3d.Component));
     feng3d.Camera = Camera;
     // 投影后可视区域
-    var visibleBox = new feng3d.Box(new feng3d.Vector3(-1, -1, -1), new feng3d.Vector3(1, 1, 1));
+    var visibleBox = new feng3d.AABB(new feng3d.Vector3(-1, -1, -1), new feng3d.Vector3(1, 1, 1));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -30690,7 +30671,7 @@ var feng3d;
                     return box.clone();
                 pre.union(box);
                 return pre;
-            }, null) || new feng3d.Box(new feng3d.Vector3(), new feng3d.Vector3(1, 1, 1));
+            }, null) || new feng3d.AABB(new feng3d.Vector3(), new feng3d.Vector3(1, 1, 1));
             // 
             var center = worldBounds.getCenter();
             var radius = worldBounds.getSize().length / 2;
@@ -38057,10 +38038,13 @@ var feng3d;
         };
         GameObjectFactory.prototype.createCapsule = function (name) {
             if (name === void 0) { name = "capsule"; }
-            return feng3d.serialization.setValue(new feng3d.GameObject(), {
+            var g = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: name,
                 components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.capsule },]
             });
+            g.addComponent(feng3d.CapsuleCollider);
+            g.addComponent(feng3d.Rigidbody);
+            return g;
         };
         GameObjectFactory.prototype.createTerrain = function (name) {
             if (name === void 0) { name = "Terrain"; }
@@ -38965,7 +38949,6 @@ var CANNON;
 (function (CANNON) {
     var Shape = /** @class */ (function () {
         /**
-         * Base class for shapes
          *
          * @param options
          * @author schteppe
@@ -38982,29 +38965,8 @@ var CANNON;
             this.body = null;
         }
         /**
-         * Computes the bounding sphere radius. The result is stored in the property .boundingSphereRadius
+         * 编号计数器
          */
-        Shape.prototype.updateBoundingSphereRadius = function () {
-            throw "computeBoundingSphereRadius() not implemented for shape type " + this.type;
-        };
-        /**
-         * Get the volume of this shape
-         */
-        Shape.prototype.volume = function () {
-            throw "volume() not implemented for shape type " + this.type;
-        };
-        /**
-         * Calculates the inertia in the local frame for this shape.
-         * @param mass
-         * @param target
-         * @see http://en.wikipedia.org/wiki/List_of_moments_of_inertia
-         */
-        Shape.prototype.calculateLocalInertia = function (mass, target) {
-            throw "calculateLocalInertia() not implemented for shape type " + this.type;
-        };
-        Shape.prototype.calculateWorldAABB = function (pos, quat, min, max) {
-            throw "未实现";
-        };
         Shape.idCounter = 0;
         return Shape;
     }());
@@ -39012,6 +38974,9 @@ var CANNON;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 凸多面体
+     */
     var ConvexPolyhedron = /** @class */ (function (_super) {
         __extends(ConvexPolyhedron, _super);
         /**
@@ -39038,13 +39003,13 @@ var CANNON;
                 type: CANNON.ShapeType.CONVEXPOLYHEDRON
             }) || this;
             _this.vertices = points || [];
-            _this.worldVertices = []; // World transformed version of .vertices
+            _this.worldVertices = [];
             _this.worldVerticesNeedsUpdate = true;
             _this.faces = faces || [];
             _this.faceNormals = [];
             _this.computeNormals();
             _this.worldFaceNormalsNeedsUpdate = true;
-            _this.worldFaceNormals = []; // World transformed version of .faceNormals
+            _this.worldFaceNormals = [];
             _this.uniqueEdges = [];
             _this.uniqueAxes = uniqueAxes ? uniqueAxes.slice() : null;
             _this.computeEdges();
@@ -39052,15 +39017,14 @@ var CANNON;
             return _this;
         }
         /**
-         * Computes uniqueEdges
+         * 计算边数组
          */
         ConvexPolyhedron.prototype.computeEdges = function () {
             var faces = this.faces;
             var vertices = this.vertices;
-            var nv = vertices.length;
             var edges = this.uniqueEdges;
             edges.length = 0;
-            var edge = computeEdges_tmpEdge;
+            var edge = new feng3d.Vector3();
             for (var i = 0; i !== faces.length; i++) {
                 var face = faces[i];
                 var numVertices = face.length;
@@ -39082,11 +39046,10 @@ var CANNON;
             }
         };
         /**
-         * Compute the normals of the faces. Will reuse existing Vec3 objects in the .faceNormals array if they exist.
+         * 计算这些面的法线。将重用. facenormals数组中现有的Vec3对象(如果它们存在的话)。
          */
         ConvexPolyhedron.prototype.computeNormals = function () {
             this.faceNormals.length = this.faces.length;
-            // Generate normals
             for (var i = 0; i < this.faces.length; i++) {
                 // Check so all vertices exists for this face
                 for (var j = 0; j < this.faces[i].length; j++) {
@@ -39096,7 +39059,6 @@ var CANNON;
                 }
                 var n = this.faceNormals[i] || new feng3d.Vector3();
                 this.getFaceNormal(i, n);
-                n.negateTo(n);
                 this.faceNormals[i] = n;
                 var vertex = this.vertices[this.faces[i][0]];
                 if (n.dot(vertex) < 0) {
@@ -39108,7 +39070,7 @@ var CANNON;
             }
         };
         /**
-         * Get face normal given 3 vertices
+         * 得到3个顶点的法向量
          *
          * @param va
          * @param vb
@@ -39116,6 +39078,8 @@ var CANNON;
          * @param target
          */
         ConvexPolyhedron.computeNormal = function (va, vb, vc, target) {
+            var cb = new feng3d.Vector3();
+            var ab = new feng3d.Vector3();
             vb.subTo(va, ab);
             vc.subTo(vb, cb);
             cb.crossTo(ab, target);
@@ -39124,7 +39088,7 @@ var CANNON;
             }
         };
         /**
-         * Compute the normal of a face from its vertices
+         * 从顶点计算面法线
          *
          * @param i
          * @param target
@@ -39149,9 +39113,7 @@ var CANNON;
          * @see http://bullet.googlecode.com/svn/trunk/src/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp
          */
         ConvexPolyhedron.prototype.clipAgainstHull = function (posA, quatA, hullB, posB, quatB, separatingNormal, minDist, maxDist, result) {
-            var WorldNormal = cah_WorldNormal;
-            var hullA = this;
-            var curMaxDist = maxDist;
+            var WorldNormal = new feng3d.Vector3();
             var closestFaceB = -1;
             var dmax = -Number.MAX_VALUE;
             for (var face = 0; face < hullB.faces.length; face++) {
@@ -39191,7 +39153,7 @@ var CANNON;
          * @returns Returns false if a separation is found, else true
          */
         ConvexPolyhedron.prototype.findSeparatingAxis = function (hullB, transformA, transformB, target, faceListA, faceListB) {
-            var faceANormalWS3 = fsa_faceANormalWS3, Worldnormal1 = fsa_Worldnormal1, deltaC = fsa_deltaC, worldEdge0 = fsa_worldEdge0, worldEdge1 = fsa_worldEdge1, Cross = fsa_Cross;
+            var faceANormalWS3 = new feng3d.Vector3(), Worldnormal1 = new feng3d.Vector3(), deltaC = new feng3d.Vector3(), worldEdge0 = new feng3d.Vector3(), worldEdge1 = new feng3d.Vector3(), Cross = new feng3d.Vector3();
             var dmin = Number.MAX_VALUE;
             var hullA = this;
             var curPlaneTests = 0;
@@ -39299,6 +39261,7 @@ var CANNON;
          */
         ConvexPolyhedron.prototype.testSepAxis = function (axis, hullB, transformA, transformB) {
             var hullA = this;
+            var maxminA = [], maxminB = [];
             ConvexPolyhedron.project(hullA, axis, transformA, maxminA);
             ConvexPolyhedron.project(hullB, axis, transformB, maxminB);
             var maxA = maxminA[0];
@@ -39321,6 +39284,8 @@ var CANNON;
         ConvexPolyhedron.prototype.calculateLocalInertia = function (mass, target) {
             // Approximate with box inertia
             // Exact inertia calculation is overkill, but see http://geometrictools.com/Documentation/PolyhedralMassProperties.pdf for the correct way to do it
+            var cli_aabbmin = new feng3d.Vector3();
+            var cli_aabbmax = new feng3d.Vector3();
             this.computeLocalAABB(cli_aabbmin, cli_aabbmax);
             var x = cli_aabbmax.x - cli_aabbmin.x, y = cli_aabbmax.y - cli_aabbmin.y, z = cli_aabbmax.z - cli_aabbmin.z;
             target.x = 1.0 / 12.0 * mass * (2 * y * 2 * y + 2 * z * 2 * z);
@@ -39350,7 +39315,14 @@ var CANNON;
          * @param result Array to store resulting contact points in. Will be objects with properties: point, depth, normal. These are represented in world coordinates.
          */
         ConvexPolyhedron.prototype.clipFaceAgainstHull = function (separatingNormal, posA, quatA, worldVertsB1, minDist, maxDist, result) {
-            var faceANormalWS = cfah_faceANormalWS, edge0 = cfah_edge0, WorldEdge0 = cfah_WorldEdge0, worldPlaneAnormal1 = cfah_worldPlaneAnormal1, planeNormalWS1 = cfah_planeNormalWS1, worldA1 = cfah_worldA1, localPlaneNormal = cfah_localPlaneNormal, planeNormalWS = cfah_planeNormalWS;
+            var faceANormalWS = new feng3d.Vector3();
+            var edge0 = new feng3d.Vector3();
+            var WorldEdge0 = new feng3d.Vector3();
+            var worldPlaneAnormal1 = new feng3d.Vector3();
+            var planeNormalWS1 = new feng3d.Vector3();
+            var worldA1 = new feng3d.Vector3();
+            var localPlaneNormal = new feng3d.Vector3();
+            var planeNormalWS = new feng3d.Vector3();
             var hullA = this;
             var worldVertsB2 = [];
             var pVtxIn = worldVertsB1;
@@ -39375,18 +39347,16 @@ var CANNON;
             //console.log("closest A: ",closestFaceA);
             // Get the face and construct connected faces
             var polyA = hullA.faces[closestFaceA];
-            polyA.connectedFaces = [];
+            var connectedFaces = [];
             for (var i = 0; i < hullA.faces.length; i++) {
                 for (var j = 0; j < hullA.faces[i].length; j++) {
-                    if (polyA.indexOf(hullA.faces[i][j]) !== -1 /* Sharing a vertex*/ && i !== closestFaceA /* Not the one we are looking for connections from */ && polyA.connectedFaces.indexOf(i) === -1 /* Not already added */) {
-                        polyA.connectedFaces.push(i);
+                    if (polyA.indexOf(hullA.faces[i][j]) !== -1 /* Sharing a vertex*/ && i !== closestFaceA /* Not the one we are looking for connections from */ && connectedFaces.indexOf(i) === -1 /* Not already added */) {
+                        connectedFaces.push(i);
                     }
                 }
             }
             // Clip the polygon to the back of the planes of all faces of hull A, that are adjacent to the witness face
-            var numContacts = pVtxIn.length;
             var numVerticesA = polyA.length;
-            var res = [];
             for (var e0 = 0; e0 < numVerticesA; e0++) {
                 var a = hullA.vertices[polyA[e0]];
                 var b = hullA.vertices[polyA[(e0 + 1) % numVerticesA]];
@@ -39402,21 +39372,13 @@ var CANNON;
                 worldA1.copy(a);
                 quatA.vmult(worldA1, worldA1);
                 posA.addTo(worldA1, worldA1);
-                var planeEqWS1 = -worldA1.dot(planeNormalWS1);
-                var planeEqWS;
-                if (true) {
-                    var otherFace = polyA.connectedFaces[e0];
-                    localPlaneNormal.copy(this.faceNormals[otherFace]);
-                    var localPlaneEq = this.getPlaneConstantOfFace(otherFace);
-                    planeNormalWS.copy(localPlaneNormal);
-                    quatA.vmult(planeNormalWS, planeNormalWS);
-                    //posA.vadd(planeNormalWS,planeNormalWS);
-                    var planeEqWS = localPlaneEq - planeNormalWS.dot(posA);
-                }
-                else {
-                    planeNormalWS.copy(planeNormalWS1);
-                    planeEqWS = planeEqWS1;
-                }
+                var otherFace = connectedFaces[e0];
+                localPlaneNormal.copy(this.faceNormals[otherFace]);
+                var localPlaneEq = this.getPlaneConstantOfFace(otherFace);
+                planeNormalWS.copy(localPlaneNormal);
+                quatA.vmult(planeNormalWS, planeNormalWS);
+                //posA.vadd(planeNormalWS,planeNormalWS);
+                var planeEqWS = localPlaneEq - planeNormalWS.dot(posA);
                 // Clip face against our constructed plane
                 this.clipFaceAgainstPlane(pVtxIn, pVtxOut, planeNormalWS, planeEqWS);
                 // Throw away all clipped points, but save the reamining until next clip
@@ -39436,7 +39398,6 @@ var CANNON;
             var planeEqWS = localPlaneEq - planeNormalWS.dot(posA);
             for (var i = 0; i < pVtxIn.length; i++) {
                 var depth = planeNormalWS.dot(pVtxIn[i]) + planeEqWS; //???
-                /*console.log("depth calc from normal=",planeNormalWS.toString()," and constant "+planeEqWS+" and vertex ",pVtxIn[i].toString()," gives "+depth);*/
                 if (depth <= minDist) {
                     console.log("clamped: depth=" + depth + " to minDist=" + (minDist + ""));
                     depth = minDist;
@@ -39444,16 +39405,7 @@ var CANNON;
                 if (depth <= maxDist) {
                     var point = pVtxIn[i];
                     if (depth <= 0) {
-                        /*console.log("Got contact point ",point.toString(),
-                          ", depth=",depth,
-                          "contact normal=",separatingNormal.toString(),
-                          "plane",planeNormalWS.toString(),
-                          "planeConstant",planeEqWS);*/
-                        var p = {
-                            point: point,
-                            normal: planeNormalWS,
-                            depth: depth,
-                        };
+                        var p = { point: point, normal: planeNormalWS, depth: depth, };
                         result.push(p);
                     }
                 }
@@ -39506,7 +39458,12 @@ var CANNON;
             }
             return outVertices;
         };
-        // Updates .worldVertices and sets .worldVerticesNeedsUpdate to false.
+        /**
+         * 计算世界空间顶点数组
+         *
+         * @param position
+         * @param quat
+         */
         ConvexPolyhedron.prototype.computeWorldVertices = function (position, quat) {
             var N = this.vertices.length;
             while (this.worldVertices.length < N) {
@@ -39520,9 +39477,10 @@ var CANNON;
             this.worldVerticesNeedsUpdate = false;
         };
         ConvexPolyhedron.prototype.computeLocalAABB = function (aabbmin, aabbmax) {
-            var n = this.vertices.length, vertices = this.vertices, worldVert = computeLocalAABB_worldVert;
-            aabbmin.set(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-            aabbmax.set(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
+            var n = this.vertices.length;
+            var vertices = this.vertices;
+            aabbmin.init(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+            aabbmax.init(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
             for (var i = 0; i < n; i++) {
                 var v = vertices[i];
                 if (v.x < aabbmin.x) {
@@ -39584,6 +39542,7 @@ var CANNON;
         ConvexPolyhedron.prototype.calculateWorldAABB = function (pos, quat, min, max) {
             var n = this.vertices.length, verts = this.vertices;
             var minx, miny, minz, maxx, maxy, maxz;
+            var tempWorldVertex = new feng3d.Vector3();
             for (var i = 0; i < n; i++) {
                 tempWorldVertex.copy(verts[i]);
                 quat.vmult(tempWorldVertex, tempWorldVertex);
@@ -39672,20 +39631,22 @@ var CANNON;
          * @param p      A point given in local coordinates
          */
         ConvexPolyhedron.prototype.pointIsInside = function (p) {
-            var n = this.vertices.length, verts = this.vertices, faces = this.faces, normals = this.faceNormals;
+            var vToP = new feng3d.Vector3();
+            var vToPointInside = new feng3d.Vector3();
+            //
+            var verts = this.vertices;
+            var faces = this.faces;
+            var normals = this.faceNormals;
             var positiveResult = null;
             var N = this.faces.length;
-            var pointInside = ConvexPolyhedron_pointIsInside;
+            var pointInside = new feng3d.Vector3();
             this.getAveragePointLocal(pointInside);
             for (var i = 0; i < N; i++) {
-                var numVertices = this.faces[i].length;
                 var n0 = normals[i];
                 var v = verts[faces[i][0]]; // We only need one point in the face
                 // This dot product determines which side of the edge the point is
-                var vToP = ConvexPolyhedron_vToP;
                 p.subTo(v, vToP);
                 var r1 = n0.dot(vToP);
-                var vToPointInside = ConvexPolyhedron_vToPointInside;
                 pointInside.subTo(v, vToPointInside);
                 var r2 = n0.dot(vToPointInside);
                 if ((r1 < 0 && r2 > 0) || (r1 > 0 && r2 < 0)) {
@@ -39707,7 +39668,12 @@ var CANNON;
          * @param result result[0] and result[1] will be set to maximum and minimum, respectively.
          */
         ConvexPolyhedron.project = function (hull, axis, transform, result) {
-            var n = hull.vertices.length, worldVertex = project_worldVertex, localAxis = project_localAxis, max = 0, min = 0, localOrigin = project_localOrigin, vs = hull.vertices;
+            var n = hull.vertices.length;
+            var localAxis = new feng3d.Vector3();
+            var max = 0;
+            var min = 0;
+            var localOrigin = new feng3d.Vector3();
+            var vs = hull.vertices;
             localOrigin.setZero();
             // Transform the axis to local
             CANNON.Transform.vectorToLocalFrame(transform, axis, localAxis);
@@ -39739,72 +39705,33 @@ var CANNON;
         return ConvexPolyhedron;
     }(CANNON.Shape));
     CANNON.ConvexPolyhedron = ConvexPolyhedron;
-    var computeEdges_tmpEdge = new feng3d.Vector3();
-    var cb = new feng3d.Vector3();
-    var ab = new feng3d.Vector3();
-    var cah_WorldNormal = new feng3d.Vector3();
-    var fsa_faceANormalWS3 = new feng3d.Vector3();
-    var fsa_Worldnormal1 = new feng3d.Vector3();
-    var fsa_deltaC = new feng3d.Vector3();
-    var fsa_worldEdge0 = new feng3d.Vector3();
-    var fsa_worldEdge1 = new feng3d.Vector3();
-    var fsa_Cross = new feng3d.Vector3();
-    var maxminA = [], maxminB = [];
-    var cli_aabbmin = new feng3d.Vector3();
-    var cli_aabbmax = new feng3d.Vector3();
-    var cfah_faceANormalWS = new feng3d.Vector3();
-    var cfah_edge0 = new feng3d.Vector3();
-    var cfah_WorldEdge0 = new feng3d.Vector3();
-    var cfah_worldPlaneAnormal1 = new feng3d.Vector3();
-    var cfah_planeNormalWS1 = new feng3d.Vector3();
-    var cfah_worldA1 = new feng3d.Vector3();
-    var cfah_localPlaneNormal = new feng3d.Vector3();
-    var cfah_planeNormalWS = new feng3d.Vector3();
-    var computeLocalAABB_worldVert = new feng3d.Vector3();
-    var tempWorldVertex = new feng3d.Vector3();
-    var ConvexPolyhedron_pointIsInside = new feng3d.Vector3();
-    var ConvexPolyhedron_vToP = new feng3d.Vector3();
-    var ConvexPolyhedron_vToPointInside = new feng3d.Vector3();
-    var project_worldVertex = new feng3d.Vector3();
-    var project_localAxis = new feng3d.Vector3();
-    var project_localOrigin = new feng3d.Vector3();
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 长方体
+     */
     var Box = /** @class */ (function (_super) {
         __extends(Box, _super);
         /**
-         * A 3d box shape.
+         *
          * @param halfExtents
          * @author schteppe
          */
         function Box(halfExtents) {
-            var _this = _super.call(this, {
-                type: CANNON.ShapeType.BOX
-            }) || this;
-            _this.halfExtents = halfExtents;
-            _this.convexPolyhedronRepresentation = null;
-            _this.updateConvexPolyhedronRepresentation();
-            _this.updateBoundingSphereRadius();
-            return _this;
-        }
-        /**
-         * Updates the local convex polyhedron representation used for some collisions.
-         */
-        Box.prototype.updateConvexPolyhedronRepresentation = function () {
-            var sx = this.halfExtents.x;
-            var sy = this.halfExtents.y;
-            var sz = this.halfExtents.z;
-            var V = feng3d.Vector3;
+            var _this = this;
+            var sx = halfExtents.x;
+            var sy = halfExtents.y;
+            var sz = halfExtents.z;
             var vertices = [
-                new V(-sx, -sy, -sz),
-                new V(sx, -sy, -sz),
-                new V(sx, sy, -sz),
-                new V(-sx, sy, -sz),
-                new V(-sx, -sy, sz),
-                new V(sx, -sy, sz),
-                new V(sx, sy, sz),
-                new V(-sx, sy, sz)
+                new feng3d.Vector3(-sx, -sy, -sz),
+                new feng3d.Vector3(sx, -sy, -sz),
+                new feng3d.Vector3(sx, sy, -sz),
+                new feng3d.Vector3(-sx, sy, -sz),
+                new feng3d.Vector3(-sx, -sy, sz),
+                new feng3d.Vector3(sx, -sy, sz),
+                new feng3d.Vector3(sx, sy, sz),
+                new feng3d.Vector3(-sx, sy, sz)
             ];
             var indices = [
                 [3, 2, 1, 0],
@@ -39814,10 +39741,12 @@ var CANNON;
                 [0, 4, 7, 3],
                 [1, 2, 6, 5],
             ];
-            var h = new CANNON.ConvexPolyhedron(vertices, indices);
-            this.convexPolyhedronRepresentation = h;
-            h.material = this.material;
-        };
+            _this = _super.call(this, vertices, indices) || this;
+            _this.type = CANNON.ShapeType.BOX;
+            _this.halfExtents = halfExtents;
+            _this.updateBoundingSphereRadius();
+            return _this;
+        }
         Box.prototype.calculateLocalInertia = function (mass, target) {
             if (target === void 0) { target = new feng3d.Vector3(); }
             Box.calculateInertia(this.halfExtents, mass, target);
@@ -39830,9 +39759,10 @@ var CANNON;
             target.z = 1.0 / 12.0 * mass * (2 * e.y * 2 * e.y + 2 * e.x * 2 * e.x);
         };
         /**
-         * Get the box 6 side normals
-         * @param sixTargetVectors An array of 6 vectors, to store the resulting side normals in.
-         * @param quat             Orientation to apply to the normal vectors. If not provided, the vectors will be in respect to the local frame.
+         * 得到长方体6面的法线
+         *
+         * @param sixTargetVectors 一个由6个向量组成的数组，用来存储产生的面法线。
+         * @param quat             将方向应用于法向量。如果没有提供，向量将是关于局部坐标系的。
          */
         Box.prototype.getSideNormals = function (sixTargetVectors, quat) {
             var sides = sixTargetVectors;
@@ -39853,156 +39783,64 @@ var CANNON;
         Box.prototype.volume = function () {
             return 8.0 * this.halfExtents.x * this.halfExtents.y * this.halfExtents.z;
         };
-        Box.prototype.updateBoundingSphereRadius = function () {
-            this.boundingSphereRadius = this.halfExtents.length;
-        };
-        Box.prototype.forEachWorldCorner = function (pos, quat, callback) {
-            var e = this.halfExtents;
-            var corners = [[e.x, e.y, e.z],
-                [-e.x, e.y, e.z],
-                [-e.x, -e.y, e.z],
-                [-e.x, -e.y, -e.z],
-                [e.x, -e.y, -e.z],
-                [e.x, e.y, -e.z],
-                [-e.x, e.y, -e.z],
-                [e.x, -e.y, e.z]];
-            for (var i = 0; i < corners.length; i++) {
-                worldCornerTempPos.init(corners[i][0], corners[i][1], corners[i][2]);
-                quat.vmult(worldCornerTempPos, worldCornerTempPos);
-                pos.addTo(worldCornerTempPos, worldCornerTempPos);
-                callback(worldCornerTempPos.x, worldCornerTempPos.y, worldCornerTempPos.z);
-            }
-        };
-        Box.prototype.calculateWorldAABB = function (pos, quat, min, max) {
-            var e = this.halfExtents;
-            worldCornersTemp[0].init(e.x, e.y, e.z);
-            worldCornersTemp[1].init(-e.x, e.y, e.z);
-            worldCornersTemp[2].init(-e.x, -e.y, e.z);
-            worldCornersTemp[3].init(-e.x, -e.y, -e.z);
-            worldCornersTemp[4].init(e.x, -e.y, -e.z);
-            worldCornersTemp[5].init(e.x, e.y, -e.z);
-            worldCornersTemp[6].init(-e.x, e.y, -e.z);
-            worldCornersTemp[7].init(e.x, -e.y, e.z);
-            var wc = worldCornersTemp[0];
-            quat.vmult(wc, wc);
-            pos.addTo(wc, wc);
-            max.copy(wc);
-            min.copy(wc);
-            for (var i = 1; i < 8; i++) {
-                var wc = worldCornersTemp[i];
-                quat.vmult(wc, wc);
-                pos.addTo(wc, wc);
-                var x = wc.x;
-                var y = wc.y;
-                var z = wc.z;
-                if (x > max.x) {
-                    max.x = x;
-                }
-                if (y > max.y) {
-                    max.y = y;
-                }
-                if (z > max.z) {
-                    max.z = z;
-                }
-                if (x < min.x) {
-                    min.x = x;
-                }
-                if (y < min.y) {
-                    min.y = y;
-                }
-                if (z < min.z) {
-                    min.z = z;
-                }
-            }
-            // Get each axis max
-            // min.set(Infinity,Infinity,Infinity);
-            // max.set(-Infinity,-Infinity,-Infinity);
-            // this.forEachWorldCorner(pos,quat,function(x,y,z){
-            //     if(x > max.x){
-            //         max.x = x;
-            //     }
-            //     if(y > max.y){
-            //         max.y = y;
-            //     }
-            //     if(z > max.z){
-            //         max.z = z;
-            //     }
-            //     if(x < min.x){
-            //         min.x = x;
-            //     }
-            //     if(y < min.y){
-            //         min.y = y;
-            //     }
-            //     if(z < min.z){
-            //         min.z = z;
-            //     }
-            // });
-        };
         return Box;
-    }(CANNON.Shape));
+    }(CANNON.ConvexPolyhedron));
     CANNON.Box = Box;
-    var worldCornerTempPos = new feng3d.Vector3();
-    var worldCornerTempNeg = new feng3d.Vector3();
-    var worldCornersTemp = [
-        new feng3d.Vector3(),
-        new feng3d.Vector3(),
-        new feng3d.Vector3(),
-        new feng3d.Vector3(),
-        new feng3d.Vector3(),
-        new feng3d.Vector3(),
-        new feng3d.Vector3(),
-        new feng3d.Vector3()
-    ];
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 圆柱体
+     */
     var Cylinder = /** @class */ (function (_super) {
         __extends(Cylinder, _super);
         /**
-         * @param radiusTop
-         * @param radiusBottom
-         * @param height
-         * @param numSegments The number of segments to build the cylinder out of
-         *
-         * @author schteppe / https://github.com/schteppe
+         * @param radiusTop 顶部半径
+         * @param radiusBottom 底部半径
+         * @param height 高度
+         * @param numSegments 圆周分段数
          */
         function Cylinder(radiusTop, radiusBottom, height, numSegments) {
             var _this = this;
-            var N = numSegments, verts = [], axes = [], faces = [], bottomface = [], topface = [], cos = Math.cos, sin = Math.sin;
-            // First bottom point
-            verts.push(new feng3d.Vector3(radiusBottom * cos(0), radiusBottom * sin(0), -height * 0.5));
+            var N = numSegments;
+            var verts = [];
+            var axes = [];
+            var faces = [];
+            var bottomface = [];
+            var topface = [];
+            var cos = Math.cos;
+            var sin = Math.sin;
+            // 第一个底部顶点
+            verts.push(new feng3d.Vector3(radiusBottom * cos(0), -height * 0.5, radiusBottom * sin(0)));
             bottomface.push(0);
-            // First top point
-            verts.push(new feng3d.Vector3(radiusTop * cos(0), radiusTop * sin(0), height * 0.5));
+            // 第一个顶部顶点
+            verts.push(new feng3d.Vector3(radiusTop * cos(0), height * 0.5, radiusTop * sin(0)));
             topface.push(1);
             for (var i = 0; i < N; i++) {
                 var theta = 2 * Math.PI / N * (i + 1);
                 var thetaN = 2 * Math.PI / N * (i + 0.5);
                 if (i < N - 1) {
-                    // Bottom
-                    verts.push(new feng3d.Vector3(radiusBottom * cos(theta), radiusBottom * sin(theta), -height * 0.5));
+                    // 底部
+                    verts.push(new feng3d.Vector3(radiusBottom * cos(theta), -height * 0.5, radiusBottom * sin(theta)));
                     bottomface.push(2 * i + 2);
-                    // Top
-                    verts.push(new feng3d.Vector3(radiusTop * cos(theta), radiusTop * sin(theta), height * 0.5));
+                    // 顶部
+                    verts.push(new feng3d.Vector3(radiusTop * cos(theta), height * 0.5, radiusTop * sin(theta)));
                     topface.push(2 * i + 3);
-                    // Face
+                    // 侧面
                     faces.push([2 * i + 2, 2 * i + 3, 2 * i + 1, 2 * i]);
                 }
                 else {
-                    faces.push([0, 1, 2 * i + 1, 2 * i]); // Connect
+                    faces.push([0, 1, 2 * i + 1, 2 * i]); // 连接处
                 }
-                // Axis: we can cut off half of them if we have even number of segments
+                // 如果是偶数段，我们可以切掉一半
                 if (N % 2 === 1 || i < N / 2) {
-                    axes.push(new feng3d.Vector3(cos(thetaN), sin(thetaN), 0));
+                    axes.push(new feng3d.Vector3(cos(thetaN), 0, sin(thetaN)));
                 }
             }
             faces.push(topface);
-            axes.push(new feng3d.Vector3(0, 0, 1));
-            // Reorder bottom face
-            var temp = [];
-            for (var i = 0; i < bottomface.length; i++) {
-                temp.push(bottomface[bottomface.length - i - 1]);
-            }
+            axes.push(new feng3d.Vector3(0, 1, 0));
+            // 反转地面
+            var temp = bottomface.reverse();
             faces.push(temp);
             _this = _super.call(this, verts, faces, axes) || this;
             return _this;
@@ -40013,6 +39851,9 @@ var CANNON;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 高度场
+     */
     var Heightfield = /** @class */ (function (_super) {
         __extends(Heightfield, _super);
         /**
@@ -40042,11 +39883,6 @@ var CANNON;
          *     heightfieldBody.addShape(heightfieldShape);
          *     world.addBody(heightfieldBody);
          */
-        /**
-         *
-         * @param data
-         * @param options
-         */
         function Heightfield(data, options) {
             if (options === void 0) { options = {}; }
             var _this = _super.call(this) || this;
@@ -40072,20 +39908,17 @@ var CANNON;
             _this.pillarConvex = new CANNON.ConvexPolyhedron();
             _this.pillarOffset = new feng3d.Vector3();
             _this.updateBoundingSphereRadius();
-            // "i_j_isUpper" => { convex: ..., offset: ... }
-            // for example:
-            // _cachedPillars["0_2_1"]
             _this._cachedPillars = {};
             return _this;
         }
         /**
-         * Call whenever you change the data array.
+         * 更新
          */
         Heightfield.prototype.update = function () {
             this._cachedPillars = {};
         };
         /**
-         * Update the .minValue property
+         * 更新最小值
          */
         Heightfield.prototype.updateMinValue = function () {
             var data = this.data;
@@ -40101,7 +39934,7 @@ var CANNON;
             this.minValue = minValue;
         };
         /**
-         * Update the .maxValue property
+         * 更新最大值
          */
         Heightfield.prototype.updateMaxValue = function () {
             var data = this.data;
@@ -40117,7 +39950,7 @@ var CANNON;
             this.maxValue = maxValue;
         };
         /**
-         * Set the height value at an index. Don't forget to update maxValue and minValue after you're done.
+         * 在索引处设置高度值。完成后不要忘记更新maxValue和minValue。
          *
          * @param xi
          * @param yi
@@ -40141,14 +39974,13 @@ var CANNON;
             }
         };
         /**
-         * Get max/min in a rectangle in the matrix data
+         * 获取矩形数据中的最大最小值
          *
          * @param iMinX
          * @param iMinY
          * @param iMaxX
          * @param iMaxY
-         * @param result An array to store the results in.
-         * @return The result array, if it was passed in. Minimum will be at position 0 and max at 1.
+         * @param result
          */
         Heightfield.prototype.getRectMinMax = function (iMinX, iMinY, iMaxX, iMaxY, result) {
             result = result || [];
@@ -40166,12 +39998,12 @@ var CANNON;
             result[1] = max;
         };
         /**
-         * Get the index of a local position on the heightfield. The indexes indicate the rectangles, so if your terrain is made of N x N height data points, you will have rectangle indexes ranging from 0 to N-1.
+         * 获取heightfield上本地位置的索引。索引表示矩形，因此，如果地形由N x N个高度数据点组成，则矩形索引的范围为0到N-1。
          *
          * @param x
          * @param y
-         * @param result Two-element array
-         * @param clamp If the position should be clamped to the heightfield edge.
+         * @param result
+         * @param clamp
          */
         Heightfield.prototype.getIndexOfPosition = function (x, y, result, clamp) {
             // Get the index of the data points to test against
@@ -40202,8 +40034,18 @@ var CANNON;
             }
             return true;
         };
+        /**
+         * 获取三角形
+         *
+         * @param x
+         * @param y
+         * @param edgeClamp
+         * @param a
+         * @param b
+         * @param c
+         */
         Heightfield.prototype.getTriangleAt = function (x, y, edgeClamp, a, b, c) {
-            var idx = getHeightAt_idx;
+            var idx = [];
             this.getIndexOfPosition(x, y, idx, edgeClamp);
             var xi = idx[0];
             var yi = idx[1];
@@ -40219,12 +40061,20 @@ var CANNON;
             this.getTriangle(xi, yi, upper, a, b, c);
             return upper;
         };
+        /**
+         * 获取法线
+         *
+         * @param x
+         * @param y
+         * @param edgeClamp
+         * @param result
+         */
         Heightfield.prototype.getNormalAt = function (x, y, edgeClamp, result) {
-            var a = getNormalAt_a;
-            var b = getNormalAt_b;
-            var c = getNormalAt_c;
-            var e0 = getNormalAt_e0;
-            var e1 = getNormalAt_e1;
+            var a = new feng3d.Vector3();
+            var b = new feng3d.Vector3();
+            var c = new feng3d.Vector3();
+            var e0 = new feng3d.Vector3();
+            var e1 = new feng3d.Vector3();
             this.getTriangleAt(x, y, edgeClamp, a, b, c);
             b.subTo(a, e0);
             c.subTo(a, e1);
@@ -40232,7 +40082,7 @@ var CANNON;
             result.normalize();
         };
         /**
-         * Get an AABB of a square in the heightfield
+         * 获取指定位置的包围盒
          *
          * @param xi
          * @param yi
@@ -40245,7 +40095,7 @@ var CANNON;
             result.upperBound.init((xi + 1) * elementSize, (yi + 1) * elementSize, data[xi + 1][yi + 1]);
         };
         /**
-         * Get the height in the heightfield at a given position
+         * 获取指定位置高度
          *
          * @param x
          * @param y
@@ -40253,10 +40103,11 @@ var CANNON;
          */
         Heightfield.prototype.getHeightAt = function (x, y, edgeClamp) {
             var data = this.data;
-            var a = getHeightAt_a;
-            var b = getHeightAt_b;
-            var c = getHeightAt_c;
-            var idx = getHeightAt_idx;
+            var getHeightAt_weights = new feng3d.Vector3();
+            var a = new feng3d.Vector3();
+            var b = new feng3d.Vector3();
+            var c = new feng3d.Vector3();
+            var idx = [];
             this.getIndexOfPosition(x, y, idx, edgeClamp);
             var xi = idx[0];
             var yi = idx[1];
@@ -40276,23 +40127,53 @@ var CANNON;
                 return data[xi][yi] * w.x + data[xi + 1][yi] * w.y + data[xi][yi + 1] * w.z;
             }
         };
+        /**
+         * 获取缓冲键值
+         *
+         * @param xi
+         * @param yi
+         * @param getUpperTriangle
+         */
         Heightfield.prototype.getCacheConvexTrianglePillarKey = function (xi, yi, getUpperTriangle) {
             return xi + '_' + yi + '_' + (getUpperTriangle ? 1 : 0);
         };
+        /**
+         * 获取缓冲值
+         *
+         * @param xi
+         * @param yi
+         * @param getUpperTriangle
+         */
         Heightfield.prototype.getCachedConvexTrianglePillar = function (xi, yi, getUpperTriangle) {
             return this._cachedPillars[this.getCacheConvexTrianglePillarKey(xi, yi, getUpperTriangle)];
         };
+        /**
+         * 设置缓冲值
+         *
+         * @param xi
+         * @param yi
+         * @param getUpperTriangle
+         * @param convex
+         * @param offset
+         */
         Heightfield.prototype.setCachedConvexTrianglePillar = function (xi, yi, getUpperTriangle, convex, offset) {
             this._cachedPillars[this.getCacheConvexTrianglePillarKey(xi, yi, getUpperTriangle)] = {
                 convex: convex,
                 offset: offset
             };
         };
+        /**
+         * 清楚缓冲
+         *
+         * @param xi
+         * @param yi
+         * @param getUpperTriangle
+         */
         Heightfield.prototype.clearCachedConvexTrianglePillar = function (xi, yi, getUpperTriangle) {
             delete this._cachedPillars[this.getCacheConvexTrianglePillarKey(xi, yi, getUpperTriangle)];
         };
         /**
-         * Get a triangle from the heightfield
+         * 获取三角形
          *
          * @param xi
          * @param yi
@@ -40319,7 +40200,7 @@ var CANNON;
         };
         ;
         /**
-         * Get a triangle in the terrain in the form of a triangular convex shape.
+         * 在地形中以三角形凸形的形式得到一个三角形。
          *
          * @param i
          * @param j
@@ -40458,7 +40339,7 @@ var CANNON;
             this.boundingSphereRadius = new feng3d.Vector3(data.length * s, data[0].length * s, Math.max(Math.abs(this.maxValue), Math.abs(this.minValue))).length;
         };
         /**
-         * Sets the height values from an image. Currently only supported in browser.
+         * 设置图像的高度值。目前只支持浏览器。
          *
          * @param image
          * @param scale
@@ -40501,16 +40382,6 @@ var CANNON;
         return Heightfield;
     }(CANNON.Shape));
     CANNON.Heightfield = Heightfield;
-    var getHeightAt_idx = [];
-    var getHeightAt_weights = new feng3d.Vector3();
-    var getHeightAt_a = new feng3d.Vector3();
-    var getHeightAt_b = new feng3d.Vector3();
-    var getHeightAt_c = new feng3d.Vector3();
-    var getNormalAt_a = new feng3d.Vector3();
-    var getNormalAt_b = new feng3d.Vector3();
-    var getNormalAt_c = new feng3d.Vector3();
-    var getNormalAt_e0 = new feng3d.Vector3();
-    var getNormalAt_e1 = new feng3d.Vector3();
     // from https://en.wikipedia.org/wiki/Barycentric_coordinate_system
     function barycentricWeights(x, y, ax, ay, bx, by, cx, cy, result) {
         result.x = ((by - cy) * (x - cx) + (cx - bx) * (y - cy)) / ((by - cy) * (ax - cx) + (cx - bx) * (ay - cy));
@@ -40520,13 +40391,11 @@ var CANNON;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 粒子
+     */
     var Particle = /** @class */ (function (_super) {
         __extends(Particle, _super);
-        /**
-         * Particle shape.
-         *
-         * @author schteppe
-         */
         function Particle() {
             return _super.call(this, {
                 type: CANNON.ShapeType.PARTICLE
@@ -40548,7 +40417,6 @@ var CANNON;
             this.boundingSphereRadius = 0;
         };
         Particle.prototype.calculateWorldAABB = function (pos, quat, min, max) {
-            // Get each axis max
             min.copy(pos);
             max.copy(pos);
         };
@@ -40558,18 +40426,18 @@ var CANNON;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 平面
+     */
     var Plane = /** @class */ (function (_super) {
         __extends(Plane, _super);
         /**
-         * A plane, facing in the Z direction. The plane has its surface at z=0 and everything below z=0 is assumed to be solid plane. To make the plane face in some other direction than z, you must put it inside a Body and rotate that body. See the demos.
          *
-         * @author schteppe
          */
         function Plane() {
             var _this = _super.call(this, {
                 type: CANNON.ShapeType.PLANE
             }) || this;
-            // World oriented normal
             _this.worldNormal = new feng3d.Vector3();
             _this.worldNormalNeedsUpdate = true;
             _this.boundingSphereRadius = Number.MAX_VALUE;
@@ -40586,11 +40454,10 @@ var CANNON;
             return target;
         };
         Plane.prototype.volume = function () {
-            return Number.MAX_VALUE; // The plane is infinite...
+            return Number.MAX_VALUE;
         };
         Plane.prototype.calculateWorldAABB = function (pos, quat, min, max) {
-            // The plane AABB is infinite, except if the normal is pointing along any axis
-            tempNormal.init(0, 1, 0); // Default plane normal is y
+            var tempNormal = new feng3d.Vector3(0, 1, 0);
             quat.vmult(tempNormal, tempNormal);
             var maxVal = Number.MAX_VALUE;
             min.init(-maxVal, -maxVal, -maxVal);
@@ -40620,10 +40487,12 @@ var CANNON;
         return Plane;
     }(CANNON.Shape));
     CANNON.Plane = Plane;
-    var tempNormal = new feng3d.Vector3();
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 球体
+     */
     var Sphere = /** @class */ (function (_super) {
         __extends(Sphere, _super);
         /**
@@ -40638,9 +40507,7 @@ var CANNON;
                 type: CANNON.ShapeType.SPHERE
             }) || this;
             _this.radius = radius;
-            if (_this.radius < 0) {
-                throw new Error('The sphere radius cannot be negative.');
-            }
+            console.assert(radius >= 0, "\u7403\u9762\u534A\u5F84\u4E0D\u80FD\u662F\u8D1F\u7684\u3002");
             _this.updateBoundingSphereRadius();
             return _this;
         }
@@ -40659,13 +40526,8 @@ var CANNON;
             this.boundingSphereRadius = this.radius;
         };
         Sphere.prototype.calculateWorldAABB = function (pos, quat, min, max) {
-            var r = this.radius;
-            var axes = ['x', 'y', 'z'];
-            for (var i = 0; i < axes.length; i++) {
-                var ax = axes[i];
-                min[ax] = pos[ax] - r;
-                max[ax] = pos[ax] + r;
-            }
+            pos.subNumberTo(this.radius, min);
+            pos.addNumberTo(this.radius, max);
         };
         return Sphere;
     }(CANNON.Shape));
@@ -40921,6 +40783,9 @@ var CANNON;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 三角网格
+     */
     var Trimesh = /** @class */ (function (_super) {
         __extends(Trimesh, _super);
         /**
@@ -40943,15 +40808,11 @@ var CANNON;
             var _this = _super.call(this, {
                 type: CANNON.ShapeType.TRIMESH
             }) || this;
-            _this.vertices = new Float32Array(vertices);
-            /**
-             * Array of integers, indicating which vertices each triangle consists of. The length of this array is thus 3 times the number of triangles.
-             */
-            _this.indices = new Int16Array(indices);
-            _this.normals = new Float32Array(indices.length);
+            _this.vertices = vertices;
+            _this.indices = indices;
+            _this.normals = [];
             _this.aabb = new CANNON.AABB();
             _this.edges = null;
-            _this.scale = new feng3d.Vector3(1, 1, 1);
             _this.tree = new CANNON.Octree();
             _this.updateEdges();
             _this.updateNormals();
@@ -40960,17 +40821,13 @@ var CANNON;
             _this.updateTree();
             return _this;
         }
+        /**
+         * 更新树
+         */
         Trimesh.prototype.updateTree = function () {
             var tree = this.tree;
             tree.reset();
             tree.aabb.copy(this.aabb);
-            var scale = this.scale; // The local mesh AABB is scaled, but the octree AABB should be unscaled
-            tree.aabb.lowerBound.x *= 1 / scale.x;
-            tree.aabb.lowerBound.y *= 1 / scale.y;
-            tree.aabb.lowerBound.z *= 1 / scale.z;
-            tree.aabb.upperBound.x *= 1 / scale.x;
-            tree.aabb.upperBound.y *= 1 / scale.y;
-            tree.aabb.upperBound.z *= 1 / scale.z;
             // Insert all triangles
             var triangleAABB = new CANNON.AABB();
             var a = new feng3d.Vector3();
@@ -40978,61 +40835,35 @@ var CANNON;
             var c = new feng3d.Vector3();
             var points = [a, b, c];
             for (var i = 0; i < this.indices.length / 3; i++) {
-                //this.getTriangleVertices(i, a, b, c);
                 // Get unscaled triangle verts
                 var i3 = i * 3;
-                this._getUnscaledVertex(this.indices[i3], a);
-                this._getUnscaledVertex(this.indices[i3 + 1], b);
-                this._getUnscaledVertex(this.indices[i3 + 2], c);
+                this.getVertex(this.indices[i3], a);
+                this.getVertex(this.indices[i3 + 1], b);
+                this.getVertex(this.indices[i3 + 2], c);
                 triangleAABB.setFromPoints(points);
                 tree.insert(triangleAABB, i);
             }
             tree.removeEmptyNodes();
         };
         /**
-         * Get triangles in a local AABB from the trimesh.
+         * 从trimesh获取本地AABB中的三角形。
          *
          * @param aabb
-         * @param result An array of integers, referencing the queried triangles.
+         * @param result 一个整数数组，引用查询的三角形。
          */
         Trimesh.prototype.getTrianglesInAABB = function (aabb, result) {
+            var unscaledAABB = new CANNON.AABB();
             unscaledAABB.copy(aabb);
-            // Scale it to local
-            var scale = this.scale;
-            var isx = scale.x;
-            var isy = scale.y;
-            var isz = scale.z;
-            var l = unscaledAABB.lowerBound;
-            var u = unscaledAABB.upperBound;
-            l.x /= isx;
-            l.y /= isy;
-            l.z /= isz;
-            u.x /= isx;
-            u.y /= isy;
-            u.z /= isz;
             return this.tree.aabbQuery(unscaledAABB, result);
         };
         /**
-         * @param scale
-         */
-        Trimesh.prototype.setScale = function (scale) {
-            // var wasUniform = this.scale.x === this.scale.y === this.scale.z;// 等价下面代码?
-            var wasUniform = this.scale.x === this.scale.y && this.scale.y === this.scale.z; //?
-            // var isUniform = scale.x === scale.y === scale.z;// 等价下面代码?
-            var isUniform = scale.x === scale.y && scale.y === scale.z; //?
-            if (!(wasUniform && isUniform)) {
-                // Non-uniform scaling. Need to update normals.
-                this.updateNormals();
-            }
-            this.scale.copy(scale);
-            this.updateAABB();
-            this.updateBoundingSphereRadius();
-        };
-        /**
-         * Compute the normals of the faces. Will save in the .normals array.
+         * 计算法线
          */
         Trimesh.prototype.updateNormals = function () {
-            var n = computeNormals_n;
+            var n = new feng3d.Vector3();
+            var va = new feng3d.Vector3();
+            var vb = new feng3d.Vector3();
+            var vc = new feng3d.Vector3();
             // Generate normals
             var normals = this.normals;
             for (var i = 0; i < this.indices.length / 3; i++) {
@@ -41048,11 +40879,11 @@ var CANNON;
             }
         };
         /**
-         * Update the .edges property
+         * 更新边数组
          */
         Trimesh.prototype.updateEdges = function () {
             var edges = {};
-            var add = function (indexA, indexB) {
+            var add = function (a, b) {
                 var key = a < b ? a + '_' + b : b + '_' + a;
                 edges[key] = true;
             };
@@ -41064,7 +40895,7 @@ var CANNON;
                 add(c, a);
             }
             var keys = Object.keys(edges);
-            this.edges = new Int16Array(keys.length * 2);
+            this.edges = [];
             for (var i = 0; i < keys.length; i++) {
                 var indices = keys[i].split('_');
                 this.edges[2 * i] = parseInt(indices[0], 10);
@@ -41072,31 +40903,31 @@ var CANNON;
             }
         };
         /**
-         * Get an edge vertex
+         * 获取边的顶点
          *
          * @param edgeIndex
-         * @param firstOrSecond 0 or 1, depending on which one of the vertices you need.
-         * @param vertexStore Where to store the result
+         * @param firstOrSecond 0还是1，取决于你需要哪个顶点。
+         * @param vertexStore 保存结果
          */
         Trimesh.prototype.getEdgeVertex = function (edgeIndex, firstOrSecond, vertexStore) {
             var vertexIndex = this.edges[edgeIndex * 2 + (firstOrSecond ? 1 : 0)];
             this.getVertex(vertexIndex, vertexStore);
         };
         /**
-         * Get a vector along an edge.
+         * 沿着一条边得到一个向量。
          *
          * @param edgeIndex
          * @param vectorStore
          */
         Trimesh.prototype.getEdgeVector = function (edgeIndex, vectorStore) {
-            var va = getEdgeVector_va;
-            var vb = getEdgeVector_vb;
+            var va = new feng3d.Vector3();
+            var vb = new feng3d.Vector3();
             this.getEdgeVertex(edgeIndex, 0, va);
             this.getEdgeVertex(edgeIndex, 1, vb);
             vb.subTo(va, vectorStore);
         };
         /**
-         * Get face normal given 3 vertices
+         * 得到3个顶点的法向量
          *
          * @param va
          * @param vb
@@ -41104,6 +40935,8 @@ var CANNON;
          * @param target
          */
         Trimesh.computeNormal = function (va, vb, vc, target) {
+            var cb = new feng3d.Vector3();
+            var ab = new feng3d.Vector3();
             vb.subTo(va, ab);
             vc.subTo(vb, cb);
             cb.crossTo(ab, target);
@@ -41112,34 +40945,19 @@ var CANNON;
             }
         };
         /**
-         * Get vertex i.
+         * 获取顶点
          *
          * @param i
          * @param out
          * @return The "out" vector object
          */
         Trimesh.prototype.getVertex = function (i, out) {
-            var scale = this.scale;
-            this._getUnscaledVertex(i, out);
-            out.x *= scale.x;
-            out.y *= scale.y;
-            out.z *= scale.z;
-            return out;
-        };
-        /**
-         * Get raw vertex i
-         *
-         * @param i
-         * @param out
-         * @return The "out" vector object
-         */
-        Trimesh.prototype._getUnscaledVertex = function (i, out) {
             var i3 = i * 3;
             var vertices = this.vertices;
             return out.init(vertices[i3], vertices[i3 + 1], vertices[i3 + 2]);
         };
         /**
-         * Get a vertex from the trimesh,transformed by the given position and quaternion.
+         * 通过给定的位置和四元数转换，从三元组中得到一个顶点。
          *
          * @param i
          * @param pos
@@ -41153,7 +40971,7 @@ var CANNON;
             return out;
         };
         /**
-         * Get the three vertices for triangle i.
+         * 从三角形中获取三个顶点
          *
          * @param i
          * @param a
@@ -41167,7 +40985,7 @@ var CANNON;
             this.getVertex(this.indices[i3 + 2], c);
         };
         /**
-         * Compute the normal of triangle i.
+         * 获取三角形的法线
          *
          * @param i
          * @param target
@@ -41186,17 +41004,18 @@ var CANNON;
         Trimesh.prototype.calculateLocalInertia = function (mass, target) {
             // Approximate with box inertia
             // Exact inertia calculation is overkill, but see http://geometrictools.com/Documentation/PolyhedralMassProperties.pdf for the correct way to do it
+            var cli_aabb = new CANNON.AABB();
             this.computeLocalAABB(cli_aabb);
             var x = cli_aabb.upperBound.x - cli_aabb.lowerBound.x, y = cli_aabb.upperBound.y - cli_aabb.lowerBound.y, z = cli_aabb.upperBound.z - cli_aabb.lowerBound.z;
             return target.init(1.0 / 12.0 * mass * (2 * y * 2 * y + 2 * z * 2 * z), 1.0 / 12.0 * mass * (2 * x * 2 * x + 2 * z * 2 * z), 1.0 / 12.0 * mass * (2 * y * 2 * y + 2 * x * 2 * x));
         };
         /**
-         * Compute the local AABB for the trimesh
+         * 计算包围盒
          *
          * @param aabb
          */
         Trimesh.prototype.computeLocalAABB = function (aabb) {
-            var l = aabb.lowerBound, u = aabb.upperBound, n = this.vertices.length, vertices = this.vertices, v = computeLocalAABB_worldVert;
+            var l = aabb.lowerBound, u = aabb.upperBound, n = this.vertices.length, v = new feng3d.Vector3();
             this.getVertex(0, v);
             l.copy(v);
             u.copy(v);
@@ -41223,13 +41042,13 @@ var CANNON;
             }
         };
         /**
-         * Update the .aabb property
+         * 更新包围盒
          */
         Trimesh.prototype.updateAABB = function () {
             this.computeLocalAABB(this.aabb);
         };
         /**
-         * Will update the .boundingSphereRadius property
+         * 更新此形状的局部包围球半径
          */
         Trimesh.prototype.updateBoundingSphereRadius = function () {
             // Assume points are distributed with local (0,0,0) as center
@@ -41245,41 +41064,18 @@ var CANNON;
             }
             this.boundingSphereRadius = Math.sqrt(max2);
         };
+        /**
+         * 计算世界包围盒
+         *
+         * @param pos
+         * @param quat
+         * @param min
+         * @param max
+         */
         Trimesh.prototype.calculateWorldAABB = function (pos, quat, min, max) {
-            /*
-            var n = this.vertices.length / 3,
-                verts = this.vertices;
-            var minx,miny,minz,maxx,maxy,maxz;
-        
-            var v = tempWorldVertex;
-            for(var i=0; i<n; i++){
-                this.getVertex(i, v);
-                quat.vmult(v, v);
-                pos.vadd(v, v);
-                if (v.x < minx || minx===undefined){
-                    minx = v.x;
-                } else if(v.x > maxx || maxx===undefined){
-                    maxx = v.x;
-                }
-        
-                if (v.y < miny || miny===undefined){
-                    miny = v.y;
-                } else if(v.y > maxy || maxy===undefined){
-                    maxy = v.y;
-                }
-        
-                if (v.z < minz || minz===undefined){
-                    minz = v.z;
-                } else if(v.z > maxz || maxz===undefined){
-                    maxz = v.z;
-                }
-            }
-            min.set(minx,miny,minz);
-            max.set(maxx,maxy,maxz);
-            */
-            // Faster approximation using local AABB
-            var frame = calculateWorldAABB_frame;
-            var result = calculateWorldAABB_aabb;
+            // 使用局部AABB进行更快的近似
+            var frame = new CANNON.Transform();
+            var result = new CANNON.AABB();
             frame.position = pos;
             frame.quaternion = quat;
             this.aabb.toWorldFrame(frame, result);
@@ -41288,70 +41084,14 @@ var CANNON;
         };
         ;
         /**
-         * Get approximate volume
+         * 得到近似体积
          */
         Trimesh.prototype.volume = function () {
             return 4.0 * Math.PI * this.boundingSphereRadius / 3.0;
         };
-        /**
-         * Create a Trimesh instance, shaped as a torus.
-         *
-         * @param radius
-         * @param tube
-         * @param radialSegments
-         * @param tubularSegments
-         * @param arc
-         *
-         * @return A torus
-         */
-        Trimesh.createTorus = function (radius, tube, radialSegments, tubularSegments, arc) {
-            radius = radius || 1;
-            tube = tube || 0.5;
-            radialSegments = radialSegments || 8;
-            tubularSegments = tubularSegments || 6;
-            arc = arc || Math.PI * 2;
-            var vertices = [];
-            var indices = [];
-            for (var j = 0; j <= radialSegments; j++) {
-                for (var i = 0; i <= tubularSegments; i++) {
-                    var u = i / tubularSegments * arc;
-                    var v = j / radialSegments * Math.PI * 2;
-                    var x = (radius + tube * Math.cos(v)) * Math.cos(u);
-                    var y = (radius + tube * Math.cos(v)) * Math.sin(u);
-                    var z = tube * Math.sin(v);
-                    vertices.push(x, y, z);
-                }
-            }
-            for (var j = 1; j <= radialSegments; j++) {
-                for (var i = 1; i <= tubularSegments; i++) {
-                    var a = (tubularSegments + 1) * j + i - 1;
-                    var b = (tubularSegments + 1) * (j - 1) + i - 1;
-                    var c = (tubularSegments + 1) * (j - 1) + i;
-                    var d = (tubularSegments + 1) * j + i;
-                    indices.push(a, b, d);
-                    indices.push(b, c, d);
-                }
-            }
-            return new Trimesh(vertices, indices);
-        };
-        ;
         return Trimesh;
     }(CANNON.Shape));
     CANNON.Trimesh = Trimesh;
-    var computeNormals_n = new feng3d.Vector3();
-    var unscaledAABB = new CANNON.AABB();
-    var getEdgeVector_va = new feng3d.Vector3();
-    var getEdgeVector_vb = new feng3d.Vector3();
-    var cb = new feng3d.Vector3();
-    var ab = new feng3d.Vector3();
-    var va = new feng3d.Vector3();
-    var vb = new feng3d.Vector3();
-    var vc = new feng3d.Vector3();
-    var cli_aabb = new CANNON.AABB();
-    var computeLocalAABB_worldVert = new feng3d.Vector3();
-    var tempWorldVertex = new feng3d.Vector3();
-    var calculateWorldAABB_frame = new CANNON.Transform();
-    var calculateWorldAABB_aabb = new CANNON.AABB();
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
@@ -42456,8 +42196,9 @@ var CANNON;
             this.hasHit = false;
             this.result.reset();
             this._updateDirection();
+            var tmpAABB = new CANNON.AABB();
             this.getAABB(tmpAABB);
-            tmpArray.length = 0;
+            var tmpArray = [];
             world.broadphase.aabbQuery(world, tmpAABB, tmpArray);
             this.intersectBodies(tmpArray);
             return this.hasHit;
@@ -42479,8 +42220,8 @@ var CANNON;
             if ((this.collisionFilterGroup & body.collisionFilterMask) === 0 || (body.collisionFilterGroup & this.collisionFilterMask) === 0) {
                 return;
             }
-            var xi = intersectBody_xi;
-            var qi = intersectBody_qi;
+            var xi = new feng3d.Vector3();
+            var qi = new feng3d.Quaternion();
             for (var i = 0, N = body.shapes.length; i < N; i++) {
                 var shape = body.shapes[i];
                 if (checkCollisionResponse && !shape.collisionResponse) {
@@ -42530,7 +42271,7 @@ var CANNON;
             }
         };
         Ray.prototype.intersectBox = function (shape, quat, position, body, reportedShape) {
-            return this.intersectConvex(shape.convexPolyhedronRepresentation, quat, position, body, reportedShape);
+            return this.intersectConvex(shape, quat, position, body, reportedShape);
         };
         Ray.prototype.intersectPlane = function (shape, quat, position, body, reportedShape) {
             var from = this.from;
@@ -42580,16 +42321,15 @@ var CANNON;
         };
         Ray.prototype.intersectHeightfield = function (shape, transform, body, reportedShape) {
             var quat = transform.quaternion;
-            var data = shape.data, w = shape.elementSize;
             // Convert the ray to local heightfield coordinates
-            var localRay = intersectHeightfield_localRay; //new Ray(this.from, this.to);
+            var localRay = new Ray(); //new Ray(this.from, this.to);
             localRay.from.copy(this.from);
             localRay.to.copy(this.to);
             CANNON.Transform.pointToLocalFrame(transform, localRay.from, localRay.from);
             CANNON.Transform.pointToLocalFrame(transform, localRay.to, localRay.to);
             localRay._updateDirection();
             // Get the index of the data points to test against
-            var index = intersectHeightfield_index;
+            var index = [];
             var iMinX, iMinY, iMaxX, iMaxY;
             // Set to max
             iMinX = iMinY = 0;
@@ -42602,6 +42342,10 @@ var CANNON;
             shape.getIndexOfPosition(aabb.upperBound.x, aabb.upperBound.y, index, true);
             iMaxX = Math.min(iMaxX, index[0] + 1);
             iMaxY = Math.min(iMaxY, index[1] + 1);
+            var intersectConvexOptions = {
+                faceList: [0]
+            };
+            var worldPillarOffset = new feng3d.Vector3();
             for (var i = iMinX; i < iMaxX; i++) {
                 for (var j = iMinY; j < iMaxY; j++) {
                     if (this.result._shouldStop) {
@@ -42631,8 +42375,8 @@ var CANNON;
             var b = 2 * ((to.x - from.x) * (from.x - position.x) + (to.y - from.y) * (from.y - position.y) + (to.z - from.z) * (from.z - position.z));
             var c = Math.pow(from.x - position.x, 2) + Math.pow(from.y - position.y, 2) + Math.pow(from.z - position.z, 2) - Math.pow(r, 2);
             var delta = Math.pow(b, 2) - 4 * a * c;
-            var intersectionPoint = Ray_intersectSphere_intersectionPoint;
-            var normal = Ray_intersectSphere_normal;
+            var intersectionPoint = new feng3d.Vector3();
+            var normal = new feng3d.Vector3();
             if (delta < 0) {
                 // No intersection
                 return;
@@ -42666,10 +42410,8 @@ var CANNON;
         };
         Ray.prototype.intersectConvex = function (shape, quat, position, body, reportedShape, options) {
             if (options === void 0) { options = {}; }
-            var minDistNormal = intersectConvex_minDistNormal;
-            var normal = intersectConvex_normal;
-            var vector = intersectConvex_vector;
-            var minDistIntersect = intersectConvex_minDistIntersect;
+            var normal = new feng3d.Vector3();
+            var vector = new feng3d.Vector3();
             var faceList = (options && options.faceList) || null;
             // Checking faces
             var faces = shape.faces, vertices = shape.vertices, normals = shape.faceNormals;
@@ -42677,9 +42419,11 @@ var CANNON;
             var from = this.from;
             var to = this.to;
             var fromToDistance = from.distance(to);
-            var minDist = -1;
             var Nfaces = faceList ? faceList.length : faces.length;
             var result = this.result;
+            var a = new feng3d.Vector3();
+            var b = new feng3d.Vector3();
+            var c = new feng3d.Vector3();
             for (var j = 0; !result._shouldStop && j < Nfaces; j++) {
                 var fi = faceList ? faceList[j] : j;
                 var face = faces[fi];
@@ -42734,46 +42478,31 @@ var CANNON;
             }
         };
         /**
-         * @method intersectTrimesh
-         * @private
-         * @param  {Shape} shape
-         * @param  {Quaternion} quat
-         * @param  {Vector3} position
-         * @param  {Body} body
-         * @param {object} [options]
-         */
-        /**
          *
          * @param mesh
          * @param quat
          * @param position
          * @param body
          * @param reportedShape
-         * @param options
          *
          * @todo Optimize by transforming the world to local space first.
          * @todo Use Octree lookup
          */
-        Ray.prototype.intersectTrimesh = function (mesh, quat, position, body, reportedShape, options) {
-            var normal = intersectTrimesh_normal;
-            var triangles = intersectTrimesh_triangles;
-            var treeTransform = intersectTrimesh_treeTransform;
-            var minDistNormal = intersectConvex_minDistNormal;
-            var vector = intersectConvex_vector;
-            var minDistIntersect = intersectConvex_minDistIntersect;
-            var localAABB = intersectTrimesh_localAABB;
-            var localDirection = intersectTrimesh_localDirection;
-            var localFrom = intersectTrimesh_localFrom;
-            var localTo = intersectTrimesh_localTo;
-            var worldIntersectPoint = intersectTrimesh_worldIntersectPoint;
-            var worldNormal = intersectTrimesh_worldNormal;
-            var faceList = (options && options.faceList) || null;
+        Ray.prototype.intersectTrimesh = function (mesh, quat, position, body, reportedShape) {
+            var normal = new feng3d.Vector3();
+            var triangles = [];
+            var treeTransform = new CANNON.Transform();
+            var vector = new feng3d.Vector3();
+            var localDirection = new feng3d.Vector3();
+            var localFrom = new feng3d.Vector3();
+            var localTo = new feng3d.Vector3();
+            var worldIntersectPoint = new feng3d.Vector3();
+            var worldNormal = new feng3d.Vector3();
             // Checking faces
-            var indices = mesh.indices, vertices = mesh.vertices, normals = mesh.faceNormals;
+            var indices = mesh.indices;
             var from = this.from;
             var to = this.to;
             var direction = this._direction;
-            var minDist = -1;
             treeTransform.position.copy(position);
             treeTransform.quaternion.copy(quat);
             // Transform ray to local space!
@@ -42790,6 +42519,9 @@ var CANNON;
             localDirection.normalize();
             var fromToDistanceSquared = localFrom.distanceSquared(localTo);
             mesh.tree.rayQuery(this, treeTransform, triangles);
+            var a = new feng3d.Vector3();
+            var b = new feng3d.Vector3();
+            var c = new feng3d.Vector3();
             for (var i = 0, N = triangles.length; !this.result._shouldStop && i !== N; i++) {
                 var trianglesIndex = triangles[i];
                 mesh.getNormal(trianglesIndex, normal);
@@ -42866,6 +42598,9 @@ var CANNON;
          * As per "Barycentric Technique" as named here http://www.blackpawn.com/texts/pointinpoly/default.html But without the division
          */
         Ray.pointInTriangle = function (p, a, b, c) {
+            var v0 = new feng3d.Vector3();
+            var v1 = new feng3d.Vector3();
+            var v2 = new feng3d.Vector3();
             c.subTo(a, v0);
             b.subTo(a, v1);
             p.subTo(a, v2);
@@ -42885,44 +42620,7 @@ var CANNON;
         return Ray;
     }());
     CANNON.Ray = Ray;
-    var tmpAABB = new CANNON.AABB();
-    var tmpArray = [];
-    var v1 = new feng3d.Vector3();
-    var v2 = new feng3d.Vector3();
-    var intersectBody_xi = new feng3d.Vector3();
-    var intersectBody_qi = new feng3d.Quaternion();
-    var vector = new feng3d.Vector3();
-    var normal = new feng3d.Vector3();
     var intersectPoint = new feng3d.Vector3();
-    var a = new feng3d.Vector3();
-    var b = new feng3d.Vector3();
-    var c = new feng3d.Vector3();
-    var d = new feng3d.Vector3();
-    var tmpRaycastResult = new CANNON.RaycastResult();
-    var v0 = new feng3d.Vector3();
-    var intersect = new feng3d.Vector3();
-    var intersectTrimesh_normal = new feng3d.Vector3();
-    var intersectTrimesh_localDirection = new feng3d.Vector3();
-    var intersectTrimesh_localFrom = new feng3d.Vector3();
-    var intersectTrimesh_localTo = new feng3d.Vector3();
-    var intersectTrimesh_worldNormal = new feng3d.Vector3();
-    var intersectTrimesh_worldIntersectPoint = new feng3d.Vector3();
-    var intersectTrimesh_localAABB = new CANNON.AABB();
-    var intersectTrimesh_triangles = [];
-    var intersectTrimesh_treeTransform = new CANNON.Transform();
-    var intersectConvexOptions = {
-        faceList: [0]
-    };
-    var worldPillarOffset = new feng3d.Vector3();
-    var intersectHeightfield_localRay = new Ray();
-    var intersectHeightfield_index = [];
-    var intersectHeightfield_minMax = [];
-    var Ray_intersectSphere_intersectionPoint = new feng3d.Vector3();
-    var Ray_intersectSphere_normal = new feng3d.Vector3();
-    var intersectConvex_normal = new feng3d.Vector3();
-    var intersectConvex_minDistNormal = new feng3d.Vector3();
-    var intersectConvex_minDistIntersect = new feng3d.Vector3();
-    var intersectConvex_vector = new feng3d.Vector3();
     Ray.prototype[CANNON.ShapeType.BOX] = Ray.prototype["intersectBox"];
     Ray.prototype[CANNON.ShapeType.PLANE] = Ray.prototype["intersectPlane"];
     Ray.prototype[CANNON.ShapeType.HEIGHTFIELD] = Ray.prototype["intersectHeightfield"];
@@ -42931,12 +42629,12 @@ var CANNON;
     Ray.prototype[CANNON.ShapeType.CONVEXPOLYHEDRON] = Ray.prototype["intersectConvex"];
     function distanceFromIntersection(from, direction, position) {
         // v0 is vector from from to position
-        position.vsub(from, v0);
+        var v0 = position.subTo(from);
         var dot = v0.dot(direction);
         // intersect = direction*dot + from
-        direction.mult(dot, intersect);
+        var intersect = direction.multiplyNumberTo(dot);
         intersect.addTo(from, intersect);
-        var distance = position.distanceTo(intersect);
+        var distance = position.distance(intersect);
         return distance;
     }
 })(CANNON || (CANNON = {}));
@@ -44578,6 +44276,9 @@ var CANNON;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 方程式
+     */
     var Equation = /** @class */ (function () {
         /**
          * Equation base class
@@ -44943,25 +44644,19 @@ var CANNON;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 求解器
+     */
     var Solver = /** @class */ (function () {
         /**
-         * Constraint equation solver base class.
-         * @author schteppe / https://github.com/schteppe
+         * 约束方程求解器基类
          */
         function Solver() {
             this.equations = [];
         }
         /**
-         * Should be implemented in subclasses!
-         * @param dt
-         * @param world
-         */
-        Solver.prototype.solve = function (dt, world) {
-            // Should return the number of iterations done!
-            return 0;
-        };
-        /**
-         * Add an equation
+         * 添加方程
+         *
          * @param eq
          */
         Solver.prototype.addEquation = function (eq) {
@@ -44970,7 +44665,8 @@ var CANNON;
             }
         };
         /**
-         * Remove an equation
+         * 移除方程式
+         *
          * @param eq
          */
         Solver.prototype.removeEquation = function (eq) {
@@ -44981,7 +44677,7 @@ var CANNON;
             }
         };
         /**
-         * Add all equations
+         * 移除所有方程式
          */
         Solver.prototype.removeAllEquations = function () {
             this.equations.length = 0;
@@ -44992,22 +44688,33 @@ var CANNON;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
+    /**
+     * 约束方程 Gauss-Seidel 求解器
+     */
     var GSSolver = /** @class */ (function (_super) {
         __extends(GSSolver, _super);
-        /**
-         * Constraint equation Gauss-Seidel solver.
-         * @todo The spook parameters should be specified for each constraint, not globally.
-         * @author schteppe / https://github.com/schteppe
-         * @see https://www8.cs.umu.se/kurser/5DV058/VT09/lectures/spooknotes.pdf
-         */
         function GSSolver() {
-            var _this = _super.call(this) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            /**
+             * 求解器迭代的次数
+             *
+             * 求解器迭代的次数决定了约束条件的质量。迭代越多，模拟就越正确。然而，更多的迭代需要更多的计算。如果你的世界有很大的重力，你将需要更多的迭代。
+             */
             _this.iterations = 10;
+            /**
+             * 容差
+             *
+             * 当达到容差时，假定系统是收敛的。
+             */
             _this.tolerance = 1e-7;
             return _this;
         }
         GSSolver.prototype.solve = function (dt, world) {
-            var iter = 0, maxIter = this.iterations, tolSquared = this.tolerance * this.tolerance, equations = this.equations, Neq = equations.length, bodies = world.bodies, Nbodies = bodies.length, h = dt, q, B, invC, deltalambda, deltalambdaTot, GWlambda, lambdaj;
+            var iter = 0;
+            var equations = this.equations;
+            var Neq = equations.length;
+            var bodies = world.bodies;
+            var Nbodies = bodies.length;
             // Update solve mass
             if (Neq !== 0) {
                 for (var i = 0; i !== Nbodies; i++) {
@@ -45015,14 +44722,16 @@ var CANNON;
                 }
             }
             // Things that does not change during iteration can be computed once
-            var invCs = GSSolver_solve_invCs, Bs = GSSolver_solve_Bs, lambda = GSSolver_solve_lambda;
+            var invCs = [];
+            var Bs = [];
+            var lambda = [];
             invCs.length = Neq;
             Bs.length = Neq;
             lambda.length = Neq;
             for (var i = 0; i !== Neq; i++) {
                 var c = equations[i];
                 lambda[i] = 0.0;
-                Bs[i] = c.computeB(h, 0, 0);
+                Bs[i] = c.computeB(dt, 0, 0);
                 invCs[i] = 1.0 / c.computeC();
             }
             if (Neq !== 0) {
@@ -45033,17 +44742,17 @@ var CANNON;
                     wlambda.init(0, 0, 0);
                 }
                 // Iterate over equations
-                for (iter = 0; iter !== maxIter; iter++) {
+                for (iter = 0; iter !== this.iterations; iter++) {
                     // Accumulate the total error for each iteration.
-                    deltalambdaTot = 0.0;
+                    var deltalambdaTot = 0.0;
                     for (var j = 0; j !== Neq; j++) {
                         var c = equations[j];
                         // Compute iteration
-                        B = Bs[j];
-                        invC = invCs[j];
-                        lambdaj = lambda[j];
-                        GWlambda = c.computeGWlambda();
-                        deltalambda = invC * (B - GWlambda - c.eps * lambdaj);
+                        var B = Bs[j];
+                        var invC = invCs[j];
+                        var lambdaj = lambda[j];
+                        var GWlambda = c.computeGWlambda();
+                        var deltalambda = invC * (B - GWlambda - c.eps * lambdaj);
                         // Clamp if we are not within the min/max interval
                         if (lambdaj + deltalambda < c.minForce) {
                             deltalambda = c.minForce - lambdaj;
@@ -45056,7 +44765,7 @@ var CANNON;
                         c.addToWlambda(deltalambda);
                     }
                     // If the total error is small enough - stop iterate
-                    if (deltalambdaTot * deltalambdaTot < tolSquared) {
+                    if (deltalambdaTot * deltalambdaTot < this.tolerance * this.tolerance) {
                         break;
                     }
                 }
@@ -45070,7 +44779,7 @@ var CANNON;
                 }
                 // Set the .multiplier property of each equation
                 var l = equations.length;
-                var invDt = 1 / h;
+                var invDt = 1 / dt;
                 while (l--) {
                     equations[l].multiplier = lambda[l] * invDt;
                 }
@@ -45080,9 +44789,6 @@ var CANNON;
         return GSSolver;
     }(CANNON.Solver));
     CANNON.GSSolver = GSSolver;
-    var GSSolver_solve_lambda = []; // Just temporary number holders that we want to reuse each solve.
-    var GSSolver_solve_invCs = [];
-    var GSSolver_solve_Bs = [];
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
@@ -46183,21 +45889,21 @@ var CANNON;
             }
         };
         Narrowphase.prototype.boxBox = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
-            si.convexPolyhedronRepresentation.material = si.material;
-            sj.convexPolyhedronRepresentation.material = sj.material;
-            si.convexPolyhedronRepresentation.collisionResponse = si.collisionResponse;
-            sj.convexPolyhedronRepresentation.collisionResponse = sj.collisionResponse;
-            return this.convexConvex(si.convexPolyhedronRepresentation, sj.convexPolyhedronRepresentation, transformi, transformj, bi, bj, si, sj, justTest);
+            si.material = si.material;
+            sj.material = sj.material;
+            si.collisionResponse = si.collisionResponse;
+            sj.collisionResponse = sj.collisionResponse;
+            return this.convexConvex(si, sj, transformi, transformj, bi, bj, si, sj, justTest);
         };
         Narrowphase.prototype.boxConvex = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
-            si.convexPolyhedronRepresentation.material = si.material;
-            si.convexPolyhedronRepresentation.collisionResponse = si.collisionResponse;
-            return this.convexConvex(si.convexPolyhedronRepresentation, sj, transformi, transformj, bi, bj, si, sj, justTest);
+            si.material = si.material;
+            si.collisionResponse = si.collisionResponse;
+            return this.convexConvex(si, sj, transformi, transformj, bi, bj, si, sj, justTest);
         };
         Narrowphase.prototype.boxParticle = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
-            si.convexPolyhedronRepresentation.material = si.material;
-            si.convexPolyhedronRepresentation.collisionResponse = si.collisionResponse;
-            return this.convexParticle(si.convexPolyhedronRepresentation, sj, transformi, transformj, bi, bj, si, sj, justTest);
+            si.material = si.material;
+            si.collisionResponse = si.collisionResponse;
+            return this.convexParticle(si, sj, transformi, transformj, bi, bj, si, sj, justTest);
         };
         Narrowphase.prototype.sphereSphere = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
             if (justTest) {
@@ -46395,7 +46101,8 @@ var CANNON;
             }
             triangles.length = 0;
         };
-        Narrowphase.prototype.spherePlane = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
+        Narrowphase.prototype.spherePlane = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
+            var xi = transformi.position, xj = transformj.position, qi = transformi.quaternion, qj = transformj.quaternion;
             // We will have one contact in this case
             var r = this.createContactEquation(bi, bj, si, sj, rsi, rsj);
             // Contact normal
@@ -46424,13 +46131,13 @@ var CANNON;
                 this.createFrictionEquationsFromContact(r, this.frictionResult);
             }
         };
-        Narrowphase.prototype.sphereBox = function (si, sj, xi, xj, qi, qj, bi, bj, rsi, rsj, justTest) {
+        Narrowphase.prototype.sphereBox = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
+            var xi = transformi.position, xj = transformj.position, qi = transformi.quaternion, qj = transformj.quaternion;
             // we refer to the box as body j
             var sides = sphereBox_sides;
             xi.subTo(xj, box_to_sphere);
             sj.getSideNormals(sides, qj);
             var R = si.radius;
-            var penetrating_sides = [];
             // Check side (plane) intersections
             var found = false;
             // Store the resulting side penetration info
@@ -46762,10 +46469,10 @@ var CANNON;
             }
         };
         Narrowphase.prototype.planeBox = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
-            sj.convexPolyhedronRepresentation.material = sj.material;
-            sj.convexPolyhedronRepresentation.collisionResponse = sj.collisionResponse;
-            sj.convexPolyhedronRepresentation.id = sj.id;
-            return this.planeConvex(si, sj.convexPolyhedronRepresentation, transformi, transformj, bi, bj, si, sj, justTest);
+            sj.material = sj.material;
+            sj.collisionResponse = sj.collisionResponse;
+            sj.id = sj.id;
+            return this.planeConvex(si, sj, transformi, transformj, bi, bj, si, sj, justTest);
         };
         Narrowphase.prototype.planeConvex = function (planeShape, convexShape, planeTransform, convexTransform, planeBody, convexBody, si, sj, justTest) {
             var planePosition = planeTransform.position, convexPosition = convexTransform.position, planeQuat = planeTransform.quaternion, convexQuat = convexTransform.quaternion;
@@ -46828,8 +46535,8 @@ var CANNON;
                     }
                     var r = this.createContactEquation(bi, bj, si, sj, rsi, rsj), ri = r.ri, rj = r.rj;
                     sepAxis.negateTo(r.ni);
-                    res[j].normal.negate(q);
-                    q.multiplyTo(res[j].depth, q);
+                    res[j].normal.negateTo(q);
+                    q.multiplyNumberTo(res[j].depth, q);
                     res[j].point.addTo(q, ri);
                     rj.copy(res[j].point);
                     // Contact points are in world coordinates. Transform back to relative
@@ -47031,9 +46738,9 @@ var CANNON;
             }
         };
         Narrowphase.prototype.boxHeightfield = function (si, sj, transformi, transformj, bi, bj, rsi, rsj, justTest) {
-            si.convexPolyhedronRepresentation.material = si.material;
-            si.convexPolyhedronRepresentation.collisionResponse = si.collisionResponse;
-            return this.convexHeightfield(si.convexPolyhedronRepresentation, sj, transformi, transformj, bi, bj, si, sj, justTest);
+            si.material = si.material;
+            si.collisionResponse = si.collisionResponse;
+            return this.convexHeightfield(si, sj, transformi, transformj, bi, bj, si, sj, justTest);
         };
         Narrowphase.prototype.convexHeightfield = function (convexShape, hfShape, convexTransform, hfTransform, convexBody, hfBody, rsi, rsj, justTest) {
             var convexPos = convexTransform.position;
@@ -47518,6 +47225,139 @@ var feng3d;
         return CylinderCollider;
     }(feng3d.Collider));
     feng3d.CylinderCollider = CylinderCollider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * 胶囊体碰撞体
+     */
+    var CapsuleCollider = /** @class */ (function (_super) {
+        __extends(CapsuleCollider, _super);
+        function CapsuleCollider() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._radius = 0.5;
+            _this._height = 1;
+            _this._segmentsW = 16;
+            _this._segmentsH = 15;
+            _this._yUp = true;
+            return _this;
+        }
+        Object.defineProperty(CapsuleCollider.prototype, "radius", {
+            /**
+             * 胶囊体半径
+             */
+            get: function () {
+                return this._radius;
+            },
+            set: function (v) {
+                if (this._radius == v)
+                    return;
+                this._radius = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleCollider.prototype, "height", {
+            /**
+             * 胶囊体高度
+             */
+            get: function () {
+                return this._height;
+            },
+            set: function (v) {
+                if (this._height == v)
+                    return;
+                this._height = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleCollider.prototype, "segmentsW", {
+            /**
+             * 横向分割数
+             */
+            get: function () {
+                return this._segmentsW;
+            },
+            set: function (v) {
+                if (this._segmentsW == v)
+                    return;
+                this._segmentsW = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleCollider.prototype, "segmentsH", {
+            /**
+             * 纵向分割数
+             */
+            get: function () {
+                return this._segmentsH;
+            },
+            set: function (v) {
+                if (this._segmentsH == v)
+                    return;
+                this._segmentsH = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleCollider.prototype, "yUp", {
+            /**
+             * 正面朝向 true:Y+ false:Z+
+             */
+            get: function () {
+                return this._yUp;
+            },
+            set: function (v) {
+                if (this._yUp == v)
+                    return;
+                this._yUp = v;
+                this.invalidateGeometry();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CapsuleCollider.prototype.init = function () {
+            this.invalidateGeometry();
+        };
+        CapsuleCollider.prototype.invalidateGeometry = function () {
+            var g = new feng3d.CapsuleGeometry();
+            g.radius = this._radius;
+            g.height = this._height;
+            g.segmentsW = this._segmentsW;
+            g.segmentsH = this._segmentsH;
+            g.yUp = this._yUp;
+            g.updateGrometry();
+            this._shape = new CANNON.Trimesh(g.positions, g.indices);
+        };
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "radius", null);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "height", null);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "segmentsW", null);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "segmentsH", null);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "yUp", null);
+        return CapsuleCollider;
+    }(feng3d.Collider));
+    feng3d.CapsuleCollider = CapsuleCollider;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {

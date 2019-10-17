@@ -6035,7 +6035,7 @@ declare namespace feng3d {
         /**
          * 是否与盒子相交
          */
-        intersectsBox(box: Box): boolean;
+        intersectsBox(box: AABB): boolean;
         /**
          * 与指定点最近的点
          * @param point 点
@@ -6116,21 +6116,21 @@ declare namespace feng3d {
     /**
      * 长方体，盒子
      */
-    class Box {
+    class AABB {
         /**
          * 从一组顶点初始化盒子
          * @param positions 坐标数据列表
          */
-        static formPositions(positions: number[]): Box;
+        static formPositions(positions: number[]): AABB;
         /**
          * 从一组点初始化盒子
          * @param ps 点列表
          */
-        static fromPoints(ps: Vector3[]): Box;
+        static fromPoints(ps: Vector3[]): AABB;
         /**
          * 随机盒子
          */
-        static random(): Box;
+        static random(): AABB;
         /**
          * 最小点
          */
@@ -6192,11 +6192,11 @@ declare namespace feng3d {
          * 应用矩阵
          * @param mat 矩阵
          */
-        applyMatrix3DTo(mat: Matrix4x4, out?: Box): Box;
+        applyMatrix3DTo(mat: Matrix4x4, out?: AABB): AABB;
         /**
          *
          */
-        clone(): Box;
+        clone(): AABB;
         /**
          * 是否包含指定点
          * @param p 点
@@ -6206,24 +6206,24 @@ declare namespace feng3d {
          * 是否包含盒子
          * @param box 盒子
          */
-        containsBox(box: Box): boolean;
+        containsBox(box: AABB): boolean;
         /**
          * 拷贝
          * @param box 盒子
          */
-        copy(box: Box): this;
+        copy(box: AABB): this;
         /**
          * 比较盒子是否相等
          * @param box 盒子
          */
-        equals(box: Box): boolean;
+        equals(box: AABB): boolean;
         /**
          * 膨胀盒子
          * @param dx x方向膨胀量
          * @param dy y方向膨胀量
          * @param dz z方向膨胀量
          */
-        inflate(dx: any, dy: any, dz: any): void;
+        inflate(dx: number, dy: number, dz: number): void;
         /**
          * 膨胀盒子
          * @param delta 膨胀量
@@ -6233,17 +6233,17 @@ declare namespace feng3d {
          * 与盒子相交
          * @param box 盒子
          */
-        intersection(box: Box): this;
+        intersection(box: AABB): this;
         /**
          * 与盒子相交
          * @param box 盒子
          */
-        intersectionTo(box: Box, vbox?: Box): Box;
+        intersectionTo(box: AABB, vbox?: AABB): AABB;
         /**
          * 盒子是否相交
          * @param box 盒子
          */
-        intersects(box: Box): boolean;
+        intersects(box: AABB): boolean;
         /**
          * 与射线相交
          * @param position 射线起点
@@ -6253,11 +6253,10 @@ declare namespace feng3d {
          */
         rayIntersection(position: Vector3, direction: Vector3, targetNormal: Vector3): number;
         /**
-         * Finds the closest point on the Box to another given point. This can be used for maximum error calculations for content within a given Box.
+         * 获取长方体上距离指定点最近的点
          *
-         * @param point The point for which to find the closest point on the Box
-         * @param target An optional Vector3 to store the result to prevent creating a new object.
-         * @return
+         * @param point 指定点
+         * @param target 存储最近的点
          */
         closestPointToPoint(point: Vector3, target?: Vector3): Vector3;
         /**
@@ -6286,13 +6285,14 @@ declare namespace feng3d {
          * 联合盒子
          * @param box 盒子
          */
-        union(box: Box): Box;
+        union(box: AABB): AABB;
         /**
          * 是否与球相交
          * @param sphere 球
          */
         intersectsSphere(sphere: Sphere): boolean;
         /**
+         * 夹紧？
          *
          * @param point 点
          * @param pout 输出点
@@ -6389,7 +6389,7 @@ declare namespace feng3d {
          * 是否与盒子相交
          * @param box 盒子
          */
-        intersectsBox(box: Box): boolean;
+        intersectsBox(box: AABB): boolean;
         /**
          * 是否与平面相交
          * @param plane 平面
@@ -6404,7 +6404,7 @@ declare namespace feng3d {
         /**
          * 获取包围盒
          */
-        getBoundingBox(box?: Box): Box;
+        getBoundingBox(box?: AABB): AABB;
         /**
          * 应用矩阵
          * @param matrix 矩阵
@@ -6599,14 +6599,14 @@ declare namespace feng3d {
          * 从盒子初始化
          * @param box 盒子
          */
-        static fromBox(box: Box): TriangleGeometry;
+        static fromBox(box: AABB): TriangleGeometry;
         triangles: Triangle3D[];
         constructor(triangles?: Triangle3D[]);
         /**
          * 从盒子初始化
          * @param box 盒子
          */
-        fromBox(box: Box): this;
+        fromBox(box: AABB): this;
         /**
          * 获取所有顶点，去除重复顶点
          */
@@ -6619,7 +6619,7 @@ declare namespace feng3d {
         /**
          * 包围盒
          */
-        getBox(box?: Box): Box;
+        getBox(box?: AABB): AABB;
         /**
          * 与指定点最近的点
          * @param point 点
@@ -12776,7 +12776,7 @@ declare namespace feng3d {
         /**
          * 世界包围盒
          */
-        readonly worldBounds: Box;
+        readonly worldBounds: AABB;
         /**
          * 监听对象的所有事件并且传播到所有组件中
          */
@@ -13071,11 +13071,11 @@ declare namespace feng3d {
         /**
          * 自身局部包围盒
          */
-        readonly selfLocalBounds: Box;
+        readonly selfLocalBounds: AABB;
         /**
          * 自身世界包围盒
          */
-        readonly selfWorldBounds: Box;
+        readonly selfWorldBounds: AABB;
         constructor();
         init(): void;
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene3d: Scene3D, camera: Camera): void;
@@ -13493,7 +13493,7 @@ declare namespace feng3d {
          * 包围盒失效
          */
         invalidateBounds(): void;
-        readonly bounding: Box;
+        readonly bounding: AABB;
         /**
          * 射线投影几何体
          * @param ray                           射线
@@ -13652,7 +13652,7 @@ declare namespace feng3d {
          * 获取包围盒
          * @param positions 顶点数据
          */
-        getAABB(positions: number[]): Box;
+        getAABB(positions: number[]): AABB;
     }
 }
 declare namespace feng3d {
@@ -13789,7 +13789,7 @@ declare namespace feng3d {
          *
          * 一个包含可视空间的最小包围盒
          */
-        readonly viewBox: Box;
+        readonly viewBox: AABB;
         /**
          * 摄像机空间坐标投影到GPU空间坐标
          * @param point3d 摄像机空间坐标
@@ -13829,7 +13829,7 @@ declare namespace feng3d {
         private _invertMatrixInvalid;
         private _inverseMatrix;
         private _viewBoxInvalid;
-        protected _viewBox: Box;
+        protected _viewBox: AABB;
         protected _matrix: Matrix4x4;
         /**
          * 投影矩阵失效
@@ -13956,7 +13956,7 @@ declare namespace feng3d {
         /**
          * 可视包围盒
          */
-        readonly viewBox: Box;
+        readonly viewBox: AABB;
         /**
          * 创建一个摄像机
          */
@@ -13993,7 +13993,7 @@ declare namespace feng3d {
          * 是否与盒子相交
          * @param box 盒子
          */
-        intersectsBox(box: Box): boolean;
+        intersectsBox(box: AABB): boolean;
         /**
          * 处理场景变换改变事件
          */
@@ -17759,35 +17759,55 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
-    class Shape {
+    abstract class Shape {
         /**
-         * Identifyer of the Shape.
+         * 编号
          */
         id: number;
         /**
-         * The type of this shape. Must be set to an int > 0 by subclasses.
+         * 形状类型
          */
-        type: number;
+        type: ShapeType;
         /**
-         * The local bounding sphere radius of this shape.
+         * 此形状的局部包围球半径
          */
         boundingSphereRadius: number;
         /**
          * Whether to produce contact forces when in contact with other bodies. Note that contacts will be generated, but they will be disabled.
+         * 是否响应碰撞
          */
         collisionResponse: boolean;
         collisionFilterGroup: number;
         collisionFilterMask: number;
+        /**
+         * 材质
+         */
         material: Material;
+        /**
+         * 物体
+         */
         body: Body;
+        /**
+         * 面数组
+         */
         faces: number[][];
+        /**
+         * 顶点索引数组
+         */
         indices: number[];
+        /**
+         * 顶点坐标数组
+         */
         vertices: feng3d.Vector3[] | number[];
+        /**
+         * 面法线数组
+         */
         faceNormals: feng3d.Vector3[];
-        convexPolyhedronRepresentation: ConvexPolyhedron;
+        /**
+         * 半径
+         */
         radius: number;
         /**
-         * Base class for shapes
          *
          * @param options
          * @author schteppe
@@ -17800,43 +17820,74 @@ declare namespace CANNON {
             material?: any;
         });
         /**
-         * Computes the bounding sphere radius. The result is stored in the property .boundingSphereRadius
+         * 计算包围球半径。结果存储在.boundingSphereRadius属性中
          */
-        updateBoundingSphereRadius(): void;
+        abstract updateBoundingSphereRadius(): void;
         /**
-         * Get the volume of this shape
+         * 得到这个形状的体积
          */
-        volume(): void;
+        abstract volume(): number;
         /**
-         * Calculates the inertia in the local frame for this shape.
-         * @param mass
+         * 计算此形状在局部框架中的惯性。
+         *
+         * @param mass 质量
          * @param target
          * @see http://en.wikipedia.org/wiki/List_of_moments_of_inertia
          */
-        calculateLocalInertia(mass: number, target: feng3d.Vector3): void;
-        calculateWorldAABB(pos: feng3d.Vector3, quat: feng3d.Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
+        abstract calculateLocalInertia(mass: number, target: feng3d.Vector3): void;
+        /**
+         * 计算世界包围盒
+         *
+         * @param pos 世界坐标
+         * @param quat 世界旋转
+         * @param min 最小坐标
+         * @param max 最大坐标
+         */
+        abstract calculateWorldAABB(pos: feng3d.Vector3, quat: feng3d.Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
+        /**
+         * 编号计数器
+         */
         static idCounter: number;
     }
 }
 declare namespace CANNON {
+    /**
+     * 凸多面体
+     */
     class ConvexPolyhedron extends Shape {
+        /**
+         * 顶点数组
+         */
         vertices: feng3d.Vector3[];
+        /**
+         * 世界空间顶点数组
+         */
         worldVertices: feng3d.Vector3[];
+        /**
+         * 是否需要更新世界空间顶点数组
+         */
         worldVerticesNeedsUpdate: boolean;
         /**
          * Array of integer arrays, indicating which vertices each face consists of
          */
-        faces: ({
-            connectedFaces: number[];
-        } & (number[]))[];
+        faces: number[][];
+        /**
+         * 面法线数组
+         */
         faceNormals: feng3d.Vector3[];
         worldFaceNormalsNeedsUpdate: boolean;
+        /**
+         * 世界空间面法线数组
+         */
         worldFaceNormals: feng3d.Vector3[];
+        /**
+         * 边数组
+         */
         uniqueEdges: feng3d.Vector3[];
         /**
          * If given, these locally defined, normalized axes are the only ones being checked when doing separating axis check.
          */
-        uniqueAxes: any[];
+        uniqueAxes: feng3d.Vector3[];
         /**
          * A set of polygons describing a convex shape.
          * @class ConvexPolyhedron
@@ -17856,17 +17907,17 @@ declare namespace CANNON {
          * @todo Move the clipping functions to ContactGenerator?
          * @todo Automatically merge coplanar polygons in constructor.
          */
-        constructor(points?: feng3d.Vector3[], faces?: number[][], uniqueAxes?: any[]);
+        constructor(points?: feng3d.Vector3[], faces?: number[][], uniqueAxes?: feng3d.Vector3[]);
         /**
-         * Computes uniqueEdges
+         * 计算边数组
          */
         computeEdges(): void;
         /**
-         * Compute the normals of the faces. Will reuse existing Vec3 objects in the .faceNormals array if they exist.
+         * 计算这些面的法线。将重用. facenormals数组中现有的Vec3对象(如果它们存在的话)。
          */
         computeNormals(): void;
         /**
-         * Get face normal given 3 vertices
+         * 得到3个顶点的法向量
          *
          * @param va
          * @param vb
@@ -17875,7 +17926,7 @@ declare namespace CANNON {
          */
         static computeNormal(va: feng3d.Vector3, vb: feng3d.Vector3, vc: feng3d.Vector3, target: feng3d.Vector3): void;
         /**
-         * Compute the normal of a face from its vertices
+         * 从顶点计算面法线
          *
          * @param i
          * @param target
@@ -17893,7 +17944,11 @@ declare namespace CANNON {
          * @param result The an array of contact point objects, see clipFaceAgainstHull
          * @see http://bullet.googlecode.com/svn/trunk/src/BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.cpp
          */
-        clipAgainstHull(posA: feng3d.Vector3, quatA: feng3d.Quaternion, hullB: ConvexPolyhedron, posB: feng3d.Vector3, quatB: feng3d.Quaternion, separatingNormal: feng3d.Vector3, minDist: number, maxDist: number, result: number[]): void;
+        clipAgainstHull(posA: feng3d.Vector3, quatA: feng3d.Quaternion, hullB: ConvexPolyhedron, posB: feng3d.Vector3, quatB: feng3d.Quaternion, separatingNormal: feng3d.Vector3, minDist: number, maxDist: number, result: {
+            point: feng3d.Vector3;
+            normal: feng3d.Vector3;
+            depth: number;
+        }[]): void;
         /**
          * Find the separating axis between this hull and another
          *
@@ -17938,7 +17993,11 @@ declare namespace CANNON {
          * @param maxDist
          * @param result Array to store resulting contact points in. Will be objects with properties: point, depth, normal. These are represented in world coordinates.
          */
-        clipFaceAgainstHull(separatingNormal: feng3d.Vector3, posA: feng3d.Vector3, quatA: feng3d.Quaternion, worldVertsB1: feng3d.Vector3[], minDist: number, maxDist: number, result: any[]): void;
+        clipFaceAgainstHull(separatingNormal: feng3d.Vector3, posA: feng3d.Vector3, quatA: feng3d.Quaternion, worldVertsB1: feng3d.Vector3[], minDist: number, maxDist: number, result: {
+            point: feng3d.Vector3;
+            normal: feng3d.Vector3;
+            depth: number;
+        }[]): void;
         /**
          * Clip a face in a hull against the back of a plane.
          *
@@ -17948,8 +18007,14 @@ declare namespace CANNON {
          * @param planeConstant The constant in the mathematical plane equation
          */
         clipFaceAgainstPlane(inVertices: feng3d.Vector3[], outVertices: feng3d.Vector3[], planeNormal: feng3d.Vector3, planeConstant: number): feng3d.Vector3[];
+        /**
+         * 计算世界空间顶点数组
+         *
+         * @param position
+         * @param quat
+         */
         computeWorldVertices(position: feng3d.Vector3, quat: feng3d.Quaternion): void;
-        computeLocalAABB(aabbmin: any, aabbmax: any): void;
+        computeLocalAABB(aabbmin: feng3d.Vector3, aabbmax: feng3d.Vector3): void;
         /**
          * Updates .worldVertices and sets .worldVerticesNeedsUpdate to false.
          *
@@ -18001,67 +18066,62 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
-    class Box extends Shape {
+    /**
+     * 长方体
+     */
+    class Box extends ConvexPolyhedron {
         halfExtents: feng3d.Vector3;
         /**
-         * Used by the contact generator to make contacts with other convex polyhedra for example
-         */
-        convexPolyhedronRepresentation: ConvexPolyhedron;
-        /**
-         * A 3d box shape.
+         *
          * @param halfExtents
          * @author schteppe
          */
         constructor(halfExtents: feng3d.Vector3);
-        /**
-         * Updates the local convex polyhedron representation used for some collisions.
-         */
-        updateConvexPolyhedronRepresentation(): void;
         calculateLocalInertia(mass: number, target?: feng3d.Vector3): feng3d.Vector3;
         static calculateInertia(halfExtents: feng3d.Vector3, mass: number, target: feng3d.Vector3): void;
         /**
-         * Get the box 6 side normals
-         * @param sixTargetVectors An array of 6 vectors, to store the resulting side normals in.
-         * @param quat             Orientation to apply to the normal vectors. If not provided, the vectors will be in respect to the local frame.
+         * 得到长方体6面的法线
+         *
+         * @param sixTargetVectors 一个由6个向量组成的数组，用来存储产生的面法线。
+         * @param quat             将方向应用于法向量。如果没有提供，向量将是关于局部坐标系的。
          */
         getSideNormals(sixTargetVectors: feng3d.Vector3[], quat: feng3d.Quaternion): feng3d.Vector3[];
         volume(): number;
-        updateBoundingSphereRadius(): void;
-        forEachWorldCorner(pos: feng3d.Vector3, quat: feng3d.Quaternion, callback: Function): void;
-        calculateWorldAABB(pos: feng3d.Vector3, quat: feng3d.Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
     }
 }
 declare namespace CANNON {
+    /**
+     * 圆柱体
+     */
     class Cylinder extends ConvexPolyhedron {
         /**
-         * @param radiusTop
-         * @param radiusBottom
-         * @param height
-         * @param numSegments The number of segments to build the cylinder out of
-         *
-         * @author schteppe / https://github.com/schteppe
+         * @param radiusTop 顶部半径
+         * @param radiusBottom 底部半径
+         * @param height 高度
+         * @param numSegments 圆周分段数
          */
         constructor(radiusTop: number, radiusBottom: number, height: number, numSegments: number);
     }
 }
 declare namespace CANNON {
+    /**
+     * 高度场
+     */
     class Heightfield extends Shape {
         /**
-         * An array of numbers, or height values, that are spread out along the x axis.
-         * @property {array} data
+         * 沿x轴展开的一组数字或高度值。
          */
-        data: any[];
+        data: number[][];
         /**
-         * Max value of the data
+         * 最大值
          */
         maxValue: number;
         /**
-         * Max value of the data
+         * 最小值
          */
         minValue: number;
         /**
-          * The width of each element
-          * @todo elementSizeX and Y
+          * 每个元素的宽度
           */
         elementSize: number;
         cacheEnabled: boolean;
@@ -18095,30 +18155,25 @@ declare namespace CANNON {
          *     heightfieldBody.addShape(heightfieldShape);
          *     world.addBody(heightfieldBody);
          */
-        /**
-         *
-         * @param data
-         * @param options
-         */
-        constructor(data: any[], options?: {
+        constructor(data: number[][], options?: {
             maxValue?: number;
             minValue?: number;
             elementSize?: number;
         });
         /**
-         * Call whenever you change the data array.
+         * 更新
          */
         update(): void;
         /**
-         * Update the .minValue property
+         * 更新最小值
          */
         updateMinValue(): void;
         /**
-         * Update the .maxValue property
+         * 更新最大值
          */
         updateMaxValue(): void;
         /**
-         * Set the height value at an index. Don't forget to update maxValue and minValue after you're done.
+         * 在索引处设置高度值。完成后不要忘记更新maxValue和minValue。
          *
          * @param xi
          * @param yi
@@ -18126,29 +18181,46 @@ declare namespace CANNON {
          */
         setHeightValueAtIndex(xi: number, yi: number, value: number): void;
         /**
-         * Get max/min in a rectangle in the matrix data
+         * 获取矩形数据中的最大最小值
          *
          * @param iMinX
          * @param iMinY
          * @param iMaxX
          * @param iMaxY
-         * @param result An array to store the results in.
-         * @return The result array, if it was passed in. Minimum will be at position 0 and max at 1.
+         * @param result
          */
-        getRectMinMax(iMinX: number, iMinY: number, iMaxX: number, iMaxY: number, result: any[]): void;
+        getRectMinMax(iMinX: number, iMinY: number, iMaxX: number, iMaxY: number, result: number[]): void;
         /**
-         * Get the index of a local position on the heightfield. The indexes indicate the rectangles, so if your terrain is made of N x N height data points, you will have rectangle indexes ranging from 0 to N-1.
+         * 获取heightfield上本地位置的索引。索引表示矩形，因此，如果地形由N x N个高度数据点组成，则矩形索引的范围为0到N-1。
          *
          * @param x
          * @param y
-         * @param result Two-element array
-         * @param clamp If the position should be clamped to the heightfield edge.
+         * @param result
+         * @param clamp
          */
-        getIndexOfPosition(x: number, y: number, result: any[], clamp: boolean): boolean;
+        getIndexOfPosition(x: number, y: number, result: number[], clamp: boolean): boolean;
+        /**
+         * 获取三角形
+         *
+         * @param x
+         * @param y
+         * @param edgeClamp
+         * @param a
+         * @param b
+         * @param c
+         */
         getTriangleAt(x: number, y: number, edgeClamp: boolean, a: feng3d.Vector3, b: feng3d.Vector3, c: feng3d.Vector3): boolean;
+        /**
+         * 获取法线
+         *
+         * @param x
+         * @param y
+         * @param edgeClamp
+         * @param result
+         */
         getNormalAt(x: number, y: number, edgeClamp: boolean, result: feng3d.Vector3): void;
         /**
-         * Get an AABB of a square in the heightfield
+         * 获取指定位置的包围盒
          *
          * @param xi
          * @param yi
@@ -18156,19 +18228,52 @@ declare namespace CANNON {
          */
         getAabbAtIndex(xi: number, yi: number, result: AABB): void;
         /**
-         * Get the height in the heightfield at a given position
+         * 获取指定位置高度
          *
          * @param x
          * @param y
          * @param edgeClamp
          */
         getHeightAt(x: number, y: number, edgeClamp: boolean): number;
+        /**
+         * 获取缓冲键值
+         *
+         * @param xi
+         * @param yi
+         * @param getUpperTriangle
+         */
         getCacheConvexTrianglePillarKey(xi: number, yi: number, getUpperTriangle: boolean): string;
-        getCachedConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean): any;
+        /**
+         * 获取缓冲值
+         *
+         * @param xi
+         * @param yi
+         * @param getUpperTriangle
+         */
+        getCachedConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean): {
+            convex: ConvexPolyhedron;
+            offset: feng3d.Vector3;
+        };
+        /**
+         * 设置缓冲值
+         *
+         * @param xi
+         * @param yi
+         * @param getUpperTriangle
+         * @param convex
+         * @param offset
+         */
         setCachedConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean, convex: ConvexPolyhedron, offset: feng3d.Vector3): void;
+        /**
+         * 清楚缓冲
+         *
+         * @param xi
+         * @param yi
+         * @param getUpperTriangle
+         */
         clearCachedConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean): void;
         /**
-         * Get a triangle from the heightfield
+         * 获取三角形
          *
          * @param xi
          * @param yi
@@ -18179,7 +18284,7 @@ declare namespace CANNON {
          */
         getTriangle(xi: number, yi: number, upper: boolean, a: feng3d.Vector3, b: feng3d.Vector3, c: feng3d.Vector3): void;
         /**
-         * Get a triangle in the terrain in the form of a triangular convex shape.
+         * 在地形中以三角形凸形的形式得到一个三角形。
          *
          * @param i
          * @param j
@@ -18191,7 +18296,7 @@ declare namespace CANNON {
         calculateWorldAABB(pos: feng3d.Vector3, quat: feng3d.Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
         updateBoundingSphereRadius(): void;
         /**
-         * Sets the height values from an image. Currently only supported in browser.
+         * 设置图像的高度值。目前只支持浏览器。
          *
          * @param image
          * @param scale
@@ -18200,16 +18305,14 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
+    /**
+     * 粒子
+     */
     class Particle extends Shape {
         position: feng3d.Vector3;
         velocity: feng3d.Vector3;
         mass: number;
         force: feng3d.Vector3;
-        /**
-         * Particle shape.
-         *
-         * @author schteppe
-         */
         constructor();
         /**
          * @param mass
@@ -18222,13 +18325,15 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
+    /**
+     * 平面
+     */
     class Plane extends Shape {
         worldNormal: feng3d.Vector3;
         worldNormalNeedsUpdate: boolean;
+        boundingSphereRadius: number;
         /**
-         * A plane, facing in the Z direction. The plane has its surface at z=0 and everything below z=0 is assumed to be solid plane. To make the plane face in some other direction than z, you must put it inside a Body and rotate that body. See the demos.
          *
-         * @author schteppe
          */
         constructor();
         computeWorldNormal(quat: feng3d.Quaternion): void;
@@ -18239,7 +18344,13 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
+    /**
+     * 球体
+     */
     class Sphere extends Shape {
+        /**
+         * 半径
+         */
         radius: number;
         /**
          * 球体
@@ -18334,26 +18445,28 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
+    /**
+     * 三角网格
+     */
     class Trimesh extends Shape {
+        /**
+         * 顶点坐标数据
+         */
         vertices: number[];
         /**
-         * The normals data.
+         * 面法线数据
          */
-        normals: Float32Array;
+        normals: number[];
         /**
-         * The local AABB of the mesh.
+         * 包围盒
          */
         aabb: AABB;
         /**
-         * References to vertex pairs, making up all unique edges in the trimesh.
+         * 边数组
          */
-        edges: any[];
+        edges: number[];
         /**
-         * Local scaling of the mesh. Use .setScale() to set it.
-         */
-        scale: feng3d.Vector3;
-        /**
-         * The indexed triangles. Use .updateTree() to update it.
+         * 索引的三角形。使用. updatetree()更新它。
          */
         tree: Octree;
         /**
@@ -18373,43 +18486,42 @@ declare namespace CANNON {
          *     var trimeshShape = new Trimesh(vertices, indices);
          */
         constructor(vertices: number[], indices: number[]);
+        /**
+         * 更新树
+         */
         updateTree(): void;
         /**
-         * Get triangles in a local AABB from the trimesh.
+         * 从trimesh获取本地AABB中的三角形。
          *
          * @param aabb
-         * @param result An array of integers, referencing the queried triangles.
+         * @param result 一个整数数组，引用查询的三角形。
          */
-        getTrianglesInAABB(aabb: AABB, result: number[]): any[];
+        getTrianglesInAABB(aabb: AABB, result: number[]): number[];
         /**
-         * @param scale
-         */
-        setScale(scale: feng3d.Vector3): void;
-        /**
-         * Compute the normals of the faces. Will save in the .normals array.
+         * 计算法线
          */
         updateNormals(): void;
         /**
-         * Update the .edges property
+         * 更新边数组
          */
         updateEdges(): void;
         /**
-         * Get an edge vertex
+         * 获取边的顶点
          *
          * @param edgeIndex
-         * @param firstOrSecond 0 or 1, depending on which one of the vertices you need.
-         * @param vertexStore Where to store the result
+         * @param firstOrSecond 0还是1，取决于你需要哪个顶点。
+         * @param vertexStore 保存结果
          */
         getEdgeVertex(edgeIndex: number, firstOrSecond: number, vertexStore: feng3d.Vector3): void;
         /**
-         * Get a vector along an edge.
+         * 沿着一条边得到一个向量。
          *
          * @param edgeIndex
          * @param vectorStore
          */
         getEdgeVector(edgeIndex: number, vectorStore: feng3d.Vector3): void;
         /**
-         * Get face normal given 3 vertices
+         * 得到3个顶点的法向量
          *
          * @param va
          * @param vb
@@ -18418,7 +18530,7 @@ declare namespace CANNON {
          */
         static computeNormal(va: feng3d.Vector3, vb: feng3d.Vector3, vc: feng3d.Vector3, target: feng3d.Vector3): void;
         /**
-         * Get vertex i.
+         * 获取顶点
          *
          * @param i
          * @param out
@@ -18426,15 +18538,7 @@ declare namespace CANNON {
          */
         getVertex(i: number, out: feng3d.Vector3): feng3d.Vector3;
         /**
-         * Get raw vertex i
-         *
-         * @param i
-         * @param out
-         * @return The "out" vector object
-         */
-        private _getUnscaledVertex;
-        /**
-         * Get a vertex from the trimesh,transformed by the given position and quaternion.
+         * 通过给定的位置和四元数转换，从三元组中得到一个顶点。
          *
          * @param i
          * @param pos
@@ -18444,7 +18548,7 @@ declare namespace CANNON {
          */
         getWorldVertex(i: number, transform: Transform, out: feng3d.Vector3): feng3d.Vector3;
         /**
-         * Get the three vertices for triangle i.
+         * 从三角形中获取三个顶点
          *
          * @param i
          * @param a
@@ -18453,7 +18557,7 @@ declare namespace CANNON {
          */
         getTriangleVertices(i: number, a: feng3d.Vector3, b: feng3d.Vector3, c: feng3d.Vector3): void;
         /**
-         * Compute the normal of triangle i.
+         * 获取三角形的法线
          *
          * @param i
          * @param target
@@ -18468,36 +18572,32 @@ declare namespace CANNON {
          */
         calculateLocalInertia(mass: number, target: feng3d.Vector3): feng3d.Vector3;
         /**
-         * Compute the local AABB for the trimesh
+         * 计算包围盒
          *
          * @param aabb
          */
         computeLocalAABB(aabb: AABB): void;
         /**
-         * Update the .aabb property
+         * 更新包围盒
          */
         updateAABB(): void;
         /**
-         * Will update the .boundingSphereRadius property
+         * 更新此形状的局部包围球半径
          */
         updateBoundingSphereRadius(): void;
+        /**
+         * 计算世界包围盒
+         *
+         * @param pos
+         * @param quat
+         * @param min
+         * @param max
+         */
         calculateWorldAABB(pos: feng3d.Vector3, quat: feng3d.Quaternion, min: feng3d.Vector3, max: feng3d.Vector3): void;
         /**
-         * Get approximate volume
+         * 得到近似体积
          */
         volume(): number;
-        /**
-         * Create a Trimesh instance, shaped as a torus.
-         *
-         * @param radius
-         * @param tube
-         * @param radialSegments
-         * @param tubularSegments
-         * @param arc
-         *
-         * @return A torus
-         */
-        static createTorus(radius: number, tube: number, radialSegments: number, tubularSegments: number, arc: number): Trimesh;
     }
 }
 declare namespace CANNON {
@@ -18548,7 +18648,7 @@ declare namespace CANNON {
          * @param result
          * @return The "result" object
          */
-        aabbQuery(aabb: AABB, result: any[]): any[];
+        aabbQuery(aabb: AABB, result: number[]): number[];
         /**
          * Get all data, potentially intersected by a ray.
          *
@@ -18982,22 +19082,12 @@ declare namespace CANNON {
         private intersectSphere;
         private intersectConvex;
         /**
-         * @method intersectTrimesh
-         * @private
-         * @param  {Shape} shape
-         * @param  {Quaternion} quat
-         * @param  {Vector3} position
-         * @param  {Body} body
-         * @param {object} [options]
-         */
-        /**
          *
          * @param mesh
          * @param quat
          * @param position
          * @param body
          * @param reportedShape
-         * @param options
          *
          * @todo Optimize by transforming the world to local space first.
          * @todo Use Octree lookup
@@ -19804,6 +19894,9 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
+    /**
+     * 方程式
+     */
     class Equation {
         id: number;
         minForce: number;
@@ -20002,56 +20095,60 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
-    class Solver {
+    /**
+     * 求解器
+     */
+    abstract class Solver {
         /**
-         * All equations to be solved
+         * 求解的方程数组
          */
         equations: Equation[];
         /**
-         * Constraint equation solver base class.
-         * @author schteppe / https://github.com/schteppe
+         * 约束方程求解器基类
          */
         constructor();
         /**
-         * Should be implemented in subclasses!
+         * 求解
+         *
          * @param dt
          * @param world
          */
-        solve(dt: number, world: World): number;
+        abstract solve(dt: number, world: World): number;
         /**
-         * Add an equation
+         * 添加方程
+         *
          * @param eq
          */
         addEquation(eq: Equation): void;
         /**
-         * Remove an equation
+         * 移除方程式
+         *
          * @param eq
          */
         removeEquation(eq: Equation): void;
         /**
-         * Add all equations
+         * 移除所有方程式
          */
         removeAllEquations(): void;
     }
 }
 declare namespace CANNON {
+    /**
+     * 约束方程 Gauss-Seidel 求解器
+     */
     class GSSolver extends Solver {
         /**
-         * The number of solver iterations determines quality of the constraints in the world. The more iterations, the more correct simulation. More iterations need more computations though. If you have a large gravity force in your world, you will need more iterations.
-         * @todo write more about solver and iterations in the wiki
+         * 求解器迭代的次数
+         *
+         * 求解器迭代的次数决定了约束条件的质量。迭代越多，模拟就越正确。然而，更多的迭代需要更多的计算。如果你的世界有很大的重力，你将需要更多的迭代。
          */
         iterations: number;
         /**
-         * When tolerance is reached, the system is assumed to be converged.
+         * 容差
+         *
+         * 当达到容差时，假定系统是收敛的。
          */
         tolerance: number;
-        /**
-         * Constraint equation Gauss-Seidel solver.
-         * @todo The spook parameters should be specified for each constraint, not globally.
-         * @author schteppe / https://github.com/schteppe
-         * @see https://www8.cs.umu.se/kurser/5DV058/VT09/lectures/spooknotes.pdf
-         */
-        constructor();
         solve(dt: number, world: World): number;
     }
 }
@@ -20392,10 +20489,10 @@ declare namespace CANNON {
          * @param {array} oldcontacts Optional. Array of reusable contact objects
          */
         getContacts(p1: Body[], p2: Body[], world: World, result: any[], oldcontacts: any[], frictionResult: any[], frictionPool: any[]): void;
-        boxBox(si: Shape, sj: Shape, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        boxConvex(si: Shape, sj: ConvexPolyhedron, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        boxParticle(si: Shape, sj: Shape, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereSphere(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        boxBox(si: Box, sj: Box, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        boxConvex(si: Box, sj: ConvexPolyhedron, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        boxParticle(si: Box, sj: Particle, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereSphere(si: Sphere, sj: Sphere, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         /**
          * @method planeTrimesh
          * @param  {Shape}      si
@@ -20407,13 +20504,13 @@ declare namespace CANNON {
          * @param  {Body}       bi
          * @param  {Body}       bj
          */
-        planeTrimesh(planeShape: Shape, trimeshShape: any, planeTransform: Transform, trimeshTransform: Transform, planeBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereTrimesh(sphereShape: Shape, trimeshShape: any, sphereTransform: Transform, trimeshTransform: Transform, sphereBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        spherePlane(si: Shape, sj: Shape, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereBox(si: Shape, sj: any, xi: feng3d.Vector3, xj: feng3d.Vector3, qi: feng3d.Quaternion, qj: feng3d.Quaternion, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereConvex(si: Shape, sj: Shape, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        planeBox(si: Shape, sj: Shape, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        planeConvex(planeShape: Shape, convexShape: any, planeTransform: Transform, convexTransform: Transform, planeBody: Body, convexBody: Body, si: Shape, sj: Shape, justTest: boolean): boolean;
+        planeTrimesh(planeShape: Plane, trimeshShape: Trimesh, planeTransform: Transform, trimeshTransform: Transform, planeBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereTrimesh(sphereShape: Sphere, trimeshShape: Trimesh, sphereTransform: Transform, trimeshTransform: Transform, sphereBody: Body, trimeshBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        spherePlane(si: Sphere, sj: Plane, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereBox(si: Sphere, sj: Box, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereConvex(si: Sphere, sj: ConvexPolyhedron, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        planeBox(si: Plane, sj: Box, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        planeConvex(planeShape: Plane, convexShape: ConvexPolyhedron, planeTransform: Transform, convexTransform: Transform, planeBody: Body, convexBody: Body, si: Shape, sj: Shape, justTest: boolean): boolean;
         convexConvex(si: ConvexPolyhedron, sj: ConvexPolyhedron, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean, faceListA?: any[], faceListB?: any[]): boolean;
         /**
          * @method convexTrimesh
@@ -20427,12 +20524,12 @@ declare namespace CANNON {
          * @param  {Body}       bi
          * @param  {Body}       bj
          */
-        planeParticle(sj: Shape, si: Shape, xj: feng3d.Vector3, xi: feng3d.Vector3, qj: feng3d.Quaternion, qi: feng3d.Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        planeParticle(sj: Plane, si: Particle, xj: feng3d.Vector3, xi: feng3d.Vector3, qj: feng3d.Quaternion, qi: feng3d.Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         sphereParticle(sj: Shape, si: Shape, xj: feng3d.Vector3, xi: feng3d.Vector3, qj: feng3d.Quaternion, qi: feng3d.Quaternion, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        convexParticle(sj: any, si: Shape, transformi: Transform, transformj: Transform, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        boxHeightfield(si: Shape, sj: Heightfield, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        convexParticle(sj: ConvexPolyhedron, si: Particle, transformi: Transform, transformj: Transform, bj: Body, bi: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        boxHeightfield(si: Box, sj: Heightfield, transformi: Transform, transformj: Transform, bi: Body, bj: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
         convexHeightfield(convexShape: ConvexPolyhedron, hfShape: Heightfield, convexTransform: Transform, hfTransform: Transform, convexBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
-        sphereHeightfield(sphereShape: Shape, hfShape: any, sphereTransform: Transform, hfTransform: Transform, sphereBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
+        sphereHeightfield(sphereShape: Sphere, hfShape: Heightfield, sphereTransform: Transform, hfTransform: Transform, sphereBody: Body, hfBody: Body, rsi: Shape, rsj: Shape, justTest: boolean): boolean;
     }
 }
 declare namespace feng3d {
@@ -20521,6 +20618,42 @@ declare namespace feng3d {
         readonly shape: CANNON.Cylinder;
         protected _shape: CANNON.Cylinder;
         init(): void;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 胶囊体碰撞体
+     */
+    class CapsuleCollider extends Collider {
+        /**
+         * 胶囊体半径
+         */
+        radius: number;
+        private _radius;
+        /**
+         * 胶囊体高度
+         */
+        height: number;
+        private _height;
+        /**
+         * 横向分割数
+         */
+        segmentsW: number;
+        private _segmentsW;
+        /**
+         * 纵向分割数
+         */
+        segmentsH: number;
+        private _segmentsH;
+        /**
+         * 正面朝向 true:Y+ false:Z+
+         */
+        yUp: boolean;
+        private _yUp;
+        readonly shape: CANNON.Trimesh;
+        protected _shape: CANNON.Trimesh;
+        init(): void;
+        private invalidateGeometry;
     }
 }
 declare namespace feng3d {

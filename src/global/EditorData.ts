@@ -222,7 +222,7 @@ namespace editor
             }
             return this._transformBox;
         }
-        private _transformBox: feng3d.Box;
+        private _transformBox: feng3d.AABB;
         private _transformBoxInvalid = true;
 
         /**

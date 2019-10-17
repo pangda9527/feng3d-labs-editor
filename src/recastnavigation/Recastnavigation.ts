@@ -19,7 +19,7 @@ namespace editor
         /**
          * 包围盒
          */
-        private _aabb: feng3d.Box;
+        private _aabb: feng3d.AABB;
         /**
          * 体素尺寸
          */
@@ -54,7 +54,7 @@ namespace editor
          */
         doRecastnavigation(mesh: { positions: number[], indices: number[] }, agent = new NavigationAgent(), voxelSize?: feng3d.Vector3)
         {
-            this._aabb = feng3d.Box.formPositions(mesh.positions);
+            this._aabb = feng3d.AABB.formPositions(mesh.positions);
             this._voxelSize = voxelSize || new feng3d.Vector3(agent.radius / 3, agent.radius / 3, agent.radius / 3);
             this._agent = agent;
             // 
