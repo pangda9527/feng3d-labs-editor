@@ -39,8 +39,8 @@ namespace editor
                 ["resource/template/index.html", "index.html"],
                 ["resource/template/project.js", "project.js"],
                 ["resource/template/tsconfig.json", "tsconfig.json"],
-                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
-                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ["node_modules/feng3d/out/feng3d.js", "libs/feng3d.js"],
+                ["node_modules/feng3d/out/feng3d.d.ts", "libs/feng3d.d.ts"],
             ];
             var index = 0;
             var loadUrls = () =>
@@ -68,8 +68,8 @@ namespace editor
         upgradeProject(callback: () => void)
         {
             var urls = [
-                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
-                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ["node_modules/feng3d/out/feng3d.js", "libs/feng3d.js"],
+                ["node_modules/feng3d/out/feng3d.d.ts", "libs/feng3d.d.ts"],
             ];
             var index = 0;
             var loadUrls = () =>
