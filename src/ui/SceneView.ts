@@ -5,6 +5,8 @@ namespace editor
 	 */
 	export class SceneView extends eui.Component implements ModuleView
 	{
+		public backRect: eui.Rect;
+
 		private _canvas: HTMLCanvasElement;
 		private _areaSelectStartPosition: feng3d.Vector2;
 		private _areaSelectRect: AreaSelectRect;
@@ -90,8 +92,8 @@ namespace editor
 
 			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
 
-			this.addEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
-			this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+			this.backRect.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+			this.backRect.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
 
 			feng3d.shortcut.on("selectGameObject", this.onSelectGameObject, this);
 			//
@@ -139,8 +141,8 @@ namespace editor
 		{
 			this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
 
-			this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this._onMouseOver, this);
-			this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
+			this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
+			this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
 
 			//
 			feng3d.shortcut.off("selectGameObject", this.onSelectGameObject, this);
@@ -205,7 +207,7 @@ namespace editor
 			this._areaSelectRect.hide();
 		}
 
-		private _onMouseOver()
+		private onMouseOver()
 		{
 			feng3d.shortcut.activityState("mouseInView3D");
 		}

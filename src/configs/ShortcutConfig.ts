@@ -30,7 +30,7 @@ var shortcutConfig = [ //
 	//
 	{ key: "del", command: "deleteSeletedGameObject", when: "" },
 	//
-	{ key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal" },
+	{ key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal+mouseInView3D+!splitGroupDraging" },
 	{ key: "mousemove", stateCommand: "!selecting", when: "selecting" },
 	{ key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "selecting" },
 	//
