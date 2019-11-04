@@ -5,7 +5,7 @@ namespace editor
     {
         public group: eui.Group;
         public titleGroup: eui.Group;
-        public titleButton: eui.Rect;
+        public labelLab: eui.Label;
         public contentGroup: eui.Group;
         public sizeTxt: eui.TextInput;
 
@@ -60,13 +60,13 @@ namespace editor
                 this.attributeViews[i] = <any>displayObject;
             }
             this.currentState = "hide";
-            this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+            this.titleGroup.addEventListener(egret.MouseEvent.CLICK, this.onTitleGroupClick, this);
             this.sizeTxt.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
         }
 
         dispose()
         {
-            this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
+            this.titleGroup.removeEventListener(egret.MouseEvent.CLICK, this.onTitleGroupClick, this);
             this.sizeTxt.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
 
             this.attributeViews = [];
@@ -78,7 +78,7 @@ namespace editor
             this.attributeViews = null;
         }
 
-        private onTitleButtonClick()
+        private onTitleGroupClick()
         {
             this.currentState = this.currentState == "hide" ? "show" : "hide";
         }
