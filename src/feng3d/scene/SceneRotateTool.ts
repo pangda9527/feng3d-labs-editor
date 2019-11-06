@@ -112,12 +112,6 @@ namespace editor
                     menu.popup(
                         [
                             {
-                                label: "左视图", click: () =>
-                                {
-                                    this.clickItem(arrowsX);
-                                }
-                            },
-                            {
                                 label: "右视图", click: () =>
                                 {
                                     this.clickItem(arrowsNX);
@@ -130,15 +124,21 @@ namespace editor
                                 }
                             },
                             {
-                                label: "底视图", click: () =>
-                                {
-                                    this.clickItem(arrowsNY);
-                                }
-                            },
-                            {
                                 label: "前视图", click: () =>
                                 {
                                     this.clickItem(arrowsZ);
+                                }
+                            },
+                            {
+                                label: "左视图", click: () =>
+                                {
+                                    this.clickItem(arrowsX);
+                                }
+                            },
+                            {
+                                label: "底视图", click: () =>
+                                {
+                                    this.clickItem(arrowsNY);
                                 }
                             },
                             {
@@ -177,10 +177,10 @@ namespace editor
         {
             var front_view = new feng3d.Vector3(0, 0, 0);//前视图
             var back_view = new feng3d.Vector3(0, 180, 0);//后视图
-            var right_view = new feng3d.Vector3(0, -90, 0);//右视图
-            var left_view = new feng3d.Vector3(0, 90, 0);//左视图
-            var top_view = new feng3d.Vector3(-90, 0, 180);//顶视图
-            var bottom_view = new feng3d.Vector3(-90, 180, 0);//底视图
+            var right_view = new feng3d.Vector3(0, 90, 0);//右视图
+            var left_view = new feng3d.Vector3(0, -90, 0);//左视图
+            var top_view = new feng3d.Vector3(-90, 0, 0);//顶视图
+            var bottom_view = new feng3d.Vector3(90, 0, 0);//底视图
 
             var rotation: feng3d.Vector3;
             switch (item)
