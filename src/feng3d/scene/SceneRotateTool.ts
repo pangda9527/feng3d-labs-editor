@@ -114,7 +114,7 @@ namespace editor
                             {
                                 label: "右视图", click: () =>
                                 {
-                                    this.clickItem(arrowsNX);
+                                    this.clickItem(arrowsX);
                                 }
                             },
                             {
@@ -132,7 +132,7 @@ namespace editor
                             {
                                 label: "左视图", click: () =>
                                 {
-                                    this.clickItem(arrowsX);
+                                    this.clickItem(arrowsNX);
                                 }
                             },
                             {
@@ -186,10 +186,10 @@ namespace editor
             switch (item)
             {
                 case this.arrowsX:
-                    rotation = left_view;
+                    rotation = right_view;
                     break;
                 case this.arrowsNX:
-                    rotation = right_view;
+                    rotation = left_view;
                     break;
                 case this.arrowsY:
                     rotation = top_view;
