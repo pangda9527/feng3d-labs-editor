@@ -39,7 +39,8 @@
     "asar": "^1.0.0",
     "electron": "^4.1.4",
     "fs-extra": "^7.0.1",
-    "rimraf": "^2.6.3"
+    "rimraf": "^2.6.3",
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "feng3d": "0.1.3"
