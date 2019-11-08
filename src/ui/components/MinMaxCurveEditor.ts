@@ -179,7 +179,8 @@ namespace editor
                 {
                     var imageUtil = new feng3d.ImageUtil(element.width, element.height, this.backColor);
                     if (!this.minMaxCurve.between0And1) imageUtil.drawLine(new feng3d.Vector2(0, element.height / 2), new feng3d.Vector2(element.width, element.height / 2), feng3d.Color4.BLACK);
-                    imageUtil.drawCurve(curves[i], this.minMaxCurve.between0And1, feng3d.Color4.WHITE);
+                    var curve = feng3d.serialization.setValue(new feng3d.AnimationCurve(), curves[i]);
+                    imageUtil.drawCurve(curve, this.minMaxCurve.between0And1, feng3d.Color4.WHITE);
 
                     element.source = imageUtil.toDataURL();
                     this.samplesGroup.addChild(element);
@@ -187,7 +188,11 @@ namespace editor
                 {
                     var imageUtil = new feng3d.ImageUtil(element.width, element.height, this.backColor);
                     if (!this.minMaxCurve.between0And1) imageUtil.drawLine(new feng3d.Vector2(0, element.height / 2), new feng3d.Vector2(element.width, element.height / 2), feng3d.Color4.BLACK);
-                    imageUtil.drawBetweenTwoCurves(doubleCurves[i].curveMin, doubleCurves[i].curveMax, this.minMaxCurve.between0And1, feng3d.Color4.WHITE);
+
+                    var curveMin = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curve);
+                    var curveMax = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curve1);
+
+                    imageUtil.drawBetweenTwoCurves(curveMin, curveMax, this.minMaxCurve.between0And1, feng3d.Color4.WHITE);
 
                     element.source = imageUtil.toDataURL();
                     this.samplesGroup.addChild(element);
@@ -210,11 +215,12 @@ namespace editor
                     var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
                     if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
                     {
-                        this.minMaxCurve.curve = feng3d.serialization.clone(curves[i]);
+                        var curve = <feng3d.AnimationCurve>this.minMaxCurve.curve;
+                        feng3d.serialization.setValue(curve, curves[i]);
                     } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
                     {
-                        this.minMaxCurve.curve = feng3d.serialization.clone(doubleCurves[i].curveMin);
-                        this.minMaxCurve.curve1 = feng3d.serialization.clone(doubleCurves[i].curveMax);
+                        feng3d.serialization.setValue(this.minMaxCurve.curve, doubleCurves[i].curve);
+                        feng3d.serialization.setValue(this.minMaxCurve.curve1, doubleCurves[i].curve1);
                     }
                     this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                     this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
@@ -528,93 +534,93 @@ namespace editor
         }
     }
 
-    var particleCurves = [
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
+    var particleCurves: feng3d.gPartial<feng3d.AnimationCurve>[] = [
+        { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
+        { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
+        { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
+        { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
+        { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
+        { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
+        { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
+        { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
     ];
-    var particleCurvesSingend = [
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
-        feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-    ];
-
-    var particleDoubleCurves = [{
-        curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-        curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
-    },
-    {
-        curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
-        curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
-    },
-    {
-        curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
-        curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
-    },
-    {
-        curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
-        curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
-    },
-    {
-        curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
-        curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
-    },
-    {
-        curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
-        curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
-    },
-    {
-        curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
-        curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
-    },
-    {
-        curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-        curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
-    },
+    var particleCurvesSingend: feng3d.gPartial<feng3d.AnimationCurve>[] = [
+        { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
+        { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
+        { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
+        { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
+        { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
+        { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
+        { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
+        { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
     ];
 
-    var particleDoubleCurvesSingend = [
+    var particleDoubleCurves: feng3d.gPartial<feng3d.MinMaxCurve>[] = [{
+        curve: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
+        curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+    },
+    {
+        curve: { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
+        curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+    },
+    {
+        curve: { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
+        curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+    },
+    {
+        curve: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
+        curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+    },
+    {
+        curve: { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
+        curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+    },
+    {
+        curve: { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
+        curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+    },
+    {
+        curve: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
+        curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+    },
+    {
+        curve: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
+        curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+    },
+    ];
+
+    var particleDoubleCurvesSingend: feng3d.gPartial<feng3d.MinMaxCurve>[] = [
         {
-            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: -1, tangent: 0 }, { time: 1, value: -1, tangent: 0 }] })
+            curve: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
+            curve1: { keys: [{ time: 0, value: -1, tangent: 0 }, { time: 1, value: -1, tangent: 0 }] }
         },
         {
-            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] }),
-            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curve: { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
+            curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
         },
         {
-            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] }),
-            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curve: { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
+            curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
         },
         {
-            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] }),
-            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curve: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
+            curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
         },
         {
-            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] }),
-            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curve: { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
+            curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
         },
         {
-            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] }),
-            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curve: { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
+            curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
         },
         {
-            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] }),
-            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curve: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
+            curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
         },
         {
-            curveMin: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] }),
-            curveMax: feng3d.serialization.setValue(new feng3d.AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] })
+            curve: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
+            curve1: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
         },
     ];
 }
