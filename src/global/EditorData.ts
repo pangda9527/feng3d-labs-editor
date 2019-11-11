@@ -96,11 +96,14 @@ namespace editor
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectMultiObject(objs: (feng3d.GameObject | AssetNode)[])
+        selectMultiObject(objs: (feng3d.GameObject | AssetNode)[], isAdd?: boolean)
         {
             var selecteds = this.selectedObjects.concat();
 
-            var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
+            if (isAdd === undefined)
+            {
+                isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
+            }
             if (!isAdd) selecteds.length = 0;
             //
             objs.forEach(v =>

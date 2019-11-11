@@ -19,7 +19,6 @@ namespace editor
             // 
             feng3d.shortcut.on("copy", this.onCopy, this);
             feng3d.shortcut.on("paste", this.onPaste, this);
-            feng3d.shortcut.on("duplicate", this.onDuplicate, this);
         }
 
         private onGameobjectMoveTool()
@@ -69,17 +68,21 @@ namespace editor
 
         private onCopy()
         {
-            
+            var objects = editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
+            editorData.copyObjects = objects;
         }
 
         private onPaste()
         {
-
-        }
-
-        private onDuplicate()
-        {
-
+            var objects: feng3d.GameObject[] = editorData.copyObjects.filter(v => v instanceof feng3d.GameObject);
+            if (objects.length == 0) return;
+            var parent = objects[0].parent;
+            var newGameObjects = objects.map(v => feng3d.serialization.clone(v));
+            newGameObjects.forEach(v =>
+            {
+                parent.addChild(v);
+            });
+            editorData.selectMultiObject(newGameObjects, false);
         }
     }
 
