@@ -222,13 +222,13 @@ namespace editor
                     var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
                     if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
                     {
-                        var curve = <feng3d.AnimationCurve>this.minMaxCurve.curve;
-                        feng3d.serialization.setValue(curve, curves[i]);
+                        this.minMaxCurve.curve = feng3d.serialization.setValue(new feng3d.AnimationCurve(), curves[i]);
                     } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
                     {
-                        feng3d.serialization.setValue(this.minMaxCurve.curve, doubleCurves[i].curve);
-                        feng3d.serialization.setValue(this.minMaxCurve.curve1, doubleCurves[i].curve1);
+                        this.minMaxCurve.curve = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curve);
+                        this.minMaxCurve.curve1 = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curve1);
                     }
+                    this.selectedKey = null;
                     this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                     this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
                     break;
