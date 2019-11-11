@@ -18,9 +18,9 @@ namespace editor
             {
                 this.data.setdargSource(dragSource)
             }, ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
-                {
-                    this.data.acceptDragDrop(dragdata);
-                });
+            {
+                this.data.acceptDragDrop(dragdata);
+            });
             MouseOnDisableScroll.register(this);
             //
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
@@ -57,9 +57,50 @@ namespace editor
             {
                 menus.push(
                     {
+                        label: "复制", click: () =>
+                        {
+                            var objects = editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
+                            editorData.copyObjects = objects;
+                        }
+                    },
+                    {
+                        label: "粘贴", click: () =>
+                        {
+                            var objects: feng3d.GameObject[] = editorData.copyObjects.filter(v => v instanceof feng3d.GameObject);
+                            if (objects.length == 0) return;
+                            var newGameObjects = objects.map(v => feng3d.serialization.clone(v));
+                            newGameObjects.forEach(v =>
+                            {
+                                this.data.gameobject.parent.addChild(v);
+                            });
+                            editorData.selectMultiObject(newGameObjects);
+                        }
+                    },
+                    { type: 'separator' },
+                    {
+                        label: "副本", click: () =>
+                        {
+                            var objects = editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
+                            var newGameObjects = objects.map(v =>
+                            {
+                                var no = feng3d.serialization.clone(v);
+                                v.parent.addChild(no);
+                                return no;
+                            });
+                            editorData.selectMultiObject(newGameObjects);
+                        }
+                    },
+                    {
                         label: "删除", click: () =>
                         {
                             this.data.gameobject.parent.removeChild(this.data.gameobject);
+                            var index = editorData.selectedObjects.indexOf(this.data.gameobject);
+                            if (index != -1)
+                            {
+                                var selectedObjects = editorData.selectedObjects.concat();
+                                selectedObjects.splice(index, 1);
+                                editorData.selectMultiObject(selectedObjects);
+                            }
                         }
                     }
                 );

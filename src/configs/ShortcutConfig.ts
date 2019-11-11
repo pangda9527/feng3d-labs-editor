@@ -40,6 +40,9 @@ var shortcutConfig = [ //
 	//
 	{ key: "f12", command: "openDevTools", stateCommand: "", when: "" },
 	{ key: "f5", command: "refreshWindow", stateCommand: "", when: "" },
+	//
+	{ key: "ctrl+c", command: "copy" },
+	{ key: "ctrl+v", command: "paste" },
 
 	// 可用命令
 	// - fpsViewStart						启动fps浏览场景

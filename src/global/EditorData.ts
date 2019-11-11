@@ -62,6 +62,11 @@ namespace editor
         }
         private _selectedObjects = [];
 
+        /**
+         * 被复制的对象
+         */
+        copyObjects = [];
+
         clearSelectedObjects()
         {
             this.selectedObjects = [];

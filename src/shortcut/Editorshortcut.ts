@@ -16,6 +16,10 @@ namespace editor
             //
             feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
             feng3d.shortcut.on("refreshWindow", this.onRefreshWindow, this);
+            // 
+            feng3d.shortcut.on("copy", this.onCopy, this);
+            feng3d.shortcut.on("paste", this.onPaste, this);
+            feng3d.shortcut.on("duplicate", this.onDuplicate, this);
         }
 
         private onGameobjectMoveTool()
@@ -61,6 +65,21 @@ namespace editor
         private onRefreshWindow()
         {
             window.location.reload();
+        }
+
+        private onCopy()
+        {
+            
+        }
+
+        private onPaste()
+        {
+
+        }
+
+        private onDuplicate()
+        {
+
         }
     }
 
