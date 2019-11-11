@@ -19,6 +19,7 @@ namespace editor
             // 
             feng3d.shortcut.on("copy", this.onCopy, this);
             feng3d.shortcut.on("paste", this.onPaste, this);
+            feng3d.shortcut.on("undo", this.onUndo, this);
         }
 
         private onGameobjectMoveTool()
@@ -74,6 +75,8 @@ namespace editor
 
         private onPaste()
         {
+            var undoSelectedObjects = editorData.selectedObjects;
+            //
             var objects: feng3d.GameObject[] = editorData.copyObjects.filter(v => v instanceof feng3d.GameObject);
             if (objects.length == 0) return;
             var parent = objects[0].parent;
@@ -83,6 +86,22 @@ namespace editor
                 parent.addChild(v);
             });
             editorData.selectMultiObject(newGameObjects, false);
+
+            // undo
+            editorData.undoList.push(() =>
+            {
+                newGameObjects.forEach(v =>
+                {
+                    v.remove();
+                });
+                editorData.selectMultiObject(undoSelectedObjects, false);
+            });
+        }
+
+        private onUndo()
+        {
+            var item = editorData.undoList.pop();
+            if (item) item();
         }
     }
 

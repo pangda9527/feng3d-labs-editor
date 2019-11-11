@@ -258,6 +258,11 @@ namespace editor
         openScript: feng3d.StringAsset;
 
         /**
+         * 历史记录undo列表
+         */
+        undoList: (() => void)[] = [];
+
+        /**
          * 获取编辑器资源绝对路径
          * @param url 编辑器资源相对路径
          */

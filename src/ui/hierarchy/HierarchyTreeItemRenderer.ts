@@ -66,6 +66,8 @@ namespace editor
                     {
                         label: "粘贴", click: () =>
                         {
+                            var undoSelectedObjects = editorData.selectedObjects;
+                            //
                             var objects: feng3d.GameObject[] = editorData.copyObjects.filter(v => v instanceof feng3d.GameObject);
                             if (objects.length == 0) return;
                             var newGameObjects = objects.map(v => feng3d.serialization.clone(v));
@@ -74,12 +76,24 @@ namespace editor
                                 this.data.gameobject.parent.addChild(v);
                             });
                             editorData.selectMultiObject(newGameObjects);
+
+                            // undo
+                            editorData.undoList.push(() =>
+                            {
+                                newGameObjects.forEach(v =>
+                                {
+                                    v.remove();
+                                });
+                                editorData.selectMultiObject(undoSelectedObjects, false);
+                            });
                         }
                     },
                     { type: 'separator' },
                     {
                         label: "副本", click: () =>
                         {
+                            var undoSelectedObjects = editorData.selectedObjects;
+                            //
                             var objects = editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
                             var newGameObjects = objects.map(v =>
                             {
@@ -88,6 +102,16 @@ namespace editor
                                 return no;
                             });
                             editorData.selectMultiObject(newGameObjects);
+
+                            // undo
+                            editorData.undoList.push(() =>
+                            {
+                                newGameObjects.forEach(v =>
+                                {
+                                    v.remove();
+                                });
+                                editorData.selectMultiObject(undoSelectedObjects, false);
+                            });
                         }
                     },
                     {

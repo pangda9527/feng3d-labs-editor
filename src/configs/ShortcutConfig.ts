@@ -43,6 +43,7 @@ var shortcutConfig = [ //
 	//
 	{ key: "ctrl+c", command: "copy" },
 	{ key: "ctrl+v", command: "paste" },
+	{ key: "ctrl+z", command: "undo" },
 
 	// 可用命令
 	// - fpsViewStart						启动fps浏览场景
