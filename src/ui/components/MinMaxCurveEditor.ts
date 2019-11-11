@@ -36,6 +36,7 @@ namespace editor
         public sample_5: eui.Image;
         public sample_6: eui.Image;
         public sample_7: eui.Image;
+        public modeBtn: eui.Button;
 
         //
         private timeline: feng3d.AnimationCurve;
@@ -86,8 +87,8 @@ namespace editor
 
             this.sampleImages = [this.sample_0, this.sample_1, this.sample_2, this.sample_3, this.sample_4, this.sample_5, this.sample_6, this.sample_7];
 
-            feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
-            feng3d.windowEventProxy.on("dblclick", this.ondblclick, this);
+            this.viewGroup.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            editorui.stage.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondblclick, this);
 
             this.sampleImages.forEach(v => v.addEventListener(egret.MouseEvent.CLICK, this.onSampleClick, this));
 
@@ -97,6 +98,8 @@ namespace editor
                 space: this.minMaxCurve, attribute: "curveMultiplier", textInput: this.multiplierInput, editable: true,
                 controller: null,
             }));
+
+            this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onModeBtn, this);
 
             feng3d.watcher.watch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
 
@@ -111,8 +114,12 @@ namespace editor
 
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
 
-            feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
-            feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
+            this.viewGroup.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
+            editorui.stage.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondblclick, this);
+
+            // feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
+
+            this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onModeBtn, this);
 
             feng3d.watcher.unwatch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
 
@@ -361,9 +368,9 @@ namespace editor
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         }
 
-        private onMouseDown(ev: MouseEvent)
+        private onMouseDown(ev: egret.MouseEvent)
         {
-            var lp = this.viewGroup.globalToLocal(ev.clientX, ev.clientY);
+            var lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
 
             var x = lp.x;
             var y = lp.y;
@@ -396,19 +403,19 @@ namespace editor
 
             if (this.editKey != null || this.editorControlkey != null)
             {
-                feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-                feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+                editorui.stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+                editorui.stage.addEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
             }
 
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
 
-        private onMouseMove(ev: MouseEvent)
+        private onMouseMove(ev: egret.MouseEvent)
         {
             this.editing = true;
 
-            var lp = this.viewGroup.globalToLocal(ev.clientX, ev.clientY);
+            var lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
 
             var x = lp.x;
             var y = lp.y;
@@ -453,8 +460,8 @@ namespace editor
             this.editing = false;
             this.editorControlkey = null;
 
-            feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-            feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
+            editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
+            editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
         }
 
         private findControlKey(key: feng3d.AnimationCurveKeyframe, x: number, y: number, radius: number)
@@ -474,13 +481,13 @@ namespace editor
             return null;
         }
 
-        private ondblclick(ev: MouseEvent)
+        private ondblclick(ev: egret.MouseEvent)
         {
             this.editing = false;
             this.editKey = null;
             this.editorControlkey = null;
 
-            var lp = this.viewGroup.globalToLocal(ev.clientX, ev.clientY);
+            var lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
 
             var x = lp.x;
             var y = lp.y;
@@ -531,6 +538,18 @@ namespace editor
                 }
             }
 
+        }
+
+        private onModeBtn(e: egret.TouchEvent)
+        {
+            e.stopPropagation();
+
+            var selectTimeline = this.selectTimeline;
+            if (!selectTimeline) return;
+            menu.popupEnum(feng3d.AnimationCurveWrapMode, selectTimeline.wrapMode, (v) =>
+            {
+                selectTimeline.wrapMode = v;
+            });
         }
     }
 
