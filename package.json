@@ -34,7 +34,7 @@
   "author": "feng",
   "license": "ISC",
   "devDependencies": {
-    "@feng3d/build": "0.0.6",
+    "@feng3d/build": "0.0.7",
     "fs-extra": "^7.0.1",
     "rimraf": "^2.6.3",
     "typescript": "^3.6.3"
