@@ -6,20 +6,24 @@ var result = [];
 
 xhrTsconfig("node_modules/feng3d/tsconfig.json", () =>
 {
-    loadjs(result, () =>
+    xhrTsconfig("node_modules/feng3d-physics/tsconfig.json", () =>
     {
-        if (fstype == "indexedDB")
+        loadjs(result, () =>
         {
-            feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
-            feng3d.fs = feng3d.indexedDBFS;
-            feng3d.rs = new feng3d.ReadRS(feng3d.indexedDBFS);
-        }
-        // 初始化资源系统
-        feng3d.rs.init(() =>
-        {
-            loadProjectJs(initProject);
+            if (fstype == "indexedDB")
+            {
+                feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
+                feng3d.fs = feng3d.indexedDBFS;
+                feng3d.rs = new feng3d.ReadRS(feng3d.indexedDBFS);
+            }
+            // 初始化资源系统
+            feng3d.rs.init(() =>
+            {
+                loadProjectJs(initProject);
+            });
         });
     });
+
 });
 
 function loadProjectJs(callback)
@@ -132,13 +136,8 @@ function xhrTsconfig(url, callback)
     var root = ps.join("/");
     xhr(url, (xhr) =>
     {
-        var obj = JSON.parse(xhr.responseText.split("\n").map(v =>
-        {
-            var index = v.indexOf("//");
-            if (index > 0)
-                v = v.substr(0, index);
-            return v;
-        }).join(""));
+        var obj;
+        eval("obj=" + xhr.responseText);
         if (obj.compilerOptions.outDir)
         {
             var files = obj.files.filter(v => v.indexOf(".d.ts") == -1);

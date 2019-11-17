@@ -427,11 +427,11 @@ namespace editor
                 {
                     label: "Physics",
                     submenu: [
-                        { label: "Rigidbody", click: () => { gameobject.addComponent(feng3d.Rigidbody); } },
-                        { label: "Box Collider", click: () => { gameobject.addComponent(feng3d.BoxCollider); } },
-                        { label: "Sphere Collider", click: () => { gameobject.addComponent(feng3d.SphereCollider); } },
-                        { label: "Cylinder Collider", click: () => { gameobject.addComponent(feng3d.CylinderCollider); } },
-                        { label: "Plane Collider", click: () => { gameobject.addComponent(feng3d.PlaneCollider); } },
+                        { label: "Rigidbody", click: () => { gameobject.addComponent(physics.Rigidbody); } },
+                        { label: "Box Collider", click: () => { gameobject.addComponent(physics.BoxCollider); } },
+                        { label: "Sphere Collider", click: () => { gameobject.addComponent(physics.SphereCollider); } },
+                        { label: "Cylinder Collider", click: () => { gameobject.addComponent(physics.CylinderCollider); } },
+                        { label: "Plane Collider", click: () => { gameobject.addComponent(physics.PlaneCollider); } },
                     ]
                 },
                 {

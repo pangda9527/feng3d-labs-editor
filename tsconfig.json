@@ -17,8 +17,10 @@
         // "outDir": "debug"
     },
     "include": [
-        "../feng3d/out",
-        "../feng3d/debug"
+        "node_modules/feng3d/out",
+        "node_modules/feng3d/debug",
+        "node_modules/feng3d-physics/out",
+        "node_modules/feng3d-physics/debug"
     ],
     "files": [
         //
