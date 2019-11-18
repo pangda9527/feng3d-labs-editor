@@ -41,6 +41,8 @@ namespace editor
                 ["resource/template/tsconfig.json", "tsconfig.json"],
                 ["../feng3d/out/feng3d.js", "libs/feng3d.js"],
                 ["../feng3d/out/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ["../physics/out/physics.js", "libs/physics.js"],
+                ["../physics/out/physics.d.ts", "libs/physics.d.ts"],
             ];
             var index = 0;
             var loadUrls = () =>
@@ -70,6 +72,8 @@ namespace editor
             var urls = [
                 ["../feng3d/out/feng3d.js", "libs/feng3d.js"],
                 ["../feng3d/out/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ["../physics/out/physics.js", "libs/physics.js"],
+                ["../physics/out/physics.d.ts", "libs/physics.d.ts"],
             ];
             var index = 0;
             var loadUrls = () =>

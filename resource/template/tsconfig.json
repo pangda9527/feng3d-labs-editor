@@ -8,5 +8,6 @@
   },
   "files": [
     "libs/feng3d.d.ts",
+    "libs/physics.d.ts",
   ]
 }
