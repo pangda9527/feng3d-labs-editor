@@ -10,18 +10,9 @@
             "es2015",
             "dom"
         ],
-        "types": [
-            // "feng3d"
-        ],
         "outFile": "out/editor.js"
         // "outDir": "debug"
     },
-    "include": [
-        "node_modules/feng3d/out",
-        "node_modules/feng3d/debug",
-        "node_modules/feng3d-physics/out",
-        "node_modules/feng3d-physics/debug"
-    ],
     "references": [
         {
             "path": "../feng3d"
