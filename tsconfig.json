@@ -22,6 +22,14 @@
         "node_modules/feng3d-physics/out",
         "node_modules/feng3d-physics/debug"
     ],
+    "references": [
+        {
+            "path": "../feng3d"
+        },
+        {
+            "path": "../physics"
+        },
+    ],
     "files": [
         //
         "libs/modules/egret/egret.d.ts",
