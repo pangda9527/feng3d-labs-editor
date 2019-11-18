@@ -427,6 +427,7 @@ namespace editor
                 {
                     label: "Physics",
                     submenu: [
+                        { label: "PhysicsWorld", click: () => { gameobject.addComponent(physics.PhysicsWorld); } },
                         { label: "Rigidbody", click: () => { gameobject.addComponent(physics.Rigidbody); } },
                         { label: "Box Collider", click: () => { gameobject.addComponent(physics.BoxCollider); } },
                         { label: "Sphere Collider", click: () => { gameobject.addComponent(physics.SphereCollider); } },
