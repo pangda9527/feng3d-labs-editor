@@ -8,11 +8,14 @@ var result = [
     isdebug ? "libs/modules/tween/tween.js" : "libs/modules/tween/tween.min.js",
 ];
 
-xhrTsconfig("node_modules/feng3d/tsconfig.json", () =>
+xhrTsconfig("../feng3d/tsconfig.json", () =>
 {
-    xhrTsconfig("tsconfig.json", () =>
+    xhrTsconfig("../physics/tsconfig.json", () =>
     {
-        loadjs(result, loadComplete);
+        xhrTsconfig("tsconfig.json", () =>
+        {
+            loadjs(result, loadComplete);
+        });
     });
 });
 
