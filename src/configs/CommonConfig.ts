@@ -23,14 +23,14 @@ namespace editor
                             label: "新建场景",
                             click: () =>
                             {
-                                editorData.gameScene = creatNewScene();
+                                editorData.gameScene = feng3d.Engine.createNewScene();
                             },
                         },
                         {
                             label: "打开场景",
                             click: () =>
                             {
-                                editorData.gameScene = creatNewScene();
+                                editorData.gameScene = feng3d.Engine.createNewScene();
                             },
                         },
                         {
@@ -199,7 +199,7 @@ namespace editor
                                 {
                                     editorAsset.runProjectScript(() =>
                                     {
-                                        editorData.gameScene = creatNewScene()
+                                        editorData.gameScene = feng3d.Engine.createNewScene()
                                         editorui.assetview.invalidateAssettree();
                                         console.log("清空项目完成!");
                                     });
