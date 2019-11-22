@@ -146,7 +146,15 @@ namespace editor
                 menus.push({
                     label: "Paste", click: () =>
                     {
-                        feng3d.serialization.setValue(this.minMaxCurve, copyCurve);
+                        if (copyCurve.mode == feng3d.MinMaxCurveMode.Curve)
+                        {
+                            this.minMaxCurve.curve = feng3d.serialization.clone(copyCurve.curve);
+                        } else if (copyCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
+                        {
+                            this.minMaxCurve.curveMin = feng3d.serialization.clone(copyCurve.curveMin);
+                            this.minMaxCurve.curveMax = feng3d.serialization.clone(copyCurve.curveMax);
+                        }
+                        this.minMaxCurve.curveMultiplier = copyCurve.curveMultiplier;
 
                         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                         this.dispatchEvent(new egret.Event(egret.Event.CHANGE));

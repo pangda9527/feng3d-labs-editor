@@ -5620,7 +5620,14 @@ var editor;
             if (copyCurve && this.minMaxCurve.mode == copyCurve.mode && copyCurve.between0And1 == this.minMaxCurve.between0And1) {
                 menus.push({
                     label: "Paste", click: function () {
-                        feng3d.serialization.setValue(_this.minMaxCurve, copyCurve);
+                        if (copyCurve.mode == feng3d.MinMaxCurveMode.Curve) {
+                            _this.minMaxCurve.curve = feng3d.serialization.clone(copyCurve.curve);
+                        }
+                        else if (copyCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
+                            _this.minMaxCurve.curveMin = feng3d.serialization.clone(copyCurve.curveMin);
+                            _this.minMaxCurve.curveMax = feng3d.serialization.clone(copyCurve.curveMax);
+                        }
+                        _this.minMaxCurve.curveMultiplier = copyCurve.curveMultiplier;
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                         _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
                     }
@@ -6341,15 +6348,15 @@ var editor;
                             else if (mode == feng3d.MinMaxGradientMode.TwoColors)
                                 copyColor = _this.minMaxGradient.colorMin.clone();
                             else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
-                                copyGradient = feng3d.serialization.serialize(_this.minMaxGradient.gradientMin);
+                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradientMin);
                             else
-                                copyGradient = feng3d.serialization.serialize(_this.minMaxGradient.gradient);
+                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradient);
                         }
                         else if (target == _this.colorGroup1) {
                             if (mode == feng3d.MinMaxGradientMode.TwoColors)
                                 copyColor = _this.minMaxGradient.colorMax.clone();
                             else
-                                copyGradient = feng3d.serialization.serialize(_this.minMaxGradient.gradientMax);
+                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradientMax);
                         }
                     }
                 }];
@@ -6363,15 +6370,15 @@ var editor;
                             else if (mode == feng3d.MinMaxGradientMode.TwoColors)
                                 _this.minMaxGradient.colorMin.copy(copyColor);
                             else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
-                                feng3d.serialization.setValue(_this.minMaxGradient.gradientMin, copyGradient);
+                                _this.minMaxGradient.gradientMin = feng3d.serialization.clone(copyGradient);
                             else
-                                feng3d.serialization.setValue(_this.minMaxGradient.gradient, copyGradient);
+                                _this.minMaxGradient.gradient = feng3d.serialization.clone(copyGradient);
                         }
                         else if (target == _this.colorGroup1) {
                             if (mode == feng3d.MinMaxGradientMode.TwoColors)
                                 _this.minMaxGradient.colorMax.copy(copyColor);
                             else
-                                feng3d.serialization.setValue(_this.minMaxGradient.gradientMax, copyGradient);
+                                _this.minMaxGradient.gradientMax = feng3d.serialization.clone(copyGradient);
                         }
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                         _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
