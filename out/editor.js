@@ -6251,11 +6251,11 @@ var editor;
                             break;
                         case feng3d.MinMaxGradientMode.TwoColors:
                             view = editor.colorPickerView = editor.colorPickerView || new editor.ColorPickerView();
-                            editor.colorPickerView.color = this.minMaxGradient.color;
+                            editor.colorPickerView.color = this.minMaxGradient.colorMin;
                             break;
                         case feng3d.MinMaxGradientMode.TwoGradients:
                             view = editor.gradientEditor = editor.gradientEditor || new editor.GradientEditor();
-                            editor.gradientEditor.gradient = this.minMaxGradient.gradient;
+                            editor.gradientEditor.gradient = this.minMaxGradient.gradientMin;
                             break;
                         case feng3d.MinMaxGradientMode.RandomColor:
                             view = editor.gradientEditor = editor.gradientEditor || new editor.GradientEditor();
@@ -6306,10 +6306,10 @@ var editor;
                         this.minMaxGradient.gradient = editor.gradientEditor.gradient;
                         break;
                     case feng3d.MinMaxGradientMode.TwoColors:
-                        this.minMaxGradient.color = editor.colorPickerView.color.clone();
+                        this.minMaxGradient.colorMin = editor.colorPickerView.color.clone();
                         break;
                     case feng3d.MinMaxGradientMode.TwoGradients:
-                        this.minMaxGradient.gradient = editor.gradientEditor.gradient;
+                        this.minMaxGradient.gradientMin = editor.gradientEditor.gradient;
                         break;
                     case feng3d.MinMaxGradientMode.RandomColor:
                         this.minMaxGradient.gradient = editor.gradientEditor.gradient;
@@ -6336,16 +6336,20 @@ var editor;
             var menus = [{
                     label: "Copy", click: function () {
                         if (target == _this.colorGroup0) {
-                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.TwoColors)
+                            if (mode == feng3d.MinMaxGradientMode.Color)
                                 copyColor = _this.minMaxGradient.color.clone();
+                            else if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                                copyColor = _this.minMaxGradient.colorMin.clone();
+                            else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
+                                copyGradient = feng3d.serialization.serialize(_this.minMaxGradient.gradientMin);
                             else
-                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradient);
+                                copyGradient = feng3d.serialization.serialize(_this.minMaxGradient.gradient);
                         }
                         else if (target == _this.colorGroup1) {
                             if (mode == feng3d.MinMaxGradientMode.TwoColors)
                                 copyColor = _this.minMaxGradient.colorMax.clone();
                             else
-                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradientMax);
+                                copyGradient = feng3d.serialization.serialize(_this.minMaxGradient.gradientMax);
                         }
                     }
                 }];
@@ -6354,8 +6358,12 @@ var editor;
                 menus.push({
                     label: "Paste", click: function () {
                         if (target == _this.colorGroup0) {
-                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.TwoColors)
+                            if (mode == feng3d.MinMaxGradientMode.Color)
                                 _this.minMaxGradient.color.copy(copyColor);
+                            else if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                                _this.minMaxGradient.colorMin.copy(copyColor);
+                            else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
+                                feng3d.serialization.setValue(_this.minMaxGradient.gradientMin, copyGradient);
                             else
                                 feng3d.serialization.setValue(_this.minMaxGradient.gradient, copyGradient);
                         }
@@ -6634,7 +6642,6 @@ var editor;
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.colorLineGroup.width;
                 this.gradient.colorKeys.sort(function (a, b) { return a.time - b.time; });
-                ;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
             else {

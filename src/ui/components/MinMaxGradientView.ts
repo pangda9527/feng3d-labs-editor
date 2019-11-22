@@ -131,11 +131,11 @@ namespace editor
                             break;
                         case feng3d.MinMaxGradientMode.TwoColors:
                             view = colorPickerView = colorPickerView || new editor.ColorPickerView();
-                            colorPickerView.color = this.minMaxGradient.color;
+                            colorPickerView.color = this.minMaxGradient.colorMin;
                             break;
                         case feng3d.MinMaxGradientMode.TwoGradients:
                             view = gradientEditor = gradientEditor || new editor.GradientEditor();
-                            gradientEditor.gradient = this.minMaxGradient.gradient;
+                            gradientEditor.gradient = this.minMaxGradient.gradientMin;
                             break;
                         case feng3d.MinMaxGradientMode.RandomColor:
                             view = gradientEditor = gradientEditor || new editor.GradientEditor();
@@ -194,10 +194,10 @@ namespace editor
                         this.minMaxGradient.gradient = gradientEditor.gradient;
                         break;
                     case feng3d.MinMaxGradientMode.TwoColors:
-                        this.minMaxGradient.color = (<feng3d.Color4>colorPickerView.color).clone();
+                        this.minMaxGradient.colorMin = (<feng3d.Color4>colorPickerView.color).clone();
                         break;
                     case feng3d.MinMaxGradientMode.TwoGradients:
-                        this.minMaxGradient.gradient = gradientEditor.gradient;
+                        this.minMaxGradient.gradientMin = gradientEditor.gradient;
                         break;
                     case feng3d.MinMaxGradientMode.RandomColor:
                         this.minMaxGradient.gradient = gradientEditor.gradient;
@@ -230,16 +230,20 @@ namespace editor
                 {
                     if (target == this.colorGroup0)
                     {
-                        if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.TwoColors)
+                        if (mode == feng3d.MinMaxGradientMode.Color)
                             copyColor = this.minMaxGradient.color.clone();
+                        else if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                            copyColor = this.minMaxGradient.colorMin.clone();
+                        else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
+                            copyGradient = feng3d.serialization.serialize(this.minMaxGradient.gradientMin);
                         else
-                            copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradient);
+                            copyGradient = feng3d.serialization.serialize(this.minMaxGradient.gradient);
                     } else if (target == this.colorGroup1)
                     {
                         if (mode == feng3d.MinMaxGradientMode.TwoColors)
                             copyColor = this.minMaxGradient.colorMax.clone();
                         else
-                            copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradientMax);
+                            copyGradient = feng3d.serialization.serialize(this.minMaxGradient.gradientMax);
                     }
                 }
             }];
@@ -252,8 +256,12 @@ namespace editor
                     {
                         if (target == this.colorGroup0)
                         {
-                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.TwoColors)
+                            if (mode == feng3d.MinMaxGradientMode.Color)
                                 this.minMaxGradient.color.copy(copyColor);
+                            else if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                                this.minMaxGradient.colorMin.copy(copyColor);
+                            else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
+                                feng3d.serialization.setValue(this.minMaxGradient.gradientMin, copyGradient);
                             else
                                 feng3d.serialization.setValue(this.minMaxGradient.gradient, copyGradient);
                         } else if (target == this.colorGroup1)
@@ -269,12 +277,12 @@ namespace editor
                     }
                 });
             }
-            menu.popup(menus)
+            menu.popup(menus);
         }
 
     }
 
-    var copyGradient: feng3d.Gradient;
+    var copyGradient: feng3d.gPartial<feng3d.Gradient>;
     var copyColor: feng3d.Color4;
 
 }

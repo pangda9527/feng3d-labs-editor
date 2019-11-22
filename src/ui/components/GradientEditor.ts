@@ -326,7 +326,7 @@ namespace editor
                 var sp = this.colorLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.colorLineGroup.width;
-                this.gradient.colorKeys.sort((a, b) => a.time - b.time);;
+                this.gradient.colorKeys.sort((a, b) => a.time - b.time);
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             } else
             {
