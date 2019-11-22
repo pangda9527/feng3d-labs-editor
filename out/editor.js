@@ -5813,13 +5813,13 @@ var editor;
         };
         MinMaxCurveEditor.prototype.getKeyLeftControlUIPos = function (key) {
             var current = this.curveToUIPos(key.time, key.value);
-            var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
+            var currenttan = key.inTangent * this.curveRect.height / this.curveRect.width;
             var lcp = new feng3d.Vector2(current.x - this.controllerLength * Math.cos(Math.atan(currenttan)), current.y + this.controllerLength * Math.sin(Math.atan(currenttan)));
             return lcp;
         };
         MinMaxCurveEditor.prototype.getKeyRightControlUIPos = function (key) {
             var current = this.curveToUIPos(key.time, key.value);
-            var currenttan = key.tangent * this.curveRect.height / this.curveRect.width;
+            var currenttan = key.outTangent * this.curveRect.height / this.curveRect.width;
             var rcp = new feng3d.Vector2(current.x + this.controllerLength * Math.cos(Math.atan(currenttan)), current.y - this.controllerLength * Math.sin(Math.atan(currenttan)));
             return rcp;
         };
@@ -5932,14 +5932,14 @@ var editor;
             else if (this.editorControlkey) {
                 var index = this.selectTimeline.indexOfKeys(this.editorControlkey);
                 if (index == 0 && curvePos.time < this.editorControlkey.time) {
-                    this.editorControlkey.tangent = curvePos.value > this.editorControlkey.value ? Infinity : -Infinity;
+                    this.editorControlkey.inTangent = curvePos.value > this.editorControlkey.value ? Infinity : -Infinity;
                     return;
                 }
                 if (index == this.selectTimeline.numKeys - 1 && curvePos.time > this.editorControlkey.time) {
-                    this.editorControlkey.tangent = curvePos.value > this.editorControlkey.value ? -Infinity : Infinity;
+                    this.editorControlkey.outTangent = curvePos.value > this.editorControlkey.value ? -Infinity : Infinity;
                     return;
                 }
-                this.editorControlkey.tangent = (curvePos.value - this.editorControlkey.value) / (curvePos.time - this.editorControlkey.time);
+                this.editorControlkey.inTangent = this.editorControlkey.outTangent = (curvePos.value - this.editorControlkey.value) / (curvePos.time - this.editorControlkey.time);
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }
@@ -6010,8 +6010,9 @@ var editor;
             var selectTimeline = this.selectTimeline;
             if (!selectTimeline)
                 return;
-            editor.menu.popupEnum(feng3d.AnimationCurveWrapMode, selectTimeline.wrapMode, function (v) {
-                selectTimeline.wrapMode = v;
+            editor.menu.popupEnum(feng3d.AnimationCurveWrapMode, selectTimeline.preWrapMode, function (v) {
+                selectTimeline.preWrapMode = v;
+                selectTimeline.postWrapMode = v;
             });
         };
         __decorate([
@@ -6021,90 +6022,90 @@ var editor;
     }(eui.Component));
     editor.MinMaxCurveEditor = MinMaxCurveEditor;
     var particleCurves = [
-        { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-        { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
-        { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
-        { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
-        { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
-        { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
-        { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
-        { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
+        { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+        { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] },
+        { keys: [{ time: 0, value: 1, inTangent: -1, outTangent: -1 }, { time: 1, value: 0, inTangent: -1, outTangent: -1 }] },
+        { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 2, outTangent: 2 }] },
+        { keys: [{ time: 0, value: 1, inTangent: -2, outTangent: -2 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] },
+        { keys: [{ time: 0, value: 0, inTangent: 2, outTangent: 2 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+        { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: -2, outTangent: -2 }] },
+        { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
     ];
     var particleCurvesSingend = [
-        { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-        { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
-        { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
-        { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
-        { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
-        { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
-        { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
-        { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
+        { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+        { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] },
+        { keys: [{ time: 0, value: 1, inTangent: -1, outTangent: -1 }, { time: 1, value: 0, inTangent: -1, outTangent: -1 }] },
+        { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 2, outTangent: 2 }] },
+        { keys: [{ time: 0, value: 1, inTangent: -2, outTangent: -2 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] },
+        { keys: [{ time: 0, value: 0, inTangent: 2, outTangent: 2 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+        { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: -2, outTangent: -2 }] },
+        { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
     ];
     var particleDoubleCurves = [{
-            curveMin: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curveMin: { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 1, inTangent: -1, outTangent: -1 }, { time: 1, value: 0, inTangent: -1, outTangent: -1 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 2, outTangent: 2 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 1, inTangent: -2, outTangent: -2 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 0, inTangent: 2, outTangent: 2 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: -2, outTangent: -2 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
     ];
     var particleDoubleCurvesSingend = [
         {
-            curve: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: -1, tangent: 0 }, { time: 1, value: -1, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+            curveMax: { keys: [{ time: 0, value: -1, inTangent: 0, outTangent: 0 }, { time: 1, value: -1, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 1, tangent: -1 }, { time: 1, value: 0, tangent: -1 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 1, inTangent: -1, outTangent: -1 }, { time: 1, value: 0, inTangent: -1, outTangent: -1 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 2 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 2, outTangent: 2 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 1, tangent: -2 }, { time: 1, value: 0, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 1, inTangent: -2, outTangent: -2 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 0, tangent: 2 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 0, inTangent: 2, outTangent: 2 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 1, tangent: 0 }, { time: 1, value: 0, tangent: -2 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: -2, outTangent: -2 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
         {
-            curve: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] },
-            curveMax: { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 0, tangent: 0 }] }
+            curve: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
+            curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
         },
     ];
 })(editor || (editor = {}));
@@ -6202,18 +6203,18 @@ var editor;
                     if (this.secondGroup.parent)
                         this.secondGroup.parent.removeChild(this.secondGroup);
                 }
-                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors) {
-                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(this.minMaxGradient.color).toDataURL();
+                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.TwoColors) {
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(this.minMaxGradient.colorMin).toDataURL();
                     //
-                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawColorRect(this.minMaxGradient.color1).toDataURL();
+                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawColorRect(this.minMaxGradient.colorMax).toDataURL();
                     //
                     if (!this.secondGroup.parent)
                         this.secondGroupParent.addChildAt(this.secondGroup, 1);
                 }
-                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients) {
-                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
+                else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.TwoGradients) {
+                    this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradientMin).toDataURL();
                     //
-                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawMinMaxGradient(this.minMaxGradient.gradient1).toDataURL();
+                    this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawMinMaxGradient(this.minMaxGradient.gradientMax).toDataURL();
                     //
                     if (!this.secondGroup.parent)
                         this.secondGroupParent.addChildAt(this.secondGroup, 1);
@@ -6248,11 +6249,11 @@ var editor;
                             view = editor.gradientEditor = editor.gradientEditor || new editor.GradientEditor();
                             editor.gradientEditor.gradient = this.minMaxGradient.gradient;
                             break;
-                        case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                        case feng3d.MinMaxGradientMode.TwoColors:
                             view = editor.colorPickerView = editor.colorPickerView || new editor.ColorPickerView();
                             editor.colorPickerView.color = this.minMaxGradient.color;
                             break;
-                        case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                        case feng3d.MinMaxGradientMode.TwoGradients:
                             view = editor.gradientEditor = editor.gradientEditor || new editor.GradientEditor();
                             editor.gradientEditor.gradient = this.minMaxGradient.gradient;
                             break;
@@ -6265,13 +6266,13 @@ var editor;
                 case this.colorGroup1:
                     this.activeColorGroup = this.colorGroup1;
                     switch (this.minMaxGradient.mode) {
-                        case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                        case feng3d.MinMaxGradientMode.TwoColors:
                             view = editor.colorPickerView = editor.colorPickerView || new editor.ColorPickerView();
-                            editor.colorPickerView.color = this.minMaxGradient.color1;
+                            editor.colorPickerView.color = this.minMaxGradient.colorMax;
                             break;
-                        case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                        case feng3d.MinMaxGradientMode.TwoGradients:
                             view = editor.gradientEditor = editor.gradientEditor || new editor.GradientEditor();
-                            editor.gradientEditor.gradient = this.minMaxGradient.gradient1;
+                            editor.gradientEditor.gradient = this.minMaxGradient.gradientMax;
                             break;
                     }
                     break;
@@ -6304,10 +6305,10 @@ var editor;
                     case feng3d.MinMaxGradientMode.Gradient:
                         this.minMaxGradient.gradient = editor.gradientEditor.gradient;
                         break;
-                    case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
+                    case feng3d.MinMaxGradientMode.TwoColors:
                         this.minMaxGradient.color = editor.colorPickerView.color.clone();
                         break;
-                    case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
+                    case feng3d.MinMaxGradientMode.TwoGradients:
                         this.minMaxGradient.gradient = editor.gradientEditor.gradient;
                         break;
                     case feng3d.MinMaxGradientMode.RandomColor:
@@ -6317,11 +6318,11 @@ var editor;
             }
             else if (this.activeColorGroup == this.colorGroup1) {
                 switch (this.minMaxGradient.mode) {
-                    case feng3d.MinMaxGradientMode.RandomBetweenTwoColors:
-                        this.minMaxGradient.color1 = editor.colorPickerView.color.clone();
+                    case feng3d.MinMaxGradientMode.TwoColors:
+                        this.minMaxGradient.colorMax = editor.colorPickerView.color.clone();
                         break;
-                    case feng3d.MinMaxGradientMode.RandomBetweenTwoGradients:
-                        this.minMaxGradient.gradient1 = editor.gradientEditor.gradient;
+                    case feng3d.MinMaxGradientMode.TwoGradients:
+                        this.minMaxGradient.gradientMax = editor.gradientEditor.gradient;
                         break;
                 }
             }
@@ -6335,34 +6336,34 @@ var editor;
             var menus = [{
                     label: "Copy", click: function () {
                         if (target == _this.colorGroup0) {
-                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.TwoColors)
                                 copyColor = _this.minMaxGradient.color.clone();
                             else
                                 copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradient);
                         }
                         else if (target == _this.colorGroup1) {
-                            if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
-                                copyColor = _this.minMaxGradient.color1.clone();
+                            if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                                copyColor = _this.minMaxGradient.colorMax.clone();
                             else
-                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradient1);
+                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradientMax);
                         }
                     }
                 }];
-            if ((copyGradient != null && (mode == feng3d.MinMaxGradientMode.Gradient || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoGradients || mode == feng3d.MinMaxGradientMode.RandomColor))
-                || (copyColor != null && (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors))) {
+            if ((copyGradient != null && (mode == feng3d.MinMaxGradientMode.Gradient || mode == feng3d.MinMaxGradientMode.TwoGradients || mode == feng3d.MinMaxGradientMode.RandomColor))
+                || (copyColor != null && (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.TwoColors))) {
                 menus.push({
                     label: "Paste", click: function () {
                         if (target == _this.colorGroup0) {
-                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
+                            if (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.TwoColors)
                                 _this.minMaxGradient.color.copy(copyColor);
                             else
                                 feng3d.serialization.setValue(_this.minMaxGradient.gradient, copyGradient);
                         }
                         else if (target == _this.colorGroup1) {
-                            if (mode == feng3d.MinMaxGradientMode.RandomBetweenTwoColors)
-                                _this.minMaxGradient.color1.copy(copyColor);
+                            if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                                _this.minMaxGradient.colorMax.copy(copyColor);
                             else
-                                feng3d.serialization.setValue(_this.minMaxGradient.gradient1, copyGradient);
+                                feng3d.serialization.setValue(_this.minMaxGradient.gradientMax, copyGradient);
                         }
                         _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                         _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
