@@ -5551,7 +5551,7 @@ var editor;
                     controller: null,
                 }));
             }
-            else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants) {
+            else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoConstants) {
                 this.randomBetweenTwoConstantsGroup.visible = true;
                 this.addBinder(new editor.NumberTextInputBinder().init({
                     space: this.minMaxCurve, attribute: "constant", textInput: this.minValueTextInput, editable: true,
@@ -5568,7 +5568,7 @@ var editor;
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
                     imageUtil.drawCurve(this.minMaxCurve.curve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
-                else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
+                else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoCurves) {
                     imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curveMax, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
                 this.curveImage.source = imageUtil.toDataURL();
@@ -5610,7 +5610,7 @@ var editor;
         };
         MinMaxCurveView.prototype._onRightClick = function () {
             var _this = this;
-            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant || this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants)
+            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant || this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoConstants)
                 return;
             var menus = [{
                     label: "Copy", click: function () {
@@ -5623,7 +5623,7 @@ var editor;
                         if (copyCurve.mode == feng3d.MinMaxCurveMode.Curve) {
                             _this.minMaxCurve.curve = feng3d.serialization.clone(copyCurve.curve);
                         }
-                        else if (copyCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
+                        else if (copyCurve.mode == feng3d.MinMaxCurveMode.TwoCurves) {
                             _this.minMaxCurve.curveMin = feng3d.serialization.clone(copyCurve.curveMin);
                             _this.minMaxCurve.curveMax = feng3d.serialization.clone(copyCurve.curveMax);
                         }
@@ -5715,7 +5715,7 @@ var editor;
                 this.imageUtil.drawCurve(this.timeline, this.minMaxCurve.between0And1, this.curveColor, this.curveRect);
                 this.drawCurveKeys(this.timeline);
             }
-            else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
+            else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoCurves) {
                 this.imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curveMax, this.minMaxCurve.between0And1, this.curveColor, this.fillTwoCurvesColor, this.curveRect);
                 this.drawCurveKeys(this.timeline);
                 this.drawCurveKeys(this.timeline1);
@@ -5748,7 +5748,7 @@ var editor;
                     element.source = imageUtil.toDataURL();
                     this.samplesGroup.addChild(element);
                 }
-                else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves && doubleCurves[i]) {
+                else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoCurves && doubleCurves[i]) {
                     var imageUtil = new feng3d.ImageUtil(element.width, element.height, this.backColor);
                     if (!this.minMaxCurve.between0And1)
                         imageUtil.drawLine(new feng3d.Vector2(0, element.height / 2), new feng3d.Vector2(element.width, element.height / 2), feng3d.Color4.BLACK);
@@ -5772,7 +5772,7 @@ var editor;
                     if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve) {
                         this.minMaxCurve.curve = feng3d.serialization.setValue(new feng3d.AnimationCurve(), curves[i]);
                     }
-                    else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves) {
+                    else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoCurves) {
                         this.minMaxCurve.curve = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curve);
                         this.minMaxCurve.curveMax = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curveMax);
                     }

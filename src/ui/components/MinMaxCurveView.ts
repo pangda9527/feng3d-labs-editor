@@ -57,7 +57,7 @@ namespace editor
                     space: this.minMaxCurve, attribute: "constant", textInput: this.constantTextInput, editable: true,
                     controller: null,
                 }));
-            } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants)
+            } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoConstants)
             {
                 this.randomBetweenTwoConstantsGroup.visible = true;
 
@@ -76,7 +76,7 @@ namespace editor
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
                 {
                     imageUtil.drawCurve(this.minMaxCurve.curve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
-                } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
+                } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoCurves)
                 {
                     imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curveMax, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
                 }
@@ -132,7 +132,7 @@ namespace editor
 
         private _onRightClick()
         {
-            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant || this.minMaxCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoConstants)
+            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant || this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoConstants)
                 return;
 
             var menus: MenuItem[] = [{
@@ -149,7 +149,7 @@ namespace editor
                         if (copyCurve.mode == feng3d.MinMaxCurveMode.Curve)
                         {
                             this.minMaxCurve.curve = feng3d.serialization.clone(copyCurve.curve);
-                        } else if (copyCurve.mode == feng3d.MinMaxCurveMode.RandomBetweenTwoCurves)
+                        } else if (copyCurve.mode == feng3d.MinMaxCurveMode.TwoCurves)
                         {
                             this.minMaxCurve.curveMin = feng3d.serialization.clone(copyCurve.curveMin);
                             this.minMaxCurve.curveMax = feng3d.serialization.clone(copyCurve.curveMax);
