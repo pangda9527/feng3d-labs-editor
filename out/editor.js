@@ -5554,11 +5554,11 @@ var editor;
             else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoConstants) {
                 this.randomBetweenTwoConstantsGroup.visible = true;
                 this.addBinder(new editor.NumberTextInputBinder().init({
-                    space: this.minMaxCurve, attribute: "constant", textInput: this.minValueTextInput, editable: true,
+                    space: this.minMaxCurve, attribute: "constantMin", textInput: this.minValueTextInput, editable: true,
                     controller: null,
                 }));
                 this.addBinder(new editor.NumberTextInputBinder().init({
-                    space: this.minMaxCurve, attribute: "constant1", textInput: this.maxValueTextInput, editable: true,
+                    space: this.minMaxCurve, attribute: "constantMax", textInput: this.maxValueTextInput, editable: true,
                     controller: null,
                 }));
             }
