@@ -11590,7 +11590,6 @@ var editor;
             rotationmatrix3d.appendRotation(feng3d.Vector3.Z_AXIS, rotation.z);
             rotationmatrix3d.appendRotation(axis, angle);
             var newrotation = rotationmatrix3d.decompose()[1];
-            newrotation.scaleNumber(180 / Math.PI);
             var v = Math.round((newrotation.x - rotation.x) / 180);
             if (v % 2 != 0) {
                 newrotation.x += 180;
@@ -12587,7 +12586,6 @@ var editor;
             var temp = cameraSceneTransform.clone();
             temp.append(this.toolModel.transform.worldToLocalMatrix);
             var rotation = temp.decompose()[1];
-            rotation.scaleNumber(Math.RAD2DEG);
             this.toolModel.freeAxis.transform.rotation = rotation;
             this.toolModel.cameraAxis.transform.rotation = rotation;
         };
@@ -13101,7 +13099,7 @@ var editor;
                 var rect = _this.engine.canvas.getBoundingClientRect();
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
-                var rotation = _this.engine.camera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleNumber(180 / Math.PI);
+                var rotation = _this.engine.camera.transform.localToWorldMatrix.clone().invert().decompose()[1];
                 rotationToolModel.transform.rotation = rotation;
                 //隐藏角度
                 var visibleAngle = Math.cos(15 * Math.DEG2RAD);
@@ -13212,7 +13210,6 @@ var editor;
                 var cameraTargetMatrix3D = feng3d.Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
                 cameraTargetMatrix3D.invert();
                 var result = cameraTargetMatrix3D.decompose()[1];
-                result.scaleNumber(180 / Math.PI);
                 feng3d.dispatcher.dispatch("editorCameraRotate", result);
                 this.onEditorCameraRotate(result);
             }

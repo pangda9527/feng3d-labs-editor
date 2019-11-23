@@ -73,7 +73,7 @@ namespace editor
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
 
-                var rotation = this.engine.camera.transform.localToWorldMatrix.clone().invert().decompose()[1].scaleNumber(180 / Math.PI);
+                var rotation = this.engine.camera.transform.localToWorldMatrix.clone().invert().decompose()[1];
                 rotationToolModel.transform.rotation = rotation;
 
                 //隐藏角度
@@ -209,7 +209,6 @@ namespace editor
                 var cameraTargetMatrix3D = feng3d.Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
                 cameraTargetMatrix3D.invert();
                 var result = cameraTargetMatrix3D.decompose()[1];
-                result.scaleNumber(180 / Math.PI);
 
                 feng3d.dispatcher.dispatch("editorCameraRotate", result);
 

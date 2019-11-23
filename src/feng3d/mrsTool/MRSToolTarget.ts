@@ -303,7 +303,6 @@ namespace editor
             rotationmatrix3d.appendRotation(feng3d.Vector3.Z_AXIS, rotation.z);
             rotationmatrix3d.appendRotation(axis, angle);
             var newrotation = rotationmatrix3d.decompose()[1];
-            newrotation.scaleNumber(180 / Math.PI);
             var v = Math.round((newrotation.x - rotation.x) / 180);
             if (v % 2 != 0)
             {

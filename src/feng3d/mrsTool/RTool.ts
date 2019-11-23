@@ -171,7 +171,6 @@ namespace editor
             var temp = cameraSceneTransform.clone();
             temp.append(this.toolModel.transform.worldToLocalMatrix);
             var rotation = temp.decompose()[1];
-            rotation.scaleNumber(Math.RAD2DEG);
             this.toolModel.freeAxis.transform.rotation = rotation;
             this.toolModel.cameraAxis.transform.rotation = rotation;
         }
