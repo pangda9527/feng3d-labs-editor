@@ -324,6 +324,12 @@ namespace editor
                             }
                         },
                         {
+                            label: "四边形", click: () =>
+                            {
+                                hierarchy.addGameObject(feng3d.gameObjectFactory.createQuad());
+                            }
+                        },
+                        {
                             label: "立方体", click: () =>
                             {
                                 hierarchy.addGameObject(feng3d.gameObjectFactory.createCube());

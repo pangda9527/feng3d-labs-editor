@@ -16336,6 +16336,11 @@ var editor;
                             }
                         },
                         {
+                            label: "四边形", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createQuad());
+                            }
+                        },
+                        {
                             label: "立方体", click: function () {
                                 editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCube());
                             }
