@@ -46,14 +46,14 @@ namespace editor
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
-            var pos = globalMatrix3D.position;
+            var pos = globalMatrix3D.getPosition();
             var xDir = globalMatrix3D.right;
             var yDir = globalMatrix3D.up;
             var zDir = globalMatrix3D.forward;
             //摄像机前方方向
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
-            var cameraPos = cameraSceneTransform.position;
+            var cameraPos = cameraSceneTransform.getPosition();
             this.movePlane3D = new feng3d.Plane3D();
             switch (event.currentTarget)
             {
@@ -99,7 +99,7 @@ namespace editor
                 case this.toolModel.yAxis:
                 case this.toolModel.zAxis:
                 case this.toolModel.cameraAxis:
-                    var origin = this.startSceneTransform.position;
+                    var origin = this.startSceneTransform.getPosition();
                     var planeCross = this.getMousePlaneCross();
                     var startDir = this.stepPlaneCross.subTo(origin);
                     startDir.normalize();

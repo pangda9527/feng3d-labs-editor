@@ -306,7 +306,7 @@ namespace editor
 			{
 				this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
 				this.rotateSceneCenter.scaleNumber(sceneControlConfig.lookDistance);
-				this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.position);
+				this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.getPosition());
 			}
 		}
 

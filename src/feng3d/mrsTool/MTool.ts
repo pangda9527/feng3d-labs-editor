@@ -128,7 +128,7 @@ namespace editor
             addPos.z *= this.changeXYZ.z;
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
-            var sceneAddpos = sceneTransform.position.subTo(this.startSceneTransform.position);
+            var sceneAddpos = sceneTransform.getPosition().subTo(this.startSceneTransform.getPosition());
             this.mrsToolTarget.translation(sceneAddpos);
         }
 

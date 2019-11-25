@@ -2857,7 +2857,7 @@ var editor;
             else {
                 this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
                 this.rotateSceneCenter.scaleNumber(editor.sceneControlConfig.lookDistance);
-                this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.position);
+                this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.getPosition());
             }
         };
         SceneView.prototype.onMouseRotateScene = function () {
@@ -11504,7 +11504,7 @@ var editor;
                         var localPivotPoint = this._position;
                         if (gameobject.parent)
                             localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
-                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).position;
+                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).getPosition();
                         gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                     }
                 }
@@ -11552,8 +11552,8 @@ var editor;
                         if (gameobject.parent)
                             localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
                         //
-                        tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).position;
-                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).position;
+                        tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
+                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
                         tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
                         gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
                     }
@@ -12406,7 +12406,7 @@ var editor;
             addPos.z *= this.changeXYZ.z;
             var sceneTransform = this.startSceneTransform.clone();
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
-            var sceneAddpos = sceneTransform.position.subTo(this.startSceneTransform.position);
+            var sceneAddpos = sceneTransform.getPosition().subTo(this.startSceneTransform.getPosition());
             this.mrsToolTarget.translation(sceneAddpos);
         };
         MTool.prototype.onMouseUp = function () {
@@ -12474,14 +12474,14 @@ var editor;
             //全局矩阵
             var globalMatrix3D = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
-            var pos = globalMatrix3D.position;
+            var pos = globalMatrix3D.getPosition();
             var xDir = globalMatrix3D.right;
             var yDir = globalMatrix3D.up;
             var zDir = globalMatrix3D.forward;
             //摄像机前方方向
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
-            var cameraPos = cameraSceneTransform.position;
+            var cameraPos = cameraSceneTransform.getPosition();
             this.movePlane3D = new feng3d.Plane3D();
             switch (event.currentTarget) {
                 case this.toolModel.xAxis:
@@ -12523,7 +12523,7 @@ var editor;
                 case this.toolModel.yAxis:
                 case this.toolModel.zAxis:
                 case this.toolModel.cameraAxis:
-                    var origin = this.startSceneTransform.position;
+                    var origin = this.startSceneTransform.getPosition();
                     var planeCross = this.getMousePlaneCross();
                     var startDir = this.stepPlaneCross.subTo(origin);
                     startDir.normalize();

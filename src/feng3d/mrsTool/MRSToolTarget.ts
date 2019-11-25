@@ -194,7 +194,7 @@ namespace editor
                         var localPivotPoint = this._position;
                         if (gameobject.parent)
                             localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
-                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).position;
+                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).getPosition();
                         gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                     }
                 }
@@ -250,8 +250,8 @@ namespace editor
                         if (gameobject.parent)
                             localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
                         //
-                        tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).position;
-                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).position;
+                        tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
+                        gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
 
                         tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
                         gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
