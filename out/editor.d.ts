@@ -1399,8 +1399,8 @@ declare namespace editor {
         once<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => void, thisObject?: any, priority?: number): void;
         dispatch<K extends keyof TreeNodeMap>(type: K, data?: TreeNodeMap[K], bubbles?: boolean): feng3d.Event<TreeNodeMap[K]>;
         has<K extends keyof TreeNodeMap>(type: K): boolean;
-        on<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
-        off<K extends keyof TreeNodeMap>(type?: K, listener?: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any): any;
+        on<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof TreeNodeMap>(type?: K, listener?: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any): void;
     }
     class TreeNode extends feng3d.EventDispatcher {
         /**
@@ -1963,8 +1963,8 @@ declare namespace editor {
         once<K extends keyof TextInputBinderEventMap>(type: K, listener: (event: feng3d.Event<TextInputBinderEventMap[K]>) => void, thisObject?: any, priority?: number): void;
         dispatch<K extends keyof TextInputBinderEventMap>(type: K, data?: TextInputBinderEventMap[K], bubbles?: boolean): feng3d.Event<TextInputBinderEventMap[K]>;
         has<K extends keyof TextInputBinderEventMap>(type: K): boolean;
-        on<K extends keyof TextInputBinderEventMap>(type: K, listener: (event: feng3d.Event<TextInputBinderEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
-        off<K extends keyof TextInputBinderEventMap>(type?: K, listener?: (event: feng3d.Event<TextInputBinderEventMap[K]>) => any, thisObject?: any): any;
+        on<K extends keyof TextInputBinderEventMap>(type: K, listener: (event: feng3d.Event<TextInputBinderEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof TextInputBinderEventMap>(type?: K, listener?: (event: feng3d.Event<TextInputBinderEventMap[K]>) => any, thisObject?: any): void;
     }
     class TextInputBinder extends feng3d.EventDispatcher implements UIBinder {
         space: any;
@@ -2841,8 +2841,8 @@ declare namespace editor {
         once<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => void, thisObject?: any, priority?: number): void;
         dispatch<K extends keyof AssetNodeEventMap>(type: K, data?: AssetNodeEventMap[K], bubbles?: boolean): feng3d.Event<AssetNodeEventMap[K]>;
         has<K extends keyof AssetNodeEventMap>(type: K): boolean;
-        on<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): any;
-        off<K extends keyof AssetNodeEventMap>(type?: K, listener?: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any): any;
+        on<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof AssetNodeEventMap>(type?: K, listener?: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any): void;
     }
     /**
      * 资源树结点

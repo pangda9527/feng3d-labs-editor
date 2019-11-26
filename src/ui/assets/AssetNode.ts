@@ -13,8 +13,8 @@ namespace editor
         once<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => void, thisObject?: any, priority?: number): void;
         dispatch<K extends keyof AssetNodeEventMap>(type: K, data?: AssetNodeEventMap[K], bubbles?: boolean): feng3d.Event<AssetNodeEventMap[K]>;
         has<K extends keyof AssetNodeEventMap>(type: K): boolean;
-        on<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean);
-        off<K extends keyof AssetNodeEventMap>(type?: K, listener?: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any);
+        on<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof AssetNodeEventMap>(type?: K, listener?: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any): void;
     }
 
     /**
