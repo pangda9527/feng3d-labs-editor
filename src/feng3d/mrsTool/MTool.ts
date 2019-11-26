@@ -149,7 +149,7 @@ namespace editor
             if (this.ismouseDown) return;
             if (!this.editorCamera) return;
 
-            var cameraPos = this.editorCamera.transform.scenePosition;
+            var cameraPos = this.editorCamera.transform.worldPosition;
             var localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformVector(cameraPos);
 
             this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;

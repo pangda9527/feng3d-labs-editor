@@ -346,7 +346,7 @@ namespace editor
 			sceneControlConfig.lookDistance -= moveDistance;
 
 			var forward = this.editorCamera.transform.localToWorldMatrix.forward;
-			var camerascenePosition = this.editorCamera.transform.scenePosition;
+			var camerascenePosition = this.editorCamera.transform.worldPosition;
 			var newCamerascenePosition = new feng3d.Vector3(
 				forward.x * moveDistance + camerascenePosition.x,
 				forward.y * moveDistance + camerascenePosition.y,

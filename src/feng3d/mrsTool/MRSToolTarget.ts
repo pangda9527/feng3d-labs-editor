@@ -86,12 +86,12 @@ namespace editor
             var position = new feng3d.Vector3();
             if (editorData.isBaryCenter)
             {
-                position.copy(transform.scenePosition);
+                position.copy(transform.worldPosition);
             } else
             {
                 for (var i = 0; i < this._controllerTargets.length; i++)
                 {
-                    position.add(this._controllerTargets[i].scenePosition);
+                    position.add(this._controllerTargets[i].worldPosition);
                 }
                 position.scaleNumber(1 / this._controllerTargets.length);
             }

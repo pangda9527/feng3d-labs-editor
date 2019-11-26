@@ -47,7 +47,7 @@ namespace editor
         {
             if (!this.editorCamera) return;
 
-            var cameraGlobalPosition = this.editorCamera.transform.scenePosition;
+            var cameraGlobalPosition = this.editorCamera.transform.worldPosition;
             var level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
             var step = Math.pow(10, level - 1);
 

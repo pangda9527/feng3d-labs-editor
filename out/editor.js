@@ -2888,7 +2888,7 @@ var editor;
             var moveDistance = (currentMousePoint.x + currentMousePoint.y - this.preMousePoint.x - this.preMousePoint.y) * editor.sceneControlConfig.sceneCameraForwardBackwardStep;
             editor.sceneControlConfig.lookDistance -= moveDistance;
             var forward = this.editorCamera.transform.localToWorldMatrix.forward;
-            var camerascenePosition = this.editorCamera.transform.scenePosition;
+            var camerascenePosition = this.editorCamera.transform.worldPosition;
             var newCamerascenePosition = new feng3d.Vector3(forward.x * moveDistance + camerascenePosition.x, forward.y * moveDistance + camerascenePosition.y, forward.z * moveDistance + camerascenePosition.z);
             var newCameraPosition = this.editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
             this.editorCamera.transform.position = newCameraPosition;
@@ -11416,11 +11416,11 @@ var editor;
             var transform = this._controllerTargets[this._controllerTargets.length - 1];
             var position = new feng3d.Vector3();
             if (editor.editorData.isBaryCenter) {
-                position.copy(transform.scenePosition);
+                position.copy(transform.worldPosition);
             }
             else {
                 for (var i = 0; i < this._controllerTargets.length; i++) {
-                    position.add(this._controllerTargets[i].scenePosition);
+                    position.add(this._controllerTargets[i].worldPosition);
                 }
                 position.scaleNumber(1 / this._controllerTargets.length);
             }
@@ -12423,7 +12423,7 @@ var editor;
                 return;
             if (!this.editorCamera)
                 return;
-            var cameraPos = this.editorCamera.transform.scenePosition;
+            var cameraPos = this.editorCamera.transform.worldPosition;
             var localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformVector(cameraPos);
             this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
             this.toolModel.xyPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;
@@ -13221,14 +13221,14 @@ var editor;
             if (editor.editorData.selectedGameObjects.length > 0) {
                 //计算观察距离
                 var selectedObj = editor.editorData.selectedGameObjects[0];
-                var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
+                var lookray = selectedObj.transform.worldPosition.subTo(camera.transform.worldPosition);
                 lookDistance = Math.max(0, forward.dot(lookray));
             }
             else {
                 lookDistance = editor.sceneControlConfig.lookDistance;
             }
             //旋转中心
-            var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
+            var rotateCenter = camera.transform.worldPosition.addTo(forward.scaleNumber(lookDistance));
             //计算目标四元素旋转
             var targetQuat = new feng3d.Quaternion();
             resultRotation.scaleNumber(Math.DEG2RAD);
@@ -13295,7 +13295,7 @@ var editor;
         GroundGrid.prototype.update = function () {
             if (!this.editorCamera)
                 return;
-            var cameraGlobalPosition = this.editorCamera.transform.scenePosition;
+            var cameraGlobalPosition = this.editorCamera.transform.worldPosition;
             var level = Math.floor(Math.log(Math.abs(cameraGlobalPosition.y)) / Math.LN10 + 1);
             var step = Math.pow(10, level - 1);
             var startX = Math.round(cameraGlobalPosition.x / (10 * step)) * 10 * step;
@@ -15288,7 +15288,7 @@ var editor;
                     new feng3d.Vector3(this.light.range, this.light.range, this.light.range);
             if (editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1) {
                 //
-                var camerapos = this.gameObject.transform.inverseTransformPoint(this.editorCamera.gameObject.transform.scenePosition);
+                var camerapos = this.gameObject.transform.inverseTransformPoint(this.editorCamera.gameObject.transform.worldPosition);
                 //
                 var segments = [];
                 var alpha = 1;

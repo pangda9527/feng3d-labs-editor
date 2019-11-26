@@ -99,7 +99,7 @@ namespace editor
             if (editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1)
             {
                 //
-                var camerapos = this.gameObject.transform.inverseTransformPoint(this.editorCamera.gameObject.transform.scenePosition);
+                var camerapos = this.gameObject.transform.inverseTransformPoint(this.editorCamera.gameObject.transform.worldPosition);
                 //
                 var segments: feng3d.Segment[] = [];
                 var alpha = 1;

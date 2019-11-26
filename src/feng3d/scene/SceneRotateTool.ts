@@ -225,14 +225,14 @@ namespace editor
             {
                 //计算观察距离
                 var selectedObj = editorData.selectedGameObjects[0];
-                var lookray = selectedObj.transform.scenePosition.subTo(camera.transform.scenePosition);
+                var lookray = selectedObj.transform.worldPosition.subTo(camera.transform.worldPosition);
                 lookDistance = Math.max(0, forward.dot(lookray));
             } else
             {
                 lookDistance = sceneControlConfig.lookDistance;
             }
             //旋转中心
-            var rotateCenter = camera.transform.scenePosition.addTo(forward.scaleNumber(lookDistance));
+            var rotateCenter = camera.transform.worldPosition.addTo(forward.scaleNumber(lookDistance));
             //计算目标四元素旋转
             var targetQuat = new feng3d.Quaternion();
             resultRotation.scaleNumber(Math.DEG2RAD);
