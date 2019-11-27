@@ -433,12 +433,12 @@ namespace editor
                 {
                     label: "Physics",
                     submenu: [
-                        { label: "PhysicsWorld", click: () => { gameobject.addComponent(physics.PhysicsWorld); } },
-                        { label: "Rigidbody", click: () => { gameobject.addComponent(physics.Rigidbody); } },
-                        { label: "Box Collider", click: () => { gameobject.addComponent(physics.BoxCollider); } },
-                        { label: "Sphere Collider", click: () => { gameobject.addComponent(physics.SphereCollider); } },
-                        { label: "Cylinder Collider", click: () => { gameobject.addComponent(physics.CylinderCollider); } },
-                        { label: "Plane Collider", click: () => { gameobject.addComponent(physics.PlaneCollider); } },
+                        { label: "PhysicsWorld", click: () => { gameobject.addComponent(CANNON.PhysicsWorld); } },
+                        { label: "Rigidbody", click: () => { gameobject.addComponent(CANNON.Rigidbody); } },
+                        { label: "Box Collider", click: () => { gameobject.addComponent(CANNON.BoxCollider); } },
+                        { label: "Sphere Collider", click: () => { gameobject.addComponent(CANNON.SphereCollider); } },
+                        { label: "Cylinder Collider", click: () => { gameobject.addComponent(CANNON.CylinderCollider); } },
+                        { label: "Plane Collider", click: () => { gameobject.addComponent(CANNON.PlaneCollider); } },
                     ]
                 },
                 {

@@ -18,7 +18,7 @@
             "path": "../feng3d"
         },
         {
-            "path": "../physics"
+            "path": "../cannon-plugin"
         },
     ],
     "files": [
