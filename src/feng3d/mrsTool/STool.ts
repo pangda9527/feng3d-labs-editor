@@ -65,22 +65,22 @@ namespace editor
                 case this.toolModel.xCube:
                     this.selectedItem = this.toolModel.xCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(ox).crossTo(ox), po);
-                    this.changeXYZ.init(1, 0, 0);
+                    this.changeXYZ.set(1, 0, 0);
                     break;
                 case this.toolModel.yCube:
                     this.selectedItem = this.toolModel.yCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oy).crossTo(oy), po);
-                    this.changeXYZ.init(0, 1, 0);
+                    this.changeXYZ.set(0, 1, 0);
                     break;
                 case this.toolModel.zCube:
                     this.selectedItem = this.toolModel.zCube;
                     this.movePlane3D.fromNormalAndPoint(cameraDir.crossTo(oz).crossTo(oz), po);
-                    this.changeXYZ.init(0, 0, 1);
+                    this.changeXYZ.set(0, 0, 1);
                     break;
                 case this.toolModel.oCube:
                     this.selectedItem = this.toolModel.oCube;
                     this.startMousePos = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
-                    this.changeXYZ.init(1, 1, 1);
+                    this.changeXYZ.set(1, 1, 1);
                     break;
             }
             this.startSceneTransform = globalMatrix3D.clone();
@@ -99,9 +99,9 @@ namespace editor
             {
                 var currentMouse = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
                 var distance = currentMouse.x - currentMouse.y - this.startMousePos.x + this.startMousePos.y;
-                addPos.init(distance, distance, distance);
+                addPos.set(distance, distance, distance);
                 var scale = 1 + (addPos.x + addPos.y) / editorui.stage.stageHeight;
-                addScale.init(scale, scale, scale);
+                addScale.set(scale, scale, scale);
             } else
             {
                 var crossPos = this.getLocalMousePlaneCross();
