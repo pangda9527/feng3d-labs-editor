@@ -16429,12 +16429,12 @@ var editor;
                 {
                     label: "Physics",
                     submenu: [
-                        { label: "PhysicsWorld", click: function () { gameobject.addComponent(physics.PhysicsWorld); } },
-                        { label: "Rigidbody", click: function () { gameobject.addComponent(physics.Rigidbody); } },
-                        { label: "Box Collider", click: function () { gameobject.addComponent(physics.BoxCollider); } },
-                        { label: "Sphere Collider", click: function () { gameobject.addComponent(physics.SphereCollider); } },
-                        { label: "Cylinder Collider", click: function () { gameobject.addComponent(physics.CylinderCollider); } },
-                        { label: "Plane Collider", click: function () { gameobject.addComponent(physics.PlaneCollider); } },
+                        { label: "PhysicsWorld", click: function () { gameobject.addComponent(CANNON.PhysicsWorld); } },
+                        { label: "Rigidbody", click: function () { gameobject.addComponent(CANNON.Rigidbody); } },
+                        { label: "Box Collider", click: function () { gameobject.addComponent(CANNON.BoxCollider); } },
+                        { label: "Sphere Collider", click: function () { gameobject.addComponent(CANNON.SphereCollider); } },
+                        { label: "Cylinder Collider", click: function () { gameobject.addComponent(CANNON.CylinderCollider); } },
+                        { label: "Plane Collider", click: function () { gameobject.addComponent(CANNON.PlaneCollider); } },
                     ]
                 },
                 {
