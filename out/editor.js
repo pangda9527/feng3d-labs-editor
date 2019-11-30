@@ -13279,7 +13279,7 @@ var editor;
             this._gameObject.addChild(groundGridObject);
             var model = groundGridObject.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            model.material = feng3d.Material.getDefaultMaterial("Default-SegmentMaterial");
+            model.material = feng3d.Material.getDefaultMaterial("Segment-Material");
         };
         GroundGrid.prototype.update = function () {
             if (!this.editorCamera)
@@ -13508,7 +13508,7 @@ var editor;
     var Feng3dScreenShot = /** @class */ (function () {
         function Feng3dScreenShot() {
             this.defaultGeometry = feng3d.Geometry.sphere;
-            this.defaultMaterial = feng3d.Material.default;
+            this.defaultMaterial = feng3d.Material.getDefaultMaterial("Default-Material");
             this.materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
             this.geometryObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
             // 初始化3d
@@ -16360,6 +16360,11 @@ var editor;
                         {
                             label: "圆环", click: function () {
                                 editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createTorus());
+                            }
+                        },
+                        {
+                            label: "线段", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createSegment());
                             }
                         },
                         {

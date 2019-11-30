@@ -39,7 +39,7 @@ namespace editor
 
             var model = groundGridObject.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            model.material = feng3d.Material.getDefaultMaterial("Default-SegmentMaterial");
+            model.material = feng3d.Material.getDefaultMaterial("Segment-Material");
         }
 
         update()

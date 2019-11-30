@@ -366,6 +366,12 @@ namespace editor
                             }
                         },
                         {
+                            label: "线段", click: () =>
+                            {
+                                hierarchy.addGameObject(feng3d.gameObjectFactory.createSegment());
+                            }
+                        },
+                        {
                             label: "地形", click: () =>
                             {
                                 hierarchy.addGameObject(feng3d.gameObjectFactory.createTerrain());
