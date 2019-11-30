@@ -13279,7 +13279,7 @@ var editor;
             this._gameObject.addChild(groundGridObject);
             var model = groundGridObject.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            model.material = feng3d.Material.getDefaultMaterial("Segment-Material");
+            model.material = feng3d.Material.getDefault("Segment-Material");
         };
         GroundGrid.prototype.update = function () {
             if (!this.editorCamera)
@@ -13508,7 +13508,7 @@ var editor;
     var Feng3dScreenShot = /** @class */ (function () {
         function Feng3dScreenShot() {
             this.defaultGeometry = feng3d.Geometry.getDefault("Sphere");
-            this.defaultMaterial = feng3d.Material.getDefaultMaterial("Default-Material");
+            this.defaultMaterial = feng3d.Material.getDefault("Default-Material");
             this.materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
             this.geometryObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
             // 初始化3d

@@ -17,7 +17,7 @@ namespace editor
 
         defaultGeometry = feng3d.Geometry.getDefault("Sphere");
 
-        defaultMaterial = feng3d.Material.getDefaultMaterial("Default-Material");
+        defaultMaterial = feng3d.Material.getDefault("Default-Material");
 
         constructor()
         {
