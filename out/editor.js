@@ -13507,7 +13507,7 @@ var editor;
      */
     var Feng3dScreenShot = /** @class */ (function () {
         function Feng3dScreenShot() {
-            this.defaultGeometry = feng3d.Geometry.sphere;
+            this.defaultGeometry = feng3d.Geometry.getDefault("Sphere");
             this.defaultMaterial = feng3d.Material.getDefaultMaterial("Default-Material");
             this.materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
             this.geometryObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
