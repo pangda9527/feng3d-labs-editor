@@ -86,7 +86,7 @@ namespace editor
                 {
                     //
                     var points: feng3d.PointInfo[] = [];
-                    var segments: feng3d.Segment[] = [];
+                    var segments: Partial<feng3d.Segment>[] = [];
                     var lens = this.camera.lens;
                     var near = lens.near;
                     var far = lens.far;
@@ -136,7 +136,11 @@ namespace editor
                         { start: new feng3d.Vector3(farRight, farBottom, far), end: new feng3d.Vector3(farRight, farTop, far) },
                     );
                     this._pointGeometry.points = points;
-                    this._segmentGeometry.segments = segments;
+                    this._segmentGeometry.segments.length = 0;
+                    segments.forEach(v =>
+                    {
+                        this._segmentGeometry.addSegment(v);
+                    })
                     this._lensChanged = false;
                 }
                 //

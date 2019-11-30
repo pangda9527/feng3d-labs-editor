@@ -293,7 +293,7 @@ namespace navigation
         private debugShowLines(lines: Line[])
         {
             createSegment();
-            var segments: feng3d.Segment[] = [];
+            segmentGeometry.segments.length = 0;
             lines.forEach(element =>
             {
                 var points = element.points.map((pointindex) =>
@@ -301,9 +301,8 @@ namespace navigation
                     var value = this.data.pointmap.get(pointindex).value;
                     return new feng3d.Vector3(value[0], value[1], value[2]);
                 });
-                segments.push({ start: points[0], end: points[1] });
+                segmentGeometry.addSegment({ start: points[0], end: points[1] });
             });
-            segmentGeometry.segments = segments;
         }
 
         /**

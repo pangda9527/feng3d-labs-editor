@@ -9497,6 +9497,11 @@ var editor;
                                     }
                                 },
                                 {
+                                    label: "线段", click: function () {
+                                        _this.createAsset(assetNode, feng3d.GeometryAsset, "New SegmentGeometry", { data: new feng3d.SegmentGeometry() });
+                                    }
+                                },
+                                {
                                     label: "地形", click: function () {
                                         _this.createAsset(assetNode, feng3d.GeometryAsset, "New TerrainGeometry", { data: new feng3d.TerrainGeometry() });
                                     }
@@ -11664,7 +11669,7 @@ var editor;
             var xLine = new feng3d.GameObject();
             var model = xLine.addComponent(feng3d.Model);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            segmentGeometry.segments.push({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
+            segmentGeometry.addSegment({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
             this.segmentMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
             this.gameObject.addChild(xLine);
             //
@@ -13278,8 +13283,7 @@ var editor;
             this._gameObject.addChild(groundGridObject);
             var model = groundGridObject.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES } });
-            material.renderParams.enableBlend = true;
+            model.material = feng3d.Material.create("segment", {}, { enableBlend: true });
         };
         GroundGrid.prototype.update = function () {
             if (!this.editorCamera)
@@ -14530,15 +14534,14 @@ var navigation;
         NavigationProcess.prototype.debugShowLines = function (lines) {
             var _this = this;
             createSegment();
-            var segments = [];
+            segmentGeometry.segments.length = 0;
             lines.forEach(function (element) {
                 var points = element.points.map(function (pointindex) {
                     var value = _this.data.pointmap.get(pointindex).value;
                     return new feng3d.Vector3(value[0], value[1], value[2]);
                 });
-                segments.push({ start: points[0], end: points[1] });
+                segmentGeometry.addSegment({ start: points[0], end: points[1] });
             });
-            segmentGeometry.segments = segments;
         };
         /**
          * 获取所有独立边
@@ -15638,6 +15641,7 @@ var editor;
             this.enabled = true;
         };
         CameraIcon.prototype.update = function () {
+            var _this = this;
             if (!this.camera)
                 return;
             if (editor.editorData.selectedGameObjects.indexOf(this.camera.gameObject) != -1) {
@@ -15682,7 +15686,10 @@ var editor;
                     //
                     { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farRight, farBottom, far) }, { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farLeft, farTop, far) }, { start: new feng3d.Vector3(farLeft, farTop, far), end: new feng3d.Vector3(farRight, farTop, far) }, { start: new feng3d.Vector3(farRight, farBottom, far), end: new feng3d.Vector3(farRight, farTop, far) });
                     this._pointGeometry.points = points;
-                    this._segmentGeometry.segments = segments;
+                    this._segmentGeometry.segments.length = 0;
+                    segments.forEach(function (v) {
+                        _this._segmentGeometry.addSegment(v);
+                    });
                     this._lensChanged = false;
                 }
                 //

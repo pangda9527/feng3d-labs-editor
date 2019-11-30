@@ -45,7 +45,7 @@ namespace editor
 
             //
             var num = 10;
-            var segments: feng3d.Segment[] = [];
+            var segments: Partial<feng3d.Segment>[] = [];
             for (var i = 0; i < num; i++)
             {
                 var angle = i * Math.PI * 2 / num;
