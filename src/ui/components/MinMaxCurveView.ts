@@ -55,7 +55,7 @@ namespace editor
 
                 this.addBinder(new NumberTextInputBinder().init({
                     space: this.minMaxCurve, attribute: "constant", textInput: this.constantTextInput, editable: true,
-                    controller: null,
+                    controller: this.constantTextInput,
                 }));
             } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoConstants)
             {
@@ -63,11 +63,11 @@ namespace editor
 
                 this.addBinder(new NumberTextInputBinder().init({
                     space: this.minMaxCurve, attribute: "constantMin", textInput: this.minValueTextInput, editable: true,
-                    controller: null,
+                    controller: this.minValueTextInput,
                 }));
                 this.addBinder(new NumberTextInputBinder().init({
                     space: this.minMaxCurve, attribute: "constantMax", textInput: this.maxValueTextInput, editable: true,
-                    controller: null,
+                    controller: this.maxValueTextInput,
                 }));
             } else
             {
