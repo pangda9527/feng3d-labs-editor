@@ -18,11 +18,6 @@ namespace editor
         stepScale = 1;
 
         /**
-         * 控制器
-         */
-        controller: egret.DisplayObject;
-
-        /**
          * 最小值
          */
         minValue = NaN;
@@ -31,6 +26,11 @@ namespace editor
          * 最小值
          */
         maxValue = NaN;
+
+        /**
+         * 控制器
+         */
+        controller: egret.DisplayObject;
 
         toText = function (v)
         {

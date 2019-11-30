@@ -1986,10 +1986,6 @@ declare namespace editor {
          */
         stepScale: number;
         /**
-         * 控制器
-         */
-        controller: egret.DisplayObject;
-        /**
          * 最小值
          */
         minValue: number;
@@ -1997,6 +1993,10 @@ declare namespace editor {
          * 最小值
          */
         maxValue: number;
+        /**
+         * 控制器
+         */
+        controller: egret.DisplayObject;
         toText: (v: any) => string;
         toValue: (v: any) => number;
         initView(): void;
@@ -2311,6 +2311,26 @@ declare namespace editor {
         yTextInput: eui.TextInput;
         zLabel: eui.Label;
         zTextInput: eui.TextInput;
+        /**
+         * 步长，精度
+         */
+        step: number;
+        /**
+         * 键盘上下方向键步长
+         */
+        stepDownup: number;
+        /**
+         * 移动一个像素时增加的步长数量
+         */
+        stepScale: number;
+        /**
+         * 最小值
+         */
+        minValue: number;
+        /**
+         * 最小值
+         */
+        maxValue: number;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
     }

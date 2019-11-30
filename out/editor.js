@@ -7604,6 +7604,26 @@ var editor;
         __extends(OAVVector3, _super);
         function OAVVector3(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
+            /**
+             * 步长，精度
+             */
+            _this.step = 0.001;
+            /**
+             * 键盘上下方向键步长
+             */
+            _this.stepDownup = 0.001;
+            /**
+             * 移动一个像素时增加的步长数量
+             */
+            _this.stepScale = 1;
+            /**
+             * 最小值
+             */
+            _this.minValue = NaN;
+            /**
+             * 最小值
+             */
+            _this.maxValue = NaN;
             _this.skinName = "OAVVector3";
             return _this;
         }
@@ -7611,15 +7631,15 @@ var editor;
             _super.prototype.initView.call(this);
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
-                controller: this.xLabel,
+                controller: this.xLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.attributeValue, attribute: "y", textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
-                controller: this.yLabel,
+                controller: this.yLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.attributeValue, attribute: "z", textInput: this.zTextInput, editable: this._attributeViewInfo.editable,
-                controller: this.zLabel,
+                controller: this.zLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
         };
         OAVVector3 = __decorate([
