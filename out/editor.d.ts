@@ -1456,7 +1456,8 @@ declare namespace editor {
         set vm(v: feng3d.Vector3 | feng3d.Vector4);
         private _vm;
         constructor();
-        set showw(value: any);
+        get showw(): boolean;
+        set showw(value: boolean);
         private _showw;
         private onComplete;
         private onAddedToStage;
@@ -2308,6 +2309,20 @@ declare namespace editor {
         initView(): void;
         dispose(): void;
         updateView(): void;
+    }
+}
+declare namespace editor {
+    /**
+     * Vector2属性界面
+     */
+    class OAVVector2 extends OAVBase {
+        labelLab: eui.Label;
+        xLabel: eui.Label;
+        xTextInput: eui.TextInput;
+        yLabel: eui.Label;
+        yTextInput: eui.TextInput;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
     }
 }
 declare namespace editor {

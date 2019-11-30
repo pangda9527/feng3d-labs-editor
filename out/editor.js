@@ -4509,6 +4509,7 @@ var editor;
             configurable: true
         });
         Object.defineProperty(Vector3DView.prototype, "showw", {
+            get: function () { return this._showw; },
             set: function (value) {
                 if (this._showw == value)
                     return;
@@ -7673,6 +7674,36 @@ var editor;
         return OAVMultiText;
     }(editor.OAVBase));
     editor.OAVMultiText = OAVMultiText;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * Vector2属性界面
+     */
+    var OAVVector2 = /** @class */ (function (_super) {
+        __extends(OAVVector2, _super);
+        function OAVVector2(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVVector2";
+            return _this;
+        }
+        OAVVector2.prototype.initView = function () {
+            _super.prototype.initView.call(this);
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
+                controller: this.xLabel,
+            }));
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.attributeValue, attribute: "y", textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
+                controller: this.yLabel,
+            }));
+        };
+        OAVVector2 = __decorate([
+            feng3d.OAVComponent()
+        ], OAVVector2);
+        return OAVVector2;
+    }(editor.OAVBase));
+    editor.OAVVector2 = OAVVector2;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -16549,6 +16580,7 @@ var editor;
     feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "OAVBoolean" });
     feng3d.objectview.setDefaultTypeAttributeView("String", { component: "OAVString" });
     feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
+    feng3d.objectview.setDefaultTypeAttributeView("Vector2", { component: "OAVVector2" });
     feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
     feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });
     feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });

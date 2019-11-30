@@ -9,6 +9,7 @@ namespace editor
     feng3d.objectview.setDefaultTypeAttributeView("Boolean", { component: "OAVBoolean" });
     feng3d.objectview.setDefaultTypeAttributeView("String", { component: "OAVString" });
     feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
+    feng3d.objectview.setDefaultTypeAttributeView("Vector2", { component: "OAVVector2" });
     feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
     feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });
     feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });

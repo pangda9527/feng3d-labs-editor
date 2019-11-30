@@ -32,6 +32,7 @@ namespace editor
 			this.skinName = "Vector3DViewSkin";
 		}
 
+		get showw() { return this._showw; }
 		set showw(value)
 		{
 			if (this._showw == value)

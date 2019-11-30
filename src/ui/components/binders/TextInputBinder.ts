@@ -67,12 +67,12 @@ namespace editor
         /**
          * 绑定属性值转换为文本
          */
-        toText = (v) => v;
+        toText = (v: any) => v;
 
         /**
          * 文本转换为绑定属性值
          */
-        toValue = (v) => v;
+        toValue = (v: any) => v;
 
         init(v: Partial<this>)
         {

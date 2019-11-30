@@ -120,6 +120,7 @@
         "src/objectview/oav/OAVNumber.ts",
         "src/objectview/oav/OAVString.ts",
         "src/objectview/oav/OAVMultiText.ts",
+        "src/objectview/oav/OAVVector2.ts",
         "src/objectview/oav/OAVVector3D.ts",
         "src/objectview/oav/OAVArray.ts",
         "src/objectview/oav/OAVEnum.ts",
