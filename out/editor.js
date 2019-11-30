@@ -11670,7 +11670,7 @@ var editor;
             var model = xLine.addComponent(feng3d.Model);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             segmentGeometry.addSegment({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
-            this.segmentMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES, enableBlend: true } });
+            this.segmentMaterial = model.material = feng3d.Material.create("segment");
             this.gameObject.addChild(xLine);
             //
             this.xArrow = new feng3d.GameObject();
@@ -11773,11 +11773,7 @@ var editor;
             var border = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "border" });
             model = border.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
-                shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
-                uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
-            });
-            material.renderParams.enableBlend = true;
+            model.material = feng3d.Material.create("segment", { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) });
             this.gameObject.addChild(border);
             this.isinit = true;
             this.update();
@@ -13283,7 +13279,7 @@ var editor;
             this._gameObject.addChild(groundGridObject);
             var model = groundGridObject.addComponent(feng3d.Model);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-            model.material = feng3d.Material.create("segment", {}, { enableBlend: true });
+            model.material = feng3d.Material.getDefaultMaterial("Default-SegmentMaterial");
         };
         GroundGrid.prototype.update = function () {
             if (!this.editorCamera)
