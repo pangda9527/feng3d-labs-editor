@@ -1445,33 +1445,6 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class Vector3DView extends eui.Component implements eui.UIComponent {
-        group: eui.Group;
-        xTextInput: eui.TextInput;
-        yTextInput: eui.TextInput;
-        zTextInput: eui.TextInput;
-        wGroup: eui.Group;
-        wTextInput: eui.TextInput;
-        get vm(): feng3d.Vector3 | feng3d.Vector4;
-        set vm(v: feng3d.Vector3 | feng3d.Vector4);
-        private _vm;
-        constructor();
-        get showw(): boolean;
-        set showw(value: boolean);
-        private _showw;
-        private onComplete;
-        private onAddedToStage;
-        private onRemovedFromStage;
-        private addItemEventListener;
-        private removeItemEventListener;
-        private _textfocusintxt;
-        private ontxtfocusin;
-        private ontxtfocusout;
-        updateView(): void;
-        private onTextChange;
-    }
-}
-declare namespace editor {
     class ComponentView extends eui.Component {
         component: feng3d.Components;
         componentView: feng3d.IObjectView;
@@ -2326,12 +2299,39 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class OAVVector3D extends OAVBase {
+    /**
+     * Vector3属性界面
+     */
+    class OAVVector3 extends OAVBase {
         labelLab: eui.Label;
-        vector3DView: editor.Vector3DView;
+        group: eui.Group;
+        xLabel: eui.Label;
+        xTextInput: eui.TextInput;
+        yLabel: eui.Label;
+        yTextInput: eui.TextInput;
+        zLabel: eui.Label;
+        zTextInput: eui.TextInput;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
-        dispose(): void;
+    }
+}
+declare namespace editor {
+    /**
+     * Vector4属性界面
+     */
+    class OAVVector4 extends OAVBase {
+        labelLab: eui.Label;
+        group: eui.Group;
+        xLabel: eui.Label;
+        xTextInput: eui.TextInput;
+        yLabel: eui.Label;
+        yTextInput: eui.TextInput;
+        zLabel: eui.Label;
+        zTextInput: eui.TextInput;
+        wLabel: eui.Label;
+        wTextInput: eui.TextInput;
+        constructor(attributeViewInfo: feng3d.AttributeViewInfo);
+        initView(): void;
     }
 }
 declare namespace editor {

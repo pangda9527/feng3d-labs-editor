@@ -4483,116 +4483,6 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var Vector3DView = /** @class */ (function (_super) {
-        __extends(Vector3DView, _super);
-        function Vector3DView() {
-            var _this = _super.call(this) || this;
-            _this._vm = new feng3d.Vector3(1, 2, 3);
-            _this._showw = false;
-            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
-            _this.skinName = "Vector3DViewSkin";
-            return _this;
-        }
-        Object.defineProperty(Vector3DView.prototype, "vm", {
-            get: function () {
-                return this._vm;
-            },
-            set: function (v) {
-                if (v)
-                    this._vm = v;
-                else
-                    this._vm = new feng3d.Vector3(1, 2, 3);
-                this.showw = v instanceof feng3d.Vector4;
-                this.updateView();
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Vector3DView.prototype, "showw", {
-            get: function () { return this._showw; },
-            set: function (value) {
-                if (this._showw == value)
-                    return;
-                this._showw = value;
-                this.skin.currentState = this._showw ? "showw" : "default";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Vector3DView.prototype.onComplete = function () {
-            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
-            if (this.stage) {
-                this.onAddedToStage();
-            }
-        };
-        Vector3DView.prototype.onAddedToStage = function () {
-            var _this = this;
-            this.skin.currentState = this._showw ? "showw" : "default";
-            this.updateView();
-            [this.xTextInput, this.yTextInput, this.zTextInput, this.wTextInput].forEach(function (item) {
-                _this.addItemEventListener(item);
-            });
-        };
-        Vector3DView.prototype.onRemovedFromStage = function () {
-            var _this = this;
-            [this.xTextInput, this.yTextInput, this.zTextInput, this.wTextInput].forEach(function (item) {
-                _this.removeItemEventListener(item);
-            });
-        };
-        Vector3DView.prototype.addItemEventListener = function (input) {
-            input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            input.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-        };
-        Vector3DView.prototype.removeItemEventListener = function (input) {
-            input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-        };
-        Vector3DView.prototype.ontxtfocusin = function () {
-            this._textfocusintxt = true;
-        };
-        Vector3DView.prototype.ontxtfocusout = function () {
-            this._textfocusintxt = false;
-            this.updateView();
-        };
-        Vector3DView.prototype.updateView = function () {
-            if (this._textfocusintxt)
-                return;
-            if (!this.xTextInput)
-                return;
-            this.xTextInput.text = "" + this.vm.x;
-            this.yTextInput.text = "" + this.vm.y;
-            this.zTextInput.text = "" + this.vm.z;
-            if (this.vm instanceof feng3d.Vector4)
-                this.wTextInput.text = "" + this.vm.w;
-        };
-        Vector3DView.prototype.onTextChange = function (event) {
-            if (!this._textfocusintxt)
-                return;
-            switch (event.currentTarget) {
-                case this.xTextInput:
-                    this.vm.x = Number(this.xTextInput.text);
-                    break;
-                case this.yTextInput:
-                    this.vm.y = Number(this.yTextInput.text);
-                    break;
-                case this.zTextInput:
-                    this.vm.z = Number(this.zTextInput.text);
-                    break;
-                case this.wTextInput:
-                    if (this.vm instanceof feng3d.Vector4)
-                        this.wTextInput.text = "" + this.vm.w;
-                    break;
-            }
-        };
-        return Vector3DView;
-    }(eui.Component));
-    editor.Vector3DView = Vector3DView;
-})(editor || (editor = {}));
-var editor;
-(function (editor) {
     var ComponentView = /** @class */ (function (_super) {
         __extends(ComponentView, _super);
         /**
@@ -7707,27 +7597,75 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    var OAVVector3D = /** @class */ (function (_super) {
-        __extends(OAVVector3D, _super);
-        function OAVVector3D(attributeViewInfo) {
+    /**
+     * Vector3属性界面
+     */
+    var OAVVector3 = /** @class */ (function (_super) {
+        __extends(OAVVector3, _super);
+        function OAVVector3(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
-            _this.skinName = "OAVVector3DSkin";
+            _this.skinName = "OAVVector3";
             return _this;
         }
-        OAVVector3D.prototype.initView = function () {
-            this.vector3DView.vm = this.attributeValue;
-            eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
+        OAVVector3.prototype.initView = function () {
+            _super.prototype.initView.call(this);
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
+                controller: this.xLabel,
+            }));
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.attributeValue, attribute: "y", textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
+                controller: this.yLabel,
+            }));
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.attributeValue, attribute: "z", textInput: this.zTextInput, editable: this._attributeViewInfo.editable,
+                controller: this.zLabel,
+            }));
         };
-        OAVVector3D.prototype.dispose = function () {
-            // this.vector3DView.vm = <any>this.attributeValue;
-            // eui.Binding.bindProperty(this, ["_space", this._attributeName], this.vector3DView, "vm");
-        };
-        OAVVector3D = __decorate([
+        OAVVector3 = __decorate([
             feng3d.OAVComponent()
-        ], OAVVector3D);
-        return OAVVector3D;
+        ], OAVVector3);
+        return OAVVector3;
     }(editor.OAVBase));
-    editor.OAVVector3D = OAVVector3D;
+    editor.OAVVector3 = OAVVector3;
+})(editor || (editor = {}));
+var editor;
+(function (editor) {
+    /**
+     * Vector4属性界面
+     */
+    var OAVVector4 = /** @class */ (function (_super) {
+        __extends(OAVVector4, _super);
+        function OAVVector4(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVVector4";
+            return _this;
+        }
+        OAVVector4.prototype.initView = function () {
+            _super.prototype.initView.call(this);
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
+                controller: this.xLabel,
+            }));
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.attributeValue, attribute: "y", textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
+                controller: this.yLabel,
+            }));
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.attributeValue, attribute: "z", textInput: this.zTextInput, editable: this._attributeViewInfo.editable,
+                controller: this.zLabel,
+            }));
+            this.addBinder(new editor.NumberTextInputBinder().init({
+                space: this.attributeValue, attribute: "w", textInput: this.wTextInput, editable: this._attributeViewInfo.editable,
+                controller: this.wLabel,
+            }));
+        };
+        OAVVector4 = __decorate([
+            feng3d.OAVComponent()
+        ], OAVVector4);
+        return OAVVector4;
+    }(editor.OAVBase));
+    editor.OAVVector4 = OAVVector4;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
@@ -16581,7 +16519,8 @@ var editor;
     feng3d.objectview.setDefaultTypeAttributeView("String", { component: "OAVString" });
     feng3d.objectview.setDefaultTypeAttributeView("number", { component: "OAVNumber" });
     feng3d.objectview.setDefaultTypeAttributeView("Vector2", { component: "OAVVector2" });
-    feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3D" });
+    feng3d.objectview.setDefaultTypeAttributeView("Vector3", { component: "OAVVector3" });
+    feng3d.objectview.setDefaultTypeAttributeView("Vector4", { component: "OAVVector4" });
     feng3d.objectview.setDefaultTypeAttributeView("Array", { component: "OAVArray" });
     feng3d.objectview.setDefaultTypeAttributeView("Function", { component: "OAVFunction" });
     feng3d.objectview.setDefaultTypeAttributeView("Color3", { component: "OAVColorPicker" });

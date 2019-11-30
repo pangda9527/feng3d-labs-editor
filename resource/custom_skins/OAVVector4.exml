@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="OAVVector4" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
+	<e:Group y="0" width="100%">
+		<e:Label id="labelLab" size="12" width="80" x="0" y="0" verticalAlign="middle" textColor="0x000000" multiline="false" text=""/>
+		<e:Group id="group" width="100%">
+		<e:Group x="0" y="0" width="100%">
+			<e:Label id="xLabel" text="X" size="12" textAlign="right" x="0" y="0" textColor="0x000000"/>
+			<e:TextInput id="xTextInput" width="100%" x="113" y="117"/>
+			<e:layout>
+			<e:HorizontalLayout verticalAlign="middle"/>
+			</e:layout>
+		</e:Group>
+		<e:Group x="112" y="0" width="100%">
+			<e:Label id="yLabel" text="Y" size="12" textAlign="right" x="0" y="0" textColor="0x000000" verticalAlign="middle"/>
+			<e:TextInput id="yTextInput" width="100%" x="123" y="127"/>
+			<e:layout>
+			<e:HorizontalLayout verticalAlign="middle"/>
+			</e:layout>
+		</e:Group>
+		<e:Group x="122" y="10" width="100%">
+			<e:Label id="zLabel" text="Z" size="12" textAlign="right" x="0" y="0" textColor="0x000000" verticalAlign="middle"/>
+			<e:TextInput id="zTextInput" width="100%" x="133" y="137"/>
+			<e:layout>
+			<e:HorizontalLayout verticalAlign="middle"/>
+			</e:layout>
+		</e:Group>
+		<e:Group x="132" y="20" width="100%">
+			<e:Label id="wLabel" text="W" size="12" textAlign="right" x="0" y="0" textColor="0x000000" verticalAlign="middle"/>
+			<e:TextInput id="wTextInput" width="100%" x="133" y="137"/>
+			<e:layout>
+			<e:HorizontalLayout verticalAlign="middle"/>
+			</e:layout>
+		</e:Group>
+		<e:layout>
+			<e:HorizontalLayout paddingLeft="0" paddingRight="0" verticalAlign="middle"/>
+		</e:layout>
+		</e:Group>
+		<e:layout>
+		<e:HorizontalLayout verticalAlign="middle"/>
+		</e:layout>
+	</e:Group>
+</e:Skin>
