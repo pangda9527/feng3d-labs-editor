@@ -164,7 +164,7 @@ namespace editor
             var toolEngine = new feng3d.Engine(canvas);
             toolEngine.scene.background.a = 0.0;
             toolEngine.scene.ambientColor.setTo(0.2, 0.2, 0.2);
-            toolEngine.root.addChild(feng3d.gameObjectFactory.createPointLight());
+            toolEngine.root.addChild(feng3d.GameObject.createPrimitive("Point light"));
             return { toolEngine, canvas };
         }
 

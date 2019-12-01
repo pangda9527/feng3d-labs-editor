@@ -320,13 +320,13 @@ namespace editor
                         {
                             label: "平面", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createPlane());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Plane"));
                             }
                         },
                         {
                             label: "四边形", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createQuad());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Quad"));
                             }
                         },
                         {
@@ -338,49 +338,49 @@ namespace editor
                         {
                             label: "球体", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createSphere());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Sphere"));
                             }
                         },
                         {
                             label: "胶囊体", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createCapsule());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Capsule"));
                             }
                         },
                         {
                             label: "圆柱体", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createCylinder());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cylinder"));
                             }
                         },
                         {
                             label: "圆锥体", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createCone());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cone"));
                             }
                         },
                         {
                             label: "圆环", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createTorus());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Torus"));
                             }
                         },
                         {
                             label: "线段", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createSegment());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Segment"));
                             }
                         },
                         {
                             label: "地形", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createTerrain());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Terrain"));
                             }
                         },
                         {
                             label: "水", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createWater());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Water"));
                             }
                         },
                     ],
@@ -391,19 +391,19 @@ namespace editor
                         {
                             label: "点光源", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createPointLight());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Point light"));
                             }
                         },
                         {
                             label: "方向光源", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createDirectionalLight());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Directional light"));
                             }
                         },
                         {
                             label: "聚光灯", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createSpotLight());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Spot light"));
                             }
                         },
                     ],
@@ -411,13 +411,13 @@ namespace editor
                 {
                     label: "粒子系统", click: () =>
                     {
-                        hierarchy.addGameObject(feng3d.gameObjectFactory.createParticle());
+                        hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Particle System"));
                     }
                 },
                 {
                     label: "摄像机", click: () =>
                     {
-                        hierarchy.addGameObject(feng3d.gameObjectFactory.createCamera());
+                        hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Camera"));
                     }
                 },
             ];

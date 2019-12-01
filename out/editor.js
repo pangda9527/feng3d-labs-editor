@@ -13162,7 +13162,7 @@ var editor;
             var toolEngine = new feng3d.Engine(canvas);
             toolEngine.scene.background.a = 0.0;
             toolEngine.scene.ambientColor.setTo(0.2, 0.2, 0.2);
-            toolEngine.root.addChild(feng3d.gameObjectFactory.createPointLight());
+            toolEngine.root.addChild(feng3d.GameObject.createPrimitive("Point light"));
             return { toolEngine: toolEngine, canvas: canvas };
         };
         SceneRotateTool.prototype.onclick = function (e) {
@@ -16324,12 +16324,12 @@ var editor;
                     submenu: [
                         {
                             label: "平面", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createPlane());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Plane"));
                             }
                         },
                         {
                             label: "四边形", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createQuad());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Quad"));
                             }
                         },
                         {
@@ -16339,42 +16339,42 @@ var editor;
                         },
                         {
                             label: "球体", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createSphere());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Sphere"));
                             }
                         },
                         {
                             label: "胶囊体", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCapsule());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Capsule"));
                             }
                         },
                         {
                             label: "圆柱体", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCylinder());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cylinder"));
                             }
                         },
                         {
                             label: "圆锥体", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCone());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cone"));
                             }
                         },
                         {
                             label: "圆环", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createTorus());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Torus"));
                             }
                         },
                         {
                             label: "线段", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createSegment());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Segment"));
                             }
                         },
                         {
                             label: "地形", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createTerrain());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Terrain"));
                             }
                         },
                         {
                             label: "水", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createWater());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Water"));
                             }
                         },
                     ],
@@ -16384,29 +16384,29 @@ var editor;
                     submenu: [
                         {
                             label: "点光源", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createPointLight());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Point light"));
                             }
                         },
                         {
                             label: "方向光源", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createDirectionalLight());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Directional light"));
                             }
                         },
                         {
                             label: "聚光灯", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createSpotLight());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Spot light"));
                             }
                         },
                     ],
                 },
                 {
                     label: "粒子系统", click: function () {
-                        editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createParticle());
+                        editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Particle System"));
                     }
                 },
                 {
                     label: "摄像机", click: function () {
-                        editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCamera());
+                        editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Camera"));
                     }
                 },
             ];
