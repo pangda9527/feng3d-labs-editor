@@ -15,7 +15,7 @@ namespace navigation
             var up = new feng3d.Vector3(0, 1, 0);
             var mincos = Math.cos(maxSlope * Math.DEG2RAD);
 
-            var keys = this.data.trianglemap.getKeys();
+            var keys = Map.getKeys(this.data.trianglemap);
             keys.forEach(element =>
             {
                 var normal = this.data.trianglemap.get(element).getNormal();
@@ -47,7 +47,7 @@ namespace navigation
             // pointmap.getValues().forEach(handlePoint);
             // 方案2：遍历所有边缘边，把所有在边缘边左边角内的点移到左边角平分线上，所有在边缘边右边角内的移到右边角平分线上，
             line0s.forEach(handleLine0);
-            trianglemap.getValues().forEach(triangle =>
+            trianglemap.forEach(triangle =>
             {
                 if (triangle.getNormal().dot(new feng3d.Vector3(0, 1, 0)) < 0)
                     trianglemap.delete(triangle.index);
@@ -243,8 +243,8 @@ namespace navigation
             var linemap = this.data.linemap;
             var trianglemap = this.data.trianglemap;
             //
-            var triangle0s = trianglemap.getValues().map(createTriangle);
-            pointmap.getValues().forEach(handlePoint);
+            var triangle0s = Map.getValues(trianglemap).map(createTriangle);
+            Map.getValues(pointmap).forEach(handlePoint);
 
             //
             function createTriangle(triangle: Triangle)

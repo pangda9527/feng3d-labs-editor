@@ -83,19 +83,19 @@ namespace editor
 
         private update()
         {
-            this.directionLightIconMap.getValues().forEach(v =>
+            this.directionLightIconMap.forEach(v =>
             {
                 v.editorCamera = this.editorCamera;
             });
-            this.pointLightIconMap.getValues().forEach(v =>
+            this.pointLightIconMap.forEach(v =>
             {
                 v.editorCamera = this.editorCamera;
             });
-            this.spotLightIconMap.getValues().forEach(v =>
+            this.spotLightIconMap.forEach(v =>
             {
                 v.editorCamera = this.editorCamera;
             });
-            this.cameraIconMap.getValues().forEach(v =>
+            this.cameraIconMap.forEach(v =>
             {
                 v.editorCamera = this.editorCamera;
             });

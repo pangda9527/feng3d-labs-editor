@@ -2417,7 +2417,7 @@ var editor;
             this.update();
         };
         Cursor.prototype.update = function () {
-            var v = this.o.getValues().reverse()[0];
+            var v = Map.getValues(this.o).reverse()[0];
             document.body.style.cursor = v || "auto";
         };
         return Cursor;
@@ -13443,16 +13443,16 @@ var editor;
         };
         EditorComponent.prototype.update = function () {
             var _this = this;
-            this.directionLightIconMap.getValues().forEach(function (v) {
+            this.directionLightIconMap.forEach(function (v) {
                 v.editorCamera = _this.editorCamera;
             });
-            this.pointLightIconMap.getValues().forEach(function (v) {
+            this.pointLightIconMap.forEach(function (v) {
                 v.editorCamera = _this.editorCamera;
             });
-            this.spotLightIconMap.getValues().forEach(function (v) {
+            this.spotLightIconMap.forEach(function (v) {
                 v.editorCamera = _this.editorCamera;
             });
-            this.cameraIconMap.getValues().forEach(function (v) {
+            this.cameraIconMap.forEach(function (v) {
                 v.editorCamera = _this.editorCamera;
             });
         };
@@ -14298,7 +14298,7 @@ var navigation;
             var _this = this;
             var up = new feng3d.Vector3(0, 1, 0);
             var mincos = Math.cos(maxSlope * Math.DEG2RAD);
-            var keys = this.data.trianglemap.getKeys();
+            var keys = Map.getKeys(this.data.trianglemap);
             keys.forEach(function (element) {
                 var normal = _this.data.trianglemap.get(element).getNormal();
                 var dot = normal.dot(up);
@@ -14324,7 +14324,7 @@ var navigation;
             // pointmap.getValues().forEach(handlePoint);
             // 方案2：遍历所有边缘边，把所有在边缘边左边角内的点移到左边角平分线上，所有在边缘边右边角内的移到右边角平分线上，
             line0s.forEach(handleLine0);
-            trianglemap.getValues().forEach(function (triangle) {
+            trianglemap.forEach(function (triangle) {
                 if (triangle.getNormal().dot(new feng3d.Vector3(0, 1, 0)) < 0)
                     trianglemap.delete(triangle.index);
             }); //删除面向-y方向的三角形
@@ -14494,8 +14494,8 @@ var navigation;
             var linemap = this.data.linemap;
             var trianglemap = this.data.trianglemap;
             //
-            var triangle0s = trianglemap.getValues().map(createTriangle);
-            pointmap.getValues().forEach(handlePoint);
+            var triangle0s = Map.getValues(trianglemap).map(createTriangle);
+            Map.getValues(pointmap).forEach(handlePoint);
             //
             function createTriangle(triangle) {
                 var triangle3D = triangle.getTriangle3D();

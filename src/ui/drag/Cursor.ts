@@ -18,7 +18,7 @@ namespace editor
 
         private update()
         {
-            var v = this.o.getValues().reverse()[0];
+            var v = Map.getValues(this.o).reverse()[0];
             document.body.style.cursor = v || "auto";
         }
     }
