@@ -16315,7 +16315,7 @@ var editor;
                 //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
                 {
                     label: "游戏对象", click: function () {
-                        editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createGameObject());
+                        editor.hierarchy.addGameObject(feng3d.GameObject.create());
                     }
                 },
                 { type: "separator" },
@@ -16334,7 +16334,7 @@ var editor;
                         },
                         {
                             label: "立方体", click: function () {
-                                editor.hierarchy.addGameObject(feng3d.gameObjectFactory.createCube());
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cube"));
                             }
                         },
                         {

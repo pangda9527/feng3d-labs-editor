@@ -310,7 +310,7 @@ namespace editor
                 {
                     label: "游戏对象", click: () =>
                     {
-                        hierarchy.addGameObject(feng3d.gameObjectFactory.createGameObject());
+                        hierarchy.addGameObject(feng3d.GameObject.create());
                     }
                 },
                 { type: "separator" },
@@ -332,7 +332,7 @@ namespace editor
                         {
                             label: "立方体", click: () =>
                             {
-                                hierarchy.addGameObject(feng3d.gameObjectFactory.createCube());
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cube"));
                             }
                         },
                         {
