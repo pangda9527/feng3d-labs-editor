@@ -49,7 +49,7 @@ namespace editor
             v = v.filter(v => !!v);
             if (!v) v = [];
             if (v == this._selectedObjects) return;
-            if (v.length == this.selectedObjects.length && v.concat(this._selectedObjects).unique().length == v.length) return;
+            if (v.length == this.selectedObjects.length && Array.unique(v.concat(this._selectedObjects)).length == v.length) return;
 
             this._selectedObjects = v;
 
