@@ -7,7 +7,7 @@ namespace editor
 {
     export class DirectionLightIcon extends EditorScript
     {
-        __class__: "editor.DirectionLightIcon" = "editor.DirectionLightIcon";
+        __class__: "editor.DirectionLightIcon";
 
         @feng3d.watch("onLightChanged")
         light: feng3d.DirectionalLight;

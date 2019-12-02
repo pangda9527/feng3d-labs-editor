@@ -15075,9 +15075,7 @@ var editor;
     var DirectionLightIcon = /** @class */ (function (_super) {
         __extends(DirectionLightIcon, _super);
         function DirectionLightIcon() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.__class__ = "editor.DirectionLightIcon";
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         Object.defineProperty(DirectionLightIcon.prototype, "editorCamera", {
             get: function () { return this._editorCamera; },
