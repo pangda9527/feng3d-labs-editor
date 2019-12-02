@@ -6,9 +6,9 @@ namespace editor
     /**
      * editor的版本号
      */
-    export var revision: string = "2018.08.22";
+    export var version: string = "2018.08.22";
 
-    console.log(`editor version ${revision}`)
+    console.log(`editor version ${version}`)
 
     /**
      * 编辑器

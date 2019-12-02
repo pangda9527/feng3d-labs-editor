@@ -17494,8 +17494,8 @@ var editor;
     /**
      * editor的版本号
      */
-    editor.revision = "2018.08.22";
-    console.log("editor version " + editor.revision);
+    editor.version = "2018.08.22";
+    console.log("editor version " + editor.version);
     /**
      * 编辑器
      */

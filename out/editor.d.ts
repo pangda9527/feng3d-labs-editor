@@ -4817,7 +4817,7 @@ declare namespace editor {
     /**
      * editor的版本号
      */
-    var revision: string;
+    var version: string;
     /**
      * 编辑器
      */
