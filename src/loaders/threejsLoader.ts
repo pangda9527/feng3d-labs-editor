@@ -184,7 +184,7 @@ namespace editor
             propertyClip.propertyValues = [];
             var propertyValues = propertyClip.propertyValues;
             var times: number[] = keyframeTrack.times;
-            var values: number[] = feng3d.utils.arrayFrom(keyframeTrack.values);
+            var values: number[] = Array.from(keyframeTrack.values);
             if (usenumberfixed)
             {
                 values = values.map((v: number) => { return Number(v.toFixed(6)); });
@@ -289,7 +289,7 @@ namespace editor
             if (attributes.hasOwnProperty(key))
             {
                 var element = attributes[key];
-                var array: number[] = feng3d.utils.arrayFrom(element.array);
+                var array: number[] = Array.from(element.array);
                 if (usenumberfixed)
                 {
                     array = array.map((v: number) => { return Number(v.toFixed(6)); });

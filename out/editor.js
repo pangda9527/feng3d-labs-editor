@@ -15885,7 +15885,7 @@ var editor;
             propertyClip.propertyValues = [];
             var propertyValues = propertyClip.propertyValues;
             var times = keyframeTrack.times;
-            var values = feng3d.utils.arrayFrom(keyframeTrack.values);
+            var values = Array.from(keyframeTrack.values);
             if (usenumberfixed) {
                 values = values.map(function (v) { return Number(v.toFixed(6)); });
             }
@@ -15961,7 +15961,7 @@ var editor;
         for (var key in attributes) {
             if (attributes.hasOwnProperty(key)) {
                 var element = attributes[key];
-                var array = feng3d.utils.arrayFrom(element.array);
+                var array = Array.from(element.array);
                 if (usenumberfixed) {
                     array = array.map(function (v) { return Number(v.toFixed(6)); });
                 }
