@@ -61,7 +61,7 @@ namespace editor
         {
             var gameobject = gameobjectAsset.getAssetData();
 
-            feng3d.debuger && console.assert(!gameobject.parent);
+            console.assert(!gameobject.parent);
 
             if (parent)
                 parent.addChild(gameobject);

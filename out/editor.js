@@ -3658,7 +3658,7 @@ var editor;
         TabView.prototype.removeModule = function (moduleName) {
             var moduleView = this._moduleViews.filter(function (v) { return v.moduleName == moduleName; })[0];
             var index = this._moduleViews.indexOf(moduleView);
-            feng3d.debuger && console.assert(index != -1);
+            console.assert(index != -1);
             this._moduleViews.splice(index, 1);
             this.adjust(this);
             this._invalidateView();
@@ -3695,7 +3695,7 @@ var editor;
                     this.adjust(parent);
                 }
                 else {
-                    feng3d.debuger && console.assert(false);
+                    console.assert(false);
                 }
             }
             // 找到对象所属窗口，删除空窗口
@@ -4434,7 +4434,7 @@ var editor;
         };
         TreeNode.prototype.addChild = function (node) {
             node.remove();
-            feng3d.debuger && console.assert(!node.contain(this), "无法添加到自身结点中!");
+            console.assert(!node.contain(this), "无法添加到自身结点中!");
             if (this.children.indexOf(node) == -1)
                 this.children.push(node);
             node.parent = this;
@@ -8917,7 +8917,7 @@ var editor;
                         if (!this._viewData.isLoaded) {
                             var viewData = this._viewData;
                             viewData.load(function () {
-                                feng3d.debuger && console.assert(!!viewData.asset);
+                                console.assert(!!viewData.asset);
                                 if (viewData == _this._viewData)
                                     _this.updateShowData(viewData.asset);
                             });
@@ -8941,7 +8941,7 @@ var editor;
                     var feng3dAsset = feng3d.rs.getAsset(this._viewData.assetId);
                     if (feng3dAsset) {
                         editor.editorRS.writeAsset(feng3dAsset, function (err) {
-                            feng3d.debuger && console.assert(!err, "\u8D44\u6E90 " + feng3dAsset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                            console.assert(!err, "\u8D44\u6E90 " + feng3dAsset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                             callback && callback();
                         });
                     }
@@ -9370,7 +9370,7 @@ var editor;
          */
         EditorAsset.prototype.saveAsset = function (assetNode, callback) {
             editor.editorRS.writeAsset(assetNode.asset, function (err) {
-                feng3d.debuger && console.assert(!err, "\u8D44\u6E90 " + assetNode.asset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
+                console.assert(!err, "\u8D44\u6E90 " + assetNode.asset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
             });
         };
@@ -9732,7 +9732,7 @@ var editor;
                     if (!this.data.isLoaded) {
                         var data = this.data;
                         data.load(function () {
-                            feng3d.debuger && console.assert(data.isLoaded);
+                            console.assert(data.isLoaded);
                             if (data == _this.data)
                                 _this.dataChanged();
                         });
@@ -9860,7 +9860,7 @@ var editor;
             }
             this.isLoading = true;
             editor.editorRS.readAsset(this.asset.assetId, function (err, asset) {
-                feng3d.debuger && console.assert(!err);
+                console.assert(!err);
                 _this.isLoading = false;
                 _this.isLoaded = true;
                 callback && callback();
@@ -10526,7 +10526,7 @@ var editor;
             if (showMenuItem)
                 return;
             var list = this.parent;
-            feng3d.debuger && console.assert(list instanceof eui.List);
+            console.assert(list instanceof eui.List);
             items = list.$children.filter(function (v) { return v instanceof TopMenuItemRenderer; }).map(function (v) { return { item: v, rect: v.getGlobalBounds() }; });
             showMenu(this);
             feng3d.windowEventProxy.on("mousemove", onMenuMouseMove);
@@ -11563,7 +11563,7 @@ var editor;
             }
         };
         MRSToolTarget.prototype.doScale = function (scale) {
-            feng3d.debuger && console.assert(!!scale.length);
+            console.assert(!!scale.length);
             for (var i = 0; i < this._controllerTargets.length; i++) {
                 var result = this._startScaleVec[i].multiplyTo(scale);
                 this._controllerTargets[i].sx = result.x;
@@ -12936,7 +12936,7 @@ var editor;
         };
         Hierarchy.prototype.addGameoObjectFromAsset = function (gameobjectAsset, parent) {
             var gameobject = gameobjectAsset.getAssetData();
-            feng3d.debuger && console.assert(!gameobject.parent);
+            console.assert(!gameobject.parent);
             if (parent)
                 parent.addChild(gameobject);
             else
@@ -14668,7 +14668,7 @@ var navigation;
         NavigationData.prototype.init = function (geometry) {
             var positions = geometry.positions;
             var indices = geometry.indices;
-            feng3d.debuger && console.assert(indices.length % 3 == 0);
+            console.assert(indices.length % 3 == 0);
             var pointmap = this.pointmap = new Map();
             var linemap = this.linemap = new Map();
             var trianglemap = this.trianglemap = new Map();
@@ -15807,7 +15807,7 @@ var editor;
                     var skinnedModel = gameobject.addComponent(feng3d.SkinnedModel);
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
-                    feng3d.debuger && console.assert(object3d.bindMode == "attached");
+                    console.assert(object3d.bindMode == "attached");
                     skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
                         skinnedModel.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();

@@ -111,7 +111,7 @@ namespace editor
 
             editorRS.readAsset(this.asset.assetId, (err, asset) =>
             {
-                feng3d.debuger && console.assert(!err);
+                console.assert(!err);
 
                 this.isLoading = false;
                 this.isLoaded = true;

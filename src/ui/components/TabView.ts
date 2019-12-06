@@ -252,7 +252,7 @@ namespace editor
 		{
 			let moduleView = this._moduleViews.filter(v => v.moduleName == moduleName)[0];
 			var index = this._moduleViews.indexOf(moduleView);
-			feng3d.debuger && console.assert(index != -1);
+			console.assert(index != -1);
 			this._moduleViews.splice(index, 1);
 
 			this.adjust(this);
@@ -298,7 +298,7 @@ namespace editor
 					this.adjust(parent);
 				} else
 				{
-					feng3d.debuger && console.assert(false);
+					console.assert(false);
 				}
 			}
 			// 找到对象所属窗口，删除空窗口

@@ -212,7 +212,7 @@ namespace editor
 			if (showMenuItem) return;
 
 			var list = this.parent;
-			feng3d.debuger && console.assert(list instanceof eui.List);
+			console.assert(list instanceof eui.List);
 			items = list.$children.filter(v => v instanceof TopMenuItemRenderer).map((v: TopMenuItemRenderer) => { return { item: v, rect: v.getGlobalBounds() }; });
 
 			showMenu(this);

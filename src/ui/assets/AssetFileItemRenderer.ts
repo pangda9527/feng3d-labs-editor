@@ -58,7 +58,7 @@ namespace editor
                         var data = this.data;
                         data.load(() =>
                         {
-                            feng3d.debuger && console.assert(data.isLoaded);
+                            console.assert(data.isLoaded);
                             if (data == this.data) this.dataChanged();
                         })
                         return;

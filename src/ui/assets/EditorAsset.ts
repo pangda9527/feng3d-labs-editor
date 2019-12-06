@@ -111,7 +111,7 @@ namespace editor
         {
             editorRS.writeAsset(assetNode.asset, (err) =>
             {
-                feng3d.debuger && console.assert(!err, `资源 ${assetNode.asset.assetId} 保存失败！`);
+                console.assert(!err, `资源 ${assetNode.asset.assetId} 保存失败！`);
                 callback && callback();
             });
         }
