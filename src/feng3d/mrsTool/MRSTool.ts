@@ -56,8 +56,8 @@ namespace editor
             //
             this.currentTool = this.mTool;
             //
-            feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
-            feng3d.dispatcher.on("editor.toolTypeChanged", this.onToolTypeChange, this);
+            feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+            feng3d.globalDispatcher.on("editor.toolTypeChanged", this.onToolTypeChange, this);
         }
 
         dispose()
@@ -75,8 +75,8 @@ namespace editor
             this.sTool.dispose();
             this.sTool = null;
             //
-            feng3d.dispatcher.off("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
-            feng3d.dispatcher.off("editor.toolTypeChanged", this.onToolTypeChange, this);
+            feng3d.globalDispatcher.off("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+            feng3d.globalDispatcher.off("editor.toolTypeChanged", this.onToolTypeChange, this);
 
             super.dispose();
         }

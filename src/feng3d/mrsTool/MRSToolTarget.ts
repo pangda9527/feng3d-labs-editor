@@ -48,10 +48,10 @@ namespace editor
 
         constructor()
         {
-            feng3d.dispatcher.on("editor.isWoldCoordinateChanged", this.invalidateControllerImage, this);
-            feng3d.dispatcher.on("editor.isBaryCenterChanged", this.invalidateControllerImage, this);
+            feng3d.globalDispatcher.on("editor.isWoldCoordinateChanged", this.invalidateControllerImage, this);
+            feng3d.globalDispatcher.on("editor.isBaryCenterChanged", this.invalidateControllerImage, this);
             //
-            feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+            feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
         }
 
         private onSelectedGameObjectChange()

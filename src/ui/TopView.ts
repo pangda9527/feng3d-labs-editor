@@ -49,7 +49,7 @@ namespace editor
 			this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-			feng3d.dispatcher.on("editor.toolTypeChanged", this.updateview, this);
+			feng3d.globalDispatcher.on("editor.toolTypeChanged", this.updateview, this);
 
 			//
 			var menuItems = menuConfig.getMainMenu();
@@ -77,7 +77,7 @@ namespace editor
 			this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 			this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-			feng3d.dispatcher.off("editor.toolTypeChanged", this.updateview, this);
+			feng3d.globalDispatcher.off("editor.toolTypeChanged", this.updateview, this);
 
 			if (runwin) runwin.close();
 			runwin = null;
@@ -108,7 +108,7 @@ namespace editor
 					editorData.isBaryCenter = !editorData.isBaryCenter;
 					break;
 				case this.playBtn:
-					var e = feng3d.dispatcher.dispatch("inspector.saveShowData", () =>
+					var e = feng3d.globalDispatcher.dispatch("inspector.saveShowData", () =>
 					{
 						let obj = feng3d.serialization.serialize(editorData.gameScene.gameObject);
 						editorRS.fs.writeObject("default.scene.json", obj, (err) =>

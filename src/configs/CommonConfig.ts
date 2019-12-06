@@ -222,7 +222,7 @@ namespace editor
                         label: "编译脚本",
                         click: () =>
                         {
-                            feng3d.dispatcher.dispatch("script.compile");
+                            feng3d.globalDispatcher.dispatch("script.compile");
                         },
                     },],
                 },
@@ -268,7 +268,7 @@ namespace editor
                             label: v,
                             click: () =>
                             {
-                                feng3d.dispatcher.dispatch("viewLayout.reset", viewLayoutConfig[v]);
+                                feng3d.globalDispatcher.dispatch("viewLayout.reset", viewLayoutConfig[v]);
                             },
                         };
                     }),

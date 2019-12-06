@@ -9,7 +9,7 @@ namespace editor
                 load(data, (gameobject) =>
                 {
                     gameobject.name = feng3d.pathUtils.getName(url);
-                    feng3d.dispatcher.dispatch("asset.parsed", gameobject);
+                    feng3d.globalDispatcher.dispatch("asset.parsed", gameobject);
                 });
             });
         }

@@ -292,7 +292,7 @@ namespace editor
                         this.addChild(v);
                     } else
                     {
-                        feng3d.dispatcher.dispatch("message.error", err.message);
+                        feng3d.globalDispatcher.dispatch("message.error", err.message);
                     }
                 });
             });

@@ -210,7 +210,7 @@ namespace editor
                 cameraTargetMatrix3D.invert();
                 var result = cameraTargetMatrix3D.decompose()[1];
 
-                feng3d.dispatcher.dispatch("editorCameraRotate", result);
+                feng3d.globalDispatcher.dispatch("editorCameraRotate", result);
 
                 this.onEditorCameraRotate(result);
             }

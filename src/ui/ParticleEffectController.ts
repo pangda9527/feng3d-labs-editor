@@ -81,7 +81,7 @@ namespace editor
             {
                 this.parent.removeChild(this);
             });
-            feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
+            feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
         }
 
         private updateView()

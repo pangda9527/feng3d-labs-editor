@@ -174,7 +174,7 @@ namespace editor
                     this.fs.deleteFile(realPath, callback);
                 }
             });
-            feng3d.dispatcher.dispatch("fs.delete", path);
+            feng3d.globalDispatcher.dispatch("fs.delete", path);
         }
 
         /**
@@ -187,7 +187,7 @@ namespace editor
         {
             var realPath = this.getAbsolutePath(path);
             this.fs.writeFile(realPath, arraybuffer, err => { callback && callback(err); });
-            feng3d.dispatcher.dispatch("fs.write", path);
+            feng3d.globalDispatcher.dispatch("fs.write", path);
         }
 
         /**
@@ -200,7 +200,7 @@ namespace editor
         {
             var buffer = feng3d.dataTransform.stringToArrayBuffer(str);
             this.writeArrayBuffer(path, buffer, callback);
-            feng3d.dispatcher.dispatch("fs.write", path);
+            feng3d.globalDispatcher.dispatch("fs.write", path);
         }
 
         /**
@@ -213,7 +213,7 @@ namespace editor
         {
             var str = JSON.stringify(object, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1')
             this.writeString(path, str, callback);
-            feng3d.dispatcher.dispatch("fs.write", path);
+            feng3d.globalDispatcher.dispatch("fs.write", path);
         }
 
         /**
@@ -228,7 +228,7 @@ namespace editor
             {
                 this.writeArrayBuffer(path, buffer, callback);
             });
-            feng3d.dispatcher.dispatch("fs.write", path);
+            feng3d.globalDispatcher.dispatch("fs.write", path);
         }
 
         /**

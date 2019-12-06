@@ -58,7 +58,7 @@ namespace editor
             {
                 this.parent.removeChild(this);
             });
-            feng3d.dispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
+            feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
 
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
