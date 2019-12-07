@@ -458,7 +458,7 @@ namespace editor
             if (assetNode.asset instanceof feng3d.FileAsset)
             {
                 var filePath = assetNode.asset.assetPath;
-                var extensions = feng3d.pathUtils.getExtension(filePath);
+                var extensions = feng3d.pathUtils.extname(filePath);
                 switch (extensions)
                 {
                     case "mdl": menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(filePath) }); break;

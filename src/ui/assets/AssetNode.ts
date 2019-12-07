@@ -307,7 +307,7 @@ namespace editor
 
             var path = this.asset.assetPath;
             if (!feng3d.pathUtils.isDirectory(path))
-                path = feng3d.pathUtils.getParentPath(path);
+                path = feng3d.pathUtils.dirname(path);
 
             var filename = this.label;
             editorRS.fs.getAllPathsInFolder(path, (err, filepaths) =>

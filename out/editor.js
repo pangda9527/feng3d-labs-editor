@@ -9650,7 +9650,7 @@ var editor;
         EditorAsset.prototype.parserMenu = function (menuconfig, assetNode) {
             if (assetNode.asset instanceof feng3d.FileAsset) {
                 var filePath = assetNode.asset.assetPath;
-                var extensions = feng3d.pathUtils.getExtension(filePath);
+                var extensions = feng3d.pathUtils.extname(filePath);
                 switch (extensions) {
                     case "mdl":
                         menuconfig.push({ label: "解析", click: function () { return feng3d.mdlLoader.load(filePath); } });
@@ -10017,7 +10017,7 @@ var editor;
             var zip = new JSZip();
             var path = this.asset.assetPath;
             if (!feng3d.pathUtils.isDirectory(path))
-                path = feng3d.pathUtils.getParentPath(path);
+                path = feng3d.pathUtils.dirname(path);
             var filename = this.label;
             editor.editorRS.fs.getAllPathsInFolder(path, function (err, filepaths) {
                 readfiles();
