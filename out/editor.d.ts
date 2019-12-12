@@ -4344,32 +4344,52 @@ declare namespace editor {
     }
 }
 declare namespace feng3d {
-    var loadjs: {
-        load: (params: {
-            paths: string | string[] | {
-                url: string;
-                type: string;
-            } | {
-                url: string;
-                type: string;
-            }[];
-            bundleId?: string;
-            success?: () => void;
-            error?: (pathsNotFound?: string[]) => void;
-            async?: boolean;
-            numRetries?: number;
-            before?: (path: {
-                url: string;
-                type: string;
-            }, e: any) => boolean;
-            onitemload?: (url: string, content: string) => void;
-        }) => void;
-        ready: (params: {
-            depends: string | string[];
-            success?: () => void;
-            error?: (pathsNotFound?: string[]) => void;
-        }) => void;
+    export var loadjs: {
+        load: typeof load;
+        ready: typeof ready;
     };
+    /**
+     * 加载文件
+     * @param params.paths          加载路径
+     * @param params.bundleId       加载包编号
+     * @param params.success        成功回调
+     * @param params.error          错误回调
+     * @param params.async          是否异步加载
+     * @param params.numRetries     加载失败尝试次数
+     * @param params.before         加载前回调
+     * @param params.onitemload     单条文件加载完成回调
+     */
+    function load(params: {
+        paths: string | string[] | {
+            url: string;
+            type: string;
+        } | {
+            url: string;
+            type: string;
+        }[];
+        bundleId?: string;
+        success?: () => void;
+        error?: (pathsNotFound?: string[]) => void;
+        async?: boolean;
+        numRetries?: number;
+        before?: (path: {
+            url: string;
+            type: string;
+        }, e: any) => boolean;
+        onitemload?: (url: string, content: string) => void;
+    }): void;
+    /**
+     * 准备依赖包
+     * @param params.depends        依赖包编号
+     * @param params.success        成功回调
+     * @param params.error          错误回调
+     */
+    function ready(params: {
+        depends: string | string[];
+        success?: () => void;
+        error?: (pathsNotFound?: string[]) => void;
+    }): void;
+    export {};
 }
 declare namespace editor {
     class ThreejsLoader {
