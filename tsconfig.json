@@ -201,6 +201,7 @@
         "src/scripts/SpotLightIcon.ts",
         "src/scripts/CameraIcon.ts",
         //
+        "src/loaders/load.ts",
         "src/loaders/threejsLoader.ts",
         //configs
         "src/configs/CommonConfig.ts",
