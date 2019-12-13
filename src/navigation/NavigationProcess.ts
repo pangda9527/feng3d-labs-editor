@@ -457,7 +457,7 @@ namespace navigation
                 var pointvalue = this.pointmap.get(element).value;
                 points.push(new feng3d.Vector3(pointvalue[0], pointvalue[1], pointvalue[2]));
             });
-            var triangle3D = new feng3d.Triangle3D(points[0], points[1], points[2]);
+            var triangle3D = new feng3d.Triangle3(points[0], points[1], points[2]);
             return triangle3D;
         }
 

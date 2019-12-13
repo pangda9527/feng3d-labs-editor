@@ -14642,7 +14642,7 @@ var navigation;
                 var pointvalue = _this.pointmap.get(element).value;
                 points.push(new feng3d.Vector3(pointvalue[0], pointvalue[1], pointvalue[2]));
             });
-            var triangle3D = new feng3d.Triangle3D(points[0], points[1], points[2]);
+            var triangle3D = new feng3d.Triangle3(points[0], points[1], points[2]);
             return triangle3D;
         };
         /**
@@ -14891,7 +14891,7 @@ var editor;
          */
         Recastnavigation.prototype._voxelizationTriangle = function (p0, p1, p2) {
             var _this = this;
-            var triangle = feng3d.Triangle3D.fromPositions(p0.concat(p1).concat(p2));
+            var triangle = feng3d.Triangle3.fromPositions(p0.concat(p1).concat(p2));
             var normal = triangle.getNormal();
             var result = triangle.rasterizeCustom(this._voxelSize, this._aabb.min);
             result.forEach(function (v, i) {

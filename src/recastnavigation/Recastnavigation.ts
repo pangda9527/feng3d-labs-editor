@@ -121,7 +121,7 @@ namespace editor
          */
         private _voxelizationTriangle(p0: number[], p1: number[], p2: number[])
         {
-            var triangle = feng3d.Triangle3D.fromPositions(p0.concat(p1).concat(p2));
+            var triangle = feng3d.Triangle3.fromPositions(p0.concat(p1).concat(p2));
             var normal = triangle.getNormal();
             var result = triangle.rasterizeCustom(this._voxelSize, this._aabb.min);
 
