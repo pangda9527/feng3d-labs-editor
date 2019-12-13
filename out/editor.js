@@ -14835,7 +14835,7 @@ var editor;
          */
         Recastnavigation.prototype.doRecastnavigation = function (mesh, agent, voxelSize) {
             if (agent === void 0) { agent = new editor.NavigationAgent(); }
-            this._aabb = feng3d.AABB.formPositions(mesh.positions);
+            this._aabb = feng3d.Box3.formPositions(mesh.positions);
             this._voxelSize = voxelSize || new feng3d.Vector3(agent.radius / 3, agent.radius / 3, agent.radius / 3);
             this._agent = agent;
             // 

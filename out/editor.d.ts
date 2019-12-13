@@ -3277,7 +3277,7 @@ declare namespace editor {
         get transformGameObject(): feng3d.GameObject;
         private _transformGameObject;
         private _transformGameObjectInvalid;
-        get transformBox(): feng3d.AABB;
+        get transformBox(): feng3d.Box3;
         private _transformBox;
         private _transformBoxInvalid;
         /**
