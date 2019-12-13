@@ -199,7 +199,7 @@ namespace navigation
                 var line0 = new Line0();
                 line0.index = line.index;
                 var points = line.points.map((v) => { var point = pointmap.get(v); return new feng3d.Vector3(point.value[0], point.value[1], point.value[2]); })
-                line0.segment = new feng3d.Segment3D(points[0], points[1]);
+                line0.segment = new feng3d.Segment3(points[0], points[1]);
                 //
                 var triangle = trianglemap.get(line.triangles[0]);
                 if (!triangle)
@@ -483,7 +483,7 @@ namespace navigation
         /**
          * 边所在直线
          */
-        segment: feng3d.Segment3D;
+        segment: feng3d.Segment3;
         /**
          * 可行走区域的内部方向
          */
