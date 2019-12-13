@@ -1361,8 +1361,8 @@ declare namespace editor {
 declare namespace editor {
     class ColorPicker extends eui.Component implements eui.UIComponent {
         picker: eui.Rect;
-        get value(): feng3d.Color4 | feng3d.Color3;
-        set value(v: feng3d.Color4 | feng3d.Color3);
+        get value(): feng3d.Color3 | feng3d.Color4;
+        set value(v: feng3d.Color3 | feng3d.Color4);
         private _value;
         constructor();
         private onComplete;
