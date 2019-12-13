@@ -12341,7 +12341,7 @@ var editor;
             //摄像机前方方向
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
-            this.movePlane3D = new feng3d.Plane3D();
+            this.movePlane3D = new feng3d.Plane();
             //
             switch (event.currentTarget) {
                 case this.toolModel.xAxis:
@@ -12472,7 +12472,7 @@ var editor;
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.getPosition();
-            this.movePlane3D = new feng3d.Plane3D();
+            this.movePlane3D = new feng3d.Plane();
             switch (event.currentTarget) {
                 case this.toolModel.xAxis:
                     this.selectedItem = this.toolModel.xAxis;
@@ -12635,7 +12635,7 @@ var editor;
             //摄像机前方方向
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
-            this.movePlane3D = new feng3d.Plane3D();
+            this.movePlane3D = new feng3d.Plane();
             switch (event.currentTarget) {
                 case this.toolModel.xCube:
                     this.selectedItem = this.toolModel.xCube;

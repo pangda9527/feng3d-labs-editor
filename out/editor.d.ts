@@ -3541,7 +3541,7 @@ declare namespace editor {
         private _selectedItem;
         private _toolModel;
         protected ismouseDown: boolean;
-        protected movePlane3D: feng3d.Plane3D;
+        protected movePlane3D: feng3d.Plane;
         protected startSceneTransform: feng3d.Matrix4x4;
         get editorCamera(): feng3d.Camera;
         set editorCamera(v: feng3d.Camera);

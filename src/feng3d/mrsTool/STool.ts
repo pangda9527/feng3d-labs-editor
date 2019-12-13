@@ -59,7 +59,7 @@ namespace editor
             //摄像机前方方向
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
-            this.movePlane3D = new feng3d.Plane3D();
+            this.movePlane3D = new feng3d.Plane();
             switch (event.currentTarget)
             {
                 case this.toolModel.xCube:

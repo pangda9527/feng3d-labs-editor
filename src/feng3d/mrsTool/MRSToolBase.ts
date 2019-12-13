@@ -9,7 +9,7 @@ namespace editor
         protected ismouseDown = false;
 
         //平移平面，该平面处于场景空间，用于计算位移量
-        protected movePlane3D: feng3d.Plane3D;
+        protected movePlane3D: feng3d.Plane;
         protected startSceneTransform: feng3d.Matrix4x4;
 
         get editorCamera() { return this._editorCamera; }

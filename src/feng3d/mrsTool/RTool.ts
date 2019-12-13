@@ -54,7 +54,7 @@ namespace editor
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
             var cameraPos = cameraSceneTransform.getPosition();
-            this.movePlane3D = new feng3d.Plane3D();
+            this.movePlane3D = new feng3d.Plane();
             switch (event.currentTarget)
             {
                 case this.toolModel.xAxis:
