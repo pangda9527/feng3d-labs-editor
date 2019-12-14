@@ -298,9 +298,7 @@ namespace editor
         private rotateRotation(rotation: feng3d.Vector3, axis: feng3d.Vector3, angle)
         {
             var rotationmatrix3d = new feng3d.Matrix4x4();
-            rotationmatrix3d.appendRotation(feng3d.Vector3.X_AXIS, rotation.x);
-            rotationmatrix3d.appendRotation(feng3d.Vector3.Y_AXIS, rotation.y);
-            rotationmatrix3d.appendRotation(feng3d.Vector3.Z_AXIS, rotation.z);
+            rotationmatrix3d.fromRotation(rotation.x, rotation.y, rotation.z);
             rotationmatrix3d.appendRotation(axis, angle);
             var newrotation = rotationmatrix3d.decompose()[1];
             var v = Math.round((newrotation.x - rotation.x) / 180);
