@@ -244,7 +244,7 @@ namespace editor
                 }
             }
             if (indices.length == 0) indices = [0, 0, 0];
-            this.geometry.setVAData("a_position", vertexPositionData, 3);
+            this.geometry.positions = vertexPositionData;
             this.geometry.indices = indices;
             //绘制边界
             var startPoint = new feng3d.Vector3(this.radius * Math.cos((this._start - 0.1) * Math.DEG2RAD), this.radius * Math.sin((this._start - 0.1) * Math.DEG2RAD), 0);

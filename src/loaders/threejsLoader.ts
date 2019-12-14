@@ -306,7 +306,7 @@ namespace editor
                         geo.uvs = array;
                         break;
                     case "skinIndex":
-                        geo.setVAData("a_jointindex0", array, 4);
+                        geo.skinIndices = array;
                         break;
                     case "skinWeight":
                         geo.setVAData("a_jointweight0", array, 4);
