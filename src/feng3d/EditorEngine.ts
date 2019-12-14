@@ -7,7 +7,7 @@ namespace editor
         /**
          * 编辑器场景，用于显示只在编辑器中存在的游戏对象，例如灯光Icon，对象操作工具等显示。
          */
-        editorScene: feng3d.Scene3D;
+        editorScene: feng3d.Scene;
 
         editorComponent: EditorComponent;
 

@@ -1,6 +1,6 @@
 /// <reference path="libs/feng3d.d.ts" />
 
-var view3D = new feng3d.Engine();
+var view = new feng3d.Engine();
 
 // 初始化资源系统
 feng3d.rs.init(() =>
@@ -38,18 +38,18 @@ function initProject()
     {
         feng3d.rs.deserializeWithAssets(obj, (scene) =>
         {
-            if (scene.getComponent(feng3d.Scene3D))
-                view3D.scene = scene.getComponent(feng3d.Scene3D);
+            if (scene.getComponent(feng3d.Scene))
+                view.scene = scene.getComponent(feng3d.Scene);
 
-            var cameras = view3D.root.getComponentsInChildren(feng3d.Camera);
+            var cameras = view.root.getComponentsInChildren(feng3d.Camera);
             if (cameras.length > 0)
             {
-                view3D.camera = cameras[0];
+                view.camera = cameras[0];
             } else
             {
-                var camera = view3D.camera;
+                var camera = view.camera;
                 camera.transform.z = -10;
-                camera.transform.lookAt(new feng3d.Vector3D());
+                camera.transform.lookAt(new feng3d.Vector3());
                 //
             }
         });

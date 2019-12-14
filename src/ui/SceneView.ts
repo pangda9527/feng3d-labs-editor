@@ -69,7 +69,7 @@ namespace editor
 				editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
 				this.engine.camera = editorCamera;
 				//
-				var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene3D);
+				var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene);
 				editorScene.runEnvironment = feng3d.RunEnvironment.all;
 				this.engine.editorScene = editorScene;
 				//

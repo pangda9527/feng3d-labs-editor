@@ -2786,7 +2786,7 @@ declare namespace editor {
          * @param callback
          */
         initproject(callback: () => void): void;
-        readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void): void;
+        readScene(path: string, callback: (err: Error, scene: feng3d.Scene) => void): void;
         /**
          * 根据资源编号获取文件
          *
@@ -3222,7 +3222,7 @@ declare namespace editor {
         /**
          * 游戏运行时的场景
          */
-        gameScene: feng3d.Scene3D;
+        gameScene: feng3d.Scene;
         /**
          * 选中对象，游戏对象与资源文件列表
          * 选中对象时尽量使用 selectObject 方法设置选中对象
@@ -3781,7 +3781,7 @@ declare namespace editor {
         /**
          * 编辑器场景，用于显示只在编辑器中存在的游戏对象，例如灯光Icon，对象操作工具等显示。
          */
-        editorScene: feng3d.Scene3D;
+        editorScene: feng3d.Scene;
         editorComponent: EditorComponent;
         /**
          * 绘制场景
@@ -3796,8 +3796,8 @@ declare namespace feng3d {
 }
 declare namespace editor {
     class EditorComponent extends feng3d.Component {
-        get scene(): feng3d.Scene3D;
-        set scene(v: feng3d.Scene3D);
+        get scene(): feng3d.Scene;
+        set scene(v: feng3d.Scene);
         private _scene;
         get editorCamera(): feng3d.Camera;
         set editorCamera(v: feng3d.Camera);
@@ -3826,7 +3826,7 @@ declare namespace editor {
      */
     class Feng3dScreenShot {
         engine: feng3d.Engine;
-        scene: feng3d.Scene3D;
+        scene: feng3d.Scene;
         camera: feng3d.Camera;
         container: feng3d.GameObject;
         defaultGeometry: feng3d.SphereGeometry;

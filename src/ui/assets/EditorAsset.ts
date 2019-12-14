@@ -52,7 +52,7 @@ namespace editor
             });
         }
 
-        readScene(path: string, callback: (err: Error, scene: feng3d.Scene3D) => void)
+        readScene(path: string, callback: (err: Error, scene: feng3d.Scene) => void)
         {
             editorRS.fs.readObject(path, (err, obj) =>
             {
@@ -63,7 +63,7 @@ namespace editor
                 }
                 editorRS.deserializeWithAssets(obj, (object: feng3d.GameObject) =>
                 {
-                    var scene = object.getComponent(feng3d.Scene3D);
+                    var scene = object.getComponent(feng3d.Scene);
                     callback(null, scene);
                 });
             });

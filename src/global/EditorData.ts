@@ -33,7 +33,7 @@ namespace editor
         /**
          * 游戏运行时的场景
          */
-        gameScene: feng3d.Scene3D;
+        gameScene: feng3d.Scene;
 
         /**
          * 选中对象，游戏对象与资源文件列表

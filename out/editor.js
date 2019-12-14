@@ -1958,10 +1958,13 @@ var editor;
                 ["resource/template/index.html", "index.html"],
                 ["resource/template/project.js", "project.js"],
                 ["resource/template/tsconfig.json", "tsconfig.json"],
-                ["../feng3d/out/feng3d.js", "libs/feng3d.js"],
-                ["../feng3d/out/feng3d.d.ts", "libs/feng3d.d.ts"],
-                ["../physics/out/physics.js", "libs/physics.js"],
-                ["../physics/out/physics.d.ts", "libs/physics.d.ts"],
+                ["resource/template/default.scene.json", "default.scene.json"],
+                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ["resource/template/libs/cannon.js", "libs/cannon.js"],
+                ["resource/template/libs/cannon.d.ts", "libs/cannon.d.ts"],
+                ["resource/template/libs/cannon-plugin.js", "libs/cannon-plugin.js"],
+                ["resource/template/libs/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
             ];
             var index = 0;
             var loadUrls = function () {
@@ -2663,7 +2666,7 @@ var editor;
                 editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
                 this.engine.camera = editorCamera;
                 //
-                var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene3D);
+                var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene);
                 editorScene.runEnvironment = feng3d.RunEnvironment.all;
                 this.engine.editorScene = editorScene;
                 //
@@ -9103,7 +9106,7 @@ var editor;
         HierarchyTreeItemRenderer.prototype.onrightclick = function () {
             var _this = this;
             var menus = [];
-            //scene3d无法删除
+            //scene无法删除
             if (this.data.gameobject.scene.gameObject != this.data.gameobject) {
                 menus.push({
                     label: "复制", click: function () {
@@ -9332,7 +9335,7 @@ var editor;
                     return;
                 }
                 editor.editorRS.deserializeWithAssets(obj, function (object) {
-                    var scene = object.getComponent(feng3d.Scene3D);
+                    var scene = object.getComponent(feng3d.Scene);
                     callback(null, scene);
                 });
             });
@@ -9753,7 +9756,7 @@ var editor;
                 editor.editorAsset.showFloder = this.data;
             }
             else if (this.data.asset instanceof feng3d.GameObject) {
-                var scene = this.data.asset.getComponent(feng3d.Scene3D);
+                var scene = this.data.asset.getComponent(feng3d.Scene);
                 if (scene) {
                     editor.editorData.gameScene = scene;
                 }

@@ -9,7 +9,7 @@ namespace editor
     {
         engine: feng3d.Engine;
 
-        scene: feng3d.Scene3D;
+        scene: feng3d.Scene;
 
         camera: feng3d.Camera;
 

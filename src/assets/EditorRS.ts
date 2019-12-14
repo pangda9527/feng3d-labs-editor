@@ -39,10 +39,13 @@ namespace editor
                 ["resource/template/index.html", "index.html"],
                 ["resource/template/project.js", "project.js"],
                 ["resource/template/tsconfig.json", "tsconfig.json"],
-                ["../feng3d/out/feng3d.js", "libs/feng3d.js"],
-                ["../feng3d/out/feng3d.d.ts", "libs/feng3d.d.ts"],
-                ["../physics/out/physics.js", "libs/physics.js"],
-                ["../physics/out/physics.d.ts", "libs/physics.d.ts"],
+                ["resource/template/default.scene.json", "default.scene.json"],
+                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ["resource/template/libs/cannon.js", "libs/cannon.js"],
+                ["resource/template/libs/cannon.d.ts", "libs/cannon.d.ts"],
+                ["resource/template/libs/cannon-plugin.js", "libs/cannon-plugin.js"],
+                ["resource/template/libs/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
             ];
             var index = 0;
             var loadUrls = () =>

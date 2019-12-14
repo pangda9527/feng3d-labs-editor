@@ -1,0 +1,101 @@
+{
+	"hideFlags": 64,
+	"name": "Untitled",
+	"children": [
+		{
+			"name": "Main Camera",
+			"components": [
+				{
+					"y": 1,
+					"z": -10
+				},
+				{
+					"__class__": "feng3d.Camera"
+				},
+				{
+					"__class__": "feng3d.AudioListener"
+				}],
+			"__class__": "feng3d.GameObject"
+		},
+		{
+			"name": "DirectionalLight",
+			"components": [
+				{
+					"y": 3,
+					"rx": 50,
+					"ry": -30
+				},
+				{
+					"shadowType": 1,
+					"__class__": "feng3d.DirectionalLight"
+				}],
+			"__class__": "feng3d.GameObject"
+		},
+		{
+			"name": "Plane",
+			"components": [
+				null,
+				{
+					"geometry": {
+						"hideFlags": 8,
+						"assetId": "Plane",
+						"width": 10,
+						"height": 10,
+						"__class__": "feng3d.PlaneGeometry"
+					},
+					"__class__": "feng3d.MeshModel"
+				},
+				{
+					"__class__": "CANNON.PlaneCollider"
+				},
+				{
+					"__class__": "CANNON.Rigidbody"
+				}],
+			"__class__": "feng3d.GameObject"
+		},
+		{
+			"name": "Sphere",
+			"components": [
+				{
+					"y": 2.9849713057602134,
+					"z": 0.1509242773580413
+				},
+				{
+					"geometry": {
+						"hideFlags": 8,
+						"assetId": "Sphere",
+						"__class__": "feng3d.SphereGeometry"
+					},
+					"__class__": "feng3d.MeshModel"
+				},
+				{
+					"__class__": "CANNON.SphereCollider"
+				},
+				{
+					"mass": 1,
+					"__class__": "CANNON.Rigidbody"
+				}],
+			"__class__": "feng3d.GameObject"
+		}],
+	"components": [
+		{
+			"hideFlags": 3
+		},
+		{
+			"background": {
+				"r": 0.2784,
+				"g": 0.2784,
+				"b": 0.2784
+			},
+			"ambientColor": {
+				"r": 0.4,
+				"g": 0.4,
+				"b": 0.4
+			},
+			"__class__": "feng3d.Scene"
+		},
+		{
+			"__class__": "CANNON.PhysicsWorld"
+		}],
+	"__class__": "feng3d.GameObject"
+}

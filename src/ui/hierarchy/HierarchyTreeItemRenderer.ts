@@ -52,7 +52,7 @@ namespace editor
         private onrightclick()
         {
             var menus: MenuItem[] = [];
-            //scene3d无法删除
+            //scene无法删除
             if (this.data.gameobject.scene.gameObject != this.data.gameobject)
             {
                 menus.push(

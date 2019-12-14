@@ -38,7 +38,7 @@ namespace editor
             }
         }
 
-        private _scene: feng3d.Scene3D
+        private _scene: feng3d.Scene
 
         get editorCamera() { return this._editorCamera; }
         set editorCamera(v) { if (this._editorCamera == v) return; this._editorCamera = v; this.update(); }
