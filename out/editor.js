@@ -12000,7 +12000,7 @@ var editor;
             }
             if (indices.length == 0)
                 indices = [0, 0, 0];
-            this.geometry.setVAData("a_position", vertexPositionData, 3);
+            this.geometry.positions = vertexPositionData;
             this.geometry.indices = indices;
             //绘制边界
             var startPoint = new feng3d.Vector3(this.radius * Math.cos((this._start - 0.1) * Math.DEG2RAD), this.radius * Math.sin((this._start - 0.1) * Math.DEG2RAD), 0);
@@ -16362,10 +16362,10 @@ var editor;
                         geo.uvs = array;
                         break;
                     case "skinIndex":
-                        geo.setVAData("a_jointindex0", array, 4);
+                        geo.skinIndices = array;
                         break;
                     case "skinWeight":
-                        geo.setVAData("a_jointweight0", array, 4);
+                        geo.skinWeights = array;
                         break;
                     default:
                         console.warn("没有解析顶点数据", key);

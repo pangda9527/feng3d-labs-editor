@@ -309,7 +309,7 @@ namespace editor
                         geo.skinIndices = array;
                         break;
                     case "skinWeight":
-                        geo.setVAData("a_jointweight0", array, 4);
+                        geo.skinWeights = array;
                         break;
                     default:
                         console.warn("没有解析顶点数据", key);
