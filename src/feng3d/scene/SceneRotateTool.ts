@@ -4,9 +4,9 @@ namespace editor
 {
     export class SceneRotateTool extends feng3d.Component
     {
-        get engine() { return this._engine; }
-        set engine(v) { this._engine = v; this.load(); }
-        private _engine: EditorEngine;
+        get view() { return this._view; }
+        set view(v) { this._view = v; this.load(); }
+        private _view: EditorView;
 
         private arrowsX: feng3d.GameObject;
         private arrowsNX: feng3d.GameObject;
@@ -26,7 +26,7 @@ namespace editor
 
         private load()
         {
-            if (!this.engine) return;
+            if (!this.view) return;
             if (this.isload) return;
             this.isload = true;
 
@@ -52,9 +52,9 @@ namespace editor
             var planeNY = rotationToolModel.find("planeNY");
             var planeNZ = rotationToolModel.find("planeNZ");
 
-            var { toolEngine, canvas } = this.newEngine();
+            var { toolView: toolView, canvas } = this.newView();
 
-            toolEngine.root.addChild(rotationToolModel);
+            toolView.root.addChild(rotationToolModel);
             rotationToolModel.transform.sx = 0.01
             rotationToolModel.transform.sy = 0.01
             rotationToolModel.transform.sz = 0.01
@@ -69,11 +69,11 @@ namespace editor
 
             feng3d.ticker.onframe(() =>
             {
-                var rect = this.engine.canvas.getBoundingClientRect();
+                var rect = this.view.canvas.getBoundingClientRect();
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
 
-                var rotation = this.engine.camera.transform.localToWorldMatrix.clone().invert().decompose()[1];
+                var rotation = this.view.camera.transform.localToWorldMatrix.clone().invert().decompose()[1];
                 rotationToolModel.transform.rotation = rotation;
 
                 //隐藏角度
@@ -153,7 +153,7 @@ namespace editor
 
         }
 
-        private newEngine()
+        private newView()
         {
             var canvas = document.createElement("canvas");
             (<any>document.getElementById("SceneRotateToolLayer")).append(canvas);
@@ -161,11 +161,11 @@ namespace editor
             canvas.width = 80;
             canvas.height = 80;
             // 
-            var toolEngine = new feng3d.Engine(canvas);
-            toolEngine.scene.background.a = 0.0;
-            toolEngine.scene.ambientColor.setTo(0.2, 0.2, 0.2);
-            toolEngine.root.addChild(feng3d.GameObject.createPrimitive("Point light"));
-            return { toolEngine, canvas };
+            var toolView = new feng3d.View(canvas);
+            toolView.scene.background.a = 0.0;
+            toolView.scene.ambientColor.setTo(0.2, 0.2, 0.2);
+            toolView.root.addChild(feng3d.GameObject.createPrimitive("Point light"));
+            return { toolView: toolView, canvas };
         }
 
         private onclick(e: feng3d.Event<any>)
@@ -218,7 +218,7 @@ namespace editor
 
         private onEditorCameraRotate(resultRotation: feng3d.Vector3)
         {
-            var camera = this.engine.camera;
+            var camera = this.view.camera;
             var forward = camera.transform.forwardVector;
             var lookDistance: number;
             if (editorData.selectedGameObjects.length > 0)

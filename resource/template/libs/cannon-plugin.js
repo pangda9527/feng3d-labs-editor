@@ -558,7 +558,7 @@ var feng3d;
 var feng3d;
 (function (feng3d) {
     // 默认在 Scene.init 添加物理世界模块
-    feng3d.functionwrap.extendFunction(feng3d.Engine, "createNewScene", function (r) {
+    feng3d.functionwrap.extendFunction(feng3d.View, "createNewScene", function (r) {
         r.gameObject.addComponent(CANNON.PhysicsWorld);
         return r;
     });

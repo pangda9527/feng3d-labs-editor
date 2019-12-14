@@ -1008,7 +1008,7 @@ declare namespace editor {
         private _canvas;
         private _areaSelectStartPosition;
         private _areaSelectRect;
-        private engine;
+        private view;
         private editorCamera;
         private selectedObjectsHistory;
         private rotateSceneCenter;
@@ -1057,7 +1057,7 @@ declare namespace editor {
         group: eui.Group;
         private saveParent;
         private canvas;
-        private previewEngine;
+        private previewView;
         get camera(): feng3d.Camera;
         set camera(value: feng3d.Camera);
         private _camera;
@@ -3737,9 +3737,9 @@ declare namespace feng3d {
 }
 declare namespace editor {
     class SceneRotateTool extends feng3d.Component {
-        get engine(): EditorEngine;
-        set engine(v: EditorEngine);
-        private _engine;
+        get view(): EditorView;
+        set view(v: EditorView);
+        private _view;
         private arrowsX;
         private arrowsNX;
         private arrowsY;
@@ -3750,7 +3750,7 @@ declare namespace editor {
         private isload;
         private load;
         private onLoaded;
-        private newEngine;
+        private newView;
         private onclick;
         private clickItem;
         private onEditorCameraRotate;
@@ -3776,7 +3776,7 @@ declare namespace editor {
     }
 }
 declare namespace editor {
-    class EditorEngine extends feng3d.Engine {
+    class EditorView extends feng3d.View {
         wireframeColor: feng3d.Color4;
         /**
          * 编辑器场景，用于显示只在编辑器中存在的游戏对象，例如灯光Icon，对象操作工具等显示。
@@ -3825,7 +3825,7 @@ declare namespace editor {
      * feng3d预览图工具
      */
     class Feng3dScreenShot {
-        engine: feng3d.Engine;
+        view: feng3d.View;
         scene: feng3d.Scene;
         camera: feng3d.Camera;
         container: feng3d.GameObject;

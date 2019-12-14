@@ -6,7 +6,7 @@ namespace editor
         //
         private saveParent: egret.DisplayObjectContainer;
         private canvas: HTMLElement;
-        private previewEngine: feng3d.Engine;
+        private previewView: feng3d.View;
 
         get camera()
         {
@@ -19,7 +19,7 @@ namespace editor
                 feng3d.ticker.offframe(this.onframe, this);
             }
             this._camera = value;
-            this.previewEngine.camera = this._camera;
+            this.previewView.camera = this._camera;
             this.visible = !!this._camera;
             this.canvas.style.display = this._camera ? "inline" : "none";
             if (this._camera)
@@ -49,9 +49,9 @@ namespace editor
             //
             var canvas = this.canvas = document.createElement("canvas");
             (<any>document.getElementById("CameraPreviewLayer")).append(canvas);
-            this.previewEngine = new feng3d.Engine(canvas);
-            this.previewEngine.mouse3DManager.mouseInput.enable = false;
-            this.previewEngine.stop();
+            this.previewView = new feng3d.View(canvas);
+            this.previewView.mouse3DManager.mouseInput.enable = false;
+            this.previewView.stop();
             //
             this.saveParent = this.parent;
             feng3d.ticker.nextframe(() =>
@@ -106,11 +106,11 @@ namespace editor
 
         private onframe()
         {
-            if (this.previewEngine.scene != editorData.gameScene)
+            if (this.previewView.scene != editorData.gameScene)
             {
-                this.previewEngine.scene = editorData.gameScene;
+                this.previewView.scene = editorData.gameScene;
             }
-            this.previewEngine.render();
+            this.previewView.render();
         }
     }
 }

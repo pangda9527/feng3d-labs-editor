@@ -1,6 +1,6 @@
 /// <reference path="libs/feng3d.d.ts" />
 
-var view = new feng3d.Engine();
+var view = new feng3d.View();
 
 // 初始化资源系统
 feng3d.rs.init(() =>

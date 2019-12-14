@@ -12045,7 +12045,7 @@ declare namespace feng3d {
          * @param type		类定义
          * @return			返回与给出类定义一致的组件
          */
-        getComponents<T extends Components>(type?: Constructor<T>): T[];
+        getComponents<T extends Components>(type: Constructor<T>): T[];
         /**
          * 从自身与子代（孩子，孩子的孩子，...）游戏对象中获取所有指定类型的组件
          *
@@ -12217,9 +12217,9 @@ interface HTMLCanvasElement {
 }
 declare namespace feng3d {
     /**
-     * 3D视图
+     * 视图
      */
-    class Engine extends Feng3dObject {
+    class View extends Feng3dObject {
         canvas: HTMLCanvasElement;
         /**
          * 摄像机
@@ -18703,7 +18703,7 @@ declare namespace feng3d {
          * @param scene 场景
          * @param camera 摄像机
          */
-        pick(engine: Engine, scene: Scene, camera: Camera): GameObject;
+        pick(view: View, scene: Scene, camera: Camera): GameObject;
         constructor(mouseInput: MouseInput, viewport?: Lazy<Rectangle>);
         private _selectedGameObject;
         private _mouseEventTypes;

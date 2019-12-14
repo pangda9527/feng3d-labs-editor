@@ -1,6 +1,6 @@
 namespace editor
 {
-    export class EditorEngine extends feng3d.Engine
+    export class EditorView extends feng3d.View
     {
         wireframeColor = new feng3d.Color4(125 / 255, 176 / 255, 250 / 255);
 

@@ -7,7 +7,7 @@ namespace editor
      */
     export class Feng3dScreenShot
     {
-        engine: feng3d.Engine;
+        view: feng3d.View;
 
         scene: feng3d.Scene;
 
@@ -22,15 +22,15 @@ namespace editor
         constructor()
         {
             // 初始化3d
-            var engine = this.engine = new feng3d.Engine();
-            engine.canvas.style.visibility = "hidden";
-            engine.setSize(64, 64);
+            var view = this.view = new feng3d.View();
+            view.canvas.style.visibility = "hidden";
+            view.setSize(64, 64);
             //
-            var scene = this.scene = engine.scene;
+            var scene = this.scene = view.scene;
             scene.background.fromUnit(0xff525252);
             scene.ambientColor.setTo(0.4, 0.4, 0.4);
             //
-            var camera = this.camera = engine.camera;
+            var camera = this.camera = view.camera;
             camera.lens = new feng3d.PerspectiveLens(45);
             //
             var light = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -43,7 +43,7 @@ namespace editor
             this.container.name = "渲染截图容器";
             scene.gameObject.addChild(this.container);
 
-            engine.stop();
+            view.stop();
         }
 
         /**
@@ -180,9 +180,9 @@ namespace editor
          */
         toDataURL(width = 64, height = 64)
         {
-            this.engine.setSize(width, height);
-            this.engine.render();
-            var dataUrl = this.engine.canvas.toDataURL();
+            this.view.setSize(width, height);
+            this.view.render();
+            var dataUrl = this.view.canvas.toDataURL();
             return dataUrl;
         }
 

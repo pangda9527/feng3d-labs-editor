@@ -10,7 +10,7 @@ namespace editor
 		private _canvas: HTMLCanvasElement;
 		private _areaSelectStartPosition: feng3d.Vector2;
 		private _areaSelectRect: AreaSelectRect;
-		private engine: EditorEngine;
+		private view: EditorView;
 		private editorCamera: feng3d.Camera;
 		private selectedObjectsHistory: feng3d.GameObject[] = [];
 		private rotateSceneCenter: feng3d.Vector3;
@@ -58,7 +58,7 @@ namespace editor
 				//
 				this._canvas = document.createElement("canvas");
 				(<any>document.getElementById("app")).append(this._canvas);
-				this.engine = new EditorEngine(this._canvas);
+				this.view = new EditorView(this._canvas);
 				//
 				var editorCamera = this.editorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
 				editorCamera.lens.far = 5000;
@@ -67,21 +67,21 @@ namespace editor
 				editorCamera.transform.z = 5;
 				editorCamera.transform.lookAt(new feng3d.Vector3());
 				editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
-				this.engine.camera = editorCamera;
+				this.view.camera = editorCamera;
 				//
 				var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene);
 				editorScene.runEnvironment = feng3d.RunEnvironment.all;
-				this.engine.editorScene = editorScene;
+				this.view.editorScene = editorScene;
 				//
 				var sceneRotateTool = editorScene.gameObject.addComponent(SceneRotateTool);
-				sceneRotateTool.engine = this.engine;
+				sceneRotateTool.view = this.view;
 				//
 				//初始化模块
 				var groundGrid = editorScene.gameObject.addComponent(GroundGrid);
 				groundGrid.editorCamera = editorCamera;
 				var mrsTool = editorScene.gameObject.addComponent(MRSTool);
 				mrsTool.editorCamera = editorCamera;
-				this.engine.editorComponent = editorScene.gameObject.addComponent(EditorComponent);
+				this.view.editorComponent = editorScene.gameObject.addComponent(EditorComponent);
 				//
 				feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
 				{
@@ -127,7 +127,7 @@ namespace editor
 				});
 				dragdata.getDragData("file_script").forEach(v =>
 				{
-					var gameobject = this.engine.mouse3DManager.selectedGameObject;
+					var gameobject = this.view.mouse3DManager.selectedGameObject;
 					if (!gameobject || !gameobject.scene)
 						gameobject = hierarchy.rootnode.gameobject;
 					gameobject.addScript(v.scriptName);
@@ -193,7 +193,7 @@ namespace editor
 			//
 			this._areaSelectRect.show(this._areaSelectStartPosition, areaSelectEndPosition);
 			//
-			var gs = this.engine.getObjectsInGlobalArea(this._areaSelectStartPosition, areaSelectEndPosition);
+			var gs = this.view.getObjectsInGlobalArea(this._areaSelectStartPosition, areaSelectEndPosition);
 			var gs0 = gs.filter(g =>
 			{
 				return !!hierarchy.getNode(g);
@@ -241,11 +241,11 @@ namespace editor
 		{
 			if (!this.mouseInView) return;
 
-			var gameObjects = feng3d.raycaster.pickAll(this.engine.getMouseRay3D(), this.engine.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+			var gameObjects = feng3d.raycaster.pickAll(this.view.getMouseRay3D(), this.view.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
 			if (gameObjects.length > 0)
 				return;
 			//
-			gameObjects = feng3d.raycaster.pickAll(this.engine.getMouseRay3D(), editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+			gameObjects = feng3d.raycaster.pickAll(this.view.getMouseRay3D(), editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
 			if (gameObjects.length == 0)
 			{
 				editorData.clearSelectedObjects();
@@ -316,7 +316,7 @@ namespace editor
 
 			var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
 			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-			var view3DRect = this.engine.viewRect;
+			var view3DRect = this.view.viewRect;
 			var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
 			var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
 			globalMatrix3D.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
@@ -376,7 +376,7 @@ namespace editor
 
 			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
-			var scale = this.engine.getScaleByDepth(sceneControlConfig.lookDistance);
+			var scale = this.view.getScaleByDepth(sceneControlConfig.lookDistance);
 			var up = this.dragSceneCameraGlobalMatrix3D.up;
 			var right = this.dragSceneCameraGlobalMatrix3D.right;
 			up.scaleNumber(addPoint.y * scale);

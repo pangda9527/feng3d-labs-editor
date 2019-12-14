@@ -57,7 +57,7 @@ function loadProjectJs(callback)
 
 function initProject(callback)
 {
-    var view = new feng3d.Engine();
+    var view = new feng3d.View();
 
     // 加载并初始化场景
     feng3d.fs.readObject("default.scene.json", (err, obj) =>

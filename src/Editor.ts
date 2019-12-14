@@ -89,7 +89,7 @@ namespace editor
                     editorAsset.readScene("default.scene.json", (err, scene) =>
                     {
                         if (err)
-                            editorData.gameScene = feng3d.Engine.createNewScene();
+                            editorData.gameScene = feng3d.View.createNewScene();
                         else
                             editorData.gameScene = scene;
 
