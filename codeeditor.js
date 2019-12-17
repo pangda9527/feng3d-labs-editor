@@ -24,7 +24,7 @@ initMonaco(() =>
         };
     }
 
-    feng3d.dispatcher.on("codeeditor.openScript", (e) =>
+    feng3d.globalDispatcher.on("codeeditor.openScript", (e) =>
     {
         openScript(e.data);
     });
@@ -33,7 +33,7 @@ initMonaco(() =>
 
 function openScript(script)
 {
-    feng3d.dispatcher.dispatch("script.gettslibs", {
+    feng3d.globalDispatcher.dispatch("script.gettslibs", {
         callback: (tslibs) =>
         {
             codeEditor(tslibs, script);
@@ -167,7 +167,7 @@ function codeEditor(tslibs, file)
 function triggerCompile(callback)
 {
     logLabel.textContent = "正在编译。。。。";
-    feng3d.dispatcher.dispatch("script.compile", {
+    feng3d.globalDispatcher.dispatch("script.compile", {
         onComplete: () =>
         {
             logLabel.textContent = "完成编译。。。。";
