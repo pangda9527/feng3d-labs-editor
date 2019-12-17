@@ -9561,7 +9561,7 @@ var editor;
                     var imageUtil = new feng3d.ImageUtil().fromImage(image);
                     var backColor = new feng3d.Color4(222 / 255, 222 / 255, 222 / 255);
                     imageUtil.clearBackColor(backColor);
-                    feng3d.dataTransform.imagedataToImage(imageUtil.imageData, function (img) {
+                    feng3d.dataTransform.imagedataToImage(imageUtil.imageData, 1, function (img) {
                         assetNode.asset["image"] = img;
                         _this.saveAsset(assetNode);
                     });
