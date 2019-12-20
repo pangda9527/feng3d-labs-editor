@@ -153,7 +153,7 @@ namespace editor
          * 绘制材质
          * @param geometry 材质
          */
-        drawGeometry(geometry: feng3d.Geometrys, cameraRotation = new feng3d.Vector3(-20, 120, 0))
+        drawGeometry(geometry: feng3d.GeometryLike, cameraRotation = new feng3d.Vector3(-20, 120, 0))
         {
             var model = this.geometryObject.getComponent(feng3d.Model);
             model.geometry = geometry;

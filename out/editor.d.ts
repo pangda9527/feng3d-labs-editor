@@ -3851,7 +3851,7 @@ declare namespace editor {
          * 绘制材质
          * @param geometry 材质
          */
-        drawGeometry(geometry: feng3d.Geometrys, cameraRotation?: feng3d.Vector3): this;
+        drawGeometry(geometry: feng3d.GeometryLike, cameraRotation?: feng3d.Vector3): this;
         /**
          * 绘制游戏对象
          * @param gameObject 游戏对象
