@@ -10,13 +10,16 @@ var result = [
 
 xhrTsconfig("../feng3d/tsconfig.json", () =>
 {
-    xhrTsconfig("../cannon/tsconfig.json", () =>
+    xhrTsconfig("../feng2d/tsconfig.json", () =>
     {
-        xhrTsconfig("../cannon-plugin/tsconfig.json", () =>
+        xhrTsconfig("../cannon/tsconfig.json", () =>
         {
-            xhrTsconfig("tsconfig.json", () =>
+            xhrTsconfig("../cannon-plugin/tsconfig.json", () =>
             {
-                loadjs(result, loadComplete);
+                xhrTsconfig("tsconfig.json", () =>
+                {
+                    loadjs(result, loadComplete);
+                });
             });
         });
     });
