@@ -6,22 +6,25 @@ var result = [];
 
 xhrTsconfig("../feng3d/tsconfig.json", () =>
 {
-    xhrTsconfig("../cannon/tsconfig.json", () =>
+    xhrTsconfig("../feng2d/tsconfig.json", () =>
     {
-        xhrTsconfig("../cannon-plugin/tsconfig.json", () =>
+        xhrTsconfig("../cannon/tsconfig.json", () =>
         {
-            loadjs(result, () =>
+            xhrTsconfig("../cannon-plugin/tsconfig.json", () =>
             {
-                if (fstype == "indexedDB")
+                loadjs(result, () =>
                 {
-                    feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
-                    feng3d.fs = feng3d.indexedDBFS;
-                    feng3d.rs = new feng3d.ReadRS(feng3d.indexedDBFS);
-                }
-                // 初始化资源系统
-                feng3d.rs.init(() =>
-                {
-                    loadProjectJs(initProject);
+                    if (fstype == "indexedDB")
+                    {
+                        feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
+                        feng3d.fs = feng3d.indexedDBFS;
+                        feng3d.rs = new feng3d.ReadRS(feng3d.indexedDBFS);
+                    }
+                    // 初始化资源系统
+                    feng3d.rs.init(() =>
+                    {
+                        loadProjectJs(initProject);
+                    });
                 });
             });
         });

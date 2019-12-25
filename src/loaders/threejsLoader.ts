@@ -354,7 +354,7 @@ namespace editor
                 return;
 
             preparing = true;
-            feng3d.loadjs.load({
+            loadjs.load({
                 paths: [
                     "threejs/three.js",
                     // <!-- FBX -->

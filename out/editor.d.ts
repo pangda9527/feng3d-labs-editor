@@ -4343,7 +4343,7 @@ declare namespace editor {
         private onMousedown;
     }
 }
-declare namespace feng3d {
+declare namespace editor {
     export var loadjs: {
         load: typeof load;
         ready: typeof ready;

@@ -15739,9 +15739,9 @@ var editor;
     }(editor.EditorScript));
     editor.CameraIcon = CameraIcon;
 })(editor || (editor = {}));
-var feng3d;
-(function (feng3d) {
-    feng3d.loadjs = {
+var editor;
+(function (editor) {
+    editor.loadjs = {
         load: load,
         ready: ready,
     };
@@ -16124,7 +16124,7 @@ var feng3d;
         { reg: /(\.png\b)/i, type: types.image },
         { reg: /(\.jpg\b)/i, type: types.image },
     ];
-})(feng3d || (feng3d = {}));
+})(editor || (editor = {}));
 var editor;
 (function (editor) {
     var ThreejsLoader = /** @class */ (function () {
@@ -16399,7 +16399,7 @@ var editor;
             if (preparing)
                 return;
             preparing = true;
-            feng3d.loadjs.load({
+            editor.loadjs.load({
                 paths: [
                     "threejs/three.js",
                     // <!-- FBX -->
@@ -16779,6 +16779,16 @@ var editor;
                         {
                             label: "聚光灯", click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Spot light"));
+                            }
+                        },
+                    ],
+                },
+                {
+                    label: "UI",
+                    submenu: [
+                        {
+                            label: "图片", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Image"));
                             }
                         },
                     ],

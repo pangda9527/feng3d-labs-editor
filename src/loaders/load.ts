@@ -1,4 +1,4 @@
-namespace feng3d
+namespace editor
 {
     export var loadjs = {
         load: load,

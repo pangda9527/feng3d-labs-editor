@@ -409,6 +409,17 @@ namespace editor
                     ],
                 },
                 {
+                    label: "UI",
+                    submenu: [
+                        {
+                            label: "图片", click: () =>
+                            {
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Image"));
+                            }
+                        },
+                    ],
+                },
+                {
                     label: "粒子系统", click: () =>
                     {
                         hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Particle System"));
