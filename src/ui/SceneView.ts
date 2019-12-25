@@ -14,11 +14,11 @@ namespace editor
 		private editorCamera: feng3d.Camera;
 		private selectedObjectsHistory: feng3d.GameObject[] = [];
 		private rotateSceneCenter: feng3d.Vector3;
-		private rotateSceneCameraGlobalMatrix3D: feng3d.Matrix4x4;
+		private rotateSceneCameraGlobalMatrix: feng3d.Matrix4x4;
 		private rotateSceneMousePoint: feng3d.Vector2;
 		private preMousePoint: feng3d.Vector2;
 		private dragSceneMousePoint: feng3d.Vector2;
-		private dragSceneCameraGlobalMatrix3D: feng3d.Matrix4x4;
+		private dragSceneCameraGlobalMatrix: feng3d.Matrix4x4;
 
 		/**
 		 * 模块名称
@@ -295,7 +295,7 @@ namespace editor
 			if (!this.mouseInView) return;
 
 			this.rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-			this.rotateSceneCameraGlobalMatrix3D = this.editorCamera.transform.localToWorldMatrix.clone();
+			this.rotateSceneCameraGlobalMatrix = this.editorCamera.transform.localToWorldMatrix.clone();
 			this.rotateSceneCenter = null;
 			//获取第一个 游戏对象
 			var transformBox = editorData.transformBox;
@@ -304,9 +304,9 @@ namespace editor
 				this.rotateSceneCenter = transformBox.getCenter();
 			} else
 			{
-				this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix3D.forward;
+				this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix.forward;
 				this.rotateSceneCenter.scaleNumber(sceneControlConfig.lookDistance);
-				this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix3D.getPosition());
+				this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix.getPosition());
 			}
 		}
 
@@ -314,15 +314,15 @@ namespace editor
 		{
 			if (!this.rotateSceneMousePoint) return;
 
-			var globalMatrix3D = this.rotateSceneCameraGlobalMatrix3D.clone();
+			var globalMatrix = this.rotateSceneCameraGlobalMatrix.clone();
 			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			var view3DRect = this.view.viewRect;
 			var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
 			var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
-			globalMatrix3D.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
-			var rotateAxisX = globalMatrix3D.right;
-			globalMatrix3D.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
-			this.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
+			globalMatrix.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
+			var rotateAxisX = globalMatrix.right;
+			globalMatrix.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
+			this.editorCamera.transform.localToWorldMatrix = globalMatrix;
 		}
 
 		private onMouseRotateSceneEnd()
@@ -367,7 +367,7 @@ namespace editor
 			if (!this.mouseInView) return;
 
 			this.dragSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-			this.dragSceneCameraGlobalMatrix3D = this.editorCamera.transform.localToWorldMatrix.clone();
+			this.dragSceneCameraGlobalMatrix = this.editorCamera.transform.localToWorldMatrix.clone();
 		}
 
 		private onDragScene()
@@ -377,19 +377,19 @@ namespace editor
 			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
 			var scale = this.view.getScaleByDepth(sceneControlConfig.lookDistance);
-			var up = this.dragSceneCameraGlobalMatrix3D.up;
-			var right = this.dragSceneCameraGlobalMatrix3D.right;
+			var up = this.dragSceneCameraGlobalMatrix.up;
+			var right = this.dragSceneCameraGlobalMatrix.right;
 			up.scaleNumber(addPoint.y * scale);
 			right.scaleNumber(-addPoint.x * scale);
-			var globalMatrix3D = this.dragSceneCameraGlobalMatrix3D.clone();
-			globalMatrix3D.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
-			this.editorCamera.transform.localToWorldMatrix = globalMatrix3D;
+			var globalMatrix = this.dragSceneCameraGlobalMatrix.clone();
+			globalMatrix.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
+			this.editorCamera.transform.localToWorldMatrix = globalMatrix;
 		}
 
 		private onDragSceneEnd()
 		{
 			this.dragSceneMousePoint = null;
-			this.dragSceneCameraGlobalMatrix3D = null;
+			this.dragSceneCameraGlobalMatrix = null;
 		}
 
 		private onFpsViewStart()

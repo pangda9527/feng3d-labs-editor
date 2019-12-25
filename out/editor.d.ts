@@ -1012,11 +1012,11 @@ declare namespace editor {
         private editorCamera;
         private selectedObjectsHistory;
         private rotateSceneCenter;
-        private rotateSceneCameraGlobalMatrix3D;
+        private rotateSceneCameraGlobalMatrix;
         private rotateSceneMousePoint;
         private preMousePoint;
         private dragSceneMousePoint;
-        private dragSceneCameraGlobalMatrix3D;
+        private dragSceneCameraGlobalMatrix;
         /**
          * 模块名称
          */

@@ -87,7 +87,7 @@ namespace editor
                     console.assert(object3d.bindMode == "attached");
                     skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                     if (parent)
-                        skinnedModel.initMatrix3d = gameobject.transform.localToWorldMatrix.clone();
+                        skinnedModel.initMatrix = gameobject.transform.localToWorldMatrix.clone();
                     break;
                 case "Mesh":
                     var model = gameobject.addComponent(feng3d.Model);
@@ -135,7 +135,7 @@ namespace editor
     {
         var matrixTemp = new window["THREE"].Matrix4();
         var quaternionTemp = new window["THREE"].Quaternion();
-        var fmatrix3d = new feng3d.Matrix4x4();
+        var fmatrix = new feng3d.Matrix4x4();
 
         //
         var animationClip = new feng3d.AnimationClip();
@@ -232,7 +232,7 @@ namespace editor
             var skeletonJoint = joints[i] = new feng3d.SkeletonJoint();
             //
             skeletonJoint.name = bone.name;
-            skeletonJoint.matrix3D = new feng3d.Matrix4x4(bone.matrixWorld.elements);
+            skeletonJoint.matrix = new feng3d.Matrix4x4(bone.matrixWorld.elements);
 
             var parentId = skeNameDic[bone.parent.name];
             if (parentId === undefined)
@@ -268,7 +268,7 @@ namespace editor
             if (jointsMapitem)
             {
                 skinSkeleton.joints[i] = jointsMapitem;
-                joints[jointsMapitem[0]].matrix3D = new feng3d.Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
+                joints[jointsMapitem[0]].matrix = new feng3d.Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
             } else
             {
                 console.warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);

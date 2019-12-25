@@ -139,9 +139,9 @@ namespace editor
             var geometry = model && model.geometry;
             if (geometry && gameobject.navigationArea != -1)
             {
-                var matrix3d = gameobject.transform.localToWorldMatrix;
+                var matrix = gameobject.transform.localToWorldMatrix;
                 var positions = Array.apply(null, geometry.positions);
-                matrix3d.transformVectors(positions, positions);
+                matrix.transformVectors(positions, positions);
                 var indices = Array.apply(null, geometry.indices);
                 //
                 geometrys.push({ positions: positions, indices: indices });

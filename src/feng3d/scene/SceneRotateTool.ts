@@ -206,9 +206,9 @@ namespace editor
             }
             if (rotation)
             {
-                var cameraTargetMatrix3D = feng3d.Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
-                cameraTargetMatrix3D.invert();
-                var result = cameraTargetMatrix3D.decompose()[1];
+                var cameraTargetMatrix = feng3d.Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
+                cameraTargetMatrix.invert();
+                var result = cameraTargetMatrix.decompose()[1];
 
                 feng3d.globalDispatcher.dispatch("editorCameraRotate", result);
 

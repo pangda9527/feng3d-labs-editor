@@ -46,12 +46,12 @@ namespace editor
 
             super.onItemMouseDown(event);
             //全局矩阵
-            var globalMatrix3D = this.transform.localToWorldMatrix;
+            var globalMatrix = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
-            var po = globalMatrix3D.transformVector(new feng3d.Vector3(0, 0, 0));
-            var px = globalMatrix3D.transformVector(new feng3d.Vector3(1, 0, 0));
-            var py = globalMatrix3D.transformVector(new feng3d.Vector3(0, 1, 0));
-            var pz = globalMatrix3D.transformVector(new feng3d.Vector3(0, 0, 1));
+            var po = globalMatrix.transformVector(new feng3d.Vector3(0, 0, 0));
+            var px = globalMatrix.transformVector(new feng3d.Vector3(1, 0, 0));
+            var py = globalMatrix.transformVector(new feng3d.Vector3(0, 1, 0));
+            var pz = globalMatrix.transformVector(new feng3d.Vector3(0, 0, 1));
             //
             var ox = px.subTo(po);
             var oy = py.subTo(po);
@@ -83,7 +83,7 @@ namespace editor
                     this.changeXYZ.set(1, 1, 1);
                     break;
             }
-            this.startSceneTransform = globalMatrix3D.clone();
+            this.startSceneTransform = globalMatrix.clone();
             this.startPlanePos = this.getLocalMousePlaneCross();
 
             this.mrsToolTarget.startScale();

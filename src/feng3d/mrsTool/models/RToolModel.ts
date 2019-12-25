@@ -118,10 +118,10 @@ namespace editor
             this.torusGeometry.radius = this.radius;
             var color = this.selected ? this.selectedColor : this.color;
 
-            var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
+            var inverseGlobalMatrix = this.transform.worldToLocalMatrix;
             if (this.filterNormal)
             {
-                var localNormal = inverseGlobalMatrix3D.deltaTransformVector(this.filterNormal);
+                var localNormal = inverseGlobalMatrix.deltaTransformVector(this.filterNormal);
             }
 
             this.segmentGeometry.segments = [];
@@ -150,9 +150,9 @@ namespace editor
 
         showSector(startPos: feng3d.Vector3, endPos: feng3d.Vector3)
         {
-            var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
-            var localStartPos = inverseGlobalMatrix3D.transformVector(startPos);
-            var localEndPos = inverseGlobalMatrix3D.transformVector(endPos);
+            var inverseGlobalMatrix = this.transform.worldToLocalMatrix;
+            var localStartPos = inverseGlobalMatrix.transformVector(startPos);
+            var localEndPos = inverseGlobalMatrix.transformVector(endPos);
             var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * Math.RAD2DEG;
             var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * Math.RAD2DEG;
 
@@ -307,7 +307,7 @@ namespace editor
             this.sector.radius = this.radius;
             var color = this.selected ? this.selectedColor : this.color;
 
-            var inverseGlobalMatrix3D = this.transform.worldToLocalMatrix;
+            var inverseGlobalMatrix = this.transform.worldToLocalMatrix;
 
             var segments: feng3d.Segment[] = [];
             var points: feng3d.Vector3[] = [];

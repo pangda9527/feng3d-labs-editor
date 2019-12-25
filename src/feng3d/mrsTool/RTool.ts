@@ -44,12 +44,12 @@ namespace editor
 
             super.onItemMouseDown(event);
             //全局矩阵
-            var globalMatrix3D = this.transform.localToWorldMatrix;
+            var globalMatrix = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
-            var pos = globalMatrix3D.getPosition();
-            var xDir = globalMatrix3D.right;
-            var yDir = globalMatrix3D.up;
-            var zDir = globalMatrix3D.forward;
+            var pos = globalMatrix.getPosition();
+            var xDir = globalMatrix.right;
+            var yDir = globalMatrix.up;
+            var zDir = globalMatrix.forward;
             //摄像机前方方向
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
             var cameraDir = cameraSceneTransform.forward;
@@ -83,7 +83,7 @@ namespace editor
             this.stepPlaneCross = this.startPlanePos.clone();
             //
             this.startMousePos = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
-            this.startSceneTransform = globalMatrix3D.clone();
+            this.startSceneTransform = globalMatrix.clone();
             this.mrsToolTarget.startRotate();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);

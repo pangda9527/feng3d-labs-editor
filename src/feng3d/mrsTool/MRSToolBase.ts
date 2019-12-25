@@ -127,9 +127,9 @@ namespace editor
             //射线与平面交点
             var crossPos = this.getMousePlaneCross();
             //把交点从世界转换为模型空间
-            var inverseGlobalMatrix3D = this.startSceneTransform.clone();
-            inverseGlobalMatrix3D.invert();
-            crossPos = inverseGlobalMatrix3D.transformVector(crossPos);
+            var inverseGlobalMatrix = this.startSceneTransform.clone();
+            inverseGlobalMatrix.invert();
+            crossPos = inverseGlobalMatrix.transformVector(crossPos);
             return crossPos;
         }
 
