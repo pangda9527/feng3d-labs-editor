@@ -16791,6 +16791,11 @@ var editor;
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Image"));
                             }
                         },
+                        {
+                            label: "文本", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Text"));
+                            }
+                        },
                     ],
                 },
                 {
