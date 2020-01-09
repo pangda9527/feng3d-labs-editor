@@ -13359,7 +13359,7 @@ var editor;
             if (this.scene) {
                 editor.editorData.selectedGameObjects.forEach(function (element) {
                     if (element.getComponent(feng3d.Renderable) && !element.getComponent(feng3d.ParticleSystem))
-                        feng3d.wireframeRenderer.drawGameObject(_this.gl, element, _this.scene, _this.camera, _this.wireframeColor);
+                        feng3d.wireframeRenderer.drawGameObject(_this.gl, element.getComponent(feng3d.Renderable), _this.scene, _this.camera, _this.wireframeColor);
                 });
             }
         };

@@ -55,7 +55,7 @@ namespace editor
                 editorData.selectedGameObjects.forEach(element =>
                 {
                     if (element.getComponent(feng3d.Renderable) && !element.getComponent(feng3d.ParticleSystem))
-                        feng3d.wireframeRenderer.drawGameObject(this.gl, element, this.scene, this.camera, this.wireframeColor);
+                        feng3d.wireframeRenderer.drawGameObject(this.gl, element.getComponent(feng3d.Renderable), this.scene, this.camera, this.wireframeColor);
                 });
             }
         }
