@@ -8,7 +8,7 @@ namespace editor
      */
     function setAwaysVisible(component: feng3d.Component)
     {
-        var models = component.getComponentsInChildren(feng3d.Model);
+        var models = component.getComponentsInChildren(feng3d.Renderable);
         models.forEach(element =>
         {
             if (element.material && !element.material.assetId)
