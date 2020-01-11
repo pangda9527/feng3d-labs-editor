@@ -6667,11 +6667,11 @@ var editor;
         TextInputBinder.prototype.initView = function () {
             //
             if (this.editable) {
-                feng3d.watcher.watch(this.space, this.attribute, this.onValueChanged, this);
                 this.textInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
                 this.textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
                 this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
             }
+            feng3d.watcher.watch(this.space, this.attribute, this.onValueChanged, this);
             this.textInput.enabled = this.editable;
         };
         TextInputBinder.prototype.onValueChanged = function () {
