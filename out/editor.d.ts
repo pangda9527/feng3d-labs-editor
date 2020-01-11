@@ -1954,11 +1954,11 @@ declare namespace editor {
         /**
          * 绑定属性值转换为文本
          */
-        toText: (v: any) => any;
+        toText(v: any): any;
         /**
          * 文本转换为绑定属性值
          */
-        toValue: (v: any) => any;
+        toValue(v: any): any;
         init(v: Partial<this>): this;
         dispose(): void;
         protected initView(): void;
@@ -1978,7 +1978,7 @@ declare namespace editor {
          */
         step: number;
         /**
-         * 键盘上下方向键步长
+         * 按下上下方向键时增加的步长数量
          */
         stepDownup: number;
         /**
@@ -1997,8 +1997,8 @@ declare namespace editor {
          * 控制器
          */
         controller: egret.DisplayObject;
-        toText: (v: any) => string;
-        toValue: (v: any) => number;
+        toText(v: number): string;
+        toValue(v: string): number;
         initView(): void;
         dispose(): void;
         protected onValueChanged(): void;
@@ -2261,6 +2261,26 @@ declare namespace editor {
     class OAVNumber extends OAVBase {
         labelLab: eui.Label;
         text: eui.TextInput;
+        /**
+         * 步长，精度
+         */
+        step: number;
+        /**
+         * 键盘上下方向键步长
+         */
+        stepDownup: number;
+        /**
+         * 移动一个像素时增加的步长数量
+         */
+        stepScale: number;
+        /**
+         * 最小值
+         */
+        minValue: number;
+        /**
+         * 最小值
+         */
+        maxValue: number;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
     }
@@ -2294,6 +2314,26 @@ declare namespace editor {
         xTextInput: eui.TextInput;
         yLabel: eui.Label;
         yTextInput: eui.TextInput;
+        /**
+         * 步长，精度
+         */
+        step: number;
+        /**
+         * 键盘上下方向键步长
+         */
+        stepDownup: number;
+        /**
+         * 移动一个像素时增加的步长数量
+         */
+        stepScale: number;
+        /**
+         * 最小值
+         */
+        minValue: number;
+        /**
+         * 最小值
+         */
+        maxValue: number;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
     }
@@ -3719,6 +3759,12 @@ declare namespace editor {
          * @param gameobject 游戏对象
          */
         addGameObject(gameobject: feng3d.GameObject): void;
+        /**
+         * 添加UI
+         *
+         * @param gameobject
+         */
+        addUI(gameobject: feng3d.GameObject): void;
         addGameoObjectFromAsset(gameobjectAsset: feng3d.GameObjectAsset, parent?: feng3d.GameObject): feng3d.GameObject;
         private _selectedGameObjects;
         private rootGameObjectChanged;

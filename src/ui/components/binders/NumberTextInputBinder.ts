@@ -8,9 +8,9 @@ namespace editor
         step = 0.001;
 
 		/**
-		 * 键盘上下方向键步长
+		 * 按下上下方向键时增加的步长数量
 		 */
-        stepDownup = 0.001;
+        stepDownup = 10;
 
 		/**
 		 * 移动一个像素时增加的步长数量
@@ -32,7 +32,7 @@ namespace editor
          */
         controller: egret.DisplayObject;
 
-        toText = function (v)
+        toText(v: number)
         {
             // 消除数字显示为类似 0.0000000001 的问题
             var fractionDigits = 1; while (fractionDigits * this.step < 1) { fractionDigits *= 10; }
@@ -40,9 +40,11 @@ namespace editor
             return text;
         }
 
-        toValue = function (v)
+        toValue(v: string)
         {
             var n = Number(v) || 0;
+            var fractionDigits = 1; while (fractionDigits * this.step < 1) { fractionDigits *= 10; }
+            n = Math.round(fractionDigits * (Math.round(n / this.step) * this.step)) / fractionDigits;
             return n;
         }
 
@@ -123,10 +125,12 @@ namespace editor
         {
             if (event.key == "ArrowUp")
             {
-                this.space[this.attribute] += this.step;
+                this.space[this.attribute] += this.step * this.stepDownup;
+                this.textInput.text = this.toText.call(this, this.space[this.attribute]);
             } else if (event.key == "ArrowDown")
             {
-                this.space[this.attribute] -= this.step;
+                this.space[this.attribute] -= this.step * this.stepDownup;
+                this.textInput.text = this.toText.call(this, this.space[this.attribute]);
             }
             this.invalidateView();
         }

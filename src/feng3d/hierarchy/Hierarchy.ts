@@ -49,11 +49,42 @@ namespace editor
          */
         addGameObject(gameobject: feng3d.GameObject)
         {
+            if (gameobject.getComponent(feng3d.Transform2D))
+            {
+                this.addUI(gameobject);
+                return;
+            }
+
             var selectedNode = this.getSelectedNode();
             if (selectedNode)
                 selectedNode.gameobject.addChild(gameobject);
             else
                 this.rootnode.gameobject.addChild(gameobject);
+            editorData.selectObject(gameobject);
+        }
+
+        /**
+         * 添加UI
+         * 
+         * @param gameobject 
+         */
+        addUI(gameobject: feng3d.GameObject)
+        {
+            var selectedNode = this.getSelectedNode();
+            if (selectedNode && selectedNode.gameobject.getComponent(feng3d.Transform2D))
+            {
+                selectedNode.gameobject.addChild(gameobject);
+            }
+            else
+            {
+                var canvas = this.rootnode.gameobject.getComponentsInChildren(feng3d.Canvas)[0];
+                if (!canvas)
+                {
+                    canvas = feng3d.GameObject.createPrimitive("Canvas").getComponent(feng3d.Canvas);
+                    this.rootnode.gameobject.addChild(canvas.gameObject);
+                }
+                canvas.gameObject.addChild(gameobject);
+            }
             editorData.selectObject(gameobject);
         }
 

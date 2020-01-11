@@ -67,12 +67,18 @@ namespace editor
         /**
          * 绑定属性值转换为文本
          */
-        toText = (v: any) => v;
+        toText(v: any)
+        {
+            return v;
+        }
 
         /**
          * 文本转换为绑定属性值
          */
-        toValue = (v: any) => v;
+        toValue(v: any)
+        {
+            return v;
+        }
 
         init(v: Partial<this>)
         {
@@ -125,13 +131,13 @@ namespace editor
         {
             if (!this._textfocusintxt)
             {
-                this.textInput.text = this.toText.call(this, this.space[this.attribute]);
+                this.textInput.text = this.toText(this.space[this.attribute]);
             }
         }
 
         protected onTextChange()
         {
-            this.space[this.attribute] = this.toValue.call(this, this.textInput.text);
+            this.space[this.attribute] = this.toValue(this.textInput.text);
         }
 
         private _textfocusintxt: boolean;

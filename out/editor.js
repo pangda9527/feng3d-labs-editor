@@ -6635,16 +6635,20 @@ var editor;
              * 是否可编辑
              */
             _this.editable = true;
-            /**
-             * 绑定属性值转换为文本
-             */
-            _this.toText = function (v) { return v; };
-            /**
-             * 文本转换为绑定属性值
-             */
-            _this.toValue = function (v) { return v; };
             return _this;
         }
+        /**
+         * 绑定属性值转换为文本
+         */
+        TextInputBinder.prototype.toText = function (v) {
+            return v;
+        };
+        /**
+         * 文本转换为绑定属性值
+         */
+        TextInputBinder.prototype.toValue = function (v) {
+            return v;
+        };
         TextInputBinder.prototype.init = function (v) {
             Object.assign(this, v);
             //
@@ -6681,11 +6685,11 @@ var editor;
         };
         TextInputBinder.prototype.updateView = function () {
             if (!this._textfocusintxt) {
-                this.textInput.text = this.toText.call(this, this.space[this.attribute]);
+                this.textInput.text = this.toText(this.space[this.attribute]);
             }
         };
         TextInputBinder.prototype.onTextChange = function () {
-            this.space[this.attribute] = this.toValue.call(this, this.textInput.text);
+            this.space[this.attribute] = this.toValue(this.textInput.text);
         };
         TextInputBinder.prototype.ontxtfocusin = function () {
             this._textfocusintxt = true;
@@ -6712,9 +6716,9 @@ var editor;
              */
             _this.step = 0.001;
             /**
-             * 键盘上下方向键步长
+             * 按下上下方向键时增加的步长数量
              */
-            _this.stepDownup = 0.001;
+            _this.stepDownup = 10;
             /**
              * 移动一个像素时增加的步长数量
              */
@@ -6727,23 +6731,28 @@ var editor;
              * 最小值
              */
             _this.maxValue = NaN;
-            _this.toText = function (v) {
-                // 消除数字显示为类似 0.0000000001 的问题
-                var fractionDigits = 1;
-                while (fractionDigits * this.step < 1) {
-                    fractionDigits *= 10;
-                }
-                var text = String(Math.round(fractionDigits * (Math.round(v / this.step) * this.step)) / fractionDigits);
-                return text;
-            };
-            _this.toValue = function (v) {
-                var n = Number(v) || 0;
-                return n;
-            };
             _this.mouseDownPosition = new feng3d.Vector2();
             _this.mouseDownValue = 0;
             return _this;
         }
+        NumberTextInputBinder.prototype.toText = function (v) {
+            // 消除数字显示为类似 0.0000000001 的问题
+            var fractionDigits = 1;
+            while (fractionDigits * this.step < 1) {
+                fractionDigits *= 10;
+            }
+            var text = String(Math.round(fractionDigits * (Math.round(v / this.step) * this.step)) / fractionDigits);
+            return text;
+        };
+        NumberTextInputBinder.prototype.toValue = function (v) {
+            var n = Number(v) || 0;
+            var fractionDigits = 1;
+            while (fractionDigits * this.step < 1) {
+                fractionDigits *= 10;
+            }
+            n = Math.round(fractionDigits * (Math.round(n / this.step) * this.step)) / fractionDigits;
+            return n;
+        };
         NumberTextInputBinder.prototype.initView = function () {
             _super.prototype.initView.call(this);
             if (this.editable) {
@@ -6795,10 +6804,12 @@ var editor;
         };
         NumberTextInputBinder.prototype.onWindowKeyDown = function (event) {
             if (event.key == "ArrowUp") {
-                this.space[this.attribute] += this.step;
+                this.space[this.attribute] += this.step * this.stepDownup;
+                this.textInput.text = this.toText.call(this, this.space[this.attribute]);
             }
             else if (event.key == "ArrowDown") {
-                this.space[this.attribute] -= this.step;
+                this.space[this.attribute] -= this.step * this.stepDownup;
+                this.textInput.text = this.toText.call(this, this.space[this.attribute]);
             }
             this.invalidateView();
         };
@@ -7503,6 +7514,26 @@ var editor;
         __extends(OAVNumber, _super);
         function OAVNumber(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
+            /**
+             * 步长，精度
+             */
+            _this.step = 0.001;
+            /**
+             * 键盘上下方向键步长
+             */
+            _this.stepDownup = 0.001;
+            /**
+             * 移动一个像素时增加的步长数量
+             */
+            _this.stepScale = 1;
+            /**
+             * 最小值
+             */
+            _this.minValue = NaN;
+            /**
+             * 最小值
+             */
+            _this.maxValue = NaN;
             _this.skinName = "OAVNumber";
             return _this;
         }
@@ -7510,7 +7541,7 @@ var editor;
             _super.prototype.initView.call(this);
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.space, attribute: this._attributeName, textInput: this.text, editable: this._attributeViewInfo.editable,
-                controller: this.labelLab,
+                controller: this.labelLab, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
         };
         OAVNumber = __decorate([
@@ -7577,6 +7608,26 @@ var editor;
         __extends(OAVVector2, _super);
         function OAVVector2(attributeViewInfo) {
             var _this = _super.call(this, attributeViewInfo) || this;
+            /**
+             * 步长，精度
+             */
+            _this.step = 0.001;
+            /**
+             * 键盘上下方向键步长
+             */
+            _this.stepDownup = 10;
+            /**
+             * 移动一个像素时增加的步长数量
+             */
+            _this.stepScale = 1;
+            /**
+             * 最小值
+             */
+            _this.minValue = NaN;
+            /**
+             * 最小值
+             */
+            _this.maxValue = NaN;
             _this.skinName = "OAVVector2";
             return _this;
         }
@@ -7584,11 +7635,11 @@ var editor;
             _super.prototype.initView.call(this);
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
-                controller: this.xLabel,
+                controller: this.xLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.attributeValue, attribute: "y", textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
-                controller: this.yLabel,
+                controller: this.yLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
         };
         OAVVector2 = __decorate([
@@ -12928,11 +12979,35 @@ var editor;
          * @param gameobject 游戏对象
          */
         Hierarchy.prototype.addGameObject = function (gameobject) {
+            if (gameobject.getComponent(feng3d.Transform2D)) {
+                this.addUI(gameobject);
+                return;
+            }
             var selectedNode = this.getSelectedNode();
             if (selectedNode)
                 selectedNode.gameobject.addChild(gameobject);
             else
                 this.rootnode.gameobject.addChild(gameobject);
+            editor.editorData.selectObject(gameobject);
+        };
+        /**
+         * 添加UI
+         *
+         * @param gameobject
+         */
+        Hierarchy.prototype.addUI = function (gameobject) {
+            var selectedNode = this.getSelectedNode();
+            if (selectedNode && selectedNode.gameobject.getComponent(feng3d.Transform2D)) {
+                selectedNode.gameobject.addChild(gameobject);
+            }
+            else {
+                var canvas = this.rootnode.gameobject.getComponentsInChildren(feng3d.Canvas)[0];
+                if (!canvas) {
+                    canvas = feng3d.GameObject.createPrimitive("Canvas").getComponent(feng3d.Canvas);
+                    this.rootnode.gameobject.addChild(canvas.gameObject);
+                }
+                canvas.gameObject.addChild(gameobject);
+            }
             editor.editorData.selectObject(gameobject);
         };
         Hierarchy.prototype.addGameoObjectFromAsset = function (gameobjectAsset, parent) {
@@ -16859,6 +16934,7 @@ var editor;
                 {
                     label: "Layout",
                     submenu: [
+                        { label: "Transform2D", click: function () { gameobject.addComponent(feng3d.Transform2D); } },
                         { label: "HoldSizeComponent", click: function () { gameobject.addComponent(feng3d.HoldSizeComponent); } },
                         { label: "BillboardComponent", click: function () { gameobject.addComponent(feng3d.BillboardComponent); } },
                     ]
