@@ -48,7 +48,7 @@ namespace editor
 
             //
             var canvas = this.canvas = document.createElement("canvas");
-            (<any>document.getElementById("CameraPreviewLayer")).append(canvas);
+            (document.getElementById("CameraPreviewLayer")).appendChild(canvas);
             this.previewView = new feng3d.View(canvas);
             this.previewView.mouse3DManager.mouseInput.enable = false;
             this.previewView.stop();

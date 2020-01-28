@@ -57,7 +57,7 @@ namespace editor
 			{
 				//
 				this._canvas = document.createElement("canvas");
-				(<any>document.getElementById("app")).append(this._canvas);
+				document.getElementById("app").appendChild(this._canvas);
 				this.view = new EditorView(this._canvas);
 				//
 				var editorCamera = this.editorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);

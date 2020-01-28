@@ -2654,7 +2654,7 @@ var editor;
             if (!this._canvas) {
                 //
                 this._canvas = document.createElement("canvas");
-                document.getElementById("app").append(this._canvas);
+                document.getElementById("app").appendChild(this._canvas);
                 this.view = new editor.EditorView(this._canvas);
                 //
                 var editorCamera = this.editorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
@@ -3016,7 +3016,7 @@ var editor;
                 return;
             //
             var canvas = this.canvas = document.createElement("canvas");
-            document.getElementById("CameraPreviewLayer").append(canvas);
+            (document.getElementById("CameraPreviewLayer")).appendChild(canvas);
             this.previewView = new feng3d.View(canvas);
             this.previewView.mouse3DManager.mouseInput.enable = false;
             this.previewView.stop();
@@ -13230,7 +13230,7 @@ var editor;
         };
         SceneRotateTool.prototype.newView = function () {
             var canvas = document.createElement("canvas");
-            document.getElementById("SceneRotateToolLayer").append(canvas);
+            document.getElementById("SceneRotateToolLayer").appendChild(canvas);
             canvas.style.position = "absolute";
             canvas.width = 80;
             canvas.height = 80;

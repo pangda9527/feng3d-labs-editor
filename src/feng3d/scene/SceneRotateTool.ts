@@ -156,7 +156,7 @@ namespace editor
         private newView()
         {
             var canvas = document.createElement("canvas");
-            (<any>document.getElementById("SceneRotateToolLayer")).append(canvas);
+            document.getElementById("SceneRotateToolLayer").appendChild(canvas);
             canvas.style.position = "absolute";
             canvas.width = 80;
             canvas.height = 80;
