@@ -310,7 +310,7 @@ namespace editor
                 {
                     label: "游戏对象", click: () =>
                     {
-                        hierarchy.addGameObject(feng3d.GameObject.create());
+                        hierarchy.addGameObject(new feng3d.GameObject());
                     }
                 },
                 { type: "separator" },
