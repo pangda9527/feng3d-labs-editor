@@ -429,6 +429,12 @@ namespace editor
                                 hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Text"));
                             }
                         },
+                        {
+                            label: "按钮", click: () =>
+                            {
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Button"));
+                            }
+                        },
                     ],
                 },
                 {
