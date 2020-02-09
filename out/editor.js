@@ -16862,6 +16862,11 @@ var editor;
                     label: "UI",
                     submenu: [
                         {
+                            label: "矩形", click: function () {
+                                editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Rect"));
+                            }
+                        },
+                        {
                             label: "图片", click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Image"));
                             }

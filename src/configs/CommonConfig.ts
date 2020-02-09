@@ -412,6 +412,12 @@ namespace editor
                     label: "UI",
                     submenu: [
                         {
+                            label: "矩形", click: () =>
+                            {
+                                hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Rect"));
+                            }
+                        },
+                        {
                             label: "图片", click: () =>
                             {
                                 hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Image"));
