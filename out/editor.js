@@ -12979,7 +12979,7 @@ var editor;
          * @param gameobject 游戏对象
          */
         Hierarchy.prototype.addGameObject = function (gameobject) {
-            if (gameobject.getComponent(feng3d.Transform2D)) {
+            if (gameobject.getComponent(feng2d.Transform2D)) {
                 this.addUI(gameobject);
                 return;
             }
@@ -12997,13 +12997,13 @@ var editor;
          */
         Hierarchy.prototype.addUI = function (gameobject) {
             var selectedNode = this.getSelectedNode();
-            if (selectedNode && selectedNode.gameobject.getComponent(feng3d.Transform2D)) {
+            if (selectedNode && selectedNode.gameobject.getComponent(feng2d.Transform2D)) {
                 selectedNode.gameobject.addChild(gameobject);
             }
             else {
-                var canvas = this.rootnode.gameobject.getComponentsInChildren(feng3d.Canvas)[0];
+                var canvas = this.rootnode.gameobject.getComponentsInChildren(feng2d.Canvas)[0];
                 if (!canvas) {
-                    canvas = feng3d.GameObject.createPrimitive("Canvas").getComponent(feng3d.Canvas);
+                    canvas = feng3d.GameObject.createPrimitive("Canvas").getComponent(feng2d.Canvas);
                     this.rootnode.gameobject.addChild(canvas.gameObject);
                 }
                 canvas.gameObject.addChild(gameobject);
@@ -16939,7 +16939,7 @@ var editor;
                 {
                     label: "Layout",
                     submenu: [
-                        { label: "Transform2D", click: function () { gameobject.addComponent(feng3d.Transform2D); } },
+                        { label: "Transform2D", click: function () { gameobject.addComponent(feng2d.Transform2D); } },
                         { label: "HoldSizeComponent", click: function () { gameobject.addComponent(feng3d.HoldSizeComponent); } },
                         { label: "BillboardComponent", click: function () { gameobject.addComponent(feng3d.BillboardComponent); } },
                     ]

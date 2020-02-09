@@ -497,7 +497,7 @@ namespace editor
                 {
                     label: "Layout",
                     submenu: [
-                        { label: "Transform2D", click: () => { gameobject.addComponent(feng3d.Transform2D); } },
+                        { label: "Transform2D", click: () => { gameobject.addComponent(feng2d.Transform2D); } },
                         { label: "HoldSizeComponent", click: () => { gameobject.addComponent(feng3d.HoldSizeComponent); } },
                         { label: "BillboardComponent", click: () => { gameobject.addComponent(feng3d.BillboardComponent); } },
                     ]
