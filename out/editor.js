@@ -16935,16 +16935,15 @@ var editor;
                         { label: "OutLineComponent", click: function () { gameobject.addComponent(feng3d.OutLineComponent); } },
                     ]
                 },
-                {
-                    label: "Controller",
-                    submenu: [
-                        { label: "FPSController", click: function () { gameobject.addComponent(feng3d.FPSController); } },
-                    ]
-                },
+                // {
+                //     label: "Controller",
+                //     submenu: [
+                //         { label: "FPSController", click: () => { gameobject.addComponent(feng3d.FPSController); } },
+                //     ]
+                // },
                 {
                     label: "Layout",
                     submenu: [
-                        { label: "Transform2D", click: function () { gameobject.addComponent(feng2d.Transform2D); } },
                         { label: "HoldSizeComponent", click: function () { gameobject.addComponent(feng3d.HoldSizeComponent); } },
                         { label: "BillboardComponent", click: function () { gameobject.addComponent(feng3d.BillboardComponent); } },
                     ]
@@ -16988,9 +16987,11 @@ var editor;
                         currentMenuItem = null;
                     }
                     currentMenuItem = currentmenu.filter(function (m) { return m.label == p; })[0];
-                    if (!currentMenuItem)
+                    if (!currentMenuItem) {
                         currentMenuItem = { label: p };
-                    currentmenu.push(currentMenuItem);
+                        currentmenu.push(currentMenuItem);
+                    }
+                    ;
                 });
                 currentMenuItem.click = function () { gameobject.addComponent(item.type); };
             });

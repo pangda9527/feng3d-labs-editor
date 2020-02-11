@@ -494,16 +494,15 @@ namespace editor
                         // { label: "LineComponent", click: () => { needcreateComponentGameObject.addComponent(LineComponent); } },
                     ]
                 },
-                {
-                    label: "Controller",
-                    submenu: [
-                        { label: "FPSController", click: () => { gameobject.addComponent(feng3d.FPSController); } },
-                    ]
-                },
+                // {
+                //     label: "Controller",
+                //     submenu: [
+                //         { label: "FPSController", click: () => { gameobject.addComponent(feng3d.FPSController); } },
+                //     ]
+                // },
                 {
                     label: "Layout",
                     submenu: [
-                        { label: "Transform2D", click: () => { gameobject.addComponent(feng2d.Transform2D); } },
                         { label: "HoldSizeComponent", click: () => { gameobject.addComponent(feng3d.HoldSizeComponent); } },
                         { label: "BillboardComponent", click: () => { gameobject.addComponent(feng3d.BillboardComponent); } },
                     ]
@@ -550,8 +549,11 @@ namespace editor
                         currentMenuItem = null;
                     }
                     currentMenuItem = currentmenu.filter(m => m.label == p)[0];
-                    if (!currentMenuItem) currentMenuItem = { label: p };
-                    currentmenu.push(currentMenuItem);
+                    if (!currentMenuItem)
+                    {
+                        currentMenuItem = { label: p }
+                        currentmenu.push(currentMenuItem);
+                    };
                 });
                 currentMenuItem.click = () => { gameobject.addComponent(item.type); }
             });
