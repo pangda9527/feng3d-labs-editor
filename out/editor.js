@@ -16975,6 +16975,25 @@ var editor;
                     ]
                 },
             ];
+            // 处理 由 AddComponentMenu 添加的菜单
+            feng3d.menuConfig.component.forEach(function (item) {
+                var paths = item.path.split("/");
+                var currentmenu = menu;
+                var currentMenuItem = null;
+                paths.forEach(function (p) {
+                    if (currentMenuItem) {
+                        if (!currentMenuItem.submenu)
+                            currentMenuItem.submenu = [];
+                        currentmenu = currentMenuItem.submenu;
+                        currentMenuItem = null;
+                    }
+                    currentMenuItem = currentmenu.filter(function (m) { return m.label == p; })[0];
+                    if (!currentMenuItem)
+                        currentMenuItem = { label: p };
+                    currentmenu.push(currentMenuItem);
+                });
+                currentMenuItem.click = function () { gameobject.addComponent(item.type); };
+            });
             return menu;
         };
         return MenuConfig;

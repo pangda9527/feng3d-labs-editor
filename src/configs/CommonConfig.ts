@@ -534,6 +534,28 @@ namespace editor
                     ]
                 },
             ];
+
+            // 处理 由 AddComponentMenu 添加的菜单
+            feng3d.menuConfig.component.forEach(item =>
+            {
+                var paths = item.path.split("/");
+                var currentmenu = menu;
+                var currentMenuItem: MenuItem = null;
+                paths.forEach(p =>
+                {
+                    if (currentMenuItem)
+                    {
+                        if (!currentMenuItem.submenu) currentMenuItem.submenu = [];
+                        currentmenu = currentMenuItem.submenu;
+                        currentMenuItem = null;
+                    }
+                    currentMenuItem = currentmenu.filter(m => m.label == p)[0];
+                    if (!currentMenuItem) currentMenuItem = { label: p };
+                    currentmenu.push(currentMenuItem);
+                });
+                currentMenuItem.click = () => { gameobject.addComponent(item.type); }
+            });
+
             return menu;
         }
 
