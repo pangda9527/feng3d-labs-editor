@@ -13917,6 +13917,9 @@ var editor;
         __decorate([
             feng3d.oav()
         ], Navigation.prototype, "bake", null);
+        Navigation = __decorate([
+            feng3d.AddComponentMenu("Navigation/Navigation")
+        ], Navigation);
         return Navigation;
     }(feng3d.Component));
     editor.Navigation = Navigation;
@@ -16901,79 +16904,7 @@ var editor;
          * @param gameobject 游戏对象
          */
         MenuConfig.prototype.getCreateComponentMenu = function (gameobject) {
-            var menu = [
-                //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
-                {
-                    label: "SkyBox",
-                    click: function () { gameobject.addComponent(feng3d.SkyBox); }
-                },
-                {
-                    label: "Physics",
-                    submenu: [
-                        { label: "PhysicsWorld", click: function () { gameobject.addComponent(CANNON.PhysicsWorld); } },
-                        { label: "Rigidbody", click: function () { gameobject.addComponent(CANNON.Rigidbody); } },
-                        { label: "Box Collider", click: function () { gameobject.addComponent(CANNON.BoxCollider); } },
-                        { label: "Sphere Collider", click: function () { gameobject.addComponent(CANNON.SphereCollider); } },
-                        { label: "Cylinder Collider", click: function () { gameobject.addComponent(CANNON.CylinderCollider); } },
-                        { label: "Plane Collider", click: function () { gameobject.addComponent(CANNON.PlaneCollider); } },
-                    ]
-                },
-                {
-                    label: "Animator",
-                    submenu: [
-                        { label: "ParticleSystem", click: function () { gameobject.addComponent(feng3d.ParticleSystem); } },
-                        { label: "Animation", click: function () { gameobject.addComponent(feng3d.Animation); } },
-                    ]
-                },
-                {
-                    label: "Rendering",
-                    submenu: [
-                        { label: "CartoonComponent", click: function () { gameobject.addComponent(feng3d.CartoonComponent); } },
-                        { label: "Camera", click: function () { gameobject.addComponent(feng3d.Camera); } },
-                        { label: "PointLight", click: function () { gameobject.addComponent(feng3d.PointLight); } },
-                        { label: "DirectionalLight", click: function () { gameobject.addComponent(feng3d.DirectionalLight); } },
-                        { label: "OutLineComponent", click: function () { gameobject.addComponent(feng3d.OutLineComponent); } },
-                    ]
-                },
-                // {
-                //     label: "Controller",
-                //     submenu: [
-                //         { label: "FPSController", click: () => { gameobject.addComponent(feng3d.FPSController); } },
-                //     ]
-                // },
-                {
-                    label: "Layout",
-                    submenu: [
-                        { label: "HoldSizeComponent", click: function () { gameobject.addComponent(feng3d.HoldSizeComponent); } },
-                        { label: "BillboardComponent", click: function () { gameobject.addComponent(feng3d.BillboardComponent); } },
-                    ]
-                },
-                {
-                    label: "Audio",
-                    submenu: [
-                        { label: "AudioListener", click: function () { gameobject.addComponent(feng3d.AudioListener); } },
-                        { label: "AudioSource", click: function () { gameobject.addComponent(feng3d.AudioSource); } },
-                    ]
-                },
-                {
-                    label: "Navigation",
-                    submenu: [
-                        { label: "Navigation", click: function () { gameobject.addComponent(editor.Navigation); } },
-                    ]
-                },
-                {
-                    label: "Graphics",
-                    submenu: [
-                        { label: "Water", click: function () { gameobject.addComponent(feng3d.Water); } },
-                    ]
-                },
-                {
-                    label: "Script",
-                    submenu: [
-                        { label: "Script", click: function () { gameobject.addComponent(feng3d.ScriptComponent); } },
-                    ]
-                },
-            ];
+            var menu = [];
             // 处理 由 AddComponentMenu 添加的菜单
             feng3d.menuConfig.component.forEach(function (item) {
                 var paths = item.path.split("/");
