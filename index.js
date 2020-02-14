@@ -8,22 +8,34 @@ var result = [
     isdebug ? "libs/modules/tween/tween.js" : "libs/modules/tween/tween.min.js",
 ];
 
-xhrTsconfig("../feng3d/tsconfig.json", () =>
+var modules = [
+    "../feng3d/tsconfig.json",
+    "../feng2d/tsconfig.json",
+    "../TMPro/runtime/tsconfig.json",
+    "../cannon/tsconfig.json",
+    "../cannon-plugin/tsconfig.json",
+    "tsconfig.json",
+];
+
+loadModule(modules, () =>
 {
-    xhrTsconfig("../feng2d/tsconfig.json", () =>
-    {
-        xhrTsconfig("../cannon/tsconfig.json", () =>
-        {
-            xhrTsconfig("../cannon-plugin/tsconfig.json", () =>
-            {
-                xhrTsconfig("tsconfig.json", () =>
-                {
-                    loadjs(result, loadComplete);
-                });
-            });
-        });
-    });
+    loadjs(result, loadComplete);
 });
+
+function loadModule(modules, callback)
+{
+    if (modules.length == 0)
+    {
+        callback && callback();
+        return;
+    }
+    modules = modules.concat()
+    var modulepath = modules.shift()
+    xhrTsconfig(modulepath, () =>
+    {
+        loadModule(modules, callback);
+    });
+}
 
 function loadjs(path, onload, onerror)
 {

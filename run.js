@@ -4,33 +4,47 @@ var fstype = GetQueryString("fstype");
 
 var result = [];
 
-xhrTsconfig("../feng3d/tsconfig.json", () =>
+var modules = [
+    "../feng3d/tsconfig.json",
+    "../feng2d/tsconfig.json",
+    "../TMPro/runtime/tsconfig.json",
+    "../cannon/tsconfig.json",
+    "../cannon-plugin/tsconfig.json",
+];
+
+loadModule(modules, () =>
 {
-    xhrTsconfig("../feng2d/tsconfig.json", () =>
+    loadjs(result, () =>
     {
-        xhrTsconfig("../cannon/tsconfig.json", () =>
+        if (fstype == "indexedDB")
         {
-            xhrTsconfig("../cannon-plugin/tsconfig.json", () =>
-            {
-                loadjs(result, () =>
-                {
-                    if (fstype == "indexedDB")
-                    {
-                        feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
-                        feng3d.fs = feng3d.indexedDBFS;
-                        feng3d.rs = new feng3d.ReadRS(feng3d.indexedDBFS);
-                    }
-                    // 初始化资源系统
-                    feng3d.rs.init(() =>
-                    {
-                        loadProjectJs(initProject);
-                    });
-                });
-            });
+            feng3d.indexedDBFS.projectname = decodeURI(GetQueryString("project"));
+            feng3d.fs = feng3d.indexedDBFS;
+            feng3d.rs = new feng3d.ReadRS(feng3d.indexedDBFS);
+        }
+        // 初始化资源系统
+        feng3d.rs.init(() =>
+        {
+            loadProjectJs(initProject);
         });
     });
-
+    
 });
+
+function loadModule(modules, callback)
+{
+    if (modules.length == 0)
+    {
+        callback && callback();
+        return;
+    }
+    modules = modules.concat()
+    var modulepath = modules.shift()
+    xhrTsconfig(modulepath, () =>
+    {
+        loadModule(modules, callback);
+    });
+}
 
 function loadProjectJs(callback)
 {
