@@ -24,6 +24,9 @@
             "path": "../TMPro/runtime",
         },
         {
+            "path": "../unity",
+        },
+        {
             "path": "../cannon",
         },
         {
