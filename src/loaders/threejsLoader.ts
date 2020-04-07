@@ -81,7 +81,7 @@ namespace editor
                     gameobject.addComponent(feng3d.Camera).lens = parsePerspectiveCamera(object3d);
                     break;
                 case "SkinnedMesh":
-                    var skinnedModel = gameobject.addComponent(feng3d.SkinnedModel);
+                    var skinnedModel = gameobject.addComponent(feng3d.SkinnedMeshRenderer);
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
                     console.assert(object3d.bindMode == "attached");
