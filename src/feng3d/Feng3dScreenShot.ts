@@ -211,8 +211,8 @@ namespace editor
             this.camera.transform.position = localLookPos;
         }
 
-        private materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel" }] });
-        private geometryObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshModel", }, { __class__: "feng3d.WireframeComponent", }] });
+        private materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshRenderer" }] });
+        private geometryObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshRenderer", }, { __class__: "feng3d.WireframeComponent", }] });
 
         private _drawGameObject(gameObject: feng3d.GameObject)
         {

@@ -24,7 +24,7 @@ namespace editor
                 name: "PointLightIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
-                        __class__: "feng3d.MeshModel", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
+                        __class__: "feng3d.MeshRenderer", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
                         material: {
                             __class__: "feng3d.Material",
                             shaderName: "texture",
@@ -48,7 +48,7 @@ namespace editor
             var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
-                    __class__: "feng3d.MeshModel", material: {
+                    __class__: "feng3d.MeshRenderer", material: {
                         __class__: "feng3d.Material",
                         shaderName: "segment",
                         uniforms: {
@@ -64,7 +64,7 @@ namespace editor
             var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
-                    __class__: "feng3d.MeshModel",
+                    __class__: "feng3d.MeshRenderer",
                     geometry: {
                         __class__: "feng3d.PointGeometry",
                         points: [

@@ -24,7 +24,7 @@ namespace editor
                 name: "SpotLightIcon", components: [
                     { __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
                     {
-                        __class__: "feng3d.MeshModel", material: {
+                        __class__: "feng3d.MeshRenderer", material: {
                             __class__: "feng3d.Material",
                             shaderName: "texture",
                             uniforms: {
@@ -48,7 +48,7 @@ namespace editor
             var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
                 components: [{
-                    __class__: "feng3d.MeshModel", material: {
+                    __class__: "feng3d.MeshRenderer", material: {
                         __class__: "feng3d.Material", shaderName: "segment",
                         uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 } },
                         renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.LINES },
@@ -63,7 +63,7 @@ namespace editor
             var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
                 name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
                     {
-                        __class__: "feng3d.MeshModel",
+                        __class__: "feng3d.MeshRenderer",
                         material: { __class__: "feng3d.Material", shaderName: "point", uniforms: { u_PointSize: 5 }, renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.POINTS } },
                         geometry: { __class__: "feng3d.PointGeometry", },
                     },
