@@ -546,7 +546,7 @@ namespace editor
 
             var selectTimeline = this.selectTimeline;
             if (!selectTimeline) return;
-            menu.popupEnum(feng3d.AnimationCurveWrapMode, selectTimeline.preWrapMode, (v) =>
+            menu.popupEnum(feng3d.WrapMode, selectTimeline.preWrapMode, (v) =>
             {
                 selectTimeline.preWrapMode = v;
                 selectTimeline.postWrapMode = v;
