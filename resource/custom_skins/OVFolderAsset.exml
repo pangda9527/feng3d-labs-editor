@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="OVFolderAsset" xmlns:e="http://ns.egret.com/eui" xmlns:editor="editor.*" xmlns:w="http://ns.egret.com/wing" width="200">
+	<e:Group width="100%" height="42">
+		<e:Rect width="100%" height="100%" scaleX="1" scaleY="1" fillColor="0xdcdcdc"/>
+		<e:Image x="5" verticalCenter="0" source="folder_png" width="30" height="30"/>
+		<e:Label id="nameLabel" text="Label" x="46" y="6" size="12" textColor="0x000000"/>
+		<e:Button id="openBtn" label="Open" right="5" bottom="5">
+		</e:Button>
+	</e:Group>
+</e:Skin>

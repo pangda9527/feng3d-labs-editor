@@ -118,6 +118,7 @@
         "resource/custom_skins/NavigationView.exml",
         "resource/custom_skins/ShortCutSetting.exml",
         "resource/custom_skins/ShortCutSettingItemRenderer.exml",
+        "resource/custom_skins/OVFolderAsset.exml",
         "resource/custom_skins/MainSplitView.exml",
         "resource/custom_skins/MainView.exml"
     ]

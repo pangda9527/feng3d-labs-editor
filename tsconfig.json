@@ -114,6 +114,8 @@
         "src/ui/components/terrain/TerrainView.ts",
         "src/ui/components/terrain/OVTerrain.ts",
         //
+        "src/objectview/ov/OVFolderAsset.ts",
+        //
         "src/objectview/ov/OVBaseDefault.ts",
         "src/objectview/ov/OVDefault.ts",
         "src/objectview/ov/OVTransform.ts",
