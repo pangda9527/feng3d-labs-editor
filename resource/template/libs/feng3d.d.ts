@@ -297,7 +297,7 @@ declare namespace feng3d {
          * @param handler 变化回调函数 (object: T, property: string, oldvalue: V) => void
          * @param thisObject 变化回调函数 this值
          */
-        watchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+        watchchain(object: any, property: string, handler: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
         /**
          * 取消监听对象属性链值变化
          *
@@ -315,7 +315,7 @@ declare namespace feng3d {
          * @param handler 变化回调函数 (object: T, property: string, oldvalue: V) => void
          * @param thisObject 变化回调函数 this值
          */
-        watchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+        watchobject<T>(object: T, property: gPartial<T>, handler: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
         /**
          * 取消监听对象属性链值变化
          *
@@ -460,7 +460,7 @@ interface ObjectConstructor {
      * @param object 对象
      * @param property 属性名称
      */
-    getPropertyDescriptor(object: Object, property: string): PropertyDescriptor;
+    getPropertyDescriptor(object: Object, property: string): PropertyDescriptor | undefined;
     /**
      * 属性是否可写
      * @param obj 对象
@@ -509,7 +509,7 @@ interface ObjectConstructor {
      * @param handlers 处理函数列表，先于 Object.assignDeepDefaultHandlers 执行。函数返回值为true表示该属性赋值已完成跳过默认属性赋值操作，否则执行默认属性赋值操作。执行在 Object.DefaultAssignDeepReplacers 前。
      * @param deep 赋值深度，deep<1时直接返回。
      */
-    assignDeep<T>(target: T, source: feng3d.gPartial<T>, handlers?: AssignDeepHandler | AssignDeepHandler[], deep?: number): T;
+    assignDeep<T>(target: T, source: feng3d.gPartial<T>, handlers?: AssignDeepHandler[], deep?: number): T;
     /**
      * 深度比较两个对象子代可枚举属性值
      *
@@ -918,6 +918,12 @@ declare namespace feng3d {
          * @returns 序列化后简单数据对象（由Object与Array组合可 JSON.stringify 的简单结构）
          */
         serialize<T>(target: T): gPartial<T>;
+        /**
+         * 删除 Json 对象中 CLASS_KEY 属性，防止被反序列化。
+         *
+         * @param obj
+         */
+        deleteCLASS_KEY(obj: Object): void;
         /**
          * 反序列化对象为基础对象数据（由Object与Array组合）
          *
@@ -3001,6 +3007,25 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
+     * 点与面的相对位置
+     */
+    enum PlaneClassification {
+        /**
+         * 在平面后面
+         */
+        BACK = 0,
+        /**
+         * 在平面前面
+         */
+        FRONT = 1,
+        /**
+         * 与平面相交
+         */
+        INTERSECT = 2
+    }
+}
+declare namespace feng3d {
+    /**
      * 颜色
      */
     class Color3 {
@@ -3087,154 +3112,154 @@ declare namespace feng3d {
         static ToHex(i: number): string;
     }
     var ColorKeywords: {
-        'aliceblue': number;
-        'antiquewhite': number;
-        'aqua': number;
-        'aquamarine': number;
-        'azure': number;
-        'beige': number;
-        'bisque': number;
-        'black': number;
-        'blanchedalmond': number;
-        'blue': number;
-        'blueviolet': number;
-        'brown': number;
-        'burlywood': number;
-        'cadetblue': number;
-        'chartreuse': number;
-        'chocolate': number;
-        'coral': number;
-        'cornflowerblue': number;
-        'cornsilk': number;
-        'crimson': number;
-        'cyan': number;
-        'darkblue': number;
-        'darkcyan': number;
-        'darkgoldenrod': number;
-        'darkgray': number;
-        'darkgreen': number;
-        'darkgrey': number;
-        'darkkhaki': number;
-        'darkmagenta': number;
-        'darkolivegreen': number;
-        'darkorange': number;
-        'darkorchid': number;
-        'darkred': number;
-        'darksalmon': number;
-        'darkseagreen': number;
-        'darkslateblue': number;
-        'darkslategray': number;
-        'darkslategrey': number;
-        'darkturquoise': number;
-        'darkviolet': number;
-        'deeppink': number;
-        'deepskyblue': number;
-        'dimgray': number;
-        'dimgrey': number;
-        'dodgerblue': number;
-        'firebrick': number;
-        'floralwhite': number;
-        'forestgreen': number;
-        'fuchsia': number;
-        'gainsboro': number;
-        'ghostwhite': number;
-        'gold': number;
-        'goldenrod': number;
-        'gray': number;
-        'green': number;
-        'greenyellow': number;
-        'grey': number;
-        'honeydew': number;
-        'hotpink': number;
-        'indianred': number;
-        'indigo': number;
-        'ivory': number;
-        'khaki': number;
-        'lavender': number;
-        'lavenderblush': number;
-        'lawngreen': number;
-        'lemonchiffon': number;
-        'lightblue': number;
-        'lightcoral': number;
-        'lightcyan': number;
-        'lightgoldenrodyellow': number;
-        'lightgray': number;
-        'lightgreen': number;
-        'lightgrey': number;
-        'lightpink': number;
-        'lightsalmon': number;
-        'lightseagreen': number;
-        'lightskyblue': number;
-        'lightslategray': number;
-        'lightslategrey': number;
-        'lightsteelblue': number;
-        'lightyellow': number;
-        'lime': number;
-        'limegreen': number;
-        'linen': number;
-        'magenta': number;
-        'maroon': number;
-        'mediumaquamarine': number;
-        'mediumblue': number;
-        'mediumorchid': number;
-        'mediumpurple': number;
-        'mediumseagreen': number;
-        'mediumslateblue': number;
-        'mediumspringgreen': number;
-        'mediumturquoise': number;
-        'mediumvioletred': number;
-        'midnightblue': number;
-        'mintcream': number;
-        'mistyrose': number;
-        'moccasin': number;
-        'navajowhite': number;
-        'navy': number;
-        'oldlace': number;
-        'olive': number;
-        'olivedrab': number;
-        'orange': number;
-        'orangered': number;
-        'orchid': number;
-        'palegoldenrod': number;
-        'palegreen': number;
-        'paleturquoise': number;
-        'palevioletred': number;
-        'papayawhip': number;
-        'peachpuff': number;
-        'peru': number;
-        'pink': number;
-        'plum': number;
-        'powderblue': number;
-        'purple': number;
-        'rebeccapurple': number;
-        'red': number;
-        'rosybrown': number;
-        'royalblue': number;
-        'saddlebrown': number;
-        'salmon': number;
-        'sandybrown': number;
-        'seagreen': number;
-        'seashell': number;
-        'sienna': number;
-        'silver': number;
-        'skyblue': number;
-        'slateblue': number;
-        'slategray': number;
-        'slategrey': number;
-        'snow': number;
-        'springgreen': number;
-        'steelblue': number;
-        'tan': number;
-        'teal': number;
-        'thistle': number;
-        'tomato': number;
-        'turquoise': number;
-        'violet': number;
-        'wheat': number;
-        'white': number;
-        'whitesmoke': number;
-        'yellow': number;
-        'yellowgreen': number;
+        aliceblue: number;
+        antiquewhite: number;
+        aqua: number;
+        aquamarine: number;
+        azure: number;
+        beige: number;
+        bisque: number;
+        black: number;
+        blanchedalmond: number;
+        blue: number;
+        blueviolet: number;
+        brown: number;
+        burlywood: number;
+        cadetblue: number;
+        chartreuse: number;
+        chocolate: number;
+        coral: number;
+        cornflowerblue: number;
+        cornsilk: number;
+        crimson: number;
+        cyan: number;
+        darkblue: number;
+        darkcyan: number;
+        darkgoldenrod: number;
+        darkgray: number;
+        darkgreen: number;
+        darkgrey: number;
+        darkkhaki: number;
+        darkmagenta: number;
+        darkolivegreen: number;
+        darkorange: number;
+        darkorchid: number;
+        darkred: number;
+        darksalmon: number;
+        darkseagreen: number;
+        darkslateblue: number;
+        darkslategray: number;
+        darkslategrey: number;
+        darkturquoise: number;
+        darkviolet: number;
+        deeppink: number;
+        deepskyblue: number;
+        dimgray: number;
+        dimgrey: number;
+        dodgerblue: number;
+        firebrick: number;
+        floralwhite: number;
+        forestgreen: number;
+        fuchsia: number;
+        gainsboro: number;
+        ghostwhite: number;
+        gold: number;
+        goldenrod: number;
+        gray: number;
+        green: number;
+        greenyellow: number;
+        grey: number;
+        honeydew: number;
+        hotpink: number;
+        indianred: number;
+        indigo: number;
+        ivory: number;
+        khaki: number;
+        lavender: number;
+        lavenderblush: number;
+        lawngreen: number;
+        lemonchiffon: number;
+        lightblue: number;
+        lightcoral: number;
+        lightcyan: number;
+        lightgoldenrodyellow: number;
+        lightgray: number;
+        lightgreen: number;
+        lightgrey: number;
+        lightpink: number;
+        lightsalmon: number;
+        lightseagreen: number;
+        lightskyblue: number;
+        lightslategray: number;
+        lightslategrey: number;
+        lightsteelblue: number;
+        lightyellow: number;
+        lime: number;
+        limegreen: number;
+        linen: number;
+        magenta: number;
+        maroon: number;
+        mediumaquamarine: number;
+        mediumblue: number;
+        mediumorchid: number;
+        mediumpurple: number;
+        mediumseagreen: number;
+        mediumslateblue: number;
+        mediumspringgreen: number;
+        mediumturquoise: number;
+        mediumvioletred: number;
+        midnightblue: number;
+        mintcream: number;
+        mistyrose: number;
+        moccasin: number;
+        navajowhite: number;
+        navy: number;
+        oldlace: number;
+        olive: number;
+        olivedrab: number;
+        orange: number;
+        orangered: number;
+        orchid: number;
+        palegoldenrod: number;
+        palegreen: number;
+        paleturquoise: number;
+        palevioletred: number;
+        papayawhip: number;
+        peachpuff: number;
+        peru: number;
+        pink: number;
+        plum: number;
+        powderblue: number;
+        purple: number;
+        rebeccapurple: number;
+        red: number;
+        rosybrown: number;
+        royalblue: number;
+        saddlebrown: number;
+        salmon: number;
+        sandybrown: number;
+        seagreen: number;
+        seashell: number;
+        sienna: number;
+        silver: number;
+        skyblue: number;
+        slateblue: number;
+        slategray: number;
+        slategrey: number;
+        snow: number;
+        springgreen: number;
+        steelblue: number;
+        tan: number;
+        teal: number;
+        thistle: number;
+        tomato: number;
+        turquoise: number;
+        violet: number;
+        wheat: number;
+        white: number;
+        whitesmoke: number;
+        yellow: number;
+        yellowgreen: number;
     };
 }
 declare namespace feng3d {
@@ -3243,8 +3268,8 @@ declare namespace feng3d {
      */
     class Color4 {
         __class__: "feng3d.Color4";
-        static WHITE: Color4;
-        static BLACK: Color4;
+        static readonly WHITE: Readonly<Color4>;
+        static readonly BLACK: Readonly<Color4>;
         static fromUnit(color: number): Color4;
         static fromUnit24(color: number, a?: number): Color4;
         static fromColor3(color3: Color3, a?: number): Color4;
@@ -3283,6 +3308,10 @@ declare namespace feng3d {
          * 输出16进制字符串
          */
         toHexString(): string;
+        /**
+         * 输出 RGBA 颜色值，例如 rgba(255,255,255,1)
+         */
+        toRGBA(): string;
         /**
          * 混合颜色
          * @param color 混入的颜色
@@ -3342,14 +3371,14 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * Point 对象表示二维坐标系统中的某个位置，其中 x 表示水平轴，y 表示垂直轴。
+     * Vector2 对象表示二维坐标系统中的某个位置，其中 x 表示水平轴，y 表示垂直轴。
      */
     class Vector2 {
         __class__: "feng3d.Vector2";
         /**
          * 原点
          */
-        static ZERO: Vector2;
+        static ZERO: Readonly<Vector2>;
         /**
          * 将一对极坐标转换为笛卡尔点坐标。
          * @param len 极坐标对的长度。
@@ -4341,6 +4370,23 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    /**
+     * Matrix3x3 类表示一个转换矩阵，该矩阵确定二维 (2D) 显示对象的位置和方向。
+     * 该矩阵可以执行转换功能，包括平移（沿 x 和 y 轴重新定位）、旋转和缩放（调整大小）。
+     * ```
+     *  ---                                   ---
+     *  |   scaleX      0         0    |   x轴
+     *  |     0       scaleY      0    |   y轴
+     *  |     tx        ty        1    |   平移
+     *  ---                                   ---
+     *
+     *  ---                                   ---
+     *  |     0         1         2    |   x轴
+     *  |     3         4         5    |   y轴
+     *  |     6         7         8    |   平移
+     *  ---                                   ---
+     * ```
+     */
     class Matrix3x3 {
         /**
          * 长度为9的向量，包含所有的矩阵元素
@@ -4454,6 +4500,12 @@ declare namespace feng3d {
          * @param offset 偏移
          */
         toArray(array?: number[], offset?: number): number[];
+        /**
+         * 转换为4x4矩阵
+         *
+         * @param out 4x4矩阵
+         */
+        toMatrix4x4(out?: Matrix4x4): Matrix4x4;
     }
 }
 declare namespace feng3d {
@@ -4466,7 +4518,7 @@ declare namespace feng3d {
      *  |   scaleX      0         0       0     |   x轴
      *  |     0       scaleY      0       0     |   y轴
      *  |     0         0       scaleZ    0     |   z轴
-     *  |     tx        ty        tz      tw    |   平移
+     *  |     tx        ty        tz      1     |   平移
      *  ---                                   ---
      *
      *  ---                                   ---
@@ -4667,9 +4719,9 @@ declare namespace feng3d {
         copyColumnToVector4(column: number, vector3D?: Vector4): Vector4;
         /**
          * 将源 Matrix4x4 对象中的所有矩阵数据复制到调用方 Matrix4x4 对象中。
-         * @param   sourceMatrix3D      要从中复制数据的 Matrix4x4 对象。
+         * @param   source      要从中复制数据的 Matrix4x4 对象。
          */
-        copyFrom(sourceMatrix3D: Matrix4x4): this;
+        copyFrom(source: Matrix4x4): this;
         /**
          * 将源 Vector 对象中的所有矢量数据复制到调用方 Matrix4x4 对象中。利用可选索引参数，您可以选择矢量中的任何起始文字插槽。
          * @param   vector      要从中复制数据的 Vector 对象。
@@ -4700,7 +4752,7 @@ declare namespace feng3d {
          * 拷贝当前矩阵
          * @param   dest    目标矩阵
          */
-        copyToMatrix3D(dest: Matrix4x4): this;
+        copyToMatrix(dest: Matrix4x4): this;
         /**
          * 通过位移旋转缩放重组矩阵
          *
@@ -4802,7 +4854,7 @@ declare namespace feng3d {
         /**
          * 比较矩阵是否相等
          */
-        equals(matrix3D: Matrix4x4, precision?: number): boolean;
+        equals(matrix: Matrix4x4, precision?: number): boolean;
         /**
          * 看向目标位置
          * @param target    目标位置
@@ -4857,6 +4909,12 @@ declare namespace feng3d {
          * @param offset 偏移
          */
         toArray(array?: number[], offset?: number): number[];
+        /**
+         * 转换为3x3矩阵
+         *
+         * @param out 3x3矩阵
+         */
+        toMatrix3x3(out?: Matrix3x3): Matrix3x3;
         /**
          * 以字符串返回矩阵的值
          */
@@ -5019,7 +5077,7 @@ declare namespace feng3d {
          *
          * @param target
          */
-        toMatrix3D(target?: Matrix4x4): Matrix4x4;
+        toMatrix(target?: Matrix4x4): Matrix4x4;
         /**
          * 从矩阵初始化四元素
          *
@@ -5220,6 +5278,14 @@ declare namespace feng3d {
         p1: Vector3;
         constructor(p0?: Vector3, p1?: Vector3);
         /**
+         * 线段长度
+         */
+        getLength(): number;
+        /**
+         * 线段长度的平方
+         */
+        getLengthSquared(): number;
+        /**
          * 获取线段所在直线
          */
         getLine(line?: Line3): Line3;
@@ -5334,6 +5400,13 @@ declare namespace feng3d {
          * 三角形2号点
          */
         p2: Vector3;
+        /**
+         * 构造三角形
+         *
+         * @param p0 三角形0号点
+         * @param p1 三角形1号点
+         * @param p2 三角形2号点
+         */
         constructor(p0?: Vector3, p1?: Vector3, p2?: Vector3);
         /**
          * 三角形三个点
@@ -5489,6 +5562,15 @@ declare namespace feng3d {
          * 克隆
          */
         clone(): Triangle3;
+        /**
+         * 判断指定点是否在三角形内
+         *
+         * @param p0 三角形0号点
+         * @param p1 三角形1号点
+         * @param p2 三角形2号点
+         * @param p 指定点
+         */
+        static containsPoint(p0: Vector3, p1: Vector3, p2: Vector3, p: Vector3): boolean;
     }
 }
 declare namespace feng3d {
@@ -5542,7 +5624,7 @@ declare namespace feng3d {
         /**
          * 转换为包围盒八个角所在点列表
          */
-        toPoints(): Vector3[];
+        toPoints(points?: Vector3[]): Vector3[];
         /**
          * 从一组顶点初始化包围盒
          * @param positions 坐标数据列表
@@ -5566,12 +5648,12 @@ declare namespace feng3d {
          * 应用矩阵
          * @param mat 矩阵
          */
-        applyMatrix3D(mat: Matrix4x4): this;
+        applyMatrix(mat: Matrix4x4): this;
         /**
          * 应用矩阵
          * @param mat 矩阵
          */
-        applyMatrix3DTo(mat: Matrix4x4, out?: Box3): Box3;
+        applyMatrixTo(mat: Matrix4x4, out?: Box3): Box3;
         /**
          *
          */
@@ -5693,6 +5775,12 @@ declare namespace feng3d {
          * @param triangle 三角形
          */
         intersectsTriangle(triangle: Triangle3): boolean;
+        /**
+        * 是否与指定长方体相交
+        *
+        * @param box3 长方体
+        */
+        overlaps(box3: Box3): boolean;
         /**
          * 转换为三角形列表
          */
@@ -6025,26 +6113,6 @@ declare namespace feng3d {
          * @param point
          */
         containsPoint(point: Vector3, precision?: number): boolean;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 点与面的相对位置
-
-     */
-    enum PlaneClassification {
-        /**
-         * 在平面后面
-         */
-        BACK = 0,
-        /**
-         * 在平面前面
-         */
-        FRONT = 1,
-        /**
-         * 与平面相交
-         */
-        INTERSECT = 2
     }
 }
 declare namespace feng3d {
@@ -6621,7 +6689,7 @@ declare namespace feng3d {
     /**
      * 动画曲线Wrap模式，处理超出范围情况
      */
-    enum AnimationCurveWrapMode {
+    enum WrapMode {
         /**
          * 夹紧; 0>-<1
          */
@@ -6633,7 +6701,15 @@ declare namespace feng3d {
         /**
          * 来回循环; 0->1,1->0
          */
-        PingPong = 4
+        PingPong = 4,
+        /**
+         * When time reaches the end of the animation clip, the clip will automatically stop playing and time will be reset to beginning of the clip.
+         */
+        Once = 5,
+        /**
+         * Reads the default repeat mode set higher up.
+         */
+        Default = 6
     }
 }
 declare namespace feng3d {
@@ -6653,13 +6729,13 @@ declare namespace feng3d {
          *
          * 在第一个关键帧之前的动画行为。
          */
-        preWrapMode: AnimationCurveWrapMode;
+        preWrapMode: WrapMode;
         /**
          * The behaviour of the animation after the last keyframe.
          *
          * 动画在最后一个关键帧之后的行为。
          */
-        postWrapMode: AnimationCurveWrapMode;
+        postWrapMode: WrapMode;
         /**
          * All keys defined in the animation curve.
          *
@@ -6725,7 +6801,7 @@ declare namespace feng3d {
          *
          * @param time 时间轴的位置 [0,1]
          * @param value 值
-         * @param precision 查找进度
+         * @param precision 查找精度
          */
         addKeyAtCurve(time: number, value: number, precision: number): AnimationCurveKeyframe;
         /**
@@ -6855,59 +6931,76 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * Ported from Stefan Gustavson's java implementation
-     * http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
-     * Read Stefan's excellent paper for details on how this code works.
-     *
-     * Sean McCullough banksean@gmail.com
-     *
-     * Added 4D noise
-     * Joshua Koo zz85nus@gmail.com
-     *
-     * @see https://github.com/mrdoob/three.js/blob/dev/examples/js/math/SimplexNoise.js
-     *
-     * 另外参考 https://github.com/WardBenjamin/SimplexNoise    https://github.com/sarveshsvaran/Procedural-Volumetric-Particles-from-3d-4d-noise/blob/master/Assets/Noise.cs
+     * 噪音
      */
-    class SimplexNoise {
-        private _grad3;
-        private _grad4;
+    var noise: Noise;
+    /**
+     * 柏林噪音
+     *
+     * 用于生产随机的噪音贴图
+     *
+     * @see http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
+     * @see https://mrl.nyu.edu/~perlin/noise/
+     * @see https://gitee.com/feng3d_admin/noise
+     */
+    class Noise {
+        /**
+         * 构建柏林噪音
+         *
+         * @param seed 随机种子
+         */
+        constructor(seed?: number);
+        /**
+         * 1D 经典噪音
+         *
+         * @param x X轴数值
+         */
+        perlin1(x: number): number;
+        /**
+         * 2D 经典噪音
+         *
+         * @param x X轴数值
+         * @param y Y轴数值
+         */
+        perlin2(x: number, y: number): number;
+        /**
+         * 3D 经典噪音
+         *
+         * @param x X轴数值
+         * @param y Y轴数值
+         * @param z Z轴数值
+         */
+        perlin3(x: number, y: number, z: number): number;
+        /**
+         * N阶经典噪音
+         *
+         * 如果是1D，2D，3D噪音，最好选用对于函数，perlinN中存在for循环因此效率比perlin3等性能差3到5（8）倍！
+         *
+         * 满足以下运算
+         * perlinN(x) == perlin1(x)
+         * perlinN(x,y) == perlin2(x,y)
+         * perlinN(x,y,z) == perlin3(x,y,z)
+         *
+         * @param ps 每个轴的数值
+         */
+        perlinN(...ps: number[]): number;
+        /**
+         * This isn't a very good seeding function, but it works ok. It supports 2^16
+         * different seed values. Write something better if you need more seeds.
+         */
+        get seed(): number;
+        set seed(v: number);
+        private _seed;
         private _p;
-        private _perm;
-        private _simplex;
-        /**
-         * You can pass in a random number generator object if you like.
-         * It is assumed to have a random() method.
-         */
-        constructor(r?: {
-            random: () => number;
-        });
-        private _dot;
-        private _dot3;
-        private _dot4;
-        /**
-         *
-         * @param xin
-         * @param yin
-         */
-        noise(xin: number, yin: number): number;
-        /**
-         * 3D simplex noise
-         *
-         * @param xin
-         * @param yin
-         * @param zin
-         */
-        noise3d(xin: number, yin: number, zin: number): number;
-        /**
-         * 4D simplex noise
-         *
-         * @param x
-         * @param y
-         * @param z
-         * @param w
-         */
-        noise4d(x: number, y: number, z: number, w: number): number;
     }
+    /**
+     *
+     * @param n
+     *
+     * len = 2^(n-1) * n
+     */
+    function createGrad(n: number): number[][];
+    function getBits(n: number): number[][];
 }
 declare namespace feng3d {
     /**
@@ -8972,19 +9065,19 @@ declare namespace feng3d {
         /**
          * 关节索引
          */
-        a_jointindex0: Attribute;
+        a_skinIndices: Attribute;
         /**
          * 关节权重
          */
-        a_jointweight0: Attribute;
+        a_skinWeights: Attribute;
         /**
          * 关节索引
          */
-        a_jointindex1: Attribute;
+        a_skinIndices1: Attribute;
         /**
          * 关节权重
          */
-        a_jointweight1: Attribute;
+        a_skinWeights1: Attribute;
     }
     /**
      * 属性渲染数据
@@ -9286,6 +9379,10 @@ declare namespace feng3d {
          * 是否启用粒子系统纹理表动画模块
          */
         ENABLED_PARTICLE_SYSTEM_textureSheetAnimation: Boolean;
+        /**
+         * 是否有颜色顶点数据
+         */
+        HAS_a_color: Boolean;
     }
 }
 declare namespace feng3d {
@@ -9363,6 +9460,47 @@ declare namespace feng3d {
          */
         readonly draw: (renderAtomic: RenderAtomic) => void;
         constructor(gl: GL);
+    }
+}
+declare namespace feng3d {
+    /**
+     * 添加组件菜单
+     *
+     * 在组件类上新增 @feng3d.AddComponentMenu("UI/Text") 可以把该组件添加到组件菜单上。
+     *
+     * @param path 组件菜单中路径
+     * @param componentOrder 组件菜单中组件的顺序(从低到高)。
+     */
+    function AddComponentMenu(path: string, componentOrder?: number): (target: Constructor<PointLight | SpotLight | DirectionalLight | Component | Behaviour | SkyBox | Transform | HoldSizeComponent | BillboardComponent | WireframeComponent | CartoonComponent | OutLineComponent | MeshRenderer | ScriptComponent | Scene | Camera | FPSController | AudioListener | AudioSource | Water | Terrain | ParticleSystem | SkeletonComponent | SkinnedMeshRenderer | Animation>) => void;
+    /**
+     * 菜单配置
+     */
+    const menuConfig: MenuConfig;
+    /**
+     * 菜单配置
+     */
+    interface MenuConfig {
+        /**
+         * 组件菜单
+         */
+        component?: ComponentMenu[];
+    }
+    /**
+     * 组件菜单
+     */
+    interface ComponentMenu {
+        /**
+         * 组件菜单中路径
+         */
+        path: string;
+        /**
+         * 组件菜单中组件的顺序(从低到高)。
+         */
+        order: number;
+        /**
+         * 组件类定义
+         */
+        type: Constructor<Components>;
     }
 }
 declare namespace feng3d {
@@ -9601,7 +9739,7 @@ declare namespace feng3d {
              */
             step?: number;
             /**
-             * 键盘上下方向键步长
+             * 按下上下方向键时增加的步长数量
              */
             stepDownup?: number;
             /**
@@ -9852,11 +9990,11 @@ declare namespace feng3d {
         /**
          * canvas转换为dataURL
          */
-        canvasToDataURL(canvas: HTMLCanvasElement, type?: "png" | "jpeg"): string;
+        canvasToDataURL(canvas: HTMLCanvasElement, type?: "png" | "jpeg", quality?: number): string;
         /**
          * canvas转换为图片
          */
-        canvasToImage(canvas: HTMLCanvasElement, type: "png" | "jpeg", callback: (img: HTMLImageElement) => void): void;
+        canvasToImage(canvas: HTMLCanvasElement, type: "png" | "jpeg", quality: number, callback: (img: HTMLImageElement) => void): void;
         /**
          * File、Blob对象转换为dataURL
          * File对象也是一个Blob对象，二者的处理相同。
@@ -9875,12 +10013,12 @@ declare namespace feng3d {
         dataURLToArrayBuffer(dataurl: string, callback: (arraybuffer: ArrayBuffer) => void): void;
         arrayBufferToDataURL(arrayBuffer: ArrayBuffer, callback: (dataurl: string) => void): void;
         dataURLToImage(dataurl: string, callback: (img: HTMLImageElement) => void): void;
-        imageToDataURL(img: HTMLImageElement): string;
+        imageToDataURL(img: HTMLImageElement, quality?: number): string;
         imageToCanvas(img: HTMLImageElement): HTMLCanvasElement;
         imageToArrayBuffer(img: HTMLImageElement, callback: (arraybuffer: ArrayBuffer) => void): void;
-        imageDataToDataURL(imageData: ImageData): string;
+        imageDataToDataURL(imageData: ImageData, quality?: number): string;
         imageDataToCanvas(imageData: ImageData): HTMLCanvasElement;
-        imagedataToImage(imageData: ImageData, callback: (img: HTMLImageElement) => void): void;
+        imagedataToImage(imageData: ImageData, quality: number, callback: (img: HTMLImageElement) => void): void;
         arrayBufferToImage(arrayBuffer: ArrayBuffer, callback: (img: HTMLImageElement) => void): void;
         blobToText(blob: Blob, callback: (content: string) => void): void;
         stringToArrayBuffer(str: string): ArrayBuffer;
@@ -10894,6 +11032,10 @@ declare namespace feng3d {
 declare namespace feng3d {
     interface Uniforms {
         /**
+         * t(单位秒) 是自该初始化开始所经过的时间，4个分量分别是 (t/20, t, t*2, t*3)
+         */
+        _Time: Vector4;
+        /**
          * 模型矩阵
          */
         u_modelMatrix: Matrix4x4;
@@ -10938,7 +11080,7 @@ declare namespace feng3d {
         /**
          * 漫反射贴图
          */
-        s_texture: TextureInfo;
+        s_texture: Texture2D;
         /**
          * 漫反射贴图
          */
@@ -11318,7 +11460,7 @@ declare namespace feng3d {
          * 渲染
          */
         draw(gl: GL, viewRect: Rectangle): GameObject;
-        protected drawRenderables(gl: GL, model: Model): void;
+        protected drawRenderables(gl: GL, renderable: Renderable): void;
         /**
          * 绘制3D对象
          */
@@ -11377,7 +11519,7 @@ declare namespace feng3d {
         /**
          * 绘制3D对象
          */
-        drawGameObject(gl: GL, gameObject: GameObject, scene: Scene, camera: Camera, wireframeColor?: Color4): void;
+        drawGameObject(gl: GL, renderable: Renderable, scene: Scene, camera: Camera, wireframeColor?: Color4): void;
     }
     interface RenderAtomic {
         /**
@@ -11429,9 +11571,14 @@ declare namespace feng3d {
         get disposed(): boolean;
         private _disposed;
         /**
-         * 创建一个组件容器
+         * 创建一个组件
          */
         constructor();
+        /**
+         * 初始化组件
+         *
+         * 在添加到GameObject时立即被调用。
+         */
         init(): void;
         /**
          * Returns the component of Type type if the game object has one attached, null if it doesn't.
@@ -11640,11 +11787,11 @@ declare namespace feng3d {
         /**
          * 变换矩阵变化
          */
-        transformChanged: any;
+        transformChanged: Transform;
         /**
          *
          */
-        updateLocalToWorldMatrix: any;
+        updateLocalToWorldMatrix: Transform;
         /**
          * 场景矩阵变化
          */
@@ -11740,8 +11887,8 @@ declare namespace feng3d {
         /**
          * 本地变换矩阵
          */
-        get matrix3d(): Matrix4x4;
-        set matrix3d(v: Matrix4x4);
+        get matrix(): Matrix4x4;
+        set matrix(v: Matrix4x4);
         /**
          * 本地旋转矩阵
          */
@@ -11808,37 +11955,85 @@ declare namespace feng3d {
         get worldToLocalRotationMatrix(): Matrix4x4;
         /**
          * 将方向从局部空间转换到世界空间。
+         *
+         * @param direction 局部空间方向
          */
         transformDirection(direction: Vector3): Vector3;
         /**
+         * 将方向从局部空间转换到世界空间。
+         *
+         * @param direction 局部空间方向
+         */
+        localToWolrdDirection(direction: Vector3): Vector3;
+        /**
          * 将位置从局部空间转换为世界空间。
+         *
+         * @param position 局部空间位置
          */
         transformPoint(position: Vector3): Vector3;
         /**
+         * 将位置从局部空间转换为世界空间。
+         *
+         * @param position 局部空间位置
+         */
+        localToWorldPoint(position: Vector3): Vector3;
+        /**
          * 将向量从局部空间变换到世界空间。
+         *
+         * @param vector 局部空间向量
          */
         transformVector(vector: Vector3): Vector3;
         /**
+         * 将向量从局部空间变换到世界空间。
+         *
+         * @param vector 局部空间位置
+         */
+        localToWorldVector(vector: Vector3): Vector3;
+        /**
+         * Transforms a direction from world space to local space. The opposite of Transform.TransformDirection.
+         *
          * 将一个方向从世界空间转换到局部空间。
          */
         inverseTransformDirection(direction: Vector3): Vector3;
         /**
+         * 将一个方向从世界空间转换到局部空间。
+         */
+        worldToLocalDirection(direction: Vector3): Vector3;
+        /**
+         * Transforms position from world space to local space.
+         *
          * 将位置从世界空间转换为局部空间。
+         *
+         * @param position 世界坐标系中位置
          */
         inverseTransformPoint(position: Vector3): Vector3;
         /**
+         * 将位置从世界空间转换为局部空间。
+         *
+         * @param position 世界坐标系中位置
+         */
+        worldToLocalPoint(position: Vector3): Vector3;
+        /**
          * 将向量从世界空间转换为局部空间
+         *
+         * @param vector 世界坐标系中向量
          */
         inverseTransformVector(vector: Vector3): Vector3;
+        /**
+         * 将位置从世界空间转换为局部空间。
+         *
+         * @param vector 世界坐标系中向量
+         */
+        worldToLocalVector(vector: Vector3): Vector3;
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene: Scene, camera: Camera): void;
         private readonly _position;
         private readonly _rotation;
         private readonly _orientation;
         private readonly _scale;
-        protected readonly _matrix3d: Matrix4x4;
-        protected _matrix3dInvalid: boolean;
-        protected readonly _rotationMatrix3d: Matrix4x4;
-        protected _rotationMatrix3dInvalid: boolean;
+        protected readonly _matrix: Matrix4x4;
+        protected _matrixInvalid: boolean;
+        protected readonly _rotationMatrix: Matrix4x4;
+        protected _rotationMatrixInvalid: boolean;
         protected readonly _localToWorldMatrix: Matrix4x4;
         protected _localToWorldMatrixInvalid: boolean;
         protected readonly _ITlocalToWorldMatrix: Matrix4x4;
@@ -11853,7 +12048,7 @@ declare namespace feng3d {
         private _scaleChanged;
         private _invalidateTransform;
         private _invalidateSceneTransform;
-        private _updateMatrix3D;
+        private _updateMatrix;
         private _updateLocalToWorldMatrix;
         private _updateWorldToLocalMatrix;
         private _updateITlocalToWorldMatrix;
@@ -11917,7 +12112,6 @@ declare namespace feng3d {
          * 资源编号
          */
         assetId: string;
-        readonly renderAtomic: RenderAtomic;
         /**
          * 名称
          */
@@ -11955,8 +12149,8 @@ declare namespace feng3d {
          */
         get globalVisible(): any;
         get scene(): Scene;
-        get components(): Components[];
-        set components(value: Components[]);
+        get components(): (PointLight | SpotLight | DirectionalLight | Component | Behaviour | SkyBox | Transform | HoldSizeComponent | BillboardComponent | WireframeComponent | CartoonComponent | OutLineComponent | MeshRenderer | ScriptComponent | Scene | Camera | FPSController | AudioListener | AudioSource | Water | Terrain | ParticleSystem | SkeletonComponent | SkinnedMeshRenderer | Animation)[];
+        set components(value: (PointLight | SpotLight | DirectionalLight | Component | Behaviour | SkyBox | Transform | HoldSizeComponent | BillboardComponent | WireframeComponent | CartoonComponent | OutLineComponent | MeshRenderer | ScriptComponent | Scene | Camera | FPSController | AudioListener | AudioSource | Water | Terrain | ParticleSystem | SkeletonComponent | SkinnedMeshRenderer | Animation)[]);
         /**
          * 构建3D对象
          */
@@ -12140,17 +12334,6 @@ declare namespace feng3d {
          */
         onLoadCompleted(callback: () => void): void;
         /**
-         * 渲染前执行函数
-         *
-         * 可用于渲染前收集渲染数据，或者更新显示效果等
-         *
-         * @param gl
-         * @param renderAtomic
-         * @param scene
-         * @param camera
-         */
-        beforeRender(gl: GL, renderAtomic: RenderAtomic, scene: Scene, camera: Camera): void;
-        /**
          * 查找指定名称的游戏对象
          *
          * @param name
@@ -12180,36 +12363,27 @@ declare namespace feng3d {
          */
         private addComponentAt;
         /**
-         * 创建游戏对象
-         *
-         * @param param 游戏对象参数
-         */
-        static create(param?: gPartial<GameObject>): GameObject;
-        /**
          * 创建指定类型的游戏对象。
          *
          * @param type 游戏对象类型。
          * @param param 游戏对象参数。
          */
         static createPrimitive<K extends keyof PrimitiveGameObject>(type: K, param?: gPartial<GameObject>): GameObject;
+        /**
+         * 注册原始游戏对象，被注册后可以使用 GameObject.createPrimitive 进行创建。
+         *
+         * @param type 原始游戏对象类型。
+         * @param handler 构建原始游戏对象的函数。
+         */
+        static registerPrimitive<K extends keyof PrimitiveGameObject>(type: K, handler: (gameObject: GameObject) => void): void;
+        static _registerPrimitives: {
+            [type: string]: (gameObject: GameObject) => void;
+        };
     }
+    /**
+     * 原始游戏对象，可以通过GameObject.createPrimitive进行创建。
+     */
     interface PrimitiveGameObject {
-        Cube: GameObject;
-        Plane: GameObject;
-        Quad: GameObject;
-        Cylinder: GameObject;
-        Cone: GameObject;
-        Torus: GameObject;
-        Sphere: GameObject;
-        Capsule: GameObject;
-        Segment: GameObject;
-        Terrain: GameObject;
-        Camera: GameObject;
-        "Point light": GameObject;
-        "Directional light": GameObject;
-        "Spot light": GameObject;
-        "Particle System": GameObject;
-        "Water": GameObject;
     }
 }
 interface HTMLCanvasElement {
@@ -12221,6 +12395,7 @@ declare namespace feng3d {
      */
     class View extends Feng3dObject {
         canvas: HTMLCanvasElement;
+        private _contextAttributes;
         /**
          * 摄像机
          */
@@ -12252,7 +12427,7 @@ declare namespace feng3d {
          * @param scene     3D场景
          * @param camera    摄像机
          */
-        constructor(canvas?: HTMLCanvasElement, scene?: Scene, camera?: Camera);
+        constructor(canvas?: HTMLCanvasElement, scene?: Scene, camera?: Camera, contextAttributes?: WebGLContextAttributes);
         /**
          * 修改canvas尺寸
          * @param width 宽度
@@ -12417,16 +12592,16 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface ComponentMap {
-        Model: Model;
-    }
-    class Model extends Behaviour {
-        __class__: string;
+    /**
+     * 可渲染组件
+     */
+    class Renderable extends Behaviour {
         get single(): boolean;
+        readonly renderAtomic: RenderAtomic;
         /**
          * 几何体
          */
-        geometry: Geometrys;
+        geometry: GeometryLike;
         /**
          * 材质
          */
@@ -12443,6 +12618,16 @@ declare namespace feng3d {
         get selfWorldBounds(): Box3;
         constructor();
         init(): void;
+        /**
+         * 渲染前执行函数
+         *
+         * 可用于渲染前收集渲染数据，或者更新显示效果等
+         *
+         * @param gl
+         * @param renderAtomic
+         * @param scene
+         * @param camera
+         */
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene: Scene, camera: Camera): void;
         /**
           * 判断射线是否穿过对象
@@ -12482,10 +12667,13 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     interface ComponentMap {
-        MeshModel: MeshModel;
+        MeshRenderer: MeshRenderer;
     }
-    class MeshModel extends Model {
-        __class__: "feng3d.MeshModel";
+    /**
+     * 网格渲染器
+     */
+    class MeshRenderer extends Renderable {
+        __class__: "feng3d.MeshRenderer";
     }
 }
 declare namespace feng3d {
@@ -12597,11 +12785,11 @@ declare namespace feng3d {
         /**
          * 所有 Model
          */
-        get models(): Model[];
+        get models(): Renderable[];
         /**
          * 所有 可见且开启的 Model
          */
-        get visibleAndEnabledModels(): Model[];
+        get visibleAndEnabledModels(): Renderable[];
         /**
          * 所有 SkyBox
          */
@@ -12627,12 +12815,12 @@ declare namespace feng3d {
          * 获取接收光照渲染对象列表
          * @param light
          */
-        getPickByDirectionalLight(light: DirectionalLight): Model[];
+        getPickByDirectionalLight(light: DirectionalLight): Renderable[];
         /**
          * 获取 可被摄像机看见的 Model 列表
          * @param camera
          */
-        getModelsByCamera(camera: Camera): Model[];
+        getModelsByCamera(camera: Camera): Renderable[];
         private _mouseCheckObjects;
         private _models;
         private _visibleAndEnabledModels;
@@ -12673,22 +12861,22 @@ declare namespace feng3d {
          * @param gameObject
          * @param camera
          */
-        get activeModels(): Model[];
+        get activeModels(): Renderable[];
         /**
          * 半透明渲染对象
          */
-        get blenditems(): Model[];
+        get blenditems(): Renderable[];
         /**
          * 半透明渲染对象
          */
-        get unblenditems(): Model[];
+        get unblenditems(): Renderable[];
         clear(): void;
     }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
     }
-    type Geometrys = GeometryMap[keyof GeometryMap];
+    type GeometryLike = GeometryTypes[keyof GeometryTypes];
     interface GeometryEventMap {
         /**
          * 包围盒失效
@@ -12731,6 +12919,11 @@ declare namespace feng3d {
         get positions(): number[];
         set positions(value: number[]);
         /**
+         * 颜色数据
+         */
+        get colors(): number[];
+        set colors(value: number[]);
+        /**
          * uv数据
          */
         get uvs(): number[];
@@ -12745,6 +12938,26 @@ declare namespace feng3d {
          */
         get tangents(): number[];
         set tangents(value: number[]);
+        /**
+         * 蒙皮索引，顶点关联的关节索引
+         */
+        get skinIndices(): number[];
+        set skinIndices(value: number[]);
+        /**
+         * 蒙皮权重，顶点关联的关节权重
+         */
+        get skinWeights(): number[];
+        set skinWeights(value: number[]);
+        /**
+         * 蒙皮索引，顶点关联的关节索引
+         */
+        get skinIndices1(): number[];
+        set skinIndices1(value: number[]);
+        /**
+         * 蒙皮权重，顶点关联的关节权重
+         */
+        get skinWeights1(): number[];
+        set skinWeights1(value: number[]);
         /**
          * 创建一个几何体
          */
@@ -12761,20 +12974,6 @@ declare namespace feng3d {
          * 构建几何体
          */
         protected buildGeometry(): void;
-        /**
-         * 设置顶点属性数据
-         * @param vaId                  顶点属性编号
-         * @param data                  顶点属性数据
-         * @param size                  顶点数据尺寸
-         * @param autogenerate          是否自动生成数据
-         */
-        setVAData<K extends keyof Attributes>(vaId: K, data: number[], size: number): void;
-        /**
-         * 获取顶点属性数据
-         * @param vaId 数据类型编号
-         * @return 顶点属性数据
-         */
-        getVAData1(vaId: string): number[];
         /**
          * 顶点数量
          */
@@ -12845,10 +13044,19 @@ declare namespace feng3d {
          */
         protected _attributes: {
             a_position: Attribute;
+            a_color: Attribute;
             a_uv: Attribute;
             a_normal: Attribute;
             a_tangent: Attribute;
+            a_skinIndices: Attribute;
+            a_skinWeights: Attribute;
+            a_skinIndices1: Attribute;
+            a_skinWeights1: Attribute;
         };
+        /**
+         * 清理数据
+         */
+        clear(): void;
         private _geometryInvalid;
         private _useFaceWeights;
         private _bounding;
@@ -12874,7 +13082,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         CustomGeometry: CustomGeometry;
     }
     class CustomGeometry extends Geometry {
@@ -12882,22 +13090,31 @@ declare namespace feng3d {
         /**
          * 顶点索引缓冲
          */
-        get indicesBase(): number[];
-        set indicesBase(value: number[]);
+        indices: number[];
         /**
          * 属性数据列表
          */
         get attributes(): {
             a_position: Attribute;
+            a_color: Attribute;
             a_uv: Attribute;
             a_normal: Attribute;
             a_tangent: Attribute;
+            a_skinIndices: Attribute;
+            a_skinWeights: Attribute;
+            a_skinIndices1: Attribute;
+            a_skinWeights1: Attribute;
         };
-        set attributes(value: {
+        set attributes(v: {
             a_position: Attribute;
+            a_color: Attribute;
             a_uv: Attribute;
             a_normal: Attribute;
             a_tangent: Attribute;
+            a_skinIndices: Attribute;
+            a_skinWeights: Attribute;
+            a_skinIndices1: Attribute;
+            a_skinWeights1: Attribute;
         });
     }
 }
@@ -12996,7 +13213,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         PointGeometry: PointGeometry;
     }
     /**
@@ -13025,7 +13242,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         SegmentGeometry: SegmentGeometry;
     }
     /**
@@ -13071,6 +13288,9 @@ declare namespace feng3d {
          * 终点颜色
          */
         endColor: Color4;
+    }
+    interface PrimitiveGameObject {
+        Segment: GameObject;
     }
 }
 declare namespace feng3d {
@@ -13308,9 +13528,12 @@ declare namespace feng3d {
         private _onLensChanged;
         private _onProjectionChanged;
     }
+    interface PrimitiveGameObject {
+        Camera: GameObject;
+    }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         QuadGeometry: QuadGeometry;
     }
     /**
@@ -13323,9 +13546,12 @@ declare namespace feng3d {
     interface DefaultGeometry {
         Quad: QuadGeometry;
     }
+    interface PrimitiveGameObject {
+        Quad: GameObject;
+    }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         PlaneGeometry: PlaneGeometry;
     }
     /**
@@ -13398,9 +13624,12 @@ declare namespace feng3d {
     interface DefaultGeometry {
         Plane: PlaneGeometry;
     }
+    interface PrimitiveGameObject {
+        Plane: GameObject;
+    }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         CubeGeometry: CubeGeometry;
     }
     /**
@@ -13481,9 +13710,12 @@ declare namespace feng3d {
     interface DefaultGeometry {
         Cube: CubeGeometry;
     }
+    interface PrimitiveGameObject {
+        Cube: GameObject;
+    }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         SphereGeometry: SphereGeometry;
     }
     /**
@@ -13534,9 +13766,12 @@ declare namespace feng3d {
     interface DefaultGeometry {
         Sphere: SphereGeometry;
     }
+    interface PrimitiveGameObject {
+        Sphere: GameObject;
+    }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         CapsuleGeometry: CapsuleGeometry;
     }
     /**
@@ -13591,9 +13826,12 @@ declare namespace feng3d {
     interface DefaultGeometry {
         Capsule: CapsuleGeometry;
     }
+    interface PrimitiveGameObject {
+        Capsule: GameObject;
+    }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         CylinderGeometry: CylinderGeometry;
     }
     /**
@@ -13660,6 +13898,9 @@ declare namespace feng3d {
     interface DefaultGeometry {
         Cylinder: CylinderGeometry;
     }
+    interface PrimitiveGameObject {
+        Cylinder: GameObject;
+    }
 }
 declare namespace feng3d {
     /**
@@ -13685,9 +13926,12 @@ declare namespace feng3d {
     interface DefaultGeometry {
         Cone: ConeGeometry;
     }
+    interface PrimitiveGameObject {
+        Cone: GameObject;
+    }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         TorusGeometry: TorusGeometry;
     }
     /**
@@ -13750,9 +13994,12 @@ declare namespace feng3d {
     interface DefaultGeometry {
         Torus: TorusGeometry;
     }
+    interface PrimitiveGameObject {
+        Torus: GameObject;
+    }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         ParametricGeometry: ParametricGeometry;
     }
     class ParametricGeometry extends Geometry {
@@ -13840,6 +14087,10 @@ declare namespace feng3d {
          */
         onLoadCompleted(callback: () => void): void;
         private _source;
+        /**
+         * 默认贴图
+         */
+        static white: Texture2D;
         /**
          * 默认贴图
          */
@@ -13963,17 +14214,17 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface UniformsMap {
+    interface UniformsTypes {
     }
-    type ShaderNames = keyof UniformsMap;
-    type UniformsData = UniformsMap[keyof UniformsMap];
+    type ShaderNames = keyof UniformsTypes;
+    type UniformsLike = UniformsTypes[keyof UniformsTypes];
     /**
      * 材质
      */
     class Material extends AssetData {
         __class__: "feng3d.Material";
-        static create<K extends keyof UniformsMap>(shaderName: K, uniforms?: gPartial<UniformsMap[K]>, renderParams?: gPartial<RenderParams>): Material;
-        init<K extends keyof UniformsMap>(shaderName: K, uniforms?: gPartial<UniformsMap[K]>, renderParams?: gPartial<RenderParams>): this;
+        static create<K extends keyof UniformsTypes>(shaderName: K, uniforms?: gPartial<UniformsTypes[K]>, renderParams?: gPartial<RenderParams>): Material;
+        init<K extends keyof UniformsTypes>(shaderName: K, uniforms?: gPartial<UniformsTypes[K]>, renderParams?: gPartial<RenderParams>): this;
         private renderAtomic;
         private preview;
         /**
@@ -13984,7 +14235,7 @@ declare namespace feng3d {
         /**
          * Uniform数据
          */
-        uniforms: UniformsData;
+        uniforms: UniformsLike;
         /**
          * 渲染参数
          */
@@ -14036,7 +14287,7 @@ declare namespace feng3d {
         EXP2 = 2,
         LINEAR = 3
     }
-    interface UniformsMap {
+    interface UniformsTypes {
         standard: StandardUniforms;
     }
     class StandardUniforms {
@@ -14115,7 +14366,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface UniformsMap {
+    interface UniformsTypes {
         point: PointUniforms;
     }
     class PointUniforms {
@@ -14131,7 +14382,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface UniformsMap {
+    interface UniformsTypes {
         color: ColorUniforms;
     }
     class ColorUniforms {
@@ -14143,7 +14394,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface UniformsMap {
+    interface UniformsTypes {
         texture: TextureUniforms;
     }
     class TextureUniforms {
@@ -14159,7 +14410,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface UniformsMap {
+    interface UniformsTypes {
         segment: SegmentUniforms;
     }
     /**
@@ -14304,7 +14555,10 @@ declare namespace feng3d {
          * 通过视窗摄像机进行更新
          * @param viewCamera 视窗摄像机
          */
-        updateShadowByCamera(scene: Scene, viewCamera: Camera, models: Model[]): void;
+        updateShadowByCamera(scene: Scene, viewCamera: Camera, models: Renderable[]): void;
+    }
+    interface PrimitiveGameObject {
+        "Directional light": GameObject;
     }
 }
 declare namespace feng3d {
@@ -14329,6 +14583,9 @@ declare namespace feng3d {
         get shadowMapSize(): Vector2;
         constructor();
         private invalidRange;
+    }
+    interface PrimitiveGameObject {
+        "Point light": GameObject;
     }
 }
 declare namespace feng3d {
@@ -14362,11 +14619,14 @@ declare namespace feng3d {
         private _invalidRange;
         private _invalidAngle;
     }
+    interface PrimitiveGameObject {
+        "Spot light": GameObject;
+    }
 }
 declare namespace feng3d {
     class LightPicker {
         private _model;
-        constructor(model: Model);
+        constructor(model: Renderable);
         beforeRender(renderAtomic: RenderAtomic): void;
     }
 }
@@ -14729,7 +14989,7 @@ declare namespace feng3d {
     /**
      * The Water component renders the terrain.
      */
-    class Water extends Model {
+    class Water extends Renderable {
         __class__: "feng3d.Water";
         geometry: PlaneGeometry;
         material: Material;
@@ -14739,9 +14999,12 @@ declare namespace feng3d {
         private frameBufferObject;
         beforeRender(gl: GL, renderAtomic: RenderAtomic, scene: Scene, camera: Camera): void;
     }
+    interface PrimitiveGameObject {
+        Water: GameObject;
+    }
 }
 declare namespace feng3d {
-    interface UniformsMap {
+    interface UniformsTypes {
         water: WaterUniforms;
     }
     class WaterUniforms {
@@ -14768,7 +15031,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface GeometryMap {
+    interface GeometryTypes {
         TerrainGeometry: TerrainGeometry;
     }
     /**
@@ -14838,7 +15101,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    interface UniformsMap {
+    interface UniformsTypes {
         terrain: TerrainUniforms;
     }
     class TerrainUniforms extends StandardUniforms {
@@ -14904,7 +15167,7 @@ declare namespace feng3d {
     /**
      * The Terrain component renders the terrain.
      */
-    class Terrain extends Model {
+    class Terrain extends Renderable {
         __class__: "feng3d.Terrain";
         /**
          * 地形资源
@@ -14912,6 +15175,9 @@ declare namespace feng3d {
         assign: TerrainData;
         geometry: TerrainGeometry;
         material: Material;
+    }
+    interface PrimitiveGameObject {
+        Terrain: GameObject;
     }
 }
 declare namespace feng3d {
@@ -14984,13 +15250,29 @@ declare namespace feng3d {
          */
         cache: {};
         /**
+         * 上次记录的时间
+         */
+        preTime: number;
+        /**
+         * 当前记录的时间
+         */
+        curTime: number;
+        /**
+         * 上次记录位置
+         */
+        prePosition: Vector3;
+        /**
+         * 当前记录位置
+         */
+        curPosition: Vector3;
+        /**
          * 更新状态
          */
-        updateState(preTime: number, time: number): void;
+        updateState(time: number): void;
     }
 }
 declare namespace feng3d {
-    interface UniformsMap {
+    interface UniformsTypes {
         Particles_Additive: ParticlesAdditiveUniforms;
     }
     /**
@@ -15042,6 +15324,10 @@ declare namespace feng3d {
     }
     interface GameObjectEventMap {
         /**
+         * 粒子系统播放完一个周期
+         */
+        particleCycled: ParticleSystem;
+        /**
          * 粒子效果播放结束
          */
         particleCompleted: ParticleSystem;
@@ -15049,7 +15335,7 @@ declare namespace feng3d {
     /**
      * 粒子系统
      */
-    class ParticleSystem extends Model {
+    class ParticleSystem extends Renderable {
         __class__: "feng3d.ParticleSystem";
         /**
          * Is the particle system playing right now ?
@@ -15136,6 +15422,18 @@ declare namespace feng3d {
         set rotationBySpeed(v: ParticleRotationBySpeedModule);
         private _rotationBySpeed;
         /**
+         * 旋转角度随速度变化模块
+         */
+        get noise(): ParticleNoiseModule;
+        set noise(v: ParticleNoiseModule);
+        private _noise;
+        /**
+         * 旋转角度随速度变化模块
+         */
+        get subEmitters(): ParticleSubEmittersModule;
+        set subEmitters(v: ParticleSubEmittersModule);
+        private _subEmitters;
+        /**
          * 粒子系统纹理表动画模块。
          */
         get textureSheetAnimation(): ParticleTextureSheetAnimationModule;
@@ -15201,11 +15499,39 @@ declare namespace feng3d {
          * 此时在周期中的位置
          */
         get rateAtDuration(): number;
+        private _rateAtDuration;
         /**
          * 发射粒子
-         * @param time 当前粒子时间
+         *
+         * @param startTime 发射起始时间
+         * @param endTime 发射终止时间
+         * @param startPos 发射起始位置
+         * @param stopPos 发射终止位置
          */
         private _emit;
+        /**
+         * 由指定粒子发射粒子。
+         *
+         * @param particle 发射子粒子系统的粒子
+         */
+        private _emitFromParticle;
+        /**
+         * 计算在指定移动的位移线段中发射的粒子列表。
+         *
+         * @param rateAtDuration
+         * @param prePos
+         * @param currentPos
+         */
+        private _emitWithMove;
+        /**
+         * 计算在指定时间段内发射的粒子列表
+         *
+         * @param rateAtDuration
+         * @param preRealTime
+         * @param duration
+         * @param realEmitTime
+         */
+        private _emitWithTime;
         /**
          * 发射粒子
          * @param birthTime 发射时间
@@ -15227,6 +15553,22 @@ declare namespace feng3d {
          */
         private _updateParticleState;
         private _simulationSpaceChanged;
+        /**
+         * 给指定粒子添加指定空间的位移。
+         *
+         * @param particle 粒子。
+         * @param position 速度。
+         * @param space 速度所在空间。
+         * @param name  速度名称。如果不为 undefined 时保存，调用 removeParticleVelocity 可以移除该部分速度。
+         */
+        addParticlePosition(particle: Particle, position: Vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        /**
+         * 移除指定粒子上的位移
+         *
+         * @param particle 粒子。
+         * @param name 位移名称。
+         */
+        removeParticlePosition(particle: Particle, name: string): void;
         /**
          * 给指定粒子添加指定空间的速度。
          *
@@ -15260,17 +15602,41 @@ declare namespace feng3d {
          */
         removeParticleAcceleration(particle: Particle, name: string): void;
         /**
+         * 触发子发射器
+         *
+         * @param subEmitterIndex 子发射器索引
+         */
+        TriggerSubEmitter(subEmitterIndex: number, particles?: Particle[]): void;
+        /**
          * 上次移动发射的位置
          */
         private _preworldPos;
+        /**
+         * 是否已经执行位移发射。
+         */
         private _isRateOverDistance;
+        /**
+         * 用于处理移动发射的剩余移动距离。
+         */
         private _leftRateOverDistance;
-        worldPos: Vector3;
+        /**
+         * 当前粒子世界坐标
+         */
+        private _currentWorldPos;
+        /**
+         * 此次位移
+         */
         moveVec: Vector3;
+        /**
+         * 当前移动速度
+         */
         speed: Vector3;
     }
     interface DefaultGeometry {
         "Billboard-Geometry": QuadGeometry;
+    }
+    interface PrimitiveGameObject {
+        "Particle System": GameObject;
     }
 }
 declare namespace feng3d {
@@ -15736,6 +16102,80 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
+     * The events that cause new particles to be spawned.
+     *
+     * 导致新粒子产生的事件。
+     */
+    enum ParticleSystemSubEmitterType {
+        /**
+         * Spawns new particles when particles from the parent system are born.
+         *
+         * 当来自父系统的粒子诞生时，产生新的粒子。
+         */
+        Birth = 0,
+        /**
+         * Spawns new particles when particles from the parent system collide with something.
+         *
+         * 当来自父系统的粒子与某物碰撞时，产生新的粒子。
+         */
+        Collision = 1,
+        /**
+         * Spawns new particles when particles from the parent system die.
+         *
+         * 当来自父系统的粒子死亡时，产生新的粒子。
+         */
+        Death = 2,
+        /**
+         * Spawns new particles when particles from the parent system pass conditions in the Trigger Module.
+         *
+         * 当来自父系统的粒子通过触发器模块中的条件时，生成新的粒子。
+         */
+        Trigger = 3,
+        /**
+         * Spawns new particles when triggered from script using ParticleSystem.TriggerSubEmitter.
+         *
+         * 当使用ParticleSystem.TriggerSubEmitter从脚本中触发时，生成新的粒子。
+         */
+        Manual = 4
+    }
+}
+declare namespace feng3d {
+    /**
+     * The properties of sub-emitter particles.
+     */
+    enum ParticleSystemSubEmitterProperties {
+        /**
+         * When spawning new particles, do not inherit any properties from the parent particles.
+         */
+        InheritNothing = 0,
+        /**
+         * When spawning new particles, inherit all available properties from the parent particles.
+         */
+        InheritEverything = 1,
+        /**
+         * When spawning new particles, multiply the start color by the color of the parent particles.
+         */
+        InheritColor = 2,
+        /**
+         * When spawning new particles, multiply the start size by the size of the parent particles.
+         */
+        InheritSize = 3,
+        /**
+         * When spawning new particles, add the start rotation to the rotation of the parent particles.
+         */
+        InheritRotation = 4,
+        /**
+         * New particles will have a shorter lifespan, the closer their parent particles are to death.
+         */
+        InheritLifetime = 5,
+        /**
+         * When spawning new particles, use the duration and age properties from the parent system, when sampling MainModule curves in the Sub-Emitter.
+         */
+        InheritDuration = 6
+    }
+}
+declare namespace feng3d {
+    /**
      * 粒子系统 发射形状
      */
     class ParticleSystemShape {
@@ -16010,6 +16450,12 @@ declare namespace feng3d {
          * @param particle 粒子
          */
         updateParticleState(particle: Particle): void;
+        /**
+         * 更新
+         *
+         * @param interval
+         */
+        update(interval: number): void;
     }
 }
 declare namespace feng3d {
@@ -17297,6 +17743,12 @@ declare namespace feng3d {
          */
         scrollSpeed: MinMaxCurve;
         /**
+         * Higher frequency noise will reduce the strength by a proportional amount, if enabled.
+         *
+         * 如果启用高频率噪音，将按比例减少强度。
+         */
+        damping: boolean;
+        /**
          * Layers of noise that combine to produce final noise.
          *
          * 一层一层的噪声组合在一起产生最终的噪声。
@@ -17360,6 +17812,122 @@ declare namespace feng3d {
          */
         get remapZ(): MinMaxCurve;
         set remapZ(v: MinMaxCurve);
+        /**
+         * 初始化粒子状态
+         * @param particle 粒子
+         */
+        initParticleState(particle: Particle): void;
+        /**
+         * 更新粒子状态
+         * @param particle 粒子
+         */
+        updateParticleState(particle: Particle): void;
+        static _frequencyScale: number;
+        static _strengthScale: number;
+        static _timeScale: number;
+        /**
+         * 绘制噪音到图片
+         *
+         * @param image 图片数据
+         */
+        drawImage(image: ImageData): void;
+        private _getDrawImageStrength;
+        /**
+         * 获取噪音值
+         *
+         * @param x
+         * @param y
+         */
+        private _getNoiseValue;
+        /**
+         * 获取单层噪音值
+         *
+         * @param x
+         * @param y
+         */
+        private _getNoiseValueBase;
+        /**
+         * 更新
+         *
+         * @param interval
+         */
+        update(interval: number): void;
+        private _scrollValue;
+    }
+}
+declare namespace feng3d {
+    /**
+     * Script interface for the SubEmittersModule.
+     *
+     * The sub-emitters module allows you to spawn particles in child emitters from the positions of particles in the parent system.
+     *
+     * This module triggers child particle emission on events such as the birth, death, and collision of particles in the parent system.
+     */
+    class ParticleSubEmittersModule extends ParticleModule {
+        /**
+         * The total number of sub-emitters.
+         */
+        subEmittersCount: number;
+        private subEmitters;
+        /**
+         * Add a new sub-emitter.
+         */
+        AddSubEmitter(subEmitter: ParticleSystem, type: ParticleSystemSubEmitterType, properties: ParticleSystemSubEmitterProperties, emitProbability: number): void;
+        /**
+         * Gets the probability that the sub-emitter emits particles.
+         *
+         * @param index The index of the sub-emitter.
+         */
+        GetSubEmitterEmitProbability(index: number): number;
+        /**
+         * Gets the properties of the sub - emitter at the given index.
+         *
+         * @param index The index of the sub-emitter.
+         */
+        GetSubEmitterProperties(index: number): ParticleSystemSubEmitterProperties;
+        /**
+         * Gets the sub - emitter Particle System at the given index.
+         *
+         * @param index The index of the desired sub-emitter.
+         */
+        GetSubEmitterSystem(index: number): ParticleSystem;
+        /**
+         * Gets the type of the sub - emitter at the given index.
+         *
+         * @param index The index of the desired sub-emitter.
+         */
+        GetSubEmitterType(index: number): ParticleSystemSubEmitterType;
+        /**
+         * Removes a sub - emitter from the given index in the array.
+         *
+         * @param index The index of the desired sub-emitter.
+         */
+        RemoveSubEmitter(index: number): void;
+        /**
+         * Sets the probability that the sub - emitter emits particles.
+         *
+         * @param index The index of the sub-emitter you want to modify.
+         * @param emitProbability The probability value.
+         */
+        SetSubEmitterEmitProbability(index: number, emitProbability: number): void;
+        /**
+         * Sets the properties of the sub - emitter at the given index.
+         *
+         * @param index The index of the sub-emitter you want to modify.
+         * @param properties The new properties to assign to this sub-emitter.
+         */
+        SetSubEmitterProperties(index: number, properties: ParticleSystemSubEmitterProperties): void;
+        /**
+         * Sets the Particle System to use as the sub - emitter at the given index.
+         */
+        SetSubEmitterSystem(index: number, subEmitter: ParticleSystem): void;
+        /**
+         * Sets the type of the sub - emitter at the given index.
+         *
+         * @param index The index of the sub-emitter you want to modify.
+         * @param type The new spawning type to assign to this sub-emitter.
+         */
+        SetSubEmitterType(index: number, type: ParticleSystemSubEmitterType): void;
     }
 }
 declare namespace feng3d {
@@ -17490,10 +18058,10 @@ declare namespace feng3d {
         /** 关节名字 */
         name: string;
         /** 骨骼全局矩阵 */
-        matrix3D: Matrix4x4;
+        matrix: Matrix4x4;
         children: number[];
-        get invertMatrix3D(): Matrix4x4;
-        private _invertMatrix3D;
+        get invertMatrix(): Matrix4x4;
+        private _invertMatrix;
     }
 }
 declare namespace feng3d {
@@ -17514,8 +18082,8 @@ declare namespace feng3d {
         private jointGameObjectMap;
         private _globalPropertiesInvalid;
         private _jointsInvalid;
-        private _globalMatrix3DsInvalid;
-        private globalMatrix3Ds;
+        private _globalMatrixsInvalid;
+        private globalMatrixs;
         private _globalMatrices;
         initSkeleton(): void;
         /**
@@ -17528,13 +18096,13 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     interface ComponentMap {
-        SkinnedModel: SkinnedModel;
+        SkinnedMeshRenderer: SkinnedMeshRenderer;
     }
-    class SkinnedModel extends Model {
-        __class__: "feng3d.SkinnedModel";
+    class SkinnedMeshRenderer extends Renderable {
+        __class__: "feng3d.SkinnedMeshRenderer";
         get single(): boolean;
         skinSkeleton: SkinSkeleton;
-        initMatrix3d: Matrix4x4;
+        initMatrix: Matrix4x4;
         /**
          * 创建一个骨骼动画类
          */
@@ -18234,7 +18802,7 @@ declare namespace feng3d.war3 {
         buildAnimationclip(animationclip: AnimationClip, __chache__: {
             [key: string]: PropertyClip;
         }, start: number, end: number): void;
-        private getMatrix3D;
+        private getMatrix;
     }
     /**
      * 骨骼的位移信息
@@ -18614,76 +19182,6 @@ declare namespace feng3d {
          * @param callback 加载完成回调
          */
         load(mdlurl: string, callback?: (gameObject: GameObject) => void): void;
-    }
-}
-declare namespace feng3d {
-    /**
-     * UIRenderMode for the Canvas.
-     *
-     * Canvas的渲染模式
-     */
-    enum UIRenderMode {
-        /**
-         * Render at the end of the Scene using a 2D Canvas.
-         *
-         * 在场景的最后使用2D画布渲染。
-         */
-        ScreenSpaceOverlay = 0,
-        /**
-         * Render using the Camera configured on the Canvas.
-         *
-         * 使用在画布上配置的摄像机进行渲染。
-         */
-        ScreenSpaceCamera = 1,
-        /**
-         * Render using any Camera in the Scene that can render the layer.
-         *
-         * 使用场景中任何可以渲染图层的相机渲染。
-         */
-        WorldSpace = 2
-    }
-}
-declare namespace feng3d {
-    /**
-     * Position, size, anchor and pivot information for a rectangle.
-     *
-     * 矩形的位置、大小、锚点和枢轴信息。
-     */
-    class RectTransform extends Transform {
-    }
-}
-declare namespace feng3d {
-    /**
-     * Element that can be used for screen rendering.
-     *
-     * 能够被用于屏幕渲染的元素
-     */
-    class Canvas extends Behaviour {
-        /**
-         * Is the Canvas in World or Overlay mode?
-         *
-         * 画布是在世界或覆盖模式?
-         */
-        renderMode: UIRenderMode;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 图片组件
-     */
-    class UIImage extends Behaviour {
-        /**
-         * The source texture of the Image element.
-         *
-         * 图像元素的源纹理。
-         */
-        image: Texture2D;
-        /**
-         * Tinting color for this Image.
-         *
-         * 为该图像着色。
-         */
-        color: Color4;
     }
 }
 declare namespace feng3d {

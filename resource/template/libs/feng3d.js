@@ -78,7 +78,10 @@ var feng3d;
          * @return 			如果指定类型的侦听器已注册，则值为 true；否则，值为 false。
          */
         FEvent.prototype.has = function (obj, type) {
-            return !!(this.feventMap.get(obj) && this.feventMap.get(obj)[type] && this.feventMap.get(obj)[type].length);
+            var objectListener = this.feventMap.get(obj);
+            if (!objectListener)
+                return false;
+            return !!(objectListener[type] && objectListener[type].length);
         };
         /**
          * 添加监听
@@ -90,8 +93,10 @@ var feng3d;
             if (priority === void 0) { priority = 0; }
             if (once === void 0) { once = false; }
             var objectListener = this.feventMap.get(obj);
-            if (!objectListener)
-                (this.feventMap.set(obj, objectListener = {}));
+            if (!objectListener) {
+                objectListener = { __allEventType__: [] };
+                this.feventMap.set(obj, objectListener);
+            }
             var listeners = objectListener[type] = objectListener[type] || [];
             for (var i = 0; i < listeners.length; i++) {
                 var element = listeners[i];
@@ -119,12 +124,14 @@ var feng3d;
                 this.feventMap.delete(obj);
                 return;
             }
+            var objectListener = this.feventMap.get(obj);
+            if (!objectListener)
+                return;
             if (!listener) {
-                if (this.feventMap.get(obj))
-                    delete this.feventMap.get(obj)[type];
+                delete objectListener[type];
                 return;
             }
-            var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[type];
+            var listeners = objectListener[type];
             if (listeners) {
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     var element = listeners[i];
@@ -133,7 +140,7 @@ var feng3d;
                     }
                 }
                 if (listeners.length == 0) {
-                    delete this.feventMap.get(obj)[type];
+                    delete objectListener[type];
                 }
             }
         };
@@ -147,9 +154,11 @@ var feng3d;
         FEvent.prototype.onAll = function (obj, listener, thisObject, priority) {
             if (priority === void 0) { priority = 0; }
             var objectListener = this.feventMap.get(obj);
-            if (!objectListener)
-                (this.feventMap.set(obj, objectListener = {}));
-            var listeners = objectListener.__allEventType__ = objectListener.__allEventType__ || [];
+            if (!objectListener) {
+                objectListener = { __allEventType__: [] };
+                this.feventMap.set(obj, objectListener);
+            }
+            var listeners = objectListener.__allEventType__;
             for (var i = 0; i < listeners.length; i++) {
                 var element = listeners[i];
                 if (element.listener == listener && element.thisObject == thisObject) {
@@ -172,21 +181,19 @@ var feng3d;
          * @param thisObject 回调函数 this 指针
          */
         FEvent.prototype.offAll = function (obj, listener, thisObject) {
+            var objectListener = this.feventMap.get(obj);
             if (!listener) {
-                if (this.feventMap.get(obj))
-                    delete this.feventMap.get(obj).__allEventType__;
+                if (objectListener)
+                    objectListener.__allEventType__.length = 0;
                 return;
             }
-            var listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
-            if (listeners) {
+            if (objectListener) {
+                var listeners = objectListener.__allEventType__;
                 for (var i = listeners.length - 1; i >= 0; i--) {
                     var element = listeners[i];
                     if (element.listener == listener && element.thisObject == thisObject) {
                         listeners.splice(i, 1);
                     }
-                }
-                if (listeners.length == 0) {
-                    delete this.feventMap.get(obj).__allEventType__;
                 }
             }
         };
@@ -202,7 +209,11 @@ var feng3d;
                 e.currentTarget = obj;
             }
             catch (error) { }
-            var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[e.type];
+            //
+            var objectListener = this.feventMap.get(obj);
+            if (!objectListener)
+                return;
+            var listeners = objectListener[e.type];
             if (listeners) {
                 //遍历调用事件回调函数
                 var listeners0 = listeners.concat();
@@ -215,10 +226,10 @@ var feng3d;
                         listeners.splice(i, 1);
                 }
                 if (listeners.length == 0)
-                    delete this.feventMap.get(obj)[e.type];
+                    delete objectListener[e.type];
             }
             // All_EVENT_Type
-            listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
+            listeners = objectListener.__allEventType__;
             if (listeners) {
                 //遍历调用事件回调函数
                 var listeners0 = listeners.concat();
@@ -229,8 +240,6 @@ var feng3d;
                     if (listeners[i].once)
                         listeners.splice(i, 1);
                 }
-                if (listeners.length == 0)
-                    delete this.feventMap.get(obj).__allEventType__;
             }
         };
         /**
@@ -638,6 +647,7 @@ Object.isBaseType = function (object) {
         || typeof object == "string"
         || typeof object == "number")
         return true;
+    return false;
 };
 Object.getPropertyDescriptor = function (host, property) {
     var data = Object.getOwnPropertyDescriptor(host, property);
@@ -648,7 +658,7 @@ Object.getPropertyDescriptor = function (host, property) {
     if (prototype) {
         return Object.getPropertyDescriptor(prototype, property);
     }
-    return null;
+    return undefined;
 };
 Object.propertyIsWritable = function (host, property) {
     var data = Object.getPropertyDescriptor(host, property);
@@ -755,9 +765,9 @@ Object.assignDeep = function (target, source, replacers, deep) {
     if (deep < 1)
         return target;
     var keys = Object.keys(source);
+    var handles = replacers.concat(Object.assignDeepDefaultHandlers);
     keys.forEach(function (k) {
         //
-        var handles = [].concat(replacers).concat(Object.assignDeepDefaultHandlers);
         for (var i = 0; i < handles.length; i++) {
             if (handles[i](target, source, k, replacers, deep)) {
                 return;
@@ -772,18 +782,21 @@ Object.assignDeepDefaultHandlers = [
     function (target, source, key) {
         if (target[key] == source[key])
             return true;
+        return false;
     },
     function (target, source, key) {
         if (Object.isBaseType(target[key]) || Object.isBaseType(source[key])) {
             target[key] = source[key];
             return true;
         }
+        return false;
     },
     function (target, source, key, handlers, deep) {
         if (Array.isArray(source[key]) || Object.isObject(source[key])) {
             Object.assignDeep(target[key], source[key], handlers, deep - 1);
             return true;
         }
+        return false;
     },
 ];
 var feng3d;
@@ -1196,7 +1209,7 @@ Math.randFloatSpread = Math.randFloatSpread || function (range) {
  * @param degrees 角度
  */
 Math.degToRad = Math.degToRad || function (degrees) {
-    return degrees * this.DEG2RAD;
+    return degrees * Math.DEG2RAD;
 };
 /**
  * 弧度转换为角度
@@ -1204,7 +1217,7 @@ Math.degToRad = Math.degToRad || function (degrees) {
  * @param radians 弧度
  */
 Math.radToDeg = Math.radToDeg || function (radians) {
-    return radians * this.RAD2DEG;
+    return radians * Math.RAD2DEG;
 };
 /**
  * 判断指定整数是否为2的幂
@@ -1263,7 +1276,7 @@ Math.toRound = Math.toRound || function (source, target, precision) {
  */
 Math.equals = Math.equals || function (a, b, precision) {
     if (precision == undefined)
-        precision = this.PRECISION;
+        precision = Math.PRECISION;
     return Math.abs(a - b) < precision;
 };
 /**
@@ -1390,6 +1403,19 @@ var feng3d;
             return v;
         };
         /**
+         * 删除 Json 对象中 CLASS_KEY 属性，防止被反序列化。
+         *
+         * @param obj
+         */
+        Serialization.prototype.deleteCLASS_KEY = function (obj) {
+            if (Object.isBaseType(obj))
+                return;
+            delete obj[feng3d.CLASS_KEY];
+            for (var key in obj) {
+                this.deleteCLASS_KEY(obj[key]);
+            }
+        };
+        /**
          * 反序列化对象为基础对象数据（由Object与Array组合）
          *
          * @param object 换为Json的对象
@@ -1425,7 +1451,7 @@ var feng3d;
          */
         Serialization.prototype.setValue = function (target, source) {
             if (Object.isBaseType(source) || target == source)
-                return;
+                return target;
             var handlers = this.setValueHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
             propertyHandler({ __root__: target }, { __root__: source }, __root__, handlers, this);
             return target;
@@ -5341,6 +5367,27 @@ var feng3d;
 var feng3d;
 (function (feng3d) {
     /**
+     * 点与面的相对位置
+     */
+    var PlaneClassification;
+    (function (PlaneClassification) {
+        /**
+         * 在平面后面
+         */
+        PlaneClassification[PlaneClassification["BACK"] = 0] = "BACK";
+        /**
+         * 在平面前面
+         */
+        PlaneClassification[PlaneClassification["FRONT"] = 1] = "FRONT";
+        /**
+         * 与平面相交
+         */
+        PlaneClassification[PlaneClassification["INTERSECT"] = 2] = "INTERSECT";
+    })(PlaneClassification = feng3d.PlaneClassification || (feng3d.PlaneClassification = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
      * 颜色
      */
     var Color3 = /** @class */ (function () {
@@ -5638,6 +5685,12 @@ var feng3d;
             return "#" + feng3d.Color3.ToHex(intA) + feng3d.Color3.ToHex(intR) + feng3d.Color3.ToHex(intG) + feng3d.Color3.ToHex(intB);
         };
         /**
+         * 输出 RGBA 颜色值，例如 rgba(255,255,255,1)
+         */
+        Color4.prototype.toRGBA = function () {
+            return "rgba(" + this.r * 255 + "," + this.g * 255 + "," + this.b * 255 + "," + this.a + ")";
+        };
+        /**
          * 混合颜色
          * @param color 混入的颜色
          * @param rate  混入比例
@@ -5759,8 +5812,8 @@ var feng3d;
         Color4.prototype.clone = function () {
             return new Color4(this.r, this.g, this.b, this.a);
         };
-        Color4.WHITE = new Color4();
-        Color4.BLACK = new Color4(0, 0, 0);
+        Color4.WHITE = Object.freeze(new Color4(1, 1, 1, 1));
+        Color4.BLACK = Object.freeze(new Color4(0, 0, 0, 1));
         __decorate([
             feng3d.oav(),
             feng3d.serialize
@@ -5785,7 +5838,7 @@ var feng3d;
 (function (feng3d) {
     var DEG_TO_RAD = Math.PI / 180;
     /**
-     * Point 对象表示二维坐标系统中的某个位置，其中 x 表示水平轴，y 表示垂直轴。
+     * Vector2 对象表示二维坐标系统中的某个位置，其中 x 表示水平轴，y 表示垂直轴。
      */
     var Vector2 = /** @class */ (function () {
         /**
@@ -6099,7 +6152,7 @@ var feng3d;
         /**
          * 原点
          */
-        Vector2.ZERO = new Vector2();
+        Vector2.ZERO = Object.freeze(new Vector2());
         __decorate([
             feng3d.oav(),
             feng3d.serialize
@@ -7645,6 +7698,23 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
+    /**
+     * Matrix3x3 类表示一个转换矩阵，该矩阵确定二维 (2D) 显示对象的位置和方向。
+     * 该矩阵可以执行转换功能，包括平移（沿 x 和 y 轴重新定位）、旋转和缩放（调整大小）。
+     * ```
+     *  ---                                   ---
+     *  |   scaleX      0         0    |   x轴
+     *  |     0       scaleY      0    |   y轴
+     *  |     tx        ty        1    |   平移
+     *  ---                                   ---
+     *
+     *  ---                                   ---
+     *  |     0         1         2    |   x轴
+     *  |     3         4         5    |   y轴
+     *  |     6         7         8    |   平移
+     *  ---                                   ---
+     * ```
+     */
     var Matrix3x3 = /** @class */ (function () {
         /**
          * 构建3x3矩阵
@@ -8032,6 +8102,33 @@ var feng3d;
             });
             return array;
         };
+        /**
+         * 转换为4x4矩阵
+         *
+         * @param out 4x4矩阵
+         */
+        Matrix3x3.prototype.toMatrix4x4 = function (out) {
+            if (out === void 0) { out = new feng3d.Matrix4x4(); }
+            var outdata = out.rawData;
+            var indata = this.elements;
+            outdata[0] = indata[0];
+            outdata[1] = indata[1];
+            outdata[2] = 0;
+            outdata[3] = 0;
+            outdata[4] = indata[3];
+            outdata[5] = indata[4];
+            outdata[6] = 0;
+            outdata[7] = 0;
+            outdata[8] = 0;
+            outdata[9] = 0;
+            outdata[10] = 1;
+            outdata[11] = 0;
+            outdata[12] = indata[6];
+            outdata[13] = indata[7];
+            outdata[14] = 0;
+            outdata[15] = 1;
+            return out;
+        };
         return Matrix3x3;
     }());
     feng3d.Matrix3x3 = Matrix3x3;
@@ -8047,7 +8144,7 @@ var feng3d;
      *  |   scaleX      0         0       0     |   x轴
      *  |     0       scaleY      0       0     |   y轴
      *  |     0         0       scaleZ    0     |   z轴
-     *  |     tx        ty        tz      tw    |   平移
+     *  |     tx        ty        tz      1     |   平移
      *  ---                                   ---
      *
      *  ---                                   ---
@@ -8308,7 +8405,7 @@ var feng3d;
          * @param q 四元素
          */
         Matrix4x4.prototype.fromQuaternion = function (q) {
-            q.toMatrix3D(this);
+            q.toMatrix(this);
             return this;
         };
         /**
@@ -8458,11 +8555,11 @@ var feng3d;
         };
         /**
          * 将源 Matrix4x4 对象中的所有矩阵数据复制到调用方 Matrix4x4 对象中。
-         * @param   sourceMatrix3D      要从中复制数据的 Matrix4x4 对象。
+         * @param   source      要从中复制数据的 Matrix4x4 对象。
          */
-        Matrix4x4.prototype.copyFrom = function (sourceMatrix3D) {
+        Matrix4x4.prototype.copyFrom = function (source) {
             for (var i = 0; i < 16; i++) {
-                this.rawData[i] = sourceMatrix3D.rawData[i];
+                this.rawData[i] = source.rawData[i];
             }
             return this;
         };
@@ -8537,7 +8634,7 @@ var feng3d;
          * 拷贝当前矩阵
          * @param   dest    目标矩阵
          */
-        Matrix4x4.prototype.copyToMatrix3D = function (dest) {
+        Matrix4x4.prototype.copyToMatrix = function (dest) {
             dest.rawData = this.rawData.concat();
             return this;
         };
@@ -8982,9 +9079,9 @@ var feng3d;
         };
         Matrix4x4.prototype.transformRotation = function (vin, vout) {
             //转换旋转
-            var rotationMatrix3d = Matrix4x4.fromRotation(vin.x, vin.y, vin.z);
-            rotationMatrix3d.append(this);
-            var newrotation = rotationMatrix3d.decompose()[1];
+            var rotationMatrix = Matrix4x4.fromRotation(vin.x, vin.y, vin.z);
+            rotationMatrix.append(this);
+            var newrotation = rotationMatrix.decompose()[1];
             var v = Math.round((newrotation.x - vin.x) / 180);
             if (v % 2 != 0) {
                 newrotation.x += 180;
@@ -9023,9 +9120,9 @@ var feng3d;
         /**
          * 比较矩阵是否相等
          */
-        Matrix4x4.prototype.equals = function (matrix3D, precision) {
+        Matrix4x4.prototype.equals = function (matrix, precision) {
             if (precision === void 0) { precision = Math.PRECISION; }
-            var r2 = matrix3D.rawData;
+            var r2 = matrix.rawData;
             for (var i = 0; i < 16; ++i) {
                 if (!Math.equals(this.rawData[i] - r2[i], 0, precision))
                     return false;
@@ -9200,6 +9297,26 @@ var feng3d;
                 array[offset + i] = v;
             });
             return array;
+        };
+        /**
+         * 转换为3x3矩阵
+         *
+         * @param out 3x3矩阵
+         */
+        Matrix4x4.prototype.toMatrix3x3 = function (out) {
+            if (out === void 0) { out = new feng3d.Matrix3x3(); }
+            var outdata = out.elements;
+            var indata = this.rawData;
+            outdata[0] = indata[0];
+            outdata[1] = indata[1];
+            outdata[2] = 0;
+            outdata[3] = indata[4];
+            outdata[4] = indata[5];
+            outdata[5] = 0;
+            outdata[6] = indata[12];
+            outdata[7] = indata[13];
+            outdata[8] = 1;
+            return out;
         };
         /**
          * 以字符串返回矩阵的值
@@ -9617,7 +9734,7 @@ var feng3d;
          *
          * @param target
          */
-        Quaternion.prototype.toMatrix3D = function (target) {
+        Quaternion.prototype.toMatrix = function (target) {
             if (target === void 0) { target = new feng3d.Matrix4x4(); }
             var rawData = target.rawData;
             var xy2 = 2.0 * this.x * this.y, xz2 = 2.0 * this.x * this.z, xw2 = 2.0 * this.x * this.w;
@@ -10044,6 +10161,18 @@ var feng3d;
             return new Segment3(feng3d.Vector3.random(), feng3d.Vector3.random());
         };
         /**
+         * 线段长度
+         */
+        Segment3.prototype.getLength = function () {
+            return Math.sqrt(this.getLengthSquared());
+        };
+        /**
+         * 线段长度的平方
+         */
+        Segment3.prototype.getLengthSquared = function () {
+            return this.p0.distanceSquared(this.p1);
+        };
+        /**
          * 获取线段所在直线
          */
         Segment3.prototype.getLine = function (line) {
@@ -10223,6 +10352,13 @@ var feng3d;
      * 三角形
      */
     var Triangle3 = /** @class */ (function () {
+        /**
+         * 构造三角形
+         *
+         * @param p0 三角形0号点
+         * @param p1 三角形1号点
+         * @param p2 三角形2号点
+         */
         function Triangle3(p0, p1, p2) {
             if (p0 === void 0) { p0 = new feng3d.Vector3(); }
             if (p1 === void 0) { p1 = new feng3d.Vector3(); }
@@ -10436,14 +10572,17 @@ var feng3d;
         Triangle3.prototype.onWithPoint = function (p, precision) {
             if (precision === void 0) { precision = Math.PRECISION; }
             var plane3d = this.getPlane3d();
+            // 排除不在平面上的点
             if (plane3d.classifyPoint(p, precision) != feng3d.PlaneClassification.INTERSECT)
                 return false;
+            // 判断在三边上的点
             if (feng3d.Segment3.fromPoints(this.p0, this.p1).onWithPoint(p, precision))
                 return true;
             if (feng3d.Segment3.fromPoints(this.p1, this.p2).onWithPoint(p, precision))
                 return true;
             if (feng3d.Segment3.fromPoints(this.p2, this.p0).onWithPoint(p, precision))
                 return true;
+            // 如果指定点与三角形任意两个点组成的三角形与三角形不同向时，点不在三角形上。
             var n = this.getNormal();
             if (new Triangle3(this.p0, this.p1, p).getNormal().dot(n) < 0)
                 return false;
@@ -10652,6 +10791,17 @@ var feng3d;
         Triangle3.prototype.clone = function () {
             return new Triangle3().copy(this);
         };
+        /**
+         * 判断指定点是否在三角形内
+         *
+         * @param p0 三角形0号点
+         * @param p1 三角形1号点
+         * @param p2 三角形2号点
+         * @param p 指定点
+         */
+        Triangle3.containsPoint = function (p0, p1, p2, p) {
+            return new feng3d.Triangle3(p0, p1, p2).onWithPoint(p);
+        };
         return Triangle3;
     }());
     feng3d.Triangle3 = Triangle3;
@@ -10723,19 +10873,30 @@ var feng3d;
         /**
          * 转换为包围盒八个角所在点列表
          */
-        Box3.prototype.toPoints = function () {
+        Box3.prototype.toPoints = function (points) {
+            if (!points) {
+                points = [
+                    new feng3d.Vector3(),
+                    new feng3d.Vector3(),
+                    new feng3d.Vector3(),
+                    new feng3d.Vector3(),
+                    new feng3d.Vector3(),
+                    new feng3d.Vector3(),
+                    new feng3d.Vector3(),
+                    new feng3d.Vector3(),
+                ];
+            }
             var min = this.min;
             var max = this.max;
-            return [
-                new feng3d.Vector3(min.x, min.y, min.z),
-                new feng3d.Vector3(max.x, min.y, min.z),
-                new feng3d.Vector3(min.x, max.y, min.z),
-                new feng3d.Vector3(min.x, min.y, max.z),
-                new feng3d.Vector3(min.x, max.y, max.z),
-                new feng3d.Vector3(max.x, min.y, max.z),
-                new feng3d.Vector3(max.x, max.y, min.z),
-                new feng3d.Vector3(max.x, max.y, max.z),
-            ];
+            points[0].set(min.x, min.y, min.z);
+            points[1].set(max.x, min.y, min.z);
+            points[2].set(min.x, max.y, min.z);
+            points[3].set(min.x, min.y, max.z);
+            points[4].set(min.x, max.y, max.z);
+            points[5].set(max.x, min.y, max.z);
+            points[6].set(max.x, max.y, min.z);
+            points[7].set(max.x, max.y, max.z);
+            return points;
         };
         /**
          * 从一组顶点初始化包围盒
@@ -10801,7 +10962,7 @@ var feng3d;
          * 应用矩阵
          * @param mat 矩阵
          */
-        Box3.prototype.applyMatrix3D = function (mat) {
+        Box3.prototype.applyMatrix = function (mat) {
             this.fromPoints(this.toPoints().map(function (v) {
                 return v.applyMatrix4x4(mat);
             }));
@@ -10811,9 +10972,9 @@ var feng3d;
          * 应用矩阵
          * @param mat 矩阵
          */
-        Box3.prototype.applyMatrix3DTo = function (mat, out) {
+        Box3.prototype.applyMatrixTo = function (mat, out) {
             if (out === void 0) { out = new Box3(); }
-            return out.copy(this).applyMatrix3D(mat);
+            return out.copy(this).applyMatrix(mat);
         };
         /**
          *
@@ -10889,9 +11050,14 @@ var feng3d;
          * @param aabb 包围盒
          */
         Box3.prototype.intersection = function (aabb) {
-            this.min.clamp(aabb.min, aabb.max);
-            this.max.clamp(aabb.min, aabb.max);
-            return this;
+            var min = this.min.clampTo(aabb.min, aabb.max);
+            var max = this.max.clampTo(aabb.min, aabb.max);
+            if (this.containsPoint(min)) {
+                this.min.copy(min);
+                this.max.copy(max);
+                return this;
+            }
+            return null;
         };
         /**
          * 与包围盒相交
@@ -11155,6 +11321,22 @@ var feng3d;
             var triangleNormal = f0.crossTo(f1);
             axes = [triangleNormal.x, triangleNormal.y, triangleNormal.z];
             return satForAxes(axes, v0, v1, v2, extents);
+        };
+        /**
+        * 是否与指定长方体相交
+        *
+        * @param box3 长方体
+        */
+        Box3.prototype.overlaps = function (box3) {
+            var l1 = this.min, u1 = this.max, l2 = box3.min, u2 = box3.max;
+            //      l2        u2
+            //      |---------|
+            // |--------|
+            // l1       u1
+            var overlapsX = ((l2.x <= u1.x && u1.x <= u2.x) || (l1.x <= u2.x && u2.x <= u1.x));
+            var overlapsY = ((l2.y <= u1.y && u1.y <= u2.y) || (l1.y <= u2.y && u2.y <= u1.y));
+            var overlapsZ = ((l2.z <= u1.z && u1.z <= u2.z) || (l1.z <= u2.z && u2.z <= u1.z));
+            return overlapsX && overlapsY && overlapsZ;
         };
         /**
          * 转换为三角形列表
@@ -11849,28 +12031,6 @@ var feng3d;
     }());
     feng3d.Frustum = Frustum;
     var _vector = new feng3d.Vector3();
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * 点与面的相对位置
-
-     */
-    var PlaneClassification;
-    (function (PlaneClassification) {
-        /**
-         * 在平面后面
-         */
-        PlaneClassification[PlaneClassification["BACK"] = 0] = "BACK";
-        /**
-         * 在平面前面
-         */
-        PlaneClassification[PlaneClassification["FRONT"] = 1] = "FRONT";
-        /**
-         * 与平面相交
-         */
-        PlaneClassification[PlaneClassification["INTERSECT"] = 2] = "INTERSECT";
-    })(PlaneClassification = feng3d.PlaneClassification || (feng3d.PlaneClassification = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -12893,21 +13053,29 @@ var feng3d;
     /**
      * 动画曲线Wrap模式，处理超出范围情况
      */
-    var AnimationCurveWrapMode;
-    (function (AnimationCurveWrapMode) {
+    var WrapMode;
+    (function (WrapMode) {
         /**
          * 夹紧; 0>-<1
          */
-        AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 1] = "Clamp";
+        WrapMode[WrapMode["Clamp"] = 1] = "Clamp";
         /**
          * 循环; 0->1,0->1
          */
-        AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 2] = "Loop";
+        WrapMode[WrapMode["Loop"] = 2] = "Loop";
         /**
          * 来回循环; 0->1,1->0
          */
-        AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 4] = "PingPong";
-    })(AnimationCurveWrapMode = feng3d.AnimationCurveWrapMode || (feng3d.AnimationCurveWrapMode = {}));
+        WrapMode[WrapMode["PingPong"] = 4] = "PingPong";
+        /**
+         * When time reaches the end of the animation clip, the clip will automatically stop playing and time will be reset to beginning of the clip.
+         */
+        WrapMode[WrapMode["Once"] = 5] = "Once";
+        /**
+         * Reads the default repeat mode set higher up.
+         */
+        WrapMode[WrapMode["Default"] = 6] = "Default";
+    })(WrapMode = feng3d.WrapMode || (feng3d.WrapMode = {}));
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -12927,13 +13095,13 @@ var feng3d;
              *
              * 在第一个关键帧之前的动画行为。
              */
-            this.preWrapMode = feng3d.AnimationCurveWrapMode.Clamp;
+            this.preWrapMode = feng3d.WrapMode.Clamp;
             /**
              * The behaviour of the animation after the last keyframe.
              *
              * 动画在最后一个关键帧之后的行为。
              */
-            this.postWrapMode = feng3d.AnimationCurveWrapMode.Clamp;
+            this.postWrapMode = feng3d.WrapMode.Clamp;
             /**
              * All keys defined in the animation curve.
              *
@@ -12941,7 +13109,7 @@ var feng3d;
              *
              * 注： 该值已对时间排序，否则赋值前请使用 sort((a, b) => a.time - b.time) 进行排序
              */
-            this.keys = [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }];
+            this.keys = [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }];
         }
         Object.defineProperty(AnimationCurve.prototype, "numKeys", {
             /**
@@ -13000,19 +13168,19 @@ var feng3d;
          * @param t 时间轴的位置 [0,1]
          */
         AnimationCurve.prototype.getPoint = function (t) {
-            var wrapMode = feng3d.AnimationCurveWrapMode.Clamp;
+            var wrapMode = feng3d.WrapMode.Clamp;
             if (t < 0)
                 wrapMode = this.preWrapMode;
             else if (t > 1)
                 wrapMode = this.postWrapMode;
             switch (wrapMode) {
-                case feng3d.AnimationCurveWrapMode.Clamp:
+                case feng3d.WrapMode.Clamp:
                     t = Math.clamp(t, 0, 1);
                     break;
-                case feng3d.AnimationCurveWrapMode.Loop:
+                case feng3d.WrapMode.Loop:
                     t = Math.clamp(t - Math.floor(t), 0, 1);
                     break;
-                case feng3d.AnimationCurveWrapMode.PingPong:
+                case feng3d.WrapMode.PingPong:
                     t = Math.clamp(t - Math.floor(t), 0, 1);
                     if (Math.floor(t) % 2 == 1)
                         t = 1 - t;
@@ -13099,7 +13267,7 @@ var feng3d;
          *
          * @param time 时间轴的位置 [0,1]
          * @param value 值
-         * @param precision 查找进度
+         * @param precision 查找精度
          */
         AnimationCurve.prototype.addKeyAtCurve = function (time, value, precision) {
             var point = this.getPoint(time);
@@ -13320,414 +13488,366 @@ var feng3d;
 var feng3d;
 (function (feng3d) {
     /**
-     * Ported from Stefan Gustavson's java implementation
-     * http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
-     * Read Stefan's excellent paper for details on how this code works.
+     * 柏林噪音
      *
-     * Sean McCullough banksean@gmail.com
+     * 用于生产随机的噪音贴图
      *
-     * Added 4D noise
-     * Joshua Koo zz85nus@gmail.com
-     *
-     * @see https://github.com/mrdoob/three.js/blob/dev/examples/js/math/SimplexNoise.js
-     *
-     * 另外参考 https://github.com/WardBenjamin/SimplexNoise    https://github.com/sarveshsvaran/Procedural-Volumetric-Particles-from-3d-4d-noise/blob/master/Assets/Noise.cs
+     * @see http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
+     * @see https://mrl.nyu.edu/~perlin/noise/
+     * @see https://gitee.com/feng3d_admin/noise
      */
-    var SimplexNoise = /** @class */ (function () {
+    var Noise = /** @class */ (function () {
         /**
-         * You can pass in a random number generator object if you like.
-         * It is assumed to have a random() method.
+         * 构建柏林噪音
+         *
+         * @param seed 随机种子
          */
-        function SimplexNoise(r) {
-            if (r == undefined)
-                r = Math;
-            this._grad3 = [[1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
-                [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
-                [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1]];
-            this._grad4 = [[0, 1, 1, 1], [0, 1, 1, -1], [0, 1, -1, 1], [0, 1, -1, -1],
-                [0, -1, 1, 1], [0, -1, 1, -1], [0, -1, -1, 1], [0, -1, -1, -1],
-                [1, 0, 1, 1], [1, 0, 1, -1], [1, 0, -1, 1], [1, 0, -1, -1],
-                [-1, 0, 1, 1], [-1, 0, 1, -1], [-1, 0, -1, 1], [-1, 0, -1, -1],
-                [1, 1, 0, 1], [1, 1, 0, -1], [1, -1, 0, 1], [1, -1, 0, -1],
-                [-1, 1, 0, 1], [-1, 1, 0, -1], [-1, -1, 0, 1], [-1, -1, 0, -1],
-                [1, 1, 1, 0], [1, 1, -1, 0], [1, -1, 1, 0], [1, -1, -1, 0],
-                [-1, 1, 1, 0], [-1, 1, -1, 0], [-1, -1, 1, 0], [-1, -1, -1, 0]];
+        function Noise(seed) {
+            if (seed === void 0) { seed = 0; }
+            this._seed = 0;
             this._p = [];
-            for (var i = 0; i < 256; i++) {
-                this._p[i] = Math.floor(r.random() * 256);
-            }
-            // To remove the need for index wrapping, double the permutation table length
-            this._perm = [];
-            for (var i = 0; i < 512; i++) {
-                this._perm[i] = this._p[i & 255];
-            }
-            // A lookup table to traverse the simplex around a given point in 4D.
-            // Details can be found where this table is used, in the 4D noise method.
-            this._simplex = [
-                [0, 1, 2, 3], [0, 1, 3, 2], [0, 0, 0, 0], [0, 2, 3, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [1, 2, 3, 0],
-                [0, 2, 1, 3], [0, 0, 0, 0], [0, 3, 1, 2], [0, 3, 2, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [1, 3, 2, 0],
-                [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
-                [1, 2, 0, 3], [0, 0, 0, 0], [1, 3, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [2, 3, 0, 1], [2, 3, 1, 0],
-                [1, 0, 2, 3], [1, 0, 3, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [2, 0, 3, 1], [0, 0, 0, 0], [2, 1, 3, 0],
-                [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
-                [2, 0, 1, 3], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [3, 0, 1, 2], [3, 0, 2, 1], [0, 0, 0, 0], [3, 1, 2, 0],
-                [2, 1, 0, 3], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [3, 1, 0, 2], [0, 0, 0, 0], [3, 2, 0, 1], [3, 2, 1, 0]
-            ];
+            this.seed = seed;
         }
-        SimplexNoise.prototype._dot = function (g, x, y) {
-            return g[0] * x + g[1] * y;
-        };
-        SimplexNoise.prototype._dot3 = function (g, x, y, z) {
-            return g[0] * x + g[1] * y + g[2] * z;
-        };
-        SimplexNoise.prototype._dot4 = function (g, x, y, z, w) {
-            return g[0] * x + g[1] * y + g[2] * z + g[3] * w;
+        /**
+         * 1D 经典噪音
+         *
+         * @param x X轴数值
+         */
+        Noise.prototype.perlin1 = function (x) {
+            var perm = this._p;
+            // Find unit grid cell containing point
+            var X = Math.floor(x);
+            // Get relative xyz coordinates of point within that cell
+            x = x - X;
+            // Wrap the integer cells at 255 (smaller integer period can be introduced here)
+            X = X & 255;
+            // Calculate a set of eight hashed gradient indices
+            var gi00 = perm[X] % 2;
+            var gi10 = perm[X + 1] % 2;
+            // Calculate noise contributions from each of the eight corners
+            var n00 = dot1(grad1[gi00], x);
+            var n10 = dot1(grad1[gi10], x - 1);
+            // Compute the fade curve value for each of x, y
+            var u = fade(x);
+            // Interpolate along x the contributions from each of the corners
+            var nx0 = mix(n00, n10, u);
+            return nx0;
         };
         /**
+         * 2D 经典噪音
          *
-         * @param xin
-         * @param yin
+         * @param x X轴数值
+         * @param y Y轴数值
          */
-        SimplexNoise.prototype.noise = function (xin, yin) {
-            var n0, n1, n2; // Noise contributions from the three corners
-            // Skew the input space to determine which simplex cell we're in
-            var F2 = 0.5 * (Math.sqrt(3.0) - 1.0);
-            var s = (xin + yin) * F2; // Hairy factor for 2D
-            var i = Math.floor(xin + s);
-            var j = Math.floor(yin + s);
-            var G2 = (3.0 - Math.sqrt(3.0)) / 6.0;
-            var t = (i + j) * G2;
-            var X0 = i - t; // Unskew the cell origin back to (x,y) space
-            var Y0 = j - t;
-            var x0 = xin - X0; // The x,y distances from the cell origin
-            var y0 = yin - Y0;
-            // For the 2D case, the simplex shape is an equilateral triangle.
-            // Determine which simplex we are in.
-            var i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
-            if (x0 > y0) {
-                i1 = 1;
-                j1 = 0;
-                // lower triangle, XY order: (0,0)->(1,0)->(1,1)
-            }
-            else {
-                i1 = 0;
-                j1 = 1;
-            }
-            // upper triangle, YX order: (0,0)->(0,1)->(1,1)
-            // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
-            // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
-            // c = (3-sqrt(3))/6
-            var x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
-            var y1 = y0 - j1 + G2;
-            var x2 = x0 - 1.0 + 2.0 * G2; // Offsets for last corner in (x,y) unskewed coords
-            var y2 = y0 - 1.0 + 2.0 * G2;
-            // Work out the hashed gradient indices of the three simplex corners
-            var ii = i & 255;
-            var jj = j & 255;
-            var gi0 = this._perm[ii + this._perm[jj]] % 12;
-            var gi1 = this._perm[ii + i1 + this._perm[jj + j1]] % 12;
-            var gi2 = this._perm[ii + 1 + this._perm[jj + 1]] % 12;
-            // Calculate the contribution from the three corners
-            var t0 = 0.5 - x0 * x0 - y0 * y0;
-            if (t0 < 0)
-                n0 = 0.0;
-            else {
-                t0 *= t0;
-                n0 = t0 * t0 * this._dot(this._grad3[gi0], x0, y0); // (x,y) of grad3 used for 2D gradient
-            }
-            var t1 = 0.5 - x1 * x1 - y1 * y1;
-            if (t1 < 0)
-                n1 = 0.0;
-            else {
-                t1 *= t1;
-                n1 = t1 * t1 * this._dot(this._grad3[gi1], x1, y1);
-            }
-            var t2 = 0.5 - x2 * x2 - y2 * y2;
-            if (t2 < 0)
-                n2 = 0.0;
-            else {
-                t2 *= t2;
-                n2 = t2 * t2 * this._dot(this._grad3[gi2], x2, y2);
-            }
-            // Add contributions from each corner to get the final noise value.
-            // The result is scaled to return values in the interval [-1,1].
-            return 70.0 * (n0 + n1 + n2);
+        Noise.prototype.perlin2 = function (x, y) {
+            var perm = this._p;
+            // Find unit grid cell containing point
+            var X = Math.floor(x);
+            var Y = Math.floor(y);
+            // Get relative xyz coordinates of point within that cell
+            x = x - X;
+            y = y - Y;
+            // Wrap the integer cells at 255 (smaller integer period can be introduced here)
+            X = X & 255;
+            Y = Y & 255;
+            // Calculate a set of eight hashed gradient indices
+            var gi00 = perm[X + perm[Y]] % 4;
+            var gi10 = perm[X + 1 + perm[Y]] % 4;
+            var gi01 = perm[X + perm[Y + 1]] % 4;
+            var gi11 = perm[X + 1 + perm[Y + 1]] % 4;
+            // Calculate noise contributions from each of the eight corners
+            var n00 = dot2(grad2[gi00], x, y);
+            var n10 = dot2(grad2[gi10], x - 1, y);
+            var n01 = dot2(grad2[gi01], x, y - 1);
+            var n11 = dot2(grad2[gi11], x - 1, y - 1);
+            // Compute the fade curve value for each of x, y
+            var u = fade(x);
+            var v = fade(y);
+            // Interpolate along x the contributions from each of the corners
+            var nx0 = mix(n00, n10, u);
+            var nx1 = mix(n01, n11, u);
+            // Interpolate the four results along y
+            var nxy = mix(nx0, nx1, v);
+            return nxy;
         };
         /**
-         * 3D simplex noise
+         * 3D 经典噪音
          *
-         * @param xin
-         * @param yin
-         * @param zin
+         * @param x X轴数值
+         * @param y Y轴数值
+         * @param z Z轴数值
          */
-        SimplexNoise.prototype.noise3d = function (xin, yin, zin) {
-            var n0, n1, n2, n3; // Noise contributions from the four corners
-            // Skew the input space to determine which simplex cell we're in
-            var F3 = 1.0 / 3.0;
-            var s = (xin + yin + zin) * F3; // Very nice and simple skew factor for 3D
-            var i = Math.floor(xin + s);
-            var j = Math.floor(yin + s);
-            var k = Math.floor(zin + s);
-            var G3 = 1.0 / 6.0; // Very nice and simple unskew factor, too
-            var t = (i + j + k) * G3;
-            var X0 = i - t; // Unskew the cell origin back to (x,y,z) space
-            var Y0 = j - t;
-            var Z0 = k - t;
-            var x0 = xin - X0; // The x,y,z distances from the cell origin
-            var y0 = yin - Y0;
-            var z0 = zin - Z0;
-            // For the 3D case, the simplex shape is a slightly irregular tetrahedron.
-            // Determine which simplex we are in.
-            var i1, j1, k1; // Offsets for second corner of simplex in (i,j,k) coords
-            var i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords
-            if (x0 >= y0) {
-                if (y0 >= z0) {
-                    i1 = 1;
-                    j1 = 0;
-                    k1 = 0;
-                    i2 = 1;
-                    j2 = 1;
-                    k2 = 0;
-                    // X Y Z order
-                }
-                else if (x0 >= z0) {
-                    i1 = 1;
-                    j1 = 0;
-                    k1 = 0;
-                    i2 = 1;
-                    j2 = 0;
-                    k2 = 1;
-                    // X Z Y order
-                }
-                else {
-                    i1 = 0;
-                    j1 = 0;
-                    k1 = 1;
-                    i2 = 1;
-                    j2 = 0;
-                    k2 = 1;
-                } // Z X Y order
-            }
-            else { // x0<y0
-                if (y0 < z0) {
-                    i1 = 0;
-                    j1 = 0;
-                    k1 = 1;
-                    i2 = 0;
-                    j2 = 1;
-                    k2 = 1;
-                    // Z Y X order
-                }
-                else if (x0 < z0) {
-                    i1 = 0;
-                    j1 = 1;
-                    k1 = 0;
-                    i2 = 0;
-                    j2 = 1;
-                    k2 = 1;
-                    // Y Z X order
-                }
-                else {
-                    i1 = 0;
-                    j1 = 1;
-                    k1 = 0;
-                    i2 = 1;
-                    j2 = 1;
-                    k2 = 0;
-                } // Y X Z order
-            }
-            // A step of (1,0,0) in (i,j,k) means a step of (1-c,-c,-c) in (x,y,z),
-            // a step of (0,1,0) in (i,j,k) means a step of (-c,1-c,-c) in (x,y,z), and
-            // a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z), where
-            // c = 1/6.
-            var x1 = x0 - i1 + G3; // Offsets for second corner in (x,y,z) coords
-            var y1 = y0 - j1 + G3;
-            var z1 = z0 - k1 + G3;
-            var x2 = x0 - i2 + 2.0 * G3; // Offsets for third corner in (x,y,z) coords
-            var y2 = y0 - j2 + 2.0 * G3;
-            var z2 = z0 - k2 + 2.0 * G3;
-            var x3 = x0 - 1.0 + 3.0 * G3; // Offsets for last corner in (x,y,z) coords
-            var y3 = y0 - 1.0 + 3.0 * G3;
-            var z3 = z0 - 1.0 + 3.0 * G3;
-            // Work out the hashed gradient indices of the four simplex corners
-            var ii = i & 255;
-            var jj = j & 255;
-            var kk = k & 255;
-            var gi0 = this._perm[ii + this._perm[jj + this._perm[kk]]] % 12;
-            var gi1 = this._perm[ii + i1 + this._perm[jj + j1 + this._perm[kk + k1]]] % 12;
-            var gi2 = this._perm[ii + i2 + this._perm[jj + j2 + this._perm[kk + k2]]] % 12;
-            var gi3 = this._perm[ii + 1 + this._perm[jj + 1 + this._perm[kk + 1]]] % 12;
-            // Calculate the contribution from the four corners
-            var t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
-            if (t0 < 0)
-                n0 = 0.0;
-            else {
-                t0 *= t0;
-                n0 = t0 * t0 * this._dot3(this._grad3[gi0], x0, y0, z0);
-            }
-            var t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
-            if (t1 < 0)
-                n1 = 0.0;
-            else {
-                t1 *= t1;
-                n1 = t1 * t1 * this._dot3(this._grad3[gi1], x1, y1, z1);
-            }
-            var t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
-            if (t2 < 0)
-                n2 = 0.0;
-            else {
-                t2 *= t2;
-                n2 = t2 * t2 * this._dot3(this._grad3[gi2], x2, y2, z2);
-            }
-            var t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
-            if (t3 < 0)
-                n3 = 0.0;
-            else {
-                t3 *= t3;
-                n3 = t3 * t3 * this._dot3(this._grad3[gi3], x3, y3, z3);
-            }
-            // Add contributions from each corner to get the final noise value.
-            // The result is scaled to stay just inside [-1,1]
-            return 32.0 * (n0 + n1 + n2 + n3);
+        Noise.prototype.perlin3 = function (x, y, z) {
+            var perm = this._p;
+            // Find unit grid cell containing point
+            var X = Math.floor(x);
+            var Y = Math.floor(y);
+            var Z = Math.floor(z);
+            // Get relative xyz coordinates of point within that cell
+            x = x - X;
+            y = y - Y;
+            z = z - Z;
+            // Wrap the integer cells at 255 (smaller integer period can be introduced here)
+            X = X & 255;
+            Y = Y & 255;
+            Z = Z & 255;
+            // Calculate a set of eight hashed gradient indices
+            var gi000 = perm[X + perm[Y + perm[Z]]] % 12;
+            var gi100 = perm[X + 1 + perm[Y + perm[Z]]] % 12;
+            var gi010 = perm[X + perm[Y + 1 + perm[Z]]] % 12;
+            var gi110 = perm[X + 1 + perm[Y + 1 + perm[Z]]] % 12;
+            var gi001 = perm[X + perm[Y + perm[Z + 1]]] % 12;
+            var gi101 = perm[X + 1 + perm[Y + perm[Z + 1]]] % 12;
+            var gi011 = perm[X + perm[Y + 1 + perm[Z + 1]]] % 12;
+            var gi111 = perm[X + 1 + perm[Y + 1 + perm[Z + 1]]] % 12;
+            // Calculate noise contributions from each of the eight corners
+            var n000 = dot(grad3[gi000], x, y, z);
+            var n100 = dot(grad3[gi100], x - 1, y, z);
+            var n010 = dot(grad3[gi010], x, y - 1, z);
+            var n110 = dot(grad3[gi110], x - 1, y - 1, z);
+            var n001 = dot(grad3[gi001], x, y, z - 1);
+            var n101 = dot(grad3[gi101], x - 1, y, z - 1);
+            var n011 = dot(grad3[gi011], x, y - 1, z - 1);
+            var n111 = dot(grad3[gi111], x - 1, y - 1, z - 1);
+            // Compute the fade curve value for each of x, y, z
+            var u = fade(x);
+            var v = fade(y);
+            var w = fade(z);
+            // Interpolate along x the contributions from each of the corners
+            var nx00 = mix(n000, n100, u);
+            var nx01 = mix(n001, n101, u);
+            var nx10 = mix(n010, n110, u);
+            var nx11 = mix(n011, n111, u);
+            // Interpolate the four results along y
+            var nxy0 = mix(nx00, nx10, v);
+            var nxy1 = mix(nx01, nx11, v);
+            // Interpolate the two last results along z
+            var nxyz = mix(nxy0, nxy1, w);
+            return nxyz;
         };
         /**
-         * 4D simplex noise
+         * N阶经典噪音
          *
-         * @param x
-         * @param y
-         * @param z
-         * @param w
+         * 如果是1D，2D，3D噪音，最好选用对于函数，perlinN中存在for循环因此效率比perlin3等性能差3到5（8）倍！
+         *
+         * 满足以下运算
+         * perlinN(x) == perlin1(x)
+         * perlinN(x,y) == perlin2(x,y)
+         * perlinN(x,y,z) == perlin3(x,y,z)
+         *
+         * @param ps 每个轴的数值
          */
-        SimplexNoise.prototype.noise4d = function (x, y, z, w) {
-            // For faster and easier lookups
-            var grad4 = this._grad4;
-            var simplex = this._simplex;
-            var perm = this._perm;
-            // The skewing and unskewing factors are hairy again for the 4D case
-            var F4 = (Math.sqrt(5.0) - 1.0) / 4.0;
-            var G4 = (5.0 - Math.sqrt(5.0)) / 20.0;
-            var n0, n1, n2, n3, n4; // Noise contributions from the five corners
-            // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in
-            var s = (x + y + z + w) * F4; // Factor for 4D skewing
-            var i = Math.floor(x + s);
-            var j = Math.floor(y + s);
-            var k = Math.floor(z + s);
-            var l = Math.floor(w + s);
-            var t = (i + j + k + l) * G4; // Factor for 4D unskewing
-            var X0 = i - t; // Unskew the cell origin back to (x,y,z,w) space
-            var Y0 = j - t;
-            var Z0 = k - t;
-            var W0 = l - t;
-            var x0 = x - X0; // The x,y,z,w distances from the cell origin
-            var y0 = y - Y0;
-            var z0 = z - Z0;
-            var w0 = w - W0;
-            // For the 4D case, the simplex is a 4D shape I won't even try to describe.
-            // To find out which of the 24 possible simplices we're in, we need to
-            // determine the magnitude ordering of x0, y0, z0 and w0.
-            // The method below is a good way of finding the ordering of x,y,z,w and
-            // then find the correct traversal order for the simplex we’re in.
-            // First, six pair-wise comparisons are performed between each possible pair
-            // of the four coordinates, and the results are used to add up binary bits
-            // for an integer index.
-            var c1 = (x0 > y0) ? 32 : 0;
-            var c2 = (x0 > z0) ? 16 : 0;
-            var c3 = (y0 > z0) ? 8 : 0;
-            var c4 = (x0 > w0) ? 4 : 0;
-            var c5 = (y0 > w0) ? 2 : 0;
-            var c6 = (z0 > w0) ? 1 : 0;
-            var c = c1 + c2 + c3 + c4 + c5 + c6;
-            var i1, j1, k1, l1; // The integer offsets for the second simplex corner
-            var i2, j2, k2, l2; // The integer offsets for the third simplex corner
-            var i3, j3, k3, l3; // The integer offsets for the fourth simplex corner
-            // simplex[c] is a 4-vector with the numbers 0, 1, 2 and 3 in some order.
-            // Many values of c will never occur, since e.g. x>y>z>w makes x<z, y<w and x<w
-            // impossible. Only the 24 indices which have non-zero entries make any sense.
-            // We use a thresholding to set the coordinates in turn from the largest magnitude.
-            // The number 3 in the "simplex" array is at the position of the largest coordinate.
-            i1 = simplex[c][0] >= 3 ? 1 : 0;
-            j1 = simplex[c][1] >= 3 ? 1 : 0;
-            k1 = simplex[c][2] >= 3 ? 1 : 0;
-            l1 = simplex[c][3] >= 3 ? 1 : 0;
-            // The number 2 in the "simplex" array is at the second largest coordinate.
-            i2 = simplex[c][0] >= 2 ? 1 : 0;
-            j2 = simplex[c][1] >= 2 ? 1 : 0;
-            k2 = simplex[c][2] >= 2 ? 1 : 0;
-            l2 = simplex[c][3] >= 2 ? 1 : 0;
-            // The number 1 in the "simplex" array is at the second smallest coordinate.
-            i3 = simplex[c][0] >= 1 ? 1 : 0;
-            j3 = simplex[c][1] >= 1 ? 1 : 0;
-            k3 = simplex[c][2] >= 1 ? 1 : 0;
-            l3 = simplex[c][3] >= 1 ? 1 : 0;
-            // The fifth corner has all coordinate offsets = 1, so no need to look that up.
-            var x1 = x0 - i1 + G4; // Offsets for second corner in (x,y,z,w) coords
-            var y1 = y0 - j1 + G4;
-            var z1 = z0 - k1 + G4;
-            var w1 = w0 - l1 + G4;
-            var x2 = x0 - i2 + 2.0 * G4; // Offsets for third corner in (x,y,z,w) coords
-            var y2 = y0 - j2 + 2.0 * G4;
-            var z2 = z0 - k2 + 2.0 * G4;
-            var w2 = w0 - l2 + 2.0 * G4;
-            var x3 = x0 - i3 + 3.0 * G4; // Offsets for fourth corner in (x,y,z,w) coords
-            var y3 = y0 - j3 + 3.0 * G4;
-            var z3 = z0 - k3 + 3.0 * G4;
-            var w3 = w0 - l3 + 3.0 * G4;
-            var x4 = x0 - 1.0 + 4.0 * G4; // Offsets for last corner in (x,y,z,w) coords
-            var y4 = y0 - 1.0 + 4.0 * G4;
-            var z4 = z0 - 1.0 + 4.0 * G4;
-            var w4 = w0 - 1.0 + 4.0 * G4;
-            // Work out the hashed gradient indices of the five simplex corners
-            var ii = i & 255;
-            var jj = j & 255;
-            var kk = k & 255;
-            var ll = l & 255;
-            var gi0 = perm[ii + perm[jj + perm[kk + perm[ll]]]] % 32;
-            var gi1 = perm[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]] % 32;
-            var gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]] % 32;
-            var gi3 = perm[ii + i3 + perm[jj + j3 + perm[kk + k3 + perm[ll + l3]]]] % 32;
-            var gi4 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]] % 32;
-            // Calculate the contribution from the five corners
-            var t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
-            if (t0 < 0)
-                n0 = 0.0;
-            else {
-                t0 *= t0;
-                n0 = t0 * t0 * this._dot4(grad4[gi0], x0, y0, z0, w0);
+        Noise.prototype.perlinN = function () {
+            var ps = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                ps[_i] = arguments[_i];
             }
-            var t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
-            if (t1 < 0)
-                n1 = 0.0;
-            else {
-                t1 *= t1;
-                n1 = t1 * t1 * this._dot4(grad4[gi1], x1, y1, z1, w1);
+            var perm = this._p;
+            var n = ps.length;
+            // 在格子内对应每个轴的位置
+            var pp = [];
+            // 所属格子对应每个轴的索引
+            var PS = [];
+            // 在格子内对应每个轴的混合权重
+            var PF = [];
+            for (var i = 0; i < n; i++) {
+                var p = ps[i];
+                // 找到所属单元格
+                var P = Math.floor(p);
+                // 获取所在单元格内的位置
+                p = p - P;
+                // 单元格以255为周期
+                P = P & 255;
+                //
+                pp[i] = p;
+                PS[i] = P;
+                // 分别计算每个轴的混合度
+                PF[i] = fade(p);
             }
-            var t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
-            if (t2 < 0)
-                n2 = 0.0;
-            else {
-                t2 *= t2;
-                n2 = t2 * t2 * this._dot4(grad4[gi2], x2, y2, z2, w2);
+            //
+            var gradN = createGrad(n);
+            // 边的数量
+            var numEdge = gradN.length;
+            // if (n > 1)
+            // {
+            //     console.assert(numEdge == Math.pow(2, n - 1) * n, `边的数量不对！`)
+            // }
+            //
+            var bits = getBits(n);
+            var dns = [];
+            //
+            for (var i = 0, len = bits.length; i < len; i++) {
+                var bit = bits[i];
+                var bitn = bit.length;
+                // 计算索引
+                var gi = 0;
+                while (bitn > 0) {
+                    bitn--;
+                    gi = perm[PS[bitn] + bit[bitn] + gi];
+                    // if (isNaN(gi))
+                    //     debugger;
+                }
+                // 获取 grad
+                var grad = gradN[gi % numEdge];
+                bitn = bit.length;
+                // 计算点乘 dot运算
+                var dn = 0;
+                while (bitn > 0) {
+                    bitn--;
+                    dn += grad[bitn] * (pp[bitn] - bit[bitn]);
+                }
+                dns[i] = dn;
             }
-            var t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
-            if (t3 < 0)
-                n3 = 0.0;
-            else {
-                t3 *= t3;
-                n3 = t3 * t3 * this._dot4(grad4[gi3], x3, y3, z3, w3);
+            // 进行插值
+            for (var i = 0; i < n; i++) {
+                // 每次前后两个插值
+                for (var j = 0, len = dns.length; j < len; j += 2) {
+                    dns[j / 2] = mix(dns[j], dns[j + 1], PF[i]);
+                }
+                // 每波插值后 长度减半
+                dns.length = dns.length >> 1;
             }
-            var t4 = 0.6 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
-            if (t4 < 0)
-                n4 = 0.0;
-            else {
-                t4 *= t4;
-                n4 = t4 * t4 * this._dot4(grad4[gi4], x4, y4, z4, w4);
-            }
-            // Sum up and scale the result to cover the range [-1,1]
-            return 27.0 * (n0 + n1 + n2 + n3 + n4);
+            // console.assert(dns.length == 1, `结果长度不对！`)
+            return dns[0];
         };
-        return SimplexNoise;
+        Object.defineProperty(Noise.prototype, "seed", {
+            /**
+             * This isn't a very good seeding function, but it works ok. It supports 2^16
+             * different seed values. Write something better if you need more seeds.
+             */
+            get: function () {
+                return this._seed;
+            },
+            set: function (v) {
+                this._seed = v;
+                var p = this._p;
+                if (v > 0 && v < 1) {
+                    // Scale the seed out
+                    v *= 65536;
+                }
+                v = Math.floor(v);
+                if (v < 256) {
+                    v |= v << 8;
+                }
+                for (var i = 0; i < 256; i++) {
+                    var v0;
+                    if (i & 1) {
+                        v0 = permutation[i] ^ (v & 255);
+                    }
+                    else {
+                        v0 = permutation[i] ^ ((v >> 8) & 255);
+                    }
+                    p[i] = p[i + 256] = v0;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Noise;
     }());
-    feng3d.SimplexNoise = SimplexNoise;
+    feng3d.Noise = Noise;
+    /**
+     *
+     * @param n
+     *
+     * len = 2^(n-1) * n
+     */
+    function createGrad(n) {
+        if (createGradCache[n])
+            return createGradCache[n];
+        var gradBase = createGradBase(n - 1);
+        var grad = [];
+        if (n > 1) {
+            for (var i = n - 1; i >= 0; i--) {
+                for (var j = 0; j < gradBase.length; j++) {
+                    var item = gradBase[j].concat();
+                    item.splice(i, 0, 0);
+                    grad.push(item);
+                }
+            }
+        }
+        else {
+            grad = gradBase;
+        }
+        createGradCache[n] = grad;
+        return grad;
+    }
+    feng3d.createGrad = createGrad;
+    var createGradCache = {};
+    function createGradBase(n) {
+        if (n < 2)
+            return [
+                [1], [-1],
+            ];
+        var grad = createGradBase(n - 1);
+        for (var i = 0, len = grad.length; i < len; i++) {
+            var item = grad[i];
+            grad[i] = item.concat(1);
+            grad[i + len] = item.concat(-1);
+        }
+        return grad;
+    }
+    function getBits(n) {
+        if (getBitsChace[n])
+            return getBitsChace[n];
+        if (n < 2)
+            return [
+                [0], [1],
+            ];
+        var grad = getBits(n - 1);
+        for (var i = 0, len = grad.length; i < len; i++) {
+            var item = grad[i];
+            grad[i] = item.concat(0);
+            grad[i + len] = item.concat(1);
+        }
+        getBitsChace[n] = grad;
+        return grad;
+    }
+    feng3d.getBits = getBits;
+    var getBitsChace = {};
+    var grad1 = [
+        [1], [-1],
+    ];
+    var grad2 = [
+        [1, 0], [-1, 0],
+        [0, 1], [0, -1],
+    ];
+    var grad3 = [
+        [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
+        [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
+        [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1]
+    ];
+    var permutation = [
+        151, 160, 137, 91, 90, 15,
+        131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
+        190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
+        88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
+        77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244,
+        102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196,
+        135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123,
+        5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42,
+        223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9,
+        129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228,
+        251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107,
+        49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
+        138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180
+    ];
+    function dot(g, x, y, z) {
+        return g[0] * x + g[1] * y + g[2] * z;
+    }
+    function dot2(g, x, y) {
+        return g[0] * x + g[1] * y;
+    }
+    function dot1(g, x) {
+        return g[0] * x;
+    }
+    function mix(a, b, t) {
+        return (1 - t) * a + t * b;
+    }
+    function fade(t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+    feng3d.noise = new Noise();
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -17865,6 +17985,33 @@ var feng3d;
 var feng3d;
 (function (feng3d) {
     /**
+     * 添加组件菜单
+     *
+     * 在组件类上新增 @feng3d.AddComponentMenu("UI/Text") 可以把该组件添加到组件菜单上。
+     *
+     * @param path 组件菜单中路径
+     * @param componentOrder 组件菜单中组件的顺序(从低到高)。
+     */
+    function AddComponentMenu(path, componentOrder) {
+        if (componentOrder === void 0) { componentOrder = 0; }
+        return function (target) {
+            if (!feng3d.menuConfig.component)
+                feng3d.menuConfig.component = [];
+            feng3d.menuConfig.component.push({ path: path, order: componentOrder, type: target });
+            feng3d.menuConfig.component.sort(function (a, b) { if (a.path < b.path)
+                return -1; return 1; });
+            feng3d.menuConfig.component.sort(function (a, b) { return a.order - b.order; });
+        };
+    }
+    feng3d.AddComponentMenu = AddComponentMenu;
+    /**
+     * 菜单配置
+     */
+    feng3d.menuConfig = {};
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
      * 全局事件
      */
     feng3d.globalDispatcher = new feng3d.EventDispatcher();
@@ -17884,10 +18031,6 @@ var feng3d;
             "outline": {
                 "fragment": "precision mediump float;\r\n\r\nuniform vec4 u_outlineColor;\r\n\r\nvoid main() \r\n{\r\n    gl_FragColor = u_outlineColor;\r\n}",
                 "vertex": "precision mediump float;  \r\n\r\n//坐标属性\r\nattribute vec3 a_position;\r\nattribute vec3 a_normal;\r\n\r\n#include<uv_pars_vert>\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_ITModelMatrix;\r\nuniform vec3 u_cameraPos;\r\nuniform mat4 u_viewProjection;\r\nuniform float u_scaleByDepth;\r\nuniform float u_outlineMorphFactor;\r\n\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n\r\nuniform float u_outlineSize;\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n\r\n    #include<uv_vert>\r\n\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n    \r\n    vec3 normal = a_normal;\r\n\r\n    //全局坐标\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    //全局法线\r\n    vec3 globalNormal = normalize((u_ITModelMatrix * vec4(normal, 0.0)).xyz);\r\n\r\n    float depth = distance(worldPosition.xyz , u_cameraPos.xyz);\r\n    \r\n    vec3 offsetDir = mix(globalNormal, normalize(worldPosition.xyz), u_outlineMorphFactor);\r\n    //摄像机远近保持粗细一致\r\n    offsetDir = offsetDir * depth * u_scaleByDepth;\r\n    //描边宽度\r\n    offsetDir = offsetDir * u_outlineSize;\r\n\r\n    worldPosition.xyz = worldPosition.xyz + offsetDir;//\r\n\r\n    //计算投影坐标\r\n    gl_Position = u_viewProjection * worldPosition;\r\n}"
-            },
-            "particle": {
-                "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\n\r\nuniform float u_alphaThreshold;\r\n//漫反射\r\nuniform vec4 u_diffuse;\r\nuniform sampler2D s_diffuse;\r\n\r\n#include<particle_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n\r\n    //获取漫反射基本颜色\r\n    vec4 diffuseColor = u_diffuse * texture2D(s_diffuse, v_uv);\r\n\r\n    if(diffuseColor.w < u_alphaThreshold)\r\n    {\r\n        discard;\r\n    }\r\n\r\n    finalColor = diffuseColor;\r\n\r\n    #include<particle_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
-                "vertex": "precision mediump float;  \r\n\r\n//坐标属性\r\nattribute vec3 a_position;\r\nattribute vec2 a_uv;\r\nattribute vec3 a_normal;\r\n\r\nuniform mat4 u_modelMatrix;\r\nuniform mat4 u_ITModelMatrix;\r\nuniform mat4 u_viewProjection;\r\n\r\nvarying vec2 v_uv;\r\n\r\nuniform float u_PointSize;\r\n\r\n#include<particle_pars_vert>\r\n\r\nvoid main() \r\n{\r\n    vec4 position = vec4(a_position, 1.0);\r\n    //输出uv\r\n    v_uv = a_uv;\r\n    \r\n    #include<particle_vert>\r\n\r\n    vec3 normal = a_normal;\r\n\r\n    //获取全局坐标\r\n    vec4 worldPosition = u_modelMatrix * position;\r\n    //计算投影坐标\r\n    gl_Position = u_viewProjection * worldPosition;\r\n\r\n\r\n    gl_PointSize = u_PointSize;\r\n}"
             },
             "Particles_Additive": {
                 "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\n\r\nuniform vec4 _TintColor;\r\nuniform sampler2D _MainTex;\r\nuniform vec4 _MainTex_ST;\r\n\r\n#include<particle_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n\r\n    #include<particle_frag>\r\n\r\n    vec2 uv = v_uv;\r\n    uv = uv * _MainTex_ST.xy + _MainTex_ST.zw;\r\n    finalColor = 2.0 * finalColor * _TintColor * texture2D(_MainTex, uv);\r\n\r\n    gl_FragColor = finalColor;\r\n}",
@@ -17914,8 +18057,8 @@ var feng3d;
                 "vertex": "attribute vec3 a_position;\r\n\r\nuniform vec3 u_cameraPos;\r\nuniform mat4 u_viewProjection;\r\n\r\nuniform float u_skyBoxSize;\r\n\r\nvarying vec3 v_worldPos;\r\n\r\nvoid main()\r\n{\r\n    vec3 worldPos = a_position.xyz * u_skyBoxSize + u_cameraPos.xyz;\r\n    gl_Position = u_viewProjection * vec4(worldPos.xyz, 1.0);\r\n    v_worldPos = worldPos;\r\n}"
             },
             "standard": {
-                "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\nvarying vec3 v_worldPosition;\r\nuniform vec3 u_cameraPos;\r\n\r\n#include<normal_pars_frag>\r\n#include<diffuse_pars_frag>\r\n#include<alphatest_pars_frag>\r\n\r\n#include<ambient_pars_frag>\r\n#include<specular_pars_frag>\r\n#include<lights_pars_frag>\r\n\r\n#include<envmap_pars_frag>\r\n#include<particle_pars_frag>\r\n#include<fog_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0,1.0,1.0,1.0);\r\n\r\n    #include<normal_frag>\r\n    #include<diffuse_frag>\r\n    #include<alphatest_frag>\r\n\r\n    #include<ambient_frag>\r\n    #include<specular_frag>\r\n    #include<lights_frag>\r\n\r\n    #include<envmap_frag>\r\n    #include<particle_frag>\r\n    #include<fog_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
-                "vertex": "precision mediump float;  \r\n\r\n#include<position_pars_vert>\r\n#include<normal_pars_vert>\r\n#include<tangent_pars_vert>\r\n//\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n//\r\n#include<worldposition_pars_vert>\r\n#include<project_pars_vert>\r\n//\r\n#include<uv_pars_vert>\r\n#include<normalmap_pars_vert>\r\n//\r\n#include<lights_pars_vert>\r\n#include<pointsize_pars_vert>\r\n\r\nvoid main()\r\n{\r\n    // 初始化\r\n    #include<position_vert>\r\n    #include<normal_vert>\r\n    #include<tangent_vert>\r\n    #include<uv_vert>\r\n    // 动画\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n    // 投影\r\n    #include<worldposition_vert>\r\n    #include<project_vert>\r\n    // \r\n    #include<normalmap_vert>\r\n    //\r\n    #include<lights_vert>\r\n    #include<pointsize_vert>\r\n}"
+                "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\nvarying vec3 v_worldPosition;\r\nuniform vec3 u_cameraPos;\r\n\r\n#include<color_pars_frag>\r\n\r\n#include<normal_pars_frag>\r\n#include<diffuse_pars_frag>\r\n#include<alphatest_pars_frag>\r\n\r\n#include<ambient_pars_frag>\r\n#include<specular_pars_frag>\r\n#include<lights_pars_frag>\r\n\r\n#include<envmap_pars_frag>\r\n#include<particle_pars_frag>\r\n#include<fog_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0,1.0,1.0,1.0);\r\n\r\n    #include<color_frag>\r\n\r\n    #include<normal_frag>\r\n    #include<diffuse_frag>\r\n    #include<alphatest_frag>\r\n\r\n    #include<ambient_frag>\r\n    #include<specular_frag>\r\n    #include<lights_frag>\r\n\r\n    #include<envmap_frag>\r\n    #include<particle_frag>\r\n    #include<fog_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
+                "vertex": "precision mediump float;  \r\n\r\n#include<position_pars_vert>\r\n#include<normal_pars_vert>\r\n#include<tangent_pars_vert>\r\n#include<color_pars_vert>\r\n//\r\n#include<skeleton_pars_vert>\r\n#include<particle_pars_vert>\r\n//\r\n#include<worldposition_pars_vert>\r\n#include<project_pars_vert>\r\n//\r\n#include<uv_pars_vert>\r\n#include<normalmap_pars_vert>\r\n//\r\n#include<lights_pars_vert>\r\n#include<pointsize_pars_vert>\r\n\r\nvoid main()\r\n{\r\n    // 初始化\r\n    #include<position_vert>\r\n    #include<normal_vert>\r\n    #include<tangent_vert>\r\n    #include<color_vert>\r\n    #include<uv_vert>\r\n    // 动画\r\n    #include<skeleton_vert>\r\n    #include<particle_vert>\r\n    // 投影\r\n    #include<worldposition_vert>\r\n    #include<project_vert>\r\n    // \r\n    #include<normalmap_vert>\r\n    //\r\n    #include<lights_vert>\r\n    #include<pointsize_vert>\r\n}"
             },
             "terrain": {
                 "fragment": "precision mediump float;\r\n\r\nvarying vec2 v_uv;\r\nvarying vec3 v_worldPosition;\r\nuniform vec3 u_cameraPos;\r\n\r\n#include<normal_pars_frag>\r\n#include<diffuse_pars_frag>\r\n#include<alphatest_pars_frag>\r\n\r\n#include<terrain_pars_frag>\r\n\r\n#include<ambient_pars_frag>\r\n#include<specular_pars_frag>\r\n#include<lights_pars_frag>\r\n\r\n#include<envmap_pars_frag>\r\n#include<fog_pars_frag>\r\n\r\nvoid main()\r\n{\r\n    vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n\r\n    #include<normal_frag>\r\n    #include<diffuse_frag>\r\n    #include<alphatest_frag>\r\n\r\n    #include<terrain_frag>\r\n\r\n    #include<ambient_frag>\r\n    #include<specular_frag>\r\n    #include<lights_frag>\r\n\r\n    #include<envmap_frag>\r\n    #include<fog_frag>\r\n\r\n    gl_FragColor = finalColor;\r\n}",
@@ -17940,7 +18083,11 @@ var feng3d;
             "ambient_frag": "//环境光\r\nvec3 ambientColor = u_ambient.w * u_ambient.xyz * u_sceneAmbientColor.xyz * u_sceneAmbientColor.w;\r\nambientColor = ambientColor * texture2D(s_ambient, v_uv).xyz;",
             "ambient_pars_frag": "uniform vec4 u_sceneAmbientColor;\r\n\r\n//环境\r\nuniform vec4 u_ambient;\r\nuniform sampler2D s_ambient;",
             "cartoon_pars_frag": "#ifdef IS_CARTOON\r\n    #ifdef cartoon_Anti_aliasing\r\n        #extension GL_OES_standard_derivatives : enable\r\n    #endif\r\n\r\n    uniform vec4 u_diffuseSegment;\r\n    uniform vec4 u_diffuseSegmentValue;\r\n    uniform float u_specularSegment;\r\n\r\n    //漫反射\r\n    float cartoonLightDiffuse(vec3 normal,vec3 lightDir)\r\n    {\r\n        float diff = dot(normal, lightDir);\r\n        diff = diff * 0.5 + 0.5;\r\n\r\n        #ifdef cartoon_Anti_aliasing\r\n            float w = fwidth(diff) * 2.0;\r\n            if (diff < u_diffuseSegment.x + w) \r\n            {\r\n                diff = mix(u_diffuseSegment.x, u_diffuseSegment.y, smoothstep(u_diffuseSegment.x - w, u_diffuseSegment.x + w, diff));\r\n            //  diff = mix(u_diffuseSegment.x, u_diffuseSegment.y, clamp(0.5 * (diff - u_diffuseSegment.x) / w, 0, 1));\r\n            } else if (diff < u_diffuseSegment.y + w) \r\n            {\r\n                diff = mix(u_diffuseSegment.y, u_diffuseSegment.z, smoothstep(u_diffuseSegment.y - w, u_diffuseSegment.y + w, diff));\r\n            //  diff = mix(u_diffuseSegment.y, u_diffuseSegment.z, clamp(0.5 * (diff - u_diffuseSegment.y) / w, 0, 1));\r\n            } else if (diff < u_diffuseSegment.z + w) \r\n            {\r\n                diff = mix(u_diffuseSegment.z, u_diffuseSegment.w, smoothstep(u_diffuseSegment.z - w, u_diffuseSegment.z + w, diff));\r\n            //  diff = mix(u_diffuseSegment.z, u_diffuseSegment.w, clamp(0.5 * (diff - u_diffuseSegment.z) / w, 0, 1));\r\n            } else \r\n            {\r\n                diff = u_diffuseSegment.w;\r\n            }\r\n        #else\r\n            if (diff < u_diffuseSegment.x) \r\n            {\r\n                diff = u_diffuseSegmentValue.x;\r\n            } else if (diff < u_diffuseSegment.y) \r\n            {\r\n                diff = u_diffuseSegmentValue.y;\r\n            } else if (diff < u_diffuseSegment.z) \r\n            {\r\n                diff = u_diffuseSegmentValue.z;\r\n            } else \r\n            {\r\n                diff = u_diffuseSegmentValue.w;\r\n            }\r\n        #endif\r\n\r\n        return diff;\r\n    }\r\n\r\n    //镜面反射漫反射\r\n    float cartoonLightSpecular(vec3 normal,vec3 lightDir,vec3 cameraDir,float glossiness)\r\n    {\r\n        vec3 halfVec = normalize(lightDir + cameraDir);\r\n        float specComp = max(dot(normal,halfVec),0.0);\r\n        specComp = pow(specComp, glossiness);\r\n\r\n        #ifdef cartoon_Anti_aliasing\r\n            float w = fwidth(specComp);\r\n            if (specComp < u_specularSegment + w) \r\n            {\r\n                specComp = mix(0.0, 1.0, smoothstep(u_specularSegment - w, u_specularSegment + w, specComp));\r\n                // specComp = smoothstep(u_specularSegment - w, u_specularSegment + w, specComp);\r\n            } else \r\n            {\r\n                specComp = 1.0;\r\n            }\r\n        #else\r\n            if(specComp < u_specularSegment)\r\n            {\r\n                specComp = 0.0;\r\n            }else\r\n            {\r\n                specComp = 1.0;\r\n            }\r\n        #endif\r\n\r\n        return specComp;\r\n    }\r\n#endif",
-            "diffuse_frag": "//获取漫反射基本颜色\r\nvec4 diffuseColor = u_diffuse;\r\ndiffuseColor = diffuseColor * texture2D(s_diffuse, v_uv);\r\n\r\nfinalColor = diffuseColor;",
+            "color_frag": "#ifdef HAS_a_color\r\nfinalColor = v_color * finalColor;\r\n#endif\r\n",
+            "color_pars_frag": "#ifdef HAS_a_color\r\nvarying vec4 v_color;\r\n#endif\r\n",
+            "color_pars_vert": "#ifdef HAS_a_color\r\nattribute vec4 a_color;\r\n\r\nvarying vec4 v_color;\r\n#endif\r\n",
+            "color_vert": "#ifdef HAS_a_color\r\nv_color = a_color;\r\n#endif",
+            "diffuse_frag": "//获取漫反射基本颜色\r\nvec4 diffuseColor = u_diffuse;\r\ndiffuseColor = finalColor * diffuseColor * texture2D(s_diffuse, v_uv);\r\n\r\nfinalColor = diffuseColor;",
             "diffuse_pars_frag": "//漫反射\r\nuniform vec4 u_diffuse;\r\nuniform sampler2D s_diffuse;",
             "envmap_frag": "finalColor = envmapMethod(finalColor);",
             "envmap_pars_frag": "uniform samplerCube s_envMap;\r\nuniform float u_reflectivity;\r\n\r\nvec4 envmapMethod(vec4 finalColor)\r\n{\r\n    vec3 cameraToVertex = normalize( v_worldPosition - u_cameraPos );\r\n    vec3 reflectVec = reflect( cameraToVertex, v_normal );\r\n    vec4 envColor = textureCube( s_envMap, reflectVec );\r\n    finalColor.xyz *= envColor.xyz * u_reflectivity;\r\n    return finalColor;\r\n}",
@@ -17967,7 +18114,7 @@ var feng3d;
             "project_pars_vert": "uniform mat4 u_viewProjection;",
             "project_vert": "//计算投影坐标\r\ngl_Position = u_viewProjection * worldPosition;",
             "shadowmap_pars_frag": "#if (NUM_POINTLIGHT_CASTSHADOW > 0) ||  (NUM_DIRECTIONALLIGHT_CASTSHADOW > 0) ||  (NUM_SPOT_LIGHTS_CASTSHADOW > 0)\r\n    #if NUM_POINTLIGHT_CASTSHADOW > 0\r\n        // 投影的点光源\r\n        struct CastShadowPointLight\r\n        {\r\n            // 位置\r\n            vec3 position;\r\n            // 颜色\r\n            vec3 color;\r\n            // 强度\r\n            float intensity;\r\n            // 范围\r\n            float range;\r\n            // 阴影类型\r\n            int shadowType;\r\n            // 阴影偏差，用来解决判断是否为阴影时精度问题\r\n            float shadowBias;\r\n            // 阴影半径，边缘宽度\r\n            float shadowRadius;\r\n            // 阴影图尺寸\r\n            vec2 shadowMapSize;\r\n            float shadowCameraNear;\r\n            float shadowCameraFar;\r\n        };\r\n        // 投影的点光源列表\r\n        uniform CastShadowPointLight u_castShadowPointLights[NUM_POINTLIGHT_CASTSHADOW];\r\n        // 点光源阴影图\r\n        uniform sampler2D u_pointShadowMaps[NUM_POINTLIGHT_CASTSHADOW];\r\n    #endif\r\n\r\n    #if NUM_SPOT_LIGHTS_CASTSHADOW > 0\r\n        // 投影的聚光灯\r\n        struct CastShadowSpotLight\r\n        {\r\n            // 位置\r\n            vec3 position;\r\n            // 颜色\r\n            vec3 color;\r\n            // 强度\r\n            float intensity;\r\n            // 范围\r\n            float range;\r\n            // 方向\r\n            vec3 direction;\r\n            // 椎体cos值\r\n            float coneCos;\r\n            // 半影cos\r\n            float penumbraCos;\r\n\r\n            // 阴影类型\r\n            int shadowType;\r\n            // 阴影偏差，用来解决判断是否为阴影时精度问题\r\n            float shadowBias;\r\n            // 阴影半径，边缘宽度\r\n            float shadowRadius;\r\n            // 阴影图尺寸\r\n            vec2 shadowMapSize;\r\n            float shadowCameraNear;\r\n            float shadowCameraFar;\r\n        };\r\n        // 投影的投影的聚光灯列表\r\n        uniform CastShadowSpotLight u_castShadowSpotLights[NUM_SPOT_LIGHTS_CASTSHADOW];\r\n        // 投影的聚光灯阴影图\r\n        uniform sampler2D u_spotShadowMaps[NUM_SPOT_LIGHTS_CASTSHADOW];\r\n        // 方向光源投影uv列表\r\n        varying vec4 v_spotShadowCoord[ NUM_SPOT_LIGHTS_CASTSHADOW ];\r\n    #endif\r\n\r\n    #if NUM_DIRECTIONALLIGHT_CASTSHADOW > 0\r\n        // 投影的方向光源\r\n        struct CastShadowDirectionalLight\r\n        {\r\n            // 方向\r\n            vec3 direction;\r\n            // 颜色\r\n            vec3 color;\r\n            // 强度\r\n            float intensity;\r\n            // 阴影类型\r\n            int shadowType;\r\n            // 阴影偏差，用来解决判断是否为阴影时精度问题\r\n            float shadowBias;\r\n            // 阴影半径，边缘宽度\r\n            float shadowRadius;\r\n            // 阴影图尺寸\r\n            vec2 shadowMapSize;\r\n            // 位置\r\n            vec3 position;\r\n            float shadowCameraNear;\r\n            float shadowCameraFar;\r\n        };\r\n        // 投影的方向光源列表\r\n        uniform CastShadowDirectionalLight u_castShadowDirectionalLights[NUM_DIRECTIONALLIGHT_CASTSHADOW];\r\n        // 方向光源阴影图\r\n        uniform sampler2D u_directionalShadowMaps[NUM_DIRECTIONALLIGHT_CASTSHADOW];\r\n        // 方向光源投影uv列表\r\n        varying vec4 v_directionalShadowCoord[ NUM_DIRECTIONALLIGHT_CASTSHADOW ];\r\n    #endif\r\n\r\n    // @see https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/packing.glsl\r\n    const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)\r\n    const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\r\n    const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\r\n    float unpackRGBAToDepth( const in vec4 v ) \r\n    {\r\n        return dot( v, UnpackFactors );\r\n    }\r\n\r\n    float texture2DCompare( sampler2D depths, vec2 uv, float compare ) \r\n    {\r\n        return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\r\n    }\r\n\r\n    float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) \r\n    {\r\n        const vec2 offset = vec2( 0.0, 1.0 );\r\n\r\n        vec2 texelSize = vec2( 1.0 ) / size;\r\n        vec2 centroidUV = floor( uv * size + 0.5 ) / size;\r\n\r\n        float lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );\r\n        float lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );\r\n        float rb = texture2DCompare( depths, centroidUV + texelSize * offset.yx, compare );\r\n        float rt = texture2DCompare( depths, centroidUV + texelSize * offset.yy, compare );\r\n\r\n        vec2 f = fract( uv * size + 0.5 );\r\n\r\n        float a = mix( lb, lt, f.y );\r\n        float b = mix( rb, rt, f.y );\r\n        float c = mix( a, b, f.x );\r\n\r\n        return c;\r\n    }\r\n\r\n    // 计算阴影值 @see https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/shadowmap_pars_fragment.glsl\r\n    float getShadow( sampler2D shadowMap, int shadowType, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord, vec3 lightToPosition, float shadowCameraNear, float shadowCameraFar) \r\n    {\r\n        float shadow = 1.0;\r\n\r\n        shadowCoord.xy /= shadowCoord.w;\r\n        shadowCoord.xy = (shadowCoord.xy + 1.0) / 2.0;\r\n\r\n        // dp = normalized distance from light to fragment position\r\n        float dp = ( length( lightToPosition ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear ); // need to clamp?\r\n        dp += shadowBias;\r\n        shadowCoord.z = dp;\r\n\r\n        // if ( something && something ) breaks ATI OpenGL shader compiler\r\n        // if ( all( something, something ) ) using this instead\r\n\r\n        bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\r\n        bool inFrustum = all( inFrustumVec );\r\n\r\n        bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\r\n\r\n        bool frustumTest = all( frustumTestVec );\r\n\r\n        if ( frustumTest ) \r\n        {\r\n            if (shadowType == 2)\r\n            {\r\n                // PCF\r\n                vec2 texelSize = vec2( 1.0 ) / shadowMapSize;\r\n\r\n                float dx0 = - texelSize.x * shadowRadius;\r\n                float dy0 = - texelSize.y * shadowRadius;\r\n                float dx1 = + texelSize.x * shadowRadius;\r\n                float dy1 = + texelSize.y * shadowRadius;\r\n\r\n                shadow = (\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n                    texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n                ) * ( 1.0 / 9.0 );\r\n            }\r\n            else if(shadowType == 3)\r\n            {\r\n                // PCF soft\r\n                vec2 texelSize = vec2( 1.0 ) / shadowMapSize;\r\n\r\n                float dx0 = - texelSize.x * shadowRadius;\r\n                float dy0 = - texelSize.y * shadowRadius;\r\n                float dx1 = + texelSize.x * shadowRadius;\r\n                float dy1 = + texelSize.y * shadowRadius;\r\n\r\n                shadow = (\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n                    texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n                ) * ( 1.0 / 9.0 );\r\n            }\r\n            else\r\n            {\r\n                shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\r\n            }\r\n        }\r\n\r\n        return shadow;\r\n    }\r\n\r\n    // cubeToUV() maps a 3D direction vector suitable for cube texture mapping to a 2D\r\n    // vector suitable for 2D texture mapping. This code uses the following layout for the\r\n    // 2D texture:\r\n    //\r\n    // xzXZ\r\n    //  y Y\r\n    //\r\n    // Y - Positive y direction\r\n    // y - Negative y direction\r\n    // X - Positive x direction\r\n    // x - Negative x direction\r\n    // Z - Positive z direction\r\n    // z - Negative z direction\r\n    //\r\n    // Source and test bed:\r\n    // https://gist.github.com/tschw/da10c43c467ce8afd0c4\r\n\r\n    vec2 cubeToUV( vec3 v, float texelSizeY ) \r\n    {\r\n        // Number of texels to avoid at the edge of each square\r\n        vec3 absV = abs( v );\r\n\r\n        // Intersect unit cube\r\n        float scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );\r\n        absV *= scaleToCube;\r\n\r\n        // Apply scale to avoid seams\r\n\r\n        // two texels less per square (one texel will do for NEAREST)\r\n        v *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );\r\n\r\n        // Unwrap\r\n\r\n        // space: -1 ... 1 range for each square\r\n        //\r\n        // #X##\t\tdim    := ( 1/4 , 1/2 )\r\n        //  # #\t\tcenter := ( 1/2 , 1/2 )\r\n        vec2 planar;\r\n        float almostOne = 1.0 - 1.5 * texelSizeY;\r\n        if ( absV.z >= almostOne ) \r\n        {\r\n            if ( v.z > 0.0 )\r\n            {\r\n                planar.x = (0.5 + v.x * 0.5) * 0.25 + 0.75;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }else\r\n            {\r\n                planar.x = (0.5 - v.x * 0.5) * 0.25 + 0.25;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }\r\n        } else if ( absV.x >= almostOne ) \r\n        {\r\n            if( v.x > 0.0)\r\n            {\r\n                planar.x = (0.5 - v.z * 0.5) * 0.25 + 0.5;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }else\r\n            {\r\n                planar.x = (0.5 + v.z * 0.5) * 0.25 + 0.0;\r\n                planar.y = (0.5 + v.y * 0.5) * 0.5 + 0.5;\r\n            }\r\n        } else if ( absV.y >= almostOne ) \r\n        {\r\n            if( v.y > 0.0)\r\n            {\r\n                planar.x = (0.5 - v.x * 0.5) * 0.25 + 0.75;\r\n                planar.y = (0.5 + v.z * 0.5) * 0.5 + 0.0;\r\n            }else\r\n            {\r\n                planar.x = (0.5 - v.x * 0.5) * 0.25 + 0.25;\r\n                planar.y = (0.5 - v.z * 0.5) * 0.5 + 0.0;\r\n            }\r\n        }\r\n        return planar;\r\n    }\r\n\r\n    float getPointShadow( sampler2D shadowMap, int shadowType, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec3 lightToPosition, float shadowCameraNear, float shadowCameraFar ) \r\n    {\r\n        vec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );\r\n\r\n        // for point lights, the uniform @vShadowCoord is re-purposed to hold\r\n        // the vector from the light to the world-space position of the fragment.\r\n        // vec3 lightToPosition = shadowCoord.xyz;\r\n\r\n        // dp = normalized distance from light to fragment position\r\n        float dp = ( length( lightToPosition ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear ); // need to clamp?\r\n        dp += shadowBias;\r\n\r\n        // bd3D = base direction 3D\r\n        vec3 bd3D = normalize( lightToPosition );\r\n\r\n        if(shadowType == 2 || shadowType == 3)\r\n        {\r\n            vec2 offset = vec2( - 1, 1 ) * shadowRadius * texelSize.y;\r\n\r\n            return (\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyx, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyx, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxy, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxx, texelSize.y ), dp ) +\r\n                texture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxx, texelSize.y ), dp )\r\n            ) * ( 1.0 / 9.0 );\r\n        }else\r\n        {\r\n            return texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );\r\n        }\r\n    }\r\n#endif",
-            "skeleton_pars_vert": "#ifdef HAS_SKELETON_ANIMATION\r\n\r\n    attribute vec4 a_jointindex0;\r\n    attribute vec4 a_jointweight0;\r\n\r\n    #ifdef HAS_a_jointindex1\r\n        attribute vec4 a_jointindex1;\r\n        attribute vec4 a_jointweight1;\r\n    #endif\r\n\r\n    #ifdef NUM_SKELETONJOINT\r\n        uniform mat4 u_skeletonGlobalMatriices[NUM_SKELETONJOINT];\r\n    #endif\r\n\r\n    vec4 skeletonAnimation(vec4 position) \r\n    {\r\n        vec4 totalPosition = vec4(0.0,0.0,0.0,1.0);\r\n        for(int i = 0; i < 4; i++)\r\n        {\r\n            totalPosition += u_skeletonGlobalMatriices[int(a_jointindex0[i])] * position * a_jointweight0[i];\r\n        }\r\n        #ifdef HAS_a_jointindex1\r\n            for(int i = 0; i < 4; i++)\r\n            {\r\n                totalPosition += u_skeletonGlobalMatriices[int(a_jointindex1[i])] * position * a_jointweight1[i];\r\n            }\r\n        #endif\r\n        position.xyz = totalPosition.xyz;\r\n        return position;\r\n    }\r\n#endif",
+            "skeleton_pars_vert": "#ifdef HAS_SKELETON_ANIMATION\r\n\r\n    attribute vec4 a_skinIndices;\r\n    attribute vec4 a_skinWeights;\r\n\r\n    #ifdef HAS_a_skinIndices1\r\n        attribute vec4 a_skinIndices1;\r\n        attribute vec4 a_skinWeights1;\r\n    #endif\r\n\r\n    #ifdef NUM_SKELETONJOINT\r\n        uniform mat4 u_skeletonGlobalMatriices[NUM_SKELETONJOINT];\r\n    #endif\r\n\r\n    vec4 skeletonAnimation(vec4 position) \r\n    {\r\n        vec4 totalPosition = vec4(0.0,0.0,0.0,1.0);\r\n        for(int i = 0; i < 4; i++)\r\n        {\r\n            totalPosition += u_skeletonGlobalMatriices[int(a_skinIndices[i])] * position * a_skinWeights[i];\r\n        }\r\n        #ifdef HAS_a_skinIndices1\r\n            for(int i = 0; i < 4; i++)\r\n            {\r\n                totalPosition += u_skeletonGlobalMatriices[int(a_skinIndices1[i])] * position * a_skinWeights1[i];\r\n            }\r\n        #endif\r\n        position.xyz = totalPosition.xyz;\r\n        return position;\r\n    }\r\n#endif",
             "skeleton_vert": "#ifdef HAS_SKELETON_ANIMATION\r\n    position = skeletonAnimation(position);\r\n#endif",
             "specular_frag": "//获取高光值\r\nfloat glossiness = u_glossiness;\r\n//获取镜面反射基本颜色\r\nvec3 specularColor = u_specular;\r\nvec4 specularMapColor = texture2D(s_specular, v_uv);\r\nspecularColor.xyz = specularMapColor.xyz;\r\nglossiness = glossiness * specularMapColor.w;",
             "specular_pars_frag": "//镜面反射\r\nuniform vec3 u_specular;\r\nuniform float u_glossiness;\r\nuniform sampler2D s_specular;",
@@ -18563,18 +18710,20 @@ var feng3d;
         /**
          * canvas转换为dataURL
          */
-        DataTransform.prototype.canvasToDataURL = function (canvas, type) {
+        DataTransform.prototype.canvasToDataURL = function (canvas, type, quality) {
             if (type === void 0) { type = "png"; }
+            if (quality === void 0) { quality = 1; }
             if (type == "png")
                 return canvas.toDataURL("image/png");
-            return canvas.toDataURL("image/jpeg", 0.8);
+            return canvas.toDataURL("image/jpeg", quality);
         };
         /**
          * canvas转换为图片
          */
-        DataTransform.prototype.canvasToImage = function (canvas, type, callback) {
+        DataTransform.prototype.canvasToImage = function (canvas, type, quality, callback) {
             if (type === void 0) { type = "png"; }
-            var dataURL = this.canvasToDataURL(canvas, type);
+            if (quality === void 0) { quality = 1; }
+            var dataURL = this.canvasToDataURL(canvas, type, quality);
             this.dataURLToImage(dataURL, callback);
         };
         /**
@@ -18625,9 +18774,10 @@ var feng3d;
             };
             img.src = dataurl;
         };
-        DataTransform.prototype.imageToDataURL = function (img) {
+        DataTransform.prototype.imageToDataURL = function (img, quality) {
+            if (quality === void 0) { quality = 1; }
             var canvas = this.imageToCanvas(img);
-            var dataurl = this.canvasToDataURL(canvas, "png");
+            var dataurl = this.canvasToDataURL(canvas, "png", quality);
             return dataurl;
         };
         DataTransform.prototype.imageToCanvas = function (img) {
@@ -18650,9 +18800,10 @@ var feng3d;
                 callback(arraybuffer);
             });
         };
-        DataTransform.prototype.imageDataToDataURL = function (imageData) {
+        DataTransform.prototype.imageDataToDataURL = function (imageData, quality) {
+            if (quality === void 0) { quality = 1; }
             var canvas = this.imageDataToCanvas(imageData);
-            var dataurl = this.canvasToDataURL(canvas, "png");
+            var dataurl = this.canvasToDataURL(canvas, "png", quality);
             return dataurl;
         };
         DataTransform.prototype.imageDataToCanvas = function (imageData) {
@@ -18663,8 +18814,9 @@ var feng3d;
             ctxt.putImageData(imageData, 0, 0);
             return canvas;
         };
-        DataTransform.prototype.imagedataToImage = function (imageData, callback) {
-            var dataUrl = this.imageDataToDataURL(imageData);
+        DataTransform.prototype.imagedataToImage = function (imageData, quality, callback) {
+            if (quality === void 0) { quality = 1; }
+            var dataUrl = this.imageDataToDataURL(imageData, quality);
             this.dataURLToImage(dataUrl, callback);
         };
         DataTransform.prototype.arrayBufferToImage = function (arrayBuffer, callback) {
@@ -18941,16 +19093,13 @@ var feng3d;
             for (var i = 0; i < size; i++) {
                 for (var j = 0; j < size; j++) {
                     var l = Math.clamp(new feng3d.Vector2(i - half, j - half).length, 0, half) / half;
-                    // l = l * l;
                     var f = 1 - l;
                     f = f * f;
-                    // f = f * f * f;
-                    // f = - 8 / 3 * f * f * f + 4 * f * f - f / 3;
                     var pos = (i + j * size) * 4;
                     imageData.data[pos] = f * 255;
                     imageData.data[pos + 1] = f * 255;
                     imageData.data[pos + 2] = f * 255;
-                    imageData.data[pos + 3] = 255;
+                    imageData.data[pos + 3] = f * 255;
                 }
             }
             this.imageData = imageData;
@@ -22106,7 +22255,7 @@ var feng3d;
             /**
              * 格式
              */
-            _this.format = feng3d.TextureFormat.RGB;
+            _this.format = feng3d.TextureFormat.RGBA;
             /**
              * 数据类型
              */
@@ -22474,9 +22623,11 @@ var feng3d;
             uniforms.u_skyBoxSize = camera.lens.far / Math.sqrt(3);
             uniforms.u_scaleByDepth = camera.getScaleByDepth(1);
             uniforms.u_sceneAmbientColor = scene.ambientColor;
-            unblenditems.concat(blenditems).forEach(function (model) {
+            var ctime = (Date.now() / 1000) % 3600;
+            uniforms._Time = new feng3d.Vector4(ctime / 20, ctime, ctime * 2, ctime * 3);
+            unblenditems.concat(blenditems).forEach(function (renderable) {
                 //绘制
-                var renderAtomic = model.gameObject.renderAtomic;
+                var renderAtomic = renderable.renderAtomic;
                 for (var key in uniforms) {
                     renderAtomic.uniforms[key] = uniforms[key];
                 }
@@ -22488,7 +22639,7 @@ var feng3d;
                     return feng3d.lazy.getvalue(renderAtomic.uniforms.u_mvMatrix).clone().invert().transpose();
                 };
                 renderAtomic.shaderMacro.RotationOrder = feng3d.defaultRotationOrder;
-                model.gameObject.beforeRender(gl, renderAtomic, scene, camera);
+                renderable.beforeRender(gl, renderAtomic, scene, camera);
                 gl.render(renderAtomic);
             });
         };
@@ -22553,12 +22704,12 @@ var feng3d;
             // log(`选中索引3D对象${id}`, data.toString());
             return this.objects[id];
         };
-        MouseRenderer.prototype.drawRenderables = function (gl, model) {
-            if (model.gameObject.mouseEnabled) {
-                var object = model.gameObject;
+        MouseRenderer.prototype.drawRenderables = function (gl, renderable) {
+            if (renderable.gameObject.mouseEnabled) {
+                var object = renderable.gameObject;
                 var u_objectID = this.objects.length;
                 this.objects[u_objectID] = object;
-                var renderAtomic = object.renderAtomic;
+                var renderAtomic = renderable.renderAtomic;
                 renderAtomic.uniforms.u_objectID = u_objectID;
                 // super.drawRenderables(renderContext, model);
             }
@@ -22631,8 +22782,8 @@ var feng3d;
             renderAtomic.uniforms.u_lightPosition = light.position;
             renderAtomic.uniforms.u_shadowCameraNear = light.shadowCameraNear;
             renderAtomic.uniforms.u_shadowCameraFar = light.shadowCameraFar;
-            castShadowsModels.forEach(function (element) {
-                _this.drawGameObject(gl, element.gameObject, scene, camera);
+            castShadowsModels.forEach(function (renderable) {
+                _this.drawGameObject(gl, renderable, scene, camera);
             });
             light.frameBufferObject.deactive(gl);
         };
@@ -22692,8 +22843,8 @@ var feng3d;
                 renderAtomic.uniforms.u_lightPosition = light.position;
                 renderAtomic.uniforms.u_shadowCameraNear = light.shadowCameraNear;
                 renderAtomic.uniforms.u_shadowCameraFar = light.shadowCameraFar;
-                castShadowsModels.forEach(function (element) {
-                    _this.drawGameObject(gl, element.gameObject, scene, camera);
+                castShadowsModels.forEach(function (renderable) {
+                    _this.drawGameObject(gl, renderable, scene, camera);
                 });
             }
             light.frameBufferObject.deactive(gl);
@@ -22727,17 +22878,17 @@ var feng3d;
             renderAtomic.uniforms.u_shadowCameraNear = light.shadowCameraNear;
             renderAtomic.uniforms.u_shadowCameraFar = light.shadowCameraFar;
             //
-            castShadowsModels.forEach(function (element) {
-                _this.drawGameObject(gl, element.gameObject, scene, camera);
+            castShadowsModels.forEach(function (renderable) {
+                _this.drawGameObject(gl, renderable, scene, camera);
             });
             light.frameBufferObject.deactive(gl);
         };
         /**
          * 绘制3D对象
          */
-        ShadowRenderer.prototype.drawGameObject = function (gl, gameObject, scene, camera) {
-            var renderAtomic = gameObject.renderAtomic;
-            gameObject.beforeRender(gl, renderAtomic, scene, camera);
+        ShadowRenderer.prototype.drawGameObject = function (gl, renderable, scene, camera) {
+            var renderAtomic = renderable.renderAtomic;
+            renderable.beforeRender(gl, renderAtomic, scene, camera);
             renderAtomic.shadowShader = renderAtomic.shadowShader || new feng3d.Shader("shadow");
             //
             this.renderAtomic.next = renderAtomic;
@@ -22785,10 +22936,10 @@ var feng3d;
             var unblenditems = scene.getPickCache(camera).unblenditems;
             this.init();
             for (var i = 0; i < unblenditems.length; i++) {
-                var model = unblenditems[i];
-                if (model.getComponent(feng3d.OutLineComponent) || model.getComponent(feng3d.CartoonComponent)) {
-                    var renderAtomic = model.gameObject.renderAtomic;
-                    model.gameObject.beforeRender(gl, renderAtomic, scene, camera);
+                var renderable = unblenditems[i];
+                if (renderable.getComponent(feng3d.OutLineComponent) || renderable.getComponent(feng3d.CartoonComponent)) {
+                    var renderAtomic = renderable.renderAtomic;
+                    renderable.beforeRender(gl, renderAtomic, scene, camera);
                     this.renderAtomic.next = renderAtomic;
                     gl.render(this.renderAtomic);
                 }
@@ -22819,20 +22970,20 @@ var feng3d;
             var _this = this;
             var unblenditems = scene.getPickCache(camera).unblenditems;
             var wireframes = unblenditems.reduce(function (pv, cv) { var wireframe = cv.getComponent(feng3d.WireframeComponent); if (wireframe)
-                pv.push(wireframe); return pv; }, []);
+                pv.push({ wireframe: wireframe, renderable: cv }); return pv; }, []);
             if (wireframes.length == 0)
                 return;
             wireframes.forEach(function (element) {
-                _this.drawGameObject(gl, element.gameObject, scene, camera, element.color); //
+                _this.drawGameObject(gl, element.renderable, scene, camera, element.wireframe.color); //
             });
         };
         /**
          * 绘制3D对象
          */
-        WireframeRenderer.prototype.drawGameObject = function (gl, gameObject, scene, camera, wireframeColor) {
+        WireframeRenderer.prototype.drawGameObject = function (gl, renderable, scene, camera, wireframeColor) {
             if (wireframeColor === void 0) { wireframeColor = new feng3d.Color4(); }
-            var renderAtomic = gameObject.renderAtomic;
-            gameObject.beforeRender(gl, renderAtomic, scene, camera);
+            var renderAtomic = renderable.renderAtomic;
+            renderable.beforeRender(gl, renderAtomic, scene, camera);
             var renderMode = feng3d.lazy.getvalue(renderAtomic.renderParams.renderMode);
             if (renderMode == feng3d.RenderMode.POINTS
                 || renderMode == feng3d.RenderMode.LINES
@@ -22853,6 +23004,8 @@ var feng3d;
             this.renderAtomic.next = renderAtomic;
             //
             var oldIndexBuffer = renderAtomic.indexBuffer;
+            if (oldIndexBuffer.count < 3)
+                return;
             if (!renderAtomic.wireframeindexBuffer || renderAtomic.wireframeindexBuffer.count != 2 * oldIndexBuffer.count) {
                 var wireframeindices = [];
                 var indices = feng3d.lazy.getvalue(oldIndexBuffer.indices);
@@ -22891,7 +23044,7 @@ var feng3d;
         // Functions
         //------------------------------------------
         /**
-         * 创建一个组件容器
+         * 创建一个组件
          */
         function Component() {
             var _this = _super.call(this) || this;
@@ -22940,6 +23093,11 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 初始化组件
+         *
+         * 在添加到GameObject时立即被调用。
+         */
         Component.prototype.init = function () {
         };
         /**
@@ -23030,7 +23188,7 @@ var feng3d;
             canvas.height = height;
             var ctxt = canvas.getContext('2d');
             callback(ctxt);
-            feng3d.dataTransform.canvasToImage(canvas, "png", function (img) {
+            feng3d.dataTransform.canvasToImage(canvas, "png", 1, function (img) {
                 _this.image = img;
             });
             return this;
@@ -23135,6 +23293,9 @@ var feng3d;
             feng3d.serialize,
             feng3d.oav({ component: "OAVPick", componentParam: { accepttype: "texturecube", datatype: "texturecube" } })
         ], SkyBox.prototype, "s_skyboxTexture", void 0);
+        SkyBox = __decorate([
+            feng3d.AddComponentMenu("SkyBox/SkyBox")
+        ], SkyBox);
         return SkyBox;
     }(feng3d.Component));
     feng3d.SkyBox = SkyBox;
@@ -23201,7 +23362,7 @@ var feng3d;
                 return;
             this.init();
             //
-            skybox.gameObject.beforeRender(gl, this.renderAtomic, scene, camera);
+            skybox.beforeRender(gl, this.renderAtomic, scene, camera);
             //
             this.renderAtomic.uniforms.u_viewProjection = camera.viewProjection;
             this.renderAtomic.uniforms.u_viewMatrix = camera.transform.worldToLocalMatrix;
@@ -23309,10 +23470,10 @@ var feng3d;
             _this._rotation = new feng3d.Vector3();
             _this._orientation = new feng3d.Quaternion();
             _this._scale = new feng3d.Vector3(1, 1, 1);
-            _this._matrix3d = new feng3d.Matrix4x4();
-            _this._matrix3dInvalid = false;
-            _this._rotationMatrix3d = new feng3d.Matrix4x4();
-            _this._rotationMatrix3dInvalid = false;
+            _this._matrix = new feng3d.Matrix4x4();
+            _this._matrixInvalid = false;
+            _this._rotationMatrix = new feng3d.Matrix4x4();
+            _this._rotationMatrixInvalid = false;
             _this._localToWorldMatrix = new feng3d.Matrix4x4();
             _this._localToWorldMatrixInvalid = false;
             _this._ITlocalToWorldMatrix = new feng3d.Matrix4x4();
@@ -23461,7 +23622,7 @@ var feng3d;
              * 本地四元素旋转
              */
             get: function () {
-                this._orientation.fromMatrix(this.matrix3d);
+                this._orientation.fromMatrix(this.matrix);
                 return this._orientation;
             },
             set: function (value) {
@@ -23481,17 +23642,17 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Transform.prototype, "matrix3d", {
+        Object.defineProperty(Transform.prototype, "matrix", {
             /**
              * 本地变换矩阵
              */
             get: function () {
-                return this._updateMatrix3D();
+                return this._updateMatrix();
             },
             set: function (v) {
                 v.decompose(this._position, this._rotation, this._scale);
-                this._matrix3d.copyRawDataFrom(v.rawData);
-                this._matrix3dInvalid = false;
+                this._matrix.copyRawDataFrom(v.rawData);
+                this._matrixInvalid = false;
             },
             enumerable: true,
             configurable: true
@@ -23501,11 +23662,11 @@ var feng3d;
              * 本地旋转矩阵
              */
             get: function () {
-                if (this._rotationMatrix3dInvalid) {
-                    this._rotationMatrix3d.setRotation(this._rotation);
-                    this._rotationMatrix3dInvalid = false;
+                if (this._rotationMatrixInvalid) {
+                    this._rotationMatrix.setRotation(this._rotation);
+                    this._rotationMatrixInvalid = false;
                 }
-                return this._rotationMatrix3d;
+                return this._rotationMatrix;
             },
             enumerable: true,
             configurable: true
@@ -23514,7 +23675,7 @@ var feng3d;
             /**
              * 向前向量
              */
-            get: function () { return this.matrix3d.forward; },
+            get: function () { return this.matrix.forward; },
             enumerable: true,
             configurable: true
         });
@@ -23522,7 +23683,7 @@ var feng3d;
             /**
              * 向右向量
              */
-            get: function () { return this.matrix3d.right; },
+            get: function () { return this.matrix.right; },
             enumerable: true,
             configurable: true
         });
@@ -23530,7 +23691,7 @@ var feng3d;
             /**
              * 向上向量
              */
-            get: function () { return this.matrix3d.up; },
+            get: function () { return this.matrix.up; },
             enumerable: true,
             configurable: true
         });
@@ -23539,8 +23700,8 @@ var feng3d;
              * 向后向量
              */
             get: function () {
-                this.matrix3d.back;
-                var director = this.matrix3d.forward;
+                this.matrix.back;
+                var director = this.matrix.forward;
                 director.negate();
                 return director;
             },
@@ -23549,7 +23710,7 @@ var feng3d;
         });
         Object.defineProperty(Transform.prototype, "leftVector", {
             get: function () {
-                var director = this.matrix3d.left;
+                var director = this.matrix.left;
                 director.negate();
                 return director;
             },
@@ -23558,7 +23719,7 @@ var feng3d;
         });
         Object.defineProperty(Transform.prototype, "downVector", {
             get: function () {
-                var director = this.matrix3d.up;
+                var director = this.matrix.up;
                 director.negate();
                 return director;
             },
@@ -23593,9 +23754,9 @@ var feng3d;
         Transform.prototype.translateLocal = function (axis, distance) {
             var x = axis.x, y = axis.y, z = axis.z;
             var len = distance / Math.sqrt(x * x + y * y + z * z);
-            var matrix3d = this.matrix3d.clone();
-            matrix3d.prependTranslation(x * len, y * len, z * len);
-            var p = matrix3d.getPosition();
+            var matrix = this.matrix.clone();
+            matrix.prependTranslation(x * len, y * len, z * len);
+            var p = matrix.getPosition();
             this.x = p.x;
             this.y = p.y;
             this.z = p.z;
@@ -23622,13 +23783,13 @@ var feng3d;
          */
         Transform.prototype.rotate = function (axis, angle, pivotPoint) {
             //转换位移
-            var positionMatrix3d = feng3d.Matrix4x4.fromPosition(this.position.x, this.position.y, this.position.z);
-            positionMatrix3d.appendRotation(axis, angle, pivotPoint);
-            this.position = positionMatrix3d.getPosition();
+            var positionMatrix = feng3d.Matrix4x4.fromPosition(this.position.x, this.position.y, this.position.z);
+            positionMatrix.appendRotation(axis, angle, pivotPoint);
+            this.position = positionMatrix.getPosition();
             //转换旋转
-            var rotationMatrix3d = feng3d.Matrix4x4.fromRotation(this.rx, this.ry, this.rz);
-            rotationMatrix3d.appendRotation(axis, angle, pivotPoint);
-            var newrotation = rotationMatrix3d.decompose()[1];
+            var rotationMatrix = feng3d.Matrix4x4.fromRotation(this.rx, this.ry, this.rz);
+            rotationMatrix.appendRotation(axis, angle, pivotPoint);
+            var newrotation = rotationMatrix.decompose()[1];
             var v = Math.round((newrotation.x - this.rx) / 180);
             if (v % 2 != 0) {
                 newrotation.x += 180;
@@ -23653,10 +23814,10 @@ var feng3d;
          * @param upAxis    向上朝向
          */
         Transform.prototype.lookAt = function (target, upAxis) {
-            this._updateMatrix3D();
-            this._matrix3d.lookAt(target, upAxis);
-            this._matrix3d.decompose(this._position, this._rotation, this._scale);
-            this._matrix3dInvalid = false;
+            this._updateMatrix();
+            this._matrix.lookAt(target, upAxis);
+            this._matrix.decompose(this._position, this._rotation, this._scale);
+            this._matrixInvalid = false;
         };
         Object.defineProperty(Transform.prototype, "localToWorldMatrix", {
             /**
@@ -23668,7 +23829,7 @@ var feng3d;
             set: function (value) {
                 value = value.clone();
                 this.parent && value.append(this.parent.worldToLocalMatrix);
-                this.matrix3d = value;
+                this.matrix = value;
             },
             enumerable: true,
             configurable: true
@@ -23711,62 +23872,131 @@ var feng3d;
         });
         /**
          * 将方向从局部空间转换到世界空间。
+         *
+         * @param direction 局部空间方向
          */
         Transform.prototype.transformDirection = function (direction) {
+            direction = this.localToWolrdDirection(direction);
+            return direction;
+        };
+        /**
+         * 将方向从局部空间转换到世界空间。
+         *
+         * @param direction 局部空间方向
+         */
+        Transform.prototype.localToWolrdDirection = function (direction) {
             if (!this.parent)
                 return direction.clone();
-            var matrix3d = this.parent.localToWorldRotationMatrix;
-            direction = matrix3d.transformVector(direction);
+            var matrix = this.parent.localToWorldRotationMatrix;
+            direction = matrix.transformVector(direction);
             return direction;
         };
         /**
          * 将位置从局部空间转换为世界空间。
+         *
+         * @param position 局部空间位置
          */
         Transform.prototype.transformPoint = function (position) {
+            position = this.localToWorldPoint(position);
+            return position;
+        };
+        /**
+         * 将位置从局部空间转换为世界空间。
+         *
+         * @param position 局部空间位置
+         */
+        Transform.prototype.localToWorldPoint = function (position) {
             if (!this.parent)
                 return position.clone();
-            var matrix3d = this.parent.localToWorldMatrix;
-            position = matrix3d.transformVector(position);
+            var matrix = this.parent.localToWorldMatrix;
+            position = matrix.transformVector(position);
             return position;
         };
         /**
          * 将向量从局部空间变换到世界空间。
+         *
+         * @param vector 局部空间向量
          */
         Transform.prototype.transformVector = function (vector) {
+            vector = this.localToWorldVector(vector);
+            return vector;
+        };
+        /**
+         * 将向量从局部空间变换到世界空间。
+         *
+         * @param vector 局部空间位置
+         */
+        Transform.prototype.localToWorldVector = function (vector) {
             if (!this.parent)
                 return vector.clone();
-            var matrix3d = this.parent.localToWorldMatrix;
-            vector = matrix3d.deltaTransformVector(vector);
+            var matrix = this.parent.localToWorldMatrix;
+            vector = matrix.deltaTransformVector(vector);
             return vector;
+        };
+        /**
+         * Transforms a direction from world space to local space. The opposite of Transform.TransformDirection.
+         *
+         * 将一个方向从世界空间转换到局部空间。
+         */
+        Transform.prototype.inverseTransformDirection = function (direction) {
+            direction = this.worldToLocalDirection(direction);
+            return direction;
         };
         /**
          * 将一个方向从世界空间转换到局部空间。
          */
-        Transform.prototype.inverseTransformDirection = function (direction) {
+        Transform.prototype.worldToLocalDirection = function (direction) {
             if (!this.parent)
                 return direction.clone();
-            var matrix3d = this.parent.localToWorldRotationMatrix.clone().invert();
-            direction = matrix3d.transformVector(direction);
+            var matrix = this.parent.localToWorldRotationMatrix.clone().invert();
+            direction = matrix.transformVector(direction);
             return direction;
         };
         /**
+         * Transforms position from world space to local space.
+         *
          * 将位置从世界空间转换为局部空间。
+         *
+         * @param position 世界坐标系中位置
          */
         Transform.prototype.inverseTransformPoint = function (position) {
+            var position = this.worldToLocalPoint(position);
+            return position;
+        };
+        /**
+         * 将位置从世界空间转换为局部空间。
+         *
+         * @param position 世界坐标系中位置
+         */
+        Transform.prototype.worldToLocalPoint = function (position) {
             if (!this.parent)
                 return position.clone();
-            var matrix3d = this.parent.localToWorldMatrix.clone().invert();
-            position = matrix3d.transformVector(position);
+            var matrix = this.parent.localToWorldMatrix.clone().invert();
+            position = matrix.transformVector(position);
             return position;
         };
         /**
          * 将向量从世界空间转换为局部空间
+         *
+         * @param vector 世界坐标系中向量
          */
         Transform.prototype.inverseTransformVector = function (vector) {
             if (!this.parent)
                 return vector.clone();
-            var matrix3d = this.parent.localToWorldMatrix.clone().invert();
-            vector = matrix3d.deltaTransformVector(vector);
+            var matrix = this.parent.localToWorldMatrix.clone().invert();
+            vector = matrix.deltaTransformVector(vector);
+            return vector;
+        };
+        /**
+         * 将位置从世界空间转换为局部空间。
+         *
+         * @param vector 世界坐标系中向量
+         */
+        Transform.prototype.worldToLocalVector = function (vector) {
+            if (!this.parent)
+                return vector.clone();
+            var matrix = this.parent.localToWorldMatrix.clone().invert();
+            vector = matrix.deltaTransformVector(vector);
             return vector;
         };
         Transform.prototype.beforeRender = function (gl, renderAtomic, scene, camera) {
@@ -23779,7 +24009,7 @@ var feng3d;
         Transform.prototype._rotationChanged = function (object, property, oldvalue) {
             if (!Math.equals(object[property], oldvalue)) {
                 this._invalidateTransform();
-                this._rotationMatrix3dInvalid = true;
+                this._rotationMatrixInvalid = true;
             }
         };
         Transform.prototype._scaleChanged = function (object, property, oldvalue) {
@@ -23787,8 +24017,8 @@ var feng3d;
                 this._invalidateTransform();
         };
         Transform.prototype._invalidateTransform = function () {
-            if (!this._matrix3dInvalid)
-                this._matrix3dInvalid = true;
+            if (!this._matrixInvalid)
+                this._matrixInvalid = true;
             this.dispatch("transformChanged", this);
             this._invalidateSceneTransform();
         };
@@ -23807,20 +24037,20 @@ var feng3d;
                 }
             }
         };
-        Transform.prototype._updateMatrix3D = function () {
-            if (this._matrix3dInvalid) {
-                this._matrix3d.recompose(this._position, this._rotation, this._scale);
-                this._matrix3dInvalid = false;
+        Transform.prototype._updateMatrix = function () {
+            if (this._matrixInvalid) {
+                this._matrix.recompose(this._position, this._rotation, this._scale);
+                this._matrixInvalid = false;
             }
-            return this._matrix3d;
+            return this._matrix;
         };
         Transform.prototype._updateLocalToWorldMatrix = function () {
             if (this._localToWorldMatrixInvalid) {
-                this._localToWorldMatrix.copyFrom(this.matrix3d);
+                this._localToWorldMatrix.copyFrom(this.matrix);
                 if (this.parent)
                     this._localToWorldMatrix.append(this.parent.localToWorldMatrix);
                 this._localToWorldMatrixInvalid = false;
-                this.dispatch("updateLocalToWorldMatrix");
+                this.dispatch("updateLocalToWorldMatrix", this);
                 console.assert(!isNaN(this._localToWorldMatrix.rawData[0]));
             }
             return this._localToWorldMatrix;
@@ -23880,7 +24110,7 @@ var feng3d;
             feng3d.oav({ tooltip: "本地位移" })
         ], Transform.prototype, "position", null);
         __decorate([
-            feng3d.oav({ tooltip: "本地旋转", component: "OAVVector3", componentParam: { step: 0.001, stepScale: 30, stepDownup: 1 } })
+            feng3d.oav({ tooltip: "本地旋转", component: "OAVVector3", componentParam: { step: 0.001, stepScale: 30, stepDownup: 30 } })
         ], Transform.prototype, "rotation", null);
         __decorate([
             feng3d.oav({ tooltip: "本地缩放" })
@@ -23905,7 +24135,6 @@ var feng3d;
         function GameObject() {
             var _this = _super.call(this) || this;
             _this.assetType = feng3d.AssetType.gameobject;
-            _this.renderAtomic = new feng3d.RenderAtomic();
             /**
              * 是否显示
              */
@@ -24350,7 +24579,7 @@ var feng3d;
              * 世界包围盒
              */
             get: function () {
-                var model = this.getComponent(feng3d.Model);
+                var model = this.getComponent(feng3d.Renderable);
                 var box = model ? model.selfWorldBounds : new feng3d.Box3(this.transform.worldPosition, this.transform.worldPosition);
                 this.children.forEach(function (element) {
                     var ebox = element.worldBounds;
@@ -24393,7 +24622,7 @@ var feng3d;
              * 是否加载完成
              */
             get: function () {
-                var model = this.getComponent(feng3d.Model);
+                var model = this.getComponent(feng3d.Renderable);
                 if (model)
                     return model.isLoaded;
                 return true;
@@ -24410,7 +24639,7 @@ var feng3d;
                 callback();
                 return;
             }
-            var model = this.getComponent(feng3d.Model);
+            var model = this.getComponent(feng3d.Renderable);
             if (model) {
                 model.onLoadCompleted(callback);
             }
@@ -24461,21 +24690,6 @@ var feng3d;
             }
             if (loadingNum == 0)
                 callback();
-        };
-        /**
-         * 渲染前执行函数
-         *
-         * 可用于渲染前收集渲染数据，或者更新显示效果等
-         *
-         * @param gl
-         * @param renderAtomic
-         * @param scene
-         * @param camera
-         */
-        GameObject.prototype.beforeRender = function (gl, renderAtomic, scene, camera) {
-            this._components.forEach(function (element) {
-                element.beforeRender(gl, renderAtomic, scene, camera);
-            });
         };
         //------------------------------------------
         // Static Functions
@@ -24560,15 +24774,6 @@ var feng3d;
             this.dispatch("addComponent", component, true);
         };
         /**
-         * 创建游戏对象
-         *
-         * @param param 游戏对象参数
-         */
-        GameObject.create = function (param) {
-            var g = feng3d.serialization.setValue(new GameObject(), param);
-            return g;
-        };
-        /**
          * 创建指定类型的游戏对象。
          *
          * @param type 游戏对象类型。
@@ -24576,57 +24781,25 @@ var feng3d;
          */
         GameObject.createPrimitive = function (type, param) {
             var g = new GameObject();
-            if (type == "Cube") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.getDefault("Cube") },] });
-            }
-            else if (type == "Plane") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.getDefault("Plane") },] });
-            }
-            else if (type == "Quad") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.getDefault("Quad") },] });
-            }
-            else if (type == "Cylinder") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.getDefault("Cylinder") },] });
-            }
-            else if (type == "Cone") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.getDefault("Cone") },] });
-            }
-            else if (type == "Torus") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.getDefault("Torus") },] });
-            }
-            else if (type == "Sphere") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.getDefault("Sphere") },] });
-            }
-            else if (type == "Capsule") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.MeshModel", geometry: feng3d.Geometry.getDefault("Capsule") },] });
-            }
-            else if (type == "Segment") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.MeshModel", geometry: new feng3d.SegmentGeometry(), material: feng3d.Material.getDefault("Segment-Material") },] });
-            }
-            else if (type == "Terrain") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.Terrain" },] });
-            }
-            else if (type == "Camera") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.Camera" },] });
-            }
-            else if (type == "Point light") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.PointLight" },] });
-            }
-            else if (type == "Directional light") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.DirectionalLight" },] });
-            }
-            else if (type == "Spot light") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.SpotLight" },] });
-            }
-            else if (type == "Water") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.Water" },] });
-            }
-            else if (type == "Particle System") {
-                feng3d.serialization.setValue(g, { name: type, components: [{ __class__: "feng3d.Transform", rx: -90 }, { __class__: "feng3d.ParticleSystem" },], });
-            }
+            g.name = type;
+            var createHandler = this._registerPrimitives[type];
+            if (createHandler != null)
+                createHandler(g);
             feng3d.serialization.setValue(g, param);
             return g;
         };
+        /**
+         * 注册原始游戏对象，被注册后可以使用 GameObject.createPrimitive 进行创建。
+         *
+         * @param type 原始游戏对象类型。
+         * @param handler 构建原始游戏对象的函数。
+         */
+        GameObject.registerPrimitive = function (type, handler) {
+            if (this._registerPrimitives[type])
+                console.warn("\u91CD\u590D\u6CE8\u518C\u539F\u59CB\u6E38\u620F\u5BF9\u8C61 " + type + " \uFF01");
+            this._registerPrimitives[type] = handler;
+        };
+        GameObject._registerPrimitives = {};
         __decorate([
             feng3d.serialize
         ], GameObject.prototype, "prefabId", void 0);
@@ -24670,8 +24843,9 @@ var feng3d;
          * @param scene     3D场景
          * @param camera    摄像机
          */
-        function View(canvas, scene, camera) {
+        function View(canvas, scene, camera, contextAttributes) {
             var _this = _super.call(this) || this;
+            _this._contextAttributes = {};
             _this.contextLost = false;
             if (!canvas) {
                 canvas = document.createElement("canvas");
@@ -24685,17 +24859,20 @@ var feng3d;
             }
             console.assert(canvas instanceof HTMLCanvasElement, "canvas\u53C2\u6570\u5FC5\u987B\u4E3A HTMLCanvasElement \u7C7B\u578B\uFF01");
             _this.canvas = canvas;
+            if (contextAttributes) {
+                Object.assign(_this._contextAttributes, contextAttributes);
+            }
             canvas.addEventListener("webglcontextlost", function (event) {
                 event.preventDefault();
                 _this.contextLost = true;
                 // #ifdef DEBUG
-                console.log('pc.GraphicsDevice: WebGL context lost.');
+                console.log('GraphicsDevice: WebGL context lost.');
                 // #endif
             }, false);
             canvas.addEventListener("webglcontextrestored", function () {
                 _this.contextLost = false;
                 // #ifdef DEBUG
-                console.log('pc.GraphicsDevice: WebGL context restored.');
+                console.log('GraphicsDevice: WebGL context restored.');
                 // #endif
             }, false);
             _this.scene = scene || feng3d.serialization.setValue(new feng3d.GameObject(), { name: "scene" }).addComponent(feng3d.Scene);
@@ -24740,7 +24917,7 @@ var feng3d;
         Object.defineProperty(View.prototype, "gl", {
             get: function () {
                 if (!this.canvas.gl)
-                    this.canvas.gl = feng3d.GL.getGL(this.canvas);
+                    this.canvas.gl = feng3d.GL.getGL(this.canvas, this._contextAttributes);
                 return this.canvas.gl;
             },
             enumerable: true,
@@ -24890,7 +25067,7 @@ var feng3d;
             var gs = this.scene.getComponentsInChildren(feng3d.Transform).filter(function (t) {
                 if (t == _this.scene.transform)
                     return false;
-                var m = t.getComponent(feng3d.Model);
+                var m = t.getComponent(feng3d.Renderable);
                 if (m) {
                     var include = m.selfWorldBounds.toPoints().every(function (pos) {
                         var p = _this.project(pos);
@@ -24984,6 +25161,9 @@ var feng3d;
             feng3d.oav(),
             feng3d.watch("_onCameraChanged")
         ], HoldSizeComponent.prototype, "camera", void 0);
+        HoldSizeComponent = __decorate([
+            feng3d.AddComponentMenu("Layout/HoldSizeComponent")
+        ], HoldSizeComponent);
         return HoldSizeComponent;
     }(feng3d.Component));
     feng3d.HoldSizeComponent = HoldSizeComponent;
@@ -25029,6 +25209,9 @@ var feng3d;
             feng3d.oav(),
             feng3d.watch("_onCameraChanged")
         ], BillboardComponent.prototype, "camera", void 0);
+        BillboardComponent = __decorate([
+            feng3d.AddComponentMenu("Layout/BillboardComponent")
+        ], BillboardComponent);
         return BillboardComponent;
     }(feng3d.Component));
     feng3d.BillboardComponent = BillboardComponent;
@@ -25123,6 +25306,9 @@ var feng3d;
             feng3d.oav(),
             feng3d.serialize
         ], CartoonComponent.prototype, "cartoon_Anti_aliasing", null);
+        CartoonComponent = __decorate([
+            feng3d.AddComponentMenu("Rendering/CartoonComponent")
+        ], CartoonComponent);
         return CartoonComponent;
     }(feng3d.Component));
     feng3d.CartoonComponent = CartoonComponent;
@@ -25155,16 +25341,23 @@ var feng3d;
             feng3d.oav(),
             feng3d.serialize
         ], OutLineComponent.prototype, "outlineMorphFactor", void 0);
+        OutLineComponent = __decorate([
+            feng3d.AddComponentMenu("Rendering/OutLineComponent")
+        ], OutLineComponent);
         return OutLineComponent;
     }(feng3d.Component));
     feng3d.OutLineComponent = OutLineComponent;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
-    var Model = /** @class */ (function (_super) {
-        __extends(Model, _super);
-        function Model() {
+    /**
+     * 可渲染组件
+     */
+    var Renderable = /** @class */ (function (_super) {
+        __extends(Renderable, _super);
+        function Renderable() {
             var _this = _super.call(this) || this;
+            _this.renderAtomic = new feng3d.RenderAtomic();
             /**
              * 几何体
              */
@@ -25178,12 +25371,12 @@ var feng3d;
             _this._lightPicker = new feng3d.LightPicker(_this);
             return _this;
         }
-        Object.defineProperty(Model.prototype, "single", {
+        Object.defineProperty(Renderable.prototype, "single", {
             get: function () { return true; },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Model.prototype, "selfLocalBounds", {
+        Object.defineProperty(Renderable.prototype, "selfLocalBounds", {
             /**
              * 自身局部包围盒
              */
@@ -25195,7 +25388,7 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Model.prototype, "selfWorldBounds", {
+        Object.defineProperty(Renderable.prototype, "selfWorldBounds", {
             /**
              * 自身世界包围盒
              */
@@ -25207,22 +25400,37 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Model.prototype.init = function () {
+        Renderable.prototype.init = function () {
             _super.prototype.init.call(this);
             this.on("scenetransformChanged", this._onScenetransformChanged, this);
         };
-        Model.prototype.beforeRender = function (gl, renderAtomic, scene, camera) {
+        /**
+         * 渲染前执行函数
+         *
+         * 可用于渲染前收集渲染数据，或者更新显示效果等
+         *
+         * @param gl
+         * @param renderAtomic
+         * @param scene
+         * @param camera
+         */
+        Renderable.prototype.beforeRender = function (gl, renderAtomic, scene, camera) {
+            var _this = this;
             //
             this.geometry.beforeRender(renderAtomic);
             this.material.beforeRender(renderAtomic);
             this._lightPicker.beforeRender(renderAtomic);
+            this.gameObject.components.forEach(function (element) {
+                if (element != _this)
+                    element.beforeRender(gl, renderAtomic, scene, camera);
+            });
         };
         /**
           * 判断射线是否穿过对象
           * @param ray3D
           * @return
           */
-        Model.prototype.isIntersectingRay = function (ray3D) {
+        Renderable.prototype.isIntersectingRay = function (ray3D) {
             var localNormal = new feng3d.Vector3();
             //转换到当前实体坐标系空间
             var localRay = new feng3d.Ray3();
@@ -25245,7 +25453,7 @@ var feng3d;
             };
             return pickingCollisionVO;
         };
-        Object.defineProperty(Model.prototype, "isLoaded", {
+        Object.defineProperty(Renderable.prototype, "isLoaded", {
             /**
              * 是否加载完成
              */
@@ -25259,7 +25467,7 @@ var feng3d;
          * 已加载完成或者加载完成时立即调用
          * @param callback 完成回调
          */
-        Model.prototype.onLoadCompleted = function (callback) {
+        Renderable.prototype.onLoadCompleted = function (callback) {
             if (this.isLoaded)
                 callback();
             this.material.onLoadCompleted(callback);
@@ -25267,12 +25475,12 @@ var feng3d;
         /**
          * 销毁
          */
-        Model.prototype.dispose = function () {
+        Renderable.prototype.dispose = function () {
             this.geometry = null;
             this.material = null;
             _super.prototype.dispose.call(this);
         };
-        Model.prototype._onGeometryChanged = function (property, oldValue, value) {
+        Renderable.prototype._onGeometryChanged = function (property, oldValue, value) {
             if (oldValue) {
                 oldValue.off("boundsInvalid", this._onBoundsInvalid, this);
             }
@@ -25282,60 +25490,63 @@ var feng3d;
             this.geometry = this.geometry || feng3d.Geometry.getDefault("Cube");
             this._onBoundsInvalid();
         };
-        Model.prototype._onMaterialChanged = function () {
+        Renderable.prototype._onMaterialChanged = function () {
             this.material = this.material || feng3d.Material.getDefault("Default-Material");
         };
-        Model.prototype._onScenetransformChanged = function () {
+        Renderable.prototype._onScenetransformChanged = function () {
             this._selfWorldBounds = null;
         };
         /**
          * 更新世界边界
          */
-        Model.prototype._updateWorldBounds = function () {
-            this._selfWorldBounds = this.selfLocalBounds.applyMatrix3DTo(this.transform.localToWorldMatrix);
+        Renderable.prototype._updateWorldBounds = function () {
+            this._selfWorldBounds = this.selfLocalBounds.applyMatrixTo(this.transform.localToWorldMatrix);
         };
         /**
          * 处理包围盒变换事件
          */
-        Model.prototype._onBoundsInvalid = function () {
+        Renderable.prototype._onBoundsInvalid = function () {
             this._selfLocalBounds = null;
             this._selfWorldBounds = null;
         };
-        Model.prototype._updateBounds = function () {
+        Renderable.prototype._updateBounds = function () {
             this._selfLocalBounds = this.geometry.bounding;
         };
         __decorate([
             feng3d.oav({ component: "OAVPick", tooltip: "几何体，提供模型以形状", componentParam: { accepttype: "geometry", datatype: "geometry" } }),
             feng3d.serialize,
             feng3d.watch("_onGeometryChanged")
-        ], Model.prototype, "geometry", void 0);
+        ], Renderable.prototype, "geometry", void 0);
         __decorate([
             feng3d.oav({ component: "OAVPick", tooltip: "材质，提供模型以皮肤", componentParam: { accepttype: "material", datatype: "material" } }),
             feng3d.serialize,
             feng3d.watch("_onMaterialChanged")
-        ], Model.prototype, "material", void 0);
+        ], Renderable.prototype, "material", void 0);
         __decorate([
             feng3d.oav({ tooltip: "是否投射阴影" }),
             feng3d.serialize
-        ], Model.prototype, "castShadows", void 0);
+        ], Renderable.prototype, "castShadows", void 0);
         __decorate([
             feng3d.oav({ tooltip: "是否接受阴影" }),
             feng3d.serialize
-        ], Model.prototype, "receiveShadows", void 0);
-        return Model;
+        ], Renderable.prototype, "receiveShadows", void 0);
+        return Renderable;
     }(feng3d.Behaviour));
-    feng3d.Model = Model;
+    feng3d.Renderable = Renderable;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
-    var MeshModel = /** @class */ (function (_super) {
-        __extends(MeshModel, _super);
-        function MeshModel() {
+    /**
+     * 网格渲染器
+     */
+    var MeshRenderer = /** @class */ (function (_super) {
+        __extends(MeshRenderer, _super);
+        function MeshRenderer() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        return MeshModel;
-    }(feng3d.Model));
-    feng3d.MeshModel = MeshModel;
+        return MeshRenderer;
+    }(feng3d.Renderable));
+    feng3d.MeshRenderer = MeshRenderer;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -25424,6 +25635,9 @@ var feng3d;
         __decorate([
             feng3d.serialize
         ], ScriptComponent.prototype, "scriptInstance", null);
+        ScriptComponent = __decorate([
+            feng3d.AddComponentMenu("Script/Script")
+        ], ScriptComponent);
         return ScriptComponent;
     }(feng3d.Behaviour));
     feng3d.ScriptComponent = ScriptComponent;
@@ -25542,7 +25756,7 @@ var feng3d;
              * 所有 Model
              */
             get: function () {
-                return this._models = this._models || this.getComponentsInChildren(feng3d.Model);
+                return this._models = this._models || this.getComponentsInChildren(feng3d.Renderable);
             },
             enumerable: true,
             configurable: true
@@ -25655,7 +25869,7 @@ var feng3d;
                 while (i < checkList.length) {
                     var checkObject = checkList[i++];
                     if (checkObject.mouseEnabled) {
-                        if (checkObject.getComponents(feng3d.Model)) {
+                        if (checkObject.getComponents(feng3d.Renderable)) {
                             this._mouseCheckObjects.push(checkObject);
                         }
                         checkList = checkList.concat(checkObject.getChildren());
@@ -25688,7 +25902,7 @@ var feng3d;
                 var item = openlist.shift();
                 if (!item.visible)
                     continue;
-                var model = item.getComponent(feng3d.Model);
+                var model = item.getComponent(feng3d.Renderable);
                 if (model && (model.castShadows || model.receiveShadows)
                     && !model.material.renderParams.enableBlend
                     && model.material.renderParams.renderMode == feng3d.RenderMode.TRIANGLES) {
@@ -25707,7 +25921,7 @@ var feng3d;
         Scene.prototype.getModelsByCamera = function (camera) {
             var frustum = new feng3d.Frustum().fromMatrix(camera.viewProjection);
             var results = this.visibleAndEnabledModels.filter(function (i) {
-                var model = i.getComponent(feng3d.Model);
+                var model = i.getComponent(feng3d.Renderable);
                 if (model.selfWorldBounds) {
                     if (frustum.intersectsBox(model.selfWorldBounds))
                         return true;
@@ -25760,7 +25974,7 @@ var feng3d;
                     var gameObject = gameObjects.pop();
                     if (!gameObject.visible)
                         continue;
-                    var model = gameObject.getComponent(feng3d.Model);
+                    var model = gameObject.getComponent(feng3d.Renderable);
                     if (model && model.enabled) {
                         if (model.selfWorldBounds) {
                             if (frustum.intersectsBox(model.selfWorldBounds))
@@ -25848,9 +26062,14 @@ var feng3d;
              */
             _this._attributes = {
                 a_position: new feng3d.Attribute("a_position", [], 3),
+                a_color: new feng3d.Attribute("a_color", [], 4),
                 a_uv: new feng3d.Attribute("a_uv", [], 2),
                 a_normal: new feng3d.Attribute("a_normal", [], 3),
                 a_tangent: new feng3d.Attribute("a_tangent", [], 3),
+                a_skinIndices: new feng3d.Attribute("a_skinIndices", [], 4),
+                a_skinWeights: new feng3d.Attribute("a_skinWeights", [], 4),
+                a_skinIndices1: new feng3d.Attribute("a_skinIndices1", [], 4),
+                a_skinWeights1: new feng3d.Attribute("a_skinWeights1", [], 4),
             };
             _this._geometryInvalid = true;
             _this._useFaceWeights = false;
@@ -25902,6 +26121,19 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Geometry.prototype, "colors", {
+            /**
+             * 颜色数据
+             */
+            get: function () {
+                return this._attributes.a_color.data;
+            },
+            set: function (value) {
+                this._attributes.a_color.data = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Geometry.prototype, "uvs", {
             /**
              * uv数据
@@ -25941,6 +26173,58 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Geometry.prototype, "skinIndices", {
+            /**
+             * 蒙皮索引，顶点关联的关节索引
+             */
+            get: function () {
+                return this._attributes.a_skinIndices.data;
+            },
+            set: function (value) {
+                this._attributes.a_skinIndices.data = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Geometry.prototype, "skinWeights", {
+            /**
+             * 蒙皮权重，顶点关联的关节权重
+             */
+            get: function () {
+                return this._attributes.a_skinWeights.data;
+            },
+            set: function (value) {
+                this._attributes.a_skinWeights.data = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Geometry.prototype, "skinIndices1", {
+            /**
+             * 蒙皮索引，顶点关联的关节索引
+             */
+            get: function () {
+                return this._attributes.a_skinIndices1.data;
+            },
+            set: function (value) {
+                this._attributes.a_skinIndices1.data = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Geometry.prototype, "skinWeights1", {
+            /**
+             * 蒙皮权重，顶点关联的关节权重
+             */
+            get: function () {
+                return this._attributes.a_skinWeights1.data;
+            },
+            set: function (value) {
+                this._attributes.a_skinWeights1.data = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 标记需要更新几何体，在更改几何体数据后需要调用该函数。
          */
@@ -25961,33 +26245,6 @@ var feng3d;
          * 构建几何体
          */
         Geometry.prototype.buildGeometry = function () {
-        };
-        /**
-         * 设置顶点属性数据
-         * @param vaId                  顶点属性编号
-         * @param data                  顶点属性数据
-         * @param size                  顶点数据尺寸
-         * @param autogenerate          是否自动生成数据
-         */
-        Geometry.prototype.setVAData = function (vaId, data, size) {
-            var key = vaId;
-            if (data) {
-                this._attributes[key] = this._attributes[key] || new feng3d.Attribute(vaId, data, size);
-                this._attributes[key].data = data;
-            }
-            else {
-                delete this._attributes[key];
-            }
-        };
-        /**
-         * 获取顶点属性数据
-         * @param vaId 数据类型编号
-         * @return 顶点属性数据
-         */
-        Geometry.prototype.getVAData1 = function (vaId) {
-            this.updateGrometry();
-            var attribute = this._attributes[vaId];
-            return attribute && attribute.data;
         };
         Object.defineProperty(Geometry.prototype, "numVertex", {
             /**
@@ -26045,11 +26302,10 @@ var feng3d;
             var totalVertex = oldNumVertex + geometry.numVertex;
             //合并属性数据
             for (var attributeName in attributes) {
-                var stride = attributes[attributeName].size;
-                var attributeData = attributes[attributeName].data;
-                var addAttributeData = addAttributes[attributeName].data;
-                var data = attributeData.concat(addAttributeData);
-                this.setVAData(attributeName, data, stride);
+                var attribute = attributes[attributeName];
+                var addAttribute = addAttributes[attributeName];
+                //
+                attribute.data = attribute.data.concat(addAttribute.data);
             }
         };
         /**
@@ -26135,10 +26391,10 @@ var feng3d;
         Geometry.prototype.cloneFrom = function (geometry) {
             geometry.updateGrometry();
             this.indices = geometry.indices.concat();
-            this._attributes = {};
-            for (var key in geometry._attributes) {
-                var attributeRenderData = geometry._attributes[key];
-                this.setVAData(key, attributeRenderData.data, attributeRenderData.size);
+            for (var attributeName in geometry._attributes) {
+                var attribute = this._attributes[attributeName];
+                var addAttribute = geometry._attributes[attributeName];
+                attribute.data = addAttribute.data.concat();
             }
         };
         Geometry.prototype.beforeRender = function (renderAtomic) {
@@ -26151,6 +26407,15 @@ var feng3d;
             }
             renderAtomic.shaderMacro.SCALEU = this.scaleU;
             renderAtomic.shaderMacro.SCALEV = this.scaleV;
+        };
+        /**
+         * 清理数据
+         */
+        Geometry.prototype.clear = function () {
+            for (var key in this._attributes) {
+                var element = this._attributes[key];
+                element.data = [];
+            }
         };
         /**
          * 设置默认几何体
@@ -26205,19 +26470,6 @@ var feng3d;
         function CustomGeometry() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(CustomGeometry.prototype, "indicesBase", {
-            /**
-             * 顶点索引缓冲
-             */
-            get: function () {
-                return this.indices;
-            },
-            set: function (value) {
-                this.indices = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(CustomGeometry.prototype, "attributes", {
             /**
              * 属性数据列表
@@ -26225,18 +26477,15 @@ var feng3d;
             get: function () {
                 return this._attributes;
             },
-            set: function (value) {
-                this._attributes = {};
-                for (var key in value) {
-                    this.setVAData(key, value[key].data, value[key].size);
-                }
+            set: function (v) {
+                this._attributes = v;
             },
             enumerable: true,
             configurable: true
         });
         __decorate([
             feng3d.serialize
-        ], CustomGeometry.prototype, "indicesBase", null);
+        ], CustomGeometry.prototype, "indices", void 0);
         __decorate([
             feng3d.serialize
         ], CustomGeometry.prototype, "attributes", null);
@@ -26830,7 +27079,7 @@ var feng3d;
             this.uvs = uvData;
             this.normals = normalData;
             this.indices = indices;
-            this.setVAData("a_color", colors, 4);
+            this.colors = colors;
         };
         __decorate([
             feng3d.serialize,
@@ -26888,8 +27137,8 @@ var feng3d;
                 positionData.push(start.x, start.y, start.z, end.x, end.y, end.z);
                 colorData.push(startColor.r, startColor.g, startColor.b, startColor.a, endColor.r, endColor.g, endColor.b, endColor.a);
             }
-            this.setVAData("a_position", positionData, 3);
-            this.setVAData("a_color", colorData, 4);
+            this.positions = positionData;
+            this.colors = colorData;
             this.indices = indices;
         };
         __decorate([
@@ -26941,6 +27190,11 @@ var feng3d;
         return Segment;
     }());
     feng3d.Segment = Segment;
+    feng3d.GameObject.registerPrimitive("Segment", function (g) {
+        var model = g.addComponent(feng3d.MeshRenderer);
+        model.geometry = new SegmentGeometry();
+        model.material = feng3d.Material.getDefault("Segment-Material");
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27384,11 +27638,17 @@ var feng3d;
             feng3d.oav({ component: "OAVObjectView" }),
             feng3d.watch("_onLensChanged")
         ], Camera.prototype, "lens", void 0);
+        Camera = __decorate([
+            feng3d.AddComponentMenu("Rendering/Camera")
+        ], Camera);
         return Camera;
     }(feng3d.Component));
     feng3d.Camera = Camera;
     // 投影后可视区域
     var visibleBox = new feng3d.Box3(new feng3d.Vector3(-1, -1, -1), new feng3d.Vector3(1, 1, 1));
+    feng3d.GameObject.registerPrimitive("Camera", function (g) {
+        g.addComponent(Camera);
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27411,6 +27671,9 @@ var feng3d;
     }(feng3d.Geometry));
     feng3d.QuadGeometry = QuadGeometry;
     feng3d.Geometry.setDefault("Quad", new QuadGeometry());
+    feng3d.GameObject.registerPrimitive("Quad", function (g) {
+        g.addComponent(feng3d.MeshRenderer).geometry = feng3d.Geometry.getDefault("Quad");
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27449,13 +27712,13 @@ var feng3d;
          */
         PlaneGeometry.prototype.buildGeometry = function () {
             var vertexPositionData = this.buildPosition();
-            this.setVAData("a_position", vertexPositionData, 3);
+            this.positions = vertexPositionData;
             var vertexNormalData = this.buildNormal();
-            this.setVAData("a_normal", vertexNormalData, 3);
+            this.normals = vertexNormalData;
             var vertexTangentData = this.buildTangent();
-            this.setVAData("a_tangent", vertexTangentData, 3);
+            this.tangents = vertexTangentData;
             var uvData = this.buildUVs();
-            this.setVAData("a_uv", uvData, 2);
+            this.uvs = uvData;
             var indices = this.buildIndices();
             this.indices = indices;
         };
@@ -27627,6 +27890,9 @@ var feng3d;
     }(feng3d.Geometry));
     feng3d.PlaneGeometry = PlaneGeometry;
     feng3d.Geometry.setDefault("Plane", new PlaneGeometry(), { width: 10, height: 10 });
+    feng3d.GameObject.registerPrimitive("Plane", function (g) {
+        g.addComponent(feng3d.MeshRenderer).geometry = feng3d.Geometry.getDefault("Plane");
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -27670,13 +27936,13 @@ var feng3d;
         }
         CubeGeometry.prototype.buildGeometry = function () {
             var vertexPositionData = this.buildPosition();
-            this.setVAData("a_position", vertexPositionData, 3);
+            this.positions = vertexPositionData;
             var vertexNormalData = this.buildNormal();
-            this.setVAData("a_normal", vertexNormalData, 3);
+            this.normals = vertexNormalData;
             var vertexTangentData = this.buildTangent();
-            this.setVAData("a_tangent", vertexTangentData, 3);
+            this.tangents = vertexTangentData;
             var uvData = this.buildUVs();
-            this.setVAData("a_uv", uvData, 2);
+            this.uvs = uvData;
             var indices = this.buildIndices();
             this.indices = indices;
         };
@@ -28051,6 +28317,9 @@ var feng3d;
     }(feng3d.Geometry));
     feng3d.CubeGeometry = CubeGeometry;
     feng3d.Geometry.setDefault("Cube", new CubeGeometry());
+    feng3d.GameObject.registerPrimitive("Cube", function (g) {
+        g.addComponent(feng3d.MeshRenderer).geometry = feng3d.Geometry.getDefault("Cube");
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -28150,11 +28419,11 @@ var feng3d;
                     index += 3;
                 }
             }
-            this.setVAData("a_position", vertexPositionData, 3);
-            this.setVAData("a_normal", vertexNormalData, 3);
-            this.setVAData("a_tangent", vertexTangentData, 3);
+            this.positions = vertexPositionData;
+            this.normals = vertexNormalData;
+            this.tangents = vertexTangentData;
             var uvData = this.buildUVs();
-            this.setVAData("a_uv", uvData, 2);
+            this.uvs = uvData;
             var indices = this.buildIndices();
             this.indices = indices;
         };
@@ -28237,6 +28506,9 @@ var feng3d;
     }(feng3d.Geometry));
     feng3d.SphereGeometry = SphereGeometry;
     feng3d.Geometry.setDefault("Sphere", new SphereGeometry());
+    feng3d.GameObject.registerPrimitive("Sphere", function (g) {
+        g.addComponent(feng3d.MeshRenderer).geometry = feng3d.Geometry.getDefault("Sphere");
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -28341,11 +28613,11 @@ var feng3d;
                     index += 3;
                 }
             }
-            this.setVAData("a_position", vertexPositionData, 3);
-            this.setVAData("a_normal", vertexNormalData, 3);
-            this.setVAData("a_tangent", vertexTangentData, 3);
+            this.positions = vertexPositionData;
+            this.normals = vertexNormalData;
+            this.tangents = vertexTangentData;
             var uvData = this.buildUVs();
-            this.setVAData("a_uv", uvData, 2);
+            this.uvs = uvData;
             this.buildIndices();
         };
         /**
@@ -28432,6 +28704,9 @@ var feng3d;
     }(feng3d.Geometry));
     feng3d.CapsuleGeometry = CapsuleGeometry;
     feng3d.Geometry.setDefault("Capsule", new CapsuleGeometry());
+    feng3d.GameObject.registerPrimitive("Capsule", function (g) {
+        g.addComponent(feng3d.MeshRenderer).geometry = feng3d.Geometry.getDefault("Capsule");
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -28615,9 +28890,9 @@ var feng3d;
                     }
                 }
             }
-            this.setVAData("a_position", vertexPositionData, 3);
-            this.setVAData("a_normal", vertexNormalData, 3);
-            this.setVAData("a_tangent", vertexTangentData, 3);
+            this.positions = vertexPositionData;
+            this.normals = vertexNormalData;
+            this.tangents = vertexTangentData;
             function addVertex(px, py, pz, nx, ny, nz, tx, ty, tz) {
                 vertexPositionData[index] = px;
                 vertexPositionData[index + 1] = py;
@@ -28632,7 +28907,7 @@ var feng3d;
             }
             //
             var uvData = this.buildUVs();
-            this.setVAData("a_uv", uvData, 2);
+            this.uvs = uvData;
             var indices = this.buildIndices();
             this.indices = indices;
         };
@@ -28786,6 +29061,9 @@ var feng3d;
     }(feng3d.Geometry));
     feng3d.CylinderGeometry = CylinderGeometry;
     feng3d.Geometry.setDefault("Cylinder", new CylinderGeometry());
+    feng3d.GameObject.registerPrimitive("Cylinder", function (g) {
+        g.addComponent(feng3d.MeshRenderer).geometry = feng3d.Geometry.getDefault("Cylinder");
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -28817,6 +29095,9 @@ var feng3d;
     }(feng3d.CylinderGeometry));
     feng3d.ConeGeometry = ConeGeometry;
     feng3d.Geometry.setDefault("Cone", new ConeGeometry());
+    feng3d.GameObject.registerPrimitive("Cone", function (g) {
+        g.addComponent(feng3d.MeshRenderer).geometry = feng3d.Geometry.getDefault("Cone");
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -28954,9 +29235,9 @@ var feng3d;
                     }
                 }
             }
-            this.setVAData("a_position", this._vertexPositionData, 3);
-            this.setVAData("a_normal", this._vertexNormalData, 3);
-            this.setVAData("a_tangent", this._vertexTangentData, 3);
+            this.positions = this._vertexPositionData;
+            this.normals = this._vertexNormalData;
+            this.tangents = this._vertexTangentData;
             this.indices = this._rawIndices;
         };
         /**
@@ -28981,7 +29262,7 @@ var feng3d;
                 }
             }
             // build real data from raw data
-            this.setVAData("a_uv", data, 2);
+            this.uvs = data;
         };
         __decorate([
             feng3d.serialize,
@@ -29012,6 +29293,9 @@ var feng3d;
     }(feng3d.Geometry));
     feng3d.TorusGeometry = TorusGeometry;
     feng3d.Geometry.setDefault("Torus", new TorusGeometry());
+    feng3d.GameObject.registerPrimitive("Torus", function (g) {
+        g.addComponent(feng3d.MeshRenderer).geometry = feng3d.Geometry.getDefault("Torus");
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -29200,6 +29484,7 @@ var feng3d;
         return Texture2D;
     }(feng3d.TextureInfo));
     feng3d.Texture2D = Texture2D;
+    feng3d.AssetData.addAssetData("white-Texture", Texture2D.white = feng3d.serialization.setValue(new Texture2D(), { name: "white-Texture", assetId: "white-Texture", noPixels: ImageDatas.white, hideFlags: feng3d.HideFlags.NotEditable }));
     feng3d.AssetData.addAssetData("Default-Texture", Texture2D.default = feng3d.serialization.setValue(new Texture2D(), { name: "Default-Texture", assetId: "Default-Texture", hideFlags: feng3d.HideFlags.NotEditable }));
     feng3d.AssetData.addAssetData("Default-NormalTexture", Texture2D.defaultNormal = feng3d.serialization.setValue(new Texture2D(), { name: "Default-NormalTexture", assetId: "Default-NormalTexture", noPixels: ImageDatas.defaultNormal, hideFlags: feng3d.HideFlags.NotEditable }));
     feng3d.AssetData.addAssetData("Default-ParticleTexture", Texture2D.defaultParticle = feng3d.serialization.setValue(new Texture2D(), { name: "Default-ParticleTexture", assetId: "Default-ParticleTexture", noPixels: ImageDatas.defaultParticle, format: feng3d.TextureFormat.RGBA, hideFlags: feng3d.HideFlags.NotEditable }));
@@ -30007,7 +30292,7 @@ var feng3d;
                 gameObject.mouseEnabled = false;
                 gameObject.addComponent(feng3d.BillboardComponent);
                 //材质
-                var model = gameObject.getComponent(feng3d.Model);
+                var model = gameObject.getComponent(feng3d.Renderable);
                 model.geometry = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { width: this.lightType == feng3d.LightType.Point ? 1 : 0.5, height: 0.5, segmentsW: 1, segmentsH: 1, yUp: false });
                 var textureMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "texture", uniforms: { s_texture: this.frameBufferObject.texture } });
                 //
@@ -30098,9 +30383,15 @@ var feng3d;
                 feng3d.serialization.setValue(this.orthographicLens, { size: radius, near: this.shadowCameraNear, far: this.shadowCameraNear + radius * 2 });
             }
         };
+        DirectionalLight = __decorate([
+            feng3d.AddComponentMenu("Rendering/DirectionalLight")
+        ], DirectionalLight);
         return DirectionalLight;
     }(feng3d.Light));
     feng3d.DirectionalLight = DirectionalLight;
+    feng3d.GameObject.registerPrimitive("Directional light", function (g) {
+        g.addComponent(DirectionalLight);
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -30150,9 +30441,15 @@ var feng3d;
             feng3d.oav(),
             feng3d.serialize
         ], PointLight.prototype, "range", null);
+        PointLight = __decorate([
+            feng3d.AddComponentMenu("Rendering/PointLight")
+        ], PointLight);
         return PointLight;
     }(feng3d.Light));
     feng3d.PointLight = PointLight;
+    feng3d.GameObject.registerPrimitive("Point light", function (g) {
+        g.addComponent(PointLight);
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -30221,6 +30518,9 @@ var feng3d;
         return SpotLight;
     }(feng3d.Light));
     feng3d.SpotLight = SpotLight;
+    feng3d.GameObject.registerPrimitive("Spot light", function (g) {
+        g.addComponent(SpotLight);
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -30741,14 +31041,14 @@ var feng3d;
                 offsetPoint.y *= 0.15;
                 // this.targetObject.transform.rotate(Vector3.X_AXIS, offsetPoint.y, this.targetObject.transform.position);
                 // this.targetObject.transform.rotate(Vector3.Y_AXIS, offsetPoint.x, this.targetObject.transform.position);
-                var matrix3d = this.transform.localToWorldMatrix;
-                matrix3d.appendRotation(matrix3d.right, offsetPoint.y, matrix3d.getPosition());
+                var matrix = this.transform.localToWorldMatrix;
+                matrix.appendRotation(matrix.right, offsetPoint.y, matrix.getPosition());
                 var up = feng3d.Vector3.Y_AXIS.clone();
-                if (matrix3d.up.dot(up) < 0) {
+                if (matrix.up.dot(up) < 0) {
                     up.scaleNumber(-1);
                 }
-                matrix3d.appendRotation(up, offsetPoint.x, matrix3d.getPosition());
-                this.transform.localToWorldMatrix = matrix3d;
+                matrix.appendRotation(up, offsetPoint.x, matrix.getPosition());
+                this.transform.localToWorldMatrix = matrix;
                 //
                 this.preMousePoint = this.mousePoint;
                 this.mousePoint = null;
@@ -30829,6 +31129,9 @@ var feng3d;
         __decorate([
             feng3d.oav()
         ], FPSController.prototype, "acceleration", void 0);
+        FPSController = __decorate([
+            feng3d.AddComponentMenu("Controller/FPSController")
+        ], FPSController);
         return FPSController;
     }(feng3d.Behaviour));
     feng3d.FPSController = FPSController;
@@ -30851,7 +31154,7 @@ var feng3d;
             if (gameObjects.length == 0)
                 return null;
             var pickingCollisionVOs = gameObjects.reduce(function (pv, gameObject) {
-                var model = gameObject.getComponent(feng3d.Model);
+                var model = gameObject.getComponent(feng3d.Renderable);
                 var pickingCollisionVO = model && model.isIntersectingRay(ray3D);
                 if (pickingCollisionVO)
                     pv.push(pickingCollisionVO);
@@ -30893,7 +31196,7 @@ var feng3d;
             if (gameObjects.length == 0)
                 return [];
             var pickingCollisionVOs = gameObjects.reduce(function (pv, gameObject) {
-                var model = gameObject.getComponent(feng3d.Model);
+                var model = gameObject.getComponent(feng3d.Renderable);
                 var pickingCollisionVO = model && model.isIntersectingRay(ray3D);
                 if (pickingCollisionVO)
                     pv.push(pickingCollisionVO);
@@ -30963,15 +31266,21 @@ var feng3d;
             //
             var listener = feng3d.audioCtx.listener;
             // feng3d中为左手坐标系，listener中使用的为右手坐标系，参考https://developer.mozilla.org/en-US/docs/Web/API/AudioListener
-            listener.positionX.value = position.x;
-            listener.positionY.value = position.y;
-            listener.positionZ.value = -position.z;
-            listener.forwardX.value = forward.x;
-            listener.forwardY.value = forward.y;
-            listener.forwardZ.value = -forward.z;
-            listener.upX.value = up.x;
-            listener.upY.value = up.y;
-            listener.upZ.value = -up.z;
+            if (listener.forwardX) {
+                listener.positionX.setValueAtTime(position.x, feng3d.audioCtx.currentTime);
+                listener.positionY.setValueAtTime(position.y, feng3d.audioCtx.currentTime);
+                listener.positionZ.setValueAtTime(-position.z, feng3d.audioCtx.currentTime);
+                listener.forwardX.setValueAtTime(forward.x, feng3d.audioCtx.currentTime);
+                listener.forwardY.setValueAtTime(forward.y, feng3d.audioCtx.currentTime);
+                listener.forwardZ.setValueAtTime(-forward.z, feng3d.audioCtx.currentTime);
+                listener.upX.setValueAtTime(up.x, feng3d.audioCtx.currentTime);
+                listener.upY.setValueAtTime(up.y, feng3d.audioCtx.currentTime);
+                listener.upZ.setValueAtTime(-up.z, feng3d.audioCtx.currentTime);
+            }
+            else {
+                listener.setOrientation(forward.x, forward.y, -forward.z, up.x, up.y, -up.z);
+                listener.setPosition(position.x, position.y, -position.z);
+            }
         };
         AudioListener.prototype._enabledChanged = function () {
             if (!this.gain)
@@ -30994,6 +31303,9 @@ var feng3d;
             feng3d.serialize,
             feng3d.oav({ tooltip: "音量" })
         ], AudioListener.prototype, "volume", null);
+        AudioListener = __decorate([
+            feng3d.AddComponentMenu("Audio/AudioListener")
+        ], AudioListener);
         return AudioListener;
     }(feng3d.Behaviour));
     feng3d.AudioListener = AudioListener;
@@ -31269,15 +31581,16 @@ var feng3d;
             //
             var panner = this.panner;
             // feng3d使用左手坐标系，panner使用右手坐标系，参考https://developer.mozilla.org/en-US/docs/Web/API/PannerNode
-            panner.positionX.value = scenePosition.x;
-            panner.positionY.value = scenePosition.y;
-            panner.positionZ.value = -scenePosition.z;
             if (panner.orientationX) {
+                panner.positionX.value = scenePosition.x;
+                panner.positionY.value = scenePosition.y;
+                panner.positionZ.value = -scenePosition.z;
                 panner.orientationX.value = 1;
                 panner.orientationY.value = 0;
                 panner.orientationZ.value = 0;
             }
             else {
+                panner.setPosition(scenePosition.x, scenePosition.y, -scenePosition.z);
                 panner.setOrientation(1, 0, 0);
             }
         };
@@ -31375,6 +31688,9 @@ var feng3d;
         __decorate([
             feng3d.oav()
         ], AudioSource.prototype, "stop", null);
+        AudioSource = __decorate([
+            feng3d.AddComponentMenu("Audio/AudioSource")
+        ], AudioSource);
         return AudioSource;
     }(feng3d.Behaviour));
     feng3d.AudioSource = AudioSource;
@@ -31478,9 +31794,15 @@ var feng3d;
             // this.material.uniforms.s_mirrorSampler = frameBufferObject.texture;
             uniforms.u_textureMatrix = textureMatrix;
         };
+        Water = __decorate([
+            feng3d.AddComponentMenu("Graphics/Water")
+        ], Water);
         return Water;
-    }(feng3d.Model));
+    }(feng3d.Renderable));
     feng3d.Water = Water;
+    feng3d.GameObject.registerPrimitive("Water", function (g) {
+        g.addComponent(Water);
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -31653,8 +31975,8 @@ var feng3d;
                 }
             }
             var uvs = this.buildUVs();
-            this.setVAData("a_position", vertices, 3);
-            this.setVAData("a_uv", uvs, 2);
+            this.positions = vertices;
+            this.uvs = uvs;
             this.indices = indices;
         };
         /**
@@ -31986,8 +32308,11 @@ var feng3d;
             return _this;
         }
         return Terrain;
-    }(feng3d.Model));
+    }(feng3d.Renderable));
     feng3d.Terrain = Terrain;
+    feng3d.GameObject.registerPrimitive("Terrain", function (g) {
+        g.addComponent(Terrain);
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -32056,18 +32381,24 @@ var feng3d;
         /**
          * 更新状态
          */
-        Particle.prototype.updateState = function (preTime, time) {
-            preTime = Math.max(preTime, this.birthTime);
+        Particle.prototype.updateState = function (time) {
+            var preTime = Math.max(this.curTime, this.birthTime);
             time = Math.max(this.birthTime, time);
-            var pTime = time - preTime;
+            //
+            var deltaTime = time - preTime;
             // 计算速度
-            this.velocity.add(this.acceleration.scaleNumberTo(pTime));
+            this.velocity.add(this.acceleration.scaleNumberTo(deltaTime));
             // 计算位置
-            this.position.x += this.velocity.x * pTime;
-            this.position.y += this.velocity.y * pTime;
-            this.position.z += this.velocity.z * pTime;
+            this.position.x += this.velocity.x * deltaTime;
+            this.position.y += this.velocity.y * deltaTime;
+            this.position.z += this.velocity.z * deltaTime;
             // 计算角度
-            this.rotation.add(this.angularVelocity.scaleNumberTo(pTime));
+            this.rotation.add(this.angularVelocity.scaleNumberTo(deltaTime));
+            // 记录粒子此次移动的起始时间以及起始位置
+            this.prePosition = this.curPosition.clone();
+            this.curPosition = this.position.clone();
+            this.preTime = this.curTime;
+            this.curTime = time;
         };
         return Particle;
     }());
@@ -32114,7 +32445,14 @@ var feng3d;
     }());
     feng3d.ParticlesAdditiveUniforms = ParticlesAdditiveUniforms;
     feng3d.shaderConfig.shaders["Particles_Additive"].cls = ParticlesAdditiveUniforms;
-    feng3d.shaderConfig.shaders["Particles_Additive"].renderParams = { enableBlend: true, sfactor: feng3d.BlendFactor.SRC_ALPHA, dfactor: feng3d.BlendFactor.ONE, depthMask: false, cullFace: feng3d.CullFace.NONE, colorMask: feng3d.ColorMask.RGB };
+    feng3d.shaderConfig.shaders["Particles_Additive"].renderParams = {
+        enableBlend: true,
+        sfactor: feng3d.BlendFactor.SRC_ALPHA,
+        dfactor: feng3d.BlendFactor.ONE,
+        colorMask: feng3d.ColorMask.RGB,
+        cullFace: feng3d.CullFace.NONE,
+        depthMask: false,
+    };
     feng3d.Material.setDefault("Particle-Material", { shaderName: "Particles_Additive" });
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -32156,8 +32494,10 @@ var feng3d;
     feng3d.shaderConfig.shaders["Particles_AlphaBlendedPremultiply"].renderParams = {
         enableBlend: true,
         sfactor: feng3d.BlendFactor.ONE,
-        dfactor: feng3d.BlendFactor.ONE_MINUS_DST_ALPHA,
-        depthMask: false
+        dfactor: feng3d.BlendFactor.ONE_MINUS_SRC_ALPHA,
+        colorMask: feng3d.ColorMask.RGB,
+        cullFace: feng3d.CullFace.NONE,
+        depthMask: false,
     };
 })(feng3d || (feng3d = {}));
 var feng3d;
@@ -32215,15 +32555,30 @@ var feng3d;
                 a_particle_flipUV: new feng3d.Attribute("a_particle_flipUV", [], 2, 1),
             };
             _this._modules = [];
+            _this._rateAtDuration = 0;
             /**
              * 上次移动发射的位置
              */
             _this._preworldPos = new feng3d.Vector3();
+            /**
+             * 是否已经执行位移发射。
+             */
             _this._isRateOverDistance = false;
+            /**
+             * 用于处理移动发射的剩余移动距离。
+             */
             _this._leftRateOverDistance = 0;
-            //
-            _this.worldPos = new feng3d.Vector3();
+            /**
+             * 当前粒子世界坐标
+             */
+            _this._currentWorldPos = new feng3d.Vector3();
+            /**
+             * 此次位移
+             */
             _this.moveVec = new feng3d.Vector3();
+            /**
+             * 当前移动速度
+             */
             _this.speed = new feng3d.Vector3;
             _this.main = new feng3d.ParticleMainModule();
             _this.emission = new feng3d.ParticleEmissionModule();
@@ -32238,6 +32593,8 @@ var feng3d;
             _this.sizeBySpeed = new feng3d.ParticleSizeBySpeedModule();
             _this.rotationOverLifetime = new feng3d.ParticleRotationOverLifetimeModule();
             _this.rotationBySpeed = new feng3d.ParticleRotationBySpeedModule();
+            _this.noise = new feng3d.ParticleNoiseModule();
+            _this.subEmitters = new feng3d.ParticleSubEmittersModule();
             _this.textureSheetAnimation = new feng3d.ParticleTextureSheetAnimationModule();
             _this.main.enabled = true;
             _this.emission.enabled = true;
@@ -32440,6 +32797,32 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(ParticleSystem.prototype, "noise", {
+            /**
+             * 旋转角度随速度变化模块
+             */
+            get: function () { return this._noise; },
+            set: function (v) {
+                Array.replace(this._modules, this._noise, v);
+                v.particleSystem = this;
+                this._noise = v;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ParticleSystem.prototype, "subEmitters", {
+            /**
+             * 旋转角度随速度变化模块
+             */
+            get: function () { return this._subEmitters; },
+            set: function (v) {
+                Array.replace(this._modules, this._subEmitters, v);
+                v.particleSystem = this;
+                this._subEmitters = v;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(ParticleSystem.prototype, "textureSheetAnimation", {
             /**
              * 粒子系统纹理表动画模块。
@@ -32463,12 +32846,16 @@ var feng3d;
                 return;
             this.time = this.time + this.main.simulationSpeed * interval / 1000;
             this._realTime = this.time - this.startDelay;
+            this._rateAtDuration = (this._realTime % this.main.duration) / this.main.duration;
             // 粒子系统位置
-            this.worldPos.copy(this.transform.worldPosition);
+            this._currentWorldPos.copy(this.transform.worldPosition);
             // 粒子系统位移
-            this.moveVec.copy(this.worldPos).sub(this._preworldPos);
+            this.moveVec.copy(this._currentWorldPos).sub(this._preworldPos);
             // 粒子系统速度
             this.speed.copy(this.moveVec).divideNumber(this.main.simulationSpeed * interval / 1000);
+            this._modules.forEach(function (m) {
+                m.update(interval);
+            });
             this._updateActiveParticlesState();
             // 完成一个循环
             if (this.main.loop && Math.floor(this._preRealTime / this.main.duration) < Math.floor(this._realTime / this.main.duration)) {
@@ -32476,10 +32863,12 @@ var feng3d;
                 this.emission.bursts.forEach(function (element) {
                     element.calculateProbability();
                 });
+                this.dispatch("particleCycled", this);
             }
-            this._emit();
+            // 发射粒子
+            this._emit(this._preRealTime, this._realTime, this._preworldPos, this._currentWorldPos);
             this._preRealTime = this._realTime;
-            this._preworldPos.copy(this.worldPos);
+            this._preworldPos.copy(this._currentWorldPos);
             // 判断非循环的效果是否播放结束
             if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration) {
                 this.stop();
@@ -32538,7 +32927,7 @@ var feng3d;
         ParticleSystem.prototype.beforeRender = function (gl, renderAtomic, scene, camera) {
             _super.prototype.beforeRender.call(this, gl, renderAtomic, scene, camera);
             if (Boolean(scene.runEnvironment & feng3d.RunEnvironment.feng3d) && !this._awaked) {
-                this._isPlaying = this.main.playOnAwake;
+                this._isPlaying = this._isPlaying || this.main.playOnAwake;
                 this._awaked = true;
             }
             renderAtomic.instanceCount = this._activeParticles.length;
@@ -32602,46 +32991,73 @@ var feng3d;
              * 此时在周期中的位置
              */
             get: function () {
-                return (this._realTime % this.main.duration) / this.main.duration;
+                return this._rateAtDuration;
             },
             enumerable: true,
             configurable: true
         });
         /**
          * 发射粒子
-         * @param time 当前粒子时间
+         *
+         * @param startTime 发射起始时间
+         * @param endTime 发射终止时间
+         * @param startPos 发射起始位置
+         * @param stopPos 发射终止位置
          */
-        ParticleSystem.prototype._emit = function () {
+        ParticleSystem.prototype._emit = function (startTime, endTime, startPos, stopPos) {
             var _this = this;
             if (!this.emission.enabled)
                 return;
-            // 判断是否达到最大粒子数量
-            if (this._activeParticles.length >= this.main.maxParticles)
-                return;
             // 判断是否开始发射
-            if (this._realTime <= 0)
+            if (endTime <= 0)
                 return;
             var loop = this.main.loop;
             var duration = this.main.duration;
-            var rateAtDuration = this.rateAtDuration;
-            var preRealTime = this._preRealTime;
             // 判断是否结束发射
-            if (!loop && preRealTime >= duration)
+            if (!loop && startTime >= duration)
                 return;
             // 计算最后发射时间
-            var realEmitTime = this._realTime;
             if (!loop)
-                realEmitTime = Math.min(realEmitTime, duration);
+                endTime = Math.min(endTime, duration);
+            // 计算此处在发射周期的位置
+            var rateAtDuration = (endTime % duration) / duration;
             // 
             var emits = [];
-            // 单粒子发射周期
-            var step = 1 / this.emission.rateOverTime.getValue(rateAtDuration);
-            var bursts = this.emission.bursts;
             // 处理移动发射粒子
+            var moveEmits = this._emitWithMove(rateAtDuration, startPos, stopPos);
+            emits = emits.concat(moveEmits);
+            // 单粒子发射周期
+            var timeEmits = this._emitWithTime(rateAtDuration, startTime, duration, endTime);
+            emits = emits.concat(timeEmits);
+            emits.sort(function (a, b) { return a.time - b.time; });
+            emits.forEach(function (v) {
+                _this._emitParticles(rateAtDuration, v);
+            });
+        };
+        /**
+         * 由指定粒子发射粒子。
+         *
+         * @param particle 发射子粒子系统的粒子
+         */
+        ParticleSystem.prototype._emitFromParticle = function (particle) {
+            var startTime = Math.max(particle.preTime - particle.birthTime, 0);
+            var endTime = Math.max(particle.curTime - particle.birthTime, particle.lifetime);
+            this._emit(startTime, endTime, particle.prePosition, particle.curPosition);
+        };
+        /**
+         * 计算在指定移动的位移线段中发射的粒子列表。
+         *
+         * @param rateAtDuration
+         * @param prePos
+         * @param currentPos
+         */
+        ParticleSystem.prototype._emitWithMove = function (rateAtDuration, prePos, currentPos) {
+            var _this = this;
+            var emits = [];
             if (this.main.simulationSpace == feng3d.ParticleSystemSimulationSpace.World) {
                 if (this._isRateOverDistance) {
-                    var moveVec = this.moveVec;
-                    var worldPos = this.worldPos;
+                    var moveVec = currentPos.subTo(prePos);
+                    var worldPos = currentPos;
                     // 本次移动距离
                     if (moveVec.lengthSquared > 0) {
                         // 移动方向
@@ -32674,6 +33090,20 @@ var feng3d;
                 this._isRateOverDistance = false;
                 this._leftRateOverDistance = 0;
             }
+            return emits;
+        };
+        /**
+         * 计算在指定时间段内发射的粒子列表
+         *
+         * @param rateAtDuration
+         * @param preRealTime
+         * @param duration
+         * @param realEmitTime
+         */
+        ParticleSystem.prototype._emitWithTime = function (rateAtDuration, preRealTime, duration, realEmitTime) {
+            var emits = [];
+            var step = 1 / this.emission.rateOverTime.getValue(rateAtDuration);
+            var bursts = this.emission.bursts;
             // 遍历所有发射周期
             var cycleStartIndex = Math.floor(preRealTime / duration);
             var cycleEndIndex = Math.ceil(realEmitTime / duration);
@@ -32698,19 +33128,14 @@ var feng3d;
                     }
                 }
             }
-            emits.sort(function (a, b) { return a.time - b.time; });
-            ;
-            emits.forEach(function (v) {
-                _this._emitParticles(v);
-            });
+            return emits;
         };
         /**
          * 发射粒子
          * @param birthTime 发射时间
          * @param num 发射数量
          */
-        ParticleSystem.prototype._emitParticles = function (v) {
-            var rateAtDuration = this.rateAtDuration;
+        ParticleSystem.prototype._emitParticles = function (rateAtDuration, v) {
             var num = v.num;
             var birthTime = v.time;
             var position = v.position || new feng3d.Vector3();
@@ -32727,6 +33152,11 @@ var feng3d;
                     particle.birthTime = birthTime;
                     particle.lifetime = lifetime;
                     particle.rateAtLifeTime = rateAtLifeTime;
+                    //
+                    particle.preTime = this._realTime;
+                    particle.curTime = this._realTime;
+                    particle.prePosition = position.clone();
+                    particle.curPosition = position.clone();
                     //
                     particle.birthRateAtDuration = birthRateAtDuration - Math.floor(birthRateAtDuration);
                     this._activeParticles.push(particle);
@@ -32763,10 +33193,9 @@ var feng3d;
          * @param particle 粒子
          */
         ParticleSystem.prototype._updateParticleState = function (particle) {
-            var preTime = Math.max(this._preRealTime, particle.birthTime);
             //
             this._modules.forEach(function (v) { v.updateParticleState(particle); });
-            particle.updateState(preTime, this._realTime);
+            particle.updateState(this._realTime);
         };
         ParticleSystem.prototype._simulationSpaceChanged = function () {
             if (!this.transform)
@@ -32788,6 +33217,54 @@ var feng3d;
                     localToWorldMatrix.deltaTransformVector(p.velocity, p.velocity);
                     localToWorldMatrix.deltaTransformVector(p.acceleration, p.acceleration);
                 });
+            }
+        };
+        /**
+         * 给指定粒子添加指定空间的位移。
+         *
+         * @param particle 粒子。
+         * @param position 速度。
+         * @param space 速度所在空间。
+         * @param name  速度名称。如果不为 undefined 时保存，调用 removeParticleVelocity 可以移除该部分速度。
+         */
+        ParticleSystem.prototype.addParticlePosition = function (particle, position, space, name) {
+            if (name != undefined) {
+                this.removeParticleVelocity(particle, name);
+                particle.cache[name] = { value: position.clone(), space: space };
+            }
+            if (space != this.main.simulationSpace) {
+                if (space == feng3d.ParticleSystemSimulationSpace.World) {
+                    this.transform.worldToLocalMatrix.transformVector(position, position);
+                }
+                else {
+                    this.transform.localToWorldMatrix.transformVector(position, position);
+                }
+            }
+            //
+            particle.position.add(position);
+        };
+        /**
+         * 移除指定粒子上的位移
+         *
+         * @param particle 粒子。
+         * @param name 位移名称。
+         */
+        ParticleSystem.prototype.removeParticlePosition = function (particle, name) {
+            var obj = particle.cache[name];
+            if (obj) {
+                delete particle.cache[name];
+                var space = obj.space;
+                var value = obj.value;
+                if (space != this.main.simulationSpace) {
+                    if (space == feng3d.ParticleSystemSimulationSpace.World) {
+                        this.transform.worldToLocalMatrix.transformVector(value, value);
+                    }
+                    else {
+                        this.transform.localToWorldMatrix.transformVector(value, value);
+                    }
+                }
+                //
+                particle.position.sub(value);
             }
         };
         /**
@@ -32886,6 +33363,28 @@ var feng3d;
                 particle.acceleration.sub(value);
             }
         };
+        /**
+         * 触发子发射器
+         *
+         * @param subEmitterIndex 子发射器索引
+         */
+        ParticleSystem.prototype.TriggerSubEmitter = function (subEmitterIndex, particles) {
+            if (particles === void 0) { particles = null; }
+            if (!this.subEmitters.enabled)
+                return;
+            var subEmitter = this.subEmitters.GetSubEmitterSystem(subEmitterIndex);
+            if (!subEmitter)
+                return;
+            var probability = this.subEmitters.GetSubEmitterEmitProbability(subEmitterIndex);
+            this.subEmitters.GetSubEmitterProperties(subEmitterIndex);
+            this.subEmitters.GetSubEmitterType(subEmitterIndex);
+            particles = particles || this._activeParticles;
+            particles.forEach(function (p) {
+                if (Math.random() > probability)
+                    return;
+                subEmitter._emitFromParticle(p);
+            });
+        };
         __decorate([
             feng3d.serialize,
             feng3d.oav({ block: "main", component: "OAVObjectView" })
@@ -32942,6 +33441,14 @@ var feng3d;
         ], ParticleSystem.prototype, "rotationBySpeed", null);
         __decorate([
             feng3d.serialize,
+            feng3d.oav({ block: "noise", component: "OAVObjectView" })
+        ], ParticleSystem.prototype, "noise", null);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav({ block: "subEmitters", component: "OAVObjectView" })
+        ], ParticleSystem.prototype, "subEmitters", null);
+        __decorate([
+            feng3d.serialize,
             feng3d.oav({ tooltip: "粒子系统纹理表动画模块。", block: "textureSheetAnimation", component: "OAVObjectView" })
         ], ParticleSystem.prototype, "textureSheetAnimation", null);
         __decorate([
@@ -32958,10 +33465,17 @@ var feng3d;
             feng3d.oav({ block: "Renderer" }),
             feng3d.serialize
         ], ParticleSystem.prototype, "receiveShadows", void 0);
+        ParticleSystem = __decorate([
+            feng3d.AddComponentMenu("Effects/ParticleSystem")
+        ], ParticleSystem);
         return ParticleSystem;
-    }(feng3d.Model));
+    }(feng3d.Renderable));
     feng3d.ParticleSystem = ParticleSystem;
     feng3d.Geometry.setDefault("Billboard-Geometry", new feng3d.QuadGeometry());
+    feng3d.GameObject.registerPrimitive("Particle System", function (g) {
+        g.addComponent(ParticleSystem);
+        g.getComponent(feng3d.Transform).rx = -90;
+    });
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -33496,6 +34010,84 @@ var feng3d;
 var feng3d;
 (function (feng3d) {
     /**
+     * The events that cause new particles to be spawned.
+     *
+     * 导致新粒子产生的事件。
+     */
+    var ParticleSystemSubEmitterType;
+    (function (ParticleSystemSubEmitterType) {
+        /**
+         * Spawns new particles when particles from the parent system are born.
+         *
+         * 当来自父系统的粒子诞生时，产生新的粒子。
+         */
+        ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Birth"] = 0] = "Birth";
+        /**
+         * Spawns new particles when particles from the parent system collide with something.
+         *
+         * 当来自父系统的粒子与某物碰撞时，产生新的粒子。
+         */
+        ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Collision"] = 1] = "Collision";
+        /**
+         * Spawns new particles when particles from the parent system die.
+         *
+         * 当来自父系统的粒子死亡时，产生新的粒子。
+         */
+        ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Death"] = 2] = "Death";
+        /**
+         * Spawns new particles when particles from the parent system pass conditions in the Trigger Module.
+         *
+         * 当来自父系统的粒子通过触发器模块中的条件时，生成新的粒子。
+         */
+        ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Trigger"] = 3] = "Trigger";
+        /**
+         * Spawns new particles when triggered from script using ParticleSystem.TriggerSubEmitter.
+         *
+         * 当使用ParticleSystem.TriggerSubEmitter从脚本中触发时，生成新的粒子。
+         */
+        ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Manual"] = 4] = "Manual";
+    })(ParticleSystemSubEmitterType = feng3d.ParticleSystemSubEmitterType || (feng3d.ParticleSystemSubEmitterType = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * The properties of sub-emitter particles.
+     */
+    var ParticleSystemSubEmitterProperties;
+    (function (ParticleSystemSubEmitterProperties) {
+        /**
+         * When spawning new particles, do not inherit any properties from the parent particles.
+         */
+        ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritNothing"] = 0] = "InheritNothing";
+        /**
+         * When spawning new particles, inherit all available properties from the parent particles.
+         */
+        ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritEverything"] = 1] = "InheritEverything";
+        /**
+         * When spawning new particles, multiply the start color by the color of the parent particles.
+         */
+        ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritColor"] = 2] = "InheritColor";
+        /**
+         * When spawning new particles, multiply the start size by the size of the parent particles.
+         */
+        ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritSize"] = 3] = "InheritSize";
+        /**
+         * When spawning new particles, add the start rotation to the rotation of the parent particles.
+         */
+        ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritRotation"] = 4] = "InheritRotation";
+        /**
+         * New particles will have a shorter lifespan, the closer their parent particles are to death.
+         */
+        ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritLifetime"] = 5] = "InheritLifetime";
+        /**
+         * When spawning new particles, use the duration and age properties from the parent system, when sampling MainModule curves in the Sub-Emitter.
+         */
+        ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritDuration"] = 6] = "InheritDuration";
+    })(ParticleSystemSubEmitterProperties = feng3d.ParticleSystemSubEmitterProperties || (feng3d.ParticleSystemSubEmitterProperties = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
      * 粒子系统 发射形状
      */
     var ParticleSystemShape = /** @class */ (function () {
@@ -33886,7 +34478,7 @@ var feng3d;
          */
         ParticleSystemShapeBox.prototype.calcParticlePosDir = function (particle, position, dir) {
             // 计算位置
-            position.set(this.boxX, this.boxY, this.boxZ).multiply(feng3d.Vector3.random().scaleNumber(2).subNumber(1));
+            position.copy(feng3d.Vector3.random().scaleNumber(2).subNumber(1));
             if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
                 var max = Math.max(Math.abs(position.x), Math.abs(position.y), Math.abs(position.z));
                 if (Math.abs(position.x) == max) {
@@ -33914,6 +34506,7 @@ var feng3d;
                     position.y = position.y < 0 ? -1 : 1;
                 }
             }
+            position.scale(new feng3d.Vector3(this.boxX, this.boxY, this.boxZ)).scaleNumber(0.5);
             // 
             dir.set(0, 0, 1);
         };
@@ -34215,6 +34808,13 @@ var feng3d;
          * @param particle 粒子
          */
         ParticleModule.prototype.updateParticleState = function (particle) {
+        };
+        /**
+         * 更新
+         *
+         * @param interval
+         */
+        ParticleModule.prototype.update = function (interval) {
         };
         __decorate([
             feng3d.oav({ tooltip: "是否开启" }),
@@ -34829,7 +35429,6 @@ var feng3d;
              * 产生新粒子的速度，通过距离。
              * 新粒子只有世界空间模拟且发射器移动时才会被发射出来。
              */
-            // @oav({ tooltip: "The rate at which new particles are spawned, over distance." })
             _this.rateOverDistance = feng3d.serialization.setValue(new feng3d.MinMaxCurve(), { between0And1: true, constant: 0, constantMin: 0, constantMax: 1 });
             /**
              * 爆发数组
@@ -34919,6 +35518,9 @@ var feng3d;
             feng3d.oav({ tooltip: "随着时间的推移，新粒子产生的速度。" })
         ], ParticleEmissionModule.prototype, "rateOverTime", void 0);
         __decorate([
+            feng3d.serialize
+            // @oav({ tooltip: "The rate at which new particles are spawned, over distance." })
+            ,
             feng3d.oav({ tooltip: "产生新粒子的速度，通过距离。新粒子只有世界空间模拟且发射器移动时才会被发射出来。" })
         ], ParticleEmissionModule.prototype, "rateOverDistance", void 0);
         __decorate([
@@ -36833,6 +37435,12 @@ var feng3d;
              */
             _this.scrollSpeed = new feng3d.MinMaxCurve();
             /**
+             * Higher frequency noise will reduce the strength by a proportional amount, if enabled.
+             *
+             * 如果启用高频率噪音，将按比例减少强度。
+             */
+            _this.damping = true;
+            /**
              * Layers of noise that combine to produce final noise.
              *
              * 一层一层的噪声组合在一起产生最终的噪声。
@@ -36872,6 +37480,7 @@ var feng3d;
                 yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 },
                 zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }
             });
+            _this._scrollValue = 0;
             return _this;
         }
         Object.defineProperty(ParticleNoiseModule.prototype, "strength", {
@@ -36994,6 +37603,177 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 初始化粒子状态
+         * @param particle 粒子
+         */
+        ParticleNoiseModule.prototype.initParticleState = function (particle) {
+            particle[_Noise_strength_rate] = Math.random();
+            particle[_Noise_particle_rate] = Math.random();
+        };
+        /**
+         * 更新粒子状态
+         * @param particle 粒子
+         */
+        ParticleNoiseModule.prototype.updateParticleState = function (particle) {
+            this.particleSystem.removeParticlePosition(particle, _Noise_preOffset);
+            if (!this.enabled)
+                return;
+            var strengthX = 1;
+            var strengthY = 1;
+            var strengthZ = 1;
+            if (this.separateAxes) {
+                var strength3D = this.strength3D.getValue(particle.rateAtLifeTime, particle[_Noise_strength_rate]);
+                strengthX = strength3D.x;
+                strengthY = strength3D.y;
+                strengthZ = strength3D.z;
+            }
+            else {
+                strengthX = strengthY = strengthZ = this.strength.getValue(particle.rateAtLifeTime, particle[_Noise_strength_rate]);
+            }
+            //
+            var frequency = ParticleNoiseModule._frequencyScale * this.frequency;
+            //
+            var offsetPos = new feng3d.Vector3(strengthX, strengthY, strengthZ);
+            //
+            offsetPos.scaleNumber(ParticleNoiseModule._strengthScale);
+            if (this.damping) {
+                offsetPos.scaleNumber(1 / this.frequency);
+            }
+            var time = particle.rateAtLifeTime * ParticleNoiseModule._timeScale % 1;
+            //
+            offsetPos.x *= this._getNoiseValue((1 / 3 * 0 + time) * frequency, particle[_Noise_particle_rate] * frequency);
+            offsetPos.y *= this._getNoiseValue((1 / 3 * 1 + time) * frequency, particle[_Noise_particle_rate] * frequency);
+            offsetPos.z *= this._getNoiseValue((1 / 3 * 2 + time) * frequency, particle[_Noise_particle_rate] * frequency);
+            //
+            this.particleSystem.addParticlePosition(particle, offsetPos, this.particleSystem.main.simulationSpace, _Noise_preOffset);
+        };
+        /**
+         * 绘制噪音到图片
+         *
+         * @param image 图片数据
+         */
+        ParticleNoiseModule.prototype.drawImage = function (image) {
+            var strength = this._getDrawImageStrength();
+            var strengthX = strength.x;
+            var strengthY = strength.y;
+            var strengthZ = strength.z;
+            //
+            strengthX *= ParticleNoiseModule._strengthScale;
+            strengthY *= ParticleNoiseModule._strengthScale;
+            strengthZ *= ParticleNoiseModule._strengthScale;
+            if (this.damping) {
+                strengthX /= this.frequency;
+                strengthY /= this.frequency;
+                strengthZ /= this.frequency;
+            }
+            //
+            var frequency = ParticleNoiseModule._frequencyScale * this.frequency;
+            //
+            var data = image.data;
+            var imageWidth = image.width;
+            var imageHeight = image.height;
+            // var datas: number[] = [];
+            // var min = Number.MAX_VALUE;
+            // var max = Number.MIN_VALUE;
+            for (var x = 0; x < imageWidth; x++) {
+                for (var y = 0; y < imageHeight; y++) {
+                    var xv = x / imageWidth * frequency;
+                    var yv = 1 - y / imageHeight * frequency;
+                    var value = this._getNoiseValue(xv, yv);
+                    // datas.push(value);
+                    // if (min > value) min = value;
+                    // if (max < value) max = value;
+                    if (xv < 1 / 3)
+                        value = (value * strengthX + 1) / 2 * 256;
+                    else if (xv < 2 / 3)
+                        value = (value * strengthY + 1) / 2 * 256;
+                    else
+                        value = (value * strengthZ + 1) / 2 * 256;
+                    var cell = (x + y * imageWidth) * 4;
+                    data[cell] = data[cell + 1] = data[cell + 2] = Math.floor(value);
+                    data[cell + 3] = 255; // alpha
+                }
+            }
+            // console.log(datas, min, max);
+        };
+        ParticleNoiseModule.prototype._getDrawImageStrength = function () {
+            var strengthX = 1;
+            var strengthY = 1;
+            var strengthZ = 1;
+            if (this.separateAxes) {
+                if (this.strengthX.mode == feng3d.MinMaxCurveMode.Curve || this.strengthX.mode == feng3d.MinMaxCurveMode.TwoCurves)
+                    strengthX = this.strengthX.curveMultiplier;
+                else if (this.strengthX.mode == feng3d.MinMaxCurveMode.Constant)
+                    strengthX = this.strengthX.constant;
+                else if (this.strengthX.mode == feng3d.MinMaxCurveMode.TwoConstants)
+                    strengthX = this.strengthX.constantMax;
+                if (this.strengthY.mode == feng3d.MinMaxCurveMode.Curve || this.strengthY.mode == feng3d.MinMaxCurveMode.TwoCurves)
+                    strengthY = this.strengthY.curveMultiplier;
+                else if (this.strengthY.mode == feng3d.MinMaxCurveMode.Constant)
+                    strengthY = this.strengthY.constant;
+                else if (this.strengthY.mode == feng3d.MinMaxCurveMode.TwoConstants)
+                    strengthY = this.strengthY.constantMax;
+                if (this.strengthZ.mode == feng3d.MinMaxCurveMode.Curve || this.strengthZ.mode == feng3d.MinMaxCurveMode.TwoCurves)
+                    strengthZ = this.strengthZ.curveMultiplier;
+                else if (this.strengthZ.mode == feng3d.MinMaxCurveMode.Constant)
+                    strengthZ = this.strengthZ.constant;
+                else if (this.strengthZ.mode == feng3d.MinMaxCurveMode.TwoConstants)
+                    strengthZ = this.strengthZ.constantMax;
+            }
+            else {
+                if (this.strength.mode == feng3d.MinMaxCurveMode.Curve || this.strength.mode == feng3d.MinMaxCurveMode.TwoCurves)
+                    strengthX = strengthY = strengthZ = this.strength.curveMultiplier;
+                else if (this.strength.mode == feng3d.MinMaxCurveMode.Constant)
+                    strengthX = strengthY = strengthZ = this.strength.constant;
+                else if (this.strength.mode == feng3d.MinMaxCurveMode.TwoConstants)
+                    strengthX = strengthY = strengthZ = this.strength.constantMax;
+            }
+            return { x: strengthX, y: strengthY, z: strengthZ };
+        };
+        /**
+         * 获取噪音值
+         *
+         * @param x
+         * @param y
+         */
+        ParticleNoiseModule.prototype._getNoiseValue = function (x, y) {
+            var value = this._getNoiseValueBase(x, y);
+            for (var l = 1, ln = this.octaveCount; l < ln; l++) {
+                var value0 = this._getNoiseValueBase(x * this.octaveScale, y * this.octaveScale);
+                value += (value0 - value) * this.octaveMultiplier;
+            }
+            return value;
+        };
+        /**
+         * 获取单层噪音值
+         *
+         * @param x
+         * @param y
+         */
+        ParticleNoiseModule.prototype._getNoiseValueBase = function (x, y) {
+            var scrollValue = this._scrollValue;
+            if (this.quality == feng3d.ParticleSystemNoiseQuality.Low) {
+                return feng3d.noise.perlin1(x + scrollValue);
+            }
+            if (this.quality == feng3d.ParticleSystemNoiseQuality.Medium) {
+                return feng3d.noise.perlin2(x, y + scrollValue);
+            }
+            // if (this.quality == ParticleSystemNoiseQuality.High)
+            return feng3d.noise.perlin3(x, y, scrollValue);
+        };
+        /**
+         * 更新
+         *
+         * @param interval
+         */
+        ParticleNoiseModule.prototype.update = function (interval) {
+            this._scrollValue += this.scrollSpeed.getValue(this.particleSystem.rateAtDuration) * interval / 1000;
+        };
+        // 以下两个值用于与Unity中数据接近
+        ParticleNoiseModule._frequencyScale = 5;
+        ParticleNoiseModule._strengthScale = 0.3;
+        ParticleNoiseModule._timeScale = 5;
         __decorate([
             feng3d.serialize,
             feng3d.oav({ tooltip: "分别控制每个轴的噪声。" })
@@ -37015,6 +37795,10 @@ var feng3d;
         ], ParticleNoiseModule.prototype, "scrollSpeed", void 0);
         __decorate([
             feng3d.serialize,
+            feng3d.oav({ tooltip: "如果启用高频率噪音，将按比例减少强度。" })
+        ], ParticleNoiseModule.prototype, "damping", void 0);
+        __decorate([
+            feng3d.serialize,
             feng3d.oav({ tooltip: "一层一层的噪声组合在一起产生最终的噪声。" })
         ], ParticleNoiseModule.prototype, "octaveCount", void 0);
         __decorate([
@@ -37027,7 +37811,7 @@ var feng3d;
         ], ParticleNoiseModule.prototype, "octaveScale", void 0);
         __decorate([
             feng3d.serialize,
-            feng3d.oav({ tooltip: "生成一维、二维或三维噪声。" })
+            feng3d.oav({ tooltip: "生成一维、二维或三维噪声。", componentParam: { enumClass: feng3d.ParticleSystemNoiseQuality } })
         ], ParticleNoiseModule.prototype, "quality", void 0);
         __decorate([
             feng3d.serialize,
@@ -37043,6 +37827,126 @@ var feng3d;
         return ParticleNoiseModule;
     }(feng3d.ParticleModule));
     feng3d.ParticleNoiseModule = ParticleNoiseModule;
+    var _Noise_strength_rate = "_Noise_strength_rate";
+    var _Noise_particle_rate = "_Noise_particle_rate";
+    var _Noise_preOffset = "_Noise_preOffset";
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    /**
+     * Script interface for the SubEmittersModule.
+     *
+     * The sub-emitters module allows you to spawn particles in child emitters from the positions of particles in the parent system.
+     *
+     * This module triggers child particle emission on events such as the birth, death, and collision of particles in the parent system.
+     */
+    var ParticleSubEmittersModule = /** @class */ (function (_super) {
+        __extends(ParticleSubEmittersModule, _super);
+        function ParticleSubEmittersModule() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.subEmitters = [];
+            return _this;
+        }
+        /**
+         * Add a new sub-emitter.
+         */
+        ParticleSubEmittersModule.prototype.AddSubEmitter = function (subEmitter, type, properties, emitProbability) {
+            this.subEmitters.push({ subEmitter: subEmitter, type: type, properties: properties, emitProbability: emitProbability });
+        };
+        /**
+         * Gets the probability that the sub-emitter emits particles.
+         *
+         * @param index The index of the sub-emitter.
+         */
+        ParticleSubEmittersModule.prototype.GetSubEmitterEmitProbability = function (index) {
+            if (!this.subEmitters[index])
+                return 0;
+            return this.subEmitters[index].emitProbability;
+        };
+        /**
+         * Gets the properties of the sub - emitter at the given index.
+         *
+         * @param index The index of the sub-emitter.
+         */
+        ParticleSubEmittersModule.prototype.GetSubEmitterProperties = function (index) {
+            if (!this.subEmitters[index])
+                return null;
+            return this.subEmitters[index].properties;
+        };
+        /**
+         * Gets the sub - emitter Particle System at the given index.
+         *
+         * @param index The index of the desired sub-emitter.
+         */
+        ParticleSubEmittersModule.prototype.GetSubEmitterSystem = function (index) {
+            if (!this.subEmitters[index])
+                return null;
+            return this.subEmitters[index].subEmitter;
+        };
+        /**
+         * Gets the type of the sub - emitter at the given index.
+         *
+         * @param index The index of the desired sub-emitter.
+         */
+        ParticleSubEmittersModule.prototype.GetSubEmitterType = function (index) {
+            if (!this.subEmitters[index])
+                return null;
+            return this.subEmitters[index].type;
+        };
+        /**
+         * Removes a sub - emitter from the given index in the array.
+         *
+         * @param index The index of the desired sub-emitter.
+         */
+        ParticleSubEmittersModule.prototype.RemoveSubEmitter = function (index) {
+            if (!this.subEmitters[index])
+                return;
+            this.subEmitters.splice(index, 1);
+        };
+        /**
+         * Sets the probability that the sub - emitter emits particles.
+         *
+         * @param index The index of the sub-emitter you want to modify.
+         * @param emitProbability The probability value.
+         */
+        ParticleSubEmittersModule.prototype.SetSubEmitterEmitProbability = function (index, emitProbability) {
+            if (!this.subEmitters[index])
+                return;
+            this.subEmitters[index].emitProbability = emitProbability;
+        };
+        /**
+         * Sets the properties of the sub - emitter at the given index.
+         *
+         * @param index The index of the sub-emitter you want to modify.
+         * @param properties The new properties to assign to this sub-emitter.
+         */
+        ParticleSubEmittersModule.prototype.SetSubEmitterProperties = function (index, properties) {
+            if (!this.subEmitters[index])
+                return;
+            this.subEmitters[index].properties = properties;
+        };
+        /**
+         * Sets the Particle System to use as the sub - emitter at the given index.
+         */
+        ParticleSubEmittersModule.prototype.SetSubEmitterSystem = function (index, subEmitter) {
+            if (!this.subEmitters[index])
+                return;
+            this.subEmitters[index].subEmitter = subEmitter;
+        };
+        /**
+         * Sets the type of the sub - emitter at the given index.
+         *
+         * @param index The index of the sub-emitter you want to modify.
+         * @param type The new spawning type to assign to this sub-emitter.
+         */
+        ParticleSubEmittersModule.prototype.SetSubEmitterType = function (index, type) {
+            if (!this.subEmitters[index])
+                return;
+            this.subEmitters[index].type = type;
+        };
+        return ParticleSubEmittersModule;
+    }(feng3d.ParticleModule));
+    feng3d.ParticleSubEmittersModule = ParticleSubEmittersModule;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
@@ -37329,11 +38233,11 @@ var feng3d;
             this.parentIndex = -1;
             this.children = [];
         }
-        Object.defineProperty(SkeletonJoint.prototype, "invertMatrix3D", {
+        Object.defineProperty(SkeletonJoint.prototype, "invertMatrix", {
             get: function () {
-                if (!this._invertMatrix3D)
-                    this._invertMatrix3D = this.matrix3D.clone().invert();
-                return this._invertMatrix3D;
+                if (!this._invertMatrix)
+                    this._invertMatrix = this.matrix.clone().invert();
+                return this._invertMatrix;
             },
             enumerable: true,
             configurable: true
@@ -37346,7 +38250,7 @@ var feng3d;
         ], SkeletonJoint.prototype, "name", void 0);
         __decorate([
             feng3d.serialize
-        ], SkeletonJoint.prototype, "matrix3D", void 0);
+        ], SkeletonJoint.prototype, "matrix", void 0);
         return SkeletonJoint;
     }());
     feng3d.SkeletonJoint = SkeletonJoint;
@@ -37390,15 +38294,15 @@ var feng3d;
             //
             this._globalPropertiesInvalid = true;
             this._jointsInvalid = [];
-            this._globalMatrix3DsInvalid = [];
-            this.globalMatrix3Ds = [];
+            this._globalMatrixsInvalid = [];
+            this.globalMatrixs = [];
             this._globalMatrices = [];
             //
             var jointNum = this.joints.length;
             for (var i = 0; i < jointNum; i++) {
                 this._jointsInvalid[i] = true;
-                this._globalMatrix3DsInvalid[i] = true;
-                this.globalMatrix3Ds[i] = new feng3d.Matrix4x4();
+                this._globalMatrixsInvalid[i] = true;
+                this.globalMatrixs[i] = new feng3d.Matrix4x4();
                 this._globalMatrices[i] = new feng3d.Matrix4x4();
             }
         };
@@ -37409,36 +38313,36 @@ var feng3d;
             //姿势变换矩阵
             var joints = this.joints;
             var jointGameobjects = this.jointGameobjects;
-            var globalMatrix3Ds = this.globalMatrix3Ds;
-            var _globalMatrix3DsInvalid = this._globalMatrix3DsInvalid;
+            var globalMatrixs = this.globalMatrixs;
+            var _globalMatrixsInvalid = this._globalMatrixsInvalid;
             //遍历每个关节
             for (var i = 0; i < joints.length; ++i) {
                 if (!this._jointsInvalid[i])
                     continue;
                 this._globalMatrices[i]
-                    .copyFrom(globalMatrix3d(i))
-                    .prepend(joints[i].invertMatrix3D);
+                    .copyFrom(globalMatrix(i))
+                    .prepend(joints[i].invertMatrix);
                 this._jointsInvalid[i] = false;
             }
-            function globalMatrix3d(index) {
-                if (!_globalMatrix3DsInvalid[index])
-                    return globalMatrix3Ds[index];
+            function globalMatrix(index) {
+                if (!_globalMatrixsInvalid[index])
+                    return globalMatrixs[index];
                 var jointPose = joints[index];
                 var jointGameobject = jointGameobjects[index];
-                globalMatrix3Ds[index] = jointGameobject.transform.matrix3d.clone();
+                globalMatrixs[index] = jointGameobject.transform.matrix.clone();
                 if (jointPose.parentIndex >= 0) {
-                    var parentGlobalMatrix3d = globalMatrix3d(jointPose.parentIndex);
-                    globalMatrix3Ds[index].append(parentGlobalMatrix3d);
+                    var parentGlobalMatrix = globalMatrix(jointPose.parentIndex);
+                    globalMatrixs[index].append(parentGlobalMatrix);
                 }
-                _globalMatrix3DsInvalid[index] = false;
-                return globalMatrix3Ds[index];
+                _globalMatrixsInvalid[index] = false;
+                return globalMatrixs[index];
             }
         };
         SkeletonComponent.prototype.invalidjoint = function (jointIndex) {
             var _this = this;
             this._globalPropertiesInvalid = true;
             this._jointsInvalid[jointIndex] = true;
-            this._globalMatrix3DsInvalid[jointIndex] = true;
+            this._globalMatrixsInvalid[jointIndex] = true;
             this.joints[jointIndex].children.forEach(function (element) {
                 _this.invalidjoint(element);
             });
@@ -37469,11 +38373,11 @@ var feng3d;
                     parentGameobject.addChild(jointGameobject);
                 }
                 var transform = jointGameobject.transform;
-                var matrix3D = skeletonJoint.matrix3D;
+                var matrix = skeletonJoint.matrix;
                 if (skeletonJoint.parentIndex != -1) {
-                    matrix3D = matrix3D.clone().append(joints[skeletonJoint.parentIndex].invertMatrix3D);
+                    matrix = matrix.clone().append(joints[skeletonJoint.parentIndex].invertMatrix);
                 }
-                transform.matrix3d = matrix3D;
+                transform.matrix = matrix;
                 transform.on("transformChanged", function () {
                     skeleton.invalidjoint(i);
                 });
@@ -37492,14 +38396,14 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
-    var SkinnedModel = /** @class */ (function (_super) {
-        __extends(SkinnedModel, _super);
-        function SkinnedModel() {
+    var SkinnedMeshRenderer = /** @class */ (function (_super) {
+        __extends(SkinnedMeshRenderer, _super);
+        function SkinnedMeshRenderer() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.cacheU_skeletonGlobalMatriices = {};
             return _this;
         }
-        Object.defineProperty(SkinnedModel.prototype, "single", {
+        Object.defineProperty(SkinnedMeshRenderer.prototype, "single", {
             get: function () { return true; },
             enumerable: true,
             configurable: true
@@ -37507,11 +38411,11 @@ var feng3d;
         /**
          * 创建一个骨骼动画类
          */
-        SkinnedModel.prototype.init = function () {
+        SkinnedMeshRenderer.prototype.init = function () {
             _super.prototype.init.call(this);
             this.hideFlags = feng3d.HideFlags.DontTransform;
         };
-        SkinnedModel.prototype.beforeRender = function (gl, renderAtomic, scene, camera) {
+        SkinnedMeshRenderer.prototype.beforeRender = function (gl, renderAtomic, scene, camera) {
             var _this = this;
             _super.prototype.beforeRender.call(this, gl, renderAtomic, scene, camera);
             var frameId = null;
@@ -37535,11 +38439,11 @@ var feng3d;
         /**
          * 销毁
          */
-        SkinnedModel.prototype.dispose = function () {
+        SkinnedMeshRenderer.prototype.dispose = function () {
             this.cacheSkeletonComponent = null;
             _super.prototype.dispose.call(this);
         };
-        Object.defineProperty(SkinnedModel.prototype, "u_modelMatrix", {
+        Object.defineProperty(SkinnedMeshRenderer.prototype, "u_modelMatrix", {
             get: function () {
                 if (this.cacheSkeletonComponent)
                     return this.cacheSkeletonComponent.transform.localToWorldMatrix;
@@ -37548,7 +38452,7 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SkinnedModel.prototype, "u_ITModelMatrix", {
+        Object.defineProperty(SkinnedMeshRenderer.prototype, "u_ITModelMatrix", {
             get: function () {
                 if (this.cacheSkeletonComponent)
                     return this.cacheSkeletonComponent.transform.ITlocalToWorldMatrix;
@@ -37557,7 +38461,7 @@ var feng3d;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SkinnedModel.prototype, "u_skeletonGlobalMatriices", {
+        Object.defineProperty(SkinnedMeshRenderer.prototype, "u_skeletonGlobalMatriices", {
             get: function () {
                 if (!this.cacheSkeletonComponent) {
                     var gameObject = this.gameObject;
@@ -37574,8 +38478,8 @@ var feng3d;
                     var globalMatrices = this.cacheSkeletonComponent.globalMatrices;
                     for (var i = joints.length - 1; i >= 0; i--) {
                         skeletonGlobalMatriices[i] = globalMatrices[joints[i][0]].clone();
-                        if (this.initMatrix3d) {
-                            skeletonGlobalMatriices[i].prepend(this.initMatrix3d);
+                        if (this.initMatrix) {
+                            skeletonGlobalMatriices[i].prepend(this.initMatrix);
                         }
                     }
                 }
@@ -37590,13 +38494,13 @@ var feng3d;
         __decorate([
             feng3d.serialize,
             feng3d.oav()
-        ], SkinnedModel.prototype, "skinSkeleton", void 0);
+        ], SkinnedMeshRenderer.prototype, "skinSkeleton", void 0);
         __decorate([
             feng3d.serialize
-        ], SkinnedModel.prototype, "initMatrix3d", void 0);
-        return SkinnedModel;
-    }(feng3d.Model));
-    feng3d.SkinnedModel = SkinnedModel;
+        ], SkinnedMeshRenderer.prototype, "initMatrix", void 0);
+        return SkinnedMeshRenderer;
+    }(feng3d.Renderable));
+    feng3d.SkinnedMeshRenderer = SkinnedMeshRenderer;
     var defaultSkeletonGlobalMatriices = (function () { var v = [new feng3d.Matrix4x4()]; var i = 150; while (i-- > 1)
         v.push(v[0]); return v; })();
     var SkinSkeleton = /** @class */ (function () {
@@ -37874,6 +38778,9 @@ var feng3d;
             feng3d.oav(),
             feng3d.serialize
         ], Animation.prototype, "playspeed", void 0);
+        Animation = __decorate([
+            feng3d.AddComponentMenu("Animator/Animation")
+        ], Animation);
         return Animation;
     }(feng3d.Behaviour));
     feng3d.Animation = Animation;
@@ -37923,6 +38830,9 @@ var feng3d;
         __decorate([
             feng3d.serialize
         ], FolderAsset.prototype, "childrenAssets", void 0);
+        FolderAsset = __decorate([
+            feng3d.ov({ component: "OVFolderAsset" })
+        ], FolderAsset);
         return FolderAsset;
     }(feng3d.FileAsset));
     feng3d.FolderAsset = FolderAsset;
@@ -38062,6 +38972,7 @@ var feng3d;
              * 脚本父类名称
              */
             get: function () {
+                this._update();
                 return this._parentScriptName;
             },
             enumerable: true,
@@ -38072,6 +38983,7 @@ var feng3d;
              * 脚本类定义
              */
             get: function () {
+                this._update();
                 return this._scriptName;
             },
             enumerable: true,
@@ -39013,13 +39925,13 @@ var feng3d;
                 var pScaling = this.Scaling.getScaling(keyFrameTime);
                 var pRotation = this.Rotation.getRotation(keyFrameTime);
                 var pTranslation = this.Translation.getTranslation(keyFrameTime);
-                var matrix3D = this.c_transformation;
-                matrix3D.appendScale(pScaling.x, pScaling.y, pScaling.z).append(pRotation.toMatrix3D());
+                var matrix = this.c_transformation;
+                matrix.appendScale(pScaling.x, pScaling.y, pScaling.z).append(pRotation.toMatrix());
                 //设置旋转缩放中心
-                matrix3D.prependTranslation(-this.pivotPoint.x, -this.pivotPoint.y, -this.pivotPoint.z);
-                matrix3D.appendTranslation(this.pivotPoint.x, this.pivotPoint.y, this.pivotPoint.z);
+                matrix.prependTranslation(-this.pivotPoint.x, -this.pivotPoint.y, -this.pivotPoint.z);
+                matrix.appendTranslation(this.pivotPoint.x, this.pivotPoint.y, this.pivotPoint.z);
                 //平移
-                matrix3D.appendTranslation(pTranslation.x, pTranslation.y, pTranslation.z);
+                matrix.appendTranslation(pTranslation.x, pTranslation.y, pTranslation.z);
                 //
             };
             BoneObject.prototype.buildAnimationclip = function (animationclip, __chache__, start, end) {
@@ -39073,15 +39985,15 @@ var feng3d;
                     return __chache__[key];
                 }
             };
-            BoneObject.prototype.getMatrix3D = function (time) {
+            BoneObject.prototype.getMatrix = function (time) {
                 var pScaling = this.Scaling.getScaling(time);
                 var pRotation = this.Rotation.getRotation(time);
                 var pTranslation = this.Translation.getTranslation(time);
-                var matrix3D = new feng3d.Matrix4x4().appendScale(pScaling.x, pScaling.y, pScaling.z).append(pRotation.toMatrix3D());
+                var matrix = new feng3d.Matrix4x4().appendScale(pScaling.x, pScaling.y, pScaling.z).append(pRotation.toMatrix());
                 //平移
-                matrix3D.appendTranslation(pTranslation.x + this.pivotPoint.x, pTranslation.y + this.pivotPoint.y, pTranslation.z + this.pivotPoint.z);
+                matrix.appendTranslation(pTranslation.x + this.pivotPoint.x, pTranslation.y + this.pivotPoint.y, pTranslation.z + this.pivotPoint.z);
                 //
-                return matrix3D;
+                return matrix;
             };
             return BoneObject;
         }());
@@ -39398,7 +40310,7 @@ var feng3d;
                     var geoset = this.geosets[i];
                     var mesh = this.meshs[i] = new feng3d.GameObject();
                     // var model = mesh.addComponent(Model);
-                    var model = mesh.addComponent(feng3d.SkinnedModel);
+                    var model = mesh.addComponent(feng3d.SkinnedMeshRenderer);
                     var geometry = new feng3d.CustomGeometry();
                     geometry.positions = geoset.Vertices;
                     geometry.uvs = geoset.TVertices;
@@ -39409,8 +40321,8 @@ var feng3d;
                     var skinSkeleton = new feng3d.SkinSkeletonTemp();
                     skinSkeleton.resetJointIndices(skins.jointIndices0, this.skeletonComponent);
                     //更新关节索引与权重索引
-                    geometry.setVAData("a_jointindex0", skins.jointIndices0, 4);
-                    geometry.setVAData("a_jointweight0", skins.jointWeights0, 4);
+                    geometry.skinIndices = skins.jointIndices0;
+                    geometry.skinWeights = skins.jointWeights0;
                     var material = this.materials[geoset.MaterialID];
                     if (!material.material) {
                         var fBitmap = this.getFBitmap(material);
@@ -39468,15 +40380,15 @@ var feng3d;
                 skeletonJoint.parentIndex = joint.Parent;
                 var position = war3Model.pivotPoints[joint.ObjectId];
                 ;
-                var matrix3D = new feng3d.Matrix4x4().recompose(position, new feng3d.Vector3(), new feng3d.Vector3(1, 1, 1));
+                var matrix = new feng3d.Matrix4x4().recompose(position, new feng3d.Vector3(), new feng3d.Vector3(1, 1, 1));
                 if (skeletonJoint.parentIndex != -1) {
                     var parentskeletonJoint = createSkeletonJoint(skeletonJoint.parentIndex);
-                    joint.pivotPoint = matrix3D.getPosition().subTo(parentskeletonJoint.matrix3D.getPosition());
+                    joint.pivotPoint = matrix.getPosition().subTo(parentskeletonJoint.matrix.getPosition());
                 }
                 else {
                     joint.pivotPoint = position;
                 }
-                skeletonJoint.matrix3D = matrix3D;
+                skeletonJoint.matrix = matrix;
                 skeletonjoints[index] = skeletonJoint;
                 return skeletonJoint;
             }
@@ -40844,7 +41756,7 @@ var feng3d;
     function createMaterialObj(obj, subObj, materials) {
         var gameObject = new feng3d.GameObject();
         gameObject.name = subObj.g || gameObject.name;
-        var model = gameObject.addComponent(feng3d.Model);
+        var model = gameObject.addComponent(feng3d.Renderable);
         if (materials && materials[subObj.material])
             model.material = materials[subObj.material];
         var geometry = model.geometry = new feng3d.CustomGeometry();
@@ -40866,11 +41778,11 @@ var feng3d;
             }
         }
         geometry.indices = indices;
-        geometry.setVAData("a_position", vertices, 3);
+        geometry.positions = vertices;
         if (normals.length > 0)
-            geometry.setVAData("a_normal", normals, 3);
+            geometry.normals = normals;
         if (uvs.length > 0)
-            geometry.setVAData("a_uv", uvs, 2);
+            geometry.uvs = uvs;
         feng3d.globalDispatcher.dispatch("asset.parsed", geometry);
         return gameObject;
         function translateVertexData(face, vertexIndex, vertices, uvs, indices, normals, obj) {
@@ -40940,7 +41852,7 @@ var feng3d;
                 var skinSkeleton = new feng3d.SkinSkeletonTemp();
                 var geometry = this.createGeometry(md5MeshData.meshs[i], skeletonComponent, skinSkeleton);
                 var skeletonGameObject = new feng3d.GameObject();
-                var skinnedModel = skeletonGameObject.addComponent(feng3d.SkinnedModel);
+                var skinnedModel = skeletonGameObject.addComponent(feng3d.SkinnedMeshRenderer);
                 skinnedModel.geometry = geometry;
                 skinnedModel.skinSkeleton = skinSkeleton;
                 gameObject.addChild(skeletonGameObject);
@@ -41006,10 +41918,10 @@ var feng3d;
             var t = 1 - quat.x * quat.x - quat.y * quat.y - quat.z * quat.z;
             quat.w = t < 0 ? 0 : -Math.sqrt(t);
             //
-            var matrix3D = quat.toMatrix3D();
-            matrix3D.appendTranslation(-position[0], position[1], position[2]);
+            var matrix = quat.toMatrix();
+            matrix.appendTranslation(-position[0], position[1], position[2]);
             //
-            skeletonJoint.matrix3D = matrix3D;
+            skeletonJoint.matrix = matrix;
             return skeletonJoint;
         };
         MD5MeshConverter.prototype.createGeometry = function (md5Mesh, skeleton, skinSkeleton) {
@@ -41056,7 +41968,7 @@ var feng3d;
                     if (j < vertex.countWeight) {
                         weight = weights[vertex.startWeight + j];
                         if (weight.bias > 0) {
-                            bindPose = skeleton.joints[weight.joint].matrix3D;
+                            bindPose = skeleton.joints[weight.joint].matrix;
                             pos = bindPose.transformVector(new feng3d.Vector3(-weight.pos[0], weight.pos[1], weight.pos[2]));
                             vertices[i * 3] += pos.x * weight.bias;
                             vertices[i * 3 + 1] += pos.y * weight.bias;
@@ -41091,13 +42003,13 @@ var feng3d;
             //更新索引数据
             geometry.indices = indices;
             //更新顶点坐标与uv数据
-            geometry.setVAData("a_position", vertices, 3);
-            geometry.setVAData("a_uv", uvs, 2);
+            geometry.positions = vertices;
+            geometry.uvs = uvs;
             //更新关节索引与权重索引
-            geometry.setVAData("a_jointindex0", jointIndices0, 4);
-            geometry.setVAData("a_jointweight0", jointWeights0, 4);
-            geometry.setVAData("a_jointindex1", jointIndices1, 4);
-            geometry.setVAData("a_jointweight1", jointWeights1, 4);
+            geometry.skinIndices = jointIndices0;
+            geometry.skinWeights = jointWeights0;
+            geometry.skinIndices1 = jointIndices1;
+            geometry.skinWeights1 = jointWeights1;
             return geometry;
         };
         return MD5MeshConverter;
@@ -41338,95 +42250,6 @@ var feng3d;
     }());
     feng3d.MDLLoader = MDLLoader;
     feng3d.mdlLoader = new MDLLoader();
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * UIRenderMode for the Canvas.
-     *
-     * Canvas的渲染模式
-     */
-    var UIRenderMode;
-    (function (UIRenderMode) {
-        /**
-         * Render at the end of the Scene using a 2D Canvas.
-         *
-         * 在场景的最后使用2D画布渲染。
-         */
-        UIRenderMode[UIRenderMode["ScreenSpaceOverlay"] = 0] = "ScreenSpaceOverlay";
-        /**
-         * Render using the Camera configured on the Canvas.
-         *
-         * 使用在画布上配置的摄像机进行渲染。
-         */
-        UIRenderMode[UIRenderMode["ScreenSpaceCamera"] = 1] = "ScreenSpaceCamera";
-        /**
-         * Render using any Camera in the Scene that can render the layer.
-         *
-         * 使用场景中任何可以渲染图层的相机渲染。
-         */
-        UIRenderMode[UIRenderMode["WorldSpace"] = 2] = "WorldSpace";
-    })(UIRenderMode = feng3d.UIRenderMode || (feng3d.UIRenderMode = {}));
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * Position, size, anchor and pivot information for a rectangle.
-     *
-     * 矩形的位置、大小、锚点和枢轴信息。
-     */
-    var RectTransform = /** @class */ (function (_super) {
-        __extends(RectTransform, _super);
-        function RectTransform() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return RectTransform;
-    }(feng3d.Transform));
-    feng3d.RectTransform = RectTransform;
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * Element that can be used for screen rendering.
-     *
-     * 能够被用于屏幕渲染的元素
-     */
-    var Canvas = /** @class */ (function (_super) {
-        __extends(Canvas, _super);
-        function Canvas() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            /**
-             * Is the Canvas in World or Overlay mode?
-             *
-             * 画布是在世界或覆盖模式?
-             */
-            _this.renderMode = feng3d.UIRenderMode.ScreenSpaceOverlay;
-            return _this;
-        }
-        return Canvas;
-    }(feng3d.Behaviour));
-    feng3d.Canvas = Canvas;
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    /**
-     * 图片组件
-     */
-    var UIImage = /** @class */ (function (_super) {
-        __extends(UIImage, _super);
-        function UIImage() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            /**
-             * Tinting color for this Image.
-             *
-             * 为该图像着色。
-             */
-            _this.color = new feng3d.Color4();
-            return _this;
-        }
-        return UIImage;
-    }(feng3d.Behaviour));
-    feng3d.UIImage = UIImage;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
