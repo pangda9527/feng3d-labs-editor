@@ -42,7 +42,7 @@ namespace editor
             if (this.editorScene)
             {
                 // 设置鼠标射线
-                this.editorScene.mouseRay3D = this.getMouseRay3D();
+                this.editorScene.mouseRay3D = this.mouseRay3D;
                 this.editorScene.camera = this.camera;
 
                 this.editorScene.update();
