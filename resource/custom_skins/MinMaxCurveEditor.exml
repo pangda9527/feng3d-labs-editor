@@ -51,7 +51,7 @@
 			<e:VerticalLayout/>
 		</e:layout>
 	</e:Group>
-	<e:Button id="modeBtn" label="" right="10" y="20">
+	<e:Button id="preWrapModeBtn" label="" y="20" x="374" visible="false">
 		<e:skinName>
 		<e:Skin states="up,down,disabled">
 			<e:Image width="100%" height="100%" source="component_operation_png"/>
@@ -59,4 +59,13 @@
 		</e:Skin>
 		</e:skinName>
 	</e:Button>
+	<e:Button id="postWrapModeBtn" label="" y="45" x="373" visible="false">
+		<e:skinName>
+		<e:Skin states="up,down,disabled">
+			<e:Image width="100%" height="100%" source="component_operation_png"/>
+			<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+		</e:Skin>
+		</e:skinName>
+	</e:Button>
+	<e:Label id="keyPosLab" text="0.303,0.261" x="291" y="81" size="12" visible="false"/>
 </e:Skin>

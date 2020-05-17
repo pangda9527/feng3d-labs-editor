@@ -36,7 +36,10 @@ namespace editor
         public sample_5: eui.Image;
         public sample_6: eui.Image;
         public sample_7: eui.Image;
-        public modeBtn: eui.Button;
+        public preWrapModeBtn: eui.Button;
+        public postWrapModeBtn: eui.Button;
+        public keyPosLab: eui.Label;
+
 
         //
         private timeline: feng3d.AnimationCurve;
@@ -99,7 +102,8 @@ namespace editor
                 controller: null,
             }));
 
-            this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onModeBtn, this);
+            this.preWrapModeBtn.addEventListener(egret.MouseEvent.CLICK, this.onPreWrapModeBtn, this);
+            this.postWrapModeBtn.addEventListener(egret.MouseEvent.CLICK, this.onPostWrapMode, this);
 
             feng3d.watcher.watch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
 
@@ -119,7 +123,8 @@ namespace editor
 
             // feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
 
-            this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onModeBtn, this);
+            this.preWrapModeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPreWrapModeBtn, this);
+            this.postWrapModeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPostWrapMode, this);
 
             feng3d.watcher.unwatch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
 
@@ -156,6 +161,7 @@ namespace editor
             }
 
             this.drawSelectedKey();
+            this.updateWrapModeBtnPosition();
 
             // 设置绘制结果
             this.curveImage.source = this.imageUtil.toDataURL();
@@ -331,6 +337,41 @@ namespace editor
             }
         }
 
+        /**
+         * 更新曲线重复模式按钮位置
+         */
+        private updateWrapModeBtnPosition()
+        {
+            var selectTimeline = this.selectTimeline;
+
+            this.preWrapModeBtn.visible = false;
+            this.postWrapModeBtn.visible = false;
+
+            if (!selectTimeline) return;
+
+            this.preWrapModeBtn.visible = true;
+            this.postWrapModeBtn.visible = true;
+
+            var firstKey = selectTimeline.keys[0];
+            var prePos = this.curveToUIPos(firstKey.time, firstKey.value);
+            this.preWrapModeBtn.x = prePos.x - this.preWrapModeBtn.width - 10;
+            this.preWrapModeBtn.y = prePos.y;
+
+            var lastKey = selectTimeline.keys[selectTimeline.keys.length - 1];/*  */
+            var postPos = this.curveToUIPos(lastKey.time, lastKey.value);
+            this.postWrapModeBtn.x = postPos.x + 15;
+            this.postWrapModeBtn.y = postPos.y;
+
+            if (this.editKey)
+            {
+                var editKeyPos = this.curveToUIPos(this.editKey.time, this.editKey.value);
+                this.keyPosLab.x = editKeyPos.x;
+                this.keyPosLab.y = editKeyPos.y - this.keyPosLab.height - 5;
+
+                this.keyPosLab.text = this.editKey.time.toFixed(3) + "," + this.editKey.value.toFixed(3);
+            }
+        }
+
         private drawGrid(segmentW = 10, segmentH = 2)
         {
             //
@@ -403,6 +444,7 @@ namespace editor
 
             if (this.editKey != null || this.editorControlkey != null)
             {
+                this.keyPosLab.visible = true;
                 editorui.stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
                 editorui.stage.addEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
             }
@@ -459,6 +501,7 @@ namespace editor
         {
             this.editing = false;
             this.editorControlkey = null;
+            this.keyPosLab.visible = false;
 
             editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
@@ -540,7 +583,7 @@ namespace editor
 
         }
 
-        private onModeBtn(e: egret.TouchEvent)
+        private onPreWrapModeBtn(e: egret.TouchEvent)
         {
             e.stopPropagation();
 
@@ -549,7 +592,20 @@ namespace editor
             menu.popupEnum(feng3d.WrapMode, selectTimeline.preWrapMode, (v) =>
             {
                 selectTimeline.preWrapMode = v;
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            });
+        }
+
+        private onPostWrapMode(e: egret.TouchEvent)
+        {
+            e.stopPropagation();
+
+            var selectTimeline = this.selectTimeline;
+            if (!selectTimeline) return;
+            menu.popupEnum(feng3d.WrapMode, selectTimeline.postWrapMode, (v) =>
+            {
                 selectTimeline.postWrapMode = v;
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             });
         }
     }
