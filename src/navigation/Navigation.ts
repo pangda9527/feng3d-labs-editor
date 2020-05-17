@@ -136,7 +136,7 @@ namespace editor
 
             if (!gameobject.visible)
                 return geometrys;
-            var model = gameobject.getComponent(feng3d.Renderable);
+            var model = gameobject.getComponent(feng3d.Renderer);
             var geometry = model && model.geometry;
             if (geometry && gameobject.navigationArea != -1)
             {

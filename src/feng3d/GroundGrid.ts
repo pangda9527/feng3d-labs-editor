@@ -37,7 +37,7 @@ namespace editor
 
             this._gameObject.addChild(groundGridObject);
 
-            var model = groundGridObject.addComponent(feng3d.Renderable);
+            var model = groundGridObject.addComponent(feng3d.Renderer);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             model.material = feng3d.Material.getDefault("Segment-Material");
         }

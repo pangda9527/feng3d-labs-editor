@@ -90,7 +90,7 @@ namespace editor
                         skinnedModel.initMatrix = gameobject.transform.localToWorldMatrix.clone();
                     break;
                 case "Mesh":
-                    var model = gameobject.addComponent(feng3d.Renderable);
+                    var model = gameobject.addComponent(feng3d.Renderer);
                     model.geometry = parseGeometry(object3d.geometry);
                     model.material.renderParams.cullFace = feng3d.CullFace.NONE;
                     break;

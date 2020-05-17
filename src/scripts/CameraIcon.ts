@@ -58,7 +58,7 @@ namespace editor
                 },
                 ],
             });
-            this._segmentGeometry = <any>lightLines.getComponent(feng3d.Renderable).geometry;
+            this._segmentGeometry = <any>lightLines.getComponent(feng3d.Renderer).geometry;
             this.gameObject.addChild(lightLines);
             //
             var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -70,7 +70,7 @@ namespace editor
                     },
                 ]
             });
-            this._pointGeometry = <any>lightpoints.getComponent(feng3d.Renderable).geometry;
+            this._pointGeometry = <any>lightpoints.getComponent(feng3d.Renderer).geometry;
             this.gameObject.addChild(lightpoints);
 
             this.enabled = true;

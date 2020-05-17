@@ -139,7 +139,7 @@ namespace editor
          */
         drawMaterial(material: feng3d.Material, cameraRotation = new feng3d.Vector3(20, -90, 0))
         {
-            var mode = this.materialObject.getComponent(feng3d.Renderable);
+            var mode = this.materialObject.getComponent(feng3d.Renderer);
             mode.geometry = this.defaultGeometry;
             mode.material = material;
 
@@ -155,7 +155,7 @@ namespace editor
          */
         drawGeometry(geometry: feng3d.GeometryLike, cameraRotation = new feng3d.Vector3(-20, 120, 0))
         {
-            var model = this.geometryObject.getComponent(feng3d.Renderable);
+            var model = this.geometryObject.getComponent(feng3d.Renderer);
             model.geometry = geometry;
             model.material = this.defaultMaterial;
 
