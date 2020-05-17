@@ -49,7 +49,6 @@ namespace editor
 
         private editKey: feng3d.AnimationCurveKeyframe;
         private editorControlkey: feng3d.AnimationCurveKeyframe;
-        private editTimeline: feng3d.AnimationCurve;
         private editing = false;
         private mousedownxy = { x: -1, y: -1 }
         private selectedKey: feng3d.AnimationCurveKeyframe;
