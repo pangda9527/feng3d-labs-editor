@@ -113,6 +113,19 @@ namespace editor
         }
 
         /**
+         * 清理项目
+         * 
+         * @param callback 
+         */
+        clearProject(callback: () => void)
+        {
+            this._idMap = {};
+            this._pathMap = {};
+
+            this.fs.delete("", callback);
+        }
+
+        /**
          * 导出项目为zip压缩包
          * 
          * @param filename 导出后压缩包名称

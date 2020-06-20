@@ -34,7 +34,11 @@ namespace editor
         {
             editorRS.init(() =>
             {
-                editorRS.getAllAssets().map(asset =>
+                this._assetIDMap = {};
+                this._assetPathMap = {};
+
+                var allAssets = editorRS.getAllAssets();
+                allAssets.map(asset =>
                 {
                     var node = new AssetNode(asset);
                     this.addAsset(node);

@@ -30,7 +30,9 @@ namespace editor
                             label: "打开场景",
                             click: () =>
                             {
-                                editorData.gameScene = feng3d.View.createNewScene();
+                                alert("未实现！");
+                                //
+                                // editorData.gameScene = feng3d.View.createNewScene();
                             },
                         },
                         {
@@ -87,27 +89,30 @@ namespace editor
                             }
                         },
                         {
-                            label: "导入项目", click: () =>
+                            label: "打开项目", click: () =>
                             {
-                                editorRS.selectFile((filelist) =>
+                                editorRS.clearProject(() =>
                                 {
-                                    editorRS.importProject(filelist.item(0), () =>
+                                    editorRS.selectFile((filelist) =>
                                     {
-                                        console.log("导入项目完成");
-                                        editorAsset.initproject(() =>
+                                        editorRS.importProject(filelist.item(0), () =>
                                         {
-                                            editorAsset.runProjectScript(() =>
+                                            editorAsset.initproject(() =>
                                             {
-                                                editorAsset.readScene("default.scene.json", (err, scene) =>
+                                                editorAsset.runProjectScript(() =>
                                                 {
-                                                    editorData.gameScene = scene;
-                                                    editorui.assetview.invalidateAssettree();
-                                                    console.log("导入项目完成!");
+                                                    editorAsset.readScene("default.scene.json", (err, scene) =>
+                                                    {
+                                                        editorData.gameScene = scene;
+                                                        editorui.assetview.invalidateAssettree();
+                                                        console.log("打开项目完成!");
+                                                    });
                                                 });
                                             });
                                         });
                                     });
                                 });
+
                             }
                         },
                         {
