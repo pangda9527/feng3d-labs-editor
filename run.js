@@ -7,8 +7,6 @@ var result = [];
 var modules = [
     "../feng3d/tsconfig.json",
     "../feng2d/tsconfig.json",
-    "../TMPro/runtime/tsconfig.json",
-    "../unity/tsconfig.json",
     "../cannon/tsconfig.json",
     "../cannon-plugin/tsconfig.json",
 ];
