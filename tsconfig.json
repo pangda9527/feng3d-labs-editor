@@ -189,7 +189,7 @@
         "src/feng3d/hierarchy/Hierarchy.ts",
         "src/feng3d/scene/SceneRotateTool.ts",
         "src/feng3d/GroundGrid.ts",
-        "src/feng3d/EditorEngine.ts",
+        "src/feng3d/EditorView.ts",
         "src/feng3d/EditorComponent.ts",
         "src/feng3d/Feng3dScreenShot.ts",
         //
