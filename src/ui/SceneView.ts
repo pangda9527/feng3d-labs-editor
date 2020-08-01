@@ -241,11 +241,11 @@ namespace editor
 		{
 			if (!this.mouseInView) return;
 
-			var gameObjects = feng3d.raycaster.pickAll(this.view, this.view.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+			var gameObjects = feng3d.raycaster.pickAll(this.view.mouseRay3D, this.view.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
 			if (gameObjects.length > 0)
 				return;
 			//
-			gameObjects = feng3d.raycaster.pickAll(this.view, editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+			gameObjects = feng3d.raycaster.pickAll(this.view.mouseRay3D, editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
 			if (gameObjects.length == 0)
 			{
 				editorData.clearSelectedObjects();
