@@ -21,10 +21,10 @@
             "path": "../feng2d"
         },
         {
-            "path": "../cannon",
+            "path": "../cannon/cannon",
         },
         {
-            "path": "../cannon-plugin"
+            "path": "../cannon/cannon-plugin"
         },
     ],
     "files": [

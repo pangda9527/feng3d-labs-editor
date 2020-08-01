@@ -7,8 +7,8 @@ var result = [];
 var modules = [
     "../feng3d/tsconfig.json",
     "../feng2d/tsconfig.json",
-    "../cannon/tsconfig.json",
-    "../cannon-plugin/tsconfig.json",
+    "../cannon/cannon/tsconfig.json",
+    "../cannon/cannon-plugin/tsconfig.json",
 ];
 
 loadModule(modules, () =>
