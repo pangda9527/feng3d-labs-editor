@@ -137,14 +137,14 @@ namespace editor
             });
         }
 
-        private ongameobjectadded(event: feng3d.Event<feng3d.GameObject>)
+        private ongameobjectadded(event: feng3d.Event<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
         {
-            this.add(event.data);
+            this.add(event.data.child);
         }
 
-        private ongameobjectremoved(event: feng3d.Event<feng3d.GameObject>)
+        private ongameobjectremoved(event: feng3d.Event<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
         {
-            var node = nodeMap.get(event.data);
+            var node = nodeMap.get(event.data.child);
             this.remove(node);
         }
 
