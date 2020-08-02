@@ -6,12 +6,12 @@ namespace editor
     {
         rootnode: HierarchyNode;
 
-        @feng3d.watch("rootGameObjectChanged")
         rootGameObject: feng3d.GameObject;
 
         constructor()
         {
             feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
+            feng3d.watcher.watch(<Hierarchy>this, "rootGameObject", this.rootGameObjectChanged, this);
         }
 
         /**
@@ -104,8 +104,9 @@ namespace editor
 
         private _selectedGameObjects: feng3d.GameObject[] = [];
 
-        private rootGameObjectChanged(property, oldValue: feng3d.GameObject, newValue: feng3d.GameObject)
+        private rootGameObjectChanged(object: any, property: string, oldValue: feng3d.GameObject)
         {
+            var newValue: feng3d.GameObject = object[property];
             if (oldValue)
             {
                 oldValue.off("addChild", this.ongameobjectadded, this);

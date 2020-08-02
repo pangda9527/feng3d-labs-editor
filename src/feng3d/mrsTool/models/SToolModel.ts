@@ -56,15 +56,16 @@ namespace editor
         private selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
         private length = 100;
         //
-        @feng3d.watch("update")
         selected = false;
         //
-        @feng3d.watch("update")
         scaleValue = 1;
 
         init()
         {
             super.init();
+            feng3d.watcher.watch(<CoordinateScaleCube>this, "selected", this.update, this);
+            feng3d.watcher.watch(<CoordinateScaleCube>this, "scaleValue", this.update, this);
+
             var xLine = new feng3d.GameObject();
             var model = xLine.addComponent(feng3d.Renderer);
             var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {

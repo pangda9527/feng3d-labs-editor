@@ -9,7 +9,6 @@ namespace editor
     {
         __class__: "editor.DirectionLightIcon";
 
-        @feng3d.watch("onLightChanged")
         light: feng3d.DirectionalLight;
 
         get editorCamera() { return this._editorCamera; }
@@ -19,6 +18,7 @@ namespace editor
         init()
         {
             super.init();
+            feng3d.watcher.watch(<DirectionLightIcon>this, "light", this.onLightChanged, this);
             this.initicon();
             this.on("mousedown", this.onMousedown, this);
         }
@@ -102,8 +102,9 @@ namespace editor
         private _lightLines: feng3d.GameObject;
         private _textureMaterial: feng3d.Material;
 
-        private onLightChanged(property: string, oldValue: feng3d.DirectionalLight, value: feng3d.DirectionalLight)
+        private onLightChanged(object: DirectionLightIcon, property: string, oldValue: feng3d.DirectionalLight)
         {
+            var value: feng3d.DirectionalLight = object[property];
             if (oldValue)
             {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);

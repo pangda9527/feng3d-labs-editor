@@ -2,7 +2,6 @@ namespace editor
 {
     export class PointLightIcon extends EditorScript
     {
-        @feng3d.watch("onLightChanged")
         light: feng3d.PointLight;
 
         get editorCamera() { return this._editorCamera; }
@@ -12,6 +11,7 @@ namespace editor
         init()
         {
             super.init();
+            feng3d.watcher.watch(<PointLightIcon>this, "light", this.onLightChanged, this);
             this.initicon()
             this.on("mousedown", this.onMousedown, this);
         }
@@ -210,8 +210,9 @@ namespace editor
         private _segmentGeometry: feng3d.SegmentGeometry;
         private _pointGeometry: feng3d.PointGeometry;
 
-        private onLightChanged(property: string, oldValue: feng3d.PointLight, value: feng3d.PointLight)
+        private onLightChanged(object: PointLightIcon, property: string, oldValue: feng3d.PointLight)
         {
+            var value: feng3d.PointLight = object[property];
             if (oldValue)
             {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);

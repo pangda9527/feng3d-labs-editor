@@ -68,18 +68,20 @@ namespace editor
         private selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
 
         //
-        @feng3d.watch("update")
         selected = false;
 
         /**
          * 过滤法线显示某一面线条
          */
-        @feng3d.watch("update")
         filterNormal: feng3d.Vector3;
 
         init()
         {
             super.init();
+
+            feng3d.watcher.watch(<CoordinateRotationAxis>this, "selected", this.update, this);
+            feng3d.watcher.watch(<CoordinateRotationAxis>this, "filterNormal", this.update, this);
+
             this.initModels();
         }
 
@@ -269,12 +271,12 @@ namespace editor
         private selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
 
         //
-        @feng3d.watch("update")
         selected = false;
 
         init()
         {
             super.init();
+            feng3d.watcher.watch(<CoordinateRotationFreeAxis>this, "selected", this.update, this);
             this.initModels();
         }
 

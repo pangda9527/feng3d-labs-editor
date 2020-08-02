@@ -2,7 +2,6 @@ namespace editor
 {
     export class CameraIcon extends EditorScript
     {
-        @feng3d.watch("onCameraChanged")
         camera: feng3d.Camera;
 
         get editorCamera() { return this._editorCamera; }
@@ -12,6 +11,7 @@ namespace editor
         init()
         {
             super.init();
+            feng3d.watcher.watch(<CameraIcon>this, "camera", this.onCameraChanged, this);
             this.initicon()
             this.on("mousedown", this.onMousedown, this);
         }

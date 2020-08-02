@@ -80,12 +80,13 @@ namespace editor
         private length: number = 100;
 
         //
-        @feng3d.watch("update")
         selected = false;
 
         init()
         {
             super.init();
+
+            feng3d.watcher.watch(<CoordinateAxis>this, "selected", this.update, this);
 
             var xLine = new feng3d.GameObject();
             var model = xLine.addComponent(feng3d.Renderer);
@@ -134,12 +135,14 @@ namespace editor
         color = new feng3d.Color4(1, 1, 1, 0.99);
         selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
         //
-        @feng3d.watch("update")
         selected = false;
 
         init()
         {
             super.init();
+            
+            feng3d.watcher.watch(<CoordinateCube>this, "selected", this.update, this);
+            
             //
             this.oCube = new feng3d.GameObject();
             var model = this.oCube.addComponent(feng3d.Renderer)
@@ -176,12 +179,12 @@ namespace editor
         get width() { return this._width; }
         private _width = 20
         //
-        @feng3d.watch("update")
         selected = false;
 
         init()
         {
             super.init();
+            feng3d.watcher.watch(<CoordinatePlane>this, "selected", this.update, this);
 
             var plane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "plane" });
             var model = plane.addComponent(feng3d.Renderer);
