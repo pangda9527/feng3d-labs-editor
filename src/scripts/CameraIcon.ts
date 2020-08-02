@@ -175,18 +175,18 @@ namespace editor
         private _pointGeometry: feng3d.PointGeometry;
         private _lensChanged = true;
 
-        private onCameraChanged(property: string, oldValue: feng3d.Camera, value: feng3d.Camera)
+        private onCameraChanged(newValue: feng3d.Camera, oldValue: feng3d.Camera)
         {
             if (oldValue)
             {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
                 oldValue.off("lensChanged", this.onLensChanged, this);
             }
-            if (value)
+            if (newValue)
             {
                 this.onScenetransformChanged();
-                value.on("scenetransformChanged", this.onScenetransformChanged, this);
-                value.on("lensChanged", this.onLensChanged, this);
+                newValue.on("scenetransformChanged", this.onScenetransformChanged, this);
+                newValue.on("lensChanged", this.onLensChanged, this);
             }
         }
 

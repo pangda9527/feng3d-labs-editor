@@ -69,7 +69,7 @@ namespace editor
 			this.offRootNode(hierarchy.rootnode);
 		}
 
-		private onRootNodeChanged(host?: any, property?: string, oldvalue?: HierarchyNode)
+		private onRootNodeChanged(newValue?: HierarchyNode, oldvalue?: HierarchyNode)
 		{
 			this.offRootNode(oldvalue);
 			this.onRootNode(hierarchy.rootnode);

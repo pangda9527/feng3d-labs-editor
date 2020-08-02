@@ -102,17 +102,16 @@ namespace editor
         private _lightLines: feng3d.GameObject;
         private _textureMaterial: feng3d.Material;
 
-        private onLightChanged(object: DirectionLightIcon, property: string, oldValue: feng3d.DirectionalLight)
+        private onLightChanged(newValue: feng3d.DirectionalLight, oldValue: feng3d.DirectionalLight)
         {
-            var value: feng3d.DirectionalLight = object[property];
             if (oldValue)
             {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
             }
-            if (value)
+            if (newValue)
             {
                 this.onScenetransformChanged();
-                value.on("scenetransformChanged", this.onScenetransformChanged, this);
+                newValue.on("scenetransformChanged", this.onScenetransformChanged, this);
             }
         }
 

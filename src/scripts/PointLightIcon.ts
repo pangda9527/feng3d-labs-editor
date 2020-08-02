@@ -210,17 +210,16 @@ namespace editor
         private _segmentGeometry: feng3d.SegmentGeometry;
         private _pointGeometry: feng3d.PointGeometry;
 
-        private onLightChanged(object: PointLightIcon, property: string, oldValue: feng3d.PointLight)
+        private onLightChanged(newValue: feng3d.PointLight, oldValue: feng3d.PointLight)
         {
-            var value: feng3d.PointLight = object[property];
             if (oldValue)
             {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
             }
-            if (value)
+            if (newValue)
             {
                 this.onScenetransformChanged();
-                value.on("scenetransformChanged", this.onScenetransformChanged, this);
+                newValue.on("scenetransformChanged", this.onScenetransformChanged, this);
             }
         }
 

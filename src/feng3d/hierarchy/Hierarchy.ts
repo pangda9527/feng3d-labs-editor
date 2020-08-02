@@ -104,9 +104,8 @@ namespace editor
 
         private _selectedGameObjects: feng3d.GameObject[] = [];
 
-        private rootGameObjectChanged(object: any, property: string, oldValue: feng3d.GameObject)
+        private rootGameObjectChanged(newValue: feng3d.GameObject, oldValue: feng3d.GameObject)
         {
-            var newValue: feng3d.GameObject = object[property];
             if (oldValue)
             {
                 oldValue.off("addChild", this.ongameobjectadded, this);
