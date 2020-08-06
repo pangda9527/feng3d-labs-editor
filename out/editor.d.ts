@@ -809,6 +809,12 @@ declare namespace editor {
          */
         selectFile(callback: (file: FileList) => void): void;
         /**
+         * 清理项目
+         *
+         * @param callback
+         */
+        clearProject(callback: () => void): void;
+        /**
          * 导出项目为zip压缩包
          *
          * @param filename 导出后压缩包名称
@@ -1756,14 +1762,15 @@ declare namespace editor {
         sample_5: eui.Image;
         sample_6: eui.Image;
         sample_7: eui.Image;
-        modeBtn: eui.Button;
+        preWrapModeBtn: eui.Button;
+        postWrapModeBtn: eui.Button;
+        keyPosLab: eui.Label;
         private timeline;
         private timeline1;
         private curveRect;
         private canvasRect;
         private editKey;
         private editorControlkey;
-        private editTimeline;
         private editing;
         private mousedownxy;
         private selectedKey;
@@ -1815,6 +1822,10 @@ declare namespace editor {
          * 绘制选中的关键点
          */
         private drawSelectedKey;
+        /**
+         * 更新曲线重复模式按钮位置
+         */
+        private updateWrapModeBtnPosition;
         private drawGrid;
         private _onMinMaxCurveChanged;
         private _onReSize;
@@ -1823,7 +1834,8 @@ declare namespace editor {
         private onMouseUp;
         private findControlKey;
         private ondblclick;
-        private onModeBtn;
+        private onPreWrapModeBtn;
+        private onPostWrapMode;
     }
 }
 declare namespace editor {
@@ -2049,6 +2061,21 @@ declare namespace editor {
         constructor(objectViewInfo: feng3d.ObjectViewInfo);
         getAttributeView(attributeName: String): any;
         getblockView(blockName: String): any;
+    }
+}
+declare namespace editor {
+    class OVFolderAsset extends eui.Component implements feng3d.IObjectView {
+        space: feng3d.FolderAsset;
+        private _objectViewInfo;
+        nameLabel: eui.Label;
+        openBtn: eui.Button;
+        constructor(objectViewInfo: feng3d.ObjectViewInfo);
+        $onAddToStage(stage: egret.Stage, nestLevel: number): void;
+        $onRemoveFromStage(): void;
+        updateView(): void;
+        getAttributeView(attributeName: String): any;
+        getblockView(blockName: String): any;
+        private onOpenBtnClick;
     }
 }
 declare namespace editor {
@@ -2390,6 +2417,26 @@ declare namespace editor {
         zTextInput: eui.TextInput;
         wLabel: eui.Label;
         wTextInput: eui.TextInput;
+        /**
+         * 步长，精度
+         */
+        step: number;
+        /**
+         * 键盘上下方向键步长
+         */
+        stepDownup: number;
+        /**
+         * 移动一个像素时增加的步长数量
+         */
+        stepScale: number;
+        /**
+         * 最小值
+         */
+        minValue: number;
+        /**
+         * 最小值
+         */
+        maxValue: number;
         constructor(attributeViewInfo: feng3d.AttributeViewInfo);
         initView(): void;
     }
@@ -2812,6 +2859,7 @@ declare namespace editor {
          * 资源ID字典
          */
         private _assetIDMap;
+        private _assetPathMap;
         /**
          * 显示文件夹
          */
@@ -2826,6 +2874,12 @@ declare namespace editor {
          * @param callback
          */
         initproject(callback: () => void): void;
+        /**
+         * 添加新资源
+         *
+         * @param node 资源
+         */
+        addAsset(node: AssetNode): void;
         readScene(path: string, callback: (err: Error, scene: feng3d.Scene) => void): void;
         /**
          * 根据资源编号获取文件
@@ -2833,6 +2887,12 @@ declare namespace editor {
          * @param assetId 文件路径
          */
         getAssetByID(assetId: string): AssetNode;
+        /**
+         * 根据资源路径获取文件
+         *
+         * @param path 资源路径
+         */
+        getAssetByPath(path: string): AssetNode;
         /**
          * 删除资源
          *
@@ -2855,7 +2915,7 @@ declare namespace editor {
          * @param folderNode 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        createAsset<T extends feng3d.FileAsset>(folderNode: AssetNode, cls: new () => T, fileName?: string, value?: feng3d.gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void): void;
+        createAsset<T extends feng3d.FileAsset>(folderPath: string, cls: new () => T, fileName?: string, value?: feng3d.gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void): void;
         /**
          * 弹出文件菜单
          */
@@ -4474,380 +4534,380 @@ declare namespace editor {
 declare namespace editor {
     var viewLayoutConfig: {
         Default: {
-            "x": number;
-            "y": number;
-            "width": number;
-            "height": number;
-            "percentWidth": any;
-            "percentHeight": any;
-            "top": number;
-            "bottom": number;
-            "left": number;
-            "right": number;
-            "type": string;
-            "layout": string;
-            "children": ({
-                "x": number;
-                "y": number;
-                "width": number;
-                "height": number;
-                "percentWidth": number;
-                "percentHeight": number;
-                "top": any;
-                "bottom": any;
-                "left": any;
-                "right": any;
-                "type": string;
-                "layout": string;
-                "children": ({
-                    "x": number;
-                    "y": number;
-                    "width": number;
-                    "height": number;
-                    "percentWidth": number;
-                    "percentHeight": number;
-                    "top": any;
-                    "bottom": any;
-                    "left": any;
-                    "right": any;
-                    "type": string;
-                    "layout": string;
-                    "children": {
-                        "x": number;
-                        "y": number;
-                        "width": number;
-                        "height": number;
-                        "percentWidth": number;
-                        "percentHeight": number;
-                        "top": any;
-                        "bottom": any;
-                        "left": any;
-                        "right": any;
-                        "type": string;
-                        "modules": string[];
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+            percentWidth: any;
+            percentHeight: any;
+            top: number;
+            bottom: number;
+            left: number;
+            right: number;
+            type: string;
+            layout: string;
+            children: ({
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                percentWidth: number;
+                percentHeight: number;
+                top: any;
+                bottom: any;
+                left: any;
+                right: any;
+                type: string;
+                layout: string;
+                children: ({
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                    percentWidth: number;
+                    percentHeight: number;
+                    top: any;
+                    bottom: any;
+                    left: any;
+                    right: any;
+                    type: string;
+                    layout: string;
+                    children: {
+                        x: number;
+                        y: number;
+                        width: number;
+                        height: number;
+                        percentWidth: number;
+                        percentHeight: number;
+                        top: any;
+                        bottom: any;
+                        left: any;
+                        right: any;
+                        type: string;
+                        modules: string[];
                     }[];
-                    "modules"?: undefined;
+                    modules?: undefined;
                 } | {
-                    "x": number;
-                    "y": number;
-                    "width": number;
-                    "height": number;
-                    "percentWidth": number;
-                    "percentHeight": any;
-                    "top": any;
-                    "bottom": any;
-                    "left": any;
-                    "right": any;
-                    "type": string;
-                    "modules": string[];
-                    "layout"?: undefined;
-                    "children"?: undefined;
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                    percentWidth: number;
+                    percentHeight: any;
+                    top: any;
+                    bottom: any;
+                    left: any;
+                    right: any;
+                    type: string;
+                    modules: string[];
+                    layout?: undefined;
+                    children?: undefined;
                 })[];
-                "modules"?: undefined;
+                modules?: undefined;
             } | {
-                "x": number;
-                "y": number;
-                "width": number;
-                "height": number;
-                "percentWidth": number;
-                "percentHeight": number;
-                "top": any;
-                "bottom": any;
-                "left": any;
-                "right": any;
-                "type": string;
-                "modules": string[];
-                "layout"?: undefined;
-                "children"?: undefined;
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                percentWidth: number;
+                percentHeight: number;
+                top: any;
+                bottom: any;
+                left: any;
+                right: any;
+                type: string;
+                modules: string[];
+                layout?: undefined;
+                children?: undefined;
             })[];
         };
         Tall: {
-            "x": number;
-            "y": number;
-            "width": number;
-            "height": number;
-            "percentWidth": any;
-            "percentHeight": any;
-            "top": number;
-            "bottom": number;
-            "left": number;
-            "right": number;
-            "type": string;
-            "layout": string;
-            "children": ({
-                "x": number;
-                "y": number;
-                "width": number;
-                "height": number;
-                "percentWidth": number;
-                "percentHeight": number;
-                "top": any;
-                "bottom": any;
-                "left": any;
-                "right": any;
-                "type": string;
-                "layout": string;
-                "children": ({
-                    "x": number;
-                    "y": number;
-                    "width": number;
-                    "height": number;
-                    "percentWidth": number;
-                    "percentHeight": number;
-                    "top": any;
-                    "bottom": any;
-                    "left": any;
-                    "right": any;
-                    "type": string;
-                    "modules": string[];
-                    "layout"?: undefined;
-                    "children"?: undefined;
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+            percentWidth: any;
+            percentHeight: any;
+            top: number;
+            bottom: number;
+            left: number;
+            right: number;
+            type: string;
+            layout: string;
+            children: ({
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                percentWidth: number;
+                percentHeight: number;
+                top: any;
+                bottom: any;
+                left: any;
+                right: any;
+                type: string;
+                layout: string;
+                children: ({
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                    percentWidth: number;
+                    percentHeight: number;
+                    top: any;
+                    bottom: any;
+                    left: any;
+                    right: any;
+                    type: string;
+                    modules: string[];
+                    layout?: undefined;
+                    children?: undefined;
                 } | {
-                    "x": number;
-                    "y": number;
-                    "width": number;
-                    "height": number;
-                    "percentWidth": number;
-                    "percentHeight": number;
-                    "top": any;
-                    "bottom": any;
-                    "left": any;
-                    "right": any;
-                    "type": string;
-                    "layout": string;
-                    "children": {
-                        "x": number;
-                        "y": number;
-                        "width": number;
-                        "height": number;
-                        "percentWidth": number;
-                        "percentHeight": number;
-                        "top": any;
-                        "bottom": any;
-                        "left": any;
-                        "right": any;
-                        "type": string;
-                        "modules": string[];
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                    percentWidth: number;
+                    percentHeight: number;
+                    top: any;
+                    bottom: any;
+                    left: any;
+                    right: any;
+                    type: string;
+                    layout: string;
+                    children: {
+                        x: number;
+                        y: number;
+                        width: number;
+                        height: number;
+                        percentWidth: number;
+                        percentHeight: number;
+                        top: any;
+                        bottom: any;
+                        left: any;
+                        right: any;
+                        type: string;
+                        modules: string[];
                     }[];
-                    "modules"?: undefined;
+                    modules?: undefined;
                 })[];
-                "modules"?: undefined;
+                modules?: undefined;
             } | {
-                "x": number;
-                "y": number;
-                "width": number;
-                "height": number;
-                "percentWidth": number;
-                "percentHeight": number;
-                "top": any;
-                "bottom": any;
-                "left": any;
-                "right": any;
-                "type": string;
-                "modules": string[];
-                "layout"?: undefined;
-                "children"?: undefined;
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                percentWidth: number;
+                percentHeight: number;
+                top: any;
+                bottom: any;
+                left: any;
+                right: any;
+                type: string;
+                modules: string[];
+                layout?: undefined;
+                children?: undefined;
             })[];
         };
         Wide: {
-            "x": number;
-            "y": number;
-            "width": number;
-            "height": number;
-            "percentWidth": any;
-            "percentHeight": any;
-            "top": number;
-            "bottom": number;
-            "left": number;
-            "right": number;
-            "type": string;
-            "layout": string;
-            "children": ({
-                "x": number;
-                "y": number;
-                "width": number;
-                "height": number;
-                "percentWidth": number;
-                "percentHeight": number;
-                "top": any;
-                "bottom": any;
-                "left": any;
-                "right": any;
-                "type": string;
-                "layout": string;
-                "children": ({
-                    "x": number;
-                    "y": number;
-                    "width": number;
-                    "height": number;
-                    "percentWidth": number;
-                    "percentHeight": number;
-                    "top": any;
-                    "bottom": any;
-                    "left": any;
-                    "right": any;
-                    "type": string;
-                    "modules": string[];
-                    "layout"?: undefined;
-                    "children"?: undefined;
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+            percentWidth: any;
+            percentHeight: any;
+            top: number;
+            bottom: number;
+            left: number;
+            right: number;
+            type: string;
+            layout: string;
+            children: ({
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                percentWidth: number;
+                percentHeight: number;
+                top: any;
+                bottom: any;
+                left: any;
+                right: any;
+                type: string;
+                layout: string;
+                children: ({
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                    percentWidth: number;
+                    percentHeight: number;
+                    top: any;
+                    bottom: any;
+                    left: any;
+                    right: any;
+                    type: string;
+                    modules: string[];
+                    layout?: undefined;
+                    children?: undefined;
                 } | {
-                    "x": number;
-                    "y": number;
-                    "width": number;
-                    "height": number;
-                    "percentWidth": number;
-                    "percentHeight": number;
-                    "top": any;
-                    "bottom": any;
-                    "left": any;
-                    "right": any;
-                    "type": string;
-                    "layout": string;
-                    "children": {
-                        "x": number;
-                        "y": number;
-                        "width": number;
-                        "height": number;
-                        "percentWidth": number;
-                        "percentHeight": number;
-                        "top": any;
-                        "bottom": any;
-                        "left": any;
-                        "right": any;
-                        "type": string;
-                        "modules": string[];
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                    percentWidth: number;
+                    percentHeight: number;
+                    top: any;
+                    bottom: any;
+                    left: any;
+                    right: any;
+                    type: string;
+                    layout: string;
+                    children: {
+                        x: number;
+                        y: number;
+                        width: number;
+                        height: number;
+                        percentWidth: number;
+                        percentHeight: number;
+                        top: any;
+                        bottom: any;
+                        left: any;
+                        right: any;
+                        type: string;
+                        modules: string[];
                     }[];
-                    "modules"?: undefined;
+                    modules?: undefined;
                 })[];
-                "modules"?: undefined;
+                modules?: undefined;
             } | {
-                "x": number;
-                "y": number;
-                "width": number;
-                "height": number;
-                "percentWidth": number;
-                "percentHeight": number;
-                "top": any;
-                "bottom": any;
-                "left": any;
-                "right": any;
-                "type": string;
-                "modules": string[];
-                "layout"?: undefined;
-                "children"?: undefined;
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                percentWidth: number;
+                percentHeight: number;
+                top: any;
+                bottom: any;
+                left: any;
+                right: any;
+                type: string;
+                modules: string[];
+                layout?: undefined;
+                children?: undefined;
             })[];
         };
         fourSplit: {
-            "x": number;
-            "y": number;
-            "width": number;
-            "height": number;
-            "percentWidth": any;
-            "percentHeight": any;
-            "top": number;
-            "bottom": number;
-            "left": number;
-            "right": number;
-            "type": string;
-            "layout": string;
-            "children": ({
-                "x": number;
-                "y": number;
-                "width": number;
-                "height": number;
-                "percentWidth": number;
-                "percentHeight": number;
-                "top": any;
-                "bottom": any;
-                "left": any;
-                "right": any;
-                "type": string;
-                "layout": string;
-                "children": ({
-                    "x": number;
-                    "y": number;
-                    "width": number;
-                    "height": number;
-                    "percentWidth": number;
-                    "percentHeight": number;
-                    "top": any;
-                    "bottom": any;
-                    "left": any;
-                    "right": any;
-                    "type": string;
-                    "layout": string;
-                    "children": {
-                        "x": number;
-                        "y": number;
-                        "width": number;
-                        "height": number;
-                        "percentWidth": number;
-                        "percentHeight": number;
-                        "top": any;
-                        "bottom": any;
-                        "left": any;
-                        "right": any;
-                        "type": string;
-                        "layout": string;
-                        "children": {
-                            "x": number;
-                            "y": number;
-                            "width": number;
-                            "height": number;
-                            "percentWidth": number;
-                            "percentHeight": number;
-                            "top": any;
-                            "bottom": any;
-                            "left": any;
-                            "right": any;
-                            "type": string;
-                            "modules": string[];
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+            percentWidth: any;
+            percentHeight: any;
+            top: number;
+            bottom: number;
+            left: number;
+            right: number;
+            type: string;
+            layout: string;
+            children: ({
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                percentWidth: number;
+                percentHeight: number;
+                top: any;
+                bottom: any;
+                left: any;
+                right: any;
+                type: string;
+                layout: string;
+                children: ({
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                    percentWidth: number;
+                    percentHeight: number;
+                    top: any;
+                    bottom: any;
+                    left: any;
+                    right: any;
+                    type: string;
+                    layout: string;
+                    children: {
+                        x: number;
+                        y: number;
+                        width: number;
+                        height: number;
+                        percentWidth: number;
+                        percentHeight: number;
+                        top: any;
+                        bottom: any;
+                        left: any;
+                        right: any;
+                        type: string;
+                        layout: string;
+                        children: {
+                            x: number;
+                            y: number;
+                            width: number;
+                            height: number;
+                            percentWidth: number;
+                            percentHeight: number;
+                            top: any;
+                            bottom: any;
+                            left: any;
+                            right: any;
+                            type: string;
+                            modules: string[];
                         }[];
                     }[];
                 } | {
-                    "x": number;
-                    "y": number;
-                    "width": number;
-                    "height": number;
-                    "percentWidth": number;
-                    "percentHeight": number;
-                    "top": any;
-                    "bottom": any;
-                    "left": any;
-                    "right": any;
-                    "type": string;
-                    "layout": string;
-                    "children": {
-                        "x": number;
-                        "y": number;
-                        "width": number;
-                        "height": number;
-                        "percentWidth": number;
-                        "percentHeight": number;
-                        "top": any;
-                        "bottom": any;
-                        "left": any;
-                        "right": any;
-                        "type": string;
-                        "modules": string[];
+                    x: number;
+                    y: number;
+                    width: number;
+                    height: number;
+                    percentWidth: number;
+                    percentHeight: number;
+                    top: any;
+                    bottom: any;
+                    left: any;
+                    right: any;
+                    type: string;
+                    layout: string;
+                    children: {
+                        x: number;
+                        y: number;
+                        width: number;
+                        height: number;
+                        percentWidth: number;
+                        percentHeight: number;
+                        top: any;
+                        bottom: any;
+                        left: any;
+                        right: any;
+                        type: string;
+                        modules: string[];
                     }[];
                 })[];
-                "modules"?: undefined;
+                modules?: undefined;
             } | {
-                "x": number;
-                "y": number;
-                "width": number;
-                "height": number;
-                "percentWidth": number;
-                "percentHeight": number;
-                "top": any;
-                "bottom": any;
-                "left": any;
-                "right": any;
-                "type": string;
-                "modules": string[];
-                "layout"?: undefined;
-                "children"?: undefined;
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                percentWidth: number;
+                percentHeight: number;
+                top: any;
+                bottom: any;
+                left: any;
+                right: any;
+                type: string;
+                modules: string[];
+                layout?: undefined;
+                children?: undefined;
             })[];
         };
     };

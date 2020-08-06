@@ -10,8 +10,8 @@
             "ES2015",
             "dom"
         ],
-        // "outFile": "out/editor.js"
-        "outDir": "debug"
+        "outFile": "out/editor.js"
+        // "outDir": "debug"
     },
     "references": [
         {
