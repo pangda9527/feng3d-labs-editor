@@ -60,7 +60,7 @@ namespace editor
 			} else if (this.component instanceof feng3d.Terrain)
 			{
 				this.componentIcon.source = "Terrain_png";
-			} else if (this.component instanceof feng3d.Renderer)
+			} else if (this.component instanceof feng3d.Renderable)
 			{
 				this.componentIcon.source = "Model_png";
 			} else if (this.component instanceof feng3d.ScriptComponent)

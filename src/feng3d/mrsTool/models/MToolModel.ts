@@ -89,14 +89,14 @@ namespace editor
             feng3d.watcher.watch(<CoordinateAxis>this, "selected", this.update, this);
 
             var xLine = new feng3d.GameObject();
-            var model = xLine.addComponent(feng3d.Renderer);
+            var model = xLine.addComponent(feng3d.Renderable);
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             segmentGeometry.addSegment({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
             this.segmentMaterial = model.material = feng3d.Material.create("segment");
             this.gameObject.addChild(xLine);
             //
             this.xArrow = new feng3d.GameObject();
-            model = this.xArrow.addComponent(feng3d.Renderer);
+            model = this.xArrow.addComponent(feng3d.Renderable);
             model.geometry = feng3d.serialization.setValue(new feng3d.ConeGeometry(), { bottomRadius: 5, height: 18 });
             this.material = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
             this.material.renderParams.enableBlend = true;
@@ -104,7 +104,7 @@ namespace editor
             this.gameObject.addChild(this.xArrow);
 
             var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hitCoordinateAxis" });
-            model = mouseHit.addComponent(feng3d.Renderer);
+            model = mouseHit.addComponent(feng3d.Renderable);
             model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length });
             //model.material = materialFactory.create("color");
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
@@ -145,7 +145,7 @@ namespace editor
             
             //
             this.oCube = new feng3d.GameObject();
-            var model = this.oCube.addComponent(feng3d.Renderer)
+            var model = this.oCube.addComponent(feng3d.Renderable)
             model.geometry = feng3d.serialization.setValue(new feng3d.CubeGeometry(), { width: 8, height: 8, depth: 8 });
             this.colorMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
             this.colorMaterial.renderParams.enableBlend = true;
@@ -187,7 +187,7 @@ namespace editor
             feng3d.watcher.watch(<CoordinatePlane>this, "selected", this.update, this);
 
             var plane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "plane" });
-            var model = plane.addComponent(feng3d.Renderer);
+            var model = plane.addComponent(feng3d.Renderable);
             plane.transform.x = plane.transform.z = this._width / 2;
             model.geometry = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { width: this._width, height: this._width });
             this.colorMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
@@ -197,7 +197,7 @@ namespace editor
             this.gameObject.addChild(plane);
 
             var border = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "border" });
-            model = border.addComponent(feng3d.Renderer);
+            model = border.addComponent(feng3d.Renderable);
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             model.material = feng3d.Material.create(
                 "segment",

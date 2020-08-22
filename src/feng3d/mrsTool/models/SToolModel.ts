@@ -67,7 +67,7 @@ namespace editor
             feng3d.watcher.watch(<CoordinateScaleCube>this, "scaleValue", this.update, this);
 
             var xLine = new feng3d.GameObject();
-            var model = xLine.addComponent(feng3d.Renderer);
+            var model = xLine.addComponent(feng3d.Renderable);
             var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
@@ -79,7 +79,7 @@ namespace editor
             this.gameObject.addChild(this.coordinateCube.gameObject);
 
             var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hit" });
-            model = mouseHit.addComponent(feng3d.Renderer);
+            model = mouseHit.addComponent(feng3d.Renderable);
             model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length - 4 });
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
