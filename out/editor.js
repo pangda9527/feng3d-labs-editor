@@ -13388,6 +13388,7 @@ var editor;
     editor.Navigation = Navigation;
 })(editor || (editor = {}));
 // see https://github.com/sshirokov/ThreeBSP
+// see https://github.com/chandlerprall/ThreeCSG/blob/master/ThreeCSG.js
 var feng3d;
 (function (feng3d) {
     /**

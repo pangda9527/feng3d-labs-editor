@@ -1,4 +1,5 @@
 // see https://github.com/sshirokov/ThreeBSP
+// see https://github.com/chandlerprall/ThreeCSG/blob/master/ThreeCSG.js
 
 namespace feng3d
 {
