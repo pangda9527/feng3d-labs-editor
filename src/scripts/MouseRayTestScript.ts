@@ -20,7 +20,7 @@ namespace editor
             gameobject.mouseEnabled = false;
             this.gameObject.addChild(gameobject);
 
-            var position = mouseRay3D.position.clone();
+            var position = mouseRay3D.origin.clone();
             var direction = mouseRay3D.direction.clone();
             position = gameobject.transform.inverseTransformPoint(position);
             direction = gameobject.transform.inverseTransformDirection(direction);

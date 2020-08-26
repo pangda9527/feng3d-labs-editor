@@ -11869,7 +11869,7 @@ var editor;
         getMousePlaneCross() {
             var line3D = this.gameObject.scene.mouseRay3D;
             //射线与平面交点
-            var crossPos = this.movePlane3D.intersectWithLine3D(line3D);
+            var crossPos = this.movePlane3D.intersectWithLine3(line3D);
             return crossPos;
         }
     }
@@ -14545,7 +14545,7 @@ var editor;
             model.geometry = feng3d.serialization.setValue(new feng3d.SphereGeometry(), { radius: 10 });
             gameobject.mouseEnabled = false;
             this.gameObject.addChild(gameobject);
-            var position = mouseRay3D.position.clone();
+            var position = mouseRay3D.origin.clone();
             var direction = mouseRay3D.direction.clone();
             position = gameobject.transform.inverseTransformPoint(position);
             direction = gameobject.transform.inverseTransformDirection(direction);

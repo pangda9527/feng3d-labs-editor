@@ -137,7 +137,7 @@ namespace editor
         {
             var line3D = this.gameObject.scene.mouseRay3D;
             //射线与平面交点
-            var crossPos = <feng3d.Vector3>this.movePlane3D.intersectWithLine3D(line3D);
+            var crossPos = <feng3d.Vector3>this.movePlane3D.intersectWithLine3(line3D);
             return crossPos;
         }
     }
