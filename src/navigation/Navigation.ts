@@ -138,7 +138,7 @@ namespace editor
                 return geometrys;
             var model = gameobject.getComponent(feng3d.Renderable);
             var geometry = model && model.geometry;
-            if (geometry && gameobject.navigationArea != -1)
+            if (geometry)
             {
                 var matrix = gameobject.transform.localToWorldMatrix;
                 var positions = Array.apply(null, geometry.positions);
