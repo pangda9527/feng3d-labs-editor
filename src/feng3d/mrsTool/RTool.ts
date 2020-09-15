@@ -13,7 +13,7 @@ namespace editor
         init()
         {
             super.init();
-            this.toolModel = new feng3d.GameObject().addComponent(RToolModel);
+            this.toolModel = new feng3d.GameObject().addComponent("RToolModel");
         }
         protected onAddedToScene()
         {

@@ -86,7 +86,7 @@ namespace editor
                 }
                 editorRS.deserializeWithAssets(obj, (object: feng3d.GameObject) =>
                 {
-                    var scene = object.getComponent(feng3d.Scene);
+                    var scene = object.getComponent("Scene");
                     callback(null, scene);
                 });
             });

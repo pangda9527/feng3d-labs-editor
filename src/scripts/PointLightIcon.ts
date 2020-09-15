@@ -1,5 +1,8 @@
+namespace feng3d { export interface ComponentMap { PointLightIcon: editor.PointLightIcon; } }
+
 namespace editor
 {
+    @feng3d.RegisterComponent()
     export class PointLightIcon extends EditorScript
     {
         light: feng3d.PointLight;
@@ -41,7 +44,7 @@ namespace editor
                     },
                 ],
             });
-            this._textureMaterial = <any>lightIcon.getComponent(feng3d.Renderable).material;
+            this._textureMaterial = <any>lightIcon.getComponent("Renderable").material;
             this.gameObject.addChild(lightIcon);
 
             //
@@ -58,7 +61,7 @@ namespace editor
                     geometry: { __class__: "feng3d.SegmentGeometry" },
                 }]
             });
-            this._segmentGeometry = <any>lightLines.getComponent(feng3d.Renderable).geometry;
+            this._segmentGeometry = <any>lightLines.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightLines);
             //
             var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -80,7 +83,7 @@ namespace editor
                     },
                 }],
             });
-            this._pointGeometry = <any>lightpoints.getComponent(feng3d.Renderable).geometry;
+            this._pointGeometry = <any>lightpoints.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightpoints);
 
             this.enabled = true;

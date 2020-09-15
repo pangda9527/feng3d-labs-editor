@@ -8,7 +8,7 @@ namespace editor
      */
     function setAwaysVisible(component: feng3d.Component)
     {
-        var models = component.getComponentsInChildren(feng3d.Renderable);
+        var models = component.getComponentsInChildren("Renderable");
         models.forEach(element =>
         {
             if (element.material && !element.material.assetId)
@@ -43,9 +43,9 @@ namespace editor
 
             this.mrsToolObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MRSTool" });
 
-            this.mTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(MTool);
-            this.rTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(RTool);
-            this.sTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(STool);
+            this.mTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent("MTool");
+            this.rTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent("RTool");
+            this.sTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent("STool");
 
             this.mTool.mrsToolTarget = this.mrsToolTarget;
             this.rTool.mrsToolTarget = this.mrsToolTarget;

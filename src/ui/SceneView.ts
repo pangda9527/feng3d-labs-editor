@@ -60,28 +60,28 @@ namespace editor
 				document.getElementById("app").appendChild(this._canvas);
 				this.view = new EditorView(this._canvas);
 				//
-				var editorCamera = this.editorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
+				var editorCamera = this.editorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent("Camera");
 				editorCamera.lens.far = 5000;
 				editorCamera.transform.x = 5;
 				editorCamera.transform.y = 3;
 				editorCamera.transform.z = 5;
 				editorCamera.transform.lookAt(new feng3d.Vector3());
-				editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
+				editorCamera.gameObject.addComponent("FPSController").auto = false;
 				this.view.camera = editorCamera;
 				//
-				var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene);
+				var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent("Scene");
 				editorScene.runEnvironment = feng3d.RunEnvironment.all;
 				this.view.editorScene = editorScene;
 				//
-				var sceneRotateTool = editorScene.gameObject.addComponent(SceneRotateTool);
+				var sceneRotateTool = editorScene.gameObject.addComponent("SceneRotateTool");
 				sceneRotateTool.view = this.view;
 				//
 				//初始化模块
-				var groundGrid = editorScene.gameObject.addComponent(GroundGrid);
+				var groundGrid = editorScene.gameObject.addComponent("GroundGrid");
 				groundGrid.editorCamera = editorCamera;
-				var mrsTool = editorScene.gameObject.addComponent(MRSTool);
+				var mrsTool = editorScene.gameObject.addComponent("MRSTool");
 				mrsTool.editorCamera = editorCamera;
-				this.view.editorComponent = editorScene.gameObject.addComponent(EditorComponent);
+				this.view.editorComponent = editorScene.gameObject.addComponent("EditorComponent");
 				//
 				feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
 				{
@@ -396,21 +396,21 @@ namespace editor
 		{
 			if (!this.mouseInView) return;
 
-			var fpsController: feng3d.FPSController = this.editorCamera.getComponent(feng3d.FPSController)
+			var fpsController: feng3d.FPSController = this.editorCamera.getComponent("FPSController")
 			fpsController.onMousedown();
 			feng3d.ticker.onframe(this.updateFpsView, this);
 		}
 
 		private onFpsViewStop()
 		{
-			var fpsController = this.editorCamera.getComponent(feng3d.FPSController)
+			var fpsController = this.editorCamera.getComponent("FPSController")
 			fpsController.onMouseup();
 			feng3d.ticker.offframe(this.updateFpsView, this);
 		}
 
 		private updateFpsView()
 		{
-			var fpsController = this.editorCamera.getComponent(feng3d.FPSController)
+			var fpsController = this.editorCamera.getComponent("FPSController")
 			fpsController.update();
 		}
 

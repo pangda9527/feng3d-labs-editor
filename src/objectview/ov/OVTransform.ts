@@ -109,8 +109,8 @@ namespace editor
 		 */
 		updateView(): void
 		{
-			var transfrom: feng3d.Transform = <any>this.space;
-			if (!transfrom)
+			var transform: feng3d.Transform = <any>this.space;
+			if (!transform)
 				return;
 		}
 	}

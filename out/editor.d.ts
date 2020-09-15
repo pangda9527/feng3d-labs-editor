@@ -1546,9 +1546,9 @@ declare namespace editor {
 [{
     label: "Rendering",
     submenu: [
-        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
-        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
-        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
+        { label: "Camera", click: () => { gameobject.addComponent("Camera"); } },
+        { label: "PointLight", click: () => { gameobject.addComponent("PointLight"); } },
+        { label: "DirectionalLight", click: () => { gameobject.addComponent("DirectionalLight"); } },
     ]
 }]
 ```
@@ -1557,9 +1557,9 @@ declare namespace editor {
 [{
     label: "Rendering",
     submenu: [
-        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
-        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
-        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
+        { label: "DirectionalLight", click: () => { gameobject.addComponent("DirectionalLight"); } },
+        { label: "Camera", click: () => { gameobject.addComponent("Camera"); } },
+        { label: "PointLight", click: () => { gameobject.addComponent("PointLight"); } },
     ]
 }]
 ```
@@ -4385,6 +4385,11 @@ declare namespace editor {
         private onMousedown;
     }
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        PointLightIcon: editor.PointLightIcon;
+    }
+}
 declare namespace editor {
     class PointLightIcon extends EditorScript {
         light: feng3d.PointLight;
@@ -4406,6 +4411,11 @@ declare namespace editor {
         private onMousedown;
     }
 }
+declare namespace feng3d {
+    interface ComponentMap {
+        SpotLightIcon: editor.SpotLightIcon;
+    }
+}
 declare namespace editor {
     class SpotLightIcon extends EditorScript {
         light: feng3d.SpotLight;
@@ -4425,6 +4435,11 @@ declare namespace editor {
         private onLightChanged;
         private onScenetransformChanged;
         private onMousedown;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        CameraIcon: editor.CameraIcon;
     }
 }
 declare namespace editor {

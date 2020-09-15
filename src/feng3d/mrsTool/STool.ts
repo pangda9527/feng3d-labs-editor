@@ -16,7 +16,7 @@ namespace editor
         init()
         {
             super.init();
-            this.toolModel = new feng3d.GameObject().addComponent(SToolModel);
+            this.toolModel = new feng3d.GameObject().addComponent("SToolModel");
         }
 
         protected onAddedToScene()

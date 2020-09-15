@@ -80,10 +80,10 @@ function initProject(callback)
     {
         feng3d.rs.deserializeWithAssets(obj, (scene) =>
         {
-            if (scene.getComponent(feng3d.Scene))
-                view.scene = scene.getComponent(feng3d.Scene);
+            if (scene.getComponent("Scene"))
+                view.scene = scene.getComponent("Scene");
 
-            var cameras = view.root.getComponentsInChildren(feng3d.Camera);
+            var cameras = view.root.getComponentsInChildren("Camera");
             if (cameras.length > 0)
             {
                 view.camera = cameras[0];

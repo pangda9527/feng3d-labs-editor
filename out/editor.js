@@ -2549,28 +2549,28 @@ var editor;
                 document.getElementById("app").appendChild(this._canvas);
                 this.view = new editor.EditorView(this._canvas);
                 //
-                var editorCamera = this.editorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent(feng3d.Camera);
+                var editorCamera = this.editorCamera = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorCamera" }).addComponent("Camera");
                 editorCamera.lens.far = 5000;
                 editorCamera.transform.x = 5;
                 editorCamera.transform.y = 3;
                 editorCamera.transform.z = 5;
                 editorCamera.transform.lookAt(new feng3d.Vector3());
-                editorCamera.gameObject.addComponent(feng3d.FPSController).auto = false;
+                editorCamera.gameObject.addComponent("FPSController").auto = false;
                 this.view.camera = editorCamera;
                 //
-                var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent(feng3d.Scene);
+                var editorScene = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "editorScene" }).addComponent("Scene");
                 editorScene.runEnvironment = feng3d.RunEnvironment.all;
                 this.view.editorScene = editorScene;
                 //
-                var sceneRotateTool = editorScene.gameObject.addComponent(editor.SceneRotateTool);
+                var sceneRotateTool = editorScene.gameObject.addComponent("SceneRotateTool");
                 sceneRotateTool.view = this.view;
                 //
                 //初始化模块
-                var groundGrid = editorScene.gameObject.addComponent(editor.GroundGrid);
+                var groundGrid = editorScene.gameObject.addComponent("GroundGrid");
                 groundGrid.editorCamera = editorCamera;
-                var mrsTool = editorScene.gameObject.addComponent(editor.MRSTool);
+                var mrsTool = editorScene.gameObject.addComponent("MRSTool");
                 mrsTool.editorCamera = editorCamera;
-                this.view.editorComponent = editorScene.gameObject.addComponent(editor.EditorComponent);
+                this.view.editorComponent = editorScene.gameObject.addComponent("EditorComponent");
                 //
                 feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) => {
                     var trident = feng3d.serialization.deserialize(JSON.parse(content));
@@ -2819,17 +2819,17 @@ var editor;
         onFpsViewStart() {
             if (!this.mouseInView)
                 return;
-            var fpsController = this.editorCamera.getComponent(feng3d.FPSController);
+            var fpsController = this.editorCamera.getComponent("FPSController");
             fpsController.onMousedown();
             feng3d.ticker.onframe(this.updateFpsView, this);
         }
         onFpsViewStop() {
-            var fpsController = this.editorCamera.getComponent(feng3d.FPSController);
+            var fpsController = this.editorCamera.getComponent("FPSController");
             fpsController.onMouseup();
             feng3d.ticker.offframe(this.updateFpsView, this);
         }
         updateFpsView() {
-            var fpsController = this.editorCamera.getComponent(feng3d.FPSController);
+            var fpsController = this.editorCamera.getComponent("FPSController");
             fpsController.update();
         }
         onLookToSelectedGameObject() {
@@ -2931,7 +2931,7 @@ var editor;
             var selectedGameObjects = editor.editorData.selectedGameObjects;
             if (selectedGameObjects.length > 0) {
                 for (let i = 0; i < selectedGameObjects.length; i++) {
-                    var camera = selectedGameObjects[i].getComponent(feng3d.Camera);
+                    var camera = selectedGameObjects[i].getComponent("Camera");
                     if (camera) {
                         this.camera = camera;
                         this.saveParent.addChild(this);
@@ -3020,7 +3020,7 @@ var editor;
             return this.particleSystems.reduce((pv, cv) => { return pv || cv.isPlaying; }, false);
         }
         onDataChange() {
-            var particleSystems = editor.editorData.selectedGameObjects.reduce((pv, cv) => { var ps = cv.getComponent(feng3d.ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
+            var particleSystems = editor.editorData.selectedGameObjects.reduce((pv, cv) => { var ps = cv.getComponent("ParticleSystem"); ps && (pv.push(ps)); return pv; }, []);
             this.particleSystems.forEach(v => {
                 v.pause();
                 v.off("particleCompleted", this.updateView, this);
@@ -4502,9 +4502,9 @@ var editor;
 [{
     label: "Rendering",
     submenu: [
-        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
-        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
-        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
+        { label: "Camera", click: () => { gameobject.addComponent("Camera"); } },
+        { label: "PointLight", click: () => { gameobject.addComponent("PointLight"); } },
+        { label: "DirectionalLight", click: () => { gameobject.addComponent("DirectionalLight"); } },
     ]
 }]
 ```
@@ -4513,9 +4513,9 @@ var editor;
 [{
     label: "Rendering",
     submenu: [
-        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
-        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
-        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
+        { label: "DirectionalLight", click: () => { gameobject.addComponent("DirectionalLight"); } },
+        { label: "Camera", click: () => { gameobject.addComponent("Camera"); } },
+        { label: "PointLight", click: () => { gameobject.addComponent("PointLight"); } },
     ]
 }]
 ```
@@ -6919,8 +6919,8 @@ var editor;
          * 更新界面
          */
         updateView() {
-            var transfrom = this.space;
-            if (!transfrom)
+            var transform = this.space;
+            if (!transform)
                 return;
         }
     };
@@ -9000,7 +9000,7 @@ var editor;
                     return;
                 }
                 editor.editorRS.deserializeWithAssets(obj, (object) => {
-                    var scene = object.getComponent(feng3d.Scene);
+                    var scene = object.getComponent("Scene");
                     callback(null, scene);
                 });
             });
@@ -9438,7 +9438,7 @@ var editor;
                 editor.editorAsset.showFloder = this.data;
             }
             else if (this.data.asset instanceof feng3d.GameObject) {
-                var scene = this.data.asset.getComponent(feng3d.Scene);
+                var scene = this.data.asset.getComponent("Scene");
                 if (scene) {
                     editor.editorData.gameScene = scene;
                 }
@@ -11283,35 +11283,35 @@ var editor;
             this.initModels();
         }
         initModels() {
-            this.xAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent(CoordinateAxis);
+            this.xAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent("CoordinateAxis");
             this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.transform.rz = -90;
             this.gameObject.addChild(this.xAxis.gameObject);
-            this.yAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yAxis" }).addComponent(CoordinateAxis);
+            this.yAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yAxis" }).addComponent("CoordinateAxis");
             this.yAxis.color.setTo(0, 1, 0, 1);
             this.gameObject.addChild(this.yAxis.gameObject);
-            this.zAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zAxis" }).addComponent(CoordinateAxis);
+            this.zAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zAxis" }).addComponent("CoordinateAxis");
             this.zAxis.color.setTo(0, 0, 1, 1);
             this.zAxis.transform.rx = 90;
             this.gameObject.addChild(this.zAxis.gameObject);
-            this.yzPlane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yzPlane" }).addComponent(CoordinatePlane);
+            this.yzPlane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yzPlane" }).addComponent("CoordinatePlane");
             this.yzPlane.color.setTo(1, 0, 0, 0.2);
             this.yzPlane.selectedColor.setTo(1, 0, 0, 0.5);
             this.yzPlane.borderColor.setTo(1, 0, 0, 1);
             this.yzPlane.transform.rz = 90;
             this.gameObject.addChild(this.yzPlane.gameObject);
-            this.xzPlane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xzPlane" }).addComponent(CoordinatePlane);
+            this.xzPlane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xzPlane" }).addComponent("CoordinatePlane");
             this.xzPlane.color.setTo(0, 1, 0, 0.2);
             this.xzPlane.selectedColor.setTo(0, 1, 0, 0.5);
             this.xzPlane.borderColor.setTo(0, 1, 0, 1);
             this.gameObject.addChild(this.xzPlane.gameObject);
-            this.xyPlane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xyPlane" }).addComponent(CoordinatePlane);
+            this.xyPlane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xyPlane" }).addComponent("CoordinatePlane");
             this.xyPlane.color.setTo(0, 0, 1, 0.2);
             this.xyPlane.selectedColor.setTo(0, 0, 1, 0.5);
             this.xyPlane.borderColor.setTo(0, 0, 1, 1);
             this.xyPlane.transform.rx = -90;
             this.gameObject.addChild(this.xyPlane.gameObject);
-            this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
+            this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent("CoordinateCube");
             this.gameObject.addChild(this.oCube.gameObject);
         }
     };
@@ -11332,21 +11332,21 @@ var editor;
             super.init();
             feng3d.watcher.watch(this, "selected", this.update, this);
             var xLine = new feng3d.GameObject();
-            var model = xLine.addComponent(feng3d.Renderable);
+            var model = xLine.addComponent("Renderable");
             var segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             segmentGeometry.addSegment({ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.length, 0) });
             this.segmentMaterial = model.material = feng3d.Material.create("segment");
             this.gameObject.addChild(xLine);
             //
             this.xArrow = new feng3d.GameObject();
-            model = this.xArrow.addComponent(feng3d.Renderable);
+            model = this.xArrow.addComponent("Renderable");
             model.geometry = feng3d.serialization.setValue(new feng3d.ConeGeometry(), { bottomRadius: 5, height: 18 });
             this.material = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
             this.material.renderParams.enableBlend = true;
             this.xArrow.transform.y = this.length;
             this.gameObject.addChild(this.xArrow);
             var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hitCoordinateAxis" });
-            model = mouseHit.addComponent(feng3d.Renderable);
+            model = mouseHit.addComponent("Renderable");
             model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length });
             //model.material = materialFactory.create("color");
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
@@ -11383,7 +11383,7 @@ var editor;
             feng3d.watcher.watch(this, "selected", this.update, this);
             //
             this.oCube = new feng3d.GameObject();
-            var model = this.oCube.addComponent(feng3d.Renderable);
+            var model = this.oCube.addComponent("Renderable");
             model.geometry = feng3d.serialization.setValue(new feng3d.CubeGeometry(), { width: 8, height: 8, depth: 8 });
             this.colorMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
             this.colorMaterial.renderParams.enableBlend = true;
@@ -11402,7 +11402,7 @@ var editor;
         feng3d.RegisterComponent()
     ], CoordinateCube);
     editor.CoordinateCube = CoordinateCube;
-    class CoordinatePlane extends feng3d.Component {
+    let CoordinatePlane = class CoordinatePlane extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.color = new feng3d.Color4(1, 0, 0, 0.2);
@@ -11419,7 +11419,7 @@ var editor;
             super.init();
             feng3d.watcher.watch(this, "selected", this.update, this);
             var plane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "plane" });
-            var model = plane.addComponent(feng3d.Renderable);
+            var model = plane.addComponent("Renderable");
             plane.transform.x = plane.transform.z = this._width / 2;
             model.geometry = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { width: this._width, height: this._width });
             this.colorMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
@@ -11428,7 +11428,7 @@ var editor;
             plane.mouseEnabled = true;
             this.gameObject.addChild(plane);
             var border = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "border" });
-            model = border.addComponent(feng3d.Renderable);
+            model = border.addComponent("Renderable");
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             model.material = feng3d.Material.create("segment", { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) });
             this.gameObject.addChild(border);
@@ -11448,7 +11448,10 @@ var editor;
             color = this.selected ? this.selectedborderColor : this.borderColor;
             this.segmentGeometry.segments.push({ start: new feng3d.Vector3(0, 0, this._width), end: new feng3d.Vector3(0, 0, 0), startColor: color, endColor: color });
         }
-    }
+    };
+    CoordinatePlane = __decorate([
+        feng3d.RegisterComponent()
+    ], CoordinatePlane);
     editor.CoordinatePlane = CoordinatePlane;
 })(editor || (editor = {}));
 var editor;
@@ -11463,26 +11466,26 @@ var editor;
             this.initModels();
         }
         initModels() {
-            this.xAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent(CoordinateRotationAxis);
+            this.xAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent("CoordinateRotationAxis");
             this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.update();
             this.xAxis.transform.ry = 90;
             this.gameObject.addChild(this.xAxis.gameObject);
-            this.yAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yAxis" }).addComponent(CoordinateRotationAxis);
+            this.yAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yAxis" }).addComponent("CoordinateRotationAxis");
             this.yAxis.color.setTo(0, 1, 0);
             this.yAxis.update();
             this.yAxis.transform.rx = 90;
             this.gameObject.addChild(this.yAxis.gameObject);
-            this.zAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zAxis" }).addComponent(CoordinateRotationAxis);
+            this.zAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zAxis" }).addComponent("CoordinateRotationAxis");
             this.zAxis.color.setTo(0, 0, 1);
             this.zAxis.update();
             this.gameObject.addChild(this.zAxis.gameObject);
-            this.cameraAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "cameraAxis" }).addComponent(CoordinateRotationAxis);
+            this.cameraAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "cameraAxis" }).addComponent("CoordinateRotationAxis");
             this.cameraAxis.radius = 88;
             this.cameraAxis.color.setTo(1, 1, 1);
             this.cameraAxis.update();
             this.gameObject.addChild(this.cameraAxis.gameObject);
-            this.freeAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "freeAxis" }).addComponent(CoordinateRotationFreeAxis);
+            this.freeAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "freeAxis" }).addComponent("CoordinateRotationFreeAxis");
             this.freeAxis.color.setTo(1, 1, 1);
             this.freeAxis.update();
             this.gameObject.addChild(this.freeAxis.gameObject);
@@ -11510,7 +11513,7 @@ var editor;
         }
         initModels() {
             var border = new feng3d.GameObject();
-            var model = border.addComponent(feng3d.Renderable);
+            var model = border.addComponent("Renderable");
             var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
@@ -11518,9 +11521,9 @@ var editor;
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
-            this.sector = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "sector" }).addComponent(SectorGameObject);
+            this.sector = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "sector" }).addComponent("SectorGameObject");
             var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hit" });
-            model = mouseHit.addComponent(feng3d.Renderable);
+            model = mouseHit.addComponent("Renderable");
             this.torusGeometry = model.geometry = feng3d.serialization.setValue(new feng3d.TorusGeometry(), { radius: this.radius, tubeRadius: 2 });
             model.material = new feng3d.Material();
             mouseHit.transform.rx = 90;
@@ -11600,13 +11603,13 @@ var editor;
         init() {
             super.init();
             this.gameObject.name = "sector";
-            var model = this.gameObject.addComponent(feng3d.Renderable);
+            var model = this.gameObject.addComponent("Renderable");
             this.geometry = model.geometry = new feng3d.CustomGeometry();
             model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color", uniforms: { u_diffuseInput: new feng3d.Color4(0.5, 0.5, 0.5, 0.2) } });
             model.material.renderParams.enableBlend = true;
             model.material.renderParams.cullFace = feng3d.CullFace.NONE;
             var border = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "border" });
-            model = border.addComponent(feng3d.Renderable);
+            model = border.addComponent("Renderable");
             var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
@@ -11658,7 +11661,7 @@ var editor;
         feng3d.RegisterComponent()
     ], SectorGameObject);
     editor.SectorGameObject = SectorGameObject;
-    class CoordinateRotationFreeAxis extends feng3d.Component {
+    let CoordinateRotationFreeAxis = class CoordinateRotationFreeAxis extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.radius = 80;
@@ -11675,7 +11678,7 @@ var editor;
         }
         initModels() {
             var border = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "border" });
-            var model = border.addComponent(feng3d.Renderable);
+            var model = border.addComponent("Renderable");
             var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) }
@@ -11683,7 +11686,7 @@ var editor;
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(border);
-            this.sector = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "sector" }).addComponent(SectorGameObject);
+            this.sector = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "sector" }).addComponent("SectorGameObject");
             this.sector.update(0, 360);
             this.sector.gameObject.visible = false;
             this.sector.gameObject.mouseEnabled = true;
@@ -11708,7 +11711,10 @@ var editor;
             }
             this.segmentGeometry.segments = segments;
         }
-    }
+    };
+    CoordinateRotationFreeAxis = __decorate([
+        feng3d.RegisterComponent()
+    ], CoordinateRotationFreeAxis);
     editor.CoordinateRotationFreeAxis = CoordinateRotationFreeAxis;
 })(editor || (editor = {}));
 var editor;
@@ -11723,21 +11729,21 @@ var editor;
             this.initModels();
         }
         initModels() {
-            this.xCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xCube" }).addComponent(CoordinateScaleCube);
+            this.xCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xCube" }).addComponent("CoordinateScaleCube");
             this.xCube.color.setTo(1, 0, 0, 1);
             this.xCube.update();
             this.xCube.transform.rz = -90;
             this.gameObject.addChild(this.xCube.gameObject);
-            this.yCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yCube" }).addComponent(CoordinateScaleCube);
+            this.yCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yCube" }).addComponent("CoordinateScaleCube");
             this.yCube.color.setTo(0, 1, 0, 1);
             this.yCube.update();
             this.gameObject.addChild(this.yCube.gameObject);
-            this.zCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zCube" }).addComponent(CoordinateScaleCube);
+            this.zCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zCube" }).addComponent("CoordinateScaleCube");
             this.zCube.color.setTo(0, 0, 1, 1);
             this.zCube.update();
             this.zCube.transform.rx = 90;
             this.gameObject.addChild(this.zCube.gameObject);
-            this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(editor.CoordinateCube);
+            this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent("CoordinateCube");
             this.oCube.gameObject.transform.scale = new feng3d.Vector3(1.2, 1.2, 1.2);
             this.gameObject.addChild(this.oCube.gameObject);
         }
@@ -11762,7 +11768,7 @@ var editor;
             feng3d.watcher.watch(this, "selected", this.update, this);
             feng3d.watcher.watch(this, "scaleValue", this.update, this);
             var xLine = new feng3d.GameObject();
-            var model = xLine.addComponent(feng3d.Renderable);
+            var model = xLine.addComponent("Renderable");
             var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
                 shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
                 uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
@@ -11770,10 +11776,10 @@ var editor;
             material.renderParams.enableBlend = true;
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             this.gameObject.addChild(xLine);
-            this.coordinateCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "coordinateCube" }).addComponent(editor.CoordinateCube);
+            this.coordinateCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "coordinateCube" }).addComponent("CoordinateCube");
             this.gameObject.addChild(this.coordinateCube.gameObject);
             var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hit" });
-            model = mouseHit.addComponent(feng3d.Renderable);
+            model = mouseHit.addComponent("Renderable");
             model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length - 4 });
             mouseHit.transform.y = 4 + (this.length - 4) / 2;
             mouseHit.visible = false;
@@ -11810,7 +11816,7 @@ var editor;
         set editorCamera(v) { this._editorCamera = v; this.invalidate(); }
         init() {
             super.init();
-            var holdSizeComponent = this.gameObject.addComponent(feng3d.HoldSizeComponent);
+            var holdSizeComponent = this.gameObject.addComponent("HoldSizeComponent");
             holdSizeComponent.holdSize = 0.005;
             //
             this.on("addedToScene", this.onAddedToScene, this);
@@ -11834,7 +11840,7 @@ var editor;
             feng3d.ticker.nextframe(this.update, this);
         }
         update() {
-            var holdSizeComponent = this.gameObject.getComponent(feng3d.HoldSizeComponent);
+            var holdSizeComponent = this.gameObject.getComponent("HoldSizeComponent");
             holdSizeComponent.camera = this._editorCamera;
         }
         onItemMouseDown(event) {
@@ -11914,7 +11920,7 @@ var editor;
         }
         init() {
             super.init();
-            this.toolModel = new feng3d.GameObject().addComponent(editor.MToolModel);
+            this.toolModel = new feng3d.GameObject().addComponent("MToolModel");
         }
         onAddedToScene() {
             super.onAddedToScene();
@@ -12050,7 +12056,7 @@ var editor;
     let RTool = class RTool extends editor.MRSToolBase {
         init() {
             super.init();
-            this.toolModel = new feng3d.GameObject().addComponent(editor.RToolModel);
+            this.toolModel = new feng3d.GameObject().addComponent("RToolModel");
         }
         onAddedToScene() {
             super.onAddedToScene();
@@ -12212,7 +12218,7 @@ var editor;
         }
         init() {
             super.init();
-            this.toolModel = new feng3d.GameObject().addComponent(editor.SToolModel);
+            this.toolModel = new feng3d.GameObject().addComponent("SToolModel");
         }
         onAddedToScene() {
             super.onAddedToScene();
@@ -12334,7 +12340,7 @@ var editor;
      * 设置永久可见
      */
     function setAwaysVisible(component) {
-        var models = component.getComponentsInChildren(feng3d.Renderable);
+        var models = component.getComponentsInChildren("Renderable");
         models.forEach(element => {
             if (element.material && !element.material.assetId) {
                 element.material.renderParams.depthtest = false;
@@ -12354,9 +12360,9 @@ var editor;
         init() {
             super.init();
             this.mrsToolObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MRSTool" });
-            this.mTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(editor.MTool);
-            this.rTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(editor.RTool);
-            this.sTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(editor.STool);
+            this.mTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent("MTool");
+            this.rTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent("RTool");
+            this.sTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent("STool");
             this.mTool.mrsToolTarget = this.mrsToolTarget;
             this.rTool.mrsToolTarget = this.mrsToolTarget;
             this.sTool.mrsToolTarget = this.mrsToolTarget;
@@ -12532,7 +12538,7 @@ var editor;
          * @param gameobject 游戏对象
          */
         addGameObject(gameobject) {
-            if (gameobject.getComponent(feng2d.Transform2D)) {
+            if (gameobject.getComponent("Transform2D")) {
                 this.addUI(gameobject);
                 return;
             }
@@ -12550,13 +12556,13 @@ var editor;
          */
         addUI(gameobject) {
             var selectedNode = this.getSelectedNode();
-            if (selectedNode && selectedNode.gameobject.getComponent(feng2d.Transform2D)) {
+            if (selectedNode && selectedNode.gameobject.getComponent("Transform2D")) {
                 selectedNode.gameobject.addChild(gameobject);
             }
             else {
-                var canvas = this.rootnode.gameobject.getComponentsInChildren(feng2d.Canvas)[0];
+                var canvas = this.rootnode.gameobject.getComponentsInChildren("Canvas")[0];
                 if (!canvas) {
-                    canvas = feng3d.GameObject.createPrimitive("Canvas").getComponent(feng2d.Canvas);
+                    canvas = feng3d.GameObject.createPrimitive("Canvas").getComponent("Canvas");
                     this.rootnode.gameobject.addChild(canvas.gameObject);
                 }
                 canvas.gameObject.addChild(gameobject);
@@ -12886,7 +12892,7 @@ var editor;
             var groundGridObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "GroundGrid" });
             groundGridObject.mouseEnabled = false;
             this._gameObject.addChild(groundGridObject);
-            var model = groundGridObject.addComponent(feng3d.Renderable);
+            var model = groundGridObject.addComponent("Renderable");
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             model.material = feng3d.Material.getDefault("Segment-Material");
         }
@@ -12965,8 +12971,8 @@ var editor;
             }
             if (this.scene) {
                 editor.editorData.selectedGameObjects.forEach(element => {
-                    if (element.getComponent(feng3d.Renderable) && !element.getComponent(feng3d.ParticleSystem))
-                        feng3d.wireframeRenderer.drawGameObject(this.gl, element.getComponent(feng3d.Renderable), this.scene, this.camera, this.wireframeColor);
+                    if (element.getComponent("Renderable") && !element.getComponent("ParticleSystem"))
+                        feng3d.wireframeRenderer.drawGameObject(this.gl, element.getComponent("Renderable"), this.scene, this.camera, this.wireframeColor);
                 });
             }
         }
@@ -12992,13 +12998,13 @@ var editor;
             if (this._scene) {
                 this.scene.off("addComponent", this.onAddComponent, this);
                 this.scene.off("removeComponent", this.onRemoveComponent, this);
-                this.scene.getComponentsInChildren(feng3d.Component).forEach(element => {
+                this.scene.getComponentsInChildren("Component").forEach(element => {
                     this.removeComponent(element);
                 });
             }
             this._scene = v;
             if (this._scene) {
-                this.scene.getComponentsInChildren(feng3d.Component).forEach(element => {
+                this.scene.getComponentsInChildren("Component").forEach(element => {
                     this.addComponent(element);
                 });
                 this.scene.on("addComponent", this.onAddComponent, this);
@@ -13051,22 +13057,22 @@ var editor;
         }
         addComponent(component) {
             if (component instanceof feng3d.DirectionalLight) {
-                var directionLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "DirectionLightIcon", }).addComponent(editor.DirectionLightIcon), { light: component, editorCamera: this.editorCamera });
+                var directionLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "DirectionLightIcon", }).addComponent("DirectionLightIcon"), { light: component, editorCamera: this.editorCamera });
                 this.gameObject.addChild(directionLightIcon.gameObject);
                 this.directionLightIconMap.set(component, directionLightIcon);
             }
             else if (component instanceof feng3d.PointLight) {
-                var pointLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "PointLightIcon" }).addComponent(editor.PointLightIcon), { light: component, editorCamera: this.editorCamera });
+                var pointLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "PointLightIcon" }).addComponent("PointLightIcon"), { light: component, editorCamera: this.editorCamera });
                 this.gameObject.addChild(pointLightIcon.gameObject);
                 this.pointLightIconMap.set(component, pointLightIcon);
             }
             else if (component instanceof feng3d.SpotLight) {
-                var spotLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "SpotLightIcon" }).addComponent(editor.SpotLightIcon), { light: component, editorCamera: this.editorCamera });
+                var spotLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "SpotLightIcon" }).addComponent("SpotLightIcon"), { light: component, editorCamera: this.editorCamera });
                 this.gameObject.addChild(spotLightIcon.gameObject);
                 this.spotLightIconMap.set(component, spotLightIcon);
             }
             else if (component instanceof feng3d.Camera) {
-                var cameraIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "CameraIcon" }).addComponent(editor.CameraIcon), { camera: component, editorCamera: this.editorCamera });
+                var cameraIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "CameraIcon" }).addComponent("CameraIcon"), { camera: component, editorCamera: this.editorCamera });
                 this.gameObject.addChild(cameraIcon.gameObject);
                 this.cameraIconMap.set(component, cameraIcon);
             }
@@ -13217,7 +13223,7 @@ var editor;
          * @param material 材质
          */
         drawMaterial(material, cameraRotation = new feng3d.Vector3(20, -90, 0)) {
-            var mode = this.materialObject.getComponent(feng3d.Renderable);
+            var mode = this.materialObject.getComponent("Renderable");
             mode.geometry = this.defaultGeometry;
             mode.material = material;
             //
@@ -13230,7 +13236,7 @@ var editor;
          * @param geometry 材质
          */
         drawGeometry(geometry, cameraRotation = new feng3d.Vector3(-20, 120, 0)) {
-            var model = this.geometryObject.getComponent(feng3d.Renderable);
+            var model = this.geometryObject.getComponent("Renderable");
             model.geometry = geometry;
             model.material = this.defaultMaterial;
             cameraRotation && (this.camera.transform.rotation = cameraRotation);
@@ -13402,7 +13408,7 @@ var editor;
             geometrys = geometrys || [];
             if (!gameobject.visible)
                 return geometrys;
-            var model = gameobject.getComponent(feng3d.Renderable);
+            var model = gameobject.getComponent("Renderable");
             var geometry = model && model.geometry;
             if (geometry) {
                 var matrix = gameobject.transform.localToWorldMatrix;
@@ -14348,7 +14354,7 @@ function createSegment() {
         debugSegment = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "segment" });
         debugSegment.mouseEnabled = false;
         //初始化材质
-        var model = debugSegment.addComponent(feng3d.Renderable);
+        var model = debugSegment.addComponent("Renderable");
         var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
             shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
             uniforms: { u_segmentColor: new feng3d.Color4(1.0, 0, 0) },
@@ -14360,7 +14366,7 @@ function createSegment() {
     if (!debugPoint) {
         debugPoint = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "points" });
         debugPoint.mouseEnabled = false;
-        var model = debugPoint.addComponent(feng3d.Renderable);
+        var model = debugPoint.addComponent("Renderable");
         pointGeometry = model.geometry = new feng3d.PointGeometry();
         var materialp = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
             shaderName: "point", renderParams: { renderMode: feng3d.RenderMode.POINTS },
@@ -14586,7 +14592,7 @@ var editor;
         onclick() {
             var mouseRay3D = this.gameObject.scene.mouseRay3D;
             var gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "test" });
-            var model = gameobject.addComponent(feng3d.Renderable);
+            var model = gameobject.addComponent("Renderable");
             model.material = new feng3d.Material();
             model.geometry = feng3d.serialization.setValue(new feng3d.SphereGeometry(), { radius: 10 });
             gameobject.mouseEnabled = false;
@@ -14648,7 +14654,7 @@ var editor;
                         },
                     },],
             });
-            this._textureMaterial = lightIcon.addComponent(feng3d.Renderable).material;
+            this._textureMaterial = lightIcon.addComponent("Renderable").material;
             this.gameObject.addChild(lightIcon);
             //
             var num = 10;
@@ -14724,7 +14730,7 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class PointLightIcon extends editor.EditorScript {
+    let PointLightIcon = class PointLightIcon extends editor.EditorScript {
         get editorCamera() { return this._editorCamera; }
         set editorCamera(v) { this._editorCamera = v; this.initicon(); }
         init() {
@@ -14757,7 +14763,7 @@ var editor;
                     },
                 ],
             });
-            this._textureMaterial = lightIcon.getComponent(feng3d.Renderable).material;
+            this._textureMaterial = lightIcon.getComponent("Renderable").material;
             this.gameObject.addChild(lightIcon);
             //
             var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -14773,7 +14779,7 @@ var editor;
                         geometry: { __class__: "feng3d.SegmentGeometry" },
                     }]
             });
-            this._segmentGeometry = lightLines.getComponent(feng3d.Renderable).geometry;
+            this._segmentGeometry = lightLines.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightLines);
             //
             var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -14796,7 +14802,7 @@ var editor;
                         },
                     }],
             });
-            this._pointGeometry = lightpoints.getComponent(feng3d.Renderable).geometry;
+            this._pointGeometry = lightpoints.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
         }
@@ -14929,12 +14935,15 @@ var editor;
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
         }
-    }
+    };
+    PointLightIcon = __decorate([
+        feng3d.RegisterComponent()
+    ], PointLightIcon);
     editor.PointLightIcon = PointLightIcon;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class SpotLightIcon extends editor.EditorScript {
+    let SpotLightIcon = class SpotLightIcon extends editor.EditorScript {
         get editorCamera() { return this._editorCamera; }
         set editorCamera(v) { this._editorCamera = v; this.initicon(); }
         init() {
@@ -14966,7 +14975,7 @@ var editor;
                     },
                 ]
             });
-            this._textureMaterial = lightIcon.getComponent(feng3d.Renderable).material;
+            this._textureMaterial = lightIcon.getComponent("Renderable").material;
             this.gameObject.addChild(lightIcon);
             //
             var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -14981,7 +14990,7 @@ var editor;
                     },
                 ],
             });
-            this._segmentGeometry = lightLines.getComponent(feng3d.Renderable).geometry;
+            this._segmentGeometry = lightLines.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightLines);
             //
             var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -14993,7 +15002,7 @@ var editor;
                     },
                 ]
             });
-            this._pointGeometry = lightpoints.getComponent(feng3d.Renderable).geometry;
+            this._pointGeometry = lightpoints.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
         }
@@ -15076,15 +15085,18 @@ var editor;
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
         }
-    }
+    };
     __decorate([
         feng3d.watch("onLightChanged")
     ], SpotLightIcon.prototype, "light", void 0);
+    SpotLightIcon = __decorate([
+        feng3d.RegisterComponent()
+    ], SpotLightIcon);
     editor.SpotLightIcon = SpotLightIcon;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class CameraIcon extends editor.EditorScript {
+    let CameraIcon = class CameraIcon extends editor.EditorScript {
         constructor() {
             super(...arguments);
             this._lensChanged = true;
@@ -15137,7 +15149,7 @@ var editor;
                     },
                 ],
             });
-            this._segmentGeometry = lightLines.getComponent(feng3d.Renderable).geometry;
+            this._segmentGeometry = lightLines.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightLines);
             //
             var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -15149,7 +15161,7 @@ var editor;
                     },
                 ]
             });
-            this._pointGeometry = lightpoints.getComponent(feng3d.Renderable).geometry;
+            this._pointGeometry = lightpoints.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
         }
@@ -15250,7 +15262,10 @@ var editor;
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
         }
-    }
+    };
+    CameraIcon = __decorate([
+        feng3d.RegisterComponent()
+    ], CameraIcon);
     editor.CameraIcon = CameraIcon;
 })(editor || (editor = {}));
 var editor;
@@ -15695,10 +15710,10 @@ var editor;
                 parent.addChild(gameobject);
             switch (object3d.type) {
                 case "PerspectiveCamera":
-                    gameobject.addComponent(feng3d.Camera).lens = parsePerspectiveCamera(object3d);
+                    gameobject.addComponent("Camera").lens = parsePerspectiveCamera(object3d);
                     break;
                 case "SkinnedMesh":
-                    var skinnedModel = gameobject.addComponent(feng3d.SkinnedMeshRenderer);
+                    var skinnedModel = gameobject.addComponent("SkinnedMeshRenderer");
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
                     console.assert(object3d.bindMode == "attached");
@@ -15707,13 +15722,13 @@ var editor;
                         skinnedModel.initMatrix = gameobject.transform.localToWorldMatrix.clone();
                     break;
                 case "Mesh":
-                    var model = gameobject.addComponent(feng3d.Renderable);
+                    var model = gameobject.addComponent("Renderable");
                     model.geometry = parseGeometry(object3d.geometry);
                     model.material.renderParams.cullFace = feng3d.CullFace.NONE;
                     break;
                 case "Group":
                     if (object3d.skeleton) {
-                        skeletonComponent = gameobject.addComponent(feng3d.SkeletonComponent);
+                        skeletonComponent = gameobject.addComponent("SkeletonComponent");
                         skeletonComponent.joints = parseSkeleton(object3d.skeleton);
                     }
                     break;
@@ -15725,7 +15740,7 @@ var editor;
                     break;
             }
             if (object3d.animations && object3d.animations.length > 0) {
-                var animation = gameobject.addComponent(feng3d.Animation);
+                var animation = gameobject.addComponent("Animation");
                 for (var i = 0; i < object3d.animations.length; i++) {
                     var animationClip = parseAnimations(object3d.animations[i]);
                     animation.animations.push(animationClip);

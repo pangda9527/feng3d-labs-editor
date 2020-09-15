@@ -41,7 +41,7 @@ namespace editor
                     },
                 },],
             });
-            this._textureMaterial = <any>lightIcon.addComponent(feng3d.Renderable).material;
+            this._textureMaterial = <any>lightIcon.addComponent("Renderable").material;
             this.gameObject.addChild(lightIcon);
 
             //

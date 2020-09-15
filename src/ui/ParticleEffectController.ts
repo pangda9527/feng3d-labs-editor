@@ -97,7 +97,7 @@ namespace editor
 
         private onDataChange()
         {
-            var particleSystems = editorData.selectedGameObjects.reduce((pv: feng3d.ParticleSystem[], cv) => { var ps = cv.getComponent(feng3d.ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
+            var particleSystems = editorData.selectedGameObjects.reduce((pv: feng3d.ParticleSystem[], cv) => { var ps = cv.getComponent("ParticleSystem"); ps && (pv.push(ps)); return pv; }, []);
             this.particleSystems.forEach(v =>
             {
                 v.pause()

@@ -83,7 +83,7 @@ namespace editor
                 editorAsset.showFloder = this.data;
             } else if (this.data.asset instanceof feng3d.GameObject)
             {
-                var scene = this.data.asset.getComponent(feng3d.Scene);
+                var scene = this.data.asset.getComponent("Scene");
                 if (scene)
                 {
                     editorData.gameScene = scene;
