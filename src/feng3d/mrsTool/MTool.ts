@@ -5,6 +5,7 @@ namespace editor
     /**
      * 位移工具
      */
+    @feng3d.RegisterComponent()
     export class MTool extends MRSToolBase
     {
         protected toolModel: MToolModel;

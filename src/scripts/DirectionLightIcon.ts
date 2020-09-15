@@ -5,6 +5,7 @@ namespace feng3d
 
 namespace editor
 {
+    @feng3d.RegisterComponent()
     export class DirectionLightIcon extends EditorScript
     {
         __class__: "editor.DirectionLightIcon";

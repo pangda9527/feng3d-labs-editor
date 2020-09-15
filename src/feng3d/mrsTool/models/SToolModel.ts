@@ -7,6 +7,7 @@ namespace editor
     /**
      * 缩放工具模型组件
      */
+    @feng3d.RegisterComponent()
     export class SToolModel extends feng3d.Component
     {
         xCube: CoordinateScaleCube;
@@ -46,6 +47,7 @@ namespace editor
         }
     }
 
+    @feng3d.RegisterComponent()
     export class CoordinateScaleCube extends feng3d.Component
     {
         private isinit: boolean;

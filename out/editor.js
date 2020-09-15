@@ -11276,7 +11276,7 @@ var editor;
     /**
      * 移动工具模型组件
      */
-    class MToolModel extends feng3d.Component {
+    let MToolModel = class MToolModel extends feng3d.Component {
         init() {
             super.init();
             this.gameObject.name = "GameObjectMoveModel";
@@ -11314,9 +11314,12 @@ var editor;
             this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
             this.gameObject.addChild(this.oCube.gameObject);
         }
-    }
+    };
+    MToolModel = __decorate([
+        feng3d.RegisterComponent()
+    ], MToolModel);
     editor.MToolModel = MToolModel;
-    class CoordinateAxis extends feng3d.Component {
+    let CoordinateAxis = class CoordinateAxis extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.color = new feng3d.Color4(1, 0, 0, 0.99);
@@ -11361,9 +11364,12 @@ var editor;
             //
             this.material.uniforms.u_diffuseInput = color;
         }
-    }
+    };
+    CoordinateAxis = __decorate([
+        feng3d.RegisterComponent()
+    ], CoordinateAxis);
     editor.CoordinateAxis = CoordinateAxis;
-    class CoordinateCube extends feng3d.Component {
+    let CoordinateCube = class CoordinateCube extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.isinit = false;
@@ -11391,7 +11397,10 @@ var editor;
                 return;
             this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
         }
-    }
+    };
+    CoordinateCube = __decorate([
+        feng3d.RegisterComponent()
+    ], CoordinateCube);
     editor.CoordinateCube = CoordinateCube;
     class CoordinatePlane extends feng3d.Component {
         constructor() {
@@ -11447,7 +11456,7 @@ var editor;
     /**
      * 旋转工具模型组件
      */
-    class RToolModel extends feng3d.Component {
+    let RToolModel = class RToolModel extends feng3d.Component {
         init() {
             super.init();
             this.gameObject.name = "GameObjectRotationModel";
@@ -11478,9 +11487,12 @@ var editor;
             this.freeAxis.update();
             this.gameObject.addChild(this.freeAxis.gameObject);
         }
-    }
+    };
+    RToolModel = __decorate([
+        feng3d.RegisterComponent()
+    ], RToolModel);
     editor.RToolModel = RToolModel;
-    class CoordinateRotationAxis extends feng3d.Component {
+    let CoordinateRotationAxis = class CoordinateRotationAxis extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.radius = 80;
@@ -11566,12 +11578,15 @@ var editor;
             if (this.sector.gameObject.parent)
                 this.sector.gameObject.parent.removeChild(this.sector.gameObject);
         }
-    }
+    };
+    CoordinateRotationAxis = __decorate([
+        feng3d.RegisterComponent()
+    ], CoordinateRotationAxis);
     editor.CoordinateRotationAxis = CoordinateRotationAxis;
     /**
      * 扇形对象
      */
-    class SectorGameObject extends feng3d.Component {
+    let SectorGameObject = class SectorGameObject extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.borderColor = new feng3d.Color4(0, 1, 1, 0.6);
@@ -11638,7 +11653,10 @@ var editor;
                 { start: new feng3d.Vector3(), end: endPoint, startColor: this.borderColor, endColor: this.borderColor },
             ];
         }
-    }
+    };
+    SectorGameObject = __decorate([
+        feng3d.RegisterComponent()
+    ], SectorGameObject);
     editor.SectorGameObject = SectorGameObject;
     class CoordinateRotationFreeAxis extends feng3d.Component {
         constructor() {
@@ -11698,7 +11716,7 @@ var editor;
     /**
      * 缩放工具模型组件
      */
-    class SToolModel extends feng3d.Component {
+    let SToolModel = class SToolModel extends feng3d.Component {
         init() {
             super.init();
             this.gameObject.name = "GameObjectScaleModel";
@@ -11723,9 +11741,12 @@ var editor;
             this.oCube.gameObject.transform.scale = new feng3d.Vector3(1.2, 1.2, 1.2);
             this.gameObject.addChild(this.oCube.gameObject);
         }
-    }
+    };
+    SToolModel = __decorate([
+        feng3d.RegisterComponent()
+    ], SToolModel);
     editor.SToolModel = SToolModel;
-    class CoordinateScaleCube extends feng3d.Component {
+    let CoordinateScaleCube = class CoordinateScaleCube extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.color = new feng3d.Color4(1, 0, 0, 0.99);
@@ -11772,7 +11793,10 @@ var editor;
             this.coordinateCube.transform.y = this.length * this.scaleValue;
             this.coordinateCube.selected = this.selected;
         }
-    }
+    };
+    CoordinateScaleCube = __decorate([
+        feng3d.RegisterComponent()
+    ], CoordinateScaleCube);
     editor.CoordinateScaleCube = CoordinateScaleCube;
 })(editor || (editor = {}));
 var editor;
@@ -11880,7 +11904,7 @@ var editor;
     /**
      * 位移工具
      */
-    class MTool extends editor.MRSToolBase {
+    let MTool = class MTool extends editor.MRSToolBase {
         constructor() {
             super(...arguments);
             /**
@@ -12015,12 +12039,15 @@ var editor;
             this.toolModel.yzPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.yzPlane.width;
             this.toolModel.yzPlane.transform.z = localCameraPos.z > 0 ? 0 : -this.toolModel.yzPlane.width;
         }
-    }
+    };
+    MTool = __decorate([
+        feng3d.RegisterComponent()
+    ], MTool);
     editor.MTool = MTool;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class RTool extends editor.MRSToolBase {
+    let RTool = class RTool extends editor.MRSToolBase {
         init() {
             super.init();
             this.toolModel = new feng3d.GameObject().addComponent(editor.RToolModel);
@@ -12167,12 +12194,15 @@ var editor;
             this.toolModel.freeAxis.transform.rotation = rotation;
             this.toolModel.cameraAxis.transform.rotation = rotation;
         }
-    }
+    };
+    RTool = __decorate([
+        feng3d.RegisterComponent()
+    ], RTool);
     editor.RTool = RTool;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class STool extends editor.MRSToolBase {
+    let STool = class STool extends editor.MRSToolBase {
         constructor() {
             super(...arguments);
             /**
@@ -12292,7 +12322,10 @@ var editor;
             this.toolModel.yCube.scaleValue = 1;
             this.toolModel.zCube.scaleValue = 1;
         }
-    }
+    };
+    STool = __decorate([
+        feng3d.RegisterComponent()
+    ], STool);
     editor.STool = STool;
 })(editor || (editor = {}));
 var editor;
@@ -12311,7 +12344,7 @@ var editor;
     /**
      * 位移旋转缩放工具
      */
-    class MRSTool extends feng3d.Component {
+    let MRSTool = class MRSTool extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.mrsToolTarget = new editor.MRSToolTarget();
@@ -12396,7 +12429,10 @@ var editor;
                 this.mrsToolObject.addChild(this._currentTool.gameObject);
             }
         }
-    }
+    };
+    MRSTool = __decorate([
+        feng3d.RegisterComponent()
+    ], MRSTool);
     editor.MRSTool = MRSTool;
 })(editor || (editor = {}));
 var editor;
@@ -12616,7 +12652,7 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class SceneRotateTool extends feng3d.Component {
+    let SceneRotateTool = class SceneRotateTool extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.isload = false;
@@ -12816,7 +12852,10 @@ var editor;
                 },
             }).to({ rate: 1 }, 300, egret.Ease.sineIn);
         }
-    }
+    };
+    SceneRotateTool = __decorate([
+        feng3d.RegisterComponent()
+    ], SceneRotateTool);
     editor.SceneRotateTool = SceneRotateTool;
 })(editor || (editor = {}));
 var editor;
@@ -12824,7 +12863,7 @@ var editor;
     /**
      * 地面网格
      */
-    class GroundGrid extends feng3d.Component {
+    let GroundGrid = class GroundGrid extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.num = 100;
@@ -12877,10 +12916,13 @@ var editor;
             }
             this.segmentGeometry.segments = segments;
         }
-    }
+    };
     __decorate([
         feng3d.oav()
     ], GroundGrid.prototype, "num", void 0);
+    GroundGrid = __decorate([
+        feng3d.RegisterComponent()
+    ], GroundGrid);
     editor.GroundGrid = GroundGrid;
 })(editor || (editor = {}));
 var editor;
@@ -12933,7 +12975,7 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class EditorComponent extends feng3d.Component {
+    let EditorComponent = class EditorComponent extends feng3d.Component {
         constructor() {
             super(...arguments);
             this.directionLightIconMap = new Map();
@@ -13047,7 +13089,10 @@ var editor;
                 this.cameraIconMap.delete(component);
             }
         }
-    }
+    };
+    EditorComponent = __decorate([
+        feng3d.RegisterComponent()
+    ], EditorComponent);
     editor.EditorComponent = EditorComponent;
 })(editor || (editor = {}));
 var editor;
@@ -13383,7 +13428,8 @@ var editor;
         feng3d.oav()
     ], Navigation.prototype, "bake", null);
     Navigation = __decorate([
-        feng3d.AddComponentMenu("Navigation/Navigation")
+        feng3d.AddComponentMenu("Navigation/Navigation"),
+        feng3d.RegisterComponent()
     ], Navigation);
     editor.Navigation = Navigation;
 })(editor || (editor = {}));
@@ -14578,7 +14624,7 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class DirectionLightIcon extends editor.EditorScript {
+    let DirectionLightIcon = class DirectionLightIcon extends editor.EditorScript {
         get editorCamera() { return this._editorCamera; }
         set editorCamera(v) { this._editorCamera = v; this.initicon(); }
         init() {
@@ -14670,7 +14716,10 @@ var editor;
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
         }
-    }
+    };
+    DirectionLightIcon = __decorate([
+        feng3d.RegisterComponent()
+    ], DirectionLightIcon);
     editor.DirectionLightIcon = DirectionLightIcon;
 })(editor || (editor = {}));
 var editor;

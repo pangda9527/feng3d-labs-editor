@@ -7,6 +7,7 @@ namespace editor
     /**
      * 移动工具模型组件
      */
+    @feng3d.RegisterComponent()
     export class MToolModel extends feng3d.Component
     {
         xAxis: CoordinateAxis;
@@ -67,6 +68,7 @@ namespace editor
         }
     }
 
+    @feng3d.RegisterComponent()
     export class CoordinateAxis extends feng3d.Component
     {
         private isinit: boolean;
@@ -126,6 +128,7 @@ namespace editor
         }
     }
 
+    @feng3d.RegisterComponent()
     export class CoordinateCube extends feng3d.Component
     {
         private isinit = false;

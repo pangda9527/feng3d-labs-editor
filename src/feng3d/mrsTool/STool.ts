@@ -2,6 +2,7 @@ namespace feng3d { export interface ComponentMap { STool: editor.STool } }
 
 namespace editor
 {
+    @feng3d.RegisterComponent()
     export class STool extends MRSToolBase
     {
         protected toolModel: SToolModel;

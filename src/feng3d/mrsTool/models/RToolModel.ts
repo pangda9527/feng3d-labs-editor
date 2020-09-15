@@ -8,6 +8,7 @@ namespace editor
     /**
      * 旋转工具模型组件
      */
+    @feng3d.RegisterComponent()
     export class RToolModel extends feng3d.Component
     {
         xAxis: CoordinateRotationAxis;
@@ -55,6 +56,7 @@ namespace editor
         }
     }
 
+    @feng3d.RegisterComponent()
     export class CoordinateRotationAxis extends feng3d.Component
     {
         private isinit: boolean;
@@ -179,6 +181,7 @@ namespace editor
     /**
      * 扇形对象
      */
+    @feng3d.RegisterComponent()
     export class SectorGameObject extends feng3d.Component
     {
         private isinit: boolean;

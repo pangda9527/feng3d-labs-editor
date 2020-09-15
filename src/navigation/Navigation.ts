@@ -39,6 +39,7 @@ namespace editor
      * 导航组件，提供生成导航网格功能
      */
     @feng3d.AddComponentMenu("Navigation/Navigation")
+    @feng3d.RegisterComponent()
     export class Navigation extends feng3d.Component
     {
         @feng3d.oav({ component: "OAVObjectView" })

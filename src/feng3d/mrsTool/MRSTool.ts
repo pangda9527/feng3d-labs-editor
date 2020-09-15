@@ -21,6 +21,7 @@ namespace editor
     /**
      * 位移旋转缩放工具
      */
+    @feng3d.RegisterComponent()
     export class MRSTool extends feng3d.Component
     {
         private mTool: MTool;

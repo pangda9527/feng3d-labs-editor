@@ -5,6 +5,7 @@ namespace editor
     /**
      * 地面网格
      */
+    @feng3d.RegisterComponent()
     export class GroundGrid extends feng3d.Component
     {
         @feng3d.oav()

@@ -2,7 +2,7 @@ namespace feng3d { export interface ComponentMap { EditorComponent: editor.Edito
 
 namespace editor
 {
-
+    @feng3d.RegisterComponent()
     export class EditorComponent extends feng3d.Component
     {
         get scene()
